@@ -362,8 +362,8 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //update existing
         if (out.svg_) {
-            let margin = selectAll('#g_coast_margin')
-            let filter = select('#coastal_blur')
+            let margin = selectAll('#em-coast-margin')
+            let filter = select('#em-coastal-blur')
             let zg = select('#zoom-group-' + out.svgId_) || null
             if (margin._groups[0][0] && v == false) {
                 // remove existing
@@ -375,7 +375,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 //add filter
                 out.svg_
                     .append('filter')
-                    .attr('id', 'coastal_blur')
+                    .attr('id', 'em-coastal-blur')
                     .attr('x', '-200%')
                     .attr('y', '-200%')
                     .attr('width', '400%')
@@ -391,17 +391,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //draw new coastal margin
                     const cg = zoomGroup
                         .append('g')
-                        .attr('id', 'g_coast_margin')
-                        .style('fill', 'none')
+                        .attr('id', 'em-coast-margin')
                         .style('stroke-width', map.coastalMarginWidth_)
                         .style('stroke', map.coastalMarginColor_)
-                        .style('filter', 'url(#coastal_blur)')
-                        .style('stroke-linejoin', 'round')
-                        .style('stroke-linecap', 'round')
+
                     //countries bn
                     if (map._geom.cntbn)
                         cg.append('g')
-                            .attr('id', 'g_coast_margin_cnt')
+                            .attr('id', 'em-coast-margin_cnt')
                             .selectAll('path')
                             .data(map._geom.cntbn)
                             .enter()
@@ -413,7 +410,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //nuts bn
                     if (map._geom.nutsbn)
                         cg.append('g')
-                            .attr('id', 'g_coast_margin_nuts')
+                            .attr('id', 'em-coast-margin_nuts')
                             .selectAll('path')
                             .data(map._geom.nutsbn)
                             .enter()
@@ -425,7 +422,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //world bn
                     if (map._geom.worldbn)
                         cg.append('g')
-                            .attr('id', 'g_coast_margin_nuts')
+                            .attr('id', 'em-coast-margin_nuts')
                             .selectAll('path')
                             .data(map._geom.worldbn)
                             .enter()
@@ -443,7 +440,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 }
 
                 // move margin to back (in front of sea)
-                selectAll('#g_coast_margin').each(function () {
+                selectAll('#em-coast-margin').each(function () {
                     out.geo_ == 'WORLD'
                         ? this.parentNode.insertBefore(this, this.parentNode.childNodes[3])
                         : this.parentNode.insertBefore(this, this.parentNode.childNodes[1])
@@ -777,7 +774,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out.drawCoastalMargin_)
             //define filter for coastal margin
             svg.append('filter')
-                .attr('id', 'coastal_blur')
+                .attr('id', 'em-coastal-blur')
                 .attr('x', '-200%')
                 .attr('y', '-200%')
                 .attr('width', '400%')
@@ -989,19 +986,12 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         if (out.drawCoastalMargin_) {
             //draw coastal margin
-            const cg = zg
-                .append('g')
-                .attr('id', 'g_coast_margin')
-                .style('fill', 'none')
-                .style('stroke-width', out.coastalMarginWidth_)
-                .style('stroke', out.coastalMarginColor_)
-                .style('filter', 'url(#coastal_blur)')
-                .style('stroke-linejoin', 'round')
-                .style('stroke-linecap', 'round')
+            const cg = zg.append('g').attr('id', 'em-coast-margin')
+
             //countries bn
             if (out._geom.cntbn)
                 cg.append('g')
-                    .attr('id', 'g_coast_margin_cnt')
+                    .attr('id', 'em-coast-margin_cnt')
                     .selectAll('path')
                     .data(out._geom.cntbn)
                     .enter()
@@ -1013,7 +1003,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             //nuts bn
             if (out._geom.nutsbn)
                 cg.append('g')
-                    .attr('id', 'g_coast_margin_nuts')
+                    .attr('id', 'em-coast-margin_nuts')
                     .selectAll('path')
                     .data(out._geom.nutsbn)
                     .enter()
@@ -1025,7 +1015,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             //world bn
             if (out._geom.worldbn)
                 cg.append('g')
-                    .attr('id', 'g_coast_margin_nuts')
+                    .attr('id', 'em-coast-margin_nuts')
                     .selectAll('path')
                     .data(out._geom.worldbn)
                     .enter()
@@ -1334,33 +1324,32 @@ export const mapTemplate = function (config, withCenterPoints) {
         //title
         if (out.title()) {
             //define default position
-            if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass('em-title') + 10])
+            let cssClass = out.isInset ? 'em-inset-title' : 'em-title'
+            if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass(cssClass) + 10])
             //draw title
             out.svg()
                 .append('text')
                 .attr('id', 'title' + out.geo_)
-                .attr('class', 'em-title')
-                .style('pointer-events', 'none')
+                .attr('class', cssClass)
                 .attr('x', out.titlePosition()[0])
                 .attr('y', out.titlePosition()[1])
                 .text(out.title())
         }
 
         if (out.subtitle()) {
+            let cssSubtitleClass = out.isInset ? 'em-inset-subtitle' : 'em-subtitle'
+            let cssTitleClass = out.isInset ? 'em-inset-title' : 'em-title'
             //define default position
             if (!out.subtitlePosition())
-                out.subtitlePosition([10, getFontSizeFromClass('em-title') + getFontSizeFromClass('em-sutitle') + 15])
+                out.subtitlePosition([10, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
             //draw subtitle
             out.svg()
                 .append('text')
                 .attr('id', 'subtitle' + out.geo_)
-                .attr('class', 'em-subtitle')
-                .style('pointer-events', 'none')
+                .attr('class', cssSubtitleClass)
                 .attr('x', out.subtitlePosition()[0])
                 .attr('y', out.subtitlePosition()[1])
                 .text(out.subtitle())
-                .style('stroke-linejoin', 'round')
-                .style('paint-order', 'stroke')
         }
 
         //bottom text
@@ -1677,7 +1666,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         // otherwise calculate centroid
                         return 'translate(' + map._geom.path.centroid(d) + ')'
                     })
-                    .style('pointer-events', 'none')
+
                     .attr('class', 'em-stat-label')
 
                 //SHADOWS
@@ -1701,7 +1690,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                             // otherwise calculate centroid
                             return 'translate(' + map._geom.path.centroid(d) + ')'
                         })
-                        .style('pointer-events', 'none')
+
                         .attr('class', 'em-stat-label-shadow')
                 }
             }
@@ -1731,7 +1720,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             const shadowg = labelsG
                 .append('g')
                 .attr('class', 'em-label-shadows')
-                .style('pointer-events', 'none')
                 .style('font-family', map.fontFamily_)
                 .attr('text-anchor', 'middle')
 
@@ -1739,7 +1727,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             const labelg = labelsG
                 .append('g')
                 .attr('class', 'em-geolabels')
-                .style('pointer-events', 'none')
                 .style('font-family', map.fontFamily_)
                 .attr('text-anchor', 'middle')
 
@@ -2040,8 +2027,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         //mt[key__] = map[key__];
         //}
 
-        //const mt = Object.assign({}, map)
-
         const mt = mapTemplate(config, withCenterPoints)
 
         //define default values for inset configs
@@ -2062,20 +2047,20 @@ export const mapTemplate = function (config, withCenterPoints) {
         ;[
             'nutsLvl_',
             'nutsYear_',
-            'nutsrgFillStyle_',
+            'nutsrgFillStyle_', // DEPRECATED
             'hoverColor_',
-            //'nutsbnStroke_',
-            // 'nutsbnStrokeWidth_',
-            'cntrgFillStyle_',
-            'cntbnStroke_',
-            'cntbnStrokeWidth_',
+            //'nutsbnStroke_', // DEPRECATED
+            // 'nutsbnStrokeWidth_', // DEPRECATED
+            'cntrgFillStyle_', // DEPRECATED
+            'cntbnStroke_', // DEPRECATED
+            'cntbnStrokeWidth_', // DEPRECATED
             'seaFillStyle_', // DEPRECATED
             'drawCoastalMargin_',
-            'coastalMarginColor_',
-            'coastalMarginWidth_',
+            'coastalMarginColor_', // DEPRECATED
+            'coastalMarginWidth_', // DEPRECATED
             'coastalMarginStdDev_',
-            'graticuleStroke_',
-            'graticuleStrokeWidth_',
+            'graticuleStroke_', // DEPRECATED
+            'graticuleStrokeWidth_', // DEPRECATED
             'labelling_',
             'labelFill_',
             'labelValuesFontSize_',
@@ -2113,6 +2098,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //apply config values for inset
         for (let key in config) mt[key + '_'] = config[key]
 
+        mt.isInset = true // flag for inset-specific settings e.g. CSS class for titles
         return mt
     }
 

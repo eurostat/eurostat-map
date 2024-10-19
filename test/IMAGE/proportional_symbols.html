@@ -341,7 +341,7 @@
                 .psShape('circle')
                 .psClassifMethod('threshold')
                 .psThreshold([1, 2, 3, 4, 5])
-                .psMaxSize(10)
+                .psMaxSize(14)
                 .psColors(['#E9ECF6', '#BCC5EA', '#8A9BDA', '#5A71C6', '#2B48A9', '#081132'])
                 .psFillOpacity(0.8)
                 .nutsrgFillStyle('white')
@@ -350,15 +350,15 @@
                     x: 10,
                     y: 200,
                     sizeLegend: {
-                        title: 'legend title',
+                        title: 'test test test',
                         titlePadding: 10,
-                        values: [1, 3],
+                        values: [10000, 30000],
                         noData: true,
                     },
                     colorLegend: false,
                 })
-            map.statData('size').setData(test1)
-            map.statData('color').setData(test1)
+            map.statData('size').setData(data)
+            map.statData('color').setData(data)
             map.updateClassification()
             map.updateStyle()
             map.build()

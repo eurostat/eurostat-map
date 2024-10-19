@@ -28,7 +28,7 @@ export const legend = function (map, config) {
     out.legendSpacing = 35 //spacing between color & size legends (if applicable)
     out.labelFontSize = 12 //the font size of the legend labels
 
-    out.noDataShapeWidth = 20
+    out.noDataShapeWidth = 25
     out.noDataShapeHeight = 20
 
     //size legend config (legend illustrating the values of different symbol sizes)
