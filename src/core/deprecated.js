@@ -32,8 +32,6 @@ export const defineDeprecatedFunctions = (out) => {
     out.labelStrokeWidth = (v) => (console.warn('map.labelStrokeWidth() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
     out.labelOpacity = (v) => (console.warn('map.labelOpacity() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
     out.labelValuesFontSize = (v) => (console.warn('map.labelValuesFontSize() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
-    out.labelShadow = (v) => (console.warn('map.labelShadow() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
-    out.labelShadowsToShow = (v) => (console.warn('map.labelShadowsToShow() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
     out.labelShadowWidth = (v) => (console.warn('map.labelShadowWidth() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
     out.labelShadowColor = (v) => (console.warn('map.labelShadowColor() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
     

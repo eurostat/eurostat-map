@@ -349,12 +349,12 @@ export const map = function (config) {
     out.updateValuesLabels = function (map) {
         // apply to main map
         //clear previous labels
-        let prevLabels = map.svg_.selectAll('g.stat-label > *')
+        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
         prevLabels.remove()
-        let prevShadows = map.svg_.selectAll('g.stat-label-shadow > *')
+        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
         prevShadows.remove()
 
-        let statLabels = map.svg_.selectAll('g.stat-label')
+        let statLabels = map.svg_.selectAll('g.em-stat-label')
         let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
 
         statLabels
@@ -386,7 +386,7 @@ export const map = function (config) {
         //add shadows to labels
         if (out.labelShadow_) {
             map.svg_
-                .selectAll('g.stat-label-shadow')
+                .selectAll('g.em-stat-label-shadow')
                 .filter((d) => {
                     if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
                         const sv = sizeData.get(d.properties.id)

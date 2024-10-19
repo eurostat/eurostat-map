@@ -8,7 +8,12 @@
         "europe",
         "SVG",
         "NUTS",
-        "map"
+        "map",
+        "D3",
+        "cartography",
+        "thematic",
+        "mapping",
+        "eurostat-map"
     ],
     "homepage": "https://github.com/eurostat/eurostat-map",
     "author": "",

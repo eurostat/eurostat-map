@@ -142,7 +142,7 @@ export const statMap = function (config, withCenterPoints) {
                 //build legend SVG in a new group
                 out.svg()
                     .append('g')
-                    .attr('class', 'legend')
+                    .attr('class', 'em-legend')
                     .attr('transform', 'translate(' + x + ',' + y + ')')
                     .append('svg')
                     .attr('id', lg.svgId)

@@ -80,6 +80,7 @@ a text {
 
 .em-sea {
     fill: white;
+    pointer-events: none;
 }
 .em-scalebar-line {
     stroke: black;

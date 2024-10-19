@@ -154,6 +154,8 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.labelsConfig_ = DEFAULTLABELS // allow user to override map labels | see ./labels.js for example config
     out.statLabelsPositions_ = STATLABELPOSITIONS // allow user to override positions of statistical labels
     out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
+    out.labelShadowsToShow_ = ['countries', 'seas']
+    out.labelShadow_ = true
 
     out.labelFilterFunction_ = (rg, map) => {
         return rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo_[1] || map.geo_ == 'SJ_SV'
@@ -1355,7 +1357,7 @@ export const mapTemplate = function (config, withCenterPoints) {
      */
     out.updateLabels = function () {
         //clear previous labels
-        let prevLabels = out.svg_.selectAll('g.labels-container > *')
+        let prevLabels = out.svg_.selectAll('g.g_labels > *')
         if (prevLabels) prevLabels.remove()
 
         //main map
@@ -1416,12 +1418,12 @@ export const mapTemplate = function (config, withCenterPoints) {
      */
     out.updateValuesLabels = function (map) {
         //clear previous labels
-        let prevLabels = map.svg_.selectAll('g.stat-label > *')
+        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
         prevLabels.remove()
-        let prevShadows = map.svg_.selectAll('g.stat-label-shadow > *')
+        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
         prevShadows.remove()
 
-        let statLabels = map.svg_.selectAll('g.stat-label')
+        let statLabels = map.svg_.selectAll('g.em-stat-label')
 
         // filter stat-label elements to only show those with data
         statLabels.filter(out.statLabelsFilterFunction).append('text').text(out.statLabelsTextFunction)
@@ -1429,7 +1431,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //add shadows to labels
         if (out.labelShadow_) {
             map.svg_
-                .selectAll('g.stat-label-shadow')
+                .selectAll('g.em-stat-label-shadow')
                 .filter(out.statLabelsFilterFunction)
                 .append('text')
                 .text(out.statLabelsTextFunction)
@@ -1484,8 +1486,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         let language = map.lg_
         let labelsArray = []
 
-        let existing = zg.select('.em-labels-container')
-        let labelsG = existing.empty() ? zg.append('g').attr('class', 'em-labels-container') : existing
+        let existing = zg.select('#g_labels')
+        let labelsG = existing.empty() ? zg.append('g').attr('id', 'g_labels') : existing
 
         //define which labels to use (cc, countries, seas, values)
         if (map.labelsToShow_.includes('countries') || map.labelsToShow_.includes('seas')) {
@@ -1547,7 +1549,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                         // otherwise calculate centroid
                         return 'translate(' + map._geom.path.centroid(d) + ')'
                     })
-
                     .attr('class', 'em-stat-label')
 
                 //SHADOWS
@@ -1577,7 +1578,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             }
         }
 
-        // rest of label types (FROM LABELS.JS)
+        // rest of label types
         if (labelsArray) {
             let data = labelsArray.filter((d) => {
                 if (d.class == 'countries') {
@@ -1601,7 +1602,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             const shadowg = labelsG.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
 
             //common styles between all labels
-            const labelg = labelsG.append('g').attr('class', 'em-geolabels').attr('text-anchor', 'middle')
+            const labelg = labelsG.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
 
             //SHADOWS
             if (map.labelShadow_) {
@@ -1610,10 +1611,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .data(data)
                     .enter()
                     .append('text')
-                    .filter((d) => map.labelShadowsToShow_.includes(d.class))
                     .attr('class', (d) => {
-                        return 'em-labelShadow-' + d.class
+                        let classes = 'em-label-shadow-' + d.text.replace(/\s+/g, '-')
+                        if (map.labelShadowsToShow_.includes(d.class)) {
+                            classes += ' em-label-shadow-' + d.class
+                        }
+                        return classes
                     })
+                    .filter((d) => map.labelShadowsToShow_.includes(d.class))
                     .attr('x', function (d) {
                         if (d.rotate) {
                             return 0 //for rotated text, x and y positions must be specified in the transform property
@@ -1642,14 +1647,18 @@ export const mapTemplate = function (config, withCenterPoints) {
                     }) // define the text to display
             }
 
-            //LABELS
+            //LABEL texts
             labelg
                 .selectAll('text')
                 .data(data)
                 .enter()
                 .append('text')
                 .attr('class', (d) => {
-                    return 'em-geolabel-' + d.class
+                    let classes = 'em-label-' + d.text.replace(/\s+/g, '-')
+                    if (map.labelsToShow_.includes(d.class)) {
+                        classes += ' em-label-' + d.class
+                    }
+                    return classes
                 })
                 //position label
                 .attr('x', function (d) {
