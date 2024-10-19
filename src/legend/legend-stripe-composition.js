@@ -12,9 +12,9 @@ export const legend = function (map, config) {
     const out = lg.legend(map)
 
     //the width of the legend box elements
-    out.shapeWidth = 13
+    out.shapeWidth = 25
     //the height of the legend box elements
-    out.shapeHeight = 15
+    out.shapeHeight = 20
     //the distance between consecutive legend box elements
     out.shapePadding = 5
     //the font size of the legend label
@@ -66,6 +66,7 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
@@ -91,13 +92,10 @@ export const legend = function (map, config) {
 
             //label
             lgg.append('text')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
                 .text(m.catLabels()[code] || code)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
                 .on('mouseover', function () {
                     svgMap
                         .selectAll('pattern')
@@ -122,13 +120,12 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
                 .style('fill', m.noDataFillStyle())
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
                     svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
                     select(this).style('fill', m.hoverColor())
@@ -145,13 +142,10 @@ export const legend = function (map, config) {
 
             //'no data' label
             lgg.append('text')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
                 .text(out.noDataText)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
                 .on('mouseover', function () {
                     svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
                 })
