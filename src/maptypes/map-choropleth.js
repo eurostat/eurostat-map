@@ -159,7 +159,7 @@ export const map = function (config) {
 
         // Apply classification and assign 'ecl' attribute based on map type
         if (map.svg_) {
-            const selector = map.geo_ === 'WORLD' ? 'path.worldrg' : 'path.em-nutsrg'
+            const selector = map.geo_ === 'WORLD' ? 'path.em-worldrg' : 'path.em-nutsrg'
             classifyRegions(map.svg().selectAll(selector))
 
             // Handle mixed NUTS level, separating NUTS level 0
@@ -196,7 +196,7 @@ export const map = function (config) {
 
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = out.geo_ === 'WORLD' ? 'path.worldrg' : 'path.em-nutsrg'
+            const selector = out.geo_ === 'WORLD' ? 'path.em-worldrg' : 'path.em-nutsrg'
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic

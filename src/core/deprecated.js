@@ -38,8 +38,8 @@ export const defineDeprecatedFunctions = (out) => {
         console.warn('graticuleStrokeWidth() is now DEPRECATED, please use the .em-graticule CSS class')
         return out
     }
-    out.nutsrgFillStyle = function (v) {
-        console.warn('hoverColor() is now DEPRECATED, please use hoverColor() instead')
+    out.nutsrgSelFillSty = function (v) {
+        console.warn('nutsrgSelFillSty() is now DEPRECATED, please use hoverColor() instead')
         out.hoverColor_ = v
         return out
     }
@@ -57,6 +57,26 @@ export const defineDeprecatedFunctions = (out) => {
     }
     out.subtitleFill = function (v) {
         console.warn('map.subtitleFill() is now DEPRECATED. please use the .em-subtitle CSS class')
+        return out
+    }
+    out.cntbnStroke = function (v) {
+        console.warn('map.cntbnStroke() is now DEPRECATED. please use the .em-cntbn CSS class')
+        return out
+    }
+    out.cntbnStrokeWidth = function (v) {
+        console.warn('map.cntbnStrokeWidth() is now DEPRECATED. please use the .em-cntbn CSS class')
+        return out
+    }
+    out.worldCoastStroke = function (v) {
+        console.warn('map.worldCoastStroke() is now DEPRECATED. please use the .em-bn-co CSS class')
+        return out
+    }
+    out.worldCoastStrokeWidth = function (v) {
+        console.warn('map.worldCoastStrokeWidth() is now DEPRECATED. please use the .em-bn-co CSS class')
+        return out
+    }
+    out.worldFillStyle = function (v) {
+        console.warn('map.worldFillStyle() is now DEPRECATED. please use the .em-worldcoast CSS class')
         return out
     }
 }

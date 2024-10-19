@@ -1070,8 +1070,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', out._geom.path)
-                .attr('class', 'worldrg')
-                .style('fill', out.worldFillStyle_)
+                .attr('class', 'em-worldrg')
         }
 
         //draw NUTS regions
@@ -1132,7 +1131,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out._geom.cntbn) {
             zg.append('g')
                 .attr('id', 'g_cntbn')
-                .attr('class', 'nutsbn-container')
+                .attr('class', 'em-nutsbn-container')
                 .selectAll('path')
                 .data(out._geom.cntbn)
                 .enter()
@@ -1146,7 +1145,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 })
                 .attr('d', out._geom.path)
                 .attr('class', function (bn) {
-                    return bn.properties.co === 'T' ? 'bn-co' : 'cntbn'
+                    return bn.properties.co === 'T' ? 'em-bn-co' : 'em-cntbn'
                 })
         }
 
@@ -1177,8 +1176,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (props.id > 100000) {
                         return 'em-kosovo-bn'
                     }
-                    if (props.co === 'T') return 'bn-co'
-                    const cl = ['bn-' + props.lvl]
+                    if (props.co === 'T') return 'em-bn-co'
+                    const cl = ['em-bn-' + props.lvl]
                     //if (bn.oth === "T") cl.push("bn-oth");
                     return cl.join(' ')
                 })
@@ -1216,9 +1215,9 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('class', function (bn) {
                     if (bn.properties.POL_STAT > 0) {
                         //disputed
-                        return 'bn-d'
+                        return 'em-bn-d'
                     }
-                    return bn.properties.COAS_FLAG === 'F' ? 'bn-co' : 'worldbn'
+                    return bn.properties.COAS_FLAG === 'T' ? 'em-bn-co' : 'em-worldbn'
                 })
             //.attr("id", (bn) => bn.properties.CNTR_BN_ID)
         }
@@ -1233,10 +1232,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', out._geom.path)
-                .style('stroke', '#4f4f4f')
-                .style('stroke-width', function (bn) {
-                    return 0.3 + 'px'
-                })
+                .attr('class', 'em-kosovo-bn')
         }
 
         //prepare group for proportional symbols, with nuts region centroids
@@ -1600,8 +1596,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         let language = map.lg_
         let labelsArray = []
 
-        let existing = zg.select('.labels-container')
-        let labelsG = existing.empty() ? zg.append('g').attr('class', 'labels-container') : existing
+        let existing = zg.select('.em-labels-container')
+        let labelsG = existing.empty() ? zg.append('g').attr('class', 'em-labels-container') : existing
 
         //define which labels to use (cc, countries, seas, values)
         if (map.labelsToShow_.includes('countries') || map.labelsToShow_.includes('seas')) {
@@ -1624,7 +1620,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 //values label shadows parent <g>
                 const gsls = labelsG
                     .append('g')
-                    .attr('class', 'g_stat_label_shadows')
+                    .attr('class', 'em-stat-labels-shadows')
                     .style('font-size', map.labelValuesFontSize_ + 'px')
                     .attr('text-anchor', 'middle')
                     .style('opacity', (d) => map.labelOpacity_['values'])
@@ -1636,7 +1632,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 // values labels parent <g>
                 const gsl = labelsG
                     .append('g')
-                    .attr('class', 'g_stat_labels')
+                    .attr('class', 'em-stat-labels')
                     .style('font-size', map.labelValuesFontSize_ + 'px')
                     .attr('text-anchor', 'middle')
                     .style('opacity', (d) => map.labelOpacity_['values'])
@@ -1682,7 +1678,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         return 'translate(' + map._geom.path.centroid(d) + ')'
                     })
                     .style('pointer-events', 'none')
-                    .attr('class', 'stat-label')
+                    .attr('class', 'em-stat-label')
 
                 //SHADOWS
                 if (map.labelShadow_) {
@@ -1706,7 +1702,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                             return 'translate(' + map._geom.path.centroid(d) + ')'
                         })
                         .style('pointer-events', 'none')
-                        .attr('class', 'stat-label-shadow')
+                        .attr('class', 'em-stat-label-shadow')
                 }
             }
         }
@@ -1734,7 +1730,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             //common styles between all label shadows
             const shadowg = labelsG
                 .append('g')
-                .attr('class', 'g_labelShadows')
+                .attr('class', 'em-label-shadows')
                 .style('pointer-events', 'none')
                 .style('font-family', map.fontFamily_)
                 .attr('text-anchor', 'middle')
@@ -1742,7 +1738,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             //common styles between all labels
             const labelg = labelsG
                 .append('g')
-                .attr('class', 'g_geolabels')
+                .attr('class', 'em-geolabels')
                 .style('pointer-events', 'none')
                 .style('font-family', map.fontFamily_)
                 .attr('text-anchor', 'middle')
@@ -1756,7 +1752,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .append('text')
                     .filter((d) => map.labelShadowsToShow_.includes(d.class))
                     .attr('class', (d) => {
-                        return 'labelShadow_' + d.class
+                        return 'em-labelShadow-' + d.class
                     })
                     .attr('x', function (d) {
                         if (d.rotate) {
@@ -1800,7 +1796,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .enter()
                 .append('text')
                 .attr('class', (d) => {
-                    return 'geolabel_' + d.class
+                    return 'em-geolabel-' + d.class
                 })
                 //position label
                 .attr('x', function (d) {
@@ -1874,7 +1870,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         const scalebarSVG = out
             .svg()
             .append('svg')
-            .attr('class', 'scalebar')
+            .attr('class', 'em-scalebar')
             .attr('x', out.scalebarPosition_[0])
             .attr('y', out.scalebarPosition_[1])
             .attr('width', maxLengthPix + 20)
@@ -1883,7 +1879,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         // top line full width
         scalebarSVG
             .append('line')
-            .attr('class', 'eurostat-map-scalebar-line')
+            .attr('class', 'em-scalebar-line')
             .attr('x1', marginLeft)
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
@@ -1893,7 +1889,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //bottom line full width
         scalebarSVG
             .append('line')
-            .attr('class', 'eurostat-map-scalebar-line')
+            .attr('class', 'em-scalebar-line')
             .attr('x1', marginLeft)
             .attr('y1', out.scalebarSegmentHeight_)
             .attr('x2', niceLengthPixel + marginLeft)
@@ -1904,7 +1900,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //first tick
         scalebarSVG
             .append('line')
-            .attr('class', 'eurostat-map-scalebar-line')
+            .attr('class', 'em-scalebar-line')
             .attr('x1', marginLeft)
             .attr('y1', 1)
             .attr('x2', marginLeft)
@@ -1913,7 +1909,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         scalebarSVG
             .append('text')
-            .attr('class', 'eurostat-map-scalebar-label')
+            .attr('class', 'em-scalebar-label')
             .attr('x', marginLeft + textOffsetX)
             .attr('y', out.scalebarTickHeight_ + textOffsetY)
             .text('0')
@@ -1929,7 +1925,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             for (let i = 1; i < subdivisionNb; i++) {
                 scalebarSVG
                     .append('line')
-                    .attr('class', 'eurostat-map-scalebar-line')
+                    .attr('class', 'em-scalebar-line')
                     .attr('x1', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                     .attr('y1', 1)
                     .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
@@ -1940,7 +1936,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .style('stroke-width', out.scalebarStrokeWidth_)
                 scalebarSVG
                     .append('text')
-                    .attr('class', 'eurostat-map-scalebar-label')
+                    .attr('class', 'em-scalebar-label')
                     .attr('x', marginLeft + textOffsetX + i * divisionWidth)
                     .attr('y', out.scalebarTickHeight_ + textOffsetY)
                     .text(getScalebarLabel((niceLengthM[0] / subdivisionNb) * i))
@@ -1953,7 +1949,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             for (let i = -1; i < subdivisionNb; i += 2) {
                 if (i == 1) {
                     sb.append('line')
-                        .attr('class', 'eurostat-map-scalebar-line')
+                        .attr('class', 'em-scalebar-line')
                         .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
                         .attr('y1', out.scalebarSegmentHeight_ / 2)
                         .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
@@ -1964,7 +1960,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     let x1 = marginLeft + out.scalebarStrokeWidth_ / 2 + (i - 1) * divisionWidth
                     if (x1 > 0) {
                         sb.append('line')
-                            .attr('class', 'eurostat-map-scalebar-line')
+                            .attr('class', 'em-scalebar-line')
                             .attr('x1', x1)
                             .attr('y1', out.scalebarSegmentHeight_ / 2)
                             .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
@@ -1977,7 +1973,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         } else {
             // single full-length horizontal mid-line
             sb.append('line')
-                .attr('class', 'eurostat-map-scalebar-line')
+                .attr('class', 'em-scalebar-line')
                 .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
                 .attr('y1', out.scalebarSegmentHeight_ / 2)
                 .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + divisionWidth * subdivisionNb)
@@ -1989,7 +1985,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //last tick
         scalebarSVG
             .append('line')
-            .attr('class', 'eurostat-map-scalebar-line')
+            .attr('class', 'em-scalebar-line')
             .attr('x1', niceLengthPixel + marginLeft)
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
@@ -1998,7 +1994,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         scalebarSVG
             .append('text')
-            .attr('class', 'eurostat-map-scalebar-label')
+            .attr('class', 'em-scalebar-label')
             .attr('x', niceLengthPixel + marginLeft + textOffsetX)
             .attr('y', out.scalebarTickHeight_ + textOffsetY)
             .text(getScalebarLabel(niceLengthM[0]) + out.scalebarUnits_)

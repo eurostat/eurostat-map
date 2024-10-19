@@ -30,7 +30,8 @@ a text {
 .em-cntrg {
     fill: #efefef;
 }
-.em-nutsrg {
+.em-nutsrg,
+.em-worldrg {
     fill: #efefef;
     cursor: pointer;
 }
@@ -49,37 +50,38 @@ a text {
 /* NUTS boundaries */
 /* out.nutsbnStroke_ = { 0: 'none', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'grey', co: '#7f7f7f' }
 out.nutsbnStrokeWidth_ = { 0: 0, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0 } */
-.nutsbn-container {
+.em-nutsbn-container {
     fill: none;
 }
-.bn-0 {
+.em-bn-0 {
     stroke: none;
     stroke-width: 0;
 }
-.bn-1,
-.bn-2,
-.bn-3 {
+.em-bn-1,
+.em-bn-2,
+.em-bn-3 {
     stroke: grey;
     stroke-width: 0.4;
 }
 /* country boundaries */
-.cntbn,
-.worldbn {
+.em-cntbn,
+.em-worldbn {
     stroke: black;
     stroke-width: 0.5;
 }
 /* disputed */
-.bn-d {
+.em-bn-d {
     stroke: '#b2b2b2';
 }
 
 /* coastal boundaries */
-.bn-co {
+.em-bn-co {
     stroke: black;
     stroke-width: 0.2;
 }
 
 .em-graticule {
-    stroke: 'lightgray';
+    stroke: lightgray;
     stroke-width: 1;
+    fill: none;
 }
