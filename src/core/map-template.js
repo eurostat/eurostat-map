@@ -320,7 +320,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //update graticule
         let graticule = out.svg_ ? out.svg().select('#g_gra') : null
-        let zg = out.svg_ ? out.svg_.select('#zoomgroup' + out.svgId_) : null
+        let zg = out.svg_ ? out.svg_.select('#zoom-group-' + out.svgId_) : null
 
         // if existing and argument is false
         if (graticule) {
@@ -365,7 +365,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out.svg_) {
             let margin = selectAll('#g_coast_margin')
             let filter = select('#coastal_blur')
-            let zg = select('#zoomgroup' + out.svgId_) || null
+            let zg = select('#zoom-group-' + out.svgId_) || null
             if (margin._groups[0][0] && v == false) {
                 // remove existing
                 margin.remove()
@@ -388,7 +388,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 //draw for main map - geometries are still in memory so no rebuild needed
                 const drawNewCoastalMargin = (map) => {
                     // zoom group might not be inside main map (out.svg_)
-                    const zoomGroup = select('#zoomgroup' + map.svgId_)
+                    const zoomGroup = select('#zoom-group-' + map.svgId_)
                     //draw new coastal margin
                     const cg = zoomGroup
                         .append('g')
@@ -770,7 +770,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         // each map template needs a clipPath to avoid overflow. See GISCO-2707
         svg.append('defs')
             .append('clipPath')
-            .attr('id', out.svgId_ + '_clipP')
+            .attr('id', out.svgId_ + '-clip-path')
             .append('path')
             .attr('d', convertRectangles(0, 0, out.width_, out.height_))
 
@@ -791,10 +791,10 @@ export const mapTemplate = function (config, withCenterPoints) {
             .insert('g', ':first-child')
             .attr('id', 'drawing' + out.svgId_)
             .attr('class', 'em-drawing-group')
-            .attr('clip-path', 'url(#' + out.svgId_ + '_clipP' + ')')
+            .attr('clip-path', 'url(#' + out.svgId_ + '-clip-path' + ')')
 
         //create main zoom group
-        const zg = dg.append('g').attr('id', 'zoomgroup' + out.svgId_) //out.geo changed to out.svgId in order to be unique
+        const zg = dg.append('g').attr('id', 'zoom-group-' + out.svgId_) //out.geo changed to out.svgId in order to be unique
 
         //insets
         out.removeInsets() //remove existing
@@ -966,7 +966,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //prepare drawing group
-        const zg = out.svg().select('#zoomgroup' + out.svgId_)
+        const zg = out.svg().select('#zoom-group-' + out.svgId_)
         zg.selectAll('*').remove()
 
         //draw background rectangle
@@ -1214,6 +1214,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('d', out._geom.path)
                 .attr('class', function (bn) {
                     if (bn.properties.POL_STAT > 0) {
+                        console.log(bn)
                         //disputed
                         return 'em-bn-d'
                     }
@@ -1472,7 +1473,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //main map
         if (out.labelling_) {
-            let zg = out.svg_.select('#zoomgroup' + out.svgId_)
+            let zg = out.svg_.select('#zoom-group-' + out.svgId_)
             addLabelsToMap(out, zg)
             if (out.labelsToShow_.includes('values') && out.updateValuesLabels) out.updateValuesLabels(out)
         }
@@ -1489,7 +1490,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) {
                                     let map = out.insetTemplates_[geo][i][c]
                                     if (map.labelling_) {
-                                        let zg = map.svg_.select('#zoomgroup' + map.svgId_)
+                                        let zg = map.svg_.select('#zoom-group-' + map.svgId_)
                                         addLabelsToMap(map, zg)
                                         if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
                                     }
@@ -1499,7 +1500,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                             if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) {
                                 let map = out.insetTemplates_[geo][i]
                                 if (map.labelling_) {
-                                    let zg = map.svg_.select('#zoomgroup' + map.svgId_)
+                                    let zg = map.svg_.select('#zoom-group-' + map.svgId_)
                                     addLabelsToMap(map, zg)
                                     if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
                                 }
@@ -1511,7 +1512,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.insetTemplates_[geo].svgId_ !== out.svgId_) {
                         let map = out.insetTemplates_[geo]
                         if (map.labelling_) {
-                            let zg = map.svg_.select('#zoomgroup' + map.svgId_)
+                            let zg = map.svg_.select('#zoom-group-' + map.svgId_)
                             addLabelsToMap(map, zg)
                             if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
                         }

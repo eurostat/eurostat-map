@@ -67,11 +67,12 @@ out.nutsbnStrokeWidth_ = { 0: 0, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0 } */
 .em-cntbn,
 .em-worldbn {
     stroke: black;
-    stroke-width: 0.5;
+    stroke-width: 0.4;
 }
 /* disputed */
 .em-bn-d {
-    stroke: '#b2b2b2';
+    stroke: #b2b2b2;
+    stroke-width: 0.4;
 }
 
 /* coastal boundaries */

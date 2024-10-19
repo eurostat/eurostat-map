@@ -35,33 +35,20 @@
                 // common
                 .nuts2jsonBaseURL('https://gisco-services.ec.europa.eu/pub/nuts2json/v2/') //nuts2json geometries retrieved internally
                 .containerId('map') //for tooltip overflow control
-                .seaFillStyle('white')
                 .scale('10M')
                 .hoverColor('yellow')
-                .cntrgFillStyle('lightgrey')
-                .nutsrgFillStyle('lightgrey')
                 .colors(['#E6E6E6', '#E6E6E6'])
                 .threshold([1, 99999999])
                 //specific
                 .pixSize(mapConfig.pixSize)
                 .geoCenter(mapConfig.geoCenter)
-                .frameStrokeWidth(mapConfig.frameStrokeWidth)
-                .frameStroke(mapConfig.frameStroke)
                 .nutsLvl(0)
                 .geo(mapConfig.geo)
-                .cntbnStroke(mapConfig.cntbnStroke)
-                .cntbnStrokeWidth(mapConfig.cntbnStrokeWidth)
                 .tooltipText(this.tooltipWorld)
-                .worldCoastStroke('#000')
-                .worldCoastStrokeWidth(0.1)
                 .projectionFunction(mapConfig.projectionFunction)
 
             map.statData().setData({ DE: 10 })
             map.build()
-
-            setTimeout(() => {
-                map.cntrgFillStyle('red')
-            }, 4000)
 
             setTimeout(() => {
                 map.statData().setData({ ES: 10, DE: '900', CN: '20' })
