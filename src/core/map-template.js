@@ -784,6 +784,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         const ing = drawingGroup
             .append('g')
             .attr('id', 'insets-group')
+            .attr('class', 'em-insets')
             .attr('transform', 'translate(' + out.insetBoxPosition_[0] + ',' + out.insetBoxPosition_[1] + ')')
 
         if (out.insets_ === 'default') {
@@ -1248,7 +1249,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out.title()) {
             //define default position
             let cssClass = out.isInset ? 'em-inset-title' : 'em-title'
-            if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass(cssClass) + 10])
+            if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass(cssClass) + (out.isInset ? 0 : 10)])
             //draw title
             out.svg()
                 .append('text')
@@ -1729,8 +1730,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', 1)
-            .style('stroke', '#000')
-            .style('stroke-width', '0.8px')
+
         //bottom line full width
         scalebarSVG
             .append('line')
@@ -1739,8 +1739,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('y1', out.scalebarSegmentHeight_)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', out.scalebarSegmentHeight_)
-            .style('stroke', '#000')
-            .style('stroke-width', '0.8px')
 
         //first tick
         scalebarSVG
@@ -1750,17 +1748,13 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('y1', 1)
             .attr('x2', marginLeft)
             .attr('y2', out.scalebarTickHeight_)
-            .style('stroke', '#000')
-            .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
+
         scalebarSVG
             .append('text')
             .attr('class', 'em-scalebar-label')
             .attr('x', marginLeft + textOffsetX)
             .attr('y', out.scalebarTickHeight_ + textOffsetY)
             .text('0')
-            .style('font-size', out.scalebarFontSize_ + 'px')
-            .style('font-family', out.fontFamily_)
-            .attr('text-anchor', 'middle')
 
         //middle ticks
         const subdivisionNb = subdivisionNbs[scaleBarStartDigit]
@@ -1905,7 +1899,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         ;[
             'nutsLvl_',
             'nutsYear_',
-            'nutsrgFillStyle_', // DEPRECATED
             'hoverColor_',
             //'nutsbnStroke_', // DEPRECATED
             // 'nutsbnStrokeWidth_', // DEPRECATED

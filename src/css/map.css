@@ -74,9 +74,19 @@ a text {
     stroke-width: 0;
     stroke: grey;
 }
+.em-insets .em-frame {
+    stroke-width: 0.5;
+}
 
 .em-sea {
     fill: white;
+}
+.em-scalebar-line {
+    stroke: black;
+    stroke-width: 0.8px;
+}
+.em-scalebar-label {
+    text-anchor: middle;
 }
 
 /* Bottom text and symbol styling */
