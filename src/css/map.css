@@ -55,6 +55,21 @@ a text {
     font-size: 12px;
 }
 
+.em-source-pretext {
+    font-size: 11px;
+}
+.em-source-dataset-link {
+    font-size: 11px;
+    fill: #0e47cb;
+    cursor: pointer;
+    text-decoration: none;
+}
+.em-source-dataset-link:hover {
+    fill: #082b7a;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .em-frame {
     stroke-width: 0;
     stroke: grey;
@@ -68,7 +83,7 @@ a text {
 .em-bottom-text {
     pointer-events: all;
     cursor: default;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 .em-symbol {

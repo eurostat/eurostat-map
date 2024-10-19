@@ -5,7 +5,13 @@ import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoGraticule, geoGraticule10, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 import { feature } from 'topojson-client'
-import { getBBOXAsGeoJSON, spaceAsThousandSeparator, executeForAllInsets, getFontSizeFromClass } from './utils'
+import {
+    getBBOXAsGeoJSON,
+    spaceAsThousandSeparator,
+    executeForAllInsets,
+    getFontSizeFromClass,
+    getCSSPropertyFromClass,
+} from './utils'
 import * as tp from '../tooltip/tooltip'
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
 import { kosovoBnFeatures } from './kosovo'
@@ -148,30 +154,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.labelsConfig_ = DEFAULTLABELS // allow user to override map labels | see ./labels.js for example config
     out.statLabelsPositions_ = STATLABELPOSITIONS // allow user to override positions of statistical labels
     out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
-    out.labelFill_ = {
-        seas: '#003399',
-        countries: 'black',
-        cc: 'black',
-        values: 'black',
-    }
-    out.labelStroke_ = {
-        seas: 'none',
-        countries: 'none',
-        cc: 'none',
-        values: 'none',
-    }
-    out.labelStrokeWidth_ = { seas: 0.5, countries: 0.5, cc: 0.5, values: 0.5 }
-    out.labelOpacity_ = { seas: 1, countries: 1, cc: 1, values: 1 }
-    out.labelValuesFontSize_ = 10 //when labelsToShow includes "values", this is their font size
-    out.labelShadow_ = true
-    out.labelShadowsToShow_ = ['countries', 'seas', 'cc', 'values'] //accepted: "countries", "cc","seas", "values"
-    out.labelShadowWidth_ = { countries: 1, cc: 1, values: 1, seas: 0.2 }
-    out.labelShadowColor_ = {
-        seas: 'white',
-        countries: 'white',
-        cc: 'white',
-        values: 'white',
-    }
+
     out.labelFilterFunction_ = (rg, map) => {
         return rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo_[1] || map.geo_ == 'SJ_SV'
     } // filter the regions used for the labels array
@@ -1157,7 +1140,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             //add kosovo to world map
             zg.append('g')
                 .attr('id', 'g_worldbn')
-                .style('fill', 'none')
                 .selectAll('path')
                 .data(out._geom.kosovo)
                 .enter()
@@ -1302,14 +1284,9 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('x', out.botTxtPadding_)
                 .attr('y', out.height_ - out.botTxtPadding_)
                 .text(out.bottomText_)
-                .style('font-family', out.fontFamily_)
-                .style('font-size', out.botTxtFontSize_ + 'px')
-                .style('fill', out.botTxtFill_)
                 .on('mouseover', function () {
                     out._tooltip.mw___ = out._tooltip.style('max-width')
-                    // tooltip.f___ = tooltip.style("font");
                     out._tooltip.style('max-width', '400px')
-                    out._tooltip.style('font-size', out.botTxtFontSize_)
                     if (out.botTxtTooltipTxt_) out._tooltip.mouseover(out.botTxtTooltipTxt_)
                 })
                 .on('mousemove', function (e) {
@@ -1318,7 +1295,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .on('mouseout', function (e) {
                     if (out.botTxtTooltipTxt_) out._tooltip.mouseout(e)
                     out._tooltip.style('max-width', out._tooltip.mw___)
-                    // tooltip.style("font", tooltip.f___);
                 })
 
         //source dataset URL
@@ -1334,46 +1310,27 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //dataset link
                     let code = stat.eurostatDatasetCode
                     let url = `https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`
-                    let linkColor = '#0e47cb'
+                    let linkColor = getCSSPropertyFromClass('em-source-dataset-link', 'fill')
                     let link = out
                         .svg()
                         .append('a')
                         .attr('href', url)
                         .attr('target', '_blank')
                         .append('text')
-                        .attr('id', 'source-dataset-link')
+                        .attr('class', 'em-source-dataset-link')
                         .attr('x', out.width_ - out.botTxtPadding_)
                         .attr('y', out.height_ - out.botTxtPadding_)
                         .text('EUROSTAT')
-                        .style('fill', linkColor)
-                        .style('font-family', out.fontFamily_)
-                        .style('font-size', out.botTxtFontSize_ + 'px')
-                        .style('font-weight', 'bold')
                         .attr('text-anchor', 'end')
-                        .on('mouseover', function () {
-                            const sel = select(this)
-                            sel.style('fill', '#082b7a')
-                            sel.style('cursor', 'pointer')
-                            sel.style('text-decoration', 'underline')
-                        })
-                        .on('mouseout', function () {
-                            const sel = select(this)
-                            sel.style('fill', linkColor)
-                            sel.style('cursor', 'default')
-                            sel.style('text-decoration', 'none')
-                        })
-                    //.on("click", function() { window.open(`https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`); });
 
                     //pretext "Source:"
                     let linkW = link.node().getComputedTextLength()
                     out.svg()
                         .append('text')
+                        .attr('class', 'em-source-pretext')
                         .attr('x', out.width_ - out.botTxtPadding_ - linkW - 2)
                         .attr('y', out.height_ - out.botTxtPadding_)
                         .text('Source:')
-                        .style('font-family', out.fontFamily_)
-                        .style('font-size', out.botTxtFontSize_ + 'px')
-                        .style('stroke-width', '0.3px')
                         .attr('text-anchor', 'end')
                 }
             }
@@ -1548,28 +1505,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (map.labelsToShow_.includes('values')) {
             if (map._geom.nutsrg) {
                 //values label shadows parent <g>
-                const gsls = labelsG
-                    .append('g')
-                    .attr('class', 'em-stat-labels-shadows')
-                    .style('font-size', map.labelValuesFontSize_ + 'px')
-                    .attr('text-anchor', 'middle')
-                    .style('opacity', (d) => map.labelOpacity_['values'])
-                    .style('fill', (d) => map.labelShadowColor_['values'])
-                    .attr('stroke', (d) => map.labelShadowColor_['values'])
-                    .attr('stroke-width', (d) => map.labelStrokeWidth_['values'] + map.labelShadowWidth_['values'])
-                    .style('font-family', map.fontFamily_)
+                const gsls = labelsG.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
 
                 // values labels parent <g>
-                const gsl = labelsG
-                    .append('g')
-                    .attr('class', 'em-stat-labels')
-                    .style('font-size', map.labelValuesFontSize_ + 'px')
-                    .attr('text-anchor', 'middle')
-                    .style('opacity', (d) => map.labelOpacity_['values'])
-                    .style('fill', (d) => map.labelFill_['values'])
-                    .attr('stroke', (d) => map.labelStroke_['values'])
-                    .attr('stroke-width', (d) => map.labelStrokeWidth_['values'])
-                    .style('font-family', map.fontFamily_)
+                const gsl = labelsG.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
 
                 //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
                 let labelRegions
@@ -1658,18 +1597,10 @@ export const mapTemplate = function (config, withCenterPoints) {
             })
 
             //common styles between all label shadows
-            const shadowg = labelsG
-                .append('g')
-                .attr('class', 'em-label-shadows')
-                .style('font-family', map.fontFamily_)
-                .attr('text-anchor', 'middle')
+            const shadowg = labelsG.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
 
             //common styles between all labels
-            const labelg = labelsG
-                .append('g')
-                .attr('class', 'em-geolabels')
-                .style('font-family', map.fontFamily_)
-                .attr('text-anchor', 'middle')
+            const labelg = labelsG.append('g').attr('class', 'em-geolabels').attr('text-anchor', 'middle')
 
             //SHADOWS
             if (map.labelShadow_) {
@@ -1695,13 +1626,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                         return map._projection([d.x, d.y])[1]
                     })
                     .attr('dy', -7) // set y position of bottom of text
-                    .style('opacity', (d) => map.labelOpacity_[d.class])
-                    .style('letter-spacing', (d) => (d.letterSpacing ? d.letterSpacing : 0))
-                    .style('fill', (d) => map.labelShadowColor_[d.class])
-                    .attr('stroke', (d) => map.labelShadowColor_[d.class])
-                    .attr('stroke-width', (d) => map.labelStrokeWidth_[d.class] + map.labelShadowWidth_[d.class])
-                    .style('font-size', (d) => d.size + 'px')
-                    .style('font-style', (d) => (d.class == 'seas' ? 'italic' : 'normal'))
                     .attr('transform', (d) => {
                         if (d.rotate) {
                             let pos = map._projection([d.x, d.y])
@@ -1740,13 +1664,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                     return map._projection([d.x, d.y])[1]
                 })
                 .attr('dy', -7) // set y position of bottom of text
-                .style('opacity', (d) => map.labelOpacity_[d.class])
-                .style('letter-spacing', (d) => (d.letterSpacing ? d.letterSpacing : 0))
-                .style('fill', (d) => map.labelFill_[d.class])
-                .attr('stroke', (d) => map.labelStroke_[d.class])
-                .attr('stroke-width', (d) => map.labelStrokeWidth_[d.class])
-                //set label size
-                .style('font-size', (d) => d.size + 'px')
                 //transform labels which have a "rotate" property in the labels config. For rotated labels, their X,Y must also be set in the transform.
                 // note: dont apply to country code labels
                 .attr('transform', (d) => {

@@ -1,0 +1,54 @@
+/* out.labelFill_ = {
+    seas: '#003399',
+    countries: 'black',
+    cc: 'black',
+    values: 'black',
+}
+out.labelStroke_ = {
+    seas: 'none',
+    countries: 'none',
+    cc: 'none',
+    values: 'none',
+}
+out.labelStrokeWidth_ = { seas: 0.5, countries: 0.5, cc: 0.5, values: 0.5 }
+out.labelOpacity_ = { seas: 1, countries: 1, cc: 1, values: 1 }
+out.labelValuesFontSize_ = 10 //when labelsToShow includes "values", this is their font size
+out.labelShadow_ = true
+out.labelShadowsToShow_ = ['countries', 'seas', 'cc', 'values'] //accepted: "countries", "cc","seas", "values"
+out.labelShadowWidth_ = { countries: 1, cc: 1, values: 1, seas: 0.2 }
+out.labelShadowColor_ = {
+    seas: 'white',
+    countries: 'white',
+    cc: 'white',
+    values: 'white',
+} */
+.em-stat-labels-shadows {
+    font-size: 10px;
+    text-anchor: middle;
+    opacity: 1;
+    fill: white;
+    stroke: white;
+    stroke-width: 1px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.em-stat-labels {
+    font-size: 10px;
+    text-anchor: middle;
+    opacity: 1;
+    fill: black;
+    stroke: none;
+    stroke-width: 0.5px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.em-geolabels {
+}
+.em-geolabel-cc {
+}
+.em-geolabel-countries {
+}
+.em-geolabel-values {
+}
+.em-geolabel-seas {
+    fill: #003399;
+}
