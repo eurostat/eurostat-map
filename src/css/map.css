@@ -87,6 +87,7 @@ a text {
     stroke-width: 0.8px;
 }
 .em-scalebar-label {
+    font-size: 9px;
     text-anchor: middle;
 }
 

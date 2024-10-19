@@ -72,7 +72,6 @@ export const mapTemplate = function (config, withCenterPoints) {
     //scalebar
     out.showScalebar_ = false
     out.scalebarPosition_ = []
-    out.scalebarFontSize_ = 9 //px
     out.scalebarUnits_ = ' km' //label
     out.scalebarTextOffset_ = [0, 12]
     out.scalebarMaxWidth_ = 150 //px
@@ -1778,19 +1777,12 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .attr('y1', 1)
                     .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                     .attr('y2', out.scalebarTickHeight_)
-                    .style('stroke', '#000')
-                    .style('stroke-width', '0.8px')
-                    .style('stroke', 'black')
-                    .style('stroke-width', out.scalebarStrokeWidth_)
                 scalebarSVG
                     .append('text')
                     .attr('class', 'em-scalebar-label')
                     .attr('x', marginLeft + textOffsetX + i * divisionWidth)
                     .attr('y', out.scalebarTickHeight_ + textOffsetY)
                     .text(getScalebarLabel((niceLengthM[0] / subdivisionNb) * i))
-                    .style('font-size', out.scalebarFontSize_ + 'px')
-                    .style('font-family', out.fontFamily_)
-                    .attr('text-anchor', 'middle')
             }
 
             //every other segment mid-line
@@ -1802,8 +1794,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                         .attr('y1', out.scalebarSegmentHeight_ / 2)
                         .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                         .attr('y2', out.scalebarSegmentHeight_ / 2)
-                        .style('stroke', '#000')
-                        .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
                 } else {
                     let x1 = marginLeft + out.scalebarStrokeWidth_ / 2 + (i - 1) * divisionWidth
                     if (x1 > 0) {
@@ -1813,8 +1803,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                             .attr('y1', out.scalebarSegmentHeight_ / 2)
                             .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                             .attr('y2', out.scalebarSegmentHeight_ / 2)
-                            .style('stroke', '#000')
-                            .style('stroke-width', '0.8px')
                     }
                 }
             }
@@ -1826,8 +1814,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('y1', out.scalebarSegmentHeight_ / 2)
                 .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + divisionWidth * subdivisionNb)
                 .attr('y2', out.scalebarSegmentHeight_ / 2)
-                .style('stroke', '#000')
-                .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         }
 
         //last tick
@@ -1838,17 +1824,12 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', out.scalebarTickHeight_)
-            .style('stroke', '#000')
-            .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         scalebarSVG
             .append('text')
             .attr('class', 'em-scalebar-label')
             .attr('x', niceLengthPixel + marginLeft + textOffsetX)
             .attr('y', out.scalebarTickHeight_ + textOffsetY)
             .text(getScalebarLabel(niceLengthM[0]) + out.scalebarUnits_)
-            .style('text-anchor', 'middle')
-            .style('font-size', out.scalebarFontSize_ + 'px')
-            .style('font-family', out.fontFamily_)
     }
 
     function niceScaleBarLength(scaleBarLength) {
