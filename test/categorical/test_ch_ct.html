@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map1"></svg>
+        <svg id="map2"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map('choropleth')
+                .svgId('map1')
+                .title('Population in Europe')
+                .width(400)
+                .scale('20M')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
+                .classifMethod('threshold')
+                .threshold([50, 75, 100, 150, 300, 850])
+                .tooltipShowFlags(false)
+                .legend({ width: 60, x: 280, y: 30, labelDecNb: 0, boxFill: 'none', noData: false })
+                .build()
+
+            eurostatmap
+                .map('categorical')
+                .svgId('map2')
+                .title('NUTS urban/rural typology')
+                .width(400)
+                .scale('60M')
+                .nutsYear(2013)
+                .nutsLvl(3)
+                .stat({
+                    csvURL: 'https://raw.githubusercontent.com/eurostat/eurostat-map/dev/examples/urb_rur_typo.csv',
+                    geoCol: 'NUTS_ID_2013',
+                    valueCol: 'urban_rural',
+                })
+                .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
+                .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
+                .legend({ x: 270, y: 50, boxFill: 'none' })
+                .build()
+        </script>
+    </body>
+</html>

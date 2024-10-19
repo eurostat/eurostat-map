@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            let mapWidth = 800
+            let mapHeight = 600
+
+            map = eurostatmap
+                .map('ps')
+                .width(mapWidth)
+                .height(mapHeight)
+                .nutsLvl('mixed')
+                .legend(false)
+                .psFill('#4ac499')
+                .nutsYear(2016)
+
+            map.statData('size').setData({
+                TR834: 100,
+                DE: 10,
+                BE: 5,
+                BG: 3,
+                DK: 4,
+                SE: 1,
+                FR: 9,
+                ES: 8,
+                ES1: 4,
+                ES2: 4,
+                ES3: 4,
+                ES4: 4,
+                ES5: 4,
+                ES11: 10,
+                ES12: 5,
+            })
+            map.build()
+        </script>
+    </body>
+</html>

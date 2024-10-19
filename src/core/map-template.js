@@ -266,38 +266,20 @@ export const mapTemplate = function (config, withCenterPoints) {
             }
 
             //recursive call to inset components
-            setPropertyValueForAllInsets(att, v)
-
+            if (out.insetTemplates_) {
+                executeForAllInsets(
+                    out.insetTemplates_,
+                    out.svgId_,
+                    (inset, value) => {
+                        const fnName = att.substring(0, att.length - 1)
+                        inset[fnName](value)
+                    },
+                    v
+                )
+            }
             return out
         }
     })
-
-    // sets a map setting(property) value for all map insets (e.g. set tooltip for all insets)
-    const setPropertyValueForAllInsets = function (property, value) {
-        let fnName = property.substring(0, property.length - 1)
-        if (out.insetTemplates_) {
-            for (const geo in out.insetTemplates_) {
-                // insets with same geo that share the same parent inset
-                if (Array.isArray(out.insetTemplates_[geo])) {
-                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                        // insets with same geo that do not share the same parent inset
-                        if (Array.isArray(out.insetTemplates_[geo][i])) {
-                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                // set value of inset map property
-                                out.insetTemplates_[geo][i][c][fnName](value)
-                            }
-                        } else {
-                            // set value of inset map property
-                            out.insetTemplates_[geo][i][fnName](value)
-                        }
-                    }
-                } else {
-                    out.insetTemplates_[geo][fnName](value)
-                }
-            }
-        }
-    }
 
     //title getter and setter
     out.title = function (v) {

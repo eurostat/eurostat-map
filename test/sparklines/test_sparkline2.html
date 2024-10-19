@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map('sparkline')
+                .width(600)
+                .title('Heating Degree Days vs Cooling Degree Days, 2021')
+                .svgId('bivariate')
+                .nutsLvl(3)
+                .statSpark(
+                    { eurostatDatasetCode: 'nrg_chddr2_a', filters: { indic_nrg: 'HDD' } },
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'], //dates
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'] //labels
+                )
+                .sparkType('line')
+                .sparkLineWidth(10)
+                .sparkLineStrokeWidth(1)
+                .sparkLineColor('#c44a4a')
+                .sparkLineHeight(10)
+                .sparkLineOpacity(0.9)
+                .sparkLineCircleRadius(0.1)
+                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })
+                .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
+                .tooltip({
+                    xOffset: 30,
+                    yOffset: 150,
+                    fontSize: '12px',
+                    maxWidth: Math.min(400, window.innerWidth),
+                })
+                .sparkTooltipChart({
+                    width: 150,
+                    height: 50,
+                    margin: { left: 60, right: 40, top: 20, bottom: 40 },
+                    circleRadius: 1.5,
+                })
+                .build()
+        </script>
+    </body>
+</html>

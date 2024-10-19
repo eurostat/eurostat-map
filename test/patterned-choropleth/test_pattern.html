@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <div>
+            <svg id="map"></svg>
+        </div>
+
+        <div>
+            <svg id="legend" style="overflow: inherit"></svg>
+        </div>
+
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            let map = eurostatmap
+                .map('choropleth')
+                .width(900)
+                .title('Population in Europe')
+                .titleFontSize(40)
+                .titleFill('#444')
+                .scale('60M')
+                .classifMethod('threshold')
+                .filtersDefinitionFun(
+                    eurostatmap.getFillPatternDefinitionFun({
+                        patternSize: 5,
+                        shape: 'circle',
+                        bckColor: 'white',
+                        symbColor: 'black',
+                    })
+                )
+                .nutsbnStroke({ 0: '#777', 1: '#777', 2: '#777', 3: '#777', oth: '#444', co: '#777' })
+                .nutsbnStrokeWidth({ 0: 1, 1: 0.2, 2: 0.2, 3: 0.2, oth: 1, co: 1 })
+                .hoverColor('darkblue')
+                .seaFillStyle('#e9e9e9')
+                .coastalMarginColor('#777')
+                .coastalMarginStdDev(10)
+                .coastalMarginWidth(5)
+                .graticuleStroke('#888')
+                .tooltipShowFlags(false)
+                .threshold([1, 3, 6, 7, 8, 9])
+                .legend({
+                    svgId: 'legend',
+                    title: 'FIRST',
+                    labelDecNb: 0,
+                    shapeHeight: 15,
+                    shapeWidth: 25,
+                    noData: false,
+                    labelFormatter: function (val) {
+                        let o = val.toLocaleString('en').replace(/,/gi, ' ')
+                        return o
+                    },
+                })
+                .nutsLvl('mixed')
+
+            map.statData().setData({
+                ES: 2000,
+                FR: 3000,
+                DE: 4000,
+                HU: 5000,
+                SE: 12000,
+                UK: 4000,
+                IT: 2000,
+                RO: 7000,
+                PL: 8000,
+                HR: 9000,
+                SK: 10000,
+            })
+            map.build()
+
+            // update data, classification
+            setTimeout(() => {
+                map.threshold([1000, 9000]).filtersDefinitionFun(
+                    eurostatmap.getFillPatternDefinitionFun({
+                        patternSize: 5,
+                        shape: 'square',
+                        bckColor: 'white',
+                        symbColor: 'red',
+                    })
+                )
+                map.updateClassification().updateStyle()
+                map.legend({
+                    title: 'SECOND',
+                    labelFormatter: (val) => val.toLocaleString('en').replace(/,/gi, ' ,'),
+                })
+
+                //map.statData().setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
+            }, 2000)
+
+            setTimeout(() => {
+                map.threshold([1000, 3000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000]).filtersDefinitionFun(
+                    eurostatmap.getFillPatternDefinitionFun({
+                        patternSize: 5,
+                        shape: 'square',
+                        bckColor: 'LIGHTBLUE',
+                        symbColor: 'red',
+                    })
+                )
+                map.updateClassification().updateStyle()
+                map.legend({
+                    title: 'THIRD',
+                })
+
+                //map.statData().setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
+                //map.updateStatValues();
+            }, 4000)
+
+            setTimeout(() => {
+                map.threshold([1000, 3000, 6000, 99000]).filtersDefinitionFun(
+                    eurostatmap.getFillPatternDefinitionFun({
+                        patternSize: 5,
+                        shape: 'square',
+                        bckColor: 'teal',
+                        symbColor: 'red',
+                    })
+                )
+                map.updateClassification().updateStyle()
+                map.legend({
+                    title: 'THIRD',
+                })
+
+                //map.statData().setData({ ES: 4, DE: 5, FR: 3, UK: 2, SE:1 })
+                //map.updateStatValues();
+            }, 6000)
+        </script>
+    </body>
+</html>

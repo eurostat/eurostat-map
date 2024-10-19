@@ -1,5 +1,6 @@
 // to keep track of deprecated functions whilst keeping the current version clean.
-// remove when completely phased out.
+// also passes any important parameters to the new functions (if they exist)
+// To be removed when completely phased out.
 
 export const defineDeprecatedFunctions = (out) => {
     out.tooltipText = function (v) {
@@ -44,8 +45,18 @@ export const defineDeprecatedFunctions = (out) => {
     }
     out.titleFontSize = function (v) {
         console.warn('map.titleFontSize() is now DEPRECATED. please use the .em-title CSS class')
+        return out
     }
     out.subtitleFontSize = function (v) {
         console.warn('map.subtitleFontSize() is now DEPRECATED. please use the .em-subtitle CSS class')
+        return out
+    }
+    out.titleFill = function (v) {
+        console.warn('map.titleFill() is now DEPRECATED. please use the .em-title CSS class')
+        return out
+    }
+    out.subtitleFill = function (v) {
+        console.warn('map.subtitleFill() is now DEPRECATED. please use the .em-subtitle CSS class')
+        return out
     }
 }

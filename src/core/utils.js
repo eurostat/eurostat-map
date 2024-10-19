@@ -205,7 +205,6 @@ export const upperCaseFirstLetter = (string) => `${string.slice(0, 1).toUpperCas
 export const lowerCaseAllWordsExceptFirstLetters = (string) =>
     string.replaceAll(/\S*/g, (word) => `${word.slice(0, 1)}${word.slice(1).toLowerCase()}`)
 
-// Helper function to apply inline styles
 // Helper function to get all CSS rules defined in the document
 function getAllCSSRules() {
     let cssRules = []
