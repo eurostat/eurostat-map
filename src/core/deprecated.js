@@ -79,4 +79,12 @@ export const defineDeprecatedFunctions = (out) => {
         console.warn('map.worldFillStyle() is now DEPRECATED. please use the .em-worldcoast CSS class')
         return out
     }
+    out.coastalMarginWidth = function (v) {
+        console.warn('map.coastalMarginWidth() is now DEPRECATED. please use the #em-coast-margin CSS rule')
+        return out
+    }
+    out.coastalMarginColor = function (v) {
+        console.warn('map.coastalMarginColor() is now DEPRECATED. please use the #em-coast-margin CSS rule')
+        return out
+    }
 }

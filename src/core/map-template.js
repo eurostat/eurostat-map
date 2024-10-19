@@ -139,8 +139,6 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //sea
     out.drawCoastalMargin_ = false
-    out.coastalMarginColor_ = '#5d8cad'
-    out.coastalMarginWidth_ = 3
     out.coastalMarginStdDev_ = 2
     //graticule
     out.drawGraticule_ = false
@@ -389,11 +387,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     // zoom group might not be inside main map (out.svg_)
                     const zoomGroup = select('#zoom-group-' + map.svgId_)
                     //draw new coastal margin
-                    const cg = zoomGroup
-                        .append('g')
-                        .attr('id', 'em-coast-margin')
-                        .style('stroke-width', map.coastalMarginWidth_)
-                        .style('stroke', map.coastalMarginColor_)
+                    const cg = zoomGroup.append('g').attr('id', 'em-coast-margin')
 
                     //countries bn
                     if (map._geom.cntbn)
@@ -481,48 +475,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                 let inset = out.insetTemplates_[geo]
                 //set
                 inset.coastalMarginWidth_ = out.coastalMarginWidth_
-                //redraw
-                inset.drawCoastalMargin(true)
-            }
-        }
-
-        //redraw
-        out.drawCoastalMargin(true)
-
-        return out
-    }
-
-    // coastal margin color override
-    out.coastalMarginColor = function (v) {
-        if (!arguments.length) return out.coastalMarginColor_
-        out.coastalMarginColor_ = v
-
-        //update insets
-        for (const geo in out.insetTemplates_) {
-            if (Array.isArray(out.insetTemplates_[geo])) {
-                // check for insets within insets
-                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                    //check for insets within insets within insets
-                    if (Array.isArray(out.insetTemplates_[geo][i])) {
-                        for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
-                            let inset = out.insetTemplates_[geo][i][n]
-                            //set
-                            inset.coastalMarginColor_ = out.coastalMarginColor_
-                            //redraw
-                            inset.drawCoastalMargin(true)
-                        }
-                    } else {
-                        let inset = out.insetTemplates_[geo][i]
-                        //set
-                        inset.coastalMarginColor_ = out.coastalMarginColor_
-                        //redraw
-                        inset.drawCoastalMargin(true)
-                    }
-                }
-            } else {
-                let inset = out.insetTemplates_[geo]
-                //set
-                inset.coastalMarginColor_ = out.coastalMarginColor_
                 //redraw
                 inset.drawCoastalMargin(true)
             }
@@ -1092,15 +1044,12 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.bordersToShow_.includes('cc')) {
                         zg.append('g')
                             .attr('id', 'g_kosovo')
-                            .style('fill', 'none')
-                            //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
+                            .attr('class', 'em-kosovo-bn')
                             .selectAll('path')
                             .data(kosovoBn)
                             .enter()
                             .append('path')
                             .attr('d', out._geom.path)
-                            .style('stroke', 'grey')
-                            .style('stroke-width', 0.3)
                     }
                 }
             } else {
@@ -1120,7 +1069,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out._geom.cntbn) {
             zg.append('g')
                 .attr('id', 'g_cntbn')
-                .attr('class', 'em-nutsbn-container')
                 .selectAll('path')
                 .data(out._geom.cntbn)
                 .enter()
@@ -1145,8 +1093,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             })
             zg.append('g')
                 .attr('id', 'g_nutsbn')
-                .style('fill', 'none')
-                //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                 .selectAll('path')
                 .data(out._geom.nutsbn)
                 .enter()
@@ -1177,15 +1123,12 @@ export const mapTemplate = function (config, withCenterPoints) {
                 if (out.bordersToShow_.includes('cc')) {
                     zg.append('g')
                         .attr('id', 'g_kosovo')
-                        .style('fill', 'none')
-                        //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
+                        .attr('class', 'em-kosovo-bn')
                         .selectAll('path')
                         .data(kosovoBn)
                         .enter()
                         .append('path')
                         .attr('d', out._geom.path)
-                        .style('stroke', 'grey')
-                        .style('stroke-width', 0.3)
                 }
             }
         }
@@ -1194,8 +1137,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out._geom.worldbn) {
             zg.append('g')
                 .attr('id', 'g_worldbn')
-                .style('fill', 'none')
-                //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                 .selectAll('path')
                 .data(out._geom.worldbn)
                 .enter()

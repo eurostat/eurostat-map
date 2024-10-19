@@ -1,12 +1,18 @@
+/* General text settings */
 text {
     pointer-events: none;
 }
+
 a text {
     pointer-events: all;
 }
+
+/* Main map */
 .em-map {
     font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Coastal margin */
 #em-coast-margin {
     filter: url(#em-coastal-blur);
     stroke-linejoin: round;
@@ -15,96 +21,143 @@ a text {
     stroke-width: 5;
     stroke: rgb(161, 198, 237);
 }
-.em-title {
-    fill: black;
-    font-size: 24px;
-    font-weight: bold;
-    stroke: none;
-}
+
+/* Title and subtitle styling */
+.em-title,
 .em-inset-title {
     fill: black;
+    stroke: none;
+}
+
+.em-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.em-inset-title {
     font-size: 12px;
-    stroke: none;
 }
-.em-subtitle {
-    fill: #848280;
-    font-size: 17px;
-    stroke: none;
-    font-weight: 100;
-    stroke-linejoin: round;
-    paint-order: stroke;
-}
+
+.em-subtitle,
 .em-inset-subtitle {
     fill: #848280;
-    font-size: 12px;
     stroke: none;
     stroke-linejoin: round;
     paint-order: stroke;
 }
+
+.em-subtitle {
+    font-size: 17px;
+    font-weight: 100;
+}
+
+.em-inset-subtitle {
+    font-size: 12px;
+}
+
 .em-frame {
     stroke-width: 0;
     stroke: grey;
-    fill: none;
 }
+
 .em-sea {
     fill: white;
 }
-.em-cntrg {
-    fill: #efefef;
-}
-.em-nutsrg,
-.em-worldrg {
-    fill: #efefef;
-    cursor: pointer;
-}
-.em-kosovo-bn {
-    stroke: #4f4f4f;
-    stroke-width: 0.2;
-}
+
+/* Bottom text and symbol styling */
 .em-bottom-text {
     pointer-events: all;
     cursor: default;
-    font-size: 10;
+    font-size: 10px;
 }
+
 .em-symbol {
     cursor: pointer;
 }
-/* NUTS boundaries */
-/* out.nutsbnStroke_ = { 0: 'none', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'grey', co: '#7f7f7f' }
-out.nutsbnStrokeWidth_ = { 0: 0, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0 } */
-.em-nutsbn-container {
-    fill: none;
+
+/* Graticule styling */
+.em-graticule {
+    stroke: lightgray;
+    stroke-width: 1;
 }
+
+/* Region styling */
+.em-cntrg,
+.em-nutsrg,
+.em-worldrg {
+    fill: #efefef;
+}
+
+.em-nutsrg,
+.em-worldrg {
+    cursor: pointer;
+}
+
+/* Boundary styling */
+#g_worldbn,
+#g_nutsbn,
+.em-cntbn,
+.em-worldbn,
+.em-bn-0,
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-kosovo-bn,
+.em-bn-d,
+.em-bn-co {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .em-bn-0 {
     stroke: none;
     stroke-width: 0;
 }
+
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-bn-d {
+    stroke-width: 0.4;
+}
+
 .em-bn-1,
 .em-bn-2,
 .em-bn-3 {
     stroke: grey;
-    stroke-width: 0.4;
 }
-/* country boundaries */
+
+.em-kosovo-bn {
+    stroke: #4f4f4f;
+    stroke-width: 0.3;
+}
+
+.em-bn-d {
+    stroke: #b2b2b2;
+}
+
 .em-cntbn,
 .em-worldbn {
     stroke: black;
     stroke-width: 0.4;
 }
-/* disputed */
-.em-bn-d {
-    stroke: #b2b2b2;
-    stroke-width: 0.4;
-}
 
-/* coastal boundaries */
 .em-bn-co {
     stroke: black;
     stroke-width: 0;
 }
 
-.em-graticule {
-    stroke: lightgray;
-    stroke-width: 1;
+/* dont fill certain elements */
+.em-frame,
+.em-graticule,
+.em-cntbn,
+.em-worldbn,
+.em-bn-0,
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-kosovo-bn,
+.em-bn-d,
+.em-bn-co {
     fill: none;
 }
