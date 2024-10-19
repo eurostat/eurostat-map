@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { getFontSizeFromClass } from './utils'
 
 /**
  * A eurostat-map legend. This is an abstract method.
@@ -25,6 +26,8 @@ export const legend = function (map) {
 
     //legend title
     out.title = ''
+    // we now use CSS instead of inline styles
+    out.titleFontSize = getFontSizeFromClass('em-legend-title')
 
     /** Build legend. */
     out.build = function () {

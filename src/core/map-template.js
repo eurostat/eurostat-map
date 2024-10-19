@@ -319,7 +319,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.drawGraticule_ = v
 
         //update graticule
-        let graticule = out.svg_ ? out.svg().select('#g_gra') : null
+        let graticule = out.svg_ ? out.svg().select('#g_graticule') : null
         let zg = out.svg_ ? out.svg_.select('#zoom-group-' + out.svgId_) : null
 
         // if existing and argument is false
@@ -334,8 +334,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 graticule.remove()
                 // add new graticule
                 zg.append('g')
-                    .attr('id', 'g_gra')
-                    .style('fill', 'none')
+                    .attr('id', 'g_graticule')
                     .selectAll('path')
                     .data(out._geom.gra)
                     .enter()
@@ -344,7 +343,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .attr('class', 'em-graticule')
 
                 out.svg()
-                    .select('#g_gra')
+                    .select('#g_graticule')
                     .each(function () {
                         // move graticule behind land mass
                         out.geo_ == 'WORLD'
@@ -1040,8 +1039,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out._geom.gra && out.drawGraticule_) {
             //draw graticule
             zg.append('g')
-                .attr('id', 'g_gra')
-                .style('fill', 'none')
+                .attr('id', 'g_graticule')
                 .selectAll('path')
                 .data(out._geom.gra)
                 .enter()

@@ -28,9 +28,6 @@ export const legend = function (map, config) {
     out.legendSpacing = 35 //spacing between color & size legends (if applicable)
     out.labelFontSize = 12 //the font size of the legend labels
 
-    // we now use CSS instead of inline styles
-    out.titleFontSize = getFontSizeFromClass('em-legend-title')
-
     out.noDataShapeWidth = 20
     out.noDataShapeHeight = 20
 
@@ -116,9 +113,6 @@ export const legend = function (map, config) {
         //draw legend background box
         out.makeBackgroundBox()
 
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
-
         // reset height counters
         out.sizeLegend._totalBarsHeight = 0
         out.sizeLegend._totalD3SymbolsHeight = 0
@@ -173,7 +167,6 @@ export const legend = function (map, config) {
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding)
                 .text(out.sizeLegend.title)
-                .style('dominant-baseline', 'hanging')
         }
 
         let domain = m.classifierSize_.domain()
