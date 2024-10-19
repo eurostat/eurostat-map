@@ -256,7 +256,7 @@ export const map = function (config) {
 
         if (map.svg_) {
             //clear previous symbols
-            let prevSymbols = map.svg_.selectAll(':not(#insetsgroup) g.em-symbol > *')
+            let prevSymbols = map.svg_.selectAll(':not(#insets-group) g.em-symbol > *')
             prevSymbols.remove()
 
             //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)

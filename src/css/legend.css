@@ -6,6 +6,8 @@
 }
 .em-legend-label {
     font-size: 15px;
+    stroke: none;
+    fill: black;
     dominant-baseline: central;
 }
 .em-legend-title {
@@ -20,13 +22,9 @@
     stroke: grey;
     stroke-width: 1;
 }
-.em-bivariate-break2-label {
-}
 .em-bivariate-frame {
     fill: none;
     stroke: black;
-}
-.em-bivariate-arrowhead {
 }
 .em-bivariate-nodata {
     stroke: black;

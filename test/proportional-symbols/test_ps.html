@@ -77,16 +77,28 @@
 
             // semi-circles, farmland
             //Custom Semi Circle, accurate center and size
+            // Define the custom shape circle
             let customShapeCircle = {
                 draw: function (context, size) {
                     let r = Math.sqrt((2 * size) / Math.PI)
-                    let orgin = (4 * r) / (3 * Math.PI) //the orgin of the circle, not of the symbol
+                    let orgin = (4 * r) / (3 * Math.PI) // the origin of the circle, not of the symbol
                     context.arc(0, -orgin, r, Math.PI, 2 * Math.PI, true)
                     context.closePath()
                 },
             }
 
-            let customCircle = d3.symbol().type(customShapeCircle)
+            // Create a custom D3 symbol with the custom shape
+            let customCircle = d3.symbol().type(customShapeCircle).size(100)
+
+            // Use d3.path() to get the virtual context for the path
+            let path = d3.path()
+
+            // Use the custom symbol to draw in the virtual context
+            customCircle(path)
+
+            // Get the path string (HTML string for the SVG path)
+            let pathString = path.toString()
+
             eurostatmap
                 .map('proportionalSymbol')
                 .svgId('map1')
@@ -103,7 +115,7 @@
                     filters: { crops: 'ARA', time: 2018, unit: 'PC_UAA', agprdmet: 'TOTAL' },
                     unitText: '% of total agricultural area',
                 })
-                .psShape('custom')
+                .psShape('shape')
                 .psCustomShape(customCircle)
                 .psMaxSize(50)
                 .psMinSize(1)
@@ -123,8 +135,6 @@
                         title: 'Total organic arable land (HA)',
                         cellNb: 3,
                         labelFormatter: d3.format(',.2r'),
-                        shapePadding: 30,
-                        titlePadding: 10,
                         shapeOffset: { x: 0, y: 0 },
                         labelOffset: { x: 40, y: 0 },
                     },

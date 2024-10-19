@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import * as lg from '../core/legend'
 import { symbolsLibrary } from '../maptypes/map-proportional-symbols'
 import { symbol } from 'd3-shape'
-import { spaceAsThousandSeparator } from '../core/utils'
+import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
 import { formatDefaultLocale } from 'd3-format'
 import { max } from 'd3-array'
 
@@ -27,6 +27,9 @@ export const legend = function (map, config) {
     out.ascending = false //the order of the legend elements. Set to false to invert.
     out.legendSpacing = 35 //spacing between color & size legends (if applicable)
     out.labelFontSize = 12 //the font size of the legend labels
+
+    // we now use CSS instead of inline styles
+    out.titleFontSize = getFontSizeFromClass('em-legend-title')
 
     out.noDataShapeWidth = 20
     out.noDataShapeHeight = 20
@@ -57,10 +60,10 @@ export const legend = function (map, config) {
         titleFontSize: 12,
         titlePadding: 10, //padding between title and legend body
         marginTop: 30, // margin top (distance between color and size legend)
-        shapeWidth: 20, //the width of the legend box elements
+        shapeWidth: 25, //the width of the legend box elements
         shapeHeight: 20, //the height of the legend box elements
         shapePadding: 1, //the distance between consecutive legend shape elements in the color legend
-        labelOffset: { x: 25, y: 0 }, //distance (x) between label text and its corresponding shape element
+        labelOffset: { x: 5, y: 0 }, //distance (x) between label text and its corresponding shape element
         labelDecNb: 0, //the number of decimal for the legend labels
         labelFormatter: undefined, // user-defined d3 format function
         noData: true, //show no data
@@ -68,6 +71,7 @@ export const legend = function (map, config) {
         sepLineLength: 24, // //the separation line length
         sepLineStroke: 'black', //the separation line color
         sepLineStrokeWidth: 1, //the separation line width
+        tickLength: 5, // threshold ticks length in px
     }
 
     //override attribute values with config values
@@ -152,7 +156,7 @@ export const legend = function (map, config) {
                 let container = out._sizeLegendNode
                     .append('g')
                     .attr('transform', `translate(${x},${y})`)
-                    .attr('class', 'color-legend-item')
+                    .attr('class', 'em-legend-rect')
 
                 buildNoDataLegend(x, y, container, out.sizeLegend.noDataText)
             }
@@ -211,7 +215,7 @@ export const legend = function (map, config) {
             let container = out._sizeLegendNode
                 .append('g')
                 .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'color-legend-item')
+                .attr('class', 'em-legend-rect')
 
             buildNoDataLegend(x, y, container, out.sizeLegend.noDataText)
         }
@@ -229,6 +233,7 @@ export const legend = function (map, config) {
             .style('stroke', '#000')
             .attr('stroke-width', 0.4)
             .append('rect')
+            .attr('class', 'em-legend-rect')
             .attr('width', out.colorLegend ? out.colorLegend.shapeWidth : out.noDataShapeWidth)
             .attr('height', out.colorLegend ? out.colorLegend.shapeHeight : out.noDataShapeHeight)
             .on('mouseover', function () {
@@ -313,10 +318,10 @@ export const legend = function (map, config) {
         //'no data' label
         container
             .append('text')
-            .attr('x', out.colorLegend ? out.colorLegend.labelOffset.x : out.noDataShapeWidth + 5)
-            .attr('y', out.colorLegend ? out.colorLegend.shapeHeight / 2 + 1 : out.noDataShapeHeight / 2 + 1)
+            .attr('x', out.colorLegend ? out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x : out.noDataShapeWidth + 5)
+            .attr('y', out.colorLegend ? out.colorLegend.shapeHeight / 2 : out.noDataShapeHeight / 2)
             .attr('dominant-baseline', 'middle')
-            .attr('class', 'eurostatmap-legend-label')
+            .attr('class', 'em-legend-label')
             .text(noDataText)
             .style('font-size', out.labelFontSize + 'px')
             .style('font-family', m.fontFamily_)
@@ -363,7 +368,7 @@ export const legend = function (map, config) {
         let itemContainer = out._sizeLegendNode
             .append('g')
             .attr('transform', `translate(${x},${y})`)
-            .attr('class', 'size-legend-item')
+            .attr('class', 'em-size-legend-item')
 
         // draw D3 symbol
         let shape = getShape()
@@ -433,12 +438,12 @@ export const legend = function (map, config) {
         let itemContainer = out._sizeLegendNode
             .append('g')
             .attr('transform', `translate(${x},${y})`)
-            .attr('class', 'size-legend-item')
+            .attr('class', 'em-size-legend-item')
 
         // draw standard symbol
         m.customSymbols.prevSymb = itemContainer
             .append('g')
-            .attr('class', 'size-legend-symbol')
+            .attr('class', 'em-size-legend-symbol')
             .style('fill', (d) => {
                 // if secondary stat variable is used for symbol colouring, then dont colour the legend symbols using psFill()
                 return m.classifierColor_ ? out.sizeLegend.shapeFill : m.psFill_
@@ -499,7 +504,7 @@ export const legend = function (map, config) {
         let itemContainer = out._sizeLegendNode
             .append('g')
             .attr('transform', `translate(${x},${y})`)
-            .attr('class', 'size-legend-item')
+            .attr('class', 'em-size-legend-item')
 
         // draw bar symbol
         itemContainer
@@ -661,7 +666,7 @@ export const legend = function (map, config) {
             let itemContainer = out._colorLegendNode
                 .append('g')
                 .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'color-legend-item')
+                .attr('class', 'em-legend-rect')
 
             //append symbol & style
             itemContainer
@@ -673,6 +678,7 @@ export const legend = function (map, config) {
                 .attr('stroke', 'black')
                 .attr('stroke-width', 0.5)
                 .append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('width', out.colorLegend.shapeWidth)
                 .attr('height', out.colorLegend.shapeHeight)
                 .on('mouseover', function () {
@@ -702,21 +708,30 @@ export const legend = function (map, config) {
             if (i > 0) {
                 itemContainer
                     .append('line')
+                    .attr('class', 'em-legend-separator')
                     .attr('x1', 0)
                     .attr('y1', 0)
                     .attr('x2', 0 + out.colorLegend.sepLineLength)
                     .attr('y2', 0)
-                    .attr('stroke', out.colorLegend.sepLineStroke)
-                    .attr('stroke-width', out.colorLegend.sepLineStrokeWidth)
-                    .attr('class', 'eurostatmap-legend-line')
+            }
+
+            // Append tick line
+            if (i > 0) {
+                itemContainer
+                    .append('line')
+                    .attr('class', 'em-legend-tick')
+                    .attr('x1', out.colorLegend.shapeWidth)
+                    .attr('y1', 0)
+                    .attr('x2', out.colorLegend.sepLineLength + out.colorLegend.tickLength)
+                    .attr('y2', 0)
             }
 
             //label
             if (i < clnb - 1) {
                 itemContainer
                     .append('text')
-                    .attr('class', 'eurostatmap-legend-label')
-                    .attr('x', out.colorLegend.labelOffset.x)
+                    .attr('class', 'em-legend-label')
+                    .attr('x', out.colorLegend.sepLineLength + out.colorLegend.tickLength + out.colorLegend.labelOffset.x)
                     .attr('y', out.colorLegend.shapeHeight)
                     .attr('dominant-baseline', 'middle')
                     .text((d) => {
@@ -735,7 +750,7 @@ export const legend = function (map, config) {
             let container = out._colorLegendNode
                 .append('g')
                 .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'color-legend-item')
+                .attr('class', 'em-legend-rect')
 
             buildNoDataLegend(x, y, container, out.colorLegend.noDataText)
         }

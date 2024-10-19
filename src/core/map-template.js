@@ -769,6 +769,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // each map template needs a clipPath to avoid overflow. See GISCO-2707
         svg.append('defs')
+            .attr('class', 'em-defs')
             .append('clipPath')
             .attr('id', out.svgId_ + '-clip-path')
             .append('path')
@@ -789,7 +790,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //create drawing group, as first child
         const dg = svg
             .insert('g', ':first-child')
-            .attr('id', 'drawing' + out.svgId_)
+            .attr('id', 'drawing-' + out.svgId_)
             .attr('class', 'em-drawing-group')
             .attr('clip-path', 'url(#' + out.svgId_ + '-clip-path' + ')')
 
@@ -848,10 +849,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         // add container to drawing group
         // Cannot read properties of undefined (reading 'svgId')
         let svg = select('#' + out.svgId_)
-        let drawingGroup = svg.select('#drawing' + out.svgId_)
+        let drawingGroup = svg.select('#drawing-' + out.svgId_)
         const ing = drawingGroup
             .append('g')
-            .attr('id', 'insetsgroup')
+            .attr('id', 'insets-group')
             .attr('transform', 'translate(' + out.insetBoxPosition_[0] + ',' + out.insetBoxPosition_[1] + ')')
 
         if (out.insets_ === 'default') {
