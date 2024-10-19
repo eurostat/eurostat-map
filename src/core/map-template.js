@@ -78,14 +78,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     //tooltip
     //default config
     out.tooltip_ = {
-        maxWidth: '200px',
         fontSize: '14px',
-        background: 'white',
-        padding: '0px',
-        border: '0px',
-        borderRadius: '0px',
-        zIndex: '999999',
-        boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
         transitionDuration: 200,
         xOffset: 0,
         yOffset: 0,
@@ -1319,7 +1312,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     let coords = out._projection(d.geometry.coordinates)
                     return 'translate(' + coords[0].toFixed(3) + ',' + coords[1].toFixed(3) + ')'
                 })
-                .attr('class', 'symbol') // OUR SYMBOL CONTAINER
+                .attr('class', 'em-symbol') // OUR SYMBOL CONTAINER
                 .attr('id', (d) => 'ps' + d.properties.id)
                 .on('mouseover', function (e, rg) {
                     if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
@@ -1393,13 +1386,14 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //bottom text
-        if (out.bottomText())
+        if (out.bottomText_)
             out.svg()
                 .append('text')
                 .attr('id', 'bottomtext')
+                .attr('class', 'em-bottom-text')
                 .attr('x', out.botTxtPadding_)
                 .attr('y', out.height_ - out.botTxtPadding_)
-                .text(out.bottomText())
+                .text(out.bottomText_)
                 .style('font-family', out.fontFamily_)
                 .style('font-size', out.botTxtFontSize_ + 'px')
                 .style('fill', out.botTxtFill_)

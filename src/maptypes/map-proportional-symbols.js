@@ -175,9 +175,9 @@ export const map = function (config) {
         if (map.svg_) {
             if (out.classifierColor_) {
                 //assign color class to each symbol, based on their value
-                // at this point, the symbol path hasnt been appended. Only the parent g.symbol element (in map-template)
+                // at this point, the symbol path hasnt been appended. Only the parent g.em-symbol element (in map-template)
                 let colorData = map.statData('color')
-                map.svg_.selectAll('.symbol').attr('ecl', function (rg) {
+                map.svg_.selectAll('.em-symbol').attr('ecl', function (rg) {
                     const sv = colorData.get(rg.properties.id)
                     if (!sv) {
                         return 'nd'
@@ -256,7 +256,7 @@ export const map = function (config) {
 
         if (map.svg_) {
             //clear previous symbols
-            let prevSymbols = map.svg_.selectAll(':not(#insetsgroup) g.symbol > *')
+            let prevSymbols = map.svg_.selectAll(':not(#insetsgroup) g.em-symbol > *')
             prevSymbols.remove()
 
             //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)
@@ -425,7 +425,7 @@ export const map = function (config) {
             .style('stroke-width', out.psStrokeWidth())
             .style('fill', function () {
                 if (out.classifierColor_) {
-                    //for ps, ecl attribute belongs to the parent g.symbol node created in map-template
+                    //for ps, ecl attribute belongs to the parent g.em-symbol node created in map-template
                     const ecl = select(this.parentNode).attr('ecl')
                     if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
                     let color = out.psClassToFillStyle_(ecl, out.psClasses_)
@@ -469,7 +469,7 @@ export const map = function (config) {
         })
 
         let symbols = gcp
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .data(
                 // FILTERING BREAKS IMAGE -
                 // it removes regions not present in current data, but if you update the data and add data for those regions then they are not drawn!!)
@@ -501,7 +501,7 @@ export const map = function (config) {
      * @return {void}
      */
     function appendCirclesToMap(map, sizeData) {
-        let symbolContainers = map.svg().selectAll('g.symbol')
+        let symbolContainers = map.svg().selectAll('g.em-symbol')
 
         return (
             symbolContainers
@@ -532,7 +532,7 @@ export const map = function (config) {
     function appendD3SymbolsToMap(map, sizeData) {
         return map
             .svg()
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .append('path')
             .filter((rg) => {
                 const sv = sizeData.get(rg.properties.id)
@@ -569,7 +569,7 @@ export const map = function (config) {
             map
                 .svg()
                 .select('#g_ps')
-                .selectAll('g.symbol')
+                .selectAll('g.em-symbol')
                 .append('rect')
                 .filter((rg) => {
                     const sv = sizeData.get(rg.properties.id)
@@ -604,7 +604,7 @@ export const map = function (config) {
         return map
             .svg()
             .select('#g_ps')
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .append('g')
             .filter((rg) => {
                 const sv = sizeData.get(rg.properties.id)
@@ -633,7 +633,7 @@ export const map = function (config) {
         // Toggle symbol visibility - only show regions with sizeData stat values when mixing different NUTS levels
         let symb = map
             .svg()
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .style('display', function (rg) {
                 const sv = sizeData.get(rg.properties.id)
                 if (
@@ -666,26 +666,30 @@ export const map = function (config) {
         // nuts border stroke
         regions
             .style('stroke', function (rg) {
-                const lvl = select(this).attr('lvl')
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const stroke = sel.style('stroke')
                 const sv = sizeData.get(rg.properties.id)
                 if (!sv || !sv.value || !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
                     return
                 } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
                     if (lvl !== '0') {
-                        return out.nutsbnStroke_[parseInt(lvl)] || '#777'
+                        return stroke || '#777'
                     }
                 }
             })
 
             // nuts border stroke width
             .style('stroke-width', function (rg) {
-                const lvl = select(this).attr('lvl')
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const strokeWidth = sel.style('stroke-width')
                 const sv = sizeData.get(rg.properties.id)
                 if (!sv || !sv.value || !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
                     return
                 } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || out.geo_ == 'WORLD') {
                     if (lvl !== '0') {
-                        return out.nutsbnStrokeWidth_[parseInt(lvl)] || '#777'
+                        return strokeWidth || '#777'
                     }
                 }
             })

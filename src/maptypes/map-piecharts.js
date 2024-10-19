@@ -219,7 +219,7 @@ export const map = function (config) {
         if (out.svg_) {
             let s = out.svg_.selectAll('#g_ps')
             if (s) {
-                let sym = s.selectAll('g.symbol')
+                let sym = s.selectAll('g.em-symbol')
                 sym.append('g').attr('id', (rg) => {
                     nutsIds.push(rg.properties.id)
                     return 'pie_' + rg.properties.id
@@ -330,7 +330,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         let totals = []
-        let sel = out.svg().selectAll('#g_ps').selectAll('g.symbol').data()
+        let sel = out.svg().selectAll('#g_ps').selectAll('g.em-symbol').data()
 
         sel.forEach((rg) => {
             let id = rg.properties.id

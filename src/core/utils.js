@@ -176,6 +176,30 @@ export const getFontSizeFromClass = function (className) {
     return fontSize || 0
 }
 
+export const getCSSPropertyFromClass = function (className, propertyName) {
+    // Create a temporary element with the specified class
+    const tempElement = document.createElement('div')
+    tempElement.className = className
+
+    // Apply inline styles to minimize layout interference
+    tempElement.style.position = 'absolute'
+    tempElement.style.visibility = 'hidden'
+    tempElement.style.height = 'auto'
+    tempElement.style.width = 'auto'
+    tempElement.style.lineHeight = 'normal'
+
+    // Append directly to the body
+    document.body.appendChild(tempElement)
+
+    // Get the computed value of the specified property
+    const propertyValue = window.getComputedStyle(tempElement).getPropertyValue(propertyName)
+
+    // Remove the temporary element from the document body
+    document.body.removeChild(tempElement)
+
+    return propertyValue || null
+}
+
 export const upperCaseFirstLetter = (string) => `${string.slice(0, 1).toUpperCase()}${string.slice(1)}`
 
 export const lowerCaseAllWordsExceptFirstLetters = (string) =>

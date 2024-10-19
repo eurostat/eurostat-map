@@ -3,7 +3,7 @@ import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
 import * as smap from '../core/stat-map'
 import * as lgct from '../legend/legend-categorical'
-import { executeForAllInsets } from '../core/utils'
+import { executeForAllInsets, getCSSPropertyFromClass } from '../core/utils'
 
 /**
  * Returns a categorical map.
@@ -141,20 +141,25 @@ export const map = function (config) {
                 map.svg()
                     .selectAll('path.em-nutsrg')
                     .style('display', function (rg) {
-                        const ecl = select(this).attr('ecl')
-                        const lvl = select(this).attr('lvl')
+                        const sel = select(this)
+                        const ecl = sel.attr('ecl')
+                        const lvl = sel.attr('lvl')
                         const countryId = rg.properties.id.slice(0, 2)
                         return (ecl && out.countriesToShow_.includes(countryId)) || lvl === '0' ? 'block' : 'none'
                     })
                     .style('stroke', function () {
-                        const lvl = select(this).attr('lvl')
-                        const ecl = select(this).attr('ecl')
-                        return ecl && lvl !== '0' ? map.nutsbnStroke_[parseInt(lvl)] || '#777' : null
+                        const sel = select(this)
+                        const lvl = sel.attr('lvl')
+                        const ecl = sel.attr('ecl')
+                        const stroke = sel.style('stroke')
+                        return ecl && lvl !== '0' ? stroke || '#777' : null
                     })
                     .style('stroke-width', function () {
-                        const lvl = select(this).attr('lvl')
-                        const ecl = select(this).attr('ecl')
-                        return ecl && lvl !== '0' ? map.nutsbnStrokeWidth_[parseInt(lvl)] || 0.2 : null
+                        const sel = select(this)
+                        const lvl = sel.attr('lvl')
+                        const ecl = sel.attr('ecl')
+                        const strokeWidth = sel.style('stroke-width')
+                        return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
                     })
             }
 
