@@ -296,7 +296,7 @@ export const legend = function (map, config) {
                     select(this).style('stroke-width', 0.5).style('stroke', 'black') // Reset stroke width back to normal
                 })
             lgg.append('text')
-                .attr('class', 'em-bivariate-label')
+                .attr('class', 'em-bivariate-nodata-label')
                 .attr('x', out.boxPadding + out.noDataShapeWidth + 5)
                 .attr('y', y + out.noDataShapeHeight * 0.5 + 1)
                 .text(out.noDataText)

@@ -34,7 +34,7 @@
 .em-bivariate-axis-title {
     font-size: 15px;
 }
-.em-bivariate-label {
+.em-bivariate-nodata-label {
     font-size: 14px;
 }
 .em-bivariate-tick {
@@ -51,7 +51,8 @@
     stroke: white;
 }
 
-.em-bivariate-square:hover {
+.em-bivariate-square:hover,
+.em-legend-rect:hover {
     stroke-width: 2;
     stroke: red;
 }

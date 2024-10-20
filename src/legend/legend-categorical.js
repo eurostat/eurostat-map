@@ -114,14 +114,12 @@ export const legend = function (map, config) {
                 .attr('height', out.shapeHeight)
                 .style('fill', m.noDataFillStyle_)
                 .on('mouseover', function () {
-                    select(this).style('fill', m.hoverColor_)
                     highlightRegions(out.map, 'nd')
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, highlightRegions, 'nd')
                     }
                 })
                 .on('mouseout', function () {
-                    select(this).style('fill', m.noDataFillStyle_)
                     unhighlightRegions(out.map, 'nd')
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, unhighlightRegions, 'nd')
