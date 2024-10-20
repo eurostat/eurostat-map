@@ -52,9 +52,6 @@ export const legend = function (map, config) {
                 .text(out.title)
         }
 
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
-
         //get category codes
         const ecls = out.order ? out.order : m.classifier().domain()
 
@@ -71,13 +68,12 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
                 .style('fill', fillColor)
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
                     select(this).style('fill', m.hoverColor_)
                     highlightRegions(out.map, ecl)
@@ -95,14 +91,11 @@ export const legend = function (map, config) {
 
             //label
             lgg.append('text')
-                .attr('class', 'eurostat-map-legend-label')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
                 .text(m.classToText() ? m.classToText()[ecl_] : ecl_)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
         }
 
         //'no data' legend box
@@ -114,13 +107,12 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
                 .style('fill', m.noDataFillStyle_)
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
                     select(this).style('fill', m.hoverColor_)
                     highlightRegions(out.map, 'nd')
@@ -135,29 +127,14 @@ export const legend = function (map, config) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, unhighlightRegions, 'nd')
                     }
                 })
-            // .on('mouseover', function () {
-            //     const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='nd']")
-            //     sel.style('fill', m.hoverColor())
-            //     select(this).style('fill', m.hoverColor())
-            // })
-            // .on('mouseout', function () {
-            //     const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='nd']")
-            //     sel.style('fill', function (d) {
-            //         select(this).attr('fill___')
-            //     })
-            //     select(this).style('fill', m.noDataFillStyle())
-            // })
 
             //'no data' label
             lgg.append('text')
-                .attr('class', 'eurostat-map-legend-label')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
                 .text(out.noDataText)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
         }
 
         //set legend box dimensions

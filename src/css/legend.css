@@ -36,8 +36,11 @@
 }
 .em-bivariate-label {
     font-size: 14px;
+    text-anchor: middle;
 }
 .em-bivariate-tick {
+    stroke: black;
+    stroke-width: 1;
 }
 .em-bivariate-square,
 .em-legend-rect {

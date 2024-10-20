@@ -81,11 +81,7 @@ export const legend = function (map, config) {
                 .attr('x', xc + horizontalOffset)
                 .attr('y', out.boxPadding + out.titleFontSize)
                 .text(out.title)
-                .style('text-anchor', 'middle')
         }
-
-        // Set font family
-        lgg.style('font-family', out.map.fontFamily_)
 
         // The vertical position of the legend element
         let y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0)
@@ -117,19 +113,12 @@ export const legend = function (map, config) {
                     .attr('height', sz)
                     .style('fill', fill)
                     .on('mouseover', function () {
-                        const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
-                        const sel = regions.selectAll(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
-                        sel.style('fill', 'red')
+                        highlightRegions(out.map, ecl1, ecl2)
                         // Make the stroke thicker on hover
                         select(this).raise().style('stroke-width', 2).style('stroke', out.map.hoverColor_) // Increase the stroke width on hover
                     })
                     .on('mouseout', function () {
-                        const container = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
-                        const regions = container.selectAll(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
-                        regions.each(function () {
-                            const sel = select(this)
-                            sel.style('fill', sel.attr('fill___'))
-                        })
+                        unhighlightRegions(out.map, ecl1, ecl2)
                         select(this).style('fill', fill)
                         // Reset the stroke width to the original value on mouseout
                         select(this).style('stroke-width', 0.5).style('stroke', 'white') // Reset stroke width back to normal
@@ -158,8 +147,6 @@ export const legend = function (map, config) {
                     .attr('x', x + out.xAxisLabelsOffset.x)
                     .attr('y', y + out.xAxisLabelsOffset.y)
                     .text(out.breaks1[i])
-                    .attr('text-anchor', 'middle')
-                    .style('fill', out.fontFill)
 
                 square
                     .append('line')
@@ -193,8 +180,6 @@ export const legend = function (map, config) {
                     .attr('x2', x - 5)
                     .attr('y1', y)
                     .attr('y2', y)
-                    .attr('stroke', out.fontFill)
-                    .attr('stroke-width', 1)
             }
         }
 
@@ -320,6 +305,32 @@ export const legend = function (map, config) {
 
         // Set legend box dimensions
         out.setBoxDimension()
+    }
+
+    // Highlight selected regions on mouseover
+    function highlightRegions(map, ecl1, ecl2) {
+        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
+
+        // Set all regions to white
+        allRegions.style('fill', 'white')
+
+        // Highlight only the selected regions by restoring their original color
+        const selectedRegions = allRegions.filter(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
+        selectedRegions.each(function () {
+            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+        })
+    }
+
+    // Reset all regions to their original colors on mouseout
+    function unhighlightRegions(map, ecl1, ecl2) {
+        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
+
+        // Restore each region's original color from the fill___ attribute
+        allRegions.each(function () {
+            select(this).style('fill', select(this).attr('fill___'))
+        })
     }
 
     return out

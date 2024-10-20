@@ -50,9 +50,6 @@ export const legend = function (map, config) {
                 .text(out.title)
         }
 
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
-
         //draw legend elements for classes: rectangle + label
         let i = 0
         const scs = m.catColors()

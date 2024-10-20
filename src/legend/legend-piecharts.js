@@ -66,9 +66,6 @@ export const legend = function (map, config) {
         //draw legend background box
         out.makeBackgroundBox()
 
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
-
         // legend for sizes
         if (m.sizeClassifier_) {
             buildSizeLegend(m, lgg, out.sizeLegend)
@@ -176,9 +173,6 @@ export const legend = function (map, config) {
                 .attr('y', out._sizeLegendHeight + out.legendSpacing + out.boxPadding + out.titleFontSize)
                 .text(config.title)
         }
-
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
 
         //draw legend elements for classes: rectangle + label
         let i = 0
