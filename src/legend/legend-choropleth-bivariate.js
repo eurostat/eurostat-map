@@ -32,8 +32,8 @@ export const legend = function (map, config) {
     out.showBreaks = false // if set to true and breaks1 and breaks2 are undefined then breaks are automatically defined
 
     //axis
-    out.yAxisLabelsOffset = { x: 0, y: 0 }
-    out.xAxisLabelsOffset = { x: 0, y: 0 }
+    out.yAxisLabelsOffset = { x: 7, y: 0 }
+    out.xAxisLabelsOffset = { x: 0, y: 5 }
 
     //show no data
     out.noData = true
@@ -115,13 +115,13 @@ export const legend = function (map, config) {
                     .on('mouseover', function () {
                         highlightRegions(out.map, ecl1, ecl2)
                         // Make the stroke thicker on hover
-                        select(this).raise().style('stroke-width', 2).style('stroke', out.map.hoverColor_) // Increase the stroke width on hover
+                        select(this).raise()
                     })
                     .on('mouseout', function () {
-                        unhighlightRegions(out.map, ecl1, ecl2)
-                        select(this).style('fill', fill)
-                        // Reset the stroke width to the original value on mouseout
-                        select(this).style('stroke-width', 0.5).style('stroke', 'white') // Reset stroke width back to normal
+                        unhighlightRegions(out.map)
+                        // select(this).style('fill', fill)
+                        // // Reset the stroke width to the original value on mouseout
+                        // select(this).style('stroke-width', 0.5).style('stroke', 'white') // Reset stroke width back to normal
                     })
             }
         }
@@ -143,7 +143,7 @@ export const legend = function (map, config) {
 
                 square
                     .append('text')
-                    .attr('class', 'em-bivariate-label')
+                    .attr('class', 'em-bivariate-tick-label')
                     .attr('x', x + out.xAxisLabelsOffset.x)
                     .attr('y', y + out.xAxisLabelsOffset.y)
                     .text(out.breaks1[i])
@@ -166,7 +166,7 @@ export const legend = function (map, config) {
 
                 square
                     .append('text')
-                    .attr('class', 'em-bivariate-label')
+                    .attr('class', 'em-bivariate-tick-label')
                     .attr('x', x + out.yAxisLabelsOffset.y)
                     .attr('y', y - out.yAxisLabelsOffset.x)
                     .text([...out.breaks2].reverse()[i])
@@ -323,9 +323,9 @@ export const legend = function (map, config) {
     }
 
     // Reset all regions to their original colors on mouseout
-    function unhighlightRegions(map, ecl1, ecl2) {
+    function unhighlightRegions(map) {
         const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
+        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Restore each region's original color from the fill___ attribute
         allRegions.each(function () {

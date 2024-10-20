@@ -36,14 +36,22 @@
 }
 .em-bivariate-label {
     font-size: 14px;
-    text-anchor: middle;
 }
 .em-bivariate-tick {
     stroke: black;
     stroke-width: 1;
 }
+.em-bivariate-tick-label {
+    text-anchor: middle;
+    font-size: 12px;
+}
 .em-bivariate-square,
 .em-legend-rect {
     cursor: pointer;
     stroke: white;
+}
+
+.em-bivariate-square:hover {
+    stroke-width: 2;
+    stroke: red;
 }
