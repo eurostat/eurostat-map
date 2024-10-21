@@ -45,9 +45,9 @@ export const legend = function (map, config) {
     if (config)
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
-                for (let p in out[key] !== undefined) {
+                for (let p in out[key]) {
                     //override each property in size and color legend configs
-                    if (config[key][p]) {
+                    if (config[key][p] !== undefined) {
                         out[key][p] = config[key][p]
                     }
                 }

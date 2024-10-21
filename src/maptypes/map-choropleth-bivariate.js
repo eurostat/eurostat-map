@@ -368,20 +368,10 @@ const tooltipTextFunBiv = function (rg, map) {
     //region name
     if (rg.properties.id) {
         //name and code
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                rg.properties.na +
-                ' (' +
-                rg.properties.id +
-                ') </div>'
-        )
+        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + ' (' + rg.properties.id + ') </div>')
     } else {
         //region name
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                rg.properties.na +
-                '</div>'
-        )
+        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + '</div>')
     }
 
     //stat 1 value

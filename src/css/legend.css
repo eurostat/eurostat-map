@@ -57,3 +57,10 @@
     stroke-width: 2;
     stroke: red;
 }
+.em-tooltip-piechart-breakdown {
+    padding: 10px;
+    font-size: 14px;
+}
+.em-tooltip-piechart-container {
+    text-align: center;
+}

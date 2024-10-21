@@ -440,20 +440,12 @@ export const map = function (config) {
 
         if (rg.properties.id) {
             //name and code
-            tp.append('div').html(
-                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                    rg.properties.na +
-                    ' (' +
-                    rg.properties.id +
-                    ') </div>'
-            )
+            tp.append('div')
+                .attr('class', 'estat-vis-tooltip-bar')
+                .html(rg.properties.na + ' (' + rg.properties.id + ')')
         } else {
             //region name
-            tp.append('div').html(
-                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                    rg.properties.na +
-                    '</div>'
-            )
+            tp.append('div').attr('class', 'estat-vis-tooltip-bar').html(rg.properties.na)
         }
 
         //prepare data for pie chart
@@ -477,8 +469,10 @@ export const map = function (config) {
         const radius = Math.min(width, height) / 2 - margin
 
         //width = tp.node().getBoundingClientRect().width
-        const svg = tp
+        const container = tp.append('div').attr('class', 'em-tooltip-piechart-container')
+        const svg = container
             .append('svg')
+            .attr('class', 'em-tooltip-piechart-svg')
             .attr('viewbox', `0, 0, ${width}, ${height}`)
             .attr('width', width)
             .attr('height', height - margin / 2)
@@ -555,28 +549,26 @@ export const map = function (config) {
             .style('font-size', '12px')
 
         // add region values to tooltip
-        let breakdownDiv = document.createElement('div')
-        breakdownDiv.style.padding = '10px'
-        breakdownDiv.style.paddingTop = '0px'
-        breakdownDiv.style.fontSize = '13px'
-        //let units = out.statData(out.statCodes_[0]).unitText();
+        let breakdownDiv = tp.append('div').attr('class', 'em-tooltip-piechart-breakdown')
 
         // show value for each category
         for (let i = 0; i < out.statCodes_.length; i++) {
-            //retrieve code and stat value
+            // retrieve code and stat value
             const sc = out.statCodes_[i]
             const s = out.statData(sc).get(rg.properties.id)
-            if (s && s.value) {
-                let string = '<strong>' + out.catLabels_[sc] + '</strong>: ' + s.value.toFixed() + '<br>'
-                breakdownDiv.innerHTML = breakdownDiv.innerHTML + string
+
+            // check if s and s.value are valid (handle null, undefined, or 0)
+            if (s && s.value !== undefined && s.value !== null) {
+                let string = `<strong>${out.catLabels_[sc]}</strong>: ${s.value.toFixed()}<br>`
+                breakdownDiv.html(breakdownDiv.html() + string) // safely update the HTML
             }
         }
 
-        //write total
+        // write total (handle null, undefined, or 0 values for total)
         let total = getRegionTotal(rg.properties.id)
-        breakdownDiv.innerHTML = breakdownDiv.innerHTML + `<strong>Total</strong>: ${total.toFixed()} <br>`
-        // append div to tooltip
-        tp.node().appendChild(breakdownDiv)
+        if (total !== undefined && total !== null) {
+            breakdownDiv.html(breakdownDiv.html() + `<strong>Total</strong>: ${total.toFixed()}<br>`)
+        }
     }
 
     return out
