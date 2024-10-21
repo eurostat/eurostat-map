@@ -1,7 +1,7 @@
 import { select, selectAll } from 'd3-selection'
 import * as lg from '../core/legend'
 import { line } from 'd3-shape'
-import { getFontSizeFromClass } from '../core/utils'
+import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**
  * A legend for choropleth-bivariate maps
@@ -38,8 +38,8 @@ export const legend = function (map, config) {
     //show no data
     out.noData = true
     //show no data
-    out.noDataShapeHeight = 15
-    out.noDataShapeWidth = 15
+    out.noDataShapeHeight = 20
+    out.noDataShapeWidth = 25
 
     //no data text label
     out.noDataText = 'No data'
@@ -114,14 +114,16 @@ export const legend = function (map, config) {
                     .style('fill', fill)
                     .on('mouseover', function () {
                         highlightRegions(out.map, ecl1, ecl2)
-                        // Make the stroke thicker on hover
-                        select(this).raise()
+                        if (out.map.insetTemplates_) {
+                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl1, ecl2)
+                        }
+                        select(this).raise() // raise legend square to avoid stroke issue
                     })
                     .on('mouseout', function () {
                         unhighlightRegions(out.map)
-                        // select(this).style('fill', fill)
-                        // // Reset the stroke width to the original value on mouseout
-                        // select(this).style('stroke-width', 0.5).style('stroke', 'white') // Reset stroke width back to normal
+                        if (out.map.insetTemplates_) {
+                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl1, ecl2)
+                        }
                     })
             }
         }
@@ -282,8 +284,6 @@ export const legend = function (map, config) {
                     const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
                     const sel = regions.selectAll("[nd='nd']")
                     sel.style('fill', 'red')
-                    // Make the stroke thicker on hover
-                    select(this).raise().style('stroke-width', 2).style('stroke', out.map.hoverColor_) // Increase the stroke width on hover
                 })
                 .on('mouseout', function () {
                     const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
@@ -292,15 +292,12 @@ export const legend = function (map, config) {
                         return select(this).attr('fill___')
                     })
                     select(this).style('fill', out.map.noDataFillStyle())
-                    // Reset the stroke width to the original value on mouseout
-                    select(this).style('stroke-width', 0.5).style('stroke', 'black') // Reset stroke width back to normal
                 })
             lgg.append('text')
                 .attr('class', 'em-bivariate-nodata-label')
                 .attr('x', out.boxPadding + out.noDataShapeWidth + 5)
                 .attr('y', y + out.noDataShapeHeight * 0.5 + 1)
                 .text(out.noDataText)
-                .style('dominant-baseline', 'middle')
         }
 
         // Set legend box dimensions
@@ -309,7 +306,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl1, ecl2) {
-        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Set all regions to white
@@ -324,7 +321,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Restore each region's original color from the fill___ attribute

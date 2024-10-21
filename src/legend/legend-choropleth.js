@@ -63,9 +63,6 @@ export const legend = function (map, config) {
                 .text(out.title)
         }
 
-        // Set font family for legend
-        lgg.style('font-family', m.fontFamily_)
-
         // Label formatter
         const formatLabel = out.labelFormatter || format(`.${out.labelDecNb}f`)
 
@@ -86,15 +83,13 @@ export const legend = function (map, config) {
                 .attr('height', out.shapeHeight)
                 .style('fill', fillColor)
                 .on('mouseover', function () {
-                    select(this).style('fill', m.hoverColor_)
                     highlightRegions(out.map, ecl)
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl)
                     }
                 })
                 .on('mouseout', function () {
-                    select(this).style('fill', fillColor)
-                    unhighlightRegions(out.map, ecl)
+                    unhighlightRegions(out.map)
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl)
                     }
@@ -150,9 +145,9 @@ export const legend = function (map, config) {
                 })
                 .on('mouseout', function () {
                     select(this).style('fill', out.map.noDataFillStyle_)
-                    unhighlightRegions(out.map, 'nd')
+                    unhighlightRegions(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, 'nd')
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
                     }
                 })
 
@@ -170,7 +165,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl) {
-        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Set all regions to white
@@ -185,7 +180,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Restore each region's original color from the fill___ attribute

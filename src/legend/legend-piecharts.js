@@ -2,6 +2,7 @@ import { format } from 'd3-format'
 import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import * as lg from '../core/legend'
+import { executeForAllInsets } from '../core/utils'
 
 /**
  * A legend for proportional symbol map
@@ -31,8 +32,8 @@ export const legend = function (map, config) {
     out.colorLegend = {
         title: null,
         labelOffset: 5, //the distance between the legend box elements to the corresponding text label
-        shapeWidth: 22, //the width of the legend box elements
-        shapeHeight: 15, //the height of the legend box elements
+        shapeWidth: 25, //the width of the legend box elements
+        shapeHeight: 20, //the height of the legend box elements
         shapePadding: 5, //the distance between consecutive legend box elements
         noData: true, //show no data
         noDataText: 'No data', //no data label text
@@ -44,7 +45,7 @@ export const legend = function (map, config) {
     if (config)
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
-                for (let p in out[key]) {
+                for (let p in out[key] !== undefined) {
                     //override each property in size and color legend configs
                     if (config[key][p]) {
                         out[key][p] = config[key][p]
@@ -190,6 +191,7 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', config.shapeWidth)
@@ -198,19 +200,16 @@ export const legend = function (map, config) {
                 .attr('stroke', 'black')
                 .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
-                    // TODO: change this to estat logic of making all other classes transparent?
-                    svgMap
-                        .selectAll('.piechart')
-                        .selectAll("path[code='" + code + "']")
-                        .style('fill', m.hoverColor())
-                    select(this).style('fill', m.hoverColor())
+                    highlightRegions(out.map, code)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                    }
                 })
                 .on('mouseout', function () {
-                    svgMap
-                        .selectAll('.piechart')
-                        .selectAll("path[code='" + code + "']")
-                        .style('fill', col)
-                    select(this).style('fill', col)
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
+                    }
                 })
 
             //label
@@ -222,19 +221,6 @@ export const legend = function (map, config) {
                 .style('font-size', out.labelFontSize + 'px')
                 .style('font-family', m.fontFamily_)
                 .style('fill', out.fontFill)
-                .on('mouseover', function () {
-                    svgMap
-                        .selectAll('pattern')
-                        .selectAll("rect[code='" + code + "']")
-                        .style('fill', m.hoverColor())
-                })
-                .on('mouseout', function () {
-                    const col = m.catColors()[code] || 'lightgray'
-                    svgMap
-                        .selectAll('pattern')
-                        .selectAll("rect[code='" + code + "']")
-                        .style('fill', col)
-                })
 
             i++
         }
@@ -250,6 +236,7 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', config.shapeWidth)
@@ -258,17 +245,16 @@ export const legend = function (map, config) {
                 .attr('stroke', 'black')
                 .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
-                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
-                    select(this).style('fill', m.hoverColor())
+                    highlightRegions(out.map, 'nd')
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
+                    }
                 })
                 .on('mouseout', function () {
-                    const sel = svgMap
-                        .select('#g_nutsrg')
-                        .selectAll("[nd='nd']")
-                        .style('fill', function (d) {
-                            m.noDataFillStyle()
-                        })
-                    select(this).style('fill', m.noDataFillStyle())
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, 'nd')
+                    }
                 })
 
             //'no data' label
@@ -280,18 +266,31 @@ export const legend = function (map, config) {
                 .style('font-size', out.labelFontSize + 'px')
                 .style('font-family', m.fontFamily_)
                 .style('fill', out.fontFill)
-                .on('mouseover', function () {
-                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
-                })
-                .on('mouseout', function () {
-                    const sel = svgMap
-                        .select('#g_nutsrg')
-                        .selectAll("[nd='nd']")
-                        .style('fill', function (d) {
-                            m.noDataFillStyle()
-                        })
-                })
         }
+    }
+
+    // Highlight selected segments on mouseover
+    function highlightRegions(map, code) {
+        const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
+
+        // Set all segments to white
+        allSegments.style('fill', 'white')
+
+        // Highlight only the selected segments by restoring their original color
+        const selectedSegments = allSegments.filter("path[code='" + code + "']")
+        selectedSegments.each(function () {
+            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected segments
+        })
+    }
+
+    // Reset all segments to their original colors on mouseout
+    function unhighlightRegions(map) {
+        const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
+
+        // Restore each segments's original color from the fill___ attribute
+        allSegments.each(function () {
+            select(this).style('fill', select(this).attr('fill___'))
+        })
     }
 
     return out

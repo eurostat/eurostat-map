@@ -36,6 +36,7 @@
 }
 .em-bivariate-nodata-label {
     font-size: 14px;
+    dominant-baseline: middle;
 }
 .em-bivariate-tick {
     stroke: black;

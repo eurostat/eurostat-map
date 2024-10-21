@@ -122,8 +122,9 @@ export const flags = {
  * @param {*} mainSvgId the ID of the map's svg
  * @param {*} callback the function to execute for each inset
  * @param {*} [parameter=null] the parameter to pass to the callback
+ * @param {*} [parameter2=null] the parameter to pass to the callback
  */
-export const executeForAllInsets = function (insets, mainSvgId, callback, parameter = null) {
+export const executeForAllInsets = function (insets, mainSvgId, callback, parameter = null, parameter2 = null) {
     for (const geo in insets) {
         const insetGroup = insets[geo]
 
@@ -133,19 +134,19 @@ export const executeForAllInsets = function (insets, mainSvgId, callback, parame
                 if (Array.isArray(inset)) {
                     inset.forEach((nestedInset) => {
                         if (nestedInset.svgId_ !== mainSvgId) {
-                            callback(nestedInset, parameter)
+                            callback(nestedInset, parameter, parameter2)
                         }
                     })
                 } else {
                     if (inset.svgId_ !== mainSvgId) {
-                        callback(inset, parameter)
+                        callback(inset, parameter, parameter2)
                     }
                 }
             })
         } else {
             // Apply callback to unique inset
             if (insetGroup.svgId_ !== mainSvgId) {
-                callback(insetGroup, parameter)
+                callback(insetGroup, parameter, parameter2)
             }
         }
     }

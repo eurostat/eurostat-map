@@ -255,7 +255,6 @@ export const map = function (config) {
                     })
                     .on('mouseout', function () {
                         const sel = select(this)
-                        let currentFill = sel.style('fill')
                         let newFill = sel.attr('fill___')
                         if (newFill) {
                             sel.style('fill', sel.attr('fill___'))
@@ -415,6 +414,9 @@ export const map = function (config) {
                 .data(pie_(data))
                 .join('path')
                 .style('fill', (d) => {
+                    return out.catColors_[d.data.code] || 'lightgray'
+                })
+                .attr('fill___', (d) => {
                     return out.catColors_[d.data.code] || 'lightgray'
                 })
                 .attr('code', (d) => d.data.code) //for mouseover legend highlighting function
