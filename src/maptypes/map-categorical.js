@@ -58,7 +58,7 @@ export const map = function (config) {
 
         //assign class to nuts regions, based on their value
         out.svg()
-            .selectAll('path.em-nutsrg')
+            .selectAll('#em-nutsrg path')
             .attr('ecl', function (rg) {
                 const sv = out.statData().get(rg.properties.id)
                 if (!sv) return 'nd'
@@ -93,7 +93,7 @@ export const map = function (config) {
     function applyStyleToMap(map) {
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = out.geo_ === 'WORLD' ? 'path.em-worldrg' : 'path.em-nutsrg'
+            const selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic
@@ -139,7 +139,7 @@ export const map = function (config) {
             // Apply additional settings for mixed NUTS level view
             if (out.nutsLvl_ === 'mixed') {
                 map.svg()
-                    .selectAll('path.em-nutsrg')
+                    .selectAll('#em-nutsrg path')
                     .style('display', function (rg) {
                         const sel = select(this)
                         const ecl = sel.attr('ecl')

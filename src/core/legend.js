@@ -36,7 +36,7 @@ export const legend = function (map) {
         // clear previous
         out.svg.selectAll('#g_' + out.svgId).remove()
         // append new legend "g"
-        out.lgg = out.svg.append('g').attr('id', 'g_' + out.svgId)
+        out.lgg = out.svg.append('g').attr('id', 'em-legend-' + out.svgId)
     }
 
     /**

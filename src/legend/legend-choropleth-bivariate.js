@@ -281,12 +281,12 @@ export const legend = function (map, config) {
                 .attr('height', out.noDataShapeHeight)
                 .style('fill', out.map.noDataFillStyle())
                 .on('mouseover', function () {
-                    const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
+                    const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
                     const sel = regions.selectAll("[nd='nd']")
                     sel.style('fill', 'red')
                 })
                 .on('mouseout', function () {
-                    const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
+                    const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
                     const sel = nRg.selectAll("[nd='nd']")
                     sel.style('fill', function () {
                         return select(this).attr('fill___')
@@ -306,7 +306,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl1, ecl2) {
-        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Set all regions to white
@@ -321,7 +321,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
+        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Restore each region's original color from the fill___ attribute

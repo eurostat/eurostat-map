@@ -124,12 +124,12 @@ export const legend = function (map, config) {
                 .attr('height', out.shapeHeight)
                 .style('fill', m.noDataFillStyle())
                 .on('mouseover', function () {
-                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
+                    svgMap.select('#em-nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
                     select(this).style('fill', m.hoverColor())
                 })
                 .on('mouseout', function () {
                     const sel = svgMap
-                        .select('#g_nutsrg')
+                        .select('#em-nutsrg')
                         .selectAll("[nd='nd']")
                         .style('fill', function (d) {
                             m.noDataFillStyle()
@@ -144,11 +144,11 @@ export const legend = function (map, config) {
                 .attr('y', y + out.shapeHeight * 0.5)
                 .text(out.noDataText)
                 .on('mouseover', function () {
-                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
+                    svgMap.select('#em-nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
                 })
                 .on('mouseout', function () {
                     const sel = svgMap
-                        .select('#g_nutsrg')
+                        .select('#em-nutsrg')
                         .selectAll("[nd='nd']")
                         .style('fill', function (d) {
                             m.noDataFillStyle()

@@ -301,8 +301,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.drawGraticule_ = v
 
         //update graticule
-        let graticule = out.svg_ ? out.svg().select('#g_graticule') : null
-        let zg = out.svg_ ? out.svg_.select('#zoom-group-' + out.svgId_) : null
+        let graticule = out.svg_ ? out.svg().select('#em-graticule') : null
+        let zg = out.svg_ ? out.svg_.select('#em-zoom-group-' + out.svgId_) : null
 
         // if existing and argument is false
         if (graticule) {
@@ -316,7 +316,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 graticule.remove()
                 // add new graticule
                 zg.append('g')
-                    .attr('id', 'g_graticule')
+                    .attr('id', 'em-graticule')
                     .selectAll('path')
                     .data(out._geom.gra)
                     .enter()
@@ -325,7 +325,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .attr('class', 'em-graticule')
 
                 out.svg()
-                    .select('#g_graticule')
+                    .select('#em-graticule')
                     .each(function () {
                         // move graticule behind land mass
                         out.geo_ == 'WORLD'
@@ -346,7 +346,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out.svg_) {
             let margin = selectAll('#em-coast-margin')
             let filter = select('#em-coastal-blur')
-            let zg = select('#zoom-group-' + out.svgId_) || null
+            let zg = select('#em-zoom-group-' + out.svgId_) || null
             if (margin._groups[0][0] && v == false) {
                 // remove existing
                 margin.remove()
@@ -369,14 +369,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                 //draw for main map - geometries are still in memory so no rebuild needed
                 const drawNewCoastalMargin = (map) => {
                     // zoom group might not be inside main map (out.svg_)
-                    const zoomGroup = select('#zoom-group-' + map.svgId_)
+                    const zoomGroup = select('#em-zoom-group-' + map.svgId_)
                     //draw new coastal margin
                     const cg = zoomGroup.append('g').attr('id', 'em-coast-margin')
 
                     //countries bn
                     if (map._geom.cntbn)
                         cg.append('g')
-                            .attr('id', 'em-coast-margin_cnt')
+                            .attr('id', 'em-coast-margin-cnt')
                             .selectAll('path')
                             .data(map._geom.cntbn)
                             .enter()
@@ -388,7 +388,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //nuts bn
                     if (map._geom.nutsbn)
                         cg.append('g')
-                            .attr('id', 'em-coast-margin_nuts')
+                            .attr('id', 'em-coast-margin-nuts')
                             .selectAll('path')
                             .data(map._geom.nutsbn)
                             .enter()
@@ -400,7 +400,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //world bn
                     if (map._geom.worldbn)
                         cg.append('g')
-                            .attr('id', 'em-coast-margin_nuts')
+                            .attr('id', 'em-coast-margin-nuts')
                             .selectAll('path')
                             .data(map._geom.worldbn)
                             .enter()
@@ -722,12 +722,15 @@ export const mapTemplate = function (config, withCenterPoints) {
         //create drawing group, as first child
         const dg = svg
             .insert('g', ':first-child')
-            .attr('id', 'drawing-' + out.svgId_)
+            .attr('id', 'em-drawing-' + out.svgId_)
             .attr('class', 'em-drawing-group')
             .attr('clip-path', 'url(#' + out.svgId_ + '-clip-path' + ')')
 
         //create main zoom group
-        const zg = dg.append('g').attr('id', 'zoom-group-' + out.svgId_) //out.geo changed to out.svgId in order to be unique
+        const zg = dg
+            .append('g')
+            .attr('id', 'em-zoom-group-' + out.svgId_)
+            .attr('class', 'em-zoom-group') //out.geo changed to out.svgId in order to be unique
 
         //insets
         out.removeInsets() //remove existing
@@ -735,7 +738,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //draw frame
         dg.append('rect')
-            .attr('id', 'frame' + out.geo_)
+            .attr('id', 'em-frame-' + out.geo_)
             .attr('class', 'em-frame')
             .attr('x', 0)
             .attr('y', 0)
@@ -781,10 +784,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         // add container to drawing group
         // Cannot read properties of undefined (reading 'svgId')
         let svg = select('#' + out.svgId_)
-        let drawingGroup = svg.select('#drawing-' + out.svgId_)
+        let drawingGroup = svg.select('#em-drawing-' + out.svgId_)
         const ing = drawingGroup
             .append('g')
-            .attr('id', 'insets-group')
+            .attr('id', 'em-insets-group')
             .attr('class', 'em-insets')
             .attr('transform', 'translate(' + out.insetBoxPosition_[0] + ',' + out.insetBoxPosition_[1] + ')')
 
@@ -900,7 +903,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //prepare drawing group
-        const zg = out.svg().select('#zoom-group-' + out.svgId_)
+        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
         zg.selectAll('*').remove()
 
         //draw background rectangle
@@ -923,12 +926,13 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         if (out.drawCoastalMargin_) {
             //draw coastal margin
-            const cg = zg.append('g').attr('id', 'em-coast-margin')
+            const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
 
             //countries bn
             if (out._geom.cntbn)
                 cg.append('g')
-                    .attr('id', 'em-coast-margin_cnt')
+                    .attr('id', 'em-coast-margin-cnt')
+                    .attr('class', 'em-coast-margin-cnt')
                     .selectAll('path')
                     .data(out._geom.cntbn)
                     .enter()
@@ -940,7 +944,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             //nuts bn
             if (out._geom.nutsbn)
                 cg.append('g')
-                    .attr('id', 'em-coast-margin_nuts')
+                    .attr('id', 'em-coast-margin-nuts')
+                    .attr('class', 'em-coast-margin-nuts')
                     .selectAll('path')
                     .data(out._geom.nutsbn)
                     .enter()
@@ -952,7 +957,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             //world bn
             if (out._geom.worldbn)
                 cg.append('g')
-                    .attr('id', 'em-coast-margin_nuts')
+                    .attr('id', 'em-coast-margin-world')
+                    .attr('class', 'em-coast-margin-world')
                     .selectAll('path')
                     .data(out._geom.worldbn)
                     .enter()
@@ -966,19 +972,19 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out._geom.gra && out.drawGraticule_) {
             //draw graticule
             zg.append('g')
-                .attr('id', 'g_graticule')
+                .attr('id', 'em-graticule')
+                .attr('class', 'em-graticule')
                 .selectAll('path')
                 .data(out._geom.gra)
                 .enter()
                 .append('path')
                 .attr('d', out._geom.path)
-                .attr('class', 'em-graticule')
         }
 
         //draw country regions
         if (out._geom.cntrg) {
             zg.append('g')
-                .attr('id', 'g_cntrg')
+                .attr('id', 'em-cntrg')
                 .attr('class', 'em-cntrg')
                 .selectAll('path')
                 .data(out._geom.cntrg)
@@ -990,13 +996,13 @@ export const mapTemplate = function (config, withCenterPoints) {
         //draw world map
         if (out._geom.worldrg) {
             zg.append('g')
-                .attr('id', 'g_worldrg')
+                .attr('id', 'em-worldrg')
+                .attr('class', 'em-worldrg')
                 .selectAll('path')
                 .data(out._geom.worldrg)
                 .enter()
                 .append('path')
                 .attr('d', out._geom.path)
-                .attr('class', 'em-worldrg')
         }
 
         //draw NUTS regions
@@ -1012,12 +1018,12 @@ export const mapTemplate = function (config, withCenterPoints) {
                 ;[out._geom.mixed.rg0, out._geom.mixed.rg1, out._geom.mixed.rg2, out._geom.mixed.rg3].forEach((r, i) => {
                     //append each nuts level to map
                     zg.append('g')
-                        .attr('id', 'g_nutsrg')
+                        .attr('id', 'em-nutsrg')
+                        .attr('class', 'em-nutsrg')
                         .selectAll('path')
                         .data(r)
                         .enter()
                         .append('path')
-                        .attr('class', 'em-nutsrg')
                         .attr('d', out._geom.path)
                         .attr('lvl', i) //to be able to distinguish nuts levels
                 })
@@ -1028,7 +1034,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     let kosovoBn = feature(kosovoBnFeatures[out.scale_], 'nutsbn_1').features
                     if (out.bordersToShow_.includes('cc')) {
                         zg.append('g')
-                            .attr('id', 'g_kosovo')
+                            .attr('id', 'em-kosovo-bn')
                             .attr('class', 'em-kosovo-bn')
                             .selectAll('path')
                             .data(kosovoBn)
@@ -1040,12 +1046,12 @@ export const mapTemplate = function (config, withCenterPoints) {
             } else {
                 // when nutsLvl is not 'mixed'
                 zg.append('g')
-                    .attr('id', 'g_nutsrg')
+                    .attr('id', 'em-nutsrg')
+                    .attr('class', 'em-nutsrg')
                     .selectAll('path')
                     .data(out._geom.nutsrg)
                     .enter()
                     .append('path')
-                    .attr('class', 'em-nutsrg')
                     .attr('d', out._geom.path)
             }
         }
@@ -1053,7 +1059,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         //draw country boundaries
         if (out._geom.cntbn) {
             zg.append('g')
-                .attr('id', 'g_cntbn')
+                .attr('id', 'em-cntbn')
+                .attr('class', 'em-cntbn')
                 .selectAll('path')
                 .data(out._geom.cntbn)
                 .enter()
@@ -1077,7 +1084,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                 return bn2.properties.lvl - bn1.properties.lvl
             })
             zg.append('g')
-                .attr('id', 'g_nutsbn')
+                .attr('id', 'em-nutsbn')
+                .attr('class', 'em-nutsbn')
                 .selectAll('path')
                 .data(out._geom.nutsbn)
                 .enter()
@@ -1107,7 +1115,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 let kosovoBn = feature(kosovoBnFeatures[out.scale_], 'nutsbn_1').features
                 if (out.bordersToShow_.includes('cc')) {
                     zg.append('g')
-                        .attr('id', 'g_kosovo')
+                        .attr('id', 'em-kosovo-bn')
                         .attr('class', 'em-kosovo-bn')
                         .selectAll('path')
                         .data(kosovoBn)
@@ -1121,7 +1129,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         //draw world boundaries
         if (out._geom.worldbn) {
             zg.append('g')
-                .attr('id', 'g_worldbn')
+                .attr('id', 'em-worldbn')
+                .attr('class', 'em-worldbn')
                 .selectAll('path')
                 .data(out._geom.worldbn)
                 .enter()
@@ -1129,7 +1138,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('d', out._geom.path)
                 .attr('class', function (bn) {
                     if (bn.properties.POL_STAT > 0) {
-                        console.log(bn)
                         //disputed
                         return 'em-bn-d'
                     }
@@ -1141,13 +1149,13 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out._geom.kosovo) {
             //add kosovo to world map
             zg.append('g')
-                .attr('id', 'g_worldbn')
+                .attr('id', 'em-kosovo-bn')
+                .attr('class', 'em-kosovo-bn')
                 .selectAll('path')
                 .data(out._geom.kosovo)
                 .enter()
                 .append('path')
                 .attr('d', out._geom.path)
-                .attr('class', 'em-kosovo-bn')
         }
 
         //prepare group for proportional symbols, with nuts region centroids
@@ -1281,7 +1289,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (out.bottomText_)
             out.svg()
                 .append('text')
-                .attr('id', 'bottomtext')
+                .attr('id', 'em-bottom-text')
                 .attr('class', 'em-bottom-text')
                 .attr('x', out.botTxtPadding_)
                 .attr('y', out.height_ - out.botTxtPadding_)
@@ -1361,7 +1369,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //main map
         if (out.labelling_) {
-            let zg = out.svg_.select('#zoom-group-' + out.svgId_)
+            let zg = out.svg_.select('#em-zoom-group-' + out.svgId_)
             addLabelsToMap(out, zg)
             if (out.labelsToShow_.includes('values') && out.updateValuesLabels) out.updateValuesLabels(out)
         }
@@ -1378,7 +1386,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) {
                                     let map = out.insetTemplates_[geo][i][c]
                                     if (map.labelling_) {
-                                        let zg = map.svg_.select('#zoom-group-' + map.svgId_)
+                                        let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
                                         addLabelsToMap(map, zg)
                                         if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
                                     }
@@ -1388,7 +1396,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                             if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) {
                                 let map = out.insetTemplates_[geo][i]
                                 if (map.labelling_) {
-                                    let zg = map.svg_.select('#zoom-group-' + map.svgId_)
+                                    let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
                                     addLabelsToMap(map, zg)
                                     if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
                                 }
@@ -1400,7 +1408,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.insetTemplates_[geo].svgId_ !== out.svgId_) {
                         let map = out.insetTemplates_[geo]
                         if (map.labelling_) {
-                            let zg = map.svg_.select('#zoom-group-' + map.svgId_)
+                            let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
                             addLabelsToMap(map, zg)
                             if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
                         }

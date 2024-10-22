@@ -256,7 +256,7 @@ export const map = function (config) {
 
         if (map.svg_) {
             //clear previous symbols
-            let prevSymbols = map.svg_.selectAll(':not(#insets-group) g.em-symbol > *')
+            let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-symbol > *')
             prevSymbols.remove()
 
             //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)
@@ -280,7 +280,7 @@ export const map = function (config) {
             }
 
             // set style of symbols
-            let selector = map.geo_ == 'WORLD' ? 'path.em-worldrg' : 'path.em-nutsrg'
+            let selector = map.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
             let regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD') {
