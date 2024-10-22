@@ -24,7 +24,6 @@ export const legend = function (map, config) {
 
     //get the font size of the texts
     out.axisTitleFontSize = getFontSizeFromClass('em-bivariate-axis-title')
-    out.labelFontSize = getFontSizeFromClass('em-bivariate-label')
 
     //breaks
     out.breaks1 = undefined
@@ -141,7 +140,7 @@ export const legend = function (map, config) {
         if (out.breaks1) {
             for (let i = 0; i < out.breaks1.length; i++) {
                 const x = initialX + sz * (i + 1)
-                const y = out.squareSize + out.labelFontSize
+                const y = out.squareSize + getFontSizeFromClass('em-bivariate-tick-label')
 
                 square
                     .append('text')
@@ -187,7 +186,7 @@ export const legend = function (map, config) {
 
         // Append X axis arrow
         let xAxisArrowY = out.squareSize + out.arrowHeight + out.xAxisLabelsOffset.y
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisArrowY += out.labelFontSize / 1.5 // move over for tick labels
+        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5 // move over for tick labels
 
         square
             .append('path')

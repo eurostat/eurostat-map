@@ -407,7 +407,10 @@ export const map = function (config) {
 
         if (data) {
             // Create an SVG element detached from the document
-            const svg = create('svg')
+            const container = create('div').attr('class', 'em-tooltip-chart-container')
+            const svg = container
+                .append('svg')
+                .attr('class', 'em-tooltip-chart-svg')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
 
@@ -417,7 +420,7 @@ export const map = function (config) {
             createTooltipChart(g, data, width, height)
 
             // Convert the SVG node to an HTML string and add it to the buffer
-            buf.push(svg.node().outerHTML)
+            buf.push(container.node().outerHTML)
         }
 
         // Return the buffer as a single string

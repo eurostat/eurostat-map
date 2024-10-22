@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import * as lg from '../core/legend'
 import { symbolsLibrary } from '../maptypes/map-proportional-symbols'
 import { symbol } from 'd3-shape'
-import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
+import { executeForAllInsets, getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
 import { formatDefaultLocale } from 'd3-format'
 import { max } from 'd3-array'
 
@@ -220,119 +220,45 @@ export const legend = function (map, config) {
 
         //append symbol & style
         container
-            .append('g')
-            .style('fill', m.noDataFillStyle())
-            .style('fill-opacity', m.psFillOpacity())
-            .style('stroke', '#000')
-            .attr('stroke-width', 0.4)
             .append('rect')
             .attr('class', 'em-legend-rect')
+            .style('fill', m.noDataFillStyle())
             .attr('width', out.colorLegend ? out.colorLegend.shapeWidth : out.noDataShapeWidth)
             .attr('height', out.colorLegend ? out.colorLegend.shapeHeight : out.noDataShapeHeight)
             .on('mouseover', function () {
-                const parents = m.svg_.select('#g_ps').selectAll("[ecl='nd']")
-                let cellFill = select(this.parentNode).style('fill')
-                // save legend cell fill color to revert during mouseout:
-                select(this).attr('fill___', cellFill)
-                //for ps, the symbols are the children of each g_ps element but could also be nutsrg
-                parents.each(function (d, i) {
-                    let ps = select(this.childNodes[0])
-                    ps.style('fill', m.noDataFillStyle())
-                })
-                select(this).style('fill', m.hoverColor())
-
-                let ecl = 'nd'
-
-                // main map
-                highlightRegions(m.svg_, ecl)
-
-                // all external insets
+                highlightRegions(out.map, 'nd')
                 if (out.map.insetTemplates_) {
-                    let insets = out.map.insetTemplates_
-                    for (const geo in insets) {
-                        if (Array.isArray(insets[geo])) {
-                            for (var i = 0; i < insets[geo].length; i++) {
-                                // insets with same geo that do not share the same parent inset
-                                if (Array.isArray(insets[geo][i])) {
-                                    // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                                    for (var c = 0; c < insets[geo][i].length; c++) {
-                                        if (insets[geo][i][c].svgId_ !== out.svgId_)
-                                            highlightRegions(insets[geo][i][c].svg(), ecl)
-                                    }
-                                } else {
-                                    if (insets[geo][i].svgId_ !== out.svgId_) highlightRegions(insets[geo][i].svg(), ecl)
-                                }
-                            }
-                        } else {
-                            // unique inset geo_
-                            if (insets[geo].svgId_ !== out.svgId_) highlightRegions(insets[geo].svg(), ecl)
-                        }
-                    }
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
                 }
             })
             .on('mouseout', function () {
-                //for ps, the symbols are the children of each g_ps element
-                const parents = m.svg_.select('#g_ps').selectAll("[ecl='nd']")
-                let cellFill = select(this).attr('fill___')
-                parents.each(function (d, i) {
-                    let ps = select(this.childNodes[0])
-                    ps.style('fill', cellFill)
-                })
-                select(this).style('fill', m.noDataFillStyle())
-
-                let ecl = 'nd'
-                // regions
-                unhighlightRegions(m.svg_, ecl)
-                // apply hover to all external insets
+                unhighlightRegions(out.map)
                 if (out.map.insetTemplates_) {
-                    let insets = out.map.insetTemplates_
-                    for (const geo in insets) {
-                        if (Array.isArray(insets[geo])) {
-                            for (var i = 0; i < insets[geo].length; i++) {
-                                // insets with same geo that do not share the same parent inset
-                                if (Array.isArray(insets[geo][i])) {
-                                    // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                                    for (var c = 0; c < insets[geo][i].length; c++) {
-                                        if (insets[geo][i][c].svgId_ !== out.svgId_)
-                                            unhighlightRegions(insets[geo][i][c].svg(), ecl)
-                                    }
-                                } else {
-                                    if (insets[geo][i].svgId_ !== out.svgId_) unhighlightRegions(insets[geo][i].svg(), ecl)
-                                }
-                            }
-                        } else {
-                            // unique inset geo_
-                            if (insets[geo].svgId_ !== out.svgId_) unhighlightRegions(insets[geo].svg(), ecl)
-                        }
-                    }
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, 'nd')
                 }
             })
 
         //'no data' label
         container
             .append('text')
+            .attr('class', 'em-legend-label')
             .attr('x', out.colorLegend ? out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x : out.noDataShapeWidth + 5)
             .attr('y', out.colorLegend ? out.colorLegend.shapeHeight / 2 : out.noDataShapeHeight / 2)
-            .attr('dominant-baseline', 'middle')
-            .attr('class', 'em-legend-label')
             .text(noDataText)
-            .style('font-size', out.labelFontSize + 'px')
-            .style('font-family', m.fontFamily_)
-            .style('fill', out.fontFill)
     }
 
     function highlightRegions(map, ecl) {
         // TODO: change this to estat logic of making all other classes transparent?
-        let selector = out.map.geo_ == 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
+        let selector = map.geo_ == 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
         const sel = map.selectAll(selector).selectAll("[ecl='" + ecl + "']")
-        sel.style('fill', out.map.hoverColor())
+        sel.style('fill', map.hoverColor())
         sel.attr('fill___', function () {
             select(this).style('fill')
         })
     }
 
     function unhighlightRegions(map, ecl) {
-        let selector = out.map.geo_ == 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
+        let selector = map.geo_ == 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
         const sel = map.selectAll(selector).selectAll("[ecl='" + ecl + "']")
         sel.style('fill', function () {
             select(this).attr('fill___')
@@ -386,17 +312,7 @@ export const legend = function (map, config) {
         let labelX = maxSize / 2 + out.sizeLegend.labelOffset.x
 
         //append label
-        itemContainer
-            .append('text')
-            .attr('x', labelX)
-            .attr('y', 0)
-            .attr('dominant-baseline', 'middle')
-            .attr('text-anchor', 'start')
-            .attr('class', 'eurostatmap-legend-label')
-            .text(labelFormatter(value))
-            .style('font-size', out.labelFontSize + 'px')
-            .style('font-family', m.fontFamily_)
-            .style('fill', out.fontFill)
+        itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', 0).text(labelFormatter(value))
     }
 
     /**
@@ -461,15 +377,10 @@ export const legend = function (map, config) {
         //append label
         itemContainer
             .append('text')
+            .attr('class', 'em-legend-label')
             .attr('x', labelX)
             .attr('y', labelY)
-            .attr('dominant-baseline', 'middle')
-            .attr('text-anchor', 'start')
-            .attr('class', 'eurostatmap-legend-label')
             .text(labelFormatter(value))
-            .style('font-size', out.labelFontSize + 'px')
-            .style('font-family', m.fontFamily_)
-            .style('fill', out.fontFill)
     }
 
     /**
@@ -525,15 +436,10 @@ export const legend = function (map, config) {
         //append label
         itemContainer
             .append('text')
+            .attr('class', 'em-legend-label')
             .attr('x', labelX)
             .attr('y', labelY)
-            .attr('dominant-baseline', 'middle')
-            .attr('text-anchor', 'start')
-            .attr('class', 'eurostatmap-legend-label')
             .text(labelFormatter(value))
-            .style('font-size', out.labelFontSize + 'px')
-            .style('font-family', m.fontFamily_)
-            .style('fill', out.fontFill)
     }
 
     /**
@@ -575,12 +481,12 @@ export const legend = function (map, config) {
             .selectAll('g')
             .data(out._sizeLegendValues)
             .join('g')
-            .attr('class', 'eurostatmap-legend-item')
+            .attr('class', 'em-legend-item')
 
         //circles
         itemContainer
             .append('circle')
-            .attr('class', 'eurostatmap-legend-circle')
+            .attr('class', 'em-legend-circle')
             .style('fill', 'none')
             .attr('stroke', 'black')
             .attr('cy', (d) => -m.classifierSize_(d))
@@ -589,17 +495,12 @@ export const legend = function (map, config) {
         //labels
         itemContainer
             .append('text')
-            .style('font-size', out.labelFontSize + 'px')
-            .style('font-family', m.fontFamily_)
-            .style('fill', out.fontFill)
-            .attr('class', 'eurostatmap-legend-label')
+            .attr('class', 'em-legend-label')
             .attr('y', (d, i) => {
-                let y = -1 - 2 * m.classifierSize_(d) - out.labelFontSize
+                let y = -1 - 2 * m.classifierSize_(d)
                 return y
             })
             .attr('x', maxRadius + 5)
-            .attr('dy', '1.2em')
-            .attr('xml:space', 'preserve')
             .text((d) => {
                 return d.toLocaleString('en').replace(/,/gi, ' ')
             })
@@ -610,13 +511,12 @@ export const legend = function (map, config) {
             .style('stroke', 'grey')
             .attr('x1', 2)
             .attr('y1', (d, i) => {
-                let y = -1 - 2 * m.classifierSize_(d) //add padding
+                let y = -1 - 2 * m.classifierSize_(d)
                 return y
             })
-            .attr('xml:space', 'preserve')
             .attr('x2', maxRadius + 5)
             .attr('y2', (d, i) => {
-                let y = -1 - 2 * m.classifierSize_(d) //add padding
+                let y = -1 - 2 * m.classifierSize_(d)
                 return y
             })
 
@@ -659,42 +559,26 @@ export const legend = function (map, config) {
             let itemContainer = out._colorLegendNode
                 .append('g')
                 .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'em-legend-rect')
+                .attr('class', 'em-legend-item')
 
             //append symbol & style
             itemContainer
-                .append('g')
-                .style('fill', m.psClassToFillStyle()(ecl, clnb))
-                .style('fill-opacity', m.psFillOpacity())
-                .style('stroke', m.psStroke())
-                .style('stroke-width', 1)
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
                 .append('rect')
                 .attr('class', 'em-legend-rect')
+                .style('fill', m.psClassToFillStyle()(ecl, clnb))
                 .attr('width', out.colorLegend.shapeWidth)
                 .attr('height', out.colorLegend.shapeHeight)
                 .on('mouseover', function () {
-                    //for ps, the symbols are the children of each g_ps element
-                    const parents = svgMap.select('#g_ps').selectAll("[ecl='" + ecl + "']")
-                    let cellFill = select(this.parentNode).style('fill')
-                    // save legend cell fill color to revert during mouseout:
-                    select(this).attr('fill___', cellFill)
-                    parents.each(function (d, i) {
-                        let ps = select(this.childNodes[0])
-                        ps.style('fill', m.hoverColor())
-                    })
-                    select(this).style('fill', m.hoverColor())
+                    highlightRegions(out.map, ecl)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl)
+                    }
                 })
                 .on('mouseout', function () {
-                    //for ps, the symbols are the children of each g_ps element
-                    const parents = svgMap.select('#g_ps').selectAll("[ecl='" + ecl + "']")
-                    let cellFill = select(this).attr('fill___')
-                    parents.each(function (d, i) {
-                        let ps = select(this.childNodes[0])
-                        ps.style('fill', cellFill)
-                    })
-                    select(this).style('fill', m.psClassToFillStyle()(ecl, clnb))
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl)
+                    }
                 })
 
             //separation line
@@ -726,14 +610,10 @@ export const legend = function (map, config) {
                     .attr('class', 'em-legend-label')
                     .attr('x', out.colorLegend.sepLineLength + out.colorLegend.tickLength + out.colorLegend.labelOffset.x)
                     .attr('y', out.colorLegend.shapeHeight)
-                    .attr('dominant-baseline', 'middle')
                     .text((d) => {
                         let text = f(m.classifierColor_.invertExtent(out.ascending ? ecl + 1 : ecl - 1)[out.ascending ? 0 : 1])
                         return text
                     })
-                    .style('font-size', out.labelFontSize + 'px')
-                    .style('font-family', m.fontFamily_)
-                    .style('fill', out.fontFill)
             }
         }
 
@@ -743,7 +623,7 @@ export const legend = function (map, config) {
             let container = out._colorLegendNode
                 .append('g')
                 .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'em-legend-rect')
+                .attr('class', 'em-legend-item')
 
             buildNoDataLegend(x, y, container, out.colorLegend.noDataText)
         }
@@ -776,6 +656,37 @@ export const legend = function (map, config) {
             shape = symbol().type(symbolType)
         }
         return shape
+    }
+
+    // Highlight selected regions on mouseover
+    function highlightRegions(map, ecl) {
+        //for ps, the symbols are the children of each g_ps element
+        const allSymbols = map.svg_.selectAll('#g_ps').selectAll('[ecl]')
+
+        // Set all symbols to white
+        allSymbols.each(function (d, i) {
+            let symbol = select(this.childNodes[0])
+            symbol.style('fill', 'white')
+        })
+
+        // Highlight only the selected regions by restoring their original color
+        const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
+        selectedSymbols.each(function (d, i) {
+            let symbol = select(this.childNodes[0])
+            symbol.style('fill', symbol.attr('fill___')) // Restore original color for selected regions
+        })
+    }
+
+    // Reset all regions to their original colors on mouseout
+    function unhighlightRegions(map) {
+        //for ps, the symbols are the children of each g_ps element
+        const allSymbols = map.svg_.selectAll('#g_ps').selectAll('[ecl]')
+
+        // Restore each region's original color from the fill___ attribute
+        allSymbols.each(function (d, i) {
+            let symbol = select(this.childNodes[0])
+            symbol.style('fill', symbol.attr('fill___')) // Restore original color for selected regions
+        })
     }
 
     return out

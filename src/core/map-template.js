@@ -12,7 +12,7 @@ import {
     getFontSizeFromClass,
     getCSSPropertyFromClass,
 } from './utils'
-import * as tp from '../tooltip/tooltip'
+
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
 import { kosovoBnFeatures } from './kosovo'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -49,9 +49,9 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.proj_ = '3035'
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()
     out.filterGeometriesFunction_ = undefined // user defined filter function
-    out.scale_ = '20M' //TODO choose automatically, depending on pixSize ?
+    out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
     out.geoCenter_ = undefined
-    out.pixSize_ = undefined
+    out.pixelSize_ = undefined
     out.zoomExtent_ = undefined
 
     //common / shared styles
@@ -311,7 +311,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 graticule.remove()
 
                 // if map already created and argument is true
-            } else if (out._geom.gra && out._geom.path && zg && v == true) {
+            } else if (out._geom.gra && out._pathFunction && zg && v == true) {
                 //remove existing graticule
                 graticule.remove()
                 // add new graticule
@@ -321,7 +321,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .data(out._geom.gra)
                     .enter()
                     .append('path')
-                    .attr('d', out._geom.path)
+                    .attr('d', out._pathFunction)
                     .attr('class', 'em-graticule')
 
                 out.svg()
@@ -350,7 +350,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             if (margin._groups[0][0] && v == false) {
                 // remove existing
                 margin.remove()
-            } else if (v == true && out._geom.path && zg) {
+            } else if (v == true && out._pathFunction && zg) {
                 //remove existing graticule
                 margin.remove()
                 filter.remove()
@@ -384,7 +384,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return bn.properties.co === 'T'
                             })
                             .append('path')
-                            .attr('d', map._geom.path)
+                            .attr('d', map._pathFunction)
                     //nuts bn
                     if (map._geom.nutsbn)
                         cg.append('g')
@@ -396,7 +396,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return bn.properties.co === 'T'
                             })
                             .append('path')
-                            .attr('d', map._geom.path)
+                            .attr('d', map._pathFunction)
                     //world bn
                     if (map._geom.worldbn)
                         cg.append('g')
@@ -408,7 +408,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return bn.properties.COAS_FLAG === 'T'
                             })
                             .append('path')
-                            .attr('d', map._geom.path)
+                            .attr('d', map._pathFunction)
                 }
 
                 //draw for insets - requires geometries so we have to rebuild base template
@@ -590,7 +590,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     }
 
     /**
-     * Requests geographic data and builds the map template
+     * Requests geographic data and then builds the map template
      */
     out.updateGeoMapTemplate = function (callback) {
         //erase previous data
@@ -832,43 +832,34 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    /**
-     * Buid an empty map template, based on the geometries only.
-     */
-    out.buildMapTemplate = function () {
-        //prepare map tooltip
-        if (out.tooltip_) {
-            out._tooltip = tp.tooltip(out.tooltip_)
+    const defineGeoCenter = function () {
+        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+        if (defaultPosition) {
+            out.geoCenter(defaultPosition.geoCenter)
         } else {
-            //no config specified, use default
-            out._tooltip = tp.tooltip()
+            out.geoCenter([0.5 * (geoData.bbox[0] + geoData.bbox[2]), 0.5 * (geoData.bbox[1] + geoData.bbox[3])])
         }
+    }
 
-        //geo center and extent: if not specified, use the default one, or the compute one from the topojson bbox
-        const dp = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (!out.geoCenter_)
-            if (dp) {
-                out.geoCenter(dp.geoCenter)
-            } else {
-                out.geoCenter([0.5 * (geoData.bbox[0] + geoData.bbox[2]), 0.5 * (geoData.bbox[1] + geoData.bbox[3])])
-            }
-        //pixel size (zoom level): if not specified, compute value from SVG dimensions and topojson geographical extent
-        if (!out.pixSize_)
-            if (dp) {
-                out.pixSize((dp.pixSize * 800) / out.width_)
-            } else {
-                out.pixSize(
-                    Math.min((geoData.bbox[2] - geoData.bbox[0]) / out.width_, (geoData.bbox[3] - geoData.bbox[1]) / out.height_)
-                )
-            }
+    const definePixelSize = function () {
+        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+        if (defaultPosition) {
+            out.pixelSize((defaultPosition.pixelSize * 800) / out.width_)
+        } else {
+            out.pixelSize(
+                Math.min((geoData.bbox[2] - geoData.bbox[0]) / out.width_, (geoData.bbox[3] - geoData.bbox[1]) / out.height_)
+            )
+        }
+    }
 
+    const defineProjection = function () {
         //SVG drawing function
-        //compute geo bbox from geocenter, pixsize and SVG dimensions
+        //compute geo bbox from geocenter, pixelSize and SVG dimensions
         const bbox = [
-            out.geoCenter_[0] - 0.5 * out.pixSize_ * out.width_,
-            out.geoCenter_[1] - 0.5 * out.pixSize_ * out.height_,
-            out.geoCenter_[0] + 0.5 * out.pixSize_ * out.width_,
-            out.geoCenter_[1] + 0.5 * out.pixSize_ * out.height_,
+            out.geoCenter_[0] - 0.5 * out.pixelSize_ * out.width_,
+            out.geoCenter_[1] - 0.5 * out.pixelSize_ * out.height_,
+            out.geoCenter_[0] + 0.5 * out.pixelSize_ * out.width_,
+            out.geoCenter_[1] + 0.5 * out.pixelSize_ * out.height_,
         ]
 
         //WORLD geo uses 4326 geometries and reprojects to 54030 using d3
@@ -884,11 +875,30 @@ export const mapTemplate = function (config, withCenterPoints) {
                 ? out.projectionFunction_
                 : geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(bbox))
         }
+    }
 
-        out._geom.path = geoPath().projection(out._projection)
+    const definePathFunction = function () {
+        out._pathFunction = geoPath().projection(out._projection)
+    }
+
+    /**
+     * Buid an empty map template, based on the geometries only.
+     */
+    out.buildMapTemplate = function () {
+        //geo center and extent: if not specified, use the default one, or the compute one from the topojson bbox
+        if (!out.geoCenter_) {
+            defineGeoCenter()
+        }
+
+        //pixel size (zoom level): if not specified, compute value from SVG dimensions and topojson geographical extent
+        if (!out.pixelSize_) {
+            definePixelSize()
+        }
+
+        defineProjection()
+        definePathFunction()
 
         //decode topojson to geojson
-
         if (out.geo_ == 'WORLD') {
             out._geom.worldrg = feature(geoData, geoData.objects.CNTR_RG_20M_2020_4326).features
             out._geom.worldbn = feature(geoData, geoData.objects.CNTR_BN_20M_2020_4326).features
@@ -920,7 +930,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             zg.append('path')
                 .datum({ type: 'Sphere' })
                 .attr('id', 'sphere')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
                 .attr('class', 'em-graticule')
         }
 
@@ -940,7 +950,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         return bn.properties.co === 'T'
                     })
                     .append('path')
-                    .attr('d', out._geom.path)
+                    .attr('d', out._pathFunction)
             //nuts bn
             if (out._geom.nutsbn)
                 cg.append('g')
@@ -953,7 +963,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         return bn.properties.co === 'T'
                     })
                     .append('path')
-                    .attr('d', out._geom.path)
+                    .attr('d', out._pathFunction)
             //world bn
             if (out._geom.worldbn)
                 cg.append('g')
@@ -966,7 +976,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         return bn.properties.COAS_FLAG === 'T'
                     })
                     .append('path')
-                    .attr('d', out._geom.path)
+                    .attr('d', out._pathFunction)
         }
 
         if (out._geom.gra && out.drawGraticule_) {
@@ -978,7 +988,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .data(out._geom.gra)
                 .enter()
                 .append('path')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
         }
 
         //draw country regions
@@ -990,7 +1000,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .data(out._geom.cntrg)
                 .enter()
                 .append('path')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
         }
 
         //draw world map
@@ -1002,7 +1012,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .data(out._geom.worldrg)
                 .enter()
                 .append('path')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
         }
 
         //draw NUTS regions
@@ -1024,7 +1034,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         .data(r)
                         .enter()
                         .append('path')
-                        .attr('d', out._geom.path)
+                        .attr('d', out._pathFunction)
                         .attr('lvl', i) //to be able to distinguish nuts levels
                 })
 
@@ -1040,7 +1050,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                             .data(kosovoBn)
                             .enter()
                             .append('path')
-                            .attr('d', out._geom.path)
+                            .attr('d', out._pathFunction)
                     }
                 }
             } else {
@@ -1052,7 +1062,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .data(out._geom.nutsrg)
                     .enter()
                     .append('path')
-                    .attr('d', out._geom.path)
+                    .attr('d', out._pathFunction)
             }
         }
 
@@ -1072,7 +1082,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.bordersToShow_.includes('oth') && bn.properties.oth == 'T') return bn
                     if (out.bordersToShow_.includes('co') && bn.properties.co == 'T') return bn
                 })
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
                 .attr('class', function (bn) {
                     return bn.properties.co === 'T' ? 'em-bn-co' : 'em-cntbn'
                 })
@@ -1097,7 +1107,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.bordersToShow_.includes('co') && bn.properties.co == 'T') return bn
                 })
                 .append('path')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
                 .attr('class', function (bn) {
                     let props = bn.properties
                     //KOSOVO
@@ -1121,7 +1131,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                         .data(kosovoBn)
                         .enter()
                         .append('path')
-                        .attr('d', out._geom.path)
+                        .attr('d', out._pathFunction)
                 }
             }
         }
@@ -1135,7 +1145,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .data(out._geom.worldbn)
                 .enter()
                 .append('path')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
                 .attr('class', function (bn) {
                     if (bn.properties.POL_STAT > 0) {
                         //disputed
@@ -1155,7 +1165,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .data(out._geom.kosovo)
                 .enter()
                 .append('path')
-                .attr('d', out._geom.path)
+                .attr('d', out._pathFunction)
         }
 
         //prepare group for proportional symbols, with nuts region centroids
@@ -1554,7 +1564,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                             return `translate(${x},${y})`
                         }
                         // otherwise calculate centroid
-                        return 'translate(' + map._geom.path.centroid(d) + ')'
+                        return 'translate(' + map._pathFunction.centroid(d) + ')'
                     })
                     .attr('class', 'em-stat-label')
 
@@ -1577,7 +1587,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return `translate(${x},${y})`
                             }
                             // otherwise calculate centroid
-                            return 'translate(' + map._geom.path.centroid(d) + ')'
+                            return 'translate(' + map._pathFunction.centroid(d) + ')'
                         })
 
                         .attr('class', 'em-stat-label-shadow')
@@ -1701,7 +1711,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     /**
      * @function addScalebarToMap
-     * @description appends an SVG scalebar to the map. Uses pixSize to calculate units in km
+     * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
      */
     function addScalebarToMap() {
         let sb = out
@@ -1718,7 +1728,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         const maxLengthPix = out.scalebarMaxWidth_
         const textOffsetX = out.scalebarTextOffset_[0]
         const textOffsetY = out.scalebarTextOffset_[1]
-        const pixelSizeM = out.pixSize_
+        const pixelSizeM = out.pixelSize_
         const maxLengthM = maxLengthPix * pixelSizeM
         const niceLengthM = niceScaleBarLength(maxLengthM)
         const niceLengthPixel = niceLengthM[0] / pixelSizeM
@@ -1954,24 +1964,24 @@ export const mapTemplate = function (config, withCenterPoints) {
     return out
 }
 
-/** Default geocenter positions and pixSize (for default width = 800px) for territories and projections. */
+/** Default geocenter positions and pixelSize (for default width = 800px) for territories and projections. */
 const _defaultPosition = {
-    EUR_3035: { geoCenter: [4970000, 3350000], pixSize: 6800 },
-    IC_32628: { geoCenter: [443468, 3145647], pixSize: 1000 },
-    GP_32620: { geoCenter: [669498, 1784552], pixSize: 130 },
-    MQ_32620: { geoCenter: [716521, 1621322], pixSize: 130 },
-    GF_32622: { geoCenter: [266852, 444074], pixSize: 500 },
-    RE_32740: { geoCenter: [348011, 7661627], pixSize: 130 },
-    YT_32738: { geoCenter: [516549, 8583920], pixSize: 70 },
-    MT_3035: { geoCenter: [4719755, 1441701], pixSize: 70 },
-    PT20_32626: { geoCenter: [397418, 4271471], pixSize: 1500 },
-    PT30_32628: { geoCenter: [333586, 3622706], pixSize: 150 },
-    LI_3035: { geoCenter: [4287060, 2672000], pixSize: 40 },
-    IS_3035: { geoCenter: [3011804, 4960000], pixSize: 700 },
-    SJ_SV_3035: { geoCenter: [4570000, 6160156], pixSize: 800 },
-    SJ_JM_3035: { geoCenter: [3647762, 5408300], pixSize: 100 },
-    CARIB_32620: { geoCenter: [636345, 1669439], pixSize: 500 },
-    WORLD_54030: { geoCenter: [14, 17], pixSize: 9000 },
+    EUR_3035: { geoCenter: [4970000, 3350000], pixelSize: 6800 },
+    IC_32628: { geoCenter: [443468, 3145647], pixelSize: 1000 },
+    GP_32620: { geoCenter: [669498, 1784552], pixelSize: 130 },
+    MQ_32620: { geoCenter: [716521, 1621322], pixelSize: 130 },
+    GF_32622: { geoCenter: [266852, 444074], pixelSize: 500 },
+    RE_32740: { geoCenter: [348011, 7661627], pixelSize: 130 },
+    YT_32738: { geoCenter: [516549, 8583920], pixelSize: 70 },
+    MT_3035: { geoCenter: [4719755, 1441701], pixelSize: 70 },
+    PT20_32626: { geoCenter: [397418, 4271471], pixelSize: 1500 },
+    PT30_32628: { geoCenter: [333586, 3622706], pixelSize: 150 },
+    LI_3035: { geoCenter: [4287060, 2672000], pixelSize: 40 },
+    IS_3035: { geoCenter: [3011804, 4960000], pixelSize: 700 },
+    SJ_SV_3035: { geoCenter: [4570000, 6160156], pixelSize: 800 },
+    SJ_JM_3035: { geoCenter: [3647762, 5408300], pixelSize: 100 },
+    CARIB_32620: { geoCenter: [636345, 1669439], pixelSize: 500 },
+    WORLD_54030: { geoCenter: [14, 17], pixelSize: 9000 },
 }
 
 /**

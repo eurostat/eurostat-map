@@ -4,6 +4,7 @@ import * as sd from './stat-data'
 import * as lg from './legend'
 import { select } from 'd3'
 import { spaceAsThousandSeparator } from './utils'
+import * as tp from '../tooltip/tooltip'
 
 /**
  * Default function for tooltip text, for statistical maps.
@@ -116,7 +117,7 @@ export const statMap = function (config, withCenterPoints) {
      * This method should be called once, preferably after the map attributes have been set to some initial values.
      */
     out.build = function () {
-        if (out.projectionFunction_) out.proj('4326') //when using custom d3 projection function always request WGS84
+        if (out.projectionFunction_) out.proj('4326') //when using custom d3 projection function always request NUTS2JSON in WGS84
 
         //build map template base
         out.buildMapTemplateBase()
@@ -149,6 +150,15 @@ export const statMap = function (config, withCenterPoints) {
             }
 
             lg.build()
+        }
+
+        //define tooltip
+        //prepare map tooltip
+        if (out.tooltip_) {
+            out._tooltip = tp.tooltip(out.tooltip_)
+        } else {
+            //no config specified, use default
+            out._tooltip = tp.tooltip()
         }
 
         //launch geo data retrieval
@@ -295,7 +305,7 @@ export const statMap = function (config, withCenterPoints) {
         if (opts.w) out.width(opts.w)
         if (opts.h) out.height(opts.h)
         if (opts.x && opts.y) out.geoCenter([opts.x, opts.y])
-        if (opts.z) out.pixSize(opts.z)
+        if (opts.z) out.pixelSize(opts.z)
         if (opts.s) out.scale(opts.s)
         if (opts.lvl) out.nutsLvl(opts.lvl)
         if (opts.time) {

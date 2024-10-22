@@ -28,6 +28,8 @@ export const legend = function (map) {
     out.title = ''
     // we now use CSS instead of inline styles
     out.titleFontSize = getFontSizeFromClass('em-legend-title')
+    // we now use CSS instead of inline styles
+    out.labelFontSize = getFontSizeFromClass('em-legend-label')
 
     /** Build legend. */
     out.build = function () {

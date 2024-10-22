@@ -11,9 +11,8 @@
         <script>
             eurostatmap
                 .map('sparkline')
-                .width(600)
-                .title('Heating Degree Days vs Cooling Degree Days, 2021')
-                .svgId('bivariate')
+                //.width(800)
+                .title('Heating Degree Days vs Cooling Degree Days, 2009-2021')
                 .nutsLvl(3)
                 .statSpark(
                     { eurostatDatasetCode: 'nrg_chddr2_a', filters: { indic_nrg: 'HDD' } },
@@ -21,10 +20,10 @@
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'] //labels
                 )
                 .sparkType('line')
-                .sparkLineWidth(10)
+                .sparkLineWidth(20)
                 .sparkLineStrokeWidth(1)
                 .sparkLineColor('#c44a4a')
-                .sparkLineHeight(10)
+                .sparkLineHeight(5)
                 .sparkLineOpacity(0.9)
                 .sparkLineCircleRadius(0.1)
                 .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })

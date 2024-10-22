@@ -434,6 +434,9 @@ export const map = function (config) {
                     return out.psFill_
                 }
             })
+            .attr('fill___', function () {
+                return select(this).style('fill') // save for legend mouseover
+            })
     }
 
     /**
