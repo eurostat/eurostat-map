@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import * as lg from '../core/legend'
+import * as Legend from '../core/legend'
 import { executeForAllInsets } from '../core/utils'
 
 /**
@@ -9,7 +9,7 @@ import { executeForAllInsets } from '../core/utils'
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //the width of the legend box elements
     out.shapeWidth = 13

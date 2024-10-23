@@ -1,8 +1,8 @@
 import { select } from 'd3-selection'
 import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
-import * as smap from '../core/stat-map'
-import * as lgchbi from '../legend/legend-choropleth-bivariate'
+import * as StatMap from '../core/stat-map'
+import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
 import { spaceAsThousandSeparator } from '../core/utils'
 
 /**
@@ -13,7 +13,7 @@ import { spaceAsThousandSeparator } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     //number of classes for the classification. Same for both variables.
     out.numberOfClasses_ = 3
@@ -333,7 +333,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgchbi.legend
+        return BivariateLegend.legend
     }
 
     return out

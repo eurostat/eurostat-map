@@ -1,21 +1,9 @@
 import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL } from './utils'
-import * as mt from './map-template'
-import * as sd from './stat-data'
-import * as lg from './legend'
+import * as MapTemplate from './map-template'
+import * as StatisticalData from './stat-data'
+import * as Legend from './legend'
 import { select } from 'd3'
-import { spaceAsThousandSeparator } from './utils'
 import * as tp from '../tooltip/tooltip'
-
-/**
- * Default function for tooltip text, for statistical maps.
- * It simply shows the name and code of the region and the statistical value.
- *
- * @param {*} rg The region to show information on.
- * @param {*} map The map element
- */
-const defaultTooltipTextFunction = () => {
-    //
-}
 
 /**
  * An abstract statistical map: A map template with statistical data, without any particular styling rule.
@@ -24,7 +12,7 @@ const defaultTooltipTextFunction = () => {
  */
 export const statMap = function (config, withCenterPoints) {
     //build stat map from map template
-    const out = mt.mapTemplate(config, withCenterPoints)
+    const out = MapTemplate.mapTemplate(config, withCenterPoints)
 
     //statistical data
 
@@ -47,7 +35,13 @@ export const statMap = function (config, withCenterPoints) {
     }
 
     //the statistical data, retrieved from the config information. As a dictionnary.
-    out.statData_ = { default: sd.statData(), color: sd.statData(), size: sd.statData(), v1: sd.statData(), v2: sd.statData() }
+    out.statData_ = {
+        default: StatisticalData.statData(),
+        color: StatisticalData.statData(),
+        size: StatisticalData.statData(),
+        v1: StatisticalData.statData(),
+        v2: StatisticalData.statData(),
+    }
     out.statData = function (k, v) {
         //no argument: getter - return the default statData
         if (!arguments.length) return out.statData_['default']
@@ -65,7 +59,7 @@ export const statMap = function (config, withCenterPoints) {
     //transition time for rendering
     out.transitionDuration_ = 500
     //specific tooltip text function
-    out.tooltip_.textFunction = defaultTooltipTextFunction
+    out.tooltip_.textFunction = undefined
     //for maps using special fill patterns, this is the function to define them in the SVG image - See functions: getFillPatternLegend and getFillPatternDefinitionFun
     out.filtersDefinitionFun_ = undefined
     //a callback function to execute after the map build is complete.
@@ -216,7 +210,7 @@ export const statMap = function (config, withCenterPoints) {
             }
 
             //build stat data object from stat configuration and store it
-            const statData = sd.statData(out.stat(statKey))
+            const statData = StatisticalData.statData(out.stat(statKey))
             out.statData(statKey, statData)
 
             //launch query
@@ -226,7 +220,7 @@ export const statMap = function (config, withCenterPoints) {
             }
             statData.retrieveFromRemote(nl, out.lg(), () => {
                 //if geodata has not been loaded, wait again
-                if (!out.isGeoReady()) return
+                if (!out.Geometries.isGeoReady()) return
                 //if stat datasets have not all been loaded, wait again
                 if (!isStatDataReady()) return
 
@@ -283,7 +277,7 @@ export const statMap = function (config, withCenterPoints) {
      */
     out.getLegendConstructor = function () {
         console.log('Map getLegendConstructor function not implemented')
-        return lg.legend
+        return Legend.legend
     }
 
     /**

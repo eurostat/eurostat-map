@@ -2,8 +2,8 @@ import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } 
 // import {extent} from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgps from '../legend/legend-proportional-symbols'
+import * as StatMap from '../core/stat-map'
+import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../core/utils'
 
@@ -14,7 +14,7 @@ import { spaceAsThousandSeparator } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config, true)
+    const out = StatMap.statMap(config, true)
 
     //shape
     out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
@@ -779,7 +779,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgps.legend
+        return ProportionalSymbolLegend.legend
     }
 
     return out

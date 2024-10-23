@@ -1,8 +1,8 @@
 import { select, arc, pie } from 'd3'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 //schemeSet3 schemeDark2 schemePastel1 schemeTableau10
-import * as smap from '../core/stat-map'
-import * as lgscomp from '../legend/legend-stripe-composition'
+import * as StatMap from '../core/stat-map'
+import * as StripeCompositionLegend from '../legend/legend-stripe-composition'
 
 /**
  * Return a stripe composition map.
@@ -11,7 +11,7 @@ import * as lgscomp from '../legend/legend-stripe-composition'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     //width of the stripes serie
     out.stripeWidth_ = 50
@@ -281,7 +281,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgscomp.legend
+        return StripeCompositionLegend.legend
     }
 
     //specific tooltip text function

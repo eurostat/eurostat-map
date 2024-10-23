@@ -2,8 +2,8 @@ import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { interpolateYlOrBr } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgch from '../legend/legend-choropleth'
+import * as StatMap from '../core/stat-map'
+import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
 
 /**
@@ -13,7 +13,7 @@ import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     //the number of classes
     out.numberOfClasses_ = 7
@@ -232,7 +232,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgch.legend
+        return ChoroplethLegend.legend
     }
 
     const styleMixedNUTS = function (map) {

@@ -1,7 +1,7 @@
 import { format } from 'd3-format'
 import { select } from 'd3-selection'
 import { max } from 'd3-array'
-import * as lg from '../core/legend'
+import * as Legend from '../core/legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**
@@ -11,7 +11,7 @@ import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //spacing between color & size legends (if applicable)
     out.legendSpacing = 15

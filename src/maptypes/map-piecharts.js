@@ -1,8 +1,8 @@
 import { scaleSqrt } from 'd3-scale'
 import { select, arc, pie, extent, sum, selectAll } from 'd3'
 import { interpolateOrRd, schemeCategory10 } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgpc from '../legend/legend-piecharts'
+import * as StatMap from '../core/stat-map'
+import * as PiechartLegend from '../legend/legend-piecharts'
 
 /**
  * Returns a proportional pie chart map.
@@ -11,7 +11,7 @@ import * as lgpc from '../legend/legend-piecharts'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config, true)
+    const out = StatMap.statMap(config, true)
 
     // pie charts
     out.pieMinRadius_ = 5
@@ -426,7 +426,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgpc.legend
+        return PiechartLegend.legend
     }
 
     //specific tooltip text function

@@ -1,5 +1,5 @@
 import { select, selectAll } from 'd3-selection'
-import * as lg from '../core/legend'
+import * as Legend from '../core/legend'
 import { line } from 'd3-shape'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
@@ -10,7 +10,7 @@ import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //size
     out.squareSize = 100

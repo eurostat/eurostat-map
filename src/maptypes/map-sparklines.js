@@ -1,5 +1,5 @@
 import { select, scaleLinear, scaleLog, scaleSqrt, line, extent, area, min, axisBottom, axisLeft, format, create } from 'd3'
-import * as smap from '../core/stat-map'
+import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
 
 /**
@@ -9,7 +9,7 @@ import * as lgch from '../legend/legend-choropleth'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config, true)
+    const out = StatMap.statMap(config, true)
 
     out.sparkLineColor_ = 'black'
     out.sparkAreaColor_ = '#41afaa'
@@ -383,6 +383,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
+        //TODO define legend
         return lgch.legend
     }
 

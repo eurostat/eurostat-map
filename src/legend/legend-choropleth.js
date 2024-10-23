@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import * as lg from '../core/legend'
+import * as Legend from '../core/legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**
@@ -10,7 +10,7 @@ import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
  */
 export const legend = function (map, config) {
     //build generic legend object (inherit)
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //the order of the legend elements. Set to false to invert.
     out.ascending = true

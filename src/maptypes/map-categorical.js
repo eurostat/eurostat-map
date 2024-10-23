@@ -1,8 +1,8 @@
 import { select } from 'd3-selection'
 import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgct from '../legend/legend-categorical'
+import * as StatMap from '../core/stat-map'
+import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass } from '../core/utils'
 
 /**
@@ -12,7 +12,7 @@ import { executeForAllInsets, getCSSPropertyFromClass } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     /** Fill style for each category/class. Ex.: { urb: "#fdb462", int: "#ffffb3", rur: "#ccebc5" } */
     out.classToFillStyle_ = undefined
@@ -172,7 +172,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgct.legend
+        return CategoricalLegend.legend
     }
 
     return out

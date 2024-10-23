@@ -1,10 +1,9 @@
-import { json } from 'd3-fetch'
 import { zoom, zoomTransform } from 'd3-zoom'
 import { select, selectAll, pointer } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoGraticule, geoGraticule10, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
-import { feature } from 'topojson-client'
+
 import {
     getBBOXAsGeoJSON,
     spaceAsThousandSeparator,
@@ -16,6 +15,7 @@ import {
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
 import { kosovoBnFeatures } from './kosovo'
 import { defineDeprecatedFunctions } from './deprecated'
+import * as Geometries from './geometries'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -195,26 +195,6 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.insetZoomExtent_ = null //zoom disabled as default
     out.insetScale_ = '03M'
 
-    //store the geometries of the map for future updates (e.g. coastal margin requires geometries)
-    out._geom = {
-        mixed: {
-            // for 'mixed' nuts level
-            rg0: undefined, // nuts 0 regions
-            rg1: undefined,
-            rg2: undefined,
-            rg3: undefined,
-        },
-        cntbn: undefined,
-        cntrg: undefined,
-        nutsbn: undefined,
-        nutsrg: undefined,
-        gra: undefined,
-        worldrg: undefined,
-        worldbn: undefined,
-        kosovo: undefined,
-        path: undefined,
-    }
-
     /**
      * Definition of getters/setters for all previously defined attributes.
      * Each method follow the same pattern:
@@ -311,14 +291,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                 graticule.remove()
 
                 // if map already created and argument is true
-            } else if (out._geom.gra && out._pathFunction && zg && v == true) {
+            } else if (out.Geometries.geoJSONs.graticule && out._pathFunction && zg && v == true) {
                 //remove existing graticule
                 graticule.remove()
                 // add new graticule
                 zg.append('g')
                     .attr('id', 'em-graticule')
                     .selectAll('path')
-                    .data(out._geom.gra)
+                    .data(out.Geometries.geoJSONs.graticule)
                     .enter()
                     .append('path')
                     .attr('d', out._pathFunction)
@@ -470,197 +450,34 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    /**
-     * geo data, as the raw topojson object returned by nuts2json API
-     */
-    let geoData = undefined
-
-    /**
-     * geo data of ALL NUTS LEVELS (for mixing NUTS), as the raw topojson objects returned by nuts2json API
-     */
-    let allNUTSGeoData = undefined
-
-    /**
-     * NUTS2JSON centroids
-     */
-    let centroidsData = undefined
-
-    /** */
-    out.isGeoReady = function () {
-        if (!geoData) return false
-        //recursive call to inset components
-        for (const geo in out.insetTemplates_) {
-            // check for insets with same geo
-            if (Array.isArray(out.insetTemplates_[geo])) {
-                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                    // insets with same geo that do not share the same parent inset
-                    if (Array.isArray(out.insetTemplates_[geo][i])) {
-                        // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                        for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                            if (!out.insetTemplates_[geo][i][c].isGeoReady()) return false
-                        }
-                    } else {
-                        if (!out.insetTemplates_[geo][i].isGeoReady()) return false
-                    }
-                }
-            } else {
-                if (!out.insetTemplates_[geo].isGeoReady()) return false
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * Return promise for Nuts2JSON topojson data.
-     */
-    out.getGeoDataPromise = function () {
-        // for mixing all NUTS levels (i.e IMAGE)
-
-        if (out.nutsLevel_ == 'mixed' && out.geo_ !== 'WORLD') {
-            const promises = []
-            ;[0, 1, 2, 3].forEach((lvl) => {
-                const buf = []
-                buf.push(out.nuts2jsonBaseURL_)
-                buf.push(out.nutsYear_)
-                if (out.geo_ != 'EUR') buf.push('/' + this.geo_)
-                buf.push('/')
-                buf.push(out.proj_)
-                buf.push('/')
-                buf.push(out.scale_)
-                buf.push('/')
-                buf.push(lvl)
-                buf.push('.json')
-                promises.push(json(buf.join('')))
-            })
-
-            //centroids nutspt_0.json
-
-            if (withCenterPoints) {
-                ;[0, 1, 2, 3].forEach((lvl) => {
-                    const buf = []
-                    buf.push(out.nuts2jsonBaseURL_)
-                    buf.push(out.nutsYear_)
-                    if (out.geo_ != 'EUR') buf.push('/' + this.geo_)
-                    buf.push('/')
-                    buf.push(out.proj_)
-                    buf.push('/nutspt_')
-                    buf.push(lvl)
-                    buf.push('.json')
-                    promises.push(json(buf.join('')))
-                })
-            }
-            return promises
-
-            // world maps
-        } else if (out.geo_ == 'WORLD') {
-            return [json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json')]
-        } else {
-            // NUTS maps for eurobase data with a specific NUTS level
-
-            let promises = []
-            const buf = []
-            buf.push(out.nuts2jsonBaseURL_)
-            buf.push(out.nutsYear_)
-            if (out.geo_ != 'EUR') buf.push('/' + this.geo_)
-            buf.push('/')
-            buf.push(out.proj_)
-            buf.push('/')
-            buf.push(out.scale_)
-            buf.push('/')
-            buf.push(out.nutsLevel_)
-            buf.push('.json')
-            promises.push(json(buf.join('')))
-
-            if (withCenterPoints) {
-                const buf = []
-                buf.push(out.nuts2jsonBaseURL_)
-                buf.push(out.nutsYear_)
-                if (out.geo_ != 'EUR') buf.push('/' + this.geo_)
-                buf.push('/')
-                buf.push(out.proj_)
-                buf.push('/nutspt_')
-                buf.push(out.nutsLevel_)
-                buf.push('.json')
-                promises.push(json(buf.join('')))
-            }
-
-            return promises
-        }
-    }
+    // initiate Geometries class
+    out.Geometries = Geometries.Geometries(out, withCenterPoints)
 
     /**
      * Requests geographic data and then builds the map template
      */
     out.updateGeoMapTemplate = function (callback) {
-        //erase previous data
-        geoData = null
-        allNUTSGeoData = null
-        centroidsData = null
+        // Erase previous data
+        out.Geometries.geoData = null
+        out.Geometries.allNUTSGeoData = null
+        out.Geometries.centroidsData = null
 
-        //get geo data from Nuts2json API
-        if (out.nutsLevel_ == 'mixed' && out.geo_ !== 'WORLD') {
-            // mixed retrieves all NUTS levels, world doesnt
-            let promises = out.getGeoDataPromise()
-            Promise.all(promises).then(
-                (geo___) => {
-                    //user-defined filter function
-                    if (out.filterGeometriesFunction_) {
-                        geo___ = out.filterGeometriesFunction_(geo___)
-                    }
-                    allNUTSGeoData = geo___
-                    geoData = geo___[0]
-                    if (withCenterPoints) centroidsData = [geo___[4], geo___[5], geo___[6], geo___[7]]
-                    //build map template
-                    out.buildMapTemplate()
-                    //callback
-                    if (callback) callback()
-                },
-                (err) => {
-                    // rejection
-                    console.error(err)
-                }
-            )
-        } else {
-            let promises = out.getGeoDataPromise()
-            Promise.all(promises).then(
-                (geo___) => {
-                    if (out.filterGeometriesFunction_) {
-                        geo___ = out.filterGeometriesFunction_(geo___)
-                    }
-                    geoData = geo___[0]
-                    if (withCenterPoints) centroidsData = geo___[1]
-                    //build map template
-                    out.buildMapTemplate()
-                    //callback
-                    if (callback) callback()
-                },
-                (err) => {
-                    // rejection
-                    console.error(err)
-                }
-            )
+        const handleDefaultGeoData = () => {
+            // Build map template
         }
 
-        //recursive call to inset components
-        for (const geo in out.insetTemplates_) {
-            // check for insets with same geo
-            if (Array.isArray(out.insetTemplates_[geo])) {
-                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                    // insets with same geo that do not share the same parent inset
-                    if (Array.isArray(out.insetTemplates_[geo][i])) {
-                        // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                        for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                            out.insetTemplates_[geo][i][c].updateGeoMapTemplate(callback)
-                        }
-                    } else {
-                        out.insetTemplates_[geo][i].updateGeoMapTemplate(callback)
-                    }
-                }
-            } else {
-                out.insetTemplates_[geo].updateGeoMapTemplate(callback)
-            }
-        }
+        out.Geometries.getDefaultGeoData().then(() => {
+            out.buildMapTemplate()
+
+            // Execute callback if defined
+            if (callback) callback()
+        })
+
+        // Use executeForAllInsets for recursive inset updates
+        executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => {
+            inset.updateGeoMapTemplate(callback)
+        })
+
         return out
     }
 
@@ -707,7 +524,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .append('path')
             .attr('d', convertRectangles(0, 0, out.width_, out.height_))
 
-        if (out.drawCoastalMargin_)
+        if (out.drawCoastalMargin_) {
             //define filter for coastal margin
             svg.append('filter')
                 .attr('id', 'em-coastal-blur')
@@ -718,6 +535,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .append('feGaussianBlur')
                 .attr('in', 'SourceGraphic')
                 .attr('stdDeviation', out.coastalMarginStdDev_)
+        }
 
         //create drawing group, as first child
         const dg = svg
@@ -898,20 +716,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         defineProjection()
         definePathFunction()
 
-        //decode topojson to geojson
-        if (out.geo_ == 'WORLD') {
-            out._geom.worldrg = feature(geoData, geoData.objects.CNTR_RG_20M_2020_4326).features
-            out._geom.worldbn = feature(geoData, geoData.objects.CNTR_BN_20M_2020_4326).features
-            out._geom.kosovo = feature(geoData, geoData.objects.NUTS_BN_20M_2021_RS_XK_border).features
-            out._geom.gra = [geoGraticule().step([30, 30])()]
-        } else {
-            out._geom.gra = feature(geoData, geoData.objects.gra).features
-            out._geom.nutsrg = feature(geoData, geoData.objects.nutsrg).features
-            out._geom.nutsbn = feature(geoData, geoData.objects.nutsbn).features
-            out._geom.cntrg = feature(geoData, geoData.objects.cntrg).features
-            out._geom.cntbn = feature(geoData, geoData.objects.cntbn).features
-        }
-
         //prepare drawing group
         const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
         zg.selectAll('*').remove()
@@ -938,53 +742,58 @@ export const mapTemplate = function (config, withCenterPoints) {
             addCoastalMarginToMap()
         }
 
-        if (out._geom.gra && out.drawGraticule_) {
+        if (out.Geometries.geoJSONs.graticule && out.drawGraticule_) {
             //draw graticule
             zg.append('g')
                 .attr('id', 'em-graticule')
                 .attr('class', 'em-graticule')
                 .selectAll('path')
-                .data(out._geom.gra)
+                .data(out.Geometries.geoJSONs.graticule)
                 .enter()
                 .append('path')
                 .attr('d', out._pathFunction)
         }
 
         //draw country regions
-        if (out._geom.cntrg) {
+        if (out.Geometries.geoJSONs.cntrg) {
             zg.append('g')
                 .attr('id', 'em-cntrg')
                 .attr('class', 'em-cntrg')
                 .selectAll('path')
-                .data(out._geom.cntrg)
+                .data(out.Geometries.geoJSONs.cntrg)
                 .enter()
                 .append('path')
                 .attr('d', out._pathFunction)
         }
 
         //draw world map
-        if (out._geom.worldrg) {
+        if (out.Geometries.geoJSONs.worldrg) {
             zg.append('g')
                 .attr('id', 'em-worldrg')
                 .attr('class', 'em-worldrg')
                 .selectAll('path')
-                .data(out._geom.worldrg)
+                .data(out.Geometries.geoJSONs.worldrg)
                 .enter()
                 .append('path')
                 .attr('d', out._pathFunction)
         }
 
         //draw NUTS regions
-        if (out._geom.nutsrg) {
+        if (out.Geometries.geoJSONs.nutsrg) {
             if (out.nutsLevel_ == 'mixed') {
-                out._geom.mixed.rg0 = out._geom.nutsrg
-                out._geom.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
-                out._geom.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
-                out._geom.mixed.rg3 = feature(allNUTSGeoData[3], allNUTSGeoData[3].objects.nutsrg).features
+                out.Geometries.geoJSONs.mixed.rg0 = out.Geometries.geoJSONs.nutsrg
+                out.Geometries.geoJSONs.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
+                out.Geometries.geoJSONs.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
+                out.Geometries.geoJSONs.mixed.rg3 = feature(allNUTSGeoData[3], allNUTSGeoData[3].objects.nutsrg).features
 
                 //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
                 // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
-                ;[out._geom.mixed.rg0, out._geom.mixed.rg1, out._geom.mixed.rg2, out._geom.mixed.rg3].forEach((r, i) => {
+                ;[
+                    out.Geometries.geoJSONs.mixed.rg0,
+                    out.Geometries.geoJSONs.mixed.rg1,
+                    out.Geometries.geoJSONs.mixed.rg2,
+                    out.Geometries.geoJSONs.mixed.rg3,
+                ].forEach((r, i) => {
                     //append each nuts level to map
                     zg.append('g')
                         .attr('id', 'em-nutsrg')
@@ -1018,7 +827,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .attr('id', 'em-nutsrg')
                     .attr('class', 'em-nutsrg')
                     .selectAll('path')
-                    .data(out._geom.nutsrg)
+                    .data(out.Geometries.geoJSONs.nutsrg)
                     .enter()
                     .append('path')
                     .attr('d', out._pathFunction)
@@ -1026,12 +835,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //draw country boundaries
-        if (out._geom.cntbn) {
+        if (out.Geometries.geoJSONs.cntbn) {
             zg.append('g')
                 .attr('id', 'em-cntbn')
                 .attr('class', 'em-cntbn')
                 .selectAll('path')
-                .data(out._geom.cntbn)
+                .data(out.Geometries.geoJSONs.cntbn)
                 .enter()
                 .append('path')
                 .filter(function (bn) {
@@ -1048,15 +857,15 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //draw NUTS boundaries
-        if (out._geom.nutsbn) {
-            out._geom.nutsbn.sort(function (bn1, bn2) {
+        if (out.Geometries.geoJSONs.nutsbn) {
+            out.Geometries.geoJSONs.nutsbn.sort(function (bn1, bn2) {
                 return bn2.properties.lvl - bn1.properties.lvl
             })
             zg.append('g')
                 .attr('id', 'em-nutsbn')
                 .attr('class', 'em-nutsbn')
                 .selectAll('path')
-                .data(out._geom.nutsbn)
+                .data(out.Geometries.geoJSONs.nutsbn)
                 .enter()
                 .filter(function (bn) {
                     if (out.bordersToShow_.includes('eu') && bn.properties.eu == 'T') return bn
@@ -1096,12 +905,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //draw world boundaries
-        if (out._geom.worldbn) {
+        if (out.Geometries.geoJSONs.worldbn) {
             zg.append('g')
                 .attr('id', 'em-worldbn')
                 .attr('class', 'em-worldbn')
                 .selectAll('path')
-                .data(out._geom.worldbn)
+                .data(out.Geometries.geoJSONs.worldbn)
                 .enter()
                 .append('path')
                 .attr('d', out._pathFunction)
@@ -1115,13 +924,13 @@ export const mapTemplate = function (config, withCenterPoints) {
             //.attr("id", (bn) => bn.properties.CNTR_BN_ID)
         }
 
-        if (out._geom.kosovo) {
+        if (out.Geometries.geoJSONs.kosovo) {
             //add kosovo to world map
             zg.append('g')
                 .attr('id', 'em-kosovo-bn')
                 .attr('class', 'em-kosovo-bn')
                 .selectAll('path')
-                .data(out._geom.kosovo)
+                .data(out.Geometries.geoJSONs.kosovo)
                 .enter()
                 .append('path')
                 .attr('d', out._pathFunction)
@@ -1252,12 +1061,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
 
         //countries bn
-        if (out._geom.cntbn) {
+        if (out.Geometries.geoJSONs.cntbn) {
             cg.append('g')
                 .attr('id', 'em-coast-margin-cnt')
                 .attr('class', 'em-coast-margin-cnt')
                 .selectAll('path')
-                .data(out._geom.cntbn)
+                .data(out.Geometries.geoJSONs.cntbn)
                 .enter()
                 .filter(function (bn) {
                     return bn.properties.co === 'T'
@@ -1267,12 +1076,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //nuts bn
-        if (out._geom.nutsbn) {
+        if (out.Geometries.geoJSONs.nutsbn) {
             cg.append('g')
                 .attr('id', 'em-coast-margin-nuts')
                 .attr('class', 'em-coast-margin-nuts')
                 .selectAll('path')
-                .data(out._geom.nutsbn)
+                .data(out.Geometries.geoJSONs.nutsbn)
                 .enter()
                 .filter(function (bn) {
                     return bn.properties.co === 'T'
@@ -1282,12 +1091,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //world bn
-        if (out._geom.worldbn) {
+        if (out.Geometries.geoJSONs.worldbn) {
             cg.append('g')
                 .attr('id', 'em-coast-margin-world')
                 .attr('class', 'em-coast-margin-world')
                 .selectAll('path')
-                .data(out._geom.worldbn)
+                .data(out.Geometries.geoJSONs.worldbn)
                 .enter()
                 .filter(function (bn) {
                     return bn.properties.COAS_FLAG === 'T'
@@ -1304,7 +1113,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             // if centroids data is absent (e.g. for world maps) then calculate manually
             if (out.geo_ == 'WORLD') {
                 centroidFeatures = []
-                out._geom.worldrg.forEach((feature) => {
+                out.Geometries.geoJSONs.worldrg.forEach((feature) => {
                     let newFeature = { ...feature }
                     // exception for France (because guyane)
                     if (feature.properties.id == 'FR') {

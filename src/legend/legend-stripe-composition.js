@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import * as lg from '../core/legend'
+import * as Legend from '../core/legend'
 
 /**
  * A legend for choropleth maps
@@ -9,7 +9,7 @@ import * as lg from '../core/legend'
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //the width of the legend box elements
     out.shapeWidth = 25

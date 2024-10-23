@@ -1,6 +1,6 @@
 import { format } from 'd3-format'
 import { select } from 'd3-selection'
-import * as lg from '../core/legend'
+import * as Legend from '../core/legend'
 import { symbolsLibrary } from '../maptypes/map-proportional-symbols'
 import { symbol } from 'd3-shape'
 import { executeForAllInsets, getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
@@ -22,7 +22,7 @@ formatDefaultLocale({
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     out.ascending = false //the order of the legend elements. Set to false to invert.
     out.legendSpacing = 35 //spacing between color & size legends (if applicable)
