@@ -68,11 +68,11 @@ export const legend = function (map, config) {
 
         let baseY = out.boxPadding
         if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
-        for (let i = 0; i < m.clnb_; i++) {
+        for (let i = 0; i < m.numberOfClasses_; i++) {
             const y = baseY + i * out.shapeHeight
             const x = out.boxPadding
-            const ecl = out.ascending ? m.clnb() - i - 1 : i
-            const fillColor = m.classToFillStyle()(ecl, m.clnb_)
+            const ecl = out.ascending ? m.numberOfClasses() - i - 1 : i
+            const fillColor = m.classToFillStyle()(ecl, m.numberOfClasses_)
 
             // Append rectangle for each class
             lgg.append('rect')
@@ -116,7 +116,7 @@ export const legend = function (map, config) {
             }
 
             // Append label
-            if (i < m.clnb() - 1) {
+            if (i < m.numberOfClasses() - 1) {
                 lgg.append('text')
                     .attr('class', 'em-legend-label')
                     .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
@@ -128,7 +128,7 @@ export const legend = function (map, config) {
 
         // 'No data' box and label if applicable
         if (out.noData) {
-            const y = baseY + m.clnb() * out.shapeHeight + out.boxPadding
+            const y = baseY + m.numberOfClasses() * out.shapeHeight + out.boxPadding
             lgg.append('rect')
                 .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)

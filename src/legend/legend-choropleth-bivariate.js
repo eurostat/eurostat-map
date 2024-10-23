@@ -60,8 +60,8 @@ export const legend = function (map, config) {
     //@override
     out.update = function () {
         const lgg = out.lgg
-        const clnb = out.map.clnb()
-        const sz = out.squareSize / clnb
+        const numberOfClasses = out.map.numberOfClasses()
+        const sz = out.squareSize / numberOfClasses
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
 
         // Horizontal shift to move everything right (adjust this value as needed)
@@ -97,16 +97,16 @@ export const legend = function (map, config) {
         const initialX = out.yAxisLabelsOffset.x
 
         // Draw rectangles
-        for (let i = 0; i < clnb; i++) {
-            for (let j = 0; j < clnb; j++) {
-                const ecl1 = clnb - i - 1
-                const ecl2 = clnb - j - 1
+        for (let i = 0; i < numberOfClasses; i++) {
+            for (let j = 0; j < numberOfClasses; j++) {
+                const ecl1 = numberOfClasses - i - 1
+                const ecl2 = numberOfClasses - j - 1
                 const fill = out.map.classToFillStyle()(ecl1, ecl2)
 
                 square
                     .append('rect')
                     .attr('class', 'em-bivariate-square')
-                    .attr('x', initialX + (clnb - 1 - i) * sz)
+                    .attr('x', initialX + (numberOfClasses - 1 - i) * sz)
                     .attr('y', j * sz)
                     .attr('width', sz)
                     .attr('height', sz)
@@ -265,7 +265,9 @@ export const legend = function (map, config) {
         // 'No data' legend box
         if (out.noData) {
             const noDataYOffset =
-                out.rotation === 0 ? out.noDataYOffset + out.squareSize / out.map.clnb_ + out.arrowHeight / 2 : out.noDataYOffset
+                out.rotation === 0
+                    ? out.noDataYOffset + out.squareSize / out.map.numberOfClasses_ + out.arrowHeight / 2
+                    : out.noDataYOffset
 
             y =
                 out.rotation === 0
@@ -280,12 +282,12 @@ export const legend = function (map, config) {
                 .attr('height', out.noDataShapeHeight)
                 .style('fill', out.map.noDataFillStyle())
                 .on('mouseover', function () {
-                    const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
+                    const regions = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
                     const sel = regions.selectAll("[nd='nd']")
                     sel.style('fill', 'red')
                 })
                 .on('mouseout', function () {
-                    const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
+                    const nRg = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
                     const sel = nRg.selectAll("[nd='nd']")
                     sel.style('fill', function () {
                         return select(this).attr('fill___')

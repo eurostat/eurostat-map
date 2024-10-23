@@ -16,9 +16,9 @@ export const map = function (config) {
     const out = smap.statMap(config)
 
     //the number of classes
-    out.clnb_ = 7
+    out.numberOfClasses_ = 7
     //the classification method
-    out.classifMethod_ = 'quantile' // or: equinter, threshold
+    out.classificationMethod_ = 'quantile' // or: equinter, threshold
     //the threshold, when the classification method is 'threshold'
     out.threshold_ = [0]
     //colors to use for classes
@@ -42,8 +42,8 @@ export const map = function (config) {
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
     ;[
-        'clnb_',
-        'classifMethod_',
+        'numberOfClasses_',
+        'classificationMethod_',
         'threshold_',
         'makeClassifNice_',
         'colorFun_',
@@ -77,21 +77,21 @@ export const map = function (config) {
     out.threshold = function (v) {
         if (!arguments.length) return out.threshold_
         out.threshold_ = v
-        out.clnb(v.length + 1)
+        out.numberOfClasses(v.length + 1)
         return out
     }
     out.filtersDefinitionFun = function (v) {
         if (!arguments.length) return out.filtersDefinitionFun_
         out.filtersDefinitionFun_ = v
-        if (out.svg()) out.filtersDefinitionFun_(out.svg(), out.clnb_)
+        if (out.svg()) out.filtersDefinitionFun_(out.svg(), out.numberOfClasses_)
         return out
     }
 
     //override attribute values with config values
     if (config)
         [
-            'clnb',
-            'classifMethod',
+            'numberOfClasses',
+            'classificationMethod',
             'threshold',
             'makeClassifNice',
             'colorFun',
@@ -122,9 +122,9 @@ export const map = function (config) {
         // Configure classifier based on the selected classification method
         const setupClassifier = () => {
             const dataArray = out.statData().getArray()
-            const range = generateRange(out.clnb())
+            const range = generateRange(out.numberOfClasses())
 
-            switch (out.classifMethod_) {
+            switch (out.classificationMethod_) {
                 case 'quantile':
                     out.classifier(scaleQuantile().domain(dataArray).range(range))
                     break
@@ -137,8 +137,8 @@ export const map = function (config) {
                     if (out.makeClassifNice_) out.classifier().nice()
                     break
                 case 'threshold':
-                    out.clnb(out.threshold_.length + 1)
-                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.clnb())))
+                    out.numberOfClasses(out.threshold_.length + 1)
+                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.numberOfClasses())))
                     break
             }
         }
@@ -163,7 +163,7 @@ export const map = function (config) {
             classifyRegions(map.svg().selectAll(selector))
 
             // Handle mixed NUTS level, separating NUTS level 0
-            if (map.nutsLvl_ === 'mixed') {
+            if (map.nutsLevel_ === 'mixed') {
                 const nuts0Regions = map.svg().selectAll('path.em-nutsrg0')
                 classifyRegions(nuts0Regions)
             }
@@ -219,7 +219,7 @@ export const map = function (config) {
                 })
 
             // Apply additional settings for mixed NUTS level view
-            if (out.nutsLvl_ === 'mixed') {
+            if (out.nutsLevel_ === 'mixed') {
                 styleMixedNUTS(map)
             }
 
@@ -267,7 +267,7 @@ export const map = function (config) {
             // World template logic
             if (!ecl) return out.cntrgFillStyle_
             if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-            const fillStyle = out.classToFillStyle_(ecl, out.clnb_)
+            const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_)
             return fillStyle || out.cntrgFillStyle_
         } else {
             // NUTS template logic
@@ -275,7 +275,7 @@ export const map = function (config) {
             if (out.countriesToShow_.includes(countryId)) {
                 if (!ecl) return out.nutsrgFillStyle_
                 if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                return out.classToFillStyle()(ecl, out.clnb_)
+                return out.classToFillStyle()(ecl, out.numberOfClasses_)
             }
             return out.nutsrgFillStyle_
         }
@@ -308,12 +308,12 @@ export const map = function (config) {
 export const getColorLegend = function (colorFun, colorArray) {
     colorFun = colorFun || interpolateOrRd
     if (colorArray) {
-        return function (ecl, clnb) {
+        return function (ecl, numberOfClasses) {
             return colorArray[ecl]
         }
     }
-    return function (ecl, clnb) {
-        return colorFun(ecl / (clnb - 1))
+    return function (ecl, numberOfClasses) {
+        return colorFun(ecl / (numberOfClasses - 1))
     }
 }
 

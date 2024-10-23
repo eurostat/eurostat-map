@@ -18,7 +18,7 @@
                     title: 'Unemployment in Spain',
                     width: 600,
                     height: 500,
-                    nutsLvl: 2,
+                    nutsLevel: 2,
                     stat: {
                         eurostatDatasetCode: 'lfst_r_lfu3rt',
                         filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: '2019' },
@@ -32,7 +32,7 @@
                     labelling: true,
                     labelsToShow: ['values'],
                     labelShadow: ['values'],
-                    classifMethod: 'threshold',
+                    classificationMethod: 'threshold',
                     threshold: [4, 6, 8, 10, 12, 14, 16, 18, 20, 21],
                     colorFun: d3.interpolateBlues,
                     drawGraticule: false,

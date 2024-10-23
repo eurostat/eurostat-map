@@ -26,7 +26,7 @@ test('proportional symbol map', async () => {
         eurostatmap
             .map('proportionalSymbol')
             .svgId('ps-test-map')
-            .nutsLvl(0)
+            .nutsLevel(0)
             .title('GDP, 2018')
             .hoverColor('cyan')
             .zoomExtent([1, 2])
@@ -52,7 +52,7 @@ test('proportional symbol map', async () => {
             .psStroke('black')
             .psStrokeWidth(10)
 
-            .psClassifMethod('threshold')
+            .psclassificationMethod('threshold')
             .psThreshold([10000, 20000, 30200, 40000, 50000])
             .psColors(['#2d50a0', '#6487c3', '#aab9e1', '#f0cd91', '#e6a532', '#d76e2d'].reverse())
 

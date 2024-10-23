@@ -43,7 +43,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.containerId_ = undefined
 
     //geographical focus
-    out.nutsLvl_ = 3 // 0,1,2,3, or 'mixed'
+    out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
     out.nutsYear_ = 2021
     out.geo_ = 'EUR'
     out.proj_ = '3035'
@@ -517,7 +517,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.getGeoDataPromise = function () {
         // for mixing all NUTS levels (i.e IMAGE)
 
-        if (out.nutsLvl_ == 'mixed' && out.geo_ !== 'WORLD') {
+        if (out.nutsLevel_ == 'mixed' && out.geo_ !== 'WORLD') {
             const promises = []
             ;[0, 1, 2, 3].forEach((lvl) => {
                 const buf = []
@@ -568,7 +568,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             buf.push('/')
             buf.push(out.scale_)
             buf.push('/')
-            buf.push(out.nutsLvl_)
+            buf.push(out.nutsLevel_)
             buf.push('.json')
             promises.push(json(buf.join('')))
 
@@ -580,7 +580,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 buf.push('/')
                 buf.push(out.proj_)
                 buf.push('/nutspt_')
-                buf.push(out.nutsLvl_)
+                buf.push(out.nutsLevel_)
                 buf.push('.json')
                 promises.push(json(buf.join('')))
             }
@@ -599,7 +599,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         centroidsData = null
 
         //get geo data from Nuts2json API
-        if (out.nutsLvl_ == 'mixed' && out.geo_ !== 'WORLD') {
+        if (out.nutsLevel_ == 'mixed' && out.geo_ !== 'WORLD') {
             // mixed retrieves all NUTS levels, world doesnt
             let promises = out.getGeoDataPromise()
             Promise.all(promises).then(
@@ -976,7 +976,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //draw NUTS regions
         if (out._geom.nutsrg) {
-            if (out.nutsLvl_ == 'mixed') {
+            if (out.nutsLevel_ == 'mixed') {
                 out._geom.mixed.rg0 = out._geom.nutsrg
                 out._geom.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
                 out._geom.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
@@ -1013,7 +1013,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     }
                 }
             } else {
-                // when nutsLvl is not 'mixed'
+                // when nutsLevel is not 'mixed'
                 zg.append('g')
                     .attr('id', 'em-nutsrg')
                     .attr('class', 'em-nutsrg')
@@ -1322,7 +1322,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 })
             }
         } else {
-            if (out.nutsLvl_ == 'mixed') {
+            if (out.nutsLevel_ == 'mixed') {
                 centroidFeatures = [
                     ...centroidsData[0].features,
                     ...centroidsData[1].features,
@@ -1492,7 +1492,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
                 //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
                 let labelRegions
-                if (map.nutsLvl_ == 'mixed') {
+                if (map.nutsLevel_ == 'mixed') {
                     map._geom.mixed.rg0 = map._geom.nutsrg
                     map._geom.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
                     map._geom.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
@@ -1865,7 +1865,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //copy template attributes
         ;[
-            'nutsLvl_',
+            'nutsLevel_',
             'nutsYear_',
             'hoverColor_',
             //'nutsbnStroke_', // DEPRECATED

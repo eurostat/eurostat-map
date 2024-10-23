@@ -26,7 +26,7 @@ test('Two maps on a single page', async () => {
             .width(400)
             .scale('20M')
             .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
-            .classifMethod('threshold')
+            .classificationMethod('threshold')
             .threshold([50, 75, 100, 150, 300, 850])
             .tooltipShowFlags(false)
             .legend({
@@ -42,7 +42,7 @@ test('Two maps on a single page', async () => {
             .width(400)
             .scale('60M')
             .nutsYear(2013)
-            .nutsLvl(3)
+            .nutsLevel(3)
             .stat({
                 csvURL: 'https://raw.githubusercontent.com/eurostat/eurostat-map/dev/examples/urb_rur_typo.csv',
                 geoCol: 'NUTS_ID_2013',

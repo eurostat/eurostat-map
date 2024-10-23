@@ -547,14 +547,14 @@ export const legend = function (map, config) {
         let x = out.boxPadding
 
         //draw legend elements for classes: rectangle + label
-        let clnb = m.psClasses_
+        let numberOfClasses = m.psClasses_
 
-        for (let i = 0; i < clnb; i++) {
+        for (let i = 0; i < numberOfClasses; i++) {
             //the vertical position of the legend element
             let y = out.titleFontSize + out.colorLegend.titlePadding + out.colorLegend.marginTop + i * out.colorLegend.shapeHeight // account for title + margin
 
             //the class number, depending on order
-            const ecl = out.ascending ? i : clnb - i - 1
+            const ecl = out.ascending ? i : numberOfClasses - i - 1
 
             let itemContainer = out._colorLegendNode
                 .append('g')
@@ -565,7 +565,7 @@ export const legend = function (map, config) {
             itemContainer
                 .append('rect')
                 .attr('class', 'em-legend-rect')
-                .style('fill', m.psClassToFillStyle()(ecl, clnb))
+                .style('fill', m.psClassToFillStyle()(ecl, numberOfClasses))
                 .attr('width', out.colorLegend.shapeWidth)
                 .attr('height', out.colorLegend.shapeHeight)
                 .on('mouseover', function () {
@@ -604,7 +604,7 @@ export const legend = function (map, config) {
             }
 
             //label
-            if (i < clnb - 1) {
+            if (i < numberOfClasses - 1) {
                 itemContainer
                     .append('text')
                     .attr('class', 'em-legend-label')
@@ -619,7 +619,7 @@ export const legend = function (map, config) {
 
         //'no data' legend box
         if (out.colorLegend.noData) {
-            let y = out.titleFontSize + out.colorLegend.marginTop + clnb * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
+            let y = out.titleFontSize + out.colorLegend.marginTop + numberOfClasses * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
             let container = out._colorLegendNode
                 .append('g')
                 .attr('transform', `translate(${x},${y})`)

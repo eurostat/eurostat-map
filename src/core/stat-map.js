@@ -124,7 +124,7 @@ export const statMap = function (config, withCenterPoints) {
 
         //add additional filters for fill patterns for example
         if (out.filtersDefinitionFun_) {
-            out.filtersDefinitionFun_(out.svg(), out.clnb_)
+            out.filtersDefinitionFun_(out.svg(), out.numberOfClasses_)
         }
 
         //legend element
@@ -220,8 +220,8 @@ export const statMap = function (config, withCenterPoints) {
             out.statData(statKey, statData)
 
             //launch query
-            let nl = out.nutsLvl_
-            if (out.nutsLvl_ == 'mixed') {
+            let nl = out.nutsLevel_
+            if (out.nutsLevel_ == 'mixed') {
                 nl = 0
             }
             statData.retrieveFromRemote(nl, out.lg(), () => {
@@ -298,7 +298,7 @@ export const statMap = function (config, withCenterPoints) {
     /**
      * Set some map attributes based on the following URL parameters:
      * "w":width, "h":height, "x":xGeoCenter, "y":yGeoCenter, "z":pixGeoSize, "s":scale, "lvl":nuts level, "time":time,
-     * "proj":CRS, "geo":geo territory, "ny":nuts version, "lg":langage, "clnb":class number
+     * "proj":CRS, "geo":geo territory, "ny":nuts version, "lg":langage, "numberOfClasses":class number
      */
     out.setFromURL = function () {
         const opts = getURLParameters()
@@ -307,7 +307,7 @@ export const statMap = function (config, withCenterPoints) {
         if (opts.x && opts.y) out.geoCenter([opts.x, opts.y])
         if (opts.z) out.pixelSize(opts.z)
         if (opts.s) out.scale(opts.s)
-        if (opts.lvl) out.nutsLvl(opts.lvl)
+        if (opts.lvl) out.nutsLevel(opts.lvl)
         if (opts.time) {
             out.filters_.time = opts.time
             delete out.filters_.lastTimePeriod
@@ -316,7 +316,7 @@ export const statMap = function (config, withCenterPoints) {
         if (opts.geo) out.geo(opts.geo)
         if (opts.ny) out.nutsYear(opts.ny)
         if (opts.lg) out.lg(opts.lg)
-        if (opts.clnb) out.clnb(+opts.clnb)
+        if (opts.numberOfClasses) out.numberOfClasses(+opts.numberOfClasses)
         return out
     }
 
@@ -429,7 +429,7 @@ export const statMap = function (config, withCenterPoints) {
  */
 export const getURLParameters = function () {
     const ps = {}
-    const p = ['w', 'h', 'x', 'y', 'z', 's', 'lvl', 'time', 'proj', 'geo', 'ny', 'lg', 'sl', 'clnb']
+    const p = ['w', 'h', 'x', 'y', 'z', 's', 'lvl', 'time', 'proj', 'geo', 'ny', 'lg', 'sl', 'numberOfClasses']
     for (let i = 0; i < p.length; i++) ps[p[i]] = getURLParameterByName(p[i])
     return ps
 }

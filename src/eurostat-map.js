@@ -50,11 +50,11 @@ export const getFillPatternDefinitionFun = function (opts) {
     const smax = opts.maxSize || 5.5
     opts.bckColor = opts.bckColor || 'white'
     opts.symbColor = opts.symbColor || 'black'
-    return function (svg, clnb) {
+    return function (svg, numberOfClasses) {
         //clear previous
         svg.selectAll('.estatmapPattern').remove()
-        for (let i = 0; i < clnb; i++) {
-            const si = smin + ((smax - smin) * i) / (clnb - 1)
+        for (let i = 0; i < numberOfClasses; i++) {
+            const si = smin + ((smax - smin) * i) / (numberOfClasses - 1)
             const patt = svg
                 .append('pattern')
                 .attr('class', 'estatmapPattern')

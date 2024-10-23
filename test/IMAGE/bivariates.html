@@ -529,7 +529,7 @@
             ]
             const map = eurostatmap
                 .map('bivariateChoropleth')
-                .nutsLvl('mixed')
+                .nutsLevel('mixed')
                 .classToFillStyle((class1, class2) => {
                     if (class1 == 0 && class2 == 2) return COLORS[0]
                     if (class1 == 1 && class2 == 2) return COLORS[1]

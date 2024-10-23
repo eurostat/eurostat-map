@@ -16,7 +16,7 @@ export const map = function (config) {
     const out = smap.statMap(config)
 
     //number of classes for the classification. Same for both variables.
-    out.clnb_ = 3
+    out.numberOfClasses_ = 3
     //stevens.greenblue
     //TODO make it possible to use diverging color ramps ?
     out.startColor_ = '#e8e8e8'
@@ -39,7 +39,7 @@ export const map = function (config) {
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
     ;[
-        'clnb_',
+        'numberOfClasses_',
         'startColor_',
         'color1_',
         'color2_',
@@ -58,9 +58,11 @@ export const map = function (config) {
 
     //override attribute values with config values
     if (config)
-        ['clnb', 'startColor', 'color1', 'color2', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
-        })
+        ['numberOfClasses', 'startColor', 'color1', 'color2', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(
+            function (key) {
+                if (config[key] != undefined) out[key](config[key])
+            }
+        )
 
     //@override
     out.updateClassification = function () {
@@ -99,7 +101,7 @@ export const map = function (config) {
         let stat1 = out.statData('v1').getArray() || out.statData().getArray()
         let stat2 = out.statData('v2').getArray()
 
-        const range = [...Array(out.clnb()).keys()]
+        const range = [...Array(out.numberOfClasses()).keys()]
         if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
@@ -137,7 +139,7 @@ export const map = function (config) {
                 })
 
             //when mixing NUTS, level 0 is separated from the rest (class nutsrg0)
-            if (map.nutsLvl_ == 'mixed') {
+            if (map.nutsLevel_ == 'mixed') {
                 map.svg()
                     .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
@@ -160,12 +162,12 @@ export const map = function (config) {
 
             //define bivariate scale
             if (!out.classToFillStyle()) {
-                const scale = scaleBivariate(out.clnb(), out.startColor(), out.color1(), out.color2(), out.endColor())
+                const scale = scaleBivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.endColor())
                 out.classToFillStyle(scale)
             }
 
             //when mixing NUTS, level 0 is separated from the rest (using class nutsrg0)
-            if (out.nutsLvl_ == 'mixed') {
+            if (out.nutsLevel_ == 'mixed') {
                 map.svg_
                     .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
@@ -288,7 +290,7 @@ export const map = function (config) {
                     }
                 )
 
-            if (out.nutsLvl_ == 'mixed') {
+            if (out.nutsLevel_ == 'mixed') {
                 // Toggle visibility - only show NUTS 1,2,3 with stat values when mixing different NUTS levels
                 map.svg()
                     .selectAll('#em-nutsrg path')
@@ -337,17 +339,17 @@ export const map = function (config) {
     return out
 }
 
-const scaleBivariate = function (clnb, startColor, color1, color2, endColor) {
+const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {
     //color ramps, by row
     const cs = []
     //interpolate from first and last columns
     const rampS1 = interpolateRgb(startColor, color1)
     const ramp2E = interpolateRgb(color2, endColor)
-    for (let i = 0; i < clnb; i++) {
-        const t = i / (clnb - 1)
+    for (let i = 0; i < numberOfClasses; i++) {
+        const t = i / (numberOfClasses - 1)
         const colFun = interpolateRgb(rampS1(t), ramp2E(t))
         const row = []
-        for (let j = 0; j < clnb; j++) row.push(colFun(j / (clnb - 1)))
+        for (let j = 0; j < numberOfClasses; j++) row.push(colFun(j / (numberOfClasses - 1)))
         cs.push(row)
     }
     //TODO compute other matrix based on rows, and average both?

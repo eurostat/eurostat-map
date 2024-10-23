@@ -86,7 +86,7 @@ And insert it in the map definition following this format:
     eurostatmap
         .map('choropleth')
         .title('Population at risk of poverty')
-        .nutsLvl(2)
+        .nutsLevel(2)
         .stat({ eurostatDatasetCode: 'ilc_li41', filters: { unit: 'PC', time: 2018 } })
         .build()
 </script>

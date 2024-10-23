@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
 
-  <body>
-    <svg id="map"></svg>
-    <script src="../build/eurostatmap.js"></script>
-    <script>
-      const map = eurostatmap
-        .map("ch")
-        .title("Population in Europe")
-        .insets("default")
-        .scale("60M")
-        .nutsLvl(2)
-        .classifMethod("threshold")
-        .threshold([50, 75, 100, 150, 300, 850])
-        .tooltipShowFlags(false)
-        .legend({ labelDecNb: 0, x: 15, y: 160 })
-        //.labelling(true)
-        .drawGraticule(true)
-        .labelsToShow(["seas", "values"])
-        .tooltip({
-        //   maxWidth: "200px",
-        //   fontSize: "16px",
-        //   background: "white",
-        //   padding: "5px",
-        //   border: "0px",
-        //   borderRadius: "5px",
-        //   boxShadow: "5px 5px 5px grey",
-        //   transitionDuration: 200,
-        //   xOffset: 30,
-        //   yOffset: 20,
-          showFlags: "short",
-        })
-        .build();
-    </script>
-  </body>
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('ch')
+                .title('Population in Europe')
+                .insets('default')
+                .scale('60M')
+                .nutsLevel(2)
+                .classificationMethod('threshold')
+                .threshold([50, 75, 100, 150, 300, 850])
+                .tooltipShowFlags(false)
+                .legend({ labelDecNb: 0, x: 15, y: 160 })
+                //.labelling(true)
+                .drawGraticule(true)
+                .labelsToShow(['seas', 'values'])
+                .tooltip({
+                    //   maxWidth: "200px",
+                    //   fontSize: "16px",
+                    //   background: "white",
+                    //   padding: "5px",
+                    //   border: "0px",
+                    //   borderRadius: "5px",
+                    //   boxShadow: "5px 5px 5px grey",
+                    //   transitionDuration: 200,
+                    //   xOffset: 30,
+                    //   yOffset: 20,
+                    showFlags: 'short',
+                })
+                .build()
+        </script>
+    </body>
 </html>

@@ -136,11 +136,11 @@ export const statData = function (config) {
     /**
      * Retrieve stat data from remote data sources.
      *
-     * @param {*} nutsLvl
+     * @param {*} nutsLevel
      * @param {*} callback
      */
-    out.retrieveFromRemote = function (nutsLvl, lang, callback) {
-        if (out.eurostatDatasetCode_) updateEurobase(nutsLvl, lang, callback)
+    out.retrieveFromRemote = function (nutsLevel, lang, callback) {
+        if (out.eurostatDatasetCode_) updateEurobase(nutsLevel, lang, callback)
         else if (out.csvURL_) updateCSV(callback)
         return out
     }
@@ -162,12 +162,12 @@ export const statData = function (config) {
     /**
      * Return promise for Eurobase/jsonstat data.
      */
-    const getEurobasePromise = function (nutsLvl, lang) {
+    const getEurobasePromise = function (nutsLevel, lang) {
         //set precision //DEPRECATED 16/11/2021 https://ec.europa.eu/eurostat/online-help/public/en/NAVIGATION_WDDSTranslator_migration_en/#DECOMMISSION
         //out.filters_["precision"] = out.precision_;
         //select only required geo groups, depending on the specified nuts level
         if (!out.filters_.geo) {
-            out.filters_['geoLevel'] = nutsLvl + '' === '0' ? 'country' : 'nuts' + nutsLvl
+            out.filters_['geoLevel'] = nutsLevel + '' === '0' ? 'country' : 'nuts' + nutsLevel
         }
 
         //force filtering of euro-geo-aggregates
@@ -178,11 +178,11 @@ export const statData = function (config) {
     }
 
     //for eurobase statistical data to retrieve from Eurostat API
-    const updateEurobase = function (nutsLvl, lang, callback) {
+    const updateEurobase = function (nutsLevel, lang, callback) {
         //erase previous data
         out._data_ = null
 
-        getEurobasePromise(nutsLvl, lang).then(function (data___) {
+        getEurobasePromise(nutsLevel, lang).then(function (data___) {
             //decode stat data
             const jsd = JSONstat(data___)
 
@@ -228,7 +228,7 @@ export const statData = function (config) {
     /**
      * Return promise for CSV data.
      */
-    const getCSVPromise = function (nutsLvl) {
+    const getCSVPromise = function (nutsLevel) {
         return csv(out.csvURL_)
     }
 

@@ -36,4 +36,7 @@ export const defineDeprecatedFunctions = (out) => {
     out.labelShadowColor = (v) => (console.warn('map.labelShadowColor() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
     out.scalebarFontSize = (v) => (console.warn('map.scalebarFontSize() is now DEPRECATED. please use the .em-scalebar-label CSS class'), out);
     out.pixSize = (v) => (console.warn('map.pixSize() is now DEPRECATED. please use map.pixelSize() instead.'), out.pixelSize_ = v,out);
+    out.classifMethod = (v) => (console.warn('map.classifMethod() is now DEPRECATED. please use map.classificationMethod() instead.'), out.classificationMethod_ = v,out);
+    out.clnb = (v) => (console.warn('map.clnb() is now DEPRECATED. please use map.numberOfClasses() instead.'), out.numberOfClasses_ = v,out);
+    out.nutsLvl = (v) => (console.warn('map.nutsLvl() is now DEPRECATED. please use map.nutsLevel() instead.'), out.nutsLevel_ = v,out);
 }

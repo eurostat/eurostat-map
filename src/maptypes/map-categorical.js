@@ -137,7 +137,7 @@ export const map = function (config) {
                 })
 
             // Apply additional settings for mixed NUTS level view
-            if (out.nutsLvl_ === 'mixed') {
+            if (out.nutsLevel_ === 'mixed') {
                 map.svg()
                     .selectAll('#em-nutsrg path')
                     .style('display', function (rg) {

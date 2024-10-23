@@ -26,7 +26,7 @@ test('choropleth with fill pattern', async () => {
             .titleFontSize(40)
             .titleFill('#444')
             .scale('60M')
-            .classifMethod('threshold')
+            .classificationMethod('threshold')
             .threshold([35, 50, 80, 100, 140, 180, 300, 500, 1300])
 
             .filtersDefinitionFun(

@@ -526,7 +526,7 @@ export const map = function (config) {
 //build a color legend object
 export const getColorLegend = function (colorFun) {
     colorFun = colorFun || interpolateYlOrRd
-    return function (ecl, clnb) {
-        return colorFun(ecl / (clnb - 1))
+    return function (ecl, numberOfClasses) {
+        return colorFun(ecl / (numberOfClasses - 1))
     }
 }
