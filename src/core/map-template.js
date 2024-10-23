@@ -462,10 +462,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.Geometries.allNUTSGeoData = null
         out.Geometries.centroidsData = null
 
-        const handleDefaultGeoData = () => {
-            // Build map template
-        }
-
         out.Geometries.getDefaultGeoData().then(() => {
             out.buildMapTemplate()
 

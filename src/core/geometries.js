@@ -1,6 +1,7 @@
-// takes care of adding geometries to the map.
+// takes care of the map's geometries
 import { json } from 'd3-fetch'
 import { feature } from 'topojson-client'
+import { executeForAllInsets } from './utils'
 
 export const Geometries = function (map, withCenterPoints) {
     let out = {}
@@ -8,14 +9,7 @@ export const Geometries = function (map, withCenterPoints) {
     out.allNUTSGeoData = undefined
     out.centroidsData = undefined
     out.geoJSONs = {
-        //default placeholders
-        mixed: {
-            // for 'mixed' nuts level
-            rg0: undefined, // nuts 0 regions
-            rg1: undefined,
-            rg2: undefined,
-            rg3: undefined,
-        },
+        mixed: { rg0: undefined, rg1: undefined, rg2: undefined, rg3: undefined },
         cntbn: undefined,
         cntrg: undefined,
         nutsbn: undefined,
@@ -26,24 +20,23 @@ export const Geometries = function (map, withCenterPoints) {
         kosovo: undefined,
     }
 
+    /**
+     * Retrieves and parses 'default' geo data (for NUTS or World maps)
+     */
     out.getDefaultGeoData = function () {
         const promises = out.getDefaultGeoDataPromise()
-
         return Promise.all(promises)
             .then((results) => {
-                // Apply user-defined filter function
                 if (out.filterGeometriesFunction_) {
                     results = out.filterGeometriesFunction_(results)
                 }
 
                 out.geoData = results[0]
-
                 if (withCenterPoints) {
                     out.centroidsData = out.nutsLevel_ === 'mixed' ? [results[4], results[5], results[6], results[7]] : results[1]
                 }
 
                 const isWorld = out.geo_ === 'WORLD'
-
                 // Decode TopoJSON to GeoJSON
                 if (isWorld) {
                     out.geoJSONs.worldrg = feature(out.geoData, out.geoData.objects.CNTR_RG_20M_2020_4326).features
@@ -58,116 +51,67 @@ export const Geometries = function (map, withCenterPoints) {
                     out.geoJSONs.cntbn = feature(out.geoData, out.geoData.objects.cntbn).features
                 }
 
-                return results // This is the geoData array
+                return results
             })
             .catch((err) => {
-                // Handle any error case and propagate it
                 return Promise.reject(err)
             })
     }
 
     /**
-     * Return promise for Nuts2JSON topojson data.
+     * Returns an array of promises for Nuts2JSON topojson data.
      */
     out.getDefaultGeoDataPromise = function () {
-        // for mixing all NUTS levels (i.e IMAGE)
+        const nutsLevels = [0, 1, 2, 3]
+        const promises = []
 
-        if (map.nutsLevel_ == 'mixed' && map.geo_ !== 'WORLD') {
-            const promises = []
-            ;[0, 1, 2, 3].forEach((lvl) => {
-                const buf = []
-                buf.push(map.nuts2jsonBaseURL_)
-                buf.push(map.nutsYear_)
-                if (map.geo_ != 'EUR') buf.push('/' + map.geo_)
-                buf.push('/')
-                buf.push(map.proj_)
-                buf.push('/')
-                buf.push(map.scale_)
-                buf.push('/')
-                buf.push(lvl)
-                buf.push('.json')
-                promises.push(json(buf.join('')))
-            })
-
-            //centroids nutspt_0.json
-
-            if (withCenterPoints) {
-                ;[0, 1, 2, 3].forEach((lvl) => {
-                    const buf = []
-                    buf.push(map.nuts2jsonBaseURL_)
-                    buf.push(map.nutsYear_)
-                    if (map.geo_ != 'EUR') buf.push('/' + map.geo_)
-                    buf.push('/')
-                    buf.push(map.proj_)
-                    buf.push('/nutspt_')
-                    buf.push(lvl)
-                    buf.push('.json')
-                    promises.push(json(buf.join('')))
-                })
-            }
-            return promises
-
-            // world maps
-        } else if (map.geo_ == 'WORLD') {
-            return [json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json')]
-        } else {
-            // NUTS maps for eurobase data with a specific NUTS level
-
-            let promises = []
-            const buf = []
-            buf.push(map.nuts2jsonBaseURL_)
-            buf.push(map.nutsYear_)
-            if (map.geo_ != 'EUR') buf.push('/' + map.geo_)
-            buf.push('/')
-            buf.push(map.proj_)
-            buf.push('/')
-            buf.push(map.scale_)
-            buf.push('/')
-            buf.push(map.nutsLevel_)
-            buf.push('.json')
-            promises.push(json(buf.join('')))
-
-            if (withCenterPoints) {
-                const buf = []
-                buf.push(map.nuts2jsonBaseURL_)
-                buf.push(map.nutsYear_)
-                if (map.geo_ != 'EUR') buf.push('/' + map.geo_)
-                buf.push('/')
-                buf.push(map.proj_)
-                buf.push('/nutspt_')
-                buf.push(map.nutsLevel_)
-                buf.push('.json')
-                promises.push(json(buf.join('')))
-            }
-
-            return promises
+        const buildUrl = (base, year, geo, proj, scale, level, withCenter = false) => {
+            let path = `${base}/${year}`
+            if (geo !== 'EUR') path += `/${geo}`
+            path += `/${proj}/${scale ? scale + '/' : ''}${withCenter ? 'nutspt_' : ''}${level}.json`
+            return path
         }
+
+        if (map.nutsLevel_ === 'mixed' && map.geo_ !== 'WORLD') {
+            nutsLevels.forEach((lvl) =>
+                promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl)))
+            )
+            if (withCenterPoints) {
+                nutsLevels.forEach((lvl) =>
+                    promises.push(
+                        json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl, true))
+                    )
+                )
+            }
+        } else if (map.geo_ === 'WORLD') {
+            promises.push(
+                json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json')
+            )
+        } else {
+            promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)))
+            if (withCenterPoints) {
+                promises.push(
+                    json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_, true))
+                )
+            }
+        }
+
+        return promises
     }
 
-    /** */
+    /** Checks if all geo data is ready */
     out.isGeoReady = function () {
         if (!out.geoData) return false
-        //recursive call to inset components
-        for (const geo in map.insetTemplates_) {
-            // check for insets with same geo
-            if (Array.isArray(map.insetTemplates_[geo])) {
-                for (var i = 0; i < map.insetTemplates_[geo].length; i++) {
-                    // insets with same geo that do not share the same parent inset
-                    if (Array.isArray(map.insetTemplates_[geo][i])) {
-                        // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                        for (var c = 0; c < map.insetTemplates_[geo][i].length; c++) {
-                            if (!map.insetTemplates_[geo][i][c].Geometries.isGeoReady()) return false
-                        }
-                    } else {
-                        if (!map.insetTemplates_[geo][i].Geometries.isGeoReady()) return false
-                    }
-                }
-            } else {
-                if (!map.insetTemplates_[geo].Geometries.isGeoReady()) return false
-            }
-        }
 
-        return true
+        let allReady = true
+
+        executeForAllInsets(map.insetTemplates_, null, (inset) => {
+            if (!inset.Geometries.isGeoReady()) {
+                allReady = false
+            }
+        })
+
+        return allReady
     }
 
     return out

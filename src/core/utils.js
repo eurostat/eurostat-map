@@ -117,7 +117,7 @@ export const flags = {
 }
 
 /**
- * @description
+ * @description Executes a function for all inset maps. Some insets might be external SVGs which is why this function was created.
  * @param {*} insets map.insets
  * @param {*} mainSvgId the ID of the map's svg
  * @param {*} callback the function to execute for each inset
