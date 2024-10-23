@@ -274,7 +274,6 @@ export const map = function (config) {
             } else if (out.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData)
             } else {
-                // d3.symbol symbols
                 // circle, cross, star, triangle, diamond, square, wye or custom
                 symb = appendD3SymbolsToMap(map, sizeData)
             }
@@ -330,7 +329,9 @@ export const map = function (config) {
             }
 
             // set color/stroke/opacity styles
-            setSymbolColors(symb)
+            setSymbolStyles(symb)
+
+            addMouseEvents(map)
 
             // update labels of stat values, appending the stat labels to the region centroids
             if (out.labelsToShow_.includes('values')) {
@@ -338,6 +339,43 @@ export const map = function (config) {
             }
         }
         return map
+    }
+
+    const addMouseEvents = function (map) {
+        let symbols = map.svg().selectAll('g.em-symbol')
+        symbols
+            .on('mouseover', function (e, rg) {
+                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
+                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                        const sel = select(this.childNodes[0])
+                        sel.attr('fill___', sel.style('fill'))
+                        sel.style('fill', out.hoverColor_)
+                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    }
+                } else {
+                    const sel = select(this.childNodes[0])
+                    sel.attr('fill___', sel.style('fill'))
+                    sel.style('fill', out.hoverColor_)
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                }
+            })
+            .on('mousemove', function (e, rg) {
+                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
+                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                        if (out._tooltip) out._tooltip.mousemove(e)
+                    }
+                } else {
+                    if (out._tooltip) out._tooltip.mousemove(e)
+                }
+            })
+            .on('mouseout', function (e) {
+                const sel = select(this.childNodes[0])
+                let newFill = sel.attr('fill___')
+                if (newFill) {
+                    sel.style('fill', newFill)
+                    if (out._tooltip) out._tooltip.mouseout()
+                }
+            })
     }
 
     /**
@@ -419,7 +457,7 @@ export const map = function (config) {
      * @description sets color/stroke/opacity styles of all symbols
      * @param {d3.selection} symb symbols d3 selection
      */
-    function setSymbolColors(symb) {
+    function setSymbolStyles(symb) {
         symb.style('fill-opacity', out.psFillOpacity())
             .style('stroke', out.psStroke())
             .style('stroke-width', out.psStrokeWidth())
@@ -435,7 +473,8 @@ export const map = function (config) {
                 }
             })
             .attr('fill___', function () {
-                return select(this).style('fill') // save for legend mouseover
+                let fill = select(this).style('fill')
+                return fill // save for legend mouseover
             })
     }
 
@@ -494,7 +533,7 @@ export const map = function (config) {
             })
 
         // update colors
-        setSymbolColors(symbols)
+        setSymbolStyles(symbols)
     }
 
     /**
@@ -592,8 +631,14 @@ export const map = function (config) {
                     let bRect = this.getBoundingClientRect()
                     return `translate(${-this.getAttribute('width') / 2}` + `, -${this.getAttribute('height')})`
                 })
-                .transition()
-                .duration(out.transitionDuration())
+            // to use transitions we need to refactor the drawing functions to promises e.g. appendBarsToMap().then(()=>{})
+            //this is because .attr('fill___', function () {select(this).style('fill')}) doesnt work unless you execute it after the transition ends.
+            // e.g.
+            // .transition()
+            // .duration(out.transitionDuration())
+            // .style('fill', function (rg) {})
+            // .end()
+            // .then()
         )
     }
 

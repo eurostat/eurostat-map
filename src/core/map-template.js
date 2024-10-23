@@ -935,48 +935,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         if (out.drawCoastalMargin_) {
-            //draw coastal margin
-            const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
-
-            //countries bn
-            if (out._geom.cntbn)
-                cg.append('g')
-                    .attr('id', 'em-coast-margin-cnt')
-                    .attr('class', 'em-coast-margin-cnt')
-                    .selectAll('path')
-                    .data(out._geom.cntbn)
-                    .enter()
-                    .filter(function (bn) {
-                        return bn.properties.co === 'T'
-                    })
-                    .append('path')
-                    .attr('d', out._pathFunction)
-            //nuts bn
-            if (out._geom.nutsbn)
-                cg.append('g')
-                    .attr('id', 'em-coast-margin-nuts')
-                    .attr('class', 'em-coast-margin-nuts')
-                    .selectAll('path')
-                    .data(out._geom.nutsbn)
-                    .enter()
-                    .filter(function (bn) {
-                        return bn.properties.co === 'T'
-                    })
-                    .append('path')
-                    .attr('d', out._pathFunction)
-            //world bn
-            if (out._geom.worldbn)
-                cg.append('g')
-                    .attr('id', 'em-coast-margin-world')
-                    .attr('class', 'em-coast-margin-world')
-                    .selectAll('path')
-                    .data(out._geom.worldbn)
-                    .enter()
-                    .filter(function (bn) {
-                        return bn.properties.COAS_FLAG === 'T'
-                    })
-                    .append('path')
-                    .attr('d', out._pathFunction)
+            addCoastalMarginToMap()
         }
 
         if (out._geom.gra && out.drawGraticule_) {
@@ -1168,95 +1127,9 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('d', out._pathFunction)
         }
 
-        //prepare group for proportional symbols, with nuts region centroids
+        //prepare group for proportional symbols, with centroids
         if (withCenterPoints) {
-            let centroidFeatures
-
-            if (!centroidsData) {
-                // if centroids data is absent (e.g. for world maps) then calculate manually
-                if (out.geo_ == 'WORLD') {
-                    centroidFeatures = []
-                    out._geom.worldrg.forEach((feature) => {
-                        let newFeature = { ...feature }
-                        // exception for France (because guyane)
-                        if (feature.properties.id == 'FR') {
-                            newFeature.geometry = {
-                                coordinates: [2.2, 46.2],
-                                type: 'Point',
-                            }
-                        } else {
-                            newFeature.geometry = {
-                                coordinates: geoCentroid(feature),
-                                type: 'Point',
-                            }
-                        }
-                        centroidFeatures.push(newFeature)
-                    })
-                }
-            } else {
-                if (out.nutsLvl_ == 'mixed') {
-                    centroidFeatures = [
-                        ...centroidsData[0].features,
-                        ...centroidsData[1].features,
-                        ...centroidsData[2].features,
-                        ...centroidsData[3].features,
-                    ]
-                } else {
-                    centroidFeatures = centroidsData.features
-                }
-            }
-
-            out._centroidFeatures = centroidFeatures
-
-            // g_ps is the g element containing all prop symbols for the map
-            const gcp = zg.append('g').attr('id', 'g_ps')
-            //allow for different symbols by adding a g element here, then adding the symbols in proportional-symbols.js
-            gcp.selectAll('g')
-                .data(
-                    // filter out regions with no data and order by value in each map type template.
-                    // See updateSymbolsDrawOrder in map-proportional-symbols.js for example
-                    out._centroidFeatures
-                )
-                .enter()
-                .append('g')
-                .attr('transform', function (d) {
-                    let coords = out._projection(d.geometry.coordinates)
-                    return 'translate(' + coords[0].toFixed(3) + ',' + coords[1].toFixed(3) + ')'
-                })
-                .attr('class', 'em-symbol') // OUR SYMBOL CONTAINER
-                .attr('id', (d) => 'ps' + d.properties.id)
-                .on('mouseover', function (e, rg) {
-                    if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                            const sel = select(this.childNodes[0])
-                            sel.attr('fill___', sel.style('fill'))
-                            sel.style('fill', out.hoverColor_)
-                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                        }
-                    } else {
-                        const sel = select(this.childNodes[0])
-                        sel.attr('fill___', sel.style('fill'))
-                        sel.style('fill', out.hoverColor_)
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
-                })
-                .on('mousemove', function (e, rg) {
-                    if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                            if (out._tooltip) out._tooltip.mousemove(e)
-                        }
-                    } else {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    }
-                })
-                .on('mouseout', function (e) {
-                    const sel = select(this.childNodes[0])
-                    let newFill = sel.attr('fill___')
-                    if (newFill) {
-                        sel.style('fill', newFill)
-                        if (out._tooltip) out._tooltip.mouseout()
-                    }
-                })
+            addCentroidsToMap()
         }
 
         // add geographical labels to map
@@ -1296,26 +1169,9 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //bottom text
-        if (out.bottomText_)
-            out.svg()
-                .append('text')
-                .attr('id', 'em-bottom-text')
-                .attr('class', 'em-bottom-text')
-                .attr('x', out.botTxtPadding_)
-                .attr('y', out.height_ - out.botTxtPadding_)
-                .text(out.bottomText_)
-                .on('mouseover', function () {
-                    out._tooltip.mw___ = out._tooltip.style('max-width')
-                    out._tooltip.style('max-width', '400px')
-                    if (out.botTxtTooltipTxt_) out._tooltip.mouseover(out.botTxtTooltipTxt_)
-                })
-                .on('mousemove', function (e) {
-                    if (out.botTxtTooltipTxt_) out._tooltip.mousemove(e)
-                })
-                .on('mouseout', function (e) {
-                    if (out.botTxtTooltipTxt_) out._tooltip.mouseout(e)
-                    out._tooltip.style('max-width', out._tooltip.mw___)
-                })
+        if (out.bottomText_) {
+            addBottomText()
+        }
 
         //source dataset URL
         if (out.showSourceLink_) {
@@ -1368,63 +1224,167 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
+    const addBottomText = function () {
+        out.svg()
+            .append('text')
+            .attr('id', 'em-bottom-text')
+            .attr('class', 'em-bottom-text')
+            .attr('x', out.botTxtPadding_)
+            .attr('y', out.height_ - out.botTxtPadding_)
+            .text(out.bottomText_)
+            .on('mouseover', function () {
+                out._tooltip.mw___ = out._tooltip.style('max-width')
+                out._tooltip.style('max-width', '400px')
+                if (out.botTxtTooltipTxt_) out._tooltip.mouseover(out.botTxtTooltipTxt_)
+            })
+            .on('mousemove', function (e) {
+                if (out.botTxtTooltipTxt_) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function (e) {
+                if (out.botTxtTooltipTxt_) out._tooltip.mouseout(e)
+                out._tooltip.style('max-width', out._tooltip.mw___)
+            })
+    }
+
+    const addCoastalMarginToMap = function () {
+        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
+        //draw coastal margin
+        const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
+
+        //countries bn
+        if (out._geom.cntbn) {
+            cg.append('g')
+                .attr('id', 'em-coast-margin-cnt')
+                .attr('class', 'em-coast-margin-cnt')
+                .selectAll('path')
+                .data(out._geom.cntbn)
+                .enter()
+                .filter(function (bn) {
+                    return bn.properties.co === 'T'
+                })
+                .append('path')
+                .attr('d', out._pathFunction)
+        }
+
+        //nuts bn
+        if (out._geom.nutsbn) {
+            cg.append('g')
+                .attr('id', 'em-coast-margin-nuts')
+                .attr('class', 'em-coast-margin-nuts')
+                .selectAll('path')
+                .data(out._geom.nutsbn)
+                .enter()
+                .filter(function (bn) {
+                    return bn.properties.co === 'T'
+                })
+                .append('path')
+                .attr('d', out._pathFunction)
+        }
+
+        //world bn
+        if (out._geom.worldbn) {
+            cg.append('g')
+                .attr('id', 'em-coast-margin-world')
+                .attr('class', 'em-coast-margin-world')
+                .selectAll('path')
+                .data(out._geom.worldbn)
+                .enter()
+                .filter(function (bn) {
+                    return bn.properties.COAS_FLAG === 'T'
+                })
+                .append('path')
+                .attr('d', out._pathFunction)
+        }
+    }
+
+    const addCentroidsToMap = function () {
+        let centroidFeatures
+
+        if (!centroidsData) {
+            // if centroids data is absent (e.g. for world maps) then calculate manually
+            if (out.geo_ == 'WORLD') {
+                centroidFeatures = []
+                out._geom.worldrg.forEach((feature) => {
+                    let newFeature = { ...feature }
+                    // exception for France (because guyane)
+                    if (feature.properties.id == 'FR') {
+                        newFeature.geometry = {
+                            coordinates: [2.2, 46.2],
+                            type: 'Point',
+                        }
+                    } else {
+                        newFeature.geometry = {
+                            coordinates: geoCentroid(feature),
+                            type: 'Point',
+                        }
+                    }
+                    centroidFeatures.push(newFeature)
+                })
+            }
+        } else {
+            if (out.nutsLvl_ == 'mixed') {
+                centroidFeatures = [
+                    ...centroidsData[0].features,
+                    ...centroidsData[1].features,
+                    ...centroidsData[2].features,
+                    ...centroidsData[3].features,
+                ]
+            } else {
+                centroidFeatures = centroidsData.features
+            }
+        }
+
+        out._centroidFeatures = centroidFeatures
+
+        // g_ps is the g element containing all proportional symbols for the map
+        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
+        const gcp = zg.append('g').attr('id', 'g_ps')
+
+        // add centroid em-symbol elements
+        gcp.selectAll('g')
+            .data(out._centroidFeatures)
+            .enter()
+            .append('g')
+            .attr('transform', function (d) {
+                let coords = out._projection(d.geometry.coordinates)
+                return 'translate(' + coords[0].toFixed(3) + ',' + coords[1].toFixed(3) + ')'
+            })
+            .attr('class', 'em-symbol') // OUR SYMBOL CONTAINER
+            .attr('id', (d) => 'ps' + d.properties.id)
+    }
+
     /**
      * @function updateLabels
      * @description update existing map labels
      */
     out.updateLabels = function () {
-        //clear previous labels
+        // Clear previous labels
         let prevLabels = out.svg_.selectAll('g.g_labels > *')
         if (prevLabels) prevLabels.remove()
 
-        //main map
+        // Main map
         if (out.labelling_) {
             let zg = out.svg_.select('#em-zoom-group-' + out.svgId_)
             addLabelsToMap(out, zg)
-            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) out.updateValuesLabels(out)
+            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) {
+                out.updateValuesLabels(out)
+            }
         }
 
-        // apply to all insets
-        if (out.insetTemplates_) {
-            for (const geo in out.insetTemplates_) {
-                if (Array.isArray(out.insetTemplates_[geo])) {
-                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                        // insets with same geo that do not share the same parent inset
-                        if (Array.isArray(out.insetTemplates_[geo][i])) {
-                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) {
-                                    let map = out.insetTemplates_[geo][i][c]
-                                    if (map.labelling_) {
-                                        let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                                        addLabelsToMap(map, zg)
-                                        if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
-                                    }
-                                }
-                            }
-                        } else {
-                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) {
-                                let map = out.insetTemplates_[geo][i]
-                                if (map.labelling_) {
-                                    let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                                    addLabelsToMap(map, zg)
-                                    if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // unique inset geo_
-                    if (out.insetTemplates_[geo].svgId_ !== out.svgId_) {
-                        let map = out.insetTemplates_[geo]
-                        if (map.labelling_) {
-                            let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                            addLabelsToMap(map, zg)
-                            if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
-                        }
-                    }
+        // Define the callback to apply to each inset
+        const applyLabelsCallback = (map) => {
+            if (map.labelling_) {
+                let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
+                addLabelsToMap(map, zg)
+                if (map.labelsToShow_.includes('values') && out.updateValuesLabels) {
+                    out.updateValuesLabels(map)
                 }
             }
+        }
+
+        // Apply labels to all insets using the executeForAllInsets function
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
         }
     }
 

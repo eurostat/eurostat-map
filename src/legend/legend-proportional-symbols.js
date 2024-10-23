@@ -165,7 +165,7 @@ export const legend = function (map, config) {
                 .append('text')
                 .attr('class', 'em-legend-title')
                 .attr('x', out.boxPadding)
-                .attr('y', out.boxPadding)
+                .attr('y', out.boxPadding + out.titleFontSize)
                 .text(out.sizeLegend.title)
         }
 
