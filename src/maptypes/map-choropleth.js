@@ -5,6 +5,7 @@ import { interpolateYlOrBr } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
+import { jenks } from 'simple-statistics'
 
 /**
  * Returns a chroropleth map.
@@ -122,7 +123,7 @@ export const map = function (config) {
         // Configure classifier based on the selected classification method
         const setupClassifier = () => {
             const dataArray = out.statData().getArray()
-            const range = generateRange(out.numberOfClasses())
+            const range = generateRange(out.numberOfClasses_)
 
             switch (out.classificationMethod_) {
                 case 'quantile':
@@ -138,7 +139,11 @@ export const map = function (config) {
                     break
                 case 'threshold':
                     out.numberOfClasses(out.threshold_.length + 1)
-                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.numberOfClasses())))
+                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.numberOfClasses_)))
+                    break
+                case 'jenks':
+                    const jenksBreaks = jenks(dataArray, out.numberOfClasses_) // Calculate breaks for Jenks
+                    out.classifier(scaleThreshold().domain(jenksBreaks.slice(1, -1)).range(range)) // Use Jenks breaks in scale
                     break
             }
         }
