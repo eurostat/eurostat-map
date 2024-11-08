@@ -1,7 +1,7 @@
 /**
  * Default labels for country / geographical names.
  * Using centroids would clash with proportional symbols, and are generally not ideal placements, so labels are positioned independently
- * Labels are provided for all supported languages: "en","fr" and "de" (defined using map.lg())
+ * Labels are provided for all supported languages: "en","fr" and "de" (defined using map.language())
  */
 export const DEFAULTLABELS = {
     EUR_3035: {

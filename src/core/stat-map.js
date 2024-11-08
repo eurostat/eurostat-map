@@ -17,7 +17,7 @@ export const statMap = function (config, withCenterPoints) {
     //statistical data
 
     //the statistical data configuration.
-    //A map can have several stat datasets. This is a dictionnary of all stat configuration
+    //A map can have several stat datasets. This is a dictionary of all stat configuration
     out.stat_ = { default: undefined }
     out.stat = function (k, v) {
         //no argument: getter - return the default stat
@@ -34,7 +34,7 @@ export const statMap = function (config, withCenterPoints) {
         return out
     }
 
-    //the statistical data, retrieved from the config information. As a dictionnary.
+    //the statistical data, retrieved from the config information. As a dictionary.
     out.statData_ = {
         default: StatisticalData.statData(),
         color: StatisticalData.statData(),
@@ -55,7 +55,7 @@ export const statMap = function (config, withCenterPoints) {
     //test for no data case
     out.noDataText_ = 'No data available'
     //langage (currently used only for eurostat data API)
-    out.lg_ = 'en'
+    out.language_ = 'en'
     //transition time for rendering
     out.transitionDuration_ = 500
     //specific tooltip text function
@@ -125,14 +125,14 @@ export const statMap = function (config, withCenterPoints) {
         if (out.legend()) {
             //create legend object
             out.legendObj(out.getLegendConstructor()(out, out.legend()))
-            const lg = out.legendObj()
+            const legend = out.legendObj()
 
             //get legend svg. If it does not exist, create it embeded within the map
-            let lgSvg = select('#' + lg.svgId)
-            if (lgSvg.size() == 0) {
+            let legendSvg = select('#' + legend.svgId)
+            if (legendSvg.size() == 0) {
                 //get legend position
-                const x = lg.x == undefined ? out.width() - 100 - lg.boxPadding : lg.x
-                const y = lg.y == undefined ? lg.boxPadding : lg.y
+                const x = legend.x == undefined ? out.width() - 100 - legend.boxPadding : legend.x
+                const y = legend.y == undefined ? legend.boxPadding : legend.y
 
                 //build legend SVG in a new group
                 out.svg()
@@ -140,10 +140,10 @@ export const statMap = function (config, withCenterPoints) {
                     .attr('class', 'em-legend')
                     .attr('transform', 'translate(' + x + ',' + y + ')')
                     .append('svg')
-                    .attr('id', lg.svgId)
+                    .attr('id', legend.svgId)
             }
 
-            lg.build()
+            legend.build()
         }
 
         //define tooltip
@@ -218,7 +218,7 @@ export const statMap = function (config, withCenterPoints) {
             if (out.nutsLevel_ == 'mixed') {
                 nl = 0
             }
-            statData.retrieveFromRemote(nl, out.lg(), () => {
+            statData.retrieveFromRemote(nl, out.language(), () => {
                 //if geodata has not been loaded, wait again
                 if (!out.Geometries.isGeoReady()) return
                 //if stat datasets have not all been loaded, wait again
@@ -292,7 +292,7 @@ export const statMap = function (config, withCenterPoints) {
     /**
      * Set some map attributes based on the following URL parameters:
      * "w":width, "h":height, "x":xGeoCenter, "y":yGeoCenter, "z":pixGeoSize, "s":scale, "lvl":nuts level, "time":time,
-     * "proj":CRS, "geo":geo territory, "ny":nuts version, "lg":langage, "numberOfClasses":class number
+     * "proj":CRS, "geo":geo territory, "ny":nuts version, "language":langage, "numberOfClasses":class number
      */
     out.setFromURL = function () {
         const opts = getURLParameters()
@@ -309,7 +309,7 @@ export const statMap = function (config, withCenterPoints) {
         if (opts.proj) out.proj(opts.proj)
         if (opts.geo) out.geo(opts.geo)
         if (opts.ny) out.nutsYear(opts.ny)
-        if (opts.lg) out.lg(opts.lg)
+        if (opts.language) out.language(opts.language)
         if (opts.numberOfClasses) out.numberOfClasses(+opts.numberOfClasses)
         return out
     }
@@ -423,7 +423,7 @@ export const statMap = function (config, withCenterPoints) {
  */
 export const getURLParameters = function () {
     const ps = {}
-    const p = ['w', 'h', 'x', 'y', 'z', 's', 'lvl', 'time', 'proj', 'geo', 'ny', 'lg', 'sl', 'numberOfClasses']
+    const p = ['w', 'h', 'x', 'y', 'z', 's', 'lvl', 'time', 'proj', 'geo', 'ny', 'language', 'sl', 'numberOfClasses']
     for (let i = 0; i < p.length; i++) ps[p[i]] = getURLParameterByName(p[i])
     return ps
 }

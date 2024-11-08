@@ -1711,7 +1711,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             'legend',
             'legendObj',
             'noDataText',
-            'lg',
+            'language',
             'transitionDuration',
             'tooltip_',
             'classToText_',
