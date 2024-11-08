@@ -13,9 +13,9 @@ import {
 } from './utils'
 
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
-import { kosovoBnFeatures } from './kosovo'
+
 import { defineDeprecatedFunctions } from './deprecated'
-import * as Geometries from './geometries'
+import { Geometries } from './geometries'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -97,7 +97,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.tooltipShowFlags_ = false //DEPRECATED use tooltip_.textFunction
 
     //template default style
-    //countries to include
+    //countries to include with default geometries
     out.bordersToShow_ = ['eu', 'efta', 'cc', 'oth', 'co']
     out.countriesToShow_ = [
         'AL',
@@ -194,6 +194,9 @@ export const mapTemplate = function (config, withCenterPoints) {
     //out.insetZoomExtent_ = [1, 3];
     out.insetZoomExtent_ = null //zoom disabled as default
     out.insetScale_ = '03M'
+
+    // [{id:String, data:geojson, class:function}] user-defined geometries
+    out.geometries_ = undefined
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -451,7 +454,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     }
 
     // initiate Geometries class
-    out.Geometries = Geometries.Geometries(out, withCenterPoints)
+    out.Geometries = Geometries(out, withCenterPoints)
 
     /**
      * Requests geographic data and then builds the map template
@@ -462,12 +465,22 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.Geometries.allNUTSGeoData = null
         out.Geometries.centroidsData = null
 
-        out.Geometries.getDefaultGeoData().then(() => {
+        if (out.geometries_) {
+            out.Geometries.userGeoData = out.geometries_
+            // use custom user-defined geometries
             out.buildMapTemplate()
 
             // Execute callback if defined
             if (callback) callback()
-        })
+        } else {
+            // use default
+            out.Geometries.getDefaultGeoData(out.geo_, out.filterGeometriesFunction_).then(() => {
+                out.buildMapTemplate()
+
+                // Execute callback if defined
+                if (callback) callback()
+            })
+        }
 
         // Use executeForAllInsets for recursive inset updates
         executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => {
@@ -650,8 +663,13 @@ export const mapTemplate = function (config, withCenterPoints) {
         const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
         if (defaultPosition) {
             out.geoCenter(defaultPosition.geoCenter)
+        } else if (out.Geometries.geoData?.bbox) {
+            out.geoCenter([
+                0.5 * (out.Geometries.geoData.bbox[0] + out.Geometries.geoData.bbox[2]),
+                0.5 * (out.Geometries.geoData.bbox[1] + out.Geometries.geoData.bbox[3]),
+            ])
         } else {
-            out.geoCenter([0.5 * (geoData.bbox[0] + geoData.bbox[2]), 0.5 * (geoData.bbox[1] + geoData.bbox[3])])
+            //TODO: auto-define user=defined geometries geoCenter
         }
     }
 
@@ -659,10 +677,14 @@ export const mapTemplate = function (config, withCenterPoints) {
         const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
         if (defaultPosition) {
             out.pixelSize((defaultPosition.pixelSize * 800) / out.width_)
-        } else {
+        } else if (out.Geometries.geoData?.bbox) {
             out.pixelSize(
-                Math.min((geoData.bbox[2] - geoData.bbox[0]) / out.width_, (geoData.bbox[3] - geoData.bbox[1]) / out.height_)
+                Math.min(
+                    (out.Geometries.geoData.bbox[2] - out.Geometries.geoData.bbox[0]) / out.width_,
+                    (out.Geometries.geoData.bbox[3] - out.Geometries.geoData.bbox[1]) / out.height_
+                )
             )
+        } else {
         }
     }
 
@@ -713,11 +735,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         definePathFunction()
 
         //prepare drawing group
-        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
-        zg.selectAll('*').remove()
+        const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+        zoomGroup.selectAll('*').remove()
 
         //draw background rectangle
-        zg.append('rect')
+        zoomGroup
+            .append('rect')
             .attr('id', 'sea')
             .attr('class', 'em-sea')
             .attr('x', -5 * out.width_)
@@ -727,7 +750,8 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //sphere for world map
         if (out.geo_ == 'WORLD') {
-            zg.append('path')
+            zoomGroup
+                .append('path')
                 .datum({ type: 'Sphere' })
                 .attr('id', 'sphere')
                 .attr('d', out._pathFunction)
@@ -738,198 +762,19 @@ export const mapTemplate = function (config, withCenterPoints) {
             addCoastalMarginToMap()
         }
 
-        if (out.Geometries.geoJSONs.graticule && out.drawGraticule_) {
-            //draw graticule
-            zg.append('g')
-                .attr('id', 'em-graticule')
-                .attr('class', 'em-graticule')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.graticule)
-                .enter()
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-
-        //draw country regions
-        if (out.Geometries.geoJSONs.cntrg) {
-            zg.append('g')
-                .attr('id', 'em-cntrg')
-                .attr('class', 'em-cntrg')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.cntrg)
-                .enter()
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-
-        //draw world map
-        if (out.Geometries.geoJSONs.worldrg) {
-            zg.append('g')
-                .attr('id', 'em-worldrg')
-                .attr('class', 'em-worldrg')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.worldrg)
-                .enter()
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-
-        //draw NUTS regions
-        if (out.Geometries.geoJSONs.nutsrg) {
-            if (out.nutsLevel_ == 'mixed') {
-                out.Geometries.geoJSONs.mixed.rg0 = out.Geometries.geoJSONs.nutsrg
-                out.Geometries.geoJSONs.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
-                out.Geometries.geoJSONs.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
-                out.Geometries.geoJSONs.mixed.rg3 = feature(allNUTSGeoData[3], allNUTSGeoData[3].objects.nutsrg).features
-
-                //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
-                // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
-                ;[
-                    out.Geometries.geoJSONs.mixed.rg0,
-                    out.Geometries.geoJSONs.mixed.rg1,
-                    out.Geometries.geoJSONs.mixed.rg2,
-                    out.Geometries.geoJSONs.mixed.rg3,
-                ].forEach((r, i) => {
-                    //append each nuts level to map
-                    zg.append('g')
-                        .attr('id', 'em-nutsrg')
-                        .attr('class', 'em-nutsrg')
-                        .selectAll('path')
-                        .data(r)
-                        .enter()
-                        .append('path')
-                        .attr('d', out._pathFunction)
-                        .attr('lvl', i) //to be able to distinguish nuts levels
-                })
-
-                //add kosovo
-                if (out.geo_ == 'EUR' && out.proj == '3035') {
-                    // add kosovo manually
-                    let kosovoBn = feature(kosovoBnFeatures[out.scale_], 'nutsbn_1').features
-                    if (out.bordersToShow_.includes('cc')) {
-                        zg.append('g')
-                            .attr('id', 'em-kosovo-bn')
-                            .attr('class', 'em-kosovo-bn')
-                            .selectAll('path')
-                            .data(kosovoBn)
-                            .enter()
-                            .append('path')
-                            .attr('d', out._pathFunction)
-                    }
-                }
-            } else {
-                // when nutsLevel is not 'mixed'
-                zg.append('g')
-                    .attr('id', 'em-nutsrg')
-                    .attr('class', 'em-nutsrg')
-                    .selectAll('path')
-                    .data(out.Geometries.geoJSONs.nutsrg)
-                    .enter()
-                    .append('path')
-                    .attr('d', out._pathFunction)
-            }
-        }
-
-        //draw country boundaries
-        if (out.Geometries.geoJSONs.cntbn) {
-            zg.append('g')
-                .attr('id', 'em-cntbn')
-                .attr('class', 'em-cntbn')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.cntbn)
-                .enter()
-                .append('path')
-                .filter(function (bn) {
-                    if (out.bordersToShow_.includes('eu') && bn.properties.eu == 'T') return bn
-                    if (out.bordersToShow_.includes('efta') && bn.properties.efta == 'T') return bn
-                    if (out.bordersToShow_.includes('cc') && bn.properties.cc == 'T') return bn
-                    if (out.bordersToShow_.includes('oth') && bn.properties.oth == 'T') return bn
-                    if (out.bordersToShow_.includes('co') && bn.properties.co == 'T') return bn
-                })
-                .attr('d', out._pathFunction)
-                .attr('class', function (bn) {
-                    return bn.properties.co === 'T' ? 'em-bn-co' : 'em-cntbn'
-                })
-        }
-
-        //draw NUTS boundaries
-        if (out.Geometries.geoJSONs.nutsbn) {
-            out.Geometries.geoJSONs.nutsbn.sort(function (bn1, bn2) {
-                return bn2.properties.lvl - bn1.properties.lvl
-            })
-            zg.append('g')
-                .attr('id', 'em-nutsbn')
-                .attr('class', 'em-nutsbn')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.nutsbn)
-                .enter()
-                .filter(function (bn) {
-                    if (out.bordersToShow_.includes('eu') && bn.properties.eu == 'T') return bn
-                    if (out.bordersToShow_.includes('efta') && bn.properties.efta == 'T') return bn
-                    if (out.bordersToShow_.includes('cc') && bn.properties.cc == 'T') return bn
-                    if (out.bordersToShow_.includes('oth') && bn.properties.oth == 'T') return bn
-                    if (out.bordersToShow_.includes('co') && bn.properties.co == 'T') return bn
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-                .attr('class', function (bn) {
-                    let props = bn.properties
-                    //KOSOVO
-                    if (props.id > 100000) {
-                        return 'em-kosovo-bn'
-                    }
-                    if (props.co === 'T') return 'em-bn-co'
-                    const cl = ['em-bn-' + props.lvl]
-                    //if (bn.oth === "T") cl.push("bn-oth");
-                    return cl.join(' ')
-                })
-
-            if (out.geo_ == 'EUR' && out.proj == '3035') {
-                // add kosovo manually
-                let kosovoBn = feature(kosovoBnFeatures[out.scale_], 'nutsbn_1').features
-                if (out.bordersToShow_.includes('cc')) {
-                    zg.append('g')
-                        .attr('id', 'em-kosovo-bn')
-                        .attr('class', 'em-kosovo-bn')
-                        .selectAll('path')
-                        .data(kosovoBn)
-                        .enter()
-                        .append('path')
-                        .attr('d', out._pathFunction)
-                }
-            }
-        }
-
-        //draw world boundaries
-        if (out.Geometries.geoJSONs.worldbn) {
-            zg.append('g')
-                .attr('id', 'em-worldbn')
-                .attr('class', 'em-worldbn')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.worldbn)
-                .enter()
-                .append('path')
-                .attr('d', out._pathFunction)
-                .attr('class', function (bn) {
-                    if (bn.properties.POL_STAT > 0) {
-                        //disputed
-                        return 'em-bn-d'
-                    }
-                    return bn.properties.COAS_FLAG === 'T' ? 'em-bn-co' : 'em-worldbn'
-                })
-            //.attr("id", (bn) => bn.properties.CNTR_BN_ID)
-        }
-
-        if (out.Geometries.geoJSONs.kosovo) {
-            //add kosovo to world map
-            zg.append('g')
-                .attr('id', 'em-kosovo-bn')
-                .attr('class', 'em-kosovo-bn')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.kosovo)
-                .enter()
-                .append('path')
-                .attr('d', out._pathFunction)
+        if (out.geometries_) {
+            out.Geometries.addUserGeometriesToMap(out.geometries_, zoomGroup, out._pathFunction)
+        } else {
+            out.Geometries.addDefaultGeometriesToMap(
+                zoomGroup,
+                out.bordersToShow_,
+                out.drawGraticule_,
+                out._pathFunction,
+                out.nutsLevel_,
+                out.geo_,
+                out.proj_,
+                out.scale_
+            )
         }
 
         //prepare group for proportional symbols, with centroids
@@ -939,7 +784,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // add geographical labels to map
         if (out.labelling_) {
-            addLabelsToMap(out, zg)
+            addLabelsToMap(out, zoomGroup)
         }
 
         //title

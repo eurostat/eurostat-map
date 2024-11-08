@@ -8,17 +8,54 @@
     <body>
         <svg id="map"></svg>
         <script src="../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+        <script src="https://d3js.org/d3.v4.js"></script>
+        <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
         <script>
-            const map = eurostatmap.map('choropleth').width(600).height(600).title('Custom geometries test')
+            const width = 600
+            const height = 600
+            fetch(`./geometries/spain-municipalities.topojson.json`)
+                .then((response) => response.json()) // Parse response as JSON
+                .then((topoJSON) => {
+                    console.log(topoJSON)
+                    const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
+                    console.log(geoJSON)
 
-            let data = {
-                DE1: '12',
-                FR: 10,
-            }
+                    // Map and projection
+                    const projection = d3
+                        .geoMercator()
+                        .center([-3, 40]) // GPS of location to zoom on
+                        .scale(2100) // This is like the zoom
+                        .translate([width / 2, height / 2])
 
-            map.statData().setData(data)
-            map.build()
+                    const map = eurostatmap
+                        .map('choropleth')
+                        .geoCenter([2, 47])
+                        .zoomExtent([1, 10])
+                        .width(width)
+                        .height(height)
+                        .title('Custom geometries test')
+                        .projectionFunction(projection)
+                        .geometries([
+                            { id: 'regions', features: geoJSON.features, class: (feature) => 'region' },
+                            //{ id: 'borders', features: bordersData, class: (feature) => 'border' },
+                        ])
+
+                    // let data = {
+                    //     DE1: '12',
+                    //     FR2: 10,
+                    //     ES432: 20,
+                    //     ES300: 40,
+                    //     ES425: 50,
+                    //     ES423: 30,
+                    //     ES424: 10,
+                    // };
+                    // map.statData().setData(data);
+
+                    map.build()
+                })
+                .catch((error) => console.error('Error loading TopoJSON:', error))
         </script>
     </body>
 </html>

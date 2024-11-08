@@ -81,7 +81,7 @@ export const statMap = function (config, withCenterPoints) {
         'legend_',
         'legendObj_',
         'noDataText_',
-        'lg_',
+        'language_',
         'transitionDuration_',
         'tooltipText_',
         'filtersDefinitionFun_',
