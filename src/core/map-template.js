@@ -466,7 +466,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.Geometries.centroidsData = null
 
         if (out.geometries_) {
-            out.Geometries.userGeoData = out.geometries_
+            out.Geometries.setUserGeometries(out.geometries_)
             // use custom user-defined geometries
             out.buildMapTemplate()
 

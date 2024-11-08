@@ -10,6 +10,7 @@ export const Geometries = function (map, withCenterPoints) {
     out.geoData = undefined
     out.allNUTSGeoData = undefined
     out.centroidsData = undefined
+    out.userGeometries = undefined
     out.geoJSONs = {
         mixed: { rg0: undefined, rg1: undefined, rg2: undefined, rg3: undefined },
         cntbn: undefined,
@@ -103,7 +104,7 @@ export const Geometries = function (map, withCenterPoints) {
 
     /** Checks if all geo data is ready */
     out.isGeoReady = function () {
-        if (!out.geoData) return false
+        if (!out.geoData && !out.userGeometries) return false
 
         let allReady = true
 
@@ -114,6 +115,10 @@ export const Geometries = function (map, withCenterPoints) {
         })
 
         return allReady
+    }
+
+    out.setUserGeometries = function (geometries) {
+        this.userGeometries = geometries
     }
 
     out.addDefaultGeometriesToMap = function (
@@ -344,6 +349,7 @@ export const Geometries = function (map, withCenterPoints) {
         geometries.forEach((geometry) => {
             container
                 .append('g')
+                .attr('id', geometry.regions ? 'em-user-regions' : '')
                 .attr('class', geometry.class ? geometry.class : '')
                 .selectAll('path')
                 .data(geometry.features)

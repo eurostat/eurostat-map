@@ -164,7 +164,8 @@ export const map = function (config) {
 
         // Apply classification and assign 'ecl' attribute based on map type
         if (map.svg_) {
-            const selector = map.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             classifyRegions(map.svg().selectAll(selector))
 
             // Handle mixed NUTS level, separating NUTS level 0
@@ -201,7 +202,8 @@ export const map = function (config) {
 
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic
@@ -268,21 +270,27 @@ export const map = function (config) {
 
     const regionsFillFunction = function (rg) {
         const ecl = select(this).attr('ecl') // 'this' refers to the current DOM element
-        if (out.geo_ === 'WORLD') {
-            // World template logic
-            if (!ecl) return out.cntrgFillStyle_
+        if (out.Geometries.userGeometries) {
+            if (!ecl) return out.nutsrgFillStyle_
             if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-            const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_)
-            return fillStyle || out.cntrgFillStyle_
+            return out.classToFillStyle()(ecl, out.numberOfClasses_)
         } else {
-            // NUTS template logic
-            const countryId = rg.properties.id.slice(0, 2)
-            if (out.countriesToShow_.includes(countryId)) {
-                if (!ecl) return out.nutsrgFillStyle_
+            if (out.geo_ === 'WORLD') {
+                // World template logic
+                if (!ecl) return out.cntrgFillStyle_
                 if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                return out.classToFillStyle()(ecl, out.numberOfClasses_)
+                const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_)
+                return fillStyle || out.cntrgFillStyle_
+            } else {
+                // NUTS template logic
+                const countryId = rg.properties.id.slice(0, 2)
+                if (out.countriesToShow_.includes(countryId)) {
+                    if (!ecl) return out.nutsrgFillStyle_
+                    if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
+                    return out.classToFillStyle()(ecl, out.numberOfClasses_)
+                }
+                return out.nutsrgFillStyle_
             }
-            return out.nutsrgFillStyle_
         }
     }
 
@@ -290,10 +298,17 @@ export const map = function (config) {
         regions
             .on('mouseover', function (e, rg) {
                 const sel = select(this)
-                const countryId = rg.properties.id.slice(0, 2)
-                if (out.geo_ === 'WORLD' || out.countriesToShow_.includes(countryId)) {
+                if (out.Geometries.userGeometries) {
+                    // custom geometries
                     sel.style('fill', map.hoverColor_) // Apply highlight color
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                } else {
+                    // default geometries
+                    const countryId = rg.properties.id.slice(0, 2)
+                    if (out.geo_ === 'WORLD' || out.countriesToShow_.includes(countryId)) {
+                        sel.style('fill', map.hoverColor_) // Apply highlight color
+                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    }
                 }
             })
             .on('mousemove', function (e) {

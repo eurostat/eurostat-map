@@ -3,6 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .border {
+                fill: none;
+                stroke: black;
+                stroke-width: 0.5px;
+                stroke-linejoin: round;
+            }
+        </style>
     </head>
 
     <body>
@@ -15,47 +23,66 @@
         <script>
             const width = 600
             const height = 600
-            fetch(`./geometries/spain-municipalities.topojson.json`)
+
+            fetch(`./geometries/spain_borders.json`)
                 .then((response) => response.json()) // Parse response as JSON
-                .then((topoJSON) => {
-                    console.log(topoJSON)
-                    const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
-                    console.log(geoJSON)
+                .then((bordersTopoJSON) => {
+                    fetch(`./geometries/spain-municipalities.topojson.json`)
+                        .then((response) => response.json()) // Parse response as JSON
+                        .then((topoJSON) => {
+                            console.log(topoJSON)
+                            const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
+                            const bordersGeoJSON = topojson.feature(
+                                bordersTopoJSON,
+                                bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
+                            )
+                            console.log(geoJSON)
 
-                    // Map and projection
-                    const projection = d3
-                        .geoMercator()
-                        .center([-3, 40]) // GPS of location to zoom on
-                        .scale(2100) // This is like the zoom
-                        .translate([width / 2, height / 2])
+                            // add ids to feature properties
+                            geoJSON.features.forEach((feature) => {
+                                feature.properties.id = feature.id
+                            })
 
-                    const map = eurostatmap
-                        .map('choropleth')
-                        .geoCenter([2, 47])
-                        .zoomExtent([1, 10])
-                        .width(width)
-                        .height(height)
-                        .title('Custom geometries test')
-                        .projectionFunction(projection)
-                        .geometries([
-                            { id: 'regions', features: geoJSON.features, class: (feature) => 'region' },
-                            //{ id: 'borders', features: bordersData, class: (feature) => 'border' },
-                        ])
+                            function createProgressiveIdValueMap(features) {
+                                const idValueMap = {}
+                                const step = 1000 / features.length // Calculate the step for gradual increase
 
-                    // let data = {
-                    //     DE1: '12',
-                    //     FR2: 10,
-                    //     ES432: 20,
-                    //     ES300: 40,
-                    //     ES425: 50,
-                    //     ES423: 30,
-                    //     ES424: 10,
-                    // };
-                    // map.statData().setData(data);
+                                features.forEach((feature, index) => {
+                                    const id = feature.properties.id
+                                    const value = Math.floor(step * (index + 1)) // Increase value progressively
+                                    idValueMap[id] = value
+                                })
 
-                    map.build()
+                                return idValueMap
+                            }
+                            let statisticalData = createProgressiveIdValueMap(geoJSON.features)
+
+                            // Map and projection
+                            const projection = d3
+                                .geoMercator()
+                                .center([-3, 40]) // GPS of location to zoom on
+                                .scale(2100) // This is like the zoom
+                                .translate([width / 2, height / 2])
+
+                            const map = eurostatmap
+                                .map('choropleth')
+                                .geoCenter([2, 47])
+                                .zoomExtent([1, 10])
+                                .width(width)
+                                .height(height)
+                                .title('Custom geometries test')
+                                .projectionFunction(projection)
+                                .geometries([
+                                    { id: 'regions', regions: true, features: geoJSON.features, class: (feature) => 'region' },
+                                    { id: 'borders', features: bordersGeoJSON.features, class: (feature) => 'border' },
+                                ])
+
+                            map.statData().setData(statisticalData)
+
+                            map.build()
+                        })
+                        .catch((error) => console.error('Error loading TopoJSON:', error))
                 })
-                .catch((error) => console.error('Error loading TopoJSON:', error))
         </script>
     </body>
 </html>
