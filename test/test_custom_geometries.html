@@ -30,39 +30,21 @@
                     fetch(`./geometries/spain-municipalities.topojson.json`)
                         .then((response) => response.json()) // Parse response as JSON
                         .then((topoJSON) => {
-                            console.log(topoJSON)
                             const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
                             const bordersGeoJSON = topojson.feature(
                                 bordersTopoJSON,
                                 bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
                             )
-                            console.log(geoJSON)
 
-                            // add ids to feature properties
+                            // add ids to feature properties to be able to link stat data to them
                             geoJSON.features.forEach((feature) => {
                                 feature.properties.id = feature.id
                             })
 
-                            function createProgressiveIdValueMap(features) {
-                                const idValueMap = {}
-                                const step = 1000 / features.length // Calculate the step for gradual increase
-
-                                features.forEach((feature, index) => {
-                                    const id = feature.properties.id
-                                    const value = Math.floor(step * (index + 1)) // Increase value progressively
-                                    idValueMap[id] = value
-                                })
-
-                                return idValueMap
-                            }
                             let statisticalData = createProgressiveIdValueMap(geoJSON.features)
 
-                            // Map and projection
-                            const projection = d3
-                                .geoMercator()
-                                .center([-3, 40]) // GPS of location to zoom on
-                                .scale(2100) // This is like the zoom
-                                .translate([width / 2, height / 2])
+                            // projection
+                            const projection = d3.geoAzimuthalEqualArea().rotate([-1, -40.55]).scale(3000)
 
                             const map = eurostatmap
                                 .map('choropleth')
@@ -83,6 +65,19 @@
                         })
                         .catch((error) => console.error('Error loading TopoJSON:', error))
                 })
+
+            function createProgressiveIdValueMap(features) {
+                const idValueMap = {}
+                const step = 1000 / features.length // Calculate the step for gradual increase
+
+                features.forEach((feature, index) => {
+                    const id = feature.properties.id
+                    const value = Math.floor(step * (index + 1)) // Increase value progressively
+                    idValueMap[id] = value
+                })
+
+                return idValueMap
+            }
         </script>
     </body>
 </html>

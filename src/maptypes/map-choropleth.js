@@ -350,7 +350,7 @@ const choroplethTooltipFunction = function (region, map) {
     const buf = []
 
     // Header with region name and ID
-    const regionName = region.properties.na
+    const regionName = region.properties.na || region.properties.name
     const regionId = region.properties.id
     buf.push(`
         <div class="estat-vis-tooltip-bar">
