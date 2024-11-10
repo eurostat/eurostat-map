@@ -34,7 +34,7 @@ test('urban/rural categorical map with csvDataSource', async () => {
             .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
             .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
             .legend({
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
     })

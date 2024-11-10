@@ -22,7 +22,7 @@
                 .threshold([50, 75, 100, 150, 300, 850])
                 .tooltipShowFlags(false)
                 .transitionDuration(0)
-                .legend({ labelDecNb: 0, x: 10, y: 120, noData: false })
+                .legend({ decimals: 0, x: 10, y: 120, noData: false })
                 .callback(function () {
                     setTimeout(() => {
                         myMap.exportMapToPNG()

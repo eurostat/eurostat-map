@@ -28,86 +28,117 @@
             const width = 600
             const height = 600
 
-            fetch(`./data/paro_por_municipio.csv`)
-                .then((response) => response.text()) // Parse response as CSV
-                .then((csvText) => {
-                    // Use d3.csvParse to convert CSV text into an array of objects
-                    const dataArray = d3.csvParse(csvText)
+            Promise.all([
+                fetch('./data/paro_por_municipio.csv').then((response) => response.text()),
+                fetch('./data/poblacion.csv').then((response) => response.text()),
+            ])
+                .then(([firstCsvText, secondCsvText]) => {
+                    const firstCsv = d3.csvParse(firstCsvText)
+                    const secondCsv = d3.csvParse(secondCsvText)
 
-                    // Transform array of objects to a code:value object
-                    const statisticalData = {}
+                    // Convert the second CSV to a lookup object based on the standardized code
+                    const secondDataLookup = secondCsv.reduce((lookup, row) => {
+                        const code = row.id.split(' ')[0].replace(/^0+/, '') // Remove leading zeros from the code
+                        lookup[code] = row
+                        return lookup
+                    }, {})
 
-                    dataArray.forEach((row) => {
-                        let value = parseInt(row['total Paro Registrado'])
-                        if (value == '<5') value = 5
-                        statisticalData[row['Codigo Municipio']] = value // Replace 'code' and 'value' with the actual column names
+                    // Merge data based on matching standardized codes
+                    const mergedData = firstCsv.map((row) => {
+                        const code = row['Codigo Municipio'].replace(/^0+/, '') // Remove leading zeros from the first CSV code
+                        const matchingRow = secondDataLookup[code]
+                        return matchingRow ? { ...row, ...matchingRow } : row
                     })
-                    fetch(`./geometries/spain_borders.json`)
-                        .then((response) => response.json()) // Parse response as JSON
-                        .then((bordersTopoJSON) => {
-                            fetch(`./geometries/spain-municipalities.topojson.json`)
-                                .then((response) => response.json()) // Parse response as JSON
-                                .then((topoJSON) => {
-                                    const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
-                                    const bordersGeoJSON = topojson.feature(
-                                        bordersTopoJSON,
-                                        bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
-                                    )
 
-                                    // add ids to feature properties to be able to link stat data to them
-                                    geoJSON.features.forEach((feature) => {
-                                        feature.properties.id = feature.id
-                                    })
+                    // Parse value by removing thousands delimiter
+                    function parseThousandsDelimiter(value) {
+                        if (value) {
+                            return parseInt(value.replace('.', ''), 10) // Remove the dot and parse as integer
+                        }
+                    }
+                    // Transform merged data to code:value object
+                    const statisticalData = mergedData.reduce((acc, row) => {
+                        // Handle unemployment value, setting "<5" to "5" and parsing as an integer
+                        let unemployment =
+                            row['total Paro Registrado'] === '<5' ? 5 : parseThousandsDelimiter(row['total Paro Registrado'])
 
-                                    //let statisticalData = createProgressiveIdValueMap(geoJSON.features)
+                        // Parse population
+                        const population = parseThousandsDelimiter(row.total)
 
-                                    // projection
-                                    const projection = d3.geoAzimuthalEqualArea().rotate([-1, -40.55]).scale(3000)
+                        // Calculate percentage unemployed and add to accumulator
+                        const unemploymentRate = Math.round((unemployment / population) * 100)
+                        acc[row['Codigo Municipio']] = isNaN(unemploymentRate) ? ':' : unemploymentRate
 
-                                    const map = eurostatmap
-                                        .map('choropleth')
-                                        .geoCenter([2, 47])
-                                        .zoomExtent([1, 10])
-                                        .width(width)
-                                        .height(height)
-                                        .title('Custom geometries test')
-                                        .projectionFunction(projection)
-                                        .geometries([
-                                            {
-                                                id: 'regions',
-                                                class: 'regions',
-                                                regions: true,
-                                                features: geoJSON.features,
-                                                onEach: (elements) => {
-                                                    //elements.style('stroke', (region)=>region.stroke) // Set any d3 chain method here if needed
-                                                },
-                                            },
-                                            {
-                                                id: 'borders',
-                                                features: bordersGeoJSON.features,
-                                                class: 'borders', // see css class in <head>
-                                            },
-                                        ])
-                                        .legend({ title: 'Unemployment %', x: 10, y: 180, boxOpacity: 0.6 })
-                                        .bottomText(
-                                            'Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios</a>'
-                                        )
+                        return acc
+                    }, {})
 
-                                    map.statData().setData(statisticalData)
-
-                                    map.build()
-                                })
-                                .catch((error) => console.error('Error loading TopoJSON:', error))
-                        })
+                    return Promise.all([
+                        fetch('./geometries/spain_borders.json').then((response) => response.json()),
+                        fetch('./geometries/spain-municipalities.topojson.json').then((response) => response.json()),
+                        statisticalData, // Pass statisticalData forward in the chain
+                    ])
                 })
+                .then(([bordersTopoJSON, topoJSON, statisticalData]) => {
+                    const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
+                    const bordersGeoJSON = topojson.feature(
+                        bordersTopoJSON,
+                        bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
+                    )
 
+                    // Add IDs to feature properties
+                    geoJSON.features.forEach((feature) => {
+                        feature.properties.id = feature.id
+                    })
+
+                    // Set up the projection
+                    const projection = d3.geoAzimuthalEqualArea().rotate([-1, -40.55]).scale(3000)
+
+                    // Initialize the map
+                    const map = eurostatmap
+                        .map('choropleth')
+                        .geoCenter([2, 47])
+                        .zoomExtent([1, 10])
+                        .width(width)
+                        .height(height)
+                        .title('Custom Geometries Test')
+                        .projectionFunction(projection)
+                        .geometries([
+                            {
+                                id: 'regions',
+                                class: 'regions',
+                                regions: true,
+                                features: geoJSON.features,
+                                onEach: (elements) => {
+                                    // Add any D3 custom styling or behavior here
+                                },
+                            },
+                            {
+                                id: 'borders',
+                                features: bordersGeoJSON.features,
+                                class: 'borders',
+                            },
+                        ])
+                        .legend({ title: 'Unemployment %', x: 10, y: 180, boxOpacity: 0.6, decimals: 0 })
+                        .bottomText(
+                            'Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>'
+                        )
+
+                    // Set statistical data for the map
+                    map.statData().setData(statisticalData)
+
+                    // Build the map
+                    map.build()
+                })
+                .catch((error) => console.error('Error loading data or TopoJSON:', error))
+
+            // Optional function for creating a progressive ID-value map
             function createProgressiveIdValueMap(features) {
                 const idValueMap = {}
-                const step = 1000 / features.length // Calculate the step for gradual increase
+                const step = 1000 / features.length
 
                 features.forEach((feature, index) => {
                     const id = feature.properties.id
-                    const value = Math.floor(step * (index + 1)) // Increase value progressively
+                    const value = Math.floor(step * (index + 1))
                     idValueMap[id] = value
                 })
 

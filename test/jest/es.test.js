@@ -54,7 +54,7 @@ test('geo focus on spain with custom inset on canary islands', async () => {
                     },
                 ],
                 insetBoxPosition: [335, 345],
-                legend: { labelDecNb: 1, x: 13, y: 60, boxOpacity: 0, boxPadding: 7, title: 'Rate (%)', noData: false },
+                legend: { decimals: 1, x: 13, y: 60, boxOpacity: 0, boxPadding: 7, title: 'Rate (%)', noData: false },
                 callback: function () {
                     //set title with date
                     map.title(map.title() + ' in ' + map.getTime())

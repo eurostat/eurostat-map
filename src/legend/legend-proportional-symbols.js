@@ -43,7 +43,7 @@ export const legend = function (map, config) {
         shapeFill: 'white',
         shapeStroke: null,
         labelOffset: { x: 5, y: 0 }, //the distance between the legend box elements to the corresponding text label
-        labelDecNb: 0, //the number of decimal for the legend labels
+        decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,
         _totalBarsHeight: 0,
         _totalD3SymbolsHeight: 0,
@@ -61,7 +61,7 @@ export const legend = function (map, config) {
         shapeHeight: 20, //the height of the legend box elements
         shapePadding: 1, //the distance between consecutive legend shape elements in the color legend
         labelOffset: { x: 5, y: 0 }, //distance (x) between label text and its corresponding shape element
-        labelDecNb: 0, //the number of decimal for the legend labels
+        decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined, // user-defined d3 format function
         noData: true, //show no data
         noDataText: 'No data', //no data text label

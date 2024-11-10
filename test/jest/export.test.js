@@ -28,7 +28,7 @@ test('exporting map as SVG', async () => {
             .tooltipShowFlags(false)
             .legend({
                 title: 'Population change from 2015 to 2016 : in ‰)',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .callback(function () {
                 setTimeout(() => {

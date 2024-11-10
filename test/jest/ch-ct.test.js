@@ -31,7 +31,7 @@ test('Two maps on a single page', async () => {
             .tooltipShowFlags(false)
             .legend({
                 title: 'test',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
 
@@ -52,7 +52,7 @@ test('Two maps on a single page', async () => {
             .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
             .legend({
                 title: 'test',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
     })

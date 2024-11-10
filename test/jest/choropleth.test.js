@@ -32,7 +32,7 @@ test('choropleth with threshold scale', async () => {
             .tooltipShowFlags(false)
             .legend({
                 title: 'Population density test',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
     })

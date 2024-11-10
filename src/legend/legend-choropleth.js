@@ -23,7 +23,7 @@ export const legend = function (map, config) {
     //tick line length in pixels
     out.tickLength = 4
     //the number of decimal for the legend labels
-    out.labelDecNb = 2
+    out.decimals = 2
     //the distance between the legend box elements to the corresponding text label
     out.labelOffset = 3
     //labelFormatter function
@@ -64,7 +64,7 @@ export const legend = function (map, config) {
         }
 
         // Label formatter
-        const formatLabel = out.labelFormatter || format(`.${out.labelDecNb}f`)
+        const formatLabel = out.labelFormatter || format(`.${out.decimals}f`)
 
         let baseY = out.boxPadding
         if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
@@ -190,6 +190,9 @@ export const legend = function (map, config) {
             select(this).style('fill', select(this).attr('fill___'))
         })
     }
+
+    //deprecated
+    out.labelDecNb = (v) => (console.warn('labelDecNb is now DEPRECATED. Please use decimals instead.'), out)
 
     return out
 }

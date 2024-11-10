@@ -29,7 +29,7 @@ test('separated legend', async () => {
             .tooltipShowFlags(false)
             .legend({
                 title: 'Population density (people/km²)',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
     })
