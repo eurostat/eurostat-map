@@ -92,10 +92,18 @@ a text {
 }
 
 /* Bottom text and symbol styling */
-.em-bottom-text {
+.em-footnote {
     pointer-events: all;
     cursor: default;
     font-size: 11px;
+    transform: translate(5px, -5px);
+}
+.em-footnote a {
+    fill: #0e47cb;
+    text-decoration: underline;
+}
+.em-footnote a:hover {
+    fill: #0a328e;
 }
 
 .em-symbol {

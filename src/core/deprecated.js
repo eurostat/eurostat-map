@@ -40,4 +40,8 @@ export const defineDeprecatedFunctions = (out) => {
     out.clnb = (v) => (console.warn('map.clnb() is now DEPRECATED. please use map.numberOfClasses() instead.'), out.numberOfClasses_ = v,out);
     out.nutsLvl = (v) => (console.warn('map.nutsLvl() is now DEPRECATED. please use map.nutsLevel() instead.'), out.nutsLevel_ = v,out);
     out.lg = (v) => (console.warn('map.lg() is now DEPRECATED. please use map.language() instead.'), out.language_ = v,out);
+    out.bottomText = (v) => (console.warn('bottomText is now DEPRECATED. Please use the footnote() method and em-footnote CSS class instead.'),out.footnote_ = v,out);
+    out.botTxtFontSize = (v) => (console.warn('botTxtFontSize is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
+    out.botTxtFill = (v) => (console.warn('botTxtFill is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
+    out.botTxtTooltipTxt = (v) => (console.warn('botTxtTooltipTxt is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
 }

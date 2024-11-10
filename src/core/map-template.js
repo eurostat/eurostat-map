@@ -164,12 +164,9 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.showSourceLink_ = true
 
     //default copyright and disclaimer text
-    out.bottomText_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9UN-FAO \u00A9INSTAT \u00A9Turkstat' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
-    out.botTxtFontSize_ = 10
-    out.botTxtFill_ = 'black'
-    out.botTxtPadding_ = 10
-    out.botTxtTooltipTxt_ =
-        'The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.'
+    out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9UN-FAO \u00A9INSTAT \u00A9Turkstat' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
+    // out.footnoteTooltipText_ =
+    //     'The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.'
 
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2/'
@@ -819,8 +816,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //bottom text
-        if (out.bottomText_) {
-            addBottomText()
+        if (out.footnote_) {
+            addFootnote()
         }
 
         //source dataset URL
@@ -844,8 +841,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                         .attr('target', '_blank')
                         .append('text')
                         .attr('class', 'em-source-dataset-link')
-                        .attr('x', out.width_ - out.botTxtPadding_)
-                        .attr('y', out.height_ - out.botTxtPadding_)
+                        .attr('x', out.width_)
+                        .attr('y', out.height_)
                         .text('EUROSTAT')
                         .attr('text-anchor', 'end')
 
@@ -854,8 +851,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                     out.svg()
                         .append('text')
                         .attr('class', 'em-source-pretext')
-                        .attr('x', out.width_ - out.botTxtPadding_ - linkW - 2)
-                        .attr('y', out.height_ - out.botTxtPadding_)
+                        .attr('x', out.width_ - linkW - 2)
+                        .attr('y', out.height_)
                         .text('Source:')
                         .attr('text-anchor', 'end')
                 }
@@ -874,24 +871,24 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    const addBottomText = function () {
+    const addFootnote = function () {
         out.svg()
             .append('text')
-            .attr('id', 'em-bottom-text')
-            .attr('class', 'em-bottom-text')
-            .attr('x', out.botTxtPadding_)
-            .attr('y', out.height_ - out.botTxtPadding_)
-            .text(out.bottomText_)
+            .attr('id', 'em-footnote')
+            .attr('class', 'em-footnote')
+            .attr('x', 0)
+            .attr('y', out.height_)
+            .html(out.footnote_)
             .on('mouseover', function () {
                 out._tooltip.mw___ = out._tooltip.style('max-width')
                 out._tooltip.style('max-width', '400px')
-                if (out.botTxtTooltipTxt_) out._tooltip.mouseover(out.botTxtTooltipTxt_)
+                if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_)
             })
             .on('mousemove', function (e) {
-                if (out.botTxtTooltipTxt_) out._tooltip.mousemove(e)
+                if (out.footnoteTooltipText_) out._tooltip.mousemove(e)
             })
             .on('mouseout', function (e) {
-                if (out.botTxtTooltipTxt_) out._tooltip.mouseout(e)
+                if (out.footnoteTooltipText_) out._tooltip.mouseout(e)
                 out._tooltip.style('max-width', out._tooltip.mw___)
             })
     }
@@ -1503,7 +1500,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         config = config || {}
         config.proj = config.proj || _defaultCRS[config.geo]
         config.scale = config.scale || out.insetScale_
-        config.bottomText = config.bottomText || ''
+        config.footnote = config.footnote || ''
         config.showSourceLink = config.showSourceLink || false
         config.botTxtTooltipTxt = config.botTxtTooltipTxt || ''
         config.zoomExtent = config.zoomExtent || out.insetZoomExtent_
