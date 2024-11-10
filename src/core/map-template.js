@@ -471,7 +471,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             if (callback) callback()
         } else {
             // use default
-            out.Geometries.getDefaultGeoData(out.geo_, out.filterGeometriesFunction_).then(() => {
+            out.Geometries.getDefaultGeoData(out.geo_, out.filterGeometriesFunction_, out.nutsLevel_).then(() => {
                 out.buildMapTemplate()
 
                 // Execute callback if defined
@@ -947,7 +947,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     const addCentroidsToMap = function () {
         let centroidFeatures
 
-        if (!centroidsData) {
+        if (!out.Geometries.centroidsData) {
             // if centroids data is absent (e.g. for world maps) then calculate manually
             if (out.geo_ == 'WORLD') {
                 centroidFeatures = []
@@ -971,13 +971,13 @@ export const mapTemplate = function (config, withCenterPoints) {
         } else {
             if (out.nutsLevel_ == 'mixed') {
                 centroidFeatures = [
-                    ...centroidsData[0].features,
-                    ...centroidsData[1].features,
-                    ...centroidsData[2].features,
-                    ...centroidsData[3].features,
+                    ...out.Geometries.centroidsData[0].features,
+                    ...out.Geometries.centroidsData[1].features,
+                    ...out.Geometries.centroidsData[2].features,
+                    ...out.Geometries.centroidsData[3].features,
                 ]
             } else {
-                centroidFeatures = centroidsData.features
+                centroidFeatures = out.Geometries.centroidsData.features
             }
         }
 
@@ -1141,9 +1141,18 @@ export const mapTemplate = function (config, withCenterPoints) {
                 let labelRegions
                 if (map.nutsLevel_ == 'mixed') {
                     map._geom.mixed.rg0 = map._geom.nutsrg
-                    map._geom.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
-                    map._geom.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
-                    map._geom.mixed.rg3 = feature(allNUTSGeoData[3], allNUTSGeoData[3].objects.nutsrg).features
+                    map._geom.mixed.rg1 = feature(
+                        out.Geometries.allNUTSGeoData[1],
+                        out.Geometries.allNUTSGeoData[1].objects.nutsrg
+                    ).features
+                    map._geom.mixed.rg2 = feature(
+                        out.Geometries.allNUTSGeoData[2],
+                        out.Geometries.allNUTSGeoData[2].objects.nutsrg
+                    ).features
+                    map._geom.mixed.rg3 = feature(
+                        out.Geometries.allNUTSGeoData[3],
+                        out.Geometries.allNUTSGeoData[3].objects.nutsrg
+                    ).features
                     labelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
                 } else {
                     labelRegions = map._geom.nutsrg

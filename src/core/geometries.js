@@ -3,6 +3,7 @@ import { json } from 'd3-fetch'
 import { feature } from 'topojson-client'
 import { executeForAllInsets } from './utils'
 import { kosovoBnFeatures } from './kosovo'
+import { geoGraticule } from 'd3-geo'
 
 // Geometries class wrapped as a function
 export const Geometries = function (map, withCenterPoints) {
@@ -26,15 +27,16 @@ export const Geometries = function (map, withCenterPoints) {
     /**
      * Retrieves and parses 'default' geo data (for NUTS or World maps)
      */
-    out.getDefaultGeoData = function (geo, filterGeometriesFunction) {
+    out.getDefaultGeoData = function (geo, filterGeometriesFunction, nutsLevel) {
         const promises = out.getDefaultGeoDataPromise()
         return Promise.all(promises)
             .then((results) => {
                 if (filterGeometriesFunction) {
                     results = filterGeometriesFunction(results)
                 }
-
+                out.allNUTSGeoData = results
                 out.geoData = results[0]
+
                 if (withCenterPoints) {
                     out.centroidsData = nutsLevel === 'mixed' ? [results[4], results[5], results[6], results[7]] : results[1]
                 }
@@ -70,8 +72,19 @@ export const Geometries = function (map, withCenterPoints) {
 
         const buildUrl = (base, year, geo, proj, scale, level, withCenter = false) => {
             let path = `${base}/${year}`
-            if (geo !== 'EUR') path += `/${geo}`
-            path += `/${proj}/${scale ? scale + '/' : ''}${withCenter ? 'nutspt_' : ''}${level}.json`
+
+            // Include geo part if it's specified and not 'EUR' or 'WORLD'
+            if (geo && geo !== 'EUR' && geo !== 'WORLD') path += `/${geo}`
+
+            // Add projection
+            path += `/${proj}`
+
+            // Add scale only if not using center points
+            if (!withCenter && scale) path += `/${scale}`
+
+            // Append the appropriate file name
+            path += `/${withCenter ? 'nutspt_' : ''}${level}.json`
+
             return path
         }
 
@@ -101,7 +114,6 @@ export const Geometries = function (map, withCenterPoints) {
 
         return promises
     }
-
     /** Checks if all geo data is ready */
     out.isGeoReady = function () {
         if (!out.geoData && !out.userGeometries) return false
@@ -174,9 +186,9 @@ export const Geometries = function (map, withCenterPoints) {
         if (this.geoJSONs.nutsrg) {
             if (nutsLevel == 'mixed') {
                 this.geoJSONs.mixed.rg0 = this.geoJSONs.nutsrg
-                this.geoJSONs.mixed.rg1 = feature(allNUTSGeoData[1], allNUTSGeoData[1].objects.nutsrg).features
-                this.geoJSONs.mixed.rg2 = feature(allNUTSGeoData[2], allNUTSGeoData[2].objects.nutsrg).features
-                this.geoJSONs.mixed.rg3 = feature(allNUTSGeoData[3], allNUTSGeoData[3].objects.nutsrg).features
+                this.geoJSONs.mixed.rg1 = feature(out.allNUTSGeoData[1], out.allNUTSGeoData[1].objects.nutsrg).features
+                this.geoJSONs.mixed.rg2 = feature(out.allNUTSGeoData[2], out.allNUTSGeoData[2].objects.nutsrg).features
+                this.geoJSONs.mixed.rg3 = feature(out.allNUTSGeoData[3], out.allNUTSGeoData[3].objects.nutsrg).features
 
                 //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
                 // see updateClassification and updateStyle in map-choropleth.js for hiding/showing

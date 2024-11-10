@@ -36,7 +36,7 @@
                 .nuts2jsonBaseURL('https://gisco-services.ec.europa.eu/pub/nuts2json/v2/') //nuts2json geometries retrieved internally
                 .containerId('map') //for tooltip overflow control
                 .scale('10M')
-                .hoverColor('yellow')
+                .hoverColor('red')
                 .colors(['#E6E6E6', '#E6E6E6'])
                 .threshold([1, 99999999])
                 //specific
@@ -57,16 +57,16 @@
                     .threshold([1, 100, 1000, 99999])
                     .updateClassification()
                     .updateStyle()
-            }, 2000)
+            }, 500)
 
             setTimeout(() => {
                 map.statData().setData({ ES: 1, DE: 200, CN: 2000 })
                 map.updateStatValues()
-                map.colors(['red', 'pink', 'violet', 'purple', 'lightgreen'].reverse())
+                map.colors(['red', 'green', 'orange', 'purple', 'cyan'].reverse())
                     .threshold([1, 100, 1000, 99999])
                     .updateClassification()
                     .updateStyle()
-            }, 6000)
+            }, 1000)
         </script>
     </body>
 </html>
