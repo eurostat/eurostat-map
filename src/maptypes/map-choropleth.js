@@ -165,7 +165,7 @@ export const map = function (config) {
         // Apply classification and assign 'ecl' attribute based on map type
         if (map.svg_) {
             let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             classifyRegions(map.svg().selectAll(selector))
 
             // Handle mixed NUTS level, separating NUTS level 0
@@ -203,7 +203,7 @@ export const map = function (config) {
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
             let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic
@@ -298,7 +298,7 @@ export const map = function (config) {
         regions
             .on('mouseover', function (e, rg) {
                 const sel = select(this)
-                if (out.Geometries.userGeometries) {
+                if (map.Geometries.userGeometries) {
                     // custom geometries
                     sel.style('fill', map.hoverColor_) // Apply highlight color
                     out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))

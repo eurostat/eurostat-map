@@ -347,15 +347,17 @@ export const Geometries = function (map, withCenterPoints) {
      */
     out.addUserGeometriesToMap = function (geometries, container, pathFunction) {
         geometries.forEach((geometry) => {
-            container
+            let group = container
                 .append('g')
                 .attr('id', geometry.regions ? 'em-user-regions' : '')
                 .attr('class', geometry.class ? geometry.class : '')
-                .selectAll('path')
-                .data(geometry.features)
-                .enter()
-                .append('path')
-                .attr('d', pathFunction)
+
+            let elements = group.selectAll('path').data(geometry.features).enter().append('path').attr('d', pathFunction)
+
+            // Allow custom call chain modifications through onEach
+            if (typeof geometry.onEach === 'function') {
+                geometry.onEach(elements)
+            }
         })
     }
 

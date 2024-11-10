@@ -93,7 +93,8 @@ export const map = function (config) {
     function applyStyleToMap(map) {
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic

@@ -106,7 +106,8 @@ export const map = function (config) {
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
         //assign class to nuts regions, based on their value
-        let selector = map.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
         if (map.svg_) {
             let regions = map.svg().selectAll(selector)
             regions
@@ -225,7 +226,8 @@ export const map = function (config) {
 
         // set colour of regions
         if (map.svg()) {
-            let selector = out.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             let regions = map.svg().selectAll(selector)
             regions
                 .transition()

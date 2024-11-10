@@ -4,11 +4,15 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
-            .border {
+            .borders {
                 fill: none;
                 stroke: black;
                 stroke-width: 0.3px;
                 stroke-linejoin: round;
+            }
+            .regions {
+                /* stroke: white;
+                stroke-width: 0.1px; */
             }
         </style>
     </head>
@@ -24,46 +28,74 @@
             const width = 600
             const height = 600
 
-            fetch(`./geometries/spain_borders.json`)
-                .then((response) => response.json()) // Parse response as JSON
-                .then((bordersTopoJSON) => {
-                    fetch(`./geometries/spain-municipalities.topojson.json`)
+            fetch(`./data/paro_por_municipio.csv`)
+                .then((response) => response.text()) // Parse response as CSV
+                .then((csvText) => {
+                    // Use d3.csvParse to convert CSV text into an array of objects
+                    const dataArray = d3.csvParse(csvText)
+
+                    // Transform array of objects to a code:value object
+                    const statisticalData = {}
+
+                    dataArray.forEach((row) => {
+                        let value = parseInt(row['total Paro Registrado'])
+                        if (value == '<5') value = 5
+                        statisticalData[row['Codigo Municipio']] = value // Replace 'code' and 'value' with the actual column names
+                    })
+                    fetch(`./geometries/spain_borders.json`)
                         .then((response) => response.json()) // Parse response as JSON
-                        .then((topoJSON) => {
-                            const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
-                            const bordersGeoJSON = topojson.feature(
-                                bordersTopoJSON,
-                                bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
-                            )
+                        .then((bordersTopoJSON) => {
+                            fetch(`./geometries/spain-municipalities.topojson.json`)
+                                .then((response) => response.json()) // Parse response as JSON
+                                .then((topoJSON) => {
+                                    const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
+                                    const bordersGeoJSON = topojson.feature(
+                                        bordersTopoJSON,
+                                        bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
+                                    )
 
-                            // add ids to feature properties to be able to link stat data to them
-                            geoJSON.features.forEach((feature) => {
-                                feature.properties.id = feature.id
-                            })
+                                    // add ids to feature properties to be able to link stat data to them
+                                    geoJSON.features.forEach((feature) => {
+                                        feature.properties.id = feature.id
+                                    })
 
-                            let statisticalData = createProgressiveIdValueMap(geoJSON.features)
+                                    //let statisticalData = createProgressiveIdValueMap(geoJSON.features)
 
-                            // projection
-                            const projection = d3.geoAzimuthalEqualArea().rotate([-1, -40.55]).scale(3000)
+                                    // projection
+                                    const projection = d3.geoAzimuthalEqualArea().rotate([-1, -40.55]).scale(3000)
 
-                            const map = eurostatmap
-                                .map('choropleth')
-                                .geoCenter([2, 47])
-                                .zoomExtent([1, 10])
-                                .width(width)
-                                .height(height)
-                                .title('Custom geometries test')
-                                .projectionFunction(projection)
-                                .geometries([
-                                    { id: 'regions', regions: true, features: geoJSON.features, class: (feature) => 'region' },
-                                    { id: 'borders', features: bordersGeoJSON.features, class: (feature) => 'border' },
-                                ])
+                                    const map = eurostatmap
+                                        .map('choropleth')
+                                        .geoCenter([2, 47])
+                                        .zoomExtent([1, 10])
+                                        .width(width)
+                                        .height(height)
+                                        .title('Custom geometries test')
+                                        .projectionFunction(projection)
+                                        .geometries([
+                                            {
+                                                id: 'regions',
+                                                class: 'regions',
+                                                regions: true,
+                                                features: geoJSON.features,
+                                                onEach: (elements) => {
+                                                    //elements.style('stroke', (region)=>region.stroke) // Set any d3 chain method here if needed
+                                                },
+                                            },
+                                            {
+                                                id: 'borders',
+                                                features: bordersGeoJSON.features,
+                                                class: 'borders', // see css class in <head>
+                                            },
+                                        ])
+                                        .legend({ title: 'Unemployment %', x: 10, y: 180, boxOpacity: 0.6 })
 
-                            map.statData().setData(statisticalData)
+                                    map.statData().setData(statisticalData)
 
-                            map.build()
+                                    map.build()
+                                })
+                                .catch((error) => console.error('Error loading TopoJSON:', error))
                         })
-                        .catch((error) => console.error('Error loading TopoJSON:', error))
                 })
 
             function createProgressiveIdValueMap(features) {

@@ -279,7 +279,8 @@ export const map = function (config) {
             }
 
             // set style of symbols
-            let selector = map.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             let regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD') {
