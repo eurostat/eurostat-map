@@ -762,7 +762,23 @@ map = eurostatmap.map(...)
 
 ## Styling
 
-Specify specific map styles.
+Specify specific map styles. As of V4, styles have been moved to CSS classes.
+
+-   em-sea
+-   em-cntrg
+-   em-nutsrg
+-   bn_0, bn_1, bn_2, bn_3
+-   em-graticule
+-   em-title
+-   em-subtitle
+-   em-map
+-   em-footnote
+-   em-bn-co ( previously worldCoastStroke() )
+-   #em-coast-margin
+-   em-labels
+-   em-stat-labels
+-   em-stat-labels-shadows
+-   em-scalebar-label
 
 | Method                                    | Type    | Default value                                                        | Description                                                                                                                                              |
 | ----------------------------------------- | ------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -863,7 +879,7 @@ Export the map as a PNG image or a SVG file.
 | Method                                    | Type     | Default value         | Description                                                                                                                                                                                                                                                                                                                                                         |
 | ----------------------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**noDataText**([*value*])           | String   | _"No data available"_ | The text to show for regions where no data is available.                                                                                                                                                                                                                                                                                                            |
-| _map_.**lg**([*value*])                   | String   | _"en"_                | The language code, for multilingual maps.                                                                                                                                                                                                                                                                                                                           |
+| _map_.**language**([*value*])             | String   | _"en"_                | The language code, for multilingual maps.                                                                                                                                                                                                                                                                                                                           |
 | _map_.**transitionDuration**([*value*])   | int      | _800_                 | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms.                                                                                                                                                                                                                                 |
 | _map_.**filtersDefinitionFun**([*value*]) | Function | _function() {}_       | A function defining SVG filter elements. To be used to defined fill patterns.                                                                                                                                                                                                                                                                                       |
 | _map_.**callback**([*value*])             | Function | _undefined_           | A function to execute after the map build is complete.                                                                                                                                                                                                                                                                                                              |

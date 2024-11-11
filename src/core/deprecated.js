@@ -25,8 +25,8 @@ export const defineDeprecatedFunctions = (out) => {
     out.coastalMarginWidth = (v) => (console.warn('map.coastalMarginWidth() is now DEPRECATED. please use the #em-coast-margin CSS rule'), out);
     out.coastalMarginColor = (v) => (console.warn('map.coastalMarginColor() is now DEPRECATED. please use the #em-coast-margin CSS rule'), out);
     out.fontFamily = (v) => (console.warn('map.fontFamily() is now DEPRECATED. please use the .em-map CSS class'), out);
-    out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-bottom-text CSS class'), out);
-    out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-bottom-text CSS class'), out);
+    out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-footnote CSS class'), out);
+    out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-footnote CSS class'), out);
     out.labelFill = (v) => (console.warn('map.labelFill() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
     out.labelStroke = (v) => (console.warn('map.labelStroke() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
     out.labelStrokeWidth = (v) => (console.warn('map.labelStrokeWidth() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
