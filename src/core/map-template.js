@@ -1006,7 +1006,7 @@ export const mapTemplate = function (config, withCenterPoints) {
      */
     out.updateLabels = function () {
         // Clear previous labels
-        let prevLabels = out.svg_.selectAll('g.g_labels > *')
+        let prevLabels = out.svg_.selectAll('g.em-labels > *')
         if (prevLabels) prevLabels.remove()
 
         // Main map
@@ -1110,8 +1110,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         let language = map.lg_
         let labelsArray = []
 
-        let existing = zg.select('#g_labels')
-        let labelsG = existing.empty() ? zg.append('g').attr('id', 'g_labels') : existing
+        let existing = zg.select('#em-labels')
+        let labelsG = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
 
         //define which labels to use (cc, countries, seas, values)
         if (map.labelsToShow_.includes('countries') || map.labelsToShow_.includes('seas')) {

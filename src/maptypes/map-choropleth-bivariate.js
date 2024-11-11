@@ -293,42 +293,7 @@ export const map = function (config) {
                 )
 
             if (out.nutsLevel_ == 'mixed') {
-                // Toggle visibility - only show NUTS 1,2,3 with stat values when mixing different NUTS levels
-                map.svg()
-                    .selectAll('#em-nutsrg path')
-                    .style('display', function (rg) {
-                        const ecl1 = select(this).attr('ecl1')
-                        const ecl2 = select(this).attr('ecl2')
-                        const lvl = select(this).attr('lvl')
-                        // always display NUTS 0 for mixed, and filter countries to show
-                        if (
-                            (ecl1 && ecl2 && out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) ||
-                            lvl == '0'
-                        ) {
-                            return 'block'
-                        } else {
-                            // dont show unclassified regions
-                            return 'none'
-                        }
-                    })
-
-                    //toggle stroke - similar concept to display attr (only show borders of NUTS regions that are classified (as data or no data) - a la IMAGE)
-                    .style('stroke', function (bn) {
-                        const lvl = select(this).attr('lvl')
-                        const ecl1 = select(this).attr('ecl1')
-                        const ecl2 = select(this).attr('ecl2')
-                        if (ecl1 && ecl2 && lvl !== '0') {
-                            return out.nutsbnStroke_[parseInt(lvl)] || '#777'
-                        }
-                    })
-                    .style('stroke-width', function (rg) {
-                        const lvl = select(this).attr('lvl')
-                        const ecl1 = select(this).attr('ecl1')
-                        const ecl2 = select(this).attr('ecl2')
-                        if (ecl1 && ecl2 && lvl !== '0') {
-                            return out.nutsbnStrokeWidth_[parseInt(lvl)] || 0.2
-                        }
-                    })
+                styleMixedNUTS(map)
             }
         }
     }
@@ -339,6 +304,32 @@ export const map = function (config) {
     }
 
     return out
+}
+
+const styleMixedNUTS = function (map) {
+    map.svg()
+        .selectAll('#em-nutsrg path')
+        .style('display', function (rg) {
+            const sel = select(this)
+            const ecl = sel.attr('ecl')
+            const lvl = sel.attr('lvl')
+            const countryId = rg.properties.id.slice(0, 2)
+            return (ecl && out.countriesToShow_.includes(countryId)) || lvl === '0' ? 'block' : 'none'
+        })
+        .style('stroke', function () {
+            const sel = select(this)
+            const lvl = sel.attr('lvl')
+            const ecl = sel.attr('ecl')
+            const stroke = sel.style('stroke')
+            return ecl && lvl !== '0' ? stroke || '#777' : null
+        })
+        .style('stroke-width', function () {
+            const sel = select(this)
+            const lvl = sel.attr('lvl')
+            const ecl = sel.attr('ecl')
+            const strokeWidth = sel.style('stroke-width')
+            return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
+        })
 }
 
 const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {

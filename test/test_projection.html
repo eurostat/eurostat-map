@@ -3,6 +3,13 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-label-TÜRKİYE,
+            .em-label-shadow-TÜRKİYE {
+                font-size: 17px !important;
+                font-weight: bold;
+            }
+        </style>
     </head>
 
     <body>
@@ -12,23 +19,23 @@
         <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
         <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
         <script>
-            let projectionFunction = d3
-                //.geoRobinson()
-                .geoMercator()
+            let projectionFunction = d3.geoAzimuthalEqualArea().rotate([-42, -40.55]).scale(2000)
+            //.geoRobinson()
+            //.geoMercator()
 
             let labels = {
                 EUR_4326: {
                     // map.geo underscore map.proj. If you are using a different geo or projection then change this key accordingly
                     en: [
                         // you can define labels for 'en', 'fr' or 'de' which will be shown according to the language of the map. E.g. map.language('en')
+                        // add custom styling with CSS classes. em-label-countries for all, or em-label-TÜRKİYE for specific label. Or for shadows: em-label-shadow-TÜRKİYE em-label-shadow-countries
                         {
-                            text: 'TURKEY',
-                            x: 39,
+                            text: 'TÜRKİYE',
+                            x: 36,
                             y: 39,
                             class: 'countries', // the type of label. Used for filtering with map.labelsToShow([]). options are 'countries', 'cc' or 'seas'
-                            size: 12,
                             rotate: 0, // optional
-                            letterSpacing: 0, //optional
+                            letterSpacing: 5, //optional
                         },
                     ],
                 },
@@ -40,10 +47,10 @@
                 .height(600)
                 .scale('03M')
                 .projectionFunction(projectionFunction)
-                .pixelSize(0.025)
-                .geoCenter([34.5, 36])
+                .pixelSize(300) //doesnt apply if custom projection function is used
+                .geoCenter([34.5, 36]) //doesnt apply if custom projection function is used
                 .countriesToShow(['TR'])
-                .title('Population in Europe')
+                .title('Population in Türkiye')
                 .labelling(true)
                 .labelsToShow(['countries'])
                 .labelsConfig(labels)
