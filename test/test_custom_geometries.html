@@ -29,7 +29,7 @@
             const height = 600
 
             Promise.all([
-                fetch('./data/paro_por_municipio.csv').then((response) => response.text()),
+                fetch('./data/Paro_por_municipios_2023_csv.csv').then((response) => response.text()),
                 fetch('./data/poblacion.csv').then((response) => response.text()),
             ])
                 .then(([firstCsvText, secondCsvText]) => {
@@ -91,12 +91,12 @@
                     })
 
                     // Set up the projection
-                    const projection = d3.geoAzimuthalEqualArea().rotate([-1, -40.55]).scale(3000)
+                    const projection = d3.geoAzimuthalEqualArea().rotate([-0.5, -40.55]).scale(3000)
 
                     // Initialize the map
                     const map = eurostatmap
                         .map('choropleth')
-                        .geoCenter([2, 47])
+                        .geoCenter([3, 47])
                         .zoomExtent([1, 10])
                         .width(width)
                         .height(height)
@@ -118,7 +118,7 @@
                                 class: 'borders',
                             },
                         ])
-                        .legend({ title: 'Unemployment %', x: 10, y: 180, boxOpacity: 0.6, decimals: 0 })
+                        .legend({ title: 'Unemployment %', x: 10, y: 180, boxOpacity: 1, decimals: 0 })
                         .bottomText(
                             'Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>'
                         )

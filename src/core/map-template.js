@@ -458,7 +458,7 @@ export const mapTemplate = function (config, withCenterPoints) {
      */
     out.updateGeoMapTemplate = function (callback) {
         // Erase previous data
-        out.Geometries.geoData = null
+        out.Geometries.defaultGeoData = null
         out.Geometries.allNUTSGeoData = null
         out.Geometries.centroidsData = null
 
@@ -660,10 +660,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
         if (defaultPosition) {
             out.geoCenter(defaultPosition.geoCenter)
-        } else if (out.Geometries.geoData?.bbox) {
+        } else if (out.Geometries.defaultGeoData?.bbox) {
             out.geoCenter([
-                0.5 * (out.Geometries.geoData.bbox[0] + out.Geometries.geoData.bbox[2]),
-                0.5 * (out.Geometries.geoData.bbox[1] + out.Geometries.geoData.bbox[3]),
+                0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2]),
+                0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3]),
             ])
         } else {
             //TODO: auto-define user=defined geometries geoCenter
@@ -674,11 +674,11 @@ export const mapTemplate = function (config, withCenterPoints) {
         const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
         if (defaultPosition) {
             out.pixelSize((defaultPosition.pixelSize * 800) / out.width_)
-        } else if (out.Geometries.geoData?.bbox) {
+        } else if (out.Geometries.defaultGeoData?.bbox) {
             out.pixelSize(
                 Math.min(
-                    (out.Geometries.geoData.bbox[2] - out.Geometries.geoData.bbox[0]) / out.width_,
-                    (out.Geometries.geoData.bbox[3] - out.Geometries.geoData.bbox[1]) / out.height_
+                    (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
+                    (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
                 )
             )
         } else {
@@ -1130,7 +1130,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //for statistical values we need to add centroids, then add values later
         if (map.labelsToShow_.includes('values')) {
-            if (map._geom.nutsrg) {
+            if (map.Geometries.geoJSONs.nutsrg) {
                 //values label shadows parent <g>
                 const gsls = labelsG.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
 
@@ -1140,7 +1140,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
                 let labelRegions
                 if (map.nutsLevel_ == 'mixed') {
-                    map._geom.mixed.rg0 = map._geom.nutsrg
+                    map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
                     map._geom.mixed.rg1 = feature(
                         out.Geometries.allNUTSGeoData[1],
                         out.Geometries.allNUTSGeoData[1].objects.nutsrg
@@ -1155,7 +1155,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                     ).features
                     labelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
                 } else {
-                    labelRegions = map._geom.nutsrg
+                    labelRegions = map.Geometries.geoJSONs.nutsrg
                 }
 
                 // filter label regions for insets, e.g. only load MT for MT and avoid loading 2000 regions for every single inset

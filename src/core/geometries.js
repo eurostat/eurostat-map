@@ -8,10 +8,10 @@ import { geoGraticule } from 'd3-geo'
 // Geometries class wrapped as a function
 export const Geometries = function (map, withCenterPoints) {
     let out = {}
-    out.geoData = undefined
+
+    // defaults
+    out.defaultGeoData = undefined
     out.allNUTSGeoData = undefined
-    out.centroidsData = undefined
-    out.userGeometries = undefined
     out.geoJSONs = {
         mixed: { rg0: undefined, rg1: undefined, rg2: undefined, rg3: undefined },
         cntbn: undefined,
@@ -24,6 +24,12 @@ export const Geometries = function (map, withCenterPoints) {
         kosovo: undefined,
     }
 
+    // user defined
+    out.userGeometries = undefined
+
+    //centroids for prop symbols etc
+    out.centroidsData = undefined
+
     /**
      * Retrieves and parses 'default' geo data (for NUTS or World maps)
      */
@@ -35,7 +41,7 @@ export const Geometries = function (map, withCenterPoints) {
                     results = filterGeometriesFunction(results)
                 }
                 out.allNUTSGeoData = results
-                out.geoData = results[0]
+                out.defaultGeoData = results[0]
 
                 if (withCenterPoints) {
                     out.centroidsData = nutsLevel === 'mixed' ? [results[4], results[5], results[6], results[7]] : results[1]
@@ -44,16 +50,19 @@ export const Geometries = function (map, withCenterPoints) {
                 const isWorld = geo === 'WORLD'
                 // Decode TopoJSON to GeoJSON
                 if (isWorld) {
-                    out.geoJSONs.worldrg = feature(out.geoData, out.geoData.objects.CNTR_RG_20M_2020_4326).features
-                    out.geoJSONs.worldbn = feature(out.geoData, out.geoData.objects.CNTR_BN_20M_2020_4326).features
-                    out.geoJSONs.kosovo = feature(out.geoData, out.geoData.objects.NUTS_BN_20M_2021_RS_XK_border).features
+                    out.geoJSONs.worldrg = feature(out.defaultGeoData, out.defaultGeoData.objects.CNTR_RG_20M_2020_4326).features
+                    out.geoJSONs.worldbn = feature(out.defaultGeoData, out.defaultGeoData.objects.CNTR_BN_20M_2020_4326).features
+                    out.geoJSONs.kosovo = feature(
+                        out.defaultGeoData,
+                        out.defaultGeoData.objects.NUTS_BN_20M_2021_RS_XK_border
+                    ).features
                     out.geoJSONs.graticule = [geoGraticule().step([30, 30])()]
                 } else {
-                    out.geoJSONs.graticule = feature(out.geoData, out.geoData.objects.gra).features
-                    out.geoJSONs.nutsrg = feature(out.geoData, out.geoData.objects.nutsrg).features
-                    out.geoJSONs.nutsbn = feature(out.geoData, out.geoData.objects.nutsbn).features
-                    out.geoJSONs.cntrg = feature(out.geoData, out.geoData.objects.cntrg).features
-                    out.geoJSONs.cntbn = feature(out.geoData, out.geoData.objects.cntbn).features
+                    out.geoJSONs.graticule = feature(out.defaultGeoData, out.defaultGeoData.objects.gra).features
+                    out.geoJSONs.nutsrg = feature(out.defaultGeoData, out.defaultGeoData.objects.nutsrg).features
+                    out.geoJSONs.nutsbn = feature(out.defaultGeoData, out.defaultGeoData.objects.nutsbn).features
+                    out.geoJSONs.cntrg = feature(out.defaultGeoData, out.defaultGeoData.objects.cntrg).features
+                    out.geoJSONs.cntbn = feature(out.defaultGeoData, out.defaultGeoData.objects.cntbn).features
                 }
 
                 return results
@@ -116,7 +125,7 @@ export const Geometries = function (map, withCenterPoints) {
     }
     /** Checks if all geo data is ready */
     out.isGeoReady = function () {
-        if (!out.geoData && !out.userGeometries) return false
+        if (!out.defaultGeoData && !out.userGeometries) return false
 
         let allReady = true
 
