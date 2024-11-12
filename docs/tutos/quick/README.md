@@ -22,7 +22,7 @@ You should see the short code snippet defining the map:
 <svg id="map"></svg>
 <script src="https://unpkg.com/eurostat-map@3.3.0"></script>
 <script>
-    eurostatmap.map('choropleth').build()
+    eurostatmap.map('ch').build()
 </script>
 ```
 
@@ -38,7 +38,7 @@ This can be achieved by simply inserting three lines as below:
 <svg id="map"></svg>
 <script src="https://unpkg.com/eurostat-map@3.3.0"></script>
 <script>
-    eurostatmap.map('choropleth').title('Population in Europe').seaFillStyle('lightgray').labelling(true).build()
+    eurostatmap.map('ch').title('Population in Europe').seaFillStyle('lightgray').labelling(true).build()
 </script>
 ```
 
@@ -84,7 +84,7 @@ And insert it in the map definition following this format:
 <script src="https://unpkg.com/eurostat-map@3.3.0"></script>
 <script>
     eurostatmap
-        .map('choropleth')
+        .map('ch')
         .title('Population at risk of poverty')
         .nutsLvl(2)
         .stat({ eurostatDatasetCode: 'ilc_li41', filters: { unit: 'PC', time: 2018 } })

@@ -2,33 +2,26 @@
     background: #ffffff;
     color: #171a22;
     padding: 4px;
-    font-size: 16px;
+    font-size: 15px;
 }
 .estat-vis-tooltip-bar {
     background: #515560;
     color: #ffffff;
     padding: 6px;
-    font-size: 16px;
+    font-size: 15px;
 }
-.tooltip-eurostat {
-    font-family: Arial;
-    max-width: 250px;
-    overflow: hidden;
-    background: white;
+.leaflet-popup-content-wrapper {
     padding: 0px;
-    border: 0px;
+}
+.popover {
     border-radius: 0px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
-    position: absolute;
-    font-family: Helvetica, Arial, sans-serif;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 99999999;
+    padding: 0px;
 }
-.em-tooltip-piechart-breakdown {
-    padding: 10px;
-    font-size: 14px;
+.popover-content {
+    padding: 0px;
 }
-.em-tooltip-piechart-container {
-    text-align: center;
+
+div#tooltip_eurostat {
+    font-size: 16px !important;
+    font-family: Arial !important;
 }

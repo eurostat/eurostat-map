@@ -1,35 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
 
-    <body>
-        <svg id="map"></svg>
-        <script src="../build/eurostatmap.js"></script>
-        <script>
-            let myMap = eurostatmap
-                .map('choropleth')
-                .title('Population in Europe')
-                .insets(false)
-                .width(700)
-                .nutsLvl(1)
-                .insetBoxWidth(150)
-                .scale('20M')
-                .stat({ default: { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' } })
-                .classifMethod('threshold')
-                .threshold([50, 75, 100, 150, 300, 850])
-                .tooltipShowFlags(false)
-                .transitionDuration(0)
-                .legend({ labelDecNb: 0, x: 10, y: 120, noData: false })
-                .callback(function () {
-                    setTimeout(() => {
-                        myMap.exportMapToPNG()
-                        //myMap.exportMapToSVG();
-                    }, 200)
-                })
-                .build()
-        </script>
-    </body>
+  <body>
+    <svg id="map"></svg>
+    <script src="../build/eurostatmap.js"></script>
+    <script>
+        let myMap = eurostatmap
+            .map("ch")
+            .title("Population in Europe")
+            .insets("default")
+            .insetBoxWidth(150)
+            .width(600)
+            .scale("20M")
+            .stat( { default: { eurostatDatasetCode:"demo_r_d3dens", unitText: "people/km²" }} )
+            .classifMethod("threshold").threshold([50, 75, 100, 150, 300, 850])
+            .tooltipShowFlags(false)
+            .transitionDuration(0)
+            .legend({ labelDecNb:0, x:10, y:120, noData: false, })
+            .callback(function() {
+                setTimeout( ()=>{
+                    myMap.exportMapToPNG();
+                    myMap.exportMapToSVG();
+                }, 200);
+            })
+            .build();
+    </script>
+  </body>
 </html>

@@ -8,7 +8,8 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../build/eurostatmap.js"></script>
+
         <!-- for eurostatmap.colorFun() -->
         <script src="https://d3js.org/d3-color.v2.min.js"></script>
         <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
@@ -37,8 +38,9 @@
                 .seaFillStyle('white')
                 .insets('default')
                 .frameStroke('none')
+                .cntrgFillStyle('#efefef')
+                .cntbnStroke('white')
                 .drawCoastalMargin(false)
-                .drawGraticule(true)
 
             if (height > 800) {
                 //m.insets("default") //show inset maps of overseas regions using the default styling

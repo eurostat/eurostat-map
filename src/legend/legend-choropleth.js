@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as lg from '../core/legend'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
+import { executeForAllInsets } from '../core/utils'
 
 /**
  * A legend for choropleth maps
@@ -9,19 +9,26 @@ import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
  * @param {*} map
  */
 export const legend = function (map, config) {
-    //build generic legend object (inherit)
+    //build generic legend object for the map
     const out = lg.legend(map)
 
     //the order of the legend elements. Set to false to invert.
     out.ascending = true
+
     //the width of the legend box elements
     out.shapeWidth = 25
     //the height of the legend box elements
     out.shapeHeight = 20
+
     //the separation line length
-    out.sepLineLength = out.shapeWidth
-    //tick line length in pixels
-    out.tickLength = 4
+    out.sepLineLength = 27
+    //the separation line color
+    out.sepLineStroke = 'black'
+    //the separation line width
+    out.sepLineStrokeWidth = 1
+
+    //the font size of the legend label
+    out.labelFontSize = 12
     //the number of decimal for the legend labels
     out.labelDecNb = 2
     //the distance between the legend box elements to the corresponding text label
@@ -42,11 +49,49 @@ export const legend = function (map, config) {
     //@override
     out.update = function () {
         const m = out.map
+        const svgMap = m.svg()
         const lgg = out.lgg
 
         // Update legend parameters if necessary
         if (m.legend_) {
             Object.assign(out, m.legend_)
+        }
+
+        // Helper functions
+        const appendLegendText = (y, text, fontSize, fontWeight = null) => {
+            let legendText = lgg
+                .append('text')
+                .attr('x', out.boxPadding)
+                .attr('y', y)
+                .text(text)
+                .style('font-size', `${fontSize}px`)
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
+            if (fontWeight) legendText.style('font-weight', fontWeight)
+        }
+
+        const appendLegendRect = (x, y, fill, ecl, svgId) => {
+            return lgg
+                .append('rect')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('width', out.shapeWidth)
+                .attr('height', out.shapeHeight)
+                .attr('fill', fill)
+                .on('mouseover', function () {
+                    select(this).style('fill', m.nutsrgSelFillSty())
+                    highlightRegions(out.map, ecl)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, svgId, highlightRegions, ecl)
+                    }
+                })
+                .on('mouseout', function () {
+                    select(this).style('fill', fill)
+                    unhighlightRegions(out.map, ecl)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, svgId, unhighlightRegions, ecl)
+                    }
+                })
         }
 
         // Remove previous content
@@ -55,108 +100,62 @@ export const legend = function (map, config) {
         // Draw legend background box and title if provided
         out.makeBackgroundBox()
         if (out.title) {
-            let cssFontSize = getFontSizeFromClass('em-legend-title')
-            lgg.append('text')
-                .attr('class', 'em-legend-title')
-                .attr('x', out.boxPadding)
-                .attr('y', out.boxPadding + cssFontSize)
-                .text(out.title)
+            appendLegendText(out.boxPadding + out.titleFontSize, out.title, out.titleFontSize, out.titleFontWeight)
         }
+
+        // Set font family for legend
+        lgg.style('font-family', m.fontFamily_)
 
         // Label formatter
         const formatLabel = out.labelFormatter || format(`.${out.labelDecNb}f`)
 
-        let baseY = out.boxPadding
-        if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
-        for (let i = 0; i < m.clnb_; i++) {
+        // Draw legend elements for each class
+        const baseY = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0)
+        for (let i = 0; i < m.clnb(); i++) {
             const y = baseY + i * out.shapeHeight
-            const x = out.boxPadding
             const ecl = out.ascending ? m.clnb() - i - 1 : i
-            const fillColor = m.classToFillStyle()(ecl, m.clnb_)
+            const fillColor = m.classToFillStyle()(ecl, m.clnb())
 
             // Append rectangle for each class
-            lgg.append('rect')
-                .attr('class', 'em-legend-rect')
-                .attr('x', x)
-                .attr('y', y)
-                .attr('width', out.shapeWidth)
-                .attr('height', out.shapeHeight)
-                .style('fill', fillColor)
-                .on('mouseover', function () {
-                    highlightRegions(out.map, ecl)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl)
-                    }
-                })
-                .on('mouseout', function () {
-                    unhighlightRegions(out.map)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl)
-                    }
-                })
+            appendLegendRect(out.boxPadding, y, fillColor, ecl, out.svgId_ || 'defaultSvgId')
 
-            // Append separation line
+            // Append separation line if necessary
             if (i > 0) {
                 lgg.append('line')
-                    .attr('class', 'em-legend-separator')
                     .attr('x1', out.boxPadding)
                     .attr('y1', y)
                     .attr('x2', out.boxPadding + out.sepLineLength)
                     .attr('y2', y)
-            }
-
-            // Append tick line
-            if (i > 0) {
-                lgg.append('line')
-                    .attr('class', 'em-legend-tick')
-                    .attr('x1', out.boxPadding + out.sepLineLength)
-                    .attr('y1', y)
-                    .attr('x2', out.boxPadding + out.sepLineLength + out.tickLength)
-                    .attr('y2', y)
+                    .attr('stroke', out.sepLineStroke)
+                    .attr('stroke-width', out.sepLineStrokeWidth)
             }
 
             // Append label
             if (i < m.clnb() - 1) {
                 lgg.append('text')
-                    .attr('class', 'em-legend-label')
-                    .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
+                    .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength) + out.labelOffset)
                     .attr('y', y + out.shapeHeight)
                     .attr('dominant-baseline', 'middle')
                     .text(out.labels ? out.labels[i] : formatLabel(m.classifier().invertExtent(ecl)[out.ascending ? 0 : 1]))
+                    .style('font-size', `${out.labelFontSize}px`)
+                    .style('fill', out.fontFill)
             }
         }
 
         // 'No data' box and label if applicable
         if (out.noData) {
             const y = baseY + m.clnb() * out.shapeHeight + out.boxPadding
-            lgg.append('rect')
-                .attr('class', 'em-legend-rect')
-                .attr('x', out.boxPadding)
-                .attr('y', y)
-                .attr('width', out.shapeWidth)
-                .attr('height', out.shapeHeight)
-                .style('fill', out.map.noDataFillStyle_)
-                .on('mouseover', function () {
-                    select(this).style('fill', m.hoverColor_)
-                    highlightRegions(out.map, 'nd')
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
-                    }
-                })
-                .on('mouseout', function () {
-                    select(this).style('fill', out.map.noDataFillStyle_)
-                    unhighlightRegions(out.map)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
-                    }
-                })
+            appendLegendRect(out.boxPadding, y, m.noDataFillStyle(), 'nd', out.svgId_ || 'defaultSvgId')
+                .attr('stroke', 'black')
+                .attr('stroke-width', 0.5)
 
             lgg.append('text')
-                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
                 .text(out.noDataText)
+                .style('font-size', `${out.labelFontSize}px`)
+                .style('fill', out.fontFill)
         }
 
         // Set legend box dimensions
@@ -165,7 +164,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl) {
-        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
+        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Set all regions to white
@@ -180,7 +179,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
+        const selector = out.map.geo_ === 'WORLD' ? '#g_worldrg' : '#g_nutsrg'
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Restore each region's original color from the fill___ attribute

@@ -104,7 +104,7 @@ export const map = function (config) {
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
         //assign class to nuts regions, based on their value
-        let selector = map.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+        let selector = map.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
         if (map.svg_) {
             let regions = map.svg().selectAll(selector)
             regions
@@ -139,7 +139,7 @@ export const map = function (config) {
             //when mixing NUTS, level 0 is separated from the rest (class nutsrg0)
             if (map.nutsLvl_ == 'mixed') {
                 map.svg()
-                    .selectAll('path.em-nutsrg0')
+                    .selectAll('path.nutsrg0')
                     .attr('ecl1', function (rg) {
                         if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                         const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
@@ -167,7 +167,7 @@ export const map = function (config) {
             //when mixing NUTS, level 0 is separated from the rest (using class nutsrg0)
             if (out.nutsLvl_ == 'mixed') {
                 map.svg_
-                    .selectAll('path.em-nutsrg0')
+                    .selectAll('path.nutsrg0')
                     .attr('ecl1', function (rg) {
                         const sv = out.statData('v2').get(rg.properties.id)
                         if (!sv) return
@@ -223,12 +223,12 @@ export const map = function (config) {
 
         // set colour of regions
         if (map.svg()) {
-            let selector = out.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            let selector = out.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
             let regions = map.svg().selectAll(selector)
             regions
                 .transition()
                 .duration(out.transitionDuration())
-                .style('fill', function (rg) {
+                .attr('fill', function (rg) {
                     // only apply data-driven colour to included countries for NUTS templates
                     if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
                         const ecl1 = select(this).attr('ecl1')
@@ -245,23 +245,19 @@ export const map = function (config) {
                 .end()
                 .then(
                     () => {
-                        // Store the original color for each region
-                        regions.each(function () {
-                            const sel = select(this)
-                            sel.attr('fill___', sel.style('fill'))
-                        })
-
                         regions
                             .on('mouseover', function (e, rg) {
                                 if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
                                     if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
                                         const sel = select(this)
-                                        sel.style('fill', map.hoverColor_)
+                                        sel.attr('fill___', sel.attr('fill'))
+                                        sel.attr('fill', map.nutsrgSelFillSty_)
                                         if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                                     }
                                 } else {
                                     const sel = select(this)
-                                    sel.style('fill', map.hoverColor_)
+                                    sel.attr('fill___', sel.attr('fill'))
+                                    sel.attr('fill', map.nutsrgSelFillSty_)
                                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                                 }
                             })
@@ -278,7 +274,7 @@ export const map = function (config) {
                                 const sel = select(this)
                                 let newFill = sel.attr('fill___')
                                 if (newFill) {
-                                    sel.style('fill', sel.attr('fill___'))
+                                    sel.attr('fill', sel.attr('fill___'))
                                     if (map._tooltip) map._tooltip.mouseout()
                                 }
                             })
@@ -291,7 +287,7 @@ export const map = function (config) {
             if (out.nutsLvl_ == 'mixed') {
                 // Toggle visibility - only show NUTS 1,2,3 with stat values when mixing different NUTS levels
                 map.svg()
-                    .selectAll('#em-nutsrg path')
+                    .selectAll('path.nutsrg')
                     .style('display', function (rg) {
                         const ecl1 = select(this).attr('ecl1')
                         const ecl2 = select(this).attr('ecl2')
@@ -368,10 +364,20 @@ const tooltipTextFunBiv = function (rg, map) {
     //region name
     if (rg.properties.id) {
         //name and code
-        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + ' (' + rg.properties.id + ') </div>')
+        buf.push(
+            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                rg.properties.na +
+                ' (' +
+                rg.properties.id +
+                ') </div>'
+        )
     } else {
         //region name
-        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + '</div>')
+        buf.push(
+            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                rg.properties.na +
+                '</div>'
+        )
     }
 
     //stat 1 value

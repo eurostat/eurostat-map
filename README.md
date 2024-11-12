@@ -25,7 +25,7 @@ You can build an interactive statistical map with just a few lines of code:
 
 ```javascript
 eurostatmap
-    .map('choropleth')
+    .map('ch')
     .title('Population density in Europe')
     .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
     .legend({ x: 500, y: 180, title: 'Density, people/km²' })

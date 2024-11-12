@@ -167,7 +167,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('choropleth')
+    .map('ch')
     .title('Population in Europe')
     .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inhab./km²' })
     .classifMethod('threshold')
@@ -217,7 +217,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('proportionalSymbol')
+    .map('ps')
     .nutsLvl(1)
     .stat({
         eurostatDatasetCode: 'demo_r_pjangrp3',
@@ -324,7 +324,7 @@ Example:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('pieChart')
+    .map('pie')
     .nutsLvl(1)
     .stat('Y_LT15', {
         eurostatDatasetCode: 'demo_r_pjanaggr3',
@@ -351,7 +351,7 @@ Or simpler:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('pieChart')
+    .map('pie')
     .nutsLvl(3)
     .nutsYear(2016)
     .stripeWidth(10)
@@ -437,7 +437,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('categorical')
+    .map('ct')
     .nutsYear(2013)
     .nutsLvl(3)
     .stat({
@@ -480,7 +480,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('bivariateChoropleth')
+    .map('chbi')
     .nutsLvl(2)
     .nutsYear(2016)
     .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
@@ -537,7 +537,7 @@ Example:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('stripeComposition')
+    .map('scomp')
     .nutsLvl(3)
     .nutsYear(2016)
     .stripeWidth(10)
@@ -567,7 +567,7 @@ Or simplier:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('stripeComposition')
+    .map('scomp')
     .nutsLvl(3)
     .nutsYear(2016)
     .stripeWidth(10)
@@ -615,7 +615,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('sparkline')
+    .map('spark')
     .nutsLvl(1)
     .statSpark(
         { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
@@ -767,7 +767,7 @@ Specify specific map styles.
 | Method                                    | Type    | Default value                                                        | Description                                                                                                                                              |
 | ----------------------------------------- | ------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**nutsrgFillStyle**([*value*])      | String  | _"#eee"_                                                             | The fill style of the NUTS regions, used for proportional symbol maps only.                                                                              |
-| _map_.**hoverColor**([*value*])           | String  | _"#purple"_                                                          | The fill style of the selected NUTS regions.                                                                                                             |
+| _map_.**nutsrgSelFillSty**([*value*])     | String  | _"#purple"_                                                          | The fill style of the selected NUTS regions.                                                                                                             |
 | _map_.**nutsbnStroke**([*value*])         | Object  | _{0:"#777", 1:"#777", 2:"#777", 3:"#777", oth:"#444", co:"#1f78b4"}_ | The stroke style of the NUTS boundaries, depending on the NUTS level, if it is a border with another country (_'oth'_) and if it is coastal (_'co'_)     |
 | _map_.**nutsbnStrokeWidth**([*value*])    | Object  | _{0:0, 1:0.2, 2:0.2, 3:0.2, oth:1, co:1}_                            | The stroke width of the NUTS boundaries, depending on the NUTS level, if it is a border with another country (_'oth'_) and if it is coastal (_'co'_).    |
 | _map_.**cntrgFillStyle**([*value*])       | Color   | _"#f5f5f5"_                                                          | The fill style of the country areas.                                                                                                                     |

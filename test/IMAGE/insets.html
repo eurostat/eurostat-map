@@ -26,6 +26,7 @@
                     <svg id="inset12" y="650" x="1070"></svg>
                     <svg id="inset13" y="650" x="1160"></svg>
                 </svg>
+
             </svg>
         </div>
 
@@ -82,10 +83,10 @@
 
             basemap = function () {
                 return eurostatmap
-                    .map('choropleth')
+                    .map('ch')
                     .svgId('mappy')
                     .containerId('container')
-                    .pixelSize(7400)
+                    .pixSize(7400)
                     .width(mapWidth)
                     .height(mapHeight)
                     .nutsLvl('mixed')
@@ -95,7 +96,7 @@
                     .insets(insetsConfig())
                     .nuts2jsonBaseURL('https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/')
                     .scalebarPosition([420, 560])
-                    .hoverColor('#003E8C')
+                    .nutsrgSelFillSty('#003E8C')
             }
 
             let exampleData1 = {

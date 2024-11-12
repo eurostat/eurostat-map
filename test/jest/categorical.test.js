@@ -20,7 +20,7 @@ test('urban/rural categorical map with csvDataSource', async () => {
         // these will be executed within test.html, that was loaded before.
         //builds map in test.html
         eurostatmap
-            .map('categorical')
+            .map('ct')
             .svgId('testMap')
             .title('NUTS urban/rural typology')
             .scale('60M')

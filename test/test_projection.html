@@ -35,12 +35,12 @@
             }
 
             const map = eurostatmap
-                .map('choropleth')
+                .map('ch')
                 .width(600)
                 .height(600)
                 .scale('03M')
                 .projectionFunction(projectionFunction)
-                .pixelSize(0.025)
+                .pixSize(0.025)
                 .geoCenter([34.5, 36])
                 .countriesToShow(['TR'])
                 .title('Population in Europe')

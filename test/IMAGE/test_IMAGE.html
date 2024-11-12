@@ -22,10 +22,10 @@
             basemap = function (id) {
                 return (
                     eurostatmap
-                        .map('choropleth')
+                        .map('ch')
                         .svgId(id)
                         .containerId(id)
-                        .pixelSize(7400)
+                        .pixSize(7400)
                         .width(mapWidth)
                         .height(mapHeight)
                         .bottomText(null)
@@ -69,7 +69,7 @@
                         //.zoomExtent([1,10])
                         .showScalebar(true)
                         .scalebarPosition([420, 560])
-                        .hoverColor('#003E8C')
+                        .nutsrgSelFillSty('#003E8C')
 
                         //.labelling(true)
                         .labelsToShow(['seas', 'values', 'cc'])

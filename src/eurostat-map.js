@@ -15,19 +15,19 @@ import * as mt from './core/stat-map'
  */
 export const map = function (type, config) {
     //choropleth map
-    if (type == 'choropleth' || type == 'ch') return mapch.map(config)
+    if (type == 'ch') return mapch.map(config)
     //categorical map
-    if (type == 'categorical' || type == 'ct') return mapct.map(config)
+    if (type == 'ct') return mapct.map(config)
     //proportionnal symbols map
-    if (type == 'proportionalSymbol' || type == 'ps') return mapps.map(config)
+    if (type == 'ps') return mapps.map(config)
     //bivariate choropleth
-    if (type == 'bivariateChoropleth' || type == 'chbi') return mapchbi.map(config)
+    if (type == 'chbi') return mapchbi.map(config)
     //stripes composition
-    if (type == 'stripeComposition' || type == 'scomp') return mapscomp.map(config)
+    if (type == 'scomp') return mapscomp.map(config)
     //proportional pie charts
-    if (type == 'pieChart' || type == 'pie') return mappie.map(config)
+    if (type == 'pie') return mappie.map(config)
     //sparkline maps
-    if (type == 'sparkline' || type == 'spark') return mapspark.map(config)
+    if (type == 'spark') return mapspark.map(config)
     //add new map types here
     //if(type == "XX") return mapXX.map(config);
 

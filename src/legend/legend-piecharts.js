@@ -2,7 +2,6 @@ import { format } from 'd3-format'
 import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import * as lg from '../core/legend'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**
  * A legend for proportional symbol map
@@ -16,10 +15,15 @@ export const legend = function (map, config) {
     //spacing between color & size legends (if applicable)
     out.legendSpacing = 15
 
+    //the font size of the legend label
+    out.labelFontSize = 12
+    //titles' font size
+    out.titleFontSize = 12
+
     //size legend config (legend illustrating the values of different pie sizes)
     out.sizeLegend = {
         title: null,
-        titlePadding: 30, //padding between title and body
+        titlePadding: 15, //padding between title and body
         values: null,
     }
 
@@ -27,8 +31,8 @@ export const legend = function (map, config) {
     out.colorLegend = {
         title: null,
         labelOffset: 5, //the distance between the legend box elements to the corresponding text label
-        shapeWidth: 25, //the width of the legend box elements
-        shapeHeight: 20, //the height of the legend box elements
+        shapeWidth: 22, //the width of the legend box elements
+        shapeHeight: 15, //the height of the legend box elements
         shapePadding: 5, //the distance between consecutive legend box elements
         noData: true, //show no data
         noDataText: 'No data', //no data label text
@@ -42,7 +46,7 @@ export const legend = function (map, config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
-                    if (config[key][p] !== undefined) {
+                    if (config[key][p]) {
                         out[key][p] = config[key][p]
                     }
                 }
@@ -61,6 +65,9 @@ export const legend = function (map, config) {
 
         //draw legend background box
         out.makeBackgroundBox()
+
+        //set font family
+        lgg.style('font-family', m.fontFamily_)
 
         // legend for sizes
         if (m.sizeClassifier_) {
@@ -83,74 +90,73 @@ export const legend = function (map, config) {
      */
     function buildSizeLegend(m, lgg, config) {
         let domain = m.sizeClassifier_.domain()
-
-        // Assign default circle radii if none specified by user
+        //assign default circle radiuses if none specified by user
         if (!config.values) {
             config.values = [Math.floor(domain[1]), Math.floor(domain[0])]
         }
 
-        // Calculate the maximum circle size to be displayed in the legend
-        let maxSize = m.sizeClassifier_(max(config.values))
-
-        // Create the main container for the size legend, including the title
-        let container = lgg.append('g').attr('class', 'em-pie-size-legend')
-
-        // Add the title to the container if available
-        if (!config.title && out.title) config.title = out.title // Allow root legend title
-        let titleHeight = 0 // This will be adjusted based on whether the title exists
-        if (config.title) {
-            container
-                .append('text')
-                .attr('class', 'em-legend-title')
-                .attr('x', 0) // Position the title at the left edge
-                .attr('y', out.boxPadding + out.titleFontSize) // Title at top, within padding
+        //draw title
+        if (!config.title && out.title) config.title = out.title //allow root legend title
+        if (config.title)
+            lgg.append('text')
+                .attr('x', out.boxPadding)
+                .attr('y', out.boxPadding + out.titleFontSize)
                 .text(config.title)
+                .style('font-size', out.titleFontSize + 'px')
+                .style('font-weight', out.titleFontWeight)
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
 
-            // Adjust title height (using the title font size as a proxy)
-            titleHeight = out.titleFontSize + out.boxPadding + config.titlePadding
-        }
-
-        // Now position the circles **below** the title
-        let y = titleHeight + out.boxPadding + maxSize * 2 // Position circles after title height
-
-        // Append the legend circles
-        const legendItems = container
+        //circles
+        let maxSize = m.sizeClassifier_(max(config.values)) //maximum circle radius to be shown in legend
+        let y = out.boxPadding + (config.title ? out.titleFontSize + out.boxPadding + config.titlePadding : 0) + maxSize * 2
+        let container = lgg
+            .append('g')
+            .attr('fill', 'black')
+            .attr('transform', `translate(${maxSize + out.boxPadding},${y})`) //needs to be dynamic
+            .attr('text-anchor', 'right')
             .selectAll('g')
             .data(config.values)
             .join('g')
-            .attr('class', 'em-pie-size-legend-item')
-            .attr('transform', `translate(${maxSize + out.boxPadding}, ${y})`) // Dynamically move the circles down
-
-        // Append circles to each group
-        legendItems
+        container
             .append('circle')
-            .attr('class', 'em-pie-size-legend-circle')
-            .style('fill', 'none')
+            .attr('fill', 'none')
             .attr('stroke', 'black')
-            .attr('cy', (d) => -m.sizeClassifier_(d)) // Position circles based on their size
-            .attr('r', m.sizeClassifier_) // Radius is calculated from size classifier
+            .attr('cy', (d) => -m.sizeClassifier_(d))
+            .attr('r', m.sizeClassifier_)
 
-        // Append labels to each group
-        legendItems
+        //labels
+        container
             .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('y', (d) => -2 * m.sizeClassifier_(d) - out.labelFontSize - 2) // Position labels relative to circles
-            .attr('x', 30) // Set the x-position for the labels
+            .style('font-size', out.labelFontSize + 'px')
+            .attr('y', (d, i) => {
+                let y = -1 - 2 * m.sizeClassifier_(d) - out.labelFontSize
+                return y
+            })
+            .attr('x', 30)
             .attr('dy', '1.2em')
             .attr('xml:space', 'preserve')
-            .text((d) => d.toLocaleString('en').replace(/,/gi, ' ')) // Format the label text
-
-        // Add lines pointing to the top of the corresponding circle
-        legendItems
+            .text((d) => {
+                return d.toLocaleString('en').replace(/,/gi, ' ')
+            })
+        //line pointing to top of corresponding circle:
+        container
             .append('line')
-            .attr('class', 'em-pie-size-legend-line')
+            .style('stroke-dasharray', 2)
+            .style('stroke', 'grey')
             .attr('x1', 2)
+            .attr('y1', (d, i) => {
+                let y = -1 - 2 * m.sizeClassifier_(d) //add padding
+                return y
+            })
+            .attr('xml:space', 'preserve')
             .attr('x2', 30)
-            .attr('y1', (d) => -2 * m.sizeClassifier_(d)) // Position lines relative to circles
-            .attr('y2', (d) => -2 * m.sizeClassifier_(d)) // Same position for the y2 to make a horizontal line
+            .attr('y2', (d, i) => {
+                let y = -1 - 2 * m.sizeClassifier_(d) //add padding
+                return y
+            })
 
-        // Save the height value for positioning the color legend (if needed)
-        out._sizeLegendHeight = y
+        out._sizeLegendHeight = y //save height value for positioning colorLegend
         return out
     }
 
@@ -162,18 +168,21 @@ export const legend = function (map, config) {
      * @param {*} config color legend config object (colorLegend object specified as property of legend config parameter)
      */
     function buildColorLegend(m, lgg, config) {
-        //container
-        const container = lgg.append('g').attr('class', 'em-pie-color-legend')
+        const svgMap = m.svg()
 
         //draw title
-        if (config.title) {
-            container
-                .append('text')
-                .attr('class', 'em-legend-title')
+        if (config.title)
+            lgg.append('text')
                 .attr('x', out.boxPadding)
                 .attr('y', out._sizeLegendHeight + out.legendSpacing + out.boxPadding + out.titleFontSize)
                 .text(config.title)
-        }
+                .style('font-size', out.titleFontSize + 'px')
+                .style('font-weight', out.titleFontWeight)
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
+
+        //set font family
+        lgg.style('font-family', m.fontFamily_)
 
         //draw legend elements for classes: rectangle + label
         let i = 0
@@ -190,37 +199,52 @@ export const legend = function (map, config) {
             const col = m.catColors()[code] || 'lightgray'
 
             //rectangle
-            container
-                .append('rect')
-                .attr('class', 'em-legend-rect')
+            lgg.append('rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', config.shapeWidth)
                 .attr('height', config.shapeHeight)
-                .style('fill', scs[code])
+                .attr('fill', scs[code])
                 .attr('stroke', 'black')
                 .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
-                    highlightRegions(out.map, code)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
-                    }
+                    // TODO: change this to estat logic of making all other classes transparent?
+                    svgMap
+                        .selectAll('.piechart')
+                        .selectAll("path[code='" + code + "']")
+                        .style('fill', m.nutsrgSelFillSty())
+                    select(this).style('fill', m.nutsrgSelFillSty())
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(out.map)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
-                    }
+                    svgMap
+                        .selectAll('.piechart')
+                        .selectAll("path[code='" + code + "']")
+                        .style('fill', col)
+                    select(this).style('fill', col)
                 })
 
             //label
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
+            lgg.append('text')
                 .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
                 .text(m.catLabels()[code] || code)
+                .style('font-size', out.labelFontSize + 'px')
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
+                .on('mouseover', function () {
+                    svgMap
+                        .selectAll('pattern')
+                        .selectAll("rect[code='" + code + "']")
+                        .style('fill', m.nutsrgSelFillSty())
+                })
+                .on('mouseout', function () {
+                    const col = m.catColors()[code] || 'lightgray'
+                    svgMap
+                        .selectAll('pattern')
+                        .selectAll("rect[code='" + code + "']")
+                        .style('fill', col)
+                })
 
             i++
         }
@@ -235,59 +259,49 @@ export const legend = function (map, config) {
                 i * (config.shapeHeight + config.shapePadding)
 
             //rectangle
-            container
-                .append('rect')
-                .attr('class', 'em-legend-rect')
+            lgg.append('rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', config.shapeWidth)
                 .attr('height', config.shapeHeight)
-                .style('fill', m.noDataFillStyle())
+                .attr('fill', m.noDataFillStyle())
+                .attr('stroke', 'black')
+                .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
-                    highlightRegions(out.map, 'nd')
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
-                    }
+                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.nutsrgSelFillSty())
+                    select(this).style('fill', m.nutsrgSelFillSty())
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(out.map)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, 'nd')
-                    }
+                    const sel = svgMap
+                        .select('#g_nutsrg')
+                        .selectAll("[nd='nd']")
+                        .style('fill', function (d) {
+                            m.noDataFillStyle()
+                        })
+                    select(this).style('fill', m.noDataFillStyle())
                 })
 
             //'no data' label
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
+            lgg.append('text')
                 .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
                 .attr('y', y + config.shapeHeight * 0.5)
+                .attr('dominant-baseline', 'middle')
                 .text(config.noDataText)
+                .style('font-size', out.labelFontSize + 'px')
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
+                .on('mouseover', function () {
+                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.nutsrgSelFillSty())
+                })
+                .on('mouseout', function () {
+                    const sel = svgMap
+                        .select('#g_nutsrg')
+                        .selectAll("[nd='nd']")
+                        .style('fill', function (d) {
+                            m.noDataFillStyle()
+                        })
+                })
         }
-    }
-
-    // Highlight selected segments on mouseover
-    function highlightRegions(map, code) {
-        const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
-
-        // Set all segments to white
-        allSegments.style('fill', 'white')
-
-        // Highlight only the selected segments by restoring their original color
-        const selectedSegments = allSegments.filter("path[code='" + code + "']")
-        selectedSegments.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected segments
-        })
-    }
-
-    // Reset all segments to their original colors on mouseout
-    function unhighlightRegions(map) {
-        const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
-
-        // Restore each segments's original color from the fill___ attribute
-        allSegments.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
-        })
     }
 
     return out

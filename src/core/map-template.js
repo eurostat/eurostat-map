@@ -5,17 +5,11 @@ import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoGraticule, geoGraticule10, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 import { feature } from 'topojson-client'
-import {
-    getBBOXAsGeoJSON,
-    spaceAsThousandSeparator,
-    executeForAllInsets,
-    getFontSizeFromClass,
-    getCSSPropertyFromClass,
-} from './utils'
-
+import { getBBOXAsGeoJSON } from './utils'
+import * as tp from '../tooltip/tooltip'
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
 import { kosovoBnFeatures } from './kosovo'
-import { defineDeprecatedFunctions } from './deprecated'
+import { spaceAsThousandSeparator } from './utils'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -49,9 +43,9 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.proj_ = '3035'
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()
     out.filterGeometriesFunction_ = undefined // user defined filter function
-    out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
+    out.scale_ = '20M' //TODO choose automatically, depending on pixSize ?
     out.geoCenter_ = undefined
-    out.pixelSize_ = undefined
+    out.pixSize_ = undefined
     out.zoomExtent_ = undefined
 
     //common / shared styles
@@ -59,11 +53,21 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //map title
     out.title_ = ''
+    out.titleFontSize_ = 21
+    out.titleFill_ = 'black'
     out.titlePosition_ = undefined
+    out.titleFontWeight_ = 'bold'
+    out.titleStroke_ = 'none'
+    out.titleStrokeWidth_ = 'none'
 
     //map subtitle
     out.subtitle_ = ''
+    out.subtitleFontSize_ = 17
+    out.subtitleFill_ = 'grey'
     out.subtitlePosition_ = undefined
+    out.subtitleFontWeight_ = 100
+    out.subtitleStroke_ = 'none'
+    out.subtitleStrokeWidth_ = 'none'
 
     //map frame (none by default)
     out.frameStroke_ = 'none'
@@ -72,6 +76,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     //scalebar
     out.showScalebar_ = false
     out.scalebarPosition_ = []
+    out.scalebarFontSize_ = 9 //px
     out.scalebarUnits_ = ' km' //label
     out.scalebarTextOffset_ = [0, 12]
     out.scalebarMaxWidth_ = 150 //px
@@ -83,7 +88,14 @@ export const mapTemplate = function (config, withCenterPoints) {
     //tooltip
     //default config
     out.tooltip_ = {
+        maxWidth: '200px',
         fontSize: '14px',
+        background: 'white',
+        padding: '0px',
+        border: '0px',
+        borderRadius: '0px',
+        zIndex: '999999',
+        boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
         transitionDuration: 200,
         xOffset: 0,
         yOffset: 0,
@@ -139,23 +151,61 @@ export const mapTemplate = function (config, withCenterPoints) {
         'UK',
     ]
 
-    //nuts hover color
-    out.hoverColor_ = 'red' // USE CSS
-
+    //nuts styling
+    out.nutsrgFillStyle_ = '#EfEfEf'
+    out.nutsrgSelFillSty_ = 'red' // USE CSS
+    out.nutsbnStroke_ = { 0: 'none', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'grey', co: '#7f7f7f' }
+    out.nutsbnStrokeWidth_ = { 0: 0, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0 }
+    //country borders styling
+    out.cntrgFillStyle_ = '#EfEfEf'
+    out.cntbnStroke_ = { eu: 'black', efta: 'black', cc: 'black', oth: 'black', co: '#7f7f7f' }
+    out.cntbnStrokeWidth_ = { eu: 0.5, efta: 0.5, cc: 0.5, oth: 0.5, co: 0.2 }
+    //world map
+    out.worldFillStyle_ = '#EfEfEf'
+    out.worldStroke_ = 'black'
+    out.worldStrokeWidth_ = 1
+    out.worldCoastStroke_ = 'none'
+    out.worldCoastStrokeWidth_ = 0.3
     //sea
+    out.seaFillStyle_ = 'white'
     out.drawCoastalMargin_ = false
+    out.coastalMarginColor_ = '#c2daed'
+    out.coastalMarginWidth_ = 5
     out.coastalMarginStdDev_ = 2
     //graticule
     out.drawGraticule_ = false
+    out.graticuleStroke_ = 'lightgray'
+    out.graticuleStrokeWidth_ = 1
 
     //labelling (country names and geographical features)
     out.labelling_ = false
     out.labelsConfig_ = DEFAULTLABELS // allow user to override map labels | see ./labels.js for example config
     out.statLabelsPositions_ = STATLABELPOSITIONS // allow user to override positions of statistical labels
     out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
-    out.labelShadowsToShow_ = ['countries', 'seas']
+    out.labelFill_ = {
+        seas: '#003399',
+        countries: 'black',
+        cc: 'black',
+        values: 'black',
+    }
+    out.labelStroke_ = {
+        seas: 'none',
+        countries: 'none',
+        cc: 'none',
+        values: 'none',
+    }
+    out.labelStrokeWidth_ = { seas: 0.5, countries: 0.5, cc: 0.5, values: 0.5 }
+    out.labelOpacity_ = { seas: 1, countries: 1, cc: 1, values: 1 }
+    out.labelValuesFontSize_ = 10 //when labelsToShow includes "values", this is their font size
     out.labelShadow_ = true
-
+    out.labelShadowsToShow_ = ['countries', 'seas', 'cc', 'values'] //accepted: "countries", "cc","seas", "values"
+    out.labelShadowWidth_ = { countries: 1, cc: 1, values: 1, seas: 0.2 }
+    out.labelShadowColor_ = {
+        seas: 'white',
+        countries: 'white',
+        cc: 'white',
+        values: 'white',
+    }
     out.labelFilterFunction_ = (rg, map) => {
         return rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo_[1] || map.geo_ == 'SJ_SV'
     } // filter the regions used for the labels array
@@ -222,18 +272,14 @@ export const mapTemplate = function (config, withCenterPoints) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    for (const att in out) {
+    for (const att in out)
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
             return out
         }
-    }
 
-    // warn existing users of functions that have been banished to the shadow realm.
-    defineDeprecatedFunctions(out)
-
-    //special ones which affect also the insets
+        //special ones which affect also the insets
     ;['tooltip_', 'nuts2jsonBaseURL_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -248,20 +294,47 @@ export const mapTemplate = function (config, withCenterPoints) {
             }
 
             //recursive call to inset components
-            if (out.insetTemplates_) {
-                executeForAllInsets(
-                    out.insetTemplates_,
-                    out.svgId_,
-                    (inset, value) => {
-                        const fnName = att.substring(0, att.length - 1)
-                        inset[fnName](value)
-                    },
-                    v
-                )
-            }
+            setPropertyValueForAllInsets(att, v)
+
             return out
         }
     })
+
+    // sets a map setting(property) value for all map insets (e.g. set tooltip for all insets)
+    const setPropertyValueForAllInsets = function (property, value) {
+        let fnName = property.substring(0, property.length - 1)
+        if (out.insetTemplates_) {
+            for (const geo in out.insetTemplates_) {
+                // insets with same geo that share the same parent inset
+                if (Array.isArray(out.insetTemplates_[geo])) {
+                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                        // insets with same geo that do not share the same parent inset
+                        if (Array.isArray(out.insetTemplates_[geo][i])) {
+                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
+                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
+                                // set value of inset map property
+                                out.insetTemplates_[geo][i][c][fnName](value)
+                            }
+                        } else {
+                            // set value of inset map property
+                            out.insetTemplates_[geo][i][fnName](value)
+                        }
+                    }
+                } else {
+                    out.insetTemplates_[geo][fnName](value)
+                }
+            }
+        }
+    }
+
+    // override deprecated tooltipText
+    out.tooltipText = function (v) {
+        console.log(
+            'map.tooltipText() is now deprecated. Please use map.tooltip(config.textFunction) instead. See API reference for details.'
+        )
+        out.tooltip_.textFunction = v
+        return out
+    }
 
     //title getter and setter
     out.title = function (v) {
@@ -301,8 +374,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.drawGraticule_ = v
 
         //update graticule
-        let graticule = out.svg_ ? out.svg().select('#em-graticule') : null
-        let zg = out.svg_ ? out.svg_.select('#em-zoom-group-' + out.svgId_) : null
+        let graticule = out.svg_ ? out.svg().select('#g_gra') : null
+        let zg = out.svg_ ? out.svg_.select('#zoomgroup' + out.svgId_) : null
 
         // if existing and argument is false
         if (graticule) {
@@ -311,29 +384,171 @@ export const mapTemplate = function (config, withCenterPoints) {
                 graticule.remove()
 
                 // if map already created and argument is true
-            } else if (out._geom.gra && out._pathFunction && zg && v == true) {
+            } else if (out._geom.gra && out._geom.path && zg && v == true) {
                 //remove existing graticule
                 graticule.remove()
                 // add new graticule
                 zg.append('g')
-                    .attr('id', 'em-graticule')
+                    .attr('id', 'g_gra')
+                    .style('fill', 'none')
+                    .style('stroke', out.graticuleStroke())
+                    .style('stroke-width', out.graticuleStrokeWidth())
                     .selectAll('path')
                     .data(out._geom.gra)
                     .enter()
                     .append('path')
-                    .attr('d', out._pathFunction)
-                    .attr('class', 'em-graticule')
+                    .attr('d', out._geom.path)
+                    .attr('class', 'gra')
 
                 out.svg()
-                    .select('#em-graticule')
+                    .select('#g_gra')
                     .each(function () {
-                        // move graticule behind land mass
+                        // move graticule to back (in front of sea)
                         out.geo_ == 'WORLD'
                             ? this.parentNode.insertBefore(this, this.parentNode.childNodes[3])
                             : this.parentNode.insertBefore(this, this.parentNode.childNodes[1])
                     })
             }
         }
+        return out
+    }
+
+    // sea color override
+    out.seaFillStyle = function (v) {
+        if (!arguments.length) return out.seaFillStyle_
+        out.seaFillStyle_ = v
+
+        //update existing sea
+        if (out.geo_ == 'WORLD') {
+            if (out.svg_) {
+                let sea = out.svg_.select('#sphere')
+                if (sea) sea.style('fill', out.seaFillStyle_)
+            }
+        } else {
+            if (out.svg_) {
+                let sea = out.svg_.selectAll('#sea')
+                if (sea) sea.style('fill', out.seaFillStyle_)
+            }
+        }
+
+        //update insets
+        for (const geo in out.insetTemplates_) {
+            if (Array.isArray(out.insetTemplates_[geo])) {
+                // check for insets within insets
+                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                    //check for insets within insets within insets
+                    if (Array.isArray(out.insetTemplates_[geo][i])) {
+                        for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
+                            let inset = out.insetTemplates_[geo][i][n]
+                            //set
+                            inset.seaFillStyle_ = out.seaFillStyle_
+                        }
+                    } else {
+                        let inset = out.insetTemplates_[geo][i]
+                        //set
+                        inset.seaFillStyle_ = out.seaFillStyle_
+                    }
+                }
+            } else {
+                let inset = out.insetTemplates_[geo]
+                //set
+                inset.seaFillStyle_ = out.seaFillStyle_
+            }
+        }
+
+        return out
+    }
+
+    // cntrg land color override
+    out.cntrgFillStyle = function (v) {
+        if (!arguments.length) return out.cntrgFillStyle_
+        out.cntrgFillStyle_ = v
+
+        //update existing land
+        if (out.svg_) {
+            if (out.geo_ == 'WORLD') {
+                let cntrg = out.svg().selectAll('.worldrg')
+                if (cntrg) {
+                    // only change fill for world regions without an ecl class
+                    cntrg.attr('fill', (region, i, nodes) => {
+                        let node = select(nodes[i])
+                        if (!node.attr('ecl')) {
+                            return out.cntrgFillStyle_
+                        } else {
+                            // leave fill as it is
+                            return node.attr('fill')
+                        }
+                    })
+                }
+            } else {
+                let cntrg = out.svg().selectAll('.cntrg')
+                if (cntrg) cntrg.attr('fill', out.cntrgFillStyle_)
+            }
+
+            //update insets
+            for (const geo in out.insetTemplates_) {
+                if (Array.isArray(out.insetTemplates_[geo])) {
+                    // check for insets within insets
+                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                        //check for insets within insets within insets
+                        if (Array.isArray(out.insetTemplates_[geo][i])) {
+                            for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
+                                let inset = out.insetTemplates_[geo][i][n]
+                                //set
+                                inset.cntrgFillStyle_ = out.cntrgFillStyle_
+                            }
+                        } else {
+                            let inset = out.insetTemplates_[geo][i]
+                            //set
+                            inset.cntrgFillStyle_ = out.cntrgFillStyle_
+                        }
+                    }
+                } else {
+                    let inset = out.insetTemplates_[geo]
+                    //set
+                    inset.cntrgFillStyle_ = out.cntrgFillStyle_
+                }
+            }
+        }
+
+        return out
+    }
+
+    // nutsrg land color override
+    out.nutsrgFillStyle = function (v) {
+        if (!arguments.length) return out.nutsrgFillStyle_
+        out.nutsrgFillStyle_ = v
+
+        //update existing default nutsrg color
+        if (out.svg_) {
+            out.updateStyle()
+        }
+
+        //update insets
+        for (const geo in out.insetTemplates_) {
+            if (Array.isArray(out.insetTemplates_[geo])) {
+                // check for insets within insets
+                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                    //check for insets within insets within insets
+                    if (Array.isArray(out.insetTemplates_[geo][i])) {
+                        for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
+                            let inset = out.insetTemplates_[geo][i][n]
+                            //set
+                            inset.nutsrgFillStyle_ = out.nutsrgFillStyle_
+                        }
+                    } else {
+                        let inset = out.insetTemplates_[geo][i]
+                        //set
+                        inset.nutsrgFillStyle_ = out.nutsrgFillStyle_
+                    }
+                }
+            } else {
+                let inset = out.insetTemplates_[geo]
+                //set
+                inset.nutsrgFillStyle_ = out.nutsrgFillStyle_
+            }
+        }
+
         return out
     }
 
@@ -344,20 +559,20 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //update existing
         if (out.svg_) {
-            let margin = selectAll('#em-coast-margin')
-            let filter = select('#em-coastal-blur')
-            let zg = select('#em-zoom-group-' + out.svgId_) || null
+            let margin = selectAll('#g_coast_margin')
+            let filter = select('#coastal_blur')
+            let zg = select('#zoomgroup' + out.svgId_) || null
             if (margin._groups[0][0] && v == false) {
                 // remove existing
                 margin.remove()
-            } else if (v == true && out._pathFunction && zg) {
+            } else if (v == true && out._geom.path && zg) {
                 //remove existing graticule
                 margin.remove()
                 filter.remove()
                 //add filter
                 out.svg_
                     .append('filter')
-                    .attr('id', 'em-coastal-blur')
+                    .attr('id', 'coastal_blur')
                     .attr('x', '-200%')
                     .attr('y', '-200%')
                     .attr('width', '400%')
@@ -369,14 +584,21 @@ export const mapTemplate = function (config, withCenterPoints) {
                 //draw for main map - geometries are still in memory so no rebuild needed
                 const drawNewCoastalMargin = (map) => {
                     // zoom group might not be inside main map (out.svg_)
-                    const zoomGroup = select('#em-zoom-group-' + map.svgId_)
+                    const zoomGroup = select('#zoomgroup' + map.svgId_)
                     //draw new coastal margin
-                    const cg = zoomGroup.append('g').attr('id', 'em-coast-margin')
-
+                    const cg = zoomGroup
+                        .append('g')
+                        .attr('id', 'g_coast_margin')
+                        .style('fill', 'none')
+                        .style('stroke-width', map.coastalMarginWidth_)
+                        .style('stroke', map.coastalMarginColor_)
+                        .style('filter', 'url(#coastal_blur)')
+                        .style('stroke-linejoin', 'round')
+                        .style('stroke-linecap', 'round')
                     //countries bn
                     if (map._geom.cntbn)
                         cg.append('g')
-                            .attr('id', 'em-coast-margin-cnt')
+                            .attr('id', 'g_coast_margin_cnt')
                             .selectAll('path')
                             .data(map._geom.cntbn)
                             .enter()
@@ -384,11 +606,11 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return bn.properties.co === 'T'
                             })
                             .append('path')
-                            .attr('d', map._pathFunction)
+                            .attr('d', map._geom.path)
                     //nuts bn
                     if (map._geom.nutsbn)
                         cg.append('g')
-                            .attr('id', 'em-coast-margin-nuts')
+                            .attr('id', 'g_coast_margin_nuts')
                             .selectAll('path')
                             .data(map._geom.nutsbn)
                             .enter()
@@ -396,11 +618,11 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return bn.properties.co === 'T'
                             })
                             .append('path')
-                            .attr('d', map._pathFunction)
+                            .attr('d', map._geom.path)
                     //world bn
                     if (map._geom.worldbn)
                         cg.append('g')
-                            .attr('id', 'em-coast-margin-nuts')
+                            .attr('id', 'g_coast_margin_nuts')
                             .selectAll('path')
                             .data(map._geom.worldbn)
                             .enter()
@@ -408,17 +630,43 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return bn.properties.COAS_FLAG === 'T'
                             })
                             .append('path')
-                            .attr('d', map._pathFunction)
+                            .attr('d', map._geom.path)
                 }
 
                 //draw for insets - requires geometries so we have to rebuild base template
-                if (out.insetTemplates_ && out.drawCoastalMargin_) {
-                    executeForAllInsets(out.insetTemplates_, out.svgId_, drawNewCoastalMargin)
-                    drawNewCoastalMargin(out)
+                for (const geo in out.insetTemplates_) {
+                    if (Array.isArray(out.insetTemplates_[geo])) {
+                        // check for insets within insets
+                        for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                            //check for insets within insets within insets
+                            if (Array.isArray(out.insetTemplates_[geo][i])) {
+                                for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
+                                    let inset = out.insetTemplates_[geo][i][n]
+                                    //setter for inset margin
+                                    inset.drawCoastalMargin_ = out.drawCoastalMargin_
+                                    // redraw
+                                    if (out.drawCoastalMargin_) drawNewCoastalMargin(inset)
+                                }
+                            } else {
+                                let inset = out.insetTemplates_[geo][i]
+                                //setter for inset margin
+                                inset.drawCoastalMargin_ = out.drawCoastalMargin_
+                                // redraw
+                                if (out.drawCoastalMargin_) drawNewCoastalMargin(inset)
+                            }
+                        }
+                    } else {
+                        let inset = out.insetTemplates_[geo]
+                        //setter for inset margin
+                        inset.drawCoastalMargin_ = out.drawCoastalMargin_
+                        if (out.drawCoastalMargin_) drawNewCoastalMargin(inset)
+                    }
                 }
 
+                if (out.drawCoastalMargin_) drawNewCoastalMargin(out)
+
                 // move margin to back (in front of sea)
-                selectAll('#em-coast-margin').each(function () {
+                selectAll('#g_coast_margin').each(function () {
                     out.geo_ == 'WORLD'
                         ? this.parentNode.insertBefore(this, this.parentNode.childNodes[3])
                         : this.parentNode.insertBefore(this, this.parentNode.childNodes[1])
@@ -459,6 +707,48 @@ export const mapTemplate = function (config, withCenterPoints) {
                 let inset = out.insetTemplates_[geo]
                 //set
                 inset.coastalMarginWidth_ = out.coastalMarginWidth_
+                //redraw
+                inset.drawCoastalMargin(true)
+            }
+        }
+
+        //redraw
+        out.drawCoastalMargin(true)
+
+        return out
+    }
+
+    // coastal margin color override
+    out.coastalMarginColor = function (v) {
+        if (!arguments.length) return out.coastalMarginColor_
+        out.coastalMarginColor_ = v
+
+        //update insets
+        for (const geo in out.insetTemplates_) {
+            if (Array.isArray(out.insetTemplates_[geo])) {
+                // check for insets within insets
+                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                    //check for insets within insets within insets
+                    if (Array.isArray(out.insetTemplates_[geo][i])) {
+                        for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
+                            let inset = out.insetTemplates_[geo][i][n]
+                            //set
+                            inset.coastalMarginColor_ = out.coastalMarginColor_
+                            //redraw
+                            inset.drawCoastalMargin(true)
+                        }
+                    } else {
+                        let inset = out.insetTemplates_[geo][i]
+                        //set
+                        inset.coastalMarginColor_ = out.coastalMarginColor_
+                        //redraw
+                        inset.drawCoastalMargin(true)
+                    }
+                }
+            } else {
+                let inset = out.insetTemplates_[geo]
+                //set
+                inset.coastalMarginColor_ = out.coastalMarginColor_
                 //redraw
                 inset.drawCoastalMargin(true)
             }
@@ -590,7 +880,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     }
 
     /**
-     * Requests geographic data and then builds the map template
+     * Requests geographic data and builds the map template
      */
     out.updateGeoMapTemplate = function (callback) {
         //erase previous data
@@ -670,11 +960,8 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.buildMapTemplateBase = function () {
         //get svg element. Create it if it does not exists
         let svg = select('#' + out.svgId())
-        if (svg.size() == 0) {
-            svg = select('body').append('svg').attr('id', out.svgId())
-        }
-        svg.attr('class', 'em-map')
-        out.svg_ = svg
+        if (svg.size() == 0) svg = select('body').append('svg').attr('id', out.svgId())
+        out.svg(svg)
 
         //set container for cases where container contains various maps
         if (!out.containerId_) out.containerId_ = out.svgId_
@@ -701,16 +988,15 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // each map template needs a clipPath to avoid overflow. See GISCO-2707
         svg.append('defs')
-            .attr('class', 'em-defs')
             .append('clipPath')
-            .attr('id', out.svgId_ + '-clip-path')
+            .attr('id', out.svgId_ + '_clipP')
             .append('path')
             .attr('d', convertRectangles(0, 0, out.width_, out.height_))
 
         if (out.drawCoastalMargin_)
             //define filter for coastal margin
             svg.append('filter')
-                .attr('id', 'em-coastal-blur')
+                .attr('id', 'coastal_blur')
                 .attr('x', '-200%')
                 .attr('y', '-200%')
                 .attr('width', '400%')
@@ -722,15 +1008,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         //create drawing group, as first child
         const dg = svg
             .insert('g', ':first-child')
-            .attr('id', 'em-drawing-' + out.svgId_)
-            .attr('class', 'em-drawing-group')
-            .attr('clip-path', 'url(#' + out.svgId_ + '-clip-path' + ')')
+            .attr('id', 'drawing' + out.svgId_)
+            .attr('class', 'estatmap-drawing-group')
+            .attr('clip-path', 'url(#' + out.svgId_ + '_clipP' + ')')
 
         //create main zoom group
-        const zg = dg
-            .append('g')
-            .attr('id', 'em-zoom-group-' + out.svgId_)
-            .attr('class', 'em-zoom-group') //out.geo changed to out.svgId in order to be unique
+        const zg = dg.append('g').attr('id', 'zoomgroup' + out.svgId_) //out.geo changed to out.svgId in order to be unique
 
         //insets
         out.removeInsets() //remove existing
@@ -738,18 +1021,31 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //draw frame
         dg.append('rect')
-            .attr('id', 'em-frame-' + out.geo_)
-            .attr('class', 'em-frame')
+            .attr('id', 'frame' + out.geo_)
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', out.width_)
             .attr('height', out.height_)
+            .style('stroke-width', out.frameStrokeWidth_)
+            .style('stroke', out.frameStroke_)
+            .style('fill', 'none')
 
         //make drawing group zoomable
         if (out.zoomExtent()) {
             let xoo = zoom()
                 .scaleExtent(out.zoomExtent())
                 .on('zoom', function (e) {
+                    const k = e.transform.k
+                    const cs = ['gra', 'bn_0', /*"bn_1", "bn_2", "bn_3",*/ 'bn_co', 'cntbn', 'symbol']
+                    //for (let i = 0; i < cs.length; i++) {
+                    // change border thickness?
+                    //     out.svg()
+                    //         .selectAll('.' + cs[i])
+                    //         .style('stroke-width', function (d) {
+                    //             return 1 / k + 'px'
+                    //         })
+                    // }
+
                     zg.attr('transform', e.transform)
                 })
             svg.call(xoo)
@@ -784,11 +1080,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         // add container to drawing group
         // Cannot read properties of undefined (reading 'svgId')
         let svg = select('#' + out.svgId_)
-        let drawingGroup = svg.select('#em-drawing-' + out.svgId_)
+        let drawingGroup = svg.select('#drawing' + out.svgId_)
         const ing = drawingGroup
             .append('g')
-            .attr('id', 'em-insets-group')
-            .attr('class', 'em-insets')
+            .attr('id', 'insetsgroup')
             .attr('transform', 'translate(' + out.insetBoxPosition_[0] + ',' + out.insetBoxPosition_[1] + ')')
 
         if (out.insets_ === 'default') {
@@ -832,34 +1127,40 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    const defineGeoCenter = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            out.geoCenter(defaultPosition.geoCenter)
+    /**
+     * Buid an empty map template, based on the geometries only.
+     */
+    out.buildMapTemplate = function () {
+        //prepare map tooltip
+        if (out.tooltip_) {
+            out._tooltip = tp.tooltip(out.tooltip_)
         } else {
-            out.geoCenter([0.5 * (geoData.bbox[0] + geoData.bbox[2]), 0.5 * (geoData.bbox[1] + geoData.bbox[3])])
+            //no config specified, use default
+            out._tooltip = tp.tooltip()
         }
-    }
 
-    const definePixelSize = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            out.pixelSize((defaultPosition.pixelSize * 800) / out.width_)
-        } else {
-            out.pixelSize(
-                Math.min((geoData.bbox[2] - geoData.bbox[0]) / out.width_, (geoData.bbox[3] - geoData.bbox[1]) / out.height_)
-            )
-        }
-    }
+        //geo center and extent: if not specified, use the default one, or the compute one from the topojson bbox
+        const dp = _defaultPosition[out.geo_ + '_' + out.proj_]
+        if (!out.geoCenter())
+            if (dp) out.geoCenter(dp.geoCenter)
+            else out.geoCenter([0.5 * (geoData.bbox[0] + geoData.bbox[2]), 0.5 * (geoData.bbox[1] + geoData.bbox[3])])
+        //pixel size (zoom level): if not specified, compute value from SVG dimensions and topojson geographical extent
+        if (!out.pixSize_)
+            if (dp) {
+                out.pixSize((dp.pixSize * 800) / out.width_)
+            } else {
+                out.pixSize(
+                    Math.min((geoData.bbox[2] - geoData.bbox[0]) / out.width_, (geoData.bbox[3] - geoData.bbox[1]) / out.height_)
+                )
+            }
 
-    const defineProjection = function () {
         //SVG drawing function
-        //compute geo bbox from geocenter, pixelSize and SVG dimensions
+        //compute geo bbox from geocenter, pixsize and SVG dimensions
         const bbox = [
-            out.geoCenter_[0] - 0.5 * out.pixelSize_ * out.width_,
-            out.geoCenter_[1] - 0.5 * out.pixelSize_ * out.height_,
-            out.geoCenter_[0] + 0.5 * out.pixelSize_ * out.width_,
-            out.geoCenter_[1] + 0.5 * out.pixelSize_ * out.height_,
+            out.geoCenter_[0] - 0.5 * out.pixSize_ * out.width_,
+            out.geoCenter_[1] - 0.5 * out.pixSize_ * out.height_,
+            out.geoCenter_[0] + 0.5 * out.pixSize_ * out.width_,
+            out.geoCenter_[1] + 0.5 * out.pixSize_ * out.height_,
         ]
 
         //WORLD geo uses 4326 geometries and reprojects to 54030 using d3
@@ -875,30 +1176,11 @@ export const mapTemplate = function (config, withCenterPoints) {
                 ? out.projectionFunction_
                 : geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(bbox))
         }
-    }
 
-    const definePathFunction = function () {
-        out._pathFunction = geoPath().projection(out._projection)
-    }
-
-    /**
-     * Buid an empty map template, based on the geometries only.
-     */
-    out.buildMapTemplate = function () {
-        //geo center and extent: if not specified, use the default one, or the compute one from the topojson bbox
-        if (!out.geoCenter_) {
-            defineGeoCenter()
-        }
-
-        //pixel size (zoom level): if not specified, compute value from SVG dimensions and topojson geographical extent
-        if (!out.pixelSize_) {
-            definePixelSize()
-        }
-
-        defineProjection()
-        definePathFunction()
+        out._geom.path = geoPath().projection(out._projection)
 
         //decode topojson to geojson
+
         if (out.geo_ == 'WORLD') {
             out._geom.worldrg = feature(geoData, geoData.objects.CNTR_RG_20M_2020_4326).features
             out._geom.worldbn = feature(geoData, geoData.objects.CNTR_BN_20M_2020_4326).features
@@ -913,65 +1195,117 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //prepare drawing group
-        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
+        const zg = out.svg().select('#zoomgroup' + out.svgId_)
         zg.selectAll('*').remove()
 
         //draw background rectangle
         zg.append('rect')
             .attr('id', 'sea')
-            .attr('class', 'em-sea')
             .attr('x', -5 * out.width_)
             .attr('y', -5 * out.height_)
             .attr('width', 11 * out.width_)
             .attr('height', 11 * out.height_)
+            .style('fill', () => (out.geo_ == 'WORLD' ? 'white' : out.seaFillStyle_)) //for world templates sea colour is applied to the sphere
 
         //sphere for world map
         if (out.geo_ == 'WORLD') {
             zg.append('path')
                 .datum({ type: 'Sphere' })
                 .attr('id', 'sphere')
-                .attr('d', out._pathFunction)
-                .attr('class', 'em-graticule')
+                .attr('d', out._geom.path)
+                .attr('stroke', out.graticuleStroke())
+                .attr('stroke-width', out.graticuleStrokeWidth())
+                .style('fill', out.seaFillStyle_)
         }
 
         if (out.drawCoastalMargin_) {
-            addCoastalMarginToMap()
+            //draw coastal margin
+            const cg = zg
+                .append('g')
+                .attr('id', 'g_coast_margin')
+                .style('fill', 'none')
+                .style('stroke-width', out.coastalMarginWidth_)
+                .style('stroke', out.coastalMarginColor_)
+                .style('filter', 'url(#coastal_blur)')
+                .style('stroke-linejoin', 'round')
+                .style('stroke-linecap', 'round')
+            //countries bn
+            if (out._geom.cntbn)
+                cg.append('g')
+                    .attr('id', 'g_coast_margin_cnt')
+                    .selectAll('path')
+                    .data(out._geom.cntbn)
+                    .enter()
+                    .filter(function (bn) {
+                        return bn.properties.co === 'T'
+                    })
+                    .append('path')
+                    .attr('d', out._geom.path)
+            //nuts bn
+            if (out._geom.nutsbn)
+                cg.append('g')
+                    .attr('id', 'g_coast_margin_nuts')
+                    .selectAll('path')
+                    .data(out._geom.nutsbn)
+                    .enter()
+                    .filter(function (bn) {
+                        return bn.properties.co === 'T'
+                    })
+                    .append('path')
+                    .attr('d', out._geom.path)
+            //world bn
+            if (out._geom.worldbn)
+                cg.append('g')
+                    .attr('id', 'g_coast_margin_nuts')
+                    .selectAll('path')
+                    .data(out._geom.worldbn)
+                    .enter()
+                    .filter(function (bn) {
+                        return bn.properties.COAS_FLAG === 'T'
+                    })
+                    .append('path')
+                    .attr('d', out._geom.path)
         }
 
         if (out._geom.gra && out.drawGraticule_) {
             //draw graticule
             zg.append('g')
-                .attr('id', 'em-graticule')
-                .attr('class', 'em-graticule')
+                .attr('id', 'g_gra')
+                .style('fill', 'none')
+                .style('stroke', out.graticuleStroke())
+                .style('stroke-width', out.graticuleStrokeWidth())
                 .selectAll('path')
                 .data(out._geom.gra)
                 .enter()
                 .append('path')
-                .attr('d', out._pathFunction)
+                .attr('d', out._geom.path)
+                .attr('class', 'gra')
         }
 
         //draw country regions
         if (out._geom.cntrg) {
             zg.append('g')
-                .attr('id', 'em-cntrg')
-                .attr('class', 'em-cntrg')
+                .attr('id', 'g_cntrg')
                 .selectAll('path')
                 .data(out._geom.cntrg)
                 .enter()
                 .append('path')
-                .attr('d', out._pathFunction)
+                .attr('d', out._geom.path)
+                .attr('class', 'cntrg')
+                .attr('fill', out.cntrgFillStyle())
         }
 
         //draw world map
         if (out._geom.worldrg) {
             zg.append('g')
-                .attr('id', 'em-worldrg')
-                .attr('class', 'em-worldrg')
+                .attr('id', 'g_worldrg')
                 .selectAll('path')
                 .data(out._geom.worldrg)
                 .enter()
                 .append('path')
-                .attr('d', out._pathFunction)
+                .attr('d', out._geom.path)
+                .attr('class', 'worldrg')
+                .attr('fill', out.worldFillStyle_)
         }
 
         //draw NUTS regions
@@ -987,14 +1321,15 @@ export const mapTemplate = function (config, withCenterPoints) {
                 ;[out._geom.mixed.rg0, out._geom.mixed.rg1, out._geom.mixed.rg2, out._geom.mixed.rg3].forEach((r, i) => {
                     //append each nuts level to map
                     zg.append('g')
-                        .attr('id', 'em-nutsrg')
-                        .attr('class', 'em-nutsrg')
+                        .attr('id', 'g_nutsrg')
                         .selectAll('path')
                         .data(r)
                         .enter()
                         .append('path')
-                        .attr('d', out._pathFunction)
+                        .attr('d', out._geom.path)
+                        .attr('class', 'nutsrg')
                         .attr('lvl', i) //to be able to distinguish nuts levels
+                        .attr('fill', out.nutsrgFillStyle_)
                 })
 
                 //add kosovo
@@ -1003,33 +1338,38 @@ export const mapTemplate = function (config, withCenterPoints) {
                     let kosovoBn = feature(kosovoBnFeatures[out.scale_], 'nutsbn_1').features
                     if (out.bordersToShow_.includes('cc')) {
                         zg.append('g')
-                            .attr('id', 'em-kosovo-bn')
-                            .attr('class', 'em-kosovo-bn')
+                            .attr('id', 'g_kosovo')
+                            .style('fill', 'none')
+                            //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                             .selectAll('path')
                             .data(kosovoBn)
                             .enter()
                             .append('path')
-                            .attr('d', out._pathFunction)
+                            .attr('d', out._geom.path)
+                            .style('stroke', 'grey')
+                            .style('stroke-width', 0.3)
                     }
                 }
             } else {
                 // when nutsLvl is not 'mixed'
                 zg.append('g')
-                    .attr('id', 'em-nutsrg')
-                    .attr('class', 'em-nutsrg')
+                    .attr('id', 'g_nutsrg')
                     .selectAll('path')
                     .data(out._geom.nutsrg)
                     .enter()
                     .append('path')
-                    .attr('d', out._pathFunction)
+                    .attr('d', out._geom.path)
+                    .attr('class', 'nutsrg')
+                    .attr('fill', out.nutsrgFillStyle_)
             }
         }
 
         //draw country boundaries
         if (out._geom.cntbn) {
             zg.append('g')
-                .attr('id', 'em-cntbn')
-                .attr('class', 'em-cntbn')
+                .attr('id', 'g_cntbn')
+                .style('fill', 'none')
+                //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                 .selectAll('path')
                 .data(out._geom.cntbn)
                 .enter()
@@ -1041,9 +1381,33 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.bordersToShow_.includes('oth') && bn.properties.oth == 'T') return bn
                     if (out.bordersToShow_.includes('co') && bn.properties.co == 'T') return bn
                 })
-                .attr('d', out._pathFunction)
+                .attr('d', out._geom.path)
                 .attr('class', function (bn) {
-                    return bn.properties.co === 'T' ? 'em-bn-co' : 'em-cntbn'
+                    return bn.properties.co === 'T' ? 'bn_co' : 'cntbn'
+                })
+                .style('stroke', function (bn) {
+                    //coastal boundaries
+                    if (bn.properties.co === 'T') return out.cntbnStroke_.co
+                    //eu borders
+                    if (bn.properties.eu === 'T') return out.cntbnStroke_.eu
+                    //efta borders
+                    if (bn.properties.efta === 'T') return out.cntbnStroke_.efta
+                    //cc borders
+                    if (bn.properties.cc === 'T') return out.cntbnStroke_.cc
+                    //other borders
+                    if (bn.properties.oth === 'T') return out.cntbnStroke_.oth
+                })
+                .style('stroke-width', function (bn) {
+                    //coastal boundaries
+                    if (bn.properties.co === 'T') return out.cntbnStrokeWidth_.co + 'px'
+                    //eu borders
+                    if (bn.properties.eu === 'T') return out.cntbnStrokeWidth_.eu + 'px'
+                    //efta borders
+                    if (bn.properties.efta === 'T') return out.cntbnStrokeWidth_.efta + 'px'
+                    //cc borders
+                    if (bn.properties.cc === 'T') return out.cntbnStrokeWidth_.cc + 'px'
+                    //other borders
+                    if (bn.properties.oth === 'T') return out.cntbnStrokeWidth_.oth + 'px'
                 })
         }
 
@@ -1053,8 +1417,9 @@ export const mapTemplate = function (config, withCenterPoints) {
                 return bn2.properties.lvl - bn1.properties.lvl
             })
             zg.append('g')
-                .attr('id', 'em-nutsbn')
-                .attr('class', 'em-nutsbn')
+                .attr('id', 'g_nutsbn')
+                .style('fill', 'none')
+                //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                 .selectAll('path')
                 .data(out._geom.nutsbn)
                 .enter()
@@ -1066,17 +1431,36 @@ export const mapTemplate = function (config, withCenterPoints) {
                     if (out.bordersToShow_.includes('co') && bn.properties.co == 'T') return bn
                 })
                 .append('path')
-                .attr('d', out._pathFunction)
+                .attr('d', out._geom.path)
                 .attr('class', function (bn) {
-                    let props = bn.properties
-                    //KOSOVO
-                    if (props.id > 100000) {
-                        return 'em-kosovo-bn'
-                    }
-                    if (props.co === 'T') return 'em-bn-co'
-                    const cl = ['em-bn-' + props.lvl]
-                    //if (bn.oth === "T") cl.push("bn-oth");
+                    bn = bn.properties
+                    if (bn.co === 'T') return 'bn_co'
+                    const cl = ['bn_' + bn.lvl]
+                    //if (bn.oth === "T") cl.push("bn_oth");
                     return cl.join(' ')
+                })
+                .style('stroke', function (bn) {
+                    bn = bn.properties
+                    if (bn.co === 'T') return out.nutsbnStroke_.co || '#1f78b4'
+                    //if (bn.oth === "T") return out.nutsbnStroke_.oth || "#444";
+
+                    //KOSOVO
+                    if (bn.id > 100000) {
+                        return '#4f4f4f'
+                    }
+
+                    return out.nutsbnStroke_[bn.lvl] || '#777'
+                })
+                .style('stroke-width', function (bn) {
+                    bn = bn.properties
+                    if (bn.co === 'T') return out.nutsbnStrokeWidth_.co
+                    //KOSOVO
+                    if (bn.id > 100000) {
+                        return 0.2
+                    }
+                    if (bn.lvl > 0) return out.nutsbnStrokeWidth_[bn.lvl]
+                    //if (bn.oth === "T") return out.nutsbnStrokeWidth_.oth || 1;
+                    return out.nutsbnStrokeWidth_[bn.lvl]
                 })
 
             if (out.geo_ == 'EUR' && out.proj == '3035') {
@@ -1084,52 +1468,156 @@ export const mapTemplate = function (config, withCenterPoints) {
                 let kosovoBn = feature(kosovoBnFeatures[out.scale_], 'nutsbn_1').features
                 if (out.bordersToShow_.includes('cc')) {
                     zg.append('g')
-                        .attr('id', 'em-kosovo-bn')
-                        .attr('class', 'em-kosovo-bn')
+                        .attr('id', 'g_kosovo')
+                        .style('fill', 'none')
+                        //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                         .selectAll('path')
                         .data(kosovoBn)
                         .enter()
                         .append('path')
-                        .attr('d', out._pathFunction)
+                        .attr('d', out._geom.path)
+                        .style('stroke', 'grey')
+                        .style('stroke-width', 0.3)
                 }
             }
         }
 
         //draw world boundaries
-        if (out._geom.worldbn) {
+        if (out._geom.worldbn)
             zg.append('g')
-                .attr('id', 'em-worldbn')
-                .attr('class', 'em-worldbn')
+                .attr('id', 'g_worldbn')
+                .style('fill', 'none')
+                //.style("stroke-linecap", "round").style("stroke-linejoin", "round")
                 .selectAll('path')
                 .data(out._geom.worldbn)
                 .enter()
                 .append('path')
-                .attr('d', out._pathFunction)
-                .attr('class', function (bn) {
+                .attr('d', out._geom.path)
+                //.attr("class", function (bn) { return (bn.properties.COAS_FLAG === "F") ? "bn_co" : "worldbn" })
+                //.attr("id", (bn) => bn.properties.CNTR_BN_ID)
+                .style('stroke', function (bn) {
                     if (bn.properties.POL_STAT > 0) {
                         //disputed
-                        return 'em-bn-d'
+                        return '#b2b2b2'
+                    } else if (bn.properties.COAS_FLAG == 'F') {
+                        return out.worldStroke_
+                    } else if (bn.properties.COAS_FLAG == 'T') {
+                        return out.worldCoastStroke_
                     }
-                    return bn.properties.COAS_FLAG === 'T' ? 'em-bn-co' : 'em-worldbn'
                 })
-            //.attr("id", (bn) => bn.properties.CNTR_BN_ID)
-        }
+                .style('stroke-width', function (bn) {
+                    if (bn.properties.COAS_FLAG == 'F') {
+                        return out.worldStrokeWidth_
+                    } else if (bn.properties.COAS_FLAG == 'T') {
+                        return out.worldCoastStrokeWidth_
+                    }
+                })
 
         if (out._geom.kosovo) {
             //add kosovo to world map
             zg.append('g')
-                .attr('id', 'em-kosovo-bn')
-                .attr('class', 'em-kosovo-bn')
+                .attr('id', 'g_worldbn')
+                .style('fill', 'none')
                 .selectAll('path')
                 .data(out._geom.kosovo)
                 .enter()
                 .append('path')
-                .attr('d', out._pathFunction)
+                .attr('d', out._geom.path)
+                .style('stroke', '#4f4f4f')
+                .style('stroke-width', function (bn) {
+                    return 0.3 + 'px'
+                })
         }
 
-        //prepare group for proportional symbols, with centroids
+        //prepare group for proportional symbols, with nuts region centroids
         if (withCenterPoints) {
-            addCentroidsToMap()
+            let centroidFeatures
+
+            if (!centroidsData) {
+                // if centroids data is absent (e.g. for world maps) then calculate manually
+                if (out.geo_ == 'WORLD') {
+                    centroidFeatures = []
+                    out._geom.worldrg.forEach((feature) => {
+                        let newFeature = { ...feature }
+                        // exception for France (because guyane)
+                        if (feature.properties.id == 'FR') {
+                            newFeature.geometry = {
+                                coordinates: [2.2, 46.2],
+                                type: 'Point',
+                            }
+                        } else {
+                            newFeature.geometry = {
+                                coordinates: geoCentroid(feature),
+                                type: 'Point',
+                            }
+                        }
+                        centroidFeatures.push(newFeature)
+                    })
+                }
+            } else {
+                if (out.nutsLvl_ == 'mixed') {
+                    centroidFeatures = [
+                        ...centroidsData[0].features,
+                        ...centroidsData[1].features,
+                        ...centroidsData[2].features,
+                        ...centroidsData[3].features,
+                    ]
+                } else {
+                    centroidFeatures = centroidsData.features
+                }
+            }
+
+            out._centroidFeatures = centroidFeatures
+
+            // g_ps is the g element containing all prop symbols for the map
+            const gcp = zg.append('g').attr('id', 'g_ps')
+            //allow for different symbols by adding a g element here, then adding the symbols in proportional-symbols.js
+            gcp.selectAll('g')
+                .data(
+                    // filter out regions with no data and order by value in each map type template.
+                    // See updateSymbolsDrawOrder in map-proportional-symbols.js for example
+                    out._centroidFeatures
+                )
+                .enter()
+                .append('g')
+                .attr('transform', function (d) {
+                    let coords = out._projection(d.geometry.coordinates)
+                    return 'translate(' + coords[0].toFixed(3) + ',' + coords[1].toFixed(3) + ')'
+                })
+                .attr('class', 'symbol') // OUR SYMBOL CONTAINER
+                .attr('id', (d) => 'ps' + d.properties.id)
+                .on('mouseover', function (e, rg) {
+                    if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
+                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                            const sel = select(this.childNodes[0])
+                            sel.attr('fill___', sel.attr('fill'))
+                            sel.attr('fill', out.nutsrgSelFillSty_)
+                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                        }
+                    } else {
+                        const sel = select(this.childNodes[0])
+                        sel.attr('fill___', sel.attr('fill'))
+                        sel.attr('fill', out.nutsrgSelFillSty_)
+                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    }
+                })
+                .on('mousemove', function (e, rg) {
+                    if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
+                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                            if (out._tooltip) out._tooltip.mousemove(e)
+                        }
+                    } else {
+                        if (out._tooltip) out._tooltip.mousemove(e)
+                    }
+                })
+                .on('mouseout', function (e) {
+                    const sel = select(this.childNodes[0])
+                    let newFill = sel.attr('fill___')
+                    if (newFill) {
+                        sel.attr('fill', newFill)
+                        if (out._tooltip) out._tooltip.mouseout()
+                    }
+                })
         }
 
         // add geographical labels to map
@@ -1140,38 +1628,74 @@ export const mapTemplate = function (config, withCenterPoints) {
         //title
         if (out.title()) {
             //define default position
-            let cssClass = out.isInset ? 'em-inset-title' : 'em-title'
-            if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass(cssClass) + (out.isInset ? 0 : 10)])
+            if (!out.titlePosition()) out.titlePosition([10, 5 + out.titleFontSize()])
             //draw title
             out.svg()
                 .append('text')
                 .attr('id', 'title' + out.geo_)
-                .attr('class', cssClass)
+                .attr('class', 'eurostat-map-title')
+                .style('pointer-events', 'none')
                 .attr('x', out.titlePosition()[0])
                 .attr('y', out.titlePosition()[1])
                 .text(out.title())
+                .style('font-family', out.fontFamily_)
+                .style('font-size', out.titleFontSize_ + 'px')
+                .style('font-weight', out.titleFontWeight_)
+                .style('fill', out.titleFill_)
+                .style('stroke', out.titleStroke_)
+                .style('stroke-width', out.titleStrokeWidth_)
+                .style('stroke-linejoin', 'round')
+                .style('paint-order', 'stroke')
         }
 
         if (out.subtitle()) {
-            let cssSubtitleClass = out.isInset ? 'em-inset-subtitle' : 'em-subtitle'
-            let cssTitleClass = out.isInset ? 'em-inset-title' : 'em-title'
             //define default position
-            if (!out.subtitlePosition())
-                out.subtitlePosition([10, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
+            if (!out.subtitlePosition()) out.subtitlePosition([10, 8 + out.titleFontSize() + 5 + out.subtitleFontSize()])
             //draw subtitle
             out.svg()
                 .append('text')
                 .attr('id', 'subtitle' + out.geo_)
-                .attr('class', cssSubtitleClass)
+                .attr('class', 'eurostat-map-subtitle')
+                .style('pointer-events', 'none')
                 .attr('x', out.subtitlePosition()[0])
                 .attr('y', out.subtitlePosition()[1])
                 .text(out.subtitle())
+                .style('font-family', out.fontFamily_)
+                .style('font-size', out.subtitleFontSize() + 'px')
+                .style('font-weight', out.subtitleFontWeight())
+                .style('fill', out.subtitleFill())
+                .style('stroke', out.subtitleStroke())
+                .style('stroke-width', out.subtitleStrokeWidth())
+                .style('stroke-linejoin', 'round')
+                .style('paint-order', 'stroke')
         }
 
         //bottom text
-        if (out.bottomText_) {
-            addBottomText()
-        }
+        if (out.bottomText())
+            out.svg()
+                .append('text')
+                .attr('id', 'bottomtext')
+                .attr('x', out.botTxtPadding_)
+                .attr('y', out.height_ - out.botTxtPadding_)
+                .text(out.bottomText())
+                .style('font-family', out.fontFamily_)
+                .style('font-size', out.botTxtFontSize_ + 'px')
+                .style('fill', out.botTxtFill_)
+                .on('mouseover', function () {
+                    out._tooltip.mw___ = out._tooltip.style('max-width')
+                    // tooltip.f___ = tooltip.style("font");
+                    out._tooltip.style('max-width', '400px')
+                    out._tooltip.style('font-size', out.botTxtFontSize_)
+                    if (out.botTxtTooltipTxt_) out._tooltip.mouseover(out.botTxtTooltipTxt_)
+                })
+                .on('mousemove', function (e) {
+                    if (out.botTxtTooltipTxt_) out._tooltip.mousemove(e)
+                })
+                .on('mouseout', function (e) {
+                    if (out.botTxtTooltipTxt_) out._tooltip.mouseout(e)
+                    out._tooltip.style('max-width', out._tooltip.mw___)
+                    // tooltip.style("font", tooltip.f___);
+                })
 
         //source dataset URL
         if (out.showSourceLink_) {
@@ -1186,27 +1710,46 @@ export const mapTemplate = function (config, withCenterPoints) {
                     //dataset link
                     let code = stat.eurostatDatasetCode
                     let url = `https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`
-                    let linkColor = getCSSPropertyFromClass('em-source-dataset-link', 'fill')
+                    let linkColor = '#0e47cb'
                     let link = out
                         .svg()
                         .append('a')
                         .attr('href', url)
                         .attr('target', '_blank')
                         .append('text')
-                        .attr('class', 'em-source-dataset-link')
+                        .attr('id', 'source-dataset-link')
                         .attr('x', out.width_ - out.botTxtPadding_)
                         .attr('y', out.height_ - out.botTxtPadding_)
                         .text('EUROSTAT')
+                        .attr('fill', linkColor)
+                        .style('font-family', out.fontFamily_)
+                        .style('font-size', out.botTxtFontSize_ + 'px')
+                        .style('font-weight', 'bold')
                         .attr('text-anchor', 'end')
+                        .on('mouseover', function () {
+                            const sel = select(this)
+                            sel.attr('fill', '#082b7a')
+                            sel.style('cursor', 'pointer')
+                            sel.style('text-decoration', 'underline')
+                        })
+                        .on('mouseout', function () {
+                            const sel = select(this)
+                            sel.attr('fill', linkColor)
+                            sel.style('cursor', 'default')
+                            sel.style('text-decoration', 'none')
+                        })
+                    //.on("click", function() { window.open(`https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`); });
 
                     //pretext "Source:"
                     let linkW = link.node().getComputedTextLength()
                     out.svg()
                         .append('text')
-                        .attr('class', 'em-source-pretext')
                         .attr('x', out.width_ - out.botTxtPadding_ - linkW - 2)
                         .attr('y', out.height_ - out.botTxtPadding_)
                         .text('Source:')
+                        .style('font-family', out.fontFamily_)
+                        .style('font-size', out.botTxtFontSize_ + 'px')
+                        .style('stroke-width', '0.3px')
                         .attr('text-anchor', 'end')
                 }
             }
@@ -1224,167 +1767,63 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    const addBottomText = function () {
-        out.svg()
-            .append('text')
-            .attr('id', 'em-bottom-text')
-            .attr('class', 'em-bottom-text')
-            .attr('x', out.botTxtPadding_)
-            .attr('y', out.height_ - out.botTxtPadding_)
-            .text(out.bottomText_)
-            .on('mouseover', function () {
-                out._tooltip.mw___ = out._tooltip.style('max-width')
-                out._tooltip.style('max-width', '400px')
-                if (out.botTxtTooltipTxt_) out._tooltip.mouseover(out.botTxtTooltipTxt_)
-            })
-            .on('mousemove', function (e) {
-                if (out.botTxtTooltipTxt_) out._tooltip.mousemove(e)
-            })
-            .on('mouseout', function (e) {
-                if (out.botTxtTooltipTxt_) out._tooltip.mouseout(e)
-                out._tooltip.style('max-width', out._tooltip.mw___)
-            })
-    }
-
-    const addCoastalMarginToMap = function () {
-        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
-        //draw coastal margin
-        const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
-
-        //countries bn
-        if (out._geom.cntbn) {
-            cg.append('g')
-                .attr('id', 'em-coast-margin-cnt')
-                .attr('class', 'em-coast-margin-cnt')
-                .selectAll('path')
-                .data(out._geom.cntbn)
-                .enter()
-                .filter(function (bn) {
-                    return bn.properties.co === 'T'
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-
-        //nuts bn
-        if (out._geom.nutsbn) {
-            cg.append('g')
-                .attr('id', 'em-coast-margin-nuts')
-                .attr('class', 'em-coast-margin-nuts')
-                .selectAll('path')
-                .data(out._geom.nutsbn)
-                .enter()
-                .filter(function (bn) {
-                    return bn.properties.co === 'T'
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-
-        //world bn
-        if (out._geom.worldbn) {
-            cg.append('g')
-                .attr('id', 'em-coast-margin-world')
-                .attr('class', 'em-coast-margin-world')
-                .selectAll('path')
-                .data(out._geom.worldbn)
-                .enter()
-                .filter(function (bn) {
-                    return bn.properties.COAS_FLAG === 'T'
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-    }
-
-    const addCentroidsToMap = function () {
-        let centroidFeatures
-
-        if (!centroidsData) {
-            // if centroids data is absent (e.g. for world maps) then calculate manually
-            if (out.geo_ == 'WORLD') {
-                centroidFeatures = []
-                out._geom.worldrg.forEach((feature) => {
-                    let newFeature = { ...feature }
-                    // exception for France (because guyane)
-                    if (feature.properties.id == 'FR') {
-                        newFeature.geometry = {
-                            coordinates: [2.2, 46.2],
-                            type: 'Point',
-                        }
-                    } else {
-                        newFeature.geometry = {
-                            coordinates: geoCentroid(feature),
-                            type: 'Point',
-                        }
-                    }
-                    centroidFeatures.push(newFeature)
-                })
-            }
-        } else {
-            if (out.nutsLvl_ == 'mixed') {
-                centroidFeatures = [
-                    ...centroidsData[0].features,
-                    ...centroidsData[1].features,
-                    ...centroidsData[2].features,
-                    ...centroidsData[3].features,
-                ]
-            } else {
-                centroidFeatures = centroidsData.features
-            }
-        }
-
-        out._centroidFeatures = centroidFeatures
-
-        // g_ps is the g element containing all proportional symbols for the map
-        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
-        const gcp = zg.append('g').attr('id', 'g_ps')
-
-        // add centroid em-symbol elements
-        gcp.selectAll('g')
-            .data(out._centroidFeatures)
-            .enter()
-            .append('g')
-            .attr('transform', function (d) {
-                let coords = out._projection(d.geometry.coordinates)
-                return 'translate(' + coords[0].toFixed(3) + ',' + coords[1].toFixed(3) + ')'
-            })
-            .attr('class', 'em-symbol') // OUR SYMBOL CONTAINER
-            .attr('id', (d) => 'ps' + d.properties.id)
-    }
-
     /**
      * @function updateLabels
      * @description update existing map labels
      */
     out.updateLabels = function () {
-        // Clear previous labels
-        let prevLabels = out.svg_.selectAll('g.g_labels > *')
+        //clear previous labels
+        let prevLabels = out.svg_.selectAll('g.labels-container > *')
         if (prevLabels) prevLabels.remove()
 
-        // Main map
+        //main map
         if (out.labelling_) {
-            let zg = out.svg_.select('#em-zoom-group-' + out.svgId_)
+            let zg = out.svg_.select('#zoomgroup' + out.svgId_)
             addLabelsToMap(out, zg)
-            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) {
-                out.updateValuesLabels(out)
-            }
+            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) out.updateValuesLabels(out)
         }
 
-        // Define the callback to apply to each inset
-        const applyLabelsCallback = (map) => {
-            if (map.labelling_) {
-                let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                addLabelsToMap(map, zg)
-                if (map.labelsToShow_.includes('values') && out.updateValuesLabels) {
-                    out.updateValuesLabels(map)
+        // apply to all insets
+        if (out.insetTemplates_) {
+            for (const geo in out.insetTemplates_) {
+                if (Array.isArray(out.insetTemplates_[geo])) {
+                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                        // insets with same geo that do not share the same parent inset
+                        if (Array.isArray(out.insetTemplates_[geo][i])) {
+                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
+                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
+                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) {
+                                    let map = out.insetTemplates_[geo][i][c]
+                                    if (map.labelling_) {
+                                        let zg = map.svg_.select('#zoomgroup' + map.svgId_)
+                                        addLabelsToMap(map, zg)
+                                        if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
+                                    }
+                                }
+                            }
+                        } else {
+                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) {
+                                let map = out.insetTemplates_[geo][i]
+                                if (map.labelling_) {
+                                    let zg = map.svg_.select('#zoomgroup' + map.svgId_)
+                                    addLabelsToMap(map, zg)
+                                    if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // unique inset geo_
+                    if (out.insetTemplates_[geo].svgId_ !== out.svgId_) {
+                        let map = out.insetTemplates_[geo]
+                        if (map.labelling_) {
+                            let zg = map.svg_.select('#zoomgroup' + map.svgId_)
+                            addLabelsToMap(map, zg)
+                            if (map.labelsToShow_.includes('values')) out.updateValuesLabels(map)
+                        }
+                    }
                 }
             }
-        }
-
-        // Apply labels to all insets using the executeForAllInsets function
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
         }
     }
 
@@ -1395,12 +1834,12 @@ export const mapTemplate = function (config, withCenterPoints) {
      */
     out.updateValuesLabels = function (map) {
         //clear previous labels
-        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
+        let prevLabels = map.svg_.selectAll('g.stat-label > *')
         prevLabels.remove()
-        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
+        let prevShadows = map.svg_.selectAll('g.stat-label-shadow > *')
         prevShadows.remove()
 
-        let statLabels = map.svg_.selectAll('g.em-stat-label')
+        let statLabels = map.svg_.selectAll('g.stat-label')
 
         // filter stat-label elements to only show those with data
         statLabels.filter(out.statLabelsFilterFunction).append('text').text(out.statLabelsTextFunction)
@@ -1408,7 +1847,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //add shadows to labels
         if (out.labelShadow_) {
             map.svg_
-                .selectAll('g.em-stat-label-shadow')
+                .selectAll('g.stat-label-shadow')
                 .filter(out.statLabelsFilterFunction)
                 .append('text')
                 .text(out.statLabelsTextFunction)
@@ -1463,8 +1902,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         let language = map.lg_
         let labelsArray = []
 
-        let existing = zg.select('#g_labels')
-        let labelsG = existing.empty() ? zg.append('g').attr('id', 'g_labels') : existing
+        let existing = zg.select('.labels-container')
+        let labelsG = existing.empty() ? zg.append('g').attr('class', 'labels-container') : existing
 
         //define which labels to use (cc, countries, seas, values)
         if (map.labelsToShow_.includes('countries') || map.labelsToShow_.includes('seas')) {
@@ -1485,10 +1924,28 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (map.labelsToShow_.includes('values')) {
             if (map._geom.nutsrg) {
                 //values label shadows parent <g>
-                const gsls = labelsG.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
+                const gsls = labelsG
+                    .append('g')
+                    .attr('class', 'g_stat_label_shadows')
+                    .style('font-size', map.labelValuesFontSize_ + 'px')
+                    .attr('text-anchor', 'middle')
+                    .style('opacity', (d) => map.labelOpacity_['values'])
+                    .style('fill', (d) => map.labelShadowColor_['values'])
+                    .attr('stroke', (d) => map.labelShadowColor_['values'])
+                    .attr('stroke-width', (d) => map.labelStrokeWidth_['values'] + map.labelShadowWidth_['values'])
+                    .style('font-family', map.fontFamily_)
 
                 // values labels parent <g>
-                const gsl = labelsG.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
+                const gsl = labelsG
+                    .append('g')
+                    .attr('class', 'g_stat_labels')
+                    .style('font-size', map.labelValuesFontSize_ + 'px')
+                    .attr('text-anchor', 'middle')
+                    .style('opacity', (d) => map.labelOpacity_['values'])
+                    .style('fill', (d) => map.labelFill_['values'])
+                    .attr('stroke', (d) => map.labelStroke_['values'])
+                    .attr('stroke-width', (d) => map.labelStrokeWidth_['values'])
+                    .style('font-family', map.fontFamily_)
 
                 //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
                 let labelRegions
@@ -1524,9 +1981,10 @@ export const mapTemplate = function (config, withCenterPoints) {
                             return `translate(${x},${y})`
                         }
                         // otherwise calculate centroid
-                        return 'translate(' + map._pathFunction.centroid(d) + ')'
+                        return 'translate(' + map._geom.path.centroid(d) + ')'
                     })
-                    .attr('class', 'em-stat-label')
+                    .style('pointer-events', 'none')
+                    .attr('class', 'stat-label')
 
                 //SHADOWS
                 if (map.labelShadow_) {
@@ -1547,15 +2005,15 @@ export const mapTemplate = function (config, withCenterPoints) {
                                 return `translate(${x},${y})`
                             }
                             // otherwise calculate centroid
-                            return 'translate(' + map._pathFunction.centroid(d) + ')'
+                            return 'translate(' + map._geom.path.centroid(d) + ')'
                         })
-
-                        .attr('class', 'em-stat-label-shadow')
+                        .style('pointer-events', 'none')
+                        .attr('class', 'stat-label-shadow')
                 }
             }
         }
 
-        // rest of label types
+        // rest of label types (FROM LABELS.JS)
         if (labelsArray) {
             let data = labelsArray.filter((d) => {
                 if (d.class == 'countries') {
@@ -1576,10 +2034,20 @@ export const mapTemplate = function (config, withCenterPoints) {
             })
 
             //common styles between all label shadows
-            const shadowg = labelsG.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
+            const shadowg = labelsG
+                .append('g')
+                .attr('class', 'g_labelShadows')
+                .style('pointer-events', 'none')
+                .style('font-family', map.fontFamily_)
+                .attr('text-anchor', 'middle')
 
             //common styles between all labels
-            const labelg = labelsG.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
+            const labelg = labelsG
+                .append('g')
+                .attr('class', 'g_geolabels')
+                .style('pointer-events', 'none')
+                .style('font-family', map.fontFamily_)
+                .attr('text-anchor', 'middle')
 
             //SHADOWS
             if (map.labelShadow_) {
@@ -1588,14 +2056,10 @@ export const mapTemplate = function (config, withCenterPoints) {
                     .data(data)
                     .enter()
                     .append('text')
-                    .attr('class', (d) => {
-                        let classes = 'em-label-shadow-' + d.text.replace(/\s+/g, '-')
-                        if (map.labelShadowsToShow_.includes(d.class)) {
-                            classes += ' em-label-shadow-' + d.class
-                        }
-                        return classes
-                    })
                     .filter((d) => map.labelShadowsToShow_.includes(d.class))
+                    .attr('class', (d) => {
+                        return 'labelShadow_' + d.class
+                    })
                     .attr('x', function (d) {
                         if (d.rotate) {
                             return 0 //for rotated text, x and y positions must be specified in the transform property
@@ -1609,6 +2073,13 @@ export const mapTemplate = function (config, withCenterPoints) {
                         return map._projection([d.x, d.y])[1]
                     })
                     .attr('dy', -7) // set y position of bottom of text
+                    .style('opacity', (d) => map.labelOpacity_[d.class])
+                    .style('letter-spacing', (d) => (d.letterSpacing ? d.letterSpacing : 0))
+                    .style('fill', (d) => map.labelShadowColor_[d.class])
+                    .attr('stroke', (d) => map.labelShadowColor_[d.class])
+                    .attr('stroke-width', (d) => map.labelStrokeWidth_[d.class] + map.labelShadowWidth_[d.class])
+                    .style('font-size', (d) => d.size + 'px')
+                    .style('font-style', (d) => (d.class == 'seas' ? 'italic' : 'normal'))
                     .attr('transform', (d) => {
                         if (d.rotate) {
                             let pos = map._projection([d.x, d.y])
@@ -1624,18 +2095,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                     }) // define the text to display
             }
 
-            //LABEL texts
+            //LABELS
             labelg
                 .selectAll('text')
                 .data(data)
                 .enter()
                 .append('text')
                 .attr('class', (d) => {
-                    let classes = 'em-label-' + d.text.replace(/\s+/g, '-')
-                    if (map.labelsToShow_.includes(d.class)) {
-                        classes += ' em-label-' + d.class
-                    }
-                    return classes
+                    return 'geolabel_' + d.class
                 })
                 //position label
                 .attr('x', function (d) {
@@ -1651,6 +2118,13 @@ export const mapTemplate = function (config, withCenterPoints) {
                     return map._projection([d.x, d.y])[1]
                 })
                 .attr('dy', -7) // set y position of bottom of text
+                .style('opacity', (d) => map.labelOpacity_[d.class])
+                .style('letter-spacing', (d) => (d.letterSpacing ? d.letterSpacing : 0))
+                .style('fill', (d) => map.labelFill_[d.class])
+                .attr('stroke', (d) => map.labelStroke_[d.class])
+                .attr('stroke-width', (d) => map.labelStrokeWidth_[d.class])
+                //set label size
+                .style('font-size', (d) => d.size + 'px')
                 //transform labels which have a "rotate" property in the labels config. For rotated labels, their X,Y must also be set in the transform.
                 // note: dont apply to country code labels
                 .attr('transform', (d) => {
@@ -1671,7 +2145,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     /**
      * @function addScalebarToMap
-     * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
+     * @description appends an SVG scalebar to the map. Uses pixSize to calculate units in km
      */
     function addScalebarToMap() {
         let sb = out
@@ -1688,7 +2162,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         const maxLengthPix = out.scalebarMaxWidth_
         const textOffsetX = out.scalebarTextOffset_[0]
         const textOffsetY = out.scalebarTextOffset_[1]
-        const pixelSizeM = out.pixelSize_
+        const pixelSizeM = out.pixSize_
         const maxLengthM = maxLengthPix * pixelSizeM
         const niceLengthM = niceScaleBarLength(maxLengthM)
         const niceLengthPixel = niceLengthM[0] / pixelSizeM
@@ -1702,7 +2176,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         const scalebarSVG = out
             .svg()
             .append('svg')
-            .attr('class', 'em-scalebar')
+            .attr('class', 'scalebar')
             .attr('x', out.scalebarPosition_[0])
             .attr('y', out.scalebarPosition_[1])
             .attr('width', maxLengthPix + 20)
@@ -1711,36 +2185,43 @@ export const mapTemplate = function (config, withCenterPoints) {
         // top line full width
         scalebarSVG
             .append('line')
-            .attr('class', 'em-scalebar-line')
+            .attr('class', 'eurostat-map-scalebar-line')
             .attr('x1', marginLeft)
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', 1)
-
+            .style('stroke', '#000')
+            .style('stroke-width', '0.8px')
         //bottom line full width
         scalebarSVG
             .append('line')
-            .attr('class', 'em-scalebar-line')
+            .attr('class', 'eurostat-map-scalebar-line')
             .attr('x1', marginLeft)
             .attr('y1', out.scalebarSegmentHeight_)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', out.scalebarSegmentHeight_)
+            .style('stroke', '#000')
+            .style('stroke-width', '0.8px')
 
         //first tick
         scalebarSVG
             .append('line')
-            .attr('class', 'em-scalebar-line')
+            .attr('class', 'eurostat-map-scalebar-line')
             .attr('x1', marginLeft)
             .attr('y1', 1)
             .attr('x2', marginLeft)
             .attr('y2', out.scalebarTickHeight_)
-
+            .style('stroke', '#000')
+            .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         scalebarSVG
             .append('text')
-            .attr('class', 'em-scalebar-label')
+            .attr('class', 'eurostat-map-scalebar-label')
             .attr('x', marginLeft + textOffsetX)
             .attr('y', out.scalebarTickHeight_ + textOffsetY)
             .text('0')
+            .style('font-size', out.scalebarFontSize_ + 'px')
+            .style('font-family', out.fontFamily_)
+            .attr('text-anchor', 'middle')
 
         //middle ticks
         const subdivisionNb = subdivisionNbs[scaleBarStartDigit]
@@ -1750,64 +2231,82 @@ export const mapTemplate = function (config, withCenterPoints) {
             for (let i = 1; i < subdivisionNb; i++) {
                 scalebarSVG
                     .append('line')
-                    .attr('class', 'em-scalebar-line')
+                    .attr('class', 'eurostat-map-scalebar-line')
                     .attr('x1', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                     .attr('y1', 1)
                     .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                     .attr('y2', out.scalebarTickHeight_)
+                    .style('stroke', '#000')
+                    .style('stroke-width', '0.8px')
+                    .style('stroke', 'black')
+                    .style('stroke-width', out.scalebarStrokeWidth_)
                 scalebarSVG
                     .append('text')
-                    .attr('class', 'em-scalebar-label')
+                    .attr('class', 'eurostat-map-scalebar-label')
                     .attr('x', marginLeft + textOffsetX + i * divisionWidth)
                     .attr('y', out.scalebarTickHeight_ + textOffsetY)
                     .text(getScalebarLabel((niceLengthM[0] / subdivisionNb) * i))
+                    .style('font-size', out.scalebarFontSize_ + 'px')
+                    .style('font-family', out.fontFamily_)
+                    .attr('text-anchor', 'middle')
             }
 
             //every other segment mid-line
             for (let i = -1; i < subdivisionNb; i += 2) {
                 if (i == 1) {
                     sb.append('line')
-                        .attr('class', 'em-scalebar-line')
+                        .attr('class', 'eurostat-map-scalebar-line')
                         .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
                         .attr('y1', out.scalebarSegmentHeight_ / 2)
                         .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                         .attr('y2', out.scalebarSegmentHeight_ / 2)
+                        .style('stroke', '#000')
+                        .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
                 } else {
                     let x1 = marginLeft + out.scalebarStrokeWidth_ / 2 + (i - 1) * divisionWidth
                     if (x1 > 0) {
                         sb.append('line')
-                            .attr('class', 'em-scalebar-line')
+                            .attr('class', 'eurostat-map-scalebar-line')
                             .attr('x1', x1)
                             .attr('y1', out.scalebarSegmentHeight_ / 2)
                             .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                             .attr('y2', out.scalebarSegmentHeight_ / 2)
+                            .style('stroke', '#000')
+                            .style('stroke-width', '0.8px')
                     }
                 }
             }
         } else {
             // single full-length horizontal mid-line
             sb.append('line')
-                .attr('class', 'em-scalebar-line')
+                .attr('class', 'eurostat-map-scalebar-line')
                 .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
                 .attr('y1', out.scalebarSegmentHeight_ / 2)
                 .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + divisionWidth * subdivisionNb)
                 .attr('y2', out.scalebarSegmentHeight_ / 2)
+                .style('stroke', '#000')
+                .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         }
 
         //last tick
         scalebarSVG
             .append('line')
-            .attr('class', 'em-scalebar-line')
+            .attr('class', 'eurostat-map-scalebar-line')
             .attr('x1', niceLengthPixel + marginLeft)
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', out.scalebarTickHeight_)
+            .style('stroke', '#000')
+            .style('stroke-width', out.scalebarStrokeWidth_ + 'px')
         scalebarSVG
             .append('text')
-            .attr('class', 'em-scalebar-label')
+            .attr('class', 'eurostat-map-scalebar-label')
             .attr('x', niceLengthPixel + marginLeft + textOffsetX)
             .attr('y', out.scalebarTickHeight_ + textOffsetY)
             .text(getScalebarLabel(niceLengthM[0]) + out.scalebarUnits_)
+            .style('text-anchor', 'middle')
+            .style('font-size', out.scalebarFontSize_ + 'px')
+            .style('font-family', out.fontFamily_)
     }
 
     function niceScaleBarLength(scaleBarLength) {
@@ -1847,6 +2346,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         //mt[key__] = map[key__];
         //}
 
+        //const mt = Object.assign({}, map)
+
         const mt = mapTemplate(config, withCenterPoints)
 
         //define default values for inset configs
@@ -1867,19 +2368,20 @@ export const mapTemplate = function (config, withCenterPoints) {
         ;[
             'nutsLvl_',
             'nutsYear_',
-            'hoverColor_',
-            //'nutsbnStroke_', // DEPRECATED
-            // 'nutsbnStrokeWidth_', // DEPRECATED
-            'cntrgFillStyle_', // DEPRECATED
-            'cntbnStroke_', // DEPRECATED
-            'cntbnStrokeWidth_', // DEPRECATED
-            'seaFillStyle_', // DEPRECATED
+            'nutsrgFillStyle_',
+            'nutsrgSelFillSty_',
+            'nutsbnStroke_',
+            'nutsbnStrokeWidth_',
+            'cntrgFillStyle_',
+            'cntbnStroke_',
+            'cntbnStrokeWidth_',
+            'seaFillStyle_',
             'drawCoastalMargin_',
-            'coastalMarginColor_', // DEPRECATED
-            'coastalMarginWidth_', // DEPRECATED
+            'coastalMarginColor_',
+            'coastalMarginWidth_',
             'coastalMarginStdDev_',
-            'graticuleStroke_', // DEPRECATED
-            'graticuleStrokeWidth_', // DEPRECATED
+            'graticuleStroke_',
+            'graticuleStrokeWidth_',
             'labelling_',
             'labelFill_',
             'labelValuesFontSize_',
@@ -1917,31 +2419,30 @@ export const mapTemplate = function (config, withCenterPoints) {
         //apply config values for inset
         for (let key in config) mt[key + '_'] = config[key]
 
-        mt.isInset = true // flag for inset-specific settings e.g. CSS class for titles
         return mt
     }
 
     return out
 }
 
-/** Default geocenter positions and pixelSize (for default width = 800px) for territories and projections. */
+/** Default geocenter positions and pixSize (for default width = 800px) for territories and projections. */
 const _defaultPosition = {
-    EUR_3035: { geoCenter: [4970000, 3350000], pixelSize: 6800 },
-    IC_32628: { geoCenter: [443468, 3145647], pixelSize: 1000 },
-    GP_32620: { geoCenter: [669498, 1784552], pixelSize: 130 },
-    MQ_32620: { geoCenter: [716521, 1621322], pixelSize: 130 },
-    GF_32622: { geoCenter: [266852, 444074], pixelSize: 500 },
-    RE_32740: { geoCenter: [348011, 7661627], pixelSize: 130 },
-    YT_32738: { geoCenter: [516549, 8583920], pixelSize: 70 },
-    MT_3035: { geoCenter: [4719755, 1441701], pixelSize: 70 },
-    PT20_32626: { geoCenter: [397418, 4271471], pixelSize: 1500 },
-    PT30_32628: { geoCenter: [333586, 3622706], pixelSize: 150 },
-    LI_3035: { geoCenter: [4287060, 2672000], pixelSize: 40 },
-    IS_3035: { geoCenter: [3011804, 4960000], pixelSize: 700 },
-    SJ_SV_3035: { geoCenter: [4570000, 6160156], pixelSize: 800 },
-    SJ_JM_3035: { geoCenter: [3647762, 5408300], pixelSize: 100 },
-    CARIB_32620: { geoCenter: [636345, 1669439], pixelSize: 500 },
-    WORLD_54030: { geoCenter: [14, 17], pixelSize: 9000 },
+    EUR_3035: { geoCenter: [4970000, 3350000], pixSize: 6800 },
+    IC_32628: { geoCenter: [443468, 3145647], pixSize: 1000 },
+    GP_32620: { geoCenter: [669498, 1784552], pixSize: 130 },
+    MQ_32620: { geoCenter: [716521, 1621322], pixSize: 130 },
+    GF_32622: { geoCenter: [266852, 444074], pixSize: 500 },
+    RE_32740: { geoCenter: [348011, 7661627], pixSize: 130 },
+    YT_32738: { geoCenter: [516549, 8583920], pixSize: 70 },
+    MT_3035: { geoCenter: [4719755, 1441701], pixSize: 70 },
+    PT20_32626: { geoCenter: [397418, 4271471], pixSize: 1500 },
+    PT30_32628: { geoCenter: [333586, 3622706], pixSize: 150 },
+    LI_3035: { geoCenter: [4287060, 2672000], pixSize: 40 },
+    IS_3035: { geoCenter: [3011804, 4960000], pixSize: 700 },
+    SJ_SV_3035: { geoCenter: [4570000, 6160156], pixSize: 800 },
+    SJ_JM_3035: { geoCenter: [3647762, 5408300], pixSize: 100 },
+    CARIB_32620: { geoCenter: [636345, 1669439], pixSize: 500 },
+    WORLD_54030: { geoCenter: [14, 17], pixSize: 9000 },
 }
 
 /**

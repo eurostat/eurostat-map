@@ -1,75 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </head>
 
-    <body>
-        <div>
-            <svg id="mappy"></svg>
-        </div>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js" integrity="sha512-VcfmBa1zrzVT5htmBM63lMjDtqe4SAcxAlVLpQmBpUoO9beX5iNTKLGRWDuJ5F37jJZotqq65u00EZSVhJuikw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-        <script src="../../build/eurostatmap.js"></script>
-        <script src="../data/nuts3.js"></script>
-        <script src="../configs/insetConfig.js"></script>
-        <script src="../data/mixed.js"></script>
-        <script>
-            let mapWidth = 790
-            let mapHeight = 635
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-            basemap = function () {
-                return (
-                    eurostatmap
-                        .map('choropleth')
-                        .svgId('mappy')
-                        .containerId('mappy')
-                        .pixelSize(2100)
-                        .width(mapWidth)
-                        .height(mapHeight)
-                        .bottomText(null)
-                        .showSourceLink(false)
-                        .nutsLvl(0)
-                        .classifMethod('threshold')
-                        .drawGraticule(true)
-                        .graticuleStroke('#ccc')
-                        .graticuleStrokeWidth(0.5)
-                        .zoomExtent([-10, 20])
-                        .geoCenter([4531320, 2040197])
-                        .legend(false)
-                        .drawCoastalMargin(false)
-                        .seaFillStyle('#FFFFFF')
-                        .cntrgFillStyle('#E6E6E6')
-                        .nutsrgFillStyle('#E6E6E6')
-                        .nutsbnStroke({
-                            0: '#000',
-                            1: '#000',
-                            2: '#000',
-                            3: '#000',
-                            co: 'grey',
-                        })
-                        .noDataFillStyle('darkgrey')
-                        .nutsbnStrokeWidth({ 0: 0, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0 })
-                        .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 0.2, co: 0.2 })
-                        .bordersToShow(['eu', 'co', 'cc', 'efta'])
-                        //.insets(insetsConfig)
-                        .showScalebar(true)
-                        .scalebarPosition([420, 560])
-                        .hoverColor('#003E8C')
-                        .labelling(true)
-                        .labelsToShow(['seas', 'values', 'cc'])
-                        .labelValuesFontSize(10)
-                        .labelFill({ seas: '#012a7c', cc: 'black' })
-                        .labelShadow(true)
-                        .nutsYear(2016)
-                        .colors(['#feedde', '#fdd0a2', '#fdae6b', '#fd8d3c', '#e6550d', '#a63603', '#999'])
-                        .threshold([0, 5, 99999])
-                )
-            }
+<body>
+  <div>
+    <svg id="mappy"></svg>
+  </div>
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js" integrity="sha512-VcfmBa1zrzVT5htmBM63lMjDtqe4SAcxAlVLpQmBpUoO9beX5iNTKLGRWDuJ5F37jJZotqq65u00EZSVhJuikw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+  <script src="../../build/eurostatmap.js"></script>
+  <script src="../data/nuts3.js"></script>
+  <script src="../configs/insetConfig.js"></script>
+  <script src="../data/mixed.js"></script>
+  <script>
+    let mapWidth = 790;
+    let mapHeight = 635;
 
-            let map = basemap()
-            //map.statData().setData(mixedNUTS);
-            map.build()
-        </script>
-    </body>
+    basemap = function () {
+      return eurostatmap
+        .map("ch")
+        .svgId("mappy")
+        .containerId('mappy')
+        .pixSize(2100)
+        .width(mapWidth)
+        .height(mapHeight)
+        .bottomText(null)
+        .showSourceLink(false)
+        .nutsLvl(0)
+        .classifMethod("threshold")
+        .drawGraticule(true)
+        .graticuleStroke("#ccc")
+        .graticuleStrokeWidth(0.5)
+        .zoomExtent([-10,20])
+        .geoCenter([4531320, 2040197])
+        .legend(false)
+        .drawCoastalMargin(false)
+        .seaFillStyle("#FFFFFF")
+        .cntrgFillStyle("#E6E6E6")
+        .nutsrgFillStyle("#E6E6E6")
+        .nutsbnStroke({
+          0: "#000",
+          1: "#000",
+          2: "#000",
+          3: "#000",
+          co: "grey",
+        })
+        .noDataFillStyle('darkgrey')
+        .nutsbnStrokeWidth({ 0: 0, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0 })
+        .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 0.2, co: 0.2 })
+        .bordersToShow(['eu', 'co', 'cc', 'efta'])
+        //.insets(insetsConfig)
+        .showScalebar(true)
+        .scalebarPosition([420, 560])
+        .nutsrgSelFillSty('#003E8C')
+        .labelling(true)
+        .labelsToShow(["seas", "values", "cc"])
+        .labelValuesFontSize(10)
+        .labelFill({ seas: "#012a7c", cc: "black" })
+        .labelShadow(true)
+        .nutsYear(2016)
+        .colors(['#feedde', '#fdd0a2', '#fdae6b', '#fd8d3c', '#e6550d', '#a63603', '#999'])
+        .threshold([0, 5, 99999])
+    };
+
+
+    let map = basemap();
+    //map.statData().setData(mixedNUTS);
+    map.build();
+
+
+
+  </script>
+</body>
+
 </html>

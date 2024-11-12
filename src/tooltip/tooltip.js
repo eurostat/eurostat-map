@@ -27,7 +27,20 @@ export const tooltip = function (config) {
         tooltip = select('#' + config.div)
         if (tooltip.empty()) tooltip = select('body').append('div').attr('id', config.div)
 
-        tooltip.attr('class', 'tooltip-eurostat')
+        //tooltip.style("width",config.width);
+        // USE CSS
+        tooltip.style('max-width', config.maxWidth)
+        tooltip.style('overflow', 'hidden')
+        tooltip.style('font-size', config.fontSize)
+        tooltip.style('background', config.background)
+        tooltip.style('padding', config.padding)
+        tooltip.style('border', config.border)
+        tooltip.style('border-radius', config.borderRadius)
+        tooltip.style('box-shadow', config.boxShadow)
+        tooltip.style('position', 'absolute')
+        tooltip.style('font-family', config.fontFamily)
+        tooltip.style('pointer-events', 'none')
+        tooltip.style('opacity', '0')
     }
 
     my.mouseover = function (html) {

@@ -1,7 +1,6 @@
 import { select, selectAll } from 'd3-selection'
 import * as lg from '../core/legend'
 import { line } from 'd3-shape'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**
  * A legend for choropleth-bivariate maps
@@ -21,24 +20,22 @@ export const legend = function (map, config) {
     //labels
     out.label1 = 'Variable 1'
     out.label2 = 'Variable 2'
-
-    //get the font size of the texts
-    out.axisTitleFontSize = getFontSizeFromClass('em-bivariate-axis-title')
+    //the font size of the legend label
+    out.labelFontSize = 12
 
     //breaks
     out.breaks1 = undefined
     out.breaks2 = undefined
-    out.showBreaks = false // if set to true and breaks1 and breaks2 are undefined then breaks are automatically defined
 
     //axis
-    out.yAxisLabelsOffset = { x: 7, y: 0 }
+    out.yAxisLabelsOffset = { x: 5, y: 0 }
     out.xAxisLabelsOffset = { x: 0, y: 5 }
 
     //show no data
     out.noData = true
     //show no data
-    out.noDataShapeHeight = 20
-    out.noDataShapeWidth = 25
+    out.noDataShapeHeight = 15
+    out.noDataShapeWidth = 15
 
     //no data text label
     out.noDataText = 'No data'
@@ -54,160 +51,196 @@ export const legend = function (map, config) {
     out.arrowWidth = 14
     out.arrowPadding = 10 // padding between arrow and axis label
 
+    //distance between axis and axis title / arrow
+    out.axisPadding = { x: 0, y: 0 }
+
     //override attribute values with config values
     if (config) for (let key in config) out[key] = config[key]
 
     //@override
     out.update = function () {
+        const m = out.map
         const lgg = out.lgg
-        const clnb = out.map.clnb()
+        const clnb = m.clnb()
         const sz = out.squareSize / clnb
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
 
-        // Horizontal shift to move everything right (adjust this value as needed)
-        const horizontalOffset = out.axisTitleFontSize + out.arrowPadding // Adjust this value to move the whole legend to the right
-
-        // Remove previous content
+        //remove previous content
         lgg.selectAll('*').remove()
 
-        // Draw background box
+        //draw legend background box
         out.makeBackgroundBox()
 
-        // Draw title
-        if (out.title) {
+        //draw title
+        if (out.title)
             lgg.append('text')
-                .attr('class', 'em-legend-title')
-                .attr('x', xc + horizontalOffset)
+                .attr('class', 'eurostat-map-legend-title')
+                .attr('x', xc)
                 .attr('y', out.boxPadding + out.titleFontSize)
                 .text(out.title)
-        }
+                .style('text-anchor', 'middle')
+                .style('font-size', out.titleFontSize + 'px')
+                .style('font-weight', out.titleFontWeight)
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
 
-        // The vertical position of the legend element
+        //set font family
+        lgg.style('font-family', m.fontFamily_)
+
+        //the vertical position of the legend element
         let y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0)
 
-        // Square group with horizontal offset
+        //square group
         const square = lgg
             .append('g')
             .attr('class', 'bivariate-squares-chart')
             .attr(
                 'transform',
-                `translate(${out.boxPadding + horizontalOffset},${xc + y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+                'translate(' +
+                    out.boxPadding +
+                    ',' +
+                    (xc + y) +
+                    ') rotate(' +
+                    out.rotation +
+                    ') translate(' +
+                    out.boxPadding +
+                    ',' +
+                    0 +
+                    ')'
             )
 
         const initialX = out.yAxisLabelsOffset.x
 
-        // Draw rectangles
         for (let i = 0; i < clnb; i++) {
             for (let j = 0; j < clnb; j++) {
+                //the class numbers, depending on order
                 const ecl1 = clnb - i - 1
                 const ecl2 = clnb - j - 1
-                const fill = out.map.classToFillStyle()(ecl1, ecl2)
+                const fill = m.classToFillStyle()(ecl1, ecl2)
 
+                //draw rectangle
                 square
                     .append('rect')
-                    .attr('class', 'em-bivariate-square')
+                    .attr('class', 'bivariate-square')
                     .attr('x', initialX + (clnb - 1 - i) * sz)
                     .attr('y', j * sz)
                     .attr('width', sz)
                     .attr('height', sz)
-                    .style('fill', fill)
+                    .attr('fill', fill)
                     .on('mouseover', function () {
-                        highlightRegions(out.map, ecl1, ecl2)
-                        if (out.map.insetTemplates_) {
-                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl1, ecl2)
-                        }
-                        select(this).raise() // raise legend square to avoid stroke issue
+                        const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
+                        const sel = regions.selectAll("[ecl1='" + ecl1 + "']").filter("[ecl2='" + ecl2 + "']")
+                        sel.style('fill', 'red') //transparent
+                        sel.attr('fill___', function () {
+                            select(this).attr('fill')
+                        })
                     })
                     .on('mouseout', function () {
-                        unhighlightRegions(out.map)
-                        if (out.map.insetTemplates_) {
-                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl1, ecl2)
-                        }
+                        const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
+                        const sel = nRg.selectAll("[ecl1='" + ecl1 + "']").filter("[ecl2='" + ecl2 + "']")
+                        sel.style('fill', function () {
+                            select(this).attr('fill___')
+                        })
+                        select(this).style('fill', fill)
                     })
             }
         }
 
-        // set breaks if user hasnt defined them but has enabled them
-        if (!out.breaks1 && !out.breaks2 && out.showBreaks) {
-            // Get quantiles for the first variable (X axis) and truncate to one decimal place
-            out.breaks1 = map.classifier1_.quantiles().map((value) => parseFloat(value.toFixed(0)))
-
-            // Get quantiles for the second variable (Y axis) and truncate to one decimal place
-            out.breaks2 = map.classifier2_.quantiles().map((value) => parseFloat(value.toFixed(0)))
-        }
-
-        // Draw breaks labels 1 (X axis)
+        //breaks labels 1 (x axis)
         if (out.breaks1) {
             for (let i = 0; i < out.breaks1.length; i++) {
-                const x = initialX + sz * (i + 1)
-                const y = out.squareSize + getFontSizeFromClass('em-bivariate-tick-label')
-
+                let x = initialX + sz * (i + 1)
+                let y = out.squareSize + out.labelFontSize
+                // Append labels
                 square
                     .append('text')
-                    .attr('class', 'em-bivariate-tick-label')
+                    .attr('class', 'bivariate-break1-label')
                     .attr('x', x + out.xAxisLabelsOffset.x)
                     .attr('y', y + out.xAxisLabelsOffset.y)
                     .text(out.breaks1[i])
+                    .attr('text-anchor', 'middle')
+                    .style('font-size', out.labelFontSize + 'px')
+                    .style('font-family', m.fontFamily_)
+                    .style('fill', out.fontFill)
 
+                // Append ticks
                 square
                     .append('line')
-                    .attr('class', 'em-bivariate-tick')
+                    .attr('class', 'bivariate-break1-tick')
                     .attr('x1', x + out.xAxisLabelsOffset.x)
                     .attr('x2', x + out.xAxisLabelsOffset.x)
-                    .attr('y1', out.squareSize)
-                    .attr('y2', out.squareSize + 5)
+                    .attr('y1', out.squareSize) // Starting point of the tick
+                    .attr('y2', out.squareSize + 5) // Ending point of the tick (5 pixels above the starting point)
+                    .attr('stroke', out.fontFill) // Same color as the labels
+                    .attr('stroke-width', 1) // Width of the tick line
             }
         }
 
-        // Draw breaks labels 2 (Y axis)
+        //breaks labels 2 (y axis)
         if (out.breaks2) {
             for (let i = 0; i < out.breaks2.length; i++) {
-                const x = initialX
-                const y = sz * (i + 2) - sz
+                let x = initialX
+                let y = sz * (i + 2) - sz
 
+                // Append labels
                 square
                     .append('text')
-                    .attr('class', 'em-bivariate-tick-label')
+                    .attr('class', 'bivariate-break2-label')
                     .attr('x', x + out.yAxisLabelsOffset.y)
-                    .attr('y', y - out.yAxisLabelsOffset.x)
+                    .attr('y', y - out.yAxisLabelsOffset.x - 2)
                     .text([...out.breaks2].reverse()[i])
                     .attr('text-anchor', 'middle')
-                    .attr('transform', `rotate(-90, ${x}, ${y})`)
+                    .style('font-size', out.labelFontSize + 'px')
+                    .style('font-family', m.fontFamily_)
+                    .style('fill', out.fontFill)
+                    .attr('transform', `rotate(-90, ${x}, ${y})`) // Apply rotation
 
+                // Append ticks
                 square
                     .append('line')
-                    .attr('class', 'em-bivariate-tick')
-                    .attr('x1', x)
-                    .attr('x2', x - 5)
-                    .attr('y1', y)
-                    .attr('y2', y)
+                    .attr('class', 'bivariate-break2-tick')
+                    .attr('x1', x) // Starting point of the tick (5 pixels to the left)
+                    .attr('x2', x - 5) // Ending point of the tick (aligned with label x position)
+                    .attr('y1', y) // Same y position as the label
+                    .attr('y2', y) // Same y position as the label
+                    .attr('stroke', out.fontFill) // Same color as the labels
+                    .attr('stroke-width', 1) // Width of the tick line
             }
         }
 
-        // Append X axis arrow
-        let xAxisArrowY = out.squareSize + out.arrowHeight + out.xAxisLabelsOffset.y
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5 // move over for tick labels
-
+        // append X axis arrow
+        let xAxisArrowY = out.squareSize + out.arrowHeight + out.xAxisLabelsOffset.y + out.axisPadding.y
         square
             .append('path')
-            .attr('class', 'em-bivariate-axis-arrow')
+            .attr('class', 'bivariate-axis-arrow')
             .attr(
                 'd',
                 line()([
-                    [initialX, xAxisArrowY],
-                    [initialX + out.squareSize, xAxisArrowY],
+                    [initialX, xAxisArrowY], // origin
+                    [initialX + out.squareSize, xAxisArrowY], // destination
                 ])
             )
             .attr('stroke', 'black')
             .attr('marker-end', 'url(#arrowhead)')
 
-        // Append Y axis arrow
-        let yAxisArrowX = -out.arrowHeight + out.yAxisLabelsOffset.x
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) yAxisArrowX -= out.labelFontSize / 2 // move over for tick labels
+        // X axis title
+        square
+            .append('text')
+            .attr('class', 'bivariate-axis-title')
+            .attr('x', initialX + out.xAxisLabelsOffset.x)
+            .attr('y', xAxisArrowY + out.arrowPadding)
+            .text(out.label1)
+            .attr('dominant-baseline', 'hanging')
+            .attr('alignment-baseline', 'hanging')
+            .style('font-size', out.labelFontSize + 'px')
+            .style('font-family', m.fontFamily_)
+            .style('fill', out.fontFill)
 
+        // append Y axis arrow
+        let yAxisArrowX = -out.labelFontSize + 5
         square
             .append('path')
-            .attr('class', 'em-bivariate-axis-arrow')
+            .attr('class', 'bivariate-axis-arrow')
             .attr(
                 'd',
                 line()([
@@ -218,33 +251,33 @@ export const legend = function (map, config) {
             .attr('stroke', 'black')
             .attr('marker-end', 'url(#arrowhead)')
 
-        // X axis title
+        // y axis title
         square
             .append('text')
-            .attr('class', 'em-bivariate-axis-title')
-            .attr('x', initialX + out.xAxisLabelsOffset.x)
-            .attr('y', xAxisArrowY + out.arrowPadding)
-            .text(out.label1)
-            .attr('dominant-baseline', 'hanging')
-            .attr('alignment-baseline', 'hanging')
-
-        // Y axis title
-        square
-            .append('text')
-            .attr('class', 'em-bivariate-axis-title')
+            .attr('class', 'bivariate-axis-title')
             .attr('x', -out.squareSize)
-            .attr('y', yAxisArrowX - out.arrowPadding)
-            .attr('transform', `rotate(-90)`)
+            .attr('y', -out.labelFontSize)
+            .attr('x', out.rotation == 0 ? -out.squareSize : -out.labelFontSize + out.arrowWidth / 2) //with roation 0, acts as Y axis
+            .attr('y', out.rotation == 0 ? -out.labelFontSize : out.labelFontSize + out.arrowHeight / 2)
+            .attr(
+                'transform',
+                out.rotation == 0 ? 'rotate(-90) translate(0,0)' : 'rotate(90) translate(' + out.labelFontSize / 2 + ',0)'
+            )
             .text(out.label2)
+            .style('font-size', out.labelFontSize + 'px')
+            .style('font-family', m.fontFamily_)
+            .style('fill', out.fontFill)
 
-        // Frame
+        //frame
         square
             .append('rect')
-            .attr('class', 'em-bivariate-frame')
+            .attr('class', 'bivariate-frame')
             .attr('x', initialX)
             .attr('y', 0)
             .attr('width', out.squareSize)
             .attr('height', out.squareSize)
+            .attr('fill', 'none')
+            .style('stroke', 'black')
             .attr('stroke-width', 0.7)
 
         // Arrow defs
@@ -259,74 +292,58 @@ export const legend = function (map, config) {
             .attr('markerHeight', out.arrowHeight)
             .attr('orient', 'auto')
             .append('path')
-            .attr('d', 'M 0 0 L 5 5 L 0 10')
+            .attr('d', 'M 0 0 L 5 5 L 0 10') //M2,2 L10,6 L2,10 L6,6 L2,2
             .attr('marker-units', 'strokeWidth')
 
-        // 'No data' legend box
+        //'no data' legend box
         if (out.noData) {
-            const noDataYOffset =
-                out.rotation === 0 ? out.noDataYOffset + out.squareSize / out.map.clnb_ + out.arrowHeight / 2 : out.noDataYOffset
+            // add extra padding when rotation is 0
+            let noDataYOffset =
+                out.rotation == 0 ? out.noDataYOffset + out.squareSize / out.map.clnb_ + out.arrowHeight / 2 : out.noDataYOffset
 
             y =
-                out.rotation === 0
+                out.rotation == 0
                     ? y + out.squareSize + noDataYOffset
                     : y + 1.4142 * out.squareSize + out.boxPadding * 2 + noDataYOffset
 
+            //rectangle
             lgg.append('rect')
-                .attr('class', 'em-bivariate-nodata')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.noDataShapeWidth)
                 .attr('height', out.noDataShapeHeight)
-                .style('fill', out.map.noDataFillStyle())
+                .attr('fill', m.noDataFillStyle())
+                .attr('stroke', 'black')
+                .attr('stroke-width', 0.7)
                 .on('mouseover', function () {
-                    const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
+                    const regions = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
                     const sel = regions.selectAll("[nd='nd']")
-                    sel.style('fill', 'red')
+                    sel.style('fill', 'red') //transparent
+                    sel.attr('fill___', function (d) {
+                        select(this).attr('fill')
+                    })
                 })
                 .on('mouseout', function () {
-                    const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
+                    const nRg = out.map.nutsLvl_ == 'mixed' ? selectAll('#g_nutsrg') : select('#g_nutsrg')
                     const sel = nRg.selectAll("[nd='nd']")
-                    sel.style('fill', function () {
-                        return select(this).attr('fill___')
+                    sel.style('fill', function (d) {
+                        select(this).attr('fill___')
                     })
-                    select(this).style('fill', out.map.noDataFillStyle())
+                    select(this).style('fill', m.noDataFillStyle())
                 })
+            //'no data' label
             lgg.append('text')
-                .attr('class', 'em-bivariate-nodata-label')
                 .attr('x', out.boxPadding + out.noDataShapeWidth + 5)
                 .attr('y', y + out.noDataShapeHeight * 0.5 + 1)
                 .text(out.noDataText)
+                .style('font-size', out.labelFontSize + 'px')
+                .style('font-family', m.fontFamily_)
+                .style('fill', out.fontFill)
+                .style('dominant-baseline', 'middle')
         }
 
-        // Set legend box dimensions
+        //set legend box dimensions
         out.setBoxDimension()
-    }
-
-    // Highlight selected regions on mouseover
-    function highlightRegions(map, ecl1, ecl2) {
-        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
-
-        // Set all regions to white
-        allRegions.style('fill', 'white')
-
-        // Highlight only the selected regions by restoring their original color
-        const selectedRegions = allRegions.filter(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
-        selectedRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-        })
-    }
-
-    // Reset all regions to their original colors on mouseout
-    function unhighlightRegions(map) {
-        const selector = map.geo_ === 'WORLD' ? '#g_worldrg' : '#em-nutsrg'
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
-
-        // Restore each region's original color from the fill___ attribute
-        allRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
-        })
     }
 
     return out

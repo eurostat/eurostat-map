@@ -38,10 +38,10 @@
             basemap = function () {
                 return (
                     eurostatmap
-                        .map('proportionalSymbol')
+                        .map('ps')
                         .svgId('mappy')
                         .containerId('container')
-                        .pixelSize(7400)
+                        .pixSize(7400)
                         .width(mapWidth)
                         .height(mapHeight)
                         .bottomText(null)
@@ -86,7 +86,7 @@
                         //.zoomExtent([1,10])
                         .showScalebar(true)
                         .scalebarPosition([420, 560])
-                        .hoverColor('#003E8C')
+                        .nutsrgSelFillSty('#003E8C')
                         .drawCoastalMargin(true)
                 )
             }

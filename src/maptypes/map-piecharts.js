@@ -219,28 +219,28 @@ export const map = function (config) {
         if (out.svg_) {
             let s = out.svg_.selectAll('#g_ps')
             if (s) {
-                let sym = s.selectAll('g.em-symbol')
+                let sym = s.selectAll('g.symbol')
                 sym.append('g').attr('id', (rg) => {
                     nutsIds.push(rg.properties.id)
                     return 'pie_' + rg.properties.id
                 })
 
                 // set region hover function
-                let selector = out.geo_ == 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+                let selector = out.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
                 let regions = out.svg().selectAll(selector)
                 regions
                     .on('mouseover', function (e, rg) {
                         if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
                             if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
                                 const sel = select(this)
-                                sel.attr('fill___', sel.style('fill'))
-                                sel.style('fill', out.hoverColor_)
+                                sel.attr('fill___', sel.attr('fill'))
+                                sel.attr('fill', out.nutsrgSelFillSty_)
                                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                             }
                         } else {
                             const sel = select(this)
-                            sel.attr('fill___', sel.style('fill'))
-                            sel.style('fill', out.hoverColor_)
+                            sel.attr('fill___', sel.attr('fill'))
+                            sel.attr('fill', out.nutsrgSelFillSty_)
                             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                         }
                     })
@@ -255,9 +255,10 @@ export const map = function (config) {
                     })
                     .on('mouseout', function () {
                         const sel = select(this)
+                        let currentFill = sel.attr('fill')
                         let newFill = sel.attr('fill___')
                         if (newFill) {
-                            sel.style('fill', sel.attr('fill___'))
+                            sel.attr('fill', sel.attr('fill___'))
                             if (out._tooltip) out._tooltip.mouseout()
                         }
                     })
@@ -329,7 +330,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         let totals = []
-        let sel = out.svg().selectAll('#g_ps').selectAll('g.em-symbol').data()
+        let sel = out.svg().selectAll('#g_ps').selectAll('g.symbol').data()
 
         sel.forEach((rg) => {
             let id = rg.properties.id
@@ -413,10 +414,7 @@ export const map = function (config) {
                 .selectAll('path')
                 .data(pie_(data))
                 .join('path')
-                .style('fill', (d) => {
-                    return out.catColors_[d.data.code] || 'lightgray'
-                })
-                .attr('fill___', (d) => {
+                .attr('fill', (d) => {
                     return out.catColors_[d.data.code] || 'lightgray'
                 })
                 .attr('code', (d) => d.data.code) //for mouseover legend highlighting function
@@ -440,12 +438,20 @@ export const map = function (config) {
 
         if (rg.properties.id) {
             //name and code
-            tp.append('div')
-                .attr('class', 'estat-vis-tooltip-bar')
-                .html(rg.properties.na + ' (' + rg.properties.id + ')')
+            tp.append('div').html(
+                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                    rg.properties.na +
+                    ' (' +
+                    rg.properties.id +
+                    ') </div>'
+            )
         } else {
             //region name
-            tp.append('div').attr('class', 'estat-vis-tooltip-bar').html(rg.properties.na)
+            tp.append('div').html(
+                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                    rg.properties.na +
+                    '</div>'
+            )
         }
 
         //prepare data for pie chart
@@ -469,10 +475,8 @@ export const map = function (config) {
         const radius = Math.min(width, height) / 2 - margin
 
         //width = tp.node().getBoundingClientRect().width
-        const container = tp.append('div').attr('class', 'em-tooltip-piechart-container')
-        const svg = container
+        const svg = tp
             .append('svg')
-            .attr('class', 'em-tooltip-piechart-svg')
             .attr('viewbox', `0, 0, ${width}, ${height}`)
             .attr('width', width)
             .attr('height', height - margin / 2)
@@ -499,7 +503,7 @@ export const map = function (config) {
             .enter()
             .append('path')
             .attr('d', innerArc)
-            .style('fill', (d) => {
+            .attr('fill', (d) => {
                 return out.catColors()[d.data.code] || 'lightgray'
             })
             .attr('stroke', 'white')
@@ -549,26 +553,28 @@ export const map = function (config) {
             .style('font-size', '12px')
 
         // add region values to tooltip
-        let breakdownDiv = tp.append('div').attr('class', 'em-tooltip-piechart-breakdown')
+        let breakdownDiv = document.createElement('div')
+        breakdownDiv.style.padding = '10px'
+        breakdownDiv.style.paddingTop = '0px'
+        breakdownDiv.style.fontSize = '13px'
+        //let units = out.statData(out.statCodes_[0]).unitText();
 
         // show value for each category
         for (let i = 0; i < out.statCodes_.length; i++) {
-            // retrieve code and stat value
+            //retrieve code and stat value
             const sc = out.statCodes_[i]
             const s = out.statData(sc).get(rg.properties.id)
-
-            // check if s and s.value are valid (handle null, undefined, or 0)
-            if (s && s.value !== undefined && s.value !== null) {
-                let string = `<strong>${out.catLabels_[sc]}</strong>: ${s.value.toFixed()}<br>`
-                breakdownDiv.html(breakdownDiv.html() + string) // safely update the HTML
+            if (s && s.value) {
+                let string = '<strong>' + out.catLabels_[sc] + '</strong>: ' + s.value.toFixed() + '<br>'
+                breakdownDiv.innerHTML = breakdownDiv.innerHTML + string
             }
         }
 
-        // write total (handle null, undefined, or 0 values for total)
+        //write total
         let total = getRegionTotal(rg.properties.id)
-        if (total !== undefined && total !== null) {
-            breakdownDiv.html(breakdownDiv.html() + `<strong>Total</strong>: ${total.toFixed()}<br>`)
-        }
+        breakdownDiv.innerHTML = breakdownDiv.innerHTML + `<strong>Total</strong>: ${total.toFixed()} <br>`
+        // append div to tooltip
+        tp.node().appendChild(breakdownDiv)
     }
 
     return out

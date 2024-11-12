@@ -19,8 +19,8 @@
             let mapHeight = 608
 
             map = eurostatmap
-                .map('choropleth')
-                .pixelSize(7400)
+                .map('ch')
+                .pixSize(7400)
                 .width(mapWidth)
                 .height(mapHeight)
                 .bottomText(null)
@@ -64,7 +64,7 @@
                 //.zoomExtent([1,10])
                 .showScalebar(true)
                 .scalebarPosition([420, 560])
-                .hoverColor('#003E8C')
+                .nutsrgSelFillSty('#003E8C')
 
                 //.labelling(true)
                 .labelsToShow(['seas', 'values', 'cc'])
@@ -79,6 +79,7 @@
                     //     </div>
                     //     <div class="estat-vis-tooltip-text">
                     //         <table class="nuts-table">
+
                     //         </table>
                     //     </div>
                     //     `

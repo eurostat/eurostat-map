@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('chbi')
+                .nutsLvl(2)
+                .nutsYear(2016)
+                //.stat("v1", { eurostatDatasetCode:"demo_r_gind3", filters: { indic_de: "GROWRT", time: 2016 }, unitText: "‰" } )
+                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
+                .stat('v2', {
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2017 },
+                    unitText: '%',
+                })
+                .countriesToShow([
+                    'AT',
+                    'BE',
+                    'BG',
+                    'CY',
+                    'CZ',
+                    'DE',
+                    'DK',
+                    'EE',
+                    'EL',
+                    'ES',
+                    'FI',
+                    'FR',
+                    'HR',
+                    'HU',
+                    'IE',
+                    'IT',
+                    'LI',
+                    'LT',
+                    'LU',
+                    'LV',
+                    'MT',
+                    'NL',
+                    'PL',
+                    'PT',
+                    'RO',
+                    'SE',
+                    'SI',
+                    'SK',
+                ])
+                .bordersToShow(['efta', 'eu', 'oth', 'cc', 'co'])
+                .title('Unemployment and population density')
+                .insets('default')
+                .scale('60M')
+                .legend({
+                    boxFill: 'none',
+                    squareSize: 110,
+                    rotation: -45,
+                    label1: 'Unemployment ',
+                    label2: 'Population',
+                    x: 10,
+                    y: 120,
+                })
+                .drawGraticule(false)
+                .seaFillStyle('#d3dee8')
+                .drawCoastalMargin(false)
+                .zoomExtent([1, 2])
+                .build()
+        </script>
+    </body>
+</html>

@@ -20,7 +20,7 @@ test('Two maps on a single page', async () => {
         // these will be executed within test.html, that was loaded before
         //builds test map in test.html
         eurostatmap
-            .map('choropleth')
+            .map('ch')
             .svgId('testMap1')
             .title('Population in Europe')
             .width(400)
@@ -36,7 +36,7 @@ test('Two maps on a single page', async () => {
             .build()
 
         eurostatmap
-            .map('categorical')
+            .map('ct')
             .svgId('testMap2')
             .title('NUTS urban/rural typology')
             .width(400)
