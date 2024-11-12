@@ -67,7 +67,7 @@ export const map = function (config) {
         }
         out.colorFun_ = v
         // update class style function
-        if (out.filtersDefinitionFun_) {
+        if (out.filtersDefinitionFunction_) {
             // if dot density
             out.classToFillStyle(getFillPatternLegend())
         } else {
@@ -81,10 +81,10 @@ export const map = function (config) {
         out.numberOfClasses(v.length + 1)
         return out
     }
-    out.filtersDefinitionFun = function (v) {
-        if (!arguments.length) return out.filtersDefinitionFun_
-        out.filtersDefinitionFun_ = v
-        if (out.svg()) out.filtersDefinitionFun_(out.svg(), out.numberOfClasses_)
+    out.filtersDefinitionFunction = function (v) {
+        if (!arguments.length) return out.filtersDefinitionFunction_
+        out.filtersDefinitionFunction_ = v
+        if (out.svg()) out.filtersDefinitionFunction_(out.svg(), out.numberOfClasses_)
         return out
     }
 
@@ -192,7 +192,7 @@ export const map = function (config) {
 
     function applyStyleToMap(map) {
         // Define function to get a class' color
-        if (out.filtersDefinitionFun_) {
+        if (out.filtersDefinitionFunction_) {
             // Dot density style
             out.classToFillStyle(getFillPatternLegend())
         } else {

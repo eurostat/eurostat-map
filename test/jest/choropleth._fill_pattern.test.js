@@ -29,7 +29,7 @@ test('choropleth with fill pattern', async () => {
             .classificationMethod('threshold')
             .threshold([35, 50, 80, 100, 140, 180, 300, 500, 1300])
 
-            .filtersDefinitionFun(
+            .filtersDefinitionFunction(
                 eurostatmap.getFillPatternDefinitionFun({
                     patternSize: 5,
                     shape: 'circle',

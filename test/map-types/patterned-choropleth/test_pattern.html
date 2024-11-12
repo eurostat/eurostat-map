@@ -25,7 +25,7 @@
                 .titleFill('#444')
                 .scale('60M')
                 .classificationMethod('threshold')
-                .filtersDefinitionFun(
+                .filtersDefinitionFunction(
                     eurostatmap.getFillPatternDefinitionFun({
                         patternSize: 5,
                         shape: 'circle',
@@ -74,7 +74,7 @@
 
             // update data, classification
             setTimeout(() => {
-                map.threshold([1000, 9000]).filtersDefinitionFun(
+                map.threshold([1000, 9000]).filtersDefinitionFunction(
                     eurostatmap.getFillPatternDefinitionFun({
                         patternSize: 5,
                         shape: 'square',
@@ -92,7 +92,7 @@
             }, 2000)
 
             setTimeout(() => {
-                map.threshold([1000, 3000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000]).filtersDefinitionFun(
+                map.threshold([1000, 3000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000]).filtersDefinitionFunction(
                     eurostatmap.getFillPatternDefinitionFun({
                         patternSize: 5,
                         shape: 'square',
@@ -110,7 +110,7 @@
             }, 4000)
 
             setTimeout(() => {
-                map.threshold([1000, 3000, 6000, 99000]).filtersDefinitionFun(
+                map.threshold([1000, 3000, 6000, 99000]).filtersDefinitionFunction(
                     eurostatmap.getFillPatternDefinitionFun({
                         patternSize: 5,
                         shape: 'square',

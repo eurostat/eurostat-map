@@ -408,48 +408,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    // coastal margin width override
-    out.coastalMarginWidth = function (v) {
-        if (!arguments.length) return out.coastalMarginWidth_
-        out.coastalMarginWidth_ = v
-
-        //update insets
-        for (const geo in out.insetTemplates_) {
-            if (Array.isArray(out.insetTemplates_[geo])) {
-                // check for insets within insets
-                for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                    //check for insets within insets within insets
-                    if (Array.isArray(out.insetTemplates_[geo][i])) {
-                        for (var n = 0; n < out.insetTemplates_[geo][i].length; n++) {
-                            let inset = out.insetTemplates_[geo][i][n]
-                            //set
-                            inset.coastalMarginWidth_ = out.coastalMarginWidth_
-                            //redraw
-                            inset.drawCoastalMargin(true)
-                        }
-                    } else {
-                        let inset = out.insetTemplates_[geo][i]
-                        //set
-                        inset.coastalMarginWidth_ = out.coastalMarginWidth_
-                        //redraw
-                        inset.drawCoastalMargin(true)
-                    }
-                }
-            } else {
-                let inset = out.insetTemplates_[geo]
-                //set
-                inset.coastalMarginWidth_ = out.coastalMarginWidth_
-                //redraw
-                inset.drawCoastalMargin(true)
-            }
-        }
-
-        //redraw
-        out.drawCoastalMargin(true)
-
-        return out
-    }
-
     // initiate Geometries class
     out.Geometries = Geometries(out, withCenterPoints)
 
