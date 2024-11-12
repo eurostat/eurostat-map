@@ -149,7 +149,7 @@ export const map = function (config) {
                 const regionData = out.statData().get(rg.properties.id)
                 if (!regionData) return // Lack of data is handled explicitly
                 const value = regionData.value
-                if (value === ':') return 'nd'
+                if (value === ':' || value === null) return 'nd'
                 return value != null ? +out.classifier_(value) : undefined
             })
         }
