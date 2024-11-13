@@ -3,7 +3,7 @@ import { schemeCategory10 } from 'd3-scale-chromatic'
 //schemeSet3 schemeDark2 schemePastel1 schemeTableau10
 import * as StatMap from '../core/stat-map'
 import * as StripeCompositionLegend from '../legend/legend-stripe-composition'
-
+import { getCSSPropertyFromClass } from '../core/utils'
 /**
  * Return a stripe composition map.
  *
@@ -178,7 +178,7 @@ export const map = function (config) {
             .style('fill', function (d) {
                 const id = d.properties.id
 
-                if (!out.countriesToShow_.includes(id[0] + id[1])) return out.nutsrgFillStyle_
+                if (!out.countriesToShow_.includes(id[0] + id[1])) return getCSSPropertyFromClass('em-nutsrg', 'fill')
 
                 //compute composition
                 const composition = getComposition(id)

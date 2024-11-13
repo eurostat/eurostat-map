@@ -179,7 +179,7 @@ a text {
 
 .em-bn-co {
     stroke: black;
-    stroke-width: 0;
+    stroke-width: 0.1;
 }
 
 /* dont fill certain elements */

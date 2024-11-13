@@ -62,11 +62,6 @@ It is also possible to build thematic world maps using eurostat-map. Simply pass
 
 | Method                                     | Type          | Default value       | Description                                                                |
 | ------------------------------------------ | ------------- | ------------------- | -------------------------------------------------------------------------- |
-| _map_.**worldFillStyle**([*value*])        | string        | _'#E6E6E6'_         | The default fill colour for territories on a world map                     |
-| _map_.**worldStroke**([*value*])           | string        | _'black'_           | The default stroke colour of the borders for states on a world map.        |
-| _map_.**worldStrokeWidth**([*value*])      | number        | _1_                 | The default stroke width of the borders of states on a world map.          |
-| _map_.**worldCoastStroke**([*value*])      | string        | _'none'_            | The default stroke colour of the coastal borders of states on a world map. |
-| _map_.**worldCoastStrokeWidth**([*value*]) | number        | _0.3_               | The default stroke width of the coastal borders of states on a world map.  |
 | _map_.**projectionFunction**([*value*])    | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps     |
 
 ## Statistical data
@@ -648,7 +643,6 @@ Specify the map title, its style and position.
 | _map_.**title**([*value*])              | String        | ""            | The title text.                                                                                        |
 | _map_.**titlePosition**([*value*])      | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
 | _map_.**subtitle**([*value*])           | String        | ""            | The subtitle text.                                                                                     |
-| _map_.**subtitleFontWeight**([*value*]) | String        | "bold"        | The subtitle text weight.                                                                              |
 | _map_.**subtitlePosition**([*value*])   | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
 
 

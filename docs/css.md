@@ -20,8 +20,6 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-cntrg
 .em-nutsrg
 .em-worldrg
-.em-nutsrg
-.em-worldrg
 #g_worldbn
 #em-nutsbn
 .em-cntbn

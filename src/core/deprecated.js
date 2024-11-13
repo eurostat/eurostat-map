@@ -15,10 +15,13 @@ export const defineDeprecatedFunctions = (out) => {
     out.nutsrgSelFillSty = (v) => (console.warn('nutsrgSelFillSty() is now DEPRECATED, please use hoverColor() instead'), out.hoverColor_ = v, out);
     out.titleFontSize = (v) => (console.warn('map.titleFontSize() is now DEPRECATED. please use the .em-title CSS class'), out);
     out.subtitleFontSize = (v) => (console.warn('map.subtitleFontSize() is now DEPRECATED. please use the .em-subtitle CSS class'), out);
+    out.subtitleFontWeight = (v) => (console.warn('map.subtitleFontWeight() is now DEPRECATED. please use the .em-subtitle CSS class'), out);
     out.titleFill = (v) => (console.warn('map.titleFill() is now DEPRECATED. please use the .em-title CSS class'), out);
     out.subtitleFill = (v) => (console.warn('map.subtitleFill() is now DEPRECATED. please use the .em-subtitle CSS class'), out);
     out.cntbnStroke = (v) => (console.warn('map.cntbnStroke() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
     out.cntbnStrokeWidth = (v) => (console.warn('map.cntbnStrokeWidth() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
+    out.worldStroke = (v) => (console.warn('map.worldStroke() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
+    out.worldStrokeWidth = (v) => (console.warn('map.worldStrokeWidth() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
     out.worldCoastStroke = (v) => (console.warn('map.worldCoastStroke() is now DEPRECATED. please use the .em-bn-co CSS class'), out);
     out.worldCoastStrokeWidth = (v) => (console.warn('map.worldCoastStrokeWidth() is now DEPRECATED. please use the .em-bn-co CSS class'), out);
     out.worldFillStyle = (v) => (console.warn('map.worldFillStyle() is now DEPRECATED. please use the .em-worldcoast CSS class'), out);

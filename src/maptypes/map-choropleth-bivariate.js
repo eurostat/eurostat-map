@@ -3,7 +3,7 @@ import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
-import { spaceAsThousandSeparator } from '../core/utils'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * Return a bivariate choropleth map.
@@ -238,12 +238,12 @@ export const map = function (config) {
                         const ecl1 = select(this).attr('ecl1')
                         if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
                         const ecl2 = select(this).attr('ecl2')
-                        if (!ecl1 && !ecl2) return out.nutsrgFillStyle_ // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+                        if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg','fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
                         if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
                         let color = out.classToFillStyle()(+ecl1, +ecl2)
                         return color
                     } else {
-                        return out.nutsrgFillStyle_
+                        return getCSSPropertyFromClass('em-nutsrg','fill')
                     }
                 })
                 .end()

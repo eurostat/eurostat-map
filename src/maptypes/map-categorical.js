@@ -3,7 +3,7 @@ import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as CategoricalLegend from '../legend/legend-categorical'
-import { executeForAllInsets, getCSSPropertyFromClass } from '../core/utils'
+import { executeForAllInsets } from '../core/utils'
 
 /**
  * Returns a categorical map.

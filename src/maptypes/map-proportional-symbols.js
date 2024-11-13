@@ -5,7 +5,7 @@ import { interpolateOrRd } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass } from '../core/utils'
 
 /**
  * Returns a proportional symbol map.
@@ -300,7 +300,7 @@ export const map = function (config) {
                             return out.noDataFillStyle_
                         }
                         // DATA
-                        return out.nutsrgFillStyle_
+                        return getCSSPropertyFromClass('em-nutsrg', 'fill')
                     }
                 })
 
@@ -324,7 +324,7 @@ export const map = function (config) {
                     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0) || sv.value == ':') {
                         return out.worldFillStyle_
                     } else {
-                        return out.nutsrgFillStyle_
+                        return getCSSPropertyFromClass('em-nutsrg', 'fill')
                     }
                 })
             }

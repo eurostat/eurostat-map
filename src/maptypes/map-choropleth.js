@@ -6,6 +6,7 @@ import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
+import { getCSSPropertyFromClass } from '../core/utils'
 
 /**
  * Returns a chroropleth map.
@@ -151,7 +152,7 @@ export const map = function (config) {
                     break
                 }
                 case 'ckmeans': {
-                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map(v => v.pop()) // Calculate breaks for ckmeans
+                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((v) => v.pop()) // Calculate breaks for ckmeans
                     out.classifier(scaleThreshold().domain(ckmeansBreaks.slice(1, -1)).range(range)) // Use ckmeans breaks in scale
                     break
                 }
@@ -281,7 +282,7 @@ export const map = function (config) {
     const regionsFillFunction = function (rg) {
         const ecl = select(this).attr('ecl') // 'this' refers to the current DOM element
         if (out.Geometries.userGeometries) {
-            if (!ecl) return out.nutsrgFillStyle_
+            if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
             if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
             return out.classToFillStyle()(ecl, out.numberOfClasses_)
         } else {
@@ -295,11 +296,11 @@ export const map = function (config) {
                 // NUTS template logic
                 const countryId = rg.properties.id.slice(0, 2)
                 if (out.countriesToShow_.includes(countryId)) {
-                    if (!ecl) return out.nutsrgFillStyle_
+                    if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
                     if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
                     return out.classToFillStyle()(ecl, out.numberOfClasses_)
                 }
-                return out.nutsrgFillStyle_
+                return getCSSPropertyFromClass('em-nutsrg', 'fill')
             }
         }
     }

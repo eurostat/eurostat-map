@@ -586,7 +586,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 const ggeo = ing
                     .append('g')
                     .attr('id', 'em-inset-' + config.svgId)
-                    .attr('class','em-inset')
+                    .attr('class', 'em-inset')
                     .attr('transform', 'translate(' + x + ',' + y + ')')
                 ggeo.append('svg').attr('id', config.svgId)
             }
@@ -634,31 +634,37 @@ export const mapTemplate = function (config, withCenterPoints) {
                 )
             )
         } else {
+            out.pixelSize(100)
         }
     }
 
     const defineProjection = function () {
-        //SVG drawing function
-        //compute geo bbox from geocenter, pixelSize and SVG dimensions
-        const bbox = [
-            out.geoCenter_[0] - 0.5 * out.pixelSize_ * out.width_,
-            out.geoCenter_[1] - 0.5 * out.pixelSize_ * out.height_,
-            out.geoCenter_[0] + 0.5 * out.pixelSize_ * out.width_,
-            out.geoCenter_[1] + 0.5 * out.pixelSize_ * out.height_,
-        ]
+        // Define projection based on the geographical context
 
-        //WORLD geo uses 4326 geometries and reprojects to 54030 using d3
-        if (out.geo_ == 'WORLD') {
-            out._projection = out.projectionFunction_
-                ? out.projectionFunction_
-                : geoRobinson()
-                      // center and scale to container properly
-                      .translate([out.width_ / 2, out.height_ / 2])
-                      .scale((out.width_ - 20) / 2 / Math.PI)
+        if (out.geo_ === 'WORLD') {
+            // Use Robinson projection for the world with optional custom projection function
+            out._projection =
+                out.projectionFunction_ ||
+                geoRobinson()
+                    .translate([out.width_ / 2, out.height_ / 2])
+                    .scale((out.width_ - 20) / (2 * Math.PI))
         } else {
-            out._projection = out.projectionFunction_
-                ? out.projectionFunction_
-                : geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(bbox))
+            // For non-WORLD geo, use custom or default identity projection with calculated bounding box
+            out._projection =
+                out.projectionFunction_ || geoIdentity().reflectY(true).fitSize([out.width_, out.height_], calculateBboxGeoJSON())
+        }
+
+        // Helper function to calculate bbox and return as GeoJSON
+        function calculateBboxGeoJSON() {
+            const halfWidth = 0.5 * out.pixelSize_ * out.width_
+            const halfHeight = 0.5 * out.pixelSize_ * out.height_
+            const bbox = [
+                out.geoCenter_[0] - halfWidth,
+                out.geoCenter_[1] - halfHeight,
+                out.geoCenter_[0] + halfWidth,
+                out.geoCenter_[1] + halfHeight,
+            ]
+            return getBBOXAsGeoJSON(bbox)
         }
     }
 
