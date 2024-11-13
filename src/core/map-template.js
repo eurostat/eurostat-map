@@ -1037,14 +1037,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .on('zoom', function (e) {
                     const k = e.transform.k
                     const cs = ['gra', 'bn_0', /*"bn_1", "bn_2", "bn_3",*/ 'bn_co', 'cntbn', 'symbol']
-                    //for (let i = 0; i < cs.length; i++) {
-                    // change border thickness?
-                    //     out.svg()
-                    //         .selectAll('.' + cs[i])
-                    //         .style('stroke-width', function (d) {
-                    //             return 1 / k + 'px'
-                    //         })
-                    // }
+                    for (let i = 0; i < cs.length; i++) {
+                        //change border thickness?
+                        out.svg()
+                            .selectAll('.' + cs[i])
+                            .style('stroke-width', function (d) {
+                                return 1 / k + 'px'
+                            })
+                    }
 
                     zg.attr('transform', e.transform)
                 })

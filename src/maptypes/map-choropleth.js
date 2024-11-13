@@ -270,6 +270,8 @@ export const map = function (config) {
                         return ecl && lvl !== '0' ? map.nutsbnStroke_[parseInt(lvl)] || '#777' : null
                     })
                     .style('stroke-width', function () {
+                        // TODO: COASTLINE SHOULD NOT HAVE STROKE. ADDING STROKE-WIDTH TO REGIONS WITH DATA CAUSES COASTLINE TO HAVE STROKE.
+                        // SOLUTION: select all borders of the region and only apply stroke to those that are not coastal
                         const lvl = select(this).attr('lvl')
                         const ecl = select(this).attr('ecl')
                         return ecl && lvl !== '0' ? map.nutsbnStrokeWidth_[parseInt(lvl)] || 0.2 : null

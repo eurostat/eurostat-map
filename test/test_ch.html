@@ -14,83 +14,19 @@
                 .map('ch')
                 .title('Population density in Europe')
                 .classifMethod('threshold')
-                .threshold([-45, -35, -30, -25, -20])
-                .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'].reverse())
+                .threshold([50, 100, 200, 300, 400])
+                .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
                 .nutsLvl(0)
                 .legend({ x: 500, y: 180, title: 'Density, people/km²' })
-            map.statData().setData({
-                EU27_2020: -27.3,
-                BE: -24.4,
-                BG: -24.4,
-                CZ: -31,
-                DK: -31.1,
-                DE: -29.7,
-                EE: -49.9,
-                IE: -51.6,
-                EL: -28.6,
-                ES: -28.3,
-                FR: -22.4,
-                HR: -32.3,
-                IT: -22.4,
-                CY: -24.5,
-                LV: -28.1,
-                LT: -25.4,
-                LU: -20.5,
-                HU: -30.9,
-                MT: -67.4,
-                NL: -32.8,
-                AT: -18.4,
-                PL: -29.4,
-                PT: -25.9,
-                RO: -42.9,
-                SI: -34,
-                SK: -31.4,
-                FI: -33.8,
-                SE: -33.5,
-                IS: -16.1,
-                NO: -17.4,
-                CH: -30.2,
-            }),
-                map.build()
+
+            map.build()
 
             //update data and classification
-            const colors = ['#003C50', '#68AEBA', '#C9DDEA', '#EBBE5C', '#C95E1D', '#7C170F'].reverse()
-            const thresholds = [35, 20, 0, -20, -40]
-            const data = {
-                BE: 9.3,
-                BG: 2.6,
-                CZ: 76.2,
-                DK: ':',
-                DE: -34.5,
-                EE: -5.8,
-                IE: -28,
-                EL: -41,
-                ES: 10.6,
-                FR: 20,
-                HR: -42.5,
-                IT: 14,
-                CY: 25.4,
-                LV: -31.2,
-                LT: -41.2,
-                LU: -74,
-                HU: -5.9,
-                MT: ':',
-                NL: -52.2,
-                AT: -38.6,
-                PL: 28.7,
-                PT: -60.8,
-                RO: -10.5,
-                SI: -41.7,
-                SK: 48.5,
-                FI: -31,
-                SE: -21.8,
-                IS: -29.9,
-                NO: -15.8,
-                CH: 51.3,
-            }
+            const colors = ['#003C50', '#68AEBA', '#C9DDEA', '#EBBE5C', '#C95E1D', '#7C170F']
+
             setTimeout(() => {
                 map.statData().setData(data)
-                map.colors([...colors]).threshold(thresholds)
+                map.colors([...colors]).threshold([50, 100, 200, 300, 400])
                 map.updateStatValues()
             }, 4000)
         </script>
