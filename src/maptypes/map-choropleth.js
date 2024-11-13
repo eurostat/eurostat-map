@@ -5,7 +5,7 @@ import { interpolateYlOrBr } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
-import { jenks } from 'simple-statistics'
+import { jenks, ckmeans } from 'simple-statistics'
 
 /**
  * Returns a chroropleth map.
@@ -126,10 +126,12 @@ export const map = function (config) {
             const range = generateRange(out.numberOfClasses_)
 
             switch (out.classificationMethod_) {
-                case 'quantile':
+                case 'quantile': {
                     out.classifier(scaleQuantile().domain(dataArray).range(range))
                     break
-                case 'equinter':
+                }
+                case 'equal-interval':
+                case 'equinter': {
                     out.classifier(
                         scaleQuantize()
                             .domain([min(dataArray), max(dataArray)])
@@ -137,14 +139,22 @@ export const map = function (config) {
                     )
                     if (out.makeClassifNice_) out.classifier().nice()
                     break
-                case 'threshold':
+                }
+                case 'threshold': {
                     out.numberOfClasses(out.threshold_.length + 1)
                     out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.numberOfClasses_)))
                     break
-                case 'jenks':
+                }
+                case 'jenks': {
                     const jenksBreaks = jenks(dataArray, out.numberOfClasses_) // Calculate breaks for Jenks
                     out.classifier(scaleThreshold().domain(jenksBreaks.slice(1, -1)).range(range)) // Use Jenks breaks in scale
                     break
+                }
+                case 'ckmeans': {
+                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map(v => v.pop()) // Calculate breaks for ckmeans
+                    out.classifier(scaleThreshold().domain(ckmeansBreaks.slice(1, -1)).range(range)) // Use ckmeans breaks in scale
+                    break
+                }
             }
         }
 
