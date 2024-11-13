@@ -54,9 +54,6 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.pixelSize_ = undefined
     out.zoomExtent_ = undefined
 
-    //common / shared styles
-    out.fontFamily_ = 'Helvetica, Arial, sans-serif'
-
     //map title
     out.title_ = ''
     out.titlePosition_ = undefined
@@ -64,10 +61,6 @@ export const mapTemplate = function (config, withCenterPoints) {
     //map subtitle
     out.subtitle_ = ''
     out.subtitlePosition_ = undefined
-
-    //map frame (none by default)
-    out.frameStroke_ = 'none'
-    out.frameStrokeWidth_ = 0.3
 
     //scalebar
     out.showScalebar_ = false
@@ -592,7 +585,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                     config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
                 const ggeo = ing
                     .append('g')
-                    .attr('id', 'insetzg' + config.svgId)
+                    .attr('id', 'em-inset-' + config.svgId)
+                    .attr('class','em-inset')
                     .attr('transform', 'translate(' + x + ',' + y + ')')
                 ggeo.append('svg').attr('id', config.svgId)
             }
@@ -1495,17 +1489,17 @@ export const mapTemplate = function (config, withCenterPoints) {
             'graticuleStroke_', // DEPRECATED
             'graticuleStrokeWidth_', // DEPRECATED
             'labelling_',
-            'labelFill_',
-            'labelValuesFontSize_',
-            'labelOpacity_',
-            'labelStroke_',
-            'labelStrokeWidth_',
-            'labelShadowWidth_',
+            'labelFill_', // DEPRECATED
+            'labelValuesFontSize_', // DEPRECATED
+            'labelOpacity_', // DEPRECATED
+            'labelStroke_', // DEPRECATED
+            'labelStrokeWidth_', // DEPRECATED
+            'labelShadowWidth_', // DEPRECATED
             'labelShadow_',
-            'labelShadowColor_',
+            'labelShadowColor_', // DEPRECATED
             'labelShadowsToShow_',
             'labelsToShow_',
-            'fontFamily_',
+            'fontFamily_', // DEPRECATED
             'lg_',
             'projectionFunction_',
             'filterGeometriesFunction_',
@@ -1565,16 +1559,15 @@ const _defaultPosition = {
  */
 const defaultInsetConfig = function (s, p) {
     const out = [
-        { geo: 'IC', x: 0, y: 0, width: s, height: 0.3 * s, frameStroke: 'black' },
-        { geo: 'CARIB', x: 0, y: 0.3 * s + p, width: 0.5 * s, height: s, frameStroke: 'black' },
-        { geo: 'GF', x: 0.5 * s, y: 0.3 * s + p, width: 0.5 * s, height: 0.75 * s, frameStroke: 'black' },
+        { geo: 'IC', x: 0, y: 0, width: s, height: 0.3 * s },
+        { geo: 'CARIB', x: 0, y: 0.3 * s + p, width: 0.5 * s, height: s },
+        { geo: 'GF', x: 0.5 * s, y: 0.3 * s + p, width: 0.5 * s, height: 0.75 * s },
         {
             geo: 'YT',
             x: 0.5 * s,
             y: 1.05 * s + p,
             width: 0.25 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
         {
             geo: 'RE',
@@ -1582,7 +1575,6 @@ const defaultInsetConfig = function (s, p) {
             y: 1.05 * s + p,
             width: 0.25 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
         {
             geo: 'PT20',
@@ -1590,7 +1582,6 @@ const defaultInsetConfig = function (s, p) {
             y: 1.3 * s + 2 * p,
             width: 0.75 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
         {
             geo: 'PT30',
@@ -1598,16 +1589,14 @@ const defaultInsetConfig = function (s, p) {
             y: 1.3 * s + 2 * p,
             width: 0.25 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
-        { geo: 'MT', x: 0, y: 1.55 * s + 3 * p, width: 0.25 * s, height: 0.25 * s, frameStroke: 'black' },
+        { geo: 'MT', x: 0, y: 1.55 * s + 3 * p, width: 0.25 * s, height: 0.25 * s },
         {
             geo: 'LI',
             x: 0.25 * s,
             y: 1.55 * s + 3 * p,
             width: 0.25 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
         {
             geo: 'SJ_SV',
@@ -1615,7 +1604,6 @@ const defaultInsetConfig = function (s, p) {
             y: 1.55 * s + 3 * p,
             width: 0.25 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
         {
             geo: 'SJ_JM',
@@ -1623,7 +1611,6 @@ const defaultInsetConfig = function (s, p) {
             y: 1.55 * s + 3 * p,
             width: 0.25 * s,
             height: 0.25 * s,
-            frameStroke: 'black',
         },
         /*{geo:"IC", x:0, y:0}, {geo:"RE", x:dd, y:0}, {geo:"YT", x:2*dd, y:0},
 		{geo:"GP", x:0, y:dd}, {geo:"MQ", x:dd, y:dd}, {geo:"GF",scale:"10M", x:2*dd, y:dd},

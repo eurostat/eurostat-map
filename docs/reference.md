@@ -278,7 +278,6 @@ The following parameters are properties of the sizeLegend object:
 | ------------------ | -------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
 | **title**          | String   | _null_                              | Title of the size legend                                                                      |
 | **titlePadding**   | Number   | _10_                                | Padding between the legend title and legend body                                              |
-| **titleFontSize**  | Number   | _12_                                | Title font size in pixels                                                                     |
 | **values**         | Number   | _undefined_                         | Manually set the raw data values to be used in the legend                                     |
 | **cellNb**         | Number   | _4_                                 | Number of symbols to be shown in the legend (when values are not set manually)                |
 | **shapePadding**   | Number   | _10_                                | The padding between consecutive legend shape elements                                         |
@@ -298,7 +297,6 @@ The following parameters are properties of the colorLegend object:
 | ---------------------- | -------- | ----------------------------------- | ----------------------------------------------------------------------------- |
 | **title**              | String   | _null_                              | Title of the size legend                                                      |
 | **titlePadding**       | Number   | _10_                                | Padding between the legend title and legend body                              |
-| **titleFontSize**      | Number   | _12_                                | Title font size in pixels                                                     |
 | **marginTop**          | Number   | _35_                                | Margin top in pixels. Distance between size and color legends                 |
 | **shapeWidth**         | Number   | _13_                                | The width of the legend box elements                                          |
 | **shapeHeight**        | Number   | _13_                                | The height of the legend box elements                                         |
@@ -648,30 +646,11 @@ Specify the map title, its style and position.
 | Method                                  | Type          | Default value | Description                                                                                            |
 | --------------------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
 | _map_.**title**([*value*])              | String        | ""            | The title text.                                                                                        |
-| _map_.**titleFontSize**([*value*])      | int           | 30            | The title font size.                                                                                   |
-| _map_.**titleFill**([*value*])          | String        | "black"       | The title text color.                                                                                  |
 | _map_.**titlePosition**([*value*])      | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
-| _map_.**titleFontWeight**([*value*])    | String        | "bold"        | The title font weight.                                                                                 |
 | _map_.**subtitle**([*value*])           | String        | ""            | The subtitle text.                                                                                     |
-| _map_.**subtitleFontSize**([*value*])   | int           | 30            | The subtitle font size.                                                                                |
 | _map_.**subtitleFontWeight**([*value*]) | String        | "bold"        | The subtitle text weight.                                                                              |
-| _map_.**subtitleFill**([*value*])       | String        | "black"       | The subtitle text color.                                                                               |
 | _map_.**subtitlePosition**([*value*])   | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
 
-## Map font
-
-| Method                          | Type   | Default value                    | Description                                                                    |
-| ------------------------------- | ------ | -------------------------------- | ------------------------------------------------------------------------------ |
-| _map_.**fontFamily**([*value*]) | String | _"Helvetica, Arial, sans-serif"_ | The font family to use for all map components (titles, legend, labelling etc.) |
-
-## Map frame
-
-Specify the style of the map frame (the rectangle around the map).
-
-| Method                                | Type   | Default value | Description                |
-| ------------------------------------- | ------ | ------------- | -------------------------- |
-| _map_.**frameStroke**([*value*])      | Color  | "#222"        | Color of the map frame     |
-| _map_.**frameStrokeWidth**([*value*]) | number | 2             | The map frame stroke width |
 
 ## Map legend
 
@@ -683,7 +662,6 @@ Example:
 map = eurostatmap.map(...)
 	.legend({
 		title: "Legend (%)",
-		titleFontSize: "12",
 		x: 10, y: 120,
 		boxFill: "darkgray",
 	});
@@ -699,10 +677,7 @@ map = eurostatmap.map(...)
 | **boxCornerRad**    | number | _7_           | The legend box corner radius, in pixel.                                                                                |
 | **boxFill**         | color  | _"white"_     | The legend box fill style.                                                                                             |
 | **boxOpacity**      | number | _0.7_         | The legend box opacity, from 0 to 1.                                                                                   |
-| **fontFill**        | Color  | _"black"_     | The legend font color.                                                                                                 |
 | **title**           | Text   | _""_          | The legend title.                                                                                                      |
-| **titleFontSize**   | int    | _15_          | The legend title font size.                                                                                            |
-| **titleFontWeight** | String | _"normal"_    | The legend title font weight.                                                                                          |
 
 ## Scalebar
 
@@ -762,23 +737,9 @@ map = eurostatmap.map(...)
 
 ## Styling
 
-Specify specific map styles. As of V4, styles have been moved to CSS classes. See deprecated.js for deprecated functions and their successors.
+Specify specific map styles. As of V4, styles have been moved to CSS classes. See [css.md](./css.md) for a list of CSS rules.
+See deprecated.js for deprecated functions and their successors.
 
--   em-sea
--   em-cntrg
--   em-nutsrg
--   bn_0, bn_1, bn_2, bn_3
--   em-graticule
--   em-title
--   em-subtitle
--   em-map
--   em-footnote
--   em-bn-co ( previously worldCoastStroke() )
--   #em-coast-margin
--   em-labels
--   em-stat-labels
--   em-stat-labels-shadows
--   em-scalebar-label
 
 | Method                                   | Type    | Default value | Description                                                                                                                                              |
 | ---------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -795,13 +756,8 @@ Labels for country names, country codes, and/or seas can be added to the map. La
 | ---------------------------------------- | -------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | _map_.**labelling**([*value*])           | Boolean  | _false_                                                                                 | Whether or not to show geographic name labels on the map.                                                                                                                                                                                                                                                    |
 | _map_.**labelsToShow**([*value*])        | Array    | _["countries","seas"]_                                                                  | The types of labels to show on the map. Accepted values are: "countries","seas","cc","values". ("countries" show the full names of each country, "cc" stands for country codes and "values" show the statistical values for each NUTS region. NOTE: "values" only applies to the choropleth map type ("ch"). |
-| _map_.**labelValuesFontSize**([*value*]) | Number   | _10_                                                                                    | For when labelsToShow includes "values". The font size of the labels for the statistical values.                                                                                                                                                                                                             |
-| _map_.**labelFill**([*value*])           | Object   | _{"seas":"#003399", "countries":"#383838", "cc":"black", "values":"black"}_             | The colours of the labels.                                                                                                                                                                                                                                                                                   |
-| _map_.**labelOpacity**([*value*])        | Object   | _{"seas":1, "countries":0.8}_                                                           | The opacity of the labels.                                                                                                                                                                                                                                                                                   |
 | _map_.**labelShadow**([*value*])         | Boolean  | _false_                                                                                 | Whether or not to add shadows to the labels.                                                                                                                                                                                                                                                                 |
 | _map_.**labelShadowsToShow**([*value*])  | Array    | ["countries","seas", "cc", "values"]                                                    | Which label types will have shadows (halos).                                                                                                                                                                                                                                                                 |
-| _map_.**labelShadowWidth**([*value*])    | Object   | _{ "seas": 3, "countries": 3, "cc": 3, "values": 3 }_                                   | The width of the shadow added to each type of label.                                                                                                                                                                                                                                                         |
-| _map_.**labelShadowColor**([*value*])    | Object   | _{ "seas": "white", "countries": "white", "cc": "white", "values": "white" }_           | The color of the shadow added to each type of label.                                                                                                                                                                                                                                                         |
 | _map_.**statLabelsPositions**([*value*]) | Object   | _{ "regionId": {x:number, y:number} }_                                                  | Override the positions of statistical labels. Define the x and y position of the statistical value label for each region. If the region is not found here, the label is positioned at the centroid of the region.                                                                                            |
 | _map_.**labelFilterFunction**([*value*]) | Function | _`(rg, map) => rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo*[1]`* | Filter the regions used for the labels.                                                                                                                                                                                                                                                                      |
 
@@ -821,11 +777,10 @@ To specify more precisely which insets to show, their geographical extent, scale
 ```javascript
 eurostatmap.map(...)
 	.insets(
-		{ geo:"MT", scale:"01M", pixSize:3000, title:"Martinique", titleFontSize:16, width:200, height:90, x:0, y:0 },
-		{ geo:"GF", scale:"03M", pixSize:10000, title:"French Guyana", titleFontSize:16, width:200, height:90, x:210, y:0 }
+		{ geo:"MT", scale:"01M", pixSize:3000, title:"Martinique", width:200, height:90, x:0, y:0 },
+		{ geo:"GF", scale:"03M", pixSize:10000, title:"French Guyana", width:200, height:90, x:210, y:0 }
 	)
 	.insetBoxPosition([335,345]);
-);
 ```
 
 See also [this example with a focus on Spain](https://eurostat.github.io/eurostat-map/examples/spain.html) (see [the code](../examples/spain.html)).

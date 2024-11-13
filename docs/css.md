@@ -51,8 +51,23 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-pie-size-legend-line
 
 ## Insets
+.em-insets
 .em-inset-title
 .em-inset-subtitle
+
+To target a class within all insets use:
+```css
+.em-insets .em-frame {
+    /* your rule here */
+}
+```
+or for a specific inset use:
+```css
+#em-inset-[your inset svgId here] {
+ /* your rule here */
+}
+```
+
 
 ## Labels
 #em-labels
