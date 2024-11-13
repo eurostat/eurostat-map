@@ -318,3 +318,16 @@ export function rasterize(svg) {
     image.src = URL.createObjectURL(serialize(svg))
     return promise
 }
+
+/**
+ * Get a URL parameter by name.
+ *
+ * @param {string} name
+ * @returns {string | null}
+ */
+export function getParameterByName(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]')
+    let regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
+        results = regex.exec(location.search)
+    return !results ? null : decodeURIComponent(results[1].replace(/\+/g, ' '))
+}

@@ -148,12 +148,19 @@ export const map = function (config) {
                 }
                 case 'jenks': {
                     const jenksBreaks = jenks(dataArray, out.numberOfClasses_) // Calculate breaks for Jenks
-                    out.classifier(scaleThreshold().domain(jenksBreaks.slice(1, -1)).range(range)) // Use Jenks breaks in scale
+                    const domain = jenksBreaks.slice(1, -1)
+                    out.classifier(scaleThreshold().domain(domain).range(range)) // Use Jenks breaks in scale
                     break
                 }
                 case 'ckmeans': {
-                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((v) => v.pop()) // Calculate breaks for ckmeans
-                    out.classifier(scaleThreshold().domain(ckmeansBreaks.slice(1, -1)).range(range)) // Use ckmeans breaks in scale
+                    // Calculate ckmeans breaks, extracting the maximum value from each cluster
+                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((cluster) => cluster.pop())
+
+                    // Set the domain for scaleThreshold excluding the last value, as it serves as the upper bound
+                    const domain = ckmeansBreaks.slice(0, -1)
+
+                    // Use the ckmeans breaks in the scaleThreshold and set the classifier
+                    out.classifier(scaleThreshold().domain(domain).range(range))
                     break
                 }
             }

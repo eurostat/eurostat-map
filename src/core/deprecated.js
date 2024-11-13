@@ -4,6 +4,8 @@
 // To be removed when completely phased out.
 
 export const defineDeprecatedFunctions = (out) => {
+    out.geoCenter = (v) => (console.warn('map.geoCenter() is now deprecated. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
+    out.pixelSize_ = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.tooltipText = (v) => (console.warn('map.tooltipText() is now deprecated. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
     out.seaFillStyle = (v) => (console.warn('seaFillStyle() is now DEPRECATED, please use the .em-sea CSS class'), out);
     out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'), out);

@@ -13,9 +13,9 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('Test')
-                .width(1000)
+                // .width(1000)
                 .subtitle('test')
-                .classificationMethod('quantile')
+                .classificationMethod('ckmeans')
                 .numberOfClasses(6)
                 //.threshold([-45, -35, -30, -25, -20])
                 .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
@@ -24,6 +24,7 @@
                 .drawCoastalMargin(false)
                 .insets('default')
                 .zoomExtent([1, 10])
+                .maxBounds({ xMin: 1896628, xMax: 1095703, yMin: 7104179, yMax: 6882401 })
                 .build()
 
             // //update data and classification
