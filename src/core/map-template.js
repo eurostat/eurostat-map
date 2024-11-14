@@ -51,9 +51,8 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()
     out.filterGeometriesFunction_ = undefined // user defined filter function
     out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
-    out.pixelSize_ = undefined
     out.zoomExtent_ = undefined
-    out.maxBounds_ = undefined
+    out.maxBounds_ = { xMin: -Infinity, yMin: -Infinity, xMax: Infinity, yMax: Infinity }
 
     // map view
     out.position_ = { x: undefined, y: undefined, z: undefined }
@@ -605,30 +604,32 @@ export const mapTemplate = function (config, withCenterPoints) {
     const defineDefaultPosition = function () {
         const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
         if (defaultPosition) {
-            out.geoCenter(defaultPosition.geoCenter)
+            out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
+            out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
         } else if (out.Geometries.defaultGeoData?.bbox) {
-            out.geoCenter([
-                0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2]),
-                0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3]),
-            ])
+            out.position_.x =
+                out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
+            out.position_.y =
+                out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
         } else {
             //TODO: auto-define user=defined geometries geoCenter
+            // out.position_.x = Geometries.userGeometries
+            // out.position_.y = Geometries.userGeometries
         }
+        out.position_.z = out.position_.z || getDefaultZ()
     }
 
-    const definePixelSize = function () {
+    const getDefaultZ = function () {
         const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
         if (defaultPosition) {
-            out.pixelSize((defaultPosition.pixelSize * 800) / out.width_)
+            return (defaultPosition.pixelSize * 800) / out.width_
         } else if (out.Geometries.defaultGeoData?.bbox) {
-            out.pixelSize(
-                Math.min(
-                    (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
-                    (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
-                )
+            return Math.min(
+                (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
+                (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
             )
         } else {
-            out.pixelSize(100)
+            return 100
         }
     }
 
@@ -650,8 +651,8 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // Helper function to calculate bbox and return as GeoJSON
         function calculateBboxGeoJSON() {
-            const halfWidth = 0.5 * out.pixelSize_ * out.width_
-            const halfHeight = 0.5 * out.pixelSize_ * out.height_
+            const halfWidth = 0.5 * out.position_.z * out.width_
+            const halfHeight = 0.5 * out.position_.z * out.height_
             const bbox = [
                 out.position_.x - halfWidth,
                 out.position_.y - halfHeight,
@@ -671,18 +672,9 @@ export const mapTemplate = function (config, withCenterPoints) {
      */
     out.buildMapTemplate = function () {
         //geo center and extent: if not specified, use the default one, or the compute one from the topojson bbox
-        if (!out.position_.x) {
+        if (!out.position_.x || !out.position_.y) {
             defineDefaultPosition()
         }
-
-        //pixel size (zoom level): if not specified, compute value from SVG dimensions and topojson geographical extent
-        if (!out.pixelSize_) {
-            definePixelSize()
-        }
-
-        // out.position_.x = out.position_.x
-        // out.position_.y = out.position_.y
-        // out.position_.z = out.pixelSize_
 
         defineProjection()
         definePathFunction()
@@ -830,135 +822,104 @@ export const mapTemplate = function (config, withCenterPoints) {
     }
 
     const defineMapZoom = function () {
-        //make drawing group zoomable
-
         let svg = select('#' + out.svgId())
-
-        // Initialize the zoom behavior with scale limits and conditional panning constraints
+        let previousScale = 1 // Initialize previous scale
         let tP = zoomIdentity
         const xoo = zoom()
             .scaleExtent(out.zoomExtent())
-            //to make the zooming a bit faster
-            .wheelDelta((e) => -e.deltaY * (e.deltaMode === 1 ? 0.07 : e.deltaMode ? 1 : 0.004))
-            .on('zoom', function (e) {
-                const t = e.transform
-                const f = tP.k / t.k
-                if (f == 1) {
-                    //pan
-                    const dx = tP.x - t.x
-                    const dy = tP.y - t.y
-                    panHandler(dx * out.position_.z, -dy * out.position_.z)
+            .on('zoom', function (event) {
+                const transform = event.transform // Get the transform from the event
+                const currentScale = event.transform.k // Get the current zoom scale
+                const zoomFactor = tP.k / event.transform.k // TODO: work out why this is always 1 when zooming out
+
+                // Check if it's a zoom or pan event
+                if (zoomFactor == 1) {
+                    // Pan logic
+                    panHandler(event)
                 } else {
-                    //zoom at the mouse position
-                    const geographicCoordinates = out._projection.invert([e.sourceEvent.offsetX, e.sourceEvent.offsetY])
-                    zoomHandler(f, geographicCoordinates[0], geographicCoordinates[1])
+                    // Zoom logic
+                    zoomHandler(event)
                 }
+
+                // Apply transform to the SVG
+                const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
+                zoomGroup.attr('transform', transform)
+
+                // Update zoomIdentity with the new scale and translation
+                //zoomIdentity.translate(transform.x, transform.y).scale(transform.k)
+
+                // Update the previous scale for the next event
+                previousScale = currentScale
             })
 
         svg.call(xoo)
     }
 
-    /**
-     * Zoom.
-     * @param {number} f The zoom factor, within ]0, Infinity]. 1 is for no change. <1 to zoom-in, >1 to zoom-out.
-     * @param {number} xGeo The x geo position fixed in the screen.
-     * @param {number} yGeo The y geo position fixed in the screen.
-     */
-    const zoomHandler = function (f = 1, xGeo = out.position_.x, yGeo = out.position_.y) {
-        // Prevent zooming beyond extent limits
-        if (out.zoomExtent_[0] == out.position_.z && f <= 1) return
-        if (out.zoomExtent_[1] == out.position_.z && f >= 1) return
+    const updatePositionFromZoomEvent = function (event, zoomChanged) {
+        // Convert the center of the screen (SVG coordinates) to geographic coordinates
+        const centerXGeo = pixToGeoX(out.width_ / 2 - event.transform.x, event.transform.k) // Convert pixel X to geographic X
+        const centerYGeo = pixToGeoY(out.height_ / 2 - event.transform.y, event.transform.k) // Convert pixel Y to geographic Y
 
-        // Ensure zoom factor is within bounds
-        const newZf = f * out.position_.z
-        if (newZf < out.zoomExtent_[0]) f = out.zoomExtent_[0] / out.position_.z
-        if (newZf > out.zoomExtent_[1]) f = out.zoomExtent_[1] / out.position_.z
-
-        // Apply zoom factor to geographic zoom level (without directly modifying out.position_.z)
-        const zoomLevel = out.position_.z * f
-
-        // Compute translation adjustments to keep the focus point fixed
-        let dxGeo = (xGeo - out.position_.x) * (1 - f)
-        let dyGeo = (yGeo - out.position_.y) * (1 - f)
-
-        // Constrain the translation to the specified bounds
-        if (out.maxBounds_.xMin != undefined && out.position_.x + dxGeo < out.maxBounds_.xMin)
-            dxGeo = out.maxBounds_.xMin - out.position_.x
-        if (out.maxBounds_.yMin != undefined && out.position_.y + dyGeo < out.maxBounds_.yMin)
-            dyGeo = out.maxBounds_.yMin - out.position_.y
-        if (out.maxBounds_.xMax != undefined && out.position_.x + dxGeo > out.maxBounds_.xMax)
-            dxGeo = out.maxBounds_.xMax - out.position_.x
-        if (out.maxBounds_.yMax != undefined && out.position_.y + dyGeo > out.maxBounds_.yMax)
-            dyGeo = out.maxBounds_.yMax - out.position_.y
-
-        // Update view center coordinates (pan adjustment)
-        out.position_.x += dxGeo
-        out.position_.y += dyGeo
-
-        // Ensure the zoom transform is correctly applied with geographic scaling
-        if (out.svg_) {
-            const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-            const scale = 1 / zoomLevel // Scaling based on the geographic zoom level
-
-            // Debug output to check scaling factors
-            console.log('Zoom Level:', zoomLevel, 'Scale:', scale)
-
-            // Apply transform with correct scaling
-            const transform = `translate(${geoToPixX(out.position_.x)}, ${geoToPixY(out.position_.y)}) scale(${scale})`
-            zoomGroup.attr('transform', transform)
+        // Update geographic position state based on pan and zoom
+        out.position_.x = centerXGeo // Update geographic X
+        out.position_.y = centerYGeo // Update geographic Y
+        if (zoomChanged) {
+            let zoomFactor = zoomIdentity.k / event.transform.k
+            out.position_.z = out.position_.z * zoomFactor // Update the zoom level (scale factor)
         }
+        console.log(out.position_)
     }
 
-    const panHandler = function (dxGeo = 0, dyGeo = 0) {
-        //ensures x/y extent
-        if (out.maxBounds_.xMin != undefined && out.position_.x + dxGeo < out.maxBounds_.xMin)
-            dxGeo = out.maxBounds_.xMin - out.position_.x
-        if (out.maxBounds_.yMin != undefined && out.position_.y + dyGeo < out.maxBounds_.yMin)
-            dyGeo = out.maxBounds_.yMin - out.position_.y
-        if (out.maxBounds_.xMax != undefined && out.position_.x + dxGeo > out.maxBounds_.xMax)
-            dxGeo = out.maxBounds_.xMax - out.position_.x
-        if (out.maxBounds_.yMax != undefined && out.position_.y + dyGeo > out.maxBounds_.yMax)
-            dyGeo = out.maxBounds_.yMax - out.position_.y
+    // Zoom handler function
+    const zoomHandler = function (event) {
+        updatePositionFromZoomEvent(event, true)
+        console.log('zoom event')
+    }
 
-        //pan
-        out.position_.x += dxGeo
-        out.position_.y += dyGeo
+    // Pan handler function
+    const panHandler = function (event) {
+        updatePositionFromZoomEvent(event, false)
+        console.log('pan event')
+    }
 
-        if (out.svg_) {
-            //draw here
-            const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-            // apply the transform
-            let transform = zoomIdentity.translate(geoToPixX(out.position_.x), geoToPixY(out.position_.y)).scale(out.position_.z)
-            zoomGroup.attr('transform', `translate(${transform.x}, ${transform.y}) scale(${transform.k})`)
-        }
-    }
     /**
-     * @param {number} xGeo Geo x coordinate, in m.
-     * @returns {number} Screen x coordinate, in pix.
+     * Converts a geographic x coordinate to screen pixels.
+     * @param {number} xGeo Geographic x coordinate.
+     * @param {number} scale Current scale factor.
+     * @returns {number} Screen x coordinate in pixels.
      */
-    const geoToPixX = function (xGeo) {
-        return (xGeo - out.position_.x) / out.position_.z + out.width_ * 0.5
+    function geoToPixX(xGeo, scale) {
+        return (xGeo - out.position_.x) / scale + out.width_ * 0.5
     }
+
     /**
-     * @param {number} yGeo Geo y coordinate, in m.
-     * @returns {number} Screen y coordinate, in pix.
+     * Converts a geographic y coordinate to screen pixels.
+     * @param {number} yGeo Geographic y coordinate.
+     * @param {number} scale Current scale factor.
+     * @returns {number} Screen y coordinate in pixels.
      */
-    const geoToPixY = function (yGeo) {
-        return -(yGeo - out.position_.y) / out.position_.z + out.height_ * 0.5
+    function geoToPixY(yGeo, scale) {
+        return -(yGeo - out.position_.y) / scale + out.height_ * 0.5
     }
+
     /**
-     * @param {number} x Screen x coordinate, in pix.
-     * @returns {number} Geo x coordinate, in m.
+     * Converts a screen x coordinate to geographic coordinates.
+     * @param {number} x Screen x coordinate in pixels.
+     * @param {number} scale Current scale factor.
+     * @returns {number} Geographic x coordinate.
      */
-    const pixToGeoX = function (x) {
-        return (x - this.w * 0.5) * out.position_.z + out.position_.x
+    function pixToGeoX(x, scale) {
+        return (x - out.width_ * 0.5) * scale + out.position_.x
     }
+
     /**
-     * @param {number} y Screen y coordinate, in pix.
-     * @returns {number} Geo y coordinate, in m.
+     * Converts a screen y coordinate to geographic coordinates.
+     * @param {number} y Screen y coordinate in pixels.
+     * @param {number} scale Current scale factor.
+     * @returns {number} Geographic y coordinate.
      */
-    const pixToGeoY = function (y) {
-        return -(y - this.h * 0.5) * out.position_.z + out.position_.y
+    function pixToGeoY(y, scale) {
+        return -(y - out.height_ * 0.5) * scale + out.position_.y
     }
 
     /**
