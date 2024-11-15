@@ -17,6 +17,54 @@
 
         <script src="../../../build/eurostatmap.js"></script>
         <script>
+            // custom pattern function
+            const getFillPatternDefinitionFun = function () {
+                return function (svg, numberOfClasses) {
+                    const ps = 5 // Pattern size
+                    const smin = 1 // Minimum size
+                    const smax = 5.5 // Maximum size
+
+                    // Clear previous patterns
+                    svg.selectAll('.estatmapPattern').remove()
+
+                    // Create patterns for each class
+                    for (let i = 0; i < numberOfClasses; i++) {
+                        const si = smin + ((smax - smin) * i) / (numberOfClasses - 1) // Calculate size for each class
+                        const lineWidth = i + 1 // Increase line width for each class
+
+                        const patt = svg
+                            .append('pattern')
+                            .attr('class', 'estatmapPattern')
+                            .attr('id', 'pattern_' + i)
+                            .attr('x', '0')
+                            .attr('y', '0')
+                            .attr('width', ps)
+                            .attr('height', ps)
+                            .attr('patternUnits', 'userSpaceOnUse')
+
+                        // Add a line pattern with increasing stroke-width
+                        if (i < 3) {
+                            // Assuming you want to limit it to 3 lines
+                            patt.append('line')
+                                .attr('x1', 0)
+                                .attr('y1', 1)
+                                .attr('x2', 1)
+                                .attr('y2', 1)
+                                .style('stroke', 'currentColor')
+                                .style('stroke-width', lineWidth) // Progressive stroke width
+                        } else {
+                            // When the class number exceeds 2, use a different pattern (e.g., square)
+                            patt.append('rect')
+                                .attr('x', 0)
+                                .attr('y', 0)
+                                .attr('width', ps)
+                                .attr('height', ps)
+                                .style('stroke', 'none')
+                                .style('fill', 'currentColor')
+                        }
+                    }
+                }
+            }
             let map = eurostatmap
                 .map('choropleth')
                 .width(900)
@@ -25,14 +73,8 @@
                 .titleFill('#444')
                 .scale('60M')
                 .classificationMethod('threshold')
-                .filtersDefinitionFunction(
-                    eurostatmap.getFillPatternDefinitionFun({
-                        patternSize: 5,
-                        shape: 'circle',
-                        bckColor: 'white',
-                        symbColor: 'black',
-                    })
-                )
+                .clnb(6)
+                .filtersDefinitionFunction(getFillPatternDefinitionFun())
                 .nutsbnStroke({ 0: '#777', 1: '#777', 2: '#777', 3: '#777', oth: '#444', co: '#777' })
                 .nutsbnStrokeWidth({ 0: 1, 1: 0.2, 2: 0.2, 3: 0.2, oth: 1, co: 1 })
                 .hoverColor('darkblue')
@@ -89,43 +131,7 @@
                 })
 
                 //map.statData().setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
-            }, 2000)
-
-            setTimeout(() => {
-                map.threshold([1000, 3000, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 13000]).filtersDefinitionFunction(
-                    eurostatmap.getFillPatternDefinitionFun({
-                        patternSize: 5,
-                        shape: 'square',
-                        bckColor: 'LIGHTBLUE',
-                        symbColor: 'red',
-                    })
-                )
-                map.updateClassification().updateStyle()
-                map.legend({
-                    title: 'THIRD',
-                })
-
-                //map.statData().setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
-                //map.updateStatValues();
-            }, 4000)
-
-            setTimeout(() => {
-                map.threshold([1000, 3000, 6000, 99000]).filtersDefinitionFunction(
-                    eurostatmap.getFillPatternDefinitionFun({
-                        patternSize: 5,
-                        shape: 'square',
-                        bckColor: 'teal',
-                        symbColor: 'red',
-                    })
-                )
-                map.updateClassification().updateStyle()
-                map.legend({
-                    title: 'THIRD',
-                })
-
-                //map.statData().setData({ ES: 4, DE: 5, FR: 3, UK: 2, SE:1 })
-                //map.updateStatValues();
-            }, 6000)
+            }, 5000)
         </script>
     </body>
 </html>
