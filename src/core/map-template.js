@@ -829,7 +829,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             .on('zoom', function (e) {
                 const t = e.transform
                 const f = tP.k / t.k
-                //console.log('Zoom Factor:', zoomFactor)
+
+                // PLEASE NOTE THESE HANDLERS CURRENTLY DONT WORK (GEO COORDINATES IN OUT.POSITION_ ARE NOT UPDATED CORRECTLY).
                 if (f === 1) {
                     const dx = tP.x - t.x
                     const dy = tP.y - t.y
@@ -887,8 +888,8 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @param {number} scale Current scale factor.
      * @returns {number} Geographic x coordinate.
      */
-    function pixToGeoX(x, scale) {
-        return (x - out.width_ * 0.5) * scale + out.position_.x
+    function pixToGeoX(x) {
+        return (x - out.width_ * 0.5) * out.position_.z + out.position_.x
     }
 
     /**
@@ -897,8 +898,8 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @param {number} scale Current scale factor.
      * @returns {number} Geographic y coordinate.
      */
-    function pixToGeoY(y, scale) {
-        return -(y - out.height_ * 0.5) * scale + out.position_.y
+    function pixToGeoY(y) {
+        return -(y - out.height_ * 0.5) * out.position_.z + out.position_.y
     }
 
     /**
