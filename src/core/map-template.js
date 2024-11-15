@@ -607,6 +607,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
             out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
         } else if (out.Geometries.defaultGeoData?.bbox) {
+            // default to center of geoData bbox
             out.position_.x =
                 out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
             out.position_.y =
@@ -646,21 +647,22 @@ export const mapTemplate = function (config, withCenterPoints) {
         } else {
             // For non-WORLD geo, use custom or default identity projection with calculated bounding box
             out._projection =
-                out.projectionFunction_ || geoIdentity().reflectY(true).fitSize([out.width_, out.height_], calculateBboxGeoJSON())
+                out.projectionFunction_ ||
+                geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox()))
         }
+    }
 
-        // Helper function to calculate bbox and return as GeoJSON
-        function calculateBboxGeoJSON() {
-            const halfWidth = 0.5 * out.position_.z * out.width_
-            const halfHeight = 0.5 * out.position_.z * out.height_
-            const bbox = [
-                out.position_.x - halfWidth,
-                out.position_.y - halfHeight,
-                out.position_.x + halfWidth,
-                out.position_.y + halfHeight,
-            ]
-            return getBBOXAsGeoJSON(bbox)
-        }
+    // Helper function to calculate current view as bbox
+    function getCurrentBbox() {
+        const halfWidth = 0.5 * out.position_.z * out.width_
+        const halfHeight = 0.5 * out.position_.z * out.height_
+        const bbox = [
+            out.position_.x - halfWidth,
+            out.position_.y - halfHeight,
+            out.position_.x + halfWidth,
+            out.position_.y + halfHeight,
+        ]
+        return bbox
     }
 
     const definePathFunction = function () {
@@ -823,63 +825,67 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     const defineMapZoom = function () {
         let svg = select('#' + out.svgId())
-        let tP = zoomIdentity
+        let previousK = 1
         const xoo = zoom()
             .scaleExtent(out.zoomExtent())
             .on('zoom', function (e) {
                 const t = e.transform
-                const f = tP.k / t.k
 
-                // PLEASE NOTE THESE HANDLERS CURRENTLY DONT WORK (GEO COORDINATES IN OUT.POSITION_ ARE NOT UPDATED CORRECTLY).
-                if (f === 1) {
-                    const dx = tP.x - t.x
-                    const dy = tP.y - t.y
-                    panHandler(dx * out.position_.z, -dy * out.position_.z)
+                if (t.k !== previousK) {
+                    zoomHandler(e, previousK)
                 } else {
-                    //zoom at the mouse position
-                    zoomHandler(f, pixToGeoX(e.sourceEvent.offsetX), pixToGeoY(e.sourceEvent.offsetY))
+                    panHandler(e)
                 }
 
-                console.log(out.position_)
-
-                // apply default transform
+                // apply default transform to map
                 const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
                 zoomGroup.attr('transform', t)
+
+                console.log('Position:', out.position_)
+                previousK = t.k
             })
 
         svg.call(xoo)
     }
 
     // Zoom handler function
-    const zoomHandler = function (f = 1, xGeo = out.position_.x, yGeo = out.position_.y) {
-        out.position_.z *= f
+    const zoomHandler = function (event, previousK) {
+        const transform = event.transform
+        // Compute the projected center
+        const centerX = (out.width_ / 2 - transform.x) / transform.k
+        const centerY = (out.height_ / 2 - transform.y) / transform.k
 
-        //compute pan
-        let dxGeo = (xGeo - out.position_.x) * (1 - f)
-        let dyGeo = (yGeo - out.position_.y) * (1 - f)
+        // Use the projection to get the projected center in EPSG:3035
+        const [projectedX, projectedY] = out._projection.invert([centerX, centerY])
 
-        //ensures x/y extent
-        if (out.maxBounds_.xMin != undefined && out.position_.x + dxGeo < out.maxBounds_.xMin)
-            dxGeo = out.maxBounds_.xMin - out.position_.x
-        if (out.maxBounds_.yMin != undefined && out.position_.y + dyGeo < out.maxBounds_.yMin)
-            dyGeo = out.maxBounds_.yMin - out.position_.y
-        if (out.maxBounds_.xMax != undefined && out.position_.x + dxGeo > out.maxBounds_.xMax)
-            dxGeo = out.maxBounds_.xMax - out.position_.x
-        if (out.maxBounds_.yMax != undefined && out.position_.y + dyGeo > out.maxBounds_.yMax)
-            dyGeo = out.maxBounds_.yMax - out.position_.y
+        // set new position
+        out.position_.x = projectedX
+        out.position_.y = projectedY
 
-        //pan
-        out.position_.x += dxGeo
-        out.position_.y += dyGeo
-        console.log('zoom event')
+        // Get current bounding box width in meters
+        const bbox = getCurrentBbox()
+        const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
+
+        // Calculate meters per pixel
+        let zoomDelta = transform.k / previousK
+        const metersPerPixel = bboxWidth / (out.width_ * zoomDelta) // Use transform.k for zooming
+
+        out.position_.z = metersPerPixel
     }
 
     // Pan handler function
-    const panHandler = function (dxGeo = 0, dyGeo = 0) {
-        //pan
-        out.position_.x += dxGeo
-        out.position_.y += dyGeo
-        console.log('pan event')
+    const panHandler = function (event) {
+        const transform = event.transform
+        // Compute the projected center
+        const centerX = (out.width_ / 2 - transform.x) / transform.k
+        const centerY = (out.height_ / 2 - transform.y) / transform.k
+
+        // Use the projection to get the projected center in EPSG:3035
+        const [projectedX, projectedY] = out._projection.invert([centerX, centerY])
+
+        // set new position
+        out.position_.x = projectedX
+        out.position_.y = projectedY
     }
 
     /**
