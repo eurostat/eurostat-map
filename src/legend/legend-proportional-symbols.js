@@ -249,8 +249,8 @@ export const legend = function (map, config) {
 
     function highlightRegions(map, ecl) {
         // TODO: change this to estat logic of making all other classes transparent?
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
         const sel = map.selectAll(selector).selectAll("[ecl='" + ecl + "']")
         sel.style('fill', map.hoverColor())
         sel.attr('fill___', function () {
@@ -259,8 +259,8 @@ export const legend = function (map, config) {
     }
 
     function unhighlightRegions(map, ecl) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
         const sel = map.selectAll(selector).selectAll("[ecl='" + ecl + "']")
         sel.style('fill', function () {
             select(this).attr('fill___')

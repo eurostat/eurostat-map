@@ -141,8 +141,8 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Set all regions to white
@@ -157,8 +157,8 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Restore each region's original color from the fill___ attribute

@@ -3,7 +3,6 @@ import { select, selectAll, pointer } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoGraticule, geoGraticule10, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
-
 import {
     getBBOXAsGeoJSON,
     spaceAsThousandSeparator,
@@ -12,9 +11,7 @@ import {
     getCSSPropertyFromClass,
     getParameterByName,
 } from './utils'
-
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
-
 import { defineDeprecatedFunctions } from './deprecated'
 import { Geometries } from './geometries'
 
@@ -601,77 +598,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    const defineDefaultPosition = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
-            out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
-        } else if (out.Geometries.defaultGeoData?.bbox) {
-            // default to center of geoData bbox
-            out.position_.x =
-                out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
-            out.position_.y =
-                out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
-        } else {
-            //TODO: auto-define user=defined geometries geoCenter
-            // out.position_.x = Geometries.userGeometries
-            // out.position_.y = Geometries.userGeometries
-        }
-        out.position_.z = out.position_.z || getDefaultZ()
-
-        // optional: set from URL
-        setViewFromURL()
-    }
-
-    const getDefaultZ = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            return (defaultPosition.pixelSize * 800) / out.width_
-        } else if (out.Geometries.defaultGeoData?.bbox) {
-            return Math.min(
-                (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
-                (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
-            )
-        } else {
-            return 100
-        }
-    }
-
-    const defineProjection = function () {
-        // Define projection based on the geographical context
-
-        if (out.geo_ === 'WORLD') {
-            // Use Robinson projection for the world with optional custom projection function
-            out._projection =
-                out.projectionFunction_ ||
-                geoRobinson()
-                    .translate([out.width_ / 2, out.height_ / 2])
-                    .scale((out.width_ - 20) / (2 * Math.PI))
-        } else {
-            // For non-WORLD geo, use custom or default identity projection with calculated bounding box
-            out._projection =
-                out.projectionFunction_ ||
-                geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox()))
-        }
-    }
-
-    // Helper function to calculate current view as bbox
-    function getCurrentBbox() {
-        const halfWidth = 0.5 * out.position_.z * out.width_
-        const halfHeight = 0.5 * out.position_.z * out.height_
-        const bbox = [
-            out.position_.x - halfWidth,
-            out.position_.y - halfHeight,
-            out.position_.x + halfWidth,
-            out.position_.y + halfHeight,
-        ]
-        return bbox
-    }
-
-    const definePathFunction = function () {
-        out._pathFunction = geoPath().projection(out._projection)
-    }
-
     /**
      * Buid an empty map template, based on the geometries only.
      */
@@ -824,6 +750,178 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         return out
+    }
+
+    /**
+     * @function updateLabels
+     * @description update existing map labels
+     */
+    out.updateLabels = function () {
+        // Clear previous labels
+        let prevLabels = out.svg_.selectAll('g.em-labels > *')
+        if (prevLabels) prevLabels.remove()
+
+        // Main map
+        if (out.labelling_) {
+            let zg = out.svg_.select('#em-zoom-group-' + out.svgId_)
+            addLabelsToMap(out, zg)
+            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) {
+                out.updateValuesLabels(out)
+            }
+        }
+
+        // Define the callback to apply to each inset
+        const applyLabelsCallback = (map) => {
+            if (map.labelling_) {
+                let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
+                addLabelsToMap(map, zg)
+                if (map.labelsToShow_.includes('values') && out.updateValuesLabels) {
+                    out.updateValuesLabels(map)
+                }
+            }
+        }
+
+        // Apply labels to all insets using the executeForAllInsets function
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
+        }
+    }
+
+    /**
+     * @description update the statistical values labels on the map
+     * @param {Object} map eurostat-map map instance
+     * @return {} out
+     */
+    out.updateValuesLabels = function (map) {
+        //clear previous labels
+        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
+        prevLabels.remove()
+        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
+        prevShadows.remove()
+
+        let statLabels = map.svg_.selectAll('g.em-stat-label')
+
+        // filter stat-label elements to only show those with data
+        statLabels.filter(out.statLabelsFilterFunction).append('text').text(out.statLabelsTextFunction)
+
+        //add shadows to labels
+        if (out.labelShadow_) {
+            map.svg_
+                .selectAll('g.em-stat-label-shadow')
+                .filter(out.statLabelsFilterFunction)
+                .append('text')
+                .text(out.statLabelsTextFunction)
+        }
+        return out
+    }
+
+    /**
+     * @description text function for statistical labelling
+     * @param {Object} d d3 selection json data element
+     * @return {string}
+     */
+    out.statLabelsTextFunction = (d) => {
+        if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
+            const s = out.statData()
+            const sv = s.get(d.properties.id)
+
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                return ''
+            } else {
+                if (sv.value !== ':') {
+                    return spaceAsThousandSeparator(sv.value)
+                }
+            }
+        }
+    }
+
+    /**
+     * @description function for filtering statistical labels
+     * @param {Object} d d3 selection json data element
+     * @return {boolean}
+     */
+    out.statLabelsFilterFunction = (d) => {
+        if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
+            const s = out.statData()
+            const sv = s.get(d.properties.id)
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                return false
+            } else {
+                return true
+            }
+        }
+        return false
+    }
+
+    const defineDefaultPosition = function () {
+        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+        if (defaultPosition) {
+            out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
+            out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
+        } else if (out.Geometries.defaultGeoData?.bbox) {
+            // default to center of geoData bbox
+            out.position_.x =
+                out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
+            out.position_.y =
+                out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+        } else {
+            //TODO: auto-define user=defined geometries geoCenter
+            // out.position_.x = Geometries.userGeometries
+            // out.position_.y = Geometries.userGeometries
+        }
+        out.position_.z = out.position_.z || getDefaultZ()
+
+        // optional: set from URL
+        setViewFromURL()
+    }
+
+    const getDefaultZ = function () {
+        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+        if (defaultPosition) {
+            return (defaultPosition.pixelSize * 800) / out.width_
+        } else if (out.Geometries.defaultGeoData?.bbox) {
+            return Math.min(
+                (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
+                (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
+            )
+        } else {
+            return 100
+        }
+    }
+
+    const defineProjection = function () {
+        // Define projection based on the geographical context
+
+        if (out.geo_ === 'WORLD') {
+            // Use Robinson projection for the world with optional custom projection function
+            out._projection =
+                out.projectionFunction_ ||
+                geoRobinson()
+                    .translate([out.width_ / 2, out.height_ / 2])
+                    .scale((out.width_ - 20) / (2 * Math.PI))
+        } else {
+            // For non-WORLD geo, use custom or default identity projection with calculated bounding box
+            out._projection =
+                out.projectionFunction_ ||
+                geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox()))
+        }
+    }
+
+    // Helper function to calculate current view as bbox
+    const getCurrentBbox = function () {
+        const halfWidth = 0.5 * out.position_.z * out.width_
+        const halfHeight = 0.5 * out.position_.z * out.height_
+        const bbox = [
+            out.position_.x - halfWidth,
+            out.position_.y - halfHeight,
+            out.position_.x + halfWidth,
+            out.position_.y + halfHeight,
+        ]
+        return bbox
+    }
+
+    const definePathFunction = function () {
+        out._pathFunction = geoPath().projection(out._projection)
     }
 
     const defineMapZoom = function () {
@@ -1105,111 +1203,10 @@ export const mapTemplate = function (config, withCenterPoints) {
     }
 
     /**
-     * @function updateLabels
-     * @description update existing map labels
-     */
-    out.updateLabels = function () {
-        // Clear previous labels
-        let prevLabels = out.svg_.selectAll('g.em-labels > *')
-        if (prevLabels) prevLabels.remove()
-
-        // Main map
-        if (out.labelling_) {
-            let zg = out.svg_.select('#em-zoom-group-' + out.svgId_)
-            addLabelsToMap(out, zg)
-            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) {
-                out.updateValuesLabels(out)
-            }
-        }
-
-        // Define the callback to apply to each inset
-        const applyLabelsCallback = (map) => {
-            if (map.labelling_) {
-                let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                addLabelsToMap(map, zg)
-                if (map.labelsToShow_.includes('values') && out.updateValuesLabels) {
-                    out.updateValuesLabels(map)
-                }
-            }
-        }
-
-        // Apply labels to all insets using the executeForAllInsets function
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
-        }
-    }
-
-    /**
-     * @description update the statistical values labels on the map
-     * @param {Object} map eurostat-map map instance
-     * @return {} out
-     */
-    out.updateValuesLabels = function (map) {
-        //clear previous labels
-        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
-        prevLabels.remove()
-        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
-        prevShadows.remove()
-
-        let statLabels = map.svg_.selectAll('g.em-stat-label')
-
-        // filter stat-label elements to only show those with data
-        statLabels.filter(out.statLabelsFilterFunction).append('text').text(out.statLabelsTextFunction)
-
-        //add shadows to labels
-        if (out.labelShadow_) {
-            map.svg_
-                .selectAll('g.em-stat-label-shadow')
-                .filter(out.statLabelsFilterFunction)
-                .append('text')
-                .text(out.statLabelsTextFunction)
-        }
-        return out
-    }
-
-    /**
-     * @description text function for statistical labelling
-     * @param {Object} d d3 selection json data element
-     * @return {string}
-     */
-    out.statLabelsTextFunction = (d) => {
-        if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-            const s = out.statData()
-            const sv = s.get(d.properties.id)
-
-            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                return ''
-            } else {
-                if (sv.value !== ':') {
-                    return spaceAsThousandSeparator(sv.value)
-                }
-            }
-        }
-    }
-
-    /**
-     * @description function for filtering statistical labels
-     * @param {Object} d d3 selection json data element
-     * @return {boolean}
-     */
-    out.statLabelsFilterFunction = (d) => {
-        if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-            const s = out.statData()
-            const sv = s.get(d.properties.id)
-            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                return false
-            } else {
-                return true
-            }
-        }
-        return false
-    }
-
-    /**
      * @function addLabelsToMap
      * @description appends text labels to the map. Labels can be countries, country codes, ocean names or statistical values
      */
-    function addLabelsToMap(map, zg) {
+    const addLabelsToMap = function (map, zg) {
         let labels = map.labelsConfig_
         let language = map.lg_
         let labelsArray = []
@@ -1433,7 +1430,7 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @function addScalebarToMap
      * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
      */
-    function addScalebarToMap() {
+    const addScalebarToMap = function () {
         let sb = out
             .svg()
             .append('svg')
@@ -1570,7 +1567,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .text(getScalebarLabel(niceLengthM[0]) + out.scalebarUnits_)
     }
 
-    function niceScaleBarLength(scaleBarLength) {
+    const niceScaleBarLength = function (scaleBarLength) {
         //compute the 'nice' power of ten
         const pow10 = Math.pow(10, Math.floor(Math.log(scaleBarLength) / Math.log(10)))
 
@@ -1584,18 +1581,11 @@ export const mapTemplate = function (config, withCenterPoints) {
         return [pow10, 1]
     }
 
-    function getScalebarLabel(valueM) {
+    const getScalebarLabel = function (valueM) {
         if (valueM < 0.01) return valueM * 1000 + 'mm'
         if (valueM < 1) return valueM * 100 + 'cm'
         if (valueM < 1000) return valueM * 1 + 'm'
         return valueM / 1000
-    }
-
-    //format scalebar value
-    function formatScalebarValue(x) {
-        return Math.trunc(x)
-        //round to nearest 5
-        //return (x % 5) >= 2.5 ? Math.trunc(x / 5) * 5 + 5 : Math.trunc(x / 5) * 5;
     }
 
     /** Build template for inset, based on main one */
@@ -1797,7 +1787,7 @@ const _defaultCRS = {
 
 // convert rect attributes into an SVG path string
 // used for workaround whereby clipPaths which use rect elements do not work in adobe illustrator
-function convertRectangles(x, y, width, height) {
+const convertRectangles = function (x, y, width, height) {
     var x = parseFloat(x, 10)
     var y = parseFloat(y, 10)
     var width = parseFloat(width, 10)
