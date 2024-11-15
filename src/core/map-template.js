@@ -823,83 +823,62 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     const defineMapZoom = function () {
         let svg = select('#' + out.svgId())
-        let previousScale = 1 // Initialize previous scale
         let tP = zoomIdentity
         const xoo = zoom()
             .scaleExtent(out.zoomExtent())
-            .on('zoom', function (event) {
-                const transform = event.transform // Get the transform from the event
-                const currentScale = event.transform.k // Get the current zoom scale
-                const zoomFactor = tP.k / event.transform.k // TODO: work out why this is always 1 when zooming out
-
-                // Check if it's a zoom or pan event
-                if (zoomFactor == 1) {
-                    // Pan logic
-                    panHandler(event)
+            .on('zoom', function (e) {
+                const t = e.transform
+                const f = tP.k / t.k
+                //console.log('Zoom Factor:', zoomFactor)
+                if (f === 1) {
+                    const dx = tP.x - t.x
+                    const dy = tP.y - t.y
+                    panHandler(dx * out.position_.z, -dy * out.position_.z)
                 } else {
-                    // Zoom logic
-                    zoomHandler(event)
+                    //zoom at the mouse position
+                    zoomHandler(f, pixToGeoX(e.sourceEvent.offsetX), pixToGeoY(e.sourceEvent.offsetY))
                 }
 
-                // Apply transform to the SVG
+                console.log(out.position_)
+
+                // apply default transform
                 const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-                zoomGroup.attr('transform', transform)
-
-                // Update zoomIdentity with the new scale and translation
-                //zoomIdentity.translate(transform.x, transform.y).scale(transform.k)
-
-                // Update the previous scale for the next event
-                previousScale = currentScale
+                zoomGroup.attr('transform', t)
             })
 
         svg.call(xoo)
     }
 
-    const updatePositionFromZoomEvent = function (event, zoomChanged) {
-        // Convert the center of the screen (SVG coordinates) to geographic coordinates
-        const centerXGeo = pixToGeoX(out.width_ / 2 - event.transform.x, event.transform.k) // Convert pixel X to geographic X
-        const centerYGeo = pixToGeoY(out.height_ / 2 - event.transform.y, event.transform.k) // Convert pixel Y to geographic Y
-
-        // Update geographic position state based on pan and zoom
-        out.position_.x = centerXGeo // Update geographic X
-        out.position_.y = centerYGeo // Update geographic Y
-        if (zoomChanged) {
-            let zoomFactor = zoomIdentity.k / event.transform.k
-            out.position_.z = out.position_.z * zoomFactor // Update the zoom level (scale factor)
-        }
-        console.log(out.position_)
-    }
-
     // Zoom handler function
-    const zoomHandler = function (event) {
-        updatePositionFromZoomEvent(event, true)
+    const zoomHandler = function (f = 1, xGeo = out.position_.x, yGeo = out.position_.y) {
+        out.position_.z *= f
+
+        //compute pan
+        let dxGeo = (xGeo - out.position_.x) * (1 - f)
+        let dyGeo = (yGeo - out.position_.y) * (1 - f)
+
+        //ensures x/y extent
+        if (out.maxBounds_.xMin != undefined && out.position_.x + dxGeo < out.maxBounds_.xMin)
+            dxGeo = out.maxBounds_.xMin - out.position_.x
+        if (out.maxBounds_.yMin != undefined && out.position_.y + dyGeo < out.maxBounds_.yMin)
+            dyGeo = out.maxBounds_.yMin - out.position_.y
+        if (out.maxBounds_.xMax != undefined && out.position_.x + dxGeo > out.maxBounds_.xMax)
+            dxGeo = out.maxBounds_.xMax - out.position_.x
+        if (out.maxBounds_.yMax != undefined && out.position_.y + dyGeo > out.maxBounds_.yMax)
+            dyGeo = out.maxBounds_.yMax - out.position_.y
+
+        //pan
+        out.position_.x += dxGeo
+        out.position_.y += dyGeo
         console.log('zoom event')
     }
 
     // Pan handler function
-    const panHandler = function (event) {
-        updatePositionFromZoomEvent(event, false)
+    const panHandler = function (dxGeo = 0, dyGeo = 0) {
+        //pan
+        out.position_.x += dxGeo
+        out.position_.y += dyGeo
         console.log('pan event')
-    }
-
-    /**
-     * Converts a geographic x coordinate to screen pixels.
-     * @param {number} xGeo Geographic x coordinate.
-     * @param {number} scale Current scale factor.
-     * @returns {number} Screen x coordinate in pixels.
-     */
-    function geoToPixX(xGeo, scale) {
-        return (xGeo - out.position_.x) / scale + out.width_ * 0.5
-    }
-
-    /**
-     * Converts a geographic y coordinate to screen pixels.
-     * @param {number} yGeo Geographic y coordinate.
-     * @param {number} scale Current scale factor.
-     * @returns {number} Screen y coordinate in pixels.
-     */
-    function geoToPixY(yGeo, scale) {
-        return -(yGeo - out.position_.y) / scale + out.height_ * 0.5
     }
 
     /**
