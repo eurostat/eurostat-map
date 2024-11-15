@@ -1,7 +1,7 @@
 import { format } from 'd3-format'
 import { select } from 'd3-selection'
 import { max } from 'd3-array'
-import * as Legend from '../core/legend'
+import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**

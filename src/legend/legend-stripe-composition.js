@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import * as Legend from '../core/legend'
+import * as Legend from './legend'
 
 /**
  * A legend for choropleth maps

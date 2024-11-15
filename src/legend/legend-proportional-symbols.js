@@ -1,6 +1,6 @@
 import { format } from 'd3-format'
 import { select } from 'd3-selection'
-import * as Legend from '../core/legend'
+import * as Legend from './legend'
 import { symbolsLibrary } from '../maptypes/map-proportional-symbols'
 import { symbol } from 'd3-shape'
 import { executeForAllInsets, getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'

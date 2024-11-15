@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            //https://d3-annotation.susielu.com/
+            const annotations = [
+                {
+                    note: {
+                        title: 'annotationCalloutRect',
+                        lineType: 'none',
+                        align: 'left',
+                        wrap: 150, //custom text wrapping
+                    },
+                    subject: {
+                        height: 90,
+                        width: 175,
+                    },
+                    type: 'annotationCalloutRect',
+                    disable: ['connector'], // doesn't draw the connector
+                    //can pass "subject" "note" and "connector" as valid options
+                    x: 560,
+                    y: 30,
+                    dy: 1,
+                    dx: 1,
+                    className: 'show-bg',
+                    data: {},
+                },
+                {
+                    note: {
+                        label: "With arrow, note wrap '150', and note align 'middle'",
+                        title: 'annotationLabel',
+                        wrap: 150,
+                        align: 'middle',
+                    },
+                    connector: {
+                        end: 'arrow', // 'dot' also available
+                    },
+                    x: 280,
+                    y: 320,
+                    dy: -90,
+                    dx: -190,
+                },
+                {
+                    note: {
+                        label: "Changed connector type to 'curve'",
+                        title: 'annotationLabel',
+                        wrap: 150,
+                    },
+                    connector: {
+                        end: 'dot',
+                        type: 'curve',
+                        //can also add a curve type, e.g. curve: d3.curveStep
+                        points: [
+                            [120, 14],
+                            [190, 52],
+                        ],
+                    },
+                    x: 370,
+                    y: 100,
+                    dy: 120,
+                    dx: 240,
+                },
+                {
+                    //below in makeAnnotations has type set to d3.annotationLabel
+                    //you can add this type value below to override that default
+                    type: 'annotationCalloutCircle',
+                    note: {
+                        label: 'A different annotation type',
+                        title: 'annotationCalloutCircle',
+                        wrap: 190,
+                    },
+                    //settings for the subject, in this case the circle radius
+                    subject: {
+                        radius: 40,
+                    },
+                    x: 290,
+                    y: 540,
+                    dy: 90,
+                    dx: 102,
+                },
+            ].map(function (d) {
+                d.color = '#E8336D'
+                return d
+            })
+            const map = eurostatmap
+                .map('choropleth')
+                .title('annotations test')
+                .subtitle('uses d3.annotations')
+                .annotations(annotations)
+                .zoomExtent([1, 15])
+                .build()
+        </script>
+    </body>
+</html>

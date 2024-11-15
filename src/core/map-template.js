@@ -10,6 +10,7 @@ import {
     getFontSizeFromClass,
     getCSSPropertyFromClass,
     getParameterByName,
+    appendAnnotations,
 } from './utils'
 import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -74,7 +75,6 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.scalebarTickHeight_ = 8
 
     //tooltip
-    //default config
     out.tooltip_ = {
         fontSize: '14px',
         transitionDuration: 200,
@@ -84,12 +84,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         showFlags: false,
     } //  See tooltip.js for more details
 
-    out.tooltipText_ = (rg) => {
-        return rg.properties.na
-    } //DEPRECATED use tooltip_.textFunction
-    out.tooltipShowFlags_ = false //DEPRECATED use tooltip_.textFunction
-
-    //template default style
     //countries to include with default geometries
     out.bordersToShow_ = ['eu', 'efta', 'cc', 'oth', 'co']
     out.countriesToShow_ = [
@@ -132,8 +126,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         'UK',
     ]
 
-    //nuts hover color
-    out.hoverColor_ = 'red' // USE CSS
+    // region mouseover color
+    out.hoverColor_ = 'red'
 
     //sea
     out.drawCoastalMargin_ = false
@@ -148,10 +142,12 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
     out.labelShadowsToShow_ = ['countries', 'seas']
     out.labelShadow_ = true
-
     out.labelFilterFunction_ = (rg, map) => {
         return rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo_[1] || map.geo_ == 'SJ_SV'
     } // filter the regions used for the labels array
+
+    //annotations
+    out.annotations_ = undefined
 
     //dataset source link
     out.showSourceLink_ = true
@@ -664,6 +660,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         // add geographical labels to map
         if (out.labelling_) {
             addLabelsToMap(out, zoomGroup)
+        }
+
+        if (out.annotations_) {
+            appendAnnotations(zoomGroup, out.annotations_)
         }
 
         //title
