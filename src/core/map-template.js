@@ -884,12 +884,22 @@ export const mapTemplate = function (config, withCenterPoints) {
         const centerY = (out.height_ / 2 - transform.y) / transform.k
         let [geoX, geoY] = out._projection.invert([centerX, centerY])
 
-        // ensures x/y extent stays within max bounds
-        // have to also adjust transform here
-        if (out.maxBounds_.xMin != undefined && geoX < out.maxBounds_.xMin) geoX = out.maxBounds_.xMin - out.position_.x
-        if (out.maxBounds_.yMin != undefined && geoY < out.maxBounds_.yMin) geoY = out.maxBounds_.yMin - out.position_.y
-        if (out.maxBounds_.xMax != undefined && geoX > out.maxBounds_.xMax) geoX = out.maxBounds_.xMax - out.position_.x
-        if (out.maxBounds_.yMax != undefined && geoY > out.maxBounds_.yMax) geoY = out.maxBounds_.yMax - out.position_.y
+        // Ensure the geographic center stays within the defined bounds
+        const clampedX = Math.max(out.maxBounds_.xMin ?? -Infinity, Math.min(geoX, out.maxBounds_.xMax ?? Infinity))
+        const clampedY = Math.max(out.maxBounds_.yMin ?? -Infinity, Math.min(geoY, out.maxBounds_.yMax ?? Infinity))
+
+        // Update the transform only if clamping is applied
+        if (geoX !== clampedX || geoY !== clampedY) {
+            const [clampedPxX, clampedPxY] = out._projection([clampedX, clampedY])
+
+            // Calculate the new transform values
+            transform.x = out.width_ / 2 - clampedPxX * transform.k
+            transform.y = out.height_ / 2 - clampedPxY * transform.k
+
+            // Update the geographic position
+            geoX = clampedX
+            geoY = clampedY
+        }
 
         // set new position
         out.position_.x = geoX
