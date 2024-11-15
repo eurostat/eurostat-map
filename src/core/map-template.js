@@ -825,14 +825,14 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     const defineMapZoom = function () {
         let svg = select('#' + out.svgId())
-        let previousK = 1
+        let previousT = zoomIdentity
         const xoo = zoom()
             .scaleExtent(out.zoomExtent())
             .on('zoom', function (e) {
                 const t = e.transform
 
-                if (t.k !== previousK) {
-                    zoomHandler(e, previousK)
+                if (t.k !== previousT.k) {
+                    zoomHandler(e, previousT)
                 } else {
                     panHandler(e)
                 }
@@ -842,14 +842,14 @@ export const mapTemplate = function (config, withCenterPoints) {
                 zoomGroup.attr('transform', t)
 
                 console.log('Position:', out.position_)
-                previousK = t.k
+                previousT = t
             })
 
         svg.call(xoo)
     }
 
     // Zoom handler function
-    const zoomHandler = function (event, previousK) {
+    const zoomHandler = function (event, previousT) {
         const transform = event.transform
         // Compute the projected center
         const centerX = (out.width_ / 2 - transform.x) / transform.k
@@ -861,31 +861,39 @@ export const mapTemplate = function (config, withCenterPoints) {
         // set new position
         out.position_.x = projectedX
         out.position_.y = projectedY
+        out.position_.z = getMetresPerPixel(transform.k / previousT.k)
+    }
 
+    const getMetresPerPixel = function (zoomFactor) {
         // Get current bounding box width in meters
         const bbox = getCurrentBbox()
         const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
 
         // Calculate meters per pixel
-        let zoomDelta = transform.k / previousK
-        const metersPerPixel = bboxWidth / (out.width_ * zoomDelta) // Use transform.k for zooming
+        const metersPerPixel = bboxWidth / (out.width_ * zoomFactor)
 
-        out.position_.z = metersPerPixel
+        return metersPerPixel
     }
 
     // Pan handler function
-    const panHandler = function (event) {
+    const panHandler = function (event, previousT) {
         const transform = event.transform
+
         // Compute the projected center
         const centerX = (out.width_ / 2 - transform.x) / transform.k
         const centerY = (out.height_ / 2 - transform.y) / transform.k
+        let [geoX, geoY] = out._projection.invert([centerX, centerY])
 
-        // Use the projection to get the projected center in EPSG:3035
-        const [projectedX, projectedY] = out._projection.invert([centerX, centerY])
+        // ensures x/y extent stays within max bounds
+        // have to also adjust transform here
+        if (out.maxBounds_.xMin != undefined && geoX < out.maxBounds_.xMin) geoX = out.maxBounds_.xMin - out.position_.x
+        if (out.maxBounds_.yMin != undefined && geoY < out.maxBounds_.yMin) geoY = out.maxBounds_.yMin - out.position_.y
+        if (out.maxBounds_.xMax != undefined && geoX > out.maxBounds_.xMax) geoX = out.maxBounds_.xMax - out.position_.x
+        if (out.maxBounds_.yMax != undefined && geoY > out.maxBounds_.yMax) geoY = out.maxBounds_.yMax - out.position_.y
 
         // set new position
-        out.position_.x = projectedX
-        out.position_.y = projectedY
+        out.position_.x = geoX
+        out.position_.y = geoY
     }
 
     /**
