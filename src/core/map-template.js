@@ -618,6 +618,9 @@ export const mapTemplate = function (config, withCenterPoints) {
             // out.position_.y = Geometries.userGeometries
         }
         out.position_.z = out.position_.z || getDefaultZ()
+
+        // optional: set from URL
+        setViewFromURL()
     }
 
     const getDefaultZ = function () {
@@ -830,7 +833,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             .scaleExtent(out.zoomExtent())
             .on('zoom', function (e) {
                 const t = e.transform
-
                 if (t.k !== previousT.k) {
                     zoomHandler(e, previousT)
                 } else {
@@ -862,8 +864,64 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.position_.x = projectedX
         out.position_.y = projectedY
         out.position_.z = getMetresPerPixel(transform.k / previousT.k)
+
+        // adjust stroke dynamically according to zoom
+        updateStrokeWidths(transform)
     }
 
+    /**
+     * @description adjusts all stroke-widths dynamically according to zoom
+     * @param {*} transform
+     */
+    const updateStrokeWidths = function (transform) {
+        // Adjust stroke-width dynamically for elements with stroke-width
+        const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
+        const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
+
+        // Cache the transform factor to avoid repeated calls
+        const zoomFactor = transform.k
+
+        // Preprocess and batch DOM updates
+        const updates = []
+
+        elements.each(function () {
+            const element = select(this)
+            const computedStyle = window.getComputedStyle(this)
+
+            // Get stroke-width from inline or computed style
+            const inlineStrokeWidth = element.attr('stroke-width')
+            const cssStrokeWidth = computedStyle.strokeWidth
+            const strokeWidth = inlineStrokeWidth || cssStrokeWidth
+
+            // Only process elements that have a stroke width defined
+            if (strokeWidth && parseFloat(strokeWidth) > 0) {
+                const originalStrokeWidth =
+                    parseFloat(element.attr('data-sw')) || parseFloat(inlineStrokeWidth) || parseFloat(cssStrokeWidth)
+
+                // Store the original stroke width for the first time
+                if (!element.attr('data-sw')) {
+                    element.attr('data-sw', originalStrokeWidth)
+                }
+
+                // Calculate the target stroke width
+                const targetStrokeWidth = originalStrokeWidth / zoomFactor
+
+                // Add the style change to a batch array
+                updates.push({ element: this, targetStrokeWidth })
+            }
+        })
+
+        // Apply all style changes at once
+        updates.forEach(({ element, targetStrokeWidth }) => {
+            element.style.setProperty('stroke-width', `${targetStrokeWidth}px`, 'important')
+        })
+    }
+
+    /**
+     * @description get the current view's metres per pixel, based on a zoomFactor
+     * @param {number} zoomFactor this zoom / previous zoom
+     * @return {number}
+     */
     const getMetresPerPixel = function (zoomFactor) {
         // Get current bounding box width in meters
         const bbox = getCurrentBbox()
@@ -884,60 +942,27 @@ export const mapTemplate = function (config, withCenterPoints) {
         const centerY = (out.height_ / 2 - transform.y) / transform.k
         let [geoX, geoY] = out._projection.invert([centerX, centerY])
 
-        // Ensure the geographic center stays within the defined bounds
-        const clampedX = Math.max(out.maxBounds_.xMin ?? -Infinity, Math.min(geoX, out.maxBounds_.xMax ?? Infinity))
-        const clampedY = Math.max(out.maxBounds_.yMin ?? -Infinity, Math.min(geoY, out.maxBounds_.yMax ?? Infinity))
-
-        // Update the transform only if clamping is applied
-        if (geoX !== clampedX || geoY !== clampedY) {
-            const [clampedPxX, clampedPxY] = out._projection([clampedX, clampedY])
-
-            // Calculate the new transform values
-            transform.x = out.width_ / 2 - clampedPxX * transform.k
-            transform.y = out.height_ / 2 - clampedPxY * transform.k
-
-            // Update the geographic position
-            geoX = clampedX
-            geoY = clampedY
+        // Clamp geoX and geoY to max bounds and adjust the event transform
+        if (out.maxBounds_.xMin !== undefined && geoX < out.maxBounds_.xMin) {
+            geoX = out.maxBounds_.xMin
+            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
+        }
+        if (out.maxBounds_.yMin !== undefined && geoY < out.maxBounds_.yMin) {
+            geoY = out.maxBounds_.yMin
+            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
+        }
+        if (out.maxBounds_.xMax !== undefined && geoX > out.maxBounds_.xMax) {
+            geoX = out.maxBounds_.xMax
+            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
+        }
+        if (out.maxBounds_.yMax !== undefined && geoY > out.maxBounds_.yMax) {
+            geoY = out.maxBounds_.yMax
+            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
         }
 
         // set new position
         out.position_.x = geoX
         out.position_.y = geoY
-    }
-
-    /**
-     * Converts a screen x coordinate to geographic coordinates.
-     * @param {number} x Screen x coordinate in pixels.
-     * @param {number} scale Current scale factor.
-     * @returns {number} Geographic x coordinate.
-     */
-    function pixToGeoX(x) {
-        return (x - out.width_ * 0.5) * out.position_.z + out.position_.x
-    }
-
-    /**
-     * Converts a screen y coordinate to geographic coordinates.
-     * @param {number} y Screen y coordinate in pixels.
-     * @param {number} scale Current scale factor.
-     * @returns {number} Geographic y coordinate.
-     */
-    function pixToGeoY(y) {
-        return -(y - out.height_ * 0.5) * out.position_.z + out.position_.y
-    }
-
-    /**
-     * @param {number} marginPx
-     * @returns {Envelope} The envelope of the view, in geo coordinates.
-     */
-    const updateExtentGeo = function (marginPx = 20) {
-        this.extGeo = {
-            xMin: this.pixToGeoX(-marginPx),
-            xMax: this.pixToGeoX(this.w + marginPx),
-            yMin: this.pixToGeoY(this.h + marginPx),
-            yMax: this.pixToGeoY(-marginPx),
-        }
-        return this.extGeo
     }
 
     /** Get x,y,z elements from URL and assign them to the view. */
