@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .em-cntbn,
+            .em-bn-co {
+                stroke-width: 1.5 !important;
+            }
+            .em-bn-oth:not(.em-bn-co) {
+                stroke-width: 0 !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            let map = eurostatmap.map('choropleth').width(900).title('Test CSS classes').scale('60M').nutsLevel(2).build()
+        </script>
+    </body>
+</html>

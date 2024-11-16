@@ -43,7 +43,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
-    out.nutsYear_ = 2021
+    out.nutsYear_ = 2024
     out.geo_ = 'EUR'
     out.proj_ = '3035'
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()

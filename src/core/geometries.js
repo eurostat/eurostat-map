@@ -266,7 +266,17 @@ export const Geometries = function (map, withCenterPoints) {
                 })
                 .attr('d', pathFunction)
                 .attr('class', function (bn) {
-                    return bn.properties.co === 'T' ? 'em-bn-co' : 'em-cntbn'
+                    let classList = []
+                    if (bn.properties.eu === 'T') classList.push('em-bn-eu')
+                    if (bn.properties.efta === 'T') classList.push('em-bn-efta')
+                    if (bn.properties.cc === 'T') classList.push('em-bn-cc')
+                    if (bn.properties.oth === 'T') classList.push('em-bn-oth')
+                    if (bn.properties.co === 'T') {
+                        classList.push('co', 'em-bn-co')
+                    } else {
+                        classList.push('em-cntbn')
+                    }
+                    return classList.join(' ') // Use join with a space to create a valid class string
                 })
         }
 
