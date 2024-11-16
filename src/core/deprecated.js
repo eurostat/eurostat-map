@@ -49,7 +49,10 @@ export const defineDeprecatedFunctions = (out) => {
     out.bottomText = (v) => (console.warn('bottomText is now DEPRECATED. Please use the footnote() method and em-footnote CSS class instead.'),out.footnote_ = v,out);
     out.botTxtFontSize = (v) => (console.warn('botTxtFontSize is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
     out.botTxtFill = (v) => (console.warn('botTxtFill is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
-    out.botTxtTooltipTxt = (v) => (console.warn('botTxtTooltipTxt is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
+    out.botTxtPadding = (v) => (console.warn('botTxtPadding is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
+    out.botTxtTooltipTxt = (v) => (console.warn('botTxtTooltipTxt is now DEPRECATED. Please use footnoteTooltipText() instead.'),out);
 
     out.tooltipShowFlags = (v) =>(console.warn('tooltipShowFlags is now DEPRECATED. Please use out.tooltip({showFlags}) instead.'),out.tooltip_.showFlags = v,out);
+
+
 }

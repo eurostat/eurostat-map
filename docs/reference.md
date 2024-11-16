@@ -60,9 +60,9 @@ Specify the NUTS geometries and the geographical extent of the map.
 
 It is also possible to build thematic world maps using eurostat-map. Simply pass "WORLD" to the map.geo() method. See [this example](https://github.com/eurostat/eurostat-map/blob/master/examples/world.html) for how to configure a world map.
 
-| Method                                     | Type          | Default value       | Description                                                                |
-| ------------------------------------------ | ------------- | ------------------- | -------------------------------------------------------------------------- |
-| _map_.**projectionFunction**([*value*])    | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps     |
+| Method                                  | Type          | Default value       | Description                                                            |
+| --------------------------------------- | ------------- | ------------------- | ---------------------------------------------------------------------- |
+| _map_.**projectionFunction**([*value*]) | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps |
 
 ## Statistical data
 
@@ -638,13 +638,12 @@ eurostatmap
 
 Specify the map title, its style and position.
 
-| Method                                  | Type          | Default value | Description                                                                                            |
-| --------------------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
-| _map_.**title**([*value*])              | String        | ""            | The title text.                                                                                        |
-| _map_.**titlePosition**([*value*])      | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
-| _map_.**subtitle**([*value*])           | String        | ""            | The subtitle text.                                                                                     |
-| _map_.**subtitlePosition**([*value*])   | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
-
+| Method                                | Type          | Default value | Description                                                                                            |
+| ------------------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
+| _map_.**title**([*value*])            | String        | ""            | The title text.                                                                                        |
+| _map_.**titlePosition**([*value*])    | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
+| _map_.**subtitle**([*value*])         | String        | ""            | The subtitle text.                                                                                     |
+| _map_.**subtitlePosition**([*value*]) | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
 
 ## Map legend
 
@@ -661,17 +660,17 @@ map = eurostatmap.map(...)
 	});
 ```
 
-| Parameter           | Type   | Default value | Description                                                                                                            |
-| ------------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **svgId**           | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
-| **x**               | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
-| **y**               | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
-| **boxMargin**       | number | _10_          | The legend box margin, in pixel.                                                                                       |
-| **boxPadding**      | number | _7_           | The legend box padding, in pixel.                                                                                      |
-| **boxCornerRad**    | number | _7_           | The legend box corner radius, in pixel.                                                                                |
-| **boxFill**         | color  | _"white"_     | The legend box fill style.                                                                                             |
-| **boxOpacity**      | number | _0.7_         | The legend box opacity, from 0 to 1.                                                                                   |
-| **title**           | Text   | _""_          | The legend title.                                                                                                      |
+| Parameter        | Type   | Default value | Description                                                                                                            |
+| ---------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **svgId**        | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
+| **x**            | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
+| **y**            | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
+| **boxMargin**    | number | _10_          | The legend box margin, in pixel.                                                                                       |
+| **boxPadding**   | number | _7_           | The legend box padding, in pixel.                                                                                      |
+| **boxCornerRad** | number | _7_           | The legend box corner radius, in pixel.                                                                                |
+| **boxFill**      | color  | _"white"_     | The legend box fill style.                                                                                             |
+| **boxOpacity**   | number | _0.7_         | The legend box opacity, from 0 to 1.                                                                                   |
+| **title**        | Text   | _""_          | The legend title.                                                                                                      |
 
 ## Scalebar
 
@@ -734,7 +733,6 @@ map = eurostatmap.map(...)
 Specify specific map styles. As of V4, styles have been moved to CSS classes. See [css.md](./css.md) for a list of CSS rules.
 See deprecated.js for deprecated functions and their successors.
 
-
 | Method                                   | Type    | Default value | Description                                                                                                                                              |
 | ---------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**hoverColor**([*value*])          | String  | _"#purple"_   | The fill style of the selected NUTS regions.                                                                                                             |
@@ -790,18 +788,15 @@ Note that a map inset is built as a proper map within a map: It has all properti
 | _map_.**insetZoomExtent**([*value*])  | Array  | _null_        | The zoom extent of inset maps. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both. |
 | _map_.**insetScale**([*value*])       | String | _"03M"_       | The default scale of the insets.                                                                                                                                                                                                                             |
 
-## Bottom text & link to source data
+## Footnotes
 
 Specify the text to be shown at the bottom of the map.
 
-| Method                                 | Type    | Default value                   | Description                                                                                                                          |
-| -------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| _map_.**bottomText**([*value*])        | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
-| _map_.**botTxtFontSize**([*value*])    | int     | _12_                            | The font size.                                                                                                                       |
-| _map_.**botTxtFill**([*value*])        | String  | _"black"_                       | The text color.                                                                                                                      |
-| _map_.**botTxtPadding**([*value*])     | number  | _10_                            | The padding, in pixel.                                                                                                               |
-| _map_ .**botTxtTooltipTxt**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the bottom text. Set to _null_ if no tooltip has to be shown.                  |
-| _map_ .**showSourceLink**([*value*])   | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
+| Method                                    | Type    | Default value                   | Description                                                                                                                          |
+| ----------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
+| _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                     |
+| _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
 
 ## Export
 
