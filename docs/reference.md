@@ -769,8 +769,8 @@ To specify more precisely which insets to show, their geographical extent, scale
 ```javascript
 eurostatmap.map(...)
 	.insets(
-		{ geo:"MT", scale:"01M", pixSize:3000, title:"Martinique", width:200, height:90, x:0, y:0 },
-		{ geo:"GF", scale:"03M", pixSize:10000, title:"French Guyana", width:200, height:90, x:210, y:0 }
+		{ geo:"MQ", scale:"01M", position: { z: 1000 }, title:"Martinique", width:200, height:90, x:0, y:0 },
+		{ geo:"GF", scale:"03M", position: { z: 9000 }, title:"French Guyana", width:200, height:90, x:210, y:0 }
 	)
 	.insetBoxPosition([335,345]);
 ```

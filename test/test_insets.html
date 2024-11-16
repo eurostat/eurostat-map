@@ -1,57 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
+    <body>
+        <svg id="map1"></svg>
+        <svg id="map2"></svg>
+        <svg id="map3"></svg>
+        <svg id="map4"></svg>
+        <svg id="inset4_1"></svg>
+        <svg id="inset4_2"></svg>
+        <svg id="map5"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            // eurostatmap.map('ch').svgId('map1').width(400).insets('default').insetBoxWidth(100).build()
+            // eurostatmap
+            //     .map('ch')
+            //     .svgId('map2')
+            //     .width(400)
+            //     .insets({ geo: 'GF', height: 250 })
+            //     .insetBoxPosition([180, 0])
+            //     .insetZoomExtent([0, 99999])
+            //     .build()
+            // eurostatmap
+            //     .map('ch')
+            //     .svgId('map3')
+            //     .width(400)
+            //     .geo('LI')
+            //     .scale('01M')
+            //     .insets({ geo: 'MQ', scale: '01M' })
+            //     .insetBoxWidth(100)
+            //     .insetBoxPosition([0, 0])
+            //     .insetZoomExtent([0, 99999])
+            //     .insetBoxPosition([10, 10])
+            //     .build()
+            // eurostatmap
+            //     .map('ch')
+            //     .svgId('map4')
+            //     .width(250)
+            //     .geo('LI')
+            //     .scale('01M')
+            //     .insets({ geo: 'MT', svgId: 'inset4_1' }, { geo: 'GP', svgId: 'inset4_2' })
+            //     .insetBoxWidth(80)
+            //     .insetZoomExtent([0, 99999])
+            //     .build()
 
-<body>
-    <svg id="map1"></svg>
-    <svg id="map2"></svg>
-    <svg id="map3"></svg>
-    <svg id="map4"></svg>
-    <svg id="inset4_1"></svg>
-    <svg id="inset4_2"></svg>
-    <svg id="map5"></svg>
-    <script src="../build/eurostatmap.js"></script>
-    <script>
-        eurostatmap
-            .map("ch")
-            .svgId("map1")
-            .width(400)
-            .insets("default").insetBoxWidth(100)
-            .build();
-        eurostatmap
-            .map("ch")
-            .svgId("map2")
-            .width(400)
-            .insets({geo:"GF",height:250}).insetBoxPosition([180,0]).insetZoomExtent([0,99999])
-            .build();
-        eurostatmap
-            .map("ch")
-            .svgId("map3")
-            .width(400)
-            .geo("LI").scale("01M")
-            .insets({geo:"MQ",scale:"01M"}).insetBoxWidth(100).insetBoxPosition([0,0]).insetZoomExtent([0,99999])
-            .insetBoxPosition([10,10])
-            .build();
-        eurostatmap
-            .map("ch")
-            .svgId("map4")
-            .width(250)
-            .geo("LI").scale("01M")
-            .insets( {geo:"MT",svgId:"inset4_1"}, {geo:"GP",svgId:"inset4_2"} ).insetBoxWidth(80).insetZoomExtent([0,99999])
-            .build();
-
-        /*/TODO test inset in inset
-        eurostatmap
-            .map("ch")
-            .svgId("map5")
-            .width(250)
-            .geo("LI").scale("01M").insets([{geo:"YT"}]).insetBoxWidth(80).insetZoomExtent([0,99999])
-            .build();*/
-    </script>
-</body>
-
+            eurostatmap
+                .map('choropleth')
+                .insets(
+                    { geo: 'MQ', scale: '01M', position: { z: 1000 }, title: 'Martinique', width: 200, height: 90, x: 0, y: 0 },
+                    {
+                        geo: 'GF',
+                        scale: '03M',
+                        position: { z: 10000 },
+                        title: 'French Guyana',
+                        width: 200,
+                        height: 90,
+                        x: 210,
+                        y: 0,
+                    }
+                )
+                .insetBoxPosition([335, 345])
+                .build()
+        </script>
+    </body>
 </html>
