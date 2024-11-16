@@ -24,9 +24,9 @@
             // custom pattern function
 
             const getFillPatternDefinitionFunction = (svg, numberOfClasses) => {
-                const height = 4
-                const minWidth = 0.1 // Minimum stroke width
-                const maxWidth = height // Maximum stroke width
+                const minWidth = 0.5 // Minimum stroke width
+                const maxWidth = 5 // Maximum stroke width
+                const patternHeight = 4 // Shared height for all patterns
 
                 // Clear previous patterns
                 svg.selectAll('.estatmapPattern').remove()
@@ -40,24 +40,23 @@
                         .attr('x', 0)
                         .attr('y', 0)
                         .attr('width', width)
-                        .attr('height', height)
+                        .attr('height', patternHeight)
                         .attr('patternUnits', 'userSpaceOnUse')
                     elementsCallback(pattern)
                 }
 
                 // Create patterns for each class
                 for (let i = 0; i < numberOfClasses; i++) {
-                    const strokeWidth = minWidth + ((maxWidth - minWidth) * i) / (numberOfClasses - 1)
-
-                    if (i === numberOfClasses - 1) {
-                        createPattern(i, 4, (pattern) => {
-                            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', 'black')
-                        })
-                    } else if (i === 0) {
+                    if (i === 0) {
                         createPattern(i, 1, (pattern) => {
-                            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', 'white')
+                            pattern.append('rect').attr('width', 4).attr('height', patternHeight).attr('fill', 'white') // Background color
+                        })
+                    } else if (i === numberOfClasses - 1) {
+                        createPattern(i, 4, (pattern) => {
+                            pattern.append('rect').attr('width', 4).attr('height', patternHeight).attr('fill', 'none') // Transparent background
                         })
                     } else {
+                        const strokeWidth = minWidth + ((maxWidth - minWidth) * (i - 1)) / (numberOfClasses - 2)
                         createPattern(i, 1, (pattern) => {
                             pattern
                                 .append('line')
@@ -71,6 +70,7 @@
                     }
                 }
             }
+
             let map = eurostatmap
                 .map('choropleth')
                 .width(1000)
