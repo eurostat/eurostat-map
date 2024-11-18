@@ -214,16 +214,18 @@ export const map = function (config) {
         out.catLabels_ = out.catLabels_ || {}
 
         //build and assign pie charts to the regions
-        //collect nuts ids from g elements. TODO: find better way of getting IDs
-        let nutsIds = []
+        //collect nuts ids from g elements. TODO: find better way of sharing regions with pies
+        let regionFeatures = []
         if (out.svg_) {
             let s = out.svg_.selectAll('#g_ps')
             if (s) {
                 let sym = s.selectAll('g.em-symbol')
-                sym.append('g').attr('id', (rg) => {
-                    nutsIds.push(rg.properties.id)
-                    return 'pie_' + rg.properties.id
-                })
+                sym.append('g')
+                    .attr('class', 'em-pie')
+                    .attr('id', (rg) => {
+                        regionFeatures.push(rg)
+                        return 'pie_' + rg.properties.id
+                    })
 
                 // set region hover function
                 let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
@@ -263,7 +265,7 @@ export const map = function (config) {
                         }
                     })
 
-                addPieChartsToMap(nutsIds)
+                addPieChartsToMap(regionFeatures)
             }
         }
         return out
@@ -382,11 +384,12 @@ export const map = function (config) {
         return sum
     }
 
-    function addPieChartsToMap(ids) {
-        ids.forEach((nutsid) => {
+    function addPieChartsToMap(regionFeatures) {
+        regionFeatures.forEach((region) => {
+            const regionId = region.properties.id
             //prepare data for pie chart
             const data = []
-            const comp = getComposition(nutsid)
+            const comp = getComposition(regionId)
             for (const key in comp) data.push({ code: key, value: comp[key] })
 
             //case of regions with no data
@@ -396,10 +399,10 @@ export const map = function (config) {
 
             //create svg for pie chart
             // can be more than one center point for each nuts ID (e.g. Malta when included in insets)
-            let nodes = out.svg().selectAll('#pie_' + nutsid)
+            let nodes = out.svg().selectAll('#pie_' + regionId)
 
             // define radius
-            const r = out.sizeClassifier_(getRegionTotal(nutsid))
+            const r = out.sizeClassifier_(getRegionTotal(regionId))
             const ir = out.pieChartInnerRadius_
 
             //make pie chart. See https://observablehq.com/@d3/pie-chart
@@ -422,6 +425,35 @@ export const map = function (config) {
                 })
                 .attr('code', (d) => d.data.code) //for mouseover legend highlighting function
                 .attr('d', arc().innerRadius(ir).outerRadius(r))
+                .on('mouseover', function (e, rg) {
+                    if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
+                        if (out.countriesToShow_.includes(regionId[0] + regionId[1])) {
+                            const sel = select(this)
+                            // Apply a thick stroke width to the parent element
+                            const parent = select(sel.node().parentNode)
+                            parent.style('stroke-width', '2px').style('stroke', 'black') // Set stroke
+                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(region, out))
+                        }
+                    } else {
+                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(region, out))
+                    }
+                })
+                .on('mousemove', function (e, rg) {
+                    if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
+                        if (out.countriesToShow_.includes(regionId[0] + regionId[1])) {
+                            if (out._tooltip) out._tooltip.mousemove(e)
+                        }
+                    } else {
+                        if (out._tooltip) out._tooltip.mousemove(e)
+                    }
+                })
+                .on('mouseout', function () {
+                    const sel = select(this)
+                    // Reset stroke
+                    const parent = select(sel.node().parentNode)
+                    parent.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_) // Set stroke
+                    if (out._tooltip) out._tooltip.mouseout()
+                })
         })
     }
 

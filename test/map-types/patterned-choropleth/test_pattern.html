@@ -73,7 +73,7 @@
 
             let map = eurostatmap
                 .map('choropleth')
-                .width(1000)
+                .width(Math.min(1000, window.innerHeight))
                 .title('Custom choropleth pattern')
                 .titleFontSize(40)
                 .titleFill('#444')
@@ -84,7 +84,7 @@
                 .filtersDefinitionFunction(eurostatmap.getFillPatternDefinitionFunction())
                 .legend({
                     x: 5,
-                    y: 150,
+                    y: 180,
                     title: 'Custom pattern',
                 })
             map.build()
