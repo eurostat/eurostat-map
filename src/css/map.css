@@ -161,7 +161,7 @@ a text {
 .em-bn-1,
 .em-bn-2,
 .em-bn-3 {
-    stroke: grey;
+    stroke: white;
 }
 
 .em-kosovo-bn {
@@ -181,7 +181,12 @@ a text {
 
 .em-bn-co {
     stroke: black;
-    stroke-width: 0.1;
+    stroke-width: 0;
+}
+
+/* hide non cc/eu/efta borders */
+.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0 !important;
 }
 
 /* dont fill certain elements */

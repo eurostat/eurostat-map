@@ -1,7 +1,8 @@
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { interpolateYlGnBu, interpolateYlOrBr } from 'd3-scale-chromatic'
+import { interpolateYlGnBu } from 'd3-scale-chromatic'
+import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
@@ -28,7 +29,10 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    out.colorFun_ = interpolateYlGnBu
+    out.colorFunction_ = interpolateYlGnBu
+
+    let eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#17256B']
+    out.colorFunction_ = (t) => piecewise(interpolateLab, eurostatMultihue)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
@@ -48,7 +52,7 @@ export const map = function (config) {
         'classificationMethod_',
         'threshold_',
         'makeClassifNice_',
-        'colorFun_',
+        'colorFunction_',
         'classToFillStyle_',
         'noDataFillStyle_',
         'classifier_',
@@ -62,17 +66,17 @@ export const map = function (config) {
     })
 
     //override of some special getters/setters
-    out.colorFun = function (v) {
+    out.colorFunction = function (v) {
         if (!arguments.length) {
-            return out.colorFun_
+            return out.colorFunction_
         }
-        out.colorFun_ = v
+        out.colorFunction_ = v
         // update class style function
         if (out.filtersDefinitionFunction_) {
             // if dot density
             out.classToFillStyle(getFillPatternLegend())
         } else {
-            out.classToFillStyle(getColorLegend(out.colorFun(), out.colors_))
+            out.classToFillStyle(getColorLegend(out.colorFunction(), out.colors_))
         }
         return out
     }
@@ -96,7 +100,7 @@ export const map = function (config) {
             'classificationMethod',
             'threshold',
             'makeClassifNice',
-            'colorFun',
+            'colorFunction',
             'classToFillStyle',
             'noDataFillStyle',
             'colors_',
@@ -215,7 +219,7 @@ export const map = function (config) {
             out.classToFillStyle(getFillPatternLegend())
         } else {
             // Color legend style
-            out.classToFillStyle(getColorLegend(out.colorFun(), out.colors_))
+            out.classToFillStyle(getColorLegend(out.colorFunction(), out.colors_))
         }
 
         // Apply color and events to regions if SVG exists
@@ -343,15 +347,15 @@ export const map = function (config) {
 }
 
 //build a color legend object
-export const getColorLegend = function (colorFun, colorArray) {
-    colorFun = colorFun || interpolateYlGnBu
+export const getColorLegend = function (colorFunction, colorArray) {
+    colorFunction = colorFunction || interpolateYlGnBu
     if (colorArray) {
         return function (ecl, numberOfClasses) {
             return colorArray[ecl]
         }
     }
     return function (ecl, numberOfClasses) {
-        return colorFun(ecl / (numberOfClasses - 1))
+        return colorFunction(ecl / (numberOfClasses - 1))
     }
 }
 

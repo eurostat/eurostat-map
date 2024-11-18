@@ -53,6 +53,6 @@ export const defineDeprecatedFunctions = (out) => {
     out.botTxtTooltipTxt = (v) => (console.warn('botTxtTooltipTxt is now DEPRECATED. Please use footnoteTooltipText() instead.'),out);
 
     out.tooltipShowFlags = (v) =>(console.warn('tooltipShowFlags is now DEPRECATED. Please use out.tooltip({showFlags}) instead.'),out.tooltip_.showFlags = v,out);
-
+    out.colorFun = (v) =>(console.warn('colorFun is now DEPRECATED. Please use out.colorFunction() instead.'),out.colorFun_ = v,out);
 
 }

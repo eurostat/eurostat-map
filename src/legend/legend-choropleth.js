@@ -1,5 +1,8 @@
-import { select } from 'd3-selection'
+import { select, selectAll, create } from 'd3-selection'
 import { format } from 'd3-format'
+import { scaleBand, scaleLinear } from 'd3-scale'
+import { axisLeft } from 'd3-axis'
+import { max } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
@@ -23,13 +26,17 @@ export const legend = function (map, config) {
     //tick line length in pixels
     out.tickLength = 4
     //the number of decimal for the legend labels
-    out.decimals = 2
+    out.decimals = 0
     //the distance between the legend box elements to the corresponding text label
     out.labelOffset = 3
     //labelFormatter function
     out.labelFormatter = null
     // manually define labels
     out.labels = null
+
+    out.barChart = undefined
+    out.barChartCounts = undefined //show class count labels
+    out.barChartLabelFormat = undefined // allow users to format the bar chart bin labels
 
     //show no data
     out.noData = true
@@ -63,9 +70,36 @@ export const legend = function (map, config) {
                 .text(out.title)
         }
 
+        if (out.barChart) {
+            let thresholds =
+                m.threshold_.length > 1
+                    ? m.threshold_
+                    : Array.from({ length: m.numberOfClasses_ })
+                          .map((_, index) => {
+                              return m.classifier().invertExtent(index)[out.ascending ? 0 : 1]
+                          })
+                          .slice(1) // Remove the first entry and return the rest as an array
+            let colors = m.colors_
+                ? m.colors_
+                : Array.from({ length: m.numberOfClasses_ }).map((_, index) => {
+                      return m.classToFillStyle()(index, m.numberOfClasses_)
+                  })
+            let data = Object.values(m.statData()._data_).map((item) => item.value)
+            console.log(thresholds.length, data, colors.length)
+            createBarChartLegend(thresholds, data, colors)
+        } else {
+            createStandardLegend()
+        }
+
+        // Set legend box dimensions
+        out.setBoxDimension()
+    }
+
+    function createStandardLegend() {
+        const m = out.map
+        const lgg = out.lgg
         // Label formatter
         const formatLabel = out.labelFormatter || format(`.${out.decimals}f`)
-
         let baseY = out.boxPadding
         if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
         for (let i = 0; i < m.numberOfClasses_; i++) {
@@ -158,9 +192,117 @@ export const legend = function (map, config) {
                 .attr('dominant-baseline', 'middle')
                 .text(out.noDataText)
         }
+    }
 
-        // Set legend box dimensions
-        out.setBoxDimension()
+    function createBarChartLegend(thresholds, data, colors) {
+        const lgg = out.lgg
+        let baseY = out.boxPadding + 30
+        if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
+
+        // Set up dimensions
+        const svgWidth = 300
+        const svgHeight = 300
+        const margin = { top: 20, right: 60, bottom: 20, left: 150 } // Increased left margin
+
+        // Calculate counts for each threshold range
+        let counts = new Array(thresholds.length + 1).fill(0)
+        data.forEach((value) => {
+            for (let i = 0; i < thresholds.length; i++) {
+                if (value < thresholds[i]) {
+                    counts[i]++
+                    return
+                }
+            }
+            counts[thresholds.length]++
+        })
+
+        // Reverse the counts array for highest classes on top
+        const reversedCounts = counts.slice().reverse()
+
+        // Ensure that the number of colors matches the number of bars
+        const colorCount = reversedCounts.length
+        if (colors.length !== colorCount) {
+            console.warn(`Mismatch between number of colors (${colors.length}) and number of bars (${colorCount})`)
+        }
+
+        // Set up scales with reversedCounts
+        const yScale = scaleBand()
+            .domain(reversedCounts.map((_, i) => i))
+            .range([margin.top, svgHeight - margin.bottom])
+            .padding(0.1)
+
+        const xScale = scaleLinear()
+            .domain([0, max(reversedCounts)])
+            .nice()
+            .range([margin.left, svgWidth - margin.right])
+
+        // Create a new <g> element for the bars
+        const barGroup = lgg.append('g').attr('class', 'em-legend-barchart').style('transform', 'translate(0px, 10px)') // Add a class to this group for easy reference
+
+        // Draw bars with mouseover highlight and styling
+        barGroup
+            .selectAll('rect')
+            .data(reversedCounts)
+            .join('rect')
+            .attr('y', (_, i) => yScale(i))
+            .attr('x', margin.left)
+            .attr('height', yScale.bandwidth())
+            .attr('width', (d) => xScale(d) - margin.left)
+            .attr('ecl', (_, i) => i)
+            .attr('fill', (_, i) => colors[colors.length - i - 1]) // Reverse color order to match counts
+            .style('cursor', 'pointer') // Set cursor to pointer
+            .on('mouseover', function (_, i) {
+                const ecl = select(this).attr('ecl')
+                const currentIndex = parseInt(ecl, 10)
+                const reversedIndex = colors.length - 1 - currentIndex // reverse
+                highlightRegions(out.map, reversedIndex)
+                if (out.map.insetTemplates_) {
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl)
+                }
+            })
+            .on('mouseout', function (_, i) {
+                const ecl = select(this).attr('ecl')
+                unhighlightRegions(out.map)
+                if (out.map.insetTemplates_) {
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
+                }
+            })
+
+        // Add count labels next to bars
+        if (out.barChartCounts) {
+            barGroup
+                .selectAll('text.count-label')
+                .data(reversedCounts)
+                .join('text')
+                .attr('class', 'count-label')
+                .attr('x', (d) => xScale(d) + 5)
+                .attr('y', (_, i) => yScale(i) + yScale.bandwidth() / 2)
+                .attr('text-anchor', 'start')
+                .attr('alignment-baseline', 'middle')
+                .attr('font-size', '14px') // Set label font size to 14px
+                .text((d) => d)
+        }
+
+        // Add Y axis with custom tick labels in reversed order at 14px
+        const yAxis = barGroup
+            .append('g')
+            .attr('transform', `translate(${margin.left}, 0)`)
+            .call(
+                axisLeft(yScale)
+                    .tickSizeOuter(0)
+                    .tickSize(0)
+                    .tickFormat(
+                        out.barChartLabelFormat
+                            ? out.barChartLabelFormat
+                            : (_, i) => {
+                                  if (i === 0) return `> ${thresholds[thresholds.length - 1]}`
+                                  if (i === thresholds.length) return `< ${thresholds[0]}`
+                                  return `${thresholds[thresholds.length - i]} - < ${thresholds[thresholds.length - i - 1]}`
+                              }
+                    )
+            )
+            .selectAll('text')
+            .attr('font-size', '14px') // Set Y-axis tick label font size to 14px
     }
 
     // Highlight selected regions on mouseover

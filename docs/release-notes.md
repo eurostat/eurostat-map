@@ -10,3 +10,4 @@
 -   map.position({x,y,z}) setting now replaces map.geoCenter([x,y]) and map.pixelSize()
 -   stroke-width now adjusts accordingly when zooming in and out
 -   Default nutsYear now 2024
+-   Choropleth legends can now be bar charts (use legend.barChart: true) see test/map-types/choropleth/test_bar_chart_legend.html

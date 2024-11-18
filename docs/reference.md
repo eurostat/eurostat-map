@@ -168,7 +168,7 @@ eurostatmap
     .classifMethod('threshold')
     .threshold([50, 75, 100, 150, 300, 850])
     .tooltipShowFlags(false)
-    .legend({ noData: false, labelDecNb: 0, x: 15, y: 160 })
+    .legend({ noData: false, decimals: 0, x: 15, y: 160 })
     .build()
 ```
 
@@ -185,21 +185,21 @@ eurostatmap
 
 In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
 
-| Parameter              | Type     | Default value                       | Description                                                                   |
-| ---------------------- | -------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| **ascending**          | String   | _true_                              | The legend cells order. Set to false to invert.                               |
-| **shapeWidth**         | int      | _15_                                | The cell width.                                                               |
-| **shapeHeight**        | int      | _13_                                | The cell heigth.                                                              |
-| **sepLineLength**      | int      | _17_                                | The separation line length.                                                   |
-| **sepLineStroke**      | int      | _"black"_                           | The separation line color.                                                    |
-| **sepLineStrokeWidth** | int      | _1_                                 | The separation line width.                                                    |
-| **labelFontSize**      | int      | _13_                                | The label font size.                                                          |
-| **labelDecNb**         | String   | _" - "_                             | The number of decimal for the legend labels.                                  |
-| **labelOffset**        | int      | _3_                                 | The distance between the legend box elements to the corresponding text label. |
-| **labelFormatter**     | Function | _d3.format("." + labelDecNb + "f")_ | A function used to format the values of the legend labels.                    |
-| **noData**             | boolean  | _true_                              | Show 'no data' style.                                                         |
-| **noDataText**         | Text     | _"No data"_                         | 'No data' text label.                                                         |
-| **labels**             | []       | _null_                              | Manually define the labels to be used in the legend as an array               |
+| Parameter              | Type     | Default value                     | Description                                                                   |
+| ---------------------- | -------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **ascending**          | String   | _true_                            | The legend cells order. Set to false to invert.                               |
+| **shapeWidth**         | int      | _15_                              | The cell width.                                                               |
+| **shapeHeight**        | int      | _13_                              | The cell heigth.                                                              |
+| **sepLineLength**      | int      | _17_                              | The separation line length.                                                   |
+| **sepLineStroke**      | int      | _"black"_                         | The separation line color.                                                    |
+| **sepLineStrokeWidth** | int      | _1_                               | The separation line width.                                                    |
+| **labelFontSize**      | int      | _13_                              | The label font size.                                                          |
+| **decimals**           | String   | _" - "_                           | The number of decimal for the legend labels.                                  |
+| **labelOffset**        | int      | _3_                               | The distance between the legend box elements to the corresponding text label. |
+| **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **noData**             | boolean  | _true_                            | Show 'no data' style.                                                         |
+| **noDataText**         | Text     | _"No data"_                       | 'No data' text label.                                                         |
+| **labels**             | []       | _null_                            | Manually define the labels to be used in the legend as an array               |
 
 ## Proportional symbol map
 
@@ -269,42 +269,42 @@ As proportional symbol maps allow for two visual variables (size and colour), a 
 
 The following parameters are properties of the sizeLegend object:
 
-| Parameter          | Type     | Default value                       | Description                                                                                   |
-| ------------------ | -------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| **title**          | String   | _null_                              | Title of the size legend                                                                      |
-| **titlePadding**   | Number   | _10_                                | Padding between the legend title and legend body                                              |
-| **values**         | Number   | _undefined_                         | Manually set the raw data values to be used in the legend                                     |
-| **cellNb**         | Number   | _4_                                 | Number of symbols to be shown in the legend (when values are not set manually)                |
-| **shapePadding**   | Number   | _10_                                | The padding between consecutive legend shape elements                                         |
-| **shapeOffset**    | Object   | _{x:0, y:0}_                        | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
-| **shapeFill**      | String   | _white_                             | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
-| **labelOffset**    | Number   | _25_                                | The distance between the legend box elements to the corresponding text label.                 |
-| **labelDecNb**     | Number   | _0_                                 | The number of decimals for each label.                                                        |
-| **labelFormatter** | Function | _d3.format("." + labelDecNb + "f")_ | A function used to format the values of the legend labels.                                    |
-| **noData**         | Boolean  | _false_                             | Show a 'no data' legend item in the size legend.                                              |
-| **noDataText**     | String   | _'No data'_                         | Text shown in the 'no data' legend item in the size legend.                                   |
+| Parameter          | Type     | Default value                     | Description                                                                                   |
+| ------------------ | -------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
+| **title**          | String   | _null_                            | Title of the size legend                                                                      |
+| **titlePadding**   | Number   | _10_                              | Padding between the legend title and legend body                                              |
+| **values**         | Number   | _undefined_                       | Manually set the raw data values to be used in the legend                                     |
+| **cellNb**         | Number   | _4_                               | Number of symbols to be shown in the legend (when values are not set manually)                |
+| **shapePadding**   | Number   | _10_                              | The padding between consecutive legend shape elements                                         |
+| **shapeOffset**    | Object   | _{x:0, y:0}_                      | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
+| **shapeFill**      | String   | _white_                           | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
+| **labelOffset**    | Number   | _25_                              | The distance between the legend box elements to the corresponding text label.                 |
+| **decimals**       | Number   | _0_                               | The number of decimals for each label.                                                        |
+| **labelFormatter** | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                    |
+| **noData**         | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
+| **noDataText**     | String   | _'No data'_                       | Text shown in the 'no data' legend item in the size legend.                                   |
 
 **colorLegend**
 
 The following parameters are properties of the colorLegend object:
 
-| Parameter              | Type     | Default value                       | Description                                                                   |
-| ---------------------- | -------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| **title**              | String   | _null_                              | Title of the size legend                                                      |
-| **titlePadding**       | Number   | _10_                                | Padding between the legend title and legend body                              |
-| **marginTop**          | Number   | _35_                                | Margin top in pixels. Distance between size and color legends                 |
-| **shapeWidth**         | Number   | _13_                                | The width of the legend box elements                                          |
-| **shapeHeight**        | Number   | _13_                                | The height of the legend box elements                                         |
-| **shapePadding**       | Number   | _10_                                | The padding between consecutive legend shape elements                         |
-| **shapePadding**       | Number   | _10_                                | The padding between consecutive legend shape elements                         |
-| **labelOffset**        | Number   | _25_                                | The distance between the legend box elements to the corresponding text label. |
-| **labelDecNb**         | Number   | _0_                                 | The number of decimals for each label.                                        |
-| **labelFormatter**     | Function | _d3.format("." + labelDecNb + "f")_ | A function used to format the values of the legend labels.                    |
-| **noData**             | Boolean  | _true_                              | Show a legend element that represents "no data" values.                       |
-| **noDataText**         | String   | _No data_                           | No data element label text.                                                   |
-| **sepLineLength**      | Number   | _17_                                | The length of the separation line between classes.                            |
-| **sepLineStroke**      | Number   | _black_                             | The colour of the separation line between classes.                            |
-| **sepLineStrokeWidth** | Number   | _1_                                 | The width of the separation line between classes.                             |
+| Parameter              | Type     | Default value                     | Description                                                                   |
+| ---------------------- | -------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **title**              | String   | _null_                            | Title of the size legend                                                      |
+| **titlePadding**       | Number   | _10_                              | Padding between the legend title and legend body                              |
+| **marginTop**          | Number   | _35_                              | Margin top in pixels. Distance between size and color legends                 |
+| **shapeWidth**         | Number   | _13_                              | The width of the legend box elements                                          |
+| **shapeHeight**        | Number   | _13_                              | The height of the legend box elements                                         |
+| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
+| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
+| **labelOffset**        | Number   | _25_                              | The distance between the legend box elements to the corresponding text label. |
+| **decimals**           | Number   | _0_                               | The number of decimals for each label.                                        |
+| **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **noData**             | Boolean  | _true_                            | Show a legend element that represents "no data" values.                       |
+| **noDataText**         | String   | _No data_                         | No data element label text.                                                   |
+| **sepLineLength**      | Number   | _17_                              | The length of the separation line between classes.                            |
+| **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
+| **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
 
 ## Proportional pie chart map
 
