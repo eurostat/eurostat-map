@@ -27,7 +27,7 @@ test('urban/rural categorical map with csvDataSource', async () => {
             .nutsYear(2013)
             .nutsLevel(3)
             .stat({
-                csvURL: 'https://raw.githubusercontent.com/eurostat/eurostat-map/dev/examples/urb_rur_typo.csv',
+                csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                 geoCol: 'NUTS_ID_2013',
                 valueCol: 'urban_rural',
             })
