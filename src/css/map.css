@@ -57,12 +57,14 @@ a text {
 
 .em-source-pretext {
     font-size: 11px;
+    transform: translate(-5px, -5px);
 }
 .em-source-dataset-link {
     font-size: 11px;
     fill: #0e47cb;
     cursor: pointer;
-    text-decoration: none;
+    text-decoration: underline;
+    transform: translate(-5px, -5px);
 }
 .em-source-dataset-link:hover {
     fill: #082b7a;

@@ -3,6 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-bn-oth:not(.em-bn-co):not(.em-bn-cc) {
+                stroke-width: 0 !important;
+            }
+            .em-bn-co {
+                stroke-width: 0px !important;
+            }
+        </style>
     </head>
 
     <body>
@@ -92,6 +100,11 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('annotations test')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
                 .subtitle('uses d3.annotations')
                 .annotations(annotations)
                 .zoomExtent([1, 15])

@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { interpolateYlOrBr } from 'd3-scale-chromatic'
+import { interpolateYlGnBu, interpolateYlOrBr } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
@@ -28,7 +28,7 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    out.colorFun_ = interpolateYlOrBr
+    out.colorFun_ = interpolateYlGnBu
     //a function returning the color from the class i
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
@@ -344,7 +344,7 @@ export const map = function (config) {
 
 //build a color legend object
 export const getColorLegend = function (colorFun, colorArray) {
-    colorFun = colorFun || interpolateOrRd
+    colorFun = colorFun || interpolateYlGnBu
     if (colorArray) {
         return function (ecl, numberOfClasses) {
             return colorArray[ecl]

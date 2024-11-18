@@ -718,10 +718,11 @@ export const mapTemplate = function (config, withCenterPoints) {
                     let link = out
                         .svg()
                         .append('a')
+                        .attr('class', 'em-source-dataset-link')
                         .attr('href', url)
                         .attr('target', '_blank')
                         .append('text')
-                        .attr('class', 'em-source-dataset-link')
+                        .attr('class', 'em-source-dataset-link-text')
                         .attr('x', out.width_)
                         .attr('y', out.height_)
                         .text('EUROSTAT')
