@@ -42,7 +42,7 @@ export const map = function (type, config) {
  * @param {*} opts Various parameters on the fill pattern.
  * @returns {function}
  */
-export const getFillPatternDefinitionFun = function (opts) {
+export const getFillPatternDefinitionFunction = function (opts) {
     opts = opts || {}
     opts.shape = opts.shape || 'circle'
     const ps = opts.patternSize || 5

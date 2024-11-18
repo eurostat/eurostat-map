@@ -131,7 +131,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //sea
     out.drawCoastalMargin_ = false
-    out.coastalMarginStdDev_ = 2
+    out.coastalMarginStdDev_ = 3
     //graticule
     out.drawGraticule_ = false
 

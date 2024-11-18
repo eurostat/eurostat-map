@@ -11,13 +11,24 @@
             .em-bn-oth:not(.em-bn-co):not(.em-bn-cc) {
                 stroke-width: 0 !important;
             }
+            .em-bn-co {
+                stroke-width: 0px !important;
+            }
         </style>
     </head>
 
     <body>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
-            let map = eurostatmap.map('choropleth').width(900).title('Test CSS classes').scale('60M').nutsLevel(2).build()
+            let map = eurostatmap
+                .map('choropleth')
+                .width(900)
+                .title('Test CSS classes')
+                .nutsYear('2021')
+                .subtitle('For example, to remove all external borders')
+                .scale('60M')
+                .nutsLevel(2)
+                .build()
         </script>
     </body>
 </html>

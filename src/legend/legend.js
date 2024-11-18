@@ -21,8 +21,8 @@ export const legend = function (map) {
     out.y = undefined
 
     //the legend box
-    out.boxMargin = 10
     out.boxPadding = 7
+    out.boxOpacity = 0.7
 
     //legend title
     out.title = ''

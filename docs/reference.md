@@ -656,21 +656,19 @@ map = eurostatmap.map(...)
 	.legend({
 		title: "Legend (%)",
 		x: 10, y: 120,
-		boxFill: "darkgray",
+		boxOpacity: 1,
+        boxPadding: 10
 	});
 ```
 
-| Parameter        | Type   | Default value | Description                                                                                                            |
-| ---------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **svgId**        | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
-| **x**            | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
-| **y**            | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
-| **boxMargin**    | number | _10_          | The legend box margin, in pixel.                                                                                       |
-| **boxPadding**   | number | _7_           | The legend box padding, in pixel.                                                                                      |
-| **boxCornerRad** | number | _7_           | The legend box corner radius, in pixel.                                                                                |
-| **boxFill**      | color  | _"white"_     | The legend box fill style.                                                                                             |
-| **boxOpacity**   | number | _0.7_         | The legend box opacity, from 0 to 1.                                                                                   |
-| **title**        | Text   | _""_          | The legend title.                                                                                                      |
+| Parameter      | Type   | Default value | Description                                                                                                            |
+| -------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **svgId**      | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
+| **title**      | Text   | _""_          | The legend title.                                                                                                      |
+| **x**          | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
+| **y**          | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
+| **boxOpacity** | number | _0.7_         | The legend box opacity, from 0 to 1. Sets opacity of em-legend-background                                              |
+| **boxPadding** | number | _0.7_         | The legend box padding. Sets padding of em-legend-background                                                           |
 
 ## Scalebar
 
@@ -708,7 +706,7 @@ map = eurostatmap.map(...)
 		transitionDuration: 200,
 		xOffset: 30,
 		yOffset: 20,
-		textFunction: (rg => { return rg.properties.na;  }) //rg is the hovered NUTS2JSON feature
+		textFunction: (feature => { return feature.properties.na;  })
 		showFlags: false
 	});
 ```

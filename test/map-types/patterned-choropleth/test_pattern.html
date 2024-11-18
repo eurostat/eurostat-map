@@ -81,7 +81,7 @@
                 .nutsLevel(2)
                 .numberOfClasses(4)
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
-                .filtersDefinitionFunction(getFillPatternDefinitionFunction)
+                .filtersDefinitionFunction(eurostatmap.getFillPatternDefinitionFunction())
                 .legend({
                     x: 5,
                     y: 150,

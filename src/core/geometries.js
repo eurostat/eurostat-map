@@ -265,8 +265,10 @@ export const Geometries = function (map, withCenterPoints) {
                     if (bordersToShow.includes('co') && bn.properties.co == 'T') return bn
                 })
                 .attr('d', pathFunction)
+                .attr('id', (bn) => 'em-bn-' + bn.properties.id)
                 .attr('class', function (bn) {
                     let classList = []
+
                     if (bn.properties.eu === 'T') classList.push('em-bn-eu')
                     if (bn.properties.efta === 'T') classList.push('em-bn-efta')
                     if (bn.properties.cc === 'T') classList.push('em-bn-cc')
@@ -276,6 +278,8 @@ export const Geometries = function (map, withCenterPoints) {
                     } else {
                         classList.push('em-cntbn')
                     }
+
+                    if (bn.properties.id == 156) console.log(classList, bn)
                     return classList.join(' ') // Use join with a space to create a valid class string
                 })
         }
