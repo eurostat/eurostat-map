@@ -24,8 +24,11 @@ export const Geometries = function (map, withCenterPoints) {
         kosovo: undefined,
     }
 
-    // user defined
+    // user defined geometries (layers)
     out.userGeometries = undefined
+
+    // user defined statistical regions
+    out.statisticalRegions = undefined
 
     //centroids for prop symbols etc
     out.centroidsData = undefined
@@ -140,6 +143,13 @@ export const Geometries = function (map, withCenterPoints) {
 
     out.setUserGeometries = function (geometries) {
         this.userGeometries = geometries
+
+        // get regions that are linked to the statistics
+        geometries.forEach((geometry) => {
+            if (geometry.statisticalRegions) {
+                this.statisticalRegions = geometry
+            }
+        })
     }
 
     out.addDefaultGeometriesToMap = function (
@@ -384,7 +394,7 @@ export const Geometries = function (map, withCenterPoints) {
         geometries.forEach((geometry) => {
             let group = container
                 .append('g')
-                .attr('id', geometry.regions ? 'em-user-regions' : '')
+                .attr('id', geometry.statisticalRegions ? 'em-user-regions' : '')
                 .attr('class', geometry.class ? geometry.class : '')
 
             let elements = group.selectAll('path').data(geometry.features).enter().append('path').attr('d', pathFunction)

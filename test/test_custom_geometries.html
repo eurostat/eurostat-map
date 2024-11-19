@@ -25,7 +25,7 @@
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
         <script>
-            const width = 600
+            const width = 800
             const height = 600
 
             Promise.all([
@@ -56,6 +56,15 @@
                             return parseInt(value.replace('.', ''), 10) // Remove the dot and parse as integer
                         }
                     }
+
+                    function parsePopulation(input) {
+                        if (input) {
+                            return Number(input.toString().replace('.', '')) // Remove the decimal point
+                        }
+                    }
+
+                    console.log(parsePopulation('3.57'))
+
                     // Transform merged data to code:value object
                     const statisticalData = mergedData.reduce((acc, row) => {
                         // Handle unemployment value, setting "<5" to "5" and parsing as an integer
@@ -63,7 +72,7 @@
                             row['total Paro Registrado'] === '<5' ? 5 : parseThousandsDelimiter(row['total Paro Registrado'])
 
                         // Parse population
-                        const population = parseThousandsDelimiter(row.total)
+                        const population = parsePopulation(row.total)
 
                         // Calculate percentage unemployed and add to accumulator
                         const unemploymentRate = Math.round((unemployment / population) * 100)
@@ -90,23 +99,36 @@
                         feature.properties.id = feature.id
                     })
 
+                    // define canarias
+                    const canariesWidth = 200
+                    const canariesHeight = 90
+                    const canariesFeatures = geoJSON.features.filter((d) => d.id.startsWith('380') || d.id.startsWith('350'))
+                    const padding = 50 // Padding in pixels
+                    const canariesProjection = d3
+                        .geoAzimuthalEqualArea()
+                        .rotate([15.8, -28.5]) // Center around the Canary Islands
+                        .scale(2300) // Adjust scale as needed
+                        .translate([
+                            canariesWidth / 2, // Center with horizontal padding
+                            canariesHeight / 2, // Center with vertical padding
+                        ])
+                    const canariesPosition = [5, 490] // position on screen
+
                     // Set up the projection
                     const projection = d3.geoAzimuthalEqualArea().rotate([-0.5, -40.55]).scale(3000)
 
                     // Initialize the map
                     const map = eurostatmap
                         .map('choropleth')
-                        //.geoCenter([3, 47])
-                        .zoomExtent([1, 10])
                         .width(width)
                         .height(height)
-                        .title('Custom Geometries Test')
-                        .projectionFunction(projection)
+                        .title('Custom geometries test')
+                        .subtitle('Unemployment rate, municipality level, 2023')
                         .geometries([
                             {
                                 id: 'regions',
                                 class: 'regions',
-                                regions: true,
+                                statisticalRegions: true,
                                 features: geoJSON.features,
                                 onEach: (elements) => {
                                     // Add any D3 custom styling or behavior here
@@ -118,10 +140,34 @@
                                 class: 'borders',
                             },
                         ])
-                        .legend({ title: 'Unemployment %', x: 10, y: 180, boxOpacity: 1, decimals: 0 })
-                        .bottomText(
+                        .zoomExtent([1, 10])
+                        .projectionFunction(projection)
+                        .legend({ title: 'Unemployment %', x: 5, y: 180, boxOpacity: 0.8, decimals: 0 })
+                        .footnote(
                             'Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>'
                         )
+                        .insetBoxPosition(canariesPosition)
+                        .insets([
+                            {
+                                projectionFunction: canariesProjection,
+                                title: 'Canarias',
+                                //{x: -17.406208914904834, y: 27.66413486326028, z: 100}
+                                geometries: [
+                                    {
+                                        id: 'canaries',
+                                        class: 'canaries',
+                                        statisticalRegions: true,
+                                        features: canariesFeatures,
+                                    },
+                                ],
+                                width: canariesWidth,
+                                height: canariesHeight,
+                                x: 0,
+                                y: 0,
+                                zoomExtent: [1, 10],
+                            },
+                        ])
+                    // .labels({ values: true })
 
                     // Set statistical data for the map
                     map.statData().setData(statisticalData)

@@ -184,6 +184,8 @@ export const mapTemplate = function (config, withCenterPoints) {
     // [{id:String, data:geojson, class:function}] user-defined geometries
     out.geometries_ = undefined
 
+    out.processCentroids_ = undefined // runs over centroids e.g. to adjust some that are automatically calculated`
+
     /**
      * Definition of getters/setters for all previously defined attributes.
      * Each method follow the same pattern:
@@ -965,14 +967,65 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.position_.z = getMetresPerPixel(transform.k / previousT.k)
 
         // adjust stroke dynamically according to zoom
-        updateStrokeWidths(transform)
+        adjustStrokeWidths(transform)
+
+        // adjust stroke dynamically according to zoom
+        if (out.labels_?.values) adjustLabelTexts(transform)
+    }
+
+    /**
+     * @description adjusts text elements dynamically according to zoom
+     * @param {*} transform
+     */
+    const adjustLabelTexts = function (transform) {
+        // Adjust stroke-width dynamically for elements with stroke-width
+        const zoomGroup = out.svg_.select('#em-labels')
+        const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
+
+        // Cache the transform factor to avoid repeated calls
+        const zoomFactor = transform.k
+
+        // Preprocess and batch DOM updates
+        const updates = []
+
+        elements.each(function () {
+            const element = select(this)
+            const computedStyle = window.getComputedStyle(this)
+
+            // Get font-size from inline or computed style
+            const inlineFontSize = element.attr('font-size')
+            const cssFontSize = computedStyle.fontSize
+            const fontSize = inlineFontSize || cssFontSize
+
+            // Only process elements that have a font size defined
+            if (fontSize && parseFloat(fontSize) > 0) {
+                const originalFontSize =
+                    parseFloat(element.attr('data-fs')) || parseFloat(inlineFontSize) || parseFloat(cssFontSize)
+
+                // Store the original font size for the first time
+                if (!element.attr('data-fs')) {
+                    element.attr('data-fs', originalFontSize)
+                }
+
+                // Calculate the target font size based on zoom factor
+                const targetFontSize = originalFontSize / zoomFactor
+
+                // Add the style change to a batch array
+                updates.push({ element: this, targetFontSize })
+            }
+        })
+
+        // Apply all style changes at once
+        updates.forEach(({ element, targetFontSize }) => {
+            element.style.setProperty('font-size', `${targetFontSize}px`, 'important')
+        })
     }
 
     /**
      * @description adjusts all stroke-widths dynamically according to zoom
      * @param {*} transform
      */
-    const updateStrokeWidths = function (transform) {
+    const adjustStrokeWidths = function (transform) {
         // Adjust stroke-width dynamically for elements with stroke-width
         const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
         const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
@@ -1184,6 +1237,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             }
         }
 
+        if (out.processCentroids_) centroidFeatures = out.processCentroids_(centroidFeatures)
+
         out._centroidFeatures = centroidFeatures
 
         // g_ps is the g element containing all proportional symbols for the map
@@ -1308,15 +1363,19 @@ export const mapTemplate = function (config, withCenterPoints) {
     }
 
     const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
+        //values label shadows parent <g>
+        const gsls = labelsContainer.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
+
+        // values labels parent <g>
+        const gsl = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
+
+        // our features array
+        let statLabelRegions = []
+
+        // deafult geometries
         if (map.Geometries.geoJSONs.nutsrg) {
-            //values label shadows parent <g>
-            const gsls = labelsContainer.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
-
-            // values labels parent <g>
-            const gsl = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
-
             //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
-            let statLabelRegions
+
             if (map.nutsLevel_ == 'mixed') {
                 map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
                 map._geom.mixed.rg1 = feature(
@@ -1335,9 +1394,35 @@ export const mapTemplate = function (config, withCenterPoints) {
             } else {
                 statLabelRegions = map.Geometries.geoJSONs.nutsrg
             }
+        } else if (map.Geometries.userGeometries) {
+            // user defined geometries
+            statLabelRegions = map.Geometries.statisticalRegions.features
+        }
 
-            // stats labels
-            gsl.selectAll('g')
+        // stats labels
+        gsl.selectAll('g')
+            .data(statLabelRegions)
+            .enter()
+            .append('g')
+            .attr('transform', function (d) {
+                // use predefined label positioning
+                if (map.labels_.statLabelsPositions[d.properties.id]) {
+                    let pos = map._projection([
+                        map.labels_.statLabelsPositions[d.properties.id].x,
+                        map.labels_.statLabelsPositions[d.properties.id].y,
+                    ])
+                    let x = pos[0].toFixed(3)
+                    let y = pos[1].toFixed(3)
+                    return `translate(${x},${y})`
+                }
+                // otherwise we calculate centroids
+                return 'translate(' + map._pathFunction.centroid(d) + ')'
+            })
+            .attr('class', 'em-stat-label')
+
+        // stat labels shadows
+        if (map.labels_.shadows) {
+            gsls.selectAll('g')
                 .data(statLabelRegions)
                 .enter()
                 .append('g')
@@ -1352,34 +1437,11 @@ export const mapTemplate = function (config, withCenterPoints) {
                         let y = pos[1].toFixed(3)
                         return `translate(${x},${y})`
                     }
-                    // otherwise we calculate centroids
+                    // otherwise calculate centroid
                     return 'translate(' + map._pathFunction.centroid(d) + ')'
                 })
-                .attr('class', 'em-stat-label')
 
-            // stat labels shadows
-            if (map.labels_.shadows) {
-                gsls.selectAll('g')
-                    .data(statLabelRegions)
-                    .enter()
-                    .append('g')
-                    .attr('transform', function (d) {
-                        // use predefined label positioning
-                        if (map.labels_.statLabelsPositions[d.properties.id]) {
-                            let pos = map._projection([
-                                map.labels_.statLabelsPositions[d.properties.id].x,
-                                map.labels_.statLabelsPositions[d.properties.id].y,
-                            ])
-                            let x = pos[0].toFixed(3)
-                            let y = pos[1].toFixed(3)
-                            return `translate(${x},${y})`
-                        }
-                        // otherwise calculate centroid
-                        return 'translate(' + map._pathFunction.centroid(d) + ')'
-                    })
-
-                    .attr('class', 'em-stat-label-shadow')
-            }
+                .attr('class', 'em-stat-label-shadow')
         }
     }
 

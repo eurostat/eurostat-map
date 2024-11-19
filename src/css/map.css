@@ -82,7 +82,7 @@ a text {
 
 .em-sea {
     fill: white;
-    pointer-events: none;
+    /* pointer-events: none; */
 }
 .em-scalebar-line {
     stroke: black;
@@ -126,7 +126,8 @@ a text {
 }
 
 .em-nutsrg,
-.em-worldrg {
+.em-worldrg,
+#em-user-regions {
     cursor: pointer;
 }
 
