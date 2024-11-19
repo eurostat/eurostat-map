@@ -252,7 +252,9 @@ export const legend = function (map, config) {
             .attr('fill', (_, i) => colors[colors.length - i - 1]) // Reverse color order to match counts
             .style('cursor', 'pointer') // Set cursor to pointer
             .on('mouseover', function (_, i) {
-                const ecl = select(this).attr('ecl')
+                const sel = select(this)
+                sel.style('stroke', 'black')
+                const ecl = sel.attr('ecl')
                 const currentIndex = parseInt(ecl, 10)
                 const reversedIndex = colors.length - 1 - currentIndex // reverse
                 highlightRegions(out.map, reversedIndex)
@@ -261,7 +263,8 @@ export const legend = function (map, config) {
                 }
             })
             .on('mouseout', function (_, i) {
-                const ecl = select(this).attr('ecl')
+                const sel = select(this)
+                sel.style('stroke', 'none')
                 unhighlightRegions(out.map)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)

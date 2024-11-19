@@ -3,6 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-label-test {
+                font-size: 15px !important;
+            }
+            .em-label-shadow-test {
+                font-size: 15px !important;
+            }
+        </style>
     </head>
 
     <body>
@@ -20,7 +28,7 @@
                 //.insets("default")
                 .width(800)
                 .scale('10M')
-                .nutsLevel(0)
+                .nutsLevel(1)
                 .colorFun(d3.interpolateBlues)
                 .classificationMethod('threshold')
                 .threshold([50, 75, 100, 150, 300, 850])
@@ -33,14 +41,46 @@
                 .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'lightgrey', co: 'black' })
                 .graticuleStroke('lightgrey')
                 .graticuleStrokeWidth(0.4)
-                // .countriesToShow(['ES'])
-                .labelling(true)
-                //.labelsToShow(['seas', 'values', 'cc', 'countries'])
-                .labelsToShow(['values'])
-                .labelValuesFontSize(10)
-                .labelFill({ seas: '#012a7c', countries: 'black' })
-                .labelShadow(true)
-                .labelShadowsToShow(['values'])
+                .labels({
+                    shadows: true,
+                    values: true,
+                    labels: [{ text: 'Test', x: 5100000, y: 2060000, class: 'test', size: 7 }],
+                })
+                .insets([
+                    {
+                        geo: 'MT',
+                        scale: '01M',
+                        position: { z: 600 },
+                        title: 'Malta',
+                        width: 150,
+                        height: 90,
+                        x: 0,
+                        y: 0,
+                        labels: { values: true, shadows: true },
+                    },
+                    {
+                        geo: 'MQ',
+                        scale: '01M',
+                        position: { z: 1000 },
+                        title: 'Martinique',
+                        width: 150,
+                        height: 90,
+                        x: 0,
+                        y: 100,
+                        labels: { values: true },
+                    },
+                    {
+                        geo: 'GF',
+                        scale: '03M',
+                        position: { z: 7500 },
+                        title: 'French Guyana',
+                        width: 150,
+                        height: 90,
+                        x: 0,
+                        y: 200,
+                        labels: { values: true },
+                    },
+                ])
                 //.labelShadowsToShow(['cc', 'values', 'cc', 'countries'])
                 //.labelFontSize({"seas":13, "countries":13})
                 .build()

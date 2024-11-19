@@ -3,6 +3,16 @@
     stroke-linejoin: round;
     font-family: Arial, Helvetica, sans-serif;
 }
+
+.em-label {
+    font-size: 12px;
+}
+.em-label-shadow {
+    font-size: 12px;
+    stroke-width: 3px;
+    stroke: white;
+}
+
 .em-stat-label {
     font-size: 12px;
 }
@@ -14,26 +24,13 @@
 .em-label-cc {
     font-size: 12px;
 }
-.em-label-shadow-cc {
-    font-size: 12px;
-    stroke-width: 3px;
-    stroke: white;
-}
+
 .em-label-countries {
     font-size: 12px;
 }
-.em-label-shadow-countries {
-    font-size: 12px;
-    stroke-width: 3px;
-    stroke: white;
-}
+
 .em-label-seas {
     font-size: 13px;
     fill: #003399;
     letter-spacing: 3px;
-}
-.em-label-shadow-seas {
-    letter-spacing: 3px;
-    font-size: 13px;
-    stroke: #ffffff;
 }

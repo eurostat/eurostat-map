@@ -33,15 +33,7 @@ export const defineDeprecatedFunctions = (out) => {
     out.fontFamily = (v) => (console.warn('map.fontFamily() is now DEPRECATED. please use the .em-map CSS class'), out);
     out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-footnote CSS class'), out);
     out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-footnote CSS class'), out);
-    out.labelFill = (v) => (console.warn('map.labelFill() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
-    out.labelStroke = (v) => (console.warn('map.labelStroke() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
-    out.labelStrokeWidth = (v) => (console.warn('map.labelStrokeWidth() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
-    out.labelOpacity = (v) => (console.warn('map.labelOpacity() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
-    out.labelValuesFontSize = (v) => (console.warn('map.labelValuesFontSize() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
-    out.labelShadowWidth = (v) => (console.warn('map.labelShadowWidth() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
-    out.labelShadowColor = (v) => (console.warn('map.labelShadowColor() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
     out.scalebarFontSize = (v) => (console.warn('map.scalebarFontSize() is now DEPRECATED. please use the .em-scalebar-label CSS class'), out);
-
     out.classifMethod = (v) => (console.warn('map.classifMethod() is now DEPRECATED. please use map.classificationMethod() instead.'), out.classificationMethod_ = v,out);
     out.clnb = (v) => (console.warn('map.clnb() is now DEPRECATED. please use map.numberOfClasses() instead.'), out.numberOfClasses_ = v,out);
     out.nutsLvl = (v) => (console.warn('map.nutsLvl() is now DEPRECATED. please use map.nutsLevel() instead.'), out.nutsLevel_ = v,out);
@@ -51,8 +43,23 @@ export const defineDeprecatedFunctions = (out) => {
     out.botTxtFill = (v) => (console.warn('botTxtFill is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
     out.botTxtPadding = (v) => (console.warn('botTxtPadding is now DEPRECATED. Please use the em-footnote CSS class instead.'),out);
     out.botTxtTooltipTxt = (v) => (console.warn('botTxtTooltipTxt is now DEPRECATED. Please use footnoteTooltipText() instead.'),out);
-
     out.tooltipShowFlags = (v) =>(console.warn('tooltipShowFlags is now DEPRECATED. Please use out.tooltip({showFlags}) instead.'),out.tooltip_.showFlags = v,out);
     out.colorFun = (v) =>(console.warn('colorFun is now DEPRECATED. Please use out.colorFunction() instead.'),out.colorFun_ = v,out);
 
+    //labelling
+    out.labelling = (v) =>(console.warn('labelling is now DEPRECATED. Please use out.labels({}) configuration object instead. See documentation for details.'),out);
+    out.labelsConfig = (v) =>(console.warn('labelsConfig is now DEPRECATED. Please use out.labels({config:yourConfig}) configuration object instead. See documentation for details.'),out.labels_.config=v,out);
+    out.statLabelsPositions = (v) =>(console.warn('statLabelsPositions is now DEPRECATED. Please use out.labels({statLabelsPositions:yourPositions}) instead. See documentation for details.'),out.labels_.statLabelsPositions=v,out);
+    out.labelsToShow = (v) =>(console.warn('labelsToShow is now DEPRECATED. Please use out.labels({labelFilterFunction:yourFunction(region,map)}) function instead. See documentation for details.'),out);
+    out.labelShadowsToShow = (v) =>(console.warn('labelShadowsToShow is now DEPRECATED. Please use out.labels({labelFilterFunction:yourFunction(region,map)}) function instead. See documentation for details.'),out);
+    out.labelShadow = (v) =>(console.warn('labelShadow is now DEPRECATED. Please use out.labels({labelShadow:boolean}) instead. See documentation for details.'),out);
+    out.labelShadowWidth = (v) =>(console.warn('labelShadow is now DEPRECATED. Please use out.labels({labelShadow:boolean}) instead. See documentation for details.'),out);
+    out.labelFilterFunction =(v) =>(console.warn('labelFilterFunction is now DEPRECATED. Please use out.labels({labelFilterFunction:yourFunction(region,map)}) instead. See documentation for details.'),out);
+    out.labelFill = (v) => (console.warn('map.labelFill() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
+    out.labelStroke = (v) => (console.warn('map.labelStroke() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
+    out.labelStrokeWidth = (v) => (console.warn('map.labelStrokeWidth() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
+    out.labelOpacity = (v) => (console.warn('map.labelOpacity() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
+    out.labelValuesFontSize = (v) => (console.warn('map.labelValuesFontSize() is now DEPRECATED. please use the .em-stat-labels CSS class'), out);
+    out.labelShadowWidth = (v) => (console.warn('map.labelShadowWidth() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
+    out.labelShadowColor = (v) => (console.warn('map.labelShadowColor() is now DEPRECATED. please use the .em-stat-labels-shadows CSS class'), out);
 }

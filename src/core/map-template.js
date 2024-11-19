@@ -12,7 +12,7 @@ import {
     getParameterByName,
     appendAnnotations,
 } from './utils'
-import { DEFAULTLABELS, STATLABELPOSITIONS } from './labels'
+import { DEFAULTLABELS, DEFAULTSTATLABELPOSITIONS } from './labels'
 import { defineDeprecatedFunctions } from './deprecated'
 import { Geometries } from './geometries'
 
@@ -129,22 +129,22 @@ export const mapTemplate = function (config, withCenterPoints) {
     // region mouseover color
     out.hoverColor_ = 'red'
 
-    //sea
+    //coastal margin
     out.drawCoastalMargin_ = false
     out.coastalMarginStdDev_ = 3
+
     //graticule
     out.drawGraticule_ = false
 
     //labelling (country names and geographical features)
-    out.labelling_ = false
-    out.labelsConfig_ = DEFAULTLABELS // allow user to override map labels | see ./labels.js for example config
-    out.statLabelsPositions_ = STATLABELPOSITIONS // allow user to override positions of statistical labels
-    out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
-    out.labelShadowsToShow_ = ['countries', 'seas']
-    out.labelShadow_ = true
-    out.labelFilterFunction_ = (rg, map) => {
-        return rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo_[1] || map.geo_ == 'SJ_SV'
-    } // filter the regions used for the labels array
+    // {config, statLabelsPositions, labelsToShow, labelShadows, labelFilterFunction}
+    out.labels_ = undefined
+
+    // all these settings now go into labels object for cleaner API
+    // out.labelsConfig_ = DEFAULTLABELS // allow user to override map labels | see ./labels.js for example config
+    // out.statLabelsPositions = STATLABELPOSITIONS // allow user to override positions of statistical labels
+    // out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
+    // out.labelShadowsToShow_ = ['countries', 'seas']
 
     //annotations
     out.annotations_ = undefined
@@ -658,7 +658,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         // add geographical labels to map
-        if (out.labelling_) {
+        if (out.labels_) {
             addLabelsToMap(out, zoomGroup)
         }
 
@@ -763,20 +763,20 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (prevLabels) prevLabels.remove()
 
         // Main map
-        if (out.labelling_) {
+        if (out.labels_) {
             let zg = out.svg_.select('#em-zoom-group-' + out.svgId_)
             addLabelsToMap(out, zg)
-            if (out.labelsToShow_.includes('values') && out.updateValuesLabels) {
+            if (map.labels_.values && out.updateValuesLabels) {
                 out.updateValuesLabels(out)
             }
         }
 
         // Define the callback to apply to each inset
         const applyLabelsCallback = (map) => {
-            if (map.labelling_) {
+            if (map.labels_) {
                 let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
                 addLabelsToMap(map, zg)
-                if (map.labelsToShow_.includes('values') && out.updateValuesLabels) {
+                if (map.labels_.values && out.updateValuesLabels) {
                     out.updateValuesLabels(map)
                 }
             }
@@ -803,13 +803,19 @@ export const mapTemplate = function (config, withCenterPoints) {
         let statLabels = map.svg_.selectAll('g.em-stat-label')
 
         // filter stat-label elements to only show those with data
-        statLabels.filter(out.statLabelsFilterFunction).append('text').text(out.statLabelsTextFunction)
+        let filterFunction = out.labels_?.statLabelsFilterFunction
+            ? out.labels_?.statLabelsFilterFunction
+            : out.defaultStatLabelFilter
+        statLabels
+            .filter((rg) => filterFunction(rg, map))
+            .append('text')
+            .text(out.statLabelsTextFunction)
 
         //add shadows to labels
-        if (out.labelShadow_) {
+        if (out.labels_.shadows) {
             map.svg_
                 .selectAll('g.em-stat-label-shadow')
-                .filter(out.statLabelsFilterFunction)
+                .filter((rg) => filterFunction(rg, map))
                 .append('text')
                 .text(out.statLabelsTextFunction)
         }
@@ -822,16 +828,13 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @return {string}
      */
     out.statLabelsTextFunction = (d) => {
-        if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-            const s = out.statData()
-            const sv = s.get(d.properties.id)
-
-            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                return ''
-            } else {
-                if (sv.value !== ':') {
-                    return spaceAsThousandSeparator(sv.value)
-                }
+        const s = out.statData()
+        const sv = s.get(d.properties.id)
+        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+            return ''
+        } else {
+            if (sv.value !== ':') {
+                return spaceAsThousandSeparator(sv.value)
             }
         }
     }
@@ -841,17 +844,14 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @param {Object} d d3 selection json data element
      * @return {boolean}
      */
-    out.statLabelsFilterFunction = (d) => {
-        if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-            const s = out.statData()
-            const sv = s.get(d.properties.id)
-            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                return false
-            } else {
-                return true
-            }
+    out.defaultStatLabelFilter = (region, map) => {
+        const s = out.statData()
+        const sv = s.get(region.properties.id)
+        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+            return false
+        } else {
+            return true
         }
-        return false
     }
 
     const defineDefaultPosition = function () {
@@ -1208,152 +1208,37 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @description appends text labels to the map. Labels can be countries, country codes, ocean names or statistical values
      */
     const addLabelsToMap = function (map, zg) {
-        let labels = map.labelsConfig_
-        let language = map.lg_
-        let labelsArray = []
+        // set defaults
+        if (!out.labels_.config) out.labels_.config = DEFAULTLABELS
+        if (!out.labels_.statLabelsPositions) out.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
 
+        // clear existing or append new container
         let existing = zg.select('#em-labels')
-        let labelsG = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
+        let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
 
-        //define which labels to use (cc, countries, seas, values)
-        if (map.labelsToShow_.includes('countries') || map.labelsToShow_.includes('seas')) {
-            if (labels[map.geo_ + '_' + map.proj_] && labels[map.geo_ + '_' + map.proj_][language]) {
-                labelsArray = labels[map.geo_ + '_' + map.proj_][language] || []
-            } else {
-                //if geo doesnt have labels in the chosen language, fall back to english
-                //this helps save space by not including labels in other languages that are spelt the same in english
-                labelsArray = labels[map.geo_ + '_' + map.proj_]?.en || []
-            }
-        }
-        //add country codes to labels array
-        if (map.labelsToShow_.includes('cc')) {
-            labelsArray = labelsArray.concat(labels[map.geo_ + '_' + map.proj_].cc)
-        }
+        //for statistical values we need to add centroids initially, then add text to them later once the stat data is loaded
+        if (out.labels_?.values) appendStatLabelCentroidsToMap(map, labelsContainer)
 
-        //for statistical values we need to add centroids, then add values later
-        if (map.labelsToShow_.includes('values')) {
-            if (map.Geometries.geoJSONs.nutsrg) {
-                //values label shadows parent <g>
-                const gsls = labelsG.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
+        // get labels array
+        let labelsArray = out.labels_?.labels || DEFAULTLABELS[`${out.geo}_${out.proj_}.cc`]
 
-                // values labels parent <g>
-                const gsl = labelsG.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
-
-                //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
-                let labelRegions
-                if (map.nutsLevel_ == 'mixed') {
-                    map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
-                    map._geom.mixed.rg1 = feature(
-                        out.Geometries.allNUTSGeoData[1],
-                        out.Geometries.allNUTSGeoData[1].objects.nutsrg
-                    ).features
-                    map._geom.mixed.rg2 = feature(
-                        out.Geometries.allNUTSGeoData[2],
-                        out.Geometries.allNUTSGeoData[2].objects.nutsrg
-                    ).features
-                    map._geom.mixed.rg3 = feature(
-                        out.Geometries.allNUTSGeoData[3],
-                        out.Geometries.allNUTSGeoData[3].objects.nutsrg
-                    ).features
-                    labelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
-                } else {
-                    labelRegions = map.Geometries.geoJSONs.nutsrg
-                }
-
-                // filter label regions for insets, e.g. only load MT for MT and avoid loading 2000 regions for every single inset
-                if (map.geo_ !== 'EUR' && out.labelFilterFunction_) {
-                    labelRegions = labelRegions.filter((rg) => out.labelFilterFunction_(rg, map))
-                }
-
-                // stats labels
-                gsl.selectAll('g')
-                    .data(labelRegions)
-                    .enter()
-                    .append('g')
-                    .attr('transform', function (d) {
-                        // use geographic names labels' positions for NUTS0
-                        if (map.statLabelsPositions_[d.properties.id]) {
-                            let pos = map._projection([
-                                map.statLabelsPositions_[d.properties.id].x,
-                                map.statLabelsPositions_[d.properties.id].y,
-                            ])
-                            let x = pos[0].toFixed(3)
-                            let y = pos[1].toFixed(3)
-                            return `translate(${x},${y})`
-                        }
-                        // otherwise calculate centroid
-                        return 'translate(' + map._pathFunction.centroid(d) + ')'
-                    })
-                    .attr('class', 'em-stat-label')
-
-                //SHADOWS
-                if (map.labelShadow_) {
-                    gsls.selectAll('g')
-                        .data(labelRegions)
-                        .enter()
-                        .filter((d) => map.labelShadowsToShow_.includes('values'))
-                        .append('g')
-                        .attr('transform', function (d) {
-                            // use geographic names labels' positions for NUTS0
-                            if (map.statLabelsPositions_[d.properties.id]) {
-                                let pos = map._projection([
-                                    map.statLabelsPositions_[d.properties.id].x,
-                                    map.statLabelsPositions_[d.properties.id].y,
-                                ])
-                                let x = pos[0].toFixed(3)
-                                let y = pos[1].toFixed(3)
-                                return `translate(${x},${y})`
-                            }
-                            // otherwise calculate centroid
-                            return 'translate(' + map._pathFunction.centroid(d) + ')'
-                        })
-
-                        .attr('class', 'em-stat-label-shadow')
-                }
-            }
-        }
-
-        // rest of label types
+        // append other labels to map
         if (labelsArray) {
-            let data = labelsArray.filter((d) => {
-                if (d.class == 'countries') {
-                    if (map.labelsToShow_.includes('countries')) {
-                        return d
-                    }
-                }
-                if (d.class == 'seas') {
-                    if (map.labelsToShow_.includes('seas')) {
-                        return d
-                    }
-                }
-                if (d.class == 'cc') {
-                    if (map.labelsToShow_.includes('cc')) {
-                        return d
-                    }
-                }
-            })
-
             //common styles between all label shadows
-            const shadowg = labelsG.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
+            const shadowg = labelsContainer.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
 
             //common styles between all labels
-            const labelg = labelsG.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
+            const labelg = labelsContainer.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
 
             //SHADOWS
-            if (map.labelShadow_) {
+            if (map.labels_.shadows) {
                 let shadows = shadowg
                     .selectAll('text')
-                    .data(data)
+                    .data(labelsArray)
                     .enter()
                     .append('text')
-                    .attr('class', (d) => {
-                        let classes = 'em-label-shadow-' + d.text.replace(/\s+/g, '-')
-                        if (map.labelShadowsToShow_.includes(d.class)) {
-                            classes += ' em-label-shadow-' + d.class
-                        }
-                        return classes
-                    })
-                    .filter((d) => map.labelShadowsToShow_.includes(d.class))
+                    .attr('id', (d) => 'em-label-shadow-' + d.text.replace(/\s+/g, '-'))
+                    .attr('class', (d) => 'em-label-shadow em-label-shadow-' + d.class)
                     .attr('x', function (d) {
                         if (d.rotate) {
                             return 0 //for rotated text, x and y positions must be specified in the transform property
@@ -1385,16 +1270,11 @@ export const mapTemplate = function (config, withCenterPoints) {
             //LABEL texts
             labelg
                 .selectAll('text')
-                .data(data)
+                .data(labelsArray)
                 .enter()
                 .append('text')
-                .attr('class', (d) => {
-                    let classes = 'em-label-' + d.text.replace(/\s+/g, '-')
-                    if (map.labelsToShow_.includes(d.class)) {
-                        classes += ' em-label-' + d.class
-                    }
-                    return classes
-                })
+                .attr('id', (d) => 'em-label-' + d.text.replace(/\s+/g, '-'))
+                .attr('class', (d) => 'em-label em-label-' + d.class)
                 //position label
                 .attr('x', function (d) {
                     if (d.rotate) {
@@ -1424,6 +1304,82 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .text(function (d) {
                     return d.text
                 }) // define the text to display
+        }
+    }
+
+    const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
+        if (map.Geometries.geoJSONs.nutsrg) {
+            //values label shadows parent <g>
+            const gsls = labelsContainer.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
+
+            // values labels parent <g>
+            const gsl = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
+
+            //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
+            let statLabelRegions
+            if (map.nutsLevel_ == 'mixed') {
+                map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
+                map._geom.mixed.rg1 = feature(
+                    out.Geometries.allNUTSGeoData[1],
+                    out.Geometries.allNUTSGeoData[1].objects.nutsrg
+                ).features
+                map._geom.mixed.rg2 = feature(
+                    out.Geometries.allNUTSGeoData[2],
+                    out.Geometries.allNUTSGeoData[2].objects.nutsrg
+                ).features
+                map._geom.mixed.rg3 = feature(
+                    out.Geometries.allNUTSGeoData[3],
+                    out.Geometries.allNUTSGeoData[3].objects.nutsrg
+                ).features
+                statLabelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
+            } else {
+                statLabelRegions = map.Geometries.geoJSONs.nutsrg
+            }
+
+            // stats labels
+            gsl.selectAll('g')
+                .data(statLabelRegions)
+                .enter()
+                .append('g')
+                .attr('transform', function (d) {
+                    // use predefined label positioning
+                    if (map.labels_.statLabelsPositions[d.properties.id]) {
+                        let pos = map._projection([
+                            map.labels_.statLabelsPositions[d.properties.id].x,
+                            map.labels_.statLabelsPositions[d.properties.id].y,
+                        ])
+                        let x = pos[0].toFixed(3)
+                        let y = pos[1].toFixed(3)
+                        return `translate(${x},${y})`
+                    }
+                    // otherwise we calculate centroids
+                    return 'translate(' + map._pathFunction.centroid(d) + ')'
+                })
+                .attr('class', 'em-stat-label')
+
+            // stat labels shadows
+            if (map.labels_.shadows) {
+                gsls.selectAll('g')
+                    .data(statLabelRegions)
+                    .enter()
+                    .append('g')
+                    .attr('transform', function (d) {
+                        // use predefined label positioning
+                        if (map.labels_.statLabelsPositions[d.properties.id]) {
+                            let pos = map._projection([
+                                map.labels_.statLabelsPositions[d.properties.id].x,
+                                map.labels_.statLabelsPositions[d.properties.id].y,
+                            ])
+                            let x = pos[0].toFixed(3)
+                            let y = pos[1].toFixed(3)
+                            return `translate(${x},${y})`
+                        }
+                        // otherwise calculate centroid
+                        return 'translate(' + map._pathFunction.centroid(d) + ')'
+                    })
+
+                    .attr('class', 'em-stat-label-shadow')
+            }
         }
     }
 
@@ -1630,17 +1586,17 @@ export const mapTemplate = function (config, withCenterPoints) {
             'coastalMarginStdDev_',
             'graticuleStroke_', // DEPRECATED
             'graticuleStrokeWidth_', // DEPRECATED
-            'labelling_',
+            'labelling_', // DEPRECATED
             'labelFill_', // DEPRECATED
             'labelValuesFontSize_', // DEPRECATED
             'labelOpacity_', // DEPRECATED
             'labelStroke_', // DEPRECATED
             'labelStrokeWidth_', // DEPRECATED
             'labelShadowWidth_', // DEPRECATED
-            'labelShadow_',
+            'labelShadow_', // DEPRECATED
             'labelShadowColor_', // DEPRECATED
             'labelShadowsToShow_',
-            'labelsToShow_',
+            'labelsToShow_', // DEPRECATED
             'fontFamily_', // DEPRECATED
             'lg_',
             'projectionFunction_',

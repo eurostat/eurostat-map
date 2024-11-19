@@ -264,7 +264,7 @@ export const DEFAULTLABELS = {
     },
 }
 
-export const STATLABELPOSITIONS = {
+export const DEFAULTSTATLABELPOSITIONS = {
     AL: { x: 5150000, y: 2000000 },
     AT: { x: 4670000, y: 2700000 },
     BE: { x: 3930000, y: 3060000 },
