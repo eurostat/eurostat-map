@@ -184,7 +184,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     // [{id:String, data:geojson, class:function}] user-defined geometries
     out.geometries_ = undefined
 
-    out.processCentroids_ = undefined // runs over centroids e.g. to adjust some that are automatically calculated`
+    out.processCentroids_ = undefined // runs over symbol centroids
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -804,14 +804,58 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         let statLabels = map.svg_.selectAll('g.em-stat-label')
 
+        let labelsContainer = map.svg_.select('#em-labels')
+
         // filter stat-label elements to only show those with data
         let filterFunction = out.labels_?.statLabelsFilterFunction
             ? out.labels_?.statLabelsFilterFunction
             : out.defaultStatLabelFilter
         statLabels
             .filter((rg) => filterFunction(rg, map))
-            .append('text')
-            .text(out.statLabelsTextFunction)
+            // .append('text')
+            .each(function (d) {
+                const sel = select(this)
+                const labelText = out.statLabelsTextFunction(d) // Use 'd' directly for the label text
+
+                // Append rectangle behind label
+                if (out.labels_.backgrounds) appendRect(labelText, sel)
+
+                // Append text after the rectangle
+                sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
+            })
+
+        // Function to append a rectangle behind the label
+        function appendRect(labelText, container) {
+            const paddingX = 5 // Add some padding around the text
+            const paddingY = 2 // Add some padding around the text
+
+            // Create a temporary text element to get the size
+            const bbox = container
+                .append('text')
+                .attr('visibility', 'hidden') // Make the temporary text invisible
+                .text(labelText) // Set the label text to get its bounding box
+                .node()
+                .getBBox() // Get the bounding box of the text
+
+            const labelWidth = bbox.width
+            const labelHeight = bbox.height
+
+            // Remove the temporary text element after getting the bounding box
+            container.select('text[visibility="hidden"]').remove()
+
+            // Calculate the position of the rectangle to be centered on the text
+            const x = -labelWidth / 2 - paddingX // Center the rect horizontally
+            const y = -labelHeight / 2 - paddingY // Center the rect vertically
+
+            // Append rectangle with padding
+            container
+                .append('rect')
+                .attr('x', x) // Position rect horizontally
+                .attr('y', y) // Position rect vertically
+                .attr('width', labelWidth + 2 * paddingX) // Width of the rect with padding
+                .attr('height', labelHeight + 2 * paddingY) // Height of the rect with padding
+                .attr('class', 'em-label-background')
+        }
 
         //add shadows to labels
         if (out.labels_.shadows) {
@@ -971,16 +1015,68 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // adjust stroke dynamically according to zoom
         if (out.labels_?.values) adjustLabelTexts(transform)
+
+        // adjust stroke dynamically according to zoom
+        if (out.labels_?.backgrounds) adjustLabelBackgrounds(transform)
     }
 
     /**
      * @description adjusts text elements dynamically according to zoom
      * @param {*} transform
      */
+    const adjustLabelBackgrounds = function (transform) {
+        const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
+        const elements = zoomGroup.selectAll('.em-label-background')
+
+        // Cache the transform factor to avoid repeated calls
+        const zoomFactor = transform.k
+
+        // Preprocess and batch DOM updates
+        const updates = []
+
+        elements.each(function () {
+            const element = select(this) // Ensure it's a D3 selection
+
+            // Get the original width, height, x, and y from data attributes or current attributes
+            const originalWidth = parseFloat(element.attr('data-width')) || parseFloat(element.attr('width'))
+            const originalHeight = parseFloat(element.attr('data-height')) || parseFloat(element.attr('height'))
+            const originalX = parseFloat(element.attr('data-x')) || parseFloat(element.attr('x'))
+            const originalY = parseFloat(element.attr('data-y')) || parseFloat(element.attr('y'))
+
+            // Only process elements that have valid width, height, x, and y
+            if (originalWidth > 0 && originalHeight > 0 && !isNaN(originalX) && !isNaN(originalY)) {
+                // Store the original width, height, x, and y for the first time if not already stored
+                if (!element.attr('data-width')) {
+                    element.attr('data-width', originalWidth)
+                    element.attr('data-height', originalHeight)
+                    element.attr('data-x', originalX)
+                    element.attr('data-y', originalY)
+                }
+
+                // Calculate the target width, height, x, and y based on zoom factor (inverse scaling)
+                const targetWidth = originalWidth * (1 / zoomFactor) // Inverse scaling
+                const targetHeight = originalHeight * (1 / zoomFactor) // Inverse scaling
+                const targetX = originalX * (1 / zoomFactor) // Adjust x position
+                const targetY = originalY * (1 / zoomFactor) // Adjust y position
+
+                // Add the style change to a batch array
+                updates.push({ element, targetWidth, targetHeight, targetX, targetY })
+            }
+        })
+
+        // Apply all style changes at once
+        updates.forEach(({ element, targetWidth, targetHeight, targetX, targetY }) => {
+            element.attr('width', targetWidth).attr('height', targetHeight).attr('x', targetX).attr('y', targetY)
+        })
+    }
+    /**
+     * @description adjusts text elements dynamically according to zoom
+     * @param {*} transform
+     */
     const adjustLabelTexts = function (transform) {
-        // Adjust stroke-width dynamically for elements with stroke-width
-        const zoomGroup = out.svg_.select('#em-labels')
-        const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
+        const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
+        const labels = zoomGroup.select('#em-labels')
+        const elements = labels.selectAll('*') // Select all labels
 
         // Cache the transform factor to avoid repeated calls
         const zoomFactor = transform.k
@@ -1399,6 +1495,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             statLabelRegions = map.Geometries.statisticalRegions.features
         }
 
+        if (out.processCentroids_) centroidFeatures = out.processCentroids_(centroidFeatures)
+
         // stats labels
         gsl.selectAll('g')
             .data(statLabelRegions)
@@ -1414,9 +1512,15 @@ export const mapTemplate = function (config, withCenterPoints) {
                     let x = pos[0].toFixed(3)
                     let y = pos[1].toFixed(3)
                     return `translate(${x},${y})`
+                } else {
+                    let centroid = map._pathFunction.centroid(d)
+
+                    if (out.labels_.processValueLabelCentroids) {
+                        centroid = out.labels_.processValueLabelCentroids(d, centroid)
+                    }
+                    // otherwise we calculate centroids
+                    return 'translate(' + centroid + ')'
                 }
-                // otherwise we calculate centroids
-                return 'translate(' + map._pathFunction.centroid(d) + ')'
             })
             .attr('class', 'em-stat-label')
 
@@ -1436,9 +1540,15 @@ export const mapTemplate = function (config, withCenterPoints) {
                         let x = pos[0].toFixed(3)
                         let y = pos[1].toFixed(3)
                         return `translate(${x},${y})`
+                    } else {
+                        let centroid = map._pathFunction.centroid(d)
+
+                        if (out.labels_.processValueLabelCentroids) {
+                            centroid = out.labels_.processValueLabelCentroids(d, centroid)
+                        }
+                        // otherwise we calculate centroids
+                        return 'translate(' + centroid + ')'
                     }
-                    // otherwise calculate centroid
-                    return 'translate(' + map._pathFunction.centroid(d) + ')'
                 })
 
                 .attr('class', 'em-stat-label-shadow')
