@@ -112,7 +112,6 @@ export const map = function (config) {
             let regions = map.svg().selectAll(selector)
             regions
                 .attr('ecl1', function (rg) {
-                    if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                     const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
@@ -120,7 +119,6 @@ export const map = function (config) {
                     return +out.classifier1_(+v)
                 })
                 .attr('ecl2', function (rg) {
-                    if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                     const sv = out.statData('v2').get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
@@ -128,7 +126,6 @@ export const map = function (config) {
                     return +out.classifier2_(+v)
                 })
                 .attr('nd', function (rg) {
-                    if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                     const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
                     const sv2 = out.statData('v2').get(rg.properties.id)
                     if (!sv1 || !sv2) return
@@ -144,7 +141,6 @@ export const map = function (config) {
                 map.svg()
                     .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
-                        if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                         const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
                         if (!sv) return
                         const v = sv.value
@@ -152,7 +148,6 @@ export const map = function (config) {
                         return +out.classifier1_(+v)
                     })
                     .attr('ecl2', function (rg) {
-                        if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                         const sv = out.statData('v2').get(rg.properties.id)
                         if (!sv) return
                         const v = sv.value
@@ -233,18 +228,15 @@ export const map = function (config) {
                 .transition()
                 .duration(out.transitionDuration())
                 .style('fill', function (rg) {
-                    // only apply data-driven colour to included countries for NUTS templates
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        const ecl1 = select(this).attr('ecl1')
-                        if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
-                        const ecl2 = select(this).attr('ecl2')
-                        if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg','fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
-                        if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
-                        let color = out.classToFillStyle()(+ecl1, +ecl2)
-                        return color
-                    } else {
-                        return getCSSPropertyFromClass('em-nutsrg','fill')
-                    }
+                    const ecl1 = select(this).attr('ecl1')
+                    if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
+                    const ecl2 = select(this).attr('ecl2')
+                    if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+                    if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
+                    let color = out.classToFillStyle()(+ecl1, +ecl2)
+                    return color
+
+                    //return getCSSPropertyFromClass('em-nutsrg', 'fill')
                 })
                 .end()
                 .then(
@@ -257,26 +249,12 @@ export const map = function (config) {
 
                         regions
                             .on('mouseover', function (e, rg) {
-                                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                                        const sel = select(this)
-                                        sel.style('fill', map.hoverColor_)
-                                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                                    }
-                                } else {
-                                    const sel = select(this)
-                                    sel.style('fill', map.hoverColor_)
-                                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                                }
+                                const sel = select(this)
+                                sel.style('fill', map.hoverColor_)
+                                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                             })
                             .on('mousemove', function (e, rg) {
-                                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                                        if (out._tooltip) out._tooltip.mousemove(e)
-                                    }
-                                } else {
-                                    if (out._tooltip) out._tooltip.mousemove(e)
-                                }
+                                if (out._tooltip) out._tooltip.mousemove(e)
                             })
                             .on('mouseout', function () {
                                 const sel = select(this)
@@ -314,7 +292,7 @@ const styleMixedNUTS = function (map) {
             const ecl = sel.attr('ecl')
             const lvl = sel.attr('lvl')
             const countryId = rg.properties.id.slice(0, 2)
-            return (ecl && out.countriesToShow_.includes(countryId)) || lvl === '0' ? 'block' : 'none'
+            return ecl || lvl === '0' ? 'block' : 'none'
         })
         .style('stroke', function () {
             const sel = select(this)

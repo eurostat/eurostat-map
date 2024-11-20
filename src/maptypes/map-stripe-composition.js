@@ -178,8 +178,6 @@ export const map = function (config) {
             .style('fill', function (d) {
                 const id = d.properties.id
 
-                if (!out.countriesToShow_.includes(id[0] + id[1])) return getCSSPropertyFromClass('em-nutsrg', 'fill')
-
                 //compute composition
                 const composition = getComposition(id)
 
@@ -247,25 +245,13 @@ export const map = function (config) {
         let regions = out.svg().selectAll(selector)
         regions
             .on('mouseover', function (e, rg) {
-                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        const sel = select(this)
-                        sel.attr('fill___', sel.style('fill'))
-                        sel.style('fill', out.hoverColor_)
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
-                } else {
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                }
+                const sel = select(this)
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e, rg) {
-                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    }
-                } else {
-                    if (out._tooltip) out._tooltip.mousemove(e)
-                }
+                if (out._tooltip) out._tooltip.mousemove(e)
             })
             .on('mouseout', function () {
                 const sel = select(this)

@@ -84,48 +84,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         showFlags: false,
     } //  See tooltip.js for more details
 
-    //countries to include with default geometries
-    out.bordersToShow_ = ['eu', 'efta', 'cc', 'oth', 'co']
-    out.countriesToShow_ = [
-        'AL',
-        'AT',
-        'BE',
-        'BG',
-        'CH',
-        'CY',
-        'CZ',
-        'DE',
-        'DK',
-        'EE',
-        'EL',
-        'ES',
-        'FI',
-        'FR',
-        'HR',
-        'HU',
-        'IE',
-        'IS',
-        'IT',
-        'LI',
-        'LT',
-        'LU',
-        'LV',
-        'ME',
-        'MK',
-        'MT',
-        'NL',
-        'NO',
-        'PL',
-        'PT',
-        'RO',
-        'RS',
-        'SE',
-        'SI',
-        'SK',
-        'TR',
-        'UK',
-    ]
-
     // region mouseover color
     out.hoverColor_ = 'red'
 
@@ -1011,32 +969,27 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.position_.z = getMetresPerPixel(transform.k / previousT.k)
 
         // adjust stroke dynamically according to zoom
-        adjustStrokeWidths(transform)
+        scaleStrokeWidths(transform)
 
         // adjust stroke dynamically according to zoom
-        if (out.labels_?.values) adjustLabelTexts(transform)
+        if (out.labels_?.values) scaleLabelTexts(transform)
 
         // adjust stroke dynamically according to zoom
-        if (out.labels_?.backgrounds) adjustLabelBackgrounds(transform)
+        if (out.labels_?.backgrounds) scaleLabelBackgrounds(transform)
     }
 
     /**
      * @description adjusts text elements dynamically according to zoom
      * @param {*} transform
      */
-    const adjustLabelBackgrounds = function (transform) {
+    const scaleLabelBackgrounds = function (transform) {
         const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
         const elements = zoomGroup.selectAll('.em-label-background')
-
-        // Cache the transform factor to avoid repeated calls
         const zoomFactor = transform.k
-
-        // Preprocess and batch DOM updates
         const updates = []
 
         elements.each(function () {
-            const element = select(this) // Ensure it's a D3 selection
-
+            const element = select(this)
             // Get the original width, height, x, and y from data attributes or current attributes
             const originalWidth = parseFloat(element.attr('data-width')) || parseFloat(element.attr('width'))
             const originalHeight = parseFloat(element.attr('data-height')) || parseFloat(element.attr('height'))
@@ -1073,15 +1026,11 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @description adjusts text elements dynamically according to zoom
      * @param {*} transform
      */
-    const adjustLabelTexts = function (transform) {
+    const scaleLabelTexts = function (transform) {
         const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
         const labels = zoomGroup.select('#em-labels')
         const elements = labels.selectAll('*') // Select all labels
-
-        // Cache the transform factor to avoid repeated calls
         const zoomFactor = transform.k
-
-        // Preprocess and batch DOM updates
         const updates = []
 
         elements.each(function () {
@@ -1121,15 +1070,10 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @description adjusts all stroke-widths dynamically according to zoom
      * @param {*} transform
      */
-    const adjustStrokeWidths = function (transform) {
-        // Adjust stroke-width dynamically for elements with stroke-width
+    const scaleStrokeWidths = function (transform) {
         const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
         const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
-
-        // Cache the transform factor to avoid repeated calls
         const zoomFactor = transform.k
-
-        // Preprocess and batch DOM updates
         const updates = []
 
         elements.each(function () {

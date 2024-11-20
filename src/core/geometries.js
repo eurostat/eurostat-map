@@ -152,16 +152,7 @@ export const Geometries = function (map, withCenterPoints) {
         })
     }
 
-    out.addDefaultGeometriesToMap = function (
-        container,
-        bordersToShow,
-        drawGraticule,
-        pathFunction,
-        nutsLevel,
-        geo,
-        proj,
-        scale
-    ) {
+    out.addDefaultGeometriesToMap = function (container, drawGraticule, pathFunction, nutsLevel, geo, proj, scale) {
         if (this.geoJSONs.graticule && drawGraticule) {
             //draw graticule
             container
@@ -231,17 +222,15 @@ export const Geometries = function (map, withCenterPoints) {
                 if (geo == 'EUR' && proj == '3035') {
                     // add kosovo manually
                     let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
-                    if (bordersToShow.includes('cc')) {
-                        container
-                            .append('g')
-                            .attr('id', 'em-kosovo-bn')
-                            .attr('class', 'em-kosovo-bn')
-                            .selectAll('path')
-                            .data(kosovoBn)
-                            .enter()
-                            .append('path')
-                            .attr('d', pathFunction)
-                    }
+                    container
+                        .append('g')
+                        .attr('id', 'em-kosovo-bn')
+                        .attr('class', 'em-kosovo-bn em-bn-cc')
+                        .selectAll('path')
+                        .data(kosovoBn)
+                        .enter()
+                        .append('path')
+                        .attr('d', pathFunction)
                 }
             } else {
                 // when nutsLevel is not 'mixed'
@@ -268,11 +257,11 @@ export const Geometries = function (map, withCenterPoints) {
                 .enter()
                 .append('path')
                 .filter(function (bn) {
-                    if (bordersToShow.includes('eu') && bn.properties.eu == 'T') return bn
-                    if (bordersToShow.includes('efta') && bn.properties.efta == 'T') return bn
-                    if (bordersToShow.includes('cc') && bn.properties.cc == 'T') return bn
-                    if (bordersToShow.includes('oth') && bn.properties.oth == 'T') return bn
-                    if (bordersToShow.includes('co') && bn.properties.co == 'T') return bn
+                    if (bn.properties.eu == 'T') return bn
+                    if (bn.properties.efta == 'T') return bn
+                    if (bn.properties.cc == 'T') return bn
+                    if (bn.properties.oth == 'T') return bn
+                    if (bn.properties.co == 'T') return bn
                 })
                 .attr('d', pathFunction)
                 .attr('id', (bn) => 'em-bn-' + bn.properties.id)
@@ -307,11 +296,11 @@ export const Geometries = function (map, withCenterPoints) {
                 .data(this.geoJSONs.nutsbn)
                 .enter()
                 .filter(function (bn) {
-                    if (bordersToShow.includes('eu') && bn.properties.eu == 'T') return bn
-                    if (bordersToShow.includes('efta') && bn.properties.efta == 'T') return bn
-                    if (bordersToShow.includes('cc') && bn.properties.cc == 'T') return bn
-                    if (bordersToShow.includes('oth') && bn.properties.oth == 'T') return bn
-                    if (bordersToShow.includes('co') && bn.properties.co == 'T') return bn
+                    if (bn.properties.eu == 'T') return bn
+                    if (bn.properties.efta == 'T') return bn
+                    if (bn.properties.cc == 'T') return bn
+                    if (bn.properties.oth == 'T') return bn
+                    if (bn.properties.co == 'T') return bn
                 })
                 .append('path')
                 .attr('d', pathFunction)
@@ -330,17 +319,16 @@ export const Geometries = function (map, withCenterPoints) {
             if (geo == 'EUR' && proj == '3035') {
                 // add kosovo manually
                 let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
-                if (bordersToShow.includes('cc')) {
-                    container
-                        .append('g')
-                        .attr('id', 'em-kosovo-bn')
-                        .attr('class', 'em-kosovo-bn')
-                        .selectAll('path')
-                        .data(kosovoBn)
-                        .enter()
-                        .append('path')
-                        .attr('d', pathFunction)
-                }
+
+                container
+                    .append('g')
+                    .attr('id', 'em-kosovo-bn')
+                    .attr('class', 'em-kosovo-bn')
+                    .selectAll('path')
+                    .data(kosovoBn)
+                    .enter()
+                    .append('path')
+                    .attr('d', pathFunction)
             }
         }
 

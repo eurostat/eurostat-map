@@ -346,28 +346,13 @@ export const map = function (config) {
         let symbols = map.svg().selectAll('g.em-symbol')
         symbols
             .on('mouseover', function (e, rg) {
-                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        const sel = select(this.childNodes[0])
-                        sel.attr('fill___', sel.style('fill'))
-                        sel.style('fill', out.hoverColor_)
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
-                } else {
-                    const sel = select(this.childNodes[0])
-                    sel.attr('fill___', sel.style('fill'))
-                    sel.style('fill', out.hoverColor_)
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                }
+                const sel = select(this.childNodes[0])
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e, rg) {
-                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    }
-                } else {
-                    if (out._tooltip) out._tooltip.mousemove(e)
-                }
+                if (out._tooltip) out._tooltip.mousemove(e)
             })
             .on('mouseout', function (e) {
                 const sel = select(this.childNodes[0])
@@ -398,26 +383,21 @@ export const map = function (config) {
 
         statLabels
             .filter((d) => {
-                if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                    const sv = sizeData.get(d.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        return false
-                    } else {
-                        return true
-                    }
+                const sv = sizeData.get(d.properties.id)
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                    return false
+                } else {
+                    return true
                 }
-                return false
             })
             .append('text')
             .text(function (d) {
-                if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                    const sv = sizeData.get(d.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        return ''
-                    } else {
-                        if (sv.value !== ':') {
-                            return spaceAsThousandSeparator(sv.value)
-                        }
+                const sv = sizeData.get(d.properties.id)
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                    return ''
+                } else {
+                    if (sv.value !== ':') {
+                        return spaceAsThousandSeparator(sv.value)
                     }
                 }
             })
@@ -427,26 +407,21 @@ export const map = function (config) {
             map.svg_
                 .selectAll('g.em-stat-label-shadow')
                 .filter((d) => {
-                    if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                        const sv = sizeData.get(d.properties.id)
-                        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                            return false
-                        } else {
-                            return true
-                        }
+                    const sv = sizeData.get(d.properties.id)
+                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                        return false
+                    } else {
+                        return true
                     }
-                    return false
                 })
                 .append('text')
                 .text(function (d) {
-                    if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                        const sv = sizeData.get(d.properties.id)
-                        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                            return ''
-                        } else {
-                            if (sv.value !== ':') {
-                                return spaceAsThousandSeparator(sv.value)
-                            }
+                    const sv = sizeData.get(d.properties.id)
+                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                        return ''
+                    } else {
+                        if (sv.value !== ':') {
+                            return spaceAsThousandSeparator(sv.value)
                         }
                     }
                 })
@@ -685,14 +660,10 @@ export const map = function (config) {
             .selectAll('g.em-symbol')
             .style('display', function (rg) {
                 const sv = sizeData.get(rg.properties.id)
-                if (
-                    !sv ||
-                    (!sv.value && sv !== 0 && sv.value !== 0) ||
-                    !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])
-                ) {
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                     // no symbol for no input
                     return 'none'
-                } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || map.geo_ == 'WORLD') {
+                } else if (map.geo_ == 'WORLD') {
                     return 'block'
                 }
             })
@@ -700,14 +671,10 @@ export const map = function (config) {
         // toggle display of mixed NUTS levels
         regions.style('display', function (rg) {
             const sv = sizeData.get(rg.properties.id)
-            if (
-                !sv ||
-                (!sv.value && sv !== 0 && sv.value !== 0) ||
-                !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])
-            ) {
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                 // no symbol for no data
                 return 'none'
-            } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || map.geo_ == 'WORLD') {
+            } else if (map.geo_ == 'WORLD') {
                 return 'block'
             }
         })
@@ -719,9 +686,9 @@ export const map = function (config) {
                 const lvl = sel.attr('lvl')
                 const stroke = sel.style('stroke')
                 const sv = sizeData.get(rg.properties.id)
-                if (!sv || !sv.value || !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                if (!sv || !sv.value) {
                     return
-                } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                } else {
                     if (lvl !== '0') {
                         return stroke || '#777'
                     }
@@ -734,9 +701,9 @@ export const map = function (config) {
                 const lvl = sel.attr('lvl')
                 const strokeWidth = sel.style('stroke-width')
                 const sv = sizeData.get(rg.properties.id)
-                if (!sv || !sv.value || !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                if (!sv || !sv.value) {
                     return
-                } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || out.geo_ == 'WORLD') {
+                } else if (out.geo_ == 'WORLD') {
                     if (lvl !== '0') {
                         return strokeWidth || '#777'
                     }

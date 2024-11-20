@@ -29,7 +29,8 @@
                 .map('choropleth')
                 .svgId('map')
                 .zoomExtent([1, 20])
-                .title('Population Density in Europe')
+                .title('Labels test')
+                .subtitle('map.labels({yourOptions})')
                 .stat({
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Euro per inhabitant',
@@ -79,29 +80,7 @@
                         height: 90,
                         x: 0,
                         y: 0,
-                        labels: { values: true, shadows: true },
-                    },
-                    {
-                        geo: 'MQ',
-                        scale: '01M',
-                        position: { z: 1000 },
-                        title: 'Martinique',
-                        width: 150,
-                        height: 90,
-                        x: 0,
-                        y: 100,
-                        labels: { values: true, shadows: true },
-                    },
-                    {
-                        geo: 'GF',
-                        scale: '03M',
-                        position: { z: 7500 },
-                        title: 'French Guyana',
-                        width: 150,
-                        height: 90,
-                        x: 0,
-                        y: 200,
-                        labels: { values: true, shadows: true },
+                        labels: { values: true, shadows: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
                     },
                 ])
 

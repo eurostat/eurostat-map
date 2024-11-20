@@ -272,7 +272,7 @@ export const map = function (config) {
                 const ecl = sel.attr('ecl')
                 const lvl = sel.attr('lvl')
                 const countryId = rg.properties.id.slice(0, 2)
-                return (ecl && out.countriesToShow_.includes(countryId)) || lvl === '0' ? 'block' : 'none'
+                return ecl || lvl === '0' ? 'block' : 'none'
             })
             .style('stroke', function () {
                 const sel = select(this)
@@ -306,12 +306,9 @@ export const map = function (config) {
             } else {
                 // NUTS template logic
                 const countryId = rg.properties.id.slice(0, 2)
-                if (out.countriesToShow_.includes(countryId)) {
-                    if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                    if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                    return out.classToFillStyle()(ecl, out.numberOfClasses_)
-                }
-                return getCSSPropertyFromClass('em-nutsrg', 'fill')
+                if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
+                if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
+                return out.classToFillStyle()(ecl, out.numberOfClasses_)
             }
         }
     }
@@ -320,18 +317,8 @@ export const map = function (config) {
         regions
             .on('mouseover', function (e, rg) {
                 const sel = select(this)
-                if (map.Geometries.userGeometries) {
-                    // custom geometries
-                    sel.style('fill', map.hoverColor_) // Apply highlight color
-                    out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                } else {
-                    // default geometries
-                    const countryId = rg.properties.id.slice(0, 2)
-                    if (out.geo_ === 'WORLD' || out.countriesToShow_.includes(countryId)) {
-                        sel.style('fill', map.hoverColor_) // Apply highlight color
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
-                }
+                sel.style('fill', map.hoverColor_) // Apply highlight color
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e) {
                 if (out._tooltip) out._tooltip.mousemove(e)

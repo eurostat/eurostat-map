@@ -181,28 +181,16 @@ export const map = function (config) {
             .on('mouseover', function (e, rg) {
                 const data = getComposition(rg.properties.id)
                 if (data) {
-                    if (out.countriesToShow_) {
-                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                            const sel = select(this)
-                            sel.attr('fill___', sel.style('fill'))
-                            sel.style('fill', out.hoverColor_)
-                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                        }
-                    } else {
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
+                    const sel = select(this)
+                    sel.attr('fill___', sel.style('fill'))
+                    sel.style('fill', out.hoverColor_)
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 }
             })
             .on('mousemove', function (e, rg) {
                 const data = getComposition(rg.properties.id)
                 if (data) {
-                    if (out.countriesToShow_) {
-                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                            if (out._tooltip) out._tooltip.mousemove(e)
-                        }
-                    } else {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    }
+                    if (out._tooltip) out._tooltip.mousemove(e)
                 }
             })
             .on('mouseout', function () {
