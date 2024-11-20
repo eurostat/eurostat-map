@@ -1,3 +1,7 @@
+import { select } from 'd3-selection'
+import { spaceAsThousandSeparator, executeForAllInsets } from './utils'
+
+// handles all map labels e.g. stat values, or labels specified in map.labels({labels:[text:'myLabel', x:123, y: 123]})
 /**
  * Default labels for country / geographical names.
  * Using centroids would clash with proportional symbols, and are generally not ideal placements, so labels are positioned independently
@@ -270,7 +274,7 @@ export const DEFAULTSTATLABELPOSITIONS = {
     BE: { x: 3930000, y: 3060000 },
     BG: { x: 5567000, y: 2300000 },
     HR: { x: 4707718, y: 2350243 },
-    CY: { x: 6426000, y: 1490000 },
+    CY: { x: 6426000, y: 1530000 },
     CH: { x: 4170000, y: 2600000 },
     CZ: { x: 4707000, y: 2950000 },
     DK: { x: 4316000, y: 3621000 },
@@ -302,4 +306,350 @@ export const DEFAULTSTATLABELPOSITIONS = {
     TR: { x: 6510000, y: 2100000 },
     UK: { x: 3558000, y: 3250000 },
     RU: { x: 6842086, y: 3230517 },
+}
+
+/**
+ * @function updateLabels
+ * @description update existing map labels
+ */
+export const updateLabels = function (map) {
+    // Clear previous labels
+    let prevLabels = map.svg_.selectAll('g.em-labels > *')
+    if (prevLabels) prevLabels.remove()
+
+    // Main map
+    if (map.labels_) {
+        let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
+        addLabelsToMap(map, zg)
+        if (map.labels_.values && map.updateValuesLabels) {
+            map.updateValuesLabels(map)
+        }
+    }
+
+    // Define the callback to apply to each inset
+    const applyLabelsCallback = (map) => {
+        if (map.labels_) {
+            let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
+            addLabelsToMap(map, zg)
+            if (map.labels_.values && out.updateValuesLabels) {
+                out.updateValuesLabels(map)
+            }
+        }
+    }
+
+    // Apply labels to all insets using the executeForAllInsets function
+    if (out.insetTemplates_) {
+        executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
+    }
+}
+
+/**
+ * @description update the statistical values labels on the map
+ * @param {Object} map eurostat-map map instance
+ * @return {map} out
+ */
+export const updateValuesLabels = function (map) {
+    //clear previous labels
+    let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
+    prevLabels.remove()
+    let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
+    prevShadows.remove()
+
+    let statLabels = map.svg_.selectAll('g.em-stat-label')
+
+    let labelsContainer = map.svg_.select('#em-labels')
+
+    // filter stat-label elements to only show those with data
+    const filterFunction = map.labels_?.statLabelsFilterFunction ? map.labels_?.statLabelsFilterFunction : defaultStatLabelFilter
+    const statData = map.statData()
+    statLabels
+        .filter((rg) => filterFunction(rg, map))
+        // .append('text')
+        .each(function (d) {
+            const sel = select(this)
+            const labelText = statLabelsTextFunction(d, statData) // Use 'd' directly for the label text
+
+            // Append rectangle behind label
+            if (map.labels_.backgrounds) appendRect(labelText, sel)
+
+            // Append text after the rectangle
+            sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
+        })
+
+    // Function to append a rectangle behind the label
+    function appendRect(labelText, container) {
+        const paddingX = 5 // Add some padding around the text
+        const paddingY = 2 // Add some padding around the text
+
+        // Create a temporary text element to get the size
+        const bbox = container
+            .append('text')
+            .attr('visibility', 'hidden') // Make the temporary text invisible
+            .text(labelText) // Set the label text to get its bounding box
+            .node()
+            .getBBox() // Get the bounding box of the text
+
+        const labelWidth = bbox.width
+        const labelHeight = bbox.height
+
+        // Remove the temporary text element after getting the bounding box
+        container.select('text[visibility="hidden"]').remove()
+
+        // Calculate the position of the rectangle to be centered on the text
+        const x = -labelWidth / 2 - paddingX // Center the rect horizontally
+        const y = -labelHeight / 2 - paddingY // Center the rect vertically
+
+        // Append rectangle with padding
+        container
+            .append('rect')
+            .attr('x', x) // Position rect horizontally
+            .attr('y', y) // Position rect vertically
+            .attr('width', labelWidth + 2 * paddingX) // Width of the rect with padding
+            .attr('height', labelHeight + 2 * paddingY) // Height of the rect with padding
+            .attr('class', 'em-label-background')
+    }
+
+    //add shadows to labels
+    if (map.labels_.shadows) {
+        map.svg_
+            .selectAll('g.em-stat-label-shadow')
+            .filter((rg) => filterFunction(rg, map))
+            .append('text')
+            .text(map.statLabelsTextFunction)
+    }
+    return map
+}
+
+/**
+ * @description text function for statistical labelling
+ * @param {Object} d d3 selection json data element
+ * @return {string}
+ */
+export const statLabelsTextFunction = (d, statData) => {
+    const sv = statData.get(d.properties.id)
+    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+        return ''
+    } else {
+        if (sv.value !== ':') {
+            return spaceAsThousandSeparator(sv.value)
+        }
+    }
+}
+
+/**
+ * @description function for filtering statistical labels
+ * @param {Object} d d3 selection json data element
+ * @return {boolean}
+ */
+const defaultStatLabelFilter = (region, map) => {
+    const s = map.statData()
+    const sv = s.get(region.properties.id)
+    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+        return false
+    } else {
+        return true
+    }
+}
+
+/**
+ * @function addLabelsToMap
+ * @param map eurostatmap map instance
+ * @param zg zoomgroup (d3 selection of zoomable elements)
+ * @description appends text labels to the map. Labels can be countries, country codes, ocean names or statistical values
+ */
+export const addLabelsToMap = function (map, zg) {
+    // set defaults
+    if (!map.labels_.config) map.labels_.config = DEFAULTLABELS
+    if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
+
+    // clear existing or append new container
+    let existing = zg.select('#em-labels')
+    let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
+
+    //for statistical values we need to add centroids initially, then add text to them later once the stat data is loaded
+    if (map.labels_?.values) appendStatLabelCentroidsToMap(map, labelsContainer)
+
+    // get labels array
+    let labelsArray = map.labels_?.labels || DEFAULTLABELS[`${map.geo}_${map.proj_}.cc`]
+
+    // append other labels to map
+    if (labelsArray) {
+        //common styles between all label shadows
+        const shadowg = labelsContainer.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
+
+        //common styles between all labels
+        const labelg = labelsContainer.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
+
+        //SHADOWS
+        if (map.labels_.shadows) {
+            let shadows = shadowg
+                .selectAll('text')
+                .data(labelsArray)
+                .enter()
+                .append('text')
+                .attr('id', (d) => 'em-label-shadow-' + d.text.replace(/\s+/g, '-'))
+                .attr('class', (d) => 'em-label-shadow em-label-shadow-' + d.class)
+                .attr('x', function (d) {
+                    if (d.rotate) {
+                        return 0 //for rotated text, x and y positions must be specified in the transform property
+                    }
+                    return map._projection([d.x, d.y])[0]
+                })
+                .attr('y', function (d) {
+                    if (d.rotate) {
+                        return 0 //for rotated text, x and y positions must be specified in the transform property
+                    }
+                    return map._projection([d.x, d.y])[1]
+                })
+                .attr('dy', -7) // set y position of bottom of text
+                .attr('transform', (d) => {
+                    if (d.rotate) {
+                        let pos = map._projection([d.x, d.y])
+                        let x = pos[0]
+                        let y = pos[1]
+                        return `translate(${x},${y}) rotate(${d.rotate})`
+                    } else {
+                        return 'rotate(0)'
+                    }
+                })
+                .text(function (d) {
+                    return d.text
+                }) // define the text to display
+        }
+
+        //LABEL texts
+        labelg
+            .selectAll('text')
+            .data(labelsArray)
+            .enter()
+            .append('text')
+            .attr('id', (d) => 'em-label-' + d.text.replace(/\s+/g, '-'))
+            .attr('class', (d) => 'em-label em-label-' + d.class)
+            //position label
+            .attr('x', function (d) {
+                if (d.rotate) {
+                    return 0 //for rotated text, x and y positions must be specified in the transform property
+                }
+                return map._projection([d.x, d.y])[0]
+            })
+            .attr('y', function (d) {
+                if (d.rotate) {
+                    return 0 //for rotated text, x and y positions must be specified in the transform property
+                }
+                return map._projection([d.x, d.y])[1]
+            })
+            .attr('dy', -7) // set y position of bottom of text
+            //transform labels which have a "rotate" property in the labels config. For rotated labels, their X,Y must also be set in the transform.
+            // note: dont apply to country code labels
+            .attr('transform', (d) => {
+                if (d.rotate) {
+                    let pos = map._projection([d.x, d.y])
+                    let x = pos[0]
+                    let y = pos[1]
+                    return `translate(${x},${y}) rotate(${d.rotate})`
+                } else {
+                    return 'rotate(0)'
+                }
+            })
+            .text(function (d) {
+                return d.text
+            }) // define the text to display
+    }
+}
+
+const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
+    //values label shadows parent <g>
+    const gsls = labelsContainer.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
+
+    // values labels parent <g>
+    const gsl = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
+
+    // our features array
+    let statLabelRegions = []
+
+    // deafult geometries
+    if (map.Geometries.geoJSONs.nutsrg) {
+        //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
+
+        if (map.nutsLevel_ == 'mixed') {
+            map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
+            map._geom.mixed.rg1 = feature(
+                map.Geometries.allNUTSGeoData[1],
+                map.Geometries.allNUTSGeoData[1].objects.nutsrg
+            ).features
+            map._geom.mixed.rg2 = feature(
+                map.Geometries.allNUTSGeoData[2],
+                map.Geometries.allNUTSGeoData[2].objects.nutsrg
+            ).features
+            map._geom.mixed.rg3 = feature(
+                map.Geometries.allNUTSGeoData[3],
+                map.Geometries.allNUTSGeoData[3].objects.nutsrg
+            ).features
+            statLabelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
+        } else {
+            statLabelRegions = map.Geometries.geoJSONs.nutsrg
+        }
+    } else if (map.Geometries.userGeometries) {
+        // user defined geometries
+        statLabelRegions = map.Geometries.statisticalRegions.features
+    }
+
+    if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
+
+    // stats labels
+    gsl.selectAll('g')
+        .data(statLabelRegions)
+        .enter()
+        .append('g')
+        .attr('transform', function (d) {
+            // use predefined label positioning
+            if (map.labels_.statLabelsPositions[d.properties.id]) {
+                let pos = map._projection([
+                    map.labels_.statLabelsPositions[d.properties.id].x,
+                    map.labels_.statLabelsPositions[d.properties.id].y,
+                ])
+                let x = pos[0].toFixed(3)
+                let y = pos[1].toFixed(3)
+                return `translate(${x},${y})`
+            } else {
+                let centroid = map._pathFunction.centroid(d)
+
+                if (map.labels_.processValueLabelCentroids) {
+                    centroid = map.labels_.processValueLabelCentroids(d, centroid)
+                }
+                // otherwise we calculate centroids
+                return 'translate(' + centroid + ')'
+            }
+        })
+        .attr('class', 'em-stat-label')
+
+    // stat labels shadows
+    if (map.labels_.shadows) {
+        gsls.selectAll('g')
+            .data(statLabelRegions)
+            .enter()
+            .append('g')
+            .attr('transform', function (d) {
+                // use predefined label positioning
+                if (map.labels_.statLabelsPositions[d.properties.id]) {
+                    let pos = map._projection([
+                        map.labels_.statLabelsPositions[d.properties.id].x,
+                        map.labels_.statLabelsPositions[d.properties.id].y,
+                    ])
+                    let x = pos[0].toFixed(3)
+                    let y = pos[1].toFixed(3)
+                    return `translate(${x},${y})`
+                } else {
+                    let centroid = map._pathFunction.centroid(d)
+
+                    if (map.labels_.processValueLabelCentroids) {
+                        centroid = map.labels_.processValueLabelCentroids(d, centroid)
+                    }
+                    // otherwise we calculate centroids
+                    return 'translate(' + centroid + ')'
+                }
+            })
+
+            .attr('class', 'em-stat-label-shadow')
+    }
 }
