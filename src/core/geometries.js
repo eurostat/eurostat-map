@@ -152,7 +152,7 @@ export const Geometries = function (map, withCenterPoints) {
         })
     }
 
-    out.addDefaultGeometriesToMap = function (container, drawGraticule, pathFunction, nutsLevel, geo, proj, scale) {
+    out.addDefaultGeometriesToMap = function (container, drawGraticule, pathFunction, nutsLevel, nutsYear, geo, proj, scale) {
         if (this.geoJSONs.graticule && drawGraticule) {
             //draw graticule
             container
@@ -219,7 +219,7 @@ export const Geometries = function (map, withCenterPoints) {
                 )
 
                 //add kosovo
-                if (geo == 'EUR' && proj == '3035') {
+                if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
                     // add kosovo manually
                     let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
                     container
@@ -316,7 +316,7 @@ export const Geometries = function (map, withCenterPoints) {
                     return cl.join(' ')
                 })
 
-            if (geo == 'EUR' && proj == '3035') {
+            if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
                 // add kosovo manually
                 let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
 

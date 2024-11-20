@@ -15,6 +15,9 @@
                 fill: #000a66;
                 font-style: italic;
             }
+            .em-cntbn {
+                stroke: white !important;
+            }
         </style>
     </head>
 
@@ -36,9 +39,9 @@
                     unitText: 'Euro per inhabitant',
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
-                .width(800)
-                .scale('10M')
-                .nutsLevel(0)
+                .width(1080)
+                .nutsLevel(3)
+                .nutsYear(2024)
                 .tooltipShowFlags(false)
                 .legend({ title: 'test', decimals: 0, x: 15, y: 160 })
                 //styling

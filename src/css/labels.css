@@ -10,6 +10,7 @@
 }
 .em-label-background {
     fill: #b0902f;
+    pointer-events: none;
 }
 .em-label-shadow {
     font-size: 12px;

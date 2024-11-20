@@ -602,10 +602,10 @@ export const mapTemplate = function (config, withCenterPoints) {
         } else {
             out.Geometries.addDefaultGeometriesToMap(
                 zoomGroup,
-                out.bordersToShow_,
                 out.drawGraticule_,
                 out._pathFunction,
                 out.nutsLevel_,
+                out.nutsYear_,
                 out.geo_,
                 out.proj_,
                 out.scale_
