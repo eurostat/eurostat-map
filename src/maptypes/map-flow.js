@@ -66,122 +66,75 @@ export const map = function (config) {
     }
 
     /**
-     * Main function to create the Sankey diagram and map visualization.
-     * @param {Object} config - Configuration object containing required data and options.
+     * Function to create a map with Sankey diagram and other elements
+     * @param {Object} config - Configuration options and data for the map
      */
-    function createVisualization(config) {
+    function createMap(config) {
         const {
-            graph,
-            geometries,
-            poi,
-            countryBorders,
-            mergeData,
-            showArrowTips = true,
-            showArrowOutlines = true,
-            showLabels = true,
-            labelOffsetX = 10,
-            width = 960,
-            height = 600,
-            path,
-            exporters,
+            graph, // Sankey data (nodes and links)
+            width,
+            height, // SVG dimensions
+            geometries, // Geographical shapes for regions
+            poi, // Points of interest
+            exporters, // Exporters data
+            countryBorders, // Borders data
+            mergeData, // Data for labels
+            labelOffsetX, // Label offset
+            showArrowOutlines, // Show arrow outlines flag
+            showArrowTips, // Show arrow tips flag
+            showLabels, // Show labels flag
         } = config
 
+        // Create the SVG container
         const svg = out.svg_
 
-        // Sankey diagram data
-        const { nodes, links } = sankey().extent([
-            [1, 1],
-            [width - 1, height - 1],
-        ])(graph)
+        // Process Sankey data
+        const { nodes, links } = sankey(graph)
 
-        // Create definitions for markers and gradients
+        // Define marker and gradient IDs
         const defs = svg.append('defs')
         const arrowId = generateUniqueId('arrow')
-        const arrowId2 = generateUniqueId('arrow-outline')
+        const arrowOutlineId = generateUniqueId('arrow-outline')
         const gradientIds = links.map(() => generateUniqueId('gradient'))
 
-        // Add markers
+        // Add arrow markers
         addArrowMarker(defs, arrowId, '#72bb6f')
-        addArrowMarker(defs, arrowId2, '#ffffff')
+        addArrowMarker(defs, arrowOutlineId, '#ffffff')
 
-        // Add gradients
-        addGradients(defs, links, gradientIds)
+        // Add flow gradients
+        addFlowGradients(defs, gradientIds, links)
 
-        // Add graticule
-        svg.append('g')
-            .attr('class', 'graticule')
-            .datum(d3.geoGraticule().step([10, 10]))
-            .append('path')
-            .attr('d', path)
-            .attr('fill', '#fcfdff')
+        // Add geographical layers
+        addGeographicalLayers(svg, geometries, poi, exporters, countryBorders)
 
-        // Add regions
-        svg.append('g')
-            .attr('class', 'regions')
-            .selectAll('path')
-            .data(geometries)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', '#f4f4f4')
+        // Add Sankey flows
+        addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds, showArrowOutlines, showArrowTips)
 
-        // Overlay for importers and exporters
-        svg.append('g')
-            .attr('class', 'importers-overlay')
-            .selectAll('path')
-            .data(poi.features)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', (d) => (exporters.has(d.properties.id) ? '#c7e3c6' : '#bbd7ee'))
-
-        // Add borders
-        svg.append('g')
-            .attr('class', 'borders')
-            .selectAll('path')
-            .data(countryBorders)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', 'none')
-            .attr('stroke', 'grey')
-            .attr('stroke-width', 0.3)
-
-        // Process links and draw flows
-        processLinks(links, arrowId, arrowId2, gradientIds, svg, showArrowTips, showArrowOutlines)
-
-        // Fill gaps in node rendering
-        svg.append('g')
-            .attr('class', 'fill-in-gaps')
-            .selectAll('rect')
-            .data(nodes)
-            .join('rect')
-            .filter((d) => d.depth && d.height)
-            .attr('x', (d) => d.x0 - 0.5)
-            .attr('y', (d) => d.y0)
-            .attr('width', 1)
-            .attr('height', (d) => d.y1 - d.y0)
-            .attr('fill', '#72bb6f')
+        // Add additional nodes (fill gaps)
+        addFillGaps(svg, nodes)
 
         // Add labels
         if (showLabels) {
-            addLabels(svg, mergeData, path, labelOffsetX)
+            addLabels(svg, mergeData, labelOffsetX)
         }
 
         return svg.node()
     }
 
     /**
-     * Generate a unique identifier for elements like markers or gradients.
-     * @param {string} prefix - Prefix for the ID.
-     * @returns {string} A unique ID string.
+     * Generates a unique DOM ID
+     * @param {string} prefix - Prefix for the ID
+     * @returns {string} Unique ID
      */
     function generateUniqueId(prefix) {
         return `${prefix}-${Math.random().toString(36).substr(2, 9)}`
     }
 
     /**
-     * Add an arrow marker definition.
-     * @param {Object} defs - D3 selection of the defs element.
-     * @param {string} id - ID of the marker.
-     * @param {string} color - Fill color of the arrow.
+     * Adds an arrow marker to the defs section
+     * @param {Object} defs - D3 selection of defs
+     * @param {string} id - Marker ID
+     * @param {string} color - Fill color of the marker
      */
     function addArrowMarker(defs, id, color) {
         defs.append('marker')
@@ -197,12 +150,12 @@ export const map = function (config) {
     }
 
     /**
-     * Add linear gradient definitions for links.
-     * @param {Object} defs - D3 selection of the defs element.
-     * @param {Array} links - Array of link data.
-     * @param {Array} gradientIds - Array of gradient IDs.
+     * Adds linear gradient definitions for flow links
+     * @param {Object} defs - D3 selection of defs
+     * @param {Array} gradientIds - Array of gradient IDs
+     * @param {Array} links - Sankey links data
      */
-    function addGradients(defs, links, gradientIds) {
+    function addFlowGradients(defs, gradientIds, links) {
         defs.selectAll('linearGradient')
             .data(links)
             .join('linearGradient')
@@ -217,37 +170,101 @@ export const map = function (config) {
     }
 
     /**
-     * Process and draw links for the Sankey diagram.
-     * @param {Array} links - Array of link data.
-     * @param {string} arrowId - ID for the main arrow marker.
-     * @param {string} arrowId2 - ID for the outline arrow marker.
-     * @param {Array} gradientIds - Array of gradient IDs.
-     * @param {Object} svg - D3 selection of the SVG element.
-     * @param {boolean} showArrowTips - Whether to show arrow tips.
-     * @param {boolean} showArrowOutlines - Whether to show arrow outlines.
+     * Adds geographical layers (regions, POI overlay, borders)
+     * @param {Object} svg - D3 selection of SVG
+     * @param {Array} geometries - Geographical shapes for regions
+     * @param {Object} poi - Points of interest data
+     * @param {Set} exporters - Exporters data
+     * @param {Array} countryBorders - Borders data
      */
-    function processLinks(links, arrowId, arrowId2, gradientIds, svg, showArrowTips, showArrowOutlines) {
+    function addGeographicalLayers(svg, geometries, poi, exporters, countryBorders) {
+        const path = out._pathFunction
+
+        // Regions
+        svg.append('g')
+            .attr('class', 'regions')
+            .selectAll('path')
+            .data(geometries)
+            .join('path')
+            .attr('d', path)
+            .attr('fill', '#f4f4f4')
+            .attr('stroke', 'none')
+
+        // Overlay for exporters and importers
+        svg.append('g')
+            .attr('class', 'importers-overlay')
+            .selectAll('path')
+            .data(poi.features)
+            .join('path')
+            .attr('d', path)
+            .attr('fill', (d) => (exporters.has(d.properties.id) ? '#c7e3c6' : '#bbd7ee'))
+            .attr('stroke', 'none')
+
+        // National borders
+        svg.append('g')
+            .attr('class', 'borders')
+            .selectAll('path')
+            .data(countryBorders)
+            .join('path')
+            .attr('d', path)
+            .attr('fill', 'none')
+            .attr('stroke', 'grey')
+            .attr('stroke-width', 0.3)
+    }
+
+    /**
+     * Adds Sankey flows (links with markers and gradients)
+     * @param {Object} svg - D3 selection of SVG
+     * @param {Array} links - Sankey links data
+     * @param {string} arrowId - Arrow marker ID
+     * @param {string} arrowOutlineId - Arrow outline marker ID
+     * @param {Array} gradientIds - Gradient IDs
+     * @param {boolean} showArrowOutlines - Flag to show arrow outlines
+     * @param {boolean} showArrowTips - Flag to show arrow tips
+     */
+    function addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds, showArrowOutlines, showArrowTips) {
         const flowsGroup = svg.append('g').attr('class', 'flows-group')
 
-        links.forEach((d, i) => {
+        links.forEach((link, i) => {
+            // Outline path
             if (showArrowOutlines) {
                 flowsGroup
                     .append('path')
-                    .attr('d', sankeyLinkHorizontal()(d))
+                    .attr('d', sankeyLinkHorizontal()(link))
                     .attr('fill', 'none')
                     .attr('stroke', '#ffffff')
-                    .attr('stroke-width', d.width + 1.5)
-                    .attr('marker-end', !d.target.height ? `url(#${arrowId2})` : null)
+                    .attr('stroke-width', link.width + 1.5)
+                    .attr('marker-end', showArrowTips ? `url(#${arrowOutlineId})` : null)
             }
 
+            // Main path
             flowsGroup
                 .append('path')
-                .attr('d', sankeyLinkHorizontal()(d))
+                .attr('d', sankeyLinkHorizontal()(link))
                 .attr('fill', 'none')
-                .attr('stroke', !d.source.depth ? `url(#${gradientIds[i]})` : '#72bb6f')
-                .attr('stroke-width', d.width)
-                .attr('marker-end', !d.target.height ? `url(#${arrowId})` : null)
+                .attr('stroke', `url(#${gradientIds[i]})`)
+                .attr('stroke-width', link.width)
+                .attr('marker-end', showArrowTips ? `url(#${arrowId})` : null)
         })
+    }
+
+    /**
+     * Adds rectangles to fill gaps left by Sankey links
+     * @param {Object} svg - D3 selection of SVG
+     * @param {Array} nodes - Sankey nodes data
+     */
+    function addFillGaps(svg, nodes) {
+        svg.append('g')
+            .attr('class', 'fill-in-gaps')
+            .selectAll('rect')
+            .data(nodes)
+            .join('rect')
+            .filter((d) => d.depth && d.height)
+            .attr('x', (d) => d.x0 - 0.5)
+            .attr('y', (d) => d.y0)
+            .attr('width', 1)
+            .attr('height', (d) => d.y1 - d.y0)
+            .attr('fill', '#72bb6f')
     }
 
     /**
