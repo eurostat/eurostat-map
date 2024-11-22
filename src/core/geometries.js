@@ -272,11 +272,7 @@ export const Geometries = function (map, withCenterPoints) {
                     if (bn.properties.efta === 'T') classList.push('em-bn-efta')
                     if (bn.properties.cc === 'T') classList.push('em-bn-cc')
                     if (bn.properties.oth === 'T') classList.push('em-bn-oth')
-                    if (bn.properties.co === 'T') {
-                        classList.push('co', 'em-bn-co')
-                    } else {
-                        classList.push('em-cntbn')
-                    }
+                    if (bn.properties.co === 'T') classList.push('em-bn-co')
 
                     if (bn.properties.id == 156) console.log(classList, bn)
                     return classList.join(' ') // Use join with a space to create a valid class string

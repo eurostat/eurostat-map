@@ -1,29 +1,146 @@
-import {
-    annotation,
-    annotationLabel,
-    annotationCalloutRect,
-    annotationCalloutCircle,
-    annotationXYThreshold,
-} from 'd3-svg-annotation'
+// e.g. to be used with deprecated .style() functions. They will now update CSS classes.
+export function updateCSSRule(className, property, value) {
+    // Ensure the className starts with a dot
+    const selector = className.startsWith('.') ? className : `.${className}`
 
-export function appendAnnotations(svgElement, annotationsData) {
-    // Define a map that maps the type string to the corresponding annotation function
-    const annotationTypeMap = {
-        annotationLabel: annotationLabel,
-        annotationCalloutRect: annotationCalloutRect,
-        annotationCalloutCircle: annotationCalloutCircle,
-        annotationXYThreshold: annotationXYThreshold, // Add any other types you need
+    // Check if the rule already exists in any stylesheet
+    const styleSheets = Array.from(document.styleSheets)
+    for (const styleSheet of styleSheets) {
+        try {
+            const rules = styleSheet.cssRules || styleSheet.rules
+            for (const rule of rules) {
+                if (rule.selectorText === selector) {
+                    // Update the property if the rule exists
+                    rule.style[property] = value
+                    return
+                }
+            }
+        } catch (e) {
+            // Some stylesheets (e.g., cross-origin) may not be accessible
+            console.warn(`Could not access rules in stylesheet:`, e)
+        }
     }
 
-    // Map annotations data to ensure each annotation has the proper function
-    const annotationsWithTypes = annotationsData.map((d) => {
-        // Replace the 'type' string with the corresponding annotation function
-        const annotationType = annotationTypeMap[d.type] || annotationLabel // Default to annotationLabel
-        return { ...d, type: annotationType } // Update 'type' with the function reference
-    })
-    const makeAnnotations = annotation().type(annotationLabel).annotations(annotationsWithTypes)
+    // If the rule doesn't exist, create a new stylesheet and add it
+    let customSheet = document.getElementById('custom-styles')
+    if (!customSheet) {
+        customSheet = document.createElement('style')
+        customSheet.id = 'custom-styles'
+        document.head.appendChild(customSheet)
+    }
 
-    svgElement.append('g').attr('class', 'em-annotation-group').call(makeAnnotations)
+    // Add the new rule to the custom stylesheet
+    customSheet.sheet.insertRule(`${selector} { ${property}: ${value}; }`, customSheet.sheet.cssRules.length)
+}
+
+export const getFontSizeFromClass = function (className) {
+    // Create a temporary element with the specified class
+    const tempElement = document.createElement('div')
+    tempElement.className = className
+
+    // Apply inline styles to minimize layout interference
+    tempElement.style.position = 'absolute'
+    tempElement.style.visibility = 'hidden'
+    tempElement.style.height = 'auto'
+    tempElement.style.width = 'auto'
+    tempElement.style.lineHeight = 'normal'
+    tempElement.style.fontSize = 'initial'
+
+    // Append directly to the body
+    document.body.appendChild(tempElement)
+
+    // Get the computed font-size property and parse it to a number
+    const fontSize = parseFloat(window.getComputedStyle(tempElement).fontSize)
+
+    // Remove the temporary element from the document body
+    document.body.removeChild(tempElement)
+
+    return fontSize || 0
+}
+
+export const getCSSPropertyFromClass = function (className, propertyName) {
+    // Create a temporary element with the specified class
+    const tempElement = document.createElement('div')
+    tempElement.className = className
+
+    // Apply inline styles to minimize layout interference
+    tempElement.style.position = 'absolute'
+    tempElement.style.visibility = 'hidden'
+    tempElement.style.height = 'auto'
+    tempElement.style.width = 'auto'
+    tempElement.style.lineHeight = 'normal'
+
+    // Append directly to the body
+    document.body.appendChild(tempElement)
+
+    // Get the computed value of the specified property
+    const propertyValue = window.getComputedStyle(tempElement).getPropertyValue(propertyName)
+
+    // Remove the temporary element from the document body
+    document.body.removeChild(tempElement)
+
+    return propertyValue || null
+}
+
+// Helper function to get all CSS rules defined in the document
+function getAllCSSRules() {
+    let cssRules = []
+    for (let sheet of document.styleSheets) {
+        try {
+            // Some stylesheets may not be accessible due to CORS, so we catch any errors
+            for (let rule of sheet.cssRules) {
+                cssRules.push(rule)
+            }
+        } catch (e) {
+            console.warn('Unable to access stylesheet:', sheet.href, e)
+        }
+    }
+    return cssRules
+}
+
+// Helper function to get explicitly defined styles from CSS for an element
+function getStylesFromCSS(element) {
+    let matchedRules = []
+    const cssRules = getAllCSSRules()
+
+    cssRules.forEach((rule) => {
+        if (element.matches(rule.selectorText)) {
+            matchedRules.push(rule.style)
+        }
+    })
+
+    // Create an object of the explicitly set styles
+    let explicitStyles = {}
+    matchedRules.forEach((style) => {
+        for (let i = 0; i < style.length; i++) {
+            const property = style[i]
+            explicitStyles[property] = style.getPropertyValue(property)
+        }
+    })
+
+    return explicitStyles
+}
+
+// Helper function to apply inline styles explicitly set in CSS. Useful for exporting SVGs with CSS styles.
+export const applyInlineStylesFromCSS = (svgElement) => {
+    const allElements = svgElement.querySelectorAll('*')
+
+    allElements.forEach((element) => {
+        const cssStyles = getStylesFromCSS(element)
+
+        // Apply each explicitly defined CSS style as an inline style
+        Object.keys(cssStyles).forEach((property) => {
+            const value = cssStyles[property]
+
+            // Check if the property already has an inline style
+            const existingInlineStyle = element.style.getPropertyValue(property)
+
+            if (!existingInlineStyle && value) {
+                // If no existing inline style, set the new style
+                element.style.setProperty(property, value)
+            }
+        })
+    })
 }
 
 /**
@@ -180,120 +297,10 @@ export const executeForAllInsets = function (insets, mainSvgId, callback, parame
     }
 }
 
-export const getFontSizeFromClass = function (className) {
-    // Create a temporary element with the specified class
-    const tempElement = document.createElement('div')
-    tempElement.className = className
-
-    // Apply inline styles to minimize layout interference
-    tempElement.style.position = 'absolute'
-    tempElement.style.visibility = 'hidden'
-    tempElement.style.height = 'auto'
-    tempElement.style.width = 'auto'
-    tempElement.style.lineHeight = 'normal'
-    tempElement.style.fontSize = 'initial'
-
-    // Append directly to the body
-    document.body.appendChild(tempElement)
-
-    // Get the computed font-size property and parse it to a number
-    const fontSize = parseFloat(window.getComputedStyle(tempElement).fontSize)
-
-    // Remove the temporary element from the document body
-    document.body.removeChild(tempElement)
-
-    return fontSize || 0
-}
-
-export const getCSSPropertyFromClass = function (className, propertyName) {
-    // Create a temporary element with the specified class
-    const tempElement = document.createElement('div')
-    tempElement.className = className
-
-    // Apply inline styles to minimize layout interference
-    tempElement.style.position = 'absolute'
-    tempElement.style.visibility = 'hidden'
-    tempElement.style.height = 'auto'
-    tempElement.style.width = 'auto'
-    tempElement.style.lineHeight = 'normal'
-
-    // Append directly to the body
-    document.body.appendChild(tempElement)
-
-    // Get the computed value of the specified property
-    const propertyValue = window.getComputedStyle(tempElement).getPropertyValue(propertyName)
-
-    // Remove the temporary element from the document body
-    document.body.removeChild(tempElement)
-
-    return propertyValue || null
-}
-
 export const upperCaseFirstLetter = (string) => `${string.slice(0, 1).toUpperCase()}${string.slice(1)}`
 
 export const lowerCaseAllWordsExceptFirstLetters = (string) =>
     string.replaceAll(/\S*/g, (word) => `${word.slice(0, 1)}${word.slice(1).toLowerCase()}`)
-
-// Helper function to get all CSS rules defined in the document
-function getAllCSSRules() {
-    let cssRules = []
-    for (let sheet of document.styleSheets) {
-        try {
-            // Some stylesheets may not be accessible due to CORS, so we catch any errors
-            for (let rule of sheet.cssRules) {
-                cssRules.push(rule)
-            }
-        } catch (e) {
-            console.warn('Unable to access stylesheet:', sheet.href, e)
-        }
-    }
-    return cssRules
-}
-
-// Helper function to get explicitly defined styles from CSS for an element
-function getStylesFromCSS(element) {
-    let matchedRules = []
-    const cssRules = getAllCSSRules()
-
-    cssRules.forEach((rule) => {
-        if (element.matches(rule.selectorText)) {
-            matchedRules.push(rule.style)
-        }
-    })
-
-    // Create an object of the explicitly set styles
-    let explicitStyles = {}
-    matchedRules.forEach((style) => {
-        for (let i = 0; i < style.length; i++) {
-            const property = style[i]
-            explicitStyles[property] = style.getPropertyValue(property)
-        }
-    })
-
-    return explicitStyles
-}
-
-// Helper function to apply inline styles explicitly set in CSS
-export const applyInlineStylesFromCSS = (svgElement) => {
-    const allElements = svgElement.querySelectorAll('*')
-
-    allElements.forEach((element) => {
-        const cssStyles = getStylesFromCSS(element)
-
-        // Apply each explicitly defined CSS style as an inline style
-        Object.keys(cssStyles).forEach((property) => {
-            const value = cssStyles[property]
-
-            // Check if the property already has an inline style
-            const existingInlineStyle = element.style.getPropertyValue(property)
-
-            if (!existingInlineStyle && value) {
-                // If no existing inline style, set the new style
-                element.style.setProperty(property, value)
-            }
-        })
-    })
-}
 
 export function getDownloadURL(svgNode) {
     // Create XML header to ensure the SVG is recognized properly

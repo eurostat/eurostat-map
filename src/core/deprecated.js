@@ -1,39 +1,111 @@
+import { updateCSSRule } from './utils.js'
+
 /* prettier-ignore */
 // to keep track of deprecated functions whilst keeping the current version clean.
-// also passes any important parameters to the new functions (if they exist)
+// also passes any important parameters to the new functions (if they exist) and overwrites any CSS style rules.
 // To be removed when completely phased out.
 
 export const defineDeprecatedFunctions = (out) => {
+    // styles
+    out.seaFillStyle = (v) => (console.warn('seaFillStyle() is now DEPRECATED, please use the .em-sea CSS class'), updateCSSRule('.em-sea','fill',v), out);
+    out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'),updateCSSRule('.em-cntrg','fill',v), out);
+    out.nutsrgFillStyle = (v) => (console.warn('nutsrgFillStyle() is now DEPRECATED, please use the .em-nutsrg CSS class'),updateCSSRule('.em-nutsrg','fill',v), out);
+    out.nutsbnStroke = (v) => {
+        console.warn('nutsbnStroke() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes')
+        if (v['0']) {
+            updateCSSRule('.bn_0','stroke',v['0'])
+        }
+        if (v['1']) {
+            updateCSSRule('.bn_1','stroke',v['1'])
+        }
+        if (v['2']) {
+            updateCSSRule('.bn_2','stroke',v['2'])
+        }
+        if (v['3']) {
+            updateCSSRule('.bn_3','stroke',v['3'])
+        }
+        return out
+    };
+    out.nutsbnStrokeWidth = (v) => {
+        console.warn('nutsbnStrokeWidth() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes')
+        if (v['0']) {
+            updateCSSRule('.bn_0','stroke-width',v['0'])
+        }
+        if (v['1']) {
+            updateCSSRule('.bn_1','stroke-width',v['1'])
+        }
+        if (v['2']) {
+            updateCSSRule('.bn_2','stroke-width',v['2'])
+        }
+        if (v['3']) {
+            updateCSSRule('.bn_3','stroke-width',v['3'])
+        }
+        return out
+    };
+    out.graticuleStroke = () => (console.warn('graticuleStroke() is now DEPRECATED, please use the .em-graticule CSS class'), updateCSSRule('.em-graticule','stroke',v), out);
+    out.graticuleStrokeWidth = () => (console.warn('graticuleStrokeWidth() is now DEPRECATED, please use the .em-graticule CSS class'), updateCSSRule('.em-graticule','stroke-width',v), out);
+    out.nutsrgSelFillSty = (v) => (console.warn('nutsrgSelFillSty() is now DEPRECATED, please use hoverColor() instead'), out.hoverColor_ = v, out);
+    out.titleFontSize = (v) => (console.warn('map.titleFontSize() is now DEPRECATED. please use the .em-title CSS class'),updateCSSRule('.em-title','font-size',v), out);
+    out.subtitleFontSize = (v) => (console.warn('map.subtitleFontSize() is now DEPRECATED. please use the .em-subtitle CSS class'),updateCSSRule('.em-subtitle','font-size',v), out);
+    out.subtitleFontWeight = (v) => (console.warn('map.subtitleFontWeight() is now DEPRECATED. please use the .em-subtitle CSS class'),updateCSSRule('.em-subtitle','font-weight',v), out);
+    out.titleFill = (v) => (console.warn('map.titleFill() is now DEPRECATED. please use the .em-title CSS class'),updateCSSRule('.em-title','fill',v), out);
+    out.subtitleFill = (v) => (console.warn('map.subtitleFill() is now DEPRECATED. please use the .em-subtitle CSS class'),updateCSSRule('.em-subtitle','fill',v), out);
+    out.cntbnStroke = (v) => {
+        console.warn('cntbnStroke() is now DEPRECATED, please use the .em-cntbn .em-bn-eu .em-bn-efta .em-bn-cc .em-bn-oth CSS classes')
+        if (v['eu']) {
+            updateCSSRule('.em-bn-eu','stroke',v['eu'])
+        }
+        if (v['efta']) {
+            updateCSSRule('.em-bn-efta','stroke',v['efta'])
+        }
+        if (v['cc']) {
+            updateCSSRule('.em-bn-cc','stroke',v['cc'])
+        }
+        if (v['oth']) {
+            updateCSSRule('.em-bn-oth','stroke',v['oth'])
+        }
+        if (v['co']) {
+            updateCSSRule('.em-bn-co','stroke',v['co'])
+        }
+        return out
+    };
+    out.cntbnStrokeWidth = (v) => {
+        console.warn('cntbnStrokeWidth() is now DEPRECATED, please use the .em-cntbn .em-bn-eu .em-bn-efta .em-bn-cc .em-bn-oth CSS classes')
+        if (v['eu']) {
+            updateCSSRule('.em-bn-eu','stroke-width',v['eu'])
+        }
+        if (v['efta']) {
+            updateCSSRule('.em-bn-efta','stroke-width',v['efta'])
+        }
+        if (v['cc']) {
+            updateCSSRule('.em-bn-cc','stroke-width',v['cc'])
+        }
+        if (v['oth']) {
+            updateCSSRule('.em-bn-oth','stroke-width',v['oth'])
+        }
+        if (v['co']) {
+            updateCSSRule('.em-bn-co','stroke-width',v['co'])
+        }
+        return out
+    };
+    out.worldStroke = (v) => (console.warn('map.worldStroke() is now DEPRECATED. please use the .em-worldbn .em-bn-co .em-bn-d CSS classes'),updateCSSRule('.em-worldbn','stroke',v), out);
+    out.worldStrokeWidth = (v) => (console.warn('map.worldStrokeWidth() is now DEPRECATED. please use the .em-worldbn .em-bn-co .em-bn-d CSS classes'),updateCSSRule('.em-worldbn','stroke-width',v), out);
+    out.worldCoastStroke = (v) => (console.warn('map.worldCoastStroke() is now DEPRECATED. please use the .em-bn-co CSS class'),updateCSSRule('.em-bn-co','stroke',v), out);
+    out.worldCoastStrokeWidth = (v) => (console.warn('map.worldCoastStrokeWidth() is now DEPRECATED. please use the .em-bn-co CSS class'),updateCSSRule('.em-bn-co','stroke-width',v), out);
+    out.worldFillStyle = (v) => (console.warn('map.worldFillStyle() is now DEPRECATED. please use the .em-worldrg CSS class'),updateCSSRule('.em-worldrg','fill',v), out); 
+    out.coastalMarginWidth = (v) => (console.warn('map.coastalMarginWidth() is now DEPRECATED. please use the #em-coast-margin CSS rule'),updateCSSRule('#em-coast-margin','stroke-width',v), out);  
+    out.coastalMarginColor = (v) => (console.warn('map.coastalMarginColor() is now DEPRECATED. please use the #em-coast-margin CSS rule'),updateCSSRule('#em-coast-margin','stroke',v), out);
+    out.fontFamily = (v) => (console.warn('map.fontFamily() is now DEPRECATED. please use the .em-map CSS class'),updateCSSRule('.em-map','font-family',v), out);
+    out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-footnote CSS class'),updateCSSRule('.em-footnote','font-size',v), out);
+    out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-footnote CSS class'),updateCSSRule('.em-footnote','fill',v), out);
+    out.scalebarFontSize = (v) => (console.warn('map.scalebarFontSize() is now DEPRECATED. please use the .em-scalebar-label CSS class'),updateCSSRule('.em-scalebar-label','font-size',v), out);
+   
+   
+   //other
     out.geoCenter = (v) => (console.warn('map.geoCenter() is now deprecated. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
     out.pixelSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.pixSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.tooltipText = (v) => (console.warn('map.tooltipText() is now deprecated. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
-    out.seaFillStyle = (v) => (console.warn('seaFillStyle() is now DEPRECATED, please use the .em-sea CSS class'), out);
-    out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'), out);
-    out.nutsrgFillStyle = (v) => (console.warn('nutsrgFillStyle() is now DEPRECATED, please use the .em-nutsrg CSS class'), out);
-    out.nutsbnStroke = (v) => (console.warn('nutsbnStroke() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes'), out);
-    out.nutsbnStrokeWidth = (v) => (console.warn('nutsbnStrokeWidth() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes'), out);
-    out.graticuleStroke = () => (console.warn('graticuleStroke() is now DEPRECATED, please use the .em-graticule CSS class'), out);
-    out.graticuleStrokeWidth = () => (console.warn('graticuleStrokeWidth() is now DEPRECATED, please use the .em-graticule CSS class'), out);
-    out.nutsrgSelFillSty = (v) => (console.warn('nutsrgSelFillSty() is now DEPRECATED, please use hoverColor() instead'), out.hoverColor_ = v, out);
-    out.titleFontSize = (v) => (console.warn('map.titleFontSize() is now DEPRECATED. please use the .em-title CSS class'), out);
-    out.subtitleFontSize = (v) => (console.warn('map.subtitleFontSize() is now DEPRECATED. please use the .em-subtitle CSS class'), out);
-    out.subtitleFontWeight = (v) => (console.warn('map.subtitleFontWeight() is now DEPRECATED. please use the .em-subtitle CSS class'), out);
-    out.titleFill = (v) => (console.warn('map.titleFill() is now DEPRECATED. please use the .em-title CSS class'), out);
-    out.subtitleFill = (v) => (console.warn('map.subtitleFill() is now DEPRECATED. please use the .em-subtitle CSS class'), out);
-    out.cntbnStroke = (v) => (console.warn('map.cntbnStroke() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
-    out.cntbnStrokeWidth = (v) => (console.warn('map.cntbnStrokeWidth() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
-    out.worldStroke = (v) => (console.warn('map.worldStroke() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
-    out.worldStrokeWidth = (v) => (console.warn('map.worldStrokeWidth() is now DEPRECATED. please use the .em-cntbn CSS class'), out);
-    out.worldCoastStroke = (v) => (console.warn('map.worldCoastStroke() is now DEPRECATED. please use the .em-bn-co CSS class'), out);
-    out.worldCoastStrokeWidth = (v) => (console.warn('map.worldCoastStrokeWidth() is now DEPRECATED. please use the .em-bn-co CSS class'), out);
-    out.worldFillStyle = (v) => (console.warn('map.worldFillStyle() is now DEPRECATED. please use the .em-worldcoast CSS class'), out);
-    out.coastalMarginWidth = (v) => (console.warn('map.coastalMarginWidth() is now DEPRECATED. please use the #em-coast-margin CSS rule'), out);
-    out.coastalMarginColor = (v) => (console.warn('map.coastalMarginColor() is now DEPRECATED. please use the #em-coast-margin CSS rule'), out);
-    out.fontFamily = (v) => (console.warn('map.fontFamily() is now DEPRECATED. please use the .em-map CSS class'), out);
-    out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-footnote CSS class'), out);
-    out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-footnote CSS class'), out);
-    out.scalebarFontSize = (v) => (console.warn('map.scalebarFontSize() is now DEPRECATED. please use the .em-scalebar-label CSS class'), out);
     out.classifMethod = (v) => (console.warn('map.classifMethod() is now DEPRECATED. please use map.classificationMethod() instead.'), out.classificationMethod_ = v,out);
     out.clnb = (v) => (console.warn('map.clnb() is now DEPRECATED. please use map.numberOfClasses() instead.'), out.numberOfClasses_ = v,out);
     out.nutsLvl = (v) => (console.warn('map.nutsLvl() is now DEPRECATED. please use map.nutsLevel() instead.'), out.nutsLevel_ = v,out);
