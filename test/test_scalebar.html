@@ -1,28 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
-
-<body>
-    <svg id="map"></svg>
-    <script src="../build/eurostatmap.js"></script>
-    <script>
-        const map = eurostatmap
-            .map("ch")
-
-            .showScalebar(true)
-            .scalebarTickHeight(10)
-            .scalebarSegmentHeight(7)
-            .scalebarFontSize(7)
-            .scalebarPosition([200,20])
-            .scalebarUnits('')
-
-
-            map.build();
-    </script>
-</body>
-
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('ch')
+                .showScalebar(true)
+                .scalebarTickHeight(10)
+                .scalebarSegmentHeight(7)
+                .scalebarFontSize(7)
+                .scalebarPosition([200, 20])
+                .scalebarUnits('')
+            map.build()
+        </script>
+    </body>
 </html>

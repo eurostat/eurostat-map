@@ -42,8 +42,8 @@ export const defineDeprecatedFunctions = (out) => {
         }
         return out
     };
-    out.graticuleStroke = () => (console.warn('graticuleStroke() is now DEPRECATED, please use the .em-graticule CSS class'), updateCSSRule('.em-graticule','stroke',v), out);
-    out.graticuleStrokeWidth = () => (console.warn('graticuleStrokeWidth() is now DEPRECATED, please use the .em-graticule CSS class'), updateCSSRule('.em-graticule','stroke-width',v), out);
+    out.graticuleStroke = (v) => (console.warn('graticuleStroke() is now DEPRECATED, please use the .em-graticule CSS class'), updateCSSRule('.em-graticule','stroke',v), out);
+    out.graticuleStrokeWidth = (v) => (console.warn('graticuleStrokeWidth() is now DEPRECATED, please use the .em-graticule CSS class'), updateCSSRule('.em-graticule','stroke-width',v), out);
     out.nutsrgSelFillSty = (v) => (console.warn('nutsrgSelFillSty() is now DEPRECATED, please use hoverColor() instead'), out.hoverColor_ = v, out);
     out.titleFontSize = (v) => (console.warn('map.titleFontSize() is now DEPRECATED. please use the .em-title CSS class'),updateCSSRule('.em-title','font-size',v), out);
     out.subtitleFontSize = (v) => (console.warn('map.subtitleFontSize() is now DEPRECATED. please use the .em-subtitle CSS class'),updateCSSRule('.em-subtitle','font-size',v), out);
