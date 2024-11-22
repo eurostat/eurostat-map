@@ -63,8 +63,6 @@
                         }
                     }
 
-                    console.log(parsePopulation('3.57'))
-
                     // Transform merged data to code:value object
                     const statisticalData = mergedData.reduce((acc, row) => {
                         // Handle unemployment value, setting "<5" to "5" and parsing as an integer
@@ -112,9 +110,21 @@
                             canariesWidth / 2, // Center with horizontal padding
                             canariesHeight / 2, // Center with vertical padding
                         ])
-                    const canariesPosition = [5, 490] // position on screen
 
-                    // Set up the projection
+                    //define Melilla
+                    const melillaFeatures = geoJSON.features.filter((d) => d.id.startsWith('52001'))
+                    const melillaWidth = 100
+                    const melillaHeight = 90
+                    const melillaProjection = d3
+                        .geoAzimuthalEqualArea()
+                        .rotate([2.95, -35.3]) // Center around Melilla
+                        .scale(50000) // Adjust scale as needed
+                        .translate([
+                            melillaWidth / 2, // Center with horizontal padding
+                            melillaHeight / 2, // Center with vertical padding
+                        ])
+
+                    // Set up the main map projection
                     const projection = d3.geoAzimuthalEqualArea().rotate([-0.5, -40.55]).scale(3000)
 
                     // Initialize the map
@@ -146,12 +156,11 @@
                         .footnote(
                             'Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>'
                         )
-                        .insetBoxPosition(canariesPosition)
+                        .insetBoxPosition([5, 490])
                         .insets([
                             {
                                 projectionFunction: canariesProjection,
                                 title: 'Canarias',
-                                //{x: -17.406208914904834, y: 27.66413486326028, z: 100}
                                 geometries: [
                                     {
                                         id: 'canaries',
@@ -163,6 +172,23 @@
                                 width: canariesWidth,
                                 height: canariesHeight,
                                 x: 0,
+                                y: 0,
+                                zoomExtent: [1, 10],
+                            },
+                            {
+                                projectionFunction: melillaProjection,
+                                title: 'Melilla',
+                                geometries: [
+                                    {
+                                        id: 'melilla',
+                                        class: 'melilla',
+                                        statisticalRegions: true,
+                                        features: melillaFeatures,
+                                    },
+                                ],
+                                width: melillaWidth,
+                                height: melillaHeight,
+                                x: 350,
                                 y: 0,
                                 zoomExtent: [1, 10],
                             },

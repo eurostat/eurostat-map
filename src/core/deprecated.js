@@ -5,7 +5,7 @@
 
 export const defineDeprecatedFunctions = (out) => {
     out.geoCenter = (v) => (console.warn('map.geoCenter() is now deprecated. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
-    out.pixelSize_ = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
+    out.pixelSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.pixSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.tooltipText = (v) => (console.warn('map.tooltipText() is now deprecated. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
     out.seaFillStyle = (v) => (console.warn('seaFillStyle() is now DEPRECATED, please use the .em-sea CSS class'), out);
@@ -48,8 +48,8 @@ export const defineDeprecatedFunctions = (out) => {
 
     //labelling
     out.labelling = (v) =>(console.warn('labelling is now DEPRECATED. Please use out.labels({}) configuration object instead. See documentation for details.'),out);
-    out.labelsConfig = (v) =>(console.warn('labelsConfig is now DEPRECATED. Please use out.labels({config:yourConfig}) configuration object instead. See documentation for details.'),out.labels_.config=v,out);
-    out.statLabelsPositions = (v) =>(console.warn('statLabelsPositions is now DEPRECATED. Please use out.labels({statLabelsPositions:yourPositions}) instead. See documentation for details.'),out.labels_.statLabelsPositions=v,out);
+    out.labelsConfig = (v) =>(console.warn('labelsConfig is now DEPRECATED. Please use out.labels({config:yourConfig}) configuration object instead. See documentation for details.'),out.labels_ =Object.assign(out.labels_ || {}, { config: v }),out);
+    out.statLabelsPositions = (v) =>(console.warn('statLabelsPositions is now DEPRECATED. Please use out.labels({statLabelsPositions:yourPositions}) instead. See documentation for details.'),out.labels_ = Object.assign(out.labels_ || {}, { statLabelsPositions: v }),out);
     out.labelsToShow = (v) =>(console.warn('labelsToShow is now DEPRECATED. Please use out.labels({labelFilterFunction:yourFunction(region,map)}) function instead. See documentation for details.'),out);
     out.labelShadowsToShow = (v) =>(console.warn('labelShadowsToShow is now DEPRECATED. Please use out.labels({labelFilterFunction:yourFunction(region,map)}) function instead. See documentation for details.'),out);
     out.labelShadow = (v) =>(console.warn('labelShadow is now DEPRECATED. Please use out.labels({labelShadow:boolean}) instead. See documentation for details.'),out);
