@@ -14,4 +14,4 @@
 -   Choropleth legends can now be **bar charts** (use legend.barChart: true) see test/map-types/choropleth/test_bar_chart_legend.html
 -   **Labelling** API refactored.
 -   **map.labels({processValueLabelCentroids((region, centroid)=> custom logic)})** function now available to manually adjust or edit label centroids (e.g. for overlapping label placement correction). See test/test_labels.html
--   **map.filterGeometriesFunction((geometries)=>{return geometries})** to be used in favour of countriesToShow([]) and bordersToShow([])
+-   Default geometries (NUTS) filter: **map.filterGeometriesFunction((geometries)=>{return geometries})** to be used in favour of countriesToShow([]) and bordersToShow([])
