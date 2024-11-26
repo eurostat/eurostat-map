@@ -3,6 +3,7 @@
 ## v4.0.0
 
 -   Almost all inline styles moved to CSS (see ./css.md and deprecated.js)
+-   Users can now specify custom geometries (linked to statistics with 'regions:true' property)
 -   Function names renamed to more understandable ones (e.g. clnb() to numberOfClasses())
 -   Jenks and ckmeans classification methods added (uses simple-statistics library)
 -   Annotations capability added (uses d3-svg-annotation)
