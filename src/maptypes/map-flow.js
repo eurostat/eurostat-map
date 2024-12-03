@@ -1,36 +1,7 @@
 // Import required D3 modules
 import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
-
-const exampleGraph = {
-    nodes: [
-        { id: 'FR', x: 681.1851800759263, y: 230.31124763648583 },
-        { id: 'DE', x: 824.5437782154489, y: 123.70302649032199 },
-        { id: 'IT', x: 852.4825697391176, y: 341.2769489380059 },
-        { id: 'ES', x: 542.0535296122652, y: 369.06544910331417 },
-        { id: 'BE', x: 730.0123797336544, y: 127.74905244343536 },
-        { id: 'NL', x: 749.175863493742, y: 87.27354778987966 },
-        { id: 'CH', x: 782.4178994989912, y: 232.5359911477708 },
-        { id: 'PL', x: 970.7849882008576, y: 92.61718744265188 },
-        { id: 'PT', x: 445.73965176651086, y: 366.90829704399636 },
-        { id: 'AT', x: 887.5898207349595, y: 214.2378085459197 },
-        { id: 'CZ', x: 907.1965357417834, y: 157.97566911120774 },
-    ],
-    links: [
-        { source: 'FR', target: 'DE', value: 82018369.72 },
-        { source: 'FR', target: 'IT', value: 49697198.92 },
-        { source: 'FR', target: 'ES', value: 45422327.56 },
-        { source: 'FR', target: 'BE', value: 43038180.93 },
-        { source: 'FR', target: 'NL', value: 34453478.99 },
-        { source: 'FR', target: 'CH', value: 16164188.98 },
-        { source: 'FR', target: 'PL', value: 12673336.04 },
-        { source: 'FR', target: 'PT', value: 7178656.08 },
-        { source: 'FR', target: 'AT', value: 6305366.1 },
-        { source: 'FR', target: 'CZ', value: 5883790.49 },
-    ],
-}
-
-import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
-
+import * as StatMap from '../core/stat-map'
+import * as ChoroplethLegend from '../legend/legend-choropleth'
 /**
  * Returns a flow map.
  *
@@ -43,7 +14,7 @@ export const map = function (config) {
     /**
      * flowmap-specific setters/getters
      */
-    ;['flowMapConfig_'].forEach(function (att) {
+    ;['flowGraph_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -53,8 +24,13 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
-        let config = out.flowMapConfig_
-        createVisualization()
+        // type: "Feature"
+        // properties: Object {id: "ES", na: "España"}
+        // geometry: Object {type: "MultiPolygon", coordinates: Array(7)}
+        // source: "FR"
+        // target: "ES"
+        // value: 45422327.56
+        createFlowMapSVG(out.flowGraph_)
     }
 
     //@override
@@ -62,34 +38,40 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
+        //TODO: define legend
         return ChoroplethLegend.legend
+    }
+
+    // get regions that are either 'importers' or 'exporters'
+    function getFlowRegions() {
+        let regions = allNuts.filter((d) => exporter.value == d.properties.id || importers.has(d.properties.id))
+
+        // merge regions with statistical data
+        let merged = out.flowData_.find((e) => e.target === d.properties.id)
+        return { ...d, ...data2 }
+        return features
     }
 
     /**
      * Function to create a map with Sankey diagram and other elements
      * @param {Object} config - Configuration options and data for the map
      */
-    function createMap(config) {
-        const {
-            graph, // Sankey data (nodes and links)
-            width,
-            height, // SVG dimensions
-            geometries, // Geographical shapes for regions
-            poi, // Points of interest
-            exporters, // Exporters data
-            countryBorders, // Borders data
-            mergeData, // Data for labels
-            labelOffsetX, // Label offset
-            showArrowOutlines, // Show arrow outlines flag
-            showArrowTips, // Show arrow tips flag
-            showLabels, // Show labels flag
-        } = config
-
-        // Create the SVG container
+    function createFlowMapSVG(graph) {
         const svg = out.svg_
+        const sk = sankey()
+            .nodeId((d) => d.id) // Match your node IDs
+            .nodeWidth(15)
+            .nodePadding(10)
+            .extent([
+                [1, 1],
+                [out.width_ - 1, out.height_ - 1],
+            ])
 
         // Process Sankey data
-        const { nodes, links } = sankey(graph)
+        const processedGraph = sk(exampleGraph) // Processes `exampleGraph`
+        const { nodes, links } = processedGraph // Now `nodes` and `links` are arrays
+        console.log('Processed Nodes:', nodes) // Array of processed nodes
+        console.log('Processed Links:', links) // Array of processed links
 
         // Define marker and gradient IDs
         const defs = svg.append('defs')
@@ -105,18 +87,16 @@ export const map = function (config) {
         addFlowGradients(defs, gradientIds, links)
 
         // Add geographical layers
-        addGeographicalLayers(svg, geometries, poi, exporters, countryBorders)
+        //addGeographicalLayers(svg, geometries, poi, exporters, countryBorders)
 
         // Add Sankey flows
-        addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds, showArrowOutlines, showArrowTips)
+        addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds)
 
         // Add additional nodes (fill gaps)
         addFillGaps(svg, nodes)
 
         // Add labels
-        if (showLabels) {
-            addLabels(svg, mergeData, labelOffsetX)
-        }
+        //addLabels(svg)
 
         return svg.node()
     }
@@ -219,23 +199,19 @@ export const map = function (config) {
      * @param {string} arrowId - Arrow marker ID
      * @param {string} arrowOutlineId - Arrow outline marker ID
      * @param {Array} gradientIds - Gradient IDs
-     * @param {boolean} showArrowOutlines - Flag to show arrow outlines
-     * @param {boolean} showArrowTips - Flag to show arrow tips
      */
-    function addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds, showArrowOutlines, showArrowTips) {
+    function addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds) {
         const flowsGroup = svg.append('g').attr('class', 'flows-group')
 
         links.forEach((link, i) => {
             // Outline path
-            if (showArrowOutlines) {
-                flowsGroup
-                    .append('path')
-                    .attr('d', sankeyLinkHorizontal()(link))
-                    .attr('fill', 'none')
-                    .attr('stroke', '#ffffff')
-                    .attr('stroke-width', link.width + 1.5)
-                    .attr('marker-end', showArrowTips ? `url(#${arrowOutlineId})` : null)
-            }
+            flowsGroup
+                .append('path')
+                .attr('d', sankeyLinkHorizontal()(link))
+                .attr('fill', 'none')
+                .attr('stroke', '#ffffff')
+                .attr('stroke-width', link.width + 1.5)
+                .attr('marker-end', `url(#${arrowOutlineId})`)
 
             // Main path
             flowsGroup
@@ -244,7 +220,7 @@ export const map = function (config) {
                 .attr('fill', 'none')
                 .attr('stroke', `url(#${gradientIds[i]})`)
                 .attr('stroke-width', link.width)
-                .attr('marker-end', showArrowTips ? `url(#${arrowId})` : null)
+                .attr('marker-end', `url(#${arrowId})`)
         })
     }
 
@@ -270,11 +246,8 @@ export const map = function (config) {
     /**
      * Add labels for data points.
      * @param {Object} svg - D3 selection of the SVG element.
-     * @param {Array} mergeData - Array of data for labels.
-     * @param {Function} path - D3 geo path generator.
-     * @param {number} labelOffsetX - Horizontal offset for labels.
      */
-    function addLabels(svg, mergeData, path, labelOffsetX) {
+    function addLabels(svg) {
         const mapMidpointX = svg.node().getBoundingClientRect().width / 2
 
         svg.append('g')

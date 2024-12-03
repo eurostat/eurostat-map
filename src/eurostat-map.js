@@ -1,10 +1,11 @@
-import * as mapch from './maptypes/map-choropleth'
-import * as mapps from './maptypes/map-proportional-symbols'
-import * as mapct from './maptypes/map-categorical'
-import * as mapchbi from './maptypes/map-choropleth-bivariate'
-import * as mapscomp from './maptypes/map-stripe-composition'
-import * as mappie from './maptypes/map-piecharts'
-import * as mapspark from './maptypes/map-sparklines'
+import * as Choropleth from './maptypes/map-choropleth'
+import * as ProportionalSymbol from './maptypes/map-proportional-symbols'
+import * as Categorical from './maptypes/map-categorical'
+import * as BivariateChoropleth from './maptypes/map-choropleth-bivariate'
+import * as StripeComposition from './maptypes/map-stripe-composition'
+import * as PieCharts from './maptypes/map-piecharts'
+import * as Sparklines from './maptypes/map-sparklines'
+import * as FlowMap from './maptypes/map-flow'
 import * as mt from './core/stat-map'
 
 /**
@@ -15,19 +16,21 @@ import * as mt from './core/stat-map'
  */
 export const map = function (type, config) {
     //choropleth map
-    if (type == 'choropleth' || type == 'ch') return mapch.map(config)
+    if (type == 'choropleth' || type == 'ch') return Choropleth.map(config)
     //categorical map
-    if (type == 'categorical' || type == 'ct') return mapct.map(config)
+    if (type == 'categorical' || type == 'ct') return Categorical.map(config)
     //proportionnal symbols map
-    if (type == 'proportionalSymbol' || type == 'ps') return mapps.map(config)
+    if (type == 'proportionalSymbol' || type == 'ps') return ProportionalSymbol.map(config)
     //bivariate choropleth
-    if (type == 'bivariateChoropleth' || type == 'chbi') return mapchbi.map(config)
+    if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
     //stripes composition
-    if (type == 'stripeComposition' || type == 'scomp') return mapscomp.map(config)
+    if (type == 'stripeComposition' || type == 'scomp') return StripeComposition.map(config)
     //proportional pie charts
-    if (type == 'pieChart' || type == 'pie') return mappie.map(config)
+    if (type == 'pieChart' || type == 'pie') return PieCharts.map(config)
     //sparkline maps
-    if (type == 'sparkline' || type == 'spark') return mapspark.map(config)
+    if (type == 'sparkline' || type == 'spark') return Sparklines.map(config)
+    //flow maps
+    if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
     //add new map types here
     //if(type == "XX") return mapXX.map(config);
 
