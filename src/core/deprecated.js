@@ -99,8 +99,9 @@ export const defineDeprecatedFunctions = (out) => {
     out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-footnote CSS class'),updateCSSRule('.em-footnote','font-size',v), out);
     out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-footnote CSS class'),updateCSSRule('.em-footnote','fill',v), out);
     out.scalebarFontSize = (v) => (console.warn('map.scalebarFontSize() is now DEPRECATED. please use the .em-scalebar-label CSS class'),updateCSSRule('.em-scalebar-label','font-size',v), out);
-   
-   
+    out.frameStroke = (v)=> (console.warn('map.frameStroke() is now DEPRECATED. please use the .em-frame CSS class'),updateCSSRule('.em-frame','stroke',v), out);
+    out.frameStrokeWidth = (v)=> (console.warn('map.frameStrokeWidth() is now DEPRECATED. please use the .em-frame CSS class'),updateCSSRule('.em-frame','stroke-width',v), out);
+
    //other
     out.geoCenter = (v) => (console.warn('map.geoCenter() is now deprecated. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
     out.pixelSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
