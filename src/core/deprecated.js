@@ -70,7 +70,7 @@ export const defineDeprecatedFunctions = (out) => {
         return out
     };
     out.cntbnStrokeWidth = (v) => {
-        console.warn('cntbnStrokeWidth() is now DEPRECATED, please use the .em-cntbn .em-bn-eu .em-bn-efta .em-bn-cc .em-bn-oth CSS classes')
+        console.warn('cntbnStrokeWidth() is now DEPRECATED, please use the .em-cntbn .em-worldbn .em-bn-eu .em-bn-efta .em-bn-cc .em-bn-oth CSS classes')
         if (v['eu']) {
             updateCSSRule('.em-bn-eu','stroke-width',v['eu'])
         }
