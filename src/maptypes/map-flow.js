@@ -1,5 +1,8 @@
 // Import required D3 modules
-import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
+// import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
+import { linkHorizontal } from 'd3-shape'
+import { sum, max } from 'd3-array'
+import { scaleLinear } from 'd3'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
 /**
@@ -10,6 +13,7 @@ import * as ChoroplethLegend from '../legend/legend-choropleth'
 export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config)
+    out.strokeWidthScale = scaleLinear()
 
     /**
      * flowmap-specific setters/getters
@@ -30,6 +34,13 @@ export const map = function (config) {
         // source: "FR"
         // target: "ES"
         // value: 45422327.56
+
+        // update stroke width function
+        const data = out.flowGraph_.links
+        out.strokeWidthScale = scaleLinear()
+            .domain([0, max(data, (d) => d.value)])
+            .range([2, 10])
+
         createFlowMapSVG(out.flowGraph_)
     }
 
@@ -58,18 +69,7 @@ export const map = function (config) {
      */
     function createFlowMapSVG(graph) {
         const svg = out.svg_
-        const sk = sankey()
-            .nodeId((d) => d.id) // Match your node IDs
-            .nodeWidth(15)
-            .nodePadding(10)
-            .extent([
-                [1, 1],
-                [out.width_ - 1, out.height_ - 1],
-            ])
-
-        // Process Sankey data
-        const processedGraph = sk(exampleGraph) // Processes `exampleGraph`
-        const { nodes, links } = processedGraph // Now `nodes` and `links` are arrays
+        var { nodes, links } = sankey(graph)
         console.log('Processed Nodes:', nodes) // Array of processed nodes
         console.log('Processed Links:', links) // Array of processed links
 
@@ -261,6 +261,149 @@ export const map = function (config) {
             })
             .attr('y', (d) => path.centroid(d)[1])
             .text((d) => d.label)
+    }
+
+    // From this point on all code is related with spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
+    // See https://observablehq.com/@joewdavies/flow-map-of-europe
+    function clone({ nodes, links }) {
+        return { nodes: nodes.map((d) => Object.assign({}, d)), links: links.map((d) => Object.assign({}, d)) }
+    }
+
+    function sankey({ nodes, links }) {
+        const graph = clone({ nodes, links })
+        computeNodeLinks(graph)
+        computeNodeValues(graph)
+        computeNodeDepths(graph)
+        computeNodeHeights(graph)
+        computeNodeBreadths(graph)
+        computeLinkBreadths(graph)
+        console.log('Sankey Graph:', graph)
+        return graph
+    }
+
+    function computeNodeLinks({ nodes, links }) {
+        for (const [i, node] of nodes.entries()) {
+            node.index = i
+            node.sourceLinks = []
+            node.targetLinks = []
+        }
+        const nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d]))
+        for (const [i, link] of links.entries()) {
+            link.index = i
+            let { source, target } = link
+            if (typeof source !== 'object') source = link.source = find(nodeById, source)
+            if (typeof target !== 'object') target = link.target = find(nodeById, target)
+            source.sourceLinks.push(link)
+            target.targetLinks.push(link)
+        }
+        // if (linkSort != null) {
+        //     for (const { sourceLinks, targetLinks } of nodes) {
+        //         sourceLinks.sort(linkSort)
+        //         targetLinks.sort(linkSort)
+        //     }
+        // }
+    }
+
+    function find(nodeById, id) {
+        const node = nodeById.get(id)
+        if (!node) throw new Error('missing: ' + id)
+        return node
+    }
+
+    function computeNodeDepths({ nodes }) {
+        const n = nodes.length
+        let current = new Set(nodes)
+        let next = new Set()
+        let x = 0
+        while (current.size) {
+            for (const node of current) {
+                node.depth = x
+                for (const { target } of node.sourceLinks) {
+                    next.add(target)
+                }
+            }
+            if (++x > n) throw new Error('circular link')
+            current = next
+            next = new Set()
+        }
+    }
+
+    function computeNodeHeights({ nodes }) {
+        const n = nodes.length
+        let current = new Set(nodes)
+        let next = new Set()
+        let x = 0
+        while (current.size) {
+            for (const node of current) {
+                node.height = x
+                for (const { source } of node.targetLinks) {
+                    next.add(source)
+                }
+            }
+            if (++x > n) throw new Error('circular link')
+            current = next
+            next = new Set()
+        }
+    }
+
+    function computeLinkBreadths({ nodes }) {
+        for (const node of nodes) {
+            let y0 = node.y0
+            let y1 = y0
+            for (const link of node.sourceLinks) {
+                link.y0 = y0 + link.width / 2
+                y0 += link.width
+            }
+            for (const link of node.targetLinks) {
+                link.y1 = y1 + link.width / 2
+                y1 += link.width
+            }
+        }
+    }
+    function horizontalSource(d) {
+        return [d.source.x1, d.y0]
+    }
+
+    function horizontalTarget(d) {
+        return [d.target.x0, d.y1]
+    }
+
+    function computeNodeValues({ nodes }) {
+        for (const node of nodes) {
+            node.value = Math.max(
+                sum(node.sourceLinks, (d) => d.value),
+                sum(node.targetLinks, (d) => d.value)
+            )
+        }
+    }
+
+    function reorderLinks(nodes) {
+        for (const { sourceLinks, targetLinks } of nodes) {
+            sourceLinks.sort(ascendingTargetY)
+            targetLinks.sort(ascendingSourceY)
+        }
+    }
+
+    const ascendingTargetY = (a, b) => a.target.y - b.target.y
+    const ascendingSourceY = (a, b) => a.source.y - b.source.y
+
+    function computeNodeBreadths({ nodes }) {
+        for (const node of nodes) {
+            const height = out.strokeWidthScale(node.value)
+            node.x0 = node.x1 = node.x
+            node.y0 = node.y - height / 2
+            node.y1 = node.y0 + height
+            for (const link of node.sourceLinks) {
+                link.width = out.strokeWidthScale(link.value)
+            }
+        }
+        reorderLinks(nodes)
+    }
+
+    const id = (d) => d.id // used in sankey import
+
+    const sankeyLinkHorizontal = function () {
+        return linkHorizontal().source(horizontalSource).target(horizontalTarget)
     }
 
     return out
