@@ -156,7 +156,7 @@ a text {
 .em-bn-2,
 .em-bn-3,
 .em-bn-d {
-    stroke-width: 0.4;
+    stroke-width: 0.15;
 }
 
 .em-bn-1,
@@ -166,8 +166,8 @@ a text {
 }
 
 .em-kosovo-bn {
-    stroke: #4f4f4f;
-    stroke-width: 0.3;
+    stroke: #6e6e6e;
+    stroke-width: 0.19;
 }
 
 .em-bn-d {
@@ -177,7 +177,7 @@ a text {
 .em-cntbn,
 .em-worldbn {
     stroke: black;
-    stroke-width: 0.4;
+    stroke-width: 0.3;
 }
 
 .em-bn-co {
