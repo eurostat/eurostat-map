@@ -27,7 +27,6 @@
         "build/eurostatmap.min.js"
     ],
     "scripts": {
-        "preinstall": "npx npm-force-resolutions",
         "start": "webpack --config webpack/webpack.config.dev.js",
         "server": "webpack-dev-server --open --watch",
         "build-prod": "webpack --config webpack/webpack.config.prod.js",
@@ -44,7 +43,7 @@
         "simple-statistics": "^7.8.7",
         "topojson-client": "^3.1.0"
     },
-    "resolutions": {
+    "overrides": {
         "d3-color": "3.1.0"
     },
     "devDependencies": {
@@ -54,7 +53,6 @@
         "@babel/runtime": "^7.12.1",
         "babel-loader": "^9.1.2",
         "css-loader": "^7.1.2",
-        "npm-force-resolutions": "^0.0.10",
         "prettier": "^3.4.1",
         "style-loader": "^4.0.0",
         "webpack": "^5.88.1",
