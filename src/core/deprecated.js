@@ -103,6 +103,7 @@ export const defineDeprecatedFunctions = (out) => {
     out.frameStrokeWidth = (v)=> (console.warn('map.frameStrokeWidth() is now DEPRECATED. please use the .em-frame CSS class'),updateCSSRule('.em-frame','stroke-width',v), out);
 
    //other
+   out.psClassifMethod = (v) => (console.warn('psClassifMethod() is now DEPRECATED. please use psClassificationMethod instead'),out.psClassificationMethod_ = v, out);
     out.geoCenter = (v) => (console.warn('map.geoCenter() is now deprecated. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
     out.pixelSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.pixSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);

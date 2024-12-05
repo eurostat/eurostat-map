@@ -52,7 +52,7 @@ test('proportional symbol map', async () => {
             .psStroke('black')
             .psStrokeWidth(10)
 
-            .psclassificationMethod('threshold')
+            .psClassificationMethod('threshold')
             .psThreshold([10000, 20000, 30200, 40000, 50000])
             .psColors(['#2d50a0', '#6487c3', '#aab9e1', '#f0cd91', '#e6a532', '#d76e2d'].reverse())
 

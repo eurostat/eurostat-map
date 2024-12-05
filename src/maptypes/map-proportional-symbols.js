@@ -43,7 +43,7 @@ export const map = function (config) {
     //the threshold, when the classification method is 'threshold'
     out.psThreshold_ = [0]
     //the classification method
-    out.psclassificationMethod_ = 'quantile' // or: equinter, threshold
+    out.psClassificationMethod_ = 'quantile' // or: equinter, threshold
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //
@@ -81,7 +81,7 @@ export const map = function (config) {
         'psColors_',
         'psCustomSVG_',
         'psOffset_',
-        'psclassificationMethod_',
+        'psClassificationMethod_',
         'psClasses_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -112,7 +112,7 @@ export const map = function (config) {
             'psColors',
             'psCustomSVG',
             'psOffset',
-            'psclassificationMethod',
+            'psClassificationMethod',
             'psClasses',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
@@ -216,12 +216,12 @@ export const map = function (config) {
         // colour
         if (out.statData('color').getArray()) {
             //use suitable classification type for colouring
-            if (out.psclassificationMethod_ === 'quantile') {
+            if (out.psClassificationMethod_ === 'quantile') {
                 //https://github.com/d3/d3-scale#quantile-scales
                 const domain = out.statData('color').getArray()
                 const range = getA(out.psClasses_)
                 out.classifierColor(scaleQuantile().domain(domain).range(range))
-            } else if (out.psclassificationMethod_ === 'equinter') {
+            } else if (out.psClassificationMethod_ === 'equinter') {
                 //https://github.com/d3/d3-scale#quantize-scales
                 const domain = out.statData('color').getArray()
                 const range = getA(out.psClasses_)
@@ -231,7 +231,7 @@ export const map = function (config) {
                         .range(range)
                 )
                 if (out.makeClassifNice_) out.classifierColor().nice()
-            } else if (out.psclassificationMethod_ === 'threshold') {
+            } else if (out.psClassificationMethod_ === 'threshold') {
                 //https://github.com/d3/d3-scale#threshold-scales
                 out.psClasses(out.psThreshold().length + 1)
                 const range = getA(out.psClasses_)
