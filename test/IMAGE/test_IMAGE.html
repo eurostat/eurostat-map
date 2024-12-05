@@ -22,15 +22,23 @@
             basemap = function (id) {
                 return (
                     eurostatmap
-                        .map('ch')
+                        .map('choropleth')
                         .svgId(id)
                         .containerId(id)
-                        .pixSize(7400)
+                        .pixelSize(7400)
                         .width(mapWidth)
                         .height(mapHeight)
-                        .nutsLvl('mixed')
+                        .bottomText(null)
+                        .showSourceLink(false)
+                        .nutsLevel('mixed')
+                        //.nutsLevel(0)
+                        .classificationMethod('threshold')
+                        .drawGraticule(true)
+                        .graticuleStroke('#ccc')
+                        .graticuleStrokeWidth(0.5)
                         .geoCenter([4980000, 3610000])
                         .legend({
+                            ascending: false,
                             boxPadding: 5,
                             x: 10,
                             y: 200,
@@ -43,21 +51,25 @@
                             noData: true,
                             labels: [1, 2, 3, 4, 5, 6, 7],
                         })
+                        .drawCoastalMargin(false)
+                        .seaFillStyle('#E6FFFF')
+                        .cntrgFillStyle('#E6E6E6')
+                        .nutsrgFillStyle('#E6E6E6')
                         .nutsbnStroke({
                             0: '#000',
                             1: '#000',
                             2: '#000',
                             3: '#000',
-                            co: 'none',
+                            co: 'grey',
                         })
                         .noDataFillStyle('darkgrey')
-                        .nutsbnStrokeWidth({ 0: 0.5, 1: 0.3, 2: 0.3, 3: 0.3, oth: 1, co: 0 })
-                        .cntbnStrokeWidth({ eu: 0.5, efta: 0.5, cc: 0.5, oth: 0.5, co: 0 })
+                        .nutsbnStrokeWidth({ 0: 2, 1: 0.4, 2: 0.4, 3: 0.4, oth: 2, co: 0 })
+                        .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 2, co: 0.2 })
                         .bordersToShow(['eu', 'co', 'cc', 'efta'])
                         //.zoomExtent([1,10])
                         .showScalebar(true)
                         .scalebarPosition([420, 560])
-                        .nutsrgSelFillSty('#003E8C')
+                        .hoverColor('#003E8C')
 
                         //.labelling(true)
                         .labelsToShow(['seas', 'values', 'cc'])
@@ -67,10 +79,10 @@
 
                         // adjust regions to show
                         //.bordersToShow(["eu", "co","cc"])
-                        .nutsYear(2024)
-                    //.countriesToShow(['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 'ES', 'FI', 'FR', 'HR', 'HU', 'IE', 'IS', 'IT', 'LI', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'UK', 'RS']);
-                    // .colors(['#feedde', '#fdd0a2', '#fdae6b', '#fd8d3c', '#e6550d', '#a63603', '#999'])
-                    // .threshold([0, 5, 99999])
+                        .nutsYear(2016)
+                        //.countriesToShow(['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 'ES', 'FI', 'FR', 'HR', 'HU', 'IE', 'IS', 'IT', 'LI', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'UK', 'RS']);
+                        .colors(['#feedde', '#fdd0a2', '#fdae6b', '#fd8d3c', '#e6550d', '#a63603', '#999'])
+                        .threshold([0, 5, 99999])
                 )
             }
 
@@ -119,21 +131,16 @@
                 AL: 10,
                 TR: 10,
             }
-            // Randomize values between 1 and 100
-            for (let key in exampleData1) {
-                if (exampleData1.hasOwnProperty(key)) {
-                    exampleData1[key] = Math.floor(Math.random() * 100) + 1
-                }
-            }
+            let exampleData2 = { ES: 10 }
 
             // need to clone the config before it is used in a map build. eurostat-map changes this config internally, meaning any other maps that use it will be affected
             let clonedConfig = JSON.parse(JSON.stringify(insetsConfig))
 
-            // let map1 = basemap('mappy').insets(insetsConfig)
-            // map1.statData().setData(exampleData1)
-            // map1.build()
+            let map1 = basemap('mappy').insets(insetsConfig)
+            map1.statData().setData(exampleData1)
+            map1.build()
 
-            let map2 = basemap('mappy2').insets(false)
+            let map2 = basemap('mappy2').insets(clonedConfig)
             map2.statData().setData(exampleData1)
             map2.build()
 

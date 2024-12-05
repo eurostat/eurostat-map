@@ -60,14 +60,9 @@ Specify the NUTS geometries and the geographical extent of the map.
 
 It is also possible to build thematic world maps using eurostat-map. Simply pass "WORLD" to the map.geo() method. See [this example](https://github.com/eurostat/eurostat-map/blob/master/examples/world.html) for how to configure a world map.
 
-| Method                                     | Type          | Default value       | Description                                                                |
-| ------------------------------------------ | ------------- | ------------------- | -------------------------------------------------------------------------- |
-| _map_.**worldFillStyle**([*value*])        | string        | _'#E6E6E6'_         | The default fill colour for territories on a world map                     |
-| _map_.**worldStroke**([*value*])           | string        | _'black'_           | The default stroke colour of the borders for states on a world map.        |
-| _map_.**worldStrokeWidth**([*value*])      | number        | _1_                 | The default stroke width of the borders of states on a world map.          |
-| _map_.**worldCoastStroke**([*value*])      | string        | _'none'_            | The default stroke colour of the coastal borders of states on a world map. |
-| _map_.**worldCoastStrokeWidth**([*value*]) | number        | _0.3_               | The default stroke width of the coastal borders of states on a world map.  |
-| _map_.**projectionFunction**([*value*])    | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps     |
+| Method                                  | Type          | Default value       | Description                                                            |
+| --------------------------------------- | ------------- | ------------------- | ---------------------------------------------------------------------- |
+| _map_.**projectionFunction**([*value*]) | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps |
 
 ## Statistical data
 
@@ -167,13 +162,13 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('ch')
+    .map('choropleth')
     .title('Population in Europe')
     .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inhab./km²' })
     .classifMethod('threshold')
     .threshold([50, 75, 100, 150, 300, 850])
     .tooltipShowFlags(false)
-    .legend({ noData: false, labelDecNb: 0, x: 15, y: 160 })
+    .legend({ noData: false, decimals: 0, x: 15, y: 160 })
     .build()
 ```
 
@@ -190,21 +185,21 @@ eurostatmap
 
 In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
 
-| Parameter              | Type     | Default value                       | Description                                                                   |
-| ---------------------- | -------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| **ascending**          | String   | _true_                              | The legend cells order. Set to false to invert.                               |
-| **shapeWidth**         | int      | _15_                                | The cell width.                                                               |
-| **shapeHeight**        | int      | _13_                                | The cell heigth.                                                              |
-| **sepLineLength**      | int      | _17_                                | The separation line length.                                                   |
-| **sepLineStroke**      | int      | _"black"_                           | The separation line color.                                                    |
-| **sepLineStrokeWidth** | int      | _1_                                 | The separation line width.                                                    |
-| **labelFontSize**      | int      | _13_                                | The label font size.                                                          |
-| **labelDecNb**         | String   | _" - "_                             | The number of decimal for the legend labels.                                  |
-| **labelOffset**        | int      | _3_                                 | The distance between the legend box elements to the corresponding text label. |
-| **labelFormatter**     | Function | _d3.format("." + labelDecNb + "f")_ | A function used to format the values of the legend labels.                    |
-| **noData**             | boolean  | _true_                              | Show 'no data' style.                                                         |
-| **noDataText**         | Text     | _"No data"_                         | 'No data' text label.                                                         |
-| **labels**             | []       | _null_                              | Manually define the labels to be used in the legend as an array               |
+| Parameter              | Type     | Default value                     | Description                                                                   |
+| ---------------------- | -------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **ascending**          | String   | _true_                            | The legend cells order. Set to false to invert.                               |
+| **shapeWidth**         | int      | _15_                              | The cell width.                                                               |
+| **shapeHeight**        | int      | _13_                              | The cell heigth.                                                              |
+| **sepLineLength**      | int      | _17_                              | The separation line length.                                                   |
+| **sepLineStroke**      | int      | _"black"_                         | The separation line color.                                                    |
+| **sepLineStrokeWidth** | int      | _1_                               | The separation line width.                                                    |
+| **labelFontSize**      | int      | _13_                              | The label font size.                                                          |
+| **decimals**           | String   | _" - "_                           | The number of decimal for the legend labels.                                  |
+| **labelOffset**        | int      | _3_                               | The distance between the legend box elements to the corresponding text label. |
+| **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **noData**             | boolean  | _true_                            | Show 'no data' style.                                                         |
+| **noDataText**         | Text     | _"No data"_                       | 'No data' text label.                                                         |
+| **labels**             | []       | _null_                            | Manually define the labels to be used in the legend as an array               |
 
 ## Proportional symbol map
 
@@ -217,7 +212,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('ps')
+    .map('proportionalSymbol')
     .nutsLvl(1)
     .stat({
         eurostatDatasetCode: 'demo_r_pjangrp3',
@@ -274,44 +269,42 @@ As proportional symbol maps allow for two visual variables (size and colour), a 
 
 The following parameters are properties of the sizeLegend object:
 
-| Parameter          | Type     | Default value                       | Description                                                                                   |
-| ------------------ | -------- | ----------------------------------- | --------------------------------------------------------------------------------------------- |
-| **title**          | String   | _null_                              | Title of the size legend                                                                      |
-| **titlePadding**   | Number   | _10_                                | Padding between the legend title and legend body                                              |
-| **titleFontSize**  | Number   | _12_                                | Title font size in pixels                                                                     |
-| **values**         | Number   | _undefined_                         | Manually set the raw data values to be used in the legend                                     |
-| **cellNb**         | Number   | _4_                                 | Number of symbols to be shown in the legend (when values are not set manually)                |
-| **shapePadding**   | Number   | _10_                                | The padding between consecutive legend shape elements                                         |
-| **shapeOffset**    | Object   | _{x:0, y:0}_                        | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
-| **shapeFill**      | String   | _white_                             | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
-| **labelOffset**    | Number   | _25_                                | The distance between the legend box elements to the corresponding text label.                 |
-| **labelDecNb**     | Number   | _0_                                 | The number of decimals for each label.                                                        |
-| **labelFormatter** | Function | _d3.format("." + labelDecNb + "f")_ | A function used to format the values of the legend labels.                                    |
-| **noData**         | Boolean  | _false_                             | Show a 'no data' legend item in the size legend.                                              |
-| **noDataText**     | String   | _'No data'_                         | Text shown in the 'no data' legend item in the size legend.                                   |
+| Parameter          | Type     | Default value                     | Description                                                                                   |
+| ------------------ | -------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
+| **title**          | String   | _null_                            | Title of the size legend                                                                      |
+| **titlePadding**   | Number   | _10_                              | Padding between the legend title and legend body                                              |
+| **values**         | Number   | _undefined_                       | Manually set the raw data values to be used in the legend                                     |
+| **cellNb**         | Number   | _4_                               | Number of symbols to be shown in the legend (when values are not set manually)                |
+| **shapePadding**   | Number   | _10_                              | The padding between consecutive legend shape elements                                         |
+| **shapeOffset**    | Object   | _{x:0, y:0}_                      | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
+| **shapeFill**      | String   | _white_                           | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
+| **labelOffset**    | Number   | _25_                              | The distance between the legend box elements to the corresponding text label.                 |
+| **decimals**       | Number   | _0_                               | The number of decimals for each label.                                                        |
+| **labelFormatter** | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                    |
+| **noData**         | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
+| **noDataText**     | String   | _'No data'_                       | Text shown in the 'no data' legend item in the size legend.                                   |
 
 **colorLegend**
 
 The following parameters are properties of the colorLegend object:
 
-| Parameter              | Type     | Default value                       | Description                                                                   |
-| ---------------------- | -------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| **title**              | String   | _null_                              | Title of the size legend                                                      |
-| **titlePadding**       | Number   | _10_                                | Padding between the legend title and legend body                              |
-| **titleFontSize**      | Number   | _12_                                | Title font size in pixels                                                     |
-| **marginTop**          | Number   | _35_                                | Margin top in pixels. Distance between size and color legends                 |
-| **shapeWidth**         | Number   | _13_                                | The width of the legend box elements                                          |
-| **shapeHeight**        | Number   | _13_                                | The height of the legend box elements                                         |
-| **shapePadding**       | Number   | _10_                                | The padding between consecutive legend shape elements                         |
-| **shapePadding**       | Number   | _10_                                | The padding between consecutive legend shape elements                         |
-| **labelOffset**        | Number   | _25_                                | The distance between the legend box elements to the corresponding text label. |
-| **labelDecNb**         | Number   | _0_                                 | The number of decimals for each label.                                        |
-| **labelFormatter**     | Function | _d3.format("." + labelDecNb + "f")_ | A function used to format the values of the legend labels.                    |
-| **noData**             | Boolean  | _true_                              | Show a legend element that represents "no data" values.                       |
-| **noDataText**         | String   | _No data_                           | No data element label text.                                                   |
-| **sepLineLength**      | Number   | _17_                                | The length of the separation line between classes.                            |
-| **sepLineStroke**      | Number   | _black_                             | The colour of the separation line between classes.                            |
-| **sepLineStrokeWidth** | Number   | _1_                                 | The width of the separation line between classes.                             |
+| Parameter              | Type     | Default value                     | Description                                                                   |
+| ---------------------- | -------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **title**              | String   | _null_                            | Title of the size legend                                                      |
+| **titlePadding**       | Number   | _10_                              | Padding between the legend title and legend body                              |
+| **marginTop**          | Number   | _35_                              | Margin top in pixels. Distance between size and color legends                 |
+| **shapeWidth**         | Number   | _13_                              | The width of the legend box elements                                          |
+| **shapeHeight**        | Number   | _13_                              | The height of the legend box elements                                         |
+| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
+| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
+| **labelOffset**        | Number   | _25_                              | The distance between the legend box elements to the corresponding text label. |
+| **decimals**           | Number   | _0_                               | The number of decimals for each label.                                        |
+| **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **noData**             | Boolean  | _true_                            | Show a legend element that represents "no data" values.                       |
+| **noDataText**         | String   | _No data_                         | No data element label text.                                                   |
+| **sepLineLength**      | Number   | _17_                              | The length of the separation line between classes.                            |
+| **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
+| **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
 
 ## Proportional pie chart map
 
@@ -324,7 +317,7 @@ Example:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('pie')
+    .map('pieChart')
     .nutsLvl(1)
     .stat('Y_LT15', {
         eurostatDatasetCode: 'demo_r_pjanaggr3',
@@ -351,7 +344,7 @@ Or simpler:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('pie')
+    .map('pieChart')
     .nutsLvl(3)
     .nutsYear(2016)
     .stripeWidth(10)
@@ -437,7 +430,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('ct')
+    .map('categorical')
     .nutsYear(2013)
     .nutsLvl(3)
     .stat({
@@ -480,7 +473,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('chbi')
+    .map('bivariateChoropleth')
     .nutsLvl(2)
     .nutsYear(2016)
     .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
@@ -537,7 +530,7 @@ Example:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('scomp')
+    .map('stripeComposition')
     .nutsLvl(3)
     .nutsYear(2016)
     .stripeWidth(10)
@@ -567,7 +560,7 @@ Or simplier:
 ```javascript
 //population composition by age
 eurostatmap
-    .map('scomp')
+    .map('stripeComposition')
     .nutsLvl(3)
     .nutsYear(2016)
     .stripeWidth(10)
@@ -615,7 +608,7 @@ Example:
 
 ```javascript
 eurostatmap
-    .map('spark')
+    .map('sparkline')
     .nutsLvl(1)
     .statSpark(
         { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
@@ -645,33 +638,12 @@ eurostatmap
 
 Specify the map title, its style and position.
 
-| Method                                  | Type          | Default value | Description                                                                                            |
-| --------------------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
-| _map_.**title**([*value*])              | String        | ""            | The title text.                                                                                        |
-| _map_.**titleFontSize**([*value*])      | int           | 30            | The title font size.                                                                                   |
-| _map_.**titleFill**([*value*])          | String        | "black"       | The title text color.                                                                                  |
-| _map_.**titlePosition**([*value*])      | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
-| _map_.**titleFontWeight**([*value*])    | String        | "bold"        | The title font weight.                                                                                 |
-| _map_.**subtitle**([*value*])           | String        | ""            | The subtitle text.                                                                                     |
-| _map_.**subtitleFontSize**([*value*])   | int           | 30            | The subtitle font size.                                                                                |
-| _map_.**subtitleFontWeight**([*value*]) | String        | "bold"        | The subtitle text weight.                                                                              |
-| _map_.**subtitleFill**([*value*])       | String        | "black"       | The subtitle text color.                                                                               |
-| _map_.**subtitlePosition**([*value*])   | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
-
-## Map font
-
-| Method                          | Type   | Default value                    | Description                                                                    |
-| ------------------------------- | ------ | -------------------------------- | ------------------------------------------------------------------------------ |
-| _map_.**fontFamily**([*value*]) | String | _"Helvetica, Arial, sans-serif"_ | The font family to use for all map components (titles, legend, labelling etc.) |
-
-## Map frame
-
-Specify the style of the map frame (the rectangle around the map).
-
-| Method                                | Type   | Default value | Description                |
-| ------------------------------------- | ------ | ------------- | -------------------------- |
-| _map_.**frameStroke**([*value*])      | Color  | "#222"        | Color of the map frame     |
-| _map_.**frameStrokeWidth**([*value*]) | number | 2             | The map frame stroke width |
+| Method                                | Type          | Default value | Description                                                                                            |
+| ------------------------------------- | ------------- | ------------- | ------------------------------------------------------------------------------------------------------ |
+| _map_.**title**([*value*])            | String        | ""            | The title text.                                                                                        |
+| _map_.**titlePosition**([*value*])    | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
+| _map_.**subtitle**([*value*])         | String        | ""            | The subtitle text.                                                                                     |
+| _map_.**subtitlePosition**([*value*]) | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
 
 ## Map legend
 
@@ -683,26 +655,20 @@ Example:
 map = eurostatmap.map(...)
 	.legend({
 		title: "Legend (%)",
-		titleFontSize: "12",
 		x: 10, y: 120,
-		boxFill: "darkgray",
+		boxOpacity: 1,
+        boxPadding: 10
 	});
 ```
 
-| Parameter           | Type   | Default value | Description                                                                                                            |
-| ------------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **svgId**           | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
-| **x**               | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
-| **y**               | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
-| **boxMargin**       | number | _10_          | The legend box margin, in pixel.                                                                                       |
-| **boxPadding**      | number | _7_           | The legend box padding, in pixel.                                                                                      |
-| **boxCornerRad**    | number | _7_           | The legend box corner radius, in pixel.                                                                                |
-| **boxFill**         | color  | _"white"_     | The legend box fill style.                                                                                             |
-| **boxOpacity**      | number | _0.7_         | The legend box opacity, from 0 to 1.                                                                                   |
-| **fontFill**        | Color  | _"black"_     | The legend font color.                                                                                                 |
-| **title**           | Text   | _""_          | The legend title.                                                                                                      |
-| **titleFontSize**   | int    | _15_          | The legend title font size.                                                                                            |
-| **titleFontWeight** | String | _"normal"_    | The legend title font weight.                                                                                          |
+| Parameter      | Type   | Default value | Description                                                                                                            |
+| -------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **svgId**      | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
+| **title**      | Text   | _""_          | The legend title.                                                                                                      |
+| **x**          | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
+| **y**          | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
+| **boxOpacity** | number | _0.7_         | The legend box opacity, from 0 to 1. Sets opacity of em-legend-background                                              |
+| **boxPadding** | number | _0.7_         | The legend box padding. Sets padding of em-legend-background                                                           |
 
 ## Scalebar
 
@@ -740,7 +706,7 @@ map = eurostatmap.map(...)
 		transitionDuration: 200,
 		xOffset: 30,
 		yOffset: 20,
-		textFunction: (rg => { return rg.properties.na;  }) //rg is the hovered NUTS2JSON feature
+		textFunction: (feature => { return feature.properties.na;  })
 		showFlags: false
 	});
 ```
@@ -762,25 +728,15 @@ map = eurostatmap.map(...)
 
 ## Styling
 
-Specify specific map styles.
+Specify specific map styles. As of V4, styles have been moved to CSS classes. See [css.md](./css.md) for a list of CSS rules.
+See deprecated.js for deprecated functions and their successors.
 
-| Method                                    | Type    | Default value                                                        | Description                                                                                                                                              |
-| ----------------------------------------- | ------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**nutsrgFillStyle**([*value*])      | String  | _"#eee"_                                                             | The fill style of the NUTS regions, used for proportional symbol maps only.                                                                              |
-| _map_.**nutsrgSelFillSty**([*value*])     | String  | _"#purple"_                                                          | The fill style of the selected NUTS regions.                                                                                                             |
-| _map_.**nutsbnStroke**([*value*])         | Object  | _{0:"#777", 1:"#777", 2:"#777", 3:"#777", oth:"#444", co:"#1f78b4"}_ | The stroke style of the NUTS boundaries, depending on the NUTS level, if it is a border with another country (_'oth'_) and if it is coastal (_'co'_)     |
-| _map_.**nutsbnStrokeWidth**([*value*])    | Object  | _{0:0, 1:0.2, 2:0.2, 3:0.2, oth:1, co:1}_                            | The stroke width of the NUTS boundaries, depending on the NUTS level, if it is a border with another country (_'oth'_) and if it is coastal (_'co'_).    |
-| _map_.**cntrgFillStyle**([*value*])       | Color   | _"#f5f5f5"_                                                          | The fill style of the country areas.                                                                                                                     |
-| _map_.**cntbnStroke**([*value*])          | Color   | _{0:"#777", 1:"#777", 2:"#777", 3:"#777", oth:"#444", co:"#1f78b4"}_ | The stroke style of the country boundaries.                                                                                                              |
-| _map_.**cntbnStrokeWidth**([*value*])     | Number  | _{0:1, 1:0.2, 2:0.2, 3:0.2, oth:1, co:1}_                            | The stroke width of the country boundaries.                                                                                                              |
-| _map_.**seaFillStyle**([*value*])         | String  | _"white"_                                                            | The fill style of the sea areas.                                                                                                                         |
-| _map_.**drawCoastalMargin**([*value*])    | boolean | _true_                                                               | Set to true to show a coastal blurry margin. False otherwise.                                                                                            |
-| _map_.**coastalMarginColor**([*value*])   | String  | _"#c2daed"_                                                          | The color of the coastal blurry margin.                                                                                                                  |
-| _map_.**coastalMarginWidth**([*value*])   | number  | _5_                                                                  | The width of the coastal blurry margin.                                                                                                                  |
-| _map_.**coastalMarginStdDev**([*value*])  | number  | _2_                                                                  | The standard deviation of the coastal blurry margin.                                                                                                     |
-| _map_.**drawGraticule**([*value*])        | boolean | _false_                                                              | Set to true to show the graticule (meridian and parallel lines). False otherwise. Calls to this method after the map is built will update the graticule. |
-| _map_.**graticuleStroke**([*value*])      | String  | _"lightgray"_                                                        | The stroke style of the graticule.                                                                                                                       |
-| _map_.**graticuleStrokeWidth**([*value*]) | number  | _1_                                                                  | The stroke width of the graticule.                                                                                                                       |
+| Method                                   | Type    | Default value | Description                                                                                                                                              |
+| ---------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**hoverColor**([*value*])          | String  | _"#purple"_   | The fill style of the selected NUTS regions.                                                                                                             |
+| _map_.**drawCoastalMargin**([*value*])   | boolean | _true_        | Set to true to show a coastal blurry margin. False otherwise.                                                                                            |
+| _map_.**coastalMarginStdDev**([*value*]) | number  | _2_           | The standard deviation of the coastal blurry margin.                                                                                                     |
+| _map_.**drawGraticule**([*value*])       | boolean | _false_       | Set to true to show the graticule (meridian and parallel lines). False otherwise. Calls to this method after the map is built will update the graticule. |
 
 ## Labelling
 
@@ -790,13 +746,8 @@ Labels for country names, country codes, and/or seas can be added to the map. La
 | ---------------------------------------- | -------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | _map_.**labelling**([*value*])           | Boolean  | _false_                                                                                 | Whether or not to show geographic name labels on the map.                                                                                                                                                                                                                                                    |
 | _map_.**labelsToShow**([*value*])        | Array    | _["countries","seas"]_                                                                  | The types of labels to show on the map. Accepted values are: "countries","seas","cc","values". ("countries" show the full names of each country, "cc" stands for country codes and "values" show the statistical values for each NUTS region. NOTE: "values" only applies to the choropleth map type ("ch"). |
-| _map_.**labelValuesFontSize**([*value*]) | Number   | _10_                                                                                    | For when labelsToShow includes "values". The font size of the labels for the statistical values.                                                                                                                                                                                                             |
-| _map_.**labelFill**([*value*])           | Object   | _{"seas":"#003399", "countries":"#383838", "cc":"black", "values":"black"}_             | The colours of the labels.                                                                                                                                                                                                                                                                                   |
-| _map_.**labelOpacity**([*value*])        | Object   | _{"seas":1, "countries":0.8}_                                                           | The opacity of the labels.                                                                                                                                                                                                                                                                                   |
 | _map_.**labelShadow**([*value*])         | Boolean  | _false_                                                                                 | Whether or not to add shadows to the labels.                                                                                                                                                                                                                                                                 |
 | _map_.**labelShadowsToShow**([*value*])  | Array    | ["countries","seas", "cc", "values"]                                                    | Which label types will have shadows (halos).                                                                                                                                                                                                                                                                 |
-| _map_.**labelShadowWidth**([*value*])    | Object   | _{ "seas": 3, "countries": 3, "cc": 3, "values": 3 }_                                   | The width of the shadow added to each type of label.                                                                                                                                                                                                                                                         |
-| _map_.**labelShadowColor**([*value*])    | Object   | _{ "seas": "white", "countries": "white", "cc": "white", "values": "white" }_           | The color of the shadow added to each type of label.                                                                                                                                                                                                                                                         |
 | _map_.**statLabelsPositions**([*value*]) | Object   | _{ "regionId": {x:number, y:number} }_                                                  | Override the positions of statistical labels. Define the x and y position of the statistical value label for each region. If the region is not found here, the label is positioned at the centroid of the region.                                                                                            |
 | _map_.**labelFilterFunction**([*value*]) | Function | _`(rg, map) => rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo*[1]`* | Filter the regions used for the labels.                                                                                                                                                                                                                                                                      |
 
@@ -816,11 +767,10 @@ To specify more precisely which insets to show, their geographical extent, scale
 ```javascript
 eurostatmap.map(...)
 	.insets(
-		{ geo:"MT", scale:"01M", pixSize:3000, title:"Martinique", titleFontSize:16, width:200, height:90, x:0, y:0 },
-		{ geo:"GF", scale:"03M", pixSize:10000, title:"French Guyana", titleFontSize:16, width:200, height:90, x:210, y:0 }
+		{ geo:"MQ", scale:"01M", position: { z: 1000 }, title:"Martinique", width:200, height:90, x:0, y:0 },
+		{ geo:"GF", scale:"03M", position: { z: 9000 }, title:"French Guyana", width:200, height:90, x:210, y:0 }
 	)
 	.insetBoxPosition([335,345]);
-);
 ```
 
 See also [this example with a focus on Spain](https://eurostat.github.io/eurostat-map/examples/spain.html) (see [the code](../examples/spain.html)).
@@ -836,18 +786,15 @@ Note that a map inset is built as a proper map within a map: It has all properti
 | _map_.**insetZoomExtent**([*value*])  | Array  | _null_        | The zoom extent of inset maps. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both. |
 | _map_.**insetScale**([*value*])       | String | _"03M"_       | The default scale of the insets.                                                                                                                                                                                                                             |
 
-## Bottom text & link to source data
+## Footnotes
 
 Specify the text to be shown at the bottom of the map.
 
-| Method                                 | Type    | Default value                   | Description                                                                                                                          |
-| -------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| _map_.**bottomText**([*value*])        | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
-| _map_.**botTxtFontSize**([*value*])    | int     | _12_                            | The font size.                                                                                                                       |
-| _map_.**botTxtFill**([*value*])        | String  | _"black"_                       | The text color.                                                                                                                      |
-| _map_.**botTxtPadding**([*value*])     | number  | _10_                            | The padding, in pixel.                                                                                                               |
-| _map_ .**botTxtTooltipTxt**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the bottom text. Set to _null_ if no tooltip has to be shown.                  |
-| _map_ .**showSourceLink**([*value*])   | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
+| Method                                    | Type    | Default value                   | Description                                                                                                                          |
+| ----------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
+| _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                     |
+| _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
 
 ## Export
 
@@ -860,15 +807,15 @@ Export the map as a PNG image or a SVG file.
 
 ## Miscellaneous
 
-| Method                                    | Type     | Default value         | Description                                                                                                                                                                                                                                                                                                                                                         |
-| ----------------------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**noDataText**([*value*])           | String   | _"No data available"_ | The text to show for regions where no data is available.                                                                                                                                                                                                                                                                                                            |
-| _map_.**lg**([*value*])                   | String   | _"en"_                | The language code, for multilingual maps.                                                                                                                                                                                                                                                                                                                           |
-| _map_.**transitionDuration**([*value*])   | int      | _800_                 | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms.                                                                                                                                                                                                                                 |
-| _map_.**filtersDefinitionFun**([*value*]) | Function | _function() {}_       | A function defining SVG filter elements. To be used to defined fill patterns.                                                                                                                                                                                                                                                                                       |
-| _map_.**callback**([*value*])             | Function | _undefined_           | A function to execute after the map build is complete.                                                                                                                                                                                                                                                                                                              |
-| _map_.**getTime**()                       | String   | -                     | Return the _time_ parameter of the statistical data. When a filter such as _{ lastTimePeriod : 1 }_ is used, this method allows a retrieval of the map timestamp.                                                                                                                                                                                                   |
-| _map_.**setFromURL**()                    | _this_   | -                     | Set some map parameters based on URL parameters: "w" for width, "h" for height, "x" for xGeoCenter, "y" for yGeoCenter, "z" for pixGeoSize, "s" for scale, "lvl" for nuts level, "time" for time, "proj" for the CRS, "geo" for the geographical territory, "ny" for the NUTS version, "lg" for the langage, "sl" to show legend, "clnb" for the number of classes. |
+| Method                                         | Type     | Default value         | Description                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------------------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**noDataText**([*value*])                | String   | _"No data available"_ | The text to show for regions where no data is available.                                                                                                                                                                                                                                                                                                            |
+| _map_.**language**([*value*])                  | String   | _"en"_                | The language code, for multilingual maps.                                                                                                                                                                                                                                                                                                                           |
+| _map_.**transitionDuration**([*value*])        | int      | _800_                 | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms.                                                                                                                                                                                                                                 |
+| _map_.**filtersDefinitionFunction**([*value*]) | Function | _function() {}_       | A function defining SVG filter elements. To be used to defined fill patterns.                                                                                                                                                                                                                                                                                       |
+| _map_.**callback**([*value*])                  | Function | _undefined_           | A function to execute after the map build is complete.                                                                                                                                                                                                                                                                                                              |
+| _map_.**getTime**()                            | String   | -                     | Return the _time_ parameter of the statistical data. When a filter such as _{ lastTimePeriod : 1 }_ is used, this method allows a retrieval of the map timestamp.                                                                                                                                                                                                   |
+| _map_.**setFromURL**()                         | _this_   | -                     | Set some map parameters based on URL parameters: "w" for width, "h" for height, "x" for xGeoCenter, "y" for yGeoCenter, "z" for pixGeoSize, "s" for scale, "lvl" for nuts level, "time" for time, "proj" for the CRS, "geo" for the geographical territory, "ny" for the NUTS version, "lg" for the langage, "sl" to show legend, "clnb" for the number of classes. |
 
 ## Build and update
 

@@ -1,8 +1,8 @@
 import { scaleSqrt } from 'd3-scale'
 import { select, arc, pie, extent, sum, selectAll } from 'd3'
 import { interpolateOrRd, schemeCategory10 } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgpc from '../legend/legend-piecharts'
+import * as StatMap from '../core/stat-map'
+import * as PiechartLegend from '../legend/legend-piecharts'
 
 /**
  * Returns a proportional pie chart map.
@@ -11,7 +11,7 @@ import * as lgpc from '../legend/legend-piecharts'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config, true)
+    const out = StatMap.statMap(config, true)
 
     // pie charts
     out.pieMinRadius_ = 5
@@ -214,56 +214,43 @@ export const map = function (config) {
         out.catLabels_ = out.catLabels_ || {}
 
         //build and assign pie charts to the regions
-        //collect nuts ids from g elements. TODO: find better way of getting IDs
-        let nutsIds = []
+        //collect nuts ids from g elements. TODO: find better way of sharing regions with pies
+        let regionFeatures = []
         if (out.svg_) {
             let s = out.svg_.selectAll('#g_ps')
             if (s) {
-                let sym = s.selectAll('g.symbol')
-                sym.append('g').attr('id', (rg) => {
-                    nutsIds.push(rg.properties.id)
-                    return 'pie_' + rg.properties.id
-                })
+                let sym = s.selectAll('g.em-symbol')
+                sym.append('g')
+                    .attr('class', 'em-pie')
+                    .attr('id', (rg) => {
+                        regionFeatures.push(rg)
+                        return 'pie_' + rg.properties.id
+                    })
 
                 // set region hover function
-                let selector = out.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+                let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+                if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
                 let regions = out.svg().selectAll(selector)
                 regions
                     .on('mouseover', function (e, rg) {
-                        if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                            if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                                const sel = select(this)
-                                sel.attr('fill___', sel.attr('fill'))
-                                sel.attr('fill', out.nutsrgSelFillSty_)
-                                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                            }
-                        } else {
-                            const sel = select(this)
-                            sel.attr('fill___', sel.attr('fill'))
-                            sel.attr('fill', out.nutsrgSelFillSty_)
-                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                        }
+                        const sel = select(this)
+                        sel.attr('fill___', sel.style('fill'))
+                        sel.style('fill', out.hoverColor_)
+                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                     })
                     .on('mousemove', function (e, rg) {
-                        if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                            if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                                if (out._tooltip) out._tooltip.mousemove(e)
-                            }
-                        } else {
-                            if (out._tooltip) out._tooltip.mousemove(e)
-                        }
+                        if (out._tooltip) out._tooltip.mousemove(e)
                     })
                     .on('mouseout', function () {
                         const sel = select(this)
-                        let currentFill = sel.attr('fill')
                         let newFill = sel.attr('fill___')
                         if (newFill) {
-                            sel.attr('fill', sel.attr('fill___'))
+                            sel.style('fill', sel.attr('fill___'))
                             if (out._tooltip) out._tooltip.mouseout()
                         }
                     })
 
-                addPieChartsToMap(nutsIds)
+                addPieChartsToMap(regionFeatures)
             }
         }
         return out
@@ -330,7 +317,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         let totals = []
-        let sel = out.svg().selectAll('#g_ps').selectAll('g.symbol').data()
+        let sel = out.svg().selectAll('#g_ps').selectAll('g.em-symbol').data()
 
         sel.forEach((rg) => {
             let id = rg.properties.id
@@ -382,11 +369,12 @@ export const map = function (config) {
         return sum
     }
 
-    function addPieChartsToMap(ids) {
-        ids.forEach((nutsid) => {
+    function addPieChartsToMap(regionFeatures) {
+        regionFeatures.forEach((region) => {
+            const regionId = region.properties.id
             //prepare data for pie chart
             const data = []
-            const comp = getComposition(nutsid)
+            const comp = getComposition(regionId)
             for (const key in comp) data.push({ code: key, value: comp[key] })
 
             //case of regions with no data
@@ -396,10 +384,10 @@ export const map = function (config) {
 
             //create svg for pie chart
             // can be more than one center point for each nuts ID (e.g. Malta when included in insets)
-            let nodes = out.svg().selectAll('#pie_' + nutsid)
+            let nodes = out.svg().selectAll('#pie_' + regionId)
 
             // define radius
-            const r = out.sizeClassifier_(getRegionTotal(nutsid))
+            const r = out.sizeClassifier_(getRegionTotal(regionId))
             const ir = out.pieChartInnerRadius_
 
             //make pie chart. See https://observablehq.com/@d3/pie-chart
@@ -414,17 +402,37 @@ export const map = function (config) {
                 .selectAll('path')
                 .data(pie_(data))
                 .join('path')
-                .attr('fill', (d) => {
+                .style('fill', (d) => {
+                    return out.catColors_[d.data.code] || 'lightgray'
+                })
+                .attr('fill___', (d) => {
                     return out.catColors_[d.data.code] || 'lightgray'
                 })
                 .attr('code', (d) => d.data.code) //for mouseover legend highlighting function
                 .attr('d', arc().innerRadius(ir).outerRadius(r))
+                .on('mouseover', function (e, rg) {
+                    const sel = select(this)
+                    // Apply a thick stroke width to the parent element
+                    const parent = select(sel.node().parentNode)
+                    parent.style('stroke-width', '2px').style('stroke', 'black') // Set stroke
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(region, out))
+                })
+                .on('mousemove', function (e, rg) {
+                    if (out._tooltip) out._tooltip.mousemove(e)
+                })
+                .on('mouseout', function () {
+                    const sel = select(this)
+                    // Reset stroke
+                    const parent = select(sel.node().parentNode)
+                    parent.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_) // Set stroke
+                    if (out._tooltip) out._tooltip.mouseout()
+                })
         })
     }
 
     //@override
     out.getLegendConstructor = function () {
-        return lgpc.legend
+        return PiechartLegend.legend
     }
 
     //specific tooltip text function
@@ -438,20 +446,12 @@ export const map = function (config) {
 
         if (rg.properties.id) {
             //name and code
-            tp.append('div').html(
-                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                    rg.properties.na +
-                    ' (' +
-                    rg.properties.id +
-                    ') </div>'
-            )
+            tp.append('div')
+                .attr('class', 'estat-vis-tooltip-bar')
+                .html(rg.properties.na + ' (' + rg.properties.id + ')')
         } else {
             //region name
-            tp.append('div').html(
-                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                    rg.properties.na +
-                    '</div>'
-            )
+            tp.append('div').attr('class', 'estat-vis-tooltip-bar').html(rg.properties.na)
         }
 
         //prepare data for pie chart
@@ -475,8 +475,10 @@ export const map = function (config) {
         const radius = Math.min(width, height) / 2 - margin
 
         //width = tp.node().getBoundingClientRect().width
-        const svg = tp
+        const container = tp.append('div').attr('class', 'em-tooltip-piechart-container')
+        const svg = container
             .append('svg')
+            .attr('class', 'em-tooltip-piechart-svg')
             .attr('viewbox', `0, 0, ${width}, ${height}`)
             .attr('width', width)
             .attr('height', height - margin / 2)
@@ -503,7 +505,7 @@ export const map = function (config) {
             .enter()
             .append('path')
             .attr('d', innerArc)
-            .attr('fill', (d) => {
+            .style('fill', (d) => {
                 return out.catColors()[d.data.code] || 'lightgray'
             })
             .attr('stroke', 'white')
@@ -553,28 +555,26 @@ export const map = function (config) {
             .style('font-size', '12px')
 
         // add region values to tooltip
-        let breakdownDiv = document.createElement('div')
-        breakdownDiv.style.padding = '10px'
-        breakdownDiv.style.paddingTop = '0px'
-        breakdownDiv.style.fontSize = '13px'
-        //let units = out.statData(out.statCodes_[0]).unitText();
+        let breakdownDiv = tp.append('div').attr('class', 'em-tooltip-piechart-breakdown')
 
         // show value for each category
         for (let i = 0; i < out.statCodes_.length; i++) {
-            //retrieve code and stat value
+            // retrieve code and stat value
             const sc = out.statCodes_[i]
             const s = out.statData(sc).get(rg.properties.id)
-            if (s && s.value) {
-                let string = '<strong>' + out.catLabels_[sc] + '</strong>: ' + s.value.toFixed() + '<br>'
-                breakdownDiv.innerHTML = breakdownDiv.innerHTML + string
+
+            // check if s and s.value are valid (handle null, undefined, or 0)
+            if (s && s.value !== undefined && s.value !== null) {
+                let string = `<strong>${out.catLabels_[sc]}</strong>: ${s.value.toFixed()}<br>`
+                breakdownDiv.html(breakdownDiv.html() + string) // safely update the HTML
             }
         }
 
-        //write total
+        // write total (handle null, undefined, or 0 values for total)
         let total = getRegionTotal(rg.properties.id)
-        breakdownDiv.innerHTML = breakdownDiv.innerHTML + `<strong>Total</strong>: ${total.toFixed()} <br>`
-        // append div to tooltip
-        tp.node().appendChild(breakdownDiv)
+        if (total !== undefined && total !== null) {
+            breakdownDiv.html(breakdownDiv.html() + `<strong>Total</strong>: ${total.toFixed()}<br>`)
+        }
     }
 
     return out

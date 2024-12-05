@@ -1,20 +1,9 @@
-import { flags } from './utils'
-import * as mt from './map-template'
-import * as sd from './stat-data'
-import * as lg from './legend'
+import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL } from './utils'
+import * as MapTemplate from './map-template'
+import * as StatisticalData from './stat-data'
+import * as Legend from '../legend/legend'
 import { select } from 'd3'
-import { spaceAsThousandSeparator } from './utils'
-
-/**
- * Default function for tooltip text, for statistical maps.
- * It simply shows the name and code of the region and the statistical value.
- *
- * @param {*} rg The region to show information on.
- * @param {*} map The map element
- */
-const defaultTooltipTextFunction = () => {
-    //
-}
+import * as tp from '../tooltip/tooltip'
 
 /**
  * An abstract statistical map: A map template with statistical data, without any particular styling rule.
@@ -23,12 +12,12 @@ const defaultTooltipTextFunction = () => {
  */
 export const statMap = function (config, withCenterPoints) {
     //build stat map from map template
-    const out = mt.mapTemplate(config, withCenterPoints)
+    const out = MapTemplate.mapTemplate(config, withCenterPoints)
 
     //statistical data
 
     //the statistical data configuration.
-    //A map can have several stat datasets. This is a dictionnary of all stat configuration
+    //A map can have several stat datasets. This is a dictionary of all stat configuration
     out.stat_ = { default: undefined }
     out.stat = function (k, v) {
         //no argument: getter - return the default stat
@@ -45,8 +34,14 @@ export const statMap = function (config, withCenterPoints) {
         return out
     }
 
-    //the statistical data, retrieved from the config information. As a dictionnary.
-    out.statData_ = { default: sd.statData(), color: sd.statData(), size: sd.statData(), v1: sd.statData(), v2: sd.statData() }
+    //the statistical data, retrieved from the config information. As a dictionary.
+    out.statData_ = {
+        default: StatisticalData.statData(),
+        color: StatisticalData.statData(),
+        size: StatisticalData.statData(),
+        v1: StatisticalData.statData(),
+        v2: StatisticalData.statData(),
+    }
     out.statData = function (k, v) {
         //no argument: getter - return the default statData
         if (!arguments.length) return out.statData_['default']
@@ -60,13 +55,13 @@ export const statMap = function (config, withCenterPoints) {
     //test for no data case
     out.noDataText_ = 'No data available'
     //langage (currently used only for eurostat data API)
-    out.lg_ = 'en'
+    out.language_ = 'en'
     //transition time for rendering
     out.transitionDuration_ = 500
     //specific tooltip text function
-    out.tooltip_.textFunction = defaultTooltipTextFunction
+    out.tooltip_.textFunction = undefined
     //for maps using special fill patterns, this is the function to define them in the SVG image - See functions: getFillPatternLegend and getFillPatternDefinitionFun
-    out.filtersDefinitionFun_ = undefined
+    out.filtersDefinitionFunction_ = undefined
     //a callback function to execute after the map build is complete.
     out.callback_ = undefined
 
@@ -86,10 +81,10 @@ export const statMap = function (config, withCenterPoints) {
         'legend_',
         'legendObj_',
         'noDataText_',
-        'lg_',
+        'language_',
         'transitionDuration_',
         'tooltipText_',
-        'filtersDefinitionFun_',
+        'filtersDefinitionFunction_',
         'callback_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -116,39 +111,48 @@ export const statMap = function (config, withCenterPoints) {
      * This method should be called once, preferably after the map attributes have been set to some initial values.
      */
     out.build = function () {
-        if (out.projectionFunction_) out.proj('4326') //when using custom d3 projection function always request WGS84
+        if (out.projectionFunction_) out.proj('4326') //when using custom d3 projection function always request NUTS2JSON in WGS84
 
         //build map template base
         out.buildMapTemplateBase()
 
         //add additional filters for fill patterns for example
-        if (out.filtersDefinitionFun_) {
-            out.filtersDefinitionFun_(out.svg(), out.clnb_)
+        if (out.filtersDefinitionFunction_) {
+            out.filtersDefinitionFunction_(out.svg(), out.numberOfClasses_)
         }
 
         //legend element
         if (out.legend()) {
             //create legend object
             out.legendObj(out.getLegendConstructor()(out, out.legend()))
-            const lg = out.legendObj()
+            const legend = out.legendObj()
 
             //get legend svg. If it does not exist, create it embeded within the map
-            let lgSvg = select('#' + lg.svgId)
-            if (lgSvg.size() == 0) {
+            let legendSvg = select('#' + legend.svgId)
+            if (legendSvg.size() == 0) {
                 //get legend position
-                const x = lg.x == undefined ? out.width() - 100 - lg.boxPadding : lg.x
-                const y = lg.y == undefined ? lg.boxPadding : lg.y
+                const x = legend.x == undefined ? out.width() - 100 - legend.boxPadding : legend.x
+                const y = legend.y == undefined ? legend.boxPadding : legend.y
 
                 //build legend SVG in a new group
                 out.svg()
                     .append('g')
-                    .attr('class', 'legend')
+                    .attr('class', 'em-legend')
                     .attr('transform', 'translate(' + x + ',' + y + ')')
                     .append('svg')
-                    .attr('id', lg.svgId)
+                    .attr('id', legend.svgId)
             }
 
-            lg.build()
+            legend.build()
+        }
+
+        //define tooltip
+        //prepare map tooltip
+        if (out.tooltip_) {
+            out._tooltip = tp.tooltip(out.tooltip_)
+        } else {
+            //no config specified, use default
+            out._tooltip = tp.tooltip()
         }
 
         //launch geo data retrieval
@@ -206,17 +210,17 @@ export const statMap = function (config, withCenterPoints) {
             }
 
             //build stat data object from stat configuration and store it
-            const statData = sd.statData(out.stat(statKey))
+            const statData = StatisticalData.statData(out.stat(statKey))
             out.statData(statKey, statData)
 
             //launch query
-            let nl = out.nutsLvl_
-            if (out.nutsLvl_ == 'mixed') {
+            let nl = out.nutsLevel_
+            if (out.nutsLevel_ == 'mixed') {
                 nl = 0
             }
-            statData.retrieveFromRemote(nl, out.lg(), () => {
+            statData.retrieveFromRemote(nl, out.language(), () => {
                 //if geodata has not been loaded, wait again
-                if (!out.isGeoReady()) return
+                if (!out.Geometries.isGeoReady()) return
                 //if stat datasets have not all been loaded, wait again
                 if (!isStatDataReady()) return
 
@@ -273,7 +277,7 @@ export const statMap = function (config, withCenterPoints) {
      */
     out.getLegendConstructor = function () {
         console.log('Map getLegendConstructor function not implemented')
-        return lg.legend
+        return Legend.legend
     }
 
     /**
@@ -288,16 +292,16 @@ export const statMap = function (config, withCenterPoints) {
     /**
      * Set some map attributes based on the following URL parameters:
      * "w":width, "h":height, "x":xGeoCenter, "y":yGeoCenter, "z":pixGeoSize, "s":scale, "lvl":nuts level, "time":time,
-     * "proj":CRS, "geo":geo territory, "ny":nuts version, "lg":langage, "clnb":class number
+     * "proj":CRS, "geo":geo territory, "ny":nuts version, "language":langage, "numberOfClasses":class number
      */
     out.setFromURL = function () {
         const opts = getURLParameters()
         if (opts.w) out.width(opts.w)
         if (opts.h) out.height(opts.h)
         if (opts.x && opts.y) out.geoCenter([opts.x, opts.y])
-        if (opts.z) out.pixSize(opts.z)
+        if (opts.z) out.pixelSize(opts.z)
         if (opts.s) out.scale(opts.s)
-        if (opts.lvl) out.nutsLvl(opts.lvl)
+        if (opts.lvl) out.nutsLevel(opts.lvl)
         if (opts.time) {
             out.filters_.time = opts.time
             delete out.filters_.lastTimePeriod
@@ -305,8 +309,8 @@ export const statMap = function (config, withCenterPoints) {
         if (opts.proj) out.proj(opts.proj)
         if (opts.geo) out.geo(opts.geo)
         if (opts.ny) out.nutsYear(opts.ny)
-        if (opts.lg) out.lg(opts.lg)
-        if (opts.clnb) out.clnb(+opts.clnb)
+        if (opts.language) out.language(opts.language)
+        if (opts.numberOfClasses) out.numberOfClasses(+opts.numberOfClasses)
         return out
     }
 
@@ -316,14 +320,35 @@ export const statMap = function (config, withCenterPoints) {
      *
      */
     out.exportMapToSVG = function () {
-        let svgBlob = serialize(out.svg_.node())
-        var svgUrl = URL.createObjectURL(svgBlob)
-        var downloadLink = document.createElement('a')
+        // Clone the original SVG node to avoid modifying the DOM
+        const svgNodeClone = out.svg_.node().cloneNode(true)
+        // Add XML namespaces if not already present
+        if (!svgNodeClone.hasAttribute('xmlns')) {
+            svgNodeClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        }
+        if (!svgNodeClone.hasAttribute('xmlns:xlink')) {
+            svgNodeClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+        }
+
+        // Temporarily append the clone to the document to compute styles
+        document.body.appendChild(svgNodeClone)
+
+        // Convert CSS to inline styles before saving the SVG
+        applyInlineStylesFromCSS(svgNodeClone)
+
+        // Remove the cloned SVG from the document after applying styles
+        document.body.removeChild(svgNodeClone)
+
+        const svgUrl = getDownloadURL(svgNodeClone)
+
+        // Create a download link and trigger download
+        const downloadLink = document.createElement('a')
         downloadLink.href = svgUrl
         downloadLink.download = 'eurostatmap.svg'
         document.body.appendChild(downloadLink)
         downloadLink.click()
         document.body.removeChild(downloadLink)
+
         return out
     }
 
@@ -332,70 +357,64 @@ export const statMap = function (config, withCenterPoints) {
      * @description Exports the current map with styling to PNG and downloads it
      *
      */
-    out.exportMapToPNG = function () {
-        let canvasPromise = rasterize(out.svg_.node())
-        canvasPromise.then((canvasBlob) => {
-            var canvasUrl = URL.createObjectURL(canvasBlob)
-            var downloadLink = document.createElement('a')
-            downloadLink.href = canvasUrl
-            downloadLink.download = 'eurostatmap.png'
-            document.body.appendChild(downloadLink)
-            downloadLink.click()
-            document.body.removeChild(downloadLink)
-        })
+    out.exportMapToPNG = function (width, height) {
+        const svgNodeClone = out.svg_.node().cloneNode(true)
+        // Convert CSS to inline styles before saving the SVG
+        applyInlineStylesFromCSS(svgNodeClone)
+
+        // Step 1: Serialize the SVG node to a string
+        const serializer = new XMLSerializer()
+        const svgString = serializer.serializeToString(svgNodeClone)
+
+        // Step 2: Create a Blob from the serialized SVG
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+
+        // Step 3: Create a URL for the Blob
+        const url = URL.createObjectURL(svgBlob)
+
+        // Get the width and height attributes from the SVG
+        width = width || svgNodeClone.getAttribute('width')
+        height = height || svgNodeClone.getAttribute('height')
+
+        if (!width || !height) {
+            throw new Error('SVG width or height attributes are missing or invalid.')
+        }
+
+        // Step 4: Create an Image element and load the Blob URL
+        const img = new Image()
+        img.onload = function () {
+            // Step 5: Draw the image on a canvas
+            const canvas = document.createElement('canvas')
+            canvas.width = parseFloat(width) // Set canvas width from SVG's width attribute
+            canvas.height = parseFloat(height) // Set canvas height from SVG's height attribute
+
+            const context = canvas.getContext('2d')
+            context.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+            // Step 6: Convert the canvas to a PNG blob
+            canvas.toBlob(function (pngBlob) {
+                // Step 7: Download the PNG file
+                const pngUrl = URL.createObjectURL(pngBlob)
+                const downloadLink = document.createElement('a')
+                downloadLink.href = pngUrl
+                downloadLink.download = 'eurostat-map.png'
+                document.body.appendChild(downloadLink)
+                downloadLink.click()
+                document.body.removeChild(downloadLink)
+
+                // Clean up URLs
+                URL.revokeObjectURL(url)
+                URL.revokeObjectURL(pngUrl)
+            }, 'image/png')
+        }
+
+        // Set the image source to the Blob URL
+        img.src = url
         return out
     }
 
     return out
 }
-
-// adapted from https://observablehq.com/@mbostock/saving-svg
-// turns svg into blob
-function serialize(svg) {
-    const xmlns = 'http://www.w3.org/2000/xmlns/'
-    const xlinkns = 'http://www.w3.org/1999/xlink'
-    const svgns = 'http://www.w3.org/2000/svg'
-    svg = svg.cloneNode(true)
-    const fragment = window.location.href + '#'
-    const walker = document.createTreeWalker(svg, NodeFilter.SHOW_ELEMENT, null, false)
-    while (walker.nextNode()) {
-        for (const attr of walker.currentNode.attributes) {
-            if (attr.value.includes(fragment)) {
-                attr.value = attr.value.replace(fragment, '#')
-            }
-        }
-    }
-    svg.setAttributeNS(xmlns, 'xmlns', svgns)
-    svg.setAttributeNS(xmlns, 'xmlns:xlink', xlinkns)
-    const serializer = new window.XMLSerializer()
-    const string = serializer.serializeToString(svg)
-    return new Blob([string], { type: 'image/svg+xml' })
-}
-
-// adapted from https://observablehq.com/@mbostock/saving-sv
-//svg to canvas blob promise
-function rasterize(svg) {
-    let resolve, reject
-    const promise = new Promise((y, n) => ((resolve = y), (reject = n)))
-    const image = new Image()
-    image.onerror = reject
-    image.onload = () => {
-        const rect = svg.getBoundingClientRect()
-        const canvas = document.createElement('canvas')
-        canvas.width = rect.width
-        canvas.height = rect.height
-        const context = canvas.getContext('2d')
-        context.drawImage(image, 0, 0, rect.width, rect.height)
-        context.canvas.toBlob(resolve)
-    }
-    image.src = URL.createObjectURL(serialize(svg))
-    return promise
-}
-
-const upperCaseFirstLetter = (string) => `${string.slice(0, 1).toUpperCase()}${string.slice(1)}`
-
-const lowerCaseAllWordsExceptFirstLetters = (string) =>
-    string.replaceAll(/\S*/g, (word) => `${word.slice(0, 1)}${word.slice(1).toLowerCase()}`)
 
 /**
  * Retrieve some URL parameters, which could be then reused as map definition parameters.
@@ -404,7 +423,7 @@ const lowerCaseAllWordsExceptFirstLetters = (string) =>
  */
 export const getURLParameters = function () {
     const ps = {}
-    const p = ['w', 'h', 'x', 'y', 'z', 's', 'lvl', 'time', 'proj', 'geo', 'ny', 'lg', 'sl', 'clnb']
+    const p = ['w', 'h', 'x', 'y', 'z', 's', 'lvl', 'time', 'proj', 'geo', 'ny', 'language', 'sl', 'numberOfClasses']
     for (let i = 0; i < p.length; i++) ps[p[i]] = getURLParameterByName(p[i])
     return ps
 }

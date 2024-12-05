@@ -19,7 +19,7 @@
                 height: 491.34,
                 frameStroke: 'white',
                 frameStrokeWidth: 0,
-                pixSize: 5000,
+                pixelSize: 5000,
                 geoCenter: [14, 17],
                 projectionFunction: d3
                     //.geoRobinson()
@@ -29,7 +29,7 @@
                     .scale((982.68 - 20) / 2 / Math.PI + 0.1),
             }
             const map = eurostatmap
-                .map('ch')
+                .map('choropleth')
                 .width(mapConfig.width)
                 .height(mapConfig.height)
                 // common
@@ -37,15 +37,15 @@
                 .containerId('map') //for tooltip overflow control
                 .seaFillStyle('white')
                 .scale('10M')
-                .nutsrgSelFillSty('yellow')
+                .hoverColor('yellow')
                 .cntrgFillStyle('lightgrey')
                 .nutsrgFillStyle('lightgrey')
                 //specific
-                .pixSize(mapConfig.pixSize)
+                .pixelSize(mapConfig.pixelSize)
                 .geoCenter(mapConfig.geoCenter)
                 .frameStrokeWidth(mapConfig.frameStrokeWidth)
                 .frameStroke(mapConfig.frameStroke)
-                .nutsLvl(0)
+                .nutsLevel(0)
                 .geo(mapConfig.geo)
                 .cntbnStroke(mapConfig.cntbnStroke)
                 .cntbnStrokeWidth(mapConfig.cntbnStrokeWidth)

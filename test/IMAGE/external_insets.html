@@ -38,16 +38,16 @@
             basemap = function () {
                 return (
                     eurostatmap
-                        .map('ps')
+                        .map('proportionalSymbol')
                         .svgId('mappy')
                         .containerId('container')
-                        .pixSize(7400)
+                        .pixelSize(7400)
                         .width(mapWidth)
                         .height(mapHeight)
                         .bottomText(null)
                         .showSourceLink(false)
-                        .nutsLvl('mixed')
-                        //.nutsLvl(0)
+                        .nutsLevel('mixed')
+                        //.nutsLevel(0)
                         .drawGraticule(true)
                         .graticuleStroke('#ccc')
                         .graticuleStrokeWidth(0.5)
@@ -62,7 +62,7 @@
                             shapeHeight: 20,
                             shapeWidth: 50,
                             sepLineLength: 55,
-                            labelDecNb: 0,
+                            decimals: 0,
                             title: 'title',
                             titleFontSize: 20,
                             labelFontSize: 15,
@@ -86,7 +86,7 @@
                         //.zoomExtent([1,10])
                         .showScalebar(true)
                         .scalebarPosition([420, 560])
-                        .nutsrgSelFillSty('#003E8C')
+                        .hoverColor('#003E8C')
                         .drawCoastalMargin(true)
                 )
             }

@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
-import * as lg from '../core/legend'
+import * as Legend from './legend'
+import { executeForAllInsets } from '../core/utils'
 
 /**
  * A legend for categorical maps
@@ -8,7 +9,7 @@ import * as lg from '../core/legend'
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //the width of the legend box elements
     out.shapeWidth = 13
@@ -43,19 +44,13 @@ export const legend = function (map, config) {
         out.makeBackgroundBox()
 
         //draw title
-        if (out.title)
+        if (out.title) {
             lgg.append('text')
-                .attr('class', 'eurostat-map-legend-title')
+                .attr('class', 'em-legend-title')
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding + out.titleFontSize)
                 .text(out.title)
-                .style('font-size', out.titleFontSize + 'px')
-                .style('font-weight', out.titleFontWeight)
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
-
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
+        }
 
         //get category codes
         const ecls = out.order ? out.order : m.classifier().domain()
@@ -65,6 +60,7 @@ export const legend = function (map, config) {
             //the class
             const ecl_ = ecls[i]
             const ecl = m.classifier()(ecl_)
+            const fillColor = m.classToFillStyle()[ecl_]
 
             //the vertical position of the legend element
             const y =
@@ -72,56 +68,34 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
-                .attr('fill', m.classToFillStyle()[ecl_])
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
+                .style('fill', fillColor)
                 .on('mouseover', function () {
-                    const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='" + ecl + "']")
-                    sel.style('fill', m.nutsrgSelFillSty())
-                    const th = select(this)
-                    sel.attr('fill___', function (d) {
-                        th.attr('fill')
-                    })
-                    th.style('fill', m.nutsrgSelFillSty())
+                    select(this).style('fill', m.hoverColor_)
+                    highlightRegions(out.map, ecl)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.svgId_, highlightRegions, ecl)
+                    }
                 })
                 .on('mouseout', function () {
-                    const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='" + ecl + "']")
-                    const th = select(this)
-                    sel.style('fill', function (d) {
-                        th.attr('fill___')
-                    })
-                    th.style('fill', m.classToFillStyle()[ecl])
+                    select(this).style('fill', fillColor)
+                    unhighlightRegions(out.map, ecl)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.svgId_, unhighlightRegions, ecl)
+                    }
                 })
 
             //label
             lgg.append('text')
-                .attr('class', 'eurostat-map-legend-label')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
                 .text(m.classToText() ? m.classToText()[ecl_] : ecl_)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
-                .on('mouseover', function () {
-                    const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='" + ecl + "']")
-                    sel.style('fill', m.nutsrgSelFillSty())
-                    const th = select(this)
-                    sel.attr('fill___', function (d) {
-                        th.attr('fill')
-                    })
-                })
-                .on('mouseout', function () {
-                    const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='" + ecl + "']")
-                    const th = select(this)
-                    sel.style('fill', function (d) {
-                        th.attr('fill___')
-                    })
-                })
         }
 
         //'no data' legend box
@@ -133,43 +107,64 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
-                .attr('fill', m.noDataFillStyle())
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
+                .style('fill', m.noDataFillStyle_)
                 .on('mouseover', function () {
-                    const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='nd']")
-                    sel.style('fill', m.nutsrgSelFillSty())
-                    sel.attr('fill___', function (d) {
-                        select(this).attr('fill')
-                    })
-                    select(this).style('fill', m.nutsrgSelFillSty())
+                    highlightRegions(out.map, 'nd')
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.svgId_, highlightRegions, 'nd')
+                    }
                 })
                 .on('mouseout', function () {
-                    const sel = svgMap.select('#g_nutsrg').selectAll("[ecl='nd']")
-                    sel.style('fill', function (d) {
-                        select(this).attr('fill___')
-                    })
-                    select(this).style('fill', m.noDataFillStyle())
+                    unhighlightRegions(out.map, 'nd')
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.svgId_, unhighlightRegions, 'nd')
+                    }
                 })
 
             //'no data' label
             lgg.append('text')
-                .attr('class', 'eurostat-map-legend-label')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
                 .text(out.noDataText)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
         }
 
         //set legend box dimensions
         out.setBoxDimension()
+    }
+
+    // Highlight selected regions on mouseover
+    function highlightRegions(map, ecl) {
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+        // Set all regions to white
+        allRegions.style('fill', 'white')
+
+        // Highlight only the selected regions by restoring their original color
+        const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
+        selectedRegions.each(function () {
+            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+        })
+    }
+
+    // Reset all regions to their original colors on mouseout
+    function unhighlightRegions(map) {
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+        // Restore each region's original color from the fill___ attribute
+        allRegions.each(function () {
+            select(this).style('fill', select(this).attr('fill___'))
+        })
     }
 
     return out

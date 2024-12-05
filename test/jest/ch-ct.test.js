@@ -20,31 +20,31 @@ test('Two maps on a single page', async () => {
         // these will be executed within test.html, that was loaded before
         //builds test map in test.html
         eurostatmap
-            .map('ch')
+            .map('choropleth')
             .svgId('testMap1')
             .title('Population in Europe')
             .width(400)
             .scale('20M')
             .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
-            .classifMethod('threshold')
+            .classificationMethod('threshold')
             .threshold([50, 75, 100, 150, 300, 850])
             .tooltipShowFlags(false)
             .legend({
                 title: 'test',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
 
         eurostatmap
-            .map('ct')
+            .map('categorical')
             .svgId('testMap2')
             .title('NUTS urban/rural typology')
             .width(400)
             .scale('60M')
             .nutsYear(2013)
-            .nutsLvl(3)
+            .nutsLevel(3)
             .stat({
-                csvURL: 'https://raw.githubusercontent.com/eurostat/eurostat-map/dev/examples/urb_rur_typo.csv',
+                csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                 geoCol: 'NUTS_ID_2013',
                 valueCol: 'urban_rural',
             })
@@ -52,7 +52,7 @@ test('Two maps on a single page', async () => {
             .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
             .legend({
                 title: 'test',
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
     })

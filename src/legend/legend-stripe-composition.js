@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import * as lg from '../core/legend'
+import * as Legend from './legend'
 
 /**
  * A legend for choropleth maps
@@ -9,12 +9,12 @@ import * as lg from '../core/legend'
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
-    const out = lg.legend(map)
+    const out = Legend.legend(map)
 
     //the width of the legend box elements
-    out.shapeWidth = 13
+    out.shapeWidth = 25
     //the height of the legend box elements
-    out.shapeHeight = 15
+    out.shapeHeight = 20
     //the distance between consecutive legend box elements
     out.shapePadding = 5
     //the font size of the legend label
@@ -42,18 +42,13 @@ export const legend = function (map, config) {
         out.makeBackgroundBox()
 
         //draw title
-        if (out.title)
+        if (out.title) {
             lgg.append('text')
+                .attr('class', 'em-legnd-title')
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding + out.titleFontSize)
                 .text(out.title)
-                .style('font-size', out.titleFontSize + 'px')
-                .style('font-weight', out.titleFontWeight)
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
-
-        //set font family
-        lgg.style('font-family', m.fontFamily_)
+        }
 
         //draw legend elements for classes: rectangle + label
         let i = 0
@@ -68,11 +63,12 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
-                .attr('fill', scs[code])
+                .style('fill', scs[code])
                 .attr('stroke', 'black')
                 .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
@@ -80,8 +76,8 @@ export const legend = function (map, config) {
                     svgMap
                         .selectAll('pattern')
                         .selectAll("rect[code='" + code + "']")
-                        .style('fill', m.nutsrgSelFillSty())
-                    select(this).style('fill', m.nutsrgSelFillSty())
+                        .style('fill', m.hoverColor())
+                    select(this).style('fill', m.hoverColor())
                 })
                 .on('mouseout', function () {
                     svgMap
@@ -93,18 +89,15 @@ export const legend = function (map, config) {
 
             //label
             lgg.append('text')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
                 .text(m.catLabels()[code] || code)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
                 .on('mouseover', function () {
                     svgMap
                         .selectAll('pattern')
                         .selectAll("rect[code='" + code + "']")
-                        .style('fill', m.nutsrgSelFillSty())
+                        .style('fill', m.hoverColor())
                 })
                 .on('mouseout', function () {
                     const col = m.catColors()[code] || 'lightgray'
@@ -124,20 +117,19 @@ export const legend = function (map, config) {
 
             //rectangle
             lgg.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
-                .attr('fill', m.noDataFillStyle())
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
+                .style('fill', m.noDataFillStyle())
                 .on('mouseover', function () {
-                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.nutsrgSelFillSty())
-                    select(this).style('fill', m.nutsrgSelFillSty())
+                    svgMap.select('#em-nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
+                    select(this).style('fill', m.hoverColor())
                 })
                 .on('mouseout', function () {
                     const sel = svgMap
-                        .select('#g_nutsrg')
+                        .select('#em-nutsrg')
                         .selectAll("[nd='nd']")
                         .style('fill', function (d) {
                             m.noDataFillStyle()
@@ -147,19 +139,16 @@ export const legend = function (map, config) {
 
             //'no data' label
             lgg.append('text')
+                .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
                 .text(out.noDataText)
-                .style('font-size', out.labelFontSize + 'px')
-                .style('font-family', m.fontFamily_)
-                .style('fill', out.fontFill)
                 .on('mouseover', function () {
-                    svgMap.select('#g_nutsrg').selectAll("[nd='nd']").style('fill', m.nutsrgSelFillSty())
+                    svgMap.select('#em-nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
                 })
                 .on('mouseout', function () {
                     const sel = svgMap
-                        .select('#g_nutsrg')
+                        .select('#em-nutsrg')
                         .selectAll("[nd='nd']")
                         .style('fill', function (d) {
                             m.noDataFillStyle()

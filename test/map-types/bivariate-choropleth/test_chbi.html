@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('bivariateChoropleth')
+                .title('Unemployment and population density')
+                .subtitle('Inhabitants per km and % unemployed, 2021')
+                .nutsLevel(2)
+                .width(Math.min(1000, window.innerHeight))
+                .nutsYear(2016)
+                //.stat("v1", { eurostatDatasetCode:"demo_r_gind3", filters: { indic_de: "GROWRT", time: 2016 }, unitText: "‰" } )
+                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .stat('v2', {
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                    unitText: '%',
+                })
+                .bordersToShow(['efta', 'eu', 'oth', 'cc', 'co'])
+
+                .insets('default')
+                .scale('60M')
+                .legend({
+                    //rotation: -45,
+                    squareSize: 100,
+                    label1: 'Inhabitants per km²',
+                    label2: '% unemployed',
+                    // breaks1: [1, 2, 3],
+                    // breaks2: [1, 2, 3],
+                    showBreaks: true,
+                    x: 0,
+                    y: 140,
+                })
+                .drawGraticule(false)
+                .seaFillStyle('#d3dee8')
+                .drawCoastalMargin(false)
+                .zoomExtent([1, 2])
+                .build()
+        </script>
+    </body>
+</html>

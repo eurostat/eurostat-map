@@ -29,13 +29,13 @@
             basemap = function (id) {
                 return (
                     eurostatmap
-                        .map('ps')
+                        .map('proportionalSymbol')
                         .svgId(id)
                         .containerId(id)
-                        .pixSize(7400)
+                        .pixelSize(7400)
                         .width(mapWidth)
                         .height(mapHeight)
-                        .nutsLvl('mixed')
+                        .nutsLevel('mixed')
                         .psFill('#4ac499')
                         .psShape('square')
                         .psFillOpacity(0.8)

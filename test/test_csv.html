@@ -10,11 +10,10 @@
         <script src="../build/eurostatmap.js"></script>
 
         <script>
-            const map = eurostatmap.map('ch').width(600).height(600).title('Population in Europe')
+            const map = eurostatmap.map('choropleth').width(600).height(600).title('Population in Europe')
 
-            map.nutsLvl('mixed')
+            map.nutsLevel('mixed')
 
-            
             let data = {
                 DE1: '12',
                 FR: 10,

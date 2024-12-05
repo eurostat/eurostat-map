@@ -11126,7 +11126,7 @@
                             (n.lg_ = 'en'),
                             (n.transitionDuration_ = 500),
                             (n.tooltip_.textFunction = El),
-                            (n.filtersDefinitionFun_ = void 0),
+                            (n.filtersDefinitionFunction_ = void 0),
                             (n.callback_ = void 0),
                             (n.legend_ = void 0),
                             (n.legendObj_ = void 0),
@@ -11137,7 +11137,7 @@
                                 'lg_',
                                 'transitionDuration_',
                                 'tooltipText_',
-                                'filtersDefinitionFun_',
+                                'filtersDefinitionFunction_',
                                 'callback_',
                             ].forEach(function (t) {
                                 n[t.substring(0, t.length - 1)] = function (e) {
@@ -11154,7 +11154,7 @@
                                 if (
                                     (n.projectionFunction_ && n.proj('4326'),
                                     n.buildMapTemplateBase(),
-                                    n.filtersDefinitionFun_ && n.filtersDefinitionFun_(n.svg(), n.clnb_),
+                                    n.filtersDefinitionFunction_ && n.filtersDefinitionFunction_(n.svg(), n.clnb_),
                                     n.legend())
                                 ) {
                                     n.legendObj(n.getLegendConstructor()(n, n.legend()))
@@ -13467,7 +13467,7 @@
                                       }
                                       function i(t) {
                                           if (
-                                              (e.filtersDefinitionFun_
+                                              (e.filtersDefinitionFunction_
                                                   ? e.classToFillStyle(function (t) {
                                                         return 'url(#pattern_' + t + ')'
                                                     })
@@ -13595,7 +13595,7 @@
                                           (e.colorFun = function (t) {
                                               return arguments.length
                                                   ? ((e.colorFun_ = t),
-                                                    e.filtersDefinitionFun_
+                                                    e.filtersDefinitionFunction_
                                                         ? e.classToFillStyle(function (t) {
                                                               return 'url(#pattern_' + t + ')'
                                                           })
@@ -13608,12 +13608,12 @@
                                                   ? ((e.threshold_ = t), e.clnb(t.length + 1), e)
                                                   : e.threshold_
                                           }),
-                                          (e.filtersDefinitionFun = function (t) {
+                                          (e.filtersDefinitionFunction = function (t) {
                                               return arguments.length
-                                                  ? ((e.filtersDefinitionFun_ = t),
-                                                    e.svg() && e.filtersDefinitionFun_(e.svg(), e.clnb_),
+                                                  ? ((e.filtersDefinitionFunction_ = t),
+                                                    e.svg() && e.filtersDefinitionFunction_(e.svg(), e.clnb_),
                                                     e)
-                                                  : e.filtersDefinitionFun_
+                                                  : e.filtersDefinitionFunction_
                                           }),
                                           t &&
                                               [

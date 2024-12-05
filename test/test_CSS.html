@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .em-cntbn {
+                stroke-width: 1 !important;
+            }
+            .em-bn-1,
+            .em-bn-2,
+            .em-bn-3 {
+                stroke: black !important;
+                stroke-width: 0.3 !important;
+                stroke-dasharray: 4, 4 !important;
+            }
+            .em-bn-oth:not(.em-bn-co):not(.em-bn-cc) {
+                stroke-width: 0 !important;
+            }
+            .em-bn-co {
+                stroke-width: 0px !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            let map = eurostatmap
+                .map('choropleth')
+                .width(900)
+                .title('Test CSS classes')
+                .nutsYear('2021')
+                .subtitle('For example, to remove all external borders')
+                .scale('60M')
+                .nutsLevel(2)
+                .build()
+        </script>
+    </body>
+</html>

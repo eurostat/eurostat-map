@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const width = Math.min(window.innerHeight, 1000)
+            const map = eurostatmap
+                .map('choropleth')
+                .title('GDP per inhabitant')
+                .subtitle('2022')
+                .width(width)
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2022', UNIT: 'EUR_HAB' },
+                })
+                .classificationMethod('threshold')
+                // .numberOfClasses(7)
+                .threshold([20000, 30000, 40000, 50000, 60000])
+                //.colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .nutsLevel(2)
+                .legend({
+                    x: width - 285,
+                    y: 10,
+                    title: 'Euro per inhabitant',
+                    boxOpacity: 1,
+                    barChart: true,
+                    barChartCounts: true,
+                })
+                .drawCoastalMargin(false)
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>

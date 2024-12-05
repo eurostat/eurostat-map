@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map('ct')
+                .title('NUTS urban/rural typology')
+                .insets('default')
+                .zoomExtent([1, 2])
+                .height(650)
+                .scale('60M')
+                .nutsYear(2013)
+                .nutsLevel(3)
+                .stat({
+                    csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
+                    geoCol: 'NUTS_ID_2013',
+                    valueCol: 'urban_rural',
+                })
+                .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
+                .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
+                .labelling(true)
+                .legend({
+                    labelFontSize: 14,
+                    shapeWidth: 20,
+                    shapeHeight: 18,
+                    x: 10,
+                    y: 170,
+                })
+
+                .build()
+        </script>
+    </body>
+</html>

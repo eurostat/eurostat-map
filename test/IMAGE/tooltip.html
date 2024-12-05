@@ -19,15 +19,15 @@
             let mapHeight = 608
 
             map = eurostatmap
-                .map('ch')
-                .pixSize(7400)
+                .map('choropleth')
+                .pixelSize(7400)
                 .width(mapWidth)
                 .height(mapHeight)
                 .bottomText(null)
                 .showSourceLink(false)
-                .nutsLvl('mixed')
-                //.nutsLvl(0)
-                .classifMethod('threshold')
+                .nutsLevel('mixed')
+                //.nutsLevel(0)
+                .classificationMethod('threshold')
                 .drawGraticule(true)
                 .graticuleStroke('#ccc')
                 .graticuleStrokeWidth(0.5)
@@ -64,7 +64,7 @@
                 //.zoomExtent([1,10])
                 .showScalebar(true)
                 .scalebarPosition([420, 560])
-                .nutsrgSelFillSty('#003E8C')
+                .hoverColor('#003E8C')
 
                 //.labelling(true)
                 .labelsToShow(['seas', 'values', 'cc'])
@@ -79,7 +79,6 @@
                     //     </div>
                     //     <div class="estat-vis-tooltip-text">
                     //         <table class="nuts-table">
-
                     //         </table>
                     //     </div>
                     //     `

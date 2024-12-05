@@ -15,32 +15,18 @@ export const tooltip = function (config) {
     config.border = config.border || '0px'
     config.borderRadius = config.borderRadius || '0px'
     config.boxShadow = config.boxShadow || '0px 0px 0px grey'
-    config.fontFamily = config.fontFamily || 'Helvetica, Arial, sans-serif'
 
     config.transitionDuration = config.transitionDuration || 0
     config.xOffset = config.xOffset || 30
     config.yOffset = config.yOffset || 20
 
-    var tooltip
+    let tooltip
 
     function my() {
         tooltip = select('#' + config.div)
         if (tooltip.empty()) tooltip = select('body').append('div').attr('id', config.div)
 
-        //tooltip.style("width",config.width);
-        // USE CSS
-        tooltip.style('max-width', config.maxWidth)
-        tooltip.style('overflow', 'hidden')
-        tooltip.style('font-size', config.fontSize)
-        tooltip.style('background', config.background)
-        tooltip.style('padding', config.padding)
-        tooltip.style('border', config.border)
-        tooltip.style('border-radius', config.borderRadius)
-        tooltip.style('box-shadow', config.boxShadow)
-        tooltip.style('position', 'absolute')
-        tooltip.style('font-family', config.fontFamily)
-        tooltip.style('pointer-events', 'none')
-        tooltip.style('opacity', '0')
+        tooltip.attr('class', 'tooltip-eurostat')
     }
 
     my.mouseover = function (html) {

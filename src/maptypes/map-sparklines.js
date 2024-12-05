@@ -1,5 +1,5 @@
-import { select, scaleLinear, scaleLog, scaleSqrt, line, extent, area, min, axisBottom, axisLeft, format } from 'd3'
-import * as smap from '../core/stat-map'
+import { select, scaleLinear, scaleLog, scaleSqrt, line, extent, area, min, axisBottom, axisLeft, format, create } from 'd3'
+import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
 
 /**
@@ -9,7 +9,7 @@ import * as lgch from '../legend/legend-choropleth'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config, true)
+    const out = StatMap.statMap(config, true)
 
     out.sparkLineColor_ = 'black'
     out.sparkAreaColor_ = '#41afaa'
@@ -168,48 +168,37 @@ export const map = function (config) {
         //collect nuts ids from g elements. TODO: find better way of getting IDs
         let nutsIds = []
         let s = out.svg().selectAll('#g_ps')
-        let sym = s.selectAll('g.symbol').attr('id', (rg) => {
+        let sym = s.selectAll('g.em-symbol').attr('id', (rg) => {
             nutsIds.push(rg.properties.id)
             return 'spark_' + rg.properties.id
         })
 
         // set region hover function
-        let selector = out.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+        if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
         let regions = out.svg().selectAll(selector)
         regions
             .on('mouseover', function (e, rg) {
                 const data = getComposition(rg.properties.id)
                 if (data) {
-                    if (out.countriesToShow_) {
-                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                            const sel = select(this)
-                            sel.attr('fill___', sel.attr('fill'))
-                            sel.attr('fill', out.nutsrgSelFillSty_)
-                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                        }
-                    } else {
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
+                    const sel = select(this)
+                    sel.attr('fill___', sel.style('fill'))
+                    sel.style('fill', out.hoverColor_)
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 }
             })
             .on('mousemove', function (e, rg) {
                 const data = getComposition(rg.properties.id)
                 if (data) {
-                    if (out.countriesToShow_) {
-                        if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                            if (out._tooltip) out._tooltip.mousemove(e)
-                        }
-                    } else {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    }
+                    if (out._tooltip) out._tooltip.mousemove(e)
                 }
             })
             .on('mouseout', function () {
                 const sel = select(this)
-                let currentFill = sel.attr('fill')
+                let currentFill = sel.style('fill')
                 let newFill = sel.attr('fill___')
                 if (newFill) {
-                    sel.attr('fill', sel.attr('fill___'))
+                    sel.style('fill', sel.attr('fill___'))
                     if (out._tooltip) out._tooltip.mouseout()
                 }
             })
@@ -296,7 +285,7 @@ export const map = function (config) {
         // Add the line
         node.append('path')
             .datum(data)
-            .attr('fill', 'none')
+            .style('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
             .attr('stroke', typeof out.sparkLineColor_ == 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
             .attr(
@@ -322,7 +311,7 @@ export const map = function (config) {
             .data(data)
             .enter()
             .append('circle')
-            .attr('fill', 'red')
+            .style('fill', 'red')
             .attr('stroke', 'none')
             .attr('cx', function (d, i) {
                 return xScale(i)
@@ -341,7 +330,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         let maxs = []
-        let sel = out.svg().selectAll('#g_ps').selectAll('g.symbol').data()
+        let sel = out.svg().selectAll('#g_ps').selectAll('g.em-symbol').data()
 
         sel.forEach((rg) => {
             let id = rg.properties.id
@@ -383,43 +372,49 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
+        //TODO define legend
         return lgch.legend
     }
 
     //specific tooltip text function
-    out.tooltip_.textFunction = function (rg, map) {
-        //get tooltip
-        const tp = select('#tooltip_eurostat')
+    out.tooltip_.textFunction = function (region, map) {
+        const buf = []
 
-        //clear
-        tp.html('')
-        tp.selectAll('*').remove()
+        // Header with region name and ID
+        const regionName = region.properties.na
+        const regionId = region.properties.id
+        buf.push(`
+            <div class="estat-vis-tooltip-bar">
+                <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+            </div>
+        `)
 
-        //write region name
-        if (rg.properties.id) {
-            //name and code
-            tp.append('div').html('<b>' + rg.properties.na + '</b> (' + rg.properties.id + ') <br>')
-        } else {
-            //region name
-            tp.append('div').html('<b>' + rg.properties.na + '</b><br>')
-        }
+        // Prepare data for sparkline chart
+        const height = out.sparkTooltipChart_.height
+        const width = out.sparkTooltipChart_.width
+        const margin = out.sparkTooltipChart_.margin
+        const data = getComposition(region.properties.id)
 
-        //prepare data for sparkline chart
-        let height = out.sparkTooltipChart_.height
-        let width = out.sparkTooltipChart_.width
-        let margin = out.sparkTooltipChart_.margin
-        const data = getComposition(rg.properties.id)
         if (data) {
-            let svg = tp
+            // Create an SVG element detached from the document
+            const container = create('div').attr('class', 'em-tooltip-chart-container')
+            const svg = container
                 .append('svg')
+                .attr('class', 'em-tooltip-chart-svg')
                 .attr('width', width + margin.left + margin.right)
                 .attr('height', height + margin.top + margin.bottom)
-                .append('g')
-                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-            //.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
 
-            createTooltipChart(svg, data, width, height)
+            const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+            // Generate the chart within the SVG
+            createTooltipChart(g, data, width, height)
+
+            // Convert the SVG node to an HTML string and add it to the buffer
+            buf.push(container.node().outerHTML)
         }
+
+        // Return the buffer as a single string
+        return buf.join('')
     }
 
     function createTooltipChart(node, data, width, height) {
@@ -483,7 +478,7 @@ export const map = function (config) {
         // Add the line
         node.append('path')
             .datum(data)
-            .attr('fill', 'none')
+            .style('fill', 'none')
             .attr('stroke', typeof out.sparkLineColor_ == 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
             .attr('stroke-width', 1)
             .attr(
@@ -503,7 +498,7 @@ export const map = function (config) {
             .data(data)
             .enter()
             .append('circle')
-            .attr('fill', 'red')
+            .style('fill', 'red')
             .attr('stroke', 'none')
             .attr('cx', function (d, i) {
                 return xScale(d.date)
@@ -521,7 +516,7 @@ export const map = function (config) {
 //build a color legend object
 export const getColorLegend = function (colorFun) {
     colorFun = colorFun || interpolateYlOrRd
-    return function (ecl, clnb) {
-        return colorFun(ecl / (clnb - 1))
+    return function (ecl, numberOfClasses) {
+        return colorFun(ecl / (numberOfClasses - 1))
     }
 }

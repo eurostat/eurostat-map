@@ -1,10 +1,13 @@
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { interpolateYlOrBr } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgch from '../legend/legend-choropleth'
+import { interpolateYlGnBu } from 'd3-scale-chromatic'
+import { piecewise, interpolateLab } from 'd3-interpolate'
+import * as StatMap from '../core/stat-map'
+import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
+import { jenks, ckmeans } from 'simple-statistics'
+import { getCSSPropertyFromClass } from '../core/utils'
 
 /**
  * Returns a chroropleth map.
@@ -13,12 +16,12 @@ import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     //the number of classes
-    out.clnb_ = 7
+    out.numberOfClasses_ = 7
     //the classification method
-    out.classifMethod_ = 'quantile' // or: equinter, threshold
+    out.classificationMethod_ = 'quantile' // or: equinter, threshold
     //the threshold, when the classification method is 'threshold'
     out.threshold_ = [0]
     //colors to use for classes
@@ -26,7 +29,10 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    out.colorFun_ = interpolateYlOrBr
+    out.colorFunction_ = interpolateYlGnBu
+
+    let eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#17256B']
+    out.colorFunction_ = (t) => piecewise(interpolateLab, eurostatMultihue)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
@@ -42,11 +48,11 @@ export const map = function (config) {
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
     ;[
-        'clnb_',
-        'classifMethod_',
+        'numberOfClasses_',
+        'classificationMethod_',
         'threshold_',
         'makeClassifNice_',
-        'colorFun_',
+        'colorFunction_',
         'classToFillStyle_',
         'noDataFillStyle_',
         'classifier_',
@@ -60,41 +66,41 @@ export const map = function (config) {
     })
 
     //override of some special getters/setters
-    out.colorFun = function (v) {
+    out.colorFunction = function (v) {
         if (!arguments.length) {
-            return out.colorFun_
+            return out.colorFunction_
         }
-        out.colorFun_ = v
+        out.colorFunction_ = v
         // update class style function
-        if (out.filtersDefinitionFun_) {
+        if (out.filtersDefinitionFunction_) {
             // if dot density
             out.classToFillStyle(getFillPatternLegend())
         } else {
-            out.classToFillStyle(getColorLegend(out.colorFun(), out.colors_))
+            out.classToFillStyle(getColorLegend(out.colorFunction(), out.colors_))
         }
         return out
     }
     out.threshold = function (v) {
         if (!arguments.length) return out.threshold_
         out.threshold_ = v
-        out.clnb(v.length + 1)
+        out.numberOfClasses(v.length + 1)
         return out
     }
-    out.filtersDefinitionFun = function (v) {
-        if (!arguments.length) return out.filtersDefinitionFun_
-        out.filtersDefinitionFun_ = v
-        if (out.svg()) out.filtersDefinitionFun_(out.svg(), out.clnb_)
+    out.filtersDefinitionFunction = function (v) {
+        if (!arguments.length) return out.filtersDefinitionFunction_
+        out.filtersDefinitionFunction_ = v
+        if (out.svg()) out.filtersDefinitionFunction_(out.svg(), out.numberOfClasses_)
         return out
     }
 
     //override attribute values with config values
     if (config)
         [
-            'clnb',
-            'classifMethod',
+            'numberOfClasses',
+            'classificationMethod',
             'threshold',
             'makeClassifNice',
-            'colorFun',
+            'colorFunction',
             'classToFillStyle',
             'noDataFillStyle',
             'colors_',
@@ -122,13 +128,15 @@ export const map = function (config) {
         // Configure classifier based on the selected classification method
         const setupClassifier = () => {
             const dataArray = out.statData().getArray()
-            const range = generateRange(out.clnb())
+            const range = generateRange(out.numberOfClasses_)
 
-            switch (out.classifMethod_) {
-                case 'quantile':
+            switch (out.classificationMethod_) {
+                case 'quantile': {
                     out.classifier(scaleQuantile().domain(dataArray).range(range))
                     break
-                case 'equinter':
+                }
+                case 'equal-interval':
+                case 'equinter': {
                     out.classifier(
                         scaleQuantize()
                             .domain([min(dataArray), max(dataArray)])
@@ -136,10 +144,29 @@ export const map = function (config) {
                     )
                     if (out.makeClassifNice_) out.classifier().nice()
                     break
-                case 'threshold':
-                    out.clnb(out.threshold_.length + 1)
-                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.clnb())))
+                }
+                case 'threshold': {
+                    out.numberOfClasses(out.threshold_.length + 1)
+                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.numberOfClasses_)))
                     break
+                }
+                case 'jenks': {
+                    const jenksBreaks = jenks(dataArray, out.numberOfClasses_) // Calculate breaks for Jenks
+                    const domain = jenksBreaks.slice(1, -1)
+                    out.classifier(scaleThreshold().domain(domain).range(range)) // Use Jenks breaks in scale
+                    break
+                }
+                case 'ckmeans': {
+                    // Calculate ckmeans breaks, extracting the maximum value from each cluster
+                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((cluster) => cluster.pop())
+
+                    // Set the domain for scaleThreshold excluding the last value, as it serves as the upper bound
+                    const domain = ckmeansBreaks.slice(0, -1)
+
+                    // Use the ckmeans breaks in the scaleThreshold and set the classifier
+                    out.classifier(scaleThreshold().domain(domain).range(range))
+                    break
+                }
             }
         }
 
@@ -159,12 +186,13 @@ export const map = function (config) {
 
         // Apply classification and assign 'ecl' attribute based on map type
         if (map.svg_) {
-            const selector = map.geo_ === 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             classifyRegions(map.svg().selectAll(selector))
 
             // Handle mixed NUTS level, separating NUTS level 0
-            if (map.nutsLvl_ === 'mixed') {
-                const nuts0Regions = map.svg().selectAll('path.nutsrg0')
+            if (map.nutsLevel_ === 'mixed') {
+                const nuts0Regions = map.svg().selectAll('path.em-nutsrg0')
                 classifyRegions(nuts0Regions)
             }
         }
@@ -186,100 +214,46 @@ export const map = function (config) {
 
     function applyStyleToMap(map) {
         // Define function to get a class' color
-        if (out.filtersDefinitionFun_) {
+        if (out.filtersDefinitionFunction_) {
             // Dot density style
             out.classToFillStyle(getFillPatternLegend())
         } else {
             // Color legend style
-            out.classToFillStyle(getColorLegend(out.colorFun(), out.colors_))
+            out.classToFillStyle(getColorLegend(out.colorFunction(), out.colors_))
         }
 
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = out.geo_ === 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic
             regions
                 .transition()
                 .duration(out.transitionDuration())
-                .attr('fill', function (rg) {
-                    const ecl = select(this).attr('ecl')
-                    if (out.geo_ === 'WORLD') {
-                        // World template logic
-                        if (!ecl) return out.cntrgFillStyle_
-                        if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                        const fillStyle = out.classToFillStyle_(ecl, out.clnb_)
-                        return fillStyle || out.cntrgFillStyle_
-                    } else {
-                        // NUTS template logic
-                        const countryId = rg.properties.id.slice(0, 2)
-                        if (out.countriesToShow_.includes(countryId)) {
-                            if (!ecl) return out.nutsrgFillStyle_
-                            if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                            return out.classToFillStyle()(ecl, out.clnb_)
-                        }
-                        return out.nutsrgFillStyle_
-                    }
-                })
+                .style('fill', regionsFillFunction)
                 .end()
                 .then(() => {
                     // Store the original color for each region
                     regions.each(function () {
                         const sel = select(this)
-                        sel.attr('fill___', sel.attr('fill'))
+                        sel.attr('fill___', sel.style('fill'))
                     })
-
                     // Set up mouse events
-                    regions
-                        .on('mouseover', function (e, rg) {
-                            const sel = select(this)
-                            const countryId = rg.properties.id.slice(0, 2)
-                            if (out.geo_ === 'WORLD' || out.countriesToShow_.includes(countryId)) {
-                                sel.attr('fill___', sel.attr('fill')) // Store original color
-                                sel.style('fill', map.nutsrgSelFillSty_) // Apply highlight color
-                                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                            }
-                        })
-                        .on('mousemove', function (e) {
-                            if (out._tooltip) out._tooltip.mousemove(e)
-                        })
-                        .on('mouseout', function () {
-                            const sel = select(this)
-                            sel.style('fill', sel.attr('fill___')) // Revert to original color
-                            if (map._tooltip) map._tooltip.mouseout()
-                        })
+                    addMouseEventsToRegions(map, regions)
                 })
                 .catch((err) => {
                     //console.error('Error applying transition to regions:', err)
                 })
 
             // Apply additional settings for mixed NUTS level view
-            if (out.nutsLvl_ === 'mixed') {
-                map.svg()
-                    .selectAll('path.nutsrg')
-                    .style('display', function (rg) {
-                        const ecl = select(this).attr('ecl')
-                        const lvl = select(this).attr('lvl')
-                        const countryId = rg.properties.id.slice(0, 2)
-                        return (ecl && out.countriesToShow_.includes(countryId)) || lvl === '0' ? 'block' : 'none'
-                    })
-                    .style('stroke', function () {
-                        const lvl = select(this).attr('lvl')
-                        const ecl = select(this).attr('ecl')
-                        return ecl && lvl !== '0' ? map.nutsbnStroke_[parseInt(lvl)] || '#777' : null
-                    })
-                    .style('stroke-width', function () {
-                        // TODO: COASTLINE SHOULD NOT HAVE STROKE. ADDING STROKE-WIDTH TO REGIONS WITH DATA CAUSES COASTLINE TO HAVE STROKE.
-                        // SOLUTION: select all borders of the region and only apply stroke to those that are not coastal
-                        const lvl = select(this).attr('lvl')
-                        const ecl = select(this).attr('ecl')
-                        return ecl && lvl !== '0' ? map.nutsbnStrokeWidth_[parseInt(lvl)] || 0.2 : null
-                    })
+            if (out.nutsLevel_ === 'mixed') {
+                styleMixedNUTS(map)
             }
 
             // Update labels for statistical values if required
-            if (out.labelsToShow_.includes('values')) {
+            if (out.labels_?.values) {
                 out.updateValuesLabels(map)
             }
         }
@@ -287,22 +261,88 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgch.legend
+        return ChoroplethLegend.legend
+    }
+
+    const styleMixedNUTS = function (map) {
+        map.svg()
+            .selectAll('#em-nutsrg path')
+            .style('display', function (rg) {
+                const sel = select(this)
+                const ecl = sel.attr('ecl')
+                const lvl = sel.attr('lvl')
+                const countryId = rg.properties.id.slice(0, 2)
+                return ecl || lvl === '0' ? 'block' : 'none'
+            })
+            .style('stroke', function () {
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const ecl = sel.attr('ecl')
+                const stroke = sel.style('stroke')
+                return ecl && lvl !== '0' ? stroke || '#777' : null
+            })
+            .style('stroke-width', function () {
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const ecl = sel.attr('ecl')
+                const strokeWidth = sel.style('stroke-width')
+                return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
+            })
+    }
+
+    const regionsFillFunction = function (rg) {
+        const ecl = select(this).attr('ecl') // 'this' refers to the current DOM element
+        if (out.Geometries.userGeometries) {
+            if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
+            if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
+            return out.classToFillStyle()(ecl, out.numberOfClasses_)
+        } else {
+            if (out.geo_ === 'WORLD') {
+                // World template logic
+                if (!ecl) return out.cntrgFillStyle_
+                if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
+                const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_)
+                return fillStyle || out.cntrgFillStyle_
+            } else {
+                // NUTS template logic
+                const countryId = rg.properties.id.slice(0, 2)
+                if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
+                if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
+                return out.classToFillStyle()(ecl, out.numberOfClasses_)
+            }
+        }
+    }
+
+    const addMouseEventsToRegions = function (map, regions) {
+        regions
+            .on('mouseover', function (e, rg) {
+                const sel = select(this)
+                sel.style('fill', map.hoverColor_) // Apply highlight color
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function () {
+                const sel = select(this)
+                sel.style('fill', sel.attr('fill___')) // Revert to original color
+                if (map._tooltip) map._tooltip.mouseout()
+            })
     }
 
     return out
 }
 
 //build a color legend object
-export const getColorLegend = function (colorFun, colorArray) {
-    colorFun = colorFun || interpolateOrRd
+export const getColorLegend = function (colorFunction, colorArray) {
+    colorFunction = colorFunction || interpolateYlGnBu
     if (colorArray) {
-        return function (ecl, clnb) {
+        return function (ecl, numberOfClasses) {
             return colorArray[ecl]
         }
     }
-    return function (ecl, clnb) {
-        return colorFun(ecl / (clnb - 1))
+    return function (ecl, numberOfClasses) {
+        return colorFunction(ecl / (numberOfClasses - 1))
     }
 }
 
@@ -318,68 +358,51 @@ export const getFillPatternLegend = function () {
 const choroplethTooltipFunction = function (region, map) {
     const buf = []
 
-    if (region.properties.id) {
-        //name and code
-        //ESTAT tooltip
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;"><b>' +
-                region.properties.na +
-                '</b> (' +
-                region.properties.id +
-                ') </div>'
-        )
-    } else {
-        //region name
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;"><b>' +
-                region.properties.na +
-                '</b></div>'
-        )
-    }
-    //case when no data available
-    const sv = map.statData().get(region.properties.id)
-    //unit
-    const unit = map.statData('default').unitText()
+    // Header with region name and ID
+    const regionName = region.properties.na || region.properties.name
+    const regionId = region.properties.id
+    buf.push(`
+        <div class="estat-vis-tooltip-bar">
+            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+        </div>
+    `)
 
-    if (!sv || (sv.value !== 0 && !sv.value) || sv.value == ':') {
+    // Retrieve region's data value and unit
+    const statData = map.statData()
+    const sv = statData.get(regionId)
+    const unit = statData.unitText() || ''
+
+    // No data case
+    if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
         buf.push(`
-            <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
-            <table class="nuts-table">
-            <tbody>
-            <tr>
-            <td>
-            ${map.noDataText_} 
-            </td>
-            </tr>
-            </tbody>
-            </table>
+            <div class="estat-vis-tooltip-text no-data">
+                <table class="nuts-table">
+                    <tbody>
+                        <tr><td>${map.noDataText_}</td></tr>
+                    </tbody>
+                </table>
             </div>
         `)
         return buf.join('')
     }
-    //display value
+
+    // Data display
     buf.push(`
-        <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
-        <table class="nuts-table">
-        <tbody>
-        <tr>
-        <td>
-        ${spaceAsThousandSeparator(sv.value)} ${unit ? unit : ''}
-        </td>
-        </tr>
-        </tbody>
-        </table>
+        <div class="estat-vis-tooltip-text">
+            <table class="nuts-table">
+                <tbody>
+                    <tr><td>${spaceAsThousandSeparator(sv.value)} ${unit}</td></tr>
+                </tbody>
+            </table>
         </div>
     `)
 
-    //flag
-    const f = sv.status
-    if (f && map.tooltip_.showFlags) {
-        if (map.tooltip_.showFlags === 'short') buf.push(' ' + f)
-        else {
-            const f_ = flags[f]
-            buf.push(f_ ? ' (' + f_ + ')' : ' ' + f)
-        }
+    // Optional status flag
+    const statusFlag = sv.status
+    if (statusFlag && map.tooltip_.showFlags) {
+        const flagText = map.tooltip_.showFlags === 'short' ? statusFlag : flags[statusFlag] || statusFlag
+        buf.push(` <span class="status-flag">${flagText}</span>`)
     }
+
     return buf.join('')
 }

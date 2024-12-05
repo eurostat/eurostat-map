@@ -1,9 +1,9 @@
 import { select } from 'd3-selection'
 import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
-import * as smap from '../core/stat-map'
-import * as lgchbi from '../legend/legend-choropleth-bivariate'
-import { spaceAsThousandSeparator } from '../core/utils'
+import * as StatMap from '../core/stat-map'
+import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * Return a bivariate choropleth map.
@@ -13,10 +13,10 @@ import { spaceAsThousandSeparator } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     //number of classes for the classification. Same for both variables.
-    out.clnb_ = 3
+    out.numberOfClasses_ = 3
     //stevens.greenblue
     //TODO make it possible to use diverging color ramps ?
     out.startColor_ = '#e8e8e8'
@@ -39,7 +39,7 @@ export const map = function (config) {
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
     ;[
-        'clnb_',
+        'numberOfClasses_',
         'startColor_',
         'color1_',
         'color2_',
@@ -58,9 +58,11 @@ export const map = function (config) {
 
     //override attribute values with config values
     if (config)
-        ['clnb', 'startColor', 'color1', 'color2', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
-        })
+        ['numberOfClasses', 'startColor', 'color1', 'color2', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(
+            function (key) {
+                if (config[key] != undefined) out[key](config[key])
+            }
+        )
 
     //@override
     out.updateClassification = function () {
@@ -99,17 +101,17 @@ export const map = function (config) {
         let stat1 = out.statData('v1').getArray() || out.statData().getArray()
         let stat2 = out.statData('v2').getArray()
 
-        const range = [...Array(out.clnb()).keys()]
+        const range = [...Array(out.numberOfClasses()).keys()]
         if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
         //assign class to nuts regions, based on their value
-        let selector = map.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
         if (map.svg_) {
             let regions = map.svg().selectAll(selector)
             regions
                 .attr('ecl1', function (rg) {
-                    if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                     const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
@@ -117,7 +119,6 @@ export const map = function (config) {
                     return +out.classifier1_(+v)
                 })
                 .attr('ecl2', function (rg) {
-                    if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                     const sv = out.statData('v2').get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
@@ -125,7 +126,6 @@ export const map = function (config) {
                     return +out.classifier2_(+v)
                 })
                 .attr('nd', function (rg) {
-                    if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                     const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
                     const sv2 = out.statData('v2').get(rg.properties.id)
                     if (!sv1 || !sv2) return
@@ -137,11 +137,10 @@ export const map = function (config) {
                 })
 
             //when mixing NUTS, level 0 is separated from the rest (class nutsrg0)
-            if (map.nutsLvl_ == 'mixed') {
+            if (map.nutsLevel_ == 'mixed') {
                 map.svg()
-                    .selectAll('path.nutsrg0')
+                    .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
-                        if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                         const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
                         if (!sv) return
                         const v = sv.value
@@ -149,7 +148,6 @@ export const map = function (config) {
                         return +out.classifier1_(+v)
                     })
                     .attr('ecl2', function (rg) {
-                        if (!out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) return
                         const sv = out.statData('v2').get(rg.properties.id)
                         if (!sv) return
                         const v = sv.value
@@ -160,14 +158,14 @@ export const map = function (config) {
 
             //define bivariate scale
             if (!out.classToFillStyle()) {
-                const scale = scaleBivariate(out.clnb(), out.startColor(), out.color1(), out.color2(), out.endColor())
+                const scale = scaleBivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.endColor())
                 out.classToFillStyle(scale)
             }
 
             //when mixing NUTS, level 0 is separated from the rest (using class nutsrg0)
-            if (out.nutsLvl_ == 'mixed') {
+            if (out.nutsLevel_ == 'mixed') {
                 map.svg_
-                    .selectAll('path.nutsrg0')
+                    .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
                         const sv = out.statData('v2').get(rg.properties.id)
                         if (!sv) return
@@ -223,58 +221,46 @@ export const map = function (config) {
 
         // set colour of regions
         if (map.svg()) {
-            let selector = out.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             let regions = map.svg().selectAll(selector)
             regions
                 .transition()
                 .duration(out.transitionDuration())
-                .attr('fill', function (rg) {
-                    // only apply data-driven colour to included countries for NUTS templates
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        const ecl1 = select(this).attr('ecl1')
-                        if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
-                        const ecl2 = select(this).attr('ecl2')
-                        if (!ecl1 && !ecl2) return out.nutsrgFillStyle_ // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
-                        if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
-                        let color = out.classToFillStyle()(+ecl1, +ecl2)
-                        return color
-                    } else {
-                        return out.nutsrgFillStyle_
-                    }
+                .style('fill', function (rg) {
+                    const ecl1 = select(this).attr('ecl1')
+                    if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
+                    const ecl2 = select(this).attr('ecl2')
+                    if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+                    if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
+                    let color = out.classToFillStyle()(+ecl1, +ecl2)
+                    return color
+
+                    //return getCSSPropertyFromClass('em-nutsrg', 'fill')
                 })
                 .end()
                 .then(
                     () => {
+                        // Store the original color for each region
+                        regions.each(function () {
+                            const sel = select(this)
+                            sel.attr('fill___', sel.style('fill'))
+                        })
+
                         regions
                             .on('mouseover', function (e, rg) {
-                                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                                        const sel = select(this)
-                                        sel.attr('fill___', sel.attr('fill'))
-                                        sel.attr('fill', map.nutsrgSelFillSty_)
-                                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                                    }
-                                } else {
-                                    const sel = select(this)
-                                    sel.attr('fill___', sel.attr('fill'))
-                                    sel.attr('fill', map.nutsrgSelFillSty_)
-                                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                                }
+                                const sel = select(this)
+                                sel.style('fill', map.hoverColor_)
+                                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                             })
                             .on('mousemove', function (e, rg) {
-                                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                                        if (out._tooltip) out._tooltip.mousemove(e)
-                                    }
-                                } else {
-                                    if (out._tooltip) out._tooltip.mousemove(e)
-                                }
+                                if (out._tooltip) out._tooltip.mousemove(e)
                             })
                             .on('mouseout', function () {
                                 const sel = select(this)
                                 let newFill = sel.attr('fill___')
                                 if (newFill) {
-                                    sel.attr('fill', sel.attr('fill___'))
+                                    sel.style('fill', sel.attr('fill___'))
                                     if (map._tooltip) map._tooltip.mouseout()
                                 }
                             })
@@ -284,66 +270,57 @@ export const map = function (config) {
                     }
                 )
 
-            if (out.nutsLvl_ == 'mixed') {
-                // Toggle visibility - only show NUTS 1,2,3 with stat values when mixing different NUTS levels
-                map.svg()
-                    .selectAll('path.nutsrg')
-                    .style('display', function (rg) {
-                        const ecl1 = select(this).attr('ecl1')
-                        const ecl2 = select(this).attr('ecl2')
-                        const lvl = select(this).attr('lvl')
-                        // always display NUTS 0 for mixed, and filter countries to show
-                        if (
-                            (ecl1 && ecl2 && out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) ||
-                            lvl == '0'
-                        ) {
-                            return 'block'
-                        } else {
-                            // dont show unclassified regions
-                            return 'none'
-                        }
-                    })
-
-                    //toggle stroke - similar concept to display attr (only show borders of NUTS regions that are classified (as data or no data) - a la IMAGE)
-                    .style('stroke', function (bn) {
-                        const lvl = select(this).attr('lvl')
-                        const ecl1 = select(this).attr('ecl1')
-                        const ecl2 = select(this).attr('ecl2')
-                        if (ecl1 && ecl2 && lvl !== '0') {
-                            return out.nutsbnStroke_[parseInt(lvl)] || '#777'
-                        }
-                    })
-                    .style('stroke-width', function (rg) {
-                        const lvl = select(this).attr('lvl')
-                        const ecl1 = select(this).attr('ecl1')
-                        const ecl2 = select(this).attr('ecl2')
-                        if (ecl1 && ecl2 && lvl !== '0') {
-                            return out.nutsbnStrokeWidth_[parseInt(lvl)] || 0.2
-                        }
-                    })
+            if (out.nutsLevel_ == 'mixed') {
+                styleMixedNUTS(map)
             }
         }
     }
 
     //@override
     out.getLegendConstructor = function () {
-        return lgchbi.legend
+        return BivariateLegend.legend
     }
 
     return out
 }
 
-const scaleBivariate = function (clnb, startColor, color1, color2, endColor) {
+const styleMixedNUTS = function (map) {
+    map.svg()
+        .selectAll('#em-nutsrg path')
+        .style('display', function (rg) {
+            const sel = select(this)
+            const ecl = sel.attr('ecl')
+            const lvl = sel.attr('lvl')
+            const countryId = rg.properties.id.slice(0, 2)
+            return ecl || lvl === '0' ? 'block' : 'none'
+        })
+        .style('stroke', function () {
+            const sel = select(this)
+            const lvl = sel.attr('lvl')
+            const ecl = sel.attr('ecl')
+            const stroke = sel.style('stroke')
+            return ecl && lvl !== '0' ? stroke || '#777' : null
+        })
+        .style('stroke-width', function () {
+            const sel = select(this)
+            const lvl = sel.attr('lvl')
+            const ecl = sel.attr('ecl')
+            const strokeWidth = sel.style('stroke-width')
+            return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
+        })
+}
+
+const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {
     //color ramps, by row
     const cs = []
     //interpolate from first and last columns
     const rampS1 = interpolateRgb(startColor, color1)
     const ramp2E = interpolateRgb(color2, endColor)
-    for (let i = 0; i < clnb; i++) {
-        const t = i / (clnb - 1)
+    for (let i = 0; i < numberOfClasses; i++) {
+        const t = i / (numberOfClasses - 1)
         const colFun = interpolateRgb(rampS1(t), ramp2E(t))
         const row = []
-        for (let j = 0; j < clnb; j++) row.push(colFun(j / (clnb - 1)))
+        for (let j = 0; j < numberOfClasses; j++) row.push(colFun(j / (numberOfClasses - 1)))
         cs.push(row)
     }
     //TODO compute other matrix based on rows, and average both?
@@ -364,20 +341,10 @@ const tooltipTextFunBiv = function (rg, map) {
     //region name
     if (rg.properties.id) {
         //name and code
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                rg.properties.na +
-                ' (' +
-                rg.properties.id +
-                ') </div>'
-        )
+        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + ' (' + rg.properties.id + ') </div>')
     } else {
         //region name
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                rg.properties.na +
-                '</div>'
-        )
+        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + '</div>')
     }
 
     //stat 1 value

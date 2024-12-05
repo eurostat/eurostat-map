@@ -528,8 +528,8 @@
                 'rgb(56,138,224)',
             ]
             const map = eurostatmap
-                .map('chbi')
-                .nutsLvl('mixed')
+                .map('bivariateChoropleth')
+                .nutsLevel('mixed')
                 .classToFillStyle((class1, class2) => {
                     if (class1 == 0 && class2 == 2) return COLORS[0]
                     if (class1 == 1 && class2 == 2) return COLORS[1]
@@ -554,7 +554,7 @@
                     labelFontSize: 12,
                     noDataYOffset: 10,
                 })
-                .nutsrgSelFillSty('yellow')
+                .hoverColor('yellow')
                 .showSourceLink(false)
                 .coastalMarginColor('lightgray')
                 .insets('default')

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map1"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('ch')
+                .svgId('map1')
+                .zoomExtent([1, 20])
+                .title('Population Density in Europe')
+                //.insets("default")
+                .width(1000)
+                .scale('10M')
+                .nutsLvl(1)
+                // .colorFun(d3.interpolateBlues)
+                .classifMethod('threshold')
+                .threshold([50, 75, 100, 150, 300, 850])
+                .tooltipShowFlags(false)
+                .legend({ title: 'test', labelDecNb: 0, x: 15, y: 160 })
+                //styling
+                .lg('en')
+                .seaFillStyle('aliceblue')
+                .drawCoastalMargin(false)
+                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'lightgrey', co: 'black' })
+                .graticuleStroke('lightgrey')
+                .graticuleStrokeWidth(0.4)
+                .countriesToShow(['ES'])
+                .labelling(true)
+                .labelsToShow(['seas', 'values', 'cc'])
+                .labelValuesFontSize(10)
+                .labelFill({ seas: '#012a7c', countries: 'black' })
+                .labelShadow(true)
+                .labelShadowsToShow(['cc', 'values'])
+                .labelShadowWidth({
+                    cc: 5,
+                    values: 2,
+                })
+                //.labelFontSize({"seas":13, "countries":13})
+                .build()
+        </script>
+    </body>
+</html>

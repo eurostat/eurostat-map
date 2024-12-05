@@ -30,7 +30,7 @@
                     geo: 'IC',
                     x: 0,
                     y: 0,
-                    pixSize: 2900,
+                    pixelSize: 2900,
                     projectionFunction: undefined,
                     geoCenter: [410000, 3160000],
                     width: 200,
@@ -52,65 +52,65 @@
                     scalebarMaxWidth: 35,
                 },
                 {
-                geo: 'EUR',
-                x: 250,
-                y: 20,
-                scale: '03M',
-                pixSize: 300,
-                geoCenter: [2935033,1564629],
-                projectionFunction: undefined,
-                width: 60,
-                height: 60,
-                title: 'Ceuta',
-                titlePosition: [4, 13],
-                fontFamily: 'Myriad-Pro, Arial',
-                labelling: false,
-                titleFontSize: 13,
-                titleFontWeight: '',
-                frameStroke: 'grey',
-                frameStrokeWidth: 1,
-                showScalebar: true,
-                scalebarTickHeight: 6,
-                scalebarSegmentHeight: 6,
-                scalebarFontSize: 9,
-                scalebarUnits: ' km',
-                scalebarTextOffset: [0, 8],
-                scalebarPosition: [26, 42],
-                scalebarMaxWidth: 18,
-            },
-            {
-                geo: 'EUR',
-                x: 390,
-                y: 40,
-                scale: '03M',
-                pixSize: 250,
-                geoCenter: [3141000,1461000],
-                projectionFunction: undefined,
-                width: 60,
-                height: 60,
-                title: 'Melilla',
-                titlePosition: [4, 13],
-                fontFamily: 'Myriad-Pro, Arial',
-                labelling: false,
-                titleFontSize: 13,
-                titleFontWeight: '',
-                frameStroke: 'grey',
-                frameStrokeWidth: 1,
-                showScalebar: true,
-                scalebarTickHeight: 6,
-                scalebarSegmentHeight: 6,
-                scalebarFontSize: 9,
-                scalebarUnits: ' km',
-                scalebarTextOffset: [0, 8],
-                scalebarPosition: [23, 42],
-                scalebarMaxWidth: 20,
-            },
+                    geo: 'EUR',
+                    x: 250,
+                    y: 20,
+                    scale: '03M',
+                    pixelSize: 300,
+                    geoCenter: [2935033, 1564629],
+                    projectionFunction: undefined,
+                    width: 60,
+                    height: 60,
+                    title: 'Ceuta',
+                    titlePosition: [4, 13],
+                    fontFamily: 'Myriad-Pro, Arial',
+                    labelling: false,
+                    titleFontSize: 13,
+                    titleFontWeight: '',
+                    frameStroke: 'grey',
+                    frameStrokeWidth: 1,
+                    showScalebar: true,
+                    scalebarTickHeight: 6,
+                    scalebarSegmentHeight: 6,
+                    scalebarFontSize: 9,
+                    scalebarUnits: ' km',
+                    scalebarTextOffset: [0, 8],
+                    scalebarPosition: [26, 42],
+                    scalebarMaxWidth: 18,
+                },
+                {
+                    geo: 'EUR',
+                    x: 390,
+                    y: 40,
+                    scale: '03M',
+                    pixelSize: 250,
+                    geoCenter: [3141000, 1461000],
+                    projectionFunction: undefined,
+                    width: 60,
+                    height: 60,
+                    title: 'Melilla',
+                    titlePosition: [4, 13],
+                    fontFamily: 'Myriad-Pro, Arial',
+                    labelling: false,
+                    titleFontSize: 13,
+                    titleFontWeight: '',
+                    frameStroke: 'grey',
+                    frameStrokeWidth: 1,
+                    showScalebar: true,
+                    scalebarTickHeight: 6,
+                    scalebarSegmentHeight: 6,
+                    scalebarFontSize: 9,
+                    scalebarUnits: ' km',
+                    scalebarTextOffset: [0, 8],
+                    scalebarPosition: [23, 42],
+                    scalebarMaxWidth: 20,
+                },
             ]
 
             let projection = d3.geoAzimuthalEqualArea().rotate(proj.rotate).scale(proj.scale)
 
             let map = eurostatmap
-                .map('ch')
+                .map('choropleth')
                 .projectionFunction(projection)
                 .width(mapWidth)
                 .height(mapHeight)
@@ -121,7 +121,7 @@
                     filters: { time: 2016 },
                 })
                 .proj('4326')
-                .nutsLvl(2)
+                .nutsLevel(2)
                 .scale('03M')
                 .insets(insets)
                 .insetBoxPosition([0, 530])
@@ -151,7 +151,7 @@
                 .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 2, co: 0.2 })
                 .showScalebar(true)
                 .scalebarPosition([520, 560])
-                .nutsrgSelFillSty('#003E8C')
+                .hoverColor('#003E8C')
                 .zoomExtent([-100, 100])
                 .build()
         </script>

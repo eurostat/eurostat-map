@@ -1,9 +1,9 @@
 import { select, arc, pie } from 'd3'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 //schemeSet3 schemeDark2 schemePastel1 schemeTableau10
-import * as smap from '../core/stat-map'
-import * as lgscomp from '../legend/legend-stripe-composition'
-
+import * as StatMap from '../core/stat-map'
+import * as StripeCompositionLegend from '../legend/legend-stripe-composition'
+import { getCSSPropertyFromClass } from '../core/utils'
 /**
  * Return a stripe composition map.
  *
@@ -11,7 +11,7 @@ import * as lgscomp from '../legend/legend-stripe-composition'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config)
+    const out = StatMap.statMap(config)
 
     //width of the stripes serie
     out.stripeWidth_ = 50
@@ -174,11 +174,9 @@ export const map = function (config) {
 
         //build and assign texture to the regions
         out.svg()
-            .selectAll('path.nutsrg')
-            .attr('fill', function (d) {
+            .selectAll('#em-nutsrg path')
+            .style('fill', function (d) {
                 const id = d.properties.id
-
-                if (!out.countriesToShow_.includes(id[0] + id[1])) return out.nutsrgFillStyle_
 
                 //compute composition
                 const composition = getComposition(id)
@@ -242,36 +240,25 @@ export const map = function (config) {
             })
 
         // set region hover function
-        let selector = out.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+        if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
         let regions = out.svg().selectAll(selector)
         regions
             .on('mouseover', function (e, rg) {
-                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        const sel = select(this)
-                        sel.attr('fill___', sel.attr('fill'))
-                        sel.attr('fill', out.nutsrgSelFillSty_)
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    }
-                } else {
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                }
+                const sel = select(this)
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e, rg) {
-                if (out.countriesToShow_ && out.geo_ !== 'WORLD') {
-                    if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    }
-                } else {
-                    if (out._tooltip) out._tooltip.mousemove(e)
-                }
+                if (out._tooltip) out._tooltip.mousemove(e)
             })
             .on('mouseout', function () {
                 const sel = select(this)
-                let currentFill = sel.attr('fill')
+                let currentFill = sel.style('fill')
                 let newFill = sel.attr('fill___')
                 if (newFill) {
-                    sel.attr('fill', sel.attr('fill___'))
+                    sel.style('fill', sel.attr('fill___'))
                     if (out._tooltip) out._tooltip.mouseout()
                 }
             })
@@ -281,7 +268,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgscomp.legend
+        return StripeCompositionLegend.legend
     }
 
     //specific tooltip text function
@@ -330,7 +317,7 @@ export const map = function (config) {
             .selectAll('path')
             .data(pie_(data))
             .join('path')
-            .attr('fill', (d) => {
+            .style('fill', (d) => {
                 return out.catColors()[d.data.code] || 'lightgray'
             })
             .attr('d', arc().innerRadius(ir).outerRadius(r))

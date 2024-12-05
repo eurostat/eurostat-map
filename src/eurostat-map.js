@@ -1,10 +1,11 @@
-import * as mapch from './maptypes/map-choropleth'
-import * as mapps from './maptypes/map-proportional-symbols'
-import * as mapct from './maptypes/map-categorical'
-import * as mapchbi from './maptypes/map-choropleth-bivariate'
-import * as mapscomp from './maptypes/map-stripe-composition'
-import * as mappie from './maptypes/map-piecharts'
-import * as mapspark from './maptypes/map-sparklines'
+import * as Choropleth from './maptypes/map-choropleth'
+import * as ProportionalSymbol from './maptypes/map-proportional-symbols'
+import * as Categorical from './maptypes/map-categorical'
+import * as BivariateChoropleth from './maptypes/map-choropleth-bivariate'
+import * as StripeComposition from './maptypes/map-stripe-composition'
+import * as PieCharts from './maptypes/map-piecharts'
+import * as Sparklines from './maptypes/map-sparklines'
+import * as FlowMap from './maptypes/map-flow'
 import * as mt from './core/stat-map'
 
 /**
@@ -15,19 +16,21 @@ import * as mt from './core/stat-map'
  */
 export const map = function (type, config) {
     //choropleth map
-    if (type == 'ch') return mapch.map(config)
+    if (type == 'choropleth' || type == 'ch') return Choropleth.map(config)
     //categorical map
-    if (type == 'ct') return mapct.map(config)
+    if (type == 'categorical' || type == 'ct') return Categorical.map(config)
     //proportionnal symbols map
-    if (type == 'ps') return mapps.map(config)
+    if (type == 'proportionalSymbol' || type == 'ps') return ProportionalSymbol.map(config)
     //bivariate choropleth
-    if (type == 'chbi') return mapchbi.map(config)
+    if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
     //stripes composition
-    if (type == 'scomp') return mapscomp.map(config)
+    if (type == 'stripeComposition' || type == 'scomp') return StripeComposition.map(config)
     //proportional pie charts
-    if (type == 'pie') return mappie.map(config)
+    if (type == 'pieChart' || type == 'pie') return PieCharts.map(config)
     //sparkline maps
-    if (type == 'spark') return mapspark.map(config)
+    if (type == 'sparkline' || type == 'spark') return Sparklines.map(config)
+    //flow maps
+    if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
     //add new map types here
     //if(type == "XX") return mapXX.map(config);
 
@@ -42,7 +45,7 @@ export const map = function (type, config) {
  * @param {*} opts Various parameters on the fill pattern.
  * @returns {function}
  */
-export const getFillPatternDefinitionFun = function (opts) {
+export const getFillPatternDefinitionFunction = function (opts) {
     opts = opts || {}
     opts.shape = opts.shape || 'circle'
     const ps = opts.patternSize || 5
@@ -50,11 +53,11 @@ export const getFillPatternDefinitionFun = function (opts) {
     const smax = opts.maxSize || 5.5
     opts.bckColor = opts.bckColor || 'white'
     opts.symbColor = opts.symbColor || 'black'
-    return function (svg, clnb) {
+    return function (svg, numberOfClasses) {
         //clear previous
         svg.selectAll('.estatmapPattern').remove()
-        for (let i = 0; i < clnb; i++) {
-            const si = smin + ((smax - smin) * i) / (clnb - 1)
+        for (let i = 0; i < numberOfClasses; i++) {
+            const si = smin + ((smax - smin) * i) / (numberOfClasses - 1)
             const patt = svg
                 .append('pattern')
                 .attr('class', 'estatmapPattern')
@@ -88,4 +91,9 @@ export const getFillPatternDefinitionFun = function (opts) {
                     .style('fill', opts.symbColor)
         }
     }
+}
+
+export const getFillPatternDefinitionFun = function (opts) {
+    console.warn('getFillPatternDefinitionFun is now DEPRECATED. Please use getFillPatternDefinitionFunction() instead.')
+    return getFillPatternDefinitionFunction(opts)
 }

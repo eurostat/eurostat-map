@@ -2,10 +2,10 @@ import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } 
 // import {extent} from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
-import * as smap from '../core/stat-map'
-import * as lgps from '../legend/legend-proportional-symbols'
+import * as StatMap from '../core/stat-map'
+import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass } from '../core/utils'
 
 /**
  * Returns a proportional symbol map.
@@ -14,7 +14,7 @@ import { spaceAsThousandSeparator } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = smap.statMap(config, true)
+    const out = StatMap.statMap(config, true)
 
     //shape
     out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
@@ -43,7 +43,7 @@ export const map = function (config) {
     //the threshold, when the classification method is 'threshold'
     out.psThreshold_ = [0]
     //the classification method
-    out.psClassifMethod_ = 'quantile' // or: equinter, threshold
+    out.psclassificationMethod_ = 'quantile' // or: equinter, threshold
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //
@@ -81,7 +81,7 @@ export const map = function (config) {
         'psColors_',
         'psCustomSVG_',
         'psOffset_',
-        'psClassifMethod_',
+        'psclassificationMethod_',
         'psClasses_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -112,7 +112,7 @@ export const map = function (config) {
             'psColors',
             'psCustomSVG',
             'psOffset',
-            'psClassifMethod',
+            'psclassificationMethod',
             'psClasses',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
@@ -175,9 +175,9 @@ export const map = function (config) {
         if (map.svg_) {
             if (out.classifierColor_) {
                 //assign color class to each symbol, based on their value
-                // at this point, the symbol path hasnt been appended. Only the parent g.symbol element (in map-template)
+                // at this point, the symbol path hasnt been appended. Only the parent g.em-symbol element (in map-template)
                 let colorData = map.statData('color')
-                map.svg_.selectAll('.symbol').attr('ecl', function (rg) {
+                map.svg_.selectAll('.em-symbol').attr('ecl', function (rg) {
                     const sv = colorData.get(rg.properties.id)
                     if (!sv) {
                         return 'nd'
@@ -216,12 +216,12 @@ export const map = function (config) {
         // colour
         if (out.statData('color').getArray()) {
             //use suitable classification type for colouring
-            if (out.psClassifMethod_ === 'quantile') {
+            if (out.psclassificationMethod_ === 'quantile') {
                 //https://github.com/d3/d3-scale#quantile-scales
                 const domain = out.statData('color').getArray()
                 const range = getA(out.psClasses_)
                 out.classifierColor(scaleQuantile().domain(domain).range(range))
-            } else if (out.psClassifMethod_ === 'equinter') {
+            } else if (out.psclassificationMethod_ === 'equinter') {
                 //https://github.com/d3/d3-scale#quantize-scales
                 const domain = out.statData('color').getArray()
                 const range = getA(out.psClasses_)
@@ -231,7 +231,7 @@ export const map = function (config) {
                         .range(range)
                 )
                 if (out.makeClassifNice_) out.classifierColor().nice()
-            } else if (out.psClassifMethod_ === 'threshold') {
+            } else if (out.psclassificationMethod_ === 'threshold') {
                 //https://github.com/d3/d3-scale#threshold-scales
                 out.psClasses(out.psThreshold().length + 1)
                 const range = getA(out.psClasses_)
@@ -256,7 +256,7 @@ export const map = function (config) {
 
         if (map.svg_) {
             //clear previous symbols
-            let prevSymbols = map.svg_.selectAll(':not(#insetsgroup) g.symbol > *')
+            let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-symbol > *')
             prevSymbols.remove()
 
             //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)
@@ -274,22 +274,22 @@ export const map = function (config) {
             } else if (out.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData)
             } else {
-                // d3.symbol symbols
                 // circle, cross, star, triangle, diamond, square, wye or custom
                 symb = appendD3SymbolsToMap(map, sizeData)
             }
 
             // set style of symbols
-            let selector = map.geo_ == 'WORLD' ? 'path.worldrg' : 'path.nutsrg'
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
             let regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD') {
-                if (map.nutsLvl_ == 'mixed') {
+                if (map.nutsLevel_ == 'mixed') {
                     addSymbolsToMixedNUTS(map, sizeData, regions)
                 }
 
                 // nuts regions fill colour only for those with sizeData
-                regions.attr('fill', function (rg) {
+                regions.style('fill', function (rg) {
                     const sv = sizeData.get(rg.properties.id)
                     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                         // NO INPUT
@@ -300,7 +300,7 @@ export const map = function (config) {
                             return out.noDataFillStyle_
                         }
                         // DATA
-                        return out.nutsrgFillStyle_
+                        return getCSSPropertyFromClass('em-nutsrg', 'fill')
                     }
                 })
 
@@ -319,18 +319,20 @@ export const map = function (config) {
                 })
             } else {
                 // world countries fill
-                regions.attr('fill', function (rg) {
+                regions.style('fill', function (rg) {
                     const sv = sizeData.get(rg.properties.id)
                     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0) || sv.value == ':') {
                         return out.worldFillStyle_
                     } else {
-                        return out.nutsrgFillStyle_
+                        return getCSSPropertyFromClass('em-nutsrg', 'fill')
                     }
                 })
             }
 
             // set color/stroke/opacity styles
-            setSymbolColors(symb)
+            setSymbolStyles(symb)
+
+            addMouseEvents(map)
 
             // update labels of stat values, appending the stat labels to the region centroids
             if (out.labelsToShow_.includes('values')) {
@@ -338,6 +340,28 @@ export const map = function (config) {
             }
         }
         return map
+    }
+
+    const addMouseEvents = function (map) {
+        let symbols = map.svg().selectAll('g.em-symbol')
+        symbols
+            .on('mouseover', function (e, rg) {
+                const sel = select(this.childNodes[0])
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e, rg) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function (e) {
+                const sel = select(this.childNodes[0])
+                let newFill = sel.attr('fill___')
+                if (newFill) {
+                    sel.style('fill', newFill)
+                    if (out._tooltip) out._tooltip.mouseout()
+                }
+            })
     }
 
     /**
@@ -349,36 +373,31 @@ export const map = function (config) {
     out.updateValuesLabels = function (map) {
         // apply to main map
         //clear previous labels
-        let prevLabels = map.svg_.selectAll('g.stat-label > *')
+        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
         prevLabels.remove()
-        let prevShadows = map.svg_.selectAll('g.stat-label-shadow > *')
+        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
         prevShadows.remove()
 
-        let statLabels = map.svg_.selectAll('g.stat-label')
+        let statLabels = map.svg_.selectAll('g.em-stat-label')
         let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
 
         statLabels
             .filter((d) => {
-                if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                    const sv = sizeData.get(d.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        return false
-                    } else {
-                        return true
-                    }
+                const sv = sizeData.get(d.properties.id)
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                    return false
+                } else {
+                    return true
                 }
-                return false
             })
             .append('text')
             .text(function (d) {
-                if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                    const sv = sizeData.get(d.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        return ''
-                    } else {
-                        if (sv.value !== ':') {
-                            return spaceAsThousandSeparator(sv.value)
-                        }
+                const sv = sizeData.get(d.properties.id)
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                    return ''
+                } else {
+                    if (sv.value !== ':') {
+                        return spaceAsThousandSeparator(sv.value)
                     }
                 }
             })
@@ -386,28 +405,23 @@ export const map = function (config) {
         //add shadows to labels
         if (out.labelShadow_) {
             map.svg_
-                .selectAll('g.stat-label-shadow')
+                .selectAll('g.em-stat-label-shadow')
                 .filter((d) => {
-                    if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                        const sv = sizeData.get(d.properties.id)
-                        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                            return false
-                        } else {
-                            return true
-                        }
+                    const sv = sizeData.get(d.properties.id)
+                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                        return false
+                    } else {
+                        return true
                     }
-                    return false
                 })
                 .append('text')
                 .text(function (d) {
-                    if (out.countriesToShow_.includes(d.properties.id[0] + d.properties.id[1]) || out.geo_ == 'WORLD') {
-                        const sv = sizeData.get(d.properties.id)
-                        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                            return ''
-                        } else {
-                            if (sv.value !== ':') {
-                                return spaceAsThousandSeparator(sv.value)
-                            }
+                    const sv = sizeData.get(d.properties.id)
+                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                        return ''
+                    } else {
+                        if (sv.value !== ':') {
+                            return spaceAsThousandSeparator(sv.value)
                         }
                     }
                 })
@@ -419,13 +433,13 @@ export const map = function (config) {
      * @description sets color/stroke/opacity styles of all symbols
      * @param {d3.selection} symb symbols d3 selection
      */
-    function setSymbolColors(symb) {
+    function setSymbolStyles(symb) {
         symb.style('fill-opacity', out.psFillOpacity())
             .style('stroke', out.psStroke())
             .style('stroke-width', out.psStrokeWidth())
-            .attr('fill', function () {
+            .style('fill', function () {
                 if (out.classifierColor_) {
-                    //for ps, ecl attribute belongs to the parent g.symbol node created in map-template
+                    //for ps, ecl attribute belongs to the parent g.em-symbol node created in map-template
                     const ecl = select(this.parentNode).attr('ecl')
                     if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
                     let color = out.psClassToFillStyle_(ecl, out.psClasses_)
@@ -433,6 +447,10 @@ export const map = function (config) {
                 } else {
                     return out.psFill_
                 }
+            })
+            .attr('fill___', function () {
+                let fill = select(this).style('fill')
+                return fill // save for legend mouseover
             })
     }
 
@@ -469,7 +487,7 @@ export const map = function (config) {
         })
 
         let symbols = gcp
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .data(
                 // FILTERING BREAKS IMAGE -
                 // it removes regions not present in current data, but if you update the data and add data for those regions then they are not drawn!!)
@@ -491,7 +509,7 @@ export const map = function (config) {
             })
 
         // update colors
-        setSymbolColors(symbols)
+        setSymbolStyles(symbols)
     }
 
     /**
@@ -501,7 +519,7 @@ export const map = function (config) {
      * @return {void}
      */
     function appendCirclesToMap(map, sizeData) {
-        let symbolContainers = map.svg().selectAll('g.symbol')
+        let symbolContainers = map.svg().selectAll('g.em-symbol')
 
         return (
             symbolContainers
@@ -532,7 +550,7 @@ export const map = function (config) {
     function appendD3SymbolsToMap(map, sizeData) {
         return map
             .svg()
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .append('path')
             .filter((rg) => {
                 const sv = sizeData.get(rg.properties.id)
@@ -569,7 +587,7 @@ export const map = function (config) {
             map
                 .svg()
                 .select('#g_ps')
-                .selectAll('g.symbol')
+                .selectAll('g.em-symbol')
                 .append('rect')
                 .filter((rg) => {
                     const sv = sizeData.get(rg.properties.id)
@@ -589,8 +607,14 @@ export const map = function (config) {
                     let bRect = this.getBoundingClientRect()
                     return `translate(${-this.getAttribute('width') / 2}` + `, -${this.getAttribute('height')})`
                 })
-                .transition()
-                .duration(out.transitionDuration())
+            // to use transitions we need to refactor the drawing functions to promises e.g. appendBarsToMap().then(()=>{})
+            //this is because .attr('fill___', function () {select(this).style('fill')}) doesnt work unless you execute it after the transition ends.
+            // e.g.
+            // .transition()
+            // .duration(out.transitionDuration())
+            // .style('fill', function (rg) {})
+            // .end()
+            // .then()
         )
     }
 
@@ -604,7 +628,7 @@ export const map = function (config) {
         return map
             .svg()
             .select('#g_ps')
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .append('g')
             .filter((rg) => {
                 const sv = sizeData.get(rg.properties.id)
@@ -633,17 +657,13 @@ export const map = function (config) {
         // Toggle symbol visibility - only show regions with sizeData stat values when mixing different NUTS levels
         let symb = map
             .svg()
-            .selectAll('g.symbol')
+            .selectAll('g.em-symbol')
             .style('display', function (rg) {
                 const sv = sizeData.get(rg.properties.id)
-                if (
-                    !sv ||
-                    (!sv.value && sv !== 0 && sv.value !== 0) ||
-                    !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])
-                ) {
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                     // no symbol for no input
                     return 'none'
-                } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || map.geo_ == 'WORLD') {
+                } else if (map.geo_ == 'WORLD') {
                     return 'block'
                 }
             })
@@ -651,14 +671,10 @@ export const map = function (config) {
         // toggle display of mixed NUTS levels
         regions.style('display', function (rg) {
             const sv = sizeData.get(rg.properties.id)
-            if (
-                !sv ||
-                (!sv.value && sv !== 0 && sv.value !== 0) ||
-                !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])
-            ) {
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                 // no symbol for no data
                 return 'none'
-            } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || map.geo_ == 'WORLD') {
+            } else if (map.geo_ == 'WORLD') {
                 return 'block'
             }
         })
@@ -666,26 +682,30 @@ export const map = function (config) {
         // nuts border stroke
         regions
             .style('stroke', function (rg) {
-                const lvl = select(this).attr('lvl')
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const stroke = sel.style('stroke')
                 const sv = sizeData.get(rg.properties.id)
-                if (!sv || !sv.value || !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                if (!sv || !sv.value) {
                     return
-                } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                } else {
                     if (lvl !== '0') {
-                        return out.nutsbnStroke_[parseInt(lvl)] || '#777'
+                        return stroke || '#777'
                     }
                 }
             })
 
             // nuts border stroke width
             .style('stroke-width', function (rg) {
-                const lvl = select(this).attr('lvl')
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const strokeWidth = sel.style('stroke-width')
                 const sv = sizeData.get(rg.properties.id)
-                if (!sv || !sv.value || !out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1])) {
+                if (!sv || !sv.value) {
                     return
-                } else if (out.countriesToShow_.includes(rg.properties.id[0] + rg.properties.id[1]) || out.geo_ == 'WORLD') {
+                } else if (out.geo_ == 'WORLD') {
                     if (lvl !== '0') {
-                        return out.nutsbnStrokeWidth_[parseInt(lvl)] || '#777'
+                        return strokeWidth || '#777'
                     }
                 }
             })
@@ -727,7 +747,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return lgps.legend
+        return ProportionalSymbolLegend.legend
     }
 
     return out
@@ -737,12 +757,12 @@ export const map = function (config) {
 export const getColorLegend = function (colorFun, colorArray) {
     colorFun = colorFun || interpolateOrRd
     if (colorArray) {
-        return function (ecl, clnb) {
+        return function (ecl, numberOfClasses) {
             return colorArray[ecl]
         }
     }
-    return function (ecl, clnb) {
-        return colorFun(ecl / (clnb - 1))
+    return function (ecl, numberOfClasses) {
+        return colorFun(ecl / (numberOfClasses - 1))
     }
 }
 
@@ -765,52 +785,36 @@ export const symbolsLibrary = {
  * @param {*} rg The region to show information on.
  * @param {*} map The map element
  */
-const tooltipTextFunPs = function (rg, map) {
+const tooltipTextFunPs = function (region, map) {
     const buf = []
-    if (rg.properties.id) {
-        //name and code
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                rg.properties.na +
-                ' (' +
-                rg.properties.id +
-                ') </div>'
-        )
-    } else {
-        //region name
-        buf.push(
-            '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
-                rg.properties.na +
-                '</div>'
-        )
-    }
+
+    // Header with region name and ID
+    const regionName = region.properties.na
+    const regionId = region.properties.id
+    buf.push(`
+        <div class="estat-vis-tooltip-bar">
+            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+        </div>
+    `)
 
     //stat 1 value
     const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
-    const sv1 = v1.get(rg.properties.id)
+    const sv1 = v1.get(region.properties.id)
     if (!sv1 || (sv1.value != 0 && !sv1.value)) buf.push(map.noDataText_)
     else {
         //unit 1
         const unit1 = v1.unitText()
-        buf.push(
-            `<div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">${spaceAsThousandSeparator(
-                sv1.value
-            )} ${unit1 ? unit1 : ' '}</div>`
-        )
+        buf.push(`<div class="estat-vis-tooltip-text">${spaceAsThousandSeparator(sv1.value)} ${unit1 ? unit1 : ' '}</div>`)
     }
 
     //stat 2 value
     if (map.statData('color').getArray()) {
-        const sv2 = map.statData('color').get(rg.properties.id)
+        const sv2 = map.statData('color').get(region.properties.id)
         if (!sv2 || (sv2.value != 0 && !sv2.value)) buf.push(map.noDataText_)
         else {
             //stat 2
             const unit2 = map.statData('color').unitText()
-            buf.push(
-                `<div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;padding-top:0px">${spaceAsThousandSeparator(
-                    sv2.value
-                )} ${unit2 ? unit2 : ' '}</div>`
-            )
+            buf.push(`<div class="estat-vis-tooltip-text">${spaceAsThousandSeparator(sv2.value)} ${unit2 ? unit2 : ' '}</div>`)
         }
     }
 

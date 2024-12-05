@@ -1,39 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-</head>
-
-<body>
-    <svg id="map"></svg>
-    <script src="../../build/eurostatmap.js"></script>
-    <script>
-        const map = eurostatmap
-            .map("ch")
-            .filtersDefinitionFun(eurostatmap.getFillPatternDefinitionFun({ patternSize: 5, shape: 'circle', bckColor: 'white', symbColor: 'black' }))
-            .title("Population in Europe")
-            .scale("60M")
-            .nutsLvl(2)
-            .noDataFillStyle('white')
-            .legend({
-                x:550,
-                y:100,
-            ascending: true,
-            boxPadding: 5,
-            boxOpacity: 0,
-            boxMargin: 0,
-            title: 'Population density inh/km2',
-            shapeWidth: 30,
-            shapeHeight: 18,
-            sepLineLength: 35,
-            noData: true,
-        })
-            .classifMethod("threshold").threshold([50, 75, 100, 150, 300, 850])
-            map.build();
-
-    </script>
-</body>
-
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('ch')
+                .filtersDefinitionFunction(
+                    eurostatmap.getFillPatternDefinitionFun({
+                        patternSize: 5,
+                        shape: 'circle',
+                        bckColor: 'white',
+                        symbColor: 'black',
+                    })
+                )
+                .title('Population in Europe')
+                .scale('60M')
+                .nutsLevel(2)
+                .noDataFillStyle('white')
+                .legend({
+                    x: 550,
+                    y: 100,
+                    ascending: true,
+                    boxPadding: 5,
+                    boxOpacity: 0,
+                    boxMargin: 0,
+                    title: 'Population density inh/km2',
+                    shapeWidth: 30,
+                    shapeHeight: 18,
+                    sepLineLength: 35,
+                    noData: true,
+                })
+                .classificationMethod('threshold')
+                .threshold([50, 75, 100, 150, 300, 850])
+            map.build()
+        </script>
+    </body>
 </html>

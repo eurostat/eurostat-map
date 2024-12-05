@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const exampleGraph = {
+                nodes: [
+                    { id: 'FR', x: 681.1851800759263, y: 230.31124763648583 },
+                    { id: 'DE', x: 824.5437782154489, y: 123.70302649032199 },
+                    { id: 'IT', x: 852.4825697391176, y: 341.2769489380059 },
+                    { id: 'ES', x: 542.0535296122652, y: 369.06544910331417 },
+                    { id: 'BE', x: 730.0123797336544, y: 127.74905244343536 },
+                    { id: 'NL', x: 749.175863493742, y: 87.27354778987966 },
+                    { id: 'CH', x: 782.4178994989912, y: 232.5359911477708 },
+                    { id: 'PL', x: 970.7849882008576, y: 92.61718744265188 },
+                    { id: 'PT', x: 445.73965176651086, y: 366.90829704399636 },
+                    { id: 'AT', x: 887.5898207349595, y: 214.2378085459197 },
+                    { id: 'CZ', x: 907.1965357417834, y: 157.97566911120774 },
+                ],
+                links: [
+                    { source: 'FR', target: 'DE', value: 82018369.72 },
+                    { source: 'FR', target: 'IT', value: 49697198.92 },
+                    { source: 'FR', target: 'ES', value: 45422327.56 },
+                    { source: 'FR', target: 'BE', value: 43038180.93 },
+                    { source: 'FR', target: 'NL', value: 34453478.99 },
+                    { source: 'FR', target: 'CH', value: 16164188.98 },
+                    { source: 'FR', target: 'PL', value: 12673336.04 },
+                    { source: 'FR', target: 'PT', value: 7178656.08 },
+                    { source: 'FR', target: 'AT', value: 6305366.1 },
+                    { source: 'FR', target: 'CZ', value: 5883790.49 },
+                ],
+            }
+
+            //  // total trade
+            //`https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ext_tec10?format=json&lang=en&unit=THS_EUR&sizeclas=TOTAL&stk_flow=EXP&partner=${exporter.value}&time=2021&geoLevel=country`
+            //[{"id":"DE","value":82018369.72,"name":"Germany"},{"id":"IT","value":49697198.92,"name":"Italy"},{"id":"ES","value":45422327.56,"name":"Spain"},{"id":"BE","value":43038180.93,"name":"Belgium"},{"id":"NL","value":34453478.99,"name":"Netherlands"},{"id":"CH","value":16164188.98,"name":"Switzerland"},{"id":"PL","value":12673336.04,"name":"Poland"},{"id":"PT","value":7178656.08,"name":"Portugal"},{"id":"AT","value":6305366.1,"name":"Austria"},{"id":"CZ","value":5883790.49,"name":"Czechia"},{"id":"IE","value":5287477.09,"name":"Ireland"},{"id":"RO","value":4460277.11,"name":"Romania"},{"id":"DK","value":3843262.72,"name":"Denmark"},{"id":"HU","value":3624585.56,"name":"Hungary"},{"id":"SK","value":3003919.1,"name":"Slovakia"},{"id":"LU","value":2206077.33,"name":"Luxembourg"},{"id":"SI","value":1538814.42,"name":"Slovenia"},{"id":"LT","value":737286.81,"name":"Lithuania"},{"id":"RS","value":602221.24,"name":"Serbia"},{"id":"IS","value":405879.59,"name":"Iceland"},{"id":"LV","value":374371.49,"name":"Latvia"},{"id":"HR","value":371224.02,"name":"Croatia"},{"id":"MT","value":160032.27,"name":"Malta"},{"id":"MK","value":71053.23,"name":"North Macedonia"},{"id":"CY","value":42471.05,"name":"Cyprus"},{"id":"BG","value":null,"name":"Bulgaria"},{"id":"EE","value":null,"name":"Estonia"},{"id":"EL","value":null,"name":"Greece"},{"id":"FR","value":null,"name":"France"},{"id":"FI","value":null,"name":"Finland"},{"id":"SE","value":null,"name":"Sweden"},{"id":"NO","value":null,"name":"Norway"},{"id":"UK","value":null,"name":"United Kingdom"},{"id":"BA","value":null,"name":"Bosnia and Herzegovina"},{"id":"TR","value":null,"name":"Türkiye"},{"id":"XK","value":null,"name":"Kosovo*"}]
+            const map = eurostatmap
+                .map('flow')
+                .title('Test')
+                .subtitle('test')
+                .flowGraph(exampleGraph)
+                .nutsLevel(2)
+                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })
+                .drawCoastalMargin(false)
+                .insets('default')
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>

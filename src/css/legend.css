@@ -1,0 +1,64 @@
+.em-legend-background {
+    fill: white;
+    opacity: 0.7;
+    rx: 0;
+    ry: 0;
+}
+.em-legend-label {
+    font-size: 15px;
+    stroke: none;
+    fill: black;
+    dominant-baseline: central;
+}
+.em-legend-title {
+    font-size: 16px;
+    fill: black;
+}
+.em-legend-separator {
+    stroke: white;
+    stroke-width: 1;
+}
+.em-legend-tick {
+    stroke: grey;
+    stroke-width: 1;
+}
+.em-bivariate-frame {
+    fill: none;
+    stroke: black;
+}
+.em-bivariate-nodata {
+    stroke: black;
+    stroke-width: 0.5;
+    cursor: pointer;
+}
+.em-bivariate-axis-title {
+    font-size: 15px;
+}
+.em-bivariate-nodata-label {
+    font-size: 14px;
+    dominant-baseline: middle;
+}
+.em-bivariate-tick {
+    stroke: black;
+    stroke-width: 1;
+}
+.em-bivariate-tick-label {
+    text-anchor: middle;
+    font-size: 12px;
+}
+.em-bivariate-square,
+.em-legend-rect {
+    cursor: pointer;
+    stroke: white;
+}
+
+.em-bivariate-square:hover,
+.em-legend-rect:hover {
+    stroke-width: 2;
+    stroke: red;
+}
+
+.em-pie-size-legend-line {
+    stroke-dasharray: 2;
+    stroke: grey;
+}

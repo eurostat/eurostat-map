@@ -1,0 +1,42 @@
+#em-labels {
+    text-anchor: middle;
+    stroke-linejoin: round;
+    font-family: Arial, Helvetica, sans-serif;
+    dominant-baseline: central;
+}
+
+.em-label {
+    font-size: 12px;
+}
+.em-label-background {
+    fill: #b0902f;
+    pointer-events: none;
+}
+.em-label-shadow {
+    font-size: 12px;
+    stroke-width: 3px;
+    stroke: white;
+}
+.em-stat-label {
+    font-size: 13px;
+    fill: white;
+    font-weight: bold;
+}
+.em-stat-label-shadow {
+    font-size: 12px;
+    stroke-width: 4px;
+    stroke: white;
+}
+.em-label-cc {
+    font-size: 12px;
+}
+
+.em-label-countries {
+    font-size: 12px;
+}
+
+.em-label-seas {
+    font-size: 13px;
+    fill: #003399;
+    letter-spacing: 3px;
+}

@@ -20,7 +20,7 @@
                 .classifMethod('threshold')
                 .threshold([35, 50, 80, 100, 140, 180, 300, 500, 1300])
                 // define dot density pattern
-                .filtersDefinitionFun(
+                .filtersDefinitionFunction(
                     eurostatmap.getFillPatternDefinitionFun({
                         patternSize: 5,
                         shape: 'circle',
@@ -40,7 +40,7 @@
                 .tooltipShowFlags(false)
                 .legend({
                     title: 'Density - inhab./km²',
-                    labelDecNb: 0,
+                    decimals: 0,
                     x: 560,
                     noData: false,
                 })

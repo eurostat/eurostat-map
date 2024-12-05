@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .em-cntbn,
+            .em-bn-co {
+                stroke-width: 1.5 !important;
+            }
+            .em-bn-oth:not(.em-bn-co) {
+                stroke-width: 0 !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div>
+            <svg id="map"></svg>
+        </div>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // custom pattern function
+
+            const getFillPatternDefinitionFunction = (svg, numberOfClasses) => {
+                const minWidth = 0.5 // Minimum stroke width
+                const maxWidth = 5 // Maximum stroke width
+                const patternHeight = 4 // Shared height for all patterns
+
+                // Clear previous patterns
+                svg.selectAll('.estatmapPattern').remove()
+
+                // Helper to create a pattern
+                const createPattern = (id, width, elementsCallback) => {
+                    const pattern = svg
+                        .append('pattern')
+                        .attr('class', 'estatmapPattern')
+                        .attr('id', `pattern_${id}`)
+                        .attr('x', 0)
+                        .attr('y', 0)
+                        .attr('width', width)
+                        .attr('height', patternHeight)
+                        .attr('patternUnits', 'userSpaceOnUse')
+                    elementsCallback(pattern)
+                }
+
+                // Create patterns for each class
+                for (let i = 0; i < numberOfClasses; i++) {
+                    if (i === 0) {
+                        createPattern(i, 1, (pattern) => {
+                            pattern.append('rect').attr('width', 4).attr('height', patternHeight).attr('fill', 'white') // Background color
+                        })
+                    } else if (i === numberOfClasses - 1) {
+                        createPattern(i, 4, (pattern) => {
+                            pattern.append('rect').attr('width', 4).attr('height', patternHeight).attr('fill', 'none') // Transparent background
+                        })
+                    } else {
+                        const strokeWidth = minWidth + ((maxWidth - minWidth) * (i - 1)) / (numberOfClasses - 2)
+                        createPattern(i, 1, (pattern) => {
+                            pattern
+                                .append('line')
+                                .attr('x1', 0)
+                                .attr('y1', 1)
+                                .attr('x2', 1)
+                                .attr('y2', 1)
+                                .attr('stroke', 'currentColor')
+                                .attr('stroke-width', strokeWidth)
+                        })
+                    }
+                }
+            }
+
+            let map = eurostatmap
+                .map('choropleth')
+                .width(Math.min(1000, window.innerHeight))
+                .title('Custom choropleth pattern')
+                .titleFontSize(40)
+                .titleFill('#444')
+                .scale('60M')
+                .nutsLevel(2)
+                .numberOfClasses(4)
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
+                .filtersDefinitionFunction(getFillPatternDefinitionFunction)
+                .legend({
+                    x: 5,
+                    y: 180,
+                    title: 'Custom pattern',
+                })
+            map.build()
+
+            // update data, classification
+            // setTimeout(() => {
+            //     map.threshold([1000, 9000]).filtersDefinitionFunction(
+            //         eurostatmap.getFillPatternDefinitionFun({
+            //             patternSize: 5,
+            //             shape: 'square',
+            //             bckColor: 'white',
+            //             symbColor: 'red',
+            //         })
+            //     )
+            //     map.updateClassification().updateStyle()
+            //     map.legend({
+            //         title: 'SECOND',
+            //         labelFormatter: (val) => val.toLocaleString('en').replace(/,/gi, ' ,'),
+            //     })
+
+            //     //map.statData().setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
+            // }, 10000)
+        </script>
+    </body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Test')
+                // .width(1000)
+                .subtitle('test')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                //.classificationMethod('ckmeans')
+                .numberOfClasses(6)
+                //.threshold([-45, -35, -30, -25, -20])
+                //.colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .nutsLevel(2)
+                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })
+                .drawCoastalMargin(false)
+                .insets('default')
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>

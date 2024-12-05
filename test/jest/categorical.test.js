@@ -20,21 +20,21 @@ test('urban/rural categorical map with csvDataSource', async () => {
         // these will be executed within test.html, that was loaded before.
         //builds map in test.html
         eurostatmap
-            .map('ct')
+            .map('categorical')
             .svgId('testMap')
             .title('NUTS urban/rural typology')
             .scale('60M')
             .nutsYear(2013)
-            .nutsLvl(3)
+            .nutsLevel(3)
             .stat({
-                csvURL: 'https://raw.githubusercontent.com/eurostat/eurostat-map/dev/examples/urb_rur_typo.csv',
+                csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                 geoCol: 'NUTS_ID_2013',
                 valueCol: 'urban_rural',
             })
             .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
             .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
             .legend({
-                labelDecNb: 0,
+                decimals: 0,
             })
             .build()
     })

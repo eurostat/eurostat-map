@@ -1,0 +1,206 @@
+/* General text settings */
+text {
+    pointer-events: none;
+}
+
+a text {
+    pointer-events: all;
+}
+
+/* Main map */
+.em-map {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Coastal margin */
+#em-coast-margin {
+    filter: url(#em-coastal-blur);
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    fill: none;
+    stroke-width: 5;
+    stroke: rgb(161, 198, 237);
+}
+
+/* Title and subtitle styling */
+.em-title,
+.em-inset-title {
+    fill: black;
+    stroke: none;
+}
+
+.em-title {
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.em-inset-title {
+    font-size: 12px;
+}
+
+.em-subtitle,
+.em-inset-subtitle {
+    fill: #848280;
+    stroke: none;
+    stroke-linejoin: round;
+    paint-order: stroke;
+}
+
+.em-subtitle {
+    font-size: 18px;
+    font-weight: 100;
+}
+
+.em-inset-subtitle {
+    font-size: 12px;
+}
+
+.em-source-pretext {
+    font-size: 11px;
+    transform: translate(-5px, -5px);
+}
+.em-source-dataset-link {
+    font-size: 11px;
+    fill: #0e47cb;
+    cursor: pointer;
+    text-decoration: underline;
+    transform: translate(-5px, -5px);
+}
+.em-source-dataset-link:hover {
+    fill: #082b7a;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.em-frame {
+    stroke-width: 0;
+    stroke: grey;
+}
+.em-insets .em-frame {
+    stroke-width: 0.5;
+}
+
+.em-sea {
+    fill: white;
+    /* pointer-events: none; */
+}
+.em-scalebar-line {
+    stroke: black;
+    stroke-width: 0.8px;
+}
+.em-scalebar-label {
+    font-size: 9px;
+    text-anchor: middle;
+}
+
+/* Bottom text and symbol styling */
+.em-footnote {
+    pointer-events: all;
+    cursor: default;
+    font-size: 11px;
+    transform: translate(5px, -5px);
+}
+.em-footnote a {
+    fill: #0e47cb;
+    text-decoration: underline;
+}
+.em-footnote a:hover {
+    fill: #0a328e;
+}
+
+.em-symbol {
+    cursor: pointer;
+}
+
+/* Graticule styling */
+.em-graticule {
+    stroke: lightgray;
+    stroke-width: 1;
+}
+
+/* Region styling */
+.em-cntrg,
+.em-nutsrg,
+.em-worldrg {
+    fill: #efefef;
+}
+
+.em-nutsrg,
+.em-worldrg,
+#em-user-regions {
+    cursor: pointer;
+}
+
+/* Boundary styling */
+#g_worldbn,
+#em-nutsbn,
+.em-cntbn,
+.em-worldbn,
+.em-bn-0,
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-kosovo-bn,
+.em-bn-d,
+.em-bn-co {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.em-bn-0 {
+    stroke: none;
+    stroke-width: 0;
+}
+
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-bn-d {
+    stroke-width: 0.15;
+}
+
+.em-bn-1,
+.em-bn-2,
+.em-bn-3 {
+    stroke: white;
+}
+
+.em-kosovo-bn {
+    stroke: #6e6e6e;
+    stroke-width: 0.19;
+}
+
+.em-bn-d {
+    stroke: #b2b2b2;
+}
+
+.em-cntbn,
+.em-worldbn {
+    stroke: black;
+    stroke-width: 0.3;
+}
+
+.em-bn-co {
+    stroke: black;
+    stroke-width: 0;
+}
+
+/* hide non cc/eu/efta borders */
+.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0 !important;
+}
+
+/* dont fill certain elements */
+.em-frame,
+.em-graticule,
+.em-cntbn,
+.em-worldbn,
+.em-bn-0,
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-kosovo-bn,
+.em-bn-d,
+.em-bn-co {
+    fill: none;
+}
