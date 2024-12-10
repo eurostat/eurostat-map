@@ -3,21 +3,27 @@ export function updateCSSRule(className, property, value) {
     // Ensure the className starts with a dot
     const selector = className.startsWith('.') ? className : `.${className}`
 
-    // Check if the rule already exists in any stylesheet
+    // Iterate through stylesheets to find an existing rule
     const styleSheets = Array.from(document.styleSheets)
     for (const styleSheet of styleSheets) {
         try {
             const rules = styleSheet.cssRules || styleSheet.rules
+
+            // Look for the matching rule
             for (const rule of rules) {
                 if (rule.selectorText === selector) {
                     // Update the property if the rule exists
                     rule.style[property] = value
-                    return
+                    return // Exit after updating
                 }
             }
         } catch (e) {
-            // Some stylesheets (e.g., cross-origin) may not be accessible
-            console.warn(`Could not access rules in stylesheet:`, e)
+            // Skip inaccessible stylesheets and log a warning
+            if (e.name === 'SecurityError') {
+                console.warn(`Could not access rules in stylesheet:`, styleSheet.href, e.message)
+            } else {
+                console.error('Unexpected error accessing stylesheet:', e)
+            }
         }
     }
 
