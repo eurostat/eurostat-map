@@ -22,8 +22,8 @@ export const map = function (config) {
     out.numberOfClasses_ = 7
     //the classification method
     out.classificationMethod_ = 'quantile' // or: equinter, threshold
-    //the threshold, when the classification method is 'threshold'
-    out.threshold_ = [0]
+    //the thresholds, when the classification method is 'threshold'
+    out.thresholds_ = [0]
     //colors to use for classes
     out.colors_ = null
     //when computed automatically, ensure the threshold are nice rounded values
@@ -80,9 +80,9 @@ export const map = function (config) {
         }
         return out
     }
-    out.threshold = function (v) {
-        if (!arguments.length) return out.threshold_
-        out.threshold_ = v
+    out.thresholds = function (v) {
+        if (!arguments.length) return out.thresholds_
+        out.thresholds_ = v
         out.numberOfClasses(v.length + 1)
         return out
     }
@@ -146,8 +146,8 @@ export const map = function (config) {
                     break
                 }
                 case 'threshold': {
-                    out.numberOfClasses(out.threshold_.length + 1)
-                    out.classifier(scaleThreshold().domain(out.threshold_).range(generateRange(out.numberOfClasses_)))
+                    out.numberOfClasses(out.thresholds_.length + 1)
+                    out.classifier(scaleThreshold().domain(out.thresholds_).range(generateRange(out.numberOfClasses_)))
                     break
                 }
                 case 'jenks': {

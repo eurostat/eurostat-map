@@ -1,7 +1,8 @@
 // dev
 const path = require('path')
-
+const packageJson = require('../package.json')
 const LiveReloadPlugin = require('webpack-livereload-plugin')
+const webpack = require('webpack')
 
 module.exports = {
     mode: 'development',
@@ -21,7 +22,12 @@ module.exports = {
             },
         ],
     },
-    plugins: [new LiveReloadPlugin()],
+    plugins: [
+        new LiveReloadPlugin(),
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(packageJson.version),
+        }),
+    ],
     watch: true,
     devtool: 'inline-source-map',
 }

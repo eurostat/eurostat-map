@@ -1,4 +1,6 @@
 const path = require('path')
+const packageJson = require('../package.json')
+const webpack = require('webpack')
 
 module.exports = {
     mode: 'production',
@@ -11,6 +13,11 @@ module.exports = {
         publicPath: '/build/', // Optional: if resources are served from this path
     },
     devtool: false,
+    plugins: [
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(packageJson.version),
+        }),
+    ],
     module: {
         rules: [
             {
