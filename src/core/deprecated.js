@@ -11,34 +11,40 @@ export const defineDeprecatedFunctions = (out) => {
     out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'),updateCSSRule('.em-cntrg','fill',v), out);
     out.nutsrgFillStyle = (v) => (console.warn('nutsrgFillStyle() is now DEPRECATED, please use the .em-nutsrg CSS class'),updateCSSRule('.em-nutsrg','fill',v), out);
     out.nutsbnStroke = (v) => {
-        console.warn('nutsbnStroke() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes')
+        console.warn('nutsbnStroke() is now DEPRECATED, please use the .em-bn-0, .em-bn-1, .em-bn-2, .em-bn-3 CSS classes')
         if (v['0']) {
-            updateCSSRule('.bn_0','stroke',v['0'])
+            updateCSSRule('.em-bn-0','stroke',v['0'])
         }
         if (v['1']) {
-            updateCSSRule('.bn_1','stroke',v['1'])
+            updateCSSRule('.em-bn-1','stroke',v['1'])
         }
         if (v['2']) {
-            updateCSSRule('.bn_2','stroke',v['2'])
+            updateCSSRule('.em-bn-2','stroke',v['2'])
         }
         if (v['3']) {
-            updateCSSRule('.bn_3','stroke',v['3'])
+            updateCSSRule('.em-bn-3','stroke',v['3'])
+        }
+        if (v['co']) {
+            updateCSSRule('.em-bn-co','stroke',v['co'])
         }
         return out
     };
     out.nutsbnStrokeWidth = (v) => {
-        console.warn('nutsbnStrokeWidth() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes')
+        console.warn('nutsbnStrokeWidth() is now DEPRECATED, please use the .em-bn-0, .em-bn-1, .em-bn-2, .em-bn-3 CSS classes')
         if (v['0']) {
-            updateCSSRule('.bn_0','stroke-width',v['0'])
+            updateCSSRule('.em-bn-0','stroke-width',v['0'])
         }
         if (v['1']) {
-            updateCSSRule('.bn_1','stroke-width',v['1'])
+            updateCSSRule('.em-bn-1','stroke-width',v['1'])
         }
         if (v['2']) {
-            updateCSSRule('.bn_2','stroke-width',v['2'])
+            updateCSSRule('.em-bn-2','stroke-width',v['2'])
         }
         if (v['3']) {
-            updateCSSRule('.bn_3','stroke-width',v['3'])
+            updateCSSRule('.em-bn-3','stroke-width',v['3'])
+        }
+        if (v['co']) {
+            updateCSSRule('.em-bn-co','stroke-width',v['co'])
         }
         return out
     };

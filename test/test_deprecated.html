@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -16,7 +16,7 @@
                 .title('Population Density in Europe')
                 //.insets("default")
                 .width(1000)
-                .scale('10M')
+                .scale('20M')
                 .nutsLvl(1)
                 // .colorFun(d3.interpolateBlues)
                 .classifMethod('threshold')
@@ -41,7 +41,29 @@
                     cc: 5,
                     values: 2,
                 })
-                //.labelFontSize({"seas":13, "countries":13})
+                .nutsbnStrokeWidth({ 0: 1, 1: 0.4, 2: 0.4, 3: 0.4, oth: 0, co: 0.4 })
+                .drawGraticule(false)
+                .frameStrokeWidth(0)
+                .cntrgFillStyle('white')
+                .cntbnStroke({ eu: 'red', efta: 'blue', cc: 'orange', oth: 'purple' })
+                .cntbnStrokeWidth({ eu: 0.5, efta: 0.5, cc: 0.5, oth: 0.5, co: 0.5 })
+                .nutsbnStroke({
+                    0: 'grey',
+                    1: '#ffffff',
+                    2: '#ffffff',
+                    3: '#ffffff',
+                    co: 'lightgrey',
+                })
+                .nutsbnStrokeWidth({
+                    0: 0.5,
+                    1: 0.5,
+                    2: 0.5,
+                    3: 0.5,
+                    co: 0.5,
+                })
+                .transitionDuration(0)
+                .nutsrgFillStyle('blue')
+
                 .build()
         </script>
     </body>
