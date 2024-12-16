@@ -1,63 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>eurostat-map.js</title>
-</head>
+    <body>
+        <h1 style="font-family: sans-serif">20 years of GDP change in Europe</h1>
+        <p style="font-family: sans-serif">
+            Source:
+            <a href="https://ec.europa.eu/eurostat/databrowser/view/namq_10_gdp/">Eurostat</a>
+        </p>
 
-<body>
-<h1 style="font-family: sans-serif">20 years of GDP change in Europe</h1>
-<p style="font-family: sans-serif">Source: <a href="https://ec.europa.eu/eurostat/databrowser/view/namq_10_gdp/">Eurostat</a></p>
+        <script src="https://unpkg.com/eurostat-map"></script>
 
-    <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- for eurostatmap.colorFun() -->
+        <script src="https://d3js.org/d3-color.v2.min.js"></script>
+        <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
 
-    <!-- for eurostatmap.colorFun() -->
-    <script src="https://d3js.org/d3-color.v2.min.js"></script>
-    <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
+        <script>
+            //Gross domestic product at market prices
+            //Chain linked volumes, percentage change compared to same period in previous year
+            //Seasonally and calendar adjusted data
 
-    <script>
-        //Gross domestic product at market prices
-        //Chain linked volumes, percentage change compared to same period in previous year
-        //Seasonally and calendar adjusted data
+            for (let year = 2021; year >= 2000; year--) {
+                for (let q = 1; q <= 4; q++) {
+                    eurostatmap
+                        .map('ch')
+                        .svgId('map_' + year + '_Q' + q)
+                        .title(year + ' ' + 'Q' + q)
+                        .titleFontSize(18)
+                        .titleFill('#333333')
+                        .scale('60M')
+                        .width(250)
 
-        for(let year = 2021; year>=2000; year--) {
-        for(let q = 1; q<=4; q++) {
-           eurostatmap
-            .map("ch")
-            .svgId("map_"+year+"_Q"+q)
-            .title(year+" " + "Q"+q)
-            .titleFontSize(18)
-            .titleFill("#333333")
-            .scale("60M")
-            .width(250)
+                        .nutsLevel(0)
+                        .stat({
+                            eurostatDatasetCode: 'namq_10_gdp',
+                            filters: { freq: 'Q', unit: 'CLV_PCH_SM', s_adj: 'SCA', na_item: 'B1GQ', time: year + '-Q' + q },
+                            unitText: '%',
+                        })
 
-            .nutsLvl(0)
-            .stat( { eurostatDatasetCode: "namq_10_gdp", filters: { freq:"Q",unit:"CLV_PCH_SM",s_adj:"SCA",na_item:"B1GQ", time: year+"-Q"+q }, unitText: "%" } )
+                        .colorFun(d3.interpolateRdYlBu)
+                        .classifMethod('threshold')
+                        .threshold([-15, -10, -8, -6, -4, -2, -1, -0.5, 0, 0.5, , 1, 2, 4, 6, 7, 10, 15])
 
-            .colorFun(d3.interpolateRdYlBu)
-            .classifMethod("threshold")
-            .threshold([-15,-10,-8,-6,-4,-2,-1,-0.5,0,0.5,,1,2,4,6,7,10,15])
+                        .seaFillStyle('#fff')
+                        .drawCoastalMargin(false)
+                        .nutsbnStrokeWidth({ 0: 0.8, 1: 0, 2: 0, 3: 0, oth: 0, co: 0.6 })
+                        .nutsbnStroke({ 0: '#777', 1: '#777', 2: '#777', 3: '#777', oth: '#444', co: '#777' })
+                        .drawGraticule(false)
 
-            .seaFillStyle("#fff")
-            .drawCoastalMargin(false)
-        	.nutsbnStrokeWidth({ 0: 0.8, 1: 0, 2: 0, 3: 0, oth: 0, co: 0.6 })
-            .nutsbnStroke({ 0: "#777", 1: "#777", 2: "#777", 3: "#777", oth: "#444", co: "#777" })
-            .drawGraticule(false)
+                        .tooltipShowFlags('long')
+                        .bottomText(null)
+                        .transitionDuration(0)
 
-            .tooltipShowFlags("long")
-            .bottomText(null)
-            .transitionDuration(0)
-
-            .build();
-        }
-        //add br
-        document.getElementsByTagName("body")[0].appendChild( document.createElement("br") );
-    }
-
-    </script>
-</body>
-
+                        .build()
+                }
+                //add br
+                document.getElementsByTagName('body')[0].appendChild(document.createElement('br'))
+            }
+        </script>
+    </body>
 </html>

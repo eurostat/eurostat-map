@@ -45,7 +45,7 @@ Specify the NUTS geometries and the geographical extent of the map.
 
 | Method                               | Type          | Default value                                                                                                                                                                                   | Description                                                                                                                                                                                                                                                                                                                               |
 | ------------------------------------ | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**nutsLvl**([*value*])         | int/string    | _3_                                                                                                                                                                                             | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
+| _map_.**nutsLevel**([*value*])       | int/string    | _3_                                                                                                                                                                                             | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
 | _map_.**nutsYear**([*value*])        | int           | _2016_                                                                                                                                                                                          | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
 | _map_.**bordersToShow**([*value*])   | Array         | _["eu","efta","cc","oth","co"]_                                                                                                                                                                 | The types of boundaries to show on the map. See [Nuts2json](https://github.com/eurostat/Nuts2json/#api) for possible types.                                                                                                                                                                                                               |
 | _map_.**countriesToShow**([*value*]) | Array         | _["AL","AT","BE","BG","CH","CY","CZ","DE","DK","EE","EL","ES", "FI","FR","HR","HU","IE","IS","IT","LI","LT", "LU","LV","ME","MK", "MT","NL","NO","PL","PT","RO","RS","SE","SI","SK","TR","UK"]_ | The country codes of the countries to be shown on the map. Countries not included in the array, but included in NUTS2JSON will be coloured using map.nutsrgFillStyle instead of data-driven colour. (Currently for choropleth maps only).                                                                                                 |
@@ -213,7 +213,7 @@ Example:
 ```javascript
 eurostatmap
     .map('proportionalSymbol')
-    .nutsLvl(1)
+    .nutsLevel(1)
     .stat({
         eurostatDatasetCode: 'demo_r_pjangrp3',
         filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: 2016 },
@@ -318,7 +318,7 @@ Example:
 //population composition by age
 eurostatmap
     .map('pieChart')
-    .nutsLvl(1)
+    .nutsLevel(1)
     .stat('Y_LT15', {
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { age: 'Y_LT15', sex: 'T', unit: 'NR', time: '2019' },
@@ -345,7 +345,7 @@ Or simpler:
 //population composition by age
 eurostatmap
     .map('pieChart')
-    .nutsLvl(3)
+    .nutsLevel(3)
     .nutsYear(2016)
     .stripeWidth(10)
     .stripeOrientation(45)
@@ -432,7 +432,7 @@ Example:
 eurostatmap
     .map('categorical')
     .nutsYear(2013)
-    .nutsLvl(3)
+    .nutsLevel(3)
     .stat({
         csvURL: 'https://raw.githubusercontent.com/eurostat/eurostat-map/dev/examples/urb_rur_typo.csv',
         geoCol: 'NUTS_ID_2013',
@@ -474,7 +474,7 @@ Example:
 ```javascript
 eurostatmap
     .map('bivariateChoropleth')
-    .nutsLvl(2)
+    .nutsLevel(2)
     .nutsYear(2016)
     .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
     .stat('v2', {
@@ -531,7 +531,7 @@ Example:
 //population composition by age
 eurostatmap
     .map('stripeComposition')
-    .nutsLvl(3)
+    .nutsLevel(3)
     .nutsYear(2016)
     .stripeWidth(10)
     .stripeOrientation(45)
@@ -561,7 +561,7 @@ Or simplier:
 //population composition by age
 eurostatmap
     .map('stripeComposition')
-    .nutsLvl(3)
+    .nutsLevel(3)
     .nutsYear(2016)
     .stripeWidth(10)
     .stripeOrientation(45)
@@ -609,7 +609,7 @@ Example:
 ```javascript
 eurostatmap
     .map('sparkline')
-    .nutsLvl(1)
+    .nutsLevel(1)
     .statSpark(
         { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
         ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'], //dates
