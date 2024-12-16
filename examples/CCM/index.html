@@ -13961,7 +13961,7 @@
                                               (e.psColorFun_ = Il),
                                               (e.psClassToFillStyle_ = void 0),
                                               (e.psThreshold_ = [0]),
-                                              (e.psClassifMethod_ = 'quantile'),
+                                              (e.psClassificationMethod_ = 'quantile'),
                                               (e.makeClassifNice_ = !0),
                                               (e.classifierSize_ = void 0),
                                               (e.classifierColor_ = void 0),
@@ -13987,7 +13987,7 @@
                                                   'psColors_',
                                                   'psCustomSVG_',
                                                   'psOffset_',
-                                                  'psClassifMethod_',
+                                                  'psClassificationMethod_',
                                                   'psClasses_',
                                               ].forEach(function (t) {
                                                   e[t.substring(0, t.length - 1)] = function (n) {
@@ -14014,7 +14014,7 @@
                                                       'psColors',
                                                       'psCustomSVG',
                                                       'psOffset',
-                                                      'psClassifMethod',
+                                                      'psClassificationMethod',
                                                       'psClasses',
                                                   ].forEach(function (n) {
                                                       null != t[n] && e[n](t[n])
@@ -14048,11 +14048,11 @@
                                                               ),
                                                               e.statData('color').getArray())
                                                           )
-                                                              if ('quantile' === e.psClassifMethod_) {
+                                                              if ('quantile' === e.psClassificationMethod_) {
                                                                   var s = e.statData('color').getArray(),
                                                                       l = n(e.psClasses_)
                                                                   e.classifierColor(It().domain(s).range(l))
-                                                              } else if ('equinter' === e.psClassifMethod_) {
+                                                              } else if ('equinter' === e.psClassificationMethod_) {
                                                                   var u = e.statData('color').getArray(),
                                                                       c = n(e.psClasses_)
                                                                   e.classifierColor(
@@ -14061,7 +14061,7 @@
                                                                           .range(c)
                                                                   ),
                                                                       e.makeClassifNice_ && e.classifierColor().nice()
-                                                              } else if ('threshold' === e.psClassifMethod_) {
+                                                              } else if ('threshold' === e.psClassificationMethod_) {
                                                                   e.psClasses(e.psThreshold().length + 1)
                                                                   var f = n(e.psClasses_)
                                                                   e.classifierColor(fn().domain(e.psThreshold()).range(f))
