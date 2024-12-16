@@ -216,7 +216,7 @@ export const updateValuesLabels = function (map) {
             .selectAll('g.em-stat-label-shadow')
             .filter((rg) => filterFunction(rg, map))
             .append('text')
-            .text(map.statLabelsTextFunction)
+            .text(statLabelsTextFunction)
     }
     return map
 }

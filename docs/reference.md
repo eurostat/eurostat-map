@@ -740,16 +740,43 @@ See deprecated.js for deprecated style functions and their successors. (or check
 
 ## Labelling
 
-Labels for country names, country codes, and/or seas can be added to the map. Labels are displayed in the language set by the map.lg() method.
+You can customise the labels shown on the map using the following settings:
 
-| Method                                   | Type     | Default value                                                                           | Description                                                                                                                                                                                                                                                                                                  |
-| ---------------------------------------- | -------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| _map_.**labelling**([*value*])           | Boolean  | _false_                                                                                 | Whether or not to show geographic name labels on the map.                                                                                                                                                                                                                                                    |
-| _map_.**labelsToShow**([*value*])        | Array    | _["countries","seas"]_                                                                  | The types of labels to show on the map. Accepted values are: "countries","seas","cc","values". ("countries" show the full names of each country, "cc" stands for country codes and "values" show the statistical values for each NUTS region. NOTE: "values" only applies to the choropleth map type ("ch"). |
-| _map_.**labelShadow**([*value*])         | Boolean  | _false_                                                                                 | Whether or not to add shadows to the labels.                                                                                                                                                                                                                                                                 |
-| _map_.**labelShadowsToShow**([*value*])  | Array    | ["countries","seas", "cc", "values"]                                                    | Which label types will have shadows (halos).                                                                                                                                                                                                                                                                 |
-| _map_.**statLabelsPositions**([*value*]) | Object   | _{ "regionId": {x:number, y:number} }_                                                  | Override the positions of statistical labels. Define the x and y position of the statistical value label for each region. If the region is not found here, the label is positioned at the centroid of the region.                                                                                            |
-| _map_.**labelFilterFunction**([*value*]) | Function | _`(rg, map) => rg.properties.id[0] + rg.properties.id[1] == map.geo_[0] + map.geo*[1]`* | Filter the regions used for the labels.                                                                                                                                                                                                                                                                      |
+```javascript
+map = eurostatmap.map(...)
+	.labels({
+        labels: [
+            { text: 'Albania', x: 5100000, y: 2060000, class: 'cc', size: 7 },
+            { text: 'Austria', x: 4670000, y: 2629000, class: 'cc', size: 18 },
+            { text: 'Belgium', x: 3930000, y: 3010000, class: 'cc', size: 17 },
+            { text: 'Bulgaria', x: 5567000, y: 2200000, class: 'cc', size: 22 },
+            { text: 'Croatia', x: 4876000, y: 2455000, class: 'cc', size: 10 },
+        ],
+        statLabelsFilterFunction: (region, map) => {
+            // only show statistical labels for rergions with data
+            const s = map.statData()
+            const sv = s.get(region.properties.id)
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                return false
+            } else {
+                return true
+            }
+        },
+        statLabelsPositions:  {
+            // REGION CODE: {x,y}
+            AL: { x: 5150000, y: 2000000 },
+            AT: { x: 4670000, y: 2700000 },
+            BE: { x: 3930000, y: 3060000 },
+            BG: { x: 5567000, y: 2300000 },
+            HR: { x: 4707718, y: 2350243 },
+            CY: { x: 6426000, y: 1530000 },
+            CH: { x: 4170000, y: 2600000 },
+            CZ: { x: 4707000, y: 2950000 },
+            DK: { x: 4316000, y: 3621000 },
+        },
+        labelShadow: true
+	});
+```
 
 ## Insets
 
