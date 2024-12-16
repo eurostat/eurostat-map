@@ -4,8 +4,8 @@ This page describes how to quickly create a statistical map with Eurostat data. 
 
 ## Create a map
 
--   Download [**eurostat_map.html**](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/tutos/quick/eurostat_map.html) file (with CTRL+S) on your desktop.
--   Double click on it: The map below should appear in a web browser. This is a default map showing the latest Eurostat figures on population.
+- Download [**eurostat_map.html**](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/tutos/quick/eurostat_map.html) file (with CTRL+S) on your desktop.
+- Double click on it: The map below should appear in a web browser. This is a default map showing the latest Eurostat figures on population.
 
 ![map 1](map1.png)
 
@@ -13,8 +13,8 @@ This page describes how to quickly create a statistical map with Eurostat data. 
 
 To modify this map, edit the **eurostat_map.html** file with a text editor such as Notepad or [Notepad++](https://notepad-plus-plus.org/). For that, you can either:
 
--   right-click on the file, select "open with..." menu item, and select a text edition program,
--   or launch a text editor and open the file.
+- right-click on the file, select "open with..." menu item, and select a text edition program,
+- or launch a text editor and open the file.
 
 You should see the short code snippet defining the map:
 
@@ -28,9 +28,9 @@ You should see the short code snippet defining the map:
 
 As first modifications, we propose to:
 
--   add a title: _Population in Europe_,
--   change the background color in light gray,
--   show place name labels.
+- add a title: _Population in Europe_,
+- change the background color in light gray,
+- show place name labels.
 
 This can be achieved by simply inserting three lines as below:
 
@@ -38,7 +38,7 @@ This can be achieved by simply inserting three lines as below:
 <svg id="map"></svg>
 <script src="https://unpkg.com/eurostat-map@3.3.0"></script>
 <script>
-    eurostatmap.map('choropleth').title('Population in Europe').seaFillStyle('lightgray').labelling(true).build()
+    eurostatmap.map('choropleth').title('Population in Europe').labelling(true).build()
 </script>
 ```
 
@@ -69,9 +69,9 @@ Then use the [query builder](https://ec.europa.eu/eurostat/web/json-and-unicode-
 
 Note that:
 
--   For each dimension, only one value should be selected.
--   Ignore the _geo selection_, _unit code/label_ question and _EU aggregate_ question.
--   to show the most recent figures, ignore the _time selection_.
+- For each dimension, only one value should be selected.
+- Ignore the _geo selection_, _unit code/label_ question and _EU aggregate_ question.
+- to show the most recent figures, ignore the _time selection_.
 
 Hit the _Generate query filter_ button to get a selection text such as:
 

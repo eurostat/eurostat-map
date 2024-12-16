@@ -729,7 +729,7 @@ map = eurostatmap.map(...)
 ## Styling
 
 Specify specific map styles. As of V4, styles have been moved to CSS classes. See [css.md](./css.md) for a list of CSS rules.
-See deprecated.js for deprecated functions and their successors.
+See deprecated.js for deprecated style functions and their successors. (or check the developer console for warnings when using deprecated functions)
 
 | Method                                   | Type    | Default value | Description                                                                                                                                              |
 | ---------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
