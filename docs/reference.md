@@ -17,13 +17,13 @@ Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/euro
 
 Create a map with `let map = eurostatmap.map( mapType )`. Set the parameter `mapType` to a value corresponding with the desired map type:
 
--   `"ch"` for a [choropleth map](#choropleth-map),
--   `"ps"` for a [proportional symbol map](#proportional-symbol-map),
--   `"pie"` for a [proportional pie chart map](#proportional-pie-chart-map),
--   `"ct"` for a [categorical map](#categorical-map).
--   `"chbi"` for a [bivariate choropleth map](#bivariate-choropleth-map).
--   `"scomp"` for a [stripe composition map](#stripe-composition-map).
--   `"spark"` for a [spark line map](#sparkline-map).
+- `"ch"` for a [choropleth map](#choropleth-map),
+- `"ps"` for a [proportional symbol map](#proportional-symbol-map),
+- `"pie"` for a [proportional pie chart map](#proportional-pie-chart-map),
+- `"ct"` for a [categorical map](#categorical-map).
+- `"chbi"` for a [bivariate choropleth map](#bivariate-choropleth-map).
+- `"scomp"` for a [stripe composition map](#stripe-composition-map).
+- `"spark"` for a [spark line map](#sparkline-map).
 
 The `map` can then be customised with the methods listed in the tables below. Most of the map methods follow the pattern _map_.**myMethod**([*value*]): If a _value_ is specified, the method sets the parameter value and returns the _map_ object itself. If no _value_ is specified, the method returns the current value of the parameter.
 
@@ -172,16 +172,16 @@ eurostatmap
     .build()
 ```
 
-| Method                                | Type      | Default value          | Description                                                                                                                                                        |
-| ------------------------------------- | --------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| _map_.**clnb**([*value*])             | int       | _7_                    | The number of classes. When _classifMethod = "threshold"_, this parameter is inferred from the number of breaks specified.                                         |
-| _map_.**classifMethod**([*value*])    | String    | _"quantile"_           | The classification method. Possible values are _"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshol (see threshold method). |
-| _map_.**colors**([*value*])           | Array     | _null_                 | The colours to use for the classes. if unspecified, default colorFun is used.                                                                                      |
-| _map_.**threshold**([*value*])        | Array     | _[0]_                  | If _classifMethod = "threshold"_, the breaks of the classification.                                                                                                |
-| _map_.**makeClassifNice**([*value*])  | _boolean_ | true                   | Make nice break values. Works only for _classifMethod = "equinter"_.                                                                                               |
-| _map_.**colorFun**([*value*])         | Function  | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                  |
-| _map_.**classToFillStyle**([*value*]) | Function  | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorLegend(colorFun())`.                  |
-| _map_.**noDataFillStyle**([*value*])  | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                  |
+| Method                                    | Type      | Default value          | Description                                                                                                                                                        |
+| ----------------------------------------- | --------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| _map_.**numberOfClasses**([*value*])      | int       | _7_                    | The number of classes. When _classificationMethod == "threshold"_, this parameter is inferred from the number of breaks specified.                                 |
+| _map_.**classificationMethod**([*value*]) | String    | _"quantile"_           | The classification method. Possible values are _"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshol (see threshold method). |
+| _map_.**colors**([*value*])               | Array     | _null_                 | The colours to use for the classes. if unspecified, default colorFun is used.                                                                                      |
+| _map_.**thresholds**([*value*])           | Array     | _[0]_                  | If _classifMethod = "threshold"_, the breaks of the classification.                                                                                                |
+| _map_.**makeClassifNice**([*value*])      | _boolean_ | true                   | Make nice break values. Works only for _classifMethod = "equinter"_.                                                                                               |
+| _map_.**colorFunction**([*value*])        | Function  | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                  |
+| _map_.**classToFillStyle**([*value*])     | Function  | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorLegend(colorFun())`.                  |
+| _map_.**noDataFillStyle**([*value*])      | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                  |
 
 In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
 
@@ -482,7 +482,7 @@ eurostatmap
         filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2017 },
         unitText: '%',
     })
-    .clnb(4)
+    .numberOfClasses(4)
     .build()
 ```
 
