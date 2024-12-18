@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -12,6 +12,7 @@
         <script>
             eurostatmap
                 .map('ch')
+                .width(800)
                 .title('Population density in Europe')
                 .subtitle('2021')
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })

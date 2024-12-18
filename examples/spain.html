@@ -14,21 +14,19 @@
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
         <script>
             const map = eurostatmap
-                .map('ch', {
+                .map('choropleth', {
                     title: 'Unemployment in Spain',
-                    subtitle: '2019',
-                    width: 600,
-                    heiht: 600,
+                    subtitle: '2023',
+                    width: 800,
                     nutsLevel: 2,
                     stat: {
                         eurostatDatasetCode: 'lfst_r_lfu3rt',
-                        filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: '2019' },
+                        filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: '2023' },
                         unitText: '%',
                     },
                     titleFill: '#333',
                     scale: '10M',
-                    geoCenter: [3200000, 1970000],
-                    pixSize: 2900,
+                    position: { x: 3100000, y: 1970000, z: 1900 },
                     labelling: true,
                     labelsToShow: ['values'],
                     labelShadow: ['values'],
@@ -54,7 +52,7 @@
                             frameStroke: 'black',
                         },
                     ],
-                    insetBoxPosition: [370, 370],
+                    insetBoxPosition: [10, 550],
                     legend: { decimals: 1, x: 5, y: 60, boxOpacity: 0, boxPadding: 7, title: 'Rate (%)', noData: false },
                     callback: function () {
                         //set title with date
