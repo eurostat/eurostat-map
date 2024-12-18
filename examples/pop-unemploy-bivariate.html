@@ -8,17 +8,18 @@
     <body>
         <svg id="map"></svg>
         <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- <script src="../build/eurostatmap.js"></script> -->
         <script>
             let height = window.innerHeight
             const bivariateMap = eurostatmap
-                .map('chbi')
+                .map('bivariateChoropleth')
                 .width(1000)
                 .height(800)
                 .titleFontSize(25)
                 .subtitleFontSize(16)
                 .title('Unemployment and population density, 2021')
                 .subtitle('% unemployed persons aged 20-64 years & inhabitants per km²')
-                .nutsLevel(2)
+                .nutsLevel('mixed')
                 .nutsYear(2016)
                 .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
                 .stat('v2', {
@@ -26,16 +27,7 @@
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '% unemployed',
                 })
-                .clnb(4)
-                .nutsbnStroke({
-                    0: 'white',
-                    1: 'white',
-                    2: 'white',
-                    co: 'none',
-                    oth: 'white',
-                })
-                .cntbnStroke('white')
-                .nutsbnStrokeWidth({ 0: 1, 1: 0.1, 2: 0.1, 3: 0.1, co: 0 })
+                .numberOfClasses(4)
                 .startColor('#f3f3f3')
                 .color1('#00CBC9')
                 .color2('#cc5cb0')
@@ -49,21 +41,12 @@
                     label2: 'Unemployment',
                     x: 20,
                     y: 170,
-                    // axisPadding: { x: 0, y: 0 },
-                    //arrowPadding: 2,
                 })
                 .labelling(true)
-                .labelsToShow(['cc'])
-                .labelShadow(['cc'])
-                .drawGraticule(false)
-                .seaFillStyle('white')
-                .cntrgFillStyle('#f2f2f2')
-                .noDataFillStyle('#bfbfbf')
-                .drawCoastalMargin(false)
                 .zoomExtent([1, 2])
                 .frameStrokeWidth(0)
                 .geoCenter([4900000, 3500000])
-                .nutsrgSelFillSty('red')
+                .hoverColor('red')
                 .build()
         </script>
     </body>

@@ -11,6 +11,9 @@
 **Map elements and methods**<br>
 [Title](#map-title-&-subtitle) - [Frame](#map-frame) - [Legend](#map-legend) - [Scalebar](#scalebar) - [Tooltip](#tooltip) - [Styling](#styling) - [Insets](#insets) - [Bottom text & link to source data](#bottom-text-&-link-to-source-data) - [Export](#export) - [Miscellaneous](#miscellaneous) - [Build & update](#build-and-update)
 
+**Version migration**
+See https://github.com/eurostat/eurostat-map/blob/master/docs/release-notes.md for any major changes.
+
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
 
 ## Map creation

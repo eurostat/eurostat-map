@@ -72,8 +72,8 @@ export const legend = function (map, config) {
 
         if (out.barChart) {
             let thresholds =
-                m.threshold_.length > 1
-                    ? m.threshold_
+                m.thresholds_.length > 1
+                    ? m.thresholds_
                     : Array.from({ length: m.numberOfClasses_ })
                           .map((_, index) => {
                               return m.classifier().invertExtent(index)[out.ascending ? 0 : 1]

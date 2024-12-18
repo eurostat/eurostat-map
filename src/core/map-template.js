@@ -558,9 +558,12 @@ export const mapTemplate = function (config, withCenterPoints) {
         if (!out.position_.x || !out.position_.y) {
             defineDefaultPosition()
         }
+        out.position_.z = out.position_.z || getDefaultZ()
 
+        // d3 projection functions
         defineProjection()
         definePathFunction()
+        // d3 zoom
         if (out.zoomExtent()) {
             defineMapZoom()
         }
@@ -725,7 +728,6 @@ export const mapTemplate = function (config, withCenterPoints) {
             // out.position_.x = Geometries.userGeometries
             // out.position_.y = Geometries.userGeometries
         }
-        out.position_.z = out.position_.z || getDefaultZ()
 
         // optional: set from URL
         setViewFromURL()
