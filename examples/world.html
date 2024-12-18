@@ -7,7 +7,8 @@
 
     <body style="margin: 0">
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../build/eurostatmap.js"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
         <script>
             let data = {
                 JM: 70,
@@ -279,8 +280,8 @@
                 .seaFillStyle('#E6FFFF')
                 .labelling(true)
                 .labelsToShow(['seas'])
-                .classifMethod('threshold')
-                .threshold([10, 20, 30, 40, 50, 60, 70])
+                .classificationMethod('threshold')
+                .thresholds([10, 20, 30, 40, 50, 60, 70])
                 .colors(['#174060', '#1C627C', '#288AA1', '#2CAFC4', '#FDBEB0', '#F3767E', '#CE3658', '#94003A'])
 
             map.statData().setData(data)
