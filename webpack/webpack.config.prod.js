@@ -1,4 +1,7 @@
 const path = require('path')
+const webpack = require('webpack');
+const packageJson = require('../package.json');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     mode: 'production',
@@ -11,6 +14,20 @@ module.exports = {
         publicPath: '/build/', // Optional: if resources are served from this path
     },
     devtool: false,
+    plugins: [
+        new webpack.BannerPlugin({
+          banner: `/*! eurostat-map v${packageJson.version} | ${new Date().getFullYear()} Eurostat | EUPL License. See https://github.com/eurostat/eurostat-map/blob/master/LICENSE */`,
+          raw: false, // Adds the comment as plain text
+        }), 
+      ],
+      optimization: {
+        minimize: true,
+        minimizer: [
+          new TerserPlugin({
+            extractComments: false, // Disable extracting comments to a separate file
+          }),
+        ],
+      },
     module: {
         rules: [
             {
@@ -34,8 +51,4 @@ module.exports = {
         ],
     },
     watch: false,
-    optimization: {
-        usedExports: true,
-        minimize: true,
-    },
 }

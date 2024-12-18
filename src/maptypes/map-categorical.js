@@ -161,7 +161,7 @@ export const map = function (config) {
             }
 
             // Update labels for statistical values if required
-            if (out.labels_.values) {
+            if ( map.labels_ && out.labels_.values) {
                 out.updateValuesLabels(map)
             }
         }
