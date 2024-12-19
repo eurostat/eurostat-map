@@ -1,4 +1,4 @@
-import { select, scaleLinear, scaleLog, scaleSqrt, line, extent, area, min, axisBottom, axisLeft, format, create } from 'd3'
+import { select, scaleLinear, scaleLog, scaleSqrt, line, extent, area, min, max, axisBottom, axisLeft, axisRight, format, create } from 'd3'
 import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
 
@@ -108,13 +108,13 @@ export const map = function (config) {
         }
 
         //set statCodes
-        statDates = dates
+        out._statDates = dates
 
         return out
     }
 
     /** The codes of the categories to consider for the composition. */
-    let statDates = undefined
+    out._statDates = undefined
 
     /**
      * Function to compute composition for region id, for each date.
@@ -127,9 +127,9 @@ export const map = function (config) {
             sum = 0
 
         // Get stat value for each category and compute the sum.
-        for (let i = 0; i < statDates.length; i++) {
+        for (let i = 0; i < out._statDates.length; i++) {
             // Retrieve code and stat value
-            const date = statDates[i]
+            const date = out._statDates[i]
             const s = out.statData(date).get(id)
 
             // Case when some data is missing
@@ -151,11 +151,11 @@ export const map = function (config) {
             const currentValue = comp[i].value
 
             // Calculate percentage change from previous value
-            comp[i].percentageChange = previousValue === 0 ? 0 : ((currentValue - previousValue) / previousValue) * 100
+            comp[i].percentageChange = previousValue === 0 ? 0.001 : ((currentValue - previousValue) / previousValue) * 100
         }
 
         // The first data point doesn't have a previous value to compare with
-        comp[0].percentageChange = 0 // or you can leave it undefined or null, depending on how you want to handle it
+        //comp[0].percentageChange = 0.001 // or you can leave it undefined or null, depending on how you want to handle it
 
         return comp
     }
@@ -163,16 +163,19 @@ export const map = function (config) {
     //@override
     out.updateClassification = function () {
         //if not provided, get list of stat codes from the map stat data
-        if (!statDates) {
+        if (!out._statDates) {
             //get list of stat codes.
-            statDates = Object.keys(out.statData_)
+            out._statDates = Object.keys(out.statData_)
             //remove "default", if present
-            const index = statDates.indexOf('default')
-            if (index > -1) statDates.splice(index, 1)
+            const index = out._statDates.indexOf('default')
+            if (index > -1) out._statDates.splice(index, 1)
         }
 
-        // //define size scaling function
-        out.domain = out.sparkPercentageChange_ ? [-10, 10] : getDatasetMaxMin()
+        // define size scaling function
+        // Define the domain correctly for the log scale
+        out.domain = out.sparkPercentageChange_ ? [1e-3, 10] : getDatasetMaxMin() // Avoid 0 for log scale
+
+        // for area charts
         out.widthClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineWidth_])
         out.heightClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineHeight_])
 
@@ -232,57 +235,156 @@ export const map = function (config) {
             let data = getComposition(nutsid)
 
             if (data) {
-                createSparkLineChart(node, data)
+                createSparkLineChart(node, data, out.sparkLineWidth_, out.sparkLineHeight_)
             }
         })
     }
 
-    function createSparkLineChart(node, data) {
-        console.log(out.domain)
-        //define scales
-        //let ext = extent(data.map((v) => v.value)) //region extent
-        let ext = out.domain //whole dataset extent
-        let xScale
-        let yScale
-        let height
-        let width
-        if (out.sparkType_ == 'area') {
-            width = out.widthClassifier_(ext[1])
-            height = out.heightClassifier_(ext[1])
-            yScale = scaleLinear()
+    function createSparkLineChart(node, data, w, h, isForTooltip = false) {
+        // Get the extent of the whole dataset
+        let ext = out.domain
+        let height = out.sparkType_ === 'area' ? out.widthClassifier_(ext[1]) : h
+        let width = out.sparkType_ === 'area' ? out.heightClassifier_(ext[1]) : w
+
+        let scaledData
+
+        // Define X scale
+        let xScale = scaleLinear()
+            .domain([out._statDates[0], out._statDates[out._statDates.length - 1]])
+            .range([0.5, width - 0.5])
+
+        // Precompute the scaled values for the data points
+        if (out.sparkPercentageChange_) {
+            const sanitizeLogValue = (value) => {
+                if (value === 0) return 0.001 // Avoid zero
+                return value
+            }
+
+            const centerPosition = height / 2
+
+            // Separate positive and negative values for scaling
+            const positiveData = data.filter((d) => d.percentageChange > 0).map((d) => sanitizeLogValue(d.percentageChange))
+            const negativeData = data.filter((d) => d.percentageChange < 0).map((d) => sanitizeLogValue(d.percentageChange))
+
+            // Handling positive values using a positive log scale
+            const maxPositive = max(positiveData) || 1
+            const minPositive = 0.0001
+            const minNegative = min(negativeData) || -1
+
+            const scaleLogPositive = scaleLog()
+                .domain([minPositive, maxPositive]) // For positive values
+                .range([height / 2, 0]) // Positive values above center
+
+            const scaleLogNegative = scaleLog()
+                .domain([-0.01, minNegative]) // For negative values
+                .range([height / 2, height]) // Negative values below center
+
+            //console.log(minNegative, maxPositive, positiveData)
+            if (!positiveData.length || !negativeData.length) {
+                console.log('no data')
+            }
+
+            // Precompute scaled Y data
+            scaledData = data.map((d) => {
+                d.scaledYValue =
+                    d.percentageChange < 0
+                        ? scaleLogNegative(sanitizeLogValue(d.percentageChange))
+                        : scaleLogPositive(sanitizeLogValue(d.percentageChange))
+
+                d.scaledXValue = xScale(d.date)
+
+                if (isNaN(d.scaledYValue)) {
+                    console.error('NaN detected in scaledValue:', d)
+                    d.scaledYValue = 0.01
+                }
+                return d
+            })
+
+            // Draw the axis
+            if (isForTooltip) {
+                // Add the X Axis
+                node.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', 'translate(0,' + height + ')')
+                    .call(axisBottom(xScale).ticks(out._statDates.length).tickFormat(format('.0f')))
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '.15em')
+                    .attr('transform', 'rotate(-65)')
+
+                // Add the Y Axis for positive values
+                const positiveTickValuesY = [1]
+                const negativeTickValuesY = [-0.5]
+                node.append('g')
+                    .attr('class', 'y-axis-negative')
+                    .attr('transform', `translate(-10, ${0})`) // Position for negative axis
+                    .call(axisLeft(scaleLogNegative).tickValues(negativeTickValuesY).tickFormat(format(',.2r')))
+
+                node.append('g')
+                    .attr('class', 'y-axis-positive')
+                    .attr('transform', `translate(${-10}, 0)`)
+                    .call(axisLeft(scaleLogPositive).tickValues(positiveTickValuesY).tickFormat(format(',.2r')))
+                    // Manually add a custom label for 0
+                    .append('g')
+                    .attr('class', 'tick')
+                    .attr('transform', `translate(0, ${height / 2})`)
+                    .append('text')
+                    .attr('fill', 'currentColor')
+                    .attr('x', -12)
+                    .style('text-anchor', 'middle')
+                    .text('0') // Custom label for small value (0.10)
+
+                console.log(positiveTickValuesY, negativeTickValuesY)
+            }
+        } else {
+            // Raw counts (linear scale for both positive and negative)
+
+            const yScale = scaleLinear()
                 .domain(ext)
                 .range([height - 0.5, 0])
-            xScale = scaleLinear()
-                .domain([0, statDates.length - 1])
-                .range([0.5, width - 0.5])
-        } else {
-            width = out.sparkLineWidth_
-            height = out.sparkLineHeight_
-            yScale = scaleLinear()
-                .domain(ext)
-                .range([out.sparkLineHeight_ - 0.5, 0])
-            xScale = scaleLinear()
-                .domain([0, statDates.length - 1])
-                .range([0.5, out.sparkLineWidth_ - 0.5])
+
+            scaledData = data.map((d) => {
+                d.scaledXValue = xScale(d.date)
+                d.scaledYValue = yScale(d.value)
+                return d
+            })
+
+            //Draw axis
+            if (isForTooltip) {
+                // Add the X Axis
+                node.append('g')
+                    .attr('class', 'axis')
+                    .attr('transform', 'translate(0,' + height + ')')
+                    .call(axisBottom(xScale).ticks(out._statDates.length).tickFormat(format('.0f')))
+                    .selectAll('text')
+                    .style('text-anchor', 'end')
+                    .attr('dx', '-.8em')
+                    .attr('dy', '.15em')
+                    .attr('transform', 'rotate(-65)')
+
+                // Add the Y Axis
+                let domainY = yScale.domain()
+                let tickValues = [domainY[0], ((domainY[0] + domainY[1]) / 2).toFixed(1), domainY[1]]
+                node.append('g')
+                    .attr('class', 'axis')
+                    .call(axisLeft(yScale).tickValues(tickValues).tickFormat(format(',.2r')))
+            }
         }
 
-        // Add the area
-        if (out.sparkType_ == 'area') {
+        const lineGenerator = line()
+            .x((d, i) => d.scaledXValue)
+            .y((d) => d.scaledYValue)
+
+        // Draw the area (for area chart)
+        if (out.sparkType_ === 'area') {
             node.append('path')
                 .datum(data)
-                .attr(
-                    'fill',
-                    typeof out.sparkAreaColor_ == 'function' ? (d, i) => out.sparkAreaColor_(d, i) : out.sparkAreaColor_
-                )
-                .attr(
-                    'stroke',
-                    typeof out.sparkLineColor_ == 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_
-                )
+                .attr('fill', typeof out.sparkAreaColor_ === 'function' ? (d, i) => out.sparkAreaColor_(d, i) : out.sparkAreaColor_)
+                .attr('stroke', typeof out.sparkLineColor_ === 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
                 .attr(
                     'stroke-width',
-                    typeof out.sparkLineStrokeWidth_ == 'function'
-                        ? (d, i) => out.sparkLineStrokeWidth_(d, i)
-                        : out.sparkLineStrokeWidth_ + 'px'
+                    typeof out.sparkLineStrokeWidth_ === 'function' ? (d, i) => out.sparkLineStrokeWidth_(d, i) : out.sparkLineStrokeWidth_ + 'px'
                 )
                 .attr('opacity', out.sparkLineOpacity_)
                 .attr('fill-opacity', 0.3)
@@ -290,43 +392,25 @@ export const map = function (config) {
                 .attr(
                     'd',
                     area()
-                        .x(function (d, i) {
-                            return xScale(i)
-                        })
-                        .y0(height)
-                        .y1(function (d) {
-                            return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
-                        })
+                        .x((d, i) => d.scaledXValue)
+                        .y0(height) // Baseline
+                        .y1((d) => d.scaledYValue)
                 )
                 .attr('transform', (d) => `translate(0,-${height / 2})`)
         }
 
-        // Add the line
+        // Draw the line
         node.append('path')
-            .datum(data)
+            .datum(scaledData)
             .style('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
-            .attr('stroke', typeof out.sparkLineColor_ == 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
+            .attr('stroke', typeof out.sparkLineColor_ === 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
             .attr(
                 'stroke-width',
-                typeof out.sparkLineStrokeWidth_ == 'function'
-                    ? (d, i) => out.sparkLineStrokeWidth_(d, i)
-                    : out.sparkLineStrokeWidth_ + 'px'
+                typeof out.sparkLineStrokeWidth_ === 'function' ? (d, i) => out.sparkLineStrokeWidth_(d, i) : out.sparkLineStrokeWidth_ + 'px'
             )
-            .attr(
-                'd',
-                line()
-                    .x(function (d, i) {
-                        return xScale(i)
-                    })
-                    .y(function (d) {
-                        return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
-                    })
-            )
-            .attr('transform', (d) => {
-                // make sure the centroid/origin is the start of the sparkline
-                return `translate(0,-${yScale(out.sparkPercentageChange_ ? d[0].percentageChange : d[0].value)})`
-            })
+            .attr('d', lineGenerator)
+            .attr('transform', (d) => (isForTooltip ? null : `translate(0,${out.sparkPercentageChange_ ? -d[0].scaledYValue : -d[0].scaledYValue})`)) //origin of line is first data point location
 
         // Add the dots
         node.selectAll('myCircles')
@@ -335,14 +419,10 @@ export const map = function (config) {
             .append('circle')
             .style('fill', 'red')
             .attr('stroke', 'none')
-            .attr('cx', function (d, i) {
-                return xScale(i)
-            })
-            .attr('cy', function (d) {
-                return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
-            })
+            .attr('cx', (d, i) => d.scaledXValue)
+            .attr('cy', (d) => d.scaledYValue)
             .attr('r', out.sparkLineCircleRadius_)
-            .attr('transform', (d) => `translate(0,-${height / 2})`)
+            .attr('transform', (d) => (isForTooltip ? null : `translate(0,-${height / 2})`))
     }
 
     /**
@@ -375,9 +455,9 @@ export const map = function (config) {
         let s
 
         //get stat value for each date and find the max
-        for (let i = 0; i < statDates.length; i++) {
+        for (let i = 0; i < out._statDates.length; i++) {
             //retrieve code and stat value
-            const sc = statDates[i]
+            const sc = out._statDates[i]
             s = out.statData(sc).get(id)
             //case when some data is missing
             if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
@@ -429,7 +509,7 @@ export const map = function (config) {
             const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
 
             // Generate the chart within the SVG
-            createTooltipChart(g, data, width, height)
+            createSparkLineChart(g, data, width, height, true)
 
             // Convert the SVG node to an HTML string and add it to the buffer
             buf.push(container.node().outerHTML)
@@ -437,103 +517,6 @@ export const map = function (config) {
 
         // Return the buffer as a single string
         return buf.join('')
-    }
-
-    function createTooltipChart(node, data, width, height) {
-        //define scales
-        //let ext = extent(data.map((v) => v.value)) //region
-        let ext = out.domain //whole dataset
-
-        //defaults to data domain
-        let yScale = scaleLinear()
-            .domain(ext)
-            .range([height - 0.5, 0])
-        //[first date, last date]
-        let xScale = scaleLinear()
-            .domain([statDates[0], statDates[statDates.length - 1]])
-            .range([0.5, width - 0.5])
-
-        // Add the X Axis
-        node.append('g')
-            .attr('class', 'axis')
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(axisBottom(xScale).ticks(statDates.length).tickFormat(format('.0f')))
-            .selectAll('text')
-            .style('text-anchor', 'end')
-            .attr('dx', '-.8em')
-            .attr('dy', '.15em')
-            .attr('transform', 'rotate(-65)')
-
-        // Add the Y Axis
-        let domainY = yScale.domain()
-        let tickValues = [domainY[0], ((domainY[0] + domainY[1]) / 2).toFixed(1), domainY[1]]
-        node.append('g')
-            .attr('class', 'axis')
-            .call(axisLeft(yScale).tickValues(tickValues).tickFormat(format(',.2r')))
-
-        // Add the area
-        if (out.sparkType_ == 'area') {
-            node.append('path')
-                .datum(data)
-                .attr(
-                    'fill',
-                    typeof out.sparkAreaColor_ == 'function' ? (d, i) => out.sparkAreaColor_(d, i) : out.sparkAreaColor_
-                )
-                .attr(
-                    'stroke',
-                    typeof out.sparkLineColor_ == 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_
-                )
-                .attr('stroke-width', 1)
-                .attr('opacity', out.sparkLineOpacity_)
-                .attr('fill-opacity', 0.3)
-                .attr('stroke', 'none')
-                .attr('stroke', 'none')
-                .attr(
-                    'd',
-                    area()
-                        .x(function (d, i) {
-                            return xScale(d.date)
-                        })
-                        .y0(height)
-                        .y1(function (d) {
-                            return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
-                        })
-                )
-        }
-
-        // Add the line
-        node.append('path')
-            .datum(data)
-            .style('fill', 'none')
-            .attr('stroke', typeof out.sparkLineColor_ == 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
-            .attr('stroke-width', 1)
-            .attr(
-                'd',
-                line()
-                    .x(function (d, i) {
-                        return xScale(d.date)
-                    })
-                    .y(function (d) {
-                        return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
-                    })
-            )
-        //.attr("transform", (d) => `translate(-${(width / 2) + xOffset},${-(height / 2) + yOffset})`)
-
-        // Add the line
-        node.selectAll('myCircles')
-            .data(data)
-            .enter()
-            .append('circle')
-            .style('fill', 'red')
-            .attr('stroke', 'none')
-            .attr('cx', function (d, i) {
-                return xScale(d.date)
-            })
-            .attr('cy', function (d) {
-                return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
-            })
-            .attr('r', out.sparkTooltipChart_.circleRadius)
-        //.attr("transform", (d) => `translate(-${(width / 2) + xOffset},${-(height / 2) + yOffset})`)
     }
 
     return out

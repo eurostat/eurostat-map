@@ -3,6 +3,6 @@
     "tabWidth": 4,
     "semi": false,
     "singleQuote": true,
-    "printWidth": 130,
+    "printWidth": 150,
     "htmlWhitespaceSensitivity": "ignore"
 }

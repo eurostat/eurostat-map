@@ -12,57 +12,26 @@
         <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
         <script src="../build/eurostatmap.js"></script>
         <script>
-            eurostatmap
+            const MAPWIDTH = 950
+            const zoom = 5700
+            const MAP1 = eurostatmap
                 .map('sparkline')
-                .width(800)
+                .width(MAPWIDTH)
                 .title('Total population change across Europe over time')
                 .subtitle(
-                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase, <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
                 )
-                .position({ x: 4900000, y: 3500000, z: 6700 })
-                .bottomText(
-                    'Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)'
-                )
+                .position({ x: 4900000, y: 3500000, z: zoom })
+                .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
                 .nutsLevel(1)
                 .statSpark(
                     { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
-                    [
-                        '2009',
-                        '2010',
-                        '2011',
-                        '2012',
-                        '2013',
-                        '2014',
-                        '2015',
-                        '2016',
-                        '2017',
-                        '2018',
-                        '2019',
-                        '2020',
-                        '2021',
-                        '2022',
-                        '2023',
-                    ], //dates
-                    [
-                        '2009',
-                        '2010',
-                        '2011',
-                        '2012',
-                        '2013',
-                        '2014',
-                        '2015',
-                        '2016',
-                        '2017',
-                        '2018',
-                        '2019',
-                        '2020',
-                        '2021',
-                        '2022',
-                        '2023',
-                    ] //labels
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
                 )
                 .sparkType('line')
-                .sparkLineWidth(35)
+                .sparkLineWidth(30)
+                .sparkLineHeight(200)
                 .sparkLineStrokeWidth((data, index) => {
                     // console.log(data, index)
                     let val = data[data.length - 1]?.value
@@ -78,7 +47,6 @@
 
                     return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
                 })
-                .sparkLineHeight(200)
                 // .sparkLineOpacity((data, index) => {
                 //     let val = data[data.length - 1]?.value
                 //     if (val > 10000000) return 1
@@ -92,7 +60,7 @@
                 .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
                 .tooltip({
                     xOffset: 30,
-                    yOffset: 150,
+                    yOffset: 10,
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
@@ -105,59 +73,26 @@
                 .nutsrgSelFillSty('yellow')
                 .build()
 
-            eurostatmap
+            const MAP2 = eurostatmap
                 .map('sparkline')
                 .svgId('map2')
-                .width(800)
+                .width(MAPWIDTH)
                 .title('Percentage population change across Europe over time')
                 .subtitle(
-                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase, <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
                 )
-                .position({ x: 4900000, y: 3500000, z: 6700 })
-                .bottomText(
-                    'Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)'
-                )
+                .position({ x: 4900000, y: 3500000, z: zoom })
+                .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
                 .nutsLevel(1)
                 .sparkPercentageChange(true)
                 .statSpark(
                     { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
-                    [
-                        '2009',
-                        '2010',
-                        '2011',
-                        '2012',
-                        '2013',
-                        '2014',
-                        '2015',
-                        '2016',
-                        '2017',
-                        '2018',
-                        '2019',
-                        '2020',
-                        '2021',
-                        '2022',
-                        '2023',
-                    ], //dates
-                    [
-                        '2009',
-                        '2010',
-                        '2011',
-                        '2012',
-                        '2013',
-                        '2014',
-                        '2015',
-                        '2016',
-                        '2017',
-                        '2018',
-                        '2019',
-                        '2020',
-                        '2021',
-                        '2022',
-                        '2023',
-                    ] //labels
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
                 )
                 .sparkType('line')
                 .sparkLineWidth(35)
+                .sparkLineHeight(20)
                 .sparkLineStrokeWidth((data, index) => {
                     // console.log(data, index)
                     let val = data[data.length - 1]?.value
@@ -172,7 +107,6 @@
                     const endPopulation = dataArray[dataArray.length - 1].value
                     return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
                 })
-                .sparkLineHeight(200)
                 // .sparkLineOpacity((data, index) => {
                 //     let val = data[data.length - 1]?.value
                 //     if (val > 10000000) return 1
@@ -186,7 +120,7 @@
                 .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
                 .tooltip({
                     xOffset: 30,
-                    yOffset: 150,
+                    yOffset: 10,
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
@@ -198,6 +132,10 @@
                 })
                 .nutsrgSelFillSty('yellow')
                 .build()
+
+            // setTimeout(() => {
+            //     MAP2.exportMapToPNG()
+            // }, 3000)
         </script>
     </body>
 </html>
