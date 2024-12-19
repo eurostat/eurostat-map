@@ -8,14 +8,18 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="../build/eurostatmap.js"></script>
         <script>
             eurostatmap
                 .map('sparkline')
                 .width(800)
-                .title('Population change across Europe over the years')
-                .subtitle('Total population, 2009 - 2019.')
-                .bottomText('Line opacity and thickness determined by latest population figure.')
+                .title('Population change across Europe over time')
+                .subtitle(
+                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase, <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+                )
+                .position({ x: 4900000, y: 3500000, z: 6700 })
+                .bottomText('Line thickness determined by latest population figure. By NUTS1 regions.')
                 .nutsLevel(1)
                 .statSpark(
                     { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
@@ -33,16 +37,21 @@
                     if (val > 1000000) return 1.5
                     return 1
                 })
-                .sparkLineColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))
-                .sparkLineHeight(12)
-                .sparkLineOpacity((data, index) => {
-                    let val = data[data.length - 1]?.value
-                    if (val > 10000000) return 1
-                    if (val > 5000000) return 0.75
-                    if (val > 2000000) return 0.5
-                    if (val > 1000000) return 0.25
-                    return 0.15
+                .sparkLineColor((dataArray, i) => {
+                    const startPopulation = dataArray[0].value
+                    const endPopulation = dataArray[dataArray.length - 1].value
+
+                    return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
                 })
+                .sparkLineHeight(12)
+                // .sparkLineOpacity((data, index) => {
+                //     let val = data[data.length - 1]?.value
+                //     if (val > 10000000) return 1
+                //     if (val > 5000000) return 0.75
+                //     if (val > 2000000) return 0.5
+                //     if (val > 1000000) return 0.25
+                //     return 0.15
+                // })
                 .sparkLineCircleRadius(0.1)
                 .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })
                 .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })

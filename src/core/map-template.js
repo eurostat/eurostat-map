@@ -637,7 +637,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('class', cssClass)
                 .attr('x', out.titlePosition()[0])
                 .attr('y', out.titlePosition()[1])
-                .text(out.title())
+                .html(out.title())
         }
 
         if (out.subtitle()) {
@@ -653,7 +653,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .attr('class', cssSubtitleClass)
                 .attr('x', out.subtitlePosition()[0])
                 .attr('y', out.subtitlePosition()[1])
-                .text(out.subtitle())
+                .html(out.subtitle())
         }
 
         //bottom text
