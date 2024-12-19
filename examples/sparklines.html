@@ -19,7 +19,9 @@
                     '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase, <tspan style="fill:#d62728">red</tspan> an overall decrease.'
                 )
                 .position({ x: 4900000, y: 3500000, z: 6700 })
-                .bottomText('Line thickness determined by latest population figure. By NUTS1 regions.')
+                .bottomText(
+                    'Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)'
+                )
                 .nutsLevel(1)
                 .statSpark(
                     { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
@@ -29,7 +31,7 @@
                 .sparkType('line')
                 .sparkLineWidth(35)
                 .sparkLineStrokeWidth((data, index) => {
-                    console.log(data, index)
+                    // console.log(data, index)
                     let val = data[data.length - 1]?.value
                     if (val > 10000000) return 3
                     if (val > 5000000) return 2.5
@@ -43,7 +45,7 @@
 
                     return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
                 })
-                .sparkLineHeight(12)
+                .sparkLineHeight(200)
                 // .sparkLineOpacity((data, index) => {
                 //     let val = data[data.length - 1]?.value
                 //     if (val > 10000000) return 1

@@ -155,9 +155,9 @@ export const map = function (config) {
         }
 
         // //define size scaling function
-        let domain = getDatasetMaxMin()
-        out.widthClassifier_ = scaleSqrt().domain(domain).range([0, out.sparkLineWidth_])
-        out.heightClassifier_ = scaleSqrt().domain(domain).range([0, out.sparkLineHeight_])
+        out.domain = getDatasetMaxMin()
+        out.widthClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineWidth_])
+        out.heightClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineHeight_])
 
         return out
     }
@@ -221,8 +221,10 @@ export const map = function (config) {
     }
 
     function createSparkLineChart(node, data) {
+        console.log(out.domain)
         //define scales
-        let ext = extent(data.map((v) => v.value))
+        //let ext = extent(data.map((v) => v.value)) //region extent
+        let ext = out.domain //whole dataset extent
         let xScale
         let yScale
         let height
@@ -304,7 +306,10 @@ export const map = function (config) {
                         return yScale(d.value)
                     })
             )
-            .attr('transform', (d) => `translate(0,-${height / 2})`)
+            .attr('transform', (d) => {
+                // make sure the centroid/origin is the start of the sparkline
+                return `translate(0,-${yScale(d[0].value)})`
+            })
 
         // Add the dots
         node.selectAll('myCircles')
@@ -419,10 +424,14 @@ export const map = function (config) {
 
     function createTooltipChart(node, data, width, height) {
         //define scales
-        let ext = extent(data.map((v) => v.value))
+        //let ext = extent(data.map((v) => v.value)) //region
+        let ext = out.domain //whole dataset
+
+        //defaults to data domain
         let yScale = scaleLinear()
             .domain(ext)
             .range([height - 0.5, 0])
+        //[first date, last date]
         let xScale = scaleLinear()
             .domain([statDates[0], statDates[statDates.length - 1]])
             .range([0.5, width - 0.5])
