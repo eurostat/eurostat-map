@@ -28,7 +28,7 @@ export const map = function (type, config) {
     //proportional pie charts
     if (type == 'pieChart' || type == 'pie') return PieCharts.map(config)
     //sparkline maps
-    if (type == 'sparkline' || type == 'spark') return Sparklines.map(config)
+    if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return Sparklines.map(config)
     //flow maps
     if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
     //add new map types here
