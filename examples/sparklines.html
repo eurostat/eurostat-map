@@ -12,14 +12,14 @@
         <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
         <script src="../build/eurostatmap.js"></script>
         <script>
-            const MAPWIDTH = 950
-            const zoom = 5700
+            const MAPWIDTH = 800
+            const zoom = 6500
             const MAP1 = eurostatmap
                 .map('sparkline')
                 .width(MAPWIDTH)
                 .title('Total population change across Europe over time')
                 .subtitle(
-                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+                    '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
                 )
                 .position({ x: 4900000, y: 3500000, z: zoom })
                 .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
@@ -79,7 +79,7 @@
                 .width(MAPWIDTH)
                 .title('Percentage population change across Europe over time')
                 .subtitle(
-                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+                    '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
                 )
                 .position({ x: 4900000, y: 3500000, z: zoom })
                 .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
