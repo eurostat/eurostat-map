@@ -8,13 +8,14 @@
 
     <body>
         <svg id="map"></svg>
+        <svg id="map2"></svg>
         <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
         <script src="../build/eurostatmap.js"></script>
         <script>
             eurostatmap
                 .map('sparkline')
                 .width(800)
-                .title('Population change across Europe over time')
+                .title('Total population change across Europe over time')
                 .subtitle(
                     '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase, <tspan style="fill:#d62728">red</tspan> an overall decrease.'
                 )
@@ -25,8 +26,40 @@
                 .nutsLevel(1)
                 .statSpark(
                     { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'], //dates
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'] //labels
+                    [
+                        '2009',
+                        '2010',
+                        '2011',
+                        '2012',
+                        '2013',
+                        '2014',
+                        '2015',
+                        '2016',
+                        '2017',
+                        '2018',
+                        '2019',
+                        '2020',
+                        '2021',
+                        '2022',
+                        '2023',
+                    ], //dates
+                    [
+                        '2009',
+                        '2010',
+                        '2011',
+                        '2012',
+                        '2013',
+                        '2014',
+                        '2015',
+                        '2016',
+                        '2017',
+                        '2018',
+                        '2019',
+                        '2020',
+                        '2021',
+                        '2022',
+                        '2023',
+                    ] //labels
                 )
                 .sparkType('line')
                 .sparkLineWidth(35)
@@ -54,7 +87,7 @@
                 //     if (val > 1000000) return 0.25
                 //     return 0.15
                 // })
-                .sparkLineCircleRadius(0.1)
+                .sparkLineCircleRadius(0)
                 .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })
                 .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
                 .tooltip({
@@ -65,7 +98,101 @@
                 })
                 .sparkTooltipChart({
                     width: 150,
-                    height: 50,
+                    height: 150,
+                    margin: { left: 60, right: 40, top: 20, bottom: 40 },
+                    circleRadius: 1.5,
+                })
+                .nutsrgSelFillSty('yellow')
+                .build()
+
+            eurostatmap
+                .map('sparkline')
+                .svgId('map2')
+                .width(800)
+                .title('Percentage population change across Europe over time')
+                .subtitle(
+                    '2009 - 2019. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase, <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+                )
+                .position({ x: 4900000, y: 3500000, z: 6700 })
+                .bottomText(
+                    'Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)'
+                )
+                .nutsLevel(1)
+                .sparkPercentageChange(true)
+                .statSpark(
+                    { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
+                    [
+                        '2009',
+                        '2010',
+                        '2011',
+                        '2012',
+                        '2013',
+                        '2014',
+                        '2015',
+                        '2016',
+                        '2017',
+                        '2018',
+                        '2019',
+                        '2020',
+                        '2021',
+                        '2022',
+                        '2023',
+                    ], //dates
+                    [
+                        '2009',
+                        '2010',
+                        '2011',
+                        '2012',
+                        '2013',
+                        '2014',
+                        '2015',
+                        '2016',
+                        '2017',
+                        '2018',
+                        '2019',
+                        '2020',
+                        '2021',
+                        '2022',
+                        '2023',
+                    ] //labels
+                )
+                .sparkType('line')
+                .sparkLineWidth(35)
+                .sparkLineStrokeWidth((data, index) => {
+                    // console.log(data, index)
+                    let val = data[data.length - 1]?.value
+                    if (val > 10000000) return 3
+                    if (val > 5000000) return 2.5
+                    if (val > 2000000) return 2
+                    if (val > 1000000) return 1.5
+                    return 1
+                })
+                .sparkLineColor((dataArray, i) => {
+                    const startPopulation = dataArray[0].value
+                    const endPopulation = dataArray[dataArray.length - 1].value
+                    return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
+                })
+                .sparkLineHeight(200)
+                // .sparkLineOpacity((data, index) => {
+                //     let val = data[data.length - 1]?.value
+                //     if (val > 10000000) return 1
+                //     if (val > 5000000) return 0.75s
+                //     if (val > 2000000) return 0.5
+                //     if (val > 1000000) return 0.25
+                //     return 0.15
+                // })
+                .sparkLineCircleRadius(0)
+                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })
+                .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
+                .tooltip({
+                    xOffset: 30,
+                    yOffset: 150,
+                    fontSize: '12px',
+                    maxWidth: Math.min(400, window.innerWidth),
+                })
+                .sparkTooltipChart({
+                    width: 150,
+                    height: 150,
                     margin: { left: 60, right: 40, top: 20, bottom: 40 },
                     circleRadius: 1.5,
                 })

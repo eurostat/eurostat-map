@@ -29,6 +29,7 @@ export const map = function (config) {
     //show sparklines only when data for all dates is complete.
     //Otherwise, consider the regions as being with no data at all.
     out.showOnlyWhenComplete_ = false
+    out.sparkPercentageChange_ = false // show percentage change instead of raw counts
 
     out.statSpark_ = null
     out.sparkHeightClassifier_ = null
@@ -51,6 +52,7 @@ export const map = function (config) {
         'sparkLineCircleRadius_',
         'sparkLineAreaColor_',
         'sparkTooltipChart_',
+        'sparkPercentageChange_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -72,6 +74,7 @@ export const map = function (config) {
             'sparkLineCircleRadius_',
             'sparkLineAreaColor',
             'sparkTooltipChart_',
+            'sparkPercentageChange_',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
@@ -122,23 +125,37 @@ export const map = function (config) {
     const getComposition = function (id) {
         let comp = [],
             sum = 0
-        //get stat value for each category. Compute the sum.
+
+        // Get stat value for each category and compute the sum.
         for (let i = 0; i < statDates.length; i++) {
-            //retrieve code and stat value
+            // Retrieve code and stat value
             const date = statDates[i]
             const s = out.statData(date).get(id)
 
-            //case when some data is missing
+            // Case when some data is missing
             if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
                 if (out.showOnlyWhenComplete()) return undefined
                 else continue
             }
+
             comp.push({ date: date, value: s.value })
             sum += s.value
         }
 
-        //case when no data
+        // Case when no data
         if (sum == 0) return undefined
+
+        // Calculate year-on-year percentage change
+        for (let i = 1; i < comp.length; i++) {
+            const previousValue = comp[i - 1].value
+            const currentValue = comp[i].value
+
+            // Calculate percentage change from previous value
+            comp[i].percentageChange = previousValue === 0 ? 0 : ((currentValue - previousValue) / previousValue) * 100
+        }
+
+        // The first data point doesn't have a previous value to compare with
+        comp[0].percentageChange = 0 // or you can leave it undefined or null, depending on how you want to handle it
 
         return comp
     }
@@ -155,7 +172,7 @@ export const map = function (config) {
         }
 
         // //define size scaling function
-        out.domain = getDatasetMaxMin()
+        out.domain = out.sparkPercentageChange_ ? [-10, 10] : getDatasetMaxMin()
         out.widthClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineWidth_])
         out.heightClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineHeight_])
 
@@ -278,7 +295,7 @@ export const map = function (config) {
                         })
                         .y0(height)
                         .y1(function (d) {
-                            return yScale(d.value)
+                            return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
                         })
                 )
                 .attr('transform', (d) => `translate(0,-${height / 2})`)
@@ -303,12 +320,12 @@ export const map = function (config) {
                         return xScale(i)
                     })
                     .y(function (d) {
-                        return yScale(d.value)
+                        return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
                     })
             )
             .attr('transform', (d) => {
                 // make sure the centroid/origin is the start of the sparkline
-                return `translate(0,-${yScale(d[0].value)})`
+                return `translate(0,-${yScale(out.sparkPercentageChange_ ? d[0].percentageChange : d[0].value)})`
             })
 
         // Add the dots
@@ -322,7 +339,7 @@ export const map = function (config) {
                 return xScale(i)
             })
             .attr('cy', function (d) {
-                return yScale(d.value)
+                return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
             })
             .attr('r', out.sparkLineCircleRadius_)
             .attr('transform', (d) => `translate(0,-${height / 2})`)
@@ -479,7 +496,7 @@ export const map = function (config) {
                         })
                         .y0(height)
                         .y1(function (d) {
-                            return yScale(d.value)
+                            return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
                         })
                 )
         }
@@ -497,7 +514,7 @@ export const map = function (config) {
                         return xScale(d.date)
                     })
                     .y(function (d) {
-                        return yScale(d.value)
+                        return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
                     })
             )
         //.attr("transform", (d) => `translate(-${(width / 2) + xOffset},${-(height / 2) + yOffset})`)
@@ -513,7 +530,7 @@ export const map = function (config) {
                 return xScale(d.date)
             })
             .attr('cy', function (d) {
-                return yScale(d.value)
+                return yScale(out.sparkPercentageChange_ ? d.percentageChange : d.value)
             })
             .attr('r', out.sparkTooltipChart_.circleRadius)
         //.attr("transform", (d) => `translate(-${(width / 2) + xOffset},${-(height / 2) + yOffset})`)
