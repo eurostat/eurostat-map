@@ -3,6 +3,12 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            #sphere,
+            .em-graticule {
+                fill: #e6ffff;
+            }
+        </style>
     </head>
 
     <body style="margin: 0">
@@ -277,7 +283,7 @@
                 .title('World map')
                 .drawGraticule(true)
                 .graticuleStrokeWidth(0.4)
-                .seaFillStyle('#E6FFFF')
+                .seaFillStyle('#FFFFFF')
                 .labelling(true)
                 .labelsToShow(['seas'])
                 .classificationMethod('threshold')
