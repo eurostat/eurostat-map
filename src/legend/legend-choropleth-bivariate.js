@@ -89,10 +89,7 @@ export const legend = function (map, config) {
         const square = lgg
             .append('g')
             .attr('class', 'bivariate-squares-chart')
-            .attr(
-                'transform',
-                `translate(${out.boxPadding + horizontalOffset},${xc + y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
-            )
+            .attr('transform', `translate(${out.boxPadding + horizontalOffset},${xc + y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`)
 
         const initialX = out.yAxisLabelsOffset.x
 
@@ -234,8 +231,8 @@ export const legend = function (map, config) {
             .attr('class', 'em-bivariate-axis-title')
             .attr('x', -out.squareSize)
             .attr('y', yAxisArrowX - out.arrowPadding)
-            .attr('transform', `rotate(-90)`)
             .text(out.label2)
+            .style('transform', out.rotation < 0 ? 'translate(-51px, 95px) rotate(90deg)' : 'rotate(-90deg)')
 
         // Frame
         square
@@ -265,19 +262,14 @@ export const legend = function (map, config) {
         // 'No data' legend box
         if (out.noData) {
             const noDataYOffset =
-                out.rotation === 0
-                    ? out.noDataYOffset + out.squareSize / out.map.numberOfClasses_ + out.arrowHeight / 2
-                    : out.noDataYOffset
+                out.rotation === 0 ? out.noDataYOffset + out.squareSize / out.map.numberOfClasses_ + out.arrowHeight / 2 : out.noDataYOffset
 
-            y =
-                out.rotation === 0
-                    ? y + out.squareSize + noDataYOffset
-                    : y + 1.4142 * out.squareSize + out.boxPadding * 2 + noDataYOffset
+            y = out.rotation === 0 ? y + out.squareSize + noDataYOffset : y + 1.4142 * out.squareSize + out.boxPadding * 2 + noDataYOffset
 
             lgg.append('rect')
                 .attr('class', 'em-bivariate-nodata')
-                .attr('x', out.boxPadding)
-                .attr('y', y)
+                .attr('x', out.boxPadding + (out.rotation == 0 ? 1 : 15))
+                .attr('y', y + (out.rotation == 0 ? 0 : -10))
                 .attr('width', out.noDataShapeWidth)
                 .attr('height', out.noDataShapeHeight)
                 .style('fill', out.map.noDataFillStyle())
@@ -296,8 +288,8 @@ export const legend = function (map, config) {
                 })
             lgg.append('text')
                 .attr('class', 'em-bivariate-nodata-label')
-                .attr('x', out.boxPadding + out.noDataShapeWidth + 5)
-                .attr('y', y + out.noDataShapeHeight * 0.5 + 1)
+                .attr('x', out.boxPadding + out.noDataShapeWidth + 5 + (out.rotation == 0 ? 1 : 15))
+                .attr('y', y + out.noDataShapeHeight * 0.5 + 1 + (out.rotation == 0 ? 0 : -10))
                 .text(out.noDataText)
         }
 

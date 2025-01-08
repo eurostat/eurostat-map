@@ -7,8 +7,8 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
-        <!-- <script src="../build/eurostatmap.js"></script> -->
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="../build/eurostatmap.js"></script>
         <script>
             let height = window.innerHeight
             const bivariateMap = eurostatmap
@@ -18,33 +18,33 @@
                 .subtitleFontSize(16)
                 //.title('Unemployment and population density, 2021')
                 //.subtitle('% unemployed persons aged 20-64 years & inhabitants per km²')
-                .nutsLevel('mixed')
-                .nutsYear(2016)
-                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
+                .nutsLevel(1)
+                .nutsYear(2021)
+                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { time: '2021' } })
                 .stat('v2', {
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '% unemployed',
                 })
                 .numberOfClasses(4)
-                .startColor('#f3f3f3')
+                .startColor('#CCDCE9')
                 .color1('#00CBC9')
                 .color2('#cc5cb0')
                 .endColor('#0019a8')
                 .scale('10M')
                 .legend({
-                    boxFill: 'none',
+                    boxOpacity: 0,
                     squareSize: 100,
+                    rotation: -45,
                     labelFontSize: 14,
                     label1: 'Population / km²',
                     label2: 'Unemployment',
                     x: 530,
-                    y: 120,
+                    y: 100,
                 })
                 .labelling(true)
                 .zoomExtent([1, 2])
                 .frameStrokeWidth(0)
-                .geoCenter([4900000, 3500000])
                 .hoverColor('red')
                 .build()
         </script>
