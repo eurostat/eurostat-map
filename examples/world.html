@@ -6,7 +6,7 @@
         <style>
             #sphere,
             .em-graticule {
-                fill: #e6ffff;
+                fill: #f2fcfc;
             }
         </style>
     </head>
@@ -280,7 +280,7 @@
                 .geo('WORLD')
                 .width(Math.min(window.innerHeight, window.innerWidth))
                 .nutsLevel('mixed')
-                .title('World map')
+                //.title('World map')
                 .drawGraticule(true)
                 .graticuleStrokeWidth(0.4)
                 .seaFillStyle('#FFFFFF')
@@ -288,7 +288,7 @@
                 .labelsToShow(['seas'])
                 .classificationMethod('threshold')
                 .thresholds([10, 20, 30, 40, 50, 60, 70])
-                .colors(['#174060', '#1C627C', '#288AA1', '#2CAFC4', '#FDBEB0', '#F3767E', '#CE3658', '#94003A'])
+                .colors(['#e9ecf6', '#cfd6ef', '#b5bee9', '#98a6df', '#7c90d6', '#6277cd', '#4760b7', '#2c49a9'])
 
             map.statData().setData(data)
             map.build()

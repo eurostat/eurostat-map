@@ -12,7 +12,8 @@
         <script>
             eurostatmap
                 .map('ch')
-                .title('Population in Europe')
+                //.title('Population in Europe')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
                 .titleFill('#444')
                 .width(800)
                 .nutsLevel(1)
@@ -42,6 +43,7 @@
                     title: 'Density - inhab./km²',
                     decimals: 0,
                     x: 560,
+                    y: 50,
                     noData: false,
                 })
                 .build()

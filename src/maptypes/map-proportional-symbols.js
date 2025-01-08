@@ -146,12 +146,10 @@ export const map = function (config) {
                         if (Array.isArray(out.insetTemplates_[geo][i])) {
                             // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
                             for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_)
-                                    applyClassificationToMap(out.insetTemplates_[geo][i][c])
+                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyClassificationToMap(out.insetTemplates_[geo][i][c])
                             }
                         } else {
-                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_)
-                                applyClassificationToMap(out.insetTemplates_[geo][i])
+                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyClassificationToMap(out.insetTemplates_[geo][i])
                         }
                     }
                 } else {
@@ -334,8 +332,8 @@ export const map = function (config) {
 
             addMouseEvents(map)
 
-            // update labels of stat values, appending the stat labels to the region centroids
-            if (out.labelsToShow_.includes('values')) {
+            // Update labels for statistical values if required
+            if (out.labels_?.values) {
                 out.updateValuesLabels(map)
             }
         }
@@ -728,8 +726,7 @@ export const map = function (config) {
                         if (Array.isArray(out.insetTemplates_[geo][i])) {
                             // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
                             for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_)
-                                    applyStyleToMap(out.insetTemplates_[geo][i][c])
+                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
                             }
                         } else {
                             if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
