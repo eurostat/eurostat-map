@@ -1,6 +1,6 @@
-# Documentation
+# API reference
 
-- [Documentation](#documentation)
+- [API reference](#api-reference)
     - [Map creation](#map-creation)
         - [Map definition](#map-definition)
         - [Map geography](#map-geography)
