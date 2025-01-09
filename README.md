@@ -4,7 +4,9 @@
 ![npm](https://img.shields.io/npm/v/eurostat-map)
 ![license](https://img.shields.io/badge/license-EUPL-success)
 
-Eurostat-map.js allows developers to quickly create and customise thematic web maps based on [NUTS regions](https://ec.europa.eu/eurostat/web/nuts/background), showing [Eurostat](https://ec.europa.eu/eurostat) data directly retrieved from the [Eurostat database](https://ec.europa.eu/eurostat/data/database), or custom data added manually.
+<div style="text-align: center; font-size:18px; font-style:italic;">
+  Thematic web mapping based on D3, designed for Eurostat data but compatible with custom geometries and datasets.
+</div>
 
 <div align="center">
 <a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"> <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/examples.gif" alt="examples" width="600"/> </a>
