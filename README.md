@@ -1,9 +1,9 @@
 # [eurostat-map](https://github.com/eurostat/eurostat-map)
 
 <div align="center">
-![npm bundle size](https://img.shields.io/bundlephobia/min/eurostat-map)
-![npm](https://img.shields.io/npm/v/eurostat-map)
-![license](https://img.shields.io/badge/license-EUPL-success)
+  <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
+  <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
+  <img src="https://img.shields.io/badge/license-EUPL-success" alt="license">
 </div>
 
 <div align="center">
