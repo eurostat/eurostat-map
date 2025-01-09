@@ -5,7 +5,7 @@
 ![license](https://img.shields.io/badge/license-EUPL-success)
 
 <div align="center">
-  Thematic web mapping based on D3, designed for Eurostat data but compatible with custom geometries and datasets.
+  Thematic web mapping based on D3, designed for Eurostat data but compatible with custom geometries and stats.
 </div>
 
 <div align="center">
