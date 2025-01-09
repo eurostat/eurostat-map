@@ -3,6 +3,7 @@
 # [eurostat-map](https://github.com/eurostat/eurostat-map)
 
 </div>
+
 <div align="center">
   <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
@@ -22,17 +23,40 @@
 <a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"> <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/examples.gif" alt="examples" width="600"/> </a>
 </div>
 
+---
+
+## Table of Contents
+
+<div align="center">
+
+- [eurostat-map](#eurostat-map)
+    - [Table of Contents](#table-of-contents)
+    - [Examples](#examples)
+    - [Installation](#installation)
+        - [Node.js](#nodejs)
+        - [Standalone](#standalone)
+    - [Documentation](#documentation)
+    - [Technical details](#technical-details)
+    - [About](#about)
+    - [Contribute](#contribute)
+    - [Copyright](#copyright)
+    - [Disclaimer](#disclaimer)
+
+</div>
+
+---
+
 ## Examples
 
 You can build an interactive statistical map with just a few lines of code:
 
 ```javascript
 eurostatmap
-    .map('choropleth')
-    .title('Population density in Europe')
-    .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
-    .legend({ x: 500, y: 180, title: 'Density, people/km²' })
-    .build()
+    .map('choropleth') // Specify the map type
+    .title('Population density in Europe') // Add a title
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' }) // Configure dataset
+    .legend({ x: 500, y: 180, title: 'Density, people/km²' }) // Add a legend
+    .build() // Build the map
 ```
 
 - [Population density](https://eurostat.github.io/eurostat-map/examples/population-density.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-density.html))
@@ -75,10 +99,12 @@ eurostatmap = require('eurostatmap')
 
 ## Documentation
 
+For detailed documentation see the **[API reference page](docs/reference.md)**.
+
 For a quick tutorial check out this notebook:
 https://observablehq.com/@joewdavies/eurostat-map-js
 
-Or see the **[API reference](docs/reference.md)**:
+Code examples:
 
 - For a [choropleth map](docs/reference.md#choropleth-map),
 - For a [proportional symbol map](docs/reference.md#proportional-symbol-map),
@@ -103,9 +129,9 @@ Maps based on [NUTS regions](http://ec.europa.eu/eurostat/web/nuts/overview) rel
 | _status_       | Since 2018                                                                                                                                                                            |
 | _license_      | [EUPL 1.2](https://github.com/eurostat/Nuts2json/blob/master/LICENSE)                                                                                                                 |
 
-## Support and contribution
+## Contribute
 
-Feel free to [ask support](https://github.com/eurostat/eurostat.js/issues/new), fork the project or simply star it (it's always a pleasure).
+Feel free to [ask for assistance](https://github.com/eurostat/eurostat.js/issues/new), fork the project or simply star it (it's always a pleasure).
 
 ## Copyright
 
