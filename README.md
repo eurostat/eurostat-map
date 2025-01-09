@@ -8,9 +8,13 @@
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
   <img src="https://img.shields.io/badge/license-EUPL-success" alt="license">
 </div>
+<br>
 
-<div align="center" style="padding-bottom: 10px;">
-  <em>Thematic web mapping based on D3, designed for Eurostat data but compatible with custom geometries and stats.</em>
+<div align="center">
+  <em>Customizable thematic maps for global and regional data.</em>
+</div>
+<div align="center">
+<em>Based on D3 and designed for Eurostat data but compatible with custom geometries and stats.</em>
 </div>
 
 <div align="center">
