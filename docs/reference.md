@@ -1,20 +1,35 @@
-# eurostat-map.js API reference
+# Documentation
 
-**Map**<br>[Creation](#map-creation) - [Definition](#map-definition) - [Geography](#map-geography)
-
-**Statistical data**<br>
-[Eurostat](#eurostat-database) - [CSV](#csv) - [Custom JS](#custom-js)
-
-**Map types**<br>
-[Choropleth map](#choropleth-map) - [Proportional symbol map](#proportional-symbol-map) - [Proportional pie chart map](#proportional-pie-chart-map) - [Categorical map](#categorical-map) - [Bivariate choropleth map](#bivariate-choropleth-map) - [Stripe composition map](#stripe-composition-map) - [Sparkline map](#sparkline-map)
-
-**Map elements and methods**<br>
-[Title](#map-title-&-subtitle) - [Frame](#map-frame) - [Legend](#map-legend) - [Scalebar](#scalebar) - [Tooltip](#tooltip) - [Styling](#styling) - [Insets](#insets) - [Bottom text & link to source data](#bottom-text-&-link-to-source-data) - [Export](#export) - [Miscellaneous](#miscellaneous) - [Build & update](#build-and-update)
-
-**Version migration**<br>
-See https://github.com/eurostat/eurostat-map/blob/master/docs/release-notes.md for any major changes.
-
-Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
+- [Documentation](#documentation)
+    - [Map creation](#map-creation)
+        - [Map definition](#map-definition)
+        - [Map geography](#map-geography)
+            - [World maps](#world-maps)
+        - [Statistical data](#statistical-data)
+            - [Eurostat database](#eurostat-database)
+            - [CSV](#csv)
+            - [Custom JS](#custom-js)
+    - [Map types](#map-types)
+        - [Choropleth map](#choropleth-map)
+        - [Proportional symbol map](#proportional-symbol-map)
+        - [Proportional pie chart map](#proportional-pie-chart-map)
+        - [Categorical map](#categorical-map)
+        - [Bivariate choropleth map](#bivariate-choropleth-map)
+        - [Stripe composition map](#stripe-composition-map)
+        - [Sparkline map](#sparkline-map)
+    - [Map texts](#map-texts)
+        - [Map title \& subtitle](#map-title--subtitle)
+        - [Labelling](#labelling)
+        - [Footnotes](#footnotes)
+    - [Map legend](#map-legend)
+    - [Scalebar](#scalebar)
+    - [Tooltip](#tooltip)
+    - [Styling](#styling)
+    - [Insets](#insets)
+    - [Export](#export)
+    - [Miscellaneous](#miscellaneous)
+    - [Build and update](#build-and-update)
+    - [Version migration](#version-migration)
 
 ## Map creation
 
@@ -32,7 +47,7 @@ The `map` can then be customised with the methods listed in the tables below. Mo
 
 It is also possible to specify the map parameters as an object: `let map = eurostatmap.map( mapType, { param1: v1, param2: v2} );`. This is equivalent to: `let map = eurostatmap.map( mapType ).param1(v1).param2(v2);`
 
-## Map definition
+### Map definition
 
 Specify the map SVG element.
 
@@ -42,7 +57,7 @@ Specify the map SVG element.
 | _map_.**width**([*value*])  | int    | _800_         | The width of the map, in pixel.                                                                         |
 | _map_.**height**([*value*]) | int    | _auto_        | The height of the map, in pixel. If not specified, the height is set automatically as 85% of the width. |
 
-## Map geography
+### Map geography
 
 Specify the NUTS geometries and the geographical extent of the map.
 
@@ -59,7 +74,7 @@ Specify the NUTS geometries and the geographical extent of the map.
 | _map_.**zoomExtent**([*value*])      | Array                 | _undefined_                                                                                                                                                                                     | The zoom extent. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both.                                                                                            |
 | _map_.**maxBounds**([*value*])       | {xMin,yMin,xMax,yMax} | _undefined_                                                                                                                                                                                     | The maximum bounds that the user can pan/zoom within.                                                                                                                                                                                                                                                                                     |
 
-## World maps
+#### World maps
 
 It is also possible to build thematic world maps using eurostat-map. Simply pass "WORLD" to the map.geo() method. See [this example](https://github.com/eurostat/eurostat-map/blob/master/examples/world.html) for how to configure a world map.
 
@@ -67,7 +82,7 @@ It is also possible to build thematic world maps using eurostat-map. Simply pass
 | --------------------------------------- | ------------- | ------------------- | ---------------------------------------------------------------------- |
 | _map_.**projectionFunction**([*value*]) | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps |
 
-## Statistical data
+### Statistical data
 
 The map statistical data can be accessed with the _map_.**statData**() method, which returns an object with the following methods:
 
@@ -85,7 +100,7 @@ The map statistical data can be accessed with the _map_.**statData**() method, w
 
 The map statistical data source can be accessed with the _map_.**stat**([*value*]) method. Several types of data sources are supported (see sections below).
 
-### Eurostat database
+#### Eurostat database
 
 Specify statistical data to be retrieved on-the-fly from [Eurostat database](https://ec.europa.eu/eurostat/web/main/data/database). The query parameters can be retrieved from [this page](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/generate-new-query).
 
@@ -110,7 +125,7 @@ map.stat( {
 | **filters**             | Object | _{ lastTimePeriod : 1 }_ | The Eurostat dimension codes to filter/select the chosen statistical variable. See [here](https://ec.europa.eu/eurostat/data/database) or [here](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder) to find them. |
 | **precision**           | int    | _2_                      | The precision of the statistical variable to retrieve (number of decimal places).                                                                                                                                                                             |
 
-### CSV
+#### CSV
 
 Specify statistical data to be retrieved from CSV data.
 
@@ -131,7 +146,7 @@ map.stat( {
 | **geoCol**   | String | _"geo"_       | The column with the NUTS ids.           |
 | **valueCol** | String | _"value"_     | The column with the statistical values. |
 
-### Custom JS
+#### Custom JS
 
 Specify statistical data region by region, from JavaScript code, or any kind of JSON data source.
 
@@ -151,7 +166,11 @@ map.statData().setData({
 })
 ```
 
-## Choropleth map
+## Map types
+
+There are many different types of thematic maps that you can create using eurostat-map. Here you will find documentation on how to build them.
+
+### Choropleth map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/ch_ex.png)](https://eurostat.github.io/eurostat-map/examples/population-density.html)
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/pp_ex.png)](https://eurostat.github.io/eurostat-map/examples/population-dot-density.html)
@@ -204,7 +223,7 @@ In addition to [the default legend parameters](#map-legend), choropleth maps hav
 | **noDataText**         | Text     | _"No data"_                       | 'No data' text label.                                                         |
 | **labels**             | []       | _null_                            | Manually define the labels to be used in the legend as an array               |
 
-## Proportional symbol map
+### Proportional symbol map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/pc_ex.png)](https://eurostat.github.io/eurostat-map/examples/prop-circles.html)
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/ps_ex.png)](https://eurostat.github.io/eurostat-map/examples/prop-circles.html)
@@ -309,7 +328,7 @@ The following parameters are properties of the colorLegend object:
 | **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
 | **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
 
-## Proportional pie chart map
+### Proportional pie chart map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/pie_ex.png)](https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html)
 
@@ -423,7 +442,7 @@ The following parameters are properties of the **colorLegend** object:
 | **noData**([*value*])       | boolean | _true_        | Show/hide 'no data' legend box element.                                   |
 | **noDataText**([*value*])   | string  | _"No data"_   | 'No data' label text.                                                     |
 
-## Categorical map
+### Categorical map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/ct_ex.png)](https://eurostat.github.io/eurostat-map/examples/categorical.html)
 
@@ -466,7 +485,7 @@ In addition to [the default legend parameters](#map-legend), categorical maps ha
 | **noDataText**    | Text    | _"No data"_   | 'No data' text label.                                                                                                                                 |
 | **order**         | array   | _"undefined"_ | The order in which the legend classes should be drawn. E.g. ['urb','int','rur']. If left undefined, eurostatmap will order the classes automatically. |
 
-## Bivariate choropleth map
+### Bivariate choropleth map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/chbi_ex.png)](https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html)
 
@@ -519,7 +538,7 @@ In addition to [the default legend parameters](#map-legend), bivariate choroplet
 | **yAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks1                              |
 | **xAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks2                              |
 
-## Stripe composition map
+### Stripe composition map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/comp1.png)](https://eurostat.github.io/eurostat-map/examples/livestock_composition.html)
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/comp2.png)](https://eurostat.github.io/eurostat-map/examples/farm_size.html)
@@ -601,7 +620,7 @@ In addition to [the default legend parameters](#map-legend), stripe composition 
 | _map_.**noData**([*value*])        | boolean | _true_        | Show/hide 'no data' legend box element.                                   |
 | _map_.**noDataText**([*value*])    | string  | _"No data"_   | 'No data' label text.                                                     |
 
-## Sparkline map
+### Sparkline map
 
 A sparkline is a very small line chart, typically drawn without axes or coordinates. It presents the general shape of the variation (typically over time) in some measurement, such as temperature, in a simple and highly condensed way. A chart is drawn for each region showing the temporal variations of each.
 
@@ -637,7 +656,11 @@ eurostatmap
 | _map_.**sparkChartCircleRadius**([*value*]) | number            | 0.5                                                                                               | Radius of the circles at each record                                                                                                                                         |
 | _map_.**sparkTooltipChart**([*value*])      | object            | {width: 100, height: 80, margin: { left: 60, right: 40, top: 40, bottom: 40 }, circleRadius: 1.5} | config for the chart shown in the tooltip                                                                                                                                    |
 
-## Map title & subtitle
+## Map texts
+
+Here you can find all the different texts you can add to the map.
+
+### Map title & subtitle
 
 Specify the map title, its style and position.
 
@@ -647,6 +670,56 @@ Specify the map title, its style and position.
 | _map_.**titlePosition**([*value*])    | Array ([x,y]) | auto          | The title position. If not specified, a position is automatically computed, on the top left corner.    |
 | _map_.**subtitle**([*value*])         | String        | ""            | The subtitle text.                                                                                     |
 | _map_.**subtitlePosition**([*value*]) | Array ([x,y]) | auto          | The subtitle position. If not specified, a position is automatically computed, on the top left corner. |
+
+### Labelling
+
+You can customise the labels shown on the map using the following settings:
+
+```javascript
+map = eurostatmap.map(...)
+	.labels({
+        labels: [
+            { text: 'Albania', x: 5100000, y: 2060000, class: 'cc', size: 7 },
+            { text: 'Austria', x: 4670000, y: 2629000, class: 'cc', size: 18 },
+            { text: 'Belgium', x: 3930000, y: 3010000, class: 'cc', size: 17 },
+            { text: 'Bulgaria', x: 5567000, y: 2200000, class: 'cc', size: 22 },
+            { text: 'Croatia', x: 4876000, y: 2455000, class: 'cc', size: 10 },
+        ],
+        statLabelsFilterFunction: (region, map) => {
+            // only show statistical labels for rergions with data
+            const s = map.statData()
+            const sv = s.get(region.properties.id)
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                return false
+            } else {
+                return true
+            }
+        },
+        statLabelsPositions:  {
+            // REGION CODE: {x,y}
+            AL: { x: 5150000, y: 2000000 },
+            AT: { x: 4670000, y: 2700000 },
+            BE: { x: 3930000, y: 3060000 },
+            BG: { x: 5567000, y: 2300000 },
+            HR: { x: 4707718, y: 2350243 },
+            CY: { x: 6426000, y: 1530000 },
+            CH: { x: 4170000, y: 2600000 },
+            CZ: { x: 4707000, y: 2950000 },
+            DK: { x: 4316000, y: 3621000 },
+        },
+        labelShadow: true
+	});
+```
+
+### Footnotes
+
+Specify the text to be shown at the bottom of the map.
+
+| Method                                    | Type    | Default value                   | Description                                                                                                                          |
+| ----------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
+| _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                     |
+| _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
 
 ## Map legend
 
@@ -741,46 +814,6 @@ See deprecated.js for deprecated style functions and their successors. (or check
 | _map_.**coastalMarginStdDev**([*value*]) | number  | _2_           | The standard deviation of the coastal blurry margin.                                                                                                     |
 | _map_.**drawGraticule**([*value*])       | boolean | _false_       | Set to true to show the graticule (meridian and parallel lines). False otherwise. Calls to this method after the map is built will update the graticule. |
 
-## Labelling
-
-You can customise the labels shown on the map using the following settings:
-
-```javascript
-map = eurostatmap.map(...)
-	.labels({
-        labels: [
-            { text: 'Albania', x: 5100000, y: 2060000, class: 'cc', size: 7 },
-            { text: 'Austria', x: 4670000, y: 2629000, class: 'cc', size: 18 },
-            { text: 'Belgium', x: 3930000, y: 3010000, class: 'cc', size: 17 },
-            { text: 'Bulgaria', x: 5567000, y: 2200000, class: 'cc', size: 22 },
-            { text: 'Croatia', x: 4876000, y: 2455000, class: 'cc', size: 10 },
-        ],
-        statLabelsFilterFunction: (region, map) => {
-            // only show statistical labels for rergions with data
-            const s = map.statData()
-            const sv = s.get(region.properties.id)
-            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                return false
-            } else {
-                return true
-            }
-        },
-        statLabelsPositions:  {
-            // REGION CODE: {x,y}
-            AL: { x: 5150000, y: 2000000 },
-            AT: { x: 4670000, y: 2700000 },
-            BE: { x: 3930000, y: 3060000 },
-            BG: { x: 5567000, y: 2300000 },
-            HR: { x: 4707718, y: 2350243 },
-            CY: { x: 6426000, y: 1530000 },
-            CH: { x: 4170000, y: 2600000 },
-            CZ: { x: 4707000, y: 2950000 },
-            DK: { x: 4316000, y: 3621000 },
-        },
-        labelShadow: true
-	});
-```
-
 ## Insets
 
 To add map insets, use the _map_.**insets**([*values*]) method.
@@ -815,16 +848,6 @@ Note that a map inset is built as a proper map within a map: It has all properti
 | _map_.**insetBoxWidth**([*value*])    | number | _210_         | The default width of the insets box, which are squared by default.                                                                                                                                                                                           |
 | _map_.**insetZoomExtent**([*value*])  | Array  | _null_        | The zoom extent of inset maps. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both. |
 | _map_.**insetScale**([*value*])       | String | _"03M"_       | The default scale of the insets.                                                                                                                                                                                                                             |
-
-## Footnotes
-
-Specify the text to be shown at the bottom of the map.
-
-| Method                                    | Type    | Default value                   | Description                                                                                                                          |
-| ----------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
-| _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                     |
-| _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
 
 ## Export
 
@@ -862,3 +885,7 @@ After changing some parameters, one of the following methods need to be executed
 | _map_.**updateStyle**()          | _this_ | Update the map when parameters on the styling have changed.                                                                             |
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
+
+## Version migration
+
+See https://github.com/eurostat/eurostat-map/blob/master/docs/release-notes.md for any major changes.
