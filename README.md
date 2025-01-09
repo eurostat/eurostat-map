@@ -27,8 +27,6 @@
 
 ## Table of Contents
 
-<div align="center">
-
 - [eurostat-map](#eurostat-map)
     - [Table of Contents](#table-of-contents)
     - [Examples](#examples)
@@ -41,8 +39,6 @@
     - [Contribute](#contribute)
     - [Copyright](#copyright)
     - [Disclaimer](#disclaimer)
-
-</div>
 
 ---
 
