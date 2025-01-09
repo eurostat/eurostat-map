@@ -5,6 +5,8 @@ import { sum, max } from 'd3-array'
 import { scaleLinear } from 'd3'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
+import { select, selectAll } from 'd3-selection'
+
 /**
  * Returns a flow map.
  *
@@ -12,7 +14,7 @@ import * as ChoroplethLegend from '../legend/legend-choropleth'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config)
+    const out = StatMap.statMap(config, true)
     out.strokeWidthScale = scaleLinear()
 
     /**
@@ -65,10 +67,23 @@ export const map = function (config) {
 
     /**
      * Function to create a map with Sankey diagram and other elements
-     * @param {Object} config - Configuration options and data for the map
+     * @param {Object} graph - Configuration options and data for the map
+     * exampleGraph = {
+                nodes: [
+                    { id: 'FR', x: 681.1851800759263, y: 230.31124763648583 },
+                    { id: 'DE', x: 824.5437782154489, y: 123.70302649032199 },
+                ],
+                links: [
+                    { source: 'FR', target: 'DE', value: 82018369.72 },
+                ],
+            }
      */
     function createFlowMapSVG(graph) {
         const svg = out.svg_
+
+        // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
+        addCoordinatesToGraph(graph)
+
         var { nodes, links } = sankey(graph)
         console.log('Processed Nodes:', nodes) // Array of processed nodes
         console.log('Processed Links:', links) // Array of processed links
@@ -89,16 +104,39 @@ export const map = function (config) {
         // Add geographical layers
         //addGeographicalLayers(svg, geometries, poi, exporters, countryBorders)
 
+        // Define our container SVG
+        const zoomGroup = select('#em-zoom-group-' + out.svgId_)
+        const sankeyContainer = zoomGroup.append('g').attr('class', 'sankey-container')
+
         // Add Sankey flows
-        addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds)
+        addSankeyFlows(sankeyContainer, links, arrowId, arrowOutlineId, gradientIds)
 
         // Add additional nodes (fill gaps)
-        addFillGaps(svg, nodes)
+        addFillGaps(sankeyContainer, nodes)
 
         // Add labels
         //addLabels(svg)
 
         return svg.node()
+    }
+
+    // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
+    function addCoordinatesToGraph(graph) {
+        graph.nodes.forEach((node) => {
+            if (!node.x && !node.y && out.Geometries.centroidsData) {
+                const centroid = out.Geometries.centroidsData.features.find((feature) => {
+                    if (node.id == feature.properties.id) return feature
+                })
+
+                if (centroid) {
+                    let screenCoords = out._projection([centroid.geometry.coordinates[0], centroid.geometry.coordinates[1]])
+                    node.x = screenCoords[0]
+                    node.y = screenCoords[1]
+                } else {
+                    console.error('could not find coordinates for', node.id)
+                }
+            }
+        })
     }
 
     /**

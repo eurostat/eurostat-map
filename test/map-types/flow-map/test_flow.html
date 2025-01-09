@@ -12,17 +12,17 @@
         <script>
             const exampleGraph = {
                 nodes: [
-                    { id: 'FR', x: 681.1851800759263, y: 230.31124763648583 },
-                    { id: 'DE', x: 824.5437782154489, y: 123.70302649032199 },
-                    { id: 'IT', x: 852.4825697391176, y: 341.2769489380059 },
-                    { id: 'ES', x: 542.0535296122652, y: 369.06544910331417 },
-                    { id: 'BE', x: 730.0123797336544, y: 127.74905244343536 },
-                    { id: 'NL', x: 749.175863493742, y: 87.27354778987966 },
-                    { id: 'CH', x: 782.4178994989912, y: 232.5359911477708 },
-                    { id: 'PL', x: 970.7849882008576, y: 92.61718744265188 },
-                    { id: 'PT', x: 445.73965176651086, y: 366.90829704399636 },
-                    { id: 'AT', x: 887.5898207349595, y: 214.2378085459197 },
-                    { id: 'CZ', x: 907.1965357417834, y: 157.97566911120774 },
+                    { id: 'FR' },
+                    { id: 'DE' },
+                    { id: 'IT' },
+                    { id: 'ES' },
+                    { id: 'BE' },
+                    { id: 'NL' },
+                    { id: 'CH' },
+                    { id: 'PL' },
+                    { id: 'PT' },
+                    { id: 'AT' },
+                    { id: 'CZ' },
                 ],
                 links: [
                     { source: 'FR', target: 'DE', value: 82018369.72 },
@@ -46,7 +46,7 @@
                 .title('Test')
                 .subtitle('test')
                 .flowGraph(exampleGraph)
-                .nutsLevel(2)
+                .nutsLevel(0)
                 .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })
                 .drawCoastalMargin(false)
                 .insets('default')
