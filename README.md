@@ -1,5 +1,8 @@
+<div align="center">
+
 # [eurostat-map](https://github.com/eurostat/eurostat-map)
 
+</div>
 <div align="center">
   <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
