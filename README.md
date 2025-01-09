@@ -74,7 +74,9 @@ eurostatmap
 
 ### Node.js
 
-`npm install eurostatmap`
+```npm
+npm install eurostatmap
+```
 
 then
 
@@ -90,8 +92,19 @@ eurostatmap = require('eurostatmap')
 
 ### Standalone
 
-- For the latest version, use `<script src="https://unpkg.com/eurostat-map"></script>` as shown in [the examples](#examples).
-- For a fixed version, use `<script src="https://unpkg.com/eurostat-map@X.Y.Z"></script>`, where _X.Y.Z_ is a [version number](https://www.npmjs.com/package/eurostat-map?activeTab=versions).
+- For the latest version, use:
+
+    ```html
+    <script src="https://unpkg.com/eurostat-map"></script>
+    ```
+
+- For a fixed version, use
+
+    ```html
+    <script src="https://unpkg.com/eurostat-map@X.Y.Z"></script>
+    ```
+
+    where X.Y.Z is a [version number](https://www.npmjs.com/package/eurostat-map?activeTab=versions).
 
 ## Documentation
 
