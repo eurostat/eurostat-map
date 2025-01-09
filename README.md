@@ -4,7 +4,7 @@
 ![npm](https://img.shields.io/npm/v/eurostat-map)
 ![license](https://img.shields.io/badge/license-EUPL-success)
 
-<div style="text-align: center; font-size:18px; font-style:italic;">
+<div align="center">
   Thematic web mapping based on D3, designed for Eurostat data but compatible with custom geometries and datasets.
 </div>
 
