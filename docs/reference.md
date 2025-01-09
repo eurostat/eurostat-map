@@ -35,13 +35,13 @@
 
 Create a map with `let map = eurostatmap.map( mapType )`. Set the parameter `mapType` to a value corresponding with the desired map type:
 
-- `"ch"` for a [choropleth map](#choropleth-map),
-- `"ps"` for a [proportional symbol map](#proportional-symbol-map),
-- `"pie"` for a [proportional pie chart map](#proportional-pie-chart-map),
-- `"ct"` for a [categorical map](#categorical-map).
-- `"chbi"` for a [bivariate choropleth map](#bivariate-choropleth-map).
-- `"scomp"` for a [stripe composition map](#stripe-composition-map).
-- `"spark"` for a [spark line map](#sparkline-map).
+- `"choropleth"` for a [choropleth map](#choropleth-map),
+- `"proportionalSymbol"` for a [proportional symbol map](#proportional-symbol-map),
+- `"pieChart"` for a [proportional pie chart map](#proportional-pie-chart-map),
+- `"categorical"` for a [categorical map](#categorical-map).
+- `"bivariateChoropleth"` for a [bivariate choropleth map](#bivariate-choropleth-map).
+- `"stripeComposition"` for a [stripe composition map](#stripe-composition-map).
+- `"sparkline"` for a [spark line map](#sparkline-map).
 
 The `map` can then be customised with the methods listed in the tables below. Most of the map methods follow the pattern _map_.**myMethod**([*value*]): If a _value_ is specified, the method sets the parameter value and returns the _map_ object itself. If no _value_ is specified, the method returns the current value of the parameter.
 
