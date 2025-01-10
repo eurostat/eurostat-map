@@ -16,8 +16,8 @@ export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config, true)
     out.strokeWidthScale = scaleLinear()
-    out.labelOffsetX = 10
-    out.labelOffsetY = 0
+    out.labelOffsetX = 15
+    out.labelOffsetY = 5
     out.labelFormatter = (d) => format('.2s')(d)
 
     /**
@@ -93,12 +93,12 @@ export const map = function (config) {
         // Add flow gradients
         addFlowGradients(defs, gradientIds, links)
 
-        // Add geographical layers
-        //addGeographicalLayers(svg, geometries, poi, exporters, countryBorders)
-
         // Define our container SVG
         const zoomGroup = select('#em-zoom-group-' + out.svgId_)
         const sankeyContainer = zoomGroup.append('g').attr('class', 'sankey-container')
+
+        // Add geographical layers
+        addOverlayPolygons(sankeyContainer, graph)
 
         // Add Sankey flows
         addSankeyFlows(sankeyContainer, links, arrowId, arrowOutlineId, gradientIds)
@@ -114,45 +114,43 @@ export const map = function (config) {
 
     /**
      * Adds geographical layers (regions, POI overlay, borders)
-     * @param {Object} svg - D3 selection of SVG
-     * @param {Array} geometries - Geographical shapes for regions
-     * @param {Object} poi - Points of interest data
-     * @param {Set} exporters - Exporters data
-     * @param {Array} countryBorders - Borders data
+     * @param {Object} svg - D3 selection of SVG container
      */
-    function addGeographicalLayers(svg, geometries, poi, exporters, countryBorders) {
-        const path = out._pathFunction
+    function addOverlayPolygons(svg, graph) {
+        const importerIds = []
+        const exporterIds = []
 
-        // Regions
-        svg.append('g')
-            .attr('class', 'regions')
-            .selectAll('path')
-            .data(geometries)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', '#f4f4f4')
-            .attr('stroke', 'none')
+        const features = out.Geometries.geoJSONs.nutsrg.concat(out.Geometries.geoJSONs.cntrg)
+        if (features) {
+            graph.nodes.forEach((node) => {
+                const overlay = features.find((feature) => {
+                    if (node.id == feature.properties.id) return feature
+                })
 
-        // Overlay for exporters and importers
-        svg.append('g')
-            .attr('class', 'importers-overlay')
-            .selectAll('path')
-            .data(poi.features)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', (d) => (exporters.has(d.properties.id) ? '#c7e3c6' : '#bbd7ee'))
-            .attr('stroke', 'none')
+                if (overlay) {
+                    let isImporter = graph.links.some((link) => link.source == node.id)
+                    if (isImporter) {
+                        importerIds.push(node.id)
+                    } else {
+                        exporterIds.push(node.id)
+                    }
+                } else {
+                    console.error('could not find geometry for', node.id)
+                }
+            })
 
-        // National borders
-        svg.append('g')
-            .attr('class', 'borders')
-            .selectAll('path')
-            .data(countryBorders)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', 'none')
-            .attr('stroke', 'grey')
-            .attr('stroke-width', 0.3)
+            //update existing region fills
+            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            const allRegions = out.svg_.selectAll(selector)
+
+            allRegions.each(function () {
+                select(this).style('fill', (region) => {
+                    if (importerIds.includes(region.properties.id)) return '#bbd7ee'
+                    if (exporterIds.includes(region.properties.id)) return '#c7e3c6'
+                })
+            })
+        }
     }
 
     // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
@@ -279,6 +277,7 @@ export const map = function (config) {
      */
     function addLabels(svg, nodes) {
         // for aligning left or right
+        //TODO: get midpoint of flow source point, not map
         const mapMidpointX = svg.node().getBoundingClientRect().width / 2
 
         svg.append('g')
@@ -286,6 +285,7 @@ export const map = function (config) {
             .selectAll('text')
             .data(nodes.filter((node) => node.targetLinks && node.sourceLinks.length == 0))
             .join('text')
+            .attr('text-anchor', (d) => (d.x > mapMidpointX ? 'start' : 'end'))
             .attr('x', (d) => {
                 const x = d.x
                 return x > mapMidpointX ? x + out.labelOffsetX : x - out.labelOffsetX
