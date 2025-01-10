@@ -4,7 +4,7 @@ import { linkHorizontal } from 'd3-shape'
 import { sum, max } from 'd3-array'
 import { scaleLinear } from 'd3'
 import * as StatMap from '../core/stat-map'
-import * as ChoroplethLegend from '../legend/legend-choropleth'
+import * as FlowLegend from '../legend/legend-flow'
 import { select, selectAll } from 'd3-selection'
 
 /**
@@ -52,19 +52,8 @@ export const map = function (config) {
     //@override
     out.getLegendConstructor = function () {
         //TODO: define legend
-        return ChoroplethLegend.legend
+        return FlowLegend.legend
     }
-
-    // get regions that are either 'importers' or 'exporters'
-    function getFlowRegions() {
-        let regions = allNuts.filter((d) => exporter.value == d.properties.id || importers.has(d.properties.id))
-
-        // merge regions with statistical data
-        let merged = out.flowData_.find((e) => e.target === d.properties.id)
-        return { ...d, ...data2 }
-        return features
-    }
-
     /**
      * Function to create a map with Sankey diagram and other elements
      * @param {Object} graph - Configuration options and data for the map
