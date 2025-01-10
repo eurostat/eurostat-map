@@ -284,7 +284,7 @@ export const map = function (config) {
         svg.append('g')
             .attr('class', 'labels')
             .selectAll('text')
-            .data(nodes)
+            .data(nodes.filter((node) => node.targetLinks && node.sourceLinks.length == 0))
             .join('text')
             .attr('x', (d) => {
                 const x = d.x
