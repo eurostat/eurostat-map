@@ -2,7 +2,7 @@
 // import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
 import { linkHorizontal } from 'd3-shape'
 import { sum, max } from 'd3-array'
-import { scaleLinear } from 'd3'
+import { scaleLinear, format } from 'd3'
 import * as StatMap from '../core/stat-map'
 import * as FlowLegend from '../legend/legend-flow'
 import { select, selectAll } from 'd3-selection'
@@ -16,6 +16,9 @@ export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config, true)
     out.strokeWidthScale = scaleLinear()
+    out.labelOffsetX = 10
+    out.labelOffsetY = 0
+    out.labelFormatter = (d) => format('.2s')(d)
 
     /**
      * flowmap-specific setters/getters
@@ -103,10 +106,53 @@ export const map = function (config) {
         // Add additional nodes (fill gaps)
         addFillGaps(sankeyContainer, nodes)
 
-        // Add labels
-        //addLabels(svg)
+        // Add labels to nodes
+        addLabels(sankeyContainer, nodes)
 
         return svg.node()
+    }
+
+    /**
+     * Adds geographical layers (regions, POI overlay, borders)
+     * @param {Object} svg - D3 selection of SVG
+     * @param {Array} geometries - Geographical shapes for regions
+     * @param {Object} poi - Points of interest data
+     * @param {Set} exporters - Exporters data
+     * @param {Array} countryBorders - Borders data
+     */
+    function addGeographicalLayers(svg, geometries, poi, exporters, countryBorders) {
+        const path = out._pathFunction
+
+        // Regions
+        svg.append('g')
+            .attr('class', 'regions')
+            .selectAll('path')
+            .data(geometries)
+            .join('path')
+            .attr('d', path)
+            .attr('fill', '#f4f4f4')
+            .attr('stroke', 'none')
+
+        // Overlay for exporters and importers
+        svg.append('g')
+            .attr('class', 'importers-overlay')
+            .selectAll('path')
+            .data(poi.features)
+            .join('path')
+            .attr('d', path)
+            .attr('fill', (d) => (exporters.has(d.properties.id) ? '#c7e3c6' : '#bbd7ee'))
+            .attr('stroke', 'none')
+
+        // National borders
+        svg.append('g')
+            .attr('class', 'borders')
+            .selectAll('path')
+            .data(countryBorders)
+            .join('path')
+            .attr('d', path)
+            .attr('fill', 'none')
+            .attr('stroke', 'grey')
+            .attr('stroke-width', 0.3)
     }
 
     // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
@@ -177,49 +223,6 @@ export const map = function (config) {
     }
 
     /**
-     * Adds geographical layers (regions, POI overlay, borders)
-     * @param {Object} svg - D3 selection of SVG
-     * @param {Array} geometries - Geographical shapes for regions
-     * @param {Object} poi - Points of interest data
-     * @param {Set} exporters - Exporters data
-     * @param {Array} countryBorders - Borders data
-     */
-    function addGeographicalLayers(svg, geometries, poi, exporters, countryBorders) {
-        const path = out._pathFunction
-
-        // Regions
-        svg.append('g')
-            .attr('class', 'regions')
-            .selectAll('path')
-            .data(geometries)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', '#f4f4f4')
-            .attr('stroke', 'none')
-
-        // Overlay for exporters and importers
-        svg.append('g')
-            .attr('class', 'importers-overlay')
-            .selectAll('path')
-            .data(poi.features)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', (d) => (exporters.has(d.properties.id) ? '#c7e3c6' : '#bbd7ee'))
-            .attr('stroke', 'none')
-
-        // National borders
-        svg.append('g')
-            .attr('class', 'borders')
-            .selectAll('path')
-            .data(countryBorders)
-            .join('path')
-            .attr('d', path)
-            .attr('fill', 'none')
-            .attr('stroke', 'grey')
-            .attr('stroke-width', 0.3)
-    }
-
-    /**
      * Adds Sankey flows (links with markers and gradients)
      * @param {Object} svg - D3 selection of SVG
      * @param {Array} links - Sankey links data
@@ -274,20 +277,24 @@ export const map = function (config) {
      * Add labels for data points.
      * @param {Object} svg - D3 selection of the SVG element.
      */
-    function addLabels(svg) {
+    function addLabels(svg, nodes) {
+        // for aligning left or right
         const mapMidpointX = svg.node().getBoundingClientRect().width / 2
 
         svg.append('g')
             .attr('class', 'labels')
             .selectAll('text')
-            .data(mergeData)
+            .data(nodes)
             .join('text')
             .attr('x', (d) => {
-                const [x] = path.centroid(d)
-                return x > mapMidpointX ? x + labelOffsetX : x - labelOffsetX
+                const x = d.x
+                return x > mapMidpointX ? x + out.labelOffsetX : x - out.labelOffsetX
             })
-            .attr('y', (d) => path.centroid(d)[1])
-            .text((d) => d.label)
+            .attr('y', (d) => {
+                const y = d.y
+                return y + out.labelOffsetY
+            })
+            .text((d) => out.labelFormatter(d.value))
     }
 
     // From this point on all code is related with spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
