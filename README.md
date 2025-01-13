@@ -94,17 +94,17 @@ eurostatmap = require('eurostatmap')
 
 For the latest version, use:
 
-    ```html
-    <script src="https://unpkg.com/eurostat-map"></script>
-    ```
+```html
+<script src="https://unpkg.com/eurostat-map"></script>
+```
 
-For a fixed version, use
+For a fixed version, use:
 
-    ```html
-    <script src="https://unpkg.com/eurostat-map@X.Y.Z"></script>
-    ```
+```html
+<script src="https://unpkg.com/eurostat-map@X.Y.Z"></script>
+```
 
-    where X.Y.Z is a [version number](https://www.npmjs.com/package/eurostat-map?activeTab=versions).
+where X.Y.Z is a [version number](https://www.npmjs.com/package/eurostat-map?activeTab=versions).
 
 ## Documentation
 
