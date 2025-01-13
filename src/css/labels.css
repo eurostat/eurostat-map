@@ -19,11 +19,11 @@
 }
 .em-stat-label {
     font-size: 13px;
-    fill: white;
+    fill: black;
     font-weight: bold;
 }
 .em-stat-label-shadow {
-    font-size: 12px;
+    font-size: 13px;
     stroke-width: 4px;
     stroke: white;
 }
