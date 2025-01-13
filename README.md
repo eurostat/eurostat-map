@@ -8,6 +8,7 @@
   <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
   <img src="https://img.shields.io/badge/license-EUPL-success" alt="license">
+  <a href="http://www.awesomeofficialstatistics.org"><img src="[https://img.shields.io/badge/license-EUPL-success](https://awesome.re/mentioned-badge.svg)" alt="Mentioned in Awesome Official Statistics"></a>
 </div>
 
 <div align="center">
