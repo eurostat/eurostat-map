@@ -238,6 +238,7 @@ export const map = function (config) {
                 .attr('d', sankeyLinkHorizontal()(link))
                 .attr('fill', 'none')
                 .attr('stroke', '#ffffff')
+                .attr('class', 'em-flow-link-outline')
                 .attr('stroke-width', link.width + 1.5)
                 .attr('marker-end', `url(#${arrowOutlineId})`)
 
@@ -246,9 +247,17 @@ export const map = function (config) {
                 .append('path')
                 .attr('d', sankeyLinkHorizontal()(link))
                 .attr('fill', 'none')
+                .attr('class', 'em-flow-link')
                 .attr('stroke', `url(#${gradientIds[i]})`)
                 .attr('stroke-width', link.width)
                 .attr('marker-end', `url(#${arrowId})`)
+                // add hover effect
+                .on('mouseover', function () {
+                    select(this).attr('stroke', out.hoverColor_)
+                })
+                .on('mouseout', function () {
+                    select(this).attr('stroke', `url(#${gradientIds[i]})`)
+                })
         })
     }
 

@@ -204,3 +204,10 @@ a text {
 .em-bn-co {
     fill: none;
 }
+
+.em-flow-link {
+    cursor: pointer;
+}
+.em-flow-link-outline {
+    cursor: pointer;
+}
