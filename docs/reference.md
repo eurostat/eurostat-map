@@ -677,36 +677,46 @@ You can customise the labels shown on the map using the following settings:
 map = eurostatmap.map(...)
 	.labels({
         labels: [
-            { text: 'Albania', x: 5100000, y: 2060000, class: 'cc', size: 7 },
-            { text: 'Austria', x: 4670000, y: 2629000, class: 'cc', size: 18 },
-            { text: 'Belgium', x: 3930000, y: 3010000, class: 'cc', size: 17 },
-            { text: 'Bulgaria', x: 5567000, y: 2200000, class: 'cc', size: 22 },
-            { text: 'Croatia', x: 4876000, y: 2455000, class: 'cc', size: 10 },
+            { text: 'Test label', x: 3500000, y: 4260000, class: 'test' },
+            { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1250000, class: 'ocean', letterSpacing: 7 },
+            { text: 'ATLANTIC OCEAN', x: 2700000, y: 2650000, class: 'ocean', letterSpacing: 2 },
+            { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'ocean' },
+            { text: 'BALTIC SEA', x: 4840000, y: 3600000, class: 'ocean', rotate: -30 },
+            { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
+            { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
         ],
-        statLabelsFilterFunction: (region, map) => {
-            // only show statistical labels for rergions with data
-            const s = map.statData()
-            const sv = s.get(region.properties.id)
-            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                return false
-            } else {
-                return true
+        values: true,
+        backgrounds: true,
+        shadows: true,
+        processValueLabelCentroids: (region, centroid) => {
+            // (optional) adjust NUTS1 label positions manually to avoid overlapping
+            if (region.properties.id == 'ES4') {
+                return [centroid[0] - 10, centroid[1] + 19]
+            } else if (region.properties.id == 'DE4') {
+                return [centroid[0] + 4, centroid[1] + 8]
             }
+            return centroid
         },
-        statLabelsPositions:  {
-            // REGION CODE: {x,y}
-            AL: { x: 5150000, y: 2000000 },
-            AT: { x: 4670000, y: 2700000 },
-            BE: { x: 3930000, y: 3060000 },
-            BG: { x: 5567000, y: 2300000 },
-            HR: { x: 4707718, y: 2350243 },
-            CY: { x: 6426000, y: 1530000 },
-            CH: { x: 4170000, y: 2600000 },
-            CZ: { x: 4707000, y: 2950000 },
-            DK: { x: 4316000, y: 3621000 },
-        },
-        labelShadow: true
-	});
+    })
+```
+
+You can use the 'class' attribute to customise the labels accordingly (e.g. class: 'ocean' can be styled with .em-label-ocean).
+
+These are the default classes used to style the labels:
+
+```css
+#em-labels
+.em-stat-label
+.em-stat-label-shadow
+.em-label-cc
+.em-label-shadow-cc
+.em-label-countries
+.em-label-shadow-countries
+.em-label-seas
+.em-label-shadow-seas
+.em-flow-labels
+.em-flow-label
+.em-flow-label-shadow
 ```
 
 ### Footnotes

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-label-test {
+                font-size: 15px !important;
+            }
+            .em-label-shadow-test {
+                font-size: 15px !important;
+            }
+            .em-label-ocean {
+                font-size: 12px !important;
+                fill: #000a66;
+                font-style: italic;
+            }
+            .em-cntbn {
+                stroke: white !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3-color.v2.min.js"></script>
+        <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .svgId('map')
+                .zoomExtent([1, 20])
+                .title('GDP per capita')
+                .subtitle('Gross domestic product (GDP) at current market prices by NUTS 3 region, 2021')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .width(1080)
+                .nutsLevel(0)
+                .nutsYear(2024)
+                .tooltipShowFlags(false)
+                .legend({ title: 'test', decimals: 0, x: 15, y: 160 })
+                //styling
+                .language('en')
+                .seaFillStyle('aliceblue')
+                .drawCoastalMargin(false)
+                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'lightgrey', co: 'black' })
+                .graticuleStroke('lightgrey')
+                .graticuleStrokeWidth(0.4)
+                .labels({
+                    labels: [
+                        { text: 'Test label', x: 3500000, y: 4260000, class: 'test' },
+                        { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1250000, class: 'ocean', letterSpacing: 7 },
+                        { text: 'ATLANTIC OCEAN', x: 2700000, y: 2650000, class: 'ocean', letterSpacing: 2 },
+                        { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'ocean' },
+                        { text: 'BALTIC SEA', x: 4840000, y: 3600000, class: 'ocean', rotate: -30 },
+                        { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
+                        { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
+                    ],
+                    values: true,
+                    backgrounds: true,
+                    processValueLabelCentroids: (region, centroid) => {
+                        // (optional) adjust NUTS1 label positions manually to avoid overlapping
+                        if (region.properties.id == 'ES4') {
+                            return [centroid[0] - 10, centroid[1] + 19]
+                        } else if (region.properties.id == 'DE4') {
+                            return [centroid[0] + 4, centroid[1] + 8]
+                        }
+                        return centroid
+                    },
+                    shadows: true,
+                })
+                .insets([
+                    {
+                        geo: 'MT',
+                        scale: '01M',
+                        position: { z: 600 },
+                        title: 'Malta',
+                        width: 150,
+                        height: 90,
+                        x: 0,
+                        y: 0,
+                        labels: { values: true, shadows: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
+                    },
+                ])
+
+                .build()
+        </script>
+    </body>
+</html>

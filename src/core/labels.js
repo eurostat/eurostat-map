@@ -227,12 +227,14 @@ export const updateValuesLabels = function (map) {
  * @return {string}
  */
 export const statLabelsTextFunction = (d, statData) => {
-    const sv = statData.get(d.properties.id)
-    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-        return ''
-    } else {
-        if (sv.value !== ':') {
-            return spaceAsThousandSeparator(sv.value)
+    if (statData && statData?.get) {
+        const sv = statData.get(d.properties.id)
+        if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+            return ''
+        } else {
+            if (sv.value !== ':') {
+                return spaceAsThousandSeparator(sv.value)
+            }
         }
     }
 }
@@ -268,18 +270,9 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
 
         if (map.nutsLevel_ == 'mixed') {
             map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
-            map._geom.mixed.rg1 = feature(
-                map.Geometries.allNUTSGeoData[1],
-                map.Geometries.allNUTSGeoData[1].objects.nutsrg
-            ).features
-            map._geom.mixed.rg2 = feature(
-                map.Geometries.allNUTSGeoData[2],
-                map.Geometries.allNUTSGeoData[2].objects.nutsrg
-            ).features
-            map._geom.mixed.rg3 = feature(
-                map.Geometries.allNUTSGeoData[3],
-                map.Geometries.allNUTSGeoData[3].objects.nutsrg
-            ).features
+            map._geom.mixed.rg1 = feature(map.Geometries.allNUTSGeoData[1], map.Geometries.allNUTSGeoData[1].objects.nutsrg).features
+            map._geom.mixed.rg2 = feature(map.Geometries.allNUTSGeoData[2], map.Geometries.allNUTSGeoData[2].objects.nutsrg).features
+            map._geom.mixed.rg3 = feature(map.Geometries.allNUTSGeoData[3], map.Geometries.allNUTSGeoData[3].objects.nutsrg).features
             statLabelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
         } else {
             statLabelRegions = map.Geometries.geoJSONs.nutsrg
@@ -299,10 +292,7 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
         .attr('transform', function (d) {
             // use predefined label positioning
             if (map.labels_.statLabelsPositions[d.properties.id]) {
-                let pos = map._projection([
-                    map.labels_.statLabelsPositions[d.properties.id].x,
-                    map.labels_.statLabelsPositions[d.properties.id].y,
-                ])
+                let pos = map._projection([map.labels_.statLabelsPositions[d.properties.id].x, map.labels_.statLabelsPositions[d.properties.id].y])
                 let x = pos[0].toFixed(3)
                 let y = pos[1].toFixed(3)
                 return `translate(${x},${y})`

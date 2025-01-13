@@ -211,3 +211,15 @@ a text {
 .em-flow-link-outline {
     cursor: pointer;
 }
+.em-flow-labels {
+    font-size: 15px;
+    stroke-width: 1px;
+    fill: black;
+    pointer-events: none;
+}
+.em-flow-labels-halo {
+    font-size: 15px;
+    stroke-width: 2px;
+    fill: white;
+    pointer-events: none;
+}

@@ -3,15 +3,16 @@
 Here you can find the CSS classes used to style the map and its components, in case you wish to override the default styles.
 
 ## Map
+
 .em-map
 .em-title,
 .em-subtitle,
 .em-source-pretext
-.em-source-dataset-link 
-.em-frame 
+.em-source-dataset-link
+.em-frame
 .em-insets
-.em-sea 
-.em-scalebar-line 
+.em-sea
+.em-scalebar-line
 .em-scalebar-label
 .em-footnote
 .em-symbol
@@ -33,13 +34,14 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-bn-3 //NUTS3
 
 ## Legends
+
 .em-legend-background
 .em-legend-label
 .em-legend-title
 .em-legend-separator
-.em-legend-tick 
+.em-legend-tick
 .em-bivariate-frame
-.em-bivariate-nodata 
+.em-bivariate-nodata
 .em-bivariate-axis-title
 .em-bivariate-nodata-label
 .em-bivariate-tick
@@ -49,38 +51,48 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-pie-size-legend-line
 
 ## Insets
+
 .em-insets
 .em-inset-title
 .em-inset-subtitle
 
 To target a class within all insets use:
+
 ```css
 .em-insets .em-frame {
     /* your rule here */
 }
 ```
+
 or for a specific inset use:
+
 ```css
 #em-inset-[your inset svgId here] {
- /* your rule here */
+    /* your rule here */
 }
 ```
 
-
 ## Labels
+
 #em-labels
-.em-stat-label 
-.em-stat-label-shadow 
-.em-label-cc 
-.em-label-shadow-cc 
+.em-stat-label
+.em-stat-label-shadow
+.em-flow-label
+.em-flow-label-shadow
+.em-label-cc
+.em-label-shadow-cc
 .em-label-countries
-.em-label-shadow-countries 
+.em-label-shadow-countries
 .em-label-seas
 .em-label-shadow-seas
+.em-flow-labels
+.em-flow-label
+.em-flow-label-shadow
 
 ## Tootlip
+
 .tooltip-eurostat
 .estat-vis-tooltip-text
 .estat-vis-tooltip-bar
-.em-tooltip-piechart-breakdown 
-.em-tooltip-piechart-container 
+.em-tooltip-piechart-breakdown
+.em-tooltip-piechart-container

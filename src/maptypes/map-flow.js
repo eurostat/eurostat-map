@@ -96,7 +96,7 @@ export const map = function (config) {
 
         // Define our container SVG
         const zoomGroup = select('#em-zoom-group-' + out.svgId_)
-        const sankeyContainer = zoomGroup.append('g').attr('class', 'sankey-container')
+        const sankeyContainer = zoomGroup.append('g').attr('class', 'em-flow-container')
 
         // Add geographical layers
         addOverlayPolygons(sankeyContainer, graph)
@@ -108,7 +108,7 @@ export const map = function (config) {
         addFillGaps(sankeyContainer, nodes)
 
         // Add labels to nodes
-        addLabels(sankeyContainer, nodes)
+        if (out.labels_) addLabels(sankeyContainer, nodes)
 
         return svg.node()
     }
@@ -242,7 +242,7 @@ export const map = function (config) {
      * @param {Array} gradientIds - Gradient IDs
      */
     function addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds) {
-        const flowsGroup = svg.append('g').attr('class', 'flows-group')
+        const flowsGroup = svg.append('g').attr('class', 'em-flows-group')
 
         links.forEach((link, i) => {
             // Outline path
@@ -300,7 +300,7 @@ export const map = function (config) {
      */
     function addFillGaps(svg, nodes) {
         svg.append('g')
-            .attr('class', 'fill-in-gaps')
+            .attr('class', 'em-fill-in-gaps')
             .selectAll('rect')
             .data(nodes)
             .join('rect')
@@ -317,25 +317,95 @@ export const map = function (config) {
      * @param {Object} svg - D3 selection of the SVG element.
      */
     function addLabels(svg, nodes) {
-        // for aligning left or right
-        //TODO: get midpoint of flow source point, not map
-        const mapMidpointX = svg.node().getBoundingClientRect().width / 2
+        // Filter the nodes
+        const filteredNodes = nodes.filter((node) => node.targetLinks && node.sourceLinks.length === 0)
+        const container = svg.append('g').attr('class', 'em-flow-labels')
 
-        svg.append('g')
-            .attr('class', 'labels')
-            .selectAll('text')
-            .data(nodes.filter((node) => node.targetLinks && node.sourceLinks.length == 0))
-            .join('text')
-            .attr('text-anchor', (d) => (d.x > mapMidpointX ? 'start' : 'end'))
-            .attr('x', (d) => {
-                const x = d.x
-                return x > mapMidpointX ? x + out.labelOffsetX : x - out.labelOffsetX
-            })
-            .attr('y', (d) => {
-                const y = d.y
-                return y + out.labelOffsetY
-            })
+        // Add halo effect
+        if (out.labels_.shadows) {
+            const labelsShadowGroup = container.append('g').attr('class', 'em-flow-label-shadow')
+            labelsShadowGroup
+                .selectAll('text')
+                .data(filteredNodes)
+                .join('text')
+                .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
+                .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.labelOffsetX : d.x - out.labelOffsetX))
+                .attr('y', (d) => d.y + out.labelOffsetY)
+                .text((d) => out.labelFormatter(d.value))
+        }
+
+        // Add labels
+        const labelsGroup = container.append('g').attr('class', 'em-flow-label')
+        //add background
+        // Add background rectangles and text
+        const labelElements = labelsGroup
+            .selectAll('g') // Use a group for each label to combine rect and text
+            .data(filteredNodes)
+            .join('g') // Append a group for each label
+            .attr('transform', (d) => `translate(${d.x}, ${d.y})`) // Position group at the node
+
+        // Add text first to calculate its size
+        labelElements
+            .append('text')
+            .attr('class', 'em-label-text')
+            .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
+            .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.labelOffsetX : -out.labelOffsetX))
+            .attr('y', out.labelOffsetY)
             .text((d) => out.labelFormatter(d.value))
+
+        // Add background rectangles after text is rendered
+
+        if (out.labels_.backgrounds) {
+            labelElements.each(function () {
+                const textElement = select(this).select('text')
+                const bbox = textElement.node().getBBox() // Get bounding box of the text
+
+                const paddingX = 5 // Horizontal padding
+                const paddingY = 2 // Vertical padding
+
+                // Add rectangle centered behind the text
+                select(this)
+                    .insert('rect', 'text') // Insert rect before text in DOM
+                    .attr('class', 'em-label-background')
+                    .attr('x', bbox.x - paddingX)
+                    .attr('y', bbox.y - paddingY)
+                    .attr('width', bbox.width + 2 * paddingX)
+                    .attr('height', bbox.height + 2 * paddingY)
+            })
+        }
+    }
+
+    // Function to append a rectangle behind the label
+    function appendLabelRect(labelText, container) {
+        const paddingX = 5 // Add some padding around the text
+        const paddingY = 2 // Add some padding around the text
+
+        // Create a temporary text element to get the size
+        const bbox = container
+            .append('text')
+            .attr('visibility', 'hidden') // Make the temporary text invisible
+            .text(labelText) // Set the label text to get its bounding box
+            .node()
+            .getBBox() // Get the bounding box of the text
+
+        const labelWidth = bbox.width
+        const labelHeight = bbox.height
+
+        // Remove the temporary text element after getting the bounding box
+        container.select('text[visibility="hidden"]').remove()
+
+        // Calculate the position of the rectangle to be centered on the text
+        const x = -labelWidth / 2 - paddingX // Center the rect horizontally
+        const y = -labelHeight / 2 - paddingY // Center the rect vertically
+
+        // Append rectangle with padding
+        container
+            .append('rect')
+            .attr('x', x) // Position rect horizontally
+            .attr('y', y) // Position rect vertically
+            .attr('width', labelWidth + 2 * paddingX) // Width of the rect with padding
+            .attr('height', labelHeight + 2 * paddingY) // Height of the rect with padding
+            .attr('class', 'em-label-background')
     }
 
     // From this point on all code is related with spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
