@@ -120,7 +120,8 @@ export const defineDeprecatedFunctions = (out) => {
     out.botTxtTooltipTxt = (v) => (console.warn('botTxtTooltipTxt is now DEPRECATED. Please use footnoteTooltipText() instead.'),out);
     out.tooltipShowFlags = (v) =>(console.warn('tooltipShowFlags is now DEPRECATED. Please use out.tooltip({showFlags}) instead.'),out.tooltip_.showFlags = v,out);
     out.colorFun = (v) =>(console.warn('colorFun is now DEPRECATED. Please use out.colorFunction() instead.'),out.colorFunction_ = v,out);
-
+    out.filtersDefinitionFun = ()=>(console.warn('filtersDefinitionFun is now DEPRECATED. Please use out.filtersDefinitionFunction() instead.'),out.filtersDefinitionFunction_ = v,out);
+    
     //labelling
     out.labelling = (v) =>(console.warn('labelling is now DEPRECATED. Please use out.labels({}) configuration object instead. See documentation for details.'),out);
     out.labelsConfig = (v) =>(console.warn('labelsConfig is now DEPRECATED. Please use out.labels({config:yourConfig}) configuration object instead. See documentation for details.'),out.labels_ =Object.assign(out.labels_ || {}, { config: v }),out);
