@@ -162,12 +162,10 @@ export const map = function (config) {
                         if (Array.isArray(out.insetTemplates_[geo][i])) {
                             // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
                             for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_)
-                                    applyClassificationToMap(out.insetTemplates_[geo][i][c])
+                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyClassificationToMap(out.insetTemplates_[geo][i][c])
                             }
                         } else {
-                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_)
-                                applyClassificationToMap(out.insetTemplates_[geo][i])
+                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyClassificationToMap(out.insetTemplates_[geo][i])
                         }
                     }
                 } else {
@@ -414,7 +412,7 @@ export const map = function (config) {
                     const sel = select(this)
                     // Apply a thick stroke width to the parent element
                     const parent = select(sel.node().parentNode)
-                    parent.style('stroke-width', '2px').style('stroke', 'black') // Set stroke
+                    parent.style('stroke-width', '1px').style('stroke', 'black') // Set stroke
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(region, out))
                 })
                 .on('mousemove', function (e, rg) {

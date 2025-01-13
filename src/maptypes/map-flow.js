@@ -199,6 +199,18 @@ export const map = function (config) {
             .append('path')
             .attr('fill', color)
             .attr('d', 'M0,0 q0,1,0.5,1.5 q-0.5,0.5,-0.5,1.5 q0.75,-0.75,2,-1.5 q-1.25,-0.75,-2,-1.5Z')
+
+        // add a copy for mouseover with hovered color
+        defs.append('marker')
+            .attr('id', id + 'mouseover')
+            .attr('markerHeight', 7)
+            .attr('markerWidth', 7)
+            .attr('refX', 1)
+            .attr('refY', 1.5)
+            .attr('orient', 'auto')
+            .append('path')
+            .attr('fill', out.hoverColor_)
+            .attr('d', 'M0,0 q0,1,0.5,1.5 q-0.5,0.5,-0.5,1.5 q0.75,-0.75,2,-1.5 q-1.25,-0.75,-2,-1.5Z')
     }
 
     /**
@@ -254,14 +266,28 @@ export const map = function (config) {
                 .attr('marker-end', `url(#${arrowId})`)
                 // add hover effect
                 .on('mouseover', function (e) {
-                    select(this).attr('stroke', out.hoverColor_)
+                    const hoveredColor = out.hoverColor_
+
+                    // Change the stroke color
+                    select(this).attr('stroke', hoveredColor)
+
+                    // Update the marker-end dynamically
+                    select(this).attr('marker-end', `url(#${arrowId + 'mouseover'})`)
+
+                    // Tooltip handling
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out))
                 })
                 .on('mousemove', function (e) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
+                    // Revert the stroke color
                     select(this).attr('stroke', `url(#${gradientIds[i]})`)
+
+                    // Revert the marker-end to the original
+                    select(this).attr('marker-end', `url(#${arrowId})`)
+
+                    // Tooltip handling
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })

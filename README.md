@@ -11,7 +11,7 @@
 </div>
 
 <div align="center">
-  <em>Customizable thematic maps for global and regional data.</em>
+  <em>Customizable thematic maps.</em>
 </div>
 <div align="center">
 <em>Based on D3 and designed for Eurostat data but compatible with custom geometries and stats.</em>
@@ -92,13 +92,13 @@ eurostatmap = require('eurostatmap')
 
 ### Standalone
 
-- For the latest version, use:
+For the latest version, use:
 
     ```html
     <script src="https://unpkg.com/eurostat-map"></script>
     ```
 
-- For a fixed version, use
+For a fixed version, use
 
     ```html
     <script src="https://unpkg.com/eurostat-map@X.Y.Z"></script>
