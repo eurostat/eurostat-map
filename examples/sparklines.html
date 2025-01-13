@@ -17,10 +17,10 @@
             const MAP1 = eurostatmap
                 .map('sparkline')
                 .width(MAPWIDTH)
-                //.title('Total population change across Europe over time')
-                //.subtitle(
-                // '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
-                //)
+                .title('Population change across Europe over time')
+                .subtitle(
+                    '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> = overall increase, <tspan style="fill:#d62728">red</tspan> = overall decrease.'
+                )
                 //.position({ x: 4900000, y: 3500000, z: zoom })
                 .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
                 .nutsLevel(1)

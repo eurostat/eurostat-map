@@ -12,21 +12,21 @@
             const map = eurostatmap
                 .map('stripeComposition')
                 .width(800)
-                //.title('European livestock composition')
-                //.subtitle('2018')
+                .title('European livestock composition')
+                .subtitle('2022')
                 .scale('60M')
                 .zoomExtent([1, 2])
                 .nutsLevel(1)
                 .nutsYear(2016)
                 .stripeWidth(12)
             map.statComp(
-                { eurostatDatasetCode: 'agr_r_animal', filters: { unit: 'THS_HD', time: '2018' }, unitText: '1000 heads' },
+                { eurostatDatasetCode: 'agr_r_animal', filters: { unit: 'THS_HD', time: '2022' }, unitText: '1000 heads' },
                 'animals',
                 ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
                 ['bovines', 'cows', 'buffalos', 'pigs', 'sheeps', 'goats'],
                 ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f']
             )
-                .legend({ x: 10, y: 130, title: 'Animals', boxOpacity: 0.8, boxFill: 'white' })
+                .legend({ x: 10, y: 120, title: 'Animals', boxOpacity: 0, boxFill: 'white' })
                 .seaFillStyle('white')
                 .coastalMarginColor('lightgray')
                 .drawGraticule(false)

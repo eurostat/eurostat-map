@@ -30,20 +30,22 @@
         <script>
             const map = eurostatmap
                 .map('choropleth')
+                .width(800)
                 .svgId('map')
                 .zoomExtent([1, 20])
                 .title('GDP per capita')
-                .subtitle('Gross domestic product (GDP) at current market prices by NUTS 3 region, 2021')
+                .subtitle('at current market prices, 2022')
                 .stat({
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Euro per inhabitant',
-                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                    filters: { TIME: '2022', UNIT: 'EUR_HAB' },
                 })
-                .width(800)
                 .nutsLevel(0)
                 .nutsYear(2024)
                 .tooltipShowFlags(false)
-                .legend({ title: 'Euro per inhabitant', decimals: 0, x: 550, y: 100 })
+                .legend({ title: 'Euro per inhabitant', decimals: 0, x: 550, y: 60 })
+                .classificationMethod('threshold')
+                .thresholds([10000, 20000, 30000, 40000, 50000, 60000])
                 //styling
                 .language('en')
                 .seaFillStyle('white')
@@ -52,15 +54,15 @@
                 .graticuleStroke('lightgrey')
                 .graticuleStrokeWidth(0.4)
                 .labels({
-                    labels: [
-                        // { text: 'Test label', x: 3500000, y: 4260000, class: 'test' },
-                        { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1250000, class: 'ocean', letterSpacing: 7 },
-                        { text: 'ATLANTIC OCEAN', x: 2700000, y: 2650000, class: 'ocean', letterSpacing: 2 },
-                        { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'ocean' },
-                        { text: 'BALTIC SEA', x: 4840000, y: 3600000, class: 'ocean', rotate: -30 },
-                        { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
-                        { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
-                    ],
+                    // labels: [
+                    //     // { text: 'Test label', x: 3500000, y: 4260000, class: 'test' },
+                    //     { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1250000, class: 'ocean', letterSpacing: 7 },
+                    //     { text: 'ATLANTIC OCEAN', x: 2700000, y: 2650000, class: 'ocean', letterSpacing: 2 },
+                    //     { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'ocean' },
+                    //     { text: 'BALTIC SEA', x: 4840000, y: 3600000, class: 'ocean', rotate: -30 },
+                    //     { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
+                    //     { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
+                    // ],
                     values: true,
                     backgrounds: false,
                     shadows: true,
@@ -87,7 +89,7 @@
                         labels: { values: true, shadows: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
                     },
                 ])
-                .insetBoxPosition([550, 330])
+                .insetBoxPosition([550, 280])
 
                 .build()
         </script>

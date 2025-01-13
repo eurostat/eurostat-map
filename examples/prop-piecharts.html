@@ -363,17 +363,18 @@
                 .pieOtherColor('#FFCC80')
                 .pieOtherText('Other')
                 .pieMinRadius(6)
-                //.title('Most common causes of death')
-                //.subtitle('Death rate (pie size) and cause of death (color), 2016')
+                .title('Most common causes of death')
+                .subtitle('Death rate (pie size) and cause of death (color), 2022')
                 .legend({
                     x: 530,
-                    y: 100,
+                    y: 70,
                     boxOpacity: 0,
                     boxFill: 'white',
                     titleFontWeight: 'bold',
                     sizeLegend: {
                         title: 'Death rate per 100 000 inh.',
-                        values: [700, 1600],
+                        titlePadding: 10,
+                        values: [400, 1600],
                     },
                     colorLegend: {
                         title: 'Cause of death',
