@@ -4,6 +4,7 @@ Here you can find the CSS classes used to style the map and its components, in c
 
 ## Map
 
+```css
 .em-map
 .em-title,
 .em-subtitle,
@@ -32,9 +33,11 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-bn-1 //NUTS1
 .em-bn-2 //NUTS2
 .em-bn-3 //NUTS3
+```
 
 ## Legends
 
+```css
 .em-legend-background
 .em-legend-label
 .em-legend-title
@@ -49,12 +52,15 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-bivariate-square
 .em-legend-rect
 .em-pie-size-legend-line
+```
 
 ## Insets
 
+```css
 .em-insets
 .em-inset-title
 .em-inset-subtitle
+```
 
 To target a class within all insets use:
 
@@ -74,6 +80,7 @@ or for a specific inset use:
 
 ## Labels
 
+```css
 #em-labels
 .em-stat-label
 .em-stat-label-shadow
@@ -88,11 +95,14 @@ or for a specific inset use:
 .em-flow-labels
 .em-flow-label
 .em-flow-label-shadow
+```
 
 ## Tootlip
 
+```css
 .tooltip-eurostat
 .estat-vis-tooltip-text
 .estat-vis-tooltip-bar
 .em-tooltip-piechart-breakdown
 .em-tooltip-piechart-container
+```
