@@ -19,6 +19,7 @@ export const map = function (config) {
     out.labelOffsetX = 15
     out.labelOffsetY = 5
     out.labelFormatter = (d) => format('.2s')(d)
+    out.tooltip_.textFunction = flowMapTooltipFunction
 
     /**
      * flowmap-specific setters/getters
@@ -252,11 +253,16 @@ export const map = function (config) {
                 .attr('stroke-width', link.width)
                 .attr('marker-end', `url(#${arrowId})`)
                 // add hover effect
-                .on('mouseover', function () {
+                .on('mouseover', function (e) {
                     select(this).attr('stroke', out.hoverColor_)
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out))
+                })
+                .on('mousemove', function (e) {
+                    if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
                     select(this).attr('stroke', `url(#${gradientIds[i]})`)
+                    if (out._tooltip) out._tooltip.mouseout()
                 })
         })
     }
@@ -450,4 +456,23 @@ export const map = function (config) {
     }
 
     return out
+}
+
+const flowMapTooltipFunction = function (link, map) {
+    const buf = []
+
+    // Header with region name and ID
+    const title = `${link.source.id} > ${link.target.id}`
+    buf.push(`
+        <div class="estat-vis-tooltip-bar">
+            <b>${title}</b>
+        </div>
+    `)
+
+    // Value
+    buf.push(`<div class='estat-vis-tooltip-text'>
+        ${link.target.value}
+        </div>`)
+
+    return buf.join('')
 }
