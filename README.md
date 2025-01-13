@@ -13,14 +13,15 @@
 <div align="center">
   <em>Customizable thematic maps.</em>
 </div>
-<div align="center">
-<em>Based on D3 and designed for Eurostat data but compatible with custom geometries and stats.</em>
-</div>
 
 <br>
 
 <div align="center">
 <a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"> <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/examples.gif" alt="examples" width="600"/> </a>
+</div>
+
+<div align="center">
+<em>Based on D3 and designed for Eurostat data but compatible with custom geometries and stats.</em>
 </div>
 
 ---
