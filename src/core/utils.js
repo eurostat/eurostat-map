@@ -384,3 +384,36 @@ export const hexToRgb = (hex) => {
     const int = parseInt(hex, 16)
     return [(int >> 16) & 255, (int >> 8) & 255, int & 255]
 }
+
+//blends two colors using 'multiply' blending mode. Returns the blended color as an RGB string
+export const multiplyBlendMultipleHex = (colors) => {
+    // Convert hex color to RGB
+    const hexToRgb = (hex) => {
+        hex = hex.replace('#', '')
+        if (hex.length === 3) {
+            hex = hex
+                .split('')
+                .map((h) => h + h)
+                .join('')
+        }
+        const int = parseInt(hex, 16)
+        return [(int >> 16) & 255, (int >> 8) & 255, int & 255]
+    }
+
+    // Convert RGB to hex
+    const rgbToHex = ([r, g, b]) => `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`
+
+    // Convert all hex colors to RGB arrays
+    const rgbColors = colors.map(hexToRgb)
+
+    // Initialize the result with the first color
+    let blended = [...rgbColors[0]]
+
+    // Sequentially multiply each color with the result
+    for (let i = 1; i < rgbColors.length; i++) {
+        blended = blended.map((v, idx) => Math.round((v / 255) * (rgbColors[i][idx] / 255) * 255))
+    }
+
+    // Return the blended color as a hex code
+    return rgbToHex(blended)
+}

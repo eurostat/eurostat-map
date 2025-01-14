@@ -3,7 +3,7 @@ import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as TrivariateLegend from '../legend/legend-choropleth-trivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets } from '../core/utils'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, multiplyBlendMultipleHex } from '../core/utils'
 
 /**
  * Return a trivariate choropleth map.
@@ -85,7 +85,7 @@ export const map = function (config) {
         let stat2 = out.statData('v2').getArray()
         let stat3 = out.statData('v3').getArray()
 
-        const range = [...Array(out.numberOfClasses()).keys()]
+        const range = [...Array(7).keys()]
         if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
         if (!out.classifier3_) out.classifier3(scaleQuantile().domain(stat3).range(range))
@@ -116,6 +116,22 @@ export const map = function (config) {
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
                     return +out.classifier3_(+v)
+                })
+                .attr('regionClass', function (rg) {
+                    const ecl1 = select(this).attr('ecl1')
+                    const ecl2 = select(this).attr('ecl2')
+                    const ecl3 = select(this).attr('ecl3')
+
+                    if (ecl1 === 'nd' || ecl2 === 'nd' || ecl3 === 'nd') return 'nd' // Handle 'no data'
+
+                    // Combine the classifier results into a single class (1-7)
+                    if (ecl1 && !ecl2 && !ecl3) return 1 // only variable 1 present
+                    if (!ecl1 && ecl2 && !ecl3) return 2 // only variable 2 present
+                    if (!ecl1 && !ecl2 && ecl3) return 3 // only variable 3 present
+                    if (ecl1 && ecl2 && !ecl3) return 4 // variables 1 & 2 present
+                    if (ecl1 && !ecl2 && ecl3) return 5 // variables 1 & 3 present
+                    if (!ecl1 && ecl2 && ecl3) return 6 // variables 2 & 3 present
+                    if (ecl1 && ecl2 && ecl3) return 7 // all present
                 })
             // .attr('nd', function (rg) {
             //     const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
@@ -157,7 +173,7 @@ export const map = function (config) {
 
             //define trivariate scale
             if (!out.classToFillStyle()) {
-                const scale = scaleTrivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.color3(), out.endColor())
+                const scale = scaleTrivariate(out.color1(), out.color2(), out.color3())
                 out.classToFillStyle(scale)
             }
 
@@ -186,6 +202,36 @@ export const map = function (config) {
                         if ((v != 0 && !v) || v == ':') return 'nd'
                         return +out.classifier3_(+v)
                     })
+            }
+        }
+    }
+
+    const scaleTrivariate = function (color1, color2, color3) {
+        // Blending primary colors and their overlaps
+        const overlapColors = [
+            multiplyBlendMultipleHex([color1, color2]), // Class 4 (Overlap of color1 and color2)
+            multiplyBlendMultipleHex([color2, color3]), // Class 5 (Overlap of color2 and color3)
+            multiplyBlendMultipleHex([color1, color3]), // Class 6 (Overlap of color1 and color3)
+            multiplyBlendMultipleHex([color1, color2, color3]), // Class 7 (Overlap of all three)
+        ]
+
+        // Class-to-color mapping
+        const classColors = [
+            color1, // Class 1 (First color)
+            color2, // Class 2 (Second color)
+            color3, // Class 3 (Third color)
+            overlapColors[0], // Class 4 (Overlap of color1 and color2)
+            overlapColors[1], // Class 5 (Overlap of color2 and color3)
+            overlapColors[2], // Class 6 (Overlap of color1 and color3)
+            overlapColors[3], // Class 7 (Overlap of all three)
+        ]
+
+        // Return function to get color based on region's class (1 to 7)
+        return function (classIndex) {
+            if (classIndex >= 1 && classIndex <= 7) {
+                return classColors[classIndex - 1]
+            } else {
+                return null // Return null or a default color if the classIndex is out of range
             }
         }
     }
@@ -225,7 +271,8 @@ export const map = function (config) {
 
                     if (!ecl1 && !ecl2 && !ecl3) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
 
-                    let color = out.classToFillStyle()(+ecl1, +ecl2, +ecl3)
+                    let regionClass = select(this).attr('regionClass')
+                    let color = out.classToFillStyle_(regionClass)
                     return color
 
                     //return getCSSPropertyFromClass('em-nutsrg', 'fill')
@@ -300,41 +347,6 @@ const styleMixedNUTS = function (map) {
             const strokeWidth = sel.style('stroke-width')
             return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
         })
-}
-
-const scaleTrivariate = function (numberOfClasses, startColor, color1, color2, color3, endColor) {
-    // 3D color ramps
-    const cs = []
-
-    // Interpolate between color axes
-    const rampS1 = interpolateRgb(startColor, color1) // Start to first axis
-    const ramp2E = interpolateRgb(color2, color3) // Second to third axis
-    const rampFinal = interpolateRgb(color1, color3) // Combine axes
-
-    for (let i = 0; i < numberOfClasses; i++) {
-        const t1 = i / (numberOfClasses - 1)
-        const colFun1 = interpolateRgb(rampS1(t1), rampFinal(t1))
-        const colFun2 = interpolateRgb(ramp2E(t1), endColor)
-        const plane = []
-
-        for (let j = 0; j < numberOfClasses; j++) {
-            const t2 = j / (numberOfClasses - 1)
-            const rowFun = interpolateRgb(colFun1(t2), colFun2(t2))
-            const row = []
-
-            for (let k = 0; k < numberOfClasses; k++) {
-                const t3 = k / (numberOfClasses - 1)
-                row.push(rowFun(t3))
-            }
-            plane.push(row)
-        }
-        cs.push(plane)
-    }
-
-    // Return function to get color based on three indices
-    return function (ecl1, ecl2, ecl3) {
-        return cs[ecl1][ecl2][ecl3]
-    }
 }
 
 /**

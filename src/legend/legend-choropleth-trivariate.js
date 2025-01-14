@@ -1,6 +1,6 @@
 import * as Legend from './legend'
 import { select, selectAll } from 'd3-selection'
-import { executeForAllInsets, getFontSizeFromClass, hexToRgb } from '../core/utils'
+import { executeForAllInsets, getFontSizeFromClass, multiplyBlendMultipleHex } from '../core/utils'
 
 /**
  * A legend for choropleth-trivariate maps
@@ -241,45 +241,6 @@ function drawTrivariateVennDiagram(container, colors, labels) {
         .attr('y', yCenter3 + circleRad + 15)
         .attr('class', 'venn-label')
         .attr('text-anchor', 'middle')
-    // container.append('text').text('1').attr('x', xIsect1).attr('y', yIsect1)
-    // container.append('text').text('2').attr('x', xIsect2).attr('y', yIsect2)
-    // container.append('text').text('3').attr('x', xIsect3).attr('y', yIsect3)
-    // container.append('text').text('4').attr('x', xIsect4).attr('y', yIsect4)
-    // container.append('text').text('5').attr('x', xIsect5).attr('y', yIsect5)
-    // container.append('text').text('6').attr('x', xIsect6).attr('y', yIsect6)
-}
-
-//blends two colors using 'multiply' blending mode. Returns the blended color as an RGB string
-function multiplyBlendMultipleHex(colors) {
-    // Convert hex color to RGB
-    const hexToRgb = (hex) => {
-        hex = hex.replace('#', '')
-        if (hex.length === 3) {
-            hex = hex
-                .split('')
-                .map((h) => h + h)
-                .join('')
-        }
-        const int = parseInt(hex, 16)
-        return [(int >> 16) & 255, (int >> 8) & 255, int & 255]
-    }
-
-    // Convert RGB to hex
-    const rgbToHex = ([r, g, b]) => `#${[r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')}`
-
-    // Convert all hex colors to RGB arrays
-    const rgbColors = colors.map(hexToRgb)
-
-    // Initialize the result with the first color
-    let blended = [...rgbColors[0]]
-
-    // Sequentially multiply each color with the result
-    for (let i = 1; i < rgbColors.length; i++) {
-        blended = blended.map((v, idx) => Math.round((v / 255) * (rgbColors[i][idx] / 255) * 255))
-    }
-
-    // Return the blended color as a hex code
-    return rgbToHex(blended)
 }
 
 /**
