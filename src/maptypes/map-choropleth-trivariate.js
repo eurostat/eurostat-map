@@ -6,7 +6,7 @@ import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
 import { getCSSPropertyFromClass, spaceAsThousandSeparator } from '../core/utils'
 
 /**
- * Return a bivariate choropleth map.
+ * Return a trivariate choropleth map.
  * See: https://gistbok.ucgis.org/bok-topics/multivariate-mapping
  *
  * @param {*} config
