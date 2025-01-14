@@ -3,7 +3,7 @@ import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator } from '../core/utils'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets } from '../core/utils'
 
 /**
  * Return a bivariate choropleth map.
@@ -28,6 +28,7 @@ export const map = function (config) {
     //the classifier: a function which return a class number from a stat value.
     out.classifier1_ = undefined
     out.classifier2_ = undefined
+
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunBiv
 
@@ -77,7 +78,7 @@ export const map = function (config) {
 
     function applyClassificationToMap(map) {
         //set classifiers
-        let stat1 = out.statData('v1').getArray() || out.statData().getArray()
+        let stat1 = out.statData('v1').getArray()
         let stat2 = out.statData('v2').getArray()
 
         const range = [...Array(out.numberOfClasses()).keys()]
@@ -91,7 +92,7 @@ export const map = function (config) {
             let regions = map.svg().selectAll(selector)
             regions
                 .attr('ecl1', function (rg) {
-                    const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
+                    const sv = out.statData('v1').get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
@@ -105,7 +106,7 @@ export const map = function (config) {
                     return +out.classifier2_(+v)
                 })
                 .attr('nd', function (rg) {
-                    const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
+                    const sv1 = out.statData('v1').get(rg.properties.id)
                     const sv2 = out.statData('v2').get(rg.properties.id)
                     if (!sv1 || !sv2) return
                     let v = sv1.value
@@ -120,7 +121,7 @@ export const map = function (config) {
                 map.svg()
                     .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
-                        const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
+                        const sv = out.statData('v1').get(rg.properties.id)
                         if (!sv) return
                         const v = sv.value
                         if ((v != 0 && !v) || v == ':') return 'nd'
@@ -168,24 +169,7 @@ export const map = function (config) {
         // apply style to insets
         // apply classification to all insets
         if (out.insetTemplates_) {
-            for (const geo in out.insetTemplates_) {
-                if (Array.isArray(out.insetTemplates_[geo])) {
-                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                        // insets with same geo that do not share the same parent inset
-                        if (Array.isArray(out.insetTemplates_[geo][i])) {
-                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
-                            }
-                        } else {
-                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
-                        }
-                    }
-                } else {
-                    // unique inset geo_
-                    if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
-                }
-            }
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
         }
 
         // apply to main map
@@ -326,8 +310,8 @@ const tooltipTextFunBiv = function (rg, map) {
     }
 
     //stat 1 value
-    const sv1 = map.statData('v1').get(rg.properties.id) || map.statData().get(rg.properties.id)
-    const unit1 = map.statData('v1').unitText() || map.statData().unitText()
+    const sv1 = map.statData('v1').get(rg.properties.id)
+    const unit1 = map.statData('v1').unitText()
     //stat 2 value
     const sv2 = map.statData('v2').get(rg.properties.id)
     const unit2 = map.statData('v2').unitText()

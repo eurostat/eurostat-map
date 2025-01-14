@@ -40,7 +40,8 @@ export const statMap = function (config, withCenterPoints) {
         color: StatisticalData.statData(),
         size: StatisticalData.statData(),
         v1: StatisticalData.statData(),
-        v2: StatisticalData.statData(),
+        v2: StatisticalData.statData(), //bivariate
+        v3: StatisticalData.statData(), //trivariate
     }
     out.statData = function (k, v) {
         //no argument: getter - return the default statData
@@ -77,22 +78,15 @@ export const statMap = function (config, withCenterPoints) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    ;[
-        'legend_',
-        'legendObj_',
-        'noDataText_',
-        'language_',
-        'transitionDuration_',
-        'tooltipText_',
-        'filtersDefinitionFunction_',
-        'callback_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
+    ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'callback_'].forEach(
+        function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
         }
-    })
+    )
 
     //override attribute values with config values
     if (config) for (let key in config) if (out[key] && config[key] != undefined) out[key](config[key])

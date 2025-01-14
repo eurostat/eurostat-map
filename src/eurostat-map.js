@@ -2,6 +2,7 @@ import * as Choropleth from './maptypes/map-choropleth'
 import * as ProportionalSymbol from './maptypes/map-proportional-symbols'
 import * as Categorical from './maptypes/map-categorical'
 import * as BivariateChoropleth from './maptypes/map-choropleth-bivariate'
+import * as TrivariateChoropleth from './maptypes/map-choropleth-trivariate'
 import * as StripeComposition from './maptypes/map-stripe-composition'
 import * as PieCharts from './maptypes/map-piecharts'
 import * as Sparklines from './maptypes/map-sparklines'
@@ -23,6 +24,8 @@ export const map = function (type, config) {
     if (type == 'proportionalSymbol' || type == 'ps') return ProportionalSymbol.map(config)
     //bivariate choropleth
     if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
+    //trivariate choropleth
+    if (type == 'trivariateChoropleth' || type == 'chbi') return TrivariateChoropleth.map(config)
     //stripes composition
     if (type == 'stripeComposition' || type == 'scomp') return StripeComposition.map(config)
     //proportional pie charts
@@ -67,13 +70,7 @@ export const getFillPatternDefinitionFunction = function (opts) {
                 .attr('width', ps)
                 .attr('height', ps)
                 .attr('patternUnits', 'userSpaceOnUse')
-            patt.append('rect')
-                .attr('x', 0)
-                .attr('y', 0)
-                .attr('width', ps)
-                .attr('height', ps)
-                .style('stroke', 'none')
-                .style('fill', opts.bckColor)
+            patt.append('rect').attr('x', 0).attr('y', 0).attr('width', ps).attr('height', ps).style('stroke', 'none').style('fill', opts.bckColor)
             if (opts.shape == 'square')
                 patt.append('rect')
                     .attr('x', 0)

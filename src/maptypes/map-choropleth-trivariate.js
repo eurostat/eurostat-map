@@ -2,8 +2,8 @@ import { select } from 'd3-selection'
 import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
-import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator } from '../core/utils'
+import * as TrivariateLegend from '../legend/legend-choropleth-trivariate'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets } from '../core/utils'
 
 /**
  * Return a trivariate choropleth map.
@@ -20,14 +20,16 @@ export const map = function (config) {
     //stevens.greenblue
     //TODO make it possible to use diverging color ramps ?
     out.startColor_ = '#e8e8e8'
-    out.color1_ = '#73ae80'
-    out.color2_ = '#6c83b5'
+    out.color1_ = 'red'
+    out.color2_ = 'green'
+    out.color3_ = 'blue'
     out.endColor_ = '#2a5a5b'
     //a function returning the colors for the classes i,j
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
     out.classifier1_ = undefined
     out.classifier2_ = undefined
+    out.classifier3_ = undefined
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunBiv
 
@@ -43,11 +45,13 @@ export const map = function (config) {
         'startColor_',
         'color1_',
         'color2_',
+        'color3_',
         'endColor_',
         'classToFillStyle_',
         'noDataFillStyle_',
         'classifier1_',
         'classifier2_',
+        'classifier3_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -58,7 +62,7 @@ export const map = function (config) {
 
     //override attribute values with config values
     if (config)
-        ['numberOfClasses', 'startColor', 'color1', 'color2', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(function (key) {
+        ['numberOfClasses', 'startColor', 'color1', 'color2', 'color3', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
 
@@ -77,12 +81,14 @@ export const map = function (config) {
 
     function applyClassificationToMap(map) {
         //set classifiers
-        let stat1 = out.statData('v1').getArray() || out.statData().getArray()
+        let stat1 = out.statData('v1').getArray()
         let stat2 = out.statData('v2').getArray()
+        let stat3 = out.statData('v3').getArray()
 
         const range = [...Array(out.numberOfClasses()).keys()]
         if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
+        if (!out.classifier3_) out.classifier3(scaleQuantile().domain(stat3).range(range))
 
         //assign class to nuts regions, based on their value
         let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
@@ -91,7 +97,7 @@ export const map = function (config) {
             let regions = map.svg().selectAll(selector)
             regions
                 .attr('ecl1', function (rg) {
-                    const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
+                    const sv = out.statData('v1').get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
@@ -104,23 +110,30 @@ export const map = function (config) {
                     if ((v != 0 && !v) || v == ':') return 'nd'
                     return +out.classifier2_(+v)
                 })
-                .attr('nd', function (rg) {
-                    const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
-                    const sv2 = out.statData('v2').get(rg.properties.id)
-                    if (!sv1 || !sv2) return
-                    let v = sv1.value
+                .attr('ecl3', function (rg) {
+                    const sv = out.statData('v3').get(rg.properties.id)
+                    if (!sv) return
+                    const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
-                    v = sv2.value
-                    if ((v != 0 && !v) || v == ':') return 'nd'
-                    return ''
+                    return +out.classifier3_(+v)
                 })
+            // .attr('nd', function (rg) {
+            //     const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
+            //     const sv2 = out.statData('v2').get(rg.properties.id)
+            //     if (!sv1 || !sv2) return
+            //     let v = sv1.value
+            //     if ((v != 0 && !v) || v == ':') return 'nd'
+            //     v = sv2.value
+            //     if ((v != 0 && !v) || v == ':') return 'nd'
+            //     return ''
+            // })
 
             //when mixing NUTS, level 0 is separated from the rest (class nutsrg0)
             if (map.nutsLevel_ == 'mixed') {
                 map.svg()
                     .selectAll('path.em-nutsrg0')
                     .attr('ecl1', function (rg) {
-                        const sv = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
+                        const sv = out.statData('v1').get(rg.properties.id)
                         if (!sv) return
                         const v = sv.value
                         if ((v != 0 && !v) || v == ':') return 'nd'
@@ -133,11 +146,18 @@ export const map = function (config) {
                         if ((v != 0 && !v) || v == ':') return 'nd'
                         return +out.classifier2_(+v)
                     })
+                    .attr('ecl3', function (rg) {
+                        const sv = out.statData('v3').get(rg.properties.id)
+                        if (!sv) return
+                        const v = sv.value
+                        if ((v != 0 && !v) || v == ':') return 'nd'
+                        return +out.classifier3_(+v)
+                    })
             }
 
-            //define bivariate scale
+            //define trivariate scale
             if (!out.classToFillStyle()) {
-                const scale = scaleBivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.endColor())
+                const scale = scaleTrivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.color3(), out.endColor())
                 out.classToFillStyle(scale)
             }
 
@@ -159,6 +179,13 @@ export const map = function (config) {
                         if ((v != 0 && !v) || v == ':') return 'nd'
                         return +out.classifier2_(+v)
                     })
+                    .attr('ecl3', function (rg) {
+                        const sv = out.statData('v3').get(rg.properties.id)
+                        if (!sv) return
+                        const v = sv.value
+                        if ((v != 0 && !v) || v == ':') return 'nd'
+                        return +out.classifier3_(+v)
+                    })
             }
         }
     }
@@ -168,24 +195,7 @@ export const map = function (config) {
         // apply style to insets
         // apply classification to all insets
         if (out.insetTemplates_) {
-            for (const geo in out.insetTemplates_) {
-                if (Array.isArray(out.insetTemplates_[geo])) {
-                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                        // insets with same geo that do not share the same parent inset
-                        if (Array.isArray(out.insetTemplates_[geo][i])) {
-                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
-                            }
-                        } else {
-                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
-                        }
-                    }
-                } else {
-                    // unique inset geo_
-                    if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
-                }
-            }
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
         }
 
         // apply to main map
@@ -207,11 +217,15 @@ export const map = function (config) {
                 .duration(out.transitionDuration())
                 .style('fill', function (rg) {
                     const ecl1 = select(this).attr('ecl1')
-                    if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
                     const ecl2 = select(this).attr('ecl2')
-                    if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+                    const ecl3 = select(this).attr('ecl3')
+                    if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
                     if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
-                    let color = out.classToFillStyle()(+ecl1, +ecl2)
+                    if (ecl3 === 'nd') return out.noDataFillStyle() || 'gray'
+
+                    if (!ecl1 && !ecl2 && !ecl3) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+
+                    let color = out.classToFillStyle()(+ecl1, +ecl2, +ecl3)
                     return color
 
                     //return getCSSPropertyFromClass('em-nutsrg', 'fill')
@@ -256,7 +270,7 @@ export const map = function (config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return BivariateLegend.legend
+        return TrivariateLegend.legend
     }
 
     return out
@@ -288,23 +302,38 @@ const styleMixedNUTS = function (map) {
         })
 }
 
-const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {
-    //color ramps, by row
+const scaleTrivariate = function (numberOfClasses, startColor, color1, color2, color3, endColor) {
+    // 3D color ramps
     const cs = []
-    //interpolate from first and last columns
-    const rampS1 = interpolateRgb(startColor, color1)
-    const ramp2E = interpolateRgb(color2, endColor)
-    for (let i = 0; i < numberOfClasses; i++) {
-        const t = i / (numberOfClasses - 1)
-        const colFun = interpolateRgb(rampS1(t), ramp2E(t))
-        const row = []
-        for (let j = 0; j < numberOfClasses; j++) row.push(colFun(j / (numberOfClasses - 1)))
-        cs.push(row)
-    }
-    //TODO compute other matrix based on rows, and average both?
 
-    return function (ecl1, ecl2) {
-        return cs[ecl1][ecl2]
+    // Interpolate between color axes
+    const rampS1 = interpolateRgb(startColor, color1) // Start to first axis
+    const ramp2E = interpolateRgb(color2, color3) // Second to third axis
+    const rampFinal = interpolateRgb(color1, color3) // Combine axes
+
+    for (let i = 0; i < numberOfClasses; i++) {
+        const t1 = i / (numberOfClasses - 1)
+        const colFun1 = interpolateRgb(rampS1(t1), rampFinal(t1))
+        const colFun2 = interpolateRgb(ramp2E(t1), endColor)
+        const plane = []
+
+        for (let j = 0; j < numberOfClasses; j++) {
+            const t2 = j / (numberOfClasses - 1)
+            const rowFun = interpolateRgb(colFun1(t2), colFun2(t2))
+            const row = []
+
+            for (let k = 0; k < numberOfClasses; k++) {
+                const t3 = k / (numberOfClasses - 1)
+                row.push(rowFun(t3))
+            }
+            plane.push(row)
+        }
+        cs.push(plane)
+    }
+
+    // Return function to get color based on three indices
+    return function (ecl1, ecl2, ecl3) {
+        return cs[ecl1][ecl2][ecl3]
     }
 }
 
@@ -326,8 +355,8 @@ const tooltipTextFunBiv = function (rg, map) {
     }
 
     //stat 1 value
-    const sv1 = map.statData('v1').get(rg.properties.id) || map.statData().get(rg.properties.id)
-    const unit1 = map.statData('v1').unitText() || map.statData().unitText()
+    const sv1 = map.statData('v1').get(rg.properties.id)
+    const unit1 = map.statData('v1').unitText()
     //stat 2 value
     const sv2 = map.statData('v2').get(rg.properties.id)
     const unit2 = map.statData('v2').unitText()
