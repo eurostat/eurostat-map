@@ -31,7 +31,7 @@ export const map = function (config) {
     out.classifier2_ = undefined
     out.classifier3_ = undefined
     //specific tooltip text function
-    out.tooltip_.textFunction = tooltipTextFunBiv
+    out.tooltip_.textFunction = tooltipTextFunctionTrivariate
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -355,7 +355,7 @@ const styleMixedNUTS = function (map) {
  * @param {*} rg The region to show information on.
  * @param {*} map The map element
  */
-const tooltipTextFunBiv = function (rg, map) {
+const tooltipTextFunctionTrivariate = function (rg, map) {
     const buf = []
     //region name
     if (rg.properties.id) {
@@ -372,6 +372,9 @@ const tooltipTextFunBiv = function (rg, map) {
     //stat 2 value
     const sv2 = map.statData('v2').get(rg.properties.id)
     const unit2 = map.statData('v2').unitText()
+    //stat 3 value
+    const sv3 = map.statData('v3').get(rg.properties.id)
+    const unit3 = map.statData('v2').unitText()
 
     buf.push(`
         <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
@@ -379,14 +382,20 @@ const tooltipTextFunBiv = function (rg, map) {
         <tbody>
         <tr>
         <td>
-        ${sv1 && sv1.value ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && sv1.value ? unit1 : ''}
+        Variable 1: ${sv1 && sv1.value ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && sv1.value ? unit1 : ''}
         ${!sv1 || (sv1.value != 0 && !sv1.value) ? map.noDataText_ : ''}
         </td>
         </tr>
         <tr>
         <td>
-        ${sv2 && sv2.value ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && sv2.value ? unit2 : ''}
+         Variable 2: ${sv2 && sv2.value ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && sv2.value ? unit2 : ''}
         ${!sv2 || (sv2.value != 0 && !sv2.value) ? map.noDataText_ : ''}
+        </td>
+        </tr>
+        <tr>
+        <td>
+         Variable 3: ${sv3 && sv3.value ? spaceAsThousandSeparator(sv3.value) : ''} ${unit3 && sv3 && sv3.value ? unit3 : ''}
+        ${!sv3 || (sv3.value != 0 && !sv3.value) ? map.noDataText_ : ''}
         </td>
         </tr>
         </tbody>

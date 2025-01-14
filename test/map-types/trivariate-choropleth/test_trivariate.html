@@ -8,27 +8,13 @@
     <body>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
+        <script src="../../data/nuts2.js"></script>
         <script>
-            const variable1 = {
-                ES: 1,
-                DE: 1,
-                FR: 3,
-            }
-            const variable2 = {
-                ES: 1,
-                DE: 2,
-            }
-            const variable3 = {
-                ES: 1,
-                DE: 3,
-                IT: 4,
-                PL: 1,
-            }
             const map = eurostatmap
                 .map('trivariateChoropleth')
                 .title('test')
                 .subtitle('test')
-                .nutsLevel(0)
+                .nutsLevel(2)
                 //.stat("v1", { eurostatDatasetCode:"demo_r_gind3", filters: { indic_de: "GROWRT", time: 2016 }, unitText: "‰" } )
                 // .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
                 // .stat('v2', {
