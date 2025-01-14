@@ -20,9 +20,9 @@ export const map = function (config) {
     //stevens.greenblue
     //TODO make it possible to use diverging color ramps ?
     out.startColor_ = '#e8e8e8'
-    out.color1_ = 'red'
-    out.color2_ = 'green'
-    out.color3_ = 'blue'
+    out.color1_ = '#09F8FF'
+    out.color2_ = '#F5D300'
+    out.color3_ = '#FF1493'
     out.endColor_ = '#2a5a5b'
     //a function returning the colors for the classes i,j
     out.classToFillStyle_ = undefined

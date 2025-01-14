@@ -11,10 +11,9 @@ export const legend = function (map, config) {
     const out = Legend.legend(map)
 
     // Default settings
-    out.width = 200
-    out.height = 200
-    out.squareSize = 100
-    out.rotation = 0
+    out.width = 230
+    out.height = 230
+
     out.label1 = 'Variable 1'
     out.label2 = 'Variable 2'
     out.label3 = 'Variable 3' // Add a label for the third variable
@@ -24,7 +23,7 @@ export const legend = function (map, config) {
     out.noDataShapeHeight = 20
     out.noDataShapeWidth = 25
     out.noDataText = 'No data'
-    out.boxPadding = 60
+    out.boxPadding = 60 // depends on variable 1 label length really
     out.noDataYOffset = 20
     out.arrowHeight = 15
     out.arrowWidth = 14
@@ -60,8 +59,9 @@ export const legend = function (map, config) {
 
         // Draw the trivariate Venn diagram
         const labels = [out.label1, out.label2, out.label3]
+        const colors = [out.map.color1_, out.map.color2_, out.map.color3_]
 
-        drawTrivariateVennDiagram(paddedGroup, out.width - 2 * out.boxPadding, out.height - 2 * out.boxPadding, labels, ['red', 'blue', 'green'])
+        drawTrivariateVennDiagram(paddedGroup, colors, labels)
 
         // Handle trivariate (Venn Diagram) or bivariate (grid) legend
         // if (numberOfClasses === 7) {
@@ -74,24 +74,170 @@ export const legend = function (map, config) {
     return out
 }
 
+function drawTrivariateVennDiagram(container, colors, labels) {
+    //specs for Circle 1
+    const xCenter1 = 50
+    const yCenter1 = 50
+    const circleRad = 30
+
+    //draw Circle 1
+    const circle1 = container
+        .append('circle')
+        .attr('r', circleRad)
+        .attr('transform', 'translate(' + xCenter1 + ',' + yCenter1 + ')')
+
+    //add'l specs for Circle 2
+    const offsetFactor = 1.2
+    const offset = offsetFactor * circleRad
+    const xCenter2 = xCenter1 + offset
+    const yCenter2 = yCenter1 //creating new var for clarity
+
+    //draw Circle 2
+    const circle2 = container
+        .append('circle')
+        .attr('r', circleRad)
+        .attr('transform', 'translate(' + xCenter2 + ',' + yCenter2 + ')')
+
+    //add'l specs for Circle 3
+    const xCenter3 = xCenter1 + offset / 2
+    const yCenter3 = yCenter1 + (Math.sqrt(3) * offset) / 2
+
+    //draw Circle 3
+    const circle3 = container
+        .append('circle')
+        .attr('r', circleRad)
+        .attr('transform', 'translate(' + xCenter3 + ',' + yCenter3 + ')')
+
+    //compute first points of intersection
+    const triHeight = Math.sqrt(circleRad ** 2 - (offset / 2) ** 2)
+    //outer intersection of Circles 1 and 2
+    const xIsect1 = xCenter3
+    const yIsect1 = yCenter1 - triHeight
+    //inner intersection of Circles 1 and 2
+    const xIsect4 = xCenter3
+    const yIsect4 = yCenter1 + triHeight
+
+    //treat "triHeight" as the hypoteneuse of a 30.60.90 triangle.
+    //this tells us the shift from the midpoint of a leg of the triangle
+    //to the point of intersection
+    const xDelta = (triHeight * Math.sqrt(3)) / 2
+    const yDelta = triHeight / 2
+
+    const xMidpointC1C3 = (xCenter1 + xCenter3) / 2
+    const xMidpointC2C3 = (xCenter2 + xCenter3) / 2
+    const yMidpointBoth = (yCenter1 + yCenter3) / 2
+
+    //find the rest of the points of intersection
+    const xIsect2 = xMidpointC1C3 - xDelta
+    const yIsect2 = yMidpointBoth + yDelta
+    const xIsect3 = xMidpointC2C3 + xDelta
+    const yIsect3 = yMidpointBoth + yDelta
+
+    const xIsect5 = xMidpointC1C3 + xDelta
+    const yIsect5 = yMidpointBoth - yDelta
+    const xIsect6 = xMidpointC2C3 - xDelta
+    const yIsect6 = yMidpointBoth - yDelta
+
+    const xPoints = [xIsect1, xIsect2, xIsect3, xIsect4, xIsect5, xIsect6]
+    const yPoints = [yIsect1, yIsect2, yIsect3, yIsect4, yIsect5, yIsect6]
+
+    const makeIronShapes = ([x1, x2, x3, y1, y2, y3]) => {
+        const path = `M ${x1} ${y1}
+             A ${circleRad} ${circleRad} 0 0 1 ${x2} ${y2}
+             A ${circleRad} ${circleRad} 0 0 0 ${x3} ${y3}
+             A ${circleRad} ${circleRad} 0 0 1 ${x1} ${y1}`
+        return path
+    }
+
+    const makeSunShapes = ([x1, x2, x3, y1, y2, y3]) => {
+        const path = `M ${x1} ${y1}
+             A ${circleRad} ${circleRad} 0 0 0 ${x2} ${y2}
+             A ${circleRad} ${circleRad} 0 0 0 ${x3} ${y3}
+             A ${circleRad} ${circleRad} 0 1 1 ${x1} ${y1}`
+        return path
+    }
+
+    const makeRoundedTri = ([x1, x2, x3, y1, y2, y3]) => {
+        const path = `M ${x1} ${y1}
+             A ${circleRad} ${circleRad} 0 0 1 ${x2} ${y2}
+             A ${circleRad} ${circleRad} 0 0 1 ${x3} ${y3}
+             A ${circleRad} ${circleRad} 0 0 1 ${x1} ${y1}`
+        return path
+    }
+
+    const ironPoints = [
+        [1, 5, 6],
+        [3, 4, 5],
+        [2, 6, 4],
+    ]
+    const sunPoints = [
+        [3, 5, 1],
+        [2, 4, 3],
+        [1, 6, 2],
+    ]
+    const roundedTriPoints = [[5, 4, 6]]
+
+    // main circles (raw colors)
+    sunPoints.forEach((points, index) => {
+        const ptCycle = points.map((i) => xPoints[i - 1]).concat(points.map((i) => yPoints[i - 1]))
+        const shape = makeSunShapes(ptCycle)
+
+        container.append('path').attr('d', shape).attr('class', 'segment').attr('fill', colors[index]).attr('opacity', 1)
+    })
+
+    // first intersects (combination of 2 colors)
+    ironPoints.forEach((points, index) => {
+        const ptCycle = points.map((i) => xPoints[i - 1]).concat(points.map((i) => yPoints[i - 1]))
+        const shape = makeIronShapes(ptCycle)
+
+        container.append('path').attr('d', shape).attr('class', 'segment').attr('fill', '#cc6666').attr('opacity', 1)
+    })
+
+    // nucleus (combination of all 3 colors)
+    roundedTriPoints.forEach((points, index) => {
+        const ptCycle = points.map((i) => xPoints[i - 1]).concat(points.map((i) => yPoints[i - 1]))
+        const shape = makeRoundedTri(ptCycle)
+
+        container.append('path').attr('d', shape).attr('class', 'segment').attr('fill', '#66cc66').attr('opacity', 1)
+    })
+
+    container
+        .selectAll('path.segment')
+        .on('mouseover', function () {
+            select(this).transition().attr('opacity', 0.8).duration(500)
+        })
+        .on('mouseout', function () {
+            select(this).transition().attr('opacity', 1).duration(500)
+        })
+
+    // label intersects
+    // container.append('text').text('1').attr('x', xIsect1).attr('y', yIsect1)
+    // container.append('text').text('2').attr('x', xIsect2).attr('y', yIsect2)
+    // container.append('text').text('3').attr('x', xIsect3).attr('y', yIsect3)
+    // container.append('text').text('4').attr('x', xIsect4).attr('y', yIsect4)
+    // container.append('text').text('5').attr('x', xIsect5).attr('y', yIsect5)
+    // container.append('text').text('6').attr('x', xIsect6).attr('y', yIsect6)
+}
+
 /**
  * Draws a trivariate legend as a Venn Diagram
  */
-function drawTrivariateVennDiagram(svg, containerWidth, containerHeight, labels, colors) {
+function drawTrivariateVennDiagram2(svg, containerWidth, containerHeight, labels, colors) {
     const radius = containerWidth / 5 // Radius of each circle
     const centerX = containerWidth / 2
     const centerY = containerHeight / 2
+    const offset = radius / 1.5
 
     // Define circle positions
     const circles = [
-        { id: 'circle1', cx: centerX - radius, cy: centerY, label: labels[0], color: colors[0] },
-        { id: 'circle2', cx: centerX + radius, cy: centerY, label: labels[1], color: colors[1] },
-        { id: 'circle3', cx: centerX, cy: centerY + radius * 1.5, label: labels[2], color: colors[2] },
+        { id: 'circle1', cx: centerX - offset, cy: centerY, label: labels[0], color: colors[0] },
+        { id: 'circle2', cx: centerX + offset, cy: centerY, label: labels[1], color: colors[1] },
+        { id: 'circle3', cx: centerX, cy: centerY + offset * 1.5, label: labels[2], color: colors[2] },
     ]
 
     // Draw circles
     circles.forEach(({ id, cx, cy, label, color }, index) => {
-        svg.append('circle').attr('id', id).attr('cx', cx).attr('cy', cy).attr('r', radius).style('fill', color).style('opacity', 0.5)
+        svg.append('circle').attr('id', id).attr('cx', cx).attr('cy', cy).attr('r', radius).style('fill', color).style('opacity', 1)
 
         // Add labels with specific positioning
         const labelX =
