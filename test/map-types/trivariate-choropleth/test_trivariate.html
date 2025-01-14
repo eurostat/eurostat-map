@@ -23,25 +23,29 @@
                 DE: 3,
                 IT: 4,
             }
-            const map = eurostatmap.map('trivariateChoropleth').title('test').subtitle('test').nutsLevel(0)
-            //.stat("v1", { eurostatDatasetCode:"demo_r_gind3", filters: { indic_de: "GROWRT", time: 2016 }, unitText: "‰" } )
-            // .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
-            // .stat('v2', {
-            //     eurostatDatasetCode: 'lfst_r_lfu3rt',
-            //     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
-            //     unitText: '%',
-            // })
-            // .legend({
-            //     //rotation: -45,
-            //     squareSize: 100,
-            //     label1: 'Inhabitants per km²',
-            //     label2: '% unemployed',
-            //     // breaks1: [1, 2, 3],
-            //     // breaks2: [1, 2, 3],
-            //     showBreaks: true,
-            //     x: 0,
-            //     y: 140,
-            // })
+            const map = eurostatmap
+                .map('trivariateChoropleth')
+                .title('test')
+                .subtitle('test')
+                .nutsLevel(0)
+                //.stat("v1", { eurostatDatasetCode:"demo_r_gind3", filters: { indic_de: "GROWRT", time: 2016 }, unitText: "‰" } )
+                // .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                // .stat('v2', {
+                //     eurostatDatasetCode: 'lfst_r_lfu3rt',
+                //     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                //     unitText: '%',
+                // })
+                .legend({
+                    //rotation: -45,
+                    // squareSize: 100,
+                    // label1: 'Inhabitants per km²',
+                    // label2: '% unemployed',
+                    // breaks1: [1, 2, 3],
+                    // breaks2: [1, 2, 3],
+                    // showBreaks: true,
+                    x: 520,
+                    y: 100,
+                })
 
             map.statData('v1').setData(variable1)
             map.statData('v2').setData(variable2)
