@@ -2,40 +2,40 @@
 export function updateCSSRule(selector, property, value) {
     // Validate the selector
     if (!selector.startsWith('.') && !selector.startsWith('#')) {
-        throw new Error('Invalid selector: Must start with "." for classes or "#" for IDs.');
+        throw new Error('Invalid selector: Must start with "." for classes or "#" for IDs.')
     }
 
     // Check if the rule already exists in any stylesheet
-    const styleSheets = Array.from(document.styleSheets);
+    const styleSheets = Array.from(document.styleSheets)
     for (const styleSheet of styleSheets) {
         try {
-            const rules = styleSheet.cssRules || styleSheet.rules;
+            const rules = styleSheet.cssRules || styleSheet.rules
             for (const rule of rules) {
                 if (rule.selectorText === selector) {
                     // Update the property if the rule exists
-                    rule.style[property] = value;
-                    return;
+                    rule.style[property] = value
+                    return
                 }
             }
         } catch (e) {
             // Some stylesheets (e.g., cross-origin) may not be accessible
-            console.warn(`Could not access rules in stylesheet:`, e);
+            console.warn(`Could not access rules in stylesheet:`, e)
         }
     }
 
     // If the rule doesn't exist, create a new stylesheet and add it
-    let customSheet = document.getElementById('custom-styles');
+    let customSheet = document.getElementById('custom-styles')
     if (!customSheet) {
-        customSheet = document.createElement('style');
-        customSheet.id = 'custom-styles';
-        document.head.appendChild(customSheet);
+        customSheet = document.createElement('style')
+        customSheet.id = 'custom-styles'
+        document.head.appendChild(customSheet)
     }
 
     // Add the new rule to the custom stylesheet
     try {
-        customSheet.sheet.insertRule(`${selector} { ${property}: ${value}; }`, customSheet.sheet.cssRules.length);
+        customSheet.sheet.insertRule(`${selector} { ${property}: ${value}; }`, customSheet.sheet.cssRules.length)
     } catch (e) {
-        console.error(`Failed to insert rule: ${selector} { ${property}: ${value}; }`, e);
+        console.error(`Failed to insert rule: ${selector} { ${property}: ${value}; }`, e)
     }
 }
 
@@ -371,4 +371,16 @@ export function getParameterByName(name) {
     let regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
         results = regex.exec(location.search)
     return !results ? null : decodeURIComponent(results[1].replace(/\+/g, ' '))
+}
+
+export const hexToRgb = (hex) => {
+    hex = hex.replace('#', '')
+    if (hex.length === 3) {
+        hex = hex
+            .split('')
+            .map((h) => h + h)
+            .join('')
+    }
+    const int = parseInt(hex, 16)
+    return [(int >> 16) & 255, (int >> 8) & 255, int & 255]
 }
