@@ -102,6 +102,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //annotations
     out.annotations_ = undefined
+    out.annotationsAdded = false //simple flag to know when annotations have already been added
 
     //dataset source link
     out.showSourceLink_ = true
@@ -353,6 +354,20 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
+    //annotations override (update after first call)
+    out.annotations = function (v) {
+        //get
+        if (!arguments.length) return out.annotations_
+        //set
+        out.annotations_ = v
+        //update
+        if (out.annotationsAdded) {
+            const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+            appendAnnotations(zoomGroup, out.annotations_)
+        }
+        return out
+    }
+
     // initiate Geometries class
     out.Geometries = Geometries(out, withCenterPoints)
 
@@ -523,8 +538,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             if (svg.size() == 0) {
                 // Create it as an embeded SVG if it does not exist
                 const x = config.x == undefined ? out.insetBoxPadding_ : config.x
-                const y =
-                    config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
+                const y = config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
                 const ggeo = ing
                     .append('g')
                     .attr('id', 'em-inset-' + config.svgId)
@@ -584,12 +598,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //sphere for world map
         if (out.geo_ == 'WORLD') {
-            zoomGroup
-                .append('path')
-                .datum({ type: 'Sphere' })
-                .attr('id', 'sphere')
-                .attr('d', out._pathFunction)
-                .attr('class', 'em-graticule')
+            zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
         }
 
         if (out.drawCoastalMargin_) {
@@ -623,6 +632,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         if (out.annotations_) {
             appendAnnotations(zoomGroup, out.annotations_)
+            out.annotationsAdded = true
         }
 
         //title
@@ -644,8 +654,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             let cssSubtitleClass = out.isInset ? 'em-inset-subtitle' : 'em-subtitle'
             let cssTitleClass = out.isInset ? 'em-inset-title' : 'em-title'
             //define default position
-            if (!out.subtitlePosition())
-                out.subtitlePosition([10, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
+            if (!out.subtitlePosition()) out.subtitlePosition([10, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
             //draw subtitle
             out.svg()
                 .append('text')
@@ -719,10 +728,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
         } else if (out.Geometries.defaultGeoData?.bbox) {
             // default to center of geoData bbox
-            out.position_.x =
-                out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
-            out.position_.y =
-                out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+            out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
+            out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
         } else {
             //TODO: auto-define user=defined geometries geoCenter
             // out.position_.x = Geometries.userGeometries
@@ -760,8 +767,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         } else {
             // For non-WORLD geo, use custom or default identity projection with calculated bounding box
             out._projection =
-                out.projectionFunction_ ||
-                geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox()))
+                out.projectionFunction_ || geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox()))
         }
     }
 
@@ -769,12 +775,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     const getCurrentBbox = function () {
         const halfWidth = 0.5 * out.position_.z * out.width_
         const halfHeight = 0.5 * out.position_.z * out.height_
-        const bbox = [
-            out.position_.x - halfWidth,
-            out.position_.y - halfHeight,
-            out.position_.x + halfWidth,
-            out.position_.y + halfHeight,
-        ]
+        const bbox = [out.position_.x - halfWidth, out.position_.y - halfHeight, out.position_.x + halfWidth, out.position_.y + halfHeight]
         return bbox
     }
 
@@ -897,8 +898,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
             // Only process elements that have a font size defined
             if (fontSize && parseFloat(fontSize) > 0) {
-                const originalFontSize =
-                    parseFloat(element.attr('data-fs')) || parseFloat(inlineFontSize) || parseFloat(cssFontSize)
+                const originalFontSize = parseFloat(element.attr('data-fs')) || parseFloat(inlineFontSize) || parseFloat(cssFontSize)
 
                 // Store the original font size for the first time
                 if (!element.attr('data-fs')) {
@@ -940,8 +940,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
             // Only process elements that have a stroke width defined
             if (strokeWidth && parseFloat(strokeWidth) > 0) {
-                const originalStrokeWidth =
-                    parseFloat(element.attr('data-sw')) || parseFloat(inlineStrokeWidth) || parseFloat(cssStrokeWidth)
+                const originalStrokeWidth = parseFloat(element.attr('data-sw')) || parseFloat(inlineStrokeWidth) || parseFloat(cssStrokeWidth)
 
                 // Store the original stroke width for the first time
                 if (!element.attr('data-sw')) {
@@ -1156,12 +1155,7 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
      */
     const addScalebarToMap = function () {
-        let sb = out
-            .svg()
-            .append('svg')
-            .attr('id', 'scalebar')
-            .attr('x', out.scalebarPosition_[0])
-            .attr('y', out.scalebarPosition_[1])
+        let sb = out.svg().append('svg').attr('id', 'scalebar').attr('x', out.scalebarPosition_[0]).attr('y', out.scalebarPosition_[1])
 
         let segmentHeight = out.scalebarSegmentHeight_
 
@@ -1374,19 +1368,11 @@ export const mapTemplate = function (config, withCenterPoints) {
         })
 
         //copy stat map attributes/methods
-        ;[
-            'stat',
-            'statData',
-            'legend',
-            'legendObj',
-            'noDataText',
-            'language',
-            'transitionDuration',
-            'tooltip_',
-            'classToText_',
-        ].forEach(function (att) {
-            mt[att] = out[att]
-        })
+        ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', 'classToText_'].forEach(
+            function (att) {
+                mt[att] = out[att]
+            }
+        )
 
         //apply config values for inset
         for (let key in config) mt[key + '_'] = config[key]
@@ -1521,23 +1507,5 @@ const convertRectangles = function (x, y, width, height) {
         return ''
     }
 
-    return (
-        'M' +
-        x +
-        ',' +
-        y +
-        'L' +
-        (x + width) +
-        ',' +
-        y +
-        ' ' +
-        (x + width) +
-        ',' +
-        (y + height) +
-        ' ' +
-        x +
-        ',' +
-        (y + height) +
-        'z'
-    )
+    return 'M' + x + ',' + y + 'L' + (x + width) + ',' + y + ' ' + (x + width) + ',' + (y + height) + ' ' + x + ',' + (y + height) + 'z'
 }

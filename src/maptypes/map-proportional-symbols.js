@@ -353,6 +353,9 @@ export const map = function (config) {
      */
     out.updateValuesLabels = function (map) {
         // apply to main map
+        if (!map) {
+            map = out
+        }
         //clear previous labels
         let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
         prevLabels.remove()

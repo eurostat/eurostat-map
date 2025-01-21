@@ -150,6 +150,10 @@ export const updateLabels = function (map) {
  * @return {map} out
  */
 export const updateValuesLabels = function (map) {
+    if (!map) {
+        console.warn('No map specified')
+        return
+    }
     //clear previous labels
     let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
     prevLabels.remove()

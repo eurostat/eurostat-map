@@ -10,9 +10,9 @@
             .em-label-shadow-test {
                 font-size: 15px !important;
             }
-            .em-stat-label {
+            /* .em-stat-label {
                 fill: white !important;
-            }
+            } */
             .em-label-ocean {
                 font-size: 12px !important;
                 fill: #000a66;
@@ -92,6 +92,11 @@
                 ])
 
                 .build()
+
+                setTimeout(()=>{
+                    map.labels({backgrounds:false, shadows:true})
+                    map.updateValuesLabels(map)
+                },2000)
         </script>
     </body>
 </html>

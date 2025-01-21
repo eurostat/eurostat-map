@@ -5,7 +5,8 @@ import {
     annotationCalloutCircle,
     annotationXYThreshold,
 } from 'd3-svg-annotation'
-export function appendAnnotations(svgElement, annotationsData) {
+
+export function appendAnnotations(svgElement, annotationsConfig) {
     // Define a map that maps the type string to the corresponding annotation function
     const annotationTypeMap = {
         annotationLabel: annotationLabel,
@@ -15,12 +16,14 @@ export function appendAnnotations(svgElement, annotationsData) {
     }
 
     // Map annotations data to ensure each annotation has the proper function
-    const annotationsWithTypes = annotationsData.map((d) => {
+    const annotationsWithTypes = annotationsConfig.annotations.map((d) => {
         // Replace the 'type' string with the corresponding annotation function
         const annotationType = annotationTypeMap[d.type] || annotationLabel // Default to annotationLabel
         return { ...d, type: annotationType } // Update 'type' with the function reference
     })
-    const makeAnnotations = annotation().type(annotationLabel).annotations(annotationsWithTypes)
+    const makeAnnotations = annotation().type(annotationLabel).annotations(annotationsWithTypes).editMode(annotationsConfig.editMode)
 
+    //clear previous
+    svgElement.selectAll('.em-annotation-group').remove()
     svgElement.append('g').attr('class', 'em-annotation-group').call(makeAnnotations)
 }
