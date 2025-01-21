@@ -1,6 +1,6 @@
 {
     "name": "eurostat-map",
-    "version": "4.0.10",
+    "version": "4.0.11",
     "description": "Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.",
     "keywords": [
         "eurostat",

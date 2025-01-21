@@ -109,7 +109,10 @@
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
                 .subtitle('uses d3.annotations')
-                .annotations(annotations)
+                .annotations({
+                    editMode: true,
+                    annotations: annotations,
+                })
                 // .zoomExtent([1, 15])
                 .build()
         </script>
