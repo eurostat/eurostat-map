@@ -27,18 +27,6 @@
                 .insets(false)
                 .psMaxSize(40) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
-            if (window.innerWidth > 800) {
-                map
-            } else {
-                // settings for smaller devices
-                map.legend({ x: 10, y: 200, labelFontSize: 9 })
-                    .psMaxSize(15)
-                    .psMinSize(1)
-                    .titleFontSize(12)
-                    .botTxtFontSize(6)
-                    .tooltip({ fontSize: 10 })
-            }
-
             map.build()
         </script>
     </body>
