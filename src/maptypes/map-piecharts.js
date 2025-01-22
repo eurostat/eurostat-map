@@ -5,6 +5,7 @@ import { extent, sum } from 'd3-array'
 import { interpolateOrRd, schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as PiechartLegend from '../legend/legend-piecharts'
+import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * Returns a proportional pie chart map.
