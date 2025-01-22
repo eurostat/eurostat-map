@@ -124,6 +124,7 @@ Code examples:
 - For a [bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
 - For a [stripe composition map](docs/reference.md#stripe-composition-map).
 - For a [sparkline map](docs/reference.md#sparkline-map).
+- For a [flow map](docs/reference.md#flow-map).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
 

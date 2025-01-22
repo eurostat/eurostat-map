@@ -17,6 +17,7 @@
         - [Bivariate choropleth map](#bivariate-choropleth-map)
         - [Stripe composition map](#stripe-composition-map)
         - [Sparkline map](#sparkline-map)
+        - [Flow map](#flow-map)
     - [Map texts](#map-texts)
         - [Map title \& subtitle](#map-title--subtitle)
         - [Labelling](#labelling)
@@ -653,6 +654,49 @@ eurostatmap
 | _map_.**sparkLineOpacity**([*value*])       | number            | 0.6                                                                                               | opacity of the spark lines                                                                                                                                                   |
 | _map_.**sparkChartCircleRadius**([*value*]) | number            | 0.5                                                                                               | Radius of the circles at each record                                                                                                                                         |
 | _map_.**sparkTooltipChart**([*value*])      | object            | {width: 100, height: 80, margin: { left: 60, right: 40, top: 40, bottom: 40 }, circleRadius: 1.5} | config for the chart shown in the tooltip                                                                                                                                    |
+
+### Flow map
+
+
+```javascript
+const exampleGraph = {
+    nodes: [
+        { id: 'FR' },
+        { id: 'DE' },
+        { id: 'IT' },
+        { id: 'ES' },
+        { id: 'BE' },
+        { id: 'NL' },
+        { id: 'CH' },
+        { id: 'PL' },
+        { id: 'PT' },
+        { id: 'AT' },
+        { id: 'CZ' },
+    ],
+    links: [
+        { source: 'FR', target: 'DE', value: 82018369.72 },
+        { source: 'FR', target: 'IT', value: 49697198.92 },
+        { source: 'FR', target: 'ES', value: 45422327.56 },
+        { source: 'FR', target: 'BE', value: 43038180.93 },
+        { source: 'FR', target: 'NL', value: 34453478.99 },
+        { source: 'FR', target: 'CH', value: 16164188.98 },
+        { source: 'FR', target: 'PL', value: 12673336.04 },
+        { source: 'FR', target: 'PT', value: 7178656.08 },
+        { source: 'FR', target: 'AT', value: 6305366.1 },
+        { source: 'FR', target: 'CZ', value: 5883790.49 },
+    ],
+}
+
+const map = eurostatmap
+    .map('flow')
+    .flowGraph(exampleGraph)
+    .nutsLevel(0)
+    .build()
+```
+
+| Method                         | Type   | Default | Description                                   |
+| ------------------------------ | ------ | ------- | --------------------------------------------- |
+| _map_.**flowGraph**([*value*]) | Object | undefined  | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey.  |
 
 ## Map texts
 
