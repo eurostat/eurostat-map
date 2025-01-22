@@ -2,11 +2,11 @@ import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } 
 // import {extent} from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
-import { forceSimulation } from 'd3-force'
+import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator, getCSSPropertyFromClass } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets } from '../core/utils'
 
 /**
  * Returns a proportional symbol map.
@@ -87,6 +87,7 @@ export const map = function (config) {
         'psOffset_',
         'psClassificationMethod_',
         'psClasses_',
+        'dorling_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -160,9 +161,9 @@ export const map = function (config) {
         if (map.svg_) {
             if (out.classifierColor_) {
                 //assign color class to each symbol, based on their value
-                // at this point, the symbol path hasnt been appended. Only the parent g.em-symbol element (in map-template)
+                // at this point, the symbol path hasnt been appended. Only the parent g.em-centroid element (in map-template)
                 let colorData = map.statData('color')
-                map.svg_.selectAll('.em-symbol').attr('ecl', function (rg) {
+                map.svg_.selectAll('.em-centroid').attr('ecl', function (rg) {
                     const sv = colorData.get(rg.properties.id)
                     if (!sv) {
                         return 'nd'
@@ -241,7 +242,7 @@ export const map = function (config) {
 
         if (map.svg_) {
             //clear previous symbols
-            let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-symbol > *')
+            let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-centroid > *')
             prevSymbols.remove()
 
             //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)
@@ -258,10 +259,6 @@ export const map = function (config) {
                 symb = appendBarsToMap(map, sizeData)
             } else if (out.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData)
-
-                if (out.dorling_) {
-                    applyDorlingForce(map)
-                }
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
                 symb = appendD3SymbolsToMap(map, sizeData)
@@ -331,25 +328,8 @@ export const map = function (config) {
         return map
     }
 
-    const applyDorlingForce = function (map) {
-        const simulation = forceSimulation(nutsData)
-            .force(
-                'x',
-                forceX((d) => projection(d.coords)[0])
-            )
-            .force(
-                'y',
-                forceY((d) => projection(d.coords)[1])
-            )
-            .force(
-                'collide',
-                forceCollide((d) => 0.5 + radius(d.value))
-            )
-            .stop()
-    }
-
     const addMouseEvents = function (map) {
-        let symbols = map.svg().selectAll('g.em-symbol')
+        let symbols = map.svg().selectAll('g.em-centroid')
         symbols
             .on('mouseover', function (e, rg) {
                 const sel = select(this.childNodes[0])
@@ -448,7 +428,7 @@ export const map = function (config) {
             .style('stroke-width', out.psStrokeWidth())
             .style('fill', function () {
                 if (out.classifierColor_) {
-                    //for ps, ecl attribute belongs to the parent g.em-symbol node created in map-template
+                    //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
                     const ecl = select(this.parentNode).attr('ecl')
                     if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
                     let color = out.psClassToFillStyle_(ecl, out.psClasses_)
@@ -472,22 +452,23 @@ export const map = function (config) {
         const gcp = zoomGroup.select('#g_ps')
         let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
 
-        let sortedBySize = [...map._centroidFeatures].sort(function (a, b) {
-            //A negative value indicates that a should come before b.
-            //A positive value indicates that a should come after b.
-            //Zero or NaN indicates that a and b are considered equal.
+        map._centroidFeatures.sort(function (a, b) {
+            // A negative value indicates that a should come before b.
+            // A positive value indicates that a should come after b.
+            // Zero or NaN indicates that a and b are considered equal.
             let valA = sizeData.get(a.properties.id)
             let valB = sizeData.get(b.properties.id)
+
             if (valA || valA?.value == 0 || valB || valB?.value == 0) {
                 if ((valA || valA?.value == 0) && (valB || valB?.value == 0)) {
-                    //both values exist
-                    //biggest circles at the bottom
+                    // Both values exist
+                    // Biggest circles at the bottom
                     return valB.value - valA.value
                 } else if ((valA || valA?.value == 0) && (!valB || !valB?.value == 0)) {
-                    //only valA exists
+                    // Only valA exists
                     return -1
                 } else if ((valB || valB?.value == 0) && (!valA || !valA?.value == 0)) {
-                    //only valB exists
+                    // Only valB exists
                     return 1
                 }
             } else {
@@ -495,30 +476,16 @@ export const map = function (config) {
             }
         })
 
-        let symbols = gcp
-            .selectAll('g.em-symbol')
-            .data(
-                // FILTERING BREAKS IMAGE -
-                // it removes regions not present in current data, but if you update the data and add data for those regions then they are not drawn!!)
-                // filter out regions with no data
-                // .filter((rg) => {
-                //     const sv = sizeData.get(rg.properties.id)
-                //     // has size data
-                //     if (sv && sv.value !== 0) {
-                //         return rg
-                //     }
-                // })
-                // sort by size
-                sortedBySize
-            )
-            // .enter()
+        let centroids = gcp
+            .selectAll('g.em-centroid')
+            .data(map._centroidFeatures)
             .join('g')
             .attr('transform', function (d) {
-                return 'translate(' + map._projection(d.geometry.coordinates) + ')'
+                return 'translate(' + d.properties.centroid[0].toFixed(3) + ',' + d.properties.centroid[1].toFixed(3) + ')'
             })
 
         // update colors
-        setSymbolStyles(symbols)
+        //setSymbolStyles(symbols)
     }
 
     /**
@@ -528,26 +495,64 @@ export const map = function (config) {
      * @return {void}
      */
     function appendCirclesToMap(map, sizeData) {
-        let symbolContainers = map.svg().selectAll('g.em-symbol')
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
 
-        return (
-            symbolContainers
-                .append('circle')
-                // .filter((rg) => {
-                //     const sv = sizeData.get(rg.properties.id)
-                //     if (sv && sv.value !== ':') return rg
-                // })
-                .attr('r', (rg) => {
-                    if (sizeData.get(rg.properties.id)) {
-                        let datum = sizeData.get(rg.properties.id)
-                        if (datum.value == 0) return 0
-                        let radius = out.classifierSize_(datum.value)
-                        return radius?.toFixed(3) || 0
+        // Append circles to each symbol container
+        const circles = symbolContainers
+            .append('circle')
+            .attr('r', function (d) {
+                // calculate radius
+                const datum = sizeData.get(d.properties.id)
+                const radius = datum ? out.classifierSize_(datum.value) : 0
+                const parent = select(this.parentNode)
+                parent.attr('r', radius)
+                return radius
+            })
+            .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
+
+        if (out.dorling_) {
+            applyDorlingForce(map, sizeData)
+        }
+
+        return circles
+    }
+
+    function applyDorlingForce(map, sizeData) {
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
+        // Initialize the force simulation
+        const simulation = forceSimulation(map._centroidFeatures)
+            .force(
+                'x',
+                forceX((d) => {
+                    console.log(d.properties.centroid)
+                    return d.properties.centroid[0]
+                })
+            )
+            .force(
+                'y',
+                forceY((d) => {
+                    return d.properties.centroid[1]
+                })
+            )
+            .force(
+                'collide',
+                forceCollide((d) => {
+                    if (d.properties.radius) {
+                        return d.properties.radius
                     } else {
-                        return 0
+                        const datum = sizeData.get(d.properties.id)
+                        const radius = datum ? out.classifierSize_(datum.value) : 0
+                        d.properties.radius = radius
+                        return radius
                     }
                 })
-        )
+            )
+            .on('tick', () => {
+                // Update elements with the new positions and radii
+                symbolContainers.attr('transform', function (d) {
+                    return 'translate(' + d.x + ',' + d.y + ')'
+                })
+            })
     }
 
     /**
@@ -559,7 +564,7 @@ export const map = function (config) {
     function appendD3SymbolsToMap(map, sizeData) {
         return map
             .svg()
-            .selectAll('g.em-symbol')
+            .selectAll('g.em-centroid')
             .append('path')
             .filter((rg) => {
                 const sv = sizeData.get(rg.properties.id)
@@ -596,7 +601,7 @@ export const map = function (config) {
             map
                 .svg()
                 .select('#g_ps')
-                .selectAll('g.em-symbol')
+                .selectAll('g.em-centroid')
                 .append('rect')
                 .filter((rg) => {
                     const sv = sizeData.get(rg.properties.id)
@@ -637,7 +642,7 @@ export const map = function (config) {
         return map
             .svg()
             .select('#g_ps')
-            .selectAll('g.em-symbol')
+            .selectAll('g.em-centroid')
             .append('g')
             .filter((rg) => {
                 const sv = sizeData.get(rg.properties.id)
@@ -666,7 +671,7 @@ export const map = function (config) {
         // Toggle symbol visibility - only show regions with sizeData stat values when mixing different NUTS levels
         let symb = map
             .svg()
-            .selectAll('g.em-symbol')
+            .selectAll('g.em-centroid')
             .style('display', function (rg) {
                 const sv = sizeData.get(rg.properties.id)
                 if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {

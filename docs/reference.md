@@ -254,6 +254,14 @@ Along with data-driven sizing, it is possible to colour the symbols according to
     .stat("size", { eurostatDatasetCode: "nama_10r_3gdp", unitText: "Million EUR", filters: { unit: "MIO_EUR", time: "2018" } })
 ```
 
+It is also possible to prevent overlapping via the 'dorling' method:
+
+```javascript
+   .dorling(true)
+```
+
+Please be aware that by using this method you will essentially be turning the map into a Cartogram. If deformation is high, please consider hiding the background elements/basemap.
+
 | Method                                      | Type             | Default value        | Description                                                                                                                                                                              |
 | ------------------------------------------- | ---------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**psShape**([*value*])                | string           | _circle_             | The shape of the symbol. Accepted values: circle, bar, square, star, cross, diamond, triangle, wye or custom                                                                             |
