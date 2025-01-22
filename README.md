@@ -71,6 +71,7 @@ eurostatmap
 - [Livestock composition](https://eurostat.github.io/eurostat-map/examples/livestock_composition.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/livestock_composition.html))
 - [Sparklines: Population in Europe since 2012](https://eurostat.github.io/eurostat-map/examples/sparklines.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/sparklines.html))
 - [World map](https://eurostat.github.io/eurostat-map/examples/world.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/world.html))
+- [Flow map](https://eurostat.github.io/eurostat-map/examples/flowmap.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/flowmap.html))
 
 ## Installation
 
