@@ -657,46 +657,26 @@ eurostatmap
 
 ### Flow map
 
+Here is [an example](https://eurostat.github.io/eurostat-map/examples/flowmap.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/flowmap.html))
 
 ```javascript
 const exampleGraph = {
-    nodes: [
-        { id: 'FR' },
-        { id: 'DE' },
-        { id: 'IT' },
-        { id: 'ES' },
-        { id: 'BE' },
-        { id: 'NL' },
-        { id: 'CH' },
-        { id: 'PL' },
-        { id: 'PT' },
-        { id: 'AT' },
-        { id: 'CZ' },
-    ],
+    nodes: [{ id: 'FR' }, { id: 'DE' }, { id: 'IT' }, { id: 'ES' }, { id: 'BE' }, { id: 'Custom', x: 420000, y: 320000 }],
     links: [
-        { source: 'FR', target: 'DE', value: 82018369.72 },
-        { source: 'FR', target: 'IT', value: 49697198.92 },
-        { source: 'FR', target: 'ES', value: 45422327.56 },
-        { source: 'FR', target: 'BE', value: 43038180.93 },
-        { source: 'FR', target: 'NL', value: 34453478.99 },
-        { source: 'FR', target: 'CH', value: 16164188.98 },
-        { source: 'FR', target: 'PL', value: 12673336.04 },
-        { source: 'FR', target: 'PT', value: 7178656.08 },
-        { source: 'FR', target: 'AT', value: 6305366.1 },
-        { source: 'FR', target: 'CZ', value: 5883790.49 },
+        { source: 'FR', target: 'DE', value: 8201 },
+        { source: 'FR', target: 'IT', value: 4969 },
+        { source: 'FR', target: 'ES', value: 4542 },
+        { source: 'FR', target: 'BE', value: 4303 },
+        { source: 'FR', target: 'Custom', value: 3445 },
     ],
 }
 
-const map = eurostatmap
-    .map('flow')
-    .flowGraph(exampleGraph)
-    .nutsLevel(0)
-    .build()
+const map = eurostatmap.map('flow').flowGraph(exampleGraph).nutsLevel(0).build()
 ```
 
-| Method                         | Type   | Default | Description                                   |
-| ------------------------------ | ------ | ------- | --------------------------------------------- |
-| _map_.**flowGraph**([*value*]) | Object | undefined  | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey.  |
+| Method                         | Type   | Default   | Description                                                                                                                |
+| ------------------------------ | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**flowGraph**([*value*]) | Object | undefined | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
 
 ## Map texts
 

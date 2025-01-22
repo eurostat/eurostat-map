@@ -2,10 +2,11 @@
 // import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
 import { linkHorizontal } from 'd3-shape'
 import { sum, max } from 'd3-array'
-import { scaleLinear, format } from 'd3'
+import { scaleLinear } from 'd3-scale'
 import * as StatMap from '../core/stat-map'
 import * as FlowLegend from '../legend/legend-flow'
 import { select, selectAll } from 'd3-selection'
+import { format } from 'd3-format'
 
 /**
  * Returns a flow map.

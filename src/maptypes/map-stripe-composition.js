@@ -1,4 +1,5 @@
-import { select, arc, pie } from 'd3'
+import { select } from 'd3-selection'
+import { arc, pie } from 'd3-shape'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 //schemeSet3 schemeDark2 schemePastel1 schemeTableau10
 import * as StatMap from '../core/stat-map'

@@ -1,4 +1,9 @@
-import { select, scaleLinear, scaleLog, scaleSqrt, line, extent, area, min, max, axisBottom, axisLeft, axisRight, format, create } from 'd3'
+import { select, create } from 'd3-selection'
+import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale'
+import { line, area } from 'd3-shape'
+import { extent, min, max } from 'd3-array'
+import { axisBottom, axisLeft, axisRight } from 'd3-axis'
+import { format } from 'd3-format'
 import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
 

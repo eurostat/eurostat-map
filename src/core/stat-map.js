@@ -2,7 +2,7 @@ import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL }
 import * as MapTemplate from './map-template'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
-import { select } from 'd3'
+import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
 
 /**

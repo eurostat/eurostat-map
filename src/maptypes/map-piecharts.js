@@ -1,5 +1,7 @@
 import { scaleSqrt } from 'd3-scale'
-import { select, arc, pie, extent, sum, selectAll } from 'd3'
+import { select, selectAll } from 'd3-selection'
+import { arc, pie } from 'd3-shape'
+import { extent, sum } from 'd3-array'
 import { interpolateOrRd, schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as PiechartLegend from '../legend/legend-piecharts'

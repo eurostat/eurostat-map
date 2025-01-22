@@ -2,6 +2,7 @@ import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } 
 // import {extent} from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
+import { forceSimulation } from 'd3-force'
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
@@ -52,6 +53,9 @@ export const map = function (config) {
     out.classifierColor_ = undefined
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunPs
+
+    //dorling cartogram
+    out.dorling_ = false
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -254,6 +258,10 @@ export const map = function (config) {
                 symb = appendBarsToMap(map, sizeData)
             } else if (out.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData)
+
+                if (out.dorling_) {
+                    applyDorlingForce(map)
+                }
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
                 symb = appendD3SymbolsToMap(map, sizeData)
@@ -321,6 +329,23 @@ export const map = function (config) {
             }
         }
         return map
+    }
+
+    const applyDorlingForce = function (map) {
+        const simulation = forceSimulation(nutsData)
+            .force(
+                'x',
+                forceX((d) => projection(d.coords)[0])
+            )
+            .force(
+                'y',
+                forceY((d) => projection(d.coords)[1])
+            )
+            .force(
+                'collide',
+                forceCollide((d) => 0.5 + radius(d.value))
+            )
+            .stop()
     }
 
     const addMouseEvents = function (map) {
