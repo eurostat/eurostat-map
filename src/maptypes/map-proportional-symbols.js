@@ -29,7 +29,7 @@ export const map = function (config) {
     out.psBarWidth_ = 10 //for vertical bars
     out.psMaxValue_ = undefined // allow the user to manually define the domain of the sizing scale. E.g. if the user wants to use the same scale across different maps.
     out.psMinValue_ = undefined
-    out.psSizeFun_ = scaleSqrt
+    out.psSizeFun_ = undefined //e.g d3.scaleSqrt
 
     //colour
     out.psFill_ = '#2d50a0' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
@@ -183,6 +183,12 @@ export const map = function (config) {
      * @description defines classifier functions (out.classifierColor and out.classifierSize) for both symbol size and color
      */
     function defineClassifiers() {
+        // set default scale
+        if (out.psShape_ == 'spike') {
+            out.psSizeFun_ = scaleLinear
+        }else {
+            out.psSizeFun_ = scaleSqrt
+        }
         //simply return the array [0,1,2,3,...,nb-1]
         const getA = function (nb) {
             return [...Array(nb).keys()]
@@ -259,6 +265,8 @@ export const map = function (config) {
                 symb = appendBarsToMap(map, sizeData)
             } else if (out.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData)
+            } else if (out.psShape_ == 'spike') {
+                symb = appendSpikesToMap(map, sizeData)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
                 symb = appendD3SymbolsToMap(map, sizeData)
@@ -488,6 +496,26 @@ export const map = function (config) {
         //setSymbolStyles(symbols)
     }
 
+    function appendSpikesToMap(map, sizeData) {
+        //The spike function creates a triangular path of the given length (height) with a base width of 7 pixels.
+        const spike = (length, width = 7) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
+
+        // Append circles to each symbol container
+        const spikes = symbolContainers
+            .append('path')
+            .attr('d', (d) => {
+                const datum = sizeData.get(d.properties.id)
+                const value = datum ? out.classifierSize_(datum.value) : 0
+                let path =  spike(value)
+                console.log(value)
+                return path
+            })
+            .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
+
+        return spikes
+    }
+
     /**
      * @description Appends <circle> elements for each region in the map SVG
      * @param {*} map map instance
@@ -504,8 +532,6 @@ export const map = function (config) {
                 // calculate radius
                 const datum = sizeData.get(d.properties.id)
                 const radius = datum ? out.classifierSize_(datum.value) : 0
-                const parent = select(this.parentNode)
-                parent.attr('r', radius)
                 return radius
             })
             .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
