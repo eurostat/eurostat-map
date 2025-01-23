@@ -19,7 +19,7 @@ test('programmatically defined statistics', async () => {
     await page.evaluate((_) => {
         // these will be executed within test.html, that was loaded before.
         //builds map in test.html
-        const map = eurostatmap.map('ch')
+        const map = eurostatmap.map('choropleth')
         map.nutsLevel(0)
 
         map.statData()

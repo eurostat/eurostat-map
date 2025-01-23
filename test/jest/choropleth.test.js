@@ -20,7 +20,7 @@ test('choropleth with threshold scale', async () => {
         // these will be executed within test.html, that was loaded before
         //builds test map in test.html
         eurostatmap
-            .map('ch')
+            .map('choropleth')
             .svgId('testMap')
             .svgId('mapCH')
             .title('Population in Europe')

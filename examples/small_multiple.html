@@ -29,7 +29,7 @@
             for (let year = 2021; year >= 2000; year--) {
                 for (let q = 1; q <= 4; q++) {
                     eurostatmap
-                        .map('ch')
+                        .map('choropleth')
                         .svgId('map_' + year + '_Q' + q)
                         .title(year + ' ' + 'Q' + q)
                         .titleFontSize(18)

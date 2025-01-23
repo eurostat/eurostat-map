@@ -18,7 +18,7 @@ test('exporting map as SVG', async () => {
     // evaluate will run the function in the page context
     await page.evaluate((_) => {
         let myMap = eurostatmap
-            .map('ch')
+            .map('choropleth')
             .title('Population in Europe')
             .width(600)
             .scale('20M')

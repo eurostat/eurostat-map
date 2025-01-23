@@ -11,7 +11,7 @@
         <script src="https://unpkg.com/eurostat-map"></script>
         <script>
             eurostatmap
-                .map('ch')
+                .map('choropleth')
                 .title('Population density in Europe')
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
                 .titleFill('#444')

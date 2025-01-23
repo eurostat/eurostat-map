@@ -20,7 +20,7 @@ test('separated legend', async () => {
         // these will be executed within test.html, that was loaded before
         //builds test map in test.html
         eurostatmap
-            .map('ch')
+            .map('choropleth')
             .width(500)
             .scale('60M')
             .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
