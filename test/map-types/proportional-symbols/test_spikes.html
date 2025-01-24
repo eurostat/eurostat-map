@@ -13,18 +13,24 @@
             // basic barebones proportional circles example
             let map = eurostatmap
                 .map('proportionalSymbol')
-                .nutsLevel(0)
-                .title('Total GDP')
+                .psShape('spike')
+                .psSpikeWidth(4)
+                .nutsLevel(3)
+                .title('Spikes')
                 .width(800)
                 .stat('size', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
-                .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0 })
-                .psShape('spike')
+                .legend({ title: 'Million EUR', x: 550, y: 190, boxOpacity: 0 })
+                
                 .insets(false)
-                .psMaxSize(200) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols      
+                .psStroke('white')
+                .psStrokeWidth(0.5)
+                .psSizeScale('linear')
+                .psMinSize(1)
+                .psMaxSize(60) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols      
 
             map.build()
         </script>

@@ -147,13 +147,13 @@ export const legend = function (map, config) {
             if (out.sizeLegend.noData) {
                 let y = out._sizeLegendNode.node().getBBox().height + 25
                 let x = out.boxPadding
-                let container = out._sizeLegendNode
-                    .append('g')
-                    .attr('transform', `translate(${x},${y})`)
-                    .attr('class', 'em-legend-rect')
+                let container = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-rect')
 
                 buildNoDataLegend(x, y, container, out.sizeLegend.noDataText)
             }
+            return
+        } else if (m.psShape_ == 'spike') {
+            buildSpikeLegend(m, out.sizeLegend)
             return
         }
 
@@ -205,13 +205,34 @@ export const legend = function (map, config) {
                 y += out.colorLegend.shapeHeight + 5
             }
             let x = out.boxPadding
-            let container = out._sizeLegendNode
-                .append('g')
-                .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'em-legend-rect')
+            let container = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-rect')
 
             buildNoDataLegend(x, y, container, out.sizeLegend.noDataText)
         }
+    }
+
+    function buildSpikeLegend(map, sizeLegendConfig) {
+        const spike = (length, width = map.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+        const legend = out._sizeLegendNode
+            .append('g')
+            .attr('id','em-spike-legend')
+            .attr('fill', 'black')
+            .attr('text-anchor', 'middle')
+            .style('font-size', '11px')
+            .selectAll()
+            .data(map.classifierSize_.ticks(4).slice(1))
+            .join('g')
+            .attr('transform', (d, i) => `translate(${25 * i},0)`)
+
+        legend
+            .append('path')
+            .attr('fill', map.psFill_)
+            .attr('fill-opacity', map.psFillOpacity_)
+            .attr('stroke', map.psStroke_)
+            .attr('stroke-width', map.psStrokeWidth_)
+            .attr('d', (d) => spike(map.classifierSize_(d)))
+
+        legend.append('text').attr('dy', '1em').text(map.classifierSize_.tickFormat(4, 's'))
     }
 
     //'no data' legend box
@@ -286,10 +307,7 @@ export const legend = function (map, config) {
         out.sizeLegend._totalD3SymbolsHeight += symbolSize
 
         //container for symbol and label
-        let itemContainer = out._sizeLegendNode
-            .append('g')
-            .attr('transform', `translate(${x},${y})`)
-            .attr('class', 'em-size-legend-item')
+        let itemContainer = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-size-legend-item')
 
         // draw D3 symbol
         let shape = getShape()
@@ -346,10 +364,7 @@ export const legend = function (map, config) {
         }
 
         //container for symbol and label
-        let itemContainer = out._sizeLegendNode
-            .append('g')
-            .attr('transform', `translate(${x},${y})`)
-            .attr('class', 'em-size-legend-item')
+        let itemContainer = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-size-legend-item')
 
         // draw standard symbol
         m.customSymbols.prevSymb = itemContainer
@@ -367,8 +382,7 @@ export const legend = function (map, config) {
             .append('g')
             .html(out.map.psCustomSVG_)
             .attr('transform', () => {
-                if (out.map.psCustomSVG_)
-                    return `translate(${out.sizeLegend.shapeOffset.x},${out.sizeLegend.shapeOffset.y}) scale(${symbolSize})`
+                if (out.map.psCustomSVG_) return `translate(${out.sizeLegend.shapeOffset.x},${out.sizeLegend.shapeOffset.y}) scale(${symbolSize})`
                 else return `translate(${out.sizeLegend.shapeOffset.x},${out.sizeLegend.shapeOffset.y})`
             })
 
@@ -377,12 +391,7 @@ export const legend = function (map, config) {
         let labelY = out.sizeLegend.shapeOffset.y / 2 + 1 //y + out.sizeLegend.labelOffset.y
 
         //append label
-        itemContainer
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', labelX)
-            .attr('y', labelY)
-            .text(labelFormatter(value))
+        itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', labelY).text(labelFormatter(value))
     }
 
     /**
@@ -394,11 +403,7 @@ export const legend = function (map, config) {
         // for vertical bars we dont use a dynamic X offset because all bars have the same width
         let x = out.boxPadding
         //we also dont need the y offset
-        let y =
-            out.boxPadding +
-            (out.sizeLegend.title ? out.titleFontSize + out.sizeLegend.titlePadding : 0) +
-            out.sizeLegend._totalBarsHeight +
-            10
+        let y = out.boxPadding + (out.sizeLegend.title ? out.titleFontSize + out.sizeLegend.titlePadding : 0) + out.sizeLegend._totalBarsHeight + 10
 
         out.sizeLegend._totalBarsHeight += symbolSize + 10
 
@@ -407,10 +412,7 @@ export const legend = function (map, config) {
         let d = shape.size(symbolSize * symbolSize)()
 
         //container for symbol and label
-        let itemContainer = out._sizeLegendNode
-            .append('g')
-            .attr('transform', `translate(${x},${y})`)
-            .attr('class', 'em-size-legend-item')
+        let itemContainer = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-size-legend-item')
 
         // draw bar symbol
         itemContainer
@@ -427,8 +429,7 @@ export const legend = function (map, config) {
             .append('path')
             .attr('d', d)
             .attr('transform', () => {
-                if (out.map.psCustomSVG_)
-                    return `translate(${out.sizeLegend.shapeOffset.x},${out.sizeLegend.shapeOffset.y}) scale(${symbolSize})`
+                if (out.map.psCustomSVG_) return `translate(${out.sizeLegend.shapeOffset.x},${out.sizeLegend.shapeOffset.y}) scale(${symbolSize})`
                 else return `translate(${out.sizeLegend.shapeOffset.x},${out.sizeLegend.shapeOffset.y})`
             })
         //label position
@@ -436,12 +437,7 @@ export const legend = function (map, config) {
         let labelY = symbolSize / 2 + out.sizeLegend.labelOffset.y
 
         //append label
-        itemContainer
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', labelX)
-            .attr('y', labelY)
-            .text(labelFormatter(value))
+        itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', labelY).text(labelFormatter(value))
     }
 
     /**
@@ -558,10 +554,7 @@ export const legend = function (map, config) {
             //the class number, depending on order
             const ecl = out.ascending ? i : numberOfClasses - i - 1
 
-            let itemContainer = out._colorLegendNode
-                .append('g')
-                .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'em-legend-item')
+            let itemContainer = out._colorLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-item')
 
             //append symbol & style
             itemContainer
@@ -622,10 +615,7 @@ export const legend = function (map, config) {
         //'no data' legend box
         if (out.colorLegend.noData) {
             let y = out.titleFontSize + out.colorLegend.marginTop + numberOfClasses * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
-            let container = out._colorLegendNode
-                .append('g')
-                .attr('transform', `translate(${x},${y})`)
-                .attr('class', 'em-legend-item')
+            let container = out._colorLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-item')
 
             buildNoDataLegend(x, y, container, out.colorLegend.noDataText)
         }

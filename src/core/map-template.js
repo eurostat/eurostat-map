@@ -1161,7 +1161,7 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
      */
     const addScalebarToMap = function () {
-        let sb = out.svg().append('svg').attr('id', 'scalebar').attr('x', out.scalebarPosition_[0]).attr('y', out.scalebarPosition_[1])
+        let sb = out.svg().append('g').attr('id', 'scalebar').attr('x', out.scalebarPosition_[0]).attr('y', out.scalebarPosition_[1])
 
         let segmentHeight = out.scalebarSegmentHeight_
 
@@ -1183,7 +1183,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         const scalebarSVG = out
             .svg()
-            .append('svg')
+            .append('g')
             .attr('class', 'em-scalebar')
             .attr('x', out.scalebarPosition_[0])
             .attr('y', out.scalebarPosition_[1])

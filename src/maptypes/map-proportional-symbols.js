@@ -21,6 +21,7 @@ export const map = function (config) {
     out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
     out.psCustomShape_ // see http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT
     out.psCustomSVG_ // see http://bl.ocks.org/jessihamel/9648495
+    out.psSpikeWidth_ = 7 // 'spike' shape widths
     out.psOffset_ = { x: 0, y: 0 }
 
     //size
@@ -29,7 +30,7 @@ export const map = function (config) {
     out.psBarWidth_ = 10 //for vertical bars
     out.psMaxValue_ = undefined // allow the user to manually define the domain of the sizing scale. E.g. if the user wants to use the same scale across different maps.
     out.psMinValue_ = undefined
-    out.psSizeFun_ = undefined //e.g d3.scaleSqrt
+    out.psSizeScale_ = undefined // 'sqrt' or 'linear'
 
     //colour
     out.psFill_ = '#2d50a0' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
@@ -80,6 +81,7 @@ export const map = function (config) {
         'psBarWidth_',
         'psClassToFillStyle_',
         'psColorFun_',
+        'psSizeScale_',
         'noDataFillStyle_',
         'psThreshold_',
         'psColors_',
@@ -88,6 +90,7 @@ export const map = function (config) {
         'psClassificationMethod_',
         'psClasses_',
         'dorling_',
+        'psSpikeWidth_'
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -184,11 +187,14 @@ export const map = function (config) {
      */
     function defineClassifiers() {
         // set default scale
-        if (out.psShape_ == 'spike') {
-            out.psSizeFun_ = scaleLinear
-        }else {
-            out.psSizeFun_ = scaleSqrt
+        if (!out.psSizeScale_) {
+            if (out.psShape_ == 'spike') {
+                out.psSizeScale_ = 'linear'
+            }else {
+                out.psSizeScale_ = 'sqrt'
+            }
         }
+
         //simply return the array [0,1,2,3,...,nb-1]
         const getA = function (nb) {
             return [...Array(nb).keys()]
@@ -203,7 +209,8 @@ export const map = function (config) {
 
         sizeDomain = data ? [min, max] : [out.statData().getMin(), out.statData().getMax()]
 
-        out.classifierSize(out.psSizeFun_().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
+        let scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
+        out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
 
         // colour
         if (out.statData('color').getArray()) {
@@ -498,7 +505,7 @@ export const map = function (config) {
 
     function appendSpikesToMap(map, sizeData) {
         //The spike function creates a triangular path of the given length (height) with a base width of 7 pixels.
-        const spike = (length, width = 7) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+        const spike = (length, width = out.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
         let symbolContainers = map.svg().selectAll('g.em-centroid')
 
         // Append circles to each symbol container
@@ -507,11 +514,14 @@ export const map = function (config) {
             .attr('d', (d) => {
                 const datum = sizeData.get(d.properties.id)
                 const value = datum ? out.classifierSize_(datum.value) : 0
-                let path =  spike(value)
-                console.log(value)
+                let path = spike(value)
                 return path
             })
             .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
+            //.attr('fill', map.psFill_)
+            .attr('fill-opacity', map.psFillOpacity_)
+            .attr('stroke', map.psStroke_)
+            .attr('stroke-width', map.psStrokeWidth_)
 
         return spikes
     }
