@@ -223,7 +223,7 @@ export const legend = function (map, config) {
             .selectAll()
             .data(map.classifierSize_.ticks(4).slice(1))
             .join('g')
-            .attr('transform', (d, i) => `translate(${25 * i},${maxSize + 15} )`)
+            .attr('transform', (d, i) => `translate(${25 * i + out.boxPadding},${maxSize + 15 + out.boxPadding} )`)
 
         legend
             .append('path')
