@@ -18,11 +18,35 @@
                     y: 100,
                     size: 50,
                     text: 'EU = 200¶000',
-                    stampColor: '#b7b7b7',
-                    textColor: '#000',
+                    stampColor: '#3792B6',
+                    textColor: '#3792B6',
                     strokeWidth: 2,
                 })
                 .build()
+
+            setTimeout(() => {
+                map.stamp({
+                    x: 230,
+                    y: 100,
+                    size: 70,
+                    text: 'EU = 20¶000 test with a lot of words',
+                    stampColor: '#3792B6',
+                    textColor: '#3792B6',
+                    strokeWidth: 2,
+                })
+            }, 1000)
+
+            setTimeout(() => {
+                map.stamp({
+                    x: 230,
+                    y: 100,
+                    size: 70,
+                    text: 'EU = 150 inh / km',
+                    stampColor: '#3792B6',
+                    textColor: '#3792B6',
+                    strokeWidth: 2,
+                })
+            }, 2000)
         </script>
     </body>
 </html>

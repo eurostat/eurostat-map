@@ -1,43 +1,49 @@
 export const appendStamp = (stampConfig, map) => {
-    // Set defaults
-    if (!stampConfig.size) stampConfig.size = 20
-    if (!stampConfig.x) stampConfig.x = 230
-    if (!stampConfig.y) stampConfig.y = 100
-    if (!stampConfig.textColor) stampConfig.textColor = '#000'
-    if (!stampConfig.stampColor) stampConfig.stampColor = '#000'
-    if (!stampConfig.strokeWidth) stampConfig.strokeWidth = 1
+    if (map.svg_) {
+        const existing = map.svg_.select('#em-stamp')
+        existing.remove()
+        const container = map.svg_.append('g').attr('id', 'em-stamp')
+        // Set defaults
+        if (!stampConfig.size) stampConfig.size = 20
+        if (!stampConfig.x) stampConfig.x = 230
+        if (!stampConfig.y) stampConfig.y = 100
+        if (!stampConfig.textColor) stampConfig.textColor = '#000'
+        if (!stampConfig.stampColor) stampConfig.stampColor = '#000'
+        if (!stampConfig.strokeWidth) stampConfig.strokeWidth = 1
 
-    const svg = map.svg_
+        // Draw the circle
+        container
+            .append('circle')
+            .attr('r', stampConfig.size)
+            .attr('cx', stampConfig.x)
+            .attr('cy', stampConfig.y)
+            .attr('id', 'em-stamp-circle')
+            .attr('fill', 'none')
+            .attr('stroke', stampConfig.stampColor)
+            .attr('stroke-width', stampConfig.strokeWidth)
 
-    // Draw the circle
-    svg.append('circle')
-        .attr('r', stampConfig.size)
-        .attr('cx', stampConfig.x)
-        .attr('cy', stampConfig.y)
-        .attr('id', 'em-stamp-circle')
-        .attr('fill', 'none')
-        .attr('stroke', stampConfig.stampColor)
-        .attr('stroke-width', stampConfig.strokeWidth)
+        // text
+        const text = stampConfig.text
+        const lineHeight = 13
+        const targetWidth = Math.sqrt(measureWidth(text.trim()) * lineHeight)
+        const lines = getLines(getWords(text.trim()), targetWidth)
+        const textRadius = getTextRadius(lines, lineHeight)
 
-    // text
-    const text = stampConfig.text
-    const lineHeight = 13
-    const targetWidth = Math.sqrt(measureWidth(text.trim()) * lineHeight)
-    const lines = getLines(getWords(text.trim()), targetWidth)
-    const textRadius = getTextRadius(lines, lineHeight)
-
-    //append inside circle
-    svg.append('text')
-        .attr('text-anchor', 'middle')
-        .attr('id', 'em-stamp-text')
-        .attr('transform', `translate(${stampConfig.x},${stampConfig.y}) scale(${stampConfig.size / textRadius})`)
-        .selectAll('tspan')
-        .data(lines)
-        .enter()
-        .append('tspan')
-        .attr('x', 0)
-        .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * lineHeight)
-        .text((d) => d.text.replaceAll('¶', ' ')) // replace ¶ with spaces (for users that want nbsp;)
+        //append inside circle
+        container
+            .append('text')
+            .attr('text-anchor', 'middle')
+            .attr('fill', stampConfig.textColor)
+            .attr('id', 'em-stamp-text')
+            .attr('transform', `translate(${stampConfig.x},${stampConfig.y}) scale(${stampConfig.size / textRadius})`)
+            .selectAll('tspan')
+            .data(lines)
+            .enter()
+            .append('tspan')
+            .attr('x', 0)
+            .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * lineHeight)
+            .text((d) => d.text.replaceAll('¶', ' ')) // replace ¶ with spaces (for users that want nbsp;)
+    }
 }
 
 const getWords = (text) => {

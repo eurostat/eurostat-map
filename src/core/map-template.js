@@ -368,6 +368,17 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
+    //stamps override (update after first call)
+    out.stamp = function (v) {
+        //get
+        if (!arguments.length) return out.stamp_
+        //set
+        out.stamp_ = v
+        //update
+        appendStamp(out.stamp_, out)
+        return out
+    }
+
     // initiate Geometries class
     out.Geometries = Geometries(out, withCenterPoints)
 
