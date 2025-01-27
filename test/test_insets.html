@@ -15,37 +15,35 @@
         <svg id="map5"></svg>
         <script src="../build/eurostatmap.js"></script>
         <script>
-            // eurostatmap.map('choropleth').svgId('map1').width(400).insets('default').insetBoxWidth(100).build()
-            // eurostatmap
-            //     .map('choropleth')
-            //     .svgId('map2')
-            //     .width(400)
-            //     .insets({ geo: 'GF', height: 250 })
-            //     .insetBoxPosition([180, 0])
-            //     .insetZoomExtent([0, 99999])
-            //     .build()
-            // eurostatmap
-            //     .map('choropleth')
-            //     .svgId('map3')
-            //     .width(400)
-            //     .geo('LI')
-            //     .scale('01M')
-            //     .insets({ geo: 'MQ', scale: '01M' })
-            //     .insetBoxWidth(100)
-            //     .insetBoxPosition([0, 0])
-            //     .insetZoomExtent([0, 99999])
-            //     .insetBoxPosition([10, 10])
-            //     .build()
-            // eurostatmap
-            //     .map('choropleth')
-            //     .svgId('map4')
-            //     .width(250)
-            //     .geo('LI')
-            //     .scale('01M')
-            //     .insets({ geo: 'MT', svgId: 'inset4_1' }, { geo: 'GP', svgId: 'inset4_2' })
-            //     .insetBoxWidth(80)
-            //     .insetZoomExtent([0, 99999])
-            //     .build()
+            eurostatmap.map('choropleth').svgId('map1').insets('default').build()
+            eurostatmap
+                .map('choropleth')
+                .svgId('map2')
+
+                .insets({ geo: 'GF', height: 250 })
+                // .insetBoxPosition([180, 0])
+                .insetZoomExtent([0, 99999])
+                .build()
+            eurostatmap
+                .map('choropleth')
+                .svgId('map3')
+                .geo('LI')
+                .scale('01M')
+                .insets({ geo: 'MQ', scale: '01M' })
+                .insetBoxWidth(100)
+                .insetBoxPosition([0, 0])
+                .insetZoomExtent([0, 99999])
+                .insetBoxPosition([10, 10])
+                .build()
+            eurostatmap
+                .map('choropleth')
+                .svgId('map4')
+                .geo('LI')
+                .scale('01M')
+                .insets({ geo: 'MT', svgId: 'inset4_1' }, { geo: 'GP', svgId: 'inset4_2' })
+                .insetBoxWidth(80)
+                .insetZoomExtent([0, 99999])
+                .build()
 
             eurostatmap
                 .map('choropleth')

@@ -76,8 +76,11 @@ a text {
     stroke-width: 0;
     stroke: grey;
 }
+
 .em-insets .em-frame {
-    stroke-width: 0.5;
+    /* this will give a frame to inset maps */
+    stroke: grey;
+    stroke-width: 0.3px !important;
 }
 
 .em-sea {
@@ -156,13 +159,13 @@ a text {
 .em-bn-2,
 .em-bn-3,
 .em-bn-d {
-    stroke-width: 0.15;
+    stroke-width: 0.2;
 }
 
 .em-bn-1,
 .em-bn-2,
 .em-bn-3 {
-    stroke: white;
+    stroke: grey;
 }
 
 .em-kosovo-bn {
@@ -171,6 +174,7 @@ a text {
 }
 
 .em-bn-d {
+    /* disputed */
     stroke: #b2b2b2;
 }
 
