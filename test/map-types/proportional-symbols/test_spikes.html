@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -23,14 +23,14 @@
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
-                .legend({ title: 'Million EUR', x: 550, y: 190, boxOpacity: 0 })
-                
+                .legend({ title: 'Million EUR', x: 550, y: 90, boxOpacity: 0 })
+
                 .insets(false)
                 .psStroke('white')
                 .psStrokeWidth(0.5)
                 .psSizeScale('linear')
                 .psMinSize(1)
-                .psMaxSize(60) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols      
+                .psMaxSize(60) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
             map.build()
         </script>

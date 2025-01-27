@@ -21,11 +21,13 @@ export const map = function (config) {
     out.labelOffsetY = 5
     out.labelFormatter = (d) => format('.2s')(d)
     out.tooltip_.textFunction = flowMapTooltipFunction
+    out.flowColor_ = '#72bb6f'
+    out.overlayColors_ = ['#bbd7ee', '#c7e3c6'] // exporter, importers
 
     /**
      * flowmap-specific setters/getters
      */
-    ;['flowGraph_'].forEach(function (att) {
+    ;['flowGraph_', 'flowColor_', 'overlayColors_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -79,8 +81,8 @@ export const map = function (config) {
         addCoordinatesToGraph(graph)
 
         var { nodes, links } = sankey(graph)
-        console.log('Processed Nodes:', nodes) // Array of processed nodes
-        console.log('Processed Links:', links) // Array of processed links
+        // console.log('Processed Nodes:', nodes) // Array of processed nodes
+        // console.log('Processed Links:', links) // Array of processed links
 
         // Define marker and gradient IDs
         const defs = svg.append('defs')
@@ -89,7 +91,7 @@ export const map = function (config) {
         const gradientIds = links.map(() => generateUniqueId('gradient'))
 
         // Add arrow markers
-        addArrowMarker(defs, arrowId, '#72bb6f')
+        addArrowMarker(defs, arrowId, out.flowColor_)
         addArrowMarker(defs, arrowOutlineId, '#ffffff')
 
         // Add flow gradients
@@ -148,8 +150,8 @@ export const map = function (config) {
 
             allRegions.each(function () {
                 select(this).style('fill', (region) => {
-                    if (importerIds.includes(region.properties.id)) return '#bbd7ee'
-                    if (exporterIds.includes(region.properties.id)) return '#c7e3c6'
+                    if (importerIds.includes(region.properties.id)) return out.overlayColors_[0]
+                    if (exporterIds.includes(region.properties.id)) return out.overlayColors_[1]
                 })
             })
         }
@@ -230,8 +232,8 @@ export const map = function (config) {
             .attr('x2', (d) => d.target.x0)
             .attr('y1', (d) => d.y0)
             .attr('y2', (d) => d.y1)
-            .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', '#c7e3c6'))
-            .call((g) => g.append('stop').attr('offset', '50%').attr('stop-color', '#72bb6f'))
+            .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', out.overlayColors_[0]))
+            .call((g) => g.append('stop').attr('offset', '50%').attr('stop-color', out.flowColor_))
     }
 
     /**
@@ -301,7 +303,7 @@ export const map = function (config) {
      */
     function addFillGaps(svg, nodes) {
         svg.append('g')
-            .attr('class', 'em-fill-in-gaps')
+            .attr('class', 'em-flow-fill-in-gaps')
             .selectAll('rect')
             .data(nodes)
             .join('rect')
@@ -310,7 +312,7 @@ export const map = function (config) {
             .attr('y', (d) => d.y0)
             .attr('width', 1)
             .attr('height', (d) => d.y1 - d.y0)
-            .attr('fill', '#72bb6f')
+            .attr('fill', out.flowColor_)
     }
 
     /**

@@ -213,16 +213,17 @@ export const legend = function (map, config) {
 
     function buildSpikeLegend(map, sizeLegendConfig) {
         const spike = (length, width = map.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+        let maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
         const legend = out._sizeLegendNode
             .append('g')
-            .attr('id','em-spike-legend')
+            .attr('id', 'em-spike-legend')
             .attr('fill', 'black')
             .attr('text-anchor', 'middle')
             .style('font-size', '11px')
             .selectAll()
             .data(map.classifierSize_.ticks(4).slice(1))
             .join('g')
-            .attr('transform', (d, i) => `translate(${25 * i},0)`)
+            .attr('transform', (d, i) => `translate(${25 * i},${maxSize + 15} )`)
 
         legend
             .append('path')

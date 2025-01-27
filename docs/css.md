@@ -33,6 +33,9 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-bn-1 //NUTS1
 .em-bn-2 //NUTS2
 .em-bn-3 //NUTS3
+.em-flow-link
+.em-flow-link-outline
+
 ```
 
 ## Legends

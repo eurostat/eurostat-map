@@ -22,10 +22,10 @@
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
                 .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0 })
-                .psShape('circle')
+                .psShape('circle') // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
                 .dorling(true)
                 .insets(false)
-                .psMaxSize(40) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psMaxSize(40)
 
             map.build()
         </script>
