@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('stamp test')
+                .stamp({
+                    x: 230,
+                    y: 100,
+                    size: 50,
+                    text: 'EU = 200¶000',
+                    stampColor: '#b7b7b7',
+                    textColor: '#000',
+                    strokeWidth: 2,
+                })
+                .build()
+        </script>
+    </body>
+</html>

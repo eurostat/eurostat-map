@@ -417,3 +417,18 @@ export const multiplyBlendMultipleHex = (colors) => {
     // Return the blended color as a hex code
     return rgbToHex(blended)
 }
+
+// convert rect attributes into an SVG path string
+// used for workaround whereby clipPaths which use rect elements do not work in adobe illustrator
+export const convertRectanglesToPaths = function (x, y, width, height) {
+    var x = parseFloat(x, 10)
+    var y = parseFloat(y, 10)
+    var width = parseFloat(width, 10)
+    var height = parseFloat(height, 10)
+
+    if (x < 0 || y < 0 || width < 0 || height < 0) {
+        return ''
+    }
+
+    return 'M' + x + ',' + y + 'L' + (x + width) + ',' + y + ' ' + (x + width) + ',' + (y + height) + ' ' + x + ',' + (y + height) + 'z'
+}
