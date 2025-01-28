@@ -58,12 +58,12 @@ export const getFillPatternDefinitionFunction = function (opts) {
     opts.symbColor = opts.symbColor || 'black'
     return function (svg, numberOfClasses) {
         //clear previous
-        svg.selectAll('.estatmapPattern').remove()
+        svg.selectAll('.em-fill-pattern').remove()
         for (let i = 0; i < numberOfClasses; i++) {
             const si = smin + ((smax - smin) * i) / (numberOfClasses - 1)
             const patt = svg
                 .append('pattern')
-                .attr('class', 'estatmapPattern')
+                .attr('class', 'em-fill-pattern')
                 .attr('id', 'pattern_' + i)
                 .attr('x', '0')
                 .attr('y', '0')

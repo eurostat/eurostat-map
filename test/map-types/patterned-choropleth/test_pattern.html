@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -29,13 +29,13 @@
                 const patternHeight = 4 // Shared height for all patterns
 
                 // Clear previous patterns
-                svg.selectAll('.estatmapPattern').remove()
+                svg.selectAll('.em-fill-pattern').remove()
 
                 // Helper to create a pattern
                 const createPattern = (id, width, elementsCallback) => {
                     const pattern = svg
                         .append('pattern')
-                        .attr('class', 'estatmapPattern')
+                        .attr('class', 'em-fill-pattern')
                         .attr('id', `pattern_${id}`)
                         .attr('x', 0)
                         .attr('y', 0)

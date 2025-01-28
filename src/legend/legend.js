@@ -35,9 +35,9 @@ export const legend = function (map) {
     out.build = function () {
         //set SVG element and add main drawing group
         out.svg = select('#' + out.svgId)
-        // clear previous
-        out.svg.selectAll('#g_' + out.svgId).remove()
-        // append new legend "g"
+        // clear previous legend(s)
+        out.svg.selectAll('#em-legend-' + out.svgId).remove()
+        // append new legend group
         out.lgg = out.svg.append('g').attr('id', 'em-legend-' + out.svgId)
     }
 
