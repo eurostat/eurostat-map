@@ -118,8 +118,8 @@ export const mapTemplate = function (config, withCenterPoints) {
         'The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.'
 
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
-        ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2/'
-        : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/'
+        ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
+        : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
 
     //style for no data regions
     out.noDataFillStyle_ = '#bcbcbc'
