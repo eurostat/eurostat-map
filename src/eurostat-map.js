@@ -34,6 +34,7 @@ export const map = function (type, config) {
     if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return Sparklines.map(config)
     //flow maps
     if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
+
     //add new map types here
     //if(type == "XX") return mapXX.map(config);
 

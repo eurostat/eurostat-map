@@ -121,15 +121,17 @@ a text {
     stroke-width: 1;
 }
 
-/* Region styling */
+/* Default region fill */
 .em-cntrg,
 .em-nutsrg,
-.em-worldrg {
+.em-worldrg,
+.em-grid-cell {
     fill: #efefef;
 }
 
 .em-nutsrg,
 .em-worldrg,
+.em-grid-cell,
 #em-user-regions {
     cursor: pointer;
 }
@@ -185,8 +187,9 @@ a text {
 }
 
 .em-bn-co {
-    stroke: black;
-    stroke-width: 0;
+    /* coastal */
+    stroke: white;
+    stroke-width: 0.3;
 }
 
 /* hide non cc/eu/efta borders */

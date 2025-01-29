@@ -10,6 +10,7 @@ import { defineDeprecatedFunctions } from './deprecated'
 import { Geometries } from './geometries'
 import { buildInsets, removeInsets } from './insets'
 import { appendStamp } from './stamps'
+import { csvParseRows } from 'd3-dsv'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -40,6 +41,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     out.containerId_ = undefined
 
     //geographical focus
+    out.gridCartogram_ = false // draw geometries as grid cells
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
     out.nutsYear_ = 2024
     out.geo_ = 'EUR'
@@ -485,7 +487,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('id', 'em-zoom-group-' + out.svgId_)
             .attr('class', 'em-zoom-group') //out.geo changed to out.svgId in order to be unique
 
-        //insets
+        // build insets
         removeInsets(out) //remove existing
         buildInsets(out, withCenterPoints) //build new
 
@@ -505,60 +507,171 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
+    // draw grid cartogram geometries
+    const buildGridCartogramBase = function () {
+        const svg = out.svg_
+        const zoomGroup = select('#em-zoom-group-' + out.svgId_)
+        const gridGroup = zoomGroup.append('g').attr('id', 'em-grid-container')
+
+        const svgWidth = out.width_
+        const svgHeight = out.height_
+
+        // Define padding around the grid container
+        const containerPadding = 80 // Padding around the grid container (change this value for more/less padding)
+
+        // Define the grid layout (just as an example)
+        const gridLayout =
+            out.gridCartogramPositions_ ||
+            `
+    ,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
+    ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
+    ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
+    ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
+    ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
+    ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
+    ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,  
+    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  
+    `
+
+        // Function to parse the grid layout
+        const grid = (gridLayout) => {
+            const positionById = new Map()
+            csvParseRows(gridLayout.trim(), (row, j) => {
+                row.forEach((id, i) => {
+                    if ((id = id.trim())) {
+                        positionById.set(id, [i, j])
+                    }
+                })
+            })
+            return positionById
+        }
+
+        // Get the positions from the layout
+        const position = grid(gridLayout)
+        const gridData = Array.from(position, ([id, [x, y]]) => ({ id, x, y, properties: { id: id } })) // we add properties object so it replicated geojson features for consistency within classifyRegions()
+
+        // Calculate the number of rows and columns in the grid
+        const numCols = Math.max(...gridData.map((d) => d.x)) + 1
+        const numRows = Math.max(...gridData.map((d) => d.y)) + 1
+
+        // Calculate cell size dynamically to fill the SVG, taking padding into account
+        const cellWidth = (svgWidth - 2 * containerPadding) / numCols
+        const cellHeight = (svgHeight - 2 * containerPadding) / numRows
+
+        // Use the smaller cell size to ensure the grid fits within the SVG
+        const cellSize = Math.min(cellWidth, cellHeight)
+
+        // Draw cells
+        const cells = gridGroup
+            .selectAll('.em-grid-cell')
+            .data(gridData)
+            .enter()
+            .append('g')
+            .attr('class', 'em-grid-cell')
+            .attr('fill', out.defa)
+            .each(function (d) {
+                select(this)
+                    .append('rect')
+                    .attr('x', d.x * cellSize + containerPadding) // Position cells with containerPadding
+                    .attr('y', d.y * cellSize + containerPadding) // Position cells with containerPadding
+                    .attr('width', cellSize)
+                    .attr('height', cellSize)
+                    .style('stroke', 'lightgrey')
+            })
+
+        // Draw text
+        const texts = gridGroup
+            .selectAll('text')
+            .data(gridData)
+            .enter()
+            .append('text')
+            .attr('text-anchor', 'middle')
+            .attr('font-size', 15)
+            .style('pointer-events', 'none')
+            .attr('fill', 'black')
+            .text((d) => d.id)
+            .attr('x', (d) => d.x * cellSize + containerPadding + cellSize / 2) // Center text horizontally
+            .attr('y', (d) => d.y * cellSize + containerPadding + cellSize / 2 + 5) // Center text vertically
+
+        // Center the grid group in the SVG container
+        gridGroup.each(function () {
+            const bbox = this.getBBox()
+            const dx = (svgWidth - bbox.width) / 2 - bbox.x
+            const dy = (svgHeight - bbox.height) / 2 - bbox.y
+
+            // Apply translation to center the grid group
+            gridGroup.attr('transform', `translate(${dx}, ${dy})`)
+        })
+    }
+
     /**
      * Buid an empty map template, based on the geometries only.
      */
     out.buildMapTemplate = function () {
-        //geo center and extent: if not specified, use the default one, or the compute one from the topojson bbox
-        if (!out.position_.x || !out.position_.y) {
-            defineDefaultPosition()
-        }
-        out.position_.z = out.position_.z || getDefaultZ()
-
-        // d3 projection functions
-        defineProjection()
-        definePathFunction()
-        // d3 zoom
-        if (out.zoomExtent()) {
-            defineMapZoom()
-        }
-
         //prepare drawing group
         const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+        //remove all children
         zoomGroup.selectAll('*').remove()
 
-        //draw background rectangle
-        zoomGroup
-            .append('rect')
-            .attr('id', 'sea')
-            .attr('class', 'em-sea')
-            .attr('x', -5 * out.width_)
-            .attr('y', -5 * out.height_)
-            .attr('width', 11 * out.width_)
-            .attr('height', 11 * out.height_)
-
-        //sphere for world map
-        if (out.geo_ == 'WORLD') {
-            zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
-        }
-
-        if (out.drawCoastalMargin_) {
-            addCoastalMarginToMap()
-        }
-
-        if (out.geometries_) {
-            out.Geometries.addUserGeometriesToMap(out.geometries_, zoomGroup, out._pathFunction)
+        // separate logic for cartograms
+        if (out.gridCartogram_ == true) {
+            buildGridCartogramBase()
         } else {
-            out.Geometries.addDefaultGeometriesToMap(
-                zoomGroup,
-                out.drawGraticule_,
-                out._pathFunction,
-                out.nutsLevel_,
-                out.nutsYear_,
-                out.geo_,
-                out.proj_,
-                out.scale_
-            )
+            // default geographic logic
+
+            // position
+            if (!out.position_.x || !out.position_.y) {
+                defineDefaultPosition()
+            }
+            out.position_.z = out.position_.z || getDefaultZ()
+
+            // d3 projection/path functions
+            defineProjection()
+            definePathFunction()
+
+            // d3 zoom
+            if (out.zoomExtent()) {
+                defineMapZoom()
+            }
+
+            //draw sea
+            zoomGroup
+                .append('rect')
+                .attr('id', 'sea')
+                .attr('class', 'em-sea')
+                .attr('x', -5 * out.width_)
+                .attr('y', -5 * out.height_)
+                .attr('width', 11 * out.width_)
+                .attr('height', 11 * out.height_)
+
+            //sphere for world map
+            if (out.geo_ == 'WORLD') {
+                zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
+            }
+
+            // coastal margin
+            if (out.drawCoastalMargin_) {
+                addCoastalMarginToMap()
+            }
+
+            // draw polygons and borders
+            if (out.geometries_) {
+                out.Geometries.addUserGeometriesToMap(out.geometries_, zoomGroup, out._pathFunction)
+            } else {
+                out.Geometries.addDefaultGeometriesToMap(
+                    zoomGroup,
+                    out.drawGraticule_,
+                    out._pathFunction,
+                    out.nutsLevel_,
+                    out.nutsYear_,
+                    out.geo_,
+                    out.proj_,
+                    out.scale_
+                )
+            }
         }
 
         //prepare group for proportional symbols, with centroids
@@ -571,6 +684,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             addLabelsToMap(out, zoomGroup)
         }
 
+        //annotations
         if (out.annotations_) {
             appendAnnotations(zoomGroup, out.annotations_)
             out.annotationsAdded = true
@@ -591,6 +705,7 @@ export const mapTemplate = function (config, withCenterPoints) {
                 .html(out.title())
         }
 
+        //subtitle
         if (out.subtitle()) {
             let cssSubtitleClass = out.isInset ? 'em-inset-subtitle' : 'em-subtitle'
             let cssTitleClass = out.isInset ? 'em-inset-title' : 'em-title'
@@ -650,7 +765,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             }
         }
 
-        //add scalebar
+        // scalebar
         if (out.showScalebar_) {
             if (out.scalebarPosition_.length !== 2) {
                 out.scalebarPosition_[0] = 15

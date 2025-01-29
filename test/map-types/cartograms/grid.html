@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Grid cartogram')
+                .subtitle('test')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .gridCartogram(true)
+                .numberOfClasses(6)
+                .nutsLevel(0)
+                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })
+                .build()
+        </script>
+    </body>
+</html>

@@ -29,8 +29,6 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    out.colorFunction_ = interpolateYlGnBu
-
     let eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#17256B']
     out.colorFunction_ = (t) => piecewise(interpolateLab, eurostatMultihue)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
@@ -186,8 +184,7 @@ export const map = function (config) {
 
         // Apply classification and assign 'ecl' attribute based on map type
         if (map.svg_) {
-            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            let selector = getRegionsSelector(map)
             classifyRegions(map.svg().selectAll(selector))
 
             // Handle mixed NUTS level, separating NUTS level 0
@@ -224,8 +221,7 @@ export const map = function (config) {
 
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            const selector = getRegionsSelector(map)
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic
@@ -353,6 +349,15 @@ export const getFillPatternLegend = function () {
     return function (ecl) {
         return 'url(#pattern_' + ecl + ')'
     }
+}
+
+// get css selector. Different maps have different selectors for their regions
+const getRegionsSelector = function (map) {
+    let selector
+    map.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
+    if (map.gridCartogram_) selector = '#em-grid-container .em-grid-cell'
+    if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+    return selector
 }
 
 const choroplethTooltipFunction = function (region, map) {

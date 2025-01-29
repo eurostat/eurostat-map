@@ -310,8 +310,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+        const selector = getRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Set all regions to white
@@ -326,8 +325,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+        const selector = getRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Restore each region's original color from the fill___ attribute
@@ -340,4 +338,13 @@ export const legend = function (map, config) {
     out.labelDecNb = (v) => (console.warn('labelDecNb is now DEPRECATED. Please use decimals instead.'), out)
 
     return out
+}
+
+// get css selector. Different maps have different selectors for their regions
+const getRegionsSelector = function (map) {
+    let selector
+    map.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
+    if (map.gridCartogram_) selector = '#em-grid-container'
+    if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+    return selector
 }
