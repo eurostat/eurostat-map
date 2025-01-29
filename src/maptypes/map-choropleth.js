@@ -352,12 +352,11 @@ export const getFillPatternLegend = function () {
 }
 
 // get css selector. Different maps have different selectors for their regions
-const getRegionsSelector = function (map) {
-    let selector
-    map.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-    if (map.gridCartogram_) selector = '#em-grid-container .em-grid-cell'
-    if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
-    return selector
+const getRegionsSelector = (map) => {
+    if (map.Geometries.userGeometries) return '#em-user-regions path'
+    if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
+    if (map.geo_ === 'WORLD') return '#em-worldrg path'
+    return '#em-nutsrg path'
 }
 
 const choroplethTooltipFunction = function (region, map) {

@@ -341,10 +341,9 @@ export const legend = function (map, config) {
 }
 
 // get css selector. Different maps have different selectors for their regions
-const getRegionsSelector = function (map) {
-    let selector
-    map.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-    if (map.gridCartogram_) selector = '#em-grid-container'
-    if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
-    return selector
+const getRegionsSelector = (map) => {
+    if (map.Geometries.userGeometries) return '#em-user-regions'
+    if (map.gridCartogram_) return '#em-grid-container'
+    if (map.geo_ === 'WORLD') return '#em-worldrg'
+    return '#em-nutsrg'
 }
