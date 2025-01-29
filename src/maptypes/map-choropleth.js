@@ -5,7 +5,7 @@ import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
-import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
+import { executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { getCSSPropertyFromClass } from '../core/utils'
 
@@ -238,6 +238,16 @@ export const map = function (config) {
                     })
                     // Set up mouse events
                     addMouseEventsToRegions(map, regions)
+
+                    // update font color for grid cartograms (contrast)
+                    if (out.gridCartogram_) {
+                        map.svg()
+                            .selectAll('.em-grid-text')
+                            .each(function () {
+                                const cellColor = select(this.parentNode).style('fill')
+                                select(this).attr('fill', getTextColorForBackground(cellColor))
+                            })
+                    }
                 })
                 .catch((err) => {
                     //console.error('Error applying transition to regions:', err)
@@ -349,14 +359,6 @@ export const getFillPatternLegend = function () {
     return function (ecl) {
         return 'url(#pattern_' + ecl + ')'
     }
-}
-
-// get css selector. Different maps have different selectors for their regions
-const getRegionsSelector = (map) => {
-    if (map.Geometries.userGeometries) return '#em-user-regions path'
-    if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
-    if (map.geo_ === 'WORLD') return '#em-worldrg path'
-    return '#em-nutsrg path'
 }
 
 const choroplethTooltipFunction = function (region, map) {

@@ -5,7 +5,7 @@ import { extent, sum } from 'd3-array'
 import { interpolateOrRd, schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as PiechartLegend from '../legend/legend-piecharts'
-import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
+import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * Returns a proportional pie chart map.
@@ -212,8 +212,7 @@ export const map = function (config) {
                     })
 
                 // set region hover function
-                let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-                if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+                const selector = getRegionsSelector(out)
                 let regions = out.svg().selectAll(selector)
                 regions
                     .on('mouseover', function (e, rg) {

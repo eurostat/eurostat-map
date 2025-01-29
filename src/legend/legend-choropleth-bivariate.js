@@ -1,7 +1,7 @@
 import { select, selectAll } from 'd3-selection'
 import * as Legend from './legend'
 import { line } from 'd3-shape'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
+import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 
 /**
  * A legend for choropleth-bivariate maps
@@ -299,8 +299,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl1, ecl2) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+        const selector = getLegendRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Set all regions to white
@@ -315,8 +314,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
+        const selector = getLegendRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
 
         // Restore each region's original color from the fill___ attribute

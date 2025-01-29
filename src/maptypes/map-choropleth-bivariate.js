@@ -3,7 +3,7 @@ import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets } from '../core/utils'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector } from '../core/utils'
 
 /**
  * Return a bivariate choropleth map.
@@ -86,8 +86,7 @@ export const map = function (config) {
         if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
         //assign class to nuts regions, based on their value
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        const selector = getRegionsSelector(map)
         if (map.svg_) {
             let regions = map.svg().selectAll(selector)
             regions
@@ -183,8 +182,7 @@ export const map = function (config) {
 
         // set colour of regions
         if (map.svg()) {
-            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
             regions
                 .transition()

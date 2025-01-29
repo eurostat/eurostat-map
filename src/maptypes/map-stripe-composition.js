@@ -4,7 +4,7 @@ import { schemeCategory10 } from 'd3-scale-chromatic'
 //schemeSet3 schemeDark2 schemePastel1 schemeTableau10
 import * as StatMap from '../core/stat-map'
 import * as StripeCompositionLegend from '../legend/legend-stripe-composition'
-import { getCSSPropertyFromClass } from '../core/utils'
+import { getCSSPropertyFromClass, getRegionsSelector } from '../core/utils'
 /**
  * Return a stripe composition map.
  *
@@ -241,8 +241,7 @@ export const map = function (config) {
             })
 
         // set region hover function
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        const selector = getRegionsSelector(out)
         let regions = out.svg().selectAll(selector)
         regions
             .on('mouseover', function (e, rg) {

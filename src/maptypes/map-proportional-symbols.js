@@ -6,7 +6,7 @@ import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forc
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector } from '../core/utils'
 
 /**
  * Returns a proportional symbol map.
@@ -90,7 +90,7 @@ export const map = function (config) {
         'psClassificationMethod_',
         'psClasses_',
         'dorling_',
-        'psSpikeWidth_'
+        'psSpikeWidth_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -190,7 +190,7 @@ export const map = function (config) {
         if (!out.psSizeScale_) {
             if (out.psShape_ == 'spike') {
                 out.psSizeScale_ = 'linear'
-            }else {
+            } else {
                 out.psSizeScale_ = 'sqrt'
             }
         }
@@ -280,8 +280,7 @@ export const map = function (config) {
             }
 
             // set style of symbols
-            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD') {

@@ -4,7 +4,7 @@ import { scaleBand, scaleLinear } from 'd3-scale'
 import { axisLeft } from 'd3-axis'
 import { max } from 'd3-array'
 import * as Legend from './legend'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
+import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 
 /**
  * A legend for choropleth maps
@@ -310,7 +310,7 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl) {
-        const selector = getRegionsSelector(map)
+        const selector = getLegendRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Set all regions to white
@@ -325,7 +325,7 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        const selector = getRegionsSelector(map)
+        const selector = getLegendRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
         // Restore each region's original color from the fill___ attribute
@@ -338,12 +338,4 @@ export const legend = function (map, config) {
     out.labelDecNb = (v) => (console.warn('labelDecNb is now DEPRECATED. Please use decimals instead.'), out)
 
     return out
-}
-
-// get css selector. Different maps have different selectors for their regions
-const getRegionsSelector = (map) => {
-    if (map.Geometries.userGeometries) return '#em-user-regions'
-    if (map.gridCartogram_) return '#em-grid-container'
-    if (map.geo_ === 'WORLD') return '#em-worldrg'
-    return '#em-nutsrg'
 }

@@ -6,6 +6,7 @@ import { axisBottom, axisLeft, axisRight } from 'd3-axis'
 import { format } from 'd3-format'
 import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
+import { getRegionsSelector } from '../core/utils'
 
 /**
  * Returns a sparkline map.
@@ -199,8 +200,7 @@ export const map = function (config) {
         })
 
         // set region hover function
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (out.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        const selector = getRegionsSelector(out)
         let regions = out.svg().selectAll(selector)
         regions
             .on('mouseover', function (e, rg) {

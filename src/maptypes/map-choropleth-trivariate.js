@@ -3,7 +3,7 @@ import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as TrivariateLegend from '../legend/legend-choropleth-trivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, multiplyBlendMultipleHex } from '../core/utils'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, multiplyBlendMultipleHex, getRegionsSelector } from '../core/utils'
 
 /**
  * Return a trivariate choropleth map.
@@ -91,8 +91,7 @@ export const map = function (config) {
         if (!out.classifier3_) out.classifier3(scaleQuantile().domain(stat3).range(range))
 
         //assign class to nuts regions, based on their value
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+        const selector = getRegionsSelector(map)
         if (map.svg_) {
             let regions = map.svg().selectAll(selector)
             regions
@@ -255,8 +254,7 @@ export const map = function (config) {
 
         // set colour of regions
         if (map.svg()) {
-            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
             regions
                 .transition()

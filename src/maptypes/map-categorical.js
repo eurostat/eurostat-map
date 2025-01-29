@@ -3,7 +3,7 @@ import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as CategoricalLegend from '../legend/legend-categorical'
-import { executeForAllInsets } from '../core/utils'
+import { executeForAllInsets, getRegionsSelector } from '../core/utils'
 
 /**
  * Returns a categorical map.
@@ -93,8 +93,7 @@ export const map = function (config) {
     function applyStyleToMap(map) {
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            let selector = out.geo_ === 'WORLD' ? '#em-worldrg path' : '#em-nutsrg path'
-            if (map.Geometries.userGeometries) selector = '#em-user-regions path' // for user-defined geometries
+            const selector = getRegionsSelector(map)
             const regions = map.svg().selectAll(selector)
 
             // Apply transition and set initial fill colors with data-driven logic
@@ -161,7 +160,7 @@ export const map = function (config) {
             }
 
             // Update labels for statistical values if required
-            if ( map.labels_ && out.labels_.values) {
+            if (map.labels_ && out.labels_.values) {
                 out.updateValuesLabels(map)
             }
         }

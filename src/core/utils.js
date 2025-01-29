@@ -432,3 +432,33 @@ export const convertRectanglesToPaths = function (x, y, width, height) {
 
     return 'M' + x + ',' + y + 'L' + (x + width) + ',' + y + ' ' + (x + width) + ',' + (y + height) + ' ' + x + ',' + (y + height) + 'z'
 }
+
+export const getTextColorForBackground = function (backgroundColor) {
+    // Extract RGB values from the background color string
+    const rgb = backgroundColor.match(/\d+/g)
+    const r = parseInt(rgb[0])
+    const g = parseInt(rgb[1])
+    const b = parseInt(rgb[2])
+
+    // Calculate luminance using the formula for relative luminance
+    const luminance = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
+
+    // Return black for light background, white for dark background
+    return luminance > 0.5 ? 'black' : 'white'
+}
+
+// get css selector. Different maps have different selectors for their regions
+export const getRegionsSelector = (map) => {
+    if (map.Geometries.userGeometries) return '#em-user-regions path'
+    if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
+    if (map.geo_ === 'WORLD') return '#em-worldrg path'
+    return '#em-nutsrg path'
+}
+
+// get css selector for legend mouse hover. Different maps have different selectors for their regions
+export const getLegendRegionsSelector = (map) => {
+    if (map.Geometries.userGeometries) return '#em-user-regions'
+    if (map.gridCartogram_) return '#em-grid-container'
+    if (map.geo_ === 'WORLD') return '#em-worldrg'
+    return '#em-nutsrg'
+}

@@ -517,24 +517,22 @@ export const mapTemplate = function (config, withCenterPoints) {
         const svgHeight = out.height_
 
         // Define padding around the grid container
-        const containerPadding = 80 // Padding around the grid container (change this value for more/less padding)
+        const containerPadding = 80
 
-        // Define the grid layout (just as an example)
+        // Define the grid layout
         const gridLayout =
             out.gridCartogramPositions_ ||
-            `
-    ,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
-    ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
-    ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
-    ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
-    ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
-    ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
-    ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
-    ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
-    ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
-    ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,  
-    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  
-    `
+            `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
+              ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
+              ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
+              ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
+              ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
+              ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
+              ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
+              ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
+              ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
+              ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,  
+              ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `
 
         // Function to parse the grid layout
         const grid = (gridLayout) => {
@@ -551,20 +549,20 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // Get the positions from the layout
         const position = grid(gridLayout)
-        const gridData = Array.from(position, ([id, [x, y]]) => ({ id, x, y, properties: { id: id } })) // we add properties object so it replicated geojson features for consistency within classifyRegions()
+        const gridData = Array.from(position, ([id, [x, y]]) => ({ id, x, y, properties: { id: id } }))
 
         // Calculate the number of rows and columns in the grid
         const numCols = Math.max(...gridData.map((d) => d.x)) + 1
         const numRows = Math.max(...gridData.map((d) => d.y)) + 1
 
-        // Calculate cell size dynamically to fill the SVG, taking padding into account
+        // Calculate cell size dynamically to fill the SVG
         const cellWidth = (svgWidth - 2 * containerPadding) / numCols
         const cellHeight = (svgHeight - 2 * containerPadding) / numRows
 
         // Use the smaller cell size to ensure the grid fits within the SVG
         const cellSize = Math.min(cellWidth, cellHeight)
 
-        // Draw cells
+        // Draw cells and text in the same group
         const cells = gridGroup
             .selectAll('.em-grid-cell')
             .data(gridData)
@@ -572,29 +570,32 @@ export const mapTemplate = function (config, withCenterPoints) {
             .append('g')
             .attr('class', 'em-grid-cell')
             .attr('fill', out.defa)
+            .attr('transform', (d) => {
+                const x = d.x * cellSize + containerPadding
+                const y = d.y * cellSize + containerPadding
+                return `translate(${x}, ${y})` // Position the entire group
+            })
             .each(function (d) {
+                // Append rect
                 select(this)
                     .append('rect')
-                    .attr('x', d.x * cellSize + containerPadding) // Position cells with containerPadding
-                    .attr('y', d.y * cellSize + containerPadding) // Position cells with containerPadding
+                    .attr('class', 'em-grid-rect')
                     .attr('width', cellSize)
                     .attr('height', cellSize)
                     .style('stroke', 'lightgrey')
-            })
 
-        // Draw text
-        const texts = gridGroup
-            .selectAll('text')
-            .data(gridData)
-            .enter()
-            .append('text')
-            .attr('text-anchor', 'middle')
-            .attr('font-size', 15)
-            .style('pointer-events', 'none')
-            .attr('fill', 'black')
-            .text((d) => d.id)
-            .attr('x', (d) => d.x * cellSize + containerPadding + cellSize / 2) // Center text horizontally
-            .attr('y', (d) => d.y * cellSize + containerPadding + cellSize / 2 + 5) // Center text vertically
+                // Append text
+                select(this)
+                    .append('text')
+                    .attr('class', 'em-grid-text')
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', 15)
+                    .style('pointer-events', 'none')
+                    .attr('fill', 'black')
+                    .text(d.id)
+                    .attr('x', cellSize / 2) // Center text horizontally
+                    .attr('y', cellSize / 2 + 5) // Center text vertically
+            })
 
         // Center the grid group in the SVG container
         gridGroup.each(function () {
