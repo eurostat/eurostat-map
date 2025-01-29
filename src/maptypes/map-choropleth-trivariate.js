@@ -323,7 +323,7 @@ export const map = function (config) {
 
 const styleMixedNUTS = function (map) {
     map.svg()
-        .selectAll('#em-nutsrg path')
+        .selectAll(getRegionsSelector(map))
         .style('display', function (rg) {
             const sel = select(this)
             const ecl = sel.attr('ecl')

@@ -58,7 +58,7 @@ export const map = function (config) {
 
         //assign class to nuts regions, based on their value
         out.svg()
-            .selectAll('#em-nutsrg path')
+            .selectAll(getRegionsSelector(out))
             .attr('ecl', function (rg) {
                 const sv = out.statData().get(rg.properties.id)
                 if (!sv) return 'nd'
@@ -136,7 +136,7 @@ export const map = function (config) {
             // Apply additional settings for mixed NUTS level view
             if (out.nutsLevel_ === 'mixed') {
                 map.svg()
-                    .selectAll('#em-nutsrg path')
+                    .selectAll(getRegionsSelector(map))
                     .style('display', function (rg) {
                         const sel = select(this)
                         const ecl = sel.attr('ecl')

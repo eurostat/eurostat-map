@@ -175,7 +175,7 @@ export const map = function (config) {
 
         //build and assign texture to the regions
         out.svg()
-            .selectAll('#em-nutsrg path')
+            .selectAll(getRegionsSelector(out))
             .style('fill', function (d) {
                 const id = d.properties.id
 
