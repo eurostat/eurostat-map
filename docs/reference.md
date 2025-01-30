@@ -669,7 +669,15 @@ Here is [an example](https://eurostat.github.io/eurostat-map/examples/flowmap.ht
 
 ```javascript
 const exampleGraph = {
-    nodes: [{ id: 'FR' }, { id: 'DE' }, { id: 'IT' }, { id: 'ES' }, { id: 'BE' }, { id: 'Custom', x: 420000, y: 320000 }],
+    nodes: [
+        // the ids of the nodes and links correspond with the ids of the map's regions (e.g. NUTS id)
+        { id: 'FR' },
+        { id: 'DE' },
+        { id: 'IT' },
+        { id: 'ES' },
+        { id: 'BE' },
+        { id: 'Custom', x: 420000, y: 320000 },
+    ],
     links: [
         { source: 'FR', target: 'DE', value: 8201 },
         { source: 'FR', target: 'IT', value: 4969 },
@@ -684,13 +692,15 @@ const map = eurostatmap
     .flowGraph(exampleGraph)
     .nutsLevel(0)
     .flowColor('#72bb6f')
-    .overlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+    .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
     .build()
 ```
 
-| Method                         | Type   | Default   | Description                                                                                                                |
-| ------------------------------ | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**flowGraph**([*value*]) | Object | undefined | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
+| Method                                 | Type   | Default                | Description                                                                                                                |
+| -------------------------------------- | ------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**flowGraph**([*value*])         | Object | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
+| _map_.**flowColor**([*value*])         | String | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
+| _map_.**flowOverlayColors**([*value*]) | array  | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
 
 ## Map texts
 

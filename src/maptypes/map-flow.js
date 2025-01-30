@@ -23,12 +23,12 @@ export const map = function (config) {
     out.labelFormatter = (d) => format('.2s')(d)
     out.tooltip_.textFunction = flowMapTooltipFunction
     out.flowColor_ = '#72bb6f'
-    out.overlayColors_ = ['#bbd7ee', '#c7e3c6'] // exporter, importers
+    out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // exporter, importers
 
     /**
      * flowmap-specific setters/getters
      */
-    ;['flowGraph_', 'flowColor_', 'overlayColors_'].forEach(function (att) {
+    ;['flowGraph_', 'flowColor_', 'flowOverlayColors_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -150,8 +150,8 @@ export const map = function (config) {
 
             allRegions.each(function () {
                 select(this).style('fill', (region) => {
-                    if (importerIds.includes(region.properties.id)) return out.overlayColors_[0]
-                    if (exporterIds.includes(region.properties.id)) return out.overlayColors_[1]
+                    if (importerIds.includes(region.properties.id)) return out.flowOverlayColors_[0]
+                    if (exporterIds.includes(region.properties.id)) return out.flowOverlayColors_[1]
                 })
             })
         }
@@ -232,7 +232,7 @@ export const map = function (config) {
             .attr('x2', (d) => d.target.x0)
             .attr('y1', (d) => d.y0)
             .attr('y2', (d) => d.y1)
-            .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', out.overlayColors_[0]))
+            .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', out.flowOverlayColors_[0]))
             .call((g) => g.append('stop').attr('offset', '50%').attr('stop-color', out.flowColor_))
     }
 
