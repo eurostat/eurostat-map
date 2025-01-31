@@ -270,29 +270,28 @@ export const map = function (config) {
         return ChoroplethLegend.legend
     }
 
+    // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)
     const styleMixedNUTS = function (map) {
         map.svg()
             .selectAll(getRegionsSelector(map))
-            .style('display', function (rg) {
+            .each(function () {
                 const sel = select(this)
                 const ecl = sel.attr('ecl')
                 const lvl = sel.attr('lvl')
-                const countryId = rg.properties.id.slice(0, 2)
-                return ecl || lvl === '0' ? 'block' : 'none'
-            })
-            .style('stroke', function () {
-                const sel = select(this)
-                const lvl = sel.attr('lvl')
-                const ecl = sel.attr('ecl')
-                const stroke = sel.style('stroke')
-                return ecl && lvl !== '0' ? stroke || '#777' : null
-            })
-            .style('stroke-width', function () {
-                const sel = select(this)
-                const lvl = sel.attr('lvl')
-                const ecl = sel.attr('ecl')
-                const strokeWidth = sel.style('stroke-width')
-                return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
+
+                // Precompute styles to minimize DOM reads
+                const stroke = sel.style('stroke') || '#777'
+                const strokeWidth = sel.style('stroke-width') || 0.2
+
+                // Determine display visibility
+                const isVisible = ecl || lvl === '0'
+
+                // Apply styles efficiently
+                sel.style('display', isVisible ? 'block' : 'none')
+
+                if (ecl && lvl !== '0') {
+                    sel.style('stroke', stroke).style('stroke-width', strokeWidth)
+                }
             })
     }
 

@@ -1,13 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-cntrg,
+            .em-nutsrg {
+                fill: #ebebeb !important;
+            }
+
+            .em-sea {
+                fill: #ffffff !important;
+            }
+        </style>
     </head>
 
     <body>
         <div style="margin-left: 1%">
-            <svg id="mappy"></svg>
+            <svg id="map"></svg>
         </div>
 
         <script src="../../build/eurostatmap.js"></script>
@@ -15,128 +25,41 @@
         <script src="../configs/insetConfig.js"></script>
         <script src="../data/mixed.js"></script>
         <script>
-            let mapWidth = 638
-            let mapHeight = 608
+            const map = eurostatmap
+                .map('choropleth')
+                .width(795)
+                .height(625)
+                .nutsLevel(2)
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                // .classificationMethod('threshold')
+                // .colors(['#E9ECF6', '#C8CFF0', '#A5B1E5', '#7D92E2', '#6177CC', '#3F5AB2', '#20368D', '#0B1432'])
+                // .threshold([0, 2, 4, 6, 8, 10])
+                .position({ x: 4980000, y: 3610000, z: 7400 })
+                .legend({
+                    boxPadding: 5,
+                    x: 10,
+                    y: 200,
+                    title: 'Test',
+                    titleFontSize: 17,
+                    labelFontSize: 14,
+                    shapeWidth: 30,
+                    shapeHeight: 20,
+                    sepLineLength: 35,
+                    noData: true,
+                })
+                .zoomExtent([1, 1000])
 
-            basemap = function (id) {
-                return (
-                    eurostatmap
-                        .map('choropleth')
-                        .svgId(id)
-                        .containerId(id)
-                        .pixelSize(7400)
-                        .width(mapWidth)
-                        .height(mapHeight)
-                        .bottomText(null)
-                        .showSourceLink(false)
-                        .nutsLevel('mixed')
-                        //.nutsLevel(0)
-                        .classificationMethod('threshold')
-                        .drawGraticule(true)
-                        .graticuleStroke('#ccc')
-                        .graticuleStrokeWidth(0.5)
-                        .geoCenter([4980000, 3610000])
-                        .legend({
-                            ascending: false,
-                            boxPadding: 5,
-                            x: 10,
-                            y: 200,
-                            title: 'title',
-                            titleFontSize: 17,
-                            labelFontSize: 14,
-                            shapeWidth: 30,
-                            shapeHeight: 20,
-                            sepLineLength: 35,
-                            noData: true,
-                        })
-                        .drawCoastalMargin(false)
-                        .seaFillStyle('#E6FFFF')
-                        .cntrgFillStyle('#E6E6E6')
-                        .nutsrgFillStyle('#E6E6E6')
-                        .nutsbnStroke({
-                            0: '#000',
-                            1: '#000',
-                            2: '#000',
-                            3: '#000',
-                            co: 'grey',
-                        })
-                        .noDataFillStyle('darkgrey')
-                        .nutsbnStrokeWidth({ 0: 2, 1: 0.4, 2: 0.4, 3: 0.4, oth: 2, co: 0 })
-                        .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 2, co: 0.2 })
-                        .bordersToShow(['eu', 'co', 'cc', 'efta'])
-                        .zoomExtent([1, 10])
-                        .showScalebar(true)
-                        .scalebarPosition([420, 560])
-                        .hoverColor('red')
+            //map.statData().setData(nuts3)
 
-                        //.labelling(true)
-                        .labelsToShow(['seas', 'values', 'cc'])
-                        .labelValuesFontSize(10)
-                        .labelFill({ seas: '#012a7c', cc: 'black' })
-                        .labelShadow(true)
+            map.build()
 
-                        // adjust regions to show
-                        //.bordersToShow(["eu", "co","cc"])
-                        .nutsYear(2016)
-                        //.countriesToShow(['AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 'ES', 'FI', 'FR', 'HR', 'HU', 'IE', 'IS', 'IT', 'LI', 'LT', 'LU', 'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK', 'UK', 'RS']);
-                        .colors(['#E9ECF6', '#C8CFF0', '#A5B1E5', '#7D92E2', '#6177CC', '#3F5AB2', '#20368D', '#0B1432'])
-                        .threshold([0, 2, 4, 6, 8, 10])
-                )
-            }
-
-            let exampleData1 = {
-                FRY: 1,
-                TRB: 2,
-                AT: 3,
-                BE: 4,
-                BG: 5,
-                CY: 6,
-                CZ: 7,
-                DE: ':',
-                DK: 8,
-                EE: 9,
-                EL: 10,
-                ES: 11,
-                ES1: 12,
-                ES2: 13,
-                FI: 1,
-                FR: 2,
-                HR: 3,
-                HU: 4,
-                IE: 5,
-                IS: 6,
-                IT: 7,
-                LI: 8,
-                LT: 9,
-                LU: 10,
-                LV: 11,
-                MT: 12,
-                NL: 1,
-                PL: 2,
-                PT: 3,
-                PT20: 4,
-                PT30: 5,
-                RO: 6,
-                SE: 7,
-                SI: 8,
-                SK: 9,
-                UK: 10,
-                RS: 2,
-                CH: 1,
-                NO: 3,
-                ME: 4,
-                MK: 5,
-                AL: 6,
-                TR: 7,
-            }
-            let exampleData2 = { ES: 10 }
-
-            // need to clone the config before it is used in a map build. eurostat-map changes this config internally, meaning any other maps that use it will be affected
-            let clonedConfig = JSON.parse(JSON.stringify(insetsConfig))
-
-            let map1 = basemap('mappy').insets(insetsConfig)
-            map1.statData().setData(exampleData1)
-            map1.build()
+            // setTimeout(() => {
+            //     map.exportMapToPNG(795 * 2, 625 * 2)
+            // }, 2000)
         </script>
     </body>
 </html>

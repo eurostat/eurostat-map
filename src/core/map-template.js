@@ -36,7 +36,7 @@ export const mapTemplate = function (config, withCenterPoints) {
     //map
     out.svgId_ = 'map'
     out.svg_ = undefined
-    out.width_ = Math.min(800, window.innerWidth)
+    out.width_ = Math.min(795, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
 
@@ -856,8 +856,6 @@ export const mapTemplate = function (config, withCenterPoints) {
                 // apply default transform to map
                 const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
                 zoomGroup.attr('transform', t)
-
-                console.log('Position:', out.position_)
                 previousT = t
             })
 
