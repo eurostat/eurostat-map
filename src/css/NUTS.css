@@ -39,7 +39,7 @@
     stroke-width: 0.5;
 }
 
-/* NUTS boundaries */
+/* NUTS boundaries stroke-width */
 .em-bn-0 {
     stroke: none;
 }
@@ -49,26 +49,36 @@
 /* when using MIXED NUTS levels, we add stroke to the regions, then show/hide those that have/dont have data */
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'],
+.em-bn-co {
+    stroke-width: 0.2;
+}
+
+/* NUTS boundaries stroke color */
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: grey;
-    stroke-width: 0.3;
-}
-
-.em-kosovo-bn {
-    stroke: #6e6e6e;
-    stroke-width: 0.19;
-}
-
-.em-bn-d {
-    /* disputed */
-    stroke: #b2b2b2;
-    stroke-width: 0.3;
+    stroke: #696969;
 }
 
 /* coastal boundaries */
 .em-bn-co {
     stroke: white;
-    stroke-width: 0.5;
+}
+
+/* kosovo */
+.em-kosovo-bn {
+    stroke: #6e6e6e;
+    stroke-width: 0.19;
+}
+
+/* disputed */
+.em-bn-d {
+    stroke: #b2b2b2;
+    stroke-width: 0.3;
 }
 
 /* hide non cc/eu/efta borders */
