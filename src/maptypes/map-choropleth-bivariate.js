@@ -221,7 +221,7 @@ export const map = function (config) {
                                 let newFill = sel.attr('fill___')
                                 if (newFill) {
                                     sel.style('fill', sel.attr('fill___'))
-                                    if (map._tooltip) map._tooltip.mouseout()
+                                    if (out._tooltip) out._tooltip.mouseout()
                                 }
                             })
                     },

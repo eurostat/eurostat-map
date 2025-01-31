@@ -126,7 +126,7 @@ export const map = function (config) {
                         .on('mouseout', function () {
                             const sel = select(this)
                             sel.style('fill', sel.attr('fill___')) // Revert to original color
-                            if (map._tooltip) map._tooltip.mouseout()
+                            if (out._tooltip) out._tooltip.mouseout()
                         })
                 })
                 .catch((err) => {

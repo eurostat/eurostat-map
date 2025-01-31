@@ -1218,10 +1218,6 @@ export const mapTemplate = function (config, withCenterPoints) {
      * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
      */
     const addScalebarToMap = function () {
-        let sb = out.svg().append('g').attr('id', 'scalebar').attr('x', out.scalebarPosition_[0]).attr('y', out.scalebarPosition_[1])
-
-        let segmentHeight = out.scalebarSegmentHeight_
-
         // Julien's nice scalebars
         const marginLeft = 5
         const maxLengthPix = out.scalebarMaxWidth_
@@ -1238,17 +1234,16 @@ export const mapTemplate = function (config, withCenterPoints) {
             5: 5,
         }
 
-        const scalebarSVG = out
+        const scalebarGroup = out
             .svg()
             .append('g')
             .attr('class', 'em-scalebar')
-            .attr('x', out.scalebarPosition_[0])
-            .attr('y', out.scalebarPosition_[1])
+            .attr('transform', `translate(${out.scalebarPosition_[0]},${out.scalebarPosition_[1]})`)
             .attr('width', maxLengthPix + 20)
             .attr('height', out.scalebarHeight_)
 
         // top line full width
-        scalebarSVG
+        scalebarGroup
             .append('line')
             .attr('class', 'em-scalebar-line')
             .attr('x1', marginLeft)
@@ -1257,7 +1252,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('y2', 1)
 
         //bottom line full width
-        scalebarSVG
+        scalebarGroup
             .append('line')
             .attr('class', 'em-scalebar-line')
             .attr('x1', marginLeft)
@@ -1266,7 +1261,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('y2', out.scalebarSegmentHeight_)
 
         //first tick
-        scalebarSVG
+        scalebarGroup
             .append('line')
             .attr('class', 'em-scalebar-line')
             .attr('x1', marginLeft)
@@ -1274,7 +1269,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             .attr('x2', marginLeft)
             .attr('y2', out.scalebarTickHeight_)
 
-        scalebarSVG
+        scalebarGroup
             .append('text')
             .attr('class', 'em-scalebar-label')
             .attr('x', marginLeft + textOffsetX)
@@ -1287,14 +1282,14 @@ export const mapTemplate = function (config, withCenterPoints) {
         const divisionMinWidth = 15
         if (divisionWidth >= divisionMinWidth) {
             for (let i = 1; i < subdivisionNb; i++) {
-                scalebarSVG
+                scalebarGroup
                     .append('line')
                     .attr('class', 'em-scalebar-line')
                     .attr('x1', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                     .attr('y1', 1)
                     .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
                     .attr('y2', out.scalebarTickHeight_)
-                scalebarSVG
+                scalebarGroup
                     .append('text')
                     .attr('class', 'em-scalebar-label')
                     .attr('x', marginLeft + textOffsetX + i * divisionWidth)
@@ -1305,7 +1300,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             //every other segment mid-line
             for (let i = -1; i < subdivisionNb; i += 2) {
                 if (i == 1) {
-                    sb.append('line')
+                    scalebarGroup
+                        .append('line')
                         .attr('class', 'em-scalebar-line')
                         .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
                         .attr('y1', out.scalebarSegmentHeight_ / 2)
@@ -1314,7 +1310,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                 } else {
                     let x1 = marginLeft + out.scalebarStrokeWidth_ / 2 + (i - 1) * divisionWidth
                     if (x1 > 0) {
-                        sb.append('line')
+                        scalebarGroup
+                            .append('line')
                             .attr('class', 'em-scalebar-line')
                             .attr('x1', x1)
                             .attr('y1', out.scalebarSegmentHeight_ / 2)
@@ -1325,7 +1322,8 @@ export const mapTemplate = function (config, withCenterPoints) {
             }
         } else {
             // single full-length horizontal mid-line
-            sb.append('line')
+            scalebarGroup
+                .append('line')
                 .attr('class', 'em-scalebar-line')
                 .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
                 .attr('y1', out.scalebarSegmentHeight_ / 2)
@@ -1334,14 +1332,14 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         //last tick
-        scalebarSVG
+        scalebarGroup
             .append('line')
             .attr('class', 'em-scalebar-line')
             .attr('x1', niceLengthPixel + marginLeft)
             .attr('y1', 1)
             .attr('x2', niceLengthPixel + marginLeft)
             .attr('y2', out.scalebarTickHeight_)
-        scalebarSVG
+        scalebarGroup
             .append('text')
             .attr('class', 'em-scalebar-label')
             .attr('x', niceLengthPixel + marginLeft + textOffsetX)
