@@ -549,7 +549,20 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // Get the positions from the layout
         const position = grid(gridLayout)
-        const gridData = Array.from(position, ([id, [x, y]]) => ({ id, x, y, properties: { id: id } }))
+
+        const gridData = Array.from(position, ([id, [x, y]]) => {
+            // find nuts2json feature
+            const feature = out.Geometries.geoJSONs.nutsrg.find((rg) => rg.properties.id == id)
+            return {
+                id,
+                x,
+                y,
+                properties: {
+                    id: id,
+                    name: feature ? feature.properties.na : '',
+                },
+            }
+        })
 
         // Calculate the number of rows and columns in the grid
         const numCols = Math.max(...gridData.map((d) => d.x)) + 1
@@ -620,6 +633,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         // separate logic for cartograms
         if (out.gridCartogram_ == true) {
             buildGridCartogramBase()
+            out.bottomText_ = false //dont need copyright
         } else {
             // default geographic logic
 

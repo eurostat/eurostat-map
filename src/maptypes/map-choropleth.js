@@ -198,7 +198,6 @@ export const map = function (config) {
     //@override
     out.updateStyle = function () {
         // apply style to insets
-        // apply classification to all insets
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
         }

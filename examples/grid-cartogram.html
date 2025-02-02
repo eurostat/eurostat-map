@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            .em-grid-container {
+                transform: 'translate(117.624985, -0.000030517578125)' !important;
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Grid cartogram')
+                .subtitle('ensures that each region is assigned equal visual importance')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .gridCartogram(true)
+                .classificationMethod('threshold')
+                .thresholds([10000, 20000, 30200, 40000, 50000, 60000])
+                .nutsLevel(0)
+                .legend({
+                    x: 10,
+                    y: 120,
+                    title: 'Euro per inhabitant',
+                    labels: [60000, 50000, '30200 (EU average) ', 40000, 20000, 10000],
+                    boxOpacity: 0,
+                    barChart: false,
+                })
+                .build()
+        </script>
+    </body>
+</html>

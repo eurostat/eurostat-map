@@ -55,10 +55,7 @@ export const Geometries = function (map, withCenterPoints) {
                 if (isWorld) {
                     out.geoJSONs.worldrg = feature(out.defaultGeoData, out.defaultGeoData.objects.CNTR_RG_20M_2020_4326).features
                     out.geoJSONs.worldbn = feature(out.defaultGeoData, out.defaultGeoData.objects.CNTR_BN_20M_2020_4326).features
-                    out.geoJSONs.kosovo = feature(
-                        out.defaultGeoData,
-                        out.defaultGeoData.objects.NUTS_BN_20M_2021_RS_XK_border
-                    ).features
+                    out.geoJSONs.kosovo = feature(out.defaultGeoData, out.defaultGeoData.objects.NUTS_BN_20M_2021_RS_XK_border).features
                     out.geoJSONs.graticule = [geoGraticule().step([30, 30])()]
                 } else {
                     out.geoJSONs.graticule = feature(out.defaultGeoData, out.defaultGeoData.objects.gra).features
@@ -101,26 +98,18 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         if (map.nutsLevel_ === 'mixed' && map.geo_ !== 'WORLD') {
-            nutsLevels.forEach((lvl) =>
-                promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl)))
-            )
+            nutsLevels.forEach((lvl) => promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl))))
             if (withCenterPoints) {
                 nutsLevels.forEach((lvl) =>
-                    promises.push(
-                        json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl, true))
-                    )
+                    promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl, true)))
                 )
             }
         } else if (map.geo_ === 'WORLD') {
-            promises.push(
-                json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json')
-            )
+            promises.push(json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'))
         } else {
             promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)))
             if (withCenterPoints) {
-                promises.push(
-                    json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_, true))
-                )
+                promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_, true)))
             }
         }
 
@@ -202,21 +191,19 @@ export const Geometries = function (map, withCenterPoints) {
 
                 //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
                 // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
-                ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach(
-                    (r, i) => {
-                        //append each nuts level to map
-                        container
-                            .append('g')
-                            .attr('id', 'em-nutsrg')
-                            .attr('class', 'em-nutsrg')
-                            .selectAll('path')
-                            .data(r)
-                            .enter()
-                            .append('path')
-                            .attr('d', pathFunction)
-                            .attr('lvl', i) //to be able to distinguish nuts levels
-                    }
-                )
+                ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
+                    //append each nuts level to map
+                    container
+                        .append('g')
+                        .attr('id', 'em-nutsrg')
+                        .attr('class', 'em-nutsrg')
+                        .selectAll('path')
+                        .data(r)
+                        .enter()
+                        .append('path')
+                        .attr('d', pathFunction)
+                        .attr('lvl', i) //to be able to distinguish nuts levels
+                })
 
                 //add kosovo
                 if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
@@ -274,7 +261,7 @@ export const Geometries = function (map, withCenterPoints) {
                     if (bn.properties.oth === 'T') classList.push('em-bn-oth')
                     if (bn.properties.co === 'T') classList.push('em-bn-co')
 
-                    if (bn.properties.id == 156) console.log(classList, bn)
+                    //if (bn.properties.id == 156) console.log(classList, bn)
                     return classList.join(' ') // Use join with a space to create a valid class string
                 })
         }

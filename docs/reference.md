@@ -18,6 +18,7 @@
         - [Stripe composition map](#stripe-composition-map)
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
+        - [Cartograms](#cartograms)
     - [Map texts](#map-texts)
         - [Map title \& subtitle](#map-title--subtitle)
         - [Labelling](#labelling)
@@ -701,6 +702,16 @@ const map = eurostatmap
 | _map_.**flowGraph**([*value*])         | Object | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
 | _map_.**flowColor**([*value*])         | String | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
 | _map_.**flowOverlayColors**([*value*]) | array  | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
+
+### Cartograms
+
+As of version 4.1.0 you can now create grid cartograms by using the following function:
+
+```javascript
+map.gridCartogram(true)
+```
+
+Here is [an example](https://eurostat.github.io/eurostat-map/examples/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/grid-cartogram.html))
 
 ## Map texts
 
