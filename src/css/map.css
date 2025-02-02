@@ -139,3 +139,7 @@ a text {
     fill: white;
     pointer-events: none;
 }
+
+.em-grid-rect {
+    stroke: white;
+}

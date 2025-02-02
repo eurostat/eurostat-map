@@ -590,12 +590,7 @@ export const mapTemplate = function (config, withCenterPoints) {
             })
             .each(function (d) {
                 // Append rect
-                select(this)
-                    .append('rect')
-                    .attr('class', 'em-grid-rect')
-                    .attr('width', cellSize)
-                    .attr('height', cellSize)
-                    .style('stroke', 'lightgrey')
+                select(this).append('rect').attr('class', 'em-grid-rect').attr('width', cellSize).attr('height', cellSize)
 
                 // Append text
                 select(this)
