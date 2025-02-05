@@ -711,6 +711,25 @@ As of version 4.1.0 you can now create grid cartograms by using the following fu
 map.gridCartogram(true)
 ```
 
+If you wish, you can define custom grid positions with:
+
+```javascript
+map.gridCartogramPositions(
+    `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
+    ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
+    ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
+    ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
+    ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
+    ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,
+    ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,
+    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  
+   `
+)
+```
+
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/grid-cartogram.html))
 
 ## Map texts
@@ -745,7 +764,7 @@ map = eurostatmap.map(...)
             { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
         ],
         values: true,
-        backgrounds: true,
+        backgrounds: true, // for better legibility of labelled values
         shadows: true,
         processValueLabelCentroids: (region, centroid) => {
             // (optional) adjust NUTS1 label positions manually to avoid overlapping
