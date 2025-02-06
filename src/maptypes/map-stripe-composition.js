@@ -281,12 +281,13 @@ export const map = function (config) {
         tp.selectAll('*').remove()
 
         //write region name
+        const regionName = rg.properties.na || rg.properties.name
         if (rg.properties.id) {
             //name and code
-            tp.append('div').html('<b>' + rg.properties.na + '</b> (' + rg.properties.id + ') <br>')
+            tp.append('div').html('<b>' + regionName + '</b> (' + rg.properties.id + ') <br>')
         } else {
             //region name
-            tp.append('div').html('<b>' + rg.properties.na + '</b><br>')
+            tp.append('div').html('<b>' + regionName + '</b><br>')
         }
 
         //prepare data for pie chart

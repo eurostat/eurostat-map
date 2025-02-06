@@ -299,12 +299,13 @@ const scaleBivariate = function (numberOfClasses, startColor, color1, color2, en
 const tooltipTextFunBiv = function (rg, map) {
     const buf = []
     //region name
+    const regionName = rg.properties.na || rg.properties.name
     if (rg.properties.id) {
         //name and code
-        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + ' (' + rg.properties.id + ') </div>')
+        buf.push('<div class="estat-vis-tooltip-bar" >' + regionName + ' (' + rg.properties.id + ') </div>')
     } else {
         //region name
-        buf.push('<div class="estat-vis-tooltip-bar" >' + rg.properties.na + '</div>')
+        buf.push('<div class="estat-vis-tooltip-bar" >' + regionName + '</div>')
     }
 
     //stat 1 value
