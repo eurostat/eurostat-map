@@ -140,6 +140,7 @@ a text {
     pointer-events: none;
 }
 
-.em-grid-rect {
+.em-grid-rect,
+.em-grid-hexagon {
     stroke: white;
 }

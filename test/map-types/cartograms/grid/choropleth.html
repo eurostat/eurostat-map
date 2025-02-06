@@ -20,6 +20,9 @@
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
                 .gridCartogram(true)
+                .gridCartogramShape('hexagon')
+                .gridCartogramCellPadding(8)
+                //.gridCartogramContainerPadding(110)
                 .numberOfClasses(6)
                 .nutsLevel(0)
                 .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })

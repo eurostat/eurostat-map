@@ -10,7 +10,7 @@ import { defineDeprecatedFunctions } from './deprecated'
 import { Geometries } from './geometries'
 import { buildInsets, removeInsets } from './insets'
 import { appendStamp } from './stamps'
-import { csvParseRows } from 'd3-dsv'
+import { buildGridCartogramBase } from './cartograms'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -42,6 +42,9 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //geographical focus
     out.gridCartogram_ = false // draw geometries as grid cells
+    out.gridCartogramShape_ = 'square' // square or hexagon
+    out.gridCartogramContainerPadding_ = 80
+    out.gridCartogramCellPadding_ = 2
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
     out.nutsYear_ = 2024
     out.geo_ = 'EUR'
@@ -507,115 +510,6 @@ export const mapTemplate = function (config, withCenterPoints) {
         return out
     }
 
-    // draw grid cartogram geometries
-    const buildGridCartogramBase = function () {
-        const svg = out.svg_
-        const zoomGroup = select('#em-zoom-group-' + out.svgId_)
-        const gridGroup = zoomGroup.append('g').attr('id', 'em-grid-container')
-
-        const svgWidth = out.width_
-        const svgHeight = out.height_
-
-        // Define padding around the grid container
-        const containerPadding = 80
-
-        // Define the grid layout
-        const gridLayout =
-            out.gridCartogramPositions_ ||
-            `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
-              ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
-              ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
-              ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
-              ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
-              ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
-              ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
-              ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
-              ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
-              ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,  
-              ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `
-
-        // Function to parse the grid layout
-        const grid = (gridLayout) => {
-            const positionById = new Map()
-            csvParseRows(gridLayout.trim(), (row, j) => {
-                row.forEach((id, i) => {
-                    if ((id = id.trim())) {
-                        positionById.set(id, [i, j])
-                    }
-                })
-            })
-            return positionById
-        }
-
-        // Get the positions from the layout
-        const position = grid(gridLayout)
-
-        const gridData = Array.from(position, ([id, [x, y]]) => {
-            // find nuts2json feature
-            const feature = out.Geometries.geoJSONs.nutsrg.find((rg) => rg.properties.id == id)
-            return {
-                id,
-                x,
-                y,
-                properties: {
-                    id: id,
-                    name: feature ? feature.properties.na : '',
-                },
-            }
-        })
-
-        // Calculate the number of rows and columns in the grid
-        const numCols = Math.max(...gridData.map((d) => d.x)) + 1
-        const numRows = Math.max(...gridData.map((d) => d.y)) + 1
-
-        // Calculate cell size dynamically to fill the SVG
-        const cellWidth = (svgWidth - 2 * containerPadding) / numCols
-        const cellHeight = (svgHeight - 2 * containerPadding) / numRows
-
-        // Use the smaller cell size to ensure the grid fits within the SVG
-        const cellSize = Math.min(cellWidth, cellHeight)
-
-        // Draw cells and text in the same group
-        const cells = gridGroup
-            .selectAll('.em-grid-cell')
-            .data(gridData)
-            .enter()
-            .append('g')
-            .attr('class', 'em-grid-cell')
-            .attr('fill', out.defa)
-            .attr('transform', (d) => {
-                const x = d.x * cellSize + containerPadding
-                const y = d.y * cellSize + containerPadding
-                return `translate(${x}, ${y})` // Position the entire group
-            })
-            .each(function (d) {
-                // Append rect
-                select(this).append('rect').attr('class', 'em-grid-rect').attr('width', cellSize).attr('height', cellSize)
-
-                // Append text
-                select(this)
-                    .append('text')
-                    .attr('class', 'em-grid-text')
-                    .attr('text-anchor', 'middle')
-                    .attr('font-size', 15)
-                    .style('pointer-events', 'none')
-                    .attr('fill', 'black')
-                    .text(d.id)
-                    .attr('x', cellSize / 2) // Center text horizontally
-                    .attr('y', cellSize / 2 + 5) // Center text vertically
-            })
-
-        // Center the grid group in the SVG container
-        gridGroup.each(function () {
-            const bbox = this.getBBox()
-            const dx = (svgWidth - bbox.width) / 2 - bbox.x
-            const dy = (svgHeight - bbox.height) / 2 - bbox.y
-
-            // Apply translation to center the grid group
-            gridGroup.attr('transform', `translate(${dx}, ${dy})`)
-        })
-    }
-
     /**
      * Buid an empty map template, based on the geometries only.
      */
@@ -627,7 +521,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         // separate logic for cartograms
         if (out.gridCartogram_ == true) {
-            buildGridCartogramBase()
+            buildGridCartogramBase(out)
             out.bottomText_ = false //dont need copyright
         } else {
             // default geographic logic

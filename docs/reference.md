@@ -711,7 +711,19 @@ As of version 4.1.0 you can now create grid cartograms by using the following fu
 map.gridCartogram(true)
 ```
 
-If you wish, you can define custom grid positions with:
+You can switch between squares and hexagons using
+
+```javascript
+map.gridCartogramShape('hexagon')
+```
+
+and define container or cell padding using:
+
+```javascript
+map.gridCartogramCellPadding(5).gridCartogramContainerPadding(80)
+```
+
+If you wish, you can even define custom grid positions using:
 
 ```javascript
 map.gridCartogramPositions(
