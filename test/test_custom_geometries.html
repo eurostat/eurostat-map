@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -6,7 +6,7 @@
         <style>
             .borders {
                 fill: none;
-                stroke: black;
+                stroke: grey;
                 stroke-width: 0.3px;
                 stroke-linejoin: round;
             }
@@ -66,8 +66,7 @@
                     // Transform merged data to code:value object
                     const statisticalData = mergedData.reduce((acc, row) => {
                         // Handle unemployment value, setting "<5" to "5" and parsing as an integer
-                        let unemployment =
-                            row['total Paro Registrado'] === '<5' ? 5 : parseThousandsDelimiter(row['total Paro Registrado'])
+                        let unemployment = row['total Paro Registrado'] === '<5' ? 5 : parseThousandsDelimiter(row['total Paro Registrado'])
 
                         // Parse population
                         const population = parsePopulation(row.total)
@@ -87,10 +86,7 @@
                 })
                 .then(([bordersTopoJSON, topoJSON, statisticalData]) => {
                     const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
-                    const bordersGeoJSON = topojson.feature(
-                        bordersTopoJSON,
-                        bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]]
-                    )
+                    const bordersGeoJSON = topojson.feature(bordersTopoJSON, bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]])
 
                     // Add IDs to feature properties
                     geoJSON.features.forEach((feature) => {
@@ -150,12 +146,12 @@
                                 class: 'borders',
                             },
                         ])
+                        .classificationMethod('threshold')
+                        .thresholds([3, 4, 5, 6, 7, 8, 9])
                         .zoomExtent([1, 10])
                         .projectionFunction(projection)
                         .legend({ title: 'Unemployment %', x: 5, y: 180, boxOpacity: 0.8, decimals: 0 })
-                        .footnote(
-                            'Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>'
-                        )
+                        .footnote('Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>')
                         .insetBoxPosition([5, 490])
                         .insets([
                             {
