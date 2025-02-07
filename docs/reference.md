@@ -111,6 +111,8 @@ If you wish to make maps using your own custom geometries instead of NUTS region
 | ------------------------------- | -------- | ------------- | ---------------------------------------------------------------------- |
 | _map_.**geometries**([*value*]) | Object[] | NUTS regions  | Here you can define your own custom geometries to be used in your maps |
 
+You can find a [live example here](https://eurostat.github.io/eurostat-map/examples/custom-geometries.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/custom-geometries.html))
+
 ### Statistical data
 
 The map statistical data can be accessed with the _map_.**statData**() method, which returns an object with the following methods:
