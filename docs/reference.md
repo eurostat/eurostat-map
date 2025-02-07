@@ -5,6 +5,7 @@
         - [Map definition](#map-definition)
         - [Map geography](#map-geography)
             - [World maps](#world-maps)
+            - [Custom geometries](#custom-geometries)
         - [Statistical data](#statistical-data)
             - [Eurostat database](#eurostat-database)
             - [CSV](#csv)
@@ -81,6 +82,34 @@ It is also possible to build thematic world maps using eurostat-map. Simply pass
 | Method                                  | Type          | Default value       | Description                                                            |
 | --------------------------------------- | ------------- | ------------------- | ---------------------------------------------------------------------- |
 | _map_.**projectionFunction**([*value*]) | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps |
+
+#### Custom geometries
+
+If you wish to make maps using your own custom geometries instead of NUTS regions, then you can specify them using:
+
+```javascript
+.geometries([
+    {
+        id: 'regions',
+        class: 'regions',
+        statisticalRegions: true, // this is how eurostat-map knows what regions the statistical values belong to.
+        features: myRegionsGeoJSON.features, // stats are linked via feature.properties.id
+        onEach: (elements) => {
+            // Add any D3 custom styling or behavior here
+        },
+    },
+    {
+        id: 'borders',
+        features: myBordersGeoJSON.features,
+        class: 'borders',
+    },
+])
+
+```
+
+| Method                          | Type     | Default value | Description                                                            |
+| ------------------------------- | -------- | ------------- | ---------------------------------------------------------------------- |
+| _map_.**geometries**([*value*]) | Object[] | NUTS regions  | Here you can define your own custom geometries to be used in your maps |
 
 ### Statistical data
 
