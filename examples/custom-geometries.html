@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .borders {
+                fill: none;
+                stroke: black;
+                stroke-width: 0.3px;
+                stroke-linejoin: round;
+            }
+            .regions {
+                /* stroke: white;
+                stroke-width: 0.1px; */
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+        <script src="https://d3js.org/d3.v4.js"></script>
+        <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+        <script>
+            const width = 900
+            const height = 700
+
+            Promise.all([
+                fetch('../test/data/Paro_por_municipios_2023_csv.csv').then((response) => response.text()),
+                fetch('../test/data/poblacion.csv').then((response) => response.text()),
+            ])
+                .then(([firstCsvText, secondCsvText]) => {
+                    const firstCsv = d3.csvParse(firstCsvText)
+                    const secondCsv = d3.csvParse(secondCsvText)
+
+                    // Convert the second CSV to a lookup object based on the standardized code
+                    const secondDataLookup = secondCsv.reduce((lookup, row) => {
+                        const code = row.id.split(' ')[0].replace(/^0+/, '') // Remove leading zeros from the code
+                        lookup[code] = row
+                        return lookup
+                    }, {})
+
+                    // Merge data based on matching standardized codes
+                    const mergedData = firstCsv.map((row) => {
+                        const code = row['Codigo Municipio'].replace(/^0+/, '') // Remove leading zeros from the first CSV code
+                        const matchingRow = secondDataLookup[code]
+                        return matchingRow ? { ...row, ...matchingRow } : row
+                    })
+
+                    // Parse value by removing thousands delimiter
+                    function parseThousandsDelimiter(value) {
+                        if (value) {
+                            return parseInt(value.replace('.', ''), 10) // Remove the dot and parse as integer
+                        }
+                    }
+
+                    function parsePopulation(input) {
+                        if (input) {
+                            return Number(input.toString().replace('.', '')) // Remove the decimal point
+                        }
+                    }
+
+                    // Transform merged data to code:value object
+                    const statisticalData = mergedData.reduce((acc, row) => {
+                        // Handle unemployment value, setting "<5" to "5" and parsing as an integer
+                        let unemployment = row['total Paro Registrado'] === '<5' ? 5 : parseThousandsDelimiter(row['total Paro Registrado'])
+
+                        // Parse population
+                        const population = parsePopulation(row.total)
+
+                        // Calculate percentage unemployed and add to accumulator
+                        const unemploymentRate = Math.round((unemployment / population) * 100)
+                        acc[row['Codigo Municipio']] = isNaN(unemploymentRate) ? ':' : unemploymentRate
+
+                        return acc
+                    }, {})
+
+                    return Promise.all([
+                        fetch('../test/geometries/spain_borders.json').then((response) => response.json()),
+                        fetch('../test/geometries/spain-municipalities.topojson.json').then((response) => response.json()),
+                        statisticalData, // Pass statisticalData forward in the chain
+                    ])
+                })
+                .then(([bordersTopoJSON, topoJSON, statisticalData]) => {
+                    const geoJSON = topojson.feature(topoJSON, topoJSON.objects[Object.keys(topoJSON.objects)[0]])
+                    const bordersGeoJSON = topojson.feature(bordersTopoJSON, bordersTopoJSON.objects[Object.keys(bordersTopoJSON.objects)[0]])
+
+                    // Add IDs to feature properties
+                    geoJSON.features.forEach((feature) => {
+                        feature.properties.id = feature.id
+                    })
+
+                    // define canarias
+                    const canariesWidth = 200
+                    const canariesHeight = 90
+                    const canariesFeatures = geoJSON.features.filter((d) => d.id.startsWith('380') || d.id.startsWith('350'))
+                    const padding = 50 // Padding in pixels
+                    const canariesProjection = d3
+                        .geoAzimuthalEqualArea()
+                        .rotate([15.8, -28.5]) // Center around the Canary Islands
+                        .scale(2300) // Adjust scale as needed
+                        .translate([
+                            canariesWidth / 2, // Center with horizontal padding
+                            canariesHeight / 2, // Center with vertical padding
+                        ])
+
+                    //define Melilla
+                    const melillaFeatures = geoJSON.features.filter((d) => d.id.startsWith('52001'))
+                    const melillaWidth = 50
+                    const melillaHeight = 70
+                    const melillaProjection = d3
+                        .geoAzimuthalEqualArea()
+                        .rotate([2.95, -35.3]) // Center around Melilla
+                        .scale(30000) // Adjust scale as needed
+                        .translate([
+                            melillaWidth / 2, // Center with horizontal padding
+                            melillaHeight / 2, // Center with vertical padding
+                        ])
+
+                    // Set up the main map projection
+                    const projection = d3.geoAzimuthalEqualArea().rotate([3, -42]).scale(4000)
+
+                    // Initialize the map
+                    const map = eurostatmap
+                        .map('choropleth')
+                        .width(width)
+                        .height(height)
+                        .title('Custom geometries test')
+                        .subtitle('Unemployment rate, municipality level, 2023')
+                        .geometries([
+                            {
+                                id: 'regions',
+                                class: 'regions',
+                                statisticalRegions: true,
+                                features: geoJSON.features,
+                                onEach: (elements) => {
+                                    // Add any D3 custom styling or behavior here
+                                },
+                            },
+                            {
+                                id: 'borders',
+                                features: bordersGeoJSON.features,
+                                class: 'borders',
+                            },
+                        ])
+                        .zoomExtent([1, 10])
+                        .projectionFunction(projection)
+                        .legend({ title: 'Unemployment %', x: 5, y: 180, boxOpacity: 0.8, decimals: 0 })
+                        .footnote('Source: <a href="https://datos.gob.es/en/catalogo/ea0021425-paro-registrado-por-municipios">datos.gob.es</a>')
+                        .insetBoxPosition([5, 590])
+                        .insets([
+                            {
+                                projectionFunction: canariesProjection,
+                                title: 'Canarias',
+                                geometries: [
+                                    {
+                                        id: 'canaries',
+                                        class: 'canaries',
+                                        statisticalRegions: true,
+                                        features: canariesFeatures,
+                                    },
+                                ],
+                                width: canariesWidth,
+                                height: canariesHeight,
+                                x: 0,
+                                y: 0,
+                                zoomExtent: [1, 10],
+                            },
+                            {
+                                projectionFunction: melillaProjection,
+                                title: 'Melilla',
+                                geometries: [
+                                    {
+                                        id: 'melilla',
+                                        class: 'melilla',
+                                        statisticalRegions: true,
+                                        features: melillaFeatures,
+                                    },
+                                ],
+                                width: melillaWidth,
+                                height: melillaHeight,
+                                x: 450,
+                                y: 40,
+                                zoomExtent: [1, 10],
+                            },
+                        ])
+                    // .labels({ values: true })
+
+                    // Set statistical data for the map
+                    map.statData().setData(statisticalData)
+
+                    // Build the map
+                    map.build()
+                })
+                .catch((error) => console.error('Error loading data or TopoJSON:', error))
+
+            // Optional function for creating a progressive ID-value map
+            function createProgressiveIdValueMap(features) {
+                const idValueMap = {}
+                const step = 1000 / features.length
+
+                features.forEach((feature, index) => {
+                    const id = feature.properties.id
+                    const value = Math.floor(step * (index + 1))
+                    idValueMap[id] = value
+                })
+
+                return idValueMap
+            }
+        </script>
+    </body>
+</html>
