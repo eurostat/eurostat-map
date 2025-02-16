@@ -366,10 +366,9 @@ export const mapTemplate = function (config, withCenterPoints) {
         //set
         out.annotations_ = v
         //update
-        if (out.annotationsAdded) {
-            const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
-            appendAnnotations(zoomGroup, out.annotations_)
-        }
+        const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+        if (zoomGroup) appendAnnotations(zoomGroup, out.annotations_)
+
         return out
     }
 

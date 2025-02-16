@@ -33,7 +33,7 @@ export const addLabelsToMap = function (map, zg) {
         const labelg = labelsContainer.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
 
         //SHADOWS
-        if (map.labels_.shadows) {
+        if (map.labels_?.shadows) {
             let shadows = shadowg
                 .selectAll('text')
                 .data(labelsArray)
@@ -215,7 +215,7 @@ export const updateValuesLabels = function (map) {
     }
 
     //add shadows to labels
-    if (map.labels_.shadows) {
+    if (map.labels_?.shadows) {
         map.svg_
             .selectAll('g.em-stat-label-shadow')
             .filter((rg) => filterFunction(rg, map))
@@ -271,13 +271,12 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     // deafult geometries
     if (map.Geometries.geoJSONs.nutsrg) {
         //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
-
         if (map.nutsLevel_ == 'mixed') {
-            map._geom.mixed.rg0 = map.Geometries.geoJSONs.nutsrg
-            map._geom.mixed.rg1 = feature(map.Geometries.allNUTSGeoData[1], map.Geometries.allNUTSGeoData[1].objects.nutsrg).features
-            map._geom.mixed.rg2 = feature(map.Geometries.allNUTSGeoData[2], map.Geometries.allNUTSGeoData[2].objects.nutsrg).features
-            map._geom.mixed.rg3 = feature(map.Geometries.allNUTSGeoData[3], map.Geometries.allNUTSGeoData[3].objects.nutsrg).features
-            statLabelRegions = map._geom.mixed.rg0.concat(map._geom.mixed.rg1, map._geom.mixed.rg2, map._geom.mixed.rg3)
+            statLabelRegions = map.Geometries.geoJSONs.mixed.rg0.concat(
+                map.Geometries.geoJSONs.mixed.rg1,
+                map.Geometries.geoJSONs.mixed.rg2,
+                map.Geometries.geoJSONs.mixed.rg3
+            )
         } else {
             statLabelRegions = map.Geometries.geoJSONs.nutsrg
         }
@@ -313,7 +312,7 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
         .attr('class', 'em-stat-label')
 
     // stat labels shadows
-    if (map.labels_.shadows) {
+    if (map.labels_?.shadows) {
         gsls.selectAll('g')
             .data(statLabelRegions)
             .enter()

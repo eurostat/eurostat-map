@@ -325,7 +325,7 @@ export const map = function (config) {
         const container = svg.append('g').attr('class', 'em-flow-labels')
 
         // Add halo effect
-        if (out.labels_.shadows) {
+        if (out.labels_?.shadows) {
             const labelsShadowGroup = container.append('g').attr('class', 'em-flow-label-shadow')
             labelsShadowGroup
                 .selectAll('text')

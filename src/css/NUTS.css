@@ -35,8 +35,8 @@
 /* national boundaries */
 .em-cntbn,
 .em-worldbn {
-    stroke: black;
-    stroke-width: 0.5;
+    stroke: #363636;
+    stroke-width: 1;
 }
 
 /* NUTS boundaries stroke-width */
@@ -77,8 +77,8 @@
 
 /* disputed */
 .em-bn-d {
-    stroke: #b2b2b2;
-    stroke-width: 0.3;
+    stroke: #6e6e6e;
+    stroke-width: 0.2;
 }
 
 /* hide non cc/eu/efta borders */
