@@ -1,6 +1,7 @@
 import {
     annotation,
     annotationLabel,
+    annotationCallout,
     annotationCalloutRect,
     annotationCalloutCircle,
     annotationXYThreshold,
@@ -10,6 +11,7 @@ export function appendAnnotations(svgElement, annotationsConfig) {
     // Define a map that maps the type string to the corresponding annotation function
     const annotationTypeMap = {
         annotationLabel: annotationLabel,
+        annotationCallout: annotationCallout,
         annotationCalloutRect: annotationCalloutRect,
         annotationCalloutCircle: annotationCalloutCircle,
         annotationXYThreshold: annotationXYThreshold, // Add any other types you need
