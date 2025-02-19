@@ -100,6 +100,11 @@ export const statMap = function (config, withCenterPoints) {
         return out
     }
 
+    out.updateLegend = function (v) {
+        if (out.legendObj_) out.legendObj().update()
+        return out
+    }
+
     /**
      * Build the map.
      * This method should be called once, preferably after the map attributes have been set to some initial values.
@@ -134,7 +139,6 @@ export const statMap = function (config, withCenterPoints) {
                     .attr('id', legend.svgId)
                     .attr('class', 'em-legend')
                     .attr('transform', 'translate(' + x + ',' + y + ')')
-                    
             }
 
             legend.build()

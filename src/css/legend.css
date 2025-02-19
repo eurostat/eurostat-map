@@ -62,3 +62,7 @@
     stroke-dasharray: 2;
     stroke: grey;
 }
+
+.em-legend-diverging-line {
+    stroke: black;
+}
