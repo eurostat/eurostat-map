@@ -806,7 +806,7 @@ map = eurostatmap.map(...)
             { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
             { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
         ],
-        values: true,
+        values: true, // label statistical values directly
         backgrounds: true, // for better legibility of labelled values
         shadows: true,
         processValueLabelCentroids: (region, centroid) => {

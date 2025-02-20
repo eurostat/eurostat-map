@@ -8,6 +8,7 @@ import * as PieCharts from './maptypes/map-piecharts'
 import * as Sparklines from './maptypes/map-sparklines'
 import * as FlowMap from './maptypes/map-flow'
 import * as mt from './core/stat-map'
+import { DEFAULTLABELS } from './core/labels'
 
 /**
  * Function returning a eurostat-map object.
@@ -94,4 +95,8 @@ export const getFillPatternDefinitionFunction = function (opts) {
 export const getFillPatternDefinitionFun = function (opts) {
     console.warn('getFillPatternDefinitionFun is now DEPRECATED. Please use getFillPatternDefinitionFunction() instead.')
     return getFillPatternDefinitionFunction(opts)
+}
+
+export const getDefaultLabels = function () {
+    return DEFAULTLABELS
 }

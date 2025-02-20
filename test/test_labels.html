@@ -90,13 +90,14 @@
                         labels: { values: true, shadows: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
                     },
                 ])
-
                 .build()
 
-                setTimeout(()=>{
-                    map.labels({backgrounds:false, shadows:true})
-                    map.updateValuesLabels(map)
-                },2000)
+            console.log(eurostatmap.getDefaultLabels())
+
+            setTimeout(() => {
+                map.labels({ backgrounds: false, shadows: true })
+                map.updateValuesLabels(map)
+            }, 2000)
         </script>
     </body>
 </html>

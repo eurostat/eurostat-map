@@ -341,12 +341,13 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
             .attr('class', 'em-stat-label-shadow')
     }
 }
+
 /**
  * Default labels for country / geographical names.
  * Using centroids would clash with proportional symbols, and are generally not ideal placements, so labels are positioned independently
  * Labels are provided for all supported languages: "en","fr" and "de" (defined using map.language())
  */
-const DEFAULTLABELS = {
+export const DEFAULTLABELS = {
     EUR_3035: {
         cc: [
             { text: 'AL', x: 5100000, y: 2060000, class: 'cc', size: 7 },
@@ -612,8 +613,8 @@ const DEFAULTSTATLABELPOSITIONS = {
     AT: { x: 4670000, y: 2700000 },
     BE: { x: 3930000, y: 3060000 },
     BG: { x: 5567000, y: 2300000 },
-    HR: { x: 4707718, y: 2350243 },
-    CY: { x: 6426000, y: 1530000 },
+    HR: { x: 4657718, y: 2400243 },
+    CY: { x: 6426000, y: 1490000 },
     CH: { x: 4170000, y: 2600000 },
     CZ: { x: 4707000, y: 2950000 },
     DK: { x: 4316000, y: 3621000 },
@@ -631,15 +632,15 @@ const DEFAULTSTATLABELPOSITIONS = {
     LU: { x: 4120000, y: 2940000 },
     MT: { x: 4900000, y: 1430000 },
     ME: { x: 5073000, y: 2185000 },
-    MK: { x: 5300000, y: 2120000 },
+    MK: { x: 5300000, y: 2080000 },
     NL: { x: 4020000, y: 3208000 },
     NO: { x: 4300000, y: 4147000 },
     PL: { x: 4964000, y: 3200000 },
     PT: { x: 2800000, y: 1990000 },
     RO: { x: 5451000, y: 2600000 },
     RS: { x: 5200000, y: 2370000 },
-    SK: { x: 5040000, y: 2880000 },
-    SI: { x: 4680000, y: 2550000 },
+    SK: { x: 5040000, y: 2860000 },
+    SI: { x: 4660000, y: 2520000 },
     ES: { x: 3160096, y: 1900000 },
     SE: { x: 4630000, y: 4000000 },
     TR: { x: 6510000, y: 2100000 },

@@ -45,6 +45,7 @@ export const legend = function (map, config) {
     out.pointOfDivergence = undefined
     out.pointOfDivegencePadding = 7
     out.divergingLineLength = undefined
+    out.divergingArrowLength = undefined
 
     //show no data
     out.noData = true

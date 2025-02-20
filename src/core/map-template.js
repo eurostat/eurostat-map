@@ -100,15 +100,9 @@ export const mapTemplate = function (config, withCenterPoints) {
     //graticule
     out.drawGraticule_ = false
 
-    //labelling (country names and geographical features)
-    // {config, statLabelsPositions, labelsToShow, labelShadows, labelFilterFunction}
+    //labelling
+    // see docs\reference.md#labelling
     out.labels_ = undefined
-
-    // all these settings now go into labels object for cleaner API
-    // out.labelsConfig_ = DEFAULTLABELS // allow user to override map labels | see ./labels.js for example config
-    // out.statLabelsPositions = STATLABELPOSITIONS // allow user to override positions of statistical labels
-    // out.labelsToShow_ = ['countries', 'seas'] //accepted: "countries", "cc","seas", "values"
-    // out.labelShadowsToShow_ = ['countries', 'seas']
 
     //annotations
     out.annotations_ = undefined
