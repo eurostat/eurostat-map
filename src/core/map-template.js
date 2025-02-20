@@ -5,7 +5,7 @@ import { geoIdentity, geoPath, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 import { getBBOXAsGeoJSON, executeForAllInsets, getFontSizeFromClass, getParameterByName, convertRectanglesToPaths } from './utils'
 import { appendAnnotations } from './annotations'
-import { addLabelsToMap, updateValuesLabels } from './labels'
+import { addLabelsToMap, updateLabels, updateValuesLabels } from './labels'
 import { defineDeprecatedFunctions } from './deprecated'
 import { Geometries } from './geometries'
 import { buildInsets, removeInsets } from './insets'
@@ -374,6 +374,17 @@ export const mapTemplate = function (config, withCenterPoints) {
         out.stamp_ = v
         //update
         appendStamp(out.stamp_, out)
+        return out
+    }
+
+    //labels override (update after first call)
+    out.labels = function (v) {
+        //get
+        if (!arguments.length) return out.labels_
+        //set
+        out.labels_ = v
+        //update
+        updateLabels(out)
         return out
     }
 

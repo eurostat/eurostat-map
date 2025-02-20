@@ -114,33 +114,35 @@ export const addLabelsToMap = function (map, zg) {
  * @description update existing map labels
  */
 export const updateLabels = function (map) {
-    // Clear previous labels
-    let prevLabels = map.svg_.selectAll('g.em-labels > *')
-    if (prevLabels) prevLabels.remove()
+    if (map.svg_) {
+        // Clear previous labels
+        let prevLabels = map.svg_.selectAll('g.em-labels > *')
+        if (prevLabels) prevLabels.remove()
 
-    // Main map
-    if (map.labels_) {
-        let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-        addLabelsToMap(map, zg)
-        if (map.labels_.values && map.updateValuesLabels) {
-            map.updateValuesLabels(map)
-        }
-    }
-
-    // Define the callback to apply to each inset
-    const applyLabelsCallback = (map) => {
+        // Main map
         if (map.labels_) {
             let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
             addLabelsToMap(map, zg)
-            if (map.labels_.values && out.updateValuesLabels) {
-                out.updateValuesLabels(map)
+            if (map.labels_.values && map.updateValuesLabels) {
+                map.updateValuesLabels(map)
             }
         }
-    }
 
-    // Apply labels to all insets using the executeForAllInsets function
-    if (out.insetTemplates_) {
-        executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
+        // Define the callback to apply to each inset
+        const applyLabelsCallback = (map) => {
+            if (map.labels_) {
+                let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
+                addLabelsToMap(map, zg)
+                if (map.labels_.values && out.updateValuesLabels) {
+                    out.updateValuesLabels(map)
+                }
+            }
+        }
+
+        // Apply labels to all insets using the executeForAllInsets function
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
+        }
     }
 }
 

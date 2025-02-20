@@ -64,8 +64,26 @@
                     //labelType: 'ranges',
                     pointOfDivergenceLabel: 'Increase|decrease',
                     // pointOfDivergence: 5,
+                    labels: ['test', 'test', 'test', 'test', 'test', 'test'],
                 })
-            }, 2000)
+            }, 1000)
+
+            setTimeout(() => {
+                map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
+                    .thresholds([100, 200, 300, 400, 500])
+                    .updateClassification()
+                    .updateStyle()
+                map.legend({
+                    x: 500,
+                    y: 10,
+                    title: 'Inh per km2',
+                    // boxOpacity: 1,
+                    labelType: 'thresholds',
+                    pointOfDivergenceLabel: 'Increase|decrease',
+                    // pointOfDivergence: 5,
+                    //labels: ['test', 'test', 'test', 'test', 'test', 'test'],
+                })
+            }, 3000)
         </script>
     </body>
 </html>
