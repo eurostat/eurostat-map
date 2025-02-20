@@ -1,6 +1,6 @@
 {
     "name": "eurostat-map",
-    "version": "4.1.9",
+    "version": "4.1.10",
     "description": "Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.",
     "keywords": [
         "eurostat",
@@ -18,35 +18,21 @@
         "data visualization"
     ],
     "homepage": "https://github.com/eurostat/eurostat-map",
-    "author": "ESTAT-GISCO@ec.europa.eu",
+    "author": "",
     "license": "EUPL-1.2",
     "repository": {
         "type": "git",
         "url": "https://github.com/eurostat/eurostat-map.git"
     },
     "main": "build/eurostatmap.min.js",
-    "module": "build/es/index.js",
-    "source": "src/index.js",
     "unpkg": "build/eurostatmap.min.js",
-    "exports": {
-        ".": {
-            "import": "./build/es/index.js",
-            "require": "./build/eurostatmap.min.js"
-        }
-    },
     "files": [
-        "build",
-        "README.md",
-        "LICENSE"
+        "build"
     ],
-    "sideEffects": false,
     "scripts": {
         "start": "webpack --config webpack/webpack.config.dev.js",
         "server": "webpack-dev-server --open --watch",
-        "build": "webpack --mode production",
-        "build:es": "webpack --config webpack/webpack.config.es.js",
-        "build:umd": "webpack --config webpack/webpack.config.umd.js",
-        "build-prod": "npm run build:es && npm run build:umd",
+        "build-prod": "webpack --config webpack/webpack.config.prod.js",
         "format": "prettier --write .",
         "test": "jest"
     },
@@ -77,10 +63,10 @@
         "@babel/runtime": "^7.12.1",
         "babel-loader": "^9.1.2",
         "css-loader": "^7.1.2",
+        "css-minimizer-webpack-plugin": "^7.0.0",
         "prettier": "^3.4.1",
         "style-loader": "^4.0.0",
         "webpack": "^5.88.1",
-        "webpack-bundle-analyzer": "^4.10.2",
         "webpack-cli": "^5.0.0",
         "webpack-dev-server": "^4.15.1",
         "webpack-livereload-plugin": "^3.0.2"
