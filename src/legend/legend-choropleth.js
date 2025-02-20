@@ -43,7 +43,7 @@ export const legend = function (map, config) {
     //diverging line
     out.pointOfDivergenceLabel = undefined
     out.pointOfDivergence = undefined
-    out.pointOfDivegencePadding = 7
+    out.pointOfDivergencePadding = 7
     out.divergingLineLength = undefined
     out.divergingArrowLength = undefined
 
@@ -78,6 +78,9 @@ export const legend = function (map, config) {
                 .attr('y', out.boxPadding + cssFontSize)
                 .text(out.title)
         }
+
+        //set default point of divergence if applicable
+        if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
 
         if (out.barChart) {
             createBarChartLegend()
@@ -174,12 +177,28 @@ export const legend = function (map, config) {
 
             // Append label
             if (i < m.numberOfClasses() - 1) {
-                lgg.append('text')
+                // mark label so we can move it in drawDivergingLine
+                const label = lgg
+                    .append('text')
                     .attr('class', 'em-legend-label')
                     .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
                     .attr('y', y + out.shapeHeight)
                     .attr('dominant-baseline', 'middle')
                     .text(out.labels ? out.labels[i] : formatLabel(m.classifier().invertExtent(ecl)[out.ascending ? 0 : 1]))
+
+                // mark label so we can move it in drawDivergingLine
+                if (out.pointOfDivergenceLabel && i == out.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
+            }
+        }
+
+        // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
+        if (out.pointOfDivergenceLabel) {
+            for (let i = 0; i < map.numberOfClasses_; i++) {
+                let y = baseY + i * out.shapeHeight
+                // point of divergence indicator
+                if (i == out.pointOfDivergence) {
+                    drawDivergingLine(y)
+                }
             }
         }
 
@@ -238,7 +257,7 @@ export const legend = function (map, config) {
             const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
             // shift legend items down after point of divergence if applicable
-            if (out.pointOfDivergenceLabel && i >= out.pointOfDivergence) y += out.pointOfDivegencePadding
+            if (out.pointOfDivergenceLabel && i >= out.pointOfDivergence) y += out.pointOfDivergencePadding
 
             // Append rectangle
             itemContainer
@@ -289,7 +308,6 @@ export const legend = function (map, config) {
             for (let i = 0; i < map.numberOfClasses_; i++) {
                 let y = baseY + i * out.shapeHeight
                 // point of divergence indicator
-                if (!out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
                 if (i == out.pointOfDivergence) {
                     drawDivergingLine(y)
                 }
@@ -300,7 +318,7 @@ export const legend = function (map, config) {
         if (out.noData) {
             const noDataItemContainer = container.append('g').attr('class', 'em-legend-item')
             let y = baseY + map.numberOfClasses() * out.shapeHeight + out.boxPadding
-            if (out.pointOfDivergence) y += out.pointOfDivegencePadding // shift legend items down after point of divergence
+            if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
             noDataItemContainer
                 .append('rect')
                 .attr('class', 'em-legend-rect')
@@ -337,12 +355,12 @@ export const legend = function (map, config) {
         const container = out.lgg.append('g').attr('class', 'em-legend-divergence-container')
         const markerHeight = 6
         const x = out.boxPadding
-        y = y + out.pointOfDivegencePadding / 2 // move to the middle of the space between legend item
+        if (out.labelType == 'ranges') y = y + out.pointOfDivergencePadding / 2 // move to the middle of the space between legend item
         let maxLabelLength = out.lgg
             .selectAll('.em-legend-label')
             .nodes()
             .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
-        const lineLength = out.divergingLineLength || maxLabelLength + out.boxPadding + out.shapeWidth + 15 // + padding
+        const lineLength = out.divergingLineLength || maxLabelLength + out.boxPadding + out.shapeWidth + 10 // + padding
 
         // Draw the horizontal divergence line
         container
@@ -413,6 +431,25 @@ export const legend = function (map, config) {
                 .attr('x', x + lineLength + 5)
                 .attr('y', y)
                 .text(out.pointOfDivergenceLabel)
+        }
+
+        //move threshold label out of the way of the line
+        if (out.labelType == 'thresholds') {
+            if (labels.length > 1) {
+                // move it to end of line
+                out.lgg.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)
+                // Append tick line
+                // container
+                //     .append('line')
+                //     .attr('class', 'em-legend-tick')
+                //     .attr('x1', x + lineLength)
+                //     .attr('y1', y)
+                //     .attr('x2', x + lineLength + 5)
+                //     .attr('y2', y)
+            } else {
+                //remove it so it doesnt clash with pointOfDivergenceLabel
+                out.lgg.selectAll('.em-legend-label-divergence').remove()
+            }
         }
     }
 

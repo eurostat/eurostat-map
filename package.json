@@ -1,6 +1,6 @@
 {
     "name": "eurostat-map",
-    "version": "4.1.8",
+    "version": "4.1.9",
     "description": "Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.",
     "keywords": [
         "eurostat",
@@ -13,10 +13,12 @@
         "cartography",
         "thematic",
         "mapping",
-        "eurostat-map"
+        "eurostat-map",
+        "dataviz",
+        "data visualization"
     ],
     "homepage": "https://github.com/eurostat/eurostat-map",
-    "author": "",
+    "author": "ESTAT-GISCO@ec.europa.eu",
     "license": "EUPL-1.2",
     "repository": {
         "type": "git",
@@ -24,6 +26,7 @@
     },
     "main": "build/eurostatmap.min.js",
     "module": "build/es/index.js",
+    "source": "src/index.js",
     "unpkg": "build/eurostatmap.min.js",
     "exports": {
         ".": {
@@ -32,10 +35,11 @@
         }
     },
     "files": [
-        "build/eurostatmap.min.js",
+        "build",
         "README.md",
         "LICENSE"
     ],
+    "sideEffects": false,
     "scripts": {
         "start": "webpack --config webpack/webpack.config.dev.js",
         "server": "webpack-dev-server --open --watch",

@@ -25,10 +25,14 @@
                 .build()
 
             setTimeout(() => {
+                map.stamp(false)
+            }, 500)
+
+            setTimeout(() => {
                 map.stamp({
                     x: 230,
                     y: 100,
-                    size: 70,
+                    // size: 70,
                     text: 'EU = 20¶000 test with a lot of words',
                     stampColor: '#3792B6',
                     textColor: '#3792B6',
@@ -47,6 +51,10 @@
                     strokeWidth: 2,
                 })
             }, 2000)
+
+            setTimeout(() => {
+                map.stamp(false)
+            }, 3000)
         </script>
     </body>
 </html>
