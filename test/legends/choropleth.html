@@ -17,34 +17,55 @@
                 .zoomExtent([1, 1000])
                 .numberOfClasses(6)
                 .classificationMethod('threshold')
-                .thresholds([10, 100, 200, 300, 400])
-                .colors(['#997A00', '#E2C822', '#FEEA98', '#BEEBBE', '#7FCCBB', '#208486'])
+                .thresholds([])
+                .colors([])
                 .legend({
-                    x: 500,
-                    y: 10,
-                    title: 'Inhabitants per km2',
-                    boxOpacity: 1,
-                    //labelType: 'ranges',
-                    pointOfDivergenceLabel: 'Divergence',
+                    x: 400,
+                    ascending: true,
+                    labelType: 'ranges',
+                    svgId: 'eurostatmap-legend-europe-template',
+                    boxPadding: 5,
+                    boxOpacity: 0,
+                    boxMargin: 0,
+                    boxCornerRad: 0,
+                    titleFontSize: 15,
+                    labelFontSize: 14,
+                    shapeHeight: 16,
+                    shapeWidth: 26,
+                    sepLineLength: 28,
+                    labelDecNb: 0,
+                    title: '',
+                    fontFill: '#000',
+                    noData: true,
+                    noDataText: 'Data not available',
+                    pointOfDivergenceLabel: '',
                     pointOfDivergence: 3,
                 })
                 .build()
 
-            setTimeout(() => {
-                map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B']).updateClassification().updateStyle().updateLegend()
-            }, 1000)
+            // setTimeout(() => {
+            //     map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
+            //         .thresholds([100, 200, 300, 400, 500])
+            //         .updateClassification()
+            //         .updateStyle()
+            //         .updateLegend()
+            // }, 1000)
 
             setTimeout(() => {
+                map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
+                    .thresholds([100, 200, 300, 400, 500])
+                    .updateClassification()
+                    .updateStyle()
                 map.legend({
                     x: 500,
                     y: 10,
                     title: 'Inh per km2',
-                    boxOpacity: 1,
+                    // boxOpacity: 1,
                     //labelType: 'ranges',
                     pointOfDivergenceLabel: 'Increase|decrease',
                     // pointOfDivergence: 5,
                 })
-            }, 3000)
+            }, 2000)
         </script>
     </body>
 </html>

@@ -96,7 +96,7 @@ export const statMap = function (config, withCenterPoints) {
         if (!arguments.length) return out.legend_
         out.legend_ = v
         //update if existing legend
-        if (out.legendObj_) out.legendObj().update()
+        if (out.legendObj_) out.updateLegend()
         return out
     }
 
@@ -122,26 +122,7 @@ export const statMap = function (config, withCenterPoints) {
 
         //legend element
         if (out.legend()) {
-            //create legend object
-            out.legendObj(out.getLegendConstructor()(out, out.legend()))
-            const legend = out.legendObj()
-
-            //get legend svg. If it does not exist, create it embeded within the map
-            let legendSvg = select('#' + legend.svgId)
-            if (legendSvg.size() == 0) {
-                //get legend position
-                const x = legend.x == undefined ? out.width() - 100 - legend.boxPadding : legend.x
-                const y = legend.y == undefined ? legend.boxPadding : legend.y
-
-                //build legend SVG in a new group
-                out.svg()
-                    .append('g')
-                    .attr('id', legend.svgId)
-                    .attr('class', 'em-legend')
-                    .attr('transform', 'translate(' + x + ',' + y + ')')
-            }
-
-            legend.build()
+            out.buildLegend()
         }
 
         //define tooltip
@@ -160,6 +141,29 @@ export const statMap = function (config, withCenterPoints) {
         out.updateStatData()
 
         return out
+    }
+
+    out.buildLegend = function () {
+        //create legend object
+        out.legendObj(out.getLegendConstructor()(out, out.legend()))
+        const legend = out.legendObj()
+
+        //get legend svg. If it does not exist, create it embeded within the map
+        let legendSvg = select('#' + legend.svgId)
+        if (legendSvg.size() == 0) {
+            //get legend position
+            const x = legend.x == undefined ? out.width() - 100 - legend.boxPadding : legend.x
+            const y = legend.y == undefined ? legend.boxPadding : legend.y
+
+            //build legend SVG in a new group
+            out.svg()
+                .append('g')
+                .attr('id', legend.svgId)
+                .attr('class', 'em-legend')
+                .attr('transform', 'translate(' + x + ',' + y + ')')
+        }
+
+        legend.build()
     }
 
     /** Check if all stat datasets have been loaded. */

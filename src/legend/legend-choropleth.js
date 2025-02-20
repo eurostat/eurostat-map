@@ -103,7 +103,7 @@ export const legend = function (map, config) {
                 ? map.thresholds_
                 : Array.from({ length: map.numberOfClasses_ })
                       .map((_, index) => {
-                          return mapclassifier().invertExtent(index)[out.ascending ? 0 : 1]
+                          return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
                       })
                       .slice(1) // Remove the first entry and return the rest as an array
         return thresholds
