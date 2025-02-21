@@ -116,7 +116,7 @@ export const addLabelsToMap = function (map, zg) {
 export const updateLabels = function (map) {
     if (map.svg_) {
         // Clear previous labels
-        let prevLabels = map.svg_.selectAll('g.em-labels > *')
+        let prevLabels = map.svg_.selectAll('#em-labels > *')
         if (prevLabels) prevLabels.remove()
 
         // Main map
@@ -133,15 +133,15 @@ export const updateLabels = function (map) {
             if (map.labels_) {
                 let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
                 addLabelsToMap(map, zg)
-                if (map.labels_.values && out.updateValuesLabels) {
-                    out.updateValuesLabels(map)
+                if (map.labels_.values && map.updateValuesLabels) {
+                    map.updateValuesLabels(map)
                 }
             }
         }
 
         // Apply labels to all insets using the executeForAllInsets function
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyLabelsCallback)
+        if (map.insetTemplates_) {
+            executeForAllInsets(map.insetTemplates_, map.svgId_, applyLabelsCallback)
         }
     }
 }
