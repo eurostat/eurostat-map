@@ -360,9 +360,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         //set
         out.annotations_ = v
         //update
-        const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
-        if (zoomGroup) appendAnnotations(zoomGroup, out.annotations_)
-
+        appendAnnotations(out)
         return out
     }
 
@@ -594,7 +592,7 @@ export const mapTemplate = function (config, withCenterPoints) {
 
         //annotations
         if (out.annotations_) {
-            appendAnnotations(zoomGroup, out.annotations_)
+            appendAnnotations(out)
             out.annotationsAdded = true
         }
 

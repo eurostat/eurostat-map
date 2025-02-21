@@ -1,47 +1,30 @@
 const path = require('path')
 const webpack = require('webpack')
-const TerserPlugin = require('terser-webpack-plugin')
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 const packageJson = require('../package.json')
+const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = {
     mode: 'production',
     entry: ['./src/index.js'],
     output: {
         filename: 'eurostatmap.min.js',
-        path: path.resolve(__dirname, '../build'),
+        path: path.resolve(__dirname, '../build'), // This moves the output to the parent folder's 'build' directory
         library: 'eurostatmap',
         libraryTarget: 'umd',
-        publicPath: '/build/',
+        publicPath: '/build/', // Optional: if resources are served from this path
     },
     devtool: false,
     plugins: [
         new webpack.BannerPlugin({
             banner: `/*! eurostat-map v${packageJson.version} | ${new Date().getFullYear()} Eurostat | EUPL License. See https://github.com/eurostat/eurostat-map/blob/master/LICENSE */`,
-            raw: false,
+            raw: false, // Adds the comment as plain text
         }),
     ],
     optimization: {
         minimize: true,
         minimizer: [
             new TerserPlugin({
-                extractComments: false,
-                terserOptions: {
-                    compress: {
-                        drop_console: true,
-                        drop_debugger: true,
-                        pure_funcs: ['console.log'],
-                    },
-                    output: {
-                        comments: false, // ✅ Remove JS comments
-                    },
-                    mangle: true,
-                },
-            }),
-            new CssMinimizerPlugin({
-                minimizerOptions: {
-                    preset: ['default'],
-                },
+                extractComments: false, // Disable extracting comments to a separate file
             }),
         ],
     },
@@ -60,23 +43,10 @@ module.exports = {
                     },
                 },
             },
+
             {
                 test: /\.css$/i,
-                use: [
-                    {
-                        loader: 'style-loader',
-                        options: {
-                            injectType: 'singletonStyleTag', // ✅ Combine styles into a single <style> tag
-                        },
-                    },
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            importLoaders: 1,
-                            sourceMap: false, // ✅ No source maps for production
-                        },
-                    },
-                ],
+                use: ['style-loader', 'css-loader'], // For CSS files
             },
         ],
     },
