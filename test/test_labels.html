@@ -31,8 +31,12 @@
         <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
         <script>
+            const IMAGE = { width: 797, height: 625, position: { x: 4790000, y: 3420000, z: 6400 } }
             const map = eurostatmap
                 .map('choropleth')
+                .width(IMAGE.width)
+                .height(IMAGE.height)
+                .position(IMAGE.position)
                 .svgId('map')
                 .zoomExtent([1, 20])
                 .title('Labels test')
@@ -65,7 +69,7 @@
                         { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
                     ],
                     values: true,
-                    backgrounds: true,
+                    backgrounds: false,
                     // processValueLabelCentroids: (region, centroid) => {
                     //     // (optional) adjust NUTS1 label positions manually to avoid overlapping
                     //     if (region.properties.id == 'ES4') {
@@ -94,22 +98,22 @@
 
             console.log(eurostatmap.getDefaultLabels())
 
-            setTimeout(() => {
-                map.labels({
-                    // labels: [
-                    //     { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1250000, class: 'ocean', letterSpacing: 7 },
-                    //     { text: 'ATLANTIC OCEAN', x: 2700000, y: 2650000, class: 'ocean', letterSpacing: 2 },
-                    //     { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'ocean' },
-                    //     { text: 'BALTIC SEA', x: 4840000, y: 3600000, class: 'ocean', rotate: -30 },
-                    //     { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
-                    //     { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
-                    // ],
-                    backgrounds: false,
-                    shadows: true,
-                    values: false,
-                })
-                // map.updateValuesLabels(map)
-            }, 2000)
+            // setTimeout(() => {
+            //     map.labels({
+            //         // labels: [
+            //         //     { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1250000, class: 'ocean', letterSpacing: 7 },
+            //         //     { text: 'ATLANTIC OCEAN', x: 2700000, y: 2650000, class: 'ocean', letterSpacing: 2 },
+            //         //     { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'ocean' },
+            //         //     { text: 'BALTIC SEA', x: 4840000, y: 3600000, class: 'ocean', rotate: -30 },
+            //         //     { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'ocean', letterSpacing: 1 },
+            //         //     { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
+            //         // ],
+            //         backgrounds: false,
+            //         shadows: true,
+            //         values: false,
+            //     })
+            //     // map.updateValuesLabels(map)
+            // }, 2000)
         </script>
     </body>
 </html>
