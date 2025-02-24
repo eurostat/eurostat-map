@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            /* hide non cc/eu/efta borders */
+            .em-bn-oth:not(.em-bn-eu),
+            .em-bn-cc:not(.em-bn-eu) {
+                stroke-width: 0 !important;
+            }
+            .em-kosovo-bn {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap.map('choropleth').nutsLevel(0).title('EU only example').zoomExtent([1, 1000])
+
+            map.statData().setData({
+                ES: 1,
+                FR: 2,
+                DE: 0.5,
+                RO: 4,
+                IT: 2,
+                DK: 5,
+                BG: 4,
+                SI: 6,
+                AT: 7,
+                GL: 2,
+                EL: 1,
+                HU: 2,
+                CZ: 2,
+                PL: 2,
+                SK: 2,
+                HR: 1,
+                SE: 1,
+                FI: 2,
+                PT: 3,
+                EE: 4,
+                IE: 5,
+                LT: 6,
+                LV: 2,
+                CY: 9,
+                LU: 9,
+                MT: 2,
+                NL: 1,
+                BE: 3,
+            })
+
+            map.build()
+        </script>
+    </body>
+</html>

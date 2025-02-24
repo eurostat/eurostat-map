@@ -14,9 +14,7 @@
     cursor: pointer;
 }
 
-/* Boundary styling */
-
-/* all boudnaries */
+/* all boudnaries and regions */
 #g_worldbn,
 #em-nutsbn,
 .em-cntbn,
@@ -27,7 +25,14 @@
 .em-bn-3,
 .em-kosovo-bn,
 .em-bn-d,
-.em-bn-co {
+.em-bn-co,
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'],
+.em-cntrg,
+.em-nutsrg,
+.em-worldrg,
+.em-grid-cell {
     stroke-linecap: round;
     stroke-linejoin: round;
 }

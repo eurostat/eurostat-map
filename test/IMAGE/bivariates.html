@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -605,7 +605,7 @@
             //.countriesToShow(countriesToShow)
             //.bordersToShow(['efta', 'eu', 'cc', 'co'])
 
-            map.statData().setData(data1).unitText('doctors')
+            map.statData('v1').setData(data1).unitText('doctors')
             map.statData('v2').setData(data2).unitText('beds')
             map.updateClassification()
             map.updateStyle()
