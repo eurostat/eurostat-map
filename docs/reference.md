@@ -623,7 +623,7 @@ eurostatmap
     .legend({ x: 550, y: 10, title: 'Population by age' })
 ```
 
-Or simplier:
+Or simply:
 
 ```javascript
 //population composition by age

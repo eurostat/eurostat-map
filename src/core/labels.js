@@ -121,27 +121,28 @@ export const updateLabels = function (map) {
 
         // Main map
         if (map.labels_) {
+            const masterConfig = map.labels_
             let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
             addLabelsToMap(map, zg)
-            if (map.labels_.values && map.updateValuesLabels) {
+            if (masterConfig.values && map.updateValuesLabels) {
                 map.updateValuesLabels(map)
             }
-        }
 
-        // Define the callback to apply to each inset
-        const applyLabelsCallback = (map) => {
-            if (map.labels_) {
-                let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                addLabelsToMap(map, zg)
-                if (map.labels_.values && map.updateValuesLabels) {
-                    map.updateValuesLabels(map)
+            // Define the callback to apply to each inset
+            const applyLabelsCallback = (map) => {
+                if (masterConfig) {
+                    let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
+                    addLabelsToMap(map, zg)
+                    if (masterConfig.values && map.updateValuesLabels) {
+                        map.updateValuesLabels(map)
+                    }
                 }
             }
-        }
 
-        // Apply labels to all insets using the executeForAllInsets function
-        if (map.insetTemplates_) {
-            executeForAllInsets(map.insetTemplates_, map.svgId_, applyLabelsCallback)
+            // Apply labels to all insets using the executeForAllInsets function
+            if (map.insetTemplates_) {
+                executeForAllInsets(map.insetTemplates_, map.svgId_, applyLabelsCallback)
+            }
         }
     }
 }
@@ -161,9 +162,7 @@ export const updateValuesLabels = function (map) {
     prevLabels.remove()
     let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
     prevShadows.remove()
-
     let statLabels = map.svg_.selectAll('g.em-stat-label')
-
     let labelsContainer = map.svg_.select('#em-labels')
 
     // filter stat-label elements to only show those with data
