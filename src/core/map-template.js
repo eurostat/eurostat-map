@@ -524,7 +524,7 @@ export const mapTemplate = function (config, withCenterPoints) {
         // separate logic for cartograms
         if (out.gridCartogram_ == true) {
             buildGridCartogramBase(out)
-            out.bottomText_ = false //dont need copyright
+            out.footnote_ = false //dont need copyright
         } else {
             // default geographic logic
 

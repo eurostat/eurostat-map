@@ -41,7 +41,7 @@
 .em-cntbn,
 .em-worldbn {
     stroke: #363636;
-    stroke-width: 1;
+    stroke-width: 0.9px;
 }
 
 /* NUTS boundaries stroke-width */
@@ -86,10 +86,10 @@
     stroke-width: 0.2;
 }
 
-/* hide non cc/eu/efta borders */
-.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-    stroke-width: 0 !important;
-}
+/* target non cc/eu/efta borders */
+/* .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0;
+} */
 
 /* dont fill certain elements */
 .em-frame,
