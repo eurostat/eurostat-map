@@ -57,8 +57,10 @@ eurostatmap
     .build() // Build the map
 ```
 
+For a quick tutorial check out this notebook:
+https://observablehq.com/@joewdavies/eurostat-map-js
+
 - [Population density](https://eurostat.github.io/eurostat-map/examples/population-density.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-density.html))
-- [Population density map with dot pattern](https://eurostat.github.io/eurostat-map/examples/population-dot-density.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-dot-density.html))
 - [Population map with proportional circles](https://eurostat.github.io/eurostat-map/examples/prop-circles.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-circles.html))
 - [GDP map with custom proportional symbols](https://eurostat.github.io/eurostat-map/examples/prop-symbols.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-symbols.html))
 - [Causes of death with proportional pie charts](https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-piecharts.html))
@@ -112,9 +114,6 @@ where X.Y.Z is a [version number](https://www.npmjs.com/package/eurostat-map?act
 ## Documentation
 
 For detailed documentation see the **[API reference page](docs/reference.md)**.
-
-For a quick tutorial check out this notebook:
-https://observablehq.com/@joewdavies/eurostat-map-js
 
 Code examples:
 
