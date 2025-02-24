@@ -14,11 +14,11 @@
         - [Choropleth map](#choropleth-map)
             - [Choropleth legends](#choropleth-legends)
         - [Proportional symbol map](#proportional-symbol-map)
-            - [Proportional symbol map legends](#proportional-symbol-map-legends)
+            - [Proportional symbol legends](#proportional-symbol-legends)
         - [Proportional pie chart map](#proportional-pie-chart-map)
         - [Categorical map](#categorical-map)
         - [Bivariate choropleth map](#bivariate-choropleth-map)
-            - [Bivariate choropleth map legends](#bivariate-choropleth-map-legends)
+            - [Bivariate choropleth legends](#bivariate-choropleth-legends)
         - [Stripe composition map](#stripe-composition-map)
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
@@ -321,7 +321,7 @@ Please be aware that by using this method you will essentially be turning the ma
 | _map_.**psColours**([*value*])              | Array            | null                 | The colours to be using data-driven colour. The number of colours specified in the array should match the number of classes (specified using psClasses())                                |
 | _map_.**noDataFillStyle**([*value*])        | String           | _"lightgray"_        | The fill style to be used for regions where no data is available.                                                                                                                        |
 
-#### Proportional symbol map legends
+#### Proportional symbol legends
 
 In addition to [the default legend parameters](#map-legend), proportional symbol maps have the following specific legend parameters:
 As proportional symbol maps allow for two visual variables (size and colour), a legend configuration object can be specified for each variable (sizeLegend and colorLegend).
@@ -567,7 +567,7 @@ eurostatmap
 | _map_.**classToFillStyle**([*value*]) | Function | _auto_        | A function returning the colors for each pair of classes i,j.                                                    |
 | _map_.**noDataFillStyle**([*value*])  | color    | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                |
 
-#### Bivariate choropleth map legends
+#### Bivariate choropleth legends
 
 In addition to [the default legend parameters](#map-legend), bivariate choropleth maps have the following specific legend parameters:
 
@@ -884,6 +884,12 @@ map = eurostatmap.map(...)
 | **y**          | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
 | **boxOpacity** | number | _0.7_         | The legend box opacity, from 0 to 1. Sets opacity of em-legend-background                                              |
 | **boxPadding** | number | _0.7_         | The legend box padding. Sets padding of em-legend-background                                                           |
+
+For legends of specific map types please refer to their own sections:
+
+- [Choropleth legends](#choropleth-legends)
+- [Proportional symbol legends](#proportional-symbol-legends)
+- [Bivariate choropleth legends](#bivariate-choropleth-legends)
 
 ## Scalebar
 
