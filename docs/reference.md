@@ -243,22 +243,19 @@ eurostatmap
 
 In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
 
-| Parameter              | Type                     | Default value                     | Description                                                                   |
-| ---------------------- | ------------------------ | --------------------------------- | ----------------------------------------------------------------------------- |
-| **ascending**          | String                   | _true_                            | The legend cells order. Set to false to invert.                               |
-| **shapeWidth**         | int                      | _15_                              | The cell width.                                                               |
-| **shapeHeight**        | int                      | _13_                              | The cell heigth.                                                              |
-| **sepLineLength**      | int                      | _17_                              | The separation line length.                                                   |
-| **sepLineStroke**      | int                      | _"black"_                         | The separation line color.                                                    |
-| **sepLineStrokeWidth** | int                      | _1_                               | The separation line width.                                                    |
-| **labelFontSize**      | int                      | _13_                              | The label font size.                                                          |
-| **decimals**           | String                   | _" - "_                           | The number of decimal for the legend labels.                                  |
-| **labelType**          | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                    |
-| **labelOffset**        | int                      | _3_                               | The distance between the legend box elements to the corresponding text label. |
-| **labelFormatter**     | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
-| **labels**             | []                       | _null_                            | Manually define the labels to be used in the legend as an array               |
-| **noData**             | boolean                  | _true_                            | Show 'no data' style.                                                         |
-| **noDataText**         | Text                     | _"No data"_                       | 'No data' text label.                                                         |
+| Parameter          | Type                     | Default value                     | Description                                                                   |
+| ------------------ | ------------------------ | --------------------------------- | ----------------------------------------------------------------------------- |
+| **ascending**      | String                   | _true_                            | The legend cells order. Set to false to invert.                               |
+| **shapeWidth**     | int                      | _15_                              | The cell width.                                                               |
+| **shapeHeight**    | int                      | _13_                              | The cell heigth.                                                              |
+| **sepLineLength**  | int                      | _17_                              | The separation line length.                                                   |
+| **decimals**       | String                   | _" - "_                           | The number of decimal for the legend labels.                                  |
+| **labelType**      | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                    |
+| **labelOffset**    | int                      | _3_                               | The distance between the legend box elements to the corresponding text label. |
+| **labelFormatter** | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **labels**         | []                       | _null_                            | Manually define the labels to be used in the legend as an array               |
+| **noData**         | boolean                  | _true_                            | Show 'no data' style.                                                         |
+| **noDataText**     | Text                     | _"No data"_                       | 'No data' text label.                                                         |
 
 ### Proportional symbol map
 
