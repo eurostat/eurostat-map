@@ -12,7 +12,7 @@
 </div>
 
 <div align="center">
-  <em>Customizable thematic maps.</em>
+  <em>Customizable thematic maps. See <strong><a href="docs/reference.md">documentation</a></strong>.</em>
 </div>
 
 <br>
