@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -258,7 +258,7 @@
                     unitText: 'inhabitants',
                 })
                 .stat('color', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
-                .psShape('bar') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
+                .psShape('spike') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
                 .psFill('#35aeff')
                 .psMaxSize(70)
                 .psBarWidth(20)
@@ -269,7 +269,7 @@
                 .psColorFun(d3.interpolateCividis)
                 .legend({
                     x: 610,
-                    boxPadding: 15,
+                    boxPadding: 10,
                     sizeLegend: {
                         title: 'Total population',
                         cellNb: 3,

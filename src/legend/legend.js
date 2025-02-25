@@ -57,7 +57,8 @@ export const legend = function (map) {
         container.selectAll('*').remove()
 
         //check if provided external svgId has changed
-        if (container.attr('id') !== map.legend_.svgId) {
+        const legendSVG = out.svg
+        if (legendSVG.attr('id') !== map.legend_.svgId) {
             out.build() // sets new svg and lgg
         }
     }
@@ -66,28 +67,68 @@ export const legend = function (map) {
         const map = out.map
         // Update legend parameters if necessary
         if (map.legend_) {
-            console.log(out, map.legend_)
             deepMergeExistingKeys(out, map.legend_)
-            console.log(out)
         }
     }
 
     //It performs a shallow copy — nested objects will be copied by reference, not duplicated.
     //It modifies the target object (out) in place.
     //Useful for merging objects or extending existing ones.
-    function deepMergeExistingKeys(target, source) {
+    function deepMergeExistingKeys(target, source, options = {}, seen = new WeakSet(), depth = 0) {
+        const MAX_DEPTH = options.maxDepth || 100
+
+        if (seen.has(target)) return target
+        seen.add(target)
+
+        if (depth > MAX_DEPTH) {
+            console.warn(`Max recursion depth (${MAX_DEPTH}) reached.`)
+            return target
+        }
+
         for (const key in source) {
             if (source.hasOwnProperty(key) && target.hasOwnProperty(key)) {
-                if (typeof target[key] === 'object' && typeof source[key] === 'object' && !Array.isArray(target[key])) {
-                    // Recursively merge for nested objects
-                    deepMergeExistingKeys(target[key], source[key])
+                const sourceVal = source[key]
+                const targetVal = target[key]
+
+                // Handle functions: overwrite directly
+                if (typeof sourceVal === 'function') {
+                    target[key] = sourceVal
+
+                    // Handle nested plain objects
+                } else if (isPlainObject(sourceVal) && isPlainObject(targetVal)) {
+                    deepMergeExistingKeys(targetVal, sourceVal, options, seen, depth + 1)
+
+                    // Handle arrays: overwrite (or merge if option set)
+                } else if (Array.isArray(sourceVal) && Array.isArray(targetVal)) {
+                    target[key] = options.mergeArrays ? [...new Set([...targetVal, ...sourceVal])] : [...sourceVal]
+
+                    // Handle Dates
+                } else if (sourceVal instanceof Date) {
+                    target[key] = new Date(sourceVal.getTime())
+
+                    // Handle RegExp
+                } else if (sourceVal instanceof RegExp) {
+                    target[key] = new RegExp(sourceVal)
+
+                    // Handle Map and Set
+                } else if (sourceVal instanceof Map) {
+                    target[key] = new Map(sourceVal)
+                } else if (sourceVal instanceof Set) {
+                    target[key] = new Set(sourceVal)
+
+                    // Overwrite primitives and other types
                 } else {
-                    // Overwrite value
-                    target[key] = source[key]
+                    target[key] = sourceVal
                 }
             }
         }
+
         return target
+    }
+
+    // Helper to check for plain objects
+    function isPlainObject(value) {
+        return Object.prototype.toString.call(value) === '[object Object]'
     }
 
     /** Draw legend background box */
