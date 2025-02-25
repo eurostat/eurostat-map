@@ -11,17 +11,17 @@ export const buildGridCartogramBase = function (out) {
     const cellPadding = out.gridCartogramCellPadding_ || 0
     const containerPadding = out.gridCartogramContainerPadding_ || 80
     const hexagonGrid = `
-        ,IS,  ,  ,  ,NO,  ,FI,  ,  ,  
-        ,  ,  ,  ,  ,  ,SE,  ,  ,  , 
-        ,  ,  ,  ,  ,  ,  ,  ,  ,EE,  
-        ,IE,UK,  ,  ,DK,  ,LT,LV,  , 
-        ,  ,  , NL ,,DE,PL,  ,  ,  , 
-        ,  ,  ,BE,LU,  ,CZ,SK,UA,  ,  
-        ,  ES,FR,CH,LI,AT,HU,RO,MD,  ,  
-       PT ,,  ,  ,IT,SI,  ,BA,RS,BG,  ,  
-      ,  ,  ,  ,  ,  ,HR,ME,MK,  ,   
-        ,  ,  ,  ,  ,  ,  ,AL,EL,TR,   
-        ,  ,  ,  ,MT,  ,  ,  ,  ,CY,    `
+        ,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
+        ,  ,  ,  ,  ,  ,  ,  ,,  ,  ,  ,
+        ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
+        ,IE,UK,  ,  ,DK,  ,LT, LV ,  ,  ,  ,
+        ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
+        ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
+        ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
+        ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
+        ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
+        ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,  
+        ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `
 
     const squareGrid = `
         ,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
