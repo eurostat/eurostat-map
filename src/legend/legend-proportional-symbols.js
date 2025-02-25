@@ -92,50 +92,40 @@ export const legend = function (map, config) {
         out.updateConfig()
         out.updateContainer()
 
-        const m = out.map
-        const lgg = out.lgg
+        if (out.lgg.node()) {
+            const m = out.map
+            const lgg = out.lgg
 
-        // update legend parameters if necessary
-        if (m.legend_)
-            for (let key in m.legend_) {
-                if (key == 'colorLegend' || key == 'sizeLegend') {
-                    for (let p in out[key]) {
-                        //override each property in size and color legend m.legend_
-                        if (m.legend_[key][p] !== undefined) {
-                            out[key][p] = m.legend_[key][p]
-                        }
-                    }
-                } else {
-                    out[key] = m.legend_[key]
-                }
+            //remove previous content
+            lgg.selectAll('*').remove()
+
+            //draw legend background box
+            out.makeBackgroundBox()
+
+            // reset height counters
+            out.sizeLegend._totalBarsHeight = 0
+            out.sizeLegend._totalD3SymbolsHeight = 0
+
+            // legend for size
+            out._sizeLegendNode = lgg.append('g').attr('class', 'size-legend-container')
+            if (m.classifierSize_) {
+                buildSizeLegend(m, out.sizeLegend)
+            }
+            // legend for ps color values
+            out._colorLegendNode = lgg.append('g').attr('class', 'color-legend-container')
+
+            // position it below size legend
+            if (out._sizeLegendNode) {
+                out._colorLegendNode.attr('transform', `translate(0,${out._sizeLegendNode.node().getBBox().height})`)
             }
 
-        //remove previous content
-        lgg.selectAll('*').remove()
+            if (m.classifierColor_ && out.colorLegend) {
+                buildColorLegend(m, out.colorLegend)
+            }
 
-        //draw legend background box
-        out.makeBackgroundBox()
-
-        // reset height counters
-        out.sizeLegend._totalBarsHeight = 0
-        out.sizeLegend._totalD3SymbolsHeight = 0
-
-        // legend for size
-        out._sizeLegendNode = lgg.append('g').attr('class', 'size-legend-container')
-        if (m.classifierSize_) {
-            buildSizeLegend(m, out.sizeLegend)
+            //set legend box dimensions
+            out.setBoxDimension()
         }
-        // legend for ps color values
-        out._colorLegendNode = lgg.append('g').attr('class', 'color-legend-container')
-
-        // position it below size legend
-        out._colorLegendNode.attr('transform', `translate(0,${out._sizeLegendNode.node().getBBox().height})`)
-        if (m.classifierColor_ && out.colorLegend) {
-            buildColorLegend(m, out.colorLegend)
-        }
-
-        //set legend box dimensions
-        out.setBoxDimension()
     }
 
     /**

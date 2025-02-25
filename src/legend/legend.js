@@ -38,7 +38,10 @@ export const legend = function (map) {
         // clear previous legend(s)
         out.svg.selectAll('#em-legend-' + out.svgId).remove()
         // append new legend group
-        out.lgg = out.svg.append('g').attr('id', 'em-legend-' + out.svgId)
+        out.lgg = out.svg
+            .append('g')
+            .attr('id', 'em-legend-' + out.svgId)
+            .attr('class', 'em-legend')
     }
 
     /**
@@ -69,6 +72,22 @@ export const legend = function (map) {
         if (map.legend_) {
             deepMergeExistingKeys(out, map.legend_)
         }
+
+        //ps
+        // // update legend parameters if necessary
+        // if (m.legend_)
+        //     for (let key in m.legend_) {
+        //         if (key == 'colorLegend' || key == 'sizeLegend') {
+        //             for (let p in out[key]) {
+        //                 //override each property in size and color legend m.legend_
+        //                 if (m.legend_[key][p] !== undefined) {
+        //                     out[key][p] = m.legend_[key][p]
+        //                 }
+        //             }
+        //         } else {
+        //             out[key] = m.legend_[key]
+        //         }
+        //     }
     }
 
     //It performs a shallow copy — nested objects will be copied by reference, not duplicated.
@@ -138,16 +157,18 @@ export const legend = function (map) {
 
     /** Set legend box dimensions, ensuring it has suitable dimensions to fit to all legend graphic elements */
     out.setBoxDimension = function () {
-        //get legend elements bounding box
-        const bb = out.lgg.node().getBBox({ stroke: true })
-        //apply to legend box dimensions
-        const p = out.boxPadding
-        out.svg
-            .select('#legendBR')
-            .attr('x', bb.x - p)
-            .attr('y', bb.y - p)
-            .attr('width', bb.width + 2 * p)
-            .attr('height', bb.height + 2 * p)
+        if (out.lgg.node()) {
+            //get legend elements bounding box
+            const bb = out.lgg.node().getBBox({ stroke: true })
+            //apply to legend box dimensions
+            const p = out.boxPadding
+            out.svg
+                .select('#legendBR')
+                .attr('x', bb.x - p)
+                .attr('y', bb.y - p)
+                .attr('width', bb.width + 2 * p)
+                .attr('height', bb.height + 2 * p)
+        }
     }
 
     return out

@@ -60,39 +60,41 @@ export const legend = function (map, config) {
         out.updateConfig()
         out.updateContainer()
 
-        const map = out.map
-        const container = out.lgg
+        if (out.lgg.node()) {
+            const map = out.map
+            const container = out.lgg
 
-        // Draw legend background box and title if provided
-        out.makeBackgroundBox()
-        if (out.title) {
-            let cssFontSize = getFontSizeFromClass('em-legend-title')
-            container
-                .append('text')
-                .attr('class', 'em-legend-title')
-                .attr('x', out.boxPadding)
-                .attr('y', out.boxPadding + cssFontSize)
-                .text(out.title)
-        }
-
-        //exit early if no classifier
-        if (!map.classToFillStyle()) return
-
-        //set default point of divergence if applicable
-        if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
-
-        if (out.barChart) {
-            createBarChartLegend()
-        } else {
-            if (out.labelType == 'ranges') {
-                createRangesLegend()
-            } else {
-                createThresholdsLegend()
+            // Draw legend background box and title if provided
+            out.makeBackgroundBox()
+            if (out.title) {
+                let cssFontSize = getFontSizeFromClass('em-legend-title')
+                container
+                    .append('text')
+                    .attr('class', 'em-legend-title')
+                    .attr('x', out.boxPadding)
+                    .attr('y', out.boxPadding + cssFontSize)
+                    .text(out.title)
             }
-        }
 
-        // Set legend box dimensions
-        out.setBoxDimension()
+            //exit early if no classifier
+            if (!map.classToFillStyle()) return
+
+            //set default point of divergence if applicable
+            if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
+
+            if (out.barChart) {
+                createBarChartLegend()
+            } else {
+                if (out.labelType == 'ranges') {
+                    createRangesLegend()
+                } else {
+                    createThresholdsLegend()
+                }
+            }
+
+            // Set legend box dimensions
+            out.setBoxDimension()
+        }
     }
 
     function getThresholds() {

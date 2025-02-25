@@ -8,7 +8,8 @@ a text {
 }
 
 /* Main map */
-.em-map {
+.em-map,
+.em-legend {
     font-family: Arial, Helvetica, sans-serif;
 }
 
