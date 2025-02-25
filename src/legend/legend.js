@@ -50,6 +50,46 @@ export const legend = function (map) {
         return out
     }
 
+    out.updateContainer = function () {
+        const map = out.map
+        const container = out.lgg
+        // Remove previous content
+        container.selectAll('*').remove()
+
+        //check if provided external svgId has changed
+        if (container.attr('id') !== map.legend_.svgId) {
+            out.build() // sets new svg and lgg
+        }
+    }
+
+    out.updateConfig = function () {
+        const map = out.map
+        // Update legend parameters if necessary
+        if (map.legend_) {
+            console.log(out, map.legend_)
+            deepMergeExistingKeys(out, map.legend_)
+            console.log(out)
+        }
+    }
+
+    //It performs a shallow copy — nested objects will be copied by reference, not duplicated.
+    //It modifies the target object (out) in place.
+    //Useful for merging objects or extending existing ones.
+    function deepMergeExistingKeys(target, source) {
+        for (const key in source) {
+            if (source.hasOwnProperty(key) && target.hasOwnProperty(key)) {
+                if (typeof target[key] === 'object' && typeof source[key] === 'object' && !Array.isArray(target[key])) {
+                    // Recursively merge for nested objects
+                    deepMergeExistingKeys(target[key], source[key])
+                } else {
+                    // Overwrite value
+                    target[key] = source[key]
+                }
+            }
+        }
+        return target
+    }
+
     /** Draw legend background box */
     out.makeBackgroundBox = function () {
         out.lgg.append('rect').attr('id', 'legendBR').attr('class', 'em-legend-background').style('opacity', out.boxOpacity)

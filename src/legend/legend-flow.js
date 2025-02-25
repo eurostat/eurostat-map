@@ -38,6 +38,9 @@ export const legend = function (map, config) {
 
     //@override
     out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
+
         const m = out.map
         const lgg = out.lgg
 

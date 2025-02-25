@@ -6,25 +6,58 @@
     </head>
 
     <body>
-        <svg id="map"></svg>
-        <svg id="legend"></svg>
+        <svg height="800" width="800">
+            <g id="map"></g>
+            <g id="legend1" transform="translate(20, 20)"></g>
+            <g id="legend2" transform="translate(200, 200)"></g>
+            <g id="legend3" transform="translate(300, 100)"></g>
+        </svg>
 
         <script src="../build/eurostatmap.js"></script>
+        <script src="./data/nuts3.js"></script>
         <script>
-            eurostatmap
+            const map = eurostatmap
                 .map('choropleth')
                 .width(500)
+                .nutsLevel('mixed')
                 .scale('60M')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
-                .classificationMethod('threshold')
-                .threshold([50, 75, 100, 150, 300, 850])
-                .tooltipShowFlags(false)
                 .legend({
-                    svgId: 'legend',
-                    title: 'Inhab./km²',
+                    svgId: 'legend1',
+                    title: 'Legend1',
                     decimals: 0,
                 })
-                .build()
+                .nutsYear(2021)
+
+            map.statData().setData(nuts3)
+
+            map.build()
+
+            setTimeout(() => {
+                map.legend({
+                    svgId: 'legend2',
+                    title: 'Legend2',
+                    decimals: 0,
+                })
+            }, 2000)
+
+            setTimeout(() => {
+                const map = eurostatmap
+                    .map('ps')
+                    .width(700)
+                    .nutsLevel('mixed')
+                    .scale('60M')
+                    .legend({
+                        svgId: 'legend3',
+                        title: 'Legend3',
+                        decimals: 0,
+                    })
+                    .build()
+                map.legend({
+                    svgId: 'legend2',
+                    title: 'Legend2 asdfg',
+                    decimals: 0,
+                })
+            }, 4000)
         </script>
     </body>
 </html>

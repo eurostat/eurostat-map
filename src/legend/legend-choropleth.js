@@ -57,27 +57,26 @@ export const legend = function (map, config) {
 
     //@override
     out.update = function () {
-        const m = out.map
-        const lgg = out.lgg
+        out.updateConfig()
+        out.updateContainer()
 
-        // Update legend parameters if necessary
-        if (m.legend_) {
-            Object.assign(out, m.legend_)
-        }
-
-        // Remove previous content
-        lgg.selectAll('*').remove()
+        const map = out.map
+        const container = out.lgg
 
         // Draw legend background box and title if provided
         out.makeBackgroundBox()
         if (out.title) {
             let cssFontSize = getFontSizeFromClass('em-legend-title')
-            lgg.append('text')
+            container
+                .append('text')
                 .attr('class', 'em-legend-title')
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding + cssFontSize)
                 .text(out.title)
         }
+
+        //exit early if no classifier
+        if (!map.classToFillStyle()) return
 
         //set default point of divergence if applicable
         if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
@@ -110,6 +109,7 @@ export const legend = function (map, config) {
     }
 
     function getColors() {
+        const map = out.map
         return map.colors_
             ? map.colors_
             : Array.from({ length: map.numberOfClasses_ }).map((_, index) => {
@@ -118,6 +118,7 @@ export const legend = function (map, config) {
     }
 
     function getData() {
+        const map = out.map
         return Object.values(map.statData()._data_).map((item) => item.value)
     }
 

@@ -14,7 +14,22 @@
     cursor: pointer;
 }
 
-/* all boudnaries and regions */
+/*  boundaries stroke-width */
+.em-bn-0 {
+    stroke: none;
+}
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+/* when using MIXED NUTS levels, we add stroke to the regions, then show/hide those that have/dont have data */
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'],
+.em-bn-co {
+    stroke-width: 0.1;
+}
+
+/* all boudnaries and regions linecap/linejoin */
 #g_worldbn,
 #em-nutsbn,
 .em-cntbn,
@@ -44,21 +59,6 @@
     stroke-width: 0.9px;
 }
 
-/* NUTS boundaries stroke-width */
-.em-bn-0 {
-    stroke: none;
-}
-.em-bn-1,
-.em-bn-2,
-.em-bn-3,
-/* when using MIXED NUTS levels, we add stroke to the regions, then show/hide those that have/dont have data */
-.em-nutsrg [lvl='3'],
-.em-nutsrg [lvl='2'],
-.em-nutsrg [lvl='1'],
-.em-bn-co {
-    stroke-width: 0.2;
-}
-
 /* NUTS boundaries stroke color */
 .em-bn-1,
 .em-bn-2,
@@ -77,7 +77,7 @@
 /* kosovo */
 .em-kosovo-bn {
     stroke: #6e6e6e;
-    stroke-width: 0.19;
+    stroke-width: 0.15;
 }
 
 /* disputed */
@@ -85,11 +85,6 @@
     stroke: #6e6e6e;
     stroke-width: 0.2;
 }
-
-/* target non cc/eu/efta borders */
-/* .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-    stroke-width: 0;
-} */
 
 /* dont fill certain elements */
 .em-frame,
@@ -105,3 +100,8 @@
 .em-bn-co {
     fill: none;
 }
+
+/* target non cc/eu/efta borders */
+/* .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0;
+} */

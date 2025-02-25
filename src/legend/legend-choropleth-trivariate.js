@@ -35,6 +35,8 @@ export const legend = function (map, config) {
      * Override the update method to handle trivariate legends
      */
     out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
         const lgg = out.lgg
         const numberOfClasses = out.map.numberOfClasses()
 

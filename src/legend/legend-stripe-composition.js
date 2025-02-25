@@ -31,6 +31,9 @@ export const legend = function (map, config) {
 
     //@override
     out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
+
         const m = out.map
         const svgMap = m.svg()
         const lgg = out.lgg
@@ -55,8 +58,7 @@ export const legend = function (map, config) {
         const scs = m.catColors()
         for (let code in scs) {
             //the vertical position of the legend element
-            const y =
-                out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
+            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
 
             //the color
             const col = m.catColors()[code] || 'lightgray'
@@ -112,8 +114,7 @@ export const legend = function (map, config) {
 
         //'no data' legend box
         if (out.noData) {
-            const y =
-                out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
+            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
 
             //rectangle
             lgg.append('rect')

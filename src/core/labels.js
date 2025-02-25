@@ -132,7 +132,7 @@ export const updateLabels = function (map) {
             const applyLabelsCallback = (map) => {
                 if (masterConfig) {
                     let zg = map.svg_.select('#em-zoom-group-' + map.svgId_)
-                    addLabelsToMap(map, zg)
+                    if (map.labels_) addLabelsToMap(map, zg)
                     if (masterConfig.values && map.updateValuesLabels) {
                         map.updateValuesLabels(map)
                     }

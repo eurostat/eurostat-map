@@ -267,7 +267,7 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         //draw NUTS boundaries
-        if (this.geoJSONs.nutsbn) {
+        if (this.geoJSONs.nutsbn && nutsLevel !== 'mixed') {
             this.geoJSONs.nutsbn.sort(function (bn1, bn2) {
                 return bn2.properties.lvl - bn1.properties.lvl
             })
@@ -298,21 +298,22 @@ export const Geometries = function (map, withCenterPoints) {
                     //if (bn.oth === "T") cl.push("bn-oth");
                     return cl.join(' ')
                 })
+        }
 
-            if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
-                // add kosovo manually
-                let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
+        //kosovo
+        if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
+            // add kosovo manually
+            let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
 
-                container
-                    .append('g')
-                    .attr('id', 'em-kosovo-bn')
-                    .attr('class', 'em-kosovo-bn')
-                    .selectAll('path')
-                    .data(kosovoBn)
-                    .enter()
-                    .append('path')
-                    .attr('d', pathFunction)
-            }
+            container
+                .append('g')
+                .attr('id', 'em-kosovo-bn')
+                .attr('class', 'em-kosovo-bn')
+                .selectAll('path')
+                .data(kosovoBn)
+                .enter()
+                .append('path')
+                .attr('d', pathFunction)
         }
 
         //draw world boundaries
@@ -337,7 +338,7 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         if (this.geoJSONs.kosovo) {
-            //add kosovo to world map
+            //add kosovo
             container
                 .append('g')
                 .attr('id', 'em-kosovo-bn')

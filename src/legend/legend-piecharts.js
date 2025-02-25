@@ -53,7 +53,10 @@ export const legend = function (map, config) {
 
     //@override
     out.update = function () {
-        const m = out.map
+        out.updateConfig()
+        out.updateContainer()
+
+        const map = out.map
         const lgg = out.lgg
 
         //remove previous content
@@ -63,12 +66,12 @@ export const legend = function (map, config) {
         out.makeBackgroundBox()
 
         // legend for sizes
-        if (m.sizeClassifier_) {
-            buildSizeLegend(m, lgg, out.sizeLegend)
+        if (map.sizeClassifier_) {
+            buildSizeLegend()
         }
 
         // legend for ps color values
-        buildColorLegend(m, lgg, out.colorLegend)
+        buildColorLegend()
 
         //set legend box dimensions
         out.setBoxDimension()
@@ -81,8 +84,12 @@ export const legend = function (map, config) {
      * @param {*} lgg parent legend object from core/legend.js
      * @param {*} config size legend config object (sizeLegend object specified as property of legend() config object)
      */
-    function buildSizeLegend(m, lgg, config) {
-        let domain = m.sizeClassifier_.domain()
+    function buildSizeLegend() {
+        const map = out.map
+        const config = out.sizeLegend
+        const container = out.lgg.append('g').attr('class', 'em-pie-size-legend')
+
+        const domain = map.sizeClassifier_.domain()
 
         // Assign default circle radii if none specified by user
         if (!config.values) {
@@ -90,10 +97,7 @@ export const legend = function (map, config) {
         }
 
         // Calculate the maximum circle size to be displayed in the legend
-        let maxSize = m.sizeClassifier_(max(config.values))
-
-        // Create the main container for the size legend, including the title
-        let container = lgg.append('g').attr('class', 'em-pie-size-legend')
+        let maxSize = map.sizeClassifier_(max(config.values))
 
         // Add the title to the container if available
         if (!config.title && out.title) config.title = out.title // Allow root legend title
@@ -127,14 +131,14 @@ export const legend = function (map, config) {
             .attr('class', 'em-pie-size-legend-circle')
             .style('fill', 'none')
             .attr('stroke', 'black')
-            .attr('cy', (d) => -m.sizeClassifier_(d)) // Position circles based on their size
-            .attr('r', m.sizeClassifier_) // Radius is calculated from size classifier
+            .attr('cy', (d) => -map.sizeClassifier_(d)) // Position circles based on their size
+            .attr('r', map.sizeClassifier_) // Radius is calculated from size classifier
 
         // Append labels to each group
         legendItems
             .append('text')
             .attr('class', 'em-legend-label')
-            .attr('y', (d) => -2 * m.sizeClassifier_(d) - out.labelFontSize - 2) // Position labels relative to circles
+            .attr('y', (d) => -2 * map.sizeClassifier_(d) - out.labelFontSize - 2) // Position labels relative to circles
             .attr('x', 30) // Set the x-position for the labels
             .attr('dy', '1.2em')
             .attr('xml:space', 'preserve')
@@ -146,8 +150,8 @@ export const legend = function (map, config) {
             .attr('class', 'em-pie-size-legend-line')
             .attr('x1', 2)
             .attr('x2', 30)
-            .attr('y1', (d) => -2 * m.sizeClassifier_(d)) // Position lines relative to circles
-            .attr('y2', (d) => -2 * m.sizeClassifier_(d)) // Same position for the y2 to make a horizontal line
+            .attr('y1', (d) => -2 * map.sizeClassifier_(d)) // Position lines relative to circles
+            .attr('y2', (d) => -2 * map.sizeClassifier_(d)) // Same position for the y2 to make a horizontal line
 
         // Save the height value for positioning the color legend (if needed)
         out._sizeLegendHeight = y
@@ -157,13 +161,12 @@ export const legend = function (map, config) {
     /**
      * Builds a legend illustrating the statistical values of the pie charts' different colours
      *
-     * @param {*} m map
-     * @param {*} lgg parent legend object from core/legend.js
-     * @param {*} config color legend config object (colorLegend object specified as property of legend config parameter)
      */
-    function buildColorLegend(m, lgg, config) {
+    function buildColorLegend() {
+        const map = out.map
+        const config = out.colorLegend
         //container
-        const container = lgg.append('g').attr('class', 'em-pie-color-legend')
+        const container = out.lgg.append('g').attr('class', 'em-pie-color-legend')
 
         //draw title
         if (config.title) {
@@ -177,7 +180,7 @@ export const legend = function (map, config) {
 
         //draw legend elements for classes: rectangle + label
         let i = 0
-        const scs = m.catColors()
+        const scs = map.catColors()
         for (let code in scs) {
             //the vertical position of the legend element
             const y =
@@ -187,7 +190,7 @@ export const legend = function (map, config) {
                 (config.title ? out.titleFontSize + out.boxPadding : 0) +
                 i * (config.shapeHeight + config.shapePadding)
             //the color
-            const col = m.catColors()[code] || 'lightgray'
+            const col = map.catColors()[code] || 'lightgray'
 
             //rectangle
             container
@@ -220,7 +223,7 @@ export const legend = function (map, config) {
                 .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dominant-baseline', 'middle')
-                .text(m.catLabels()[code] || code)
+                .text(map.catLabels()[code] || code)
 
             i++
         }
@@ -242,7 +245,7 @@ export const legend = function (map, config) {
                 .attr('y', y)
                 .attr('width', config.shapeWidth)
                 .attr('height', config.shapeHeight)
-                .style('fill', m.noDataFillStyle())
+                .style('fill', map.noDataFillStyle())
                 .on('mouseover', function () {
                     highlightRegions(out.map, 'nd')
                     if (out.map.insetTemplates_) {

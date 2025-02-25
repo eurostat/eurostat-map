@@ -1,6 +1,6 @@
 {
     "name": "eurostat-map",
-    "version": "4.1.15",
+    "version": "4.1.16",
     "description": "Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.",
     "keywords": [
         "eurostat",
@@ -33,6 +33,7 @@
         "start": "webpack --config webpack/webpack.config.dev.js",
         "server": "webpack-dev-server --open --watch",
         "build-prod": "webpack --config webpack/webpack.config.prod.js",
+        "build-prod-debug": "webpack --config webpack/webpack.config.debug-size.js",
         "format": "prettier --write .",
         "test": "jest"
     },
@@ -59,6 +60,7 @@
         "prettier": "^3.4.1",
         "style-loader": "^4.0.0",
         "webpack": "^5.88.1",
+        "webpack-bundle-analyzer": "^4.10.2",
         "webpack-cli": "^5.0.0",
         "webpack-dev-server": "^4.15.1",
         "webpack-livereload-plugin": "^3.0.2"

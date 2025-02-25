@@ -33,6 +33,8 @@ export const legend = function (map, config) {
 
     //@override
     out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
         const m = out.map
         const lgg = out.lgg
         const svgMap = m.svg()
@@ -63,8 +65,7 @@ export const legend = function (map, config) {
             const fillColor = m.classToFillStyle()[ecl_]
 
             //the vertical position of the legend element
-            const y =
-                out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
+            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
 
             //rectangle
             lgg.append('rect')
@@ -100,10 +101,7 @@ export const legend = function (map, config) {
 
         //'no data' legend box
         if (out.noData) {
-            const y =
-                out.boxPadding +
-                (out.title ? out.titleFontSize + out.boxPadding : 0) +
-                ecls.length * (out.shapeHeight + out.shapePadding)
+            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + ecls.length * (out.shapeHeight + out.shapePadding)
 
             //rectangle
             lgg.append('rect')

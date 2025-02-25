@@ -59,6 +59,8 @@ export const legend = function (map, config) {
 
     //@override
     out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
         const lgg = out.lgg
         const numberOfClasses = out.map.numberOfClasses()
         const sz = out.squareSize / numberOfClasses
