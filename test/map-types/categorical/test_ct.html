@@ -6,41 +6,81 @@
     </head>
 
     <body>
-        <svg id="map"></svg>
+        <svg height="700" width="700">
+            <g id="map"></g>
+            <g id="legend" transform="translate(10,200)"></g>
+        </svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
-            const map = eurostatmap
+            let map = eurostatmap
                 .map('ct')
                 .title('NUTS urban/rural typology')
                 .nutsLevel('mixed')
-                //.stat('default', { ES: '1' })
-                .stat({
-                    csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
-                    geoCol: 'NUTS_ID_2013',
-                    valueCol: 'urban_rural',
-                })
-                .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
-                .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
+                // .stat('default', { ES: 'a' })
+                // .stat({
+                //     csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
+                //     geoCol: 'NUTS_ID_2013',
+                //     valueCol: 'urban_rural',
+                // })
+                .classToFillStyle({ a: '#fdb462', b: '#ffffb3', c: '#ccebc5' })
+                .classToText({ a: 'a', b: 'b', c: 'c' })
                 .legend({
+                    svgId: 'legend',
                     labelFontSize: 14,
                     shapeWidth: 20,
                     shapeHeight: 18,
-                    x: 10,
-                    y: 170,
                 })
-                .build()
 
-            map.statData().setData({ ES: 'int' })
+            map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            map.build()
+
+            // second
             setTimeout(() => {
-                map.statData().setData({ ES: 'int', FR: 'int', DE: 'int', MT: 'rur', IT: 'rur', SI: 'rur', RO: 'test', PL: 'test2' })
+                map.classToFillStyle({ f: '#fdb462', b: '#ffffb3', c: '#ccebc5' }).classToText({ f: 'f', b: 'b', c: 'c' }).legend({
+                    svgId: 'legend',
+                    labelFontSize: 14,
+                    shapeWidth: 20,
+                    shapeHeight: 18,
+                })
+
+                map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
                 map.updateStatValues()
+                map.updateClassification().updateStyle()
+                map.updateLegend()
             }, 2000)
 
+            // third
             setTimeout(() => {
-                map.classToFillStyle({ urb: 'red', int: 'green', rur: 'blue', test: 'orange' })
-                map.classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural', test: 'TEST' })
-                map.updateClassification().updateStyle().updateLegend()
+                map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+                map.updateStatValues()
+                map.legend({
+                    svgId: 'legend',
+                    labelFontSize: 14,
+                    shapeWidth: 30,
+                    shapeHeight: 30,
+                    x: 100,
+                    y: 270,
+                })
+                map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
+                map.classToText({ a: 'a', b: 'b', e: 'e' })
+                map.updateClassification().updateStyle()
+                map.updateLegend()
             }, 4000)
+
+            setTimeout(() => {
+                map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
+                map.classToText({ a: 'a', b: 'b', e: 'e' })
+                map.legend({
+                    svgId: 'legend',
+                    labelFontSize: 12,
+                    shapeWidth: 10,
+                    shapeHeight: 10,
+                })
+                map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+                map.updateStatValues()
+                map.updateClassification().updateStyle()
+                map.updateLegend()
+            }, 6000)
         </script>
     </body>
 </html>

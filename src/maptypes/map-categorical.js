@@ -3,7 +3,7 @@ import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as CategoricalLegend from '../legend/legend-categorical'
-import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector } from '../core/utils'
+import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 
 /**
  * Returns a categorical map.
@@ -60,38 +60,45 @@ export const map = function (config) {
 
     const applyClassificationToMap = function (map) {
         //get domain (unique values)
-        const domain = map.statData().getUniqueValues()
+        const domain = out.statData().getUniqueValues()
 
         //get range [0,1,2,3,...,domain.length-1]
         const range = [...Array(domain.length).keys()]
 
         //make classifier
         //only use user-define classes
-        const ctfs = map.classToFillStyle()
+        const ctfs = out.classToFillStyle_ ? out.classToFillStyle() : undefined
         if (ctfs) {
-            //use only user-defined values
-            const domain = Object.keys(ctfs)
-            map.classifier(
+            const categories = Object.keys(ctfs)
+            out.classifier(
                 scaleOrdinal()
-                    .domain(domain)
-                    .range(domain.map((d) => domain.indexOf(d)))
+                    .domain(categories) // Only classify known categories
+                    .range(categories.map((_, i) => i)) // Assign numerical classes
             )
         } else {
-            //use all unique values
-            map.classifier(scaleOrdinal().domain(domain).range(range))
+            // Use all unique values if no user-defined classes exist
+            out.classifier(scaleOrdinal().domain(domain).range(range))
         }
 
         // Apply classifier and set 'ecl' attribute to regions based on value
         const classifyRegions = (regions) => {
             regions.attr('ecl', (rg) => {
-                const sv = map.statData().get(rg.properties.id)
+                const sv = out.statData().get(rg.properties.id)
                 if (!sv) return
+
                 const v = sv.value
-                if (v == ':') return 'nd' // no data
-                const c = +map.classifier_(isNaN(v) ? v : +v) //class
-                return c
+                if (v === ':') return 'nd' // No data
+
+                const value = isNaN(v) ? v : +v // Convert numbers, keep strings as is
+
+                // 🔹 Ensure only known values are classified
+                const classifierDomain = out.classifier().domain()
+                if (!classifierDomain.includes(value)) return // Skip unknown values
+
+                return out.classifier()(value)
             })
         }
+
         let selector = getRegionsSelector(map)
         classifyRegions(map.svg().selectAll(selector))
 
@@ -140,22 +147,18 @@ export const map = function (config) {
                         const sel = select(this)
                         sel.attr('fill___', sel.style('fill'))
                     })
-
                     // Set up mouse events
-                    regions
-                        .on('mouseover', function (e, rg) {
-                            const sel = select(this)
-                            sel.style('fill', map.hoverColor_) // Apply highlight color
-                            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                        })
-                        .on('mousemove', function (e) {
-                            if (out._tooltip) out._tooltip.mousemove(e)
-                        })
-                        .on('mouseout', function () {
-                            const sel = select(this)
-                            sel.style('fill', sel.attr('fill___')) // Revert to original color
-                            if (out._tooltip) out._tooltip.mouseout()
-                        })
+                    addMouseEventsToRegions(map, regions)
+
+                    // update font color for grid cartograms (contrast)
+                    if (out.gridCartogram_) {
+                        map.svg()
+                            .selectAll('.em-grid-text')
+                            .each(function () {
+                                const cellColor = select(this.parentNode).style('fill')
+                                select(this).attr('fill', getTextColorForBackground(cellColor))
+                            })
+                    }
                 })
                 .catch((err) => {
                     //console.error('Error applying transition to regions:', err)
@@ -167,8 +170,8 @@ export const map = function (config) {
             }
 
             // Update labels for statistical values if required
-            if (map.labels_ && out.labels_.values) {
-                out.updateValuesLabels(map)
+            if (out.labels_) {
+                if (out.labels_.values) out.updateValuesLabels(map)
             }
         }
     }
@@ -220,6 +223,24 @@ export const map = function (config) {
                 return out.classToFillStyle_[out.classifier().domain()[ecl]]
             }
         }
+    }
+
+    const addMouseEventsToRegions = function (map, regions) {
+        // Set up mouse events
+        regions
+            .on('mouseover', function (e, rg) {
+                const sel = select(this)
+                sel.style('fill', map.hoverColor_) // Apply highlight color
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function () {
+                const sel = select(this)
+                sel.style('fill', sel.attr('fill___')) // Revert to original color
+                if (out._tooltip) out._tooltip.mouseout()
+            })
     }
 
     //@override

@@ -258,8 +258,8 @@ export const map = function (config) {
             }
 
             // Update labels for statistical values if required
-            if (out.labels_?.values) {
-                out.updateValuesLabels(map)
+            if (out.labels_) {
+                if (out.labels_.values) out.updateValuesLabels(map)
             }
         }
     }
