@@ -196,7 +196,7 @@ export const Geometries = function (map, withCenterPoints) {
                     container
                         .append('g')
                         .attr('id', 'em-nutsrg')
-                        .attr('class', 'em-nutsrg')
+                        .attr('class', `em-nutsrg em-nutsrg-${i}`)
                         .selectAll('path')
                         .data(r)
                         .enter()
@@ -206,7 +206,7 @@ export const Geometries = function (map, withCenterPoints) {
                 })
 
                 //add kosovo
-                if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
+                if (geo == 'EUR' && proj == '3035') {
                     // add kosovo manually
                     let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
                     container

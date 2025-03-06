@@ -37,7 +37,6 @@ export const legend = function (map, config) {
         out.updateContainer()
         const m = out.map
         const lgg = out.lgg
-        const svgMap = m.svg()
 
         //remove previous content
         lgg.selectAll('*').remove()
@@ -55,14 +54,15 @@ export const legend = function (map, config) {
         }
 
         //get category codes
-        const ecls = out.order ? out.order : m.classifier().domain()
+        const domain = m.classToFillStyle() ? Object.keys(m.classToFillStyle()) : m.classifier_.domain()
+        const ecls = out.order ? out.order : domain
 
         //draw legend elements for classes: rectangle + label
         for (let i = 0; i < ecls.length; i++) {
             //the class
             const ecl_ = ecls[i]
-            const ecl = m.classifier()(ecl_)
-            const fillColor = m.classToFillStyle()[ecl_]
+            const ecl = m.classifier_(ecl_)
+            const fillColor = m.classToFillStyle_[ecl_]
 
             //the vertical position of the legend element
             const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
@@ -76,14 +76,12 @@ export const legend = function (map, config) {
                 .attr('height', out.shapeHeight)
                 .style('fill', fillColor)
                 .on('mouseover', function () {
-                    select(this).style('fill', m.hoverColor_)
                     highlightRegions(out.map, ecl)
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, highlightRegions, ecl)
                     }
                 })
                 .on('mouseout', function () {
-                    select(this).style('fill', fillColor)
                     unhighlightRegions(out.map, ecl)
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, unhighlightRegions, ecl)

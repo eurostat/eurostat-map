@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -9,15 +9,11 @@
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
-            eurostatmap
+            const map = eurostatmap
                 .map('ct')
                 .title('NUTS urban/rural typology')
-                .insets('default')
-                .zoomExtent([1, 2])
-                .height(650)
-                .scale('60M')
-                .nutsYear(2013)
-                .nutsLevel(3)
+                .nutsLevel('mixed')
+                //.stat('default', { ES: '1' })
                 .stat({
                     csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                     geoCol: 'NUTS_ID_2013',
@@ -25,7 +21,6 @@
                 })
                 .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
                 .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
-                .labelling(true)
                 .legend({
                     labelFontSize: 14,
                     shapeWidth: 20,
@@ -33,8 +28,19 @@
                     x: 10,
                     y: 170,
                 })
-
                 .build()
+
+            map.statData().setData({ ES: 'int' })
+            setTimeout(() => {
+                map.statData().setData({ ES: 'int', FR: 'int', DE: 'int', MT: 'rur', IT: 'rur', SI: 'rur', RO: 'test', PL: 'test2' })
+                map.updateStatValues()
+            }, 2000)
+
+            setTimeout(() => {
+                map.classToFillStyle({ urb: 'red', int: 'green', rur: 'blue', test: 'orange' })
+                map.classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural', test: 'TEST' })
+                map.updateClassification().updateStyle().updateLegend()
+            }, 4000)
         </script>
     </body>
 </html>
