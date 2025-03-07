@@ -286,7 +286,10 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
         statLabelRegions = map.Geometries.statisticalRegions.features
     }
 
+    // preprocess centroids
     if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
+
+    //TODO: dont add labels for regions that are not visible? what about panning and zooming though. Only really an issue for mixed NUTS.
 
     // stats labels
     gsl.selectAll('g')
@@ -296,7 +299,8 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
         .attr('transform', function (d) {
             // use predefined label positioning
             if (map.labels_.statLabelsPositions[d.properties.id]) {
-                let pos = map._projection([map.labels_.statLabelsPositions[d.properties.id].x, map.labels_.statLabelsPositions[d.properties.id].y])
+                const position = map.labels_.statLabelsPositions[d.properties.id]
+                let pos = map._projection([position.x, position.y])
                 let x = pos[0].toFixed(3)
                 let y = pos[1].toFixed(3)
                 return `translate(${x},${y})`
@@ -389,10 +393,10 @@ export const DEFAULTLABELS = {
             { text: 'UK', x: 3558000, y: 3250000, class: 'cc', size: 17 },
         ],
         en: [
-            { text: 'MEDITERRANEAN SEA', x: 5472000, y: 1200000, class: 'seas', size: 12, letterSpacing: 7 },
+            { text: 'MEDITERRANEAN SEA', x: 3980000, y: 1600000, class: 'seas', size: 12, letterSpacing: 7 },
             { text: 'ATLANTIC OCEAN', x: 2820000, y: 2540000, class: 'seas', size: 12, letterSpacing: 2 },
             { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'seas', size: 12 },
-            { text: 'BALTIC SEA', x: 4900000, y: 3672000, class: 'seas', size: 10, rotate: -50 },
+            { text: 'BALTIC SEA', x: 4900000, y: 3730000, class: 'seas', size: 10, rotate: -50 },
             { text: 'NORWEGIAN SEA', x: 3850000, y: 4800000, class: 'seas', size: 12, letterSpacing: 1 },
             { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'seas', size: 12, letterSpacing: 4 },
             { text: 'ALBANIA', cc: 'AL', x: 5100000, y: 2060000, class: 'countries', size: 7, rotate: 80 },

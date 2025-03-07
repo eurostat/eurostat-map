@@ -36,8 +36,12 @@
 }
 
 .em-label-seas {
-    font-size: 13px;
+    font-size: 9px;
     fill: #003399;
+    letter-spacing: 3px;
+}
+.em-label-shadow-seas {
+    font-size: 9px;
     letter-spacing: 3px;
 }
 
