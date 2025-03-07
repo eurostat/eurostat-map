@@ -42,7 +42,7 @@ export const legend = function (map, config) {
         shapeOffset: { x: 0, y: 0 },
         shapeFill: 'white',
         shapeStroke: null,
-        labelOffset: { x: 5, y: 0 }, //the distance between the legend box elements to the corresponding text label
+        labelOffset: { x: 10, y: 0 }, //the distance between the legend box elements to the corresponding text label
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,
         _totalBarsHeight: 0,
@@ -140,9 +140,8 @@ export const legend = function (map, config) {
             if (out.sizeLegend.noData) {
                 let y = out._sizeLegendNode.node().getBBox().height + 25
                 let x = out.boxPadding
-                let container = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-rect')
-
-                buildNoDataLegend(x, y, container, out.sizeLegend.noDataText)
+                let container = out._sizeLegendNode.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
+                buildNoDataLegend(container, out.sizeLegend.noDataText)
             }
             return
         } else if (m.psShape_ == 'spike') {
@@ -198,39 +197,62 @@ export const legend = function (map, config) {
                 y += out.colorLegend.shapeHeight + 5
             }
             let x = out.boxPadding
-            let container = out._sizeLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-rect')
+            let container = out._sizeLegendNode.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
 
-            buildNoDataLegend(x, y, container, out.sizeLegend.noDataText)
+            buildNoDataLegend(container, out.sizeLegend.noDataText)
         }
     }
 
     function buildSpikeLegend(map, sizeLegendConfig) {
         const spike = (length, width = map.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+
         let maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
+
+        // Determine values for the legend
+        let legendValues = out.sizeLegend.values || map.classifierSize_.ticks(4).slice(1) // Use user-defined values or default ticks
+
+        const fontSize = getFontSizeFromClass('em-legend-label') // Adjust font size
+        const labelSpacing = fontSize - 2 // Ensure labels are just below the spikes
+
         const legend = out._sizeLegendNode
             .append('g')
             .attr('id', 'em-spike-legend')
+            .attr('transform', `translate(${out.boxPadding + 5},0)`)
             .attr('fill', 'black')
             .attr('text-anchor', 'middle')
-            .style('font-size', '11px')
+            .style('font-size', `${fontSize}px`)
             .selectAll()
-            .data(map.classifierSize_.ticks(4).slice(1))
+            .data(legendValues) // Now uses user-defined values if provided
             .join('g')
-            .attr('transform', (d, i) => `translate(${25 * i + out.boxPadding},${maxSize + 15 + out.boxPadding} )`)
+            .attr('transform', (d, i) => `translate(${40 * i + out.boxPadding},${maxSize + 5})`) // Increase spacing
 
+        // Append spikes
         legend
             .append('path')
             .attr('fill', map.psFill_)
             .attr('fill-opacity', map.psFillOpacity_)
             .attr('stroke', map.psStroke_)
             .attr('stroke-width', map.psStrokeWidth_)
-            .attr('d', (d) => spike(map.classifierSize_(d)))
+            .attr('d', (d) => spike(map.classifierSize_(d))) // Correctly maps values to spike size
 
-        legend.append('text').attr('dy', '1em').text(map.classifierSize_.tickFormat(4, 's'))
+        // Append labels directly below each spike
+        legend
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('dy', labelSpacing) // Ensure text is right below spikes
+            .text((d) => map.classifierSize_.tickFormat(4, 's')(d))
+
+        // 🔹 Add "No Data" item with more spacing
+        if (out.sizeLegend.noData) {
+            let lastLabelY = maxSize + labelSpacing + fontSize + 5 // Adjust position below the labels
+            let x = out.boxPadding
+            let container = out._sizeLegendNode.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${lastLabelY})`)
+            buildNoDataLegend(container, out.sizeLegend.noDataText)
+        }
     }
 
     //'no data' legend box
-    function buildNoDataLegend(x, y, container, noDataText) {
+    function buildNoDataLegend(container, noDataText) {
         let m = out.map
 
         //append symbol & style
@@ -323,7 +345,7 @@ export const legend = function (map, config) {
             })
 
         //label position
-        let labelX = maxSize / 2 + out.sizeLegend.labelOffset.x
+        let labelX = maxSize / 2 + out.sizeLegend.labelOffset.x + out.boxPadding
 
         //append label
         itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', 0).text(labelFormatter(value))
@@ -471,7 +493,7 @@ export const legend = function (map, config) {
             .attr('text-anchor', 'right')
             .style('fill', 'black')
             .selectAll('g')
-            .data(out._sizeLegendValues)
+            .data(out._sizeLegendValues.filter((d) => m.classifierSize_(d))) // Filter data before binding
             .join('g')
             .attr('class', 'em-legend-item')
 
@@ -609,9 +631,9 @@ export const legend = function (map, config) {
         //'no data' legend box
         if (out.colorLegend.noData) {
             let y = out.titleFontSize + out.colorLegend.marginTop + numberOfClasses * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
-            let container = out._colorLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-item')
+            let container = out._colorLegendNode.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
 
-            buildNoDataLegend(x, y, container, out.colorLegend.noDataText)
+            buildNoDataLegend(container, out.colorLegend.noDataText)
         }
     }
 

@@ -43,8 +43,9 @@ export const mapTemplate = function (config, withCenterPoints) {
     //geographical focus
     out.gridCartogram_ = false // draw geometries as grid cells
     out.gridCartogramShape_ = 'square' // square or hexagon
-    out.gridCartogramContainerPadding_ = 80
-    out.gridCartogramCellPadding_ = 2
+    out.gridCartogramMargins_ = { top: 80, right: 50, bottom: 80, left: 150 }
+    out.gridCartogramCellPadding_ = 4
+    out.gridCartogramPositions_ = undefined //user defined cartograms
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
     out.nutsYear_ = 2024
     out.geo_ = 'EUR'

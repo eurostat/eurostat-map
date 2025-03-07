@@ -14,35 +14,43 @@
 }
 .em-label-shadow {
     font-size: 12px;
-    stroke-width: 3px;
+    stroke-width: 2px;
     stroke: white;
 }
 .em-stat-label {
+    opacity: 0.9;
     font-size: 13px;
-    fill: black;
+    fill: #313131;
+    stroke: #313131;
+    stroke-width: 0.2px;
     font-weight: bold;
 }
 .em-stat-label-shadow {
+    opacity: 0.9;
     font-size: 13px;
-    stroke-width: 4px;
+    stroke-width: 3.3px;
     stroke: white;
 }
 .em-label-cc {
     font-size: 12px;
+    stroke: #505050;
+    stroke-width: 0.5px;
 }
-
 .em-label-countries {
     font-size: 12px;
 }
-
 .em-label-seas {
     font-size: 9px;
     fill: #003399;
+    stroke: #003399;
+    stroke-width: 0.2px;
     letter-spacing: 3px;
 }
 .em-label-shadow-seas {
     font-size: 9px;
     letter-spacing: 3px;
+    stroke: white;
+    stroke-width: 3px;
 }
 
 .em-flow-labels {
