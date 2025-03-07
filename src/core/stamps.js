@@ -5,8 +5,9 @@ export const appendStamp = (stampConfig, map) => {
 
         if (stampConfig) {
             const container = map.svg_.append('g').attr('id', 'em-stamp')
+
             // Set defaults
-            if (!stampConfig.size) stampConfig.size = 20
+            if (!stampConfig.size) stampConfig.size = 60
             if (!stampConfig.x) stampConfig.x = 230
             if (!stampConfig.y) stampConfig.y = 100
             if (!stampConfig.textColor) stampConfig.textColor = '#000'
@@ -24,14 +25,14 @@ export const appendStamp = (stampConfig, map) => {
                 .attr('stroke', stampConfig.stampColor)
                 .attr('stroke-width', stampConfig.strokeWidth)
 
-            // text
+            // Handle text
             const text = stampConfig.text
             const lineHeight = 13
             const targetWidth = Math.sqrt(measureWidth(text.trim()) * lineHeight)
             const lines = getLines(getWords(text.trim()), targetWidth)
             const textRadius = getTextRadius(lines, lineHeight)
 
-            //append inside circle
+            // Append inside circle
             container
                 .append('text')
                 .attr('text-anchor', 'middle')
@@ -44,38 +45,35 @@ export const appendStamp = (stampConfig, map) => {
                 .append('tspan')
                 .attr('x', 0)
                 .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * lineHeight)
-                .text((d) => d.text.replaceAll('¶', ' ')) // replace ¶ with spaces (for users that want nbsp;)
+                .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', '')) // Removes ¶ (line breaker) and ~ (non breaking space)
         }
     }
 }
 
+// Splitting by both spaces and pilcrows
 const getWords = (text) => {
-    const words = text.split(/\s+/g) // To hyphenate: /\s+|(?<=-)/
-    if (!words[words.length - 1]) words.pop()
-    if (!words[0]) words.shift()
-    return words
+    return text
+        .split(/(?<=¶)|\s+/g)
+        .map((word) => word.trim())
+        .filter((word) => word.length > 0)
 }
+
+// Computes text width
 const measureWidth = (text) => {
-    // Create an off-screen SVG <text> element
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 
-    // Add text to the element
     textElement.textContent = text
-
-    // Append the <text> element to the SVG
     svg.appendChild(textElement)
-    document.body.appendChild(svg) // Temporarily add the SVG to the DOM
+    document.body.appendChild(svg)
 
-    // Measure the width of the text
     const width = textElement.getComputedTextLength()
-
-    // Clean up by removing the SVG
     document.body.removeChild(svg)
 
-    return width + 10 // add padding
+    return width + 10
 }
 
+// Compute text radius
 const getTextRadius = (lines, lineHeight) => {
     let radius = 0
     for (let i = 0, n = lines.length; i < n; ++i) {
@@ -85,22 +83,34 @@ const getTextRadius = (lines, lineHeight) => {
     }
     return radius
 }
+
+// Handles forced line breaks
 const getLines = (words, targetWidth) => {
-    let line
-    let lineWidth0 = Infinity
-    const lines = []
+    let lines = []
+    let line = { width: 0, text: '' }
 
     for (let i = 0, n = words.length; i < n; ++i) {
-        let lineText1 = (line ? line.text + ' ' : '') + words[i]
+        if (words[i] === '¶') {
+            // Push current line (if it has text)
+            if (line.text) lines.push(line)
+            // Start a new empty line
+            line = { width: 0, text: '' }
+            continue
+        }
+
+        let lineText1 = (line.text ? line.text + ' ' : '') + words[i]
         let lineWidth1 = measureWidth(lineText1)
-        if ((lineWidth0 + lineWidth1) / 2 < targetWidth) {
-            line.width = lineWidth0 = lineWidth1
+
+        if ((line.width + lineWidth1) / 2 < targetWidth) {
+            line.width = lineWidth1
             line.text = lineText1
         } else {
-            lineWidth0 = measureWidth(words[i])
-            line = { width: lineWidth0, text: words[i] }
             lines.push(line)
+            line = { width: measureWidth(words[i]), text: words[i] }
         }
     }
+
+    if (line.text) lines.push(line) // Push last line if it exists
+
     return lines
 }
