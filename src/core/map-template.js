@@ -1111,9 +1111,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             return d
         })
 
-        // g_ps is the g element containing all proportional symbols for the map
+        // em-prop-symbols is the g element containing all proportional symbols for the map
         const zg = map.svg().select('#em-zoom-group-' + map.svgId_)
-        const gcp = zg.append('g').attr('id', 'g_ps')
+        const gcp = zg.append('g').attr('id', 'em-prop-symbols')
 
         // add centroid em-centroid elements
         // then symbols are drawn/appended to these containers in the map-type js file

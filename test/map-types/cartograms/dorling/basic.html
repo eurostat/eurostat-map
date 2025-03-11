@@ -6,25 +6,28 @@
     </head>
 
     <body>
-        <svg id="map"></svg>
+        <div id="container">
+            <svg id="map"></svg>
+        </div>
+
         <script src="../../../../build/eurostatmap.js"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map@4.1.32"></script> -->
 
         <script>
             const map = eurostatmap
-                .map('proportionalSymbol')
+                .map('ps')
                 .title('Dorling cartogram')
                 .subtitle('test')
-                .stat({
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'euro per inhabitant',
-                    filters: { TIME: '2021', UNIT: 'MIO_EUR' },
-                })
+                // .stat({
+                //     eurostatDatasetCode: 'nama_10r_3gdp',
+                //     unitText: 'euro per inhabitant',
+                //     filters: { TIME: '2021', UNIT: 'MIO_EUR' },
+                // })
                 .position({ x: 3900000, y: 3085423, z: 6000 })
                 .dorling(true)
                 //.psShape('square')
-                .dorlingStrength({ x: 3, y: 3 })
                 .backgroundMap(false)
-                .circleCodeLabels(true)
+                .psCodeLabels(true)
                 .psFill('#e04a28')
                 .psMaxSize(100)
                 .psMinSize(8)
@@ -40,11 +43,14 @@
                 })
                 .labels({ values: true })
                 .nutsLevel(0)
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })
-                .build()
+                .legend({ x: 10, y: 220, title: 'Test 1' })
+
+            map.statData('size').setData({ ES: 1, FR: ':' })
+
+            map.build()
 
             setTimeout(() => {
-                map.statData().setData({
+                map.statData('size').setData({
                     ES: 22,
                     FR: 23,
                     DE: 21,
@@ -58,7 +64,7 @@
                     CZ: 29,
                     HU: 30,
                     SE: 31,
-                    AT: 32,
+                    AT: ':',
                     BG: 33,
                     DK: 34,
                     FI: 35,
@@ -75,7 +81,8 @@
                     TR: 46,
                 })
 
-                map.psMaxSize(60).dorlingStrength({ x: 1, y: 1 })
+                map.psMaxSize(60)
+                //.dorlingStrength({ x: 3, y: 3 })
                 map.stamp({
                     x: 230,
                     y: 100,

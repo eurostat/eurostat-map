@@ -58,7 +58,8 @@ export const map = function (config) {
     //dorling cartogram
     out.dorling_ = false
     out.dorlingStrength_ = { x: 1, y: 1 }
-    out.circleCodeLabels_ = false
+    out.dorlingIterations_ = 1
+    out.psCodeLabels_ = false // show country codes in symbols
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -94,7 +95,8 @@ export const map = function (config) {
         'dorling_',
         'dorlingStrength_',
         'psSpikeWidth_',
-        'circleCodeLabels_',
+        'psCodeLabels_',
+        'dorlingIterations_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -126,6 +128,7 @@ export const map = function (config) {
             'psOffset',
             'psClassificationMethod',
             'psClasses',
+            'dorlingIterations_',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
@@ -286,6 +289,8 @@ export const map = function (config) {
             // dorling cartogram
             if (out.dorling_) {
                 applyDorlingForce(map, sizeData)
+            } else {
+                if (out.simulation) stopSimulation()
             }
 
             appendLabelsToSymbols(map, sizeData)
@@ -356,11 +361,18 @@ export const map = function (config) {
     const appendLabelsToSymbols = function (map, sizeData) {
         let symbolContainers = map.svg().selectAll('g.em-centroid')
         //country code labels
-        if (out.circleCodeLabels_) {
+        if (out.psCodeLabels_) {
             const countryCodeLabel = symbolContainers
+                .filter((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value !== ':' && datum?.value != null // Ignore `':'`, `null`, and `undefined`
+                })
                 .append('text')
                 .attr('class', 'em-circle-code-label')
-                .text((d) => d.properties.id)
+                .text((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value === ':' ? '' : d.properties.id // Hide text if value is ':'
+                })
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
                 .attr('font-family', 'sans-serif')
@@ -380,6 +392,10 @@ export const map = function (config) {
         //stat labels
         if (out.labels_?.values) {
             const statLabels = symbolContainers
+                .filter((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value !== ':' && datum?.value != null // Ignore `':'`, `null`, and `undefined`
+                })
                 .append('text')
                 .attr('class', 'em-circle-stat-label')
                 .text((d) => {
@@ -396,7 +412,7 @@ export const map = function (config) {
                     return `${radius * 0.4}px`
                 })
                 .attr('fill', getTextColorForBackground(out.psFill_))
-                .attr('dy', (d) => (out.circleCodeLabels_ ? '0.6em' : '0'))
+                .attr('dy', (d) => (out.psCodeLabels_ ? '0.6em' : '0'))
         }
     }
 
@@ -453,7 +469,7 @@ export const map = function (config) {
      */
     function updateSymbolsDrawOrder(map) {
         let zoomGroup = map.svg_ ? map.svg_.select('#zoomgroup' + map.svgId_) : null
-        const gcp = zoomGroup.select('#g_ps')
+        const gcp = zoomGroup.select('#em-prop-symbols')
         let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
 
         map._centroidFeatures.sort(function (a, b) {
@@ -542,13 +558,11 @@ export const map = function (config) {
         let symbolContainers = map.svg().selectAll('g.em-centroid')
 
         if (out.simulation) {
-            out.simulation.stop() // Stops the internal tick loop
-            out.simulation.on('tick', null) // Remove tick event listener
-            out.simulation.on('end', null) // Remove end event listener
-            out.simulation = null // Remove reference
+            stopSimulation()
         }
 
         // Initialize the force simulation
+        console.log('new dorling simulation')
         out.simulation = forceSimulation(map._centroidFeatures)
             .force(
                 'x',
@@ -569,7 +583,7 @@ export const map = function (config) {
                     }
 
                     return size // Default for circles
-                }).iterations(3) // More iterations to improve collision handling
+                }).iterations(out.dorlingIterations_) // More iterations to improve collision handling
             )
             //.alphaTarget(0.3) // Helps keep centroids anchored
             .on('tick', () => {
@@ -578,6 +592,13 @@ export const map = function (config) {
             })
 
         //out.simulation.alpha(1).restart() // Ensures simulation starts with full strength
+    }
+
+    function stopSimulation() {
+        out.simulation.stop() // Stops the internal tick loop
+        out.simulation.on('tick', null) // Remove tick event listener
+        out.simulation.on('end', null) // Remove end event listener
+        out.simulation = null // Remove reference
     }
 
     /**
@@ -625,7 +646,7 @@ export const map = function (config) {
         return (
             map
                 .svg()
-                .select('#g_ps')
+                .select('#em-prop-symbols')
                 .selectAll('g.em-centroid')
                 .append('rect')
                 .filter((rg) => {
@@ -666,7 +687,7 @@ export const map = function (config) {
     function appendCustomSymbolsToMap(map, sizeData) {
         return map
             .svg()
-            .select('#g_ps')
+            .select('#em-prop-symbols')
             .selectAll('g.em-centroid')
             .append('g')
             .filter((rg) => {

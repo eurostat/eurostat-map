@@ -668,8 +668,8 @@ export const legend = function (map, config) {
 
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl) {
-        //for ps, the symbols are the children of each g_ps element
-        const allSymbols = map.svg_.selectAll('#g_ps').selectAll('[ecl]')
+        //for ps, the symbols are the children of each em-prop-symbols element
+        const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
 
         // Set all symbols to white
         allSymbols.each(function (d, i) {
@@ -687,8 +687,8 @@ export const legend = function (map, config) {
 
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
-        //for ps, the symbols are the children of each g_ps element
-        const allSymbols = map.svg_.selectAll('#g_ps').selectAll('[ecl]')
+        //for ps, the symbols are the children of each em-prop-symbols element
+        const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
 
         // Restore each region's original color from the fill___ attribute
         allSymbols.each(function (d, i) {
