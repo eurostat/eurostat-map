@@ -12,7 +12,7 @@ import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTe
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config)
+    const out = StatMap.statMap(config, false, 'ct')
 
     /** Fill style for each category/class. Ex.: { urb: "#fdb462", int: "#ffffb3", rur: "#ccebc5" } */
     out.classToFillStyle_ = undefined

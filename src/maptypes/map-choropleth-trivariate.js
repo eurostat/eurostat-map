@@ -13,7 +13,7 @@ import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets,
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config)
+    const out = StatMap.statMap(config, false, 'chtri')
 
     //number of classes for the classification. Same for both variables.
     out.numberOfClasses_ = 3

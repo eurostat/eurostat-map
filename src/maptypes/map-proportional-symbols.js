@@ -6,7 +6,7 @@ import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forc
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 
 /**
  * Returns a proportional symbol map.
@@ -15,7 +15,7 @@ import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets,
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, true)
+    const out = StatMap.statMap(config, true, 'ps')
 
     //shape
     out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
@@ -57,6 +57,8 @@ export const map = function (config) {
 
     //dorling cartogram
     out.dorling_ = false
+    out.dorlingStrength_ = { x: 1, y: 1 }
+    out.circleCodeLabels_ = false
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -90,7 +92,9 @@ export const map = function (config) {
         'psClassificationMethod_',
         'psClasses_',
         'dorling_',
+        'dorlingStrength_',
         'psSpikeWidth_',
+        'circleCodeLabels_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -279,6 +283,13 @@ export const map = function (config) {
                 symb = appendD3SymbolsToMap(map, sizeData)
             }
 
+            // dorling cartogram
+            if (out.dorling_) {
+                applyDorlingForce(map, sizeData)
+            }
+
+            appendLabelsToSymbols(map, sizeData)
+
             // set style of symbols
             const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
@@ -342,6 +353,53 @@ export const map = function (config) {
         return map
     }
 
+    const appendLabelsToSymbols = function (map, sizeData) {
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
+        //country code labels
+        if (out.circleCodeLabels_) {
+            const countryCodeLabel = symbolContainers
+                .append('text')
+                .attr('class', 'em-circle-code-label')
+                .text((d) => d.properties.id)
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .attr('font-family', 'sans-serif')
+                .style('font-size', (d) => {
+                    // calculate radius
+                    const datum = sizeData.get(d.properties.id)
+                    const radius = datum ? out.classifierSize_(datum.value) : 0
+                    // size adjustment factor depends on symbol type, and whether stat values are also added to the circles
+                    let factor = out.labels_?.values && sizeData.get(d.properties.id)?.value ? 0.8 : 0.9
+                    if (out.psShape_ === 'square') factor = factor - 0.4
+                    return `${radius * factor}px`
+                })
+                .attr('fill', getTextColorForBackground(out.psFill_))
+                .attr('dy', (d) => (out.labels_?.values && sizeData.get(d.properties.id)?.value ? '-0.3em' : '0'))
+        }
+
+        //stat labels
+        if (out.labels_?.values) {
+            const statLabels = symbolContainers
+                .append('text')
+                .attr('class', 'em-circle-stat-label')
+                .text((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    if (datum?.value) return datum.value
+                })
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .attr('font-family', 'sans-serif')
+                .style('font-size', (d) => {
+                    // calculate radius
+                    const datum = sizeData.get(d.properties.id)
+                    const radius = datum ? out.classifierSize_(datum.value) : 0
+                    return `${radius * 0.4}px`
+                })
+                .attr('fill', getTextColorForBackground(out.psFill_))
+                .attr('dy', (d) => (out.circleCodeLabels_ ? '0.6em' : '0'))
+        }
+    }
+
     const addMouseEvents = function (map) {
         let symbols = map.svg().selectAll('g.em-centroid')
         symbols
@@ -362,74 +420,6 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mouseout()
                 }
             })
-    }
-
-    /**
-     * OVERRIDE
-     * @description update the statistical values labels on the map
-     * @param {Object} map eurostat-map map instance
-     * @return {} out
-     */
-    out.updateValuesLabels = function (map) {
-        // apply to main map
-        if (!map) {
-            map = out
-        }
-        //clear previous labels
-        let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
-        prevLabels.remove()
-        let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
-        prevShadows.remove()
-
-        let statLabels = map.svg_.selectAll('g.em-stat-label')
-        let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
-
-        statLabels
-            .filter((d) => {
-                const sv = sizeData.get(d.properties.id)
-                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                    return false
-                } else {
-                    return true
-                }
-            })
-            .append('text')
-            .text(function (d) {
-                const sv = sizeData.get(d.properties.id)
-                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                    return ''
-                } else {
-                    if (sv.value !== ':') {
-                        return spaceAsThousandSeparator(sv.value)
-                    }
-                }
-            })
-
-        //add shadows to labels
-        if (out.labelShadow_) {
-            map.svg_
-                .selectAll('g.em-stat-label-shadow')
-                .filter((d) => {
-                    const sv = sizeData.get(d.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        return false
-                    } else {
-                        return true
-                    }
-                })
-                .append('text')
-                .text(function (d) {
-                    const sv = sizeData.get(d.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        return ''
-                    } else {
-                        if (sv.value !== ':') {
-                            return spaceAsThousandSeparator(sv.value)
-                        }
-                    }
-                })
-        }
-        return out
     }
 
     /**
@@ -545,49 +535,49 @@ export const map = function (config) {
             })
             .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
 
-        if (out.dorling_) {
-            applyDorlingForce(map, sizeData)
-        }
-
         return circles
     }
 
     function applyDorlingForce(map, sizeData) {
         let symbolContainers = map.svg().selectAll('g.em-centroid')
+
+        if (out.simulation) {
+            out.simulation.stop() // Stops the internal tick loop
+            out.simulation.on('tick', null) // Remove tick event listener
+            out.simulation.on('end', null) // Remove end event listener
+            out.simulation = null // Remove reference
+        }
+
         // Initialize the force simulation
-        const simulation = forceSimulation(map._centroidFeatures)
+        out.simulation = forceSimulation(map._centroidFeatures)
             .force(
                 'x',
-                forceX((d) => {
-                    console.log(d.properties.centroid)
-                    return d.properties.centroid[0]
-                })
+                forceX((d) => d.properties.centroid[0]).strength(out.dorlingStrength_.x) // Stronger pull to original x
             )
             .force(
                 'y',
-                forceY((d) => {
-                    return d.properties.centroid[1]
-                })
+                forceY((d) => d.properties.centroid[1]).strength(out.dorlingStrength_.y) // Stronger pull to original y
             )
             .force(
                 'collide',
                 forceCollide((d) => {
-                    if (d.properties.radius) {
-                        return d.properties.radius
-                    } else {
-                        const datum = sizeData.get(d.properties.id)
-                        const radius = datum ? out.classifierSize_(datum.value) : 0
-                        d.properties.radius = radius
-                        return radius
+                    const datum = sizeData.get(d.properties.id)
+                    let size = datum ? out.classifierSize_(datum.value) : 0
+
+                    if (out.psShape_ === 'square') {
+                        return (size / 2) * Math.SQRT2 // Adjust for diagonal size
                     }
-                })
+
+                    return size // Default for circles
+                }).iterations(3) // More iterations to improve collision handling
             )
+            //.alphaTarget(0.3) // Helps keep centroids anchored
             .on('tick', () => {
                 // Update elements with the new positions and radii
-                symbolContainers.attr('transform', function (d) {
-                    return 'translate(' + d.x + ',' + d.y + ')'
-                })
+                symbolContainers.attr('transform', (d) => 'translate(' + d.x + ',' + d.y + ')')
             })
+
+        //out.simulation.alpha(1).restart() // Ensures simulation starts with full strength
     }
 
     /**

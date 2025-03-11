@@ -26,9 +26,10 @@ formatDefaultLocale({
  *
  * @param {*} withCenterPoints Set to true (or 1) to add regions center points to the map template, to be used for proportional symbols maps for example.
  */
-export const mapTemplate = function (config, withCenterPoints) {
+export const mapTemplate = function (config, withCenterPoints, mapType) {
     //build map template object
     const out = {}
+    out._mapType = mapType
 
     // expose imported function to other modules
     out.updateValuesLabels = updateValuesLabels
@@ -100,6 +101,9 @@ export const mapTemplate = function (config, withCenterPoints) {
 
     //graticule
     out.drawGraticule_ = false
+
+    //background map toggle (e.g. for dorling)
+    out.backgroundMap_ = true
 
     //labelling
     // see docs\reference.md#labelling
@@ -544,40 +548,8 @@ export const mapTemplate = function (config, withCenterPoints) {
                 defineMapZoom()
             }
 
-            //draw sea
-            zoomGroup
-                .append('rect')
-                .attr('id', 'sea')
-                .attr('class', 'em-sea')
-                .attr('x', -5 * out.width_)
-                .attr('y', -5 * out.height_)
-                .attr('width', 11 * out.width_)
-                .attr('height', 11 * out.height_)
-
-            //sphere for world map
-            if (out.geo_ == 'WORLD') {
-                zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
-            }
-
-            // coastal margin
-            if (out.drawCoastalMargin_) {
-                addCoastalMarginToMap()
-            }
-
-            // draw polygons and borders
-            if (out.geometries_) {
-                out.Geometries.addUserGeometriesToMap(out.geometries_, zoomGroup, out._pathFunction)
-            } else {
-                out.Geometries.addDefaultGeometriesToMap(
-                    zoomGroup,
-                    out.drawGraticule_,
-                    out._pathFunction,
-                    out.nutsLevel_,
-                    out.nutsYear_,
-                    out.geo_,
-                    out.proj_,
-                    out.scale_
-                )
+            if (out.backgroundMap_) {
+                drawBackgroundMap(out)
             }
         }
 
@@ -682,6 +654,46 @@ export const mapTemplate = function (config, withCenterPoints) {
         }
 
         return out
+    }
+
+    const drawBackgroundMap = function (out) {
+        //draw background map
+        const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+        //draw sea
+        zoomGroup
+            .append('rect')
+            .attr('id', 'sea')
+            .attr('class', 'em-sea')
+            .attr('x', -5 * out.width_)
+            .attr('y', -5 * out.height_)
+            .attr('width', 11 * out.width_)
+            .attr('height', 11 * out.height_)
+
+        //sphere for world map
+        if (out.geo_ == 'WORLD') {
+            zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
+        }
+
+        // coastal margin
+        if (out.drawCoastalMargin_) {
+            addCoastalMarginToMap()
+        }
+
+        // draw polygons and borders
+        if (out.geometries_) {
+            out.Geometries.addUserGeometriesToMap(out.geometries_, zoomGroup, out._pathFunction)
+        } else {
+            out.Geometries.addDefaultGeometriesToMap(
+                zoomGroup,
+                out.drawGraticule_,
+                out._pathFunction,
+                out.nutsLevel_,
+                out.nutsYear_,
+                out.geo_,
+                out.proj_,
+                out.scale_
+            )
+        }
     }
 
     const defineDefaultPosition = function () {

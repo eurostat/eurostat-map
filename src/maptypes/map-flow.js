@@ -16,7 +16,7 @@ import { getRegionsSelector } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, true)
+    const out = StatMap.statMap(config, true, 'flow')
     out.strokeWidthScale = scaleLinear()
     out.labelOffsetX = 15
     out.labelOffsetY = 5

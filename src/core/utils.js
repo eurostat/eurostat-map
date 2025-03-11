@@ -434,16 +434,43 @@ export const convertRectanglesToPaths = function (x, y, width, height) {
 }
 
 export const getTextColorForBackground = function (backgroundColor) {
-    // Extract RGB values from the background color string
-    const rgb = backgroundColor.match(/\d+/g)
-    const r = parseInt(rgb[0])
-    const g = parseInt(rgb[1])
-    const b = parseInt(rgb[2])
+    let r, g, b
 
-    // Calculate luminance using the formula for relative luminance
+    // Create a temporary element to handle named colors
+    if (!backgroundColor.startsWith('rgb') && !backgroundColor.startsWith('#')) {
+        const tempDiv = document.createElement('div')
+        tempDiv.style.color = backgroundColor
+        document.body.appendChild(tempDiv)
+        const computedColor = window.getComputedStyle(tempDiv).color
+        document.body.removeChild(tempDiv)
+        backgroundColor = computedColor // Convert named color to RGB
+    }
+
+    // Handle hex colors like '#FFFFFF' or '#FFF'
+    if (backgroundColor.startsWith('#')) {
+        let hex = backgroundColor.replace('#', '')
+        if (hex.length === 3) {
+            hex = hex
+                .split('')
+                .map((c) => c + c)
+                .join('')
+        }
+        r = parseInt(hex.substring(0, 2), 16)
+        g = parseInt(hex.substring(2, 4), 16)
+        b = parseInt(hex.substring(4, 6), 16)
+    }
+    // Handle RGB colors like 'rgb(255,255,255)'
+    else {
+        const rgb = backgroundColor.match(/\d+/g)
+        r = parseInt(rgb[0])
+        g = parseInt(rgb[1])
+        b = parseInt(rgb[2])
+    }
+
+    // Calculate luminance
     const luminance = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
 
-    // Return black for light background, white for dark background
+    // Return black for light backgrounds, white for dark backgrounds
     return luminance > 0.5 ? 'black' : 'white'
 }
 

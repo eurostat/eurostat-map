@@ -14,7 +14,7 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, true)
+    const out = StatMap.statMap(config, true, 'pie')
 
     // pie charts
     out.pieMinRadius_ = 5

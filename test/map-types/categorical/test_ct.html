@@ -23,7 +23,7 @@
                 //     valueCol: 'urban_rural',
                 // })
                 .classToFillStyle({ a: '#fdb462', b: '#ffffb3', c: '#ccebc5' })
-                .classToText({ a: 'a', b: 'b', c: 'c' })
+                .classToText({ a: '1', b: '2', c: '3' })
                 .legend({
                     svgId: 'legend',
                     labelFontSize: 14,
@@ -31,56 +31,56 @@
                     shapeHeight: 18,
                 })
 
-            map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'c', IT: 'c', SI: 'c', RO: 'c', PL: 'b', PT: 'b' })
             map.build()
 
             // second
-            setTimeout(() => {
-                map.classToFillStyle({ f: '#fdb462', b: '#ffffb3', c: '#ccebc5' }).classToText({ f: 'f', b: 'b', c: 'c' }).legend({
-                    svgId: 'legend',
-                    labelFontSize: 14,
-                    shapeWidth: 20,
-                    shapeHeight: 18,
-                })
+            // setTimeout(() => {
+            //     map.classToFillStyle({ f: '#fdb462', b: '#ffffb3', c: '#ccebc5' }).classToText({ f: 'f', b: 'b', c: 'c' }).legend({
+            //         svgId: 'legend',
+            //         labelFontSize: 14,
+            //         shapeWidth: 20,
+            //         shapeHeight: 18,
+            //     })
 
-                map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
-                map.updateStatValues()
-                map.updateClassification().updateStyle()
-                map.updateLegend()
-            }, 2000)
+            //     map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.updateStatValues()
+            //     map.updateClassification().updateStyle()
+            //     map.updateLegend()
+            // }, 2000)
 
             // third
-            setTimeout(() => {
-                map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
-                map.updateStatValues()
-                map.legend({
-                    svgId: 'legend',
-                    labelFontSize: 14,
-                    shapeWidth: 30,
-                    shapeHeight: 30,
-                    x: 100,
-                    y: 270,
-                })
-                map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
-                map.classToText({ a: 'a', b: 'b', e: 'e' })
-                map.updateClassification().updateStyle()
-                map.updateLegend()
-            }, 4000)
+            // setTimeout(() => {
+            //     map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.updateStatValues()
+            //     map.legend({
+            //         svgId: 'legend',
+            //         labelFontSize: 14,
+            //         shapeWidth: 30,
+            //         shapeHeight: 30,
+            //         x: 100,
+            //         y: 270,
+            //     })
+            //     map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
+            //     map.classToText({ a: 'a', b: 'b', e: 'e' })
+            //     map.updateClassification().updateStyle()
+            //     map.updateLegend()
+            // }, 4000)
 
-            setTimeout(() => {
-                map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
-                map.classToText({ a: 'a', b: 'b', e: 'e' })
-                map.legend({
-                    svgId: 'legend',
-                    labelFontSize: 12,
-                    shapeWidth: 10,
-                    shapeHeight: 10,
-                })
-                map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
-                map.updateStatValues()
-                map.updateClassification().updateStyle()
-                map.updateLegend()
-            }, 6000)
+            // setTimeout(() => {
+            //     map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
+            //     map.classToText({ a: 'a', b: 'b', e: 'e' })
+            //     map.legend({
+            //         svgId: 'legend',
+            //         labelFontSize: 12,
+            //         shapeWidth: 10,
+            //         shapeHeight: 10,
+            //     })
+            //     map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.updateStatValues()
+            //     map.updateClassification().updateStyle()
+            //     map.updateLegend()
+            // }, 6000)
         </script>
     </body>
 </html>

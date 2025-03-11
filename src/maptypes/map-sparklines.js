@@ -15,7 +15,7 @@ import { getRegionsSelector } from '../core/utils'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, true)
+    const out = StatMap.statMap(config, true, 'spark')
 
     out.sparkLineColor_ = 'black'
     out.sparkAreaColor_ = '#41afaa'

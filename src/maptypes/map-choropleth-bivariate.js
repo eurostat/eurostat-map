@@ -3,7 +3,7 @@ import { scaleQuantile } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector } from '../core/utils'
+import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 
 /**
  * Return a bivariate choropleth map.
@@ -13,7 +13,7 @@ import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets,
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config)
+    const out = StatMap.statMap(config, false, 'chbi')
 
     //number of classes for the classification. Same for both variables.
     out.numberOfClasses_ = 3
@@ -207,23 +207,18 @@ export const map = function (config) {
                             sel.attr('fill___', sel.style('fill'))
                         })
 
-                        regions
-                            .on('mouseover', function (e, rg) {
-                                const sel = select(this)
-                                sel.style('fill', map.hoverColor_)
-                                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                            })
-                            .on('mousemove', function (e, rg) {
-                                if (out._tooltip) out._tooltip.mousemove(e)
-                            })
-                            .on('mouseout', function () {
-                                const sel = select(this)
-                                let newFill = sel.attr('fill___')
-                                if (newFill) {
-                                    sel.style('fill', sel.attr('fill___'))
-                                    if (out._tooltip) out._tooltip.mouseout()
-                                }
-                            })
+                        // Set up mouse events
+                        addMouseEventsToRegions(map, regions)
+
+                        // update font color for grid cartograms (contrast)
+                        if (out.gridCartogram_) {
+                            map.svg()
+                                .selectAll('.em-grid-text')
+                                .each(function () {
+                                    const cellColor = select(this.parentNode).style('fill')
+                                    select(this).attr('fill', getTextColorForBackground(cellColor))
+                                })
+                        }
                     },
                     (err) => {
                         // rejection
@@ -234,6 +229,26 @@ export const map = function (config) {
                 styleMixedNUTS(map)
             }
         }
+    }
+
+    const addMouseEventsToRegions = function (map, regions) {
+        regions
+            .on('mouseover', function (e, rg) {
+                const sel = select(this)
+                sel.style('fill', map.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e, rg) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function () {
+                const sel = select(this)
+                let newFill = sel.attr('fill___')
+                if (newFill) {
+                    sel.style('fill', sel.attr('fill___'))
+                    if (out._tooltip) out._tooltip.mouseout()
+                }
+            })
     }
 
     //@override

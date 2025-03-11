@@ -10,9 +10,9 @@ import * as tp from '../tooltip/tooltip'
  *
  * @param {*} withCenterPoints Set to true (or 1) to add regions center points to the map template, to be used for proportional symbols maps for example.
  */
-export const statMap = function (config, withCenterPoints) {
+export const statMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
-    const out = MapTemplate.mapTemplate(config, withCenterPoints)
+    const out = MapTemplate.mapTemplate(config, withCenterPoints, mapType)
 
     //statistical data
 

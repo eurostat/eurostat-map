@@ -18,8 +18,8 @@ export const addLabelsToMap = function (map, zg) {
     let existing = zg.select('#em-labels')
     let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
 
-    //for statistical values we need to add centroids initially, then add text to them later once the stat data is loaded
-    if (map.labels_?.values) appendStatLabelCentroidsToMap(map, labelsContainer)
+    //for statistical values on maps without centroids, we need to add centroids initially, then add text to them later once the stat data is loaded
+    if (map.labels_?.values && map._mapType !== 'ps') appendStatLabelCentroidsToMap(map, labelsContainer)
 
     // get labels array
     let labelsArray = map.labels_?.labels || DEFAULTLABELS[`${map.geo}_${map.proj_}.cc`]
@@ -151,19 +151,20 @@ export const updateLabels = function (map) {
  * @description update the statistical values labels on the map
  * @param {Object} map eurostat-map map instance
  * @return {map} out
+ * NOTE: THIS FUNCTION IS NOT CALLED FOR PROPORTIONAL SYMBOL MAPS
  */
 export const updateValuesLabels = function (map) {
     if (!map) {
         console.warn('No map specified')
         return
     }
+
     //clear previous labels
     let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
     prevLabels.remove()
     let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
     prevShadows.remove()
     let statLabels = map.svg_.selectAll('g.em-stat-label')
-    let labelsContainer = map.svg_.select('#em-labels')
 
     // filter stat-label elements to only show those with data
     const filterFunction = map.labels_?.statLabelsFilterFunction ? map.labels_?.statLabelsFilterFunction : defaultStatLabelFilter
@@ -264,7 +265,7 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     const gsls = labelsContainer.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
 
     // values labels parent <g>
-    const gsl = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
+    const statLabelsGroup = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
 
     // our features array
     let statLabelRegions = []
@@ -292,7 +293,8 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     //TODO: dont add labels for regions that are not visible? what about panning and zooming though. Only really an issue for mixed NUTS.
 
     // stats labels
-    gsl.selectAll('g')
+    statLabelsGroup
+        .selectAll('g')
         .data(statLabelRegions)
         .enter()
         .append('g')
