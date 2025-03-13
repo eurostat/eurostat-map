@@ -23,6 +23,8 @@
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
         - [Cartograms](#cartograms)
+            - [Grid Cartograms](#grid-cartograms)
+            - [Dorling Cartograms](#dorling-cartograms)
     - [Map texts](#map-texts)
         - [Map title \& subtitle](#map-title--subtitle)
         - [Labelling](#labelling)
@@ -743,7 +745,9 @@ const map = eurostatmap
 
 ### Cartograms
 
-As of version 4.1.0 you can now create grid cartograms by using the following function:
+As of version 4.1.0 you can now create grid cartograms and dorling cartograms by using the following functions:
+
+#### Grid Cartograms
 
 ```javascript
 map.gridCartogram(true)
@@ -781,6 +785,26 @@ map.gridCartogramPositions(
 ```
 
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/grid-cartogram.html))
+
+#### Dorling Cartograms
+
+Can be used like so:
+
+```javascript
+eurostatmap.map('proportionalSymbol').dorling(true).backgroundMap(false).psCodeLabels(true).psFill('#e04a28').psMaxSize(100).psMinSize(8)
+```
+
+removing the background map is optional but recommended:
+
+```javascript
+map.backgroundMap(false)
+```
+
+you can toggle the region code being shown inside the proportional symbols with:
+
+```javascript
+map.psCodeLabels(true)
+```
 
 ## Map texts
 
