@@ -762,7 +762,8 @@ map.gridCartogramShape('hexagon')
 and define container or cell padding using:
 
 ```javascript
-map.gridCartogramCellPadding(5).gridCartogramContainerPadding(80)
+ map.gridCartogramMargins({ bottom: 10, top: 100, left: 10, right: 10 })
+    .gridCartogramCellPadding(5)
 ```
 
 If you wish, you can even define custom grid positions using:
