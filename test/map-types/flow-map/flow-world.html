@@ -48,7 +48,7 @@
             const map = eurostatmap
                 .map('flow')
                 .geo('world')
-                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(160))
+                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(120).translate([260, 240]))
                 .title('Flow map with geoAzimuthalEquidistant projection')
                 .subtitle('test')
                 .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
