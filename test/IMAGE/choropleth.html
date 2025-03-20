@@ -4,14 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
-            .em-cntrg,
-            .em-nutsrg {
-                fill: #ebebeb !important;
-            }
 
-            .em-sea {
-                fill: #ffffff !important;
-            }
         </style>
     </head>
 
@@ -29,16 +22,16 @@
                 .map('choropleth')
                 .width(795)
                 .height(625)
-                .nutsLevel(2)
-                .stat({
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Euro per inhabitant',
-                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
-                })
+                .nutsLevel('mixed')
+                // .stat({
+                //     eurostatDatasetCode: 'nama_10r_3gdp',
+                //     unitText: 'Euro per inhabitant',
+                //     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                // })
                 // .classificationMethod('threshold')
                 // .colors(['#E9ECF6', '#C8CFF0', '#A5B1E5', '#7D92E2', '#6177CC', '#3F5AB2', '#20368D', '#0B1432'])
                 // .threshold([0, 2, 4, 6, 8, 10])
-                .position({ x: 4980000, y: 3610000, z: 7400 })
+                .position({ x: 4790000, y: 3420000, z: 6400 })
                 .legend({
                     boxPadding: 5,
                     x: 10,
@@ -53,7 +46,7 @@
                 })
                 .zoomExtent([1, 1000])
 
-            //map.statData().setData(nuts3)
+            map.statData().setData(mixedNUTS)
 
             map.build()
 

@@ -29,7 +29,7 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    let eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#17256B']
+    let eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#1d2b6f']
     out.colorFunction_ = (t) => piecewise(interpolateLab, eurostatMultihue)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
     out.classToFillStyle_ = undefined
@@ -172,6 +172,7 @@ export const map = function (config) {
         const classifyRegions = (regions) => {
             regions.attr('ecl', (rg) => {
                 const regionData = out.statData().get(rg.properties.id)
+                if (rg.properties.id == 'LB') console.log(regionData, out.statData())
                 if (!regionData) return // Lack of data is handled explicitly
                 const value = regionData.value
                 if (value === ':' || value === null) return 'nd'
@@ -274,6 +275,7 @@ export const map = function (config) {
         map.svg()
             .selectAll(getRegionsSelector(map))
             .each(function () {
+                if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
                 const sel = select(this)
                 const ecl = sel.attr('ecl')
                 const lvl = sel.attr('lvl')

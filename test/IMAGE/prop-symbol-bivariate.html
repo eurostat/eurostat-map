@@ -21,6 +21,7 @@
             let maxRadius = 30
 
             let sizedata = {
+                LB:122,
                 ES: 0,
                 FR: ':',
                 DE: 300,
@@ -32,10 +33,13 @@
                 NO: 900,
                 NL: 1000,
                 PO: 1100,
-                RO: 1200,
+                RO: 700,
                 DE11: 1000,
+                UA: 1234,
+                MD: 1234
             }
             let colordata = {
+                LB:122,
                 ES: 0,
                 FR: ':',
                 DE: 300,
@@ -47,22 +51,19 @@
                 NO: 900,
                 NL: 1000,
                 PO: 1100,
-                RO: 1200,
+                RO: 700,
                 DE11: 1000,
+                UA: 1234,
+                MD: 1234
             }
 
             let map = eurostatmap
                 .map('proportionalSymbol')
-                .pixelSize(7400)
                 .insets(insetsConfig)
                 .insetBoxPosition([400, 10])
                 .width(mapWidth)
                 .height(mapHeight)
-                .labelling(false)
-                .labelsToShow(['values'])
                 .nutsLevel('mixed')
-                .psFill('#4ac499')
-                .psShape('circle')
                 .psMaxSize(maxRadius)
                 .legend({
                     //svgId: "eurostatmap-legend",

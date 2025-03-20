@@ -305,20 +305,21 @@ export const map = function (config) {
                 }
 
                 // nuts regions fill colour only for those with sizeData
-                regions.style('fill', function (rg) {
-                    const sv = sizeData.get(rg.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        // NO INPUT
-                        return out.noDataFillStyle_
-                    } else if ((sv && sv.value) || (sv && sv.value == 0)) {
-                        if (sv.value == ':') {
-                            // DATA NOT AVAILABLE
-                            return out.noDataFillStyle_
-                        }
-                        // DATA
-                        return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                    }
-                })
+                // regions.style('fill', function (rg) {
+                //     if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
+                //     const sv = sizeData.get(rg.properties.id)
+                //     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                //         // NO INPUT
+                //         return out.noDataFillStyle_
+                //     } else if ((sv && sv.value) || (sv && sv.value == 0)) {
+                //         if (sv.value == ':') {
+                //             // DATA NOT AVAILABLE
+                //             return out.noDataFillStyle_
+                //         }
+                //         // DATA
+                //         return getCSSPropertyFromClass('em-nutsrg', 'fill')
+                //     }
+                // })
 
                 // apply 'nd' class to no data for legend item hover
                 regions.attr('ecl', function (rg) {
@@ -334,15 +335,15 @@ export const map = function (config) {
                     }
                 })
             } else {
-                // world countries fill
-                regions.style('fill', function (rg) {
-                    const sv = sizeData.get(rg.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0) || sv.value == ':') {
-                        return out.worldFillStyle_
-                    } else {
-                        return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                    }
-                })
+                // world countries fill only those with data
+                // regions.style('fill', function (rg) {
+                //     const sv = sizeData.get(rg.properties.id)
+                //     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0) || sv.value == ':') {
+                //         return out.worldFillStyle_
+                //     } else {
+                //         return getCSSPropertyFromClass('em-nutsrg', 'fill')
+                //     }
+                // })
             }
 
             // set color/stroke/opacity styles
@@ -730,6 +731,7 @@ export const map = function (config) {
 
         // toggle display of mixed NUTS levels
         regions.style('display', function (rg) {
+            if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
             const sv = sizeData.get(rg.properties.id)
             if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                 // no symbol for no data

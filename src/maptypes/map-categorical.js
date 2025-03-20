@@ -181,6 +181,7 @@ export const map = function (config) {
         map.svg()
             .selectAll(getRegionsSelector(map))
             .style('display', function (rg) {
+                if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
                 const sel = select(this)
                 const ecl = sel.attr('ecl')
                 const lvl = sel.attr('lvl')

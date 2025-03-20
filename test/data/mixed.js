@@ -1,4 +1,6 @@
 const mixedNUTS = {
+    LB:2,
+    EG:3,
     UK: '1.0',
     US:1,
     CA:2,
@@ -143,7 +145,7 @@ const mixedNUTS = {
     "LT":12,
     "RU":12,
     "MT":12,
-    "DE": 'dsfg',
+    "DE": '1',
     "PL": '-1.0',
     "BY":0.1,
     "RO":0.1

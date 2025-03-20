@@ -479,7 +479,7 @@ export const getRegionsSelector = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions path'
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'
-    return '#em-nutsrg path'
+    return '#em-nutsrg path, #em-cntrg path'
 }
 
 // get css selector for legend mouse hover. Different maps have different selectors for their regions
@@ -487,5 +487,5 @@ export const getLegendRegionsSelector = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions'
     if (map.gridCartogram_) return '#em-grid-container'
     if (map.geo_ === 'WORLD') return '#em-worldrg'
-    return '#em-nutsrg'
+    return '#em-nutsrg, #em-cntrg'
 }
