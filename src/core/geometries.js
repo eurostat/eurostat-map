@@ -33,6 +33,19 @@ export const Geometries = function (map, withCenterPoints) {
     //centroids for prop symbols etc
     out.centroidsData = undefined
 
+    // get geojson features of all statistical regions
+    out.getRegionFeatures = function () {
+        if (map.geo_ == 'WORLD') {
+            return out.geoJSONs.worldrg
+        } else {
+            if (map.nutsLevel_ === 'mixed') {
+                return [out.geoJSONs.mixed.rg0, out.geoJSONs.mixed.rg1, out.geoJSONs.mixed.rg2, out.geoJSONs.mixed.rg3]
+            } else {
+                return out.geoJSONs.nutsrg.concat(out.geoJSONs.cntrg)
+            }
+        }
+    }
+
     /**
      * Retrieves and parses 'default' geo data (for NUTS or World maps)
      */
@@ -86,7 +99,7 @@ export const Geometries = function (map, withCenterPoints) {
             if (geo && geo !== 'EUR' && geo !== 'WORLD') path += `/${geo}`
 
             // Add projection
-            path += `/${proj}`
+            path += `/${geo == 'WORLD' ? '4326' : proj}` // world geodata is always 4326, then reprojected
 
             // Add scale only if not using center points
             if (!withCenter && scale) path += `/${scale}`
@@ -105,7 +118,11 @@ export const Geometries = function (map, withCenterPoints) {
                 )
             }
         } else if (map.geo_ === 'WORLD') {
-            promises.push(json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'))
+            // TODO: remove third-party hosting here
+            const worldMapTopojsonURL = window.location.hostname.includes('ec.europa.eu')
+                ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/IMAGE/WORLD_4326.json'
+                : 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
+            promises.push(json(worldMapTopojsonURL))
         } else {
             promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)))
             if (withCenterPoints) {
@@ -300,8 +317,8 @@ export const Geometries = function (map, withCenterPoints) {
                 })
         }
 
-        //kosovo
-        if (geo == 'EUR' && proj == '3035' && (nutsYear == '2016' || nutsYear == '2021')) {
+        // add kosovo manually
+        if (geo == 'EUR' && (nutsYear == '2016' || nutsYear == '2021')) {
             // add kosovo manually
             let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
 
@@ -314,6 +331,10 @@ export const Geometries = function (map, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', pathFunction)
+        }
+        if (geo == 'EUR' && proj == '4326') {
+            //custom projections use 4326 geodata
+            let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
         }
 
         //draw world boundaries
@@ -338,7 +359,7 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         if (this.geoJSONs.kosovo) {
-            //add kosovo
+            //add kosovo to world maps
             container
                 .append('g')
                 .attr('id', 'em-kosovo-bn')

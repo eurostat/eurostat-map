@@ -163,6 +163,13 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     // warn existing users of functions that have been banished to the shadow realm.
     defineDeprecatedFunctions(out)
 
+    // convert geo to uppercase
+    out.geo = function (v) {
+        if (!arguments.length) return out.geo_
+        out.geo_ = v.toUpperCase()
+        return out
+    }
+
     //special ones which affect also the insets
     ;['tooltip_', 'nuts2jsonBaseURL_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {

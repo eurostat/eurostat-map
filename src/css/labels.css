@@ -36,8 +36,20 @@
     stroke: #505050;
     stroke-width: 0.5px;
 }
+.em-label-shadow-cc {
+    font-size: 12px;
+    stroke: white;
+    stroke-width: 3px;
+}
 .em-label-countries {
     font-size: 12px;
+    stroke: #505050;
+    stroke-width: 0.5px;
+}
+.em-label-shadow-countries {
+    font-size: 12px;
+    stroke: white;
+    stroke-width: 3px;
 }
 .em-label-seas {
     font-size: 9px;

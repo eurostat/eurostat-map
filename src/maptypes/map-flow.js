@@ -124,8 +124,7 @@ export const map = function (config) {
     function addOverlayPolygons(svg, graph) {
         const importerIds = []
         const exporterIds = []
-
-        const features = out.Geometries.geoJSONs.nutsrg.concat(out.Geometries.geoJSONs.cntrg)
+        const features = out.Geometries.getRegionFeatures()
         if (features) {
             graph.nodes.forEach((node) => {
                 const overlay = features.find((feature) => {
@@ -166,12 +165,22 @@ export const map = function (config) {
                 })
 
                 if (centroid) {
-                    let screenCoords = out._projection([centroid.geometry.coordinates[0], centroid.geometry.coordinates[1]])
+                    const screenCoords = out._projection([centroid.geometry.coordinates[0], centroid.geometry.coordinates[1]])
                     node.x = screenCoords[0]
                     node.y = screenCoords[1]
                 } else {
                     console.error('could not find coordinates for', node.id)
                 }
+            } else {
+                // no centroids data, calculate on the fly
+                const features = out.Geometries.getRegionFeatures()
+                const feature = features.find((feature) => {
+                    if (node.id == feature.properties.id) return feature
+                })
+                const centroid = out._pathFunction.centroid(feature)
+                const screenCoords = out._projection([centroid[0], centroid[1]])
+                node.x = screenCoords[0]
+                node.y = screenCoords[1]
             }
         })
     }
