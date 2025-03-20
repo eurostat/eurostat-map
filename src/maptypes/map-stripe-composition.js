@@ -177,6 +177,7 @@ export const map = function (config) {
         out.svg()
             .selectAll(getRegionsSelector(out))
             .style('fill', function (d) {
+                if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
                 const id = d.properties.id
 
                 //compute composition

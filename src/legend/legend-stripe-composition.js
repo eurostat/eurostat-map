@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as Legend from './legend'
+import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 
 /**
  * A legend for choropleth maps
@@ -74,19 +75,18 @@ export const legend = function (map, config) {
                 .attr('stroke', 'black')
                 .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
-                    // TODO: change this to estat logic of making all other classes transparent?
-                    svgMap
-                        .selectAll('pattern')
-                        .selectAll("rect[code='" + code + "']")
-                        .style('fill', m.hoverColor())
-                    select(this).style('fill', m.hoverColor())
+                    const sel = select(this)
+                    sel.raise()
+                    highlightRegions(out.map, code)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                    }
                 })
                 .on('mouseout', function () {
-                    svgMap
-                        .selectAll('pattern')
-                        .selectAll("rect[code='" + code + "']")
-                        .style('fill', col)
-                    select(this).style('fill', col)
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
+                    }
                 })
 
             //label
@@ -161,5 +161,38 @@ export const legend = function (map, config) {
         out.setBoxDimension()
     }
 
+    function highlightRegions(map, code) {
+        const allRegions = map.svg_.selectAll('pattern').selectAll('rect');
+    
+        // Save original colors if not already stored
+        allRegions.each(function () {
+            const el = select(this);
+            if (!el.attr('data-original-fill')) {
+                el.attr('data-original-fill', el.style('fill'));
+            }
+            el.style('fill', 'white'); // Set all regions to white
+        });
+    
+        // Highlight only the selected regions by restoring their original color
+        const selectedRegions = map.svg_.selectAll("pattern").selectAll("rect[code='" + code + "']");
+        selectedRegions.each(function () {
+            const el = select(this);
+            el.style('fill', el.attr('data-original-fill')); // Restore original fill
+        });
+    }
+    
+    function unhighlightRegions(map) {
+        const allRegions = map.svg_.selectAll('pattern').selectAll('rect');
+    
+        // Restore each region's original color from the stored attribute
+        allRegions.each(function () {
+            const el = select(this);
+            const originalFill = el.attr('data-original-fill');
+            if (originalFill) {
+                el.style('fill', originalFill);
+            }
+        });
+    }
+    
     return out
 }
