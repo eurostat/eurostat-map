@@ -159,8 +159,8 @@ export const map = function (config) {
     // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
     function addCoordinatesToGraph(graph) {
         graph.nodes.forEach((node) => {
-            if (!node.x && !node.y && out.Geometries.centroidsData) {
-                const centroid = out.Geometries.centroidsData.features.find((feature) => {
+            if (!node.x && !node.y && out.Geometries.centroidFeatures) {
+                const centroid = out.Geometries.centroidFeatures.find((feature) => {
                     if (node.id == feature.properties.id) return feature
                 })
 
@@ -177,12 +177,13 @@ export const map = function (config) {
                 const feature = features.find((feature) => {
                     if (node.id == feature.properties.id) return feature
                 })
-                const centroid = out._pathFunction.centroid(feature)
+                const centroid = feature.properties.centroid || out._pathFunction.centroid(feature)
                 const screenCoords = out._projection([centroid[0], centroid[1]])
                 node.x = screenCoords[0]
                 node.y = screenCoords[1]
             }
         })
+        console.log(graph)
     }
 
     /**
@@ -503,21 +504,50 @@ export const map = function (config) {
         }
     }
 
+    // vertically stacks links with the same origin. Causes issues on world maps
+    // function computeLinkBreadths({ nodes }) {
+    //     for (const node of nodes) {
+    //         let y0 = node.y0;  // Initial y0 position
+    //         let y1 = y0;
+    //         for (const link of node.sourceLinks) {
+    //             link.y0 = y0 + link.width / 2;  // Adjusting y0 dynamically
+    //             y0 += link.width;  // Moving y0 down for the next link
+    //         }
+    //         for (const link of node.targetLinks) {
+    //             link.y1 = y1 + link.width / 2;
+    //             y1 += link.width;
+    //         }
+    //     }
+    // }
+
     function computeLinkBreadths({ nodes }) {
         for (const node of nodes) {
-            let y0 = node.y0
-            let y1 = y0
-            for (const link of node.sourceLinks) {
-                link.y0 = y0 + link.width / 2
-                y0 += link.width
-            }
-            for (const link of node.targetLinks) {
-                link.y1 = y1 + link.width / 2
-                y1 += link.width
+            if (node.sourceLinks.length > 1) {
+                // If multiple links originate from the same source, set them to the same y0
+                const fixedY0 = node.y;  // Use the node's y position
+                node.sourceLinks.forEach(link => {
+                    link.y0 = fixedY0;  // Force all links to use the same y0
+                });
+            } else {
+                // Default behavior for other nodes
+                let y0 = node.y0;
+                let y1 = y0;
+                for (const link of node.sourceLinks) {
+                    link.y0 = y0 + link.width / 2;
+                    y0 += link.width;
+                }
+                for (const link of node.targetLinks) {
+                    link.y1 = y1 + link.width / 2;
+                    y1 += link.width;
+                }
             }
         }
     }
+    
+    
+    
     function horizontalSource(d) {
+        console.log(d)
         return [d.source.x1, d.y0]
     }
 

@@ -1112,7 +1112,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
 
         // calculate screen coordinates and save centroids to map
-        map._centroidFeatures = centroidFeatures.map((d) => {
+        map.Geometries.centroidFeatures = centroidFeatures.map((d) => {
             let coords = map._projection(d.geometry.coordinates)
             d.properties.centroid = coords
             return d
@@ -1126,7 +1126,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // then symbols are drawn/appended to these containers in the map-type js file
         const symbolContainers = gcp
             .selectAll('g')
-            .data(map._centroidFeatures)
+            .data(map.Geometries.centroidFeatures)
             .enter()
             .append('g')
             .attr('transform', function (d) {

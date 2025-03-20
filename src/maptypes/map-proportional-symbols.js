@@ -266,7 +266,7 @@ export const map = function (config) {
             prevSymbols.remove()
 
             //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)
-            if (map._centroidFeatures) {
+            if (map.Geometries.centroidFeatures) {
                 updateSymbolsDrawOrder(map)
                 applyClassificationToMap(map)
             }
@@ -472,7 +472,7 @@ export const map = function (config) {
         const gcp = zoomGroup.select('#em-prop-symbols')
         let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
 
-        map._centroidFeatures.sort(function (a, b) {
+        map.Geometries.centroidFeatures.sort(function (a, b) {
             // A negative value indicates that a should come before b.
             // A positive value indicates that a should come after b.
             // Zero or NaN indicates that a and b are considered equal.
@@ -498,7 +498,7 @@ export const map = function (config) {
 
         let centroids = gcp
             .selectAll('g.em-centroid')
-            .data(map._centroidFeatures)
+            .data(map.Geometries.centroidFeatures)
             .join('g')
             .attr('transform', function (d) {
                 return 'translate(' + d.properties.centroid[0].toFixed(3) + ',' + d.properties.centroid[1].toFixed(3) + ')'
@@ -563,7 +563,7 @@ export const map = function (config) {
 
         // Initialize the force simulation
         console.log('new dorling simulation')
-        out.simulation = forceSimulation(map._centroidFeatures)
+        out.simulation = forceSimulation(map.Geometries.centroidFeatures)
             .force(
                 'x',
                 forceX((d) => d.properties.centroid[0]).strength(out.dorlingStrength_.x) // Stronger pull to original x

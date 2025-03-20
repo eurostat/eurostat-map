@@ -2,7 +2,7 @@
 import { json } from 'd3-fetch'
 import { feature } from 'topojson-client'
 import { executeForAllInsets } from './utils'
-import { kosovoBnFeatures } from './kosovo'
+import { kosovo_4326_20M_2021, kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
 
 // Geometries class wrapped as a function
@@ -31,7 +31,9 @@ export const Geometries = function (map, withCenterPoints) {
     out.statisticalRegions = undefined
 
     //centroids for prop symbols etc
-    out.centroidsData = undefined
+    out.centroidsData = undefined //raw
+    out.centroidsFeatures = undefined //geojson features
+
 
     // get geojson features of all statistical regions
     out.getRegionFeatures = function () {
@@ -118,7 +120,6 @@ export const Geometries = function (map, withCenterPoints) {
                 )
             }
         } else if (map.geo_ === 'WORLD') {
-            // TODO: remove third-party hosting here
             const worldMapTopojsonURL = window.location.hostname.includes('ec.europa.eu')
                 ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/IMAGE/WORLD_4326.json'
                 : 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
@@ -318,10 +319,9 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         // add kosovo manually
-        if (geo == 'EUR' && (nutsYear == '2016' || nutsYear == '2021')) {
+        if (geo == 'EUR' && (nutsYear == '2016' || nutsYear == '2021' || proj == '4326')) {
             // add kosovo manually
-            let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
-
+            let kosovoBn = proj == '4326' ? kosovo_4326_20M_2021.features : feature(kosovoBnFeatures[scale], 'nutsbn_1').features
             container
                 .append('g')
                 .attr('id', 'em-kosovo-bn')
@@ -331,10 +331,6 @@ export const Geometries = function (map, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', pathFunction)
-        }
-        if (geo == 'EUR' && proj == '4326') {
-            //custom projections use 4326 geodata
-            let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
         }
 
         //draw world boundaries

@@ -2,13 +2,11 @@
 /* Default region fill */
 .em-cntrg,
 .em-nutsrg,
-.em-worldrg,
 .em-grid-cell {
     fill: #efefef;
 }
 
 .em-nutsrg,
-.em-worldrg,
 .em-grid-cell,
 #em-user-regions {
     cursor: pointer;
@@ -30,10 +28,8 @@
 }
 
 /* all boudnaries and regions linecap/linejoin */
-#g_worldbn,
 #em-nutsbn,
 .em-cntbn,
-.em-worldbn,
 .em-bn-0,
 .em-bn-1,
 .em-bn-2,
@@ -46,15 +42,13 @@
 .em-nutsrg [lvl='1'],
 .em-cntrg,
 .em-nutsrg,
-.em-worldrg,
 .em-grid-cell {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
 
 /* national boundaries */
-.em-cntbn,
-.em-worldbn {
+.em-cntbn {
     stroke: #363636;
     stroke-width: 0.9px;
 }
@@ -90,7 +84,6 @@
 .em-frame,
 .em-graticule,
 .em-cntbn,
-.em-worldbn,
 .em-bn-0,
 .em-bn-1,
 .em-bn-2,
