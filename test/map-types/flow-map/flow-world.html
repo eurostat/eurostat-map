@@ -7,6 +7,7 @@
 
     <body>
         <svg id="map"></svg>
+        <svg id="map2"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
         <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
@@ -47,10 +48,25 @@
             const map = eurostatmap
                 .map('flow')
                 .geo('world')
-                .projectionFunction(d3.geoAzimuthalEqualArea().rotate([-10, -30]).scale(160))
-                .title('Flow map with custom projection')
+                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(160))
+                .title('Flow map with geoAzimuthalEquidistant projection')
                 .subtitle('test')
-                .flowGraph(exampleGraph)
+                .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
+                .flowColor('#72bb6f')
+                .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+                .nutsLevel(0)
+                .zoomExtent([0.5, 10])
+                .build()
+
+                const map2 = eurostatmap
+                .map('flow')
+                .svgId('map2')
+                .geo('world')
+                //.proj('4326')
+                // .projectionFunction(d3.geoAzimuthalEqualArea().rotate([-10, -30]).scale(160))
+                .title('Flow map with Robinson projection')
+                .subtitle('test')
+                .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
                 .flowColor('#72bb6f')
                 .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
                 .nutsLevel(0)
