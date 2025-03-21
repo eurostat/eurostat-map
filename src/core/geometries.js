@@ -2,7 +2,7 @@
 import { json } from 'd3-fetch'
 import { feature } from 'topojson-client'
 import { executeForAllInsets } from './utils'
-import { kosovo_4326_20M_2021, kosovoBnFeatures } from './kosovo'
+import {  kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
 
 // Geometries class wrapped as a function
@@ -224,18 +224,9 @@ export const Geometries = function (map, withCenterPoints) {
                 })
 
                 //add kosovo
-                if (geo == 'EUR' && proj == '3035') {
+                if (geo == 'EUR' && (proj == '3035' || proj == '4326')) {
                     // add kosovo manually
-                    let kosovoBn = feature(kosovoBnFeatures[scale], 'nutsbn_1').features
-                    container
-                        .append('g')
-                        .attr('id', 'em-kosovo-bn')
-                        .attr('class', 'em-kosovo-bn em-bn-cc')
-                        .selectAll('path')
-                        .data(kosovoBn)
-                        .enter()
-                        .append('path')
-                        .attr('d', pathFunction)
+                    addKosovoBorder(container, pathFunction, proj, scale)
                 }
             } else {
                 // when nutsLevel is not 'mixed'
@@ -318,21 +309,6 @@ export const Geometries = function (map, withCenterPoints) {
                 })
         }
 
-        // add kosovo manually
-        if (geo == 'EUR' && (nutsYear == '2016' || nutsYear == '2021' || proj == '4326')) {
-            // add kosovo manually
-            let kosovoBn = proj == '4326' ? kosovo_4326_20M_2021.features : feature(kosovoBnFeatures[scale], 'nutsbn_1').features
-            container
-                .append('g')
-                .attr('id', 'em-kosovo-bn')
-                .attr('class', 'em-kosovo-bn')
-                .selectAll('path')
-                .data(kosovoBn)
-                .enter()
-                .append('path')
-                .attr('d', pathFunction)
-        }
-
         //draw world boundaries
         if (this.geoJSONs.worldbn) {
             container
@@ -366,6 +342,19 @@ export const Geometries = function (map, withCenterPoints) {
                 .append('path')
                 .attr('d', pathFunction)
         }
+    }
+
+    function addKosovoBorder(container, pathFunction, proj, scale) {
+        let kosovoBn = feature(kosovoBnFeatures[proj][scale], 'nutsbn_1').features
+        container
+            .append('g')
+            .attr('id', 'em-kosovo-bn')
+            .attr('class', 'em-kosovo-bn em-bn-cc')
+            .selectAll('path')
+            .data(kosovoBn)
+            .enter()
+            .append('path')
+            .attr('d', pathFunction)
     }
 
     /**
