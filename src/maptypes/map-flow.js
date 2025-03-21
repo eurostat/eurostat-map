@@ -82,8 +82,6 @@ export const map = function (config) {
         addCoordinatesToGraph(graph)
 
         var { nodes, links } = sankey(graph)
-        // console.log('Processed Nodes:', nodes) // Array of processed nodes
-        // console.log('Processed Links:', links) // Array of processed links
 
         // Define marker and gradient IDs
         const defs = svg.append('defs')
@@ -435,7 +433,6 @@ export const map = function (config) {
         computeNodeHeights(graph)
         computeNodeBreadths(graph)
         computeLinkBreadths(graph)
-        console.log('Sankey Graph:', graph)
         return graph
     }
 
@@ -524,30 +521,27 @@ export const map = function (config) {
         for (const node of nodes) {
             if (node.sourceLinks.length > 1) {
                 // If multiple links originate from the same source, set them to the same y0
-                const fixedY0 = node.y;  // Use the node's y position
-                node.sourceLinks.forEach(link => {
-                    link.y0 = fixedY0;  // Force all links to use the same y0
-                });
+                const fixedY0 = node.y // Use the node's y position
+                node.sourceLinks.forEach((link) => {
+                    link.y0 = fixedY0 // Force all links to use the same y0
+                })
             } else {
                 // Default behavior for other nodes
-                let y0 = node.y0;
-                let y1 = y0;
+                let y0 = node.y0
+                let y1 = y0
                 for (const link of node.sourceLinks) {
-                    link.y0 = y0 + link.width / 2;
-                    y0 += link.width;
+                    link.y0 = y0 + link.width / 2
+                    y0 += link.width
                 }
                 for (const link of node.targetLinks) {
-                    link.y1 = y1 + link.width / 2;
-                    y1 += link.width;
+                    link.y1 = y1 + link.width / 2
+                    y1 += link.width
                 }
             }
         }
     }
-    
-    
-    
+
     function horizontalSource(d) {
-        console.log(d)
         return [d.source.x1, d.y0]
     }
 

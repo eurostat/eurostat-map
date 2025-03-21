@@ -172,7 +172,6 @@ export const map = function (config) {
         const classifyRegions = (regions) => {
             regions.attr('ecl', (rg) => {
                 const regionData = out.statData().get(rg.properties.id)
-                if (rg.properties.id == 'LB') console.log(regionData, out.statData())
                 if (!regionData) return // Lack of data is handled explicitly
                 const value = regionData.value
                 if (value === ':' || value === null) return 'nd'

@@ -284,7 +284,6 @@ export const map = function (config) {
                 .domain([-0.01, minNegative]) // For negative values
                 .range([height / 2, height]) // Negative values below center
 
-            //console.log(minNegative, maxPositive, positiveData)
             if (!positiveData.length || !negativeData.length) {
                 console.log('no data')
             }

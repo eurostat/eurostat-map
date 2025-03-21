@@ -2,7 +2,7 @@
 import { json } from 'd3-fetch'
 import { feature } from 'topojson-client'
 import { executeForAllInsets } from './utils'
-import {  kosovoBnFeatures } from './kosovo'
+import { kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
 
 // Geometries class wrapped as a function
@@ -33,7 +33,6 @@ export const Geometries = function (map, withCenterPoints) {
     //centroids for prop symbols etc
     out.centroidsData = undefined //raw
     out.centroidsFeatures = undefined //geojson features
-
 
     // get geojson features of all statistical regions
     out.getRegionFeatures = function () {
@@ -270,7 +269,6 @@ export const Geometries = function (map, withCenterPoints) {
                     if (bn.properties.oth === 'T') classList.push('em-bn-oth')
                     if (bn.properties.co === 'T') classList.push('em-bn-co')
 
-                    //if (bn.properties.id == 156) console.log(classList, bn)
                     return classList.join(' ') // Use join with a space to create a valid class string
                 })
         }
