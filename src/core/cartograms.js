@@ -28,22 +28,22 @@ export const buildGridCartogramBase = function (out) {
 /** Determines the grid layout based on settings */
 const getGridLayout = (out) => {
     const squareGrid = `
-        ,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
-        ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
-        ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
+        ,IS,  ,  ,NO,SE,FI,  ,  ,  ,  ,  ,
+        ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,  ,
+        ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,  ,
         ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
         ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
         ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
         ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
         ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
-        ,  ,  ,  ,  ,  ,BA,ME,MK,  ,GE,  ,  
-        ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,  
+        ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
+        ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,  
         ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `
 
     const hexagonGrid = `
-        ,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
-        ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
-        ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
+        ,IS,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,
+        ,  ,  ,  ,NO,SE,FI,EE,  ,  ,  ,  ,
+        ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,  ,
         ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
         ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
         ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
