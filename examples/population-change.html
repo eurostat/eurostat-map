@@ -36,16 +36,11 @@
                 .nutsbnStrokeWidth({ 0: 1, 1: 0.1, 2: 0.1, 3: 0.1, oth: 0, co: 0 })
                 .seaFillStyle('white')
                 .insets('default')
+                .legend({ x: 10, y: 115, title: '‰', decimals: 0, boxOpacity: 0 })
             // .frameStroke('none')
             // .drawCoastalMargin(false)
             // .drawGraticule(true)
 
-            if (height > 800) {
-                //m.insets("default") //show inset maps of overseas regions using the default styling
-                m.legend({ x: 10, y: 115, title: '‰', decimals: 0 })
-            } else {
-                m.titleFontSize(12).subtitleFontSize(11).showSourceLink(false)
-            }
             m.build()
         </script>
     </body>
