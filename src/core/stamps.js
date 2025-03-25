@@ -13,6 +13,7 @@ export const appendStamp = (stampConfig, map) => {
             if (!stampConfig.textColor) stampConfig.textColor = '#000'
             if (!stampConfig.stampColor) stampConfig.stampColor = '#000'
             if (!stampConfig.strokeWidth) stampConfig.strokeWidth = 1
+            if (!stampConfig.lineHeight) stampConfig.lineHeight = 15
 
             // Draw the circle
             container
@@ -27,10 +28,9 @@ export const appendStamp = (stampConfig, map) => {
 
             // Handle text
             const text = stampConfig.text
-            const lineHeight = 13
-            const targetWidth = Math.sqrt(measureWidth(text.trim()) * lineHeight)
+            const targetWidth = Math.sqrt(measureWidth(text.trim()) * stampConfig.lineHeight)
             const lines = getLines(getWords(text.trim()), targetWidth)
-            const textRadius = getTextRadius(lines, lineHeight)
+            const textRadius = getTextRadius(lines, stampConfig.lineHeight)
 
             // Append inside circle
             container
@@ -44,7 +44,7 @@ export const appendStamp = (stampConfig, map) => {
                 .enter()
                 .append('tspan')
                 .attr('x', 0)
-                .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * lineHeight)
+                .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
                 .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', '')) // Removes ¶ (line breaker) and ~ (non breaking space)
         }
     }
