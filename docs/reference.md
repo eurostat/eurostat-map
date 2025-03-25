@@ -28,6 +28,8 @@
     - [Map texts](#map-texts)
         - [Map title \& subtitle](#map-title--subtitle)
         - [Labelling](#labelling)
+        - [Annotations](#annotations)
+        - [Stamps](#stamps)
         - [Footnotes](#footnotes)
     - [Map legend](#map-legend)
     - [Scalebar](#scalebar)
@@ -762,8 +764,7 @@ map.gridCartogramShape('hexagon')
 and define container or cell padding using:
 
 ```javascript
- map.gridCartogramMargins({ bottom: 10, top: 100, left: 10, right: 10 })
-    .gridCartogramCellPadding(5)
+map.gridCartogramMargins({ bottom: 10, top: 100, left: 10, right: 10 }).gridCartogramCellPadding(5)
 ```
 
 If you wish, you can even define custom grid positions using:
@@ -870,6 +871,64 @@ These are the default classes used to style the labels:
 .em-flow-labels
 .em-flow-label
 .em-flow-label-shadow
+```
+
+### Annotations
+
+You can add annotations to the map using d3-svg-annotation objects like so:
+
+```javascript
+// see d3-svg-annotation for how to define them:
+const annotations = [
+    {
+        note: {
+            label: 'This is an annotation',
+            title: 'annotationLabel',
+            wrap: 150,
+        },
+        connector: {
+            end: 'dot',
+            type: 'curve',
+            points: [
+                [120, 14],
+                [190, 52],
+            ],
+        },
+        x: 370,
+        y: 100,
+        dy: 120,
+        dx: 240,
+    },
+]
+
+const map = eurostatmap
+    .map('choropleth')
+    .annotations({
+        editMode: false,
+        annotations: annotations,
+    })
+    .build()
+```
+
+### Stamps
+
+Stamps are intended to be used to highlight a particular value, usually the EU average:
+
+```javascript
+// You can use a pilcrow (¶) as a line break and a tilde(~) as a non-breaking space:
+const map = eurostatmap
+    .map('choropleth')
+    .title('stamp test')
+    .stamp({
+        x: 230,
+        y: 100,
+        size: 60,
+        text: 'Hello~world¶New~Line¶Another~Line',
+        stampColor: '#3792B6',
+        textColor: '#3792B6',
+        strokeWidth: 2,
+    })
+    .build()
 ```
 
 ### Footnotes
