@@ -36,7 +36,6 @@
                         .titleFill('#333333')
                         .scale('60M')
                         .width(250)
-
                         .nutsLevel(0)
                         .stat({
                             eurostatDatasetCode: 'namq_10_gdp',
@@ -53,9 +52,9 @@
                         .nutsbnStrokeWidth({ 0: 0.8, 1: 0, 2: 0, 3: 0, oth: 0, co: 0.6 })
                         .nutsbnStroke({ 0: '#777', 1: '#777', 2: '#777', 3: '#777', oth: '#444', co: '#777' })
                         .drawGraticule(false)
-
                         .tooltipShowFlags('long')
-                        .bottomText(null)
+                        .bottomText(false)
+                        .showSourceLink(false)
                         .transitionDuration(0)
 
                         .build()
