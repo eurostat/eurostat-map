@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -21,7 +21,7 @@
             let maxRadius = 30
 
             let sizedata = {
-                LB:122,
+                LB: 122,
                 ES: 0,
                 FR: ':',
                 DE: 300,
@@ -36,10 +36,10 @@
                 RO: 700,
                 DE11: 1000,
                 UA: 1234,
-                MD: 1234
+                MD: 1234,
             }
             let colordata = {
-                LB:122,
+                LB: 122,
                 ES: 0,
                 FR: ':',
                 DE: 300,
@@ -54,7 +54,7 @@
                 RO: 700,
                 DE11: 1000,
                 UA: 1234,
-                MD: 1234
+                MD: 1234,
             }
 
             let map = eurostatmap
@@ -73,9 +73,12 @@
                     noDataShapeHeight: 14,
                     sizeLegend: {
                         title: 'legend title',
-                        noData: true,
+                        noData: false,
                     },
-                    colorLegend: false,
+                    colorLegend: {
+                        title: 'legend title',
+                        noData: false,
+                    },
                 })
 
             let mapCallbacksFired = 0
