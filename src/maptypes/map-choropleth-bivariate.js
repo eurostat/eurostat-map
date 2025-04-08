@@ -78,23 +78,29 @@ export const map = function (config) {
 
     function applyClassificationToMap(map) {
         //set classifiers
-        let stat1 = out.statData('v1').getArray()
-        let stat2 = out.statData('v2').getArray()
+        const setupClassifiers = () => {
+            let stat1 = out.statData('v1').getArray()
+            let stat2 = out.statData('v2').getArray()
 
-        const range = [...Array(out.numberOfClasses()).keys()]
-        if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
-        if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
+            const range = [...Array(out.numberOfClasses()).keys()]
+            if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
+            if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
-        //assign class to nuts regions, based on their value
-        const selector = getRegionsSelector(map)
-        if (map.svg_) {
-            let regions = map.svg().selectAll(selector)
+            //define bivariate scale
+            if (!out.classToFillStyle()) {
+                const scale = scaleBivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.endColor())
+                out.classToFillStyle(scale)
+            }
+        }
+
+        const classifyRegions = (regions) => {
             regions
                 .attr('ecl1', function (rg) {
                     const sv = out.statData('v1').get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
+                    if (rg.properties.id.length == 4) console.log(rg)
                     return +out.classifier1_(+v)
                 })
                 .attr('ecl2', function (rg) {
@@ -114,51 +120,20 @@ export const map = function (config) {
                     if ((v != 0 && !v) || v == ':') return 'nd'
                     return ''
                 })
+        }
 
-            //when mixing NUTS, level 0 is separated from the rest (class nutsrg0)
-            if (map.nutsLevel_ == 'mixed') {
-                map.svg()
-                    .selectAll('path.em-nutsrg0')
-                    .attr('ecl1', function (rg) {
-                        const sv = out.statData('v1').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier1_(+v)
-                    })
-                    .attr('ecl2', function (rg) {
-                        const sv = out.statData('v2').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier2_(+v)
-                    })
-            }
+        // Initialize classifier
+        setupClassifiers()
 
-            //define bivariate scale
-            if (!out.classToFillStyle()) {
-                const scale = scaleBivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.endColor())
-                out.classToFillStyle(scale)
-            }
+        // Apply classification and assign 'ecl' attribute based on map type
+        if (map.svg_) {
+            let selector = getRegionsSelector(map)
+            classifyRegions(map.svg().selectAll(selector))
 
-            //when mixing NUTS, level 0 is separated from the rest (using class nutsrg0)
-            if (out.nutsLevel_ == 'mixed') {
-                map.svg_
-                    .selectAll('path.em-nutsrg0')
-                    .attr('ecl1', function (rg) {
-                        const sv = out.statData('v2').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier1_(+v)
-                    })
-                    .attr('ecl2', function (rg) {
-                        const sv = out.statData('v2').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier2_(+v)
-                    })
+            // Handle mixed NUTS level, separating NUTS level 0
+            if (map.nutsLevel_ === 'mixed') {
+                const nuts0Regions = map.svg().selectAll('path.em-nutsrg0')
+                classifyRegions(nuts0Regions)
             }
         }
     }
@@ -195,8 +170,6 @@ export const map = function (config) {
                     if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
                     let color = out.classToFillStyle()(+ecl1, +ecl2)
                     return color
-
-                    //return getCSSPropertyFromClass('em-nutsrg', 'fill')
                 })
                 .end()
                 .then(
@@ -231,6 +204,31 @@ export const map = function (config) {
         }
     }
 
+    // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)
+    const styleMixedNUTS = function (map) {
+        map.svg()
+            .selectAll(getRegionsSelector(map))
+            .each(function () {
+                if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
+                const sel = select(this)
+                const ecl1 = sel.attr('ecl1')
+                const ecl2 = sel.attr('ecl2')
+                const lvl = sel.attr('lvl')
+
+                // Determine display visibilitys
+                const isVisible = ecl1 || ecl2 || lvl === '0'
+
+                // Apply styles efficiently
+                sel.style('display', isVisible ? 'block' : 'none')
+
+                if ((ecl1 || ecl2) && lvl !== '0') {
+                    const stroke = sel.style('stroke') || '#777'
+                    const strokeWidth = sel.style('stroke-width') || 0.2
+                    sel.style('stroke', stroke).style('stroke-width', strokeWidth)
+                }
+            })
+    }
+
     const addMouseEventsToRegions = function (map, regions) {
         regions
             .on('mouseover', function (e, rg) {
@@ -257,33 +255,6 @@ export const map = function (config) {
     }
 
     return out
-}
-
-const styleMixedNUTS = function (map) {
-    map.svg()
-        .selectAll(getRegionsSelector(map))
-        .style('display', function (rg) {
-            if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
-            const sel = select(this)
-            const ecl = sel.attr('ecl')
-            const lvl = sel.attr('lvl')
-            const countryId = rg.properties.id.slice(0, 2)
-            return ecl || lvl === '0' ? 'block' : 'none'
-        })
-        .style('stroke', function () {
-            const sel = select(this)
-            const lvl = sel.attr('lvl')
-            const ecl = sel.attr('ecl')
-            const stroke = sel.style('stroke')
-            return ecl && lvl !== '0' ? stroke || '#777' : null
-        })
-        .style('stroke-width', function () {
-            const sel = select(this)
-            const lvl = sel.attr('lvl')
-            const ecl = sel.attr('ecl')
-            const strokeWidth = sel.style('stroke-width')
-            return ecl && lvl !== '0' ? strokeWidth || 0.2 : null
-        })
 }
 
 const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {

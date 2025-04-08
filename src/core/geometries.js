@@ -225,7 +225,7 @@ export const Geometries = function (map, withCenterPoints) {
                 //add kosovo
                 if (geo == 'EUR' && (proj == '3035' || proj == '4326')) {
                     // add kosovo manually
-                    addKosovoBorder(container, pathFunction, proj, scale)
+                    addKosovoBorder(container, pathFunction, proj, scale, nutsYear)
                 }
             } else {
                 // when nutsLevel is not 'mixed'
@@ -342,8 +342,9 @@ export const Geometries = function (map, withCenterPoints) {
         }
     }
 
-    function addKosovoBorder(container, pathFunction, proj, scale) {
-        let kosovoBn = feature(kosovoBnFeatures[proj][scale], 'nutsbn_1').features
+    function addKosovoBorder(container, pathFunction, proj, scale, nutsYear) {
+        let kosovoFeature = kosovoBnFeatures[nutsYear] ? kosovoBnFeatures[nutsYear][proj][scale] : kosovoBnFeatures[2024][proj][scale]
+        let kosovoBn = feature(kosovoFeature, 'nutsbn_1').features
         container
             .append('g')
             .attr('id', 'em-kosovo-bn')

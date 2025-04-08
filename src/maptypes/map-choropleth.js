@@ -279,10 +279,6 @@ export const map = function (config) {
                 const ecl = sel.attr('ecl')
                 const lvl = sel.attr('lvl')
 
-                // Precompute styles to minimize DOM reads
-                const stroke = sel.style('stroke') || '#777'
-                const strokeWidth = sel.style('stroke-width') || 0.2
-
                 // Determine display visibility
                 const isVisible = ecl || lvl === '0'
 
@@ -290,6 +286,8 @@ export const map = function (config) {
                 sel.style('display', isVisible ? 'block' : 'none')
 
                 if (ecl && lvl !== '0') {
+                    const stroke = sel.style('stroke') || '#777'
+                    const strokeWidth = sel.style('stroke-width') || 0.2
                     sel.style('stroke', stroke).style('stroke-width', strokeWidth)
                 }
             })
