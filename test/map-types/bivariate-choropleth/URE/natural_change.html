@@ -29,11 +29,11 @@
                 .map('chbi')
                 .svgId('map73')
                 .scale('60M')
-                .nutsLvl('mixed')
+                .nutsLevel('mixed')
                 .nutsYear(2021)
                 .stat('v1', { csvURL: url, geoCol: 'NUTS', valueCol: 'rate', unitText: ' ‰' })
                 .stat('v2', { csvURL: url, geoCol: 'NUTS', valueCol: 'urt' })
-                .clnb(3)
+                .numberOfClasses(3)
                 .classifier1((v) => (v >= 0.0 ? 2 : v >= -4.0 ? 1 : 0))
                 .classifier2((v) => 3 - v)
                 .classToFillStyle((i, j) => {
@@ -117,7 +117,6 @@
 
                 .zoomExtent([1, 3])
                 .insets('default')
-                .nutsrgSelFillSty('red')
 
             map.build()
         </script>

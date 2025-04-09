@@ -7,11 +7,11 @@
     </head>
 
     <body style="font-family: sans-serif">
-        <svg id="map74"></svg>
+        <svg id="map61"></svg>
 
         <script src="../../../../build/eurostatmap.js"></script>
         <script>
-            const url = './csv/CH08_M04_avgcruderate_netmig.csv'
+            const url = './csv/CH07_M01_gdp_change.csv'
 
             const colors = [
                 '#6DB56D', // Forest green Light
@@ -24,17 +24,16 @@
                 '#388AE2', // Cornflower Medium
                 '#104F99', // Cornflower Dark
             ]
-
             const map = eurostatmap
                 .map('chbi')
-                .svgId('map74')
+                .svgId('map61')
                 .scale('60M')
                 .nutsLevel('mixed')
                 .nutsYear(2021)
-                .stat('v1', { csvURL: url, geoCol: 'NUTS', valueCol: 'rate', unitText: ' ‰' })
+                .stat('v1', { csvURL: url, geoCol: 'NUTS', valueCol: 'perc', unitText: ' %' })
                 .stat('v2', { csvURL: url, geoCol: 'NUTS', valueCol: 'urt' })
                 .numberOfClasses(3)
-                .classifier1((v) => (v >= 6.0 ? 2 : v >= 0 ? 1 : 0))
+                .classifier1((v) => (v >= 5.0 ? 2 : v >= -5 ? 1 : 0))
                 .classifier2((v) => 3 - v)
                 .classToFillStyle((i, j) => {
                     if (i == 0 && j == 2) return colors[6]
@@ -69,6 +68,7 @@
                         <table class="nuts-table">
                             <tbody>
                                 <tr><td>`)
+
                         //URT value
                         const sv2 = map.statData('v2').get(rg.properties.id)
                         if (!sv2 || (sv2.value != 0 && !sv2.value) || sv2.value == ':') buf.push(map.noDataText_)
@@ -90,28 +90,27 @@
                             if (unit1) buf.push(' ' + unit1)
                         }
 
-                        //close table
-                        buf.push(`</td></tr>
+                                                //close table
+                                                buf.push(`</td></tr>
                             </tbody>
                         </table>
-                    </div>
-                `)
+                    </div>`)
 
                         return buf.join('')
                     },
                 })
                 .legend({
-                    boxOpacity: 0,
-                    boxPadding: 0,
                     label2: 'Urban – Int. – Rural',
-                    label1: 'Net migration',
-                    breaks1: ['0‰', '6‰'],
+                    label1: 'GDP change',
+                    breaks1: ['-5%', '5%'],
                     showBreaks: true,
                     x: 0,
                     y: 120,
                     squareSize: 100,
                     rotation: -45,
                     axisArrows: false,
+                    boxOpacity: 0,
+                    boxPadding: 0,
                 })
                 .zoomExtent([1, 3])
                 .insets('default')
