@@ -5,20 +5,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-        .em-bivariate-axis-title, .em-bivariate-nodata-label{
-            font-size:12px !important
-        }
-        .em-bivariate-axis-arrow {
-            display: none !important;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body style="font-family: sans-serif;">
     <svg id="map71"></svg>
 
-    <script src="../../../build/eurostatmap.js"></script>
+    <script src="../../../../build/eurostatmap.js"></script>
     <script>
 
         const url = "./csv/CH08_M01_avg_popchange.csv";
@@ -122,7 +115,7 @@
                 showBreaks:true,
                 breaks1: ["-0.3%","0.3%"],
                 x: 0, y: 120,
-                squareSize: 95,
+                squareSize: 100,
                 axisArrows:false,
 		        rotation:-45
             })

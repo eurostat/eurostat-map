@@ -1,0 +1,7 @@
+
+.em-bivariate-axis-title, .em-bivariate-nodata-label{
+    font-size:12px !important
+}
+.em-bivariate-axis-arrow {
+    display: none !important;
+}
