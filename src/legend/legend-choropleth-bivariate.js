@@ -29,13 +29,14 @@ export const legend = function (map, config) {
     out.breaks1 = undefined
     out.breaks2 = undefined
     out.showBreaks = false // if set to true and breaks1 and breaks2 are undefined then breaks are automatically defined
+    out.tickLength = 5 // length of the ticks
 
     //axis
-    out.yAxisLabelsOffset = { x: 7, y: 0 }
+    out.yAxisLabelsOffset = { x: 0, y: 0 }
     out.xAxisLabelsOffset = { x: 0, y: 0 }
 
     //axis titles
-    out.yAxisTitleOffset = { x: 7, y: 0 }
+    out.yAxisTitleOffset = { x: 0, y: 0 }
     out.xAxisTitleOffset = { x: 0, y: 0 }
 
     //show no data
@@ -51,7 +52,7 @@ export const legend = function (map, config) {
     out.boxPadding = out.labelFontSize
 
     //add extra distance between legend and no data item
-    out.noDataYOffset = 20
+    out.noDataYOffset = 30
 
     //arrows
     out.axisArrows = true // if set to true, arrows are drawn at the end of the axes
@@ -231,7 +232,7 @@ export const legend = function (map, config) {
 
     function addBreakLabels() {
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
-        const initialX = out.yAxisLabelsOffset.x
+        const initialX = 0
         const numberOfClasses = out.map.numberOfClasses()
         const sz = out.squareSize / numberOfClasses
 
@@ -251,17 +252,17 @@ export const legend = function (map, config) {
                 breakLabels
                     .append('text')
                     .attr('class', 'em-bivariate-tick-label')
-                    .attr('x', x + out.xAxisLabelsOffset.x)
-                    .attr('y', y + out.xAxisLabelsOffset.y)
+                    .attr('x', x + out.xAxisLabelsOffset.x )
+                    .attr('y', y + out.xAxisLabelsOffset.y )
                     .text(out.breaks1[i])
 
                 breakLabels
                     .append('line')
                     .attr('class', 'em-bivariate-tick')
-                    .attr('x1', x + out.xAxisLabelsOffset.x)
-                    .attr('x2', x + out.xAxisLabelsOffset.x)
+                    .attr('x1', x)
+                    .attr('x2', x)
                     .attr('y1', out.squareSize)
-                    .attr('y2', out.squareSize + 5)
+                    .attr('y2', out.squareSize + out.tickLength)
             }
         }
 
@@ -274,8 +275,8 @@ export const legend = function (map, config) {
                 breakLabels
                     .append('text')
                     .attr('class', 'em-bivariate-tick-label')
-                    .attr('x', x + out.yAxisLabelsOffset.y)
-                    .attr('y', y - out.yAxisLabelsOffset.x)
+                    .attr('x', x + out.yAxisLabelsOffset.x)
+                    .attr('y', y - out.yAxisLabelsOffset.y - (out.tickLength + 2))
                     .text([...out.breaks2].reverse()[i])
                     .attr('text-anchor', 'middle')
                     .attr('transform', `rotate(-90, ${x}, ${y})`)
@@ -284,7 +285,7 @@ export const legend = function (map, config) {
                     .append('line')
                     .attr('class', 'em-bivariate-tick')
                     .attr('x1', x)
-                    .attr('x2', x - 5)
+                    .attr('x2', x - out.tickLength)
                     .attr('y1', y)
                     .attr('y2', y)
             }
@@ -304,9 +305,9 @@ export const legend = function (map, config) {
             )
 
         // X axis title
-        let xAxisTitleY = out.squareSize + out.xAxisLabelsOffset.y + (out.axisArrows ? out.arrowPadding + out.arrowHeight : 0)
+        let xAxisTitleY = out.squareSize + out.xAxisLabelsOffset.y + (out.axisArrows ? out.arrowPadding + out.arrowHeight : 7)
+        let xAxisTitleX = initialX
         if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
-        let xAxisTitleX =initialX + out.xAxisLabelsOffset.x
         if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
         if (out.xAxisTitleOffset) xAxisTitleX += out.xAxisTitleOffset.x
         axisTitles
@@ -319,7 +320,7 @@ export const legend = function (map, config) {
             .attr('alignment-baseline', 'hanging')
 
         // Y axis title
-        let yAxisTitleY = (out.axisArrows ? out._yAxisArrowX - out.arrowPadding : 0) + (out.rotation == -45 ? -4 : -1)
+        let yAxisTitleY = (out.axisArrows ? out._yAxisArrowX - out.arrowPadding : 7) + (out.rotation == -45 ? -4 : -10) // adjust for rotation
         if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
         let yAxisTitleX = -out.squareSize
         //manual offsets
@@ -331,21 +332,24 @@ export const legend = function (map, config) {
             .attr('x', yAxisTitleX)
             .attr('y', yAxisTitleY)
             .text(out.label2)
-            .style('transform', out.rotation < 0 ? `translate(${out.axisArrows ? -51 : -17}px, 95px) rotate(90deg)` : 'rotate(-90deg)')
+            .style('transform', out.rotation < 0 ? `translate(${out.axisArrows ? -51 : -15}px, 95px) rotate(90deg)` : 'rotate(-90deg)')
     }
 
     function addAxisArrows() {
+        const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
+        const initialX = 0
+
         // group with horizontal offset
-        const axisArrows = lgg
+        const axisArrows = out.lgg
             .append('g')
             .attr('class', 'bivariate-axis-arrows')
             .attr(
                 'transform',
-                `translate(${out.boxPadding + out._horizontalOffset},${xc + y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+                `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
             )
 
         // Append X axis arrow
-        out._xAxisArrowY = out.squareSize + out.arrowHeight + out.xAxisLabelsOffset.y
+        out._xAxisArrowY = out.squareSize + out.tickLength + out.arrowPadding
         if (out.showBreaks || (out.breaks1 && out.breaks2)) out._xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5 // move over for tick labels
 
         axisArrows
@@ -362,7 +366,7 @@ export const legend = function (map, config) {
             .attr('marker-end', 'url(#arrowhead)')
 
         // Append Y axis arrow
-        out._yAxisArrowX = -out.arrowHeight + out.yAxisLabelsOffset.x
+        out._yAxisArrowX = -out.tickLength - out.arrowPadding
         if (out.showBreaks || (out.breaks1 && out.breaks2)) out._yAxisArrowX -= out.labelFontSize / 2 // move over for tick labels
 
         axisArrows
