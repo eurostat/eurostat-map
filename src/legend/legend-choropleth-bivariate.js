@@ -34,6 +34,10 @@ export const legend = function (map, config) {
     out.yAxisLabelsOffset = { x: 7, y: 0 }
     out.xAxisLabelsOffset = { x: 0, y: 0 }
 
+    //axis titles
+    out.yAxisTitleOffset = { x: 7, y: 0 }
+    out.xAxisTitleOffset = { x: 0, y: 0 }
+
     //show no data
     out.noData = true
     //show no data
@@ -50,6 +54,7 @@ export const legend = function (map, config) {
     out.noDataYOffset = 20
 
     //arrows
+    out.axisArrows = true // if set to true, arrows are drawn at the end of the axes
     out.arrowHeight = 15
     out.arrowWidth = 14
     out.arrowPadding = 10 // padding between arrow and axis label
@@ -61,39 +66,126 @@ export const legend = function (map, config) {
     out.update = function () {
         out.updateConfig()
         out.updateContainer()
-        const lgg = out.lgg
-        const numberOfClasses = out.map.numberOfClasses()
-        const sz = out.squareSize / numberOfClasses
-        const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
 
         // Horizontal shift to move everything right (adjust this value as needed)
-        const horizontalOffset = out.axisTitleFontSize + out.arrowPadding // Adjust this value to move the whole legend to the right
+        out._horizontalOffset = out.axisTitleFontSize + out.arrowPadding // Adjust this value to move the whole legend to the right
 
         // Remove previous content
-        lgg.selectAll('*').remove()
+        out.lgg.selectAll('*').remove()
 
         // Draw background box
         out.makeBackgroundBox()
 
         // Draw title
         if (out.title) {
-            lgg.append('text')
+            out.lgg
+                .append('text')
                 .attr('class', 'em-legend-title')
-                .attr('x', xc + horizontalOffset)
+                .attr('x', xc + out._horizontalOffset)
                 .attr('y', out.boxPadding + out.titleFontSize)
                 .text(out.title)
         }
 
         // The vertical position of the legend element
-        let y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0)
+        out._y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0)
 
         // Square group with horizontal offset
+        addSquares()
+
+        // set breaks if user hasnt defined them but has enabled them
+        if (!out.breaks1 && !out.breaks2 && out.showBreaks) {
+            // Get quantiles for the first variable (X axis) and truncate to one decimal place
+            out.breaks1 = map.classifier1_.quantiles().map((value) => parseFloat(value.toFixed(0)))
+
+            // Get quantiles for the second variable (Y axis) and truncate to one decimal place
+            out.breaks2 = map.classifier2_.quantiles().map((value) => parseFloat(value.toFixed(0)))
+        }
+
+        // Draw breaks labels 1 (X axis)
+        addBreakLabels()
+
+        out._xAxisArrowY = 0
+        out._yAxisArrowX = 0
+        if (out.axisArrows) {
+            addAxisArrows()
+        }
+
+        addAxisTitles()
+
+        // Arrow defs
+        out.lgg
+            .append('defs')
+            .append('marker')
+            .attr('viewBox', `0 0 ${out.arrowWidth} ${out.arrowHeight}`)
+            .attr('id', 'arrowhead')
+            .attr('refX', 0)
+            .attr('refY', 5)
+            .attr('markerWidth', out.arrowWidth)
+            .attr('markerHeight', out.arrowHeight)
+            .attr('orient', 'auto')
+            .append('path')
+            .attr('d', 'M 0 0 L 5 5 L 0 10')
+            .attr('marker-units', 'strokeWidth')
+
+        // 'No data' legend box
+        if (out.noData) {
+            addNoDataElement()
+        }
+
+        // Set legend box dimensions
+        out.setBoxDimension()
+    }
+
+    function addNoDataElement() {
+        const noDataYOffset =
+            out.rotation === 0 ? out.noDataYOffset + out.squareSize / out.map.numberOfClasses_ + out.arrowHeight / 2 : out.noDataYOffset
+
+        let noDataY =
+            out.rotation === 0 ? out._y + out.squareSize + noDataYOffset : out._y + 1.4142 * out.squareSize + out.boxPadding * 2 + noDataYOffset
+
+        out.lgg
+            .append('rect')
+            .attr('class', 'em-bivariate-nodata')
+            .attr('x', out.boxPadding + out.noDataShapeWidth / 2)
+            .attr('y', noDataY + (out.rotation == 0 ? 0 : -10))
+            .attr('width', out.noDataShapeWidth)
+            .attr('height', out.noDataShapeHeight)
+            .style('fill', out.map.noDataFillStyle())
+            .on('mouseover', function () {
+                const regions = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
+                const sel = regions.selectAll("[nd='nd']")
+                sel.style('fill', 'red')
+            })
+            .on('mouseout', function () {
+                const nRg = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
+                const sel = nRg.selectAll("[nd='nd']")
+                sel.style('fill', function () {
+                    return select(this).attr('fill___')
+                })
+                select(this).style('fill', out.map.noDataFillStyle())
+            })
+        out.lgg
+            .append('text')
+            .attr('class', 'em-bivariate-nodata-label')
+            .attr('x', out.boxPadding + out.noDataShapeWidth + (out.noDataShapeWidth / 2 + 5))
+            .attr('y', noDataY + out.noDataShapeHeight * 0.5 + 1 + (out.rotation == 0 ? 0 : -10))
+            .text(out.noDataText)
+    }
+
+    function addSquares() {
+        const lgg = out.lgg
+        const numberOfClasses = out.map.numberOfClasses()
+        const sz = out.squareSize / numberOfClasses
+        const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
+        const initialX = 0
+
         const square = lgg
             .append('g')
             .attr('class', 'bivariate-squares-chart')
-            .attr('transform', `translate(${out.boxPadding + horizontalOffset},${xc + y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`)
-
-        const initialX = out.yAxisLabelsOffset.x
+            .attr(
+                'transform',
+                `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+            )
 
         // Draw rectangles
         for (let i = 0; i < numberOfClasses; i++) {
@@ -126,29 +218,44 @@ export const legend = function (map, config) {
             }
         }
 
-        // set breaks if user hasnt defined them but has enabled them
-        if (!out.breaks1 && !out.breaks2 && out.showBreaks) {
-            // Get quantiles for the first variable (X axis) and truncate to one decimal place
-            out.breaks1 = map.classifier1_.quantiles().map((value) => parseFloat(value.toFixed(0)))
+        // Frame
+        square
+            .append('rect')
+            .attr('class', 'em-bivariate-frame')
+            .attr('x', initialX)
+            .attr('y', 0)
+            .attr('width', out.squareSize)
+            .attr('height', out.squareSize)
+            .attr('stroke-width', 0.7)
+    }
 
-            // Get quantiles for the second variable (Y axis) and truncate to one decimal place
-            out.breaks2 = map.classifier2_.quantiles().map((value) => parseFloat(value.toFixed(0)))
-        }
+    function addBreakLabels() {
+        const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
+        const initialX = out.yAxisLabelsOffset.x
+        const numberOfClasses = out.map.numberOfClasses()
+        const sz = out.squareSize / numberOfClasses
 
-        // Draw breaks labels 1 (X axis)
+        // group with horizontal offset
+        const breakLabels = out.lgg
+            .append('g')
+            .attr('class', 'bivariate-break-labels')
+            .attr(
+                'transform',
+                `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+            )
         if (out.breaks1) {
             for (let i = 0; i < out.breaks1.length; i++) {
                 const x = initialX + sz * (i + 1)
                 const y = out.squareSize + getFontSizeFromClass('em-bivariate-tick-label')
 
-                square
+                breakLabels
                     .append('text')
                     .attr('class', 'em-bivariate-tick-label')
                     .attr('x', x + out.xAxisLabelsOffset.x)
                     .attr('y', y + out.xAxisLabelsOffset.y)
                     .text(out.breaks1[i])
 
-                square
+                breakLabels
                     .append('line')
                     .attr('class', 'em-bivariate-tick')
                     .attr('x1', x + out.xAxisLabelsOffset.x)
@@ -164,7 +271,7 @@ export const legend = function (map, config) {
                 const x = initialX
                 const y = sz * (i + 2) - sz
 
-                square
+                breakLabels
                     .append('text')
                     .attr('class', 'em-bivariate-tick-label')
                     .attr('x', x + out.yAxisLabelsOffset.y)
@@ -173,7 +280,7 @@ export const legend = function (map, config) {
                     .attr('text-anchor', 'middle')
                     .attr('transform', `rotate(-90, ${x}, ${y})`)
 
-                square
+                breakLabels
                     .append('line')
                     .attr('class', 'em-bivariate-tick')
                     .attr('x1', x)
@@ -182,121 +289,94 @@ export const legend = function (map, config) {
                     .attr('y2', y)
             }
         }
+    }
+
+    function addAxisTitles() {
+        const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
+        const initialX = 0
+
+        const axisTitles = out.lgg
+            .append('g')
+            .attr('class', 'bivariate-axis-titles')
+            .attr(
+                'transform',
+                `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+            )
+
+        // X axis title
+        let xAxisTitleY = out.squareSize + out.xAxisLabelsOffset.y + (out.axisArrows ? out.arrowPadding + out.arrowHeight : 0)
+        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
+        let xAxisTitleX =initialX + out.xAxisLabelsOffset.x
+        if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
+        if (out.xAxisTitleOffset) xAxisTitleX += out.xAxisTitleOffset.x
+        axisTitles
+            .append('text')
+            .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-x')
+            .attr('x', xAxisTitleX)
+            .attr('y', xAxisTitleY)
+            .text(out.label1)
+            .attr('dominant-baseline', 'hanging')
+            .attr('alignment-baseline', 'hanging')
+
+        // Y axis title
+        let yAxisTitleY = (out.axisArrows ? out._yAxisArrowX - out.arrowPadding : 0) + (out.rotation == -45 ? -4 : -1)
+        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
+        let yAxisTitleX = -out.squareSize
+        //manual offsets
+        if (out.yAxisTitleOffset) yAxisTitleY += out.yAxisTitleOffset.y
+        if (out.yAxisTitleOffset) yAxisTitleX += out.yAxisTitleOffset.x
+        axisTitles
+            .append('text')
+            .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-y')
+            .attr('x', yAxisTitleX)
+            .attr('y', yAxisTitleY)
+            .text(out.label2)
+            .style('transform', out.rotation < 0 ? `translate(${out.axisArrows ? -51 : -17}px, 95px) rotate(90deg)` : 'rotate(-90deg)')
+    }
+
+    function addAxisArrows() {
+        // group with horizontal offset
+        const axisArrows = lgg
+            .append('g')
+            .attr('class', 'bivariate-axis-arrows')
+            .attr(
+                'transform',
+                `translate(${out.boxPadding + out._horizontalOffset},${xc + y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+            )
 
         // Append X axis arrow
-        let xAxisArrowY = out.squareSize + out.arrowHeight + out.xAxisLabelsOffset.y
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5 // move over for tick labels
+        out._xAxisArrowY = out.squareSize + out.arrowHeight + out.xAxisLabelsOffset.y
+        if (out.showBreaks || (out.breaks1 && out.breaks2)) out._xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5 // move over for tick labels
 
-        square
+        axisArrows
             .append('path')
             .attr('class', 'em-bivariate-axis-arrow')
             .attr(
                 'd',
                 line()([
-                    [initialX, xAxisArrowY],
-                    [initialX + out.squareSize, xAxisArrowY],
+                    [initialX, out._xAxisArrowY],
+                    [initialX + out.squareSize, out._xAxisArrowY],
                 ])
             )
             .attr('stroke', 'black')
             .attr('marker-end', 'url(#arrowhead)')
 
         // Append Y axis arrow
-        let yAxisArrowX = -out.arrowHeight + out.yAxisLabelsOffset.x
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) yAxisArrowX -= out.labelFontSize / 2 // move over for tick labels
+        out._yAxisArrowX = -out.arrowHeight + out.yAxisLabelsOffset.x
+        if (out.showBreaks || (out.breaks1 && out.breaks2)) out._yAxisArrowX -= out.labelFontSize / 2 // move over for tick labels
 
-        square
+        axisArrows
             .append('path')
             .attr('class', 'em-bivariate-axis-arrow')
             .attr(
                 'd',
                 line()([
-                    [yAxisArrowX, out.squareSize],
-                    [yAxisArrowX, 0],
+                    [out._yAxisArrowX, out.squareSize],
+                    [out._yAxisArrowX, 0],
                 ])
             )
             .attr('stroke', 'black')
             .attr('marker-end', 'url(#arrowhead)')
-
-        // X axis title
-        square
-            .append('text')
-            .attr('class', 'em-bivariate-axis-title')
-            .attr('x', initialX + out.xAxisLabelsOffset.x)
-            .attr('y', xAxisArrowY + out.arrowPadding)
-            .text(out.label1)
-            .attr('dominant-baseline', 'hanging')
-            .attr('alignment-baseline', 'hanging')
-
-        // Y axis title
-        square
-            .append('text')
-            .attr('class', 'em-bivariate-axis-title')
-            .attr('x', -out.squareSize)
-            .attr('y', yAxisArrowX - out.arrowPadding + (out.rotation == -45 ? -4 : -1))
-            .text(out.label2)
-            .style('transform', out.rotation < 0 ? 'translate(-51px, 95px) rotate(90deg)' : 'rotate(-90deg)')
-
-        // Frame
-        square
-            .append('rect')
-            .attr('class', 'em-bivariate-frame')
-            .attr('x', initialX)
-            .attr('y', 0)
-            .attr('width', out.squareSize)
-            .attr('height', out.squareSize)
-            .attr('stroke-width', 0.7)
-
-        // Arrow defs
-        square
-            .append('defs')
-            .append('marker')
-            .attr('viewBox', `0 0 ${out.arrowWidth} ${out.arrowHeight}`)
-            .attr('id', 'arrowhead')
-            .attr('refX', 0)
-            .attr('refY', 5)
-            .attr('markerWidth', out.arrowWidth)
-            .attr('markerHeight', out.arrowHeight)
-            .attr('orient', 'auto')
-            .append('path')
-            .attr('d', 'M 0 0 L 5 5 L 0 10')
-            .attr('marker-units', 'strokeWidth')
-
-        // 'No data' legend box
-        if (out.noData) {
-            const noDataYOffset =
-                out.rotation === 0 ? out.noDataYOffset + out.squareSize / out.map.numberOfClasses_ + out.arrowHeight / 2 : out.noDataYOffset
-
-            y = out.rotation === 0 ? y + out.squareSize + noDataYOffset : y + 1.4142 * out.squareSize + out.boxPadding * 2 + noDataYOffset
-
-            lgg.append('rect')
-                .attr('class', 'em-bivariate-nodata')
-                .attr('x', out.boxPadding + out.noDataShapeWidth / 2)
-                .attr('y', y + (out.rotation == 0 ? 0 : -10))
-                .attr('width', out.noDataShapeWidth)
-                .attr('height', out.noDataShapeHeight)
-                .style('fill', out.map.noDataFillStyle())
-                .on('mouseover', function () {
-                    const regions = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
-                    const sel = regions.selectAll("[nd='nd']")
-                    sel.style('fill', 'red')
-                })
-                .on('mouseout', function () {
-                    const nRg = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
-                    const sel = nRg.selectAll("[nd='nd']")
-                    sel.style('fill', function () {
-                        return select(this).attr('fill___')
-                    })
-                    select(this).style('fill', out.map.noDataFillStyle())
-                })
-            lgg.append('text')
-                .attr('class', 'em-bivariate-nodata-label')
-                .attr('x', out.boxPadding + out.noDataShapeWidth + (out.noDataShapeWidth / 2 + 5))
-                .attr('y', y + out.noDataShapeHeight * 0.5 + 1 + (out.rotation == 0 ? 0 : -10))
-                .text(out.noDataText)
-        }
-
-        // Set legend box dimensions
-        out.setBoxDimension()
     }
 
     // Highlight selected regions on mouseover

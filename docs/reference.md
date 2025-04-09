@@ -1,45 +1,45 @@
 # API reference
 
 - [API reference](#api-reference)
-    - [Map creation](#map-creation)
-        - [Map definition](#map-definition)
-        - [Map geography](#map-geography)
-            - [World maps](#world-maps)
-            - [Custom geometries](#custom-geometries)
-        - [Statistical data](#statistical-data)
-            - [Eurostat database](#eurostat-database)
-            - [CSV](#csv)
-            - [Custom JS](#custom-js)
-    - [Map types](#map-types)
-        - [Choropleth map](#choropleth-map)
-            - [Choropleth legends](#choropleth-legends)
-        - [Proportional symbol map](#proportional-symbol-map)
-            - [Proportional symbol legends](#proportional-symbol-legends)
-        - [Proportional pie chart map](#proportional-pie-chart-map)
-        - [Categorical map](#categorical-map)
-        - [Bivariate choropleth map](#bivariate-choropleth-map)
-            - [Bivariate choropleth legends](#bivariate-choropleth-legends)
-        - [Stripe composition map](#stripe-composition-map)
-        - [Sparkline map](#sparkline-map)
-        - [Flow map](#flow-map)
-        - [Cartograms](#cartograms)
-            - [Grid Cartograms](#grid-cartograms)
-            - [Dorling Cartograms](#dorling-cartograms)
-    - [Map texts](#map-texts)
-        - [Map title \& subtitle](#map-title--subtitle)
-        - [Labelling](#labelling)
-        - [Annotations](#annotations)
-        - [Stamps](#stamps)
-        - [Footnotes](#footnotes)
-    - [Map legend](#map-legend)
-    - [Scalebar](#scalebar)
-    - [Tooltip](#tooltip)
-    - [Styling](#styling)
-    - [Insets](#insets)
-    - [Export](#export)
-    - [Miscellaneous](#miscellaneous)
-    - [Build and update](#build-and-update)
-    - [Version migration](#version-migration)
+  - [Map creation](#map-creation)
+    - [Map definition](#map-definition)
+    - [Map geography](#map-geography)
+      - [World maps](#world-maps)
+      - [Custom geometries](#custom-geometries)
+    - [Statistical data](#statistical-data)
+      - [Eurostat database](#eurostat-database)
+      - [CSV](#csv)
+      - [Custom JS](#custom-js)
+  - [Map types](#map-types)
+    - [Choropleth map](#choropleth-map)
+      - [Choropleth legends](#choropleth-legends)
+    - [Proportional symbol map](#proportional-symbol-map)
+      - [Proportional symbol legends](#proportional-symbol-legends)
+    - [Proportional pie chart map](#proportional-pie-chart-map)
+    - [Categorical map](#categorical-map)
+    - [Bivariate choropleth map](#bivariate-choropleth-map)
+      - [Bivariate choropleth legends](#bivariate-choropleth-legends)
+    - [Stripe composition map](#stripe-composition-map)
+    - [Sparkline map](#sparkline-map)
+    - [Flow map](#flow-map)
+    - [Cartograms](#cartograms)
+      - [Grid Cartograms](#grid-cartograms)
+      - [Dorling Cartograms](#dorling-cartograms)
+  - [Map texts](#map-texts)
+    - [Map title \& subtitle](#map-title--subtitle)
+    - [Labelling](#labelling)
+    - [Annotations](#annotations)
+    - [Stamps](#stamps)
+    - [Footnotes](#footnotes)
+  - [Map legend](#map-legend)
+  - [Scalebar](#scalebar)
+  - [Tooltip](#tooltip)
+  - [Styling](#styling)
+  - [Insets](#insets)
+  - [Export](#export)
+  - [Miscellaneous](#miscellaneous)
+  - [Build and update](#build-and-update)
+  - [Version migration](#version-migration)
 
 ## Map creation
 
@@ -572,21 +572,29 @@ eurostatmap
 
 In addition to [the default legend parameters](#map-legend), bivariate choropleth maps have the following specific legend parameters:
 
-| Parameter             | Type     | Default value    | Description                                                                      |
-| --------------------- | -------- | ---------------- | -------------------------------------------------------------------------------- |
-| **squareSize**        | number   | _50_             | The size, in pixel, of the legend square.                                        |
-| **rotation**          | number   | _0_              | The rotation to apply to the main legend. Recommended values are either 0 or -45 |
-| **label1**            | string   | _"Variable 1"_   | The text for the label of variable 1.                                            |
-| **label2**            | string   | _"Variable 2"_   | The text for the label of variable 1.                                            |
-| **breaks1**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 1                          |
-| **breaks2**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 2                          |
-| **labelFontSize**     | int      | _12_             | The font size of the legend label.                                               |
-| **noData**            | boolean  | _true_           | Show/hide 'no data' style in the legend.                                         |
-| **noDataShapeSize**   | number   | _15_             | The size, in pixel, of the 'No data' legend shape.                               |
-| **noDataText**        | Text     | _"No data"_      | 'No data' text label.                                                            |
-| **noDataYOffset**     | Text     | 0                | Add distance between the main legend and the 'no data' item in pixels            |
-| **yAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks1                              |
-| **xAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks2                              |
+| Parameter             | Type     | Default value    | Description                                                                                 |
+| --------------------- | -------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| **squareSize**        | number   | _50_             | The size, in pixel, of the legend square.                                                   |
+| **rotation**          | number   | _0_              | The rotation to apply to the main legend. Recommended values are either 0 or -45            |
+| **label1**            | string   | _"Variable 1"_   | The text for the label of variable 1.                                                       |
+| **label2**            | string   | _"Variable 2"_   | The text for the label of variable 1.                                                       |
+| **showBreaks**        | boolean  | _false_          | If set to true and breaks1 and breaks2 are undefined then breaks are automatically defined. |
+| **breaks1**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 1                                     |
+| **breaks2**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 2                                     |
+| **labelFontSize**     | int      | _12_             | The font size of the legend label.                                                          |
+| **noData**            | boolean  | _true_           | Show/hide 'no data' style in the legend.                                                    |
+| **noDataShapeHeight** | number   | _15_             | The height, in pixel, of the 'No data' legend shape.                                        |
+| **noDataShapeWidth**  | number   | _15_             | The width, in pixel, of the 'No data' legend shape.                                         |
+| **noDataText**        | Text     | _"No data"_      | 'No data' text label.                                                                       |
+| **noDataYOffset**     | Text     | 0                | Add distance between the main legend and the 'no data' item in pixels                       |
+| **yAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks1                                         |
+| **xAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks2                                         |
+| **yAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
+| **xAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
+| **axisArrows**        | boolean  | _true_           | Show axis arrows                                                                            |
+| **arrowHeight**       | number   | _15_             | Height of axis arrows                                                                       |
+| **arrowWidth**        | number   | _14_             | Width of axis arrows                                                                        |
+| **arrowPadding**      | number   | _10_             | Padding between arrow and axis label                                                        |
 
 ### Stripe composition map
 

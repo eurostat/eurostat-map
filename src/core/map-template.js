@@ -1296,7 +1296,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
 /** Default geocenter positions and pixelSize (for default width = 800px) for territories and projections. */
 const _defaultPosition = {
-    EUR_3035: { geoCenter: [4970000, 3350000], pixelSize: 6800 },
+    EUR_3035: { geoCenter: [4790000, 3420000], pixelSize: 6400 },
     IC_32628: { geoCenter: [443468, 3145647], pixelSize: 1000 },
     GP_32620: { geoCenter: [669498, 1784552], pixelSize: 130 },
     MQ_32620: { geoCenter: [716521, 1621322], pixelSize: 130 },
