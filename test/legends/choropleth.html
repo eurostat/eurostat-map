@@ -17,23 +17,14 @@
                 .zoomExtent([1, 1000])
                 .numberOfClasses(6)
                 .classificationMethod('threshold')
-                .thresholds([])
-                .colors([])
+                .colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
+                .thresholds([100, 200, 300, 400, 500])
                 .legend({
-                    x: 400,
+                    x: 550,
+                    y: 40,
                     ascending: true,
                     labelType: 'ranges',
                     svgId: 'eurostatmap-legend-europe-template',
-                    boxPadding: 5,
-                    boxOpacity: 0,
-                    boxMargin: 0,
-                    boxCornerRad: 0,
-                    titleFontSize: 15,
-                    labelFontSize: 14,
-                    shapeHeight: 16,
-                    shapeWidth: 26,
-                    sepLineLength: 28,
-                    labelDecNb: 0,
                     title: '',
                     fontFill: '#000',
                     noData: true,
@@ -43,47 +34,34 @@
                 })
                 .build()
 
-            // setTimeout(() => {
-            //     map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
-            //         .thresholds([100, 200, 300, 400, 500])
-            //         .updateClassification()
-            //         .updateStyle()
-            //         .updateLegend()
-            // }, 1000)
-
             setTimeout(() => {
-                map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
-                    .thresholds([100, 200, 300, 400, 500])
-                    .updateClassification()
-                    .updateStyle()
                 map.legend({
                     x: 500,
                     y: 10,
                     title: 'Inh per km2',
-                    // boxOpacity: 1,
-                    //labelType: 'ranges',
+                    labelType: 'thresholds',
                     pointOfDivergenceLabel: 'Increase|decrease',
-                    // pointOfDivergence: 5,
-                    labels: ['test', 'test', 'test', 'test', 'test', 'test'],
                 })
             }, 1000)
 
             setTimeout(() => {
-                map.colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
-                    .thresholds([100, 200, 300, 400, 500])
-                    .updateClassification()
-                    .updateStyle()
+                map.legend(false)
+            }, 2000)
+
+            setTimeout(() => {
                 map.legend({
                     x: 500,
                     y: 10,
-                    title: 'Inh per km2',
-                    // boxOpacity: 1,
+                    title: '',
                     labelType: 'thresholds',
-                    pointOfDivergenceLabel: 'Increase|decrease',
-                    // pointOfDivergence: 5,
-                    //labels: ['test', 'test', 'test', 'test', 'test', 'test'],
+                    pointOfDivergenceLabel: 'Increasesss|decreasess',
+                    labels: ['label1', 'label2', '', 'label4', 'label5'],
                 })
             }, 3000)
+
+            setTimeout(() => {
+                map.legend(false)
+            }, 4000)
         </script>
     </body>
 </html>

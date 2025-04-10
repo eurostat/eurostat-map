@@ -36,7 +36,6 @@
 .em-bn-2,
 .em-bn-3,
 .em-kosovo-bn,
-.em-bn-d,
 .em-bn-co,
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
@@ -75,11 +74,7 @@
     stroke-width: 0.15;
 }
 
-/* disputed */
-.em-bn-d {
-    stroke: #000;
-    stroke-width: 0.2;
-}
+
 
 /* dont fill certain elements */
 .em-frame,
@@ -90,7 +85,6 @@
 .em-bn-2,
 .em-bn-3,
 .em-kosovo-bn,
-.em-bn-d,
 .em-bn-co {
     fill: none;
 }

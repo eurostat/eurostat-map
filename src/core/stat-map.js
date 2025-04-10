@@ -94,6 +94,18 @@ export const statMap = function (config, withCenterPoints, mapType) {
     // override legend for updating after build
     out.legend = function (v) {
         if (!arguments.length) return out.legend_
+
+        // clear existing legend
+        if (v == false) {
+            const legend = out.legendObj()
+            const legendSvg = select('#' + legend.svgId)
+            if (legendSvg.size() > 0) {
+                legendSvg.selectAll('*').remove()
+            }
+            out.legend_ = v
+            return out
+        }
+        //set new legend config
         out.legend_ = v
         //update if existing legend
         if (out.legendObj_) out.updateLegend()

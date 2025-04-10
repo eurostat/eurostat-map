@@ -1,4 +1,6 @@
-#g_worldbn,.em-worldrg,.em-worldbn {
+#g_worldbn,
+.em-worldrg,
+.em-worldbn {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
@@ -15,4 +17,11 @@
 .em-worldrg {
     fill: #efefef;
     cursor: pointer;
+}
+
+.em-bn-d {
+    /* disputed */
+    stroke: #000;
+    stroke-width: 0.1;
+    fill: none;
 }
