@@ -262,7 +262,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
         out.updateStyle()
 
         //update legend, if any
-        if (out.legendObj()) out.legendObj().update()
+        if (out.legend_ && out.legendObj()) out.legendObj().update()
 
         return out
     }
