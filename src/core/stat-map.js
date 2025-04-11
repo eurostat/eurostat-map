@@ -98,9 +98,11 @@ export const statMap = function (config, withCenterPoints, mapType) {
         // clear existing legend
         if (v == false) {
             const legend = out.legendObj()
-            const legendSvg = select('#' + legend.svgId)
-            if (legendSvg.size() > 0) {
-                legendSvg.selectAll('*').remove()
+            if (legend) {
+                const legendSvg = select('#' + legend.svgId)
+                if (legendSvg.size() > 0) {
+                    legendSvg.selectAll('*').remove()
+                }
             }
             out.legend_ = v
             return out
