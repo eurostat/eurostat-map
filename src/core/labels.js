@@ -287,15 +287,13 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
         statLabelRegions = map.Geometries.statisticalRegions.features
     }
 
-    // preprocess centroids
-    if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
-
     //TODO: dont add labels for regions that are not visible? what about panning and zooming though. Only really an issue for mixed NUTS.
 
     // stats labels
+    const filteredRegions = statLabelRegions.filter((d, i, self) => i === self.findIndex((t) => t.properties.id === d.properties.id))
     statLabelsGroup
         .selectAll('g')
-        .data(statLabelRegions)
+        .data(filteredRegions)
         .enter()
         .append('g')
         .attr('transform', function (d) {

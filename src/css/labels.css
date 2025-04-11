@@ -18,17 +18,16 @@
     stroke: white;
 }
 .em-stat-label {
-    opacity: 0.9;
+    opacity: 1;
     font-size: 13px;
+    stroke-width: 3px;
     fill: #313131;
-    stroke: #313131;
-    stroke-width: 0.2px;
     font-weight: bold;
 }
 .em-stat-label-shadow {
-    opacity: 0.9;
+    opacity: 1;
     font-size: 13px;
-    stroke-width: 3.3px;
+    stroke-width: 4px;
     stroke: white;
 }
 .em-label-cc {
