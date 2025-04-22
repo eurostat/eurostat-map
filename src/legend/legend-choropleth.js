@@ -321,7 +321,7 @@ export const legend = function (map, config) {
         if (out.noData) {
             const noDataItemContainer = container.append('g').attr('class', 'em-legend-item')
             let y = baseY + map.numberOfClasses() * out.shapeHeight + out.boxPadding
-            if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
+            //if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
             noDataItemContainer
                 .append('rect')
                 .attr('class', 'em-legend-rect')
