@@ -370,6 +370,7 @@ The following parameters are properties of the colorLegend object:
 | **labelOffset**        | Number   | _25_                              | The distance between the legend box elements to the corresponding text label. |
 | **decimals**           | Number   | _0_                               | The number of decimals for each label.                                        |
 | **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **labels**             | Array    | _undefined_                       | Specify your own legend labels as an array of strings.                        |
 | **noData**             | Boolean  | _true_                            | Show a legend element that represents "no data" values.                       |
 | **noDataText**         | String   | _No data_                         | No data element label text.                                                   |
 | **sepLineLength**      | Number   | _17_                              | The length of the separation line between classes.                            |

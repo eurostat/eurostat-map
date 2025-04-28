@@ -64,6 +64,7 @@ export const legend = function (map, config) {
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined, // user-defined d3 format function
         labelType: 'thresholds', // type of labels to show: thresholds or ranges
+        labels: null, // user-defined labels for each class
         noData: true, //show no data
         noDataText: 'No data', //no data text label
         sepLineLength: 24, // //the separation line length
@@ -620,6 +621,7 @@ export const legend = function (map, config) {
                 .attr('y', out.colorLegend.shapeHeight / 2)
                 .attr('dominant-baseline', 'middle')
                 .text(() => {
+                    if (out.colorLegend.labels) return out.colorLegend.labels[i] // user-defined labels
                     if (i === 0) return `> ${f(thresholds[thresholds.length - 1])}`
                     if (i === thresholds.length) return `< ${f(thresholds[0])}`
                     return `${f(thresholds[thresholds.length - i - 1])} - < ${f(thresholds[thresholds.length - i])}`
@@ -637,7 +639,7 @@ export const legend = function (map, config) {
 
     function buildColorThresholdsLegend(m) {
         //define format for labels
-        let f = out.colorLegend.labelFormatter || spaceAsThousandSeparator
+        const labelFormatter = out.colorLegend.labelFormatter || spaceAsThousandSeparator
 
         //title
         if (out.colorLegend.title) {
@@ -713,10 +715,11 @@ export const legend = function (map, config) {
                     .attr('class', 'em-legend-label')
                     .attr('x', out.colorLegend.sepLineLength + out.colorLegend.tickLength + out.colorLegend.labelOffset.x)
                     .attr('y', out.colorLegend.shapeHeight)
-                    .text((d) => {
-                        let text = f(m.classifierColor_.invertExtent(out.ascending ? ecl + 1 : ecl - 1)[out.ascending ? 0 : 1])
-                        return text
-                    })
+                    .text(
+                        out.colorLegend.labels
+                            ? out.colorLegend.labels[i]
+                            : labelFormatter(m.classifierColor_.invertExtent(out.ascending ? ecl + 1 : ecl - 1)[out.ascending ? 0 : 1])
+                    )
             }
         }
 
