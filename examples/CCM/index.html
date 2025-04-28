@@ -13243,7 +13243,7 @@
                                               (e.psColors_ = null),
                                               (e.psColorFun_ = Il),
                                               (e.psClassToFillStyle_ = void 0),
-                                              (e.psThreshold_ = [0]),
+                                              (e.psThresholds_ = [0]),
                                               (e.psClassificationMethod_ = 'quantile'),
                                               (e.makeClassifNice_ = !0),
                                               (e.classifierSize_ = void 0),
@@ -13266,7 +13266,7 @@
                                                   'psClassToFillStyle_',
                                                   'psColorFun_',
                                                   'noDataFillStyle_',
-                                                  'psThreshold_',
+                                                  'psThresholds_',
                                                   'psColors_',
                                                   'psCustomSVG_',
                                                   'psOffset_',
@@ -13308,7 +13308,7 @@
                                                       : e.psColorFun_
                                               }),
                                               (e.psThreshold = function (t) {
-                                                  return arguments.length ? ((e.psThreshold_ = t), e.psClasses(t.length + 1), e) : e.psThreshold_
+                                                  return arguments.length ? ((e.psThresholds_ = t), e.psClasses(t.length + 1), e) : e.psThresholds_
                                               }),
                                               (e.updateClassification = function () {
                                                   if (

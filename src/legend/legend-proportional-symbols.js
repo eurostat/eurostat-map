@@ -63,6 +63,7 @@ export const legend = function (map, config) {
         labelOffset: { x: 5, y: 0 }, //distance (x) between label text and its corresponding shape element
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined, // user-defined d3 format function
+        labelType: 'thresholds', // type of labels to show: thresholds or ranges
         noData: true, //show no data
         noDataText: 'No data', //no data text label
         sepLineLength: 24, // //the separation line length
@@ -543,9 +544,100 @@ export const legend = function (map, config) {
      * @param {*} m map
      */
     function buildColorLegend(m) {
+        if (out.colorLegend.labelType === 'ranges') {
+            buildColorRangesLegend(m)
+        } else {
+            buildColorThresholdsLegend(m)
+        }
+    }
+
+    function getColorThresholds() {
+        const map = out.map
+        const thresholds =
+            map.psThresholds_.length > 1
+                ? map.psThresholds_
+                : Array.from({ length: map.psClasses_ })
+                      .map((_, index) => {
+                          return map.classifierColor_.invertExtent(index)[out.ascending ? 0 : 1]
+                      })
+                      .slice(1) // Remove the first entry and return the rest as an array
+        return thresholds
+    }
+
+    function buildColorRangesLegend(m) {
+        const f = out.colorLegend.labelFormatter || spaceAsThousandSeparator
+        const thresholds = getColorThresholds()
+        const numberOfClasses = m.psClasses_
+
+        //title
+        if (out.colorLegend.title) {
+            out._colorLegendNode
+                .append('text')
+                .attr('class', 'em-legend-title')
+                .attr('x', out.boxPadding)
+                .attr('y', out.titleFontSize + out.colorLegend.marginTop)
+                .text(out.colorLegend.title)
+        }
+
+        const x = out.boxPadding
+
+        for (let i = 0; i < numberOfClasses; i++) {
+            let y =
+                out.titleFontSize +
+                out.colorLegend.titlePadding +
+                out.colorLegend.marginTop +
+                i * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding)
+
+            const ecl = out.ascending ? i : numberOfClasses - i - 1
+
+            const itemContainer = out._colorLegendNode.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-item')
+
+            // Rectangle
+            itemContainer
+                .append('rect')
+                .attr('class', 'em-legend-rect')
+                .style('fill', m.psClassToFillStyle()(ecl, numberOfClasses))
+                .attr('width', out.colorLegend.shapeWidth)
+                .attr('height', out.colorLegend.shapeHeight)
+                .on('mouseover', function () {
+                    highlightRegions(out.map, ecl)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl)
+                    }
+                })
+                .on('mouseout', function () {
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
+                    }
+                })
+
+            // Label
+            itemContainer
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x)
+                .attr('y', out.colorLegend.shapeHeight / 2)
+                .attr('dominant-baseline', 'middle')
+                .text(() => {
+                    if (i === 0) return `> ${f(thresholds[thresholds.length - 1])}`
+                    if (i === thresholds.length) return `< ${f(thresholds[0])}`
+                    return `${f(thresholds[thresholds.length - i - 1])} - < ${f(thresholds[thresholds.length - i])}`
+                })
+        }
+
+        // Optionally add no-data
+        if (out.colorLegend.noData) {
+            let y = out.titleFontSize + out.colorLegend.marginTop + numberOfClasses * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
+            let container = out._colorLegendNode.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
+
+            buildNoDataLegend(container, out.colorLegend.noDataText)
+        }
+    }
+
+    function buildColorThresholdsLegend(m) {
         //define format for labels
         let f = out.colorLegend.labelFormatter || spaceAsThousandSeparator
-        const svgMap = m.svg()
 
         //title
         if (out.colorLegend.title) {

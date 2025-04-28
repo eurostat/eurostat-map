@@ -43,7 +43,7 @@ export const map = function (config) {
     out.psClassToFillStyle_ = undefined //a function returning the color from the class i
 
     //the threshold, when the classification method is 'threshold'
-    out.psThreshold_ = [0]
+    out.psThresholds_ = [0]
     //the classification method
     out.psClassificationMethod_ = 'quantile' // or: equinter, threshold
     //when computed automatically, ensure the threshold are nice rounded values
@@ -86,7 +86,7 @@ export const map = function (config) {
         'psColorFun_',
         'psSizeScale_',
         'noDataFillStyle_',
-        'psThreshold_',
+        'psThresholds_',
         'psColors_',
         'psCustomSVG_',
         'psOffset_',
@@ -140,9 +140,9 @@ export const map = function (config) {
         out.psClassToFillStyle_ = getColorLegend(out.psColorFun_, out.psColors_)
         return out
     }
-    out.psThreshold = function (v) {
-        if (!arguments.length) return out.psThreshold_
-        out.psThreshold_ = v
+    out.psThresholds = function (v) {
+        if (!arguments.length) return out.psThresholds_
+        out.psThresholds_ = v
         out.psClasses(v.length + 1)
         return out
     }
@@ -239,9 +239,9 @@ export const map = function (config) {
                 if (out.makeClassifNice_) out.classifierColor().nice()
             } else if (out.psClassificationMethod_ === 'threshold') {
                 //https://github.com/d3/d3-scale#threshold-scales
-                out.psClasses(out.psThreshold().length + 1)
+                out.psClasses(out.psThresholds().length + 1)
                 const range = getA(out.psClasses_)
-                out.classifierColor(scaleThreshold().domain(out.psThreshold()).range(range))
+                out.classifierColor(scaleThreshold().domain(out.psThresholds()).range(range))
             }
         }
     }

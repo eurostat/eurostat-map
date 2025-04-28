@@ -9,7 +9,7 @@
     font-size: 15px;
     stroke: none;
     fill: black;
-    dominant-baseline: central;
+    dominant-baseline: middle;
 }
 .em-legend-title {
     font-size: 16px;
@@ -20,7 +20,7 @@
     stroke-width: 1;
 }
 .em-legend-tick {
-    stroke: grey;
+    stroke: #d8d8d8;
     stroke-width: 1;
 }
 .em-bivariate-frame {
