@@ -37,7 +37,7 @@
                     })
                 })
                 .labels({ values: true })
-                .nutsLevel(0)
+                .nutsLevel('mixed')
                 .legend({
                     x: 10,
                     y: 220,
@@ -46,6 +46,7 @@
                 })
 
             map.statData('size').setData({
+                DED2C: 20,
                 ES: 22,
                 FR: 23,
                 DE: 21,
@@ -76,6 +77,7 @@
                 TR: 46,
             })
             map.statData('color').setData({
+                DED2C: ':',
                 ES: 22,
                 FR: 23,
                 DE: 21,

@@ -179,7 +179,7 @@ export const map = function (config) {
                         return 'nd'
                     }
                     const v = sv.value
-                    if (v !== 0 && !v) {
+                    if ((v !== 0 && !v) || v == ':') {
                         return 'nd'
                     }
                     let c = +out.classifierColor_(+v)
