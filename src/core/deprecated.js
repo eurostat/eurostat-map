@@ -110,6 +110,7 @@ export const defineDeprecatedFunctions = (out) => {
     out.tooltipText = (v) => (console.warn('map.tooltipText() is now deprecated. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
     out.classifMethod = (v) => (console.warn('map.classifMethod() is now DEPRECATED. please use map.classificationMethod() instead.'), out.classificationMethod_ = v,out);
     out.threshold = (v) => (console.warn('map.threshold() is now DEPRECATED. please use map.thresholds() instead.'), out.thresholds_ = v,out);
+    out.psThreshold = (v) => (console.warn('map.psThreshold() is now DEPRECATED. please use map.psThresholds() instead.'), out.psThresholds_ = v,out);
     out.clnb = (v) => (console.warn('map.clnb() is now DEPRECATED. please use map.numberOfClasses() instead.'), out.numberOfClasses_ = v,out);
     out.nutsLvl = (v) => (console.warn('map.nutsLvl() is now DEPRECATED. please use map.nutsLevel() instead.'), out.nutsLevel_ = v,out);
     out.lg = (v) => (console.warn('map.lg() is now DEPRECATED. please use map.language() instead.'), out.language_ = v,out);
