@@ -3,6 +3,58 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            /* Insets */
+            #titleLI,
+            #subtitleLI {
+                pointer-events: none !important;
+                stroke: none !important;
+                stroke-linejoin: round !important;
+                paint-order: stroke !important;
+            }
+            .em-inset-title,
+            .em-inset-subtitle,
+            #titleLI,
+            #subtitleLI {
+                font-size: 8.5px !important;
+            }
+            .em-inset-title,
+            .em-inset-subtitle,
+            #subtitleLI {
+                fill: #4c4b4b !important;
+            }
+            /* titleLI is actually the Liechtenstein halo. subtitleLI acts as the title */
+            #titleLI {
+                fill: white !important;
+                stroke-width: 2px !important;
+                stroke: white !important;
+                opacity: 0.8 !important;
+            }
+
+            /* Apply frame stroke to PT20 apart from main one (index8) */
+            #em-frame-PT20 {
+                stroke-width: 0.2px;
+            }
+            g[index='8'] #em-frame-PT20 {
+                stroke-width: 0px !important;
+            }
+
+            /* Apply frame stroke to GP apart from main one (index1) */
+            #em-frame-GP {
+                stroke-width: 0.2px;
+            }
+            g[index='1'] #em-frame-GP {
+                stroke-width: 0px !important;
+            }
+
+            .em-scalebar-label {
+                font-size: 8px !important;
+                fill: #878787 !important;
+            }
+            .em-scalebar-line {
+                stroke: #878787 !important;
+            }
+        </style>
     </head>
 
     <body>
@@ -35,67 +87,27 @@
         <!-- <script src="../configs/insetConfig_ext.js"></script> -->
         <script src="../data/mixed.js"></script>
         <script>
-            let mapWidth = 638
-            let mapHeight = 608
-            const h = 81.26
-            const w = 71.81
-            const size = 70 // inset size
-            const padding = 4 // inset padding
-            const insetsCfg = [
-                {
-                    geo: 'MT',
-                    x: 0,
-                    y: 0,
-                    width: w,
-                    height: h,
-                    title: 'Malta',
-                    titleFontSize: 8.78,
-                    scalebarPosition: [1, 65],
-                    labelling: true,
-                    labelsToShow: ['values'],
-                },
-                {
-                    geo: 'LI',
-                    x: w + p,
-                    y: 0,
-                    width: w,
-                    height: h,
-                    title: 'Liechtenstein',
-                    titlePosition: [2, 11],
-                    titleFill: 'white',
-                    titleStroke: 'white',
-                    titleStrokeWidth: '2px',
-                    titleFontSize: 8.78,
-                    titleFontWeight: 'normal',
-                    subtitle: 'Liechtenstein',
-                    subtitlePosition: [2, 11],
-                    subtitleFill: 'black',
-                    subtitleFontWeight: 'normal',
-                    subtitleFontSize: 8.78,
-                    geoCenter: [4285060, 2674000],
-                    scale: '01M',
-                    scalebarPosition: [1, 65],
-                    labelling: true,
-                    labelsToShow: ['values'],
-                },
-            ]
+            let mapWidth = 767
+            let mapHeight = 700
+            const insetsCfg = createOutermostInsetsConfig()
 
             basemap = function () {
                 return eurostatmap
-                    .map('choropleth')
+                    .map('proportionalSymbol')
                     .svgId('mappy')
                     .containerId('container')
-                    .pixelSize(7400)
+                    .pixelSize(6800)
                     .width(mapWidth)
                     .height(mapHeight)
                     .nutsLevel('mixed')
-                    .insets(insetsConfig())
-                    .nuts2jsonBaseURL('https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/')
+                    .insets(insetsCfg)
+                    .insetBoxPosition([500, 20])
                     .scalebarPosition([420, 560])
                     .hoverColor('#003E8C')
             }
 
             let exampleData1 = {
+                PT2: 100,
                 FRY: 120,
                 TRB: 110,
                 AT: 130,
@@ -140,33 +152,6 @@
             let exampleData2 = { ES: 10 }
             let map = basemap()
             map.statData().setData(exampleData1)
-
-            // apply labelling
-            setTimeout(() => {
-                map.insets('default').insetBoxPosition([365, 0])
-                map.build()
-            }, 2000)
-
-            setTimeout(() => {
-                map.insets(insetsCfg).insetBoxPosition([265, 0])
-                map.build()
-            }, 3000)
-
-            setTimeout(() => {
-                map.insets(insetsConfig()).insetBoxPosition([565, 0])
-                map.build()
-            }, 4000)
-
-            setTimeout(() => {
-                map.insets(insetsCfg).insetBoxPosition([165, 0])
-                map.build()
-            }, 5000)
-
-            setTimeout(() => {
-                map.insets(insetsConfig()).insetBoxPosition([565, 0])
-                map.build()
-            }, 6000)
-
             map.build()
         </script>
     </body>

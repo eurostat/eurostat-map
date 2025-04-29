@@ -84,7 +84,7 @@ const buildInset = function (config, out, withCenterPoints) {
     config.insetTemplates = config.insetTemplates || {}
     config.callback = config.callback || undefined
 
-    //copy template attributes
+    //copy main map attributes
     ;[
         'nutsLevel_',
         'nutsYear_',
@@ -101,21 +101,10 @@ const buildInset = function (config, out, withCenterPoints) {
         'coastalMarginStdDev_',
         'graticuleStroke_', // DEPRECATED
         'graticuleStrokeWidth_', // DEPRECATED
-        'labelling_', // DEPRECATED
-        'labelFill_', // DEPRECATED
-        'labelValuesFontSize_', // DEPRECATED
-        'labelOpacity_', // DEPRECATED
-        'labelStroke_', // DEPRECATED
-        'labelStrokeWidth_', // DEPRECATED
-        'labelShadowWidth_', // DEPRECATED
-        'labelShadow_', // DEPRECATED
-        'labelShadowColor_', // DEPRECATED
-        'labelShadowsToShow_',
-        'labelsToShow_', // DEPRECATED
-        'fontFamily_', // DEPRECATED
         'lg_',
         'projectionFunction_',
         'filterGeometriesFunction_',
+        'processCentroids_',
     ].forEach(function (att) {
         mt[att] = out[att]
     })

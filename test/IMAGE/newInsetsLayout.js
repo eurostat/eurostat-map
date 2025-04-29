@@ -1,7 +1,8 @@
+//IMAGE code
 const s = 210 // inset size in pixels
 const insetBoxPadding = 8 // inset box padding
 const p = 3 // inset padding
-
+const titleFontSize = 8
 const firstColumnItemWidth = 0.35 * s
 const firstColumnItemHeight = 0.45 * s
 
@@ -17,9 +18,9 @@ const finalRowItemY = finalColumnItemHeight * 3 + p + insetBoxPadding
 const finalRowItemWidth = 0.254 * s
 const finalRowItemHeight = 0.29 * s
 
-let currentConfig = null
+let outermostInsetsConfig = null
 
-const insetsConfig = () => {
+const createOutermostInsetsConfig = () => {
     let config = [
         {
             geo: 'IC',
@@ -29,21 +30,31 @@ const insetsConfig = () => {
             height: firstColumnItemHeight - 0.12 * s,
             svgId: 'inset0',
             title: 'Canarias (ES)',
-            pixelSize: 6800,
-            geoCenter: [399000, 3150000],
+            position: { x: 420000, y: 3150000, z: 6800 },
             scalebarPosition: [1, 55],
+            showScalebar: true,
         },
         {
             geo: 'GP',
-            x: insetBoxPadding + firstColumnItemWidth + p,
+            x: insetBoxPadding + firstColumnItemWidth + p * 3,
             y: insetBoxPadding,
             width: secondColumnItemWidth,
             height: GPheight,
             svgId: 'inset1',
             title: 'Guadeloupe (FR)',
-            pixelSize: 1900,
-            geoCenter: [669498, 1804552],
-            scalebarPosition: [51, 55],
+            position: { x: 680000, y: 1810000, z: 1820 },
+            titlePosition: [0, 10],
+            showScalebar: true,
+            scalebarPosition: [48, 55],
+        },
+        {
+            geo: 'GP',
+            x: insetBoxPadding + firstColumnItemWidth + p * 3,
+            y: insetBoxPadding + 18,
+            width: 23,
+            height: 15,
+            position: { x: 493000, y: 1998000, z: 1200 },
+            frameStrokeWidth: 0.8,
         },
         {
             geo: 'MQ',
@@ -53,8 +64,8 @@ const insetsConfig = () => {
             height: finalColumnItemHeight,
             svgId: 'inset2',
             title: 'Martinique (FR)',
-            pixelSize: 1800,
-            geoCenter: [716521, 1625000],
+            position: { x: 716521, y: 1625000, z: 1800 },
+            showScalebar: true,
             scalebarPosition: [0, 35],
         },
         {
@@ -65,8 +76,8 @@ const insetsConfig = () => {
             height: firstColumnItemHeight,
             svgId: 'inset3',
             title: 'Malta',
-            pixelSize: 900,
-            geoCenter: [4721000, 1440000],
+            position: { x: 4721000, y: 1440000, z: 900 },
+            showScalebar: true,
             scalebarPosition: [1, 60],
         },
         {
@@ -77,10 +88,11 @@ const insetsConfig = () => {
             height: GFheight,
             svgId: 'inset4',
             title: 'Guyane (FR)',
-            pixelSize: 6500,
-            geoCenter: [269852, 470000],
+            position: { x: 269852, y: 470000, z: 6500 },
             titlePosition: [0, 10],
-            scalebarPosition: [52, 75],
+            showScalebar: true,
+            scalebarPosition: [48, 75],
+            scalebarMaxWidth: 17,
         },
         {
             geo: 'RE',
@@ -90,8 +102,8 @@ const insetsConfig = () => {
             height: finalColumnItemHeight,
             svgId: 'inset5',
             title: 'Réunion (FR)',
-            pixelSize: 2000,
-            geoCenter: [340011, 7671627],
+            position: { x: 340011, y: 7671627, z: 2000 },
+            showScalebar: true,
             scalebarPosition: [1, 40],
         },
         {
@@ -102,7 +114,8 @@ const insetsConfig = () => {
             height: finalColumnItemHeight,
             svgId: 'inset6',
             title: 'Mayotte (FR)',
-            pixelSize: 1200,
+            position: { z: 1200 },
+            showScalebar: true,
             scalebarPosition: [1, 30],
         },
         {
@@ -111,10 +124,51 @@ const insetsConfig = () => {
             y: finalRowItemY,
             width: finalRowItemWidth,
             height: finalRowItemHeight,
-            svgId: 'inset7',
-            title: 'Açores (PT)',
-            pixelSize: 4900,
-            scalebarPosition: [1, 40],
+            svgId: 'inset7a',
+            title: 'Açores (PT) sdfghd',
+            position: { x: 470000, y: 4370000, z: 5000 },
+            processCentroids: (centroidFeatures) => {
+                //adjust centroids
+                return centroidFeatures.map((feature) => {
+                    if (feature.properties.id == 'PT2' || feature.properties.id == 'PT20' || feature.properties.id == 'PT200') {
+                        feature.geometry.coordinates[0] = 454540
+                        feature.geometry.coordinates[1] = 4279765
+                    }
+                    return feature
+                })
+            },
+            showScalebar: true,
+            scalebarPosition: [34, 41],
+        },
+        {
+            geo: 'PT20',
+            x: insetBoxPadding + 3,
+            y: finalRowItemY + titleFontSize + 8,
+            width: 20,
+            height: 20,
+            svgId: 'inset7b',
+            position: { x: 140000, y: 4385000, z: 2800 },
+            frameStrokeWidth: 0.8,
+        },
+        {
+            geo: 'PT20',
+            x: insetBoxPadding + 30,
+            y: finalRowItemY + titleFontSize + 8,
+            width: 20,
+            height: 22,
+            svgId: 'inset7c',
+            position: { x: 650000, y: 4140000, z: 6000 },
+            processCentroids: (centroidFeatures) => {
+                //adjust centroids
+                return centroidFeatures.map((feature) => {
+                    if (feature.properties.id == 'PT2' || feature.properties.id == 'PT20' || feature.properties.id == 'PT200') {
+                        feature.geometry.coordinates[0] = 454540
+                        feature.geometry.coordinates[1] = 4279765
+                    }
+                    return feature
+                })
+            },
+            frameStrokeWidth: 0.8,
         },
         {
             geo: 'PT30',
@@ -124,8 +178,11 @@ const insetsConfig = () => {
             height: finalRowItemHeight,
             svgId: 'inset8',
             title: 'Madeira (PT)',
-            pixelSize: 2400,
-            scalebarPosition: [1, 40],
+            position: { x: 323586, y: 3632706, z: 2600 },
+            titlePosition: [4, 11],
+            showScalebar: true,
+            scalebarPosition: [4, 41],
+            scalebarMaxWidth: 25,
         },
         {
             geo: 'LI',
@@ -134,20 +191,10 @@ const insetsConfig = () => {
             width: finalRowItemWidth - 5,
             height: finalRowItemHeight - 20,
             svgId: 'inset9',
-            // title: 'Liechtenstein',
-            // titleFill: 'white',
-            // titleStroke: 'white',
-            // titleStrokeWidth: '2px',
-            // titleFontWeight: 'normal',
-            // subtitle: 'Liechtenstein',
-            // titlePosition: [0, 11],
-            // subtitlePosition: [0, 11],
-            // subtitleFill: 'black',
-            // subtitleFontWeight: 'normal',
-            // subtitleFontSize: 9,
-            pixelSize: 900,
-            geoCenter: [4280060, 2669000],
-            scalebarPosition: [5, 25],
+            // title added manually in template html
+            position: { x: 4280060, y: 2669000, z: 900 },
+            showScalebar: true,
+            scalebarPosition: [4, 24],
         },
         {
             geo: 'SJ_SV',
@@ -157,23 +204,16 @@ const insetsConfig = () => {
             height: finalRowItemHeight,
             svgId: 'inset10',
             title: 'Svalbard (NO)',
-            geoCenter: [4570000, 6240000],
-            pixelSize: 12000,
-            scalebarPosition: [33, 45],
+            position: { x: 4570000, y: 6240000, z: 12000 },
+            showScalebar: true,
+            scalebarPosition: [33, 41],
+            scalebarMaxWidth: 17,
         },
     ]
 
     config.forEach((inset, i) => {
-        inset.titleFontSize = 9
-        inset.fontFamily = 'Myriad-Pro, Arial, Helvetica, sans-serif'
         if (!inset.titlePosition) inset.titlePosition = [2, 11]
-        inset.titleFontWeight = 100
-        inset.frameStroke = '#aaaaaa'
-        inset.frameStrokeWidth = 0
-        inset.labelling = false
-
-        if (inset.scalebar !== false) {
-            inset.showScalebar = true
+        if (inset.showScalebar) {
             inset.scalebarTickHeight = 6
             inset.scalebarSegmentHeight = 6
             inset.scalebarFontSize = 7
@@ -185,11 +225,27 @@ const insetsConfig = () => {
         }
 
         // generate unique identifiers for batch map-making
-        // inset.svgId = 'inset-' + i + '-' + Math.random().toString(16).slice(2)
+        inset.svgId = 'inset-' + i + '-' + Math.random().toString(16).slice(2)
     })
 
-    currentConfig = config
-    return config
-}
+    outermostInsetsConfig = config // for when we dont want to regenerate the svg ids and just want to reference the last made config
+    function deepClone(obj) {
+        if (obj === null || typeof obj !== 'object') {
+            return obj
+        }
 
-// export { insetsConfig, currentConfig }
+        if (Array.isArray(obj)) {
+            return obj.map(deepClone)
+        }
+
+        const cloned = {}
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                cloned[key] = deepClone(obj[key])
+            }
+        }
+        return cloned
+    }
+    // Clone the config to avoid mutation
+    return deepClone(config)
+}
