@@ -1166,22 +1166,22 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             .attr('height', out.scalebarHeight_)
 
         // top line full width
-        scalebarGroup
-            .append('line')
-            .attr('class', 'em-scalebar-line')
-            .attr('x1', marginLeft)
-            .attr('y1', 1)
-            .attr('x2', niceLengthPixel + marginLeft)
-            .attr('y2', 1)
+        // scalebarGroup
+        //     .append('line')
+        //     .attr('class', 'em-scalebar-line')
+        //     .attr('x1', marginLeft)
+        //     .attr('y1', 1)
+        //     .attr('x2', niceLengthPixel + marginLeft)
+        //     .attr('y2', 1)
 
         //bottom line full width
-        scalebarGroup
-            .append('line')
-            .attr('class', 'em-scalebar-line')
-            .attr('x1', marginLeft)
-            .attr('y1', out.scalebarSegmentHeight_)
-            .attr('x2', niceLengthPixel + marginLeft)
-            .attr('y2', out.scalebarSegmentHeight_)
+        // scalebarGroup
+        //     .append('line')
+        //     .attr('class', 'em-scalebar-line')
+        //     .attr('x1', marginLeft)
+        //     .attr('y1', out.scalebarSegmentHeight_)
+        //     .attr('x2', niceLengthPixel + marginLeft)
+        //     .attr('y2', out.scalebarSegmentHeight_)
 
         //first tick
         scalebarGroup
@@ -1203,6 +1203,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         const subdivisionNb = subdivisionNbs[scaleBarStartDigit]
         const divisionWidth = niceLengthPixel / subdivisionNb
         const divisionMinWidth = 15
+        const midlineY = out.scalebarSegmentHeight_ / 2 + 1
         if (divisionWidth >= divisionMinWidth) {
             for (let i = 1; i < subdivisionNb; i++) {
                 scalebarGroup
@@ -1218,40 +1219,48 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                     .attr('x', marginLeft + textOffsetX + i * divisionWidth)
                     .attr('y', out.scalebarTickHeight_ + textOffsetY)
                     .text(getScalebarLabel((niceLengthM[0] / subdivisionNb) * i))
-            }
 
-            //every other segment mid-line
-            for (let i = -1; i < subdivisionNb; i += 2) {
                 if (i == 1) {
                     scalebarGroup
                         .append('line')
-                        .attr('class', 'em-scalebar-line')
+                        .attr('class', 'em-scalebar-line em-scalebar-midline')
                         .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
-                        .attr('y1', out.scalebarSegmentHeight_ / 2)
+                        .attr('y1', midlineY)
                         .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
-                        .attr('y2', out.scalebarSegmentHeight_ / 2)
+                        .attr('y2', midlineY)
                 } else {
                     let x1 = marginLeft + out.scalebarStrokeWidth_ / 2 + (i - 1) * divisionWidth
                     if (x1 > 0) {
                         scalebarGroup
                             .append('line')
-                            .attr('class', 'em-scalebar-line')
+                            .attr('class', 'em-scalebar-line em-scalebar-midline')
                             .attr('x1', x1)
-                            .attr('y1', out.scalebarSegmentHeight_ / 2)
+                            .attr('y1', midlineY)
                             .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
-                            .attr('y2', out.scalebarSegmentHeight_ / 2)
+                            .attr('y2', midlineY)
                     }
                 }
+            }
+
+            // Draw final midline segment (last segment)
+            if (divisionWidth >= divisionMinWidth) {
+                scalebarGroup
+                    .append('line')
+                    .attr('class', 'em-scalebar-line em-scalebar-midline')
+                    .attr('x1', marginLeft + (subdivisionNb - 1) * divisionWidth)
+                    .attr('y1', midlineY)
+                    .attr('x2', marginLeft + subdivisionNb * divisionWidth)
+                    .attr('y2', midlineY)
             }
         } else {
             // single full-length horizontal mid-line
             scalebarGroup
                 .append('line')
-                .attr('class', 'em-scalebar-line')
+                .attr('class', 'em-scalebar-line em-scalebar-midline')
                 .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
-                .attr('y1', out.scalebarSegmentHeight_ / 2)
+                .attr('y1', midlineY)
                 .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + divisionWidth * subdivisionNb)
-                .attr('y2', out.scalebarSegmentHeight_ / 2)
+                .attr('y2', midlineY)
         }
 
         //last tick
