@@ -113,6 +113,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.annotations_ = undefined
     out.annotationsAdded = false //simple flag to know when annotations have already been added
 
+    //hatching
+    out.patternFill_ = undefined // e.g. {pattern:'hatching',regionIds:['DE','FR']}
+
     //dataset source link
     out.showSourceLink_ = true
 

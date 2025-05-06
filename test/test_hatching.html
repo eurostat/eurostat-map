@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .nutsLevel(0)
+                .title('basic test')
+                .patternFill([
+                    { pattern: 'dots', regionIds: ['DE', 'IT'] },
+                    { pattern: 'hatching', regionIds: ['ES', 'FR'] },
+                    { pattern: 'crosshatch', regionIds: ['PL'] },
+                ])
+                .zoomExtent([1, 1000])
+                .build()
+        </script>
+    </body>
+</html>

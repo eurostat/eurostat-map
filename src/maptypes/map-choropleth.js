@@ -8,6 +8,7 @@ import * as ChoroplethLegend from '../legend/legend-choropleth'
 import { executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { getCSSPropertyFromClass } from '../core/utils'
+import { applyPatternFill } from '../core/pattern-fill'
 
 /**
  * Returns a chroropleth map.
@@ -260,6 +261,11 @@ export const map = function (config) {
             // Update labels for statistical values if required
             if (out.labels_) {
                 if (out.labels_.values) out.updateValuesLabels(map)
+            }
+
+            //add hatching if needed
+            if (out.patternFill_) {
+                applyPatternFill(map, out.patternFill_)
             }
         }
     }
