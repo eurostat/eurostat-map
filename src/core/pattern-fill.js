@@ -13,18 +13,23 @@ export function applyPatternFill(map, configs = []) {
         defs = map.svg().append('defs')
     }
 
-    // Flatten all region-pattern mappings
-    const regionToPattern = {}
+    // Map region IDs to their specific patternId
+    const regionToPatternId = {}
 
     configs.forEach((config) => {
-        const { pattern = 'hatching', regionIds = [] } = config
+        const { pattern = 'hatching', regionIds = [], color = '#000', strokeWidth = 1 } = config
+
+        const colorKey = color.replace('#', '').toLowerCase() // e.g., 'ff0000'
+        const patternId = `${pattern}-${colorKey}-sw${strokeWidth}` // e.g., 'hatching-ff0000-sw1'
+        config.patternId = patternId // Store patternId in config for legend etc.
+        config.strokeWidth = strokeWidth // Store strokeWidth in config for legend etc.
 
         // Define pattern if missing
-        definePattern(map, pattern)
+        definePattern(map, patternId, pattern, color, strokeWidth)
 
-        // Map regions to patterns
+        // Map regions to their specific patternId
         regionIds.forEach((regionId) => {
-            regionToPattern[regionId] = pattern
+            regionToPatternId[regionId] = patternId
         })
     })
 
@@ -33,15 +38,15 @@ export function applyPatternFill(map, configs = []) {
         .selectAll(getRegionsSelector(map))
         .each(function (d) {
             const id = d?.properties?.id
-            const pattern = regionToPattern[id]
+            const patternId = regionToPatternId[id]
 
-            if (pattern) {
+            if (patternId) {
                 const original = select(this)
                 const clone = original.node().cloneNode(true)
 
                 select(clone)
-                    .attr('fill', `url(#${pattern})`)
-                    .attr('pointer-events', 'none') // Don't block interactivity
+                    .attr('fill', `url(#${patternId})`) // ✅ now uses correct patternId per region
+                    .attr('pointer-events', 'none')
                     .attr('class', (original.attr('class') || '') + ' pattern-fill-overlay')
 
                 // Append the cloned element on top
@@ -50,21 +55,21 @@ export function applyPatternFill(map, configs = []) {
         })
 }
 
-function definePattern(map, patternName) {
+function definePattern(map, patternId, patternName, color, strokeWidth) {
     const defs = map.svg().select('defs')
 
-    if (map.svg().select(`#${patternName}`).empty()) {
-        const pattern = defs.append('pattern').attr('id', patternName).attr('patternUnits', 'userSpaceOnUse').attr('width', 8).attr('height', 8)
+    if (map.svg().select(`#${patternId}`).empty()) {
+        const pattern = defs.append('pattern').attr('id', patternId).attr('patternUnits', 'userSpaceOnUse').attr('width', 8).attr('height', 8)
 
         if (patternName === 'hatching') {
-            pattern.append('path').attr('d', 'M-1,1 l2,-2 M0,8 l8,-8 M7,9 l2,-2').attr('stroke', '#000').attr('stroke-width', 1)
+            pattern.append('path').attr('d', 'M-1,1 l2,-2 M0,8 l8,-8 M7,9 l2,-2').attr('stroke', color).attr('stroke-width', strokeWidth)
         } else if (patternName === 'crosshatch') {
-            pattern.append('path').attr('d', 'M0,0 l8,8 M8,0 l-8,8').attr('stroke', '#000').attr('stroke-width', 1)
+            pattern.append('path').attr('d', 'M0,0 l8,8 M8,0 l-8,8').attr('stroke', color).attr('stroke-width', strokeWidth)
         } else if (patternName === 'dots') {
-            pattern.append('circle').attr('cx', 4).attr('cy', 4).attr('r', 1).attr('fill', '#000')
+            pattern.append('circle').attr('cx', 4).attr('cy', 4).attr('r', strokeWidth).attr('fill', color)
         } else {
             console.warn(`Unknown pattern "${patternName}", defaulting to hatching.`)
-            pattern.append('path').attr('d', 'M-1,1 l2,-2 M0,8 l8,-8 M7,9 l2,-2').attr('stroke', '#000').attr('stroke-width', 1)
+            pattern.append('path').attr('d', 'M-1,1 l2,-2 M0,8 l8,-8 M7,9 l2,-2').attr('stroke', color).attr('stroke-width', strokeWidth)
         }
     }
 }

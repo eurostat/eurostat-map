@@ -15,10 +15,11 @@
                 .nutsLevel(0)
                 .title('basic test')
                 .patternFill([
-                    { pattern: 'dots', regionIds: ['DE', 'IT'] },
-                    { pattern: 'hatching', regionIds: ['ES', 'FR'] },
-                    { pattern: 'crosshatch', regionIds: ['PL'] },
+                    { pattern: 'dots', regionIds: ['DE', 'IT'], legendLabel: 'EU Founding Members', color: 'orange', strokeWidth: 1 },
+                    { pattern: 'hatching', regionIds: ['ES', 'FR'], legendLabel: 'High Inflation', color: 'grey', strokeWidth: 1 },
+                    { pattern: 'crosshatch', regionIds: ['PL'], legendLabel: 'Transition Economy' },
                 ])
+                .legend({ x: 580 })
                 .zoomExtent([1, 1000])
                 .build()
         </script>

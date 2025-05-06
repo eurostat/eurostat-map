@@ -5,6 +5,7 @@ import { axisLeft } from 'd3-axis'
 import { max, bisector } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
+import { appendPatternFillLegend } from './legend-pattern-fill'
 
 /**
  * A legend for choropleth maps
@@ -91,6 +92,18 @@ export const legend = function (map, config) {
                     createThresholdsLegend()
                 }
             }
+
+            // Get the total height of the choropleth legend box
+            const legendHeight = out.lgg.node().getBBox().height
+
+            // Append pattern fill legend items BELOW the main legend
+            appendPatternFillLegend(map, out.lgg, {
+                shapeWidth: out.shapeWidth,
+                shapeHeight: out.shapeHeight,
+                labelOffset: out.labelOffset,
+                boxPadding: out.boxPadding,
+                offsetY: legendHeight + out.boxPadding + 5, // << this shifts pattern legend down
+            })
 
             // Set legend box dimensions
             out.setBoxDimension()
@@ -186,7 +199,8 @@ export const legend = function (map, config) {
                     .attr('class', 'em-legend-label')
                     .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
                     .attr('y', y + out.shapeHeight)
-                    .attr('dominant-baseline', 'middle')
+                    //.attr('dominant-baseline', 'middle')
+                    .attr('dy', '0.35em') // ~vertical centering
                     .text(out.labels ? out.labels[i] : formatLabel(m.classifier().invertExtent(ecl)[out.ascending ? 0 : 1]))
 
                 // mark label so we can move it in drawDivergingLine
@@ -232,7 +246,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
+                .attr('dy', '0.35em')
                 .text(out.noDataText)
         }
     }
@@ -302,7 +316,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
                 .attr('y', y + out.shapeHeight / 2)
-                .attr('dominant-baseline', 'middle')
+                .attr('dy', '0.35em')
                 .text(out.labels ? out.labels[i] : labelFormatter(map.classifier().invertExtent(ecl)[out.ascending ? 0 : 1], i))
         }
 
@@ -349,7 +363,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
+                .attr('dy', '0.35em')
                 .text(out.noDataText)
         }
     }
@@ -418,6 +432,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', directionLineX + 10)
                 .attr('y', y - directionLineLength + 10)
+                .attr('dy', '0.35em')
                 .text(labels[0])
 
             container
@@ -425,6 +440,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', directionLineX + 10)
                 .attr('y', y + directionLineLength - 10)
+                .attr('dy', '0.35em')
                 .text(labels[1])
         } else {
             // just the single label
@@ -433,6 +449,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-diverging-label em-legend-label')
                 .attr('x', x + lineLength + 5)
                 .attr('y', y)
+                .attr('dy', '0.35em')
                 .text(out.pointOfDivergenceLabel)
         }
 

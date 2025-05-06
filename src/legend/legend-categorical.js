@@ -95,7 +95,7 @@ export const legend = function (map, config) {
                     .attr('class', 'em-legend-label')
                     .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                     .attr('y', y + out.shapeHeight * 0.5)
-                    .attr('dominant-baseline', 'middle')
+                    .attr('dy', '0.35em') // ~vertical centering
                     .text(map.classToText() ? map.classToText()[ecl_] : ecl_)
             }
 
