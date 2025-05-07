@@ -6,7 +6,7 @@ import { axisBottom, axisLeft, axisRight } from 'd3-axis'
 import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
 import { getRegionsSelector } from '../core/utils'
-
+import * as StatisticalData from '../core/stat-data'
 /**
  * Returns a sparkline map.
  *
@@ -83,6 +83,28 @@ export const map = function (config) {
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
+
+    // Allow users manually add sparkline data
+    out.sparklineData_ = undefined
+    out.sparklineData = function (dataObject) {
+        const dates = Object.keys(dataObject[Object.keys(dataObject)[0]])
+        out._statDates = dates
+
+        dates.forEach((date) => {
+            const statData = StatisticalData.statData()
+            const perDateValues = {}
+
+            for (const regionId in dataObject) {
+                const regionValues = dataObject[regionId]
+                perDateValues[regionId] = regionValues[date]
+            }
+
+            statData.setData(perDateValues)
+            out.statData(date, statData)
+        })
+
+        return out
+    }
 
     /**
      * A function to define a sparkline map easily, without repetition of information.
@@ -245,7 +267,7 @@ export const map = function (config) {
     }
 
     function createSparkLineChart(node, data, width, height, isForTooltip = false) {
-        //call custom user function to draw the sparkline
+        // call custom user function to draw the sparkline
         if (out.sparkLineChartFunction_ && out.sparkLineChartFunction_ !== createSparkLineChart) {
             return out.sparkLineChartFunction_(node, data, width, height, isForTooltip)
         }
@@ -286,15 +308,17 @@ export const map = function (config) {
             // Y-axis with raw value labels
             node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
 
-            // Horizontal zero reference line
-            node.append('line')
-                .attr('x1', 0)
-                .attr('x2', width)
-                .attr('y1', zeroY)
-                .attr('y2', zeroY)
-                .attr('stroke', 'gray')
-                .attr('stroke-dasharray', '2,2')
-                .attr('stroke-width', 1)
+            // Horizontal zero reference line → only if min < 0 and max > 0
+            if (minValue < 0 && maxValue > 0) {
+                node.append('line')
+                    .attr('x1', 0)
+                    .attr('x2', width)
+                    .attr('y1', zeroY)
+                    .attr('y2', zeroY)
+                    .attr('stroke', 'gray')
+                    .attr('stroke-dasharray', '2,2')
+                    .attr('stroke-width', 1)
+            }
         }
 
         const lineGenerator = line()
@@ -386,19 +410,22 @@ export const map = function (config) {
      * @returns [min,max]
      */
     function getDatasetMaxMin() {
-        let maxs = []
-        let sel = out.svg().selectAll('#em-prop-symbols').selectAll('g.em-centroid').data()
+        const maxs = []
+        const sel = out.svg().selectAll('#em-prop-symbols').selectAll('g.em-centroid').data()
 
         sel.forEach((rg) => {
-            let id = rg.properties.id
-            let max = getRegionMax(id)
-            if (max) {
-                maxs.push(max)
+            const id = rg.properties.id
+            const regionMax = getRegionMax(id)
+            if (regionMax !== undefined) {
+                maxs.push(regionMax)
             }
         })
 
-        let minmax = extent(maxs)
-        return minmax
+        if (maxs.length === 0) {
+            return [0, 1] // fallback if no data found
+        }
+
+        return extent(maxs)
     }
 
     /**
@@ -407,23 +434,24 @@ export const map = function (config) {
      */
     const getRegionMax = function (id) {
         let max = 0
-        let s
 
-        //get stat value for each date and find the max
+        // get stat value for each date and find the max
         for (let i = 0; i < out._statDates.length; i++) {
-            //retrieve code and stat value
-            const sc = out._statDates[i]
-            s = out.statData(sc).get(id)
-            //case when some data is missing
-            if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
+            const date = out._statDates[i]
+            const statData = out.statData(date)
+
+            if (!statData || typeof statData.get !== 'function') continue
+
+            const s = statData.get(id)
+            if (!s || (s.value !== 0 && !s.value) || isNaN(s.value)) {
                 if (out.showOnlyWhenComplete()) return undefined
-                else continue
+                continue
             }
+
             if (s.value > max) max = s.value
         }
 
-        //case when no data
-        if (max == 0) return undefined
+        if (max === 0) return undefined
         return max
     }
 

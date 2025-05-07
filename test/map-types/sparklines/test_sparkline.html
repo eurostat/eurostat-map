@@ -6,6 +6,32 @@
     </head>
 
     <body>
+        <style>
+            /* Region fill */
+            .em-cntrg,
+            .em-nutsrg,
+            .em-grid-cell {
+                fill: #efefef !important;
+            }
+
+            /*  borders */
+            .em-cntbn,
+            .em-worldbn,
+            g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+                stroke-width: 0.1px !important;
+                stroke: #000 !important;
+            }
+            /*  borders */
+            .em-bn-1,
+            .em-bn-2,
+            .em-bn-3,
+            .em-nutsrg [lvl='3'],
+            .em-nutsrg [lvl='2'],
+            .em-nutsrg [lvl='1'] {
+                stroke-width: 0px !important;
+                stroke: #ffffff !important;
+            }
+        </style>
         <svg id="sparklineSVG"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
@@ -28,11 +54,12 @@
                 )
                 .sparkType('line')
                 .sparkLineWidth(30)
+                .sparkLineHeight(10)
                 .sparkLineStrokeWidth(0.8)
                 .sparkLineColor((d, i) => {
                     return d[d.length - 1].value <= 0 ? 'red' : 'blue'
                 })
-                .sparkLineHeight(20)
+
                 .sparkLineOpacity(0.8)
                 .sparkLineCircleRadius(0)
 

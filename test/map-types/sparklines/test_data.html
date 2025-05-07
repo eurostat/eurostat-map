@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="sparklineSVG"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map('sparkline')
+                .svgId('sparklineSVG')
+                .nutsLevel(0)
+                .width(600)
+                .nutsYear(2016)
+                .title('Population change 2009 - 2020')
+                .sparklineData({
+                    ES: { 2009: 5, 2010: 6, 2015: 3, 2016: 4 },
+                    IT: { 2009: 4, 2010: 5, 2015: 2, 2016: 3 },
+                    FR: { 2009: 4, 2010: 5, 2015: 2, 2016: 3 },
+                })
+                .build()
+        </script>
+    </body>
+</html>

@@ -87,6 +87,23 @@ export const statData = function (config) {
         return out
     }
 
+    //eg for sparklines
+    out.setManualMultiDate = function (dataObject) {
+        out._data_ = out._data_ || {}
+
+        for (const regionId in dataObject) {
+            const dateValueMap = dataObject[regionId]
+            out._data_[regionId] = {}
+
+            for (const date in dateValueMap) {
+                const value = dateValueMap[date]
+                out._data_[regionId][date] = { value: value }
+            }
+        }
+
+        return out
+    }
+
     /** Return all stat values as an array. This can be used to classify the values. */
     out.getArray = function () {
         if (out._data_) {
