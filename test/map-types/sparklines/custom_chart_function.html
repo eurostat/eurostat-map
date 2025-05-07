@@ -17,7 +17,7 @@
                 .nutsLevel(0)
                 .width(600)
                 .nutsYear(2016)
-                .title('Crude rate of total population change 2009 - 2020')
+                .title('Custom chart function - log scale')
                 //.zoomExtent([1, 2]) //pan & zoom
                 .statSpark(
                     {
@@ -60,7 +60,35 @@
                         .x((d, i) => xScale(i))
                         .y((d) => yScale(Math.max(d.value, 1)))
 
+                    // Draw the line
                     node.append('path').datum(data).attr('fill', 'none').attr('stroke', 'purple').attr('stroke-width', 1).attr('d', lineGenerator)
+
+                    if (isForTooltip) {
+                        // Add X-axis (with index or optional label)
+                        node.append('g')
+                            .attr('class', 'axis-x')
+                            .attr('transform', `translate(0, ${height})`)
+                            .call(
+                                d3
+                                    .axisBottom(xScale)
+                                    .ticks(data.length)
+                                    .tickFormat((d, i) => i)
+                            )
+
+                        // Add Y-axis (log scale ticks)
+                        node.append('g').attr('class', 'axis-y').call(d3.axisLeft(yScale).ticks(5, '~s'))
+
+                        // Optional: horizontal line at log(1) = 1
+                        const oneY = yScale(1)
+                        node.append('line')
+                            .attr('x1', 0)
+                            .attr('x2', width)
+                            .attr('y1', oneY)
+                            .attr('y2', oneY)
+                            .attr('stroke', 'gray')
+                            .attr('stroke-dasharray', '2,2')
+                            .attr('stroke-width', 1)
+                    }
                 })
                 .sparkTooltipChart({
                     width: 150,
