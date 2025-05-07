@@ -4,6 +4,7 @@ import { schemeSet3 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
+import { applyPatternFill } from '../core/pattern-fill'
 
 /**
  * Returns a categorical map.
@@ -172,6 +173,11 @@ export const map = function (config) {
             // Update labels for statistical values if required
             if (out.labels_) {
                 if (out.labels_.values) out.updateValuesLabels(map)
+            }
+
+            //add hatching if needed
+            if (out.patternFill_) {
+                applyPatternFill(map, out.patternFill_)
             }
         }
     }

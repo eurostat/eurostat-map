@@ -7,50 +7,67 @@ export function applyPatternFill(map, configs = []) {
         return
     }
 
-    // Add <defs> if missing
     let defs = map.svg().select('defs')
     if (defs.empty()) {
         defs = map.svg().append('defs')
     }
 
-    // Map region IDs to their specific patternId
-    const regionToPatternId = {}
+    // Prepare: map each regionId to an array of patternIds
+    const regionToPatternIds = {}
 
     configs.forEach((config) => {
-        const { pattern = 'hatching', regionIds = [], color = '#000', strokeWidth = 1 } = config
+        const { pattern = 'hatching', regionIds = [], color = '#000', strokeWidth = 1, customPattern } = config
 
-        const colorKey = color.replace('#', '').toLowerCase() // e.g., 'ff0000'
-        const patternId = `${pattern}-${colorKey}-sw${strokeWidth}` // e.g., 'hatching-ff0000-sw1'
-        config.patternId = patternId // Store patternId in config for legend etc.
-        config.strokeWidth = strokeWidth // Store strokeWidth in config for legend etc.
+        let patternId
 
-        // Define pattern if missing
-        definePattern(map, patternId, pattern, color, strokeWidth)
+        if (customPattern) {
+            const idMatch = customPattern.match(/id=['"]([^'"]+)['"]/)
+            if (idMatch) {
+                patternId = idMatch[1]
 
-        // Map regions to their specific patternId
+                if (map.svg().select(`#${patternId}`).empty()) {
+                    defs.node().insertAdjacentHTML('beforeend', customPattern)
+                }
+            } else {
+                console.warn('customPattern must include an id attribute.')
+                return
+            }
+        } else {
+            const colorKey = color.replace('#', '').toLowerCase()
+            patternId = `${pattern}-${colorKey}-sw${strokeWidth}`
+            definePattern(map, patternId, pattern, color, strokeWidth)
+        }
+
+        config.patternId = patternId
+
         regionIds.forEach((regionId) => {
-            regionToPatternId[regionId] = patternId
+            if (!regionToPatternIds[regionId]) {
+                regionToPatternIds[regionId] = []
+            }
+            regionToPatternIds[regionId].push(patternId)
         })
     })
 
-    // Select regions and overlay pattern fills
+    // Apply all patterns for each region (stacking them)
     map.svg()
         .selectAll(getRegionsSelector(map))
         .each(function (d) {
             const id = d?.properties?.id
-            const patternId = regionToPatternId[id]
+            const patternIds = regionToPatternIds[id]
 
-            if (patternId) {
+            if (patternIds && patternIds.length) {
                 const original = select(this)
-                const clone = original.node().cloneNode(true)
 
-                select(clone)
-                    .attr('fill', `url(#${patternId})`) // ✅ now uses correct patternId per region
-                    .attr('pointer-events', 'none')
-                    .attr('class', (original.attr('class') || '') + ' pattern-fill-overlay')
+                patternIds.forEach((patternId) => {
+                    const clone = original.node().cloneNode(true)
 
-                // Append the cloned element on top
-                select(this.parentNode).append(() => clone)
+                    select(clone)
+                        .attr('fill', `url(#${patternId})`)
+                        .attr('pointer-events', 'none')
+                        .attr('class', (original.attr('class') || '') + ' pattern-fill-overlay')
+
+                    select(this.parentNode).append(() => clone)
+                })
             }
         })
 }
@@ -58,7 +75,12 @@ export function applyPatternFill(map, configs = []) {
 function definePattern(map, patternId, patternName, color, strokeWidth) {
     const defs = map.svg().select('defs')
 
-    if (map.svg().select(`#${patternId}`).empty()) {
+    if (
+        map
+            .svg()
+            .select(`#${CSS.escape(patternId)}`)
+            .empty()
+    ) {
         const pattern = defs.append('pattern').attr('id', patternId).attr('patternUnits', 'userSpaceOnUse').attr('width', 8).attr('height', 8)
 
         if (patternName === 'hatching') {

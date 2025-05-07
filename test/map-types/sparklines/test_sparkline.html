@@ -57,7 +57,10 @@
                 .sparkLineHeight(10)
                 .sparkLineStrokeWidth(0.8)
                 .sparkLineColor((d, i) => {
-                    return d[d.length - 1].value <= 0 ? 'red' : 'blue'
+                    const first = d[0].value
+                    const last = d[d.length - 1].value
+
+                    return last > first ? 'blue' : 'red'
                 })
 
                 .sparkLineOpacity(0.8)

@@ -1,5 +1,3 @@
-// legend-pattern-fill.js
-
 import { select } from 'd3-selection'
 import { getFontSizeFromClass } from '../core/utils'
 
@@ -21,6 +19,15 @@ export function appendPatternFillLegend(map, container, options = {}) {
 
         const item = container.append('g').attr('class', 'em-legend-item pattern-fill-legend')
 
+        const patternColor = cfg.color || '#000' // fallback to black if no color provided
+        const isWhitePattern = patternColor.toLowerCase() === '#fff' || patternColor.toLowerCase() === 'white'
+
+        // Add background if pattern is white
+        if (isWhitePattern) {
+            item.append('rect').attr('x', boxPadding).attr('y', y).attr('width', shapeWidth).attr('height', shapeHeight).attr('fill', '#ddd') // light gray background
+        }
+
+        // Add pattern overlay
         item.append('rect')
             .attr('x', boxPadding)
             .attr('y', y)
@@ -28,6 +35,7 @@ export function appendPatternFillLegend(map, container, options = {}) {
             .attr('height', shapeHeight)
             .attr('fill', `url(#${cfg.patternId || cfg.pattern})`)
 
+        // Add label
         item.append('text')
             .attr('class', 'em-legend-label')
             .attr('x', boxPadding + shapeWidth + labelOffset)

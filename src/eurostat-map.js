@@ -100,3 +100,6 @@ export const getFillPatternDefinitionFun = function (opts) {
 export const getDefaultLabels = function () {
     return DEFAULTLABELS
 }
+
+import { version as pkgVersion } from '../package.json'
+export const version = pkgVersion

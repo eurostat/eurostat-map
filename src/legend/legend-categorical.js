@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
+import { appendPatternFillLegend } from './legend-pattern-fill'
 
 /**
  * A legend for categorical maps
@@ -131,9 +132,20 @@ export const legend = function (map, config) {
                     .attr('class', 'em-legend-label')
                     .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                     .attr('y', y + out.shapeHeight * 0.5)
-                    .attr('dominant-baseline', 'middle')
+                    .attr('dy', '0.35em') // ~vertical centering
                     .text(out.noDataText)
             }
+
+            // Append pattern fill legend items BELOW the main legend
+            // Get the total height of the choropleth legend box
+            const legendHeight = out.lgg.node().getBBox().height
+            appendPatternFillLegend(map, out.lgg, {
+                shapeWidth: out.shapeWidth,
+                shapeHeight: out.shapeHeight,
+                labelOffset: out.labelOffset,
+                boxPadding: out.boxPadding,
+                offsetY: legendHeight + out.boxPadding + 5, // << this shifts pattern legend down
+            })
 
             //set legend box dimensions
             out.setBoxDimension()
