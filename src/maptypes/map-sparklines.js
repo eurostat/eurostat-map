@@ -1,9 +1,8 @@
 import { select, create } from 'd3-selection'
-import { scaleLinear, scaleLog, scaleSqrt } from 'd3-scale'
+import { scaleLinear, scaleSqrt } from 'd3-scale'
 import { line, area } from 'd3-shape'
 import { extent, min, max } from 'd3-array'
 import { axisBottom, axisLeft, axisRight } from 'd3-axis'
-import { format } from 'd3-format'
 import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/legend-choropleth'
 import { getRegionsSelector } from '../core/utils'
@@ -35,7 +34,7 @@ export const map = function (config) {
     //show sparklines only when data for all dates is complete.
     //Otherwise, consider the regions as being with no data at all.
     out.showOnlyWhenComplete_ = false
-    out.sparkPercentageChange_ = false // show percentage change instead of raw counts
+    out.sparkLineChartFunction_ = undefined
 
     out.statSpark_ = null
     out.sparkHeightClassifier_ = null
@@ -58,7 +57,7 @@ export const map = function (config) {
         'sparkLineCircleRadius_',
         'sparkLineAreaColor_',
         'sparkTooltipChart_',
-        'sparkPercentageChange_',
+        'sparkLineChartFunction_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -80,7 +79,7 @@ export const map = function (config) {
             'sparkLineCircleRadius_',
             'sparkLineAreaColor',
             'sparkTooltipChart_',
-            'sparkPercentageChange_',
+            'sparkLineChartFunction_',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
@@ -179,7 +178,7 @@ export const map = function (config) {
 
         // define size scaling function
         // Define the domain correctly for the log scale
-        out.domain = out.sparkPercentageChange_ ? [1e-3, 10] : getDatasetMaxMin() // Avoid 0 for log scale
+        out.domain = getDatasetMaxMin() // Avoid 0 for log scale
 
         // for area charts
         out.widthClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineWidth_])
@@ -245,168 +244,82 @@ export const map = function (config) {
         })
     }
 
-    function createSparkLineChart(node, data, w, h, isForTooltip = false) {
-        // Get the extent of the whole dataset
-        let ext = out.domain
-        let height = out.sparkType_ === 'area' ? out.widthClassifier_(ext[1]) : h
-        let width = out.sparkType_ === 'area' ? out.heightClassifier_(ext[1]) : w
+    function createSparkLineChart(node, data, width, height, isForTooltip = false) {
+        //call custom user function to draw the sparkline
+        if (out.sparkLineChartFunction_ && out.sparkLineChartFunction_ !== createSparkLineChart) {
+            return out.sparkLineChartFunction_(node, data, width, height, isForTooltip)
+        }
 
-        let scaledData
-
-        // Define X scale
-        let xScale = scaleLinear()
-            .domain([out._statDates[0], out._statDates[out._statDates.length - 1]])
+        const xScale = scaleLinear()
+            .domain([0, out._statDates.length - 1])
             .range([0.5, width - 0.5])
 
-        // Precompute the scaled values for the data points
-        if (out.sparkPercentageChange_) {
-            const sanitizeLogValue = (value) => {
-                if (value === 0) return 0.001 // Avoid zero
-                return value
-            }
+        const minValue = min(data.map((d) => d.value)) || 0
+        const maxValue = max(data.map((d) => d.value)) || 1
 
-            const centerPosition = height / 2
+        const yScale = scaleLinear().domain([minValue, maxValue]).range([height, 0])
 
-            // Separate positive and negative values for scaling
-            const positiveData = data.filter((d) => d.percentageChange > 0).map((d) => sanitizeLogValue(d.percentageChange))
-            const negativeData = data.filter((d) => d.percentageChange < 0).map((d) => sanitizeLogValue(d.percentageChange))
+        const scaledData = data.map((d, i) => ({
+            ...d,
+            scaledXValue: xScale(i),
+            scaledYValue: yScale(d.value),
+        }))
 
-            // Handling positive values using a positive log scale
-            const maxPositive = max(positiveData) || 1
-            const minPositive = 0.0001
-            const minNegative = min(negativeData) || -1
+        const zeroY = yScale(0)
 
-            const scaleLogPositive = scaleLog()
-                .domain([minPositive, maxPositive]) // For positive values
-                .range([height / 2, 0]) // Positive values above center
+        if (isForTooltip) {
+            // X-axis at bottom
+            node.append('g')
+                .attr('class', 'axis-x')
+                .attr('transform', `translate(0, ${height})`)
+                .call(
+                    axisBottom(xScale)
+                        .ticks(out._statDates.length)
+                        .tickFormat((d, i) => out._statDates[i])
+                )
+                .selectAll('text')
+                .style('text-anchor', 'end')
+                .attr('dx', '-.8em')
+                .attr('dy', '.15em')
+                .attr('transform', 'rotate(-65)')
 
-            const scaleLogNegative = scaleLog()
-                .domain([-0.01, minNegative]) // For negative values
-                .range([height / 2, height]) // Negative values below center
+            // Y-axis with raw value labels
+            node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
 
-            if (!positiveData.length || !negativeData.length) {
-                console.log('no data')
-            }
-
-            // Precompute scaled Y data
-            scaledData = data.map((d) => {
-                d.scaledYValue =
-                    d.percentageChange < 0
-                        ? scaleLogNegative(sanitizeLogValue(d.percentageChange))
-                        : scaleLogPositive(sanitizeLogValue(d.percentageChange))
-
-                d.scaledXValue = xScale(d.date)
-
-                if (isNaN(d.scaledYValue)) {
-                    console.error('NaN detected in scaledValue:', d)
-                    d.scaledYValue = 0.01
-                }
-                return d
-            })
-
-            // Draw the axis
-            if (isForTooltip) {
-                // Add the X Axis
-                node.append('g')
-                    .attr('class', 'axis')
-                    .attr('transform', 'translate(0,' + height + ')')
-                    .call(axisBottom(xScale).ticks(out._statDates.length).tickFormat(format('.0f')))
-                    .selectAll('text')
-                    .style('text-anchor', 'end')
-                    .attr('dx', '-.8em')
-                    .attr('dy', '.15em')
-                    .attr('transform', 'rotate(-65)')
-
-                // Add the Y Axis for positive values
-                const positiveTickValuesY = [1]
-                const negativeTickValuesY = [-0.5]
-                node.append('g')
-                    .attr('class', 'y-axis-negative')
-                    .attr('transform', `translate(-10, ${0})`) // Position for negative axis
-                    .call(axisLeft(scaleLogNegative).tickValues(negativeTickValuesY).tickFormat(format(',.2r')))
-
-                node.append('g')
-                    .attr('class', 'y-axis-positive')
-                    .attr('transform', `translate(${-10}, 0)`)
-                    .call(axisLeft(scaleLogPositive).tickValues(positiveTickValuesY).tickFormat(format(',.2r')))
-                    // Manually add a custom label for 0
-                    .append('g')
-                    .attr('class', 'tick')
-                    .attr('transform', `translate(0, ${height / 2})`)
-                    .append('text')
-                    .attr('fill', 'currentColor')
-                    .attr('x', -12)
-                    .style('text-anchor', 'middle')
-                    .text('0') // Custom label for small value (0.10)
-
-                console.log(positiveTickValuesY, negativeTickValuesY)
-            }
-        } else {
-            // Raw counts (linear scale for both positive and negative)
-
-            const yScale = scaleLinear()
-                .domain(ext)
-                .range([height - 0.5, 0])
-
-            scaledData = data.map((d) => {
-                d.scaledXValue = xScale(d.date)
-                d.scaledYValue = yScale(d.value)
-                return d
-            })
-
-            //Draw axis
-            if (isForTooltip) {
-                // Add the X Axis
-                node.append('g')
-                    .attr('class', 'axis')
-                    .attr('transform', 'translate(0,' + height + ')')
-                    .call(axisBottom(xScale).ticks(out._statDates.length).tickFormat(format('.0f')))
-                    .selectAll('text')
-                    .style('text-anchor', 'end')
-                    .attr('dx', '-.8em')
-                    .attr('dy', '.15em')
-                    .attr('transform', 'rotate(-65)')
-
-                // Add the Y Axis
-                let domainY = yScale.domain()
-                let tickValues = [domainY[0], ((domainY[0] + domainY[1]) / 2).toFixed(1), domainY[1]]
-                node.append('g')
-                    .attr('class', 'axis')
-                    .call(axisLeft(yScale).tickValues(tickValues).tickFormat(format(',.2r')))
-            }
+            // Horizontal zero reference line
+            node.append('line')
+                .attr('x1', 0)
+                .attr('x2', width)
+                .attr('y1', zeroY)
+                .attr('y2', zeroY)
+                .attr('stroke', 'gray')
+                .attr('stroke-dasharray', '2,2')
+                .attr('stroke-width', 1)
         }
 
         const lineGenerator = line()
-            .x((d, i) => d.scaledXValue)
+            .x((d) => d.scaledXValue)
             .y((d) => d.scaledYValue)
 
-        // Draw the area (for area chart)
         if (out.sparkType_ === 'area') {
             node.append('path')
-                .datum(data)
+                .datum(scaledData)
                 .attr('fill', typeof out.sparkAreaColor_ === 'function' ? (d, i) => out.sparkAreaColor_(d, i) : out.sparkAreaColor_)
-                .attr('stroke', typeof out.sparkLineColor_ === 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
-                .attr(
-                    'stroke-width',
-                    typeof out.sparkLineStrokeWidth_ === 'function' ? (d, i) => out.sparkLineStrokeWidth_(d, i) : out.sparkLineStrokeWidth_ + 'px'
-                )
+                .attr('stroke', 'none')
                 .attr('opacity', out.sparkLineOpacity_)
                 .attr('fill-opacity', 0.3)
-                .attr('stroke', 'none')
                 .attr(
                     'd',
                     area()
-                        .x((d, i) => d.scaledXValue)
-                        .y0(height) // Baseline
+                        .x((d) => d.scaledXValue)
+                        .y0(zeroY)
                         .y1((d) => d.scaledYValue)
                 )
-                .attr('transform', (d) => `translate(0,-${height / 2})`)
         }
 
-        // Draw the line
         node.append('path')
             .datum(scaledData)
-            .style('fill', 'none')
+            .attr('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
             .attr('stroke', typeof out.sparkLineColor_ === 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
             .attr(
@@ -414,19 +327,57 @@ export const map = function (config) {
                 typeof out.sparkLineStrokeWidth_ === 'function' ? (d, i) => out.sparkLineStrokeWidth_(d, i) : out.sparkLineStrokeWidth_ + 'px'
             )
             .attr('d', lineGenerator)
-            .attr('transform', (d) => (isForTooltip ? null : `translate(0,${out.sparkPercentageChange_ ? -d[0].scaledYValue : -d[0].scaledYValue})`)) //origin of line is first data point location
 
-        // Add the dots
-        node.selectAll('myCircles')
-            .data(data)
+        node.selectAll('circle')
+            .data(scaledData)
             .enter()
             .append('circle')
-            .style('fill', 'red')
-            .attr('stroke', 'none')
-            .attr('cx', (d, i) => d.scaledXValue)
+            .attr('cx', (d) => d.scaledXValue)
             .attr('cy', (d) => d.scaledYValue)
             .attr('r', out.sparkLineCircleRadius_)
-            .attr('transform', (d) => (isForTooltip ? null : `translate(0,-${height / 2})`))
+            .attr('fill', 'red')
+            .attr('stroke', 'none')
+    }
+
+    //specific tooltip text function
+    out.tooltip_.textFunction = function (region, map) {
+        const buf = []
+
+        const regionName = region.properties.na
+        const regionId = region.properties.id
+        buf.push(`
+                <div class="estat-vis-tooltip-bar">
+                    <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+                </div>
+            `)
+
+        const chartHeight = out.sparkTooltipChart_.height
+        const chartWidth = out.sparkTooltipChart_.width
+        const margin = out.sparkTooltipChart_.margin
+        const data = getComposition(region.properties.id)
+
+        if (data) {
+            // Total SVG size (including margins)
+            const totalWidth = chartWidth + margin.left + margin.right
+            const totalHeight = chartHeight + margin.top + margin.bottom
+
+            // Create detached div
+            const container = create('div').attr('class', 'em-tooltip-chart-container')
+
+            // Create SVG with full size
+            const svg = container.append('svg').attr('class', 'em-tooltip-chart-svg').attr('width', totalWidth).attr('height', totalHeight)
+
+            // Inner group where chart is drawn
+            const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+            // Call sparkline drawing on the inner area only
+            createSparkLineChart(g, data, chartWidth, chartHeight, true)
+
+            // Add result to tooltip buffer
+            buf.push(container.node().outerHTML)
+        }
+
+        return buf.join('')
     }
 
     /**
@@ -480,47 +431,6 @@ export const map = function (config) {
     out.getLegendConstructor = function () {
         //TODO define legend
         return lgch.legend
-    }
-
-    //specific tooltip text function
-    out.tooltip_.textFunction = function (region, map) {
-        const buf = []
-
-        // Header with region name and ID
-        const regionName = region.properties.na
-        const regionId = region.properties.id
-        buf.push(`
-            <div class="estat-vis-tooltip-bar">
-                <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-            </div>
-        `)
-
-        // Prepare data for sparkline chart
-        const height = out.sparkTooltipChart_.height
-        const width = out.sparkTooltipChart_.width
-        const margin = out.sparkTooltipChart_.margin
-        const data = getComposition(region.properties.id)
-
-        if (data) {
-            // Create an SVG element detached from the document
-            const container = create('div').attr('class', 'em-tooltip-chart-container')
-            const svg = container
-                .append('svg')
-                .attr('class', 'em-tooltip-chart-svg')
-                .attr('width', width + margin.left + margin.right)
-                .attr('height', height + margin.top + margin.bottom)
-
-            const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
-
-            // Generate the chart within the SVG
-            createSparkLineChart(g, data, width, height, true)
-
-            // Convert the SVG node to an HTML string and add it to the buffer
-            buf.push(container.node().outerHTML)
-        }
-
-        // Return the buffer as a single string
-        return buf.join('')
     }
 
     return out

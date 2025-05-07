@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -12,15 +12,16 @@
             eurostatmap
                 .map('sparkline')
                 //.width(800)
-                .title('Heating Degree Days vs Cooling Degree Days, 2009-2021')
-                .nutsLevel(3)
+                .title('Demand for energy needed to heat a building ')
+                .subtitle('Heating degree days (HDD) 2009-2021')
+                .nutsLevel(2)
                 .statSpark(
                     { eurostatDatasetCode: 'nrg_chddr2_a', filters: { indic_nrg: 'HDD' } },
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'], //dates
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'] //labels
                 )
                 .sparkType('line')
-                .sparkLineWidth(20)
+                .sparkLineWidth(25)
                 .sparkLineStrokeWidth(1)
                 .sparkLineColor('#c44a4a')
                 .sparkLineHeight(5)

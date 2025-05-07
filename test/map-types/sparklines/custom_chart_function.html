@@ -8,6 +8,8 @@
     <body>
         <svg id="sparklineSVG"></svg>
         <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
         <script>
             eurostatmap
                 .map('sparkline')
@@ -41,6 +43,24 @@
                     yOffset: 150,
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
+                })
+                .sparkLineChartFunction((node, data, width, height, isForTooltip) => {
+                    const xScale = d3
+                        .scaleLinear()
+                        .domain([0, data.length - 1])
+                        .range([0, width])
+
+                    const yScale = d3
+                        .scaleLog()
+                        .domain([1, d3.max(data, (d) => Math.max(d.value, 1))]) // avoid log(0)
+                        .range([height, 0])
+
+                    const lineGenerator = d3
+                        .line()
+                        .x((d, i) => xScale(i))
+                        .y((d) => yScale(Math.max(d.value, 1)))
+
+                    node.append('path').datum(data).attr('fill', 'none').attr('stroke', 'purple').attr('stroke-width', 1).attr('d', lineGenerator)
                 })
                 .sparkTooltipChart({
                     width: 150,
