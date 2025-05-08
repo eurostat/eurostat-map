@@ -47,11 +47,6 @@
                 .zoomExtent([1, 20])
                 .title('Labels test')
                 .subtitle('map.labels({yourOptions})')
-                .stat({
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Euro per inhabitant',
-                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
-                })
                 .width(900)
                 .nutsLevel('mixed')
                 .nutsYear(2024)
@@ -66,8 +61,8 @@
                 .graticuleStrokeWidth(0.4)
                 //.projectionFunction(d3.geoAzimuthalEqualArea().rotate([-20.5, -41.5]).scale(11000))
                 .labels({
-                    labels: eurostatmap.getDefaultLabels().EUR_3035.en.filter((label) => label.class === 'seas'),
-                    values: true,
+                    labels: eurostatmap.getDefaultLabels().EUR_3035.cc.filter((label) => label.class === 'cc'),
+                    values: false,
                     shadows: true,
                     // statLabelsPositions: {
                     //     AL: { x: 20.1683, y: 41.1533 },
@@ -89,30 +84,26 @@
                         labels: { values: true, backgrounds: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
                     },
                 ])
-                .build()
 
+            map.statData().setData({
+                MD: 32,
+                AL: 23,
+                ME: 45,
+                RS: 67,
+                XK: 89,
+                BA: 100,
+                MK: 200,
+                GR: 300,
+                BG: 400,
+                RO: 500,
+                HR: 600,
+                UA: 123,
+                GE: 123,
+                BY: 123,
+                IR: 123,
+            })
+            map.build()
             console.log(eurostatmap.getDefaultLabels())
-
-            // setTimeout(() => {
-            //     map.labels({
-            //         values: true,
-            //         shadows: true,
-            //     })
-            // }, 2000)
-
-            // setTimeout(() => {
-            //     map.labels({
-            //         values: false,
-            //         shadows: true,
-            //     })
-            // }, 4000)
-
-            // setTimeout(() => {
-            //     map.labels({
-            //         values: true,
-            //         shadows: true,
-            //     })
-            // }, 6000)
         </script>
     </body>
 </html>

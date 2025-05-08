@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -36,14 +36,16 @@
                 .graticuleStroke('lightgrey')
                 .graticuleStrokeWidth(0.4)
                 //.countriesToShow(['ES'])
-                .labelling(true)
-                .labelsToShow(['values'])
-                .labelValuesFontSize(10)
-                .labelFill({ seas: '#012a7c', countries: 'black' })
-                .labelShadow(true)
-                .labelShadowsToShow(['values'])
-                .labelShadowWidth({
-                    values: 3,
+                .labels({
+                    labels: eurostatmap.getDefaultLabels().EUR_3035.en.filter((label) => label.class === 'seas'),
+                    values: true,
+                    shadows: true,
+                    // statLabelsPositions: {
+                    //     AL: { x: 20.1683, y: 41.1533 },
+                    // },
+                    // processValueLabelCentroids: (centroids) => {
+
+                    // },
                 })
                 .insets('default')
                 .insetBoxWidth(150)

@@ -277,10 +277,11 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
             statLabelRegions = map.Geometries.geoJSONs.mixed.rg0.concat(
                 map.Geometries.geoJSONs.mixed.rg1,
                 map.Geometries.geoJSONs.mixed.rg2,
-                map.Geometries.geoJSONs.mixed.rg3
+                map.Geometries.geoJSONs.mixed.rg3,
+                map.Geometries.geoJSONs.cntrg // NEW: allow labels for cntrg
             )
         } else {
-            statLabelRegions = map.Geometries.geoJSONs.nutsrg
+            statLabelRegions = map.Geometries.geoJSONs.nutsrg.concat(map.Geometries.geoJSONs.cntrg)
         }
     } else if (map.Geometries.userGeometries) {
         // user defined geometries
@@ -355,11 +356,11 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
 export const DEFAULTLABELS = {
     EUR_3035: {
         cc: [
-            { text: 'AL', x: 5100000, y: 2060000, class: 'cc', size: 7 },
+            { text: 'AL', x: 5150000, y: 2060000, class: 'cc', size: 7 },
             { text: 'AT', x: 4670000, y: 2629000, class: 'cc', size: 18 },
             { text: 'BE', x: 3930000, y: 3010000, class: 'cc', size: 17 },
-            { text: 'BG', x: 5567000, y: 2200000, class: 'cc', size: 22 },
-            { text: 'HR', x: 4876000, y: 2455000, class: 'cc', size: 10 },
+            { text: 'BG', x: 5567000, y: 2250000, class: 'cc', size: 22 },
+            { text: 'HR', x: 4840000, y: 2480000, class: 'cc', size: 10 },
             { text: 'CY', x: 6426000, y: 1480000, class: 'cc', size: 10 },
             { text: 'CZ', x: 4707000, y: 2885000, class: 'cc', size: 18 },
             { text: 'DK', x: 4316000, y: 3621000, class: 'cc', size: 20 },
@@ -377,15 +378,20 @@ export const DEFAULTLABELS = {
             { text: 'LU', x: 4120000, y: 2940000, class: 'cc', size: 12 },
             { text: 'MT', x: 4731000, y: 1300000, class: 'cc', size: 10 },
             { text: 'ME', x: 5073000, y: 2185000, class: 'cc', size: 7 },
+            { text: 'GE', x: 6942680, y: 2660000, class: 'cc' },
+            { text: 'UA', x: 5890000, y: 3050000, class: 'cc' },
+            { text: 'BA', x: 4949262, y: 2338688, class: 'cc' },
+            { text: 'MD', x: 5740000, y: 2790000, class: 'cc' },
+
             { text: 'MK', x: 5300000, y: 2080000, class: 'cc', size: 10 },
             { text: 'NL', x: 4020000, y: 3208000, class: 'cc', size: 17 },
             { text: 'NO', x: 4300000, y: 4147000, class: 'cc', size: 20 },
             { text: 'PL', x: 4964000, y: 3200000, class: 'cc', size: 22 },
             { text: 'PT', x: 2800000, y: 1990000, class: 'cc', size: 18 },
             { text: 'RO', x: 5451000, y: 2600000, class: 'cc', size: 22 },
-            { text: 'RS', x: 5200000, y: 2300000, class: 'cc', size: 10 },
+            { text: 'RS', x: 5200000, y: 2350000, class: 'cc', size: 10 },
             { text: 'SK', x: 5040000, y: 2835000, class: 'cc', size: 12 },
-            { text: 'SI', x: 4655000, y: 2480000, class: 'cc', size: 10 },
+            { text: 'SI', x: 4675000, y: 2500000, class: 'cc', size: 10 },
             { text: 'ES', x: 3160096, y: 1900000, class: 'cc', size: 22 },
             { text: 'SE', x: 4630000, y: 4000000, class: 'cc', size: 20 },
             { text: 'CH', x: 4200000, y: 2564000, class: 'cc', size: 16 },
@@ -636,6 +642,10 @@ const DEFAULTSTATLABELPOSITIONS = {
     LT: { x: 5190000, y: 3670000 },
     LU: { x: 4120000, y: 2940000 },
     MT: { x: 4880000, y: 1480000 },
+    GE: { x: 6912680, y: 2696554 },
+    UA: { x: 5865507, y: 3130158 },
+    BA: { x: 4959262, y: 2368688 },
+    MD: { x: 5736016, y: 2835957 },
     ME: { x: 5073000, y: 2230000 },
     MK: { x: 5300000, y: 2130000 },
     NL: { x: 4020000, y: 3208000 },
