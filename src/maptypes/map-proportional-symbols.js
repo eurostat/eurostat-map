@@ -1,5 +1,5 @@
 import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-// import {extent} from 'd3-array'
+import { extent } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
@@ -171,7 +171,7 @@ export const map = function (config) {
         if (map.svg_) {
             if (out.classifierColor_) {
                 //assign color class to each symbol, based on their value
-                // at this point, the symbol path hasnt been appended. Only the parent g.em-centroid element (in map-template)
+                // at this point, the symbol path hasnt been appended. Only the parent g  element (in map-template)
                 let colorData = map.statData('color')
                 map.svg_.selectAll('.em-centroid').attr('ecl', function (rg) {
                     const sv = colorData.get(rg.properties.id)
@@ -210,9 +210,10 @@ export const map = function (config) {
         // use size dataset
         let sizeDomain
         let data = out.statData('size').getArray()
-        // let domain = extent(data)
-        let min = out.psMinValue_ ? out.psMinValue_ : out.statData('size').getMin()
-        let max = out.psMaxValue_ ? out.psMaxValue_ : out.statData('size').getMax()
+        let sizeArray = out.statData('size').getArray()
+        let [minVal, maxVal] = extent(sizeArray)
+        let min = out.psMinValue_ ?? minVal
+        let max = out.psMaxValue_ ?? maxVal
 
         sizeDomain = data ? [min, max] : [out.statData().getMin(), out.statData().getMax()]
 
@@ -265,11 +266,8 @@ export const map = function (config) {
             let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-centroid > *')
             prevSymbols.remove()
 
-            //change draw order according to size, then reclassify (there was an issue with nodes changing ecl attributes)
-            if (map.Geometries.centroidFeatures) {
-                updateSymbolsDrawOrder(map)
-                applyClassificationToMap(map)
-            }
+            // small symbols on top of big ones
+            updateSymbolsDrawOrder(map)
 
             // append symbols
             let symb
@@ -304,23 +302,6 @@ export const map = function (config) {
                     addSymbolsToMixedNUTS(map, sizeData, regions)
                 }
 
-                // nuts regions fill colour only for those with sizeData
-                // regions.style('fill', function (rg) {
-                //     if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
-                //     const sv = sizeData.get(rg.properties.id)
-                //     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                //         // NO INPUT
-                //         return out.noDataFillStyle_
-                //     } else if ((sv && sv.value) || (sv && sv.value == 0)) {
-                //         if (sv.value == ':') {
-                //             // DATA NOT AVAILABLE
-                //             return out.noDataFillStyle_
-                //         }
-                //         // DATA
-                //         return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                //     }
-                // })
-
                 // apply 'nd' class to no data for legend item hover
                 regions.attr('ecl', function (rg) {
                     const sv = sizeData.get(rg.properties.id)
@@ -334,19 +315,8 @@ export const map = function (config) {
                         }
                     }
                 })
-            } else {
-                // world countries fill only those with data
-                // regions.style('fill', function (rg) {
-                //     const sv = sizeData.get(rg.properties.id)
-                //     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0) || sv.value == ':') {
-                //         return out.worldFillStyle_
-                //     } else {
-                //         return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                //     }
-                // })
             }
 
-            // set color/stroke/opacity styles
             setSymbolStyles(symb)
 
             addMouseEvents(map)
@@ -469,44 +439,29 @@ export const map = function (config) {
      * @param {*} map map instance
      */
     function updateSymbolsDrawOrder(map) {
-        let zoomGroup = map.svg_ ? map.svg_.select('#zoomgroup' + map.svgId_) : null
-        const gcp = zoomGroup.select('#em-prop-symbols')
-        let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
+        const gcp = map.svg_.select('#em-prop-symbols')
+        const sizeData = map.statData('size')?.getArray?.() ? map.statData('size') : map.statData()
 
-        map.Geometries.centroidFeatures.sort(function (a, b) {
-            // A negative value indicates that a should come before b.
-            // A positive value indicates that a should come after b.
-            // Zero or NaN indicates that a and b are considered equal.
-            let valA = sizeData.get(a.properties.id)
-            let valB = sizeData.get(b.properties.id)
-
-            if (valA || valA?.value == 0 || valB || valB?.value == 0) {
-                if ((valA || valA?.value == 0) && (valB || valB?.value == 0)) {
-                    // Both values exist
-                    // Biggest circles at the bottom
-                    return valB.value - valA.value
-                } else if ((valA || valA?.value == 0) && (!valB || !valB?.value == 0)) {
-                    // Only valA exists
-                    return -1
-                } else if ((valB || valB?.value == 0) && (!valA || !valA?.value == 0)) {
-                    // Only valB exists
-                    return 1
-                }
-            } else {
-                return 0
-            }
-        })
-
-        let centroids = gcp
-            .selectAll('g.em-centroid')
-            .data(map.Geometries.centroidFeatures)
-            .join('g')
-            .attr('transform', function (d) {
-                return 'translate(' + d.properties.centroid[0].toFixed(3) + ',' + d.properties.centroid[1].toFixed(3) + ')'
+        // 1. Filter and sort features with data
+        const sorted = map.Geometries.centroidFeatures
+            .filter((f) => {
+                const v = sizeData.get?.(f.properties.id)?.value
+                return v != null && v !== ':'
+            })
+            .sort((a, b) => {
+                return sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value
             })
 
-        // update colors
-        //setSymbolStyles(symbols)
+        // 2. Clear and rebind
+        gcp.selectAll('g.em-centroid').remove()
+
+        gcp.selectAll('g.em-centroid')
+            .data(sorted, (d) => d.properties.id)
+            .enter()
+            .append('g')
+            .attr('class', 'em-centroid')
+            .attr('id', (d) => 'ps' + d.properties.id)
+            .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
     }
 
     function appendSpikesToMap(map, sizeData) {
@@ -539,18 +494,19 @@ export const map = function (config) {
      * @return {void}
      */
     function appendCirclesToMap(map, sizeData) {
-        let symbolContainers = map.svg().selectAll('g.em-centroid')
-
         // Append circles to each symbol container
-        const circles = symbolContainers
+        const circles = map
+            .svg()
+            .selectAll('g.em-centroid')
+            .filter((d) => {
+                const datum = sizeData.get(d.properties.id)
+                return datum && datum.value !== ':' && datum.value != null
+            })
             .append('circle')
             .attr('r', function (d) {
-                // calculate radius
                 const datum = sizeData.get(d.properties.id)
-                const radius = datum ? out.classifierSize_(datum.value) : 0
-                return radius
+                return out.classifierSize_(datum.value)
             })
-            .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
 
         return circles
     }
@@ -715,20 +671,6 @@ export const map = function (config) {
      * @return {*}
      */
     function addSymbolsToMixedNUTS(map, sizeData, regions) {
-        // Toggle symbol visibility - only show regions with sizeData stat values when mixing different NUTS levels
-        let symb = map
-            .svg()
-            .selectAll('g.em-centroid')
-            .style('display', function (rg) {
-                const sv = sizeData.get(rg.properties.id)
-                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                    // no symbol for no input
-                    return 'none'
-                } else if (map.geo_ == 'WORLD') {
-                    return 'block'
-                }
-            })
-
         // toggle display of mixed NUTS levels
         regions.style('display', function (rg) {
             if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
@@ -771,8 +713,6 @@ export const map = function (config) {
                     }
                 }
             })
-
-        return symb
     }
 
     //@override

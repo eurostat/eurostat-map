@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <svg id-="legend"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            d3.text('test-data.tsv').then((text) => {
+                const data = d3.tsvParseRows(text)
+                const result = Object.fromEntries(data.map(([key, value]) => [key, +value]))
+                console.log(result)
+
+                const map = eurostatmap
+                    .map('ps')
+                    .nutsLevel('mixed')
+                    .title('Draw order. Smaller circle on top')
+                    .width(800)
+                    .insets(false)
+                    .psMinSize(1)
+                    .psMaxSize(10)
+                    .zoomExtent([1, 10])
+
+                map.statData('size').setData(result)
+                map.build()
+            })
+        </script>
+    </body>
+</html>

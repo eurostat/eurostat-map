@@ -1125,7 +1125,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         const zg = map.svg().select('#em-zoom-group-' + map.svgId_)
         const gcp = zg.append('g').attr('id', 'em-prop-symbols')
 
-        // add centroid em-centroid elements
+        // add centroid elements
         // then symbols are drawn/appended to these containers in the map-type js file
         const symbolContainers = gcp
             .selectAll('g')
