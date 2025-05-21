@@ -92,11 +92,6 @@ export const getFillPatternDefinitionFunction = function (opts) {
     }
 }
 
-export const getFillPatternDefinitionFun = function (opts) {
-    console.warn('getFillPatternDefinitionFun is now DEPRECATED. Please use getFillPatternDefinitionFunction() instead.')
-    return getFillPatternDefinitionFunction(opts)
-}
-
 export const getDefaultLabels = function () {
     return DEFAULTLABELS
 }

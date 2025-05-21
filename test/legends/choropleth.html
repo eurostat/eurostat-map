@@ -12,6 +12,7 @@
         <script>
             const map = eurostatmap
                 .map('choropleth')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
                 .nutsLevel(2)
                 .title('basic test')
                 .zoomExtent([1, 1000])

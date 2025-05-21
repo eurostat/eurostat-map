@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -17,13 +17,13 @@
                 .numberOfClasses(6)
                 .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
                 .nutsLevel('mixed')
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, barChart: false })
+                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, histogram: false })
                 .drawCoastalMargin(false)
                 .insets('default')
                 .zoomExtent([1, 10])
 
-                map.statData().setData({XK:6,BA:2,ME:3,RS:4,AL:5,MD:6})
-                map.build()
+            map.statData().setData({ XK: 6, BA: 2, ME: 3, RS: 4, AL: 5, MD: 6 })
+            map.build()
         </script>
     </body>
 </html>

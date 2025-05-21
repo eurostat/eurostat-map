@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .nutsLevel(2)
+                .title('basic test')
+                .zoomExtent([1, 1000])
+                .numberOfClasses(6)
+                .classificationMethod('threshold')
+                .thresholds([100, 200, 300, 400, 500])
+                .legend({
+                    x: 450,
+                    labelType: 'thresholds',
+                    histogram: {
+                        orientation: 'horizontal',
+                        showCounts: false,
+                        showPercentages: true,
+                        labelRotation: 60,
+                    },
+                })
+                .build()
+        </script>
+    </body>
+</html>

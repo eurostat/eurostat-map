@@ -440,28 +440,30 @@ export const map = function (config) {
         const sizeData = map.statData('size')?.getArray?.() ? map.statData('size') : map.statData()
 
         // 1. Filter and sort features with data
-        const sorted = map.Geometries.centroidFeatures
-            .filter((f) => {
-                const v = sizeData.get?.(f.properties.id)?.value
-                return v != null && v !== ':'
-            })
-            .sort((a, b) => {
-                return sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value
-            })
+        if (map.Geometries.centroidFeatures) {
+            const sorted = map.Geometries.centroidFeatures
+                .filter((f) => {
+                    const v = sizeData.get?.(f.properties.id)?.value
+                    return v != null && v !== ':'
+                })
+                .sort((a, b) => {
+                    return sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value
+                })
 
-        // 2. Clear and rebind
-        gcp.selectAll('g.em-centroid').remove()
+            // 2. Clear and rebind
+            gcp.selectAll('g.em-centroid').remove()
 
-        gcp.selectAll('g.em-centroid')
-            .data(sorted, (d) => d.properties.id)
-            .enter()
-            .append('g')
-            .attr('class', 'em-centroid')
-            .attr('id', (d) => 'ps' + d.properties.id)
-            .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
+            gcp.selectAll('g.em-centroid')
+                .data(sorted, (d) => d.properties.id)
+                .enter()
+                .append('g')
+                .attr('class', 'em-centroid')
+                .attr('id', (d) => 'ps' + d.properties.id)
+                .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
 
-        // 3. add the ecl attribute back to the newly created g elements
-        applyClassificationToMap(map) //
+            // 3. add the ecl attribute back to the newly created g elements
+            applyClassificationToMap(map) //
+        }
     }
 
     function appendSpikesToMap(map, sizeData) {
