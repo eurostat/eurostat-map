@@ -44,11 +44,15 @@ export const statMap = function (config, withCenterPoints, mapType) {
         v3: StatisticalData.statData(), //trivariate
     }
     out.statData = function (k, v) {
-        //no argument: getter - return the default statData
         if (!arguments.length) return out.statData_['default']
-        //one argument: getter
-        if (arguments.length == 1) return out.statData_[k]
-        //setter
+
+        // lazy create if not exist
+        if (arguments.length === 1) {
+            if (!out.statData_[k]) out.statData_[k] = StatisticalData.statData()
+            return out.statData_[k]
+        }
+
+        // setter
         out.statData_[k] = v
         return out
     }
@@ -182,11 +186,12 @@ export const statMap = function (config, withCenterPoints, mapType) {
 
     /** Check if all stat datasets have been loaded. */
     const isStatDataReady = function () {
-        for (let statKey in out.stat_) {
-            if (!out.statData_[statKey].isReady()) {
-                // BUG HERE. E.G. for chbi maps the user callback is never executed for all inset maps because isReady() returns false, because v1 and v2 are specified but not 'default'.
-                return false
-            }
+        for (const key in out.statData_) {
+            const hasConfig = !!out.stat_[key]
+            const hasManualData = !!(out.statData_[key] && out.statData_[key].get())
+
+            if (!hasConfig && !hasManualData) continue
+            if (!out.statData_[key].isReady()) return false
         }
         return true
     }
@@ -219,10 +224,9 @@ export const statMap = function (config, withCenterPoints, mapType) {
             //bug - map.statData('size').setData({ ES: 10000, DE: 10000, FR: 5000 }) results in out.statData(statKey).get() = undefined
             if (!out.stat(statKey) && out.statData(statKey).get()) return
 
-            //if no config is specified, use default data source: population density - why?
-            //TODO move that out of loop ?
-            if (statKey == 'default' && !out.stat(statKey)) {
-                out.stat(statKey, { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inhab./km²' })
+            if (!out.stat(statKey) && !out.statData(statKey).get()) {
+                // No remote stat config and no manually set data — skip
+                return
             }
 
             //build stat data object from stat configuration and store it

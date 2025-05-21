@@ -474,12 +474,12 @@ export const getTextColorForBackground = function (backgroundColor) {
     return luminance > 0.5 ? 'black' : 'white'
 }
 
-// get css selector. Different maps have different selectors for their regions
+// get css selector. Different maps have different selectors for their regions.
 export const getRegionsSelector = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions path'
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'
-    return '#em-nutsrg path, #em-cntrg path'
+    return '#em-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
 }
 
 // get css selector for legend mouse hover. Different maps have different selectors for their regions

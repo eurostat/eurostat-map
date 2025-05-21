@@ -171,8 +171,8 @@ export const map = function (config) {
         if (map.svg_) {
             if (out.classifierColor_) {
                 //assign color class to each symbol, based on their value
-                // at this point, the symbol path hasnt been appended. Only the parent g  element (in map-template)
-                let colorData = map.statData('color')
+                // at this point, the symbol path hasnt been appended. Only the parent g element (.em-centroid)
+                const colorData = map.statData('color')
                 map.svg_.selectAll('.em-centroid').attr('ecl', function (rg) {
                     const sv = colorData.get(rg.properties.id)
                     if (!sv) {
@@ -208,14 +208,11 @@ export const map = function (config) {
         }
 
         // use size dataset
-        let sizeDomain
-        let data = out.statData('size').getArray()
-        let sizeArray = out.statData('size').getArray()
-        let [minVal, maxVal] = extent(sizeArray)
+        let data = out.statData('size').getArray() || out.statData().getArray()
+        let [minVal, maxVal] = extent(data)
         let min = out.psMinValue_ ?? minVal
         let max = out.psMaxValue_ ?? maxVal
-
-        sizeDomain = data ? [min, max] : [out.statData().getMin(), out.statData().getMax()]
+        let sizeDomain = data ? [min, max] : [out.statData().getMin(), out.statData().getMax()]
 
         let scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
         out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
@@ -262,14 +259,14 @@ export const map = function (config) {
         let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
 
         if (map.svg_) {
-            //clear previous symbols
+            //clear previous centroids
             let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-centroid > *')
             prevSymbols.remove()
 
-            // small symbols on top of big ones
+            // 'small' centroids on top of big ones
             updateSymbolsDrawOrder(map)
 
-            // append symbols
+            // append symbols to centroids
             let symb
             if (out.psCustomSVG_) {
                 symb = appendCustomSymbolsToMap(map, sizeData)
@@ -462,6 +459,9 @@ export const map = function (config) {
             .attr('class', 'em-centroid')
             .attr('id', (d) => 'ps' + d.properties.id)
             .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
+
+        // 3. add the ecl attribute back to the newly created g elements
+        applyClassificationToMap(map) //
     }
 
     function appendSpikesToMap(map, sizeData) {

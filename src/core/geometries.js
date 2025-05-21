@@ -183,6 +183,13 @@ export const Geometries = function (map, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', pathFunction)
+                .attr('id', (cntrg) => {
+                    // add ids for RS and EL so that we can choose not to add statistical data to them.
+                    const id = cntrg.properties.id
+                    if (id == 'RS' || id == 'EL') {
+                        return 'em-cntrg-' + id
+                    }
+                })
         }
 
         //draw world map
