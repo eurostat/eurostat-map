@@ -220,36 +220,29 @@ export const statMap = function (config, withCenterPoints, mapType) {
      */
     out.updateStatData = function () {
         for (let statKey in out.stat_) {
-            //case when no stat data source is specified and stat data where specified programmatically
-            //bug - map.statData('size').setData({ ES: 10000, DE: 10000, FR: 5000 }) results in out.statData(statKey).get() = undefined
-            if (!out.stat(statKey) && out.statData(statKey).get()) return
+            const config = out.stat(statKey)
+            const manualData = out.statData(statKey).get?.()
 
-            if (!out.stat(statKey) && !out.statData(statKey).get()) {
-                // No remote stat config and no manually set data — skip
-                return
+            // Skip if neither stat config nor manual data
+            if (!config && !manualData) continue
+
+            // If there's a config, build the statData object (or replace existing)
+            if (config) {
+                const statData = StatisticalData.statData(config)
+                out.statData(statKey, statData)
+
+                // Launch remote retrieval
+                let nl = out.nutsLevel_
+                if (nl === 'mixed') nl = 0
+
+                statData.retrieveFromRemote(nl, out.language(), () => {
+                    if (!out.Geometries.isGeoReady()) return
+                    if (!isStatDataReady()) return
+
+                    out.updateStatValues()
+                    if (out.callback()) out.callback()(out)
+                })
             }
-
-            //build stat data object from stat configuration and store it
-            const statData = StatisticalData.statData(out.stat(statKey))
-            out.statData(statKey, statData)
-
-            //launch query
-            let nl = out.nutsLevel_
-            if (out.nutsLevel_ == 'mixed') {
-                nl = 0
-            }
-            statData.retrieveFromRemote(nl, out.language(), () => {
-                //if geodata has not been loaded, wait again
-                if (!out.Geometries.isGeoReady()) return
-                //if stat datasets have not all been loaded, wait again
-                if (!isStatDataReady()) return
-
-                //proceed with map construction
-                out.updateStatValues()
-
-                //execute callback function
-                if (out.callback()) out.callback()()
-            })
         }
 
         return out

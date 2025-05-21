@@ -15,11 +15,16 @@
         <svg id="map5"></svg>
         <script src="../build/eurostatmap.js"></script>
         <script>
-            eurostatmap.map('choropleth').svgId('map1').insets('default').build()
+            eurostatmap
+                .map('choropleth')
+                .svgId('map1')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .insets('default')
+                .build()
             eurostatmap
                 .map('choropleth')
                 .svgId('map2')
-
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .insets({ geo: 'GF', height: 250 })
                 // .insetBoxPosition([180, 0])
                 .insetZoomExtent([0, 99999])
@@ -27,6 +32,7 @@
             eurostatmap
                 .map('choropleth')
                 .svgId('map3')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .geo('LI')
                 .scale('01M')
                 .insets({ geo: 'MQ', scale: '01M' })
@@ -37,6 +43,7 @@
                 .build()
             eurostatmap
                 .map('choropleth')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .svgId('map4')
                 .geo('LI')
                 .scale('01M')
@@ -47,6 +54,7 @@
 
             eurostatmap
                 .map('choropleth')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .insets(
                     { geo: 'MQ', scale: '01M', position: { z: 1000 }, title: 'Martinique', width: 150, height: 90, x: 0, y: 0 },
                     {
