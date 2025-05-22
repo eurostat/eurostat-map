@@ -281,6 +281,7 @@ export const legend = function (map, config) {
         container
             .append('text')
             .attr('class', 'em-legend-label')
+            .attr('dy', '0.35em') // ~vertical centering
             .attr('x', out.colorLegend ? out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x : out.noDataShapeWidth + 5)
             .attr('y', out.colorLegend ? out.colorLegend.shapeHeight / 2 : out.noDataShapeHeight / 2)
             .text(noDataText)
@@ -350,7 +351,13 @@ export const legend = function (map, config) {
         let labelX = maxSize / 2 + out.sizeLegend.labelOffset.x + out.boxPadding
 
         //append label
-        itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', 0).text(labelFormatter(value))
+        itemContainer
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('dy', '0.35em') // ~vertical centering
+            .attr('x', labelX)
+            .attr('y', 0)
+            .text(labelFormatter(value))
     }
 
     /**
@@ -409,7 +416,13 @@ export const legend = function (map, config) {
         let labelY = out.sizeLegend.shapeOffset.y / 2 + 1 //y + out.sizeLegend.labelOffset.y
 
         //append label
-        itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', labelY).text(labelFormatter(value))
+        itemContainer
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('dy', '0.35em') // ~vertical centering
+            .attr('x', labelX)
+            .attr('y', labelY)
+            .text(labelFormatter(value))
     }
 
     /**
@@ -455,7 +468,13 @@ export const legend = function (map, config) {
         let labelY = symbolSize / 2 + out.sizeLegend.labelOffset.y
 
         //append label
-        itemContainer.append('text').attr('class', 'em-legend-label').attr('x', labelX).attr('y', labelY).text(labelFormatter(value))
+        itemContainer
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('dy', '0.35em') // ~vertical centering
+            .attr('x', labelX)
+            .attr('y', labelY)
+            .text(labelFormatter(value))
     }
 
     /**
@@ -512,6 +531,7 @@ export const legend = function (map, config) {
         itemContainer
             .append('text')
             .attr('class', 'em-legend-label')
+            .attr('dy', '0.35em') // ~vertical centering
             .attr('y', (d, i) => {
                 let y = -1 - 2 * m.classifierSize_(d)
                 return y
@@ -617,9 +637,9 @@ export const legend = function (map, config) {
             itemContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
+                .attr('dy', '0.35em') // ~vertical centering
                 .attr('x', out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x)
                 .attr('y', out.colorLegend.shapeHeight / 2)
-                .attr('dominant-baseline', 'middle')
                 .text(() => {
                     if (out.colorLegend.labels) return out.colorLegend.labels[i] // user-defined labels
                     if (i === 0) return `> ${f(thresholds[thresholds.length - 1])}`
@@ -713,6 +733,7 @@ export const legend = function (map, config) {
                 itemContainer
                     .append('text')
                     .attr('class', 'em-legend-label')
+                    .attr('dy', '0.35em') // ~vertical centering
                     .attr('x', out.colorLegend.sepLineLength + out.colorLegend.tickLength + out.colorLegend.labelOffset.x)
                     .attr('y', out.colorLegend.shapeHeight)
                     .text(
