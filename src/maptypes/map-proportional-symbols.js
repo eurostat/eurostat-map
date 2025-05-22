@@ -208,7 +208,8 @@ export const map = function (config) {
         }
 
         // use size dataset
-        let data = out.statData('size').getArray() || out.statData().getArray()
+        let rawData = out.statData('size').getArray() || out.statData().getArray()
+        let data = rawData.filter((d) => typeof d === 'number' && !isNaN(d) && isFinite(d))
         let [minVal, maxVal] = extent(data)
         let min = out.psMinValue_ ?? minVal
         let max = out.psMaxValue_ ?? maxVal
@@ -507,7 +508,10 @@ export const map = function (config) {
             .append('circle')
             .attr('r', function (d) {
                 const datum = sizeData.get(d.properties.id)
-                return out.classifierSize_(datum.value)
+                const radius = out.classifierSize_(datum.value)
+                if (radius < 0) console.error('Negative radius for circle:', d.properties.id)
+                if (isNaN(radius)) console.error('NaN radius for circle:', d.properties.id)
+                return radius
             })
 
         return circles
