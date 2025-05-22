@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .nutsLevel(2)
+                .title('basic test')
+                .zoomExtent([1, 1000])
+                .numberOfClasses(6)
+                .classificationMethod('threshold')
+                .colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
+                .thresholds([100, 200, 300, 400, 500])
+                .legend({
+                    x: 550,
+                    y: 40,
+                    ascending: true,
+                    labelType: 'ranges',
+                    svgId: 'eurostatmap-legend-europe-template',
+                    title: '',
+                    fontFill: '#000',
+                    noData: true,
+                    noDataText: 'Data not available',
+                    pointOfDivergenceLabel: '',
+                    pointOfDivergence: 3,
+                })
+                .build()
+
+            setTimeout(() => {
+                map.legend({
+                    x: 500,
+                    y: 10,
+                    title: 'Inh per km2',
+                    labelType: 'thresholds',
+                    pointOfDivergenceLabel: 'Increase|decrease',
+                    pointOfDivergence: 3,
+                })
+            }, 1000)
+
+            // setTimeout(() => {
+            //     map.legend(false)
+            // }, 2000)
+
+            // setTimeout(() => {
+            //     map.legend({
+            //         x: 500,
+            //         y: 10,
+            //         title: '',
+            //         labelType: 'thresholds',
+            //         pointOfDivergenceLabel: undefined,
+            //         pointOfDivergence: undefined,
+            //     })
+            // }, 3000)
+
+            // setTimeout(() => {
+            //     map.legend(false)
+            // }, 4000)
+        </script>
+    </body>
+</html>

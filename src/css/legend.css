@@ -67,3 +67,7 @@
 .em-legend-diverging-line {
     stroke: black;
 }
+
+.em-legend-histogram-bar {
+    cursor: pointer;
+}
