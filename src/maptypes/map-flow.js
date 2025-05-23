@@ -24,11 +24,27 @@ export const map = function (config) {
     out.tooltip_.textFunction = flowMapTooltipFunction
     out.flowColor_ = '#72bb6f'
     out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // exporter, importers
+    out.flowMaxWidth_ = 30
+    out.flowMinWidth_ = 1
+    out.flowArrows_ = true
+    out.flowOutlines_ = true
+    out.flowTargetOffset_ = 1 // Default to normal offset behavior
+    out.flowGradient_ = true
 
     /**
      * flowmap-specific setters/getters
      */
-    ;['flowGraph_', 'flowColor_', 'flowOverlayColors_'].forEach(function (att) {
+    ;[
+        'flowGraph_',
+        'flowColor_',
+        'flowOverlayColors_',
+        'flowArrows_',
+        'flowTargetOffset_',
+        'flowMaxWidth_',
+        'flowMinWidth_',
+        'flowOutlines_',
+        'flowGradient_',
+    ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -49,7 +65,7 @@ export const map = function (config) {
         const data = out.flowGraph_.links
         out.strokeWidthScale = scaleLinear()
             .domain([0, max(data, (d) => d.value)])
-            .range([2, 10])
+            .range([out.flowMinWidth_, out.flowMaxWidth_])
 
         createFlowMapSVG(out.flowGraph_)
     }
@@ -90,11 +106,15 @@ export const map = function (config) {
         const gradientIds = links.map(() => generateUniqueId('gradient'))
 
         // Add arrow markers
-        addArrowMarker(defs, arrowId, out.flowColor_)
-        addArrowMarker(defs, arrowOutlineId, '#ffffff')
+        if (out.flowArrows_) {
+            addArrowMarker(defs, arrowId, out.flowColor_)
+            addArrowMarker(defs, arrowOutlineId, '#ffffff')
+        }
 
         // Add flow gradients
-        addFlowGradients(defs, gradientIds, links)
+        if (out.flowGradient_) {
+            addFlowGradients(defs, gradientIds, links)
+        }
 
         // Define our container SVG
         const zoomGroup = select('#em-zoom-group-' + out.svgId_)
@@ -254,27 +274,31 @@ export const map = function (config) {
      */
     function addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds) {
         const flowsGroup = svg.append('g').attr('class', 'em-flows-group')
+        const flows = flowsGroup.append('g').attr('class', 'em-flow-flows')
+        const outlines = flowsGroup.append('g').attr('class', 'em-flow-outlines')
 
         links.forEach((link, i) => {
             // Outline path
-            flowsGroup
-                .append('path')
-                .attr('d', sankeyLinkHorizontal()(link))
-                .attr('fill', 'none')
-                .attr('stroke', '#ffffff')
-                .attr('class', 'em-flow-link-outline')
-                .attr('stroke-width', link.width + 1.5)
-                .attr('marker-end', `url(#${arrowOutlineId})`)
+            if (out.flowOutlines_) {
+                outlines
+                    .append('path')
+                    .attr('d', sankeyLinkHorizontal()(link))
+                    .attr('fill', 'none')
+                    .attr('stroke', '#ffffff')
+                    .attr('class', 'em-flow-link-outline')
+                    // .attr('stroke-width', link.width + 1.5)
+                    .attr('marker-end', `url(#${arrowOutlineId})`)
+            }
 
             // Main path
-            flowsGroup
+            flows
                 .append('path')
                 .attr('d', sankeyLinkHorizontal()(link))
                 .attr('fill', 'none')
                 .attr('class', 'em-flow-link')
-                .attr('stroke', `url(#${gradientIds[i]})`)
+                .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : out.flowColor_)
                 .attr('stroke-width', link.width)
-                .attr('marker-end', `url(#${arrowId})`)
+                .attr('marker-end', out.flowArrows_ ? `url(#${arrowId})` : '')
                 // add hover effect
                 .on('mouseover', function (e) {
                     const hoveredColor = out.hoverColor_
@@ -283,7 +307,7 @@ export const map = function (config) {
                     select(this).attr('stroke', hoveredColor)
 
                     // Update the marker-end dynamically
-                    select(this).attr('marker-end', `url(#${arrowId + 'mouseover'})`)
+                    if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId + 'mouseover'})`)
 
                     // Tooltip handling
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out))
@@ -293,10 +317,14 @@ export const map = function (config) {
                 })
                 .on('mouseout', function () {
                     // Revert the stroke color
-                    select(this).attr('stroke', `url(#${gradientIds[i]})`)
+                    if (out.flowGradient_) {
+                        select(this).attr('stroke', `url(#${gradientIds[i]})`)
+                    } else {
+                        select(this).attr('stroke', out.flowColor_)
+                    }
 
                     // Revert the marker-end to the original
-                    select(this).attr('marker-end', `url(#${arrowId})`)
+                    if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId})`)
 
                     // Tooltip handling
                     if (out._tooltip) out._tooltip.mouseout()
@@ -501,42 +529,63 @@ export const map = function (config) {
         }
     }
 
-    // vertically stacks links with the same origin. Causes issues on world maps
-    // function computeLinkBreadths({ nodes }) {
-    //     for (const node of nodes) {
-    //         let y0 = node.y0;  // Initial y0 position
-    //         let y1 = y0;
-    //         for (const link of node.sourceLinks) {
-    //             link.y0 = y0 + link.width / 2;  // Adjusting y0 dynamically
-    //             y0 += link.width;  // Moving y0 down for the next link
-    //         }
-    //         for (const link of node.targetLinks) {
-    //             link.y1 = y1 + link.width / 2;
-    //             y1 += link.width;
-    //         }
-    //     }
-    // }
+    function computeNodeBreadths({ nodes }) {
+        for (const node of nodes) {
+            // Compute link widths
+            node.sourceLinks.forEach((link) => (link.width = out.strokeWidthScale(link.value)))
+            node.targetLinks.forEach((link) => (link.width = out.strokeWidthScale(link.value)))
+
+            // Use total space needed by links
+            const totalLinkWidth = Math.max(
+                sum(node.sourceLinks, (d) => d.width),
+                sum(node.targetLinks, (d) => d.width)
+            )
+
+            node.x0 = node.x1 = node.x
+            node.y0 = node.y - totalLinkWidth / 2
+            node.y1 = node.y + totalLinkWidth / 2
+        }
+
+        reorderLinks(nodes)
+    }
 
     function computeLinkBreadths({ nodes }) {
         for (const node of nodes) {
-            if (node.sourceLinks.length > 1) {
-                // If multiple links originate from the same source, set them to the same y0
-                const fixedY0 = node.y // Use the node's y position
-                node.sourceLinks.forEach((link) => {
-                    link.y0 = fixedY0 // Force all links to use the same y0
-                })
-            } else {
-                // Default behavior for other nodes
-                let y0 = node.y0
-                let y1 = y0
-                for (const link of node.sourceLinks) {
-                    link.y0 = y0 + link.width / 2
-                    y0 += link.width
-                }
-                for (const link of node.targetLinks) {
-                    link.y1 = y1 + link.width / 2
-                    y1 += link.width
-                }
+            let y0 = node.y0
+            for (const link of node.sourceLinks) {
+                link.y0 = y0 + link.width / 2
+                y0 += link.width
+            }
+
+            let y1 = node.y0
+            for (const link of node.targetLinks) {
+                link.y1 = y1 + link.width / 2
+                y1 += link.width
+            }
+        }
+    }
+
+    // Group nodes by depth and stack vertically
+    function stackNodeYs(nodes) {
+        const byDepth = new Map()
+        for (const node of nodes) {
+            if (!byDepth.has(node.depth)) byDepth.set(node.depth, [])
+            byDepth.get(node.depth).push(node)
+        }
+
+        for (const [depth, group] of byDepth.entries()) {
+            // Sort by value or id to ensure consistency
+            group.sort((a, b) => b.value - a.value)
+
+            let y = 100 // starting y position
+            const padding = 5
+            for (const node of group) {
+                const nodeHeight = Math.max(
+                    sum(node.sourceLinks, (d) => d.width),
+                    sum(node.targetLinks, (d) => d.width)
+                )
+                node.y = y + nodeHeight / 2
+                y += nodeHeight + padding
             }
         }
     }
@@ -567,19 +616,6 @@ export const map = function (config) {
 
     const ascendingTargetY = (a, b) => a.target.y - b.target.y
     const ascendingSourceY = (a, b) => a.source.y - b.source.y
-
-    function computeNodeBreadths({ nodes }) {
-        for (const node of nodes) {
-            const height = out.strokeWidthScale(node.value)
-            node.x0 = node.x1 = node.x
-            node.y0 = node.y - height / 2
-            node.y1 = node.y0 + height
-            for (const link of node.sourceLinks) {
-                link.width = out.strokeWidthScale(link.value)
-            }
-        }
-        reorderLinks(nodes)
-    }
 
     const id = (d) => d.id // used in sankey import
 

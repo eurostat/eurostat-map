@@ -749,11 +749,12 @@ const map = eurostatmap
     .build()
 ```
 
-| Method                                 | Type   | Default                | Description                                                                                                                |
-| -------------------------------------- | ------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**flowGraph**([*value*])         | Object | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
-| _map_.**flowColor**([*value*])         | String | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
-| _map_.**flowOverlayColors**([*value*]) | array  | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
+| Method                                 | Type    | Default                | Description                                                                                                                |
+| -------------------------------------- | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**flowGraph**([*value*])         | Object  | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
+| _map_.**flowColor**([*value*])         | String  | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
+| _map_.**flowOverlayColors**([*value*]) | array   | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
+| _map_.**flowArrows**([*value*])        | boolean | true                   | Whether to show arrow tips or not.                                                                                         |
 
 ### Cartograms
 

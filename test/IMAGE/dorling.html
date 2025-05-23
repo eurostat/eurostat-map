@@ -14,12 +14,24 @@
         <script src="../../build/eurostatmap.js"></script>
         <script src="../data/mixed.js"></script>
         <script>
-            const map = eurostatmap.map('proportionalSymbol').nutsLevel('mixed').psMaxSize(14).psFillOpacity(0.8).dorling(false)
+            const map = eurostatmap
+                .map('proportionalSymbol')
+                .nutsLevel('mixed')
+                .psMaxSize(14)
+                .psFillOpacity(0.8)
+                .dorling(true)
+                .psCodeLabels(true)
+                .insets(false)
 
             map.statData().setData(mixedNUTS)
-            // map.statData('color').setData(data)
-            // map.updateClassification()
-            // map.updateStyle()
+
+            setTimeout(() => {
+                map.statData().setData({ ES: 1, FR: 2, DE: 3, IT: 4, PL: 5, PT: 6, RO: 7, SE: 8, GB: 9 })
+                map.updateClassification()
+                map.updateStyle()
+                map.updateStatValues()
+            }, 1000)
+
             map.build()
         </script>
     </body>
