@@ -630,7 +630,7 @@ const flowMapTooltipFunction = function (link, map) {
     const buf = []
 
     // Header with region name and ID
-    const title = `${link.source.id} > ${link.target.id}`
+    const title = `${link.source.name || link.source.id} to ${link.target.name || link.target.id}`
     buf.push(`
         <div class="estat-vis-tooltip-bar">
             <b>${title}</b>
@@ -639,7 +639,7 @@ const flowMapTooltipFunction = function (link, map) {
 
     // Value
     buf.push(`<div class='estat-vis-tooltip-text'>
-        ${link.target.value}
+        ${link.value}
         </div>`)
 
     return buf.join('')
