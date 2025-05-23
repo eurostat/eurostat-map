@@ -503,7 +503,8 @@ export const map = function (config) {
             .selectAll('g.em-centroid')
             .filter((d) => {
                 const datum = sizeData.get(d.properties.id)
-                return datum && datum.value !== ':' && datum.value != null
+                if (d.properties.id == 'DE') console.log(datum)
+                return datum && datum.value !== ':' && datum.value
             })
             .append('circle')
             .attr('r', function (d) {
@@ -807,8 +808,9 @@ const tooltipTextFunPs = function (region, map) {
     //stat 1 value
     const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
     const sv1 = v1.get(region.properties.id)
-    if (!sv1 || (sv1.value != 0 && !sv1.value)) buf.push(map.noDataText_)
-    else {
+    if (!sv1 || (sv1.value != 0 && !sv1.value)) {
+        buf.push(map.noDataText_)
+    } else {
         //unit 1
         const unit1 = v1.unitText()
         buf.push(`<div class="estat-vis-tooltip-text">${spaceAsThousandSeparator(sv1.value)} ${unit1 ? unit1 : ' '}</div>`)
