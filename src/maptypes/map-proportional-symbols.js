@@ -300,15 +300,15 @@ export const map = function (config) {
                     addSymbolsToMixedNUTS(map, sizeData, regions)
                 }
 
-                // apply 'nd' class to no data for legend item hover
+                // apply 'nd' class to no data regions for legend item hover
                 regions.attr('ecl', function (rg) {
                     const sv = sizeData.get(rg.properties.id)
                     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
                         // NO INPUT
-                        return 'nd'
-                    } else if ((sv && sv.value) || (sv && sv.value == 0)) {
+                        return 'ni'
+                    } else if (sv && sv.value) {
                         if (sv.value == ':') {
-                            // DATA NOT AVAILABLE
+                            // DATA NOT AVAILABLE (no data)
                             return 'nd'
                         }
                     }
