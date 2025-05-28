@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            let map = eurostatmap
+                .map('ps')
+                .nutsLevel(0)
+                .title('Total GDP')
+                .width(800)
+                .legend({
+                    x: 500,
+                    y: 20,
+                    sizeLegend: {
+                        title: 'title',
+                        noData: false,
+                    },
+                })
+                .psShape('circle')
+                .insets(false)
+                .psMinSize(1)
+                .psMaxSize(30)
+                .patternFill([
+                    {
+                        pattern: 'hatching',
+                        regionIds: ['UA'],
+                        legendLabel: 'Data not available',
+                        color: '#000',
+                        strokeWidth: 0.2,
+                    },
+                ])
+
+            map.statData().setData({ ES: 1, DE: 0 })
+            map.build()
+        </script>
+    </body>
+</html>

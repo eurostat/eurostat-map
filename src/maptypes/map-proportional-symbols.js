@@ -7,6 +7,7 @@ import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
 import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
+import { applyPatternFill } from '../core/pattern-fill'
 
 /**
  * Returns a proportional symbol map.
@@ -322,6 +323,11 @@ export const map = function (config) {
             // Update labels for statistical values if required
             if (out.labels_?.values) {
                 out.updateValuesLabels(map)
+            }
+
+            //add hatching if needed
+            if (out.patternFill_) {
+                applyPatternFill(map, out.patternFill_)
             }
         }
         return map

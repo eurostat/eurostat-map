@@ -6,6 +6,7 @@ import { symbol } from 'd3-shape'
 import { executeForAllInsets, getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
 import { formatDefaultLocale } from 'd3-format'
 import { max } from 'd3-array'
+import { appendPatternFillLegend } from './legend-pattern-fill'
 
 //set legend labels locale
 formatDefaultLocale({
@@ -124,6 +125,17 @@ export const legend = function (map, config) {
             if (m.classifierColor_ && out.colorLegend) {
                 buildColorLegend(m, out.colorLegend)
             }
+
+            // Append pattern fill legend items BELOW the main legend
+            // Get the total height of the choropleth legend box
+            const legendHeight = out.lgg.node().getBBox().height
+            appendPatternFillLegend(map, out.lgg, {
+                shapeWidth: out.shapeWidth,
+                shapeHeight: out.shapeHeight,
+                labelOffset: out.labelOffset,
+                boxPadding: out.boxPadding,
+                offsetY: legendHeight + out.boxPadding + 5, // << this shifts pattern legend down
+            })
 
             //set legend box dimensions
             out.setBoxDimension()
