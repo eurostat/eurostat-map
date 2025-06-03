@@ -247,19 +247,39 @@ eurostatmap
 
 In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
 
-| Parameter          | Type                     | Default value                     | Description                                                                   |
-| ------------------ | ------------------------ | --------------------------------- | ----------------------------------------------------------------------------- |
-| **ascending**      | String                   | _true_                            | The legend cells order. Set to false to invert.                               |
-| **shapeWidth**     | int                      | _15_                              | The cell width.                                                               |
-| **shapeHeight**    | int                      | _13_                              | The cell height.                                                              |
-| **sepLineLength**  | int                      | _17_                              | The separation line length.                                                   |
-| **decimals**       | String                   | _0 _                              | The number of decimal places for the legend labels.                           |
-| **labelType**      | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                    |
-| **labelOffset**    | int                      | _3_                               | The distance between the legend box elements to the corresponding text label. |
-| **labelFormatter** | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
-| **labels**         | string[]                 | _null_                            | Manually define the labels to be used in the legend as an array               |
-| **noData**         | boolean                  | _true_                            | Show 'no data' style.                                                         |
-| **noDataText**     | Text                     | _"No data"_                       | 'No data' text label.                                                         |
+| Parameter          | Type                     | Default value                     | Description                                                                                 |
+| ------------------ | ------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------- |
+| **ascending**      | String                   | _true_                            | The legend cells order. Set to false to invert.                                             |
+| **shapeWidth**     | int                      | _15_                              | The cell width.                                                                             |
+| **shapeHeight**    | int                      | _13_                              | The cell height.                                                                            |
+| **sepLineLength**  | int                      | _17_                              | The separation line length.                                                                 |
+| **decimals**       | String                   | _0 _                              | The number of decimal places for the legend labels.                                         |
+| **labelType**      | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                                  |
+| **labelOffset**    | int                      | _3_                               | The distance between the legend box elements to the corresponding text label.               |
+| **labelFormatter** | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                  |
+| **labels**         | string[]                 | _null_                            | Manually define the labels to be used in the legend as an array                             |
+| **noData**         | boolean                  | _true_                            | Show 'no data' style.                                                                       |
+| **noDataText**     | Text                     | _"No data"_                       | 'No data' text label.                                                                       |
+| **histogram**      | Object                   | _undefined_                       | When specified, the legend is shown as a histogram using these settings. See example below. |
+
+For histogram legends you can use the following settings:
+
+```javascript
+.legend({
+    title: 'histogram',
+    x: 580,
+    labelType: 'ranges',
+    histogram: {
+        height: 150,
+        width: 200,
+        orientation: 'horizontal',
+        showCounts: false,
+        showPercentages: true,
+        labelRotation: 70,
+        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    },
+})
+```
 
 ### Proportional symbol map
 
