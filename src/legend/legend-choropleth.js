@@ -266,9 +266,10 @@ export const legend = function (map, config) {
         const container = out.lgg
         const thresholds = getThresholds()
         const defaultLabeller = (label, i) => {
-            if (i === 0) return `> ${thresholds[thresholds.length - 1]}` //top
-            if (i === thresholds.length) return `< ${thresholds[0]}` //bottom
-            return `${thresholds[thresholds.length - i - 1]} - < ${thresholds[thresholds.length - i]}  ` //in-between
+            const decimalFormatter = format(`.${out.decimals}f`)
+            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}` //top
+            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
+            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
         }
         const labelFormatter = out.labelFormatter || defaultLabeller
 

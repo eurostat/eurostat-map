@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Population density in Europe</title>
+    </head>
+    <style>
+        /* target non cc/eu/efta borders */
+        .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+            stroke: none;
+        }
+    </style>
+    <body>
+        <svg id="map"></svg>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            var allowed = [
+                'AT',
+                'BE',
+                'BG',
+                'HR',
+                'CY',
+                'CZ',
+                'DK',
+                'EE',
+                'FI',
+                'FR',
+                'DE',
+                'EL',
+                'GR',
+                'HU',
+                'IE',
+                'IT',
+                'LV',
+                'LT',
+                'LU',
+                'MT',
+                'NL',
+                'PL',
+                'PT',
+                'RO',
+                'SK',
+                'SI',
+                'ES',
+                'SE',
+                'IS',
+                'LI',
+                'NO',
+                'CH',
+            ]
+
+            // turn eurostat API response into an index of {NUTSCODE: value}
+            function indexStats(response) {
+                const arr = Object.entries(response.dimension.geo.category.index)
+                    // define our object structure
+                    .map(([key, val]) => ({
+                        id: key,
+                        value: response.value[val] || null,
+                        name: response.dimension.geo.category.label[key],
+                    }))
+                //sort the array in ascending order by 'value'
+                return arr
+                    .sort((a, b) => (a.value > b.value ? -1 : b.value > a.value ? 1 : 0))
+                    .filter((v) => v.value !== null)
+                    .reduce((acc, item) => {
+                        acc[item.id] = item.value
+                        return acc
+                    }, {})
+            }
+
+            async function stats() {
+                try {
+                    const response = await d3.json(
+                        `https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_d3dens?format=json&lang=en&geoLevel=country&time=2023&unit=PER_KM2`
+                    )
+                    return indexStats(response)
+                } catch (error) {
+                    console.error('Error fetching data:', error)
+                    return {}
+                }
+            }
+
+            // Initialize the map first
+            var map = eurostatmap
+                .map('choropleth')
+                .nutsLevel(2)
+                .geo('EUR')
+                .zoomExtent([1, 10])
+                .position({ x: 4790000, y: 3020000, z: 6400 })
+                // .filterGeometriesFunction(function (geometries) {
+                //     // loop geometries[0].objects.cntbn and remove non EU and non EFTA countries
+                //     for (var i = 0; i < geometries[0].objects.cntbn.geometries.length; i++) {
+                //         if (
+                //             geometries[0].objects.cntbn.geometries[i].properties.eu == 'F' &&
+                //             geometries[0].objects.cntbn.geometries[i].properties.efta == 'F' &&
+                //             geometries[0].objects.cntbn.geometries[i].properties.cc == 'F'
+                //         ) {
+                //             geometries[0].objects.cntbn.geometries.splice(i, 1)
+                //         }
+                //     }
+                //     return geometries
+                // })
+                .noDataText('')
+                .numberOfClasses(6)
+                .colors(['#CCD8FF', '#97AFFC', '#6C8EFC', '#4769D9', '#2644A7', '#102363'])
+                .hoverColor('#FFFF00')
+                .width(800)
+                .height(750)
+                .insets('default')
+                .insetBoxWidth(170)
+                .legend({
+                    x: 10,
+                    y: 120,
+                    title: 'people/km²',
+                    boxOpacity: 1,
+                    labelType: 'ranges',
+                    decimals: 0,
+                    noData: false,
+                })
+                .callback(function () {})
+
+            map.stat({
+                eurostatDatasetCode: 'demo_r_d3dens',
+                unitText: 'people/km²',
+                filters: {
+                    geoLevel: '2',
+                    TIME: '2023',
+                    UNIT: 'PER_KM2',
+                },
+            })
+
+            // Build the map
+            map.build()
+        </script>
+    </body>
+</html>

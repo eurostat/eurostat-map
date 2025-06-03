@@ -12,7 +12,7 @@
         <script>
             let map = eurostatmap
                 .map('ps')
-                .nutsLevel(0)
+                .nutsLevel('mixed')
                 .title('Total GDP')
                 .width(800)
                 .legend({
@@ -30,14 +30,14 @@
                 .patternFill([
                     {
                         pattern: 'hatching',
-                        regionIds: ['UA'],
+                        regionIds: ['UA', 'DE'],
                         legendLabel: 'Data not available',
                         color: '#000',
                         strokeWidth: 0.2,
                     },
                 ])
 
-            map.statData().setData({ ES: 1, DE: 0 })
+            map.statData().setData({ ES: 1, DE: 0, FR: 3, PL: 5, UA: 0 })
             map.build()
         </script>
     </body>
