@@ -60,7 +60,6 @@ export const legend = function (map, config) {
                     showCounts: false,
                     showPercentages: false,
                     labelRotation: 0,
-                    labelFormat: undefined,
                     ...config.histogram,
                 }
             } else {
@@ -147,12 +146,28 @@ export const legend = function (map, config) {
         return Object.values(map.statData()._data_).map((item) => item.value)
     }
 
+    function getLabelFormatter() {
+        if (out.labelType == 'ranges') {
+            const thresholds = getThresholds()
+            const defaultLabeller = (label, i) => {
+                const decimalFormatter = format(`.${out.decimals}f`)
+                if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}` //top
+                if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
+                return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
+            }
+            return out.labelFormatter || defaultLabeller
+        } else if (out.labelType == 'thresholds') {
+            return out.labelFormatter || format(`.${out.decimals}f`)
+        } else {
+            return out.labelFormatter || format(`.${out.decimals}f`)
+        }
+    }
+
     function createThresholdsLegend() {
         const m = out.map
         const lgg = out.lgg
         // Label formatter
-        const formatLabel = out.labelFormatter || format(`.${out.decimals}f`)
-        let baseY = out.boxPadding
+        const labelFormatter = getLabelFormatter()
         if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
         for (let i = 0; i < m.numberOfClasses_; i++) {
             const y = baseY + i * out.shapeHeight
@@ -211,7 +226,7 @@ export const legend = function (map, config) {
                     .attr('y', y + out.shapeHeight)
                     //.attr('dominant-baseline', 'middle')
                     .attr('dy', '0.35em') // ~vertical centering
-                    .text(out.labels ? out.labels[i] : formatLabel(m.classifier().invertExtent(ecl)[out.ascending ? 0 : 1]))
+                    .text(out.labels ? out.labels[i] : labelFormatter(m.classifier().invertExtent(ecl)[out.ascending ? 0 : 1]))
 
                 // mark label so we can move it in drawDivergingLine
                 if (out.pointOfDivergenceLabel && i == out.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
@@ -264,14 +279,7 @@ export const legend = function (map, config) {
     function createRangesLegend() {
         const map = out.map
         const container = out.lgg
-        const thresholds = getThresholds()
-        const defaultLabeller = (label, i) => {
-            const decimalFormatter = format(`.${out.decimals}f`)
-            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}` //top
-            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
-            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
-        }
-        const labelFormatter = out.labelFormatter || defaultLabeller
+        const labelFormatter = getLabelFormatter()
 
         let baseY = out.boxPadding
         if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
@@ -492,8 +500,10 @@ export const legend = function (map, config) {
         const showCounts = out.histogram.showCounts
         const showPercentages = out.histogram.showPercentages
         const labelRotation = out.histogram.labelRotation || 0
-        const labelFormat = out.histogram.labelFormat
-        const labelFormatter = out.histogram.labelFormatter
+        const labelFormatter = getLabelFormatter()
+        const margin = out.histogram.margin || { top: 0, right: 0, bottom: 0, left: 0 }
+        const height = out.histogram.height || 200
+        const width = out.histogram.width || 270
 
         let counts = new Array(map.numberOfClasses_).fill(0)
         data.forEach((value) => {
@@ -508,9 +518,8 @@ export const legend = function (map, config) {
         const reversedPercentages = reversedCounts.map((d) => (total > 0 ? (d / total) * 100 : 0))
 
         const lgg = out.lgg
-        const baseY = out.boxPadding + (out.title ? getFontSizeFromClass('em-legend-title') + 38 : 30)
-        const svgWidth = 300
-        const svgHeight = 300
+        const baseY = out.boxPadding + (out.title ? getFontSizeFromClass('em-legend-title') + 10 : 30)
+
         const barGroup = lgg.append('g').attr('class', 'em-legend-histogram').attr('transform', `translate(0, ${baseY})`)
 
         if (orientation === 'vertical') {
@@ -520,15 +529,14 @@ export const legend = function (map, config) {
         }
 
         function drawVerticalHistogram(barGroup) {
-            const margin = { top: 20, right: 60, bottom: 40, left: 150 }
             const yScale = scaleBand()
                 .domain(reversedCounts.map((_, i) => i))
-                .range([margin.top, svgHeight - margin.bottom])
+                .range([margin.top, height - margin.bottom])
                 .padding(0.1)
             const xScale = scaleLinear()
                 .domain([0, max(reversedCounts)])
                 .nice()
-                .range([margin.left, svgWidth - margin.right])
+                .range([margin.left, width - margin.right])
 
             // Bars
             barGroup
@@ -556,37 +564,34 @@ export const legend = function (map, config) {
                     .attr('y', (_, i) => yScale(i) + yScale.bandwidth() / 2)
                     .attr('alignment-baseline', 'middle')
                     .text((_, i) => {
-                        if (typeof labelFormatter === 'function') {
-                            return labelFormatter(reversedPercentages[i], reversedCounts[i], i)
-                        }
                         return showPercentages ? `${reversedPercentages[i].toFixed(1)}%` : reversedCounts[i]
                     })
             }
 
             // Axis
-            barGroup
-                .append('g')
-                .attr('id', 'em-legend-histogram-y-axis')
-                .attr('transform', `translate(${margin.left}, 0)`)
-                .call(
-                    axisLeft(yScale)
-                        .tickSizeOuter(0)
-                        .tickSize(0)
-                        .tickFormat((_, i) => formatTickLabel(i))
-                )
+            const axisGroup = barGroup.append('g').attr('id', 'em-legend-histogram-y-axis').attr('transform', `translate(${margin.left}, 0)`)
+
+            axisGroup.call(
+                axisLeft(yScale)
+                    .tickSizeOuter(0)
+                    .tickSize(0)
+                    .tickFormat((_, i) => (labelFormatter ? labelFormatter(thresholds[i], i) : thresholds[i]))
+            )
+
+            axisGroup.selectAll('text').attr('class', 'em-legend-label em-tick-label').attr('text-anchor', 'end')
+            //.attr('transform', `rotate(-${labelRotation})`)
         }
 
         function drawHorizontalHistogram(barGroup) {
-            const margin = { top: 20, right: 60, bottom: 40, left: 10 }
             const xScale = scaleBand()
                 .domain(reversedCounts.map((_, i) => i))
-                .range([margin.left, svgWidth - margin.right])
+                .range([margin.left, width - margin.right])
                 .padding(0.1)
 
             const yScale = scaleLinear()
                 .domain([0, max(reversedCounts)])
                 .nice()
-                .range([svgHeight - margin.bottom, margin.top])
+                .range([height - margin.bottom, margin.top])
 
             // Bars
             barGroup
@@ -597,7 +602,7 @@ export const legend = function (map, config) {
                 .attr('x', (_, i) => xScale(i))
                 .attr('y', (d) => yScale(d))
                 .attr('width', xScale.bandwidth())
-                .attr('height', (d) => svgHeight - margin.bottom - yScale(d))
+                .attr('height', (d) => height - margin.bottom - yScale(d))
                 .attr('fill', (_, i) => colors[colors.length - i - 1])
                 .attr('ecl', (_, i) => i)
                 .on('mouseover', handleMouseOver)
@@ -614,9 +619,6 @@ export const legend = function (map, config) {
                     .attr('y', (d) => yScale(d) - 5)
                     .attr('text-anchor', 'middle')
                     .text((_, i) => {
-                        if (typeof labelFormatter === 'function') {
-                            return labelFormatter(reversedPercentages[i], reversedCounts[i], i)
-                        }
                         return showPercentages ? `${reversedPercentages[i].toFixed(1)}%` : reversedCounts[i]
                     })
             }
@@ -625,7 +627,7 @@ export const legend = function (map, config) {
             const axisGroup = barGroup
                 .append('g')
                 .attr('id', 'em-legend-histogram-x-axis')
-                .attr('transform', `translate(0, ${svgHeight - margin.bottom})`)
+                .attr('transform', `translate(0, ${height - margin.bottom})`)
 
             if (out.labelType === 'thresholds') {
                 const positions = []
@@ -636,17 +638,21 @@ export const legend = function (map, config) {
                     if (x !== undefined) positions.push(x + xScale.bandwidth())
                 }
 
-                const boundaryScale = scaleLinear().domain([0, svgWidth]).range([0, svgWidth])
-
+                const boundaryScale = scaleLinear().domain([0, width]).range([0, width])
                 axisGroup.call(
                     axisBottom(boundaryScale)
                         .tickValues(positions)
-                        .tickFormat((_, i) => (labelFormat ? labelFormat(thresholds[i], i) : thresholds[i]))
+                        .tickFormat((_, i) => (labelFormatter ? labelFormatter(thresholds[i], i) : thresholds[i]))
                         .tickSize(0)
                         .tickSizeOuter(0)
                 )
-            } else {
-                axisGroup.call(axisBottom(xScale).tickSizeOuter(0).tickSize(0))
+            } else if (out.labelType === 'ranges') {
+                axisGroup.call(
+                    axisBottom(xScale)
+                        .tickSizeOuter(0)
+                        .tickSize(0)
+                        .tickFormat((_, i) => (labelFormatter ? labelFormatter(thresholds[i], i) : thresholds[i]))
+                )
             }
 
             axisGroup
@@ -654,17 +660,6 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label em-tick-label')
                 .attr('text-anchor', 'end')
                 .attr('transform', `rotate(-${labelRotation})`)
-        }
-
-        function formatTickLabel(i) {
-            if (out.labelType === 'thresholds') {
-                const breakIndex = thresholds.length - i - 1
-                return thresholds[breakIndex] ?? ''
-            } else {
-                if (i === 0) return `> ${thresholds[thresholds.length - 1]}`
-                if (i === thresholds.length) return `< ${thresholds[0]}`
-                return `${thresholds[thresholds.length - i - 1]} - < ${thresholds[thresholds.length - i]}`
-            }
         }
 
         function handleMouseOver(_, i) {

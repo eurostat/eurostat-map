@@ -3,6 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-legend-label {
+                font-size: 13px !important;
+            }
+        </style>
     </head>
 
     <body>
@@ -20,13 +25,18 @@
                 .classificationMethod('threshold')
                 .thresholds([100, 200, 300, 400, 500])
                 .legend({
-                    x: 450,
-                    labelType: 'thresholds',
+                    title: 'histogram',
+                    x: 580,
+                    labelType: 'ranges',
+
                     histogram: {
                         orientation: 'horizontal',
                         showCounts: false,
                         showPercentages: true,
-                        labelRotation: 60,
+                        labelRotation: 70,
+                        height: 150,
+                        width: 200,
+                        margin: { top: 0, right: 0, bottom: 0, left: 0 },
                     },
                 })
                 .build()

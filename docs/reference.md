@@ -251,7 +251,7 @@ In addition to [the default legend parameters](#map-legend), choropleth maps hav
 | ------------------ | ------------------------ | --------------------------------- | ----------------------------------------------------------------------------- |
 | **ascending**      | String                   | _true_                            | The legend cells order. Set to false to invert.                               |
 | **shapeWidth**     | int                      | _15_                              | The cell width.                                                               |
-| **shapeHeight**    | int                      | _13_                              | The cell heigth.                                                              |
+| **shapeHeight**    | int                      | _13_                              | The cell height.                                                              |
 | **sepLineLength**  | int                      | _17_                              | The separation line length.                                                   |
 | **decimals**       | String                   | _0 _                              | The number of decimal places for the legend labels.                           |
 | **labelType**      | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                    |
@@ -526,7 +526,7 @@ In addition to [the default legend parameters](#map-legend), categorical maps ha
 | Parameter         | Type    | Default value | Description                                                                                                                                           |
 | ----------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **shapeWidth**    | int     | _15_          | The cell width.                                                                                                                                       |
-| **shapeHeight**   | int     | _13_          | The cell heigth.                                                                                                                                      |
+| **shapeHeight**   | int     | _13_          | The cell height.                                                                                                                                      |
 | **shapePadding**  | number  | _5_           | The distance between consecutive legend elements                                                                                                      |
 | **labelFontSize** | int     | _13_          | The label font size.                                                                                                                                  |
 | **labelOffset**   | int     | _5_           | The distance between the legend box elements to the corresponding text label.                                                                         |
