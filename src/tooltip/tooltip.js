@@ -15,7 +15,6 @@ export const tooltip = function (config) {
     config.border = config.border || '0px'
     config.borderRadius = config.borderRadius || '0px'
     config.boxShadow = config.boxShadow || '0px 0px 0px grey'
-
     config.transitionDuration = config.transitionDuration || 0
     config.xOffset = config.xOffset || 30
     config.yOffset = config.yOffset || 20

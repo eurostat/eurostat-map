@@ -799,7 +799,11 @@ export const symbolsLibrary = {
  * @param {*} rg The region to show information on.
  * @param {*} map The map element
  */
+
 const tooltipTextFunPs = function (region, map) {
+    if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
+        return '' // Skip tooltip for omitted regions
+    }
     const buf = []
 
     // Header with region name and ID

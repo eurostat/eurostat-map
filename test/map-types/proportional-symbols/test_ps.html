@@ -41,10 +41,38 @@
                 .legend(legendConfig)
                 .psShape('circle')
                 .insets(false)
-                .psMinSize(1)
+                .psMinSize(5)
                 .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .tooltip({
+                    omitRegions: ['RU'],
+                })
 
-            map.statData().setData({ ES: 1, DE: 0 })
+            map.statData().setData({
+                ES: 1,
+                DE: 2,
+                FR: 2,
+                RU: 10,
+                IT: 5,
+                PL: 3,
+                GB: 4,
+                NL: 6,
+                BE: 7,
+                AT: 8,
+                CZ: 9,
+                UA: 3,
+                MD: 5,
+                GE: 6,
+                AL: 2,
+                HR: 3,
+                RS: 3,
+                MK: 4,
+                BA: 5,
+                ME: 6,
+                XK: 7,
+                LT: 8,
+                LV: 9,
+                EE: 10,
+            })
             map.build()
         </script>
     </body>
