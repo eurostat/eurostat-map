@@ -11,6 +11,7 @@ import { Geometries } from './geometries'
 import { buildInsets, removeInsets } from './insets'
 import { appendStamp } from './stamps'
 import { buildGridCartogramBase } from './cartograms'
+import { appendMinimap } from './minimaps'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -81,6 +82,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     // stamp annotation
     out.stamp_ = undefined //e.g {x,y,text,size}
+
+    //minimap
+    out.minimap_ = undefined
 
     //tooltip
     out.tooltip_ = {
@@ -390,6 +394,17 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
+    //minimap override (update after first call)
+    out.minimap = function (v) {
+        //get
+        if (!arguments.length) return out.minimap_
+        //set
+        out.minimap_ = v
+        //update
+        appendMinimap(out)
+        return out
+    }
+
     //labels override (update after first call)
     out.labels = function (v) {
         //get
@@ -661,6 +676,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 out.scalebarPosition_[1] = out.height_ - 50
             }
             addScalebarToMap()
+        }
+
+        //minimap
+        if (out.minimap_) {
+            appendMinimap(out)
         }
 
         return out
