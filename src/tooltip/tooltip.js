@@ -30,10 +30,12 @@ export const tooltip = function (config) {
     }
 
     my.mouseover = function (html) {
-        if (html) tooltip.html(html)
-        let x = event.pageX
-        let y = event.pageY
-        my.ensureTooltipOnScreen(x, y)
+        tooltip.html(html)
+        if (html) {
+            let x = event.pageX
+            let y = event.pageY
+            my.ensureTooltipOnScreen(x, y)
+        }
     }
 
     my.mousemove = function (event) {

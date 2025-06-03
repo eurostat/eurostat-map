@@ -28,6 +28,7 @@
                     title: 'histogram',
                     x: 580,
                     labelType: 'ranges',
+                    boxOpacity: 0,
                     histogram: {
                         orientation: 'horizontal',
                         showCounts: false,
@@ -36,6 +37,65 @@
                         height: 150,
                         width: 200,
                         margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                    },
+                })
+                .tooltip({
+                    textFunction: (region, map) => {
+                        if (region.properties.id == 'RU') {
+                            return ''
+                        }
+                        const html = []
+                        const spaceAsThousandSeparator = function (number) {
+                            return number.toLocaleString('en').replace(/,/gi, ' ')
+                        }
+
+                        // Header with region name and ID
+                        const regionName = region.properties.na || region.properties.name
+                        const regionId = region.properties.id
+                        html.push(`
+                            <div class="estat-vis-tooltip-bar">
+                                <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+                            </div>
+                        `)
+
+                        // Retrieve region's data value and unit
+                        const statData = map.statData()
+                        const sv = statData.get(regionId)
+                        const unit = statData.unitText() || ''
+
+                        // No data case
+                        if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
+                            html.push(`
+                                <div class="estat-vis-tooltip-text no-data">
+                                    <table class="nuts-table">
+                                        <tbody>
+                                            <tr><td>${map.noDataText_}</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            `)
+                            return html.join('')
+                        }
+
+                        // Data display
+                        html.push(`
+                        <div class="estat-vis-tooltip-text">
+                            <table class="nuts-table">
+                                <tbody>
+                                    <tr><td>${spaceAsThousandSeparator(sv.value)} ${unit}</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `)
+
+                        // Optional status flag
+                        const statusFlag = sv.status
+                        if (statusFlag && map.tooltip_.showFlags) {
+                            const flagText = map.tooltip_.showFlags === 'short' ? statusFlag : flags[statusFlag] || statusFlag
+                            html.push(` <span class="status-flag">${flagText}</span>`)
+                        }
+
+                        return html.join('')
                     },
                 })
                 .build()
