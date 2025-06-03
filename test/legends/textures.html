@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-legend-label {
+                font-size: 13px !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const textures = eurostatmap
+                .map('choropleth')
+                .title('Unemployment rate')
+                .subtitle('% persons aged 20-64, 2023')
+                .svgId('dd')
+                .frameStroke('none')
+                .nutsLvl(1)
+                .scale('60M')
+                .legend({ title: '% persons', x: 600, y: 50 })
+                .stat({
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: '2023' },
+                    unitText: '%',
+                })
+                // define dot density pattern
+                .filtersDefinitionFunction(
+                    eurostatmap.getFillPatternDefinitionFunction({
+                        patternSize: 5,
+                        shape: 'circle',
+                        bckColor: 'white',
+                        symbColor: 'black',
+                    })
+                )
+
+                .build()
+        </script>
+    </body>
+</html>

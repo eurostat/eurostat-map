@@ -166,6 +166,7 @@ export const legend = function (map, config) {
     function createThresholdsLegend() {
         const m = out.map
         const lgg = out.lgg
+        let baseY = out.boxPadding
         // Label formatter
         const labelFormatter = getLabelFormatter()
         if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
