@@ -1,4 +1,4 @@
-import { geoOrthographic, geoPath, geoCentroid } from 'd3-geo'
+import { geoOrthographic, geoPath } from 'd3-geo'
 import { select } from 'd3-selection'
 import { feature } from 'topojson-client'
 import { json } from 'd3-fetch'
@@ -6,64 +6,95 @@ import proj4 from 'proj4'
 
 let projection
 let path
+let globe // to store the globe group for efficient updates
+let minimapContainer // to store the minimap container for efficient updates
+let previousState = {} // store the previous minimap state (e.g., center, zoom) to avoid redundant updates
 
 export const appendMinimap = (map) => {
     if (!map.svg_) return
 
-    //load proj4 definitions for dynamic minimaps that are linked to the main map view
-    if (!map.minimap_.countryId) {
-        if (map.proj_ === '3035') {
-            proj4.defs('EPSG:3035', '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs')
-        } else if (map.proj_ === '54030') {
-            proj4.defs('EPSG:54030', '+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs')
-        }
+    // Load proj4 definitions for dynamic minimaps that are linked to the main map view
+    if (map.proj_ === '3035') {
+        proj4.defs('EPSG:3035', '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs')
+    } else if (map.proj_ === '54030') {
+        proj4.defs('EPSG:54030', '+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs')
     }
 
-    // retrieve geometries from map or load default if not available
+    // Retrieve geometries from map or load default if not available
     if (map.Geometries.geoJSONs.worldrg) {
         drawMinimap(map)
     } else {
         json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json')
             .then((topoData) => {
                 const features = feature(topoData, topoData.objects.CNTR_RG_20M_2020_4326).features
-                map.Geometries.geoJSONs.worldrg = features // store for future use
+                map.Geometries.geoJSONs.worldrg = features // Store for future use
                 drawMinimap(map)
             })
             .catch((err) => console.error('Failed to load WORLD_4326.json', err))
     }
 
-    window.addEventListener('map:zoomed', (event) => {
-        const map = event.detail
-        const z = map.minimap_.z || 160 // default zoom level
-        const newX = map.position_.x
-        const newY = map.position_.y
-        const countryId = map.minimap_.countryId
+    // Listen for zoom/pan events to update the minimap dynamically
+    window.addEventListener(
+        'estatmap:zoomed',
+        debounce((event) => {
+            const map = event.detail
 
-        const result = getMapCenterLatLon(map, countryId, projection, path)
-        if (!result) return
-        const { lat, lon } = result
+            // Get the updated center lat and lon from the main map
+            const result = getMapCenterLatLon(map)
+            if (!result) return
+            const { lat, lon } = result
 
-        projection.rotate([-lon, -lat])
+            // Convert the main map zoom (EPSG:3035 scale) to the minimap zoom scale
+            const minimapZoom = convertMainMapZoomToMinimap(map) // Example minimap width = 160
 
-        // Update the minimap globe view
-        select('#em-minimap .em-minimap-globe').selectAll('path').attr('d', path)
-    })
+            // Update the minimap projection with the new center
+            projection.rotate([-lon, -lat])
+            projection.scale(minimapZoom)
+
+            // Update the minimap globe view with the new projection
+            globe.selectAll('path').attr('d', path)
+        }, 1) // Debounce delay: 300ms (adjust as needed)
+    )
+}
+
+const convertMainMapZoomToMinimap = (map) => {
+    const z = map.position_.z // meters per pixel
+
+    // Prevent division by 0
+    if (!z || z <= 0) return 50 // fallback default
+
+    // Convert meters per pixel to zoom-like value
+    // 156543 is meters/pixel at zoom level 0 (Web Mercator) — tweak this for your projection if needed
+    const base = 156543
+    const standardZoom = Math.log2(base / z)
+
+    // Offset for minimap — slightly lower so it stays more zoomed out
+    const zoomOffset = -1 // change to 0 for exact match, or adjust as needed
+
+    const minimapZoom = projectionScaleFromZoom(standardZoom + zoomOffset)
+    return minimapZoom
+}
+
+// Maps zoom level to D3 scale — adjust scale factor for your projection
+const projectionScaleFromZoom = (zoomLevel) => {
+    // You can tweak this multiplier for visual fit
+    return 5 * Math.pow(2, zoomLevel)
 }
 
 const drawMinimap = (map) => {
     try {
         const minimapConfig = map.minimap_ || {}
         const countryId = minimapConfig.countryId
-        const x = minimapConfig.x || 80 // default x position
-        const y = minimapConfig.y || 80 // default y position
-        const z = minimapConfig.z || 160 // default zoom level
-        const color = minimapConfig.color || '#3792B6' // default color
-        const container = map.svg_.append('g').attr('id', 'em-minimap').attr('transform', `translate(${x},${y})`) // adjust as needed
-        const size = minimapConfig.size || 160 // diameter
+        const x = minimapConfig.x || 80 // Default x position
+        const y = minimapConfig.y || 80 // Default y position
+        const z = minimapConfig.z || 160 // Default zoom level
+        const color = minimapConfig.color || '#3792B6' // Default color
+        minimapContainer = map.svg_.append('g').attr('id', 'em-minimap').attr('transform', `translate(${x},${y})`) // Adjust as needed
+        const size = minimapConfig.size || 160 // Diameter
         const geometries = map.Geometries.geoJSONs.worldrg
 
         // Draw inner circle
-        container
+        minimapContainer
             .append('circle')
             .attr('r', size / 2)
             .attr('cx', 0)
@@ -72,17 +103,18 @@ const drawMinimap = (map) => {
             .attr('stroke', color)
             .attr('stroke-width', 3)
 
+        // Initialize projection
         projection = geoOrthographic().scale(z).translate([0, 0])
         path = geoPath().projection(projection)
 
         let lat, lon
 
         if (countryId) {
-            // Center on countryId
+            // Center on countryId centroid
             const target = geometries.find((d) => d.properties.id === countryId)
             if (!target) {
                 console.warn(`Country ID ${countryId} not found in geometries`)
-                return null
+                return
             }
 
             const [[x0, y0], [x1, y1]] = path.bounds(target)
@@ -91,8 +123,8 @@ const drawMinimap = (map) => {
             lon = coords[0]
             lat = coords[1]
         } else {
-            const center = getMapCenterLatLon(map, geometries, countryId, projection, path)
-            if (!center) return null
+            const center = getMapCenterLatLon(map)
+            if (!center) return
             lat = center.lat
             lon = center.lon
         }
@@ -101,7 +133,7 @@ const drawMinimap = (map) => {
         projection.rotate([-lon, -lat])
 
         // Define circular clip
-        container
+        minimapContainer
             .append('defs')
             .append('clipPath')
             .attr('id', 'minimap-clip')
@@ -110,9 +142,9 @@ const drawMinimap = (map) => {
             .attr('cx', 0)
             .attr('cy', 0)
 
-        const globe = container.append('g').attr('class', 'em-minimap-globe').attr('clip-path', 'url(#minimap-clip)')
+        globe = minimapContainer.append('g').attr('class', 'em-minimap-globe').attr('clip-path', 'url(#minimap-clip)')
 
-        // Draw all countries
+        // Draw all countries (just once)
         globe.selectAll('path.country').data(geometries).enter().append('path').attr('d', path).attr('fill', '#e0e0e0')
 
         // Highlight selected country
@@ -122,7 +154,7 @@ const drawMinimap = (map) => {
         }
 
         // Draw outer circle
-        container
+        minimapContainer
             .append('circle')
             .attr('r', size / 2)
             .attr('cx', 0)
@@ -135,6 +167,7 @@ const drawMinimap = (map) => {
     }
 }
 
+// This function returns the map's center coordinates (lat, lon) based on the map's projection.
 const getMapCenterLatLon = (map) => {
     let lat, lon
     const mapProjected = [map.position_.x, map.position_.y]
@@ -147,5 +180,15 @@ const getMapCenterLatLon = (map) => {
         ;[lon, lat] = mapProjected
     }
 
-    return { lat, lon }
+    const truncatedLat = lat.toFixed(2)
+    const truncatedLon = lon.toFixed(2)
+    return { lat: truncatedLat, lon: truncatedLon }
+}
+
+function debounce(func, wait) {
+    let timeout
+    return function (...args) {
+        clearTimeout(timeout)
+        timeout = setTimeout(() => func(...args), wait)
+    }
 }

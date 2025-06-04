@@ -844,10 +844,26 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         //emit custom event with new position
         window.dispatchEvent(
-            new CustomEvent('map:zoomed', {
+            new CustomEvent('estatmap:zoomed', {
                 detail: out,
             })
         )
+    }
+
+    /**
+     * @description get the current view's metres per pixel, based on a zoomFactor
+     * @param {number} zoomFactor this zoom / previous zoom
+     * @return {number}
+     */
+    const getMetresPerPixel = function (zoomFactor) {
+        // Get current bounding box width in meters
+        const bbox = getCurrentBbox()
+        const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
+
+        // Calculate meters per pixel
+        const metersPerPixel = bboxWidth / (out.width_ * zoomFactor)
+
+        return metersPerPixel
     }
 
     // Zoom handler function
@@ -874,13 +890,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // adjust stroke dynamically according to zoom
         if (out.labels_?.backgrounds) scaleLabelBackgrounds(transform)
 
-        //emit custom event with new position
-        const eventDetail = {
-            x: projectedX,
-            y: projectedY,
-            z: out.position_.z,
-        }
-        window.dispatchEvent(new CustomEvent('map:zoomed', { detail: eventDetail }))
+        //emit custom event with map object
+        window.dispatchEvent(new CustomEvent('estatmap:zoomed', { detail: out }))
     }
 
     /**
@@ -1010,22 +1021,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         updates.forEach(({ element, targetStrokeWidth }) => {
             element.style.setProperty('stroke-width', `${targetStrokeWidth}px`, 'important')
         })
-    }
-
-    /**
-     * @description get the current view's metres per pixel, based on a zoomFactor
-     * @param {number} zoomFactor this zoom / previous zoom
-     * @return {number}
-     */
-    const getMetresPerPixel = function (zoomFactor) {
-        // Get current bounding box width in meters
-        const bbox = getCurrentBbox()
-        const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
-
-        // Calculate meters per pixel
-        const metersPerPixel = bboxWidth / (out.width_ * zoomFactor)
-
-        return metersPerPixel
     }
 
     /** Get x,y,z elements from URL and assign them to the view. */
