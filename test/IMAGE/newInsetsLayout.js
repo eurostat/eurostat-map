@@ -1,4 +1,3 @@
-//IMAGE code
 const s = 210 // inset size in pixels
 const insetBoxPadding = 8 // inset box padding
 const p = 3 // inset padding
@@ -20,6 +19,23 @@ const finalRowItemHeight = 0.29 * s
 
 let outermostInsetsConfig = null
 
+const deepClone = function (obj) {
+    if (obj === null || typeof obj !== 'object') {
+        return obj
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(deepClone)
+    }
+
+    const cloned = {}
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            cloned[key] = deepClone(obj[key])
+        }
+    }
+    return cloned
+}
 const createOutermostInsetsConfig = () => {
     let config = [
         {
@@ -125,7 +141,7 @@ const createOutermostInsetsConfig = () => {
             width: finalRowItemWidth,
             height: finalRowItemHeight,
             svgId: 'inset7a',
-            title: 'Açores (PT) sdfghd',
+            title: 'Açores (PT)',
             position: { x: 470000, y: 4370000, z: 5000 },
             processCentroids: (centroidFeatures) => {
                 //adjust centroids
@@ -148,6 +164,7 @@ const createOutermostInsetsConfig = () => {
             height: 20,
             svgId: 'inset7b',
             position: { x: 140000, y: 4385000, z: 2800 },
+
             frameStrokeWidth: 0.8,
         },
         {
@@ -229,23 +246,7 @@ const createOutermostInsetsConfig = () => {
     })
 
     outermostInsetsConfig = config // for when we dont want to regenerate the svg ids and just want to reference the last made config
-    function deepClone(obj) {
-        if (obj === null || typeof obj !== 'object') {
-            return obj
-        }
 
-        if (Array.isArray(obj)) {
-            return obj.map(deepClone)
-        }
-
-        const cloned = {}
-        for (const key in obj) {
-            if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                cloned[key] = deepClone(obj[key])
-            }
-        }
-        return cloned
-    }
     // Clone the config to avoid mutation
     return deepClone(config)
 }

@@ -252,8 +252,8 @@ export const legend = function (map, config) {
                 breakLabels
                     .append('text')
                     .attr('class', 'em-bivariate-tick-label')
-                    .attr('x', x + out.xAxisLabelsOffset.x )
-                    .attr('y', y + out.xAxisLabelsOffset.y )
+                    .attr('x', x + out.xAxisLabelsOffset.x)
+                    .attr('y', y + out.xAxisLabelsOffset.y)
                     .text(out.breaks1[i])
 
                 breakLabels

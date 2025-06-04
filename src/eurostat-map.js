@@ -17,30 +17,35 @@ import { DEFAULTLABELS } from './core/labels'
  * @param {*} config The configuration object. Ex.: { title: "Map title", geoCenter: [233,654], ...}
  */
 export const map = function (type, config) {
-    //choropleth map
-    if (type == 'choropleth' || type == 'ch') return Choropleth.map(config)
-    //categorical map
-    if (type == 'categorical' || type == 'ct') return Categorical.map(config)
-    //proportionnal symbols map
-    if (type == 'proportionalSymbol' || type == 'ps') return ProportionalSymbol.map(config)
-    //bivariate choropleth
-    if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
-    //trivariate choropleth
-    if (type == 'trivariateChoropleth' || type == 'chbi') return TrivariateChoropleth.map(config)
-    //stripes composition
-    if (type == 'stripeComposition' || type == 'scomp') return StripeComposition.map(config)
-    //proportional pie charts
-    if (type == 'pieChart' || type == 'pie') return PieCharts.map(config)
-    //sparkline maps
-    if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return Sparklines.map(config)
-    //flow maps
-    if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
+    try {
+        //choropleth map
+        if (type == 'choropleth' || type == 'ch') return Choropleth.map(config)
+        //categorical map
+        if (type == 'categorical' || type == 'ct') return Categorical.map(config)
+        //proportionnal symbols map
+        if (type == 'proportionalSymbol' || type == 'ps') return ProportionalSymbol.map(config)
+        //bivariate choropleth
+        if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
+        //trivariate choropleth
+        if (type == 'trivariateChoropleth' || type == 'chbi') return TrivariateChoropleth.map(config)
+        //stripes composition
+        if (type == 'stripeComposition' || type == 'scomp') return StripeComposition.map(config)
+        //proportional pie charts
+        if (type == 'pieChart' || type == 'pie') return PieCharts.map(config)
+        //sparkline maps
+        if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return Sparklines.map(config)
+        //flow maps
+        if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
 
-    //add new map types here
-    //if(type == "XX") return mapXX.map(config);
+        //add new map types here
+        //if(type == "XX") return mapXX.map(config);
 
-    console.log('Unexpected map type: ' + type)
-    return mt.statMap(config, true, type)
+        console.log('Unexpected map type: ' + type)
+        return mt.statMap(config, true, type)
+    } catch (e) {
+        console.error('Error in eurostat-map.map: ' + e.message)
+        console.error(e)
+    }
 }
 
 /**

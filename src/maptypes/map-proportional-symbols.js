@@ -150,18 +150,23 @@ export const map = function (config) {
 
     //@override
     out.updateClassification = function () {
-        //define classifiers for sizing and colouring (out.classifierSize_ & out.classifierColor_)
-        defineClassifiers()
+        try {
+            //define classifiers for sizing and colouring (out.classifierSize_ & out.classifierColor_)
+            defineClassifiers()
 
-        // apply classification to all insets that are outside of the main map's SVG
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+            // apply classification to all insets that are outside of the main map's SVG
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+            }
+
+            // apply to main map
+            applyClassificationToMap(out)
+
+            return out
+        } catch (e) {
+            console.error('Error in proportional symbols classification: ' + e.message)
+            console.error(e)
         }
-
-        // apply to main map
-        applyClassificationToMap(out)
-
-        return out
     }
 
     /**
@@ -730,33 +735,38 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
-        // apply to main map
-        applyStyleToMap(out)
+        try {
+            // apply to main map
+            applyStyleToMap(out)
 
-        // apply style to insets
-        // apply classification to all insets
-        if (out.insetTemplates_) {
-            for (const geo in out.insetTemplates_) {
-                if (Array.isArray(out.insetTemplates_[geo])) {
-                    for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                        // insets with same geo that do not share the same parent inset
-                        if (Array.isArray(out.insetTemplates_[geo][i])) {
-                            // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                            for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
+            // apply style to insets
+            // apply classification to all insets
+            if (out.insetTemplates_) {
+                for (const geo in out.insetTemplates_) {
+                    if (Array.isArray(out.insetTemplates_[geo])) {
+                        for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                            // insets with same geo that do not share the same parent inset
+                            if (Array.isArray(out.insetTemplates_[geo][i])) {
+                                // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
+                                for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
+                                    if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
+                                }
+                            } else {
+                                if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
                             }
-                        } else {
-                            if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
                         }
+                    } else {
+                        // unique inset geo_
+                        if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
                     }
-                } else {
-                    // unique inset geo_
-                    if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
                 }
             }
-        }
 
-        return out
+            return out
+        } catch (e) {
+            console.error('Error in proportional symbols styling: ' + e.message)
+            console.error(e)
+        }
     }
 
     //@override

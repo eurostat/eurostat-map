@@ -109,15 +109,20 @@ export const map = function (config) {
 
     //@override
     out.updateClassification = function () {
-        // apply classification to all insets that are outside of the main map's SVG
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+        try {
+            // apply classification to all insets that are outside of the main map's SVG
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+            }
+
+            // apply to main map
+            applyClassificationToMap(out)
+
+            return out
+        } catch (e) {
+            console.error('Error in updateClassification:', e.message)
+            console.error(e)
         }
-
-        // apply to main map
-        applyClassificationToMap(out)
-
-        return out
     }
 
     function applyClassificationToMap(map) {
@@ -198,15 +203,20 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
-        // apply style to insets
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+        try {
+            // apply style to insets
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            }
+
+            // apply to main map
+            applyStyleToMap(out)
+
+            return out
+        } catch (e) {
+            console.error('Error in updateStyle:', e.message)
+            console.error(e)
         }
-
-        // apply to main map
-        applyStyleToMap(out)
-
-        return out
     }
 
     function applyStyleToMap(map) {

@@ -4,6 +4,7 @@ import { feature } from 'topojson-client'
 import { executeForAllInsets } from './utils'
 import { kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
+import { get, set } from 'idb-keyval'
 
 // Geometries class wrapped as a function
 export const Geometries = function (map, withCenterPoints) {
@@ -95,43 +96,79 @@ export const Geometries = function (map, withCenterPoints) {
 
         const buildUrl = (base, year, geo, proj, scale, level, withCenter = false) => {
             let path = `${base}/${year}`
-
-            // Include geo part if it's specified and not 'EUR' or 'WORLD'
             if (geo && geo !== 'EUR' && geo !== 'WORLD') path += `/${geo}`
-
-            // Add projection
-            path += `/${geo == 'WORLD' ? '4326' : proj}` // world geodata is always 4326, then reprojected
-
-            // Add scale only if not using center points
+            path += `/${geo == 'WORLD' ? '4326' : proj}`
             if (!withCenter && scale) path += `/${scale}`
-
-            // Append the appropriate file name
             path += `/${withCenter ? 'nutspt_' : ''}${level}.json`
-
             return path
         }
 
+        const TTL_MS = 24 * 60 * 60 * 1000 // cache refreshes every 24 hours
+
+        const fetchWithCache = async (url) => {
+            const cacheKey = `geojson-cache:${url}`
+
+            try {
+                const cached = await get(cacheKey)
+                if (cached) {
+                    const { timestamp, data } = cached
+                    const isFresh = Date.now() - timestamp < TTL_MS
+                    if (isFresh) return data
+                }
+            } catch (e) {
+                console.warn(`Error reading from IndexedDB cache for ${url}:`, e)
+                throw e // Optionally allow failure to propagate
+            }
+
+            const data = await json(url)
+
+            try {
+                await set(cacheKey, {
+                    timestamp: Date.now(),
+                    data: data,
+                })
+            } catch (e) {
+                console.warn(`Could not cache data in IndexedDB for ${url}:`, e)
+                throw e // Optionally allow failure to propagate
+            }
+
+            return data
+        }
+
+        if (!map || !map.nuts2jsonBaseURL_) {
+            throw new Error('Missing required map context or configuration')
+        }
+
         if (map.nutsLevel_ === 'mixed' && map.geo_ !== 'WORLD') {
-            nutsLevels.forEach((lvl) => promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl))))
+            nutsLevels.forEach((lvl) => {
+                const url = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl)
+                promises.push(fetchWithCache(url))
+            })
             if (withCenterPoints) {
-                nutsLevels.forEach((lvl) =>
-                    promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl, true)))
-                )
+                nutsLevels.forEach((lvl) => {
+                    const url = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl, true)
+                    promises.push(fetchWithCache(url))
+                })
             }
         } else if (map.geo_ === 'WORLD') {
             const worldMapTopojsonURL = window.location.hostname.includes('ec.europa.eu')
                 ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/IMAGE/WORLD_4326.json'
                 : 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
-            promises.push(json(worldMapTopojsonURL))
+
+            promises.push(fetchWithCache(worldMapTopojsonURL))
         } else {
-            promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)))
+            const mainUrl = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)
+            promises.push(fetchWithCache(mainUrl))
+
             if (withCenterPoints) {
-                promises.push(json(buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_, true)))
+                const ptUrl = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_, true)
+                promises.push(fetchWithCache(ptUrl))
             }
         }
 
         return promises
     }
+
     /** Checks if all geo data is ready */
     out.isGeoReady = function () {
         if (!out.defaultGeoData && !out.userGeometries) return false
