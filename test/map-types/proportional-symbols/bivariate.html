@@ -8,7 +8,7 @@
 
     <body>
         <svg id="map"></svg>
-        <svg id-="legend"></svg>
+        <svg id="map2"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
             // size and color proportional circles example
@@ -18,19 +18,94 @@
                 .nutsLevel(0)
                 .title('Total GDP')
                 .width(800)
-                .stat('size', {
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Million EUR',
-                    filters: { unit: 'MIO_EUR', time: '2023' },
+
+                .legend({
+                    x: 570,
+                    colorLegend: {
+                        labelType: 'ranges',
+                        labels: ['test1', 'test2', 'test3', 'test4'],
+                    },
+                    sizeLegend: {
+                        //values: [50000, 5000000],
+                    },
                 })
-                .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
-                .legend({ x: 570, colorLegend: { labelType: 'ranges', labels: ['test1', 'test2', 'test3', 'test4'] } })
                 .psShape('circle')
                 .insets(false)
                 .psMinSize(1)
                 .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psMinValue(3)
+                .psMaxValue(20)
+            // .stat('size', {
+            //     eurostatDatasetCode: 'nama_10r_3gdp',
+            //     unitText: 'Million EUR',
+            //     filters: { unit: 'MIO_EUR', time: '2023' },
+            // })
+            // .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
+            map.statData('size').setData({
+                ES: 3,
+                FR: 2,
+                IT: 3,
+                RO: 10,
+                DE: 4,
+                PL: 5,
+                NL: 6,
+                BE: 7,
+                CZ: 8,
+                AT: 9,
+                DK: 10,
+                SE: 11,
+                FI: 12,
+                RU: 20,
+            })
 
             map.build()
+
+            let map2 = eurostatmap
+                .map('ps')
+                .svgId('map2')
+                .nutsLevel('mixed')
+                .title('Total GDP')
+                .width(800)
+                .legend({
+                    x: 570,
+                    colorLegend: {
+                        labelType: 'ranges',
+                        labels: ['test1', 'test2', 'test3', 'test4'],
+                    },
+                    sizeLegend: {
+                        //values: [50000, 5000000],
+                    },
+                })
+                .psShape('circle')
+                .insets(false)
+                .psMinSize(1)
+                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psMinValue(3)
+                .psMaxValue(20)
+            // .stat('size', {
+            //     eurostatDatasetCode: 'nama_10r_3gdp',
+            //     unitText: 'Million EUR',
+            //     filters: { unit: 'MIO_EUR', time: '2023' },
+            // })
+            // .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
+            map2.statData('size').setData({
+                ES: 9,
+                FR: 12,
+                IT: 13,
+                RO: 10,
+                DE: 14,
+                PL: 15,
+                NL: 16,
+                BE: 17,
+                CZ: 18,
+                AT: 19,
+                DK: 10,
+                SE: 11,
+                FI: 12,
+                RU: 20,
+            })
+
+            map2.build()
         </script>
     </body>
 </html>
