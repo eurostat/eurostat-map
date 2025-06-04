@@ -13,9 +13,9 @@ export const createHistogramLegend = (legend, thresholds, colors, data, labelFor
     const height = legend.histogram.height || 200
     const width = legend.histogram.width || 270
 
-    let counts = new Array(map.numberOfClasses_).fill(0)
+    let counts = new Array(legend.map.numberOfClasses_).fill(0)
     data.forEach((value) => {
-        const classIndex = map.classifier()(value)
+        const classIndex = legend.map.classifier()(value)
         if (typeof classIndex === 'number' && classIndex >= 0 && classIndex < counts.length) {
             counts[classIndex]++
         }

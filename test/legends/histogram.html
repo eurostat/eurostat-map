@@ -11,94 +11,43 @@
     </head>
 
     <body>
-        <svg id="map"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
-
+        <svg id="histogram"></svg>
+        <script src="../../../build/eurostatmap.min.js"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map@4.2.0"></script> -->
         <script>
-            const map = eurostatmap
+            let map = eurostatmap
                 .map('choropleth')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
-                .nutsLevel(2)
-                .title('basic test')
-                .zoomExtent([1, 1000])
-                .numberOfClasses(6)
+                .position({ x: 5110000, y: 3500000, z: 6200 })
+                .svgId('histogram')
+                .title('GDP per inhabitant')
+                .subtitle('2022')
+                .nutsLevel(1)
+                .nutsYear(2021)
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { TIME: '2022', UNIT: 'EUR_HAB' },
+                })
                 .classificationMethod('threshold')
-                .thresholds([100, 200, 300, 400, 500])
+                .thresholds([20000, 25000, 30000, 35000, 40000, 45000, 50000])
                 .legend({
-                    title: 'histogram',
-                    x: 580,
-                    labelType: 'ranges',
+                    x: 540,
+                    y: 10,
                     boxOpacity: 0,
+                    title: 'Euro per inhabitant',
+                    labelType: 'ranges',
                     histogram: {
+                        height: 280,
+                        width: 190,
                         orientation: 'vertical',
                         showCounts: false,
                         showPercentages: true,
-                        labelRotation: 70,
-                        height: 150,
-                        width: 200,
-                        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+                        labelRotation: 90,
+                        margin: { top: 0, right: 0, bottom: 0, left: 120 },
                     },
                 })
-                .tooltip({
-                    textFunction: (region, map) => {
-                        if (region.properties.id == 'RU') {
-                            return ''
-                        }
-                        const html = []
-                        const spaceAsThousandSeparator = function (number) {
-                            return number.toLocaleString('en').replace(/,/gi, ' ')
-                        }
 
-                        // Header with region name and ID
-                        const regionName = region.properties.na || region.properties.name
-                        const regionId = region.properties.id
-                        html.push(`
-                            <div class="estat-vis-tooltip-bar">
-                                <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-                            </div>
-                        `)
-
-                        // Retrieve region's data value and unit
-                        const statData = map.statData()
-                        const sv = statData.get(regionId)
-                        const unit = statData.unitText() || ''
-
-                        // No data case
-                        if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
-                            html.push(`
-                                <div class="estat-vis-tooltip-text no-data">
-                                    <table class="nuts-table">
-                                        <tbody>
-                                            <tr><td>${map.noDataText_}</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            `)
-                            return html.join('')
-                        }
-
-                        // Data display
-                        html.push(`
-                        <div class="estat-vis-tooltip-text">
-                            <table class="nuts-table">
-                                <tbody>
-                                    <tr><td>${spaceAsThousandSeparator(sv.value)} ${unit}</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    `)
-
-                        // Optional status flag
-                        const statusFlag = sv.status
-                        if (statusFlag && map.tooltip_.showFlags) {
-                            const flagText = map.tooltip_.showFlags === 'short' ? statusFlag : flags[statusFlag] || statusFlag
-                            html.push(` <span class="status-flag">${flagText}</span>`)
-                        }
-
-                        return html.join('')
-                    },
-                })
-                .build()
+            map.build()
         </script>
     </body>
 </html>
