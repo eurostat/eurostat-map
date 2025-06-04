@@ -229,22 +229,26 @@ export const map = function (config) {
             })
     }
 
-    const addMouseEventsToRegions = function (map, regions) {
+    const addMouseEventsToRegions = (map, regions) => {
+        const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
+
         regions
             .on('mouseover', function (e, rg) {
-                const sel = select(this)
-                sel.style('fill', map.hoverColor_)
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (shouldOmit(rg.properties.id)) return
+                select(this).style('fill', map.hoverColor_)
+                out._tooltip?.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e, rg) {
-                if (out._tooltip) out._tooltip.mousemove(e)
+                if (shouldOmit(rg.properties.id)) return
+                out._tooltip?.mousemove(e)
             })
-            .on('mouseout', function () {
+            .on('mouseout', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
-                let newFill = sel.attr('fill___')
+                const newFill = sel.attr('fill___')
                 if (newFill) {
-                    sel.style('fill', sel.attr('fill___'))
-                    if (out._tooltip) out._tooltip.mouseout()
+                    sel.style('fill', newFill)
+                    out._tooltip?.mouseout()
                 }
             })
     }

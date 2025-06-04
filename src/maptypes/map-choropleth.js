@@ -333,16 +333,20 @@ export const map = function (config) {
     }
 
     const addMouseEventsToRegions = function (map, regions) {
+        const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
         regions
             .on('mouseover', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', map.hoverColor_) // Apply highlight color
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
-            .on('mousemove', function (e) {
+            .on('mousemove', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
                 if (out._tooltip) out._tooltip.mousemove(e)
             })
-            .on('mouseout', function () {
+            .on('mouseout', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', sel.attr('fill___')) // Revert to original color
                 if (out._tooltip) out._tooltip.mouseout()

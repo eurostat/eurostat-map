@@ -12,7 +12,7 @@
 
     <body>
         <svg id="histogram"></svg>
-        <script src="../../../build/eurostatmap.min.js"></script>
+        <script src="../../../build/eurostatmap.js"></script>
         <!-- <script src="https://unpkg.com/eurostat-map@4.2.0"></script> -->
         <script>
             let map = eurostatmap
@@ -28,6 +28,7 @@
                     unitText: 'Euro per inhabitant',
                     filters: { TIME: '2022', UNIT: 'EUR_HAB' },
                 })
+                .tooltip({ omitRegions: ['RU', 'BY', 'IL', 'PS'] })
                 .classificationMethod('threshold')
                 .thresholds([20000, 25000, 30000, 35000, 40000, 45000, 50000])
                 .legend({
