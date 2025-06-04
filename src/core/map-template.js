@@ -811,6 +811,45 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         svg.call(xoo)
     }
 
+    // Pan handler function
+    const panHandler = function (event, previousT) {
+        const transform = event.transform
+
+        // Compute the projected center
+        const centerX = (out.width_ / 2 - transform.x) / transform.k
+        const centerY = (out.height_ / 2 - transform.y) / transform.k
+        let [geoX, geoY] = out._projection.invert([centerX, centerY])
+
+        // Clamp geoX and geoY to max bounds and adjust the event transform
+        if (out.maxBounds_.xMin !== undefined && geoX < out.maxBounds_.xMin) {
+            geoX = out.maxBounds_.xMin
+            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
+        }
+        if (out.maxBounds_.yMin !== undefined && geoY < out.maxBounds_.yMin) {
+            geoY = out.maxBounds_.yMin
+            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
+        }
+        if (out.maxBounds_.xMax !== undefined && geoX > out.maxBounds_.xMax) {
+            geoX = out.maxBounds_.xMax
+            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
+        }
+        if (out.maxBounds_.yMax !== undefined && geoY > out.maxBounds_.yMax) {
+            geoY = out.maxBounds_.yMax
+            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
+        }
+
+        // set new position
+        out.position_.x = geoX
+        out.position_.y = geoY
+
+        //emit custom event with new position
+        window.dispatchEvent(
+            new CustomEvent('map:zoomed', {
+                detail: out,
+            })
+        )
+    }
+
     // Zoom handler function
     const zoomHandler = function (event, previousT) {
         const transform = event.transform
@@ -834,6 +873,14 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // adjust stroke dynamically according to zoom
         if (out.labels_?.backgrounds) scaleLabelBackgrounds(transform)
+
+        //emit custom event with new position
+        const eventDetail = {
+            x: projectedX,
+            y: projectedY,
+            z: out.position_.z,
+        }
+        window.dispatchEvent(new CustomEvent('map:zoomed', { detail: eventDetail }))
     }
 
     /**
@@ -979,38 +1026,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         const metersPerPixel = bboxWidth / (out.width_ * zoomFactor)
 
         return metersPerPixel
-    }
-
-    // Pan handler function
-    const panHandler = function (event, previousT) {
-        const transform = event.transform
-
-        // Compute the projected center
-        const centerX = (out.width_ / 2 - transform.x) / transform.k
-        const centerY = (out.height_ / 2 - transform.y) / transform.k
-        let [geoX, geoY] = out._projection.invert([centerX, centerY])
-
-        // Clamp geoX and geoY to max bounds and adjust the event transform
-        if (out.maxBounds_.xMin !== undefined && geoX < out.maxBounds_.xMin) {
-            geoX = out.maxBounds_.xMin
-            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
-        }
-        if (out.maxBounds_.yMin !== undefined && geoY < out.maxBounds_.yMin) {
-            geoY = out.maxBounds_.yMin
-            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
-        }
-        if (out.maxBounds_.xMax !== undefined && geoX > out.maxBounds_.xMax) {
-            geoX = out.maxBounds_.xMax
-            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
-        }
-        if (out.maxBounds_.yMax !== undefined && geoY > out.maxBounds_.yMax) {
-            geoY = out.maxBounds_.yMax
-            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
-        }
-
-        // set new position
-        out.position_.x = geoX
-        out.position_.y = geoY
     }
 
     /** Get x,y,z elements from URL and assign them to the view. */

@@ -18,7 +18,7 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('minimap test')
-                .nutsLevel(3)
+                .nutsLevel(1)
                 .nutsYear(2024)
                 .position({ x: 4400000, y: 3100000, z: 1400 })
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
@@ -26,8 +26,8 @@
                 .minimap({
                     x: 705,
                     y: 90,
-                    z: 100,
-                    countryId: 'DE',
+                    z: 300,
+                    //countryId: 'DE',
                 })
                 .tooltip({ omitRegions: ['RU'] })
                 .build()

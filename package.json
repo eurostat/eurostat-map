@@ -45,6 +45,7 @@
         "d3-svg-annotation": "^2.5.1",
         "idb-keyval": "^6.2.2",
         "jsonstat-toolkit": "^1.0.8",
+        "proj4": "^2.17.0",
         "simple-statistics": "^7.8.7",
         "topojson-client": "^3.1.0"
     },
