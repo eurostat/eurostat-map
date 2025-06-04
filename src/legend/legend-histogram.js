@@ -172,16 +172,16 @@ export const createHistogramLegend = (legend, thresholds, colors, data, labelFor
         const ecl = sel.attr('ecl')
         const reversedIndex = colors.length - 1 - parseInt(ecl, 10)
         highlightRegions(map, reversedIndex)
-        if (map.insetTemplates_) {
-            executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, ecl)
+        if (legend.map.insetTemplates_) {
+            executeForAllInsets(legend.map.insetTemplates_, legend.map.svgId, highlightRegions, ecl)
         }
     }
 
     function handleMouseOut(_, i) {
         const sel = select(this).style('stroke', 'none')
         unhighlightRegions(map)
-        if (map.insetTemplates_) {
-            executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+        if (legend.map.insetTemplates_) {
+            executeForAllInsets(legend.map.insetTemplates_, legend.map.svgId, unhighlightRegions)
         }
     }
 }
