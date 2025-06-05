@@ -273,57 +273,56 @@ export const map = function (config) {
     }
 
     //specific tooltip text function
-    out.tooltip_.textFunction = function (rg, map) {
-        //get tooltip
-        const tp = select('#tooltip_eurostat')
-
-        //clear
-        tp.html('')
-        tp.selectAll('*').remove()
-
-        //write region name
+    const tooltipTextFunctionStripeComposition = function (rg, map) {
         const regionName = rg.properties.na || rg.properties.name
-        if (rg.properties.id) {
-            //name and code
-            tp.append('div').html('<b>' + regionName + '</b> (' + rg.properties.id + ') <br>')
-        } else {
-            //region name
-            tp.append('div').html('<b>' + regionName + '</b><br>')
-        }
-
-        //prepare data for pie chart
+        const regionId = rg.properties.id
+        const comp = getComposition(regionId)
         const data = []
-        const comp = getComposition(rg.properties.id)
+
         for (const key in comp) data.push({ code: key, value: comp[key] })
 
-        //case of regions with no data
-        if (!data || data.length == 0) {
-            tp.append('div').html(out.noDataText())
-            return
+        let html = ''
+        // Header with region name and ID
+        html += `<div class="estat-vis-tooltip-bar">
+        <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+    </div>`
+
+        if (!data || data.length === 0) {
+            html += `<div>${out.noDataText()}</div>`
+            return html
         }
 
-        //create svg for pie chart
+        // Build pie chart as SVG string
         const r = out.pieChartRadius(),
             ir = out.pieChartInnerRadius()
-        const svg = tp
-            .append('svg')
-            .attr('viewBox', [-r, -r, 2 * r, 2 * r])
-            .attr('width', 2 * r)
 
-        //make pie chart. See https://observablehq.com/@d3/pie-chart
         const pie_ = pie()
             .sort(null)
             .value((d) => d.value)
-        svg.append('g')
-            .attr('stroke', 'darkgray')
-            .selectAll('path')
-            .data(pie_(data))
-            .join('path')
-            .style('fill', (d) => {
-                return out.catColors()[d.data.code] || 'lightgray'
-            })
-            .attr('d', arc().innerRadius(ir).outerRadius(r))
+        const arcGen = arc().innerRadius(ir).outerRadius(r)
+
+        const pieData = pie_(data)
+
+        let paths = ''
+        for (const d of pieData) {
+            const fill = out.catColors()[d.data.code] || 'lightgray'
+            const dPath = arcGen(d)
+            paths += `<path d="${dPath}" fill="${fill}" stroke="darkgray"></path>`
+        }
+
+        const svg = `
+        <div style="display: flex; justify-content: center;">
+            <svg viewBox="${-r} ${-r} ${2 * r} ${2 * r}" width="${2 * r}">
+                <g>${paths}</g>
+            </svg>
+        </div>
+    `
+
+        html += svg
+        return html
     }
+    //specific tooltip text function
+    out.tooltip_.textFunction = tooltipTextFunctionStripeComposition
 
     return out
 }

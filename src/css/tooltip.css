@@ -18,7 +18,9 @@
     padding: 0px;
     border: 0px;
     border-radius: 0px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0px 4px 6px rgba(0, 0, 0, 0.1),
+        0px 1px 3px rgba(0, 0, 0, 0.08);
     position: absolute;
     font-family: Helvetica, Arial, sans-serif;
     pointer-events: none;
@@ -27,6 +29,7 @@
 }
 .em-tooltip-piechart-breakdown {
     padding: 10px;
+    padding-top: 0px;
     font-size: 14px;
 }
 .em-tooltip-piechart-container {

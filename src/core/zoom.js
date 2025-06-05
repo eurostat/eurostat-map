@@ -35,7 +35,7 @@ export const defineMapZoom = function (map) {
 }
 
 // Pan handler function
-const panHandler = function (event, previousT) {
+const panHandler = function (event, map) {
     const transform = event.transform
 
     // Compute the projected center

@@ -419,146 +419,108 @@ export const map = function (config) {
     }
 
     //specific tooltip text function
-    out.tooltip_.textFunction = function (rg, map) {
-        //get tooltip
-        const tp = select('#tooltip_eurostat')
+    const pieChartTooltipFunction = function (rg, map) {
+        const regionName = rg.properties.na || rg.properties.name
+        const regionId = rg.properties.id
+        const comp = getComposition(regionId)
 
-        //clear
-        tp.html('')
-        tp.selectAll('*').remove()
-
-        if (rg.properties.id) {
-            //name and code
-            tp.append('div')
-                .attr('class', 'estat-vis-tooltip-bar')
-                .html(rg.properties.na + ' (' + rg.properties.id + ')')
-        } else {
-            //region name
-            tp.append('div').attr('class', 'estat-vis-tooltip-bar').html(rg.properties.na)
-        }
-
-        //prepare data for pie chart
         const data = []
-        const comp = getComposition(rg.properties.id)
         for (const key in comp) data.push({ code: key, value: comp[key] })
 
-        //case of regions with no data
-        if (!data || data.length == 0) {
-            tp.append('div').html(out.noDataText())
-            return
+        let html = ''
+
+        // Header
+        html += `<div class="estat-vis-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
+
+        if (!data || data.length === 0) {
+            html += `<div>${out.noDataText()}</div>`
+            return html
         }
 
-        //create svg for pie chart
-        // set the dimensions and margins of the graph
-        let width = 150
-        let height = 150
-        let margin = 25
-
-        // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
+        // Chart dimensions
+        const width = 150
+        const height = 150
+        const margin = 25
         const radius = Math.min(width, height) / 2 - margin
 
-        //width = tp.node().getBoundingClientRect().width
-        const container = tp.append('div').attr('class', 'em-tooltip-piechart-container')
-        const svg = container
-            .append('svg')
-            .attr('class', 'em-tooltip-piechart-svg')
-            .attr('viewbox', `0, 0, ${width}, ${height}`)
-            .attr('width', width)
-            .attr('height', height - margin / 2)
-            .append('g')
-            .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')')
-
-        //make pie chart. See https://observablehq.com/@d3/pie-chart
+        // Generate pie and arcs
         const pie_ = pie()
             .sort(null)
             .value((d) => d.value)
-
         const innerArc = arc()
-            .innerRadius(0) // This is the size of the donut hole
+            .innerRadius(0)
             .outerRadius(radius * 0.8)
-
-        // Another arc that won't be drawn. Just for labels positioning
         const outerArc = arc()
             .innerRadius(radius * 0.9)
             .outerRadius(radius * 0.9)
 
         const pieData = pie_(data)
-        svg.selectAll('allSlices')
-            .data(pieData)
-            .enter()
-            .append('path')
-            .attr('d', innerArc)
-            .style('fill', (d) => {
-                return out.catColors()[d.data.code] || 'lightgray'
-            })
-            .attr('stroke', 'white')
-            .style('stroke-width', '1px')
-            .style('opacity', 0.7)
 
-        // Add the polylines between chart and labels:
-        svg.selectAll('allPolylines')
-            .data(pieData)
-            .enter()
-            .append('polyline')
-            .attr('stroke', 'black')
-            .style('fill', 'none')
-            .attr('stroke-width', 1)
-            .attr('points', function (d) {
-                if (d.data.value > 0.02) {
-                    const posA = innerArc.centroid(d) // line insertion in the slice
-                    const posB = outerArc.centroid(d) // line break: we use the other arc generator that has been built only for that
-                    const posC = outerArc.centroid(d) // Label position = almost the same as posB
-                    const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2 // we need the angle to see if the X position will be at the extreme right or extreme left
-                    posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1) // multiply by 1 or -1 to put it on the right or on the left
-                    return [posA, posB, posC]
+        let paths = ''
+        let polylines = ''
+        let labels = ''
+
+        for (const d of pieData) {
+            const fill = out.catColors()[d.data.code] || 'lightgray'
+            const dPath = innerArc(d)
+            paths += `<path d="${dPath}" fill="${fill}" stroke="white" stroke-width="1" opacity="0.7"></path>`
+
+            if (d.data.value > 0.02) {
+                const posA = innerArc.centroid(d)
+                const posB = outerArc.centroid(d)
+                const posC = outerArc.centroid(d)
+                const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
+                posC[0] = radius * 0.95 * (midangle < Math.PI ? 1 : -1)
+
+                polylines += `<polyline points="${posA.join(',')} ${posB.join(',')} ${posC.join(',')}"
+                stroke="black" fill="none" stroke-width="1" />`
+
+                const labelPos = outerArc.centroid(d)
+                labelPos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1)
+                const anchor = midangle < Math.PI ? 'start' : 'end'
+                const percent = (d.data.value * 100).toFixed()
+                if (!isNaN(percent)) {
+                    labels += `<text x="${labelPos[0]}" y="${labelPos[1]}" text-anchor="${anchor}" font-size="12px">
+                    ${percent}%
+                </text>`
                 }
-            })
-
-        // Add the labels:
-        svg.selectAll('allLabels')
-            .data(pieData)
-            .enter()
-            .append('text')
-            .text(function (d) {
-                if (d.data.value > 0.02) {
-                    let n = (d.data.value * 100).toFixed()
-                    if (!isNaN(n)) return n + '%'
-                }
-            })
-            .attr('transform', function (d) {
-                var pos = outerArc.centroid(d)
-                var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
-                pos[0] = radius * 0.99 * (midangle < Math.PI ? 1 : -1)
-                return 'translate(' + pos + ')'
-            })
-            .style('text-anchor', function (d) {
-                var midangle = d.startAngle + (d.endAngle - d.startAngle) / 2
-                return midangle < Math.PI ? 'start' : 'end'
-            })
-            .style('font-size', '12px')
-
-        // add region values to tooltip
-        let breakdownDiv = tp.append('div').attr('class', 'em-tooltip-piechart-breakdown')
-
-        // show value for each category
-        for (let i = 0; i < out.statCodes_.length; i++) {
-            // retrieve code and stat value
-            const sc = out.statCodes_[i]
-            const s = out.statData(sc).get(rg.properties.id)
-
-            // check if s and s.value are valid (handle null, undefined, or 0)
-            if (s && s.value !== undefined && s.value !== null) {
-                let string = `<strong>${out.catLabels_[sc]}</strong>: ${s.value.toFixed()}<br>`
-                breakdownDiv.html(breakdownDiv.html() + string) // safely update the HTML
             }
         }
 
-        // write total (handle null, undefined, or 0 values for total)
-        let total = getRegionTotal(rg.properties.id)
-        if (total !== undefined && total !== null) {
-            breakdownDiv.html(breakdownDiv.html() + `<strong>Total</strong>: ${total.toFixed()}<br>`)
+        const svg = `
+        <div style="display: flex; justify-content: center;">
+            <svg viewBox="${-width / 2} ${-height / 2} ${width} ${height}" width="${width}" height="${height - margin / 2}">
+                <g transform="translate(0,0)">
+                    ${paths}
+                    ${polylines}
+                    ${labels}
+                </g>
+            </svg>
+        </div>
+    `
+        html += svg
+
+        // Breakdown
+        html += `<div class="em-tooltip-piechart-breakdown">`
+
+        for (const sc of out.statCodes_) {
+            const s = out.statData(sc).get(regionId)
+            if (s && s.value !== undefined && s.value !== null) {
+                html += `<span>${out.catLabels_[sc]}</span>: ${s.value.toFixed()}<br>`
+            }
         }
+
+        const total = getRegionTotal(regionId)
+        if (total !== undefined && total !== null) {
+            html += `<span>Total</span>: ${total.toFixed()}<br>`
+        }
+
+        html += `</div>`
+
+        return html
     }
+
+    out.tooltip_.textFunction = pieChartTooltipFunction
 
     return out
 }
