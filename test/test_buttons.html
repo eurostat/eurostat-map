@@ -4,9 +4,20 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
-            /* .em-cntbn {
-                stroke-width: 2px !important;
-            } */
+            .em-inset-title,
+            .em-inset-subtitle {
+                font-size: 9px !important;
+                stroke-linecap: round;
+            }
+            #titleLI {
+                color: white !important;
+                font-size: 9px !important;
+                stroke: white;
+                stroke-width: 2px;
+            }
+            #subtitleLI {
+                color: black !important;
+            }
         </style>
     </head>
 
@@ -15,9 +26,13 @@
         <script src="../../../build/eurostatmap.js"></script>
 
         <script>
+            const h = 60
+            const w = 70
+            const s = 70 // inset size
+            const p = 4 // inset padding
             const map = eurostatmap
                 .map('choropleth')
-                .title('minimap test')
+                .title('buttons test')
                 .proj('3035')
                 .nutsLevel(1)
                 .nutsYear(2024)
@@ -29,8 +44,125 @@
                 .onZoomEnd((e) => {
                     console.log('Zoom ended', e)
                 })
-                .insets('default')
-                .insetBoxPosition([520, 10])
+                .insetBoxPosition([10, 50])
+                .insets([
+                    {
+                        geo: 'IC',
+                        x: 0,
+                        y: 0,
+                        width: w,
+                        height: h,
+                        title: 'Canarias (ES)',
+                        titlePosition: [2, 11],
+                        position: { x: 410000, y: 3180000, z: 8000 },
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'GP',
+                        x: 0,
+                        y: h + p,
+                        width: w,
+                        height: h,
+                        title: 'Guadeloupe (FR)',
+                        titlePosition: [2, 11],
+                        position: { x: 660000, y: 1800000, z: 1600 },
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'GP',
+                        x: p + 5,
+                        y: h + p + 15,
+                        width: 23,
+                        height: 15,
+                        titlePosition: [2, 11],
+                        position: { x: 493000, y: 1999000, z: 1500 },
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'GF',
+                        x: 0,
+                        y: h * 2 + p * 2,
+                        width: w,
+                        height: h,
+                        title: 'Guyane (FR)',
+                        titlePosition: [2, 11],
+                        position: { x: 295852, y: 484074, z: 9000 },
+                        scalebarPosition: [45, 65],
+                    },
+                    {
+                        geo: 'MQ',
+                        x: 0,
+                        y: h * 3 + p * 3,
+                        width: w,
+                        height: h,
+                        title: 'Martinique (FR)',
+                        titlePosition: [2, 11],
+                        position: { x: 716521, y: 1621322, z: 1500 },
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'YT',
+                        x: 0,
+                        y: h * 4 + p * 4,
+                        width: w,
+                        height: h,
+                        title: 'Mayotte (FR)',
+                        titlePosition: [2, 11],
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'RE',
+                        x: 0,
+                        y: h * 5 + p * 5,
+                        width: w,
+                        height: h,
+                        title: 'Réunion (FR)',
+                        titlePosition: [2, 11],
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'PT20',
+                        x: 0,
+                        y: h * 6 + p * 6,
+                        width: w,
+                        height: h,
+                        title: 'Açores (PT)',
+                        titlePosition: [2, 11],
+                        position: { x: 440000, y: 4360000, z: 4000 },
+                        scalebarPosition: [48, 65],
+                    },
+                    {
+                        geo: 'PT20',
+                        x: 10,
+                        y: h * 6 + p * 6 + 17,
+                        width: 23,
+                        height: 30,
+                        titlePosition: [2, 11],
+                        position: { x: 650000, y: 4150000, z: 5000 },
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'PT20',
+                        x: 40,
+                        y: h * 6 + p * 6 + 17,
+                        width: 15,
+                        height: 20,
+                        titlePosition: [2, 11],
+                        position: { x: 140000, y: 4390000, z: 3500 },
+                        scalebarPosition: [1, 65],
+                    },
+                    {
+                        geo: 'PT30',
+                        x: 0,
+                        y: h * 7 + p * 7,
+                        width: w,
+                        height: h,
+                        title: 'Madeira (PT)',
+                        scalebarPosition: [1, 65],
+                        titlePosition: [2, 11],
+                    },
+                ])
+
                 .build()
         </script>
     </body>
