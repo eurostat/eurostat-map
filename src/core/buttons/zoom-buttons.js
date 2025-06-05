@@ -1,5 +1,4 @@
-import { select, event as d3Event } from 'd3-selection'
-import { zoomIdentity } from 'd3-zoom'
+import { select } from 'd3-selection'
 import { getCSSPropertyFromClass } from '../utils'
 
 export const appendZoomButtons = (map) => {
@@ -11,10 +10,9 @@ export const appendZoomButtons = (map) => {
         // .attr('transform', `translate(${map.width_ - 50}, 20)`)
         .style('pointer-events', 'all') // allow clicks
 
-    const buttonSize = parseInt(getCSSPropertyFromClass('em-zoom-button', 'width')) || 30 // Default to 30px if not set
-    const spacing = 40
+    const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
 
-    const zoomInBtn = buttonGroup.append('g').attr('class', 'em-zoom-in em-zoom-button').style('cursor', 'pointer')
+    const zoomInBtn = buttonGroup.append('g').attr('class', 'em-zoom-in em-button')
     zoomInBtn.append('rect').attr('width', buttonSize).attr('height', buttonSize)
     zoomInBtn
         .append('text')
@@ -24,7 +22,7 @@ export const appendZoomButtons = (map) => {
 
     const zoomOutBtn = buttonGroup
         .append('g')
-        .attr('class', 'em-zoom-out em-zoom-button')
+        .attr('class', 'em-zoom-out em-button')
         .attr('transform', `translate(0, ${buttonSize})`)
         .style('cursor', 'pointer')
     zoomOutBtn.append('rect').attr('width', buttonSize).attr('height', buttonSize)

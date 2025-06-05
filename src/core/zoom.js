@@ -9,7 +9,7 @@ export const defineMapZoom = function (map) {
         .filter(function (event) {
             // Prevent zoom if interacting with a zoom button
             const target = event.target
-            return !target.closest('.em-zoom-buttons')
+            return !target.closest('.em-zoom-buttons') && !target.closest('.em-button')
         })
         .scaleExtent(map.zoomExtent())
         .on('zoom', function (e) {

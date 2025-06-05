@@ -1,30 +1,31 @@
-.em-zoom-buttons {
-    transform: translate(94%, 2%);
-}
-.em-zoom-button {
+.em-button {
     width: 35px;
     height: 35px;
     user-select: none;
+    cursor: pointer;
 }
-.em-zoom-button rect {
+
+.em-button rect {
     fill: white;
     stroke: #ccc;
 }
-.em-zoom-button text {
+
+.em-button rect:hover {
+    fill: lightgrey;
+}
+
+.em-button text {
     text-anchor: middle;
     font-size: 20px;
     fill: #000;
 }
 
-.em-zoom-in,
-.em-zoom-out {
-    cursor: pointer;
+/* zoom  */
+.em-zoom-buttons {
+    transform: translate(94%, 10%);
 }
 
-.em-zoom-button rect:hover {
-    fill: lightgrey;
-}
-.em-zoom-in {
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+/* insets */
+.em-insets-button {
+    transform: translate(94%, 2%);
 }

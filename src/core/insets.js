@@ -13,7 +13,7 @@ export const buildInsets = function (out, withCenterPoints) {
     // Cannot read properties of undefined (reading 'svgId')
     let svg = select('#' + out.svgId_)
     let drawingGroup = svg.select('#em-drawing-' + out.svgId_)
-    const ing = drawingGroup
+    const insetsGroup = drawingGroup
         .append('g')
         .attr('id', 'em-insets-group')
         .attr('class', 'em-insets')
@@ -35,7 +35,7 @@ export const buildInsets = function (out, withCenterPoints) {
             // Create it as an embeded SVG if it does not exist
             const x = config.x == undefined ? out.insetBoxPadding_ : config.x
             const y = config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
-            const ggeo = ing
+            const ggeo = insetsGroup
                 .append('g')
                 .attr('id', 'em-inset-' + config.svgId)
                 .attr('class', 'em-inset')
