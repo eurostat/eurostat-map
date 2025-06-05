@@ -1,0 +1,30 @@
+.em-zoom-buttons {
+    transform: translate(94%, 2%);
+}
+.em-zoom-button {
+    width: 35px;
+    height: 35px;
+    user-select: none;
+}
+.em-zoom-button rect {
+    fill: white;
+    stroke: #ccc;
+}
+.em-zoom-button text {
+    text-anchor: middle;
+    font-size: 20px;
+    fill: #000;
+}
+
+.em-zoom-in,
+.em-zoom-out {
+    cursor: pointer;
+}
+
+.em-zoom-button rect:hover {
+    fill: lightgrey;
+}
+.em-zoom-in {
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}

@@ -5,7 +5,12 @@ import { getCurrentBbox } from './utils'
 export const defineMapZoom = function (map) {
     let svg = select('#' + map.svgId())
     let previousT = zoomIdentity
-    const xoo = zoom()
+    map.__zoomBehavior = zoom()
+        .filter(function (event) {
+            // Prevent zoom if interacting with a zoom button
+            const target = event.target
+            return !target.closest('.em-zoom-buttons')
+        })
         .scaleExtent(map.zoomExtent())
         .on('zoom', function (e) {
             const t = e.transform
@@ -26,7 +31,7 @@ export const defineMapZoom = function (map) {
             }
         })
 
-    svg.call(xoo)
+    svg.call(map.__zoomBehavior)
 }
 
 // Pan handler function

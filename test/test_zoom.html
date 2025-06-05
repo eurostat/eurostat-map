@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -15,6 +15,7 @@
                 .title('Test')
                 .subtitle('test')
                 .classificationMethod('ckmeans')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 1 })
                 .zoomExtent([1, 10])
                 .position({ x: 2200000, y: 3000000, z: 7000 })

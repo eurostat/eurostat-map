@@ -12,6 +12,7 @@ import { appendStamp } from './stamps'
 import { buildGridCartogramBase } from './cartograms'
 import { appendMinimap } from './minimaps'
 import { defineMapZoom } from './zoom'
+import { appendZoomButtons } from './buttons/zoom-buttons'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -85,6 +86,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     //minimap
     out.minimap_ = undefined
+
+    //zoomButtons
+    out.showZoomButtons_ = false // show zoom buttons
 
     //tooltip
     out.tooltip_ = {
@@ -684,6 +688,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         //minimap
         if (out.minimap_) {
             appendMinimap(out)
+        }
+
+        //zoom buttons
+        if (out.showZoomButtons_) {
+            appendZoomButtons(out)
         }
 
         return out

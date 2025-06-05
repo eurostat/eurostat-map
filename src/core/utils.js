@@ -73,7 +73,7 @@ export const getCSSPropertyFromClass = function (className, propertyName) {
     tempElement.style.position = 'absolute'
     tempElement.style.visibility = 'hidden'
     tempElement.style.height = 'auto'
-    tempElement.style.width = 'auto'
+    //tempElement.style.width = 'auto'
     tempElement.style.lineHeight = 'normal'
 
     // Append directly to the body

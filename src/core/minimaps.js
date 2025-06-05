@@ -34,7 +34,7 @@ export const appendMinimap = (map) => {
     }
 
     // Listen for zoom/pan events to update the minimap dynamically
-    const debounceTime = map.minimap_?.debounce || 1 // Use minimap config or default to 300ms
+    const debounceTime = map.minimap_?.debounce || 2 // Use minimap config or default to 300ms
     window.addEventListener(
         'estatmap:zoomed',
         debounce((event) => {
