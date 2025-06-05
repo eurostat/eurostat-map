@@ -1,45 +1,47 @@
 # API reference
 
 - [API reference](#api-reference)
-    - [Map creation](#map-creation)
-        - [Map definition](#map-definition)
-        - [Map geography](#map-geography)
-            - [World maps](#world-maps)
-            - [Custom geometries](#custom-geometries)
-        - [Statistical data](#statistical-data)
-            - [Eurostat database](#eurostat-database)
-            - [CSV](#csv)
-            - [Custom JS](#custom-js)
-    - [Map types](#map-types)
-        - [Choropleth map](#choropleth-map)
-            - [Choropleth legends](#choropleth-legends)
-        - [Proportional symbol map](#proportional-symbol-map)
-            - [Proportional symbol legends](#proportional-symbol-legends)
-        - [Proportional pie chart map](#proportional-pie-chart-map)
-        - [Categorical map](#categorical-map)
-        - [Bivariate choropleth map](#bivariate-choropleth-map)
-            - [Bivariate choropleth legends](#bivariate-choropleth-legends)
-        - [Stripe composition map](#stripe-composition-map)
-        - [Sparkline map](#sparkline-map)
-        - [Flow map](#flow-map)
-        - [Cartograms](#cartograms)
-            - [Grid Cartograms](#grid-cartograms)
-            - [Dorling Cartograms](#dorling-cartograms)
-    - [Map texts](#map-texts)
-        - [Map title \& subtitle](#map-title--subtitle)
-        - [Labelling](#labelling)
-        - [Annotations](#annotations)
-        - [Stamps](#stamps)
-        - [Footnotes](#footnotes)
-    - [Map legend](#map-legend)
-    - [Scalebar](#scalebar)
-    - [Tooltip](#tooltip)
-    - [Styling](#styling)
-    - [Insets](#insets)
-    - [Export](#export)
-    - [Miscellaneous](#miscellaneous)
-    - [Build and update](#build-and-update)
-    - [Version migration](#version-migration)
+  - [Map creation](#map-creation)
+    - [Map definition](#map-definition)
+    - [Map geography](#map-geography)
+      - [World maps](#world-maps)
+      - [Custom geometries](#custom-geometries)
+    - [Statistical data](#statistical-data)
+      - [Eurostat database](#eurostat-database)
+      - [CSV](#csv)
+      - [Custom JS](#custom-js)
+  - [Map types](#map-types)
+    - [Choropleth map](#choropleth-map)
+      - [Choropleth legends](#choropleth-legends)
+    - [Proportional symbol map](#proportional-symbol-map)
+      - [Proportional symbol legends](#proportional-symbol-legends)
+    - [Proportional pie chart map](#proportional-pie-chart-map)
+    - [Categorical map](#categorical-map)
+    - [Bivariate choropleth map](#bivariate-choropleth-map)
+      - [Bivariate choropleth legends](#bivariate-choropleth-legends)
+    - [Stripe composition map](#stripe-composition-map)
+    - [Sparkline map](#sparkline-map)
+    - [Flow map](#flow-map)
+    - [Cartograms](#cartograms)
+      - [Grid Cartograms](#grid-cartograms)
+      - [Dorling Cartograms](#dorling-cartograms)
+  - [Map texts](#map-texts)
+    - [Map title \& subtitle](#map-title--subtitle)
+    - [Labelling](#labelling)
+    - [Annotations](#annotations)
+    - [Stamps](#stamps)
+    - [Footnotes](#footnotes)
+  - [Map legend](#map-legend)
+  - [Scalebar](#scalebar)
+  - [Tooltip](#tooltip)
+  - [Styling](#styling)
+  - [Insets](#insets)
+  - [Minimap](#minimap)
+  - [Buttons](#buttons)
+  - [Export](#export)
+  - [Miscellaneous](#miscellaneous)
+  - [Build and update](#build-and-update)
+  - [Version migration](#version-migration)
 
 ## Map creation
 
@@ -1115,6 +1117,25 @@ Note that a map inset is built as a proper map within a map: It has all properti
 | _map_.**insetBoxWidth**([*value*])    | number | _210_         | The default width of the insets box, which are squared by default.                                                                                                                                                                                           |
 | _map_.**insetZoomExtent**([*value*])  | Array  | _null_        | The zoom extent of inset maps. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both. |
 | _map_.**insetScale**([*value*])       | String | _"03M"_       | The default scale of the insets.                                                                                                                                                                                                                             |
+
+## Minimap
+
+You can add minimaps to your map like so:
+
+```
+map.minimap({
+    x: 705,
+    y: 90,
+    z: 200, // initial z position
+    countryId: 'DE', // highlight a region by id
+    size: 120, // diameter
+    debounce: 2, // debounce time in ms
+})
+```
+
+## Buttons
+
+You can add zoom buttons with map.showZoomButtons(true) and an inset toggle with map.showInsetButton(true). See ui.css for their styling.
 
 ## Export
 

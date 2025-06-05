@@ -67,7 +67,7 @@ const panHandler = function (event, map) {
 
     //emit custom event with new position
     window.dispatchEvent(
-        new CustomEvent('estatmap:zoomed', {
+        new CustomEvent('estatmap:zoomed-' + map.svgId_, {
             detail: map,
         })
     )
@@ -114,7 +114,7 @@ const zoomHandler = function (event, previousT, map) {
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(transform, map)
 
     //emit custom event with map object
-    window.dispatchEvent(new CustomEvent('estatmap:zoomed', { detail: map }))
+    window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
 }
 
 /**

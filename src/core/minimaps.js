@@ -4,12 +4,6 @@ import { feature } from 'topojson-client'
 import { json } from 'd3-fetch'
 import proj4 from 'proj4'
 
-let projection
-let path
-let globe // to store the globe group for efficient updates
-let minimapContainer // to store the minimap container for efficient updates
-let previousState = {} // store the previous minimap state (e.g., center, zoom) to avoid redundant updates
-
 export const appendMinimap = (map) => {
     if (!map.svg_) return
 
@@ -36,7 +30,7 @@ export const appendMinimap = (map) => {
     // Listen for zoom/pan events to update the minimap dynamically
     const debounceTime = map.minimap_?.debounce || 2 // Use minimap config or default to 300ms
     window.addEventListener(
-        'estatmap:zoomed',
+        'estatmap:zoomed-' + map.svgId_,
         debounce((event) => {
             const map = event.detail
 
@@ -49,11 +43,11 @@ export const appendMinimap = (map) => {
             const minimapZoom = convertMainMapZoomToMinimap(map)
 
             // Update the minimap projection with the new center
-            projection.rotate([-lon, -lat])
-            projection.scale(minimapZoom)
+            map._minimapProjection.rotate([-lon, -lat])
+            map._minimapProjection.scale(minimapZoom)
 
             // Update the minimap globe view with the new projection
-            globe.selectAll('path').attr('d', path)
+            map._minimapGlobe.selectAll('path').attr('d', map._minimapPath)
         }, debounceTime) // Debounce delay (adjust as needed)
     )
 }
@@ -90,12 +84,14 @@ const drawMinimap = (map) => {
         const y = minimapConfig.y || 80 // Default y position
         const z = minimapConfig.z || 160 // Default zoom level
         const color = minimapConfig.color || '#3792B6' // Default color
-        minimapContainer = map.svg_.append('g').attr('id', 'em-minimap').attr('transform', `translate(${x},${y})`) // Adjust as needed
         const size = minimapConfig.size || 160 // Diameter
         const geometries = map.Geometries.geoJSONs.worldrg
 
+        //container
+        map._minimapContainer = map.svg_.append('g').attr('id', 'em-minimap').attr('transform', `translate(${x},${y})`) // Adjust as needed
+
         // Draw inner circle
-        minimapContainer
+        map._minimapContainer
             .append('circle')
             .attr('r', size / 2)
             .attr('cx', 0)
@@ -105,8 +101,8 @@ const drawMinimap = (map) => {
             .attr('stroke-width', 3)
 
         // Initialize projection
-        projection = geoOrthographic().scale(z).translate([0, 0])
-        path = geoPath().projection(projection)
+        map._minimapProjection = geoOrthographic().scale(z).translate([0, 0])
+        map._minimapPath = geoPath().projection(map._minimapProjection)
 
         let lat, lon
 
@@ -118,9 +114,9 @@ const drawMinimap = (map) => {
                 return
             }
 
-            const [[x0, y0], [x1, y1]] = path.bounds(target)
+            const [[x0, y0], [x1, y1]] = map._minimapPath.bounds(target)
             const centroid = [(x0 + x1) / 2, (y0 + y1) / 2]
-            const coords = projection.invert(centroid)
+            const coords = map._minimapProjection.invert(centroid)
             lon = coords[0]
             lat = coords[1]
         } else {
@@ -131,10 +127,10 @@ const drawMinimap = (map) => {
         }
 
         // Now center the minimap on either the country or the main map
-        projection.rotate([-lon, -lat])
+        map._minimapProjection.rotate([-lon, -lat])
 
         // Define circular clip
-        minimapContainer
+        map._minimapContainer
             .append('defs')
             .append('clipPath')
             .attr('id', 'minimap-clip')
@@ -143,19 +139,26 @@ const drawMinimap = (map) => {
             .attr('cx', 0)
             .attr('cy', 0)
 
-        globe = minimapContainer.append('g').attr('class', 'em-minimap-globe').attr('clip-path', 'url(#minimap-clip)')
+        // define globe
+        map._minimapGlobe = map._minimapContainer.append('g').attr('class', 'em-minimap-globe').attr('clip-path', 'url(#minimap-clip)')
 
         // Draw all countries (just once)
-        globe.selectAll('path.country').data(geometries).enter().append('path').attr('d', path).attr('fill', '#e0e0e0')
+        map._minimapGlobe.selectAll('path.country').data(geometries).enter().append('path').attr('d', map._minimapPath).attr('fill', '#e0e0e0')
 
         // Highlight selected country
         if (countryId) {
             const target = geometries.find((d) => d.properties.id === countryId)
-            globe.append('path').datum(target).attr('d', path).attr('fill', color).attr('stroke', color).attr('stroke-width', 0.5)
+            map._minimapGlobe
+                .append('path')
+                .datum(target)
+                .attr('d', map._minimapPath)
+                .attr('fill', color)
+                .attr('stroke', color)
+                .attr('stroke-width', 0.5)
         }
 
         // Draw outer circle
-        minimapContainer
+        map._minimapContainer
             .append('circle')
             .attr('r', size / 2)
             .attr('cx', 0)
