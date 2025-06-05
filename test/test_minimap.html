@@ -18,6 +18,7 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('minimap test')
+                .proj('3035')
                 .nutsLevel(1)
                 .nutsYear(2024)
                 .position({ x: 4400000, y: 3100000, z: 1400 })
@@ -28,6 +29,8 @@
                     y: 90,
                     z: 300,
                     countryId: 'DE',
+                    size: 120,
+                    debounce: 20,
                 })
                 .tooltip({ omitRegions: ['RU'] })
                 .onZoomEnd((e) => {

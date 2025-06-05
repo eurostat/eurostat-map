@@ -489,3 +489,11 @@ export const getLegendRegionsSelector = (map) => {
     if (map.geo_ === 'WORLD') return '#em-worldrg'
     return '#em-nutsrg, #em-cntrg'
 }
+
+// Helper function to calculate current view as bbox
+export const getCurrentBbox = function (map) {
+    const halfWidth = 0.5 * map.position_.z * map.width_
+    const halfHeight = 0.5 * map.position_.z * map.height_
+    const bbox = [map.position_.x - halfWidth, map.position_.y - halfHeight, map.position_.x + halfWidth, map.position_.y + halfHeight]
+    return bbox
+}

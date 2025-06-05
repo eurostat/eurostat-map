@@ -1,9 +1,8 @@
-import { zoom, zoomIdentity } from 'd3-zoom'
 import { select, selectAll } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
-import { getBBOXAsGeoJSON, executeForAllInsets, getFontSizeFromClass, getParameterByName, convertRectanglesToPaths } from './utils'
+import { getBBOXAsGeoJSON, executeForAllInsets, getFontSizeFromClass, getParameterByName, convertRectanglesToPaths, getCurrentBbox } from './utils'
 import { appendAnnotations } from './annotations'
 import { addLabelsToMap, updateLabels, updateValuesLabels } from './labels'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -12,6 +11,7 @@ import { buildInsets, removeInsets } from './insets'
 import { appendStamp } from './stamps'
 import { buildGridCartogramBase } from './cartograms'
 import { appendMinimap } from './minimaps'
+import { defineMapZoom } from './zoom'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -573,7 +573,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
             // d3 zoom
             if (out.zoomExtent()) {
-                defineMapZoom()
+                defineMapZoom(out)
             }
 
             if (out.backgroundMap_) {
@@ -775,259 +775,15 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         } else {
             // For non-WORLD geo, use custom or default identity projection with calculated bounding box
             out._projection =
-                out.projectionFunction_ || geoIdentity().reflectY(true).fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox()))
+                out.projectionFunction_ ||
+                geoIdentity()
+                    .reflectY(true)
+                    .fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox(out)))
         }
-    }
-
-    // Helper function to calculate current view as bbox
-    const getCurrentBbox = function () {
-        const halfWidth = 0.5 * out.position_.z * out.width_
-        const halfHeight = 0.5 * out.position_.z * out.height_
-        const bbox = [out.position_.x - halfWidth, out.position_.y - halfHeight, out.position_.x + halfWidth, out.position_.y + halfHeight]
-        return bbox
     }
 
     const definePathFunction = function () {
         out._pathFunction = geoPath().projection(out._projection)
-    }
-
-    const defineMapZoom = function () {
-        let svg = select('#' + out.svgId())
-        let previousT = zoomIdentity
-        const xoo = zoom()
-            .scaleExtent(out.zoomExtent())
-            .on('zoom', function (e) {
-                const t = e.transform
-                if (t.k !== previousT.k) {
-                    zoomHandler(e, previousT)
-                } else {
-                    panHandler(e)
-                }
-
-                // apply default transform to map
-                const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-                zoomGroup.attr('transform', t)
-                previousT = t
-            })
-            .on('end', function (e) {
-                if (out.onZoomEnd_) {
-                    out.onZoomEnd_(e, out)
-                }
-            })
-
-        svg.call(xoo)
-    }
-
-    // Pan handler function
-    const panHandler = function (event, previousT) {
-        const transform = event.transform
-
-        // Compute the projected center
-        const centerX = (out.width_ / 2 - transform.x) / transform.k
-        const centerY = (out.height_ / 2 - transform.y) / transform.k
-        let [geoX, geoY] = out._projection.invert([centerX, centerY])
-
-        // Clamp geoX and geoY to max bounds and adjust the event transform
-        if (out.maxBounds_.xMin !== undefined && geoX < out.maxBounds_.xMin) {
-            geoX = out.maxBounds_.xMin
-            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
-        }
-        if (out.maxBounds_.yMin !== undefined && geoY < out.maxBounds_.yMin) {
-            geoY = out.maxBounds_.yMin
-            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
-        }
-        if (out.maxBounds_.xMax !== undefined && geoX > out.maxBounds_.xMax) {
-            geoX = out.maxBounds_.xMax
-            transform.x = out.width_ / 2 - out._projection([geoX, geoY])[0] * transform.k
-        }
-        if (out.maxBounds_.yMax !== undefined && geoY > out.maxBounds_.yMax) {
-            geoY = out.maxBounds_.yMax
-            transform.y = out.height_ / 2 - out._projection([geoX, geoY])[1] * transform.k
-        }
-
-        // set new position
-        out.position_.x = geoX
-        out.position_.y = geoY
-
-        //emit custom event with new position
-        window.dispatchEvent(
-            new CustomEvent('estatmap:zoomed', {
-                detail: out,
-            })
-        )
-    }
-
-    /**
-     * @description get the current view's metres per pixel, based on a zoomFactor
-     * @param {number} zoomFactor this zoom / previous zoom
-     * @return {number}
-     */
-    const getMetresPerPixel = function (zoomFactor) {
-        // Get current bounding box width in meters
-        const bbox = getCurrentBbox()
-        const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
-
-        // Calculate meters per pixel
-        const metersPerPixel = bboxWidth / (out.width_ * zoomFactor)
-
-        return metersPerPixel
-    }
-
-    // Zoom handler function
-    const zoomHandler = function (event, previousT) {
-        const transform = event.transform
-        // Compute the projected center
-        const centerX = (out.width_ / 2 - transform.x) / transform.k
-        const centerY = (out.height_ / 2 - transform.y) / transform.k
-
-        // Use the projection to get the projected center in EPSG:3035
-        const [projectedX, projectedY] = out._projection.invert([centerX, centerY])
-
-        // set new position
-        out.position_.x = projectedX
-        out.position_.y = projectedY
-        out.position_.z = getMetresPerPixel(transform.k / previousT.k)
-
-        // adjust stroke dynamically according to zoom
-        scaleStrokeWidths(transform)
-
-        // adjust stroke dynamically according to zoom
-        if (out.labels_?.values) scaleLabelTexts(transform)
-
-        // adjust stroke dynamically according to zoom
-        if (out.labels_?.backgrounds) scaleLabelBackgrounds(transform)
-
-        //emit custom event with map object
-        window.dispatchEvent(new CustomEvent('estatmap:zoomed', { detail: out }))
-    }
-
-    /**
-     * @description adjusts text elements dynamically according to zoom
-     * @param {*} transform
-     */
-    const scaleLabelBackgrounds = function (transform) {
-        const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-        const elements = zoomGroup.selectAll('.em-label-background')
-        const zoomFactor = transform.k
-        const updates = []
-
-        elements.each(function () {
-            const element = select(this)
-            // Get the original width, height, x, and y from data attributes or current attributes
-            const originalWidth = parseFloat(element.attr('data-width')) || parseFloat(element.attr('width'))
-            const originalHeight = parseFloat(element.attr('data-height')) || parseFloat(element.attr('height'))
-            const originalX = parseFloat(element.attr('data-x')) || parseFloat(element.attr('x'))
-            const originalY = parseFloat(element.attr('data-y')) || parseFloat(element.attr('y'))
-
-            // Only process elements that have valid width, height, x, and y
-            if (originalWidth > 0 && originalHeight > 0 && !isNaN(originalX) && !isNaN(originalY)) {
-                // Store the original width, height, x, and y for the first time if not already stored
-                if (!element.attr('data-width')) {
-                    element.attr('data-width', originalWidth)
-                    element.attr('data-height', originalHeight)
-                    element.attr('data-x', originalX)
-                    element.attr('data-y', originalY)
-                }
-
-                // Calculate the target width, height, x, and y based on zoom factor (inverse scaling)
-                const targetWidth = originalWidth * (1 / zoomFactor) // Inverse scaling
-                const targetHeight = originalHeight * (1 / zoomFactor) // Inverse scaling
-                const targetX = originalX * (1 / zoomFactor) // Adjust x position
-                const targetY = originalY * (1 / zoomFactor) // Adjust y position
-
-                // Add the style change to a batch array
-                updates.push({ element, targetWidth, targetHeight, targetX, targetY })
-            }
-        })
-
-        // Apply all style changes at once
-        updates.forEach(({ element, targetWidth, targetHeight, targetX, targetY }) => {
-            element.attr('width', targetWidth).attr('height', targetHeight).attr('x', targetX).attr('y', targetY)
-        })
-    }
-    /**
-     * @description adjusts text elements dynamically according to zoom
-     * @param {*} transform
-     */
-    const scaleLabelTexts = function (transform) {
-        const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-        const labels = zoomGroup.select('#em-labels')
-        const elements = labels.selectAll('*') // Select all labels
-        const zoomFactor = transform.k
-        const updates = []
-
-        elements.each(function () {
-            const element = select(this)
-            const computedStyle = window.getComputedStyle(this)
-
-            // Get font-size from inline or computed style
-            const inlineFontSize = element.attr('font-size')
-            const cssFontSize = computedStyle.fontSize
-            const fontSize = inlineFontSize || cssFontSize
-
-            // Only process elements that have a font size defined
-            if (fontSize && parseFloat(fontSize) > 0) {
-                const originalFontSize = parseFloat(element.attr('data-fs')) || parseFloat(inlineFontSize) || parseFloat(cssFontSize)
-
-                // Store the original font size for the first time
-                if (!element.attr('data-fs')) {
-                    element.attr('data-fs', originalFontSize)
-                }
-
-                // Calculate the target font size based on zoom factor
-                const targetFontSize = originalFontSize / zoomFactor
-
-                // Add the style change to a batch array
-                updates.push({ element: this, targetFontSize })
-            }
-        })
-
-        // Apply all style changes at once
-        updates.forEach(({ element, targetFontSize }) => {
-            element.style.setProperty('font-size', `${targetFontSize}px`, 'important')
-        })
-    }
-
-    /**
-     * @description adjusts all stroke-widths dynamically according to zoom
-     * @param {*} transform
-     */
-    const scaleStrokeWidths = function (transform) {
-        const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
-        const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
-        const zoomFactor = transform.k
-        const updates = []
-
-        elements.each(function () {
-            const element = select(this)
-            const computedStyle = window.getComputedStyle(this)
-
-            // Get stroke-width from inline or computed style
-            const inlineStrokeWidth = element.attr('stroke-width')
-            const cssStrokeWidth = computedStyle.strokeWidth
-            const strokeWidth = inlineStrokeWidth || cssStrokeWidth
-
-            // Only process elements that have a stroke width defined
-            if (strokeWidth && parseFloat(strokeWidth) > 0) {
-                const originalStrokeWidth = parseFloat(element.attr('data-sw')) || parseFloat(inlineStrokeWidth) || parseFloat(cssStrokeWidth)
-
-                // Store the original stroke width for the first time
-                if (!element.attr('data-sw')) {
-                    element.attr('data-sw', originalStrokeWidth)
-                }
-
-                // Calculate the target stroke width
-                const targetStrokeWidth = originalStrokeWidth / zoomFactor
-
-                // Add the style change to a batch array
-                updates.push({ element: this, targetStrokeWidth })
-            }
-        })
-
-        // Apply all style changes at once
-        updates.forEach(({ element, targetStrokeWidth }) => {
-            element.style.setProperty('stroke-width', `${targetStrokeWidth}px`, 'important')
-        })
     }
 
     /** Get x,y,z elements from URL and assign them to the view. */
