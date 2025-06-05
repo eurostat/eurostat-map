@@ -78,7 +78,7 @@ const panHandler = function (event, map) {
  * @param {number} zoomFactor this zoom / previous zoom
  * @return {number}
  */
-const getMetresPerPixel = function (zoomFactor) {
+const getMetresPerPixel = function (zoomFactor, map) {
     // Get current bounding box width in meters
     const bbox = getCurrentBbox(map)
     const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
@@ -102,7 +102,7 @@ const zoomHandler = function (event, previousT, map) {
     // set new position
     map.position_.x = projectedX
     map.position_.y = projectedY
-    map.position_.z = getMetresPerPixel(transform.k / previousT.k)
+    map.position_.z = getMetresPerPixel(transform.k / previousT.k, map)
 
     // adjust stroke dynamically according to zoom
     scaleStrokeWidths(transform, map)

@@ -26,7 +26,7 @@
                 //.scale('60M')
                 .legend({
                     //rotation: -45,
-                    boxOpacity:0,
+                    boxOpacity: 0,
                     squareSize: 100,
                     label1: 'Inhabitants per km²',
                     label2: '% unemployed',
@@ -36,6 +36,7 @@
                     x: 0,
                     y: 150,
                 })
+                .zoomExtent([1, 100])
                 .drawGraticule(false)
                 .seaFillStyle('#d3dee8')
                 .build()
