@@ -30,6 +30,9 @@
                     countryId: 'DE',
                 })
                 .tooltip({ omitRegions: ['RU'] })
+                .onZoomEnd((e) => {
+                    console.log('Zoom ended', e)
+                })
                 .build()
         </script>
     </body>

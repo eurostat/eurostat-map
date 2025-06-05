@@ -34,6 +34,7 @@ export const appendMinimap = (map) => {
     }
 
     // Listen for zoom/pan events to update the minimap dynamically
+    const debounceTime = map.minimap_?.debounce || 1 // Use minimap config or default to 300ms
     window.addEventListener(
         'estatmap:zoomed',
         debounce((event) => {
@@ -44,8 +45,8 @@ export const appendMinimap = (map) => {
             if (!result) return
             const { lat, lon } = result
 
-            // Convert the main map zoom (EPSG:3035 scale) to the minimap zoom scale
-            const minimapZoom = convertMainMapZoomToMinimap(map) // Example minimap width = 160
+            // Convert the main map zoom to the minimap zoom scale
+            const minimapZoom = convertMainMapZoomToMinimap(map)
 
             // Update the minimap projection with the new center
             projection.rotate([-lon, -lat])
@@ -53,7 +54,7 @@ export const appendMinimap = (map) => {
 
             // Update the minimap globe view with the new projection
             globe.selectAll('path').attr('d', path)
-        }, 1) // Debounce delay: 300ms (adjust as needed)
+        }, debounceTime) // Debounce delay (adjust as needed)
     )
 }
 

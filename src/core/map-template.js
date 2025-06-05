@@ -136,6 +136,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     //style for no data regions
     out.noDataFillStyle_ = '#bcbcbc'
 
+    //event handlers
+    out.onZoomEnd_ = undefined // user function to call when zoom ends
+
     /**
      * Insets.
      * The map template has a recursive structure.
@@ -145,7 +148,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.insets_ = []
     //inset templates - each inset is a map-template instance.
     out.insetTemplates_ = {}
-
     out.insetBoxPosition_ = undefined
     out.insetBoxPadding_ = 5
     out.insetBoxWidth_ = 210
@@ -806,6 +808,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
                 zoomGroup.attr('transform', t)
                 previousT = t
+            })
+            .on('end', function (e) {
+                if (out.onZoomEnd_) {
+                    out.onZoomEnd_(e, out)
+                }
             })
 
         svg.call(xoo)
