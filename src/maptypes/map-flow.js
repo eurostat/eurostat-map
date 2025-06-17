@@ -30,6 +30,7 @@ export const map = function (config) {
     out.flowOutlines_ = true
     out.flowTargetOffset_ = 1 // Default to normal offset behavior
     out.flowGradient_ = true
+    out.flowStack_ = false // Default to no stacking
 
     /**
      * flowmap-specific setters/getters
@@ -98,6 +99,14 @@ export const map = function (config) {
         addCoordinatesToGraph(graph)
 
         var { nodes, links } = sankey(graph)
+
+        if (!out.flowStack_) {
+            // Collapse all links at origin Y (or middle of the node height)
+            links.forEach((link) => {
+                const midY = (link.source.y0 + link.source.y1) / 2
+                link.y0 = midY
+            })
+        }
 
         // Define marker and gradient IDs
         const defs = svg.append('defs')
@@ -201,7 +210,6 @@ export const map = function (config) {
                 node.y = screenCoords[1]
             }
         })
-        console.log(graph)
     }
 
     /**
@@ -274,8 +282,8 @@ export const map = function (config) {
      */
     function addSankeyFlows(svg, links, arrowId, arrowOutlineId, gradientIds) {
         const flowsGroup = svg.append('g').attr('class', 'em-flows-group')
-        const flows = flowsGroup.append('g').attr('class', 'em-flow-flows')
         const outlines = flowsGroup.append('g').attr('class', 'em-flow-outlines')
+        const flows = flowsGroup.append('g').attr('class', 'em-flow-flows')
 
         links.forEach((link, i) => {
             // Outline path
@@ -286,7 +294,7 @@ export const map = function (config) {
                     .attr('fill', 'none')
                     .attr('stroke', '#ffffff')
                     .attr('class', 'em-flow-link-outline')
-                    // .attr('stroke-width', link.width + 1.5)
+                    .attr('stroke-width', link.width + 1.5)
                     .attr('marker-end', `url(#${arrowOutlineId})`)
             }
 
@@ -561,31 +569,6 @@ export const map = function (config) {
             for (const link of node.targetLinks) {
                 link.y1 = y1 + link.width / 2
                 y1 += link.width
-            }
-        }
-    }
-
-    // Group nodes by depth and stack vertically
-    function stackNodeYs(nodes) {
-        const byDepth = new Map()
-        for (const node of nodes) {
-            if (!byDepth.has(node.depth)) byDepth.set(node.depth, [])
-            byDepth.get(node.depth).push(node)
-        }
-
-        for (const [depth, group] of byDepth.entries()) {
-            // Sort by value or id to ensure consistency
-            group.sort((a, b) => b.value - a.value)
-
-            let y = 100 // starting y position
-            const padding = 5
-            for (const node of group) {
-                const nodeHeight = Math.max(
-                    sum(node.sourceLinks, (d) => d.width),
-                    sum(node.targetLinks, (d) => d.width)
-                )
-                node.y = y + nodeHeight / 2
-                y += nodeHeight + padding
             }
         }
     }

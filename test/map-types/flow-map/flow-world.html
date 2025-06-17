@@ -51,42 +51,46 @@
             const map = eurostatmap
                 .map('flow')
                 .geo('world')
-                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(100).translate([260, 210]))
+                .width(900)
+                .height(700)
+                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(180).translate([370, 340]))
                 .title('Flow map with geoAzimuthalEquidistant projection')
                 .subtitle('test')
                 .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
                 .flowColor('#72bb6f')
                 .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+                .flowOutlines(true)
+                .flowMaxWidth(20)
                 .nutsLevel(0)
                 .zoomExtent([0.5, 10])
                 .build()
 
-                // const map2 = eurostatmap
-                // .map('flow')
-                // .geo('world')
-                // .svgId('map2')
-                // .projectionFunction(d3.geoAzimuthalEqualArea().rotate([-10, -30]).scale(130).translate([260, 220]))
-                // .title('Flow map with geoAzimuthalEqualArea projection')
-                // .subtitle('test')
-                // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
-                // .flowColor('#72bb6f')
-                // .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                // .nutsLevel(0)
-                // .zoomExtent([0.5, 10])
-                // .build()
+            // const map2 = eurostatmap
+            // .map('flow')
+            // .geo('world')
+            // .svgId('map2')
+            // .projectionFunction(d3.geoAzimuthalEqualArea().rotate([-10, -30]).scale(130).translate([260, 220]))
+            // .title('Flow map with geoAzimuthalEqualArea projection')
+            // .subtitle('test')
+            // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
+            // .flowColor('#72bb6f')
+            // .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+            // .nutsLevel(0)
+            // .zoomExtent([0.5, 10])
+            // .build()
 
-                // const map3 = eurostatmap
-                // .map('flow')
-                // .svgId('map3')
-                // .geo('world')
-                // .title('Flow map with Robinson projection')
-                // .subtitle('test')
-                // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
-                // .flowColor('#72bb6f')
-                // .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                // .nutsLevel(0)
-                // .zoomExtent([0.5, 10])
-                // .build()
+            // const map3 = eurostatmap
+            // .map('flow')
+            // .svgId('map3')
+            // .geo('world')
+            // .title('Flow map with Robinson projection')
+            // .subtitle('test')
+            // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
+            // .flowColor('#72bb6f')
+            // .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+            // .nutsLevel(0)
+            // .zoomExtent([0.5, 10])
+            // .build()
         </script>
     </body>
 </html>

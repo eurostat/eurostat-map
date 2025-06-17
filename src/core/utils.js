@@ -217,7 +217,9 @@ export const spaceAsThousandSeparator = function (number) {
 }
 
 //REST API
-export const getEstatRestDataURLBase = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/'
+export const getEstatRestDataURLBase = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/' //the different dataswag endpoints are appended to this base URL
+
+// This function builds a URL to fetch data from the Eurobase REST API.
 
 /**
  * Build URL to fetch data from eurobase REST API.
