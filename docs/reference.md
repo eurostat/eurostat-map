@@ -1,47 +1,47 @@
 # API reference
 
 - [API reference](#api-reference)
-  - [Map creation](#map-creation)
-    - [Map definition](#map-definition)
-    - [Map geography](#map-geography)
-      - [World maps](#world-maps)
-      - [Custom geometries](#custom-geometries)
-    - [Statistical data](#statistical-data)
-      - [Eurostat database](#eurostat-database)
-      - [CSV](#csv)
-      - [Custom JS](#custom-js)
-  - [Map types](#map-types)
-    - [Choropleth map](#choropleth-map)
-      - [Choropleth legends](#choropleth-legends)
-    - [Proportional symbol map](#proportional-symbol-map)
-      - [Proportional symbol legends](#proportional-symbol-legends)
-    - [Proportional pie chart map](#proportional-pie-chart-map)
-    - [Categorical map](#categorical-map)
-    - [Bivariate choropleth map](#bivariate-choropleth-map)
-      - [Bivariate choropleth legends](#bivariate-choropleth-legends)
-    - [Stripe composition map](#stripe-composition-map)
-    - [Sparkline map](#sparkline-map)
-    - [Flow map](#flow-map)
-    - [Cartograms](#cartograms)
-      - [Grid Cartograms](#grid-cartograms)
-      - [Dorling Cartograms](#dorling-cartograms)
-  - [Map texts](#map-texts)
-    - [Map title \& subtitle](#map-title--subtitle)
-    - [Labelling](#labelling)
-    - [Annotations](#annotations)
-    - [Stamps](#stamps)
-    - [Footnotes](#footnotes)
-  - [Map legend](#map-legend)
-  - [Scalebar](#scalebar)
-  - [Tooltip](#tooltip)
-  - [Styling](#styling)
-  - [Insets](#insets)
-  - [Minimap](#minimap)
-  - [Buttons](#buttons)
-  - [Export](#export)
-  - [Miscellaneous](#miscellaneous)
-  - [Build and update](#build-and-update)
-  - [Version migration](#version-migration)
+    - [Map creation](#map-creation)
+        - [Map definition](#map-definition)
+        - [Map geography](#map-geography)
+            - [World maps](#world-maps)
+            - [Custom geometries](#custom-geometries)
+        - [Statistical data](#statistical-data)
+            - [Eurostat database](#eurostat-database)
+            - [CSV](#csv)
+            - [Custom JS](#custom-js)
+    - [Map types](#map-types)
+        - [Choropleth map](#choropleth-map)
+            - [Choropleth legends](#choropleth-legends)
+        - [Proportional symbol map](#proportional-symbol-map)
+            - [Proportional symbol legends](#proportional-symbol-legends)
+        - [Proportional pie chart map](#proportional-pie-chart-map)
+        - [Categorical map](#categorical-map)
+        - [Bivariate choropleth map](#bivariate-choropleth-map)
+            - [Bivariate choropleth legends](#bivariate-choropleth-legends)
+        - [Stripe composition map](#stripe-composition-map)
+        - [Sparkline map](#sparkline-map)
+        - [Flow map](#flow-map)
+        - [Cartograms](#cartograms)
+            - [Grid Cartograms](#grid-cartograms)
+            - [Dorling Cartograms](#dorling-cartograms)
+    - [Map texts](#map-texts)
+        - [Map title \& subtitle](#map-title--subtitle)
+        - [Labelling](#labelling)
+        - [Annotations](#annotations)
+        - [Stamps](#stamps)
+        - [Footnotes](#footnotes)
+    - [Map legend](#map-legend)
+    - [Scalebar](#scalebar)
+    - [Tooltip](#tooltip)
+    - [Styling](#styling)
+    - [Insets](#insets)
+    - [Minimap](#minimap)
+    - [Buttons](#buttons)
+    - [Export](#export)
+    - [Miscellaneous](#miscellaneous)
+    - [Build and update](#build-and-update)
+    - [Version migration](#version-migration)
 
 ## Map creation
 
@@ -767,7 +767,13 @@ const map = eurostatmap
     .flowGraph(exampleGraph)
     .nutsLevel(0)
     .flowColor('#72bb6f')
-    .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+    .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
+    .flowArrows(false)
+    .flowOutlines(true)
+    .flowGradient(true)
+    .flowMaxWidth(40)
+    .flowMinWidth(1)
+
     .build()
 ```
 
@@ -777,6 +783,10 @@ const map = eurostatmap
 | _map_.**flowColor**([*value*])         | String  | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
 | _map_.**flowOverlayColors**([*value*]) | array   | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
 | _map_.**flowArrows**([*value*])        | boolean | true                   | Whether to show arrow tips or not.                                                                                         |
+| _map_.**flowOutlines**([*value*])      | boolean | true                   | Whether to show flow outlines or not.                                                                                      |
+| _map_.**flowGradient**([*value*])      | boolean | true                   | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
+| _map_.**flowMaxWidth**([*value*])      | number  | 30                     | Maximum width of flow lines in px                                                                                          |
+| _map_.**flowMinWidth**([*value*])      | number  | 1                      | Minimum width of flow lines in px                                                                                          |
 
 ### Cartograms
 

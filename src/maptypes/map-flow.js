@@ -28,30 +28,21 @@ export const map = function (config) {
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
     out.flowOutlines_ = true
-    out.flowTargetOffset_ = 1 // Default to normal offset behavior
     out.flowGradient_ = true
     out.flowStack_ = false // Default to no stacking
 
     /**
      * flowmap-specific setters/getters
      */
-    ;[
-        'flowGraph_',
-        'flowColor_',
-        'flowOverlayColors_',
-        'flowArrows_',
-        'flowTargetOffset_',
-        'flowMaxWidth_',
-        'flowMinWidth_',
-        'flowOutlines_',
-        'flowGradient_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
+    ;['flowGraph_', 'flowColor_', 'flowOverlayColors_', 'flowArrows_', 'flowMaxWidth_', 'flowMinWidth_', 'flowOutlines_', 'flowGradient_'].forEach(
+        function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
         }
-    })
+    )
 
     //@override
     out.updateStyle = function () {
