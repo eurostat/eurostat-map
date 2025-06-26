@@ -120,6 +120,7 @@ const drawMinimap = (map) => {
             lon = coords[0]
             lat = coords[1]
         } else {
+            // center on the main map's center
             const center = getMapCenterLatLon(map)
             if (!center) return
             lat = center.lat

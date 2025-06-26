@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { scaleQuantile } from 'd3-scale'
+import { scaleQuantile, scaleThreshold } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
@@ -28,6 +28,9 @@ export const map = function (config) {
     //the classifier: a function which return a class number from a stat value.
     out.classifier1_ = undefined
     out.classifier2_ = undefined
+    // user defined breaks for the first and second variable.
+    out.breaks1_ = undefined
+    out.breaks2_ = undefined
 
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunBiv
@@ -41,6 +44,8 @@ export const map = function (config) {
      */
     ;[
         'numberOfClasses_',
+        'breaks1_',
+        'breaks2_',
         'startColor_',
         'color1_',
         'color2_',
@@ -83,11 +88,27 @@ export const map = function (config) {
             let stat2 = out.statData('v2').getArray()
 
             const range = [...Array(out.numberOfClasses()).keys()]
-            if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
-            if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
 
-            //define bivariate scale
-            if (!out.classToFillStyle()) {
+            // classifier1
+            if (!out.classifier1_) {
+                if (out.breaks1_) {
+                    out.classifier1(scaleThreshold().domain(out.breaks1_).range(range))
+                } else {
+                    out.classifier1(scaleQuantile().domain(stat1).range(range))
+                }
+            }
+
+            // classifier2
+            if (!out.classifier2_) {
+                if (out.breaks2_) {
+                    out.classifier2(scaleThreshold().domain(out.breaks2_).range(range))
+                } else {
+                    out.classifier2(scaleQuantile().domain(stat2).range(range))
+                }
+            }
+
+            // define bivariate color scale
+            if (!out.classToFillStyle_) {
                 const scale = scaleBivariate(out.numberOfClasses(), out.startColor(), out.color1(), out.color2(), out.endColor())
                 out.classToFillStyle(scale)
             }
@@ -168,7 +189,7 @@ export const map = function (config) {
                     const ecl2 = select(this).attr('ecl2')
                     if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
                     if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
-                    let color = out.classToFillStyle()(+ecl1, +ecl2)
+                    let color = out.classToFillStyle_(+ecl1, +ecl2)
                     return color
                 })
                 .end()

@@ -24,14 +24,17 @@
                 })
                 //.insets('default')
                 //.scale('60M')
+
+                .breaks1([100, 200])
+                .breaks2([5, 10])
                 .legend({
                     //rotation: -45,
                     boxOpacity: 0,
                     squareSize: 100,
                     label1: 'Inhabitants per km²',
                     label2: '% unemployed',
-                    // breaks1: [1, 2, 3],
-                    // breaks2: [1, 2, 3],
+                    breaks1: [100, 200],
+                    breaks2: [5, 10],
                     showBreaks: true,
                     x: 0,
                     y: 150,

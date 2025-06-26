@@ -94,12 +94,23 @@ export const legend = function (map, config) {
         addSquares()
 
         // set breaks if user hasnt defined them but has enabled them
+        // set breaks if user hasn't defined them but has enabled them
         if (!out.breaks1 && !out.breaks2 && out.showBreaks) {
-            // Get quantiles for the first variable (X axis) and truncate to one decimal place
-            out.breaks1 = map.classifier1_.quantiles().map((value) => parseFloat(value.toFixed(0)))
+            // Extract breaks from classifier1_
+            const c1 = map.classifier1_
+            if (typeof c1.quantiles === 'function') {
+                out.breaks1 = c1.quantiles().map((d) => parseFloat(d.toFixed(0)))
+            } else if (c1.domain) {
+                out.breaks1 = c1.domain().map((d) => parseFloat(d.toFixed(0)))
+            }
 
-            // Get quantiles for the second variable (Y axis) and truncate to one decimal place
-            out.breaks2 = map.classifier2_.quantiles().map((value) => parseFloat(value.toFixed(0)))
+            // Extract breaks from classifier2_
+            const c2 = map.classifier2_
+            if (typeof c2.quantiles === 'function') {
+                out.breaks2 = c2.quantiles().map((d) => parseFloat(d.toFixed(0)))
+            } else if (c2.domain) {
+                out.breaks2 = c2.domain().map((d) => parseFloat(d.toFixed(0)))
+            }
         }
 
         // Draw breaks labels 1 (X axis)
