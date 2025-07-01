@@ -22,11 +22,8 @@
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
                 .colorSchemeType('continuous')
-                //.classificationMethod('ckmeans')
-                //.numberOfClasses(6)
-                .colorFunction(d3.interpolateBlues)
-                //.threshold([-45, -35, -30, -25, -20])
-                //.colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .colorFunction(d3.interpolatePurples)
+                .valueTransform(Math.sqrt) // for distribution stretching in continuous mode
                 .nutsLevel(2)
                 .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, lowLabel: 'Low', highLabel: 'High' })
                 .drawCoastalMargin(false)

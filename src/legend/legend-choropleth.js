@@ -235,6 +235,18 @@ export const legend = function (map, config) {
                 .attr('width', out.shapeWidth)
                 .attr('height', out.shapeHeight)
                 .style('fill', m.noDataFillStyle_)
+                .on('mouseover', function () {
+                    highlightRegions(out.map, 'nd')
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
+                    }
+                })
+                .on('mouseout', function () {
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
+                    }
+                })
 
             lgg.append('text')
                 .attr('class', 'em-legend-label')

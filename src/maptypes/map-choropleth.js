@@ -38,7 +38,9 @@ export const map = function (config) {
     out.classifier_ = undefined
     // set tooltip function
     out.tooltip_.textFunction = choroplethTooltipFunction
+    // continuous
     out.colorSchemeType_ = 'discrete' // or 'continuous'
+    out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -58,6 +60,7 @@ export const map = function (config) {
         'classifier_',
         'colors_',
         'colorSchemeType_',
+        'valueTransform_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -135,8 +138,9 @@ export const map = function (config) {
             const range = generateRange(out.numberOfClasses_)
 
             if (out.colorSchemeType_ === 'continuous') {
-                const minVal = min(dataArray)
-                const maxVal = max(dataArray)
+                const transformedValues = dataArray.map(out.valueTransform_)
+                const minVal = min(transformedValues)
+                const maxVal = max(transformedValues)
 
                 out.classifier(function (val) {
                     return val // direct value
@@ -340,10 +344,13 @@ export const map = function (config) {
 
         // Continuous color scheme
         if (colorSchemeType === 'continuous') {
-            const value = +ecl
-            if (isNaN(value)) return out.noDataFillStyle?.() || 'gray'
-            const colorFn = getColorFunction(out.colorFunction_, null, 'continuous')
-            return colorFn(value, out.domain_ || [0, 1])
+            const rawValue = +ecl
+            if (isNaN(rawValue)) return out.noDataFillStyle?.() || 'gray'
+
+            const transformed = out.valueTransform_(rawValue)
+            const domain = out.domain_ || [0, 1]
+            const t = (transformed - domain[0]) / (domain[1] - domain[0])
+            return out.colorFunction_(Math.min(Math.max(t, 0), 1))
         }
 
         // Discrete color scheme
