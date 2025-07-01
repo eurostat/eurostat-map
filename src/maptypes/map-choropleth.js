@@ -41,6 +41,7 @@ export const map = function (config) {
     // continuous
     out.colorSchemeType_ = 'discrete' // or 'continuous'
     out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
+    out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -61,6 +62,7 @@ export const map = function (config) {
         'colors_',
         'colorSchemeType_',
         'valueTransform_',
+        'valueUntransform_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -349,7 +351,8 @@ export const map = function (config) {
 
             const transformed = out.valueTransform_(rawValue)
             const domain = out.domain_ || [0, 1]
-            const t = (transformed - domain[0]) / (domain[1] - domain[0])
+            const normalize = (x, domain) => (x - domain[0]) / (domain[1] - domain[0])
+            const t = normalize(transformed, domain)
             return out.colorFunction_(Math.min(Math.max(t, 0), 1))
         }
 

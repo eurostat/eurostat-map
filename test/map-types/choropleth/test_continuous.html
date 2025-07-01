@@ -24,8 +24,18 @@
                 .colorSchemeType('continuous')
                 .colorFunction(d3.interpolatePurples)
                 .valueTransform(Math.sqrt) // for distribution stretching in continuous mode
+                .valueUntransform((x) => x * x) // the legends need to 'untransform' the value to show the original value
                 .nutsLevel(2)
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, lowLabel: 'Low', highLabel: 'High' })
+                .legend({
+                    x: 10,
+                    y: 120,
+                    width: 200,
+                    //continuousTickValues: [100, 300],
+                    title: 'Test',
+                    boxOpacity: 0,
+                    lowLabel: 'Low',
+                    highLabel: 'High',
+                })
                 .drawCoastalMargin(false)
                 .insets('default')
                 .zoomExtent([1, 10])

@@ -47,6 +47,7 @@ export const legend = function (map, config) {
     //continuous legend
     out.lowLabel = undefined //'Low'
     out.highLabel = undefined //'High'
+    out.continuousTicks = 5 // Number of tick marks on continuous color legend (set to 0 to disable)
 
     //show no data
     out.noData = true
@@ -176,7 +177,7 @@ export const legend = function (map, config) {
             return m.colorFunction_(Math.min(Math.max(t, 0), 1))
         }
         const gradientId = 'legend-gradient-' + Math.random().toString(36).substr(2, 5)
-        const legendWidth = out.shapeWidth * 6
+        const legendWidth = out.width || out.shapeWidth * 6
         const legendHeight = out.shapeHeight
         const decimalFormatter = format(`.${out.decimals}f`)
         let baseY = out.boxPadding
@@ -207,23 +208,58 @@ export const legend = function (map, config) {
             .attr('height', legendHeight)
             .style('fill', `url(#${gradientId})`)
 
-        //low/high labels
-        const lowLabel = out.lowLabel ?? decimalFormatter(domain[0])
-        const highLabel = out.highLabel ?? decimalFormatter(domain[1])
+        if (out.continuousTicks > 1) {
+            //ticks
+            const tickGroup = lgg.append('g').attr('class', 'em-legend-ticks')
+            const tickFormatter = out.labelFormatter || decimalFormatter
 
-        lgg.append('text')
-            .attr('class', 'em-legend-label em-legend-label-low')
-            .attr('x', out.boxPadding)
-            .attr('y', baseY + legendHeight + 15)
-            .attr('text-anchor', 'start')
-            .text(lowLabel)
+            const ticks =
+                Array.isArray(out.continuousTickValues) && out.continuousTickValues.length > 0
+                    ? out.continuousTickValues
+                    : Array.from({ length: out.continuousTicks }, (_, i) => domain[0] + (i / (out.continuousTicks - 1)) * (domain[1] - domain[0]))
 
-        lgg.append('text')
-            .attr('class', 'em-legend-label em-legend-label-high')
-            .attr('x', out.boxPadding + legendWidth)
-            .attr('y', baseY + legendHeight + 15)
-            .attr('text-anchor', 'end')
-            .text(highLabel)
+            ticks.forEach((val) => {
+                const t = (val - domain[0]) / (domain[1] - domain[0])
+                const x = out.boxPadding + t * legendWidth
+
+                // Tick line
+                tickGroup
+                    .append('line')
+                    .attr('class', 'em-legend-tick')
+                    .attr('x1', x)
+                    .attr('y1', baseY + legendHeight)
+                    .attr('x2', x)
+                    .attr('y2', baseY + legendHeight + 4)
+
+                // Tick label
+                tickGroup
+                    .append('text')
+                    .attr('class', 'em-legend-label')
+                    .attr('x', x)
+                    .attr('y', baseY + legendHeight + 15)
+                    .attr('dy', '0.35em')
+                    .attr('text-anchor', 'middle')
+                    .text(tickFormatter(m.valueUntransform_(val)))
+            })
+        } else {
+            //low/high labels
+            const lowLabel = out.lowLabel ?? decimalFormatter(domain[0])
+            const highLabel = out.highLabel ?? decimalFormatter(domain[1])
+
+            lgg.append('text')
+                .attr('class', 'em-legend-label em-legend-label-low')
+                .attr('x', out.boxPadding)
+                .attr('y', baseY + legendHeight + 15)
+                .attr('text-anchor', 'start')
+                .text(lowLabel)
+
+            lgg.append('text')
+                .attr('class', 'em-legend-label em-legend-label-high')
+                .attr('x', out.boxPadding + legendWidth)
+                .attr('y', baseY + legendHeight + 15)
+                .attr('text-anchor', 'end')
+                .text(highLabel)
+        }
 
         // Optional: 'No data' swatch
         if (out.noData) {
