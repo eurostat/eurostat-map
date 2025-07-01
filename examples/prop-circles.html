@@ -21,7 +21,7 @@
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
-                .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0 })
+                .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0, sizeLegend: { values: [3000000, 1000000, 100000] } })
                 .psShape('circle') // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
                 .dorling(true)
                 .insets(false)

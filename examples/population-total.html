@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+        <script>
+            eurostatmap
+                .map('proportionalSymbol')
+                .title('Total population')
+                .width(800)
+                .subtitle('2021')
+                .nutsLevel(0)
+                .psFill('#cc4c02')
+                .psMinSize(3)
+                .psMaxSize(45)
+                .stat({
+                    eurostatDatasetCode: 'demo_r_pjanaggr3',
+                    unitText: 'people',
+                    filters: {
+                        TIME: '2021',
+                        SEX: 'T', // Total
+                        AGE: 'TOTAL', // All ages
+                    },
+                })
+                .legend({ x: 530, y: 130, title: 'People', boxOpacity: 0, sizeLegend: { values: [85000000, 40000000, 5000000] } })
+                .build()
+        </script>
+    </body>
+</html>

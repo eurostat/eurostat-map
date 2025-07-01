@@ -171,6 +171,7 @@ export const legend = function (map, config) {
     function createContinuousLegend() {
         const m = out.map
         const lgg = out.lgg
+        const container = out.lgg.append('g').attr('class', 'em-continuous-legend')
         const domain = m.domain_ || [0, 1]
         const colorFn = (val) => {
             const t = (val - domain[0]) / (domain[1] - domain[0])
@@ -183,11 +184,11 @@ export const legend = function (map, config) {
         let baseY = out.boxPadding
 
         if (out.title) {
-            baseY += getFontSizeFromClass('em-legend-title') + 12 // title size + padding
+            baseY += getFontSizeFromClass('em-legend-title') + 10 // title size + padding
         }
 
         // Add defs for gradient
-        const defs = lgg.append('defs')
+        const defs = container.append('defs')
         const gradient = defs.append('linearGradient').attr('id', gradientId).attr('x1', '0%').attr('x2', '100%').attr('y1', '0%').attr('y2', '0%')
 
         // Create gradient stops
@@ -201,7 +202,8 @@ export const legend = function (map, config) {
         }
 
         // Append gradient rect
-        lgg.append('rect')
+        container
+            .append('rect')
             .attr('x', out.boxPadding)
             .attr('y', baseY)
             .attr('width', legendWidth)
@@ -210,7 +212,7 @@ export const legend = function (map, config) {
 
         if (out.continuousTicks > 1) {
             //ticks
-            const tickGroup = lgg.append('g').attr('class', 'em-legend-ticks')
+            const tickGroup = container.append('g').attr('class', 'em-legend-ticks')
             const tickFormatter = out.labelFormatter || decimalFormatter
 
             const ticks =
@@ -234,7 +236,7 @@ export const legend = function (map, config) {
                 // Tick label
                 tickGroup
                     .append('text')
-                    .attr('class', 'em-legend-label')
+                    .attr('class', 'em-legend-label em-legend-ticklabel')
                     .attr('x', x)
                     .attr('y', baseY + legendHeight + 15)
                     .attr('dy', '0.35em')
@@ -246,15 +248,17 @@ export const legend = function (map, config) {
             const lowLabel = out.lowLabel ?? decimalFormatter(domain[0])
             const highLabel = out.highLabel ?? decimalFormatter(domain[1])
 
-            lgg.append('text')
-                .attr('class', 'em-legend-label em-legend-label-low')
+            container
+                .append('text')
+                .attr('class', 'em-legend-label em-legend-ticklabel em-legend-label-low')
                 .attr('x', out.boxPadding)
                 .attr('y', baseY + legendHeight + 15)
                 .attr('text-anchor', 'start')
                 .text(lowLabel)
 
-            lgg.append('text')
-                .attr('class', 'em-legend-label em-legend-label-high')
+            container
+                .append('text')
+                .attr('class', 'em-legend-label em-legend-ticklabel em-legend-label-high')
                 .attr('x', out.boxPadding + legendWidth)
                 .attr('y', baseY + legendHeight + 15)
                 .attr('text-anchor', 'end')
@@ -263,8 +267,10 @@ export const legend = function (map, config) {
 
         // Optional: 'No data' swatch
         if (out.noData) {
+            const noDataGroup = out.lgg.append('g').attr('class', 'em-no-data-legend')
             const y = baseY + legendHeight + 30
-            lgg.append('rect')
+            noDataGroup
+                .append('rect')
                 .attr('class', 'em-legend-rect')
                 .attr('x', out.boxPadding)
                 .attr('y', y)
@@ -284,7 +290,8 @@ export const legend = function (map, config) {
                     }
                 })
 
-            lgg.append('text')
+            noDataGroup
+                .append('text')
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
                 .attr('y', y + out.shapeHeight / 2)
