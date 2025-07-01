@@ -38,6 +38,7 @@ export const map = function (config) {
     out.classifier_ = undefined
     // set tooltip function
     out.tooltip_.textFunction = choroplethTooltipFunction
+    out.colorSchemeType_ = 'discrete' // or 'continuous'
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -56,6 +57,7 @@ export const map = function (config) {
         'noDataFillStyle_',
         'classifier_',
         'colors_',
+        'colorSchemeType_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -75,7 +77,7 @@ export const map = function (config) {
             // if dot density
             out.classToFillStyle(getFillPatternLegend())
         } else {
-            out.classToFillStyle(getColorLegend(out.colorFunction(), out.colors_))
+            out.classToFillStyle(getColorFunction(out.colorFunction_, out.colors_))
         }
         return out
     }
@@ -126,13 +128,24 @@ export const map = function (config) {
     }
 
     function applyClassificationToMap(map) {
-        // Helper function to generate a range [0, 1, 2, ..., nb-1]
         const generateRange = (nb) => [...Array(nb).keys()]
+        const dataArray = out.statData().getArray()
 
-        // Configure classifier based on the selected classification method
         const setupClassifier = () => {
-            const dataArray = out.statData().getArray()
             const range = generateRange(out.numberOfClasses_)
+
+            if (out.colorSchemeType_ === 'continuous') {
+                const minVal = min(dataArray)
+                const maxVal = max(dataArray)
+
+                out.classifier(function (val) {
+                    return val // direct value
+                })
+
+                // store domain for continuous scaling
+                out.domain_ = [minVal, maxVal]
+                return
+            }
 
             switch (out.classificationMethod_) {
                 case 'quantile': {
@@ -155,45 +168,43 @@ export const map = function (config) {
                     break
                 }
                 case 'jenks': {
-                    const jenksBreaks = jenks(dataArray, out.numberOfClasses_) // Calculate breaks for Jenks
+                    const jenksBreaks = jenks(dataArray, out.numberOfClasses_)
                     const domain = jenksBreaks.slice(1, -1)
-                    out.classifier(scaleThreshold().domain(domain).range(range)) // Use Jenks breaks in scale
+                    out.classifier(scaleThreshold().domain(domain).range(range))
                     break
                 }
                 case 'ckmeans': {
-                    // Calculate ckmeans breaks, extracting the maximum value from each cluster
                     const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((cluster) => cluster.pop())
-
-                    // Set the domain for scaleThreshold excluding the last value, as it serves as the upper bound
                     const domain = ckmeansBreaks.slice(0, -1)
-
-                    // Use the ckmeans breaks in the scaleThreshold and set the classifier
                     out.classifier(scaleThreshold().domain(domain).range(range))
                     break
                 }
             }
         }
 
-        // Apply classifier and set 'ecl' attribute to regions based on value
         const classifyRegions = (regions) => {
             regions.attr('ecl', (rg) => {
                 const regionData = out.statData().get(rg.properties.id)
-                if (!regionData) return // Lack of data is handled explicitly
+                if (!regionData) return
                 const value = regionData.value
                 if (value === ':' || value === null) return 'nd'
+
+                if (out.colorSchemeType_ === 'continuous') {
+                    // no class index for continuous mode
+                    return value
+                }
+
                 return value != null ? +out.classifier_(value) : undefined
             })
         }
 
-        // Initialize classifier
+        // Initialize classifier and apply classification
         setupClassifier()
 
-        // Apply classification and assign 'ecl' attribute based on map type
         if (map.svg_) {
-            let selector = getRegionsSelector(map)
+            const selector = getRegionsSelector(map)
             classifyRegions(map.svg().selectAll(selector))
 
-            // Handle mixed NUTS level, separating NUTS level 0
             if (map.nutsLevel_ === 'mixed') {
                 const nuts0Regions = map.svg().selectAll('path.em-nutsrg0')
                 classifyRegions(nuts0Regions)
@@ -226,7 +237,7 @@ export const map = function (config) {
             out.classToFillStyle(getFillPatternLegend())
         } else {
             // Color legend style
-            out.classToFillStyle(getColorLegend(out.colorFunction(), out.colors_))
+            out.classToFillStyle(getColorFunction(out.colorFunction_, out.colors_))
         }
 
         // Apply color and events to regions if SVG exists
@@ -310,26 +321,43 @@ export const map = function (config) {
     }
 
     const regionsFillFunction = function (rg) {
-        const ecl = select(this).attr('ecl') // 'this' refers to the current DOM element
-        if (out.Geometries.userGeometries) {
-            if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
-            if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-            return out.classToFillStyle()(ecl, out.numberOfClasses_)
-        } else {
-            if (out.geo_ === 'WORLD') {
-                // World template logic
-                if (!ecl) return out.cntrgFillStyle_
-                if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_)
-                return fillStyle || out.cntrgFillStyle_
-            } else {
-                // NUTS template logic
-                const countryId = rg.properties.id.slice(0, 2)
-                if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
-                return out.classToFillStyle()(ecl, out.numberOfClasses_)
-            }
+        const ecl = select(this).attr('ecl') // may be a class index or a raw value
+        const colorSchemeType = out.colorSchemeType?.() || 'discrete'
+
+        if (!ecl && ecl !== '0') {
+            return // input not added
         }
+
+        // Data not available
+        if (ecl === 'nd') {
+            return out.noDataFillStyle_ || 'gray'
+        }
+
+        // Dot-density or pattern-fill mode
+        if (out.filtersDefinitionFunction_) {
+            return out.classToFillStyle_(ecl)
+        }
+
+        // Continuous color scheme
+        if (colorSchemeType === 'continuous') {
+            const value = +ecl
+            if (isNaN(value)) return out.noDataFillStyle?.() || 'gray'
+            const colorFn = getColorFunction(out.colorFunction_, null, 'continuous')
+            return colorFn(value, out.domain_ || [0, 1])
+        }
+
+        // Discrete color scheme
+        if (out.Geometries?.userGeometries) {
+            return out.classToFillStyle?.()(ecl, out.numberOfClasses_ || 1)
+        }
+
+        if (out.geo_ === 'WORLD') {
+            const fillStyle = out.classToFillStyle_?.(ecl, out.numberOfClasses_ || 1)
+            return fillStyle || out.cntrgFillStyle_
+        }
+
+        // Default (NUTS case)
+        return out.classToFillStyle?.()(ecl, out.numberOfClasses_ || 1)
     }
 
     const addMouseEventsToRegions = function (map, regions) {
@@ -357,13 +385,22 @@ export const map = function (config) {
 }
 
 //build a color legend object
-export const getColorLegend = function (colorFunction, colorArray) {
+export const getColorFunction = function (colorFunction, colorArray, schemeType = 'discrete') {
     colorFunction = colorFunction || interpolateYlGnBu
+
+    if (schemeType === 'continuous') {
+        return function (value, domain = [0, 1]) {
+            const t = (value - domain[0]) / (domain[1] - domain[0])
+            return colorFunction(Math.min(Math.max(t, 0), 1))
+        }
+    }
+
     if (colorArray) {
         return function (ecl, numberOfClasses) {
             return colorArray[ecl]
         }
     }
+
     return function (ecl, numberOfClasses) {
         return colorFunction(ecl / (numberOfClasses - 1))
     }

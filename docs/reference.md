@@ -242,7 +242,7 @@ eurostatmap
 | _map_.**thresholds**([*value*])           | Array     | _[0]_                  | If _classifMethod = "threshold"_, the breaks of the classification.                                                                                                |
 | _map_.**makeClassifNice**([*value*])      | _boolean_ | true                   | Make nice break values. Works only for _classifMethod = "equinter"_.                                                                                               |
 | _map_.**colorFunction**([*value*])        | Function  | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                  |
-| _map_.**classToFillStyle**([*value*])     | Function  | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorLegend(colorFun())`.                  |
+| _map_.**classToFillStyle**([*value*])     | Function  | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorFunction(colorFun())`.                |
 | _map_.**noDataFillStyle**([*value*])      | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                  |
 
 #### Choropleth legends
