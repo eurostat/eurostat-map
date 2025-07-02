@@ -47,7 +47,9 @@ export const legend = function (map, config) {
     //continuous legend
     out.lowLabel = undefined //'Low'
     out.highLabel = undefined //'High'
-    out.continuousTicks = 5 // Number of tick marks on continuous color legend (set to 0 to disable)
+    out.continuousTicks = 0 // Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels)
+    out.continuousTickValues = [] // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
+    out.continuousOrientation = 'horizontal' // or 'vertical'
 
     //show no data
     out.noData = true
@@ -172,6 +174,7 @@ export const legend = function (map, config) {
         const m = out.map
         const lgg = out.lgg
         const container = out.lgg.append('g').attr('class', 'em-continuous-legend')
+        const isVertical = out.continuousOrientation === 'vertical'
         const domain = m.domain_ || [0, 1]
         const colorFn = (val) => {
             const t = (val - domain[0]) / (domain[1] - domain[0])
@@ -179,7 +182,7 @@ export const legend = function (map, config) {
         }
         const gradientId = 'legend-gradient-' + Math.random().toString(36).substr(2, 5)
         const legendWidth = out.width || out.shapeWidth * 6
-        const legendHeight = out.shapeHeight
+        const legendHeight = isVertical ? out.shapeWidth : out.shapeHeight
         const decimalFormatter = format(`.${out.decimals}f`)
         let baseY = out.boxPadding
 
@@ -189,7 +192,13 @@ export const legend = function (map, config) {
 
         // Add defs for gradient
         const defs = container.append('defs')
-        const gradient = defs.append('linearGradient').attr('id', gradientId).attr('x1', '0%').attr('x2', '100%').attr('y1', '0%').attr('y2', '0%')
+        const gradient = defs
+            .append('linearGradient')
+            .attr('id', gradientId)
+            .attr('x1', isVertical ? '0%' : '0%')
+            .attr('x2', isVertical ? '0%' : '100%')
+            .attr('y1', isVertical ? '100%' : '0%')
+            .attr('y2', isVertical ? '0%' : '0%')
 
         // Create gradient stops
         const steps = 20
@@ -206,8 +215,8 @@ export const legend = function (map, config) {
             .append('rect')
             .attr('x', out.boxPadding)
             .attr('y', baseY)
-            .attr('width', legendWidth)
-            .attr('height', legendHeight)
+            .attr('width', isVertical ? legendHeight : legendWidth)
+            .attr('height', isVertical ? legendWidth : legendHeight)
             .style('fill', `url(#${gradientId})`)
 
         if (out.continuousTicks > 1) {
@@ -220,27 +229,25 @@ export const legend = function (map, config) {
                     ? out.continuousTickValues
                     : Array.from({ length: out.continuousTicks }, (_, i) => domain[0] + (i / (out.continuousTicks - 1)) * (domain[1] - domain[0]))
 
-            ticks.forEach((val) => {
+            ticks.forEach((val, i) => {
                 const t = (val - domain[0]) / (domain[1] - domain[0])
-                const x = out.boxPadding + t * legendWidth
+                const pos = out.boxPadding + t * legendWidth
 
-                // Tick line
-                tickGroup
-                    .append('line')
-                    .attr('class', 'em-legend-tick')
-                    .attr('x1', x)
-                    .attr('y1', baseY + legendHeight)
-                    .attr('x2', x)
-                    .attr('y2', baseY + legendHeight + 4)
+                const x = isVertical ? out.boxPadding + legendHeight + 5 : pos
+                const y = isVertical ? pos : baseY + legendHeight
 
-                // Tick label
+                const tickX2 = isVertical ? x + out.tickLength : x
+                const tickY2 = isVertical ? y : y + out.tickLength
+
+                tickGroup.append('line').attr('class', 'em-legend-tick').attr('x1', x).attr('y1', y).attr('x2', tickX2).attr('y2', tickY2)
+
                 tickGroup
                     .append('text')
                     .attr('class', 'em-legend-label em-legend-ticklabel')
-                    .attr('x', x)
-                    .attr('y', baseY + legendHeight + 15)
+                    .attr('x', isVertical ? x + 2 * out.tickLength : x)
+                    .attr('y', isVertical ? y + 4 : y + 11)
                     .attr('dy', '0.35em')
-                    .attr('text-anchor', 'middle')
+                    .attr('text-anchor', isVertical ? 'start' : i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle')
                     .text(tickFormatter(m.valueUntransform_(val)))
             })
         } else {
@@ -248,27 +255,49 @@ export const legend = function (map, config) {
             const lowLabel = out.lowLabel ?? decimalFormatter(domain[0])
             const highLabel = out.highLabel ?? decimalFormatter(domain[1])
 
-            container
-                .append('text')
-                .attr('class', 'em-legend-label em-legend-ticklabel em-legend-label-low')
-                .attr('x', out.boxPadding)
-                .attr('y', baseY + legendHeight + 15)
-                .attr('text-anchor', 'start')
-                .text(lowLabel)
+            if (isVertical) {
+                container
+                    .append('text')
+                    .attr('class', 'em-legend-label')
+                    .attr('x', out.boxPadding + legendHeight + 5)
+                    // Low label (bottom of vertical bar)
+                    .attr('y', baseY + out.boxPadding + legendWidth - 15)
+                    .attr('text-anchor', 'start')
+                    .attr('dy', '0.35em')
+                    .text(lowLabel)
 
-            container
-                .append('text')
-                .attr('class', 'em-legend-label em-legend-ticklabel em-legend-label-high')
-                .attr('x', out.boxPadding + legendWidth)
-                .attr('y', baseY + legendHeight + 15)
-                .attr('text-anchor', 'end')
-                .text(highLabel)
+                container
+                    .append('text')
+                    .attr('class', 'em-legend-label')
+                    .attr('x', out.boxPadding + legendHeight + 5)
+                    // High label (top of vertical bar)
+                    .attr('y', baseY + out.boxPadding)
+                    .attr('text-anchor', 'start')
+                    .attr('dy', '0.35em')
+                    .text(highLabel)
+            } else {
+                container
+                    .append('text')
+                    .attr('class', 'em-legend-label')
+                    .attr('x', out.boxPadding)
+                    .attr('y', baseY + legendHeight + 15)
+                    .attr('text-anchor', 'start')
+                    .text(lowLabel)
+
+                container
+                    .append('text')
+                    .attr('class', 'em-legend-label')
+                    .attr('x', out.boxPadding + legendWidth)
+                    .attr('y', baseY + legendHeight + 15)
+                    .attr('text-anchor', 'end')
+                    .text(highLabel)
+            }
         }
 
         // Optional: 'No data' swatch
         if (out.noData) {
             const noDataGroup = out.lgg.append('g').attr('class', 'em-no-data-legend')
-            const y = baseY + legendHeight + 30
+            const y = isVertical ? baseY + out.boxPadding + legendWidth + 5 : baseY + legendHeight + 30
             noDataGroup
                 .append('rect')
                 .attr('class', 'em-legend-rect')

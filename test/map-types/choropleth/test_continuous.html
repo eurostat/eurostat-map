@@ -9,7 +9,7 @@
         <style>
             .em-subtitle {
                 font-size: 14px;
-                fill: black;
+                fill: #585858;
             }
         </style>
         <svg id="map"></svg>
@@ -32,15 +32,17 @@
                 .valueUntransform(Math.exp) // the legends need to 'untransform' the value to show the original value
                 .nutsLevel(2)
                 .legend({
-                    title: 'Continuous color scheme',
+                    title: 'Test',
                     x: 10,
-                    y: 120,
+                    y: 135,
                     width: 200,
+                    shapeWidth: 20,
+                    //continuousTicks: 2, // defaults to 'low' and 'high' when unspecified
                     //continuousTickValues: [100, 300],
-
-                    boxOpacity: 0,
                     lowLabel: 'Low',
                     highLabel: 'High',
+                    continuousOrientation: 'vertical',
+                    boxOpacity: 0,
                 })
                 .drawCoastalMargin(false)
                 .insets('default')

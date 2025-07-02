@@ -8,12 +8,12 @@
 .em-legend-label {
     font-size: 15px;
     stroke: none;
-    fill: black;
+    fill: #333333;
     dominant-baseline: unset;
 }
 .em-legend-title {
     font-size: 16px;
-    fill: black;
+    fill: #333333;
 }
 .em-legend-separator {
     stroke: white;
@@ -25,10 +25,10 @@
 }
 .em-bivariate-frame {
     fill: none;
-    stroke: black;
+    stroke: #333333;
 }
 .em-bivariate-nodata {
-    stroke: black;
+    stroke: #333333;
     stroke-width: 0.5;
     cursor: pointer;
 }
@@ -40,7 +40,7 @@
     dominant-baseline: middle;
 }
 .em-bivariate-tick {
-    stroke: black;
+    stroke: #333333;
     stroke-width: 1;
 }
 .em-bivariate-tick-label {
@@ -65,7 +65,7 @@
 }
 
 .em-legend-diverging-line {
-    stroke: black;
+    stroke: #333333;
 }
 
 .em-legend-histogram-bar {

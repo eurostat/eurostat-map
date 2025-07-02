@@ -26,7 +26,7 @@ a text {
 /* Title and subtitle styling */
 .em-title,
 .em-inset-title {
-    fill: black;
+    fill: #333333;
     stroke: none;
 }
 
@@ -57,6 +57,7 @@ a text {
 }
 
 .em-source-pretext {
+    fill: #848280;
     font-size: 11px;
     transform: translate(-5px, -5px);
 }
@@ -89,7 +90,7 @@ a text {
     /* pointer-events: none; */
 }
 .em-scalebar-line {
-    stroke: black;
+    stroke: #333333;
     stroke-width: 0.8px;
 }
 .em-scalebar-label {
@@ -99,6 +100,7 @@ a text {
 
 /* Bottom text and symbol styling */
 .em-footnote {
+    fill: #848280;
     pointer-events: all;
     cursor: default;
     font-size: 11px;
@@ -131,7 +133,7 @@ a text {
 .em-flow-labels {
     font-size: 15px;
     stroke-width: 1px;
-    fill: black;
+    fill: #333333;
     pointer-events: none;
 }
 .em-flow-labels-halo {
