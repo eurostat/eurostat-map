@@ -219,36 +219,55 @@ export const legend = function (map, config) {
             .attr('height', isVertical ? legendWidth : legendHeight)
             .style('fill', `url(#${gradientId})`)
 
-        if (out.continuousTicks > 1) {
+        if (out.continuousTicks > 1 || out.continuousTickValues.length > 1) {
             //ticks
             const tickGroup = container.append('g').attr('class', 'em-legend-ticks')
             const tickFormatter = out.labelFormatter || decimalFormatter
 
-            const ticks =
+            const transform = m.valueTransform_ || ((d) => d)
+            const ticksRaw =
                 Array.isArray(out.continuousTickValues) && out.continuousTickValues.length > 0
-                    ? out.continuousTickValues
+                    ? out.continuousTickValues.map(transform)
                     : Array.from({ length: out.continuousTicks }, (_, i) => domain[0] + (i / (out.continuousTicks - 1)) * (domain[1] - domain[0]))
+            const ticks = ticksRaw.filter((v) => Number.isFinite(v))
 
             ticks.forEach((val, i) => {
                 const t = (val - domain[0]) / (domain[1] - domain[0])
-                const pos = out.boxPadding + t * legendWidth
+                const pos = isVertical
+                    ? baseY + legendWidth - t * legendWidth // ✅ flip the tick position vertically
+                    : out.boxPadding + t * legendWidth
 
-                const x = isVertical ? out.boxPadding + legendHeight + 5 : pos
-                const y = isVertical ? pos : baseY + legendHeight
+                const x = isVertical ? out.boxPadding + legendHeight : pos
+                const y = isVertical ? pos + 1 : baseY + legendHeight
 
                 const tickX2 = isVertical ? x + out.tickLength : x
                 const tickY2 = isVertical ? y : y + out.tickLength
 
                 tickGroup.append('line').attr('class', 'em-legend-tick').attr('x1', x).attr('y1', y).attr('x2', tickX2).attr('y2', tickY2)
 
+                let trueValue = val
+                if (m.valueTransform_) {
+                    trueValue = m.valueUntransform_(val)
+                }
                 tickGroup
                     .append('text')
                     .attr('class', 'em-legend-label em-legend-ticklabel')
-                    .attr('x', isVertical ? x + 2 * out.tickLength : x)
-                    .attr('y', isVertical ? y + 4 : y + 11)
-                    .attr('dy', '0.35em')
+                    .attr('x', isVertical ? x + out.tickLength + 3 : x)
+                    .attr('y', isVertical ? y + 4 : y + out.tickLength + 10)
+                    .attr(
+                        'dy',
+                        isVertical
+                            ? i === 0
+                                ? '-0.1em' // bottom tick: pull up
+                                : i === ticks.length - 1
+                                  ? '0.35em' // top tick: push down
+                                  : '' // middle: no change
+                            : '0.35em'
+                    )
+
                     .attr('text-anchor', isVertical ? 'start' : i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle')
-                    .text(tickFormatter(m.valueUntransform_(val)))
+                    .attr('dominant-baseline', isVertical ? (i === 0 ? 'text-after-edge' : i === ticks.length - 1 ? 'hanging' : 'middle') : null)
+                    .text(tickFormatter(trueValue))
             })
         } else {
             //low/high labels
