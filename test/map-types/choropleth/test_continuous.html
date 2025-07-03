@@ -13,13 +13,14 @@
             }
         </style>
         <svg id="map"></svg>
+        <svg id="map2"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
 
         <script>
             const map = eurostatmap
                 .map('choropleth')
-                .title(".colorSchemeType('continuous')")
+                .title('Continuous (sequential)')
                 .subtitle('.valueTransform(Math.log) and .valueUntransform(Math.exp)')
                 .stat({
                     eurostatDatasetCode: 'nama_10r_3gdp',
@@ -38,17 +39,52 @@
                     width: 200,
                     shapeWidth: 20,
                     tickLength: 7,
-                    //continuousTicks: 2, // defaults to 'low' and 'high' when unspecified
-                    //continuousTickValues: [3000, 50000, 112000],
+                    continuousTicks: 2, // defaults to 'low' and 'high' when unspecified
+                    continuousTickValues: [3000, 50000, 112000],
+                    continuousTickLabels: ['3000 (TRB2)', '3000 (TRB2)', 112000],
+                    decimals: 0,
                     lowLabel: 'Low',
                     highLabel: 'High',
                     continuousOrientation: 'vertical', // 'vertical' or 'horizontal'
                     boxOpacity: 0,
                 })
-                .drawCoastalMargin(false)
-                .insets('default')
                 .zoomExtent([1, 10])
+                .insets('default')
                 .build()
+
+            let m = eurostatmap
+                .map('choropleth')
+                .svgId('map2')
+                .title('Continuous (diverging)')
+                .subtitle('Population change per 1 000 persons, 2023')
+                .subtitleFontSize(15)
+                .nutsLevel(2)
+                .stat({
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT', time: 2023 },
+                    unitText: '‰',
+                })
+                .colorSchemeType('continuous')
+                .colorFunction(d3.interpolateRdBu)
+                .divergencePoint(0)
+                .isDiverging(true)
+                // .valueTransform(Math.asinh)
+                // .valueUntransform(Math.sinh)
+                .transitionDuration(0)
+                .zoomExtent([1, 10])
+                .insets('default')
+
+            m.legend({
+                x: 10,
+                y: 150,
+                title: '‰',
+                decimals: 1,
+
+                labelOffset: 7,
+                continuousTickValues: [-60, 0, 38.7],
+            })
+
+            m.build()
         </script>
     </body>
 </html>

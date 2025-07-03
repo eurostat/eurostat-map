@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as Legend from './legend'
-import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
+import { checkIfDiverging, executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
 
@@ -49,6 +49,7 @@ export const legend = function (map, config) {
     out.highLabel = undefined //'High'
     out.continuousTicks = 0 // Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels)
     out.continuousTickValues = [] // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
+    out.continuousTickLabels = [] // Custom tick labels for continuous legend (if empty, will use continuousTickValues)
     out.continuousOrientation = 'horizontal' // or 'vertical'
 
     //show no data
@@ -176,10 +177,7 @@ export const legend = function (map, config) {
         const container = out.lgg.append('g').attr('class', 'em-continuous-legend')
         const isVertical = out.continuousOrientation === 'vertical'
         const domain = m.domain_ || [0, 1]
-        const colorFn = (val) => {
-            const t = (val - domain[0]) / (domain[1] - domain[0])
-            return m.colorFunction_(Math.min(Math.max(t, 0), 1))
-        }
+        const isDiverging = checkIfDiverging(m)
         const gradientId = 'legend-gradient-' + Math.random().toString(36).substr(2, 5)
         const legendWidth = out.width || out.shapeWidth * 6
         const legendHeight = isVertical ? out.shapeWidth : out.shapeHeight
@@ -204,10 +202,11 @@ export const legend = function (map, config) {
         const steps = 20
         for (let i = 0; i <= steps; i++) {
             const t = i / steps
+            const stopColor = isDiverging ? m.colorFunction_(domain[0] + t * (domain[1] - domain[0])) : m.colorFunction_(t) // t is already normalized
             gradient
                 .append('stop')
                 .attr('offset', `${t * 100}%`)
-                .attr('stop-color', colorFn(domain[0] + t * (domain[1] - domain[0]), domain))
+                .attr('stop-color', stopColor)
         }
 
         // Append gradient rect
@@ -245,10 +244,22 @@ export const legend = function (map, config) {
 
                 tickGroup.append('line').attr('class', 'em-legend-tick').attr('x1', x).attr('y1', y).attr('x2', tickX2).attr('y2', tickY2)
 
-                let trueValue = val
-                if (m.valueTransform_) {
-                    trueValue = m.valueUntransform_(val)
+                let tickText
+                let isLabel = false
+                if (out.continuousTickLabels) {
+                    if (out.continuousTickLabels[i]) {
+                        isLabel = true
+                        tickText = out.continuousTickLabels[i]
+                    } else {
+                        tickText = val // default to the value
+                    }
+                } else {
+                    tickText = val // default to the value
+                    if (m.valueTransform_) {
+                        tickText = m.valueUntransform_(val)
+                    }
                 }
+
                 tickGroup
                     .append('text')
                     .attr('class', 'em-legend-label em-legend-ticklabel')
@@ -267,7 +278,7 @@ export const legend = function (map, config) {
 
                     .attr('text-anchor', isVertical ? 'start' : i === 0 ? 'start' : i === ticks.length - 1 ? 'end' : 'middle')
                     .attr('dominant-baseline', isVertical ? (i === 0 ? 'text-after-edge' : i === ticks.length - 1 ? 'hanging' : 'middle') : null)
-                    .text(tickFormatter(trueValue))
+                    .text(isLabel ? tickText : tickFormatter(val, i))
             })
         } else {
             //low/high labels

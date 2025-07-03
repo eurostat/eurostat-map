@@ -1,3 +1,5 @@
+import { scaleLinear } from 'd3'
+
 // e.g. to be used with deprecated .style() functions. They will now update CSS classes.
 export function updateCSSRule(selector, property, value) {
     // Validate the selector
@@ -252,6 +254,37 @@ export const getURLParameterByName = function (name) {
     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)'),
         results = regex.exec(location.search)
     return !results ? null : decodeURIComponent(results[1].replace(/\+/g, ' '))
+}
+
+export const checkIfDiverging = function (map) {
+    return map.isDiverging_ === true || map.divergencePoint_ !== null
+}
+
+/**
+ * Wraps a diverging color interpolator so that it centers around a meaningful divergence point.
+ * Ensures that transformed values are mapped symmetrically around the divergence point (e.g. 0).
+ *
+ * @param {function} colorFunc - A diverging color interpolator (e.g. d3.interpolateRdBu)
+ * @param {[number, number]} domain - Raw data domain (min, max) before transformation
+ * @param {number} divergencePoint - The central value of interest (e.g. 0 for positive vs. negative)
+ * @param {function} transform - A value transform function (e.g. Math.log, Math.asinh)
+ * @returns {function} - A color function that accepts raw values and returns color strings
+ */
+export const centerDivergingColorFunction = function (colorFunc, domain, divergencePoint = 0, transform = (d) => d) {
+    // Apply valueTransform to all domain boundaries and divergence point
+    const valueTransform = transform || ((d) => d)
+
+    const tMin = valueTransform(domain[0]) // Transformed lower bound
+    const tMax = valueTransform(domain[1]) // Transformed upper bound
+    const tDiv = valueTransform(divergencePoint) // Transformed center/divergence point
+
+    // Create a diverging scale: [min → center → max] → [0 → 0.5 → 1]
+    const scaled = scaleLinear().domain([tMin, tDiv, tMax]).range([0, 0.5, 1]).clamp(true) // Prevent extrapolation beyond 0–1
+
+    // Return a function that applies the transform and maps through the scaled color interpolator
+    return function (value) {
+        return colorFunc(scaled(valueTransform(value)))
+    }
 }
 
 //flags

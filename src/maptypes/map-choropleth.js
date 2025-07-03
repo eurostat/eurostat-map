@@ -5,7 +5,14 @@ import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
 import * as ChoroplethLegend from '../legend/legend-choropleth'
-import { executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../core/utils'
+import {
+    centerDivergingColorFunction,
+    checkIfDiverging,
+    executeForAllInsets,
+    getRegionsSelector,
+    getTextColorForBackground,
+    spaceAsThousandSeparator,
+} from '../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { getCSSPropertyFromClass } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
@@ -38,10 +45,13 @@ export const map = function (config) {
     out.classifier_ = undefined
     // set tooltip function
     out.tooltip_.textFunction = choroplethTooltipFunction
-    // continuous
+
+    // continuous color schemes
     out.colorSchemeType_ = 'discrete' // or 'continuous'
     out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
+    out.isDiverging_ = undefined // optional override, else fallback to detection
+    out.divergencePoint_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -63,6 +73,8 @@ export const map = function (config) {
         'colorSchemeType_',
         'valueTransform_',
         'valueUntransform_',
+        'divergencePoint_',
+        'isDiverging_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -73,17 +85,18 @@ export const map = function (config) {
 
     //override of some special getters/setters
     out.colorFunction = function (v) {
-        if (!arguments.length) {
-            return out.colorFunction_
-        }
+        if (!arguments.length) return out.colorFunction_
+        console.log('Setting color function:', out.svgId_)
         out.colorFunction_ = v
-        // update class style function
         if (out.filtersDefinitionFunction_) {
-            // if dot density
+            // dot density style
             out.classToFillStyle(getFillPatternLegend())
         } else {
-            out.classToFillStyle(getColorFunction(out.colorFunction_, out.colors_))
+            // update color function
+            const newFunction = getColorFunction(out.colorFunction_, out.colors_, out.colorSchemeType_)
+            out.classToFillStyle(newFunction)
         }
+
         return out
     }
     out.threshold = function (v) {
@@ -140,16 +153,26 @@ export const map = function (config) {
             const range = generateRange(out.numberOfClasses_)
 
             if (out.colorSchemeType_ === 'continuous') {
-                const transformedValues = dataArray.map(out.valueTransform_)
+                const valueTransform = out.valueTransform_ || ((d) => d)
+                const transformedValues = dataArray.map(valueTransform)
                 const minVal = min(transformedValues)
                 const maxVal = max(transformedValues)
 
-                out.classifier(function (val) {
-                    return val // direct value
-                })
+                // Always enforce symmetric domain if using a diverging color scheme
+                const isDiverging = checkIfDiverging(out)
 
-                // store domain for continuous scaling
-                out.domain_ = [minVal, maxVal]
+                if (isDiverging) {
+                    const divergence = valueTransform(out.divergencePoint_ ? out.divergencePoint_ : 0)
+                    const maxOffset = Math.max(Math.abs(maxVal - divergence), Math.abs(minVal - divergence))
+                    out.domain_ = [divergence - maxOffset, divergence + maxOffset]
+                    const newFunction = centerDivergingColorFunction(out.colorFunction_, out.domain_, out.divergencePoint_ ?? 0, valueTransform)
+                    // Set on main map using setter so classToFillStyle updates correctly
+                    out.colorFunction(newFunction)
+                } else {
+                    out.domain_ = [minVal, maxVal]
+                }
+
+                out.classifier((val) => val) // identity
                 return
             }
 
@@ -328,7 +351,7 @@ export const map = function (config) {
 
     const regionsFillFunction = function (rg) {
         const ecl = select(this).attr('ecl') // may be a class index or a raw value
-        const colorSchemeType = out.colorSchemeType?.() || 'discrete'
+        const colorSchemeType = out.colorSchemeType_ || 'discrete'
 
         if (!ecl && ecl !== '0') {
             return // input not added
@@ -349,25 +372,36 @@ export const map = function (config) {
             const rawValue = +ecl
             if (isNaN(rawValue)) return out.noDataFillStyle?.() || 'gray'
 
-            const transformed = out.valueTransform_(rawValue)
             const domain = out.domain_ || [0, 1]
-            const normalize = (x, domain) => (x - domain[0]) / (domain[1] - domain[0])
-            const t = normalize(transformed, domain)
-            return out.colorFunction_(Math.min(Math.max(t, 0), 1))
+            const isDiverging = checkIfDiverging(out)
+
+            if (isDiverging) {
+                // diverging color function is already wrapped and expects raw values
+                const c = out.colorFunction_(rawValue)
+                console.log(c)
+                return c
+            } else {
+                // sequential: normalize to t ∈ [0, 1]
+                const valueTransform = out.valueTransform_ || ((d) => d)
+                const transformed = valueTransform(rawValue)
+                const normalize = (x, domain) => (x - domain[0]) / (domain[1] - domain[0])
+                const t = normalize(transformed, domain)
+                return out.colorFunction_(Math.min(Math.max(t, 0), 1))
+            }
         }
 
         // Discrete color scheme
         if (out.Geometries?.userGeometries) {
-            return out.classToFillStyle?.()(ecl, out.numberOfClasses_ || 1)
+            return out.classToFillStyle_(ecl, out.numberOfClasses_ || 1)
         }
 
         if (out.geo_ === 'WORLD') {
-            const fillStyle = out.classToFillStyle_?.(ecl, out.numberOfClasses_ || 1)
+            const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_ || 1)
             return fillStyle || out.cntrgFillStyle_
         }
 
         // Default (NUTS case)
-        return out.classToFillStyle?.()(ecl, out.numberOfClasses_ || 1)
+        return out.classToFillStyle_(ecl, out.numberOfClasses_ || 1)
     }
 
     const addMouseEventsToRegions = function (map, regions) {
