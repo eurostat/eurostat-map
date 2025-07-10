@@ -18,7 +18,7 @@
         <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
 
         <script>
-            const map = eurostatmap
+            const map1 = eurostatmap
                 .map('choropleth')
                 .title('Continuous (sequential)')
                 .subtitle('.valueTransform(Math.log) and .valueUntransform(Math.exp)')
@@ -52,7 +52,7 @@
                 .insets('default')
                 .build()
 
-            let m = eurostatmap
+            let map2 = eurostatmap
                 .map('choropleth')
                 .svgId('map2')
                 .title('Continuous (diverging)')
@@ -72,9 +72,9 @@
                 // .valueUntransform(Math.sinh)
                 .transitionDuration(0)
                 .zoomExtent([1, 10])
-                .insets('default')
+            //.insets('default') //TODO: fix diverging continuous with insets
 
-            m.legend({
+            map2.legend({
                 x: 10,
                 y: 150,
                 title: '‰',
@@ -84,7 +84,7 @@
                 continuousTickValues: [-60, 0, 38.7],
             })
 
-            m.build()
+            map2.build()
         </script>
     </body>
 </html>
