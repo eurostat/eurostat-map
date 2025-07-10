@@ -104,12 +104,14 @@
                     unitText: '‰',
                 })
                 .colorSchemeType('continuous')
-                //.colorFunction(stretchedColor)
+                .colorFunction(stretchedColor)
+                .valueTransform(valueTransform)
+                .valueUntransform(valueUntransform)
+
                 //.colorFunction(d3.interpolateRdBu)
-                .colorFunction(d3.scaleDiverging(d3.interpolateRdYlBu).domain([-60, 0, 38.7]))
-                //.valueTransform(valueTransform)
-                //.valueUntransform(valueUntransform)
-                //.divergencePoint(0)
+                //.colorFunction(d3.scaleDiverging(d3.interpolateRdYlBu).domain([-60, 0, 38.7]))
+
+                .divergencePoint(0)
                 .isDiverging(true)
                 // .valueTransform(Math.asinh)
                 // .valueUntransform(Math.sinh)
