@@ -176,7 +176,7 @@ export const legend = function (map, config) {
         const lgg = out.lgg
         const container = out.lgg.append('g').attr('class', 'em-continuous-legend')
         const isVertical = out.continuousOrientation === 'vertical'
-        const domain = m.domain_ || [0, 1]
+        const isD3Scale = typeof m.colorFunction_ === 'function' && typeof m.colorFunction_.domain === 'function'
         const isDiverging = checkIfDiverging(m)
         const gradientId = 'legend-gradient-' + Math.random().toString(36).substr(2, 5)
         const legendWidth = out.width || out.shapeWidth * 6
@@ -199,14 +199,31 @@ export const legend = function (map, config) {
             .attr('y2', isVertical ? '0%' : '0%')
 
         // Create gradient stops
+        const domain = isD3Scale ? m.colorFunction_.domain() : m.domain_ || [0, 1]
         const steps = 20
-        for (let i = 0; i <= steps; i++) {
-            const t = i / steps
-            const stopColor = isDiverging ? m.colorFunction_(domain[0] + t * (domain[1] - domain[0])) : m.colorFunction_(t) // t is already normalized
-            gradient
-                .append('stop')
-                .attr('offset', `${t * 100}%`)
-                .attr('stop-color', stopColor)
+
+        if (domain.length === 3) {
+            const [d0, d1, d2] = domain
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps
+                const interp = t < 0.5 ? d0 + (d1 - d0) * (t * 2) : d1 + (d2 - d1) * ((t - 0.5) * 2)
+                const stopColor = m.colorFunction_(interp)
+                gradient
+                    .append('stop')
+                    .attr('offset', `${t * 100}%`)
+                    .attr('stop-color', stopColor)
+            }
+        } else {
+            const [d0, d1] = domain
+            for (let i = 0; i <= steps; i++) {
+                const t = i / steps
+                const interp = d0 + t * (d1 - d0)
+                const stopColor = m.colorFunction_(interp)
+                gradient
+                    .append('stop')
+                    .attr('offset', `${t * 100}%`)
+                    .attr('stop-color', stopColor)
+            }
         }
 
         // Append gradient rect
@@ -231,10 +248,14 @@ export const legend = function (map, config) {
             const ticks = ticksRaw.filter((v) => Number.isFinite(v))
 
             ticks.forEach((val, i) => {
-                const t = (val - domain[0]) / (domain[1] - domain[0])
-                const pos = isVertical
-                    ? baseY + legendWidth - t * legendWidth // ✅ flip the tick position vertically
-                    : out.boxPadding + t * legendWidth
+                let t
+                if (domain.length === 3) {
+                    const [d0, d1, d2] = domain
+                    t = val < d1 ? (0.5 * (val - d0)) / (d1 - d0) : 0.5 + (0.5 * (val - d1)) / (d2 - d1)
+                } else {
+                    t = (val - domain[0]) / (domain[1] - domain[0])
+                }
+                const pos = isVertical ? baseY + legendWidth - t * legendWidth : out.boxPadding + t * legendWidth
 
                 const x = isVertical ? out.boxPadding + legendHeight : pos
                 const y = isVertical ? pos + 1 : baseY + legendHeight
@@ -255,7 +276,7 @@ export const legend = function (map, config) {
                     }
                 } else {
                     tickText = val // default to the value
-                    if (m.valueTransform_) {
+                    if (m.valueUntransform_) {
                         tickText = m.valueUntransform_(val)
                     }
                 }
@@ -282,8 +303,8 @@ export const legend = function (map, config) {
             })
         } else {
             //low/high labels
-            const lowLabel = out.lowLabel ?? decimalFormatter(domain[0])
-            const highLabel = out.highLabel ?? decimalFormatter(domain[1])
+            const lowLabel = out.lowLabel ?? decimalFormatter(m.valueUntransform_ ? m.valueUntransform_(domain[0]) : domain[0])
+            const highLabel = out.highLabel ?? decimalFormatter(m.valueUntransform_ ? m.valueUntransform_(domain[1]) : domain[1])
 
             if (isVertical) {
                 container

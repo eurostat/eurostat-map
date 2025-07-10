@@ -514,7 +514,6 @@ export const map = function (config) {
             .selectAll('g.em-centroid')
             .filter((d) => {
                 const datum = sizeData.get(d.properties.id)
-                if (d.properties.id == 'DE') console.log(datum)
                 return datum && datum.value !== ':' && datum.value
             })
             .append('circle')

@@ -65,7 +65,7 @@
                     unitText: '‰',
                 })
                 .colorSchemeType('continuous')
-                .colorFunction(d3.interpolateRdBu)
+                .colorFunction(d3.scaleDiverging(d3.interpolateRdBu).domain([-60, 0, 38.7]))
                 .divergencePoint(0)
                 .isDiverging(true)
                 // .valueTransform(Math.asinh)
@@ -85,6 +85,8 @@
             })
 
             map2.build()
+
+            setTimeout(() => console.log(map2.statData().getMax()), 2000)
         </script>
     </body>
 </html>
