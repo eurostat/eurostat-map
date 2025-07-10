@@ -1,3 +1,4 @@
+//map-choropleth.js
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
@@ -50,7 +51,6 @@ export const map = function (config) {
     out.colorSchemeType_ = 'discrete' // or 'continuous'
     out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
-    out.isDiverging_ = undefined // optional override, else fallback to detection
     out.divergencePoint_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
     /**
@@ -157,23 +157,20 @@ export const map = function (config) {
                 const transformedValues = dataArray.map(valueTransform)
                 const minVal = min(transformedValues)
                 const maxVal = max(transformedValues)
-
-                // Always enforce symmetric domain if using a diverging color scheme
                 const isDiverging = checkIfDiverging(out)
+                const isFullScale = typeof out.colorFunction_?.domain === 'function'
 
-                if (isDiverging) {
-                    const divergence = valueTransform(out.divergencePoint_ ? out.divergencePoint_ : 0)
-                    const maxOffset = Math.max(Math.abs(maxVal - divergence), Math.abs(minVal - divergence))
-                    out.domain_ = [divergence - maxOffset, divergence + maxOffset]
-                    const newFunction = centerDivergingColorFunction(out.colorFunction_, out.domain_, out.divergencePoint_ ?? 0, valueTransform)
-                    // Set on main map using setter so classToFillStyle updates correctly
-                    out.colorFunction(newFunction)
-                } else {
-                    out.domain_ = [minVal, maxVal]
+                if (!isFullScale) {
+                    if (isDiverging) {
+                        const divergence = valueTransform(out.divergencePoint_ ?? 0)
+                        const maxOffset = Math.max(Math.abs(maxVal - divergence), Math.abs(minVal - divergence))
+                        out.domain_ = [divergence - maxOffset, divergence + maxOffset]
+                    } else {
+                        out.domain_ = [minVal, maxVal]
+                    }
                 }
 
                 out.classifier((val) => val) // identity
-                return
             }
 
             switch (out.classificationMethod_) {
@@ -371,21 +368,18 @@ export const map = function (config) {
         if (colorSchemeType === 'continuous') {
             const rawValue = +ecl
             if (isNaN(rawValue)) return out.noDataFillStyle?.() || 'gray'
+            // If colorFunction_ has a .domain method, it's a full D3 scale (e.g. scaleDiverging)
+            const isFullScale = typeof out.colorFunction_?.domain === 'function'
 
-            const domain = out.domain_ || [0, 1]
-            const isDiverging = checkIfDiverging(out)
+            const valueTransform = out.valueTransform_ || ((d) => d)
+            const transformed = valueTransform(rawValue)
 
-            if (isDiverging) {
-                // diverging color function is already wrapped and expects raw values
-                const c = out.colorFunction_(rawValue)
-                console.log(c)
-                return c
+            if (isFullScale) {
+                return out.colorFunction_(transformed)
             } else {
-                // sequential: normalize to t ∈ [0, 1]
-                const valueTransform = out.valueTransform_ || ((d) => d)
-                const transformed = valueTransform(rawValue)
-                const normalize = (x, domain) => (x - domain[0]) / (domain[1] - domain[0])
-                const t = normalize(transformed, domain)
+                // if it's a plain interpolator, we need to normalize
+                const domain = out.domain_ || [0, 1]
+                const t = (transformed - domain[0]) / (domain[1] - domain[0])
                 return out.colorFunction_(Math.min(Math.max(t, 0), 1))
             }
         }

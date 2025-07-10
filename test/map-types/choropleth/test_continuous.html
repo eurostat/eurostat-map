@@ -18,6 +18,7 @@
         <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
 
         <script>
+            //SEQUENTIAL
             const map1 = eurostatmap
                 .map('choropleth')
                 .title('Continuous (sequential)')
@@ -52,6 +53,44 @@
                 .insets('default')
                 .build()
 
+            //DIVERGING
+            // Transform raw values to t ∈ [0, 1]
+            function divergingNormalize(min, max, divergencePoint, divergenceT) {
+                return function (x) {
+                    if (x < divergencePoint) return (divergenceT * (x - min)) / (divergencePoint - min)
+                    else return divergenceT + ((1 - divergenceT) * (x - divergencePoint)) / (max - divergencePoint)
+                }
+            }
+
+            function divergingUnnormalize(min, max, divergencePoint, divergenceT) {
+                return function (t) {
+                    if (t < divergenceT) return min + (t / divergenceT) * (divergencePoint - min)
+                    else return divergencePoint + ((t - divergenceT) / (1 - divergenceT)) * (max - divergencePoint)
+                }
+            }
+
+            const min = -60
+            const max = 38.7
+            const divergencePoint = 0 //the point in the domain where the color diverges (e.g. 0 to distinguish positive and negative values)
+            const divergenceT = 0.6 //where to diverge in [0, 1] (0.5 is the middle, 0 is the left end, 1 is the right end)
+
+            const valueTransform = divergingNormalize(min, max, divergencePoint, divergenceT)
+            const valueUntransform = divergingUnnormalize(min, max, divergencePoint, divergenceT)
+
+            // Stretch diverging color ramp (white at divVal)
+            function unbalanceColorRampStretch(divergenceT, colorRampBalanced) {
+                return divergenceT === 0
+                    ? (t) => colorRampBalanced(0.5 + t * 0.5)
+                    : divergenceT === 1
+                      ? (t) => colorRampBalanced(t * 0.5)
+                      : (t) =>
+                            t < divergenceT
+                                ? colorRampBalanced((0.5 * t) / divergenceT)
+                                : colorRampBalanced((0.5 * (t - divergenceT)) / (1 - divergenceT) + 0.5)
+            }
+
+            const stretchedColor = unbalanceColorRampStretch(divergenceT, d3.interpolateRdBu)
+
             let map2 = eurostatmap
                 .map('choropleth')
                 .svgId('map2')
@@ -65,8 +104,12 @@
                     unitText: '‰',
                 })
                 .colorSchemeType('continuous')
-                .colorFunction(d3.scaleDiverging(d3.interpolateRdBu).domain([-60, 0, 38.7]))
-                .divergencePoint(0)
+                //.colorFunction(stretchedColor)
+                //.colorFunction(d3.interpolateRdBu)
+                .colorFunction(d3.scaleDiverging(d3.interpolateRdYlBu).domain([-60, 0, 38.7]))
+                //.valueTransform(valueTransform)
+                //.valueUntransform(valueUntransform)
+                //.divergencePoint(0)
                 .isDiverging(true)
                 // .valueTransform(Math.asinh)
                 // .valueUntransform(Math.sinh)
@@ -79,14 +122,12 @@
                 y: 150,
                 title: '‰',
                 decimals: 1,
-
                 labelOffset: 7,
-                continuousTickValues: [-60, 0, 38.7],
+                continuousTickValues: [-60, 0, 38.7], // raw values
+                continuousTickLabels: ['-60', '0', '+38.7'], // strings you want to show
             })
 
             map2.build()
-
-            setTimeout(() => console.log(map2.statData().getMax()), 2000)
         </script>
     </body>
 </html>
