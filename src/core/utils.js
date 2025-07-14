@@ -287,6 +287,15 @@ export const centerDivergingColorFunction = function (colorFunc, domain, diverge
     }
 }
 
+/**
+ * Generates a unique DOM ID
+ * @param {string} prefix - Prefix for the ID
+ * @returns {string} Unique ID
+ */
+export function generateUniqueId(prefix) {
+    return `${prefix}-${Math.random().toString(36).substr(2, 9)}`
+}
+
 //flags
 export const flags = {
     b: 'break in time series',

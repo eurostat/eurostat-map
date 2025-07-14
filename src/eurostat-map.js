@@ -6,7 +6,7 @@ import * as TrivariateChoropleth from './maptypes/map-choropleth-trivariate'
 import * as StripeComposition from './maptypes/map-stripe-composition'
 import * as PieCharts from './maptypes/map-piecharts'
 import * as Sparklines from './maptypes/map-sparklines'
-import * as FlowMap from './maptypes/map-flow'
+import * as FlowMap from './maptypes/flow/map-flow'
 import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/labels'
 

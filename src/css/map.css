@@ -147,3 +147,7 @@ a text {
 .em-grid-hexagon {
     stroke: white;
 }
+
+.em-flow-donuts {
+    cursor: pointer;
+}

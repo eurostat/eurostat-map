@@ -14,14 +14,17 @@ export const defineMapZoom = function (map) {
         .scaleExtent(map.zoomExtent())
         .on('zoom', function (e) {
             const t = e.transform
+            const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
+
             if (t.k !== previousT.k) {
                 zoomHandler(e, previousT, map)
+                //  Store zoom level (k) in the DOM (e.g. to be used in mouseover events)
+                zoomGroup.attr('data-zoom', t.k)
             } else {
                 panHandler(e, map)
             }
 
             // apply default transform to map
-            const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
             zoomGroup.attr('transform', t)
             previousT = t
         })
