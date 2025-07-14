@@ -11,8 +11,8 @@ export function addDonutsToNodes(out, container, nodes) {
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
     const sizeScale = scaleSqrt().domain([0, maxValue]).range([6, 18])
     const colorByLabel = {
-        Incoming: out.incomingColor || '#1f77b4', // blue
-        Outgoing: out.outgoingColor || '#ff7f0e', // orange
+        Incoming: '#1f77b4', // blue
+        Outgoing: '#ff7f0e', // orange
         Internal: out.internalColor || '#999999', // gray (optional)
     }
 
@@ -100,12 +100,28 @@ function donutMouseoverFunction(d, out, event) {
                 <table class="nuts-table"><tbody>`)
 
     for (const segment of node.donutValues) {
+        const color =
+            {
+                Incoming: '#1f77b4',
+                Outgoing: '#ff7f0e',
+                Internal: out.internalColor || '#999999',
+            }[segment.label] || '#ccc'
+
         buf.push(`
-            <tr>
-                <td>${segment.label}</td>
-                <td >${spaceAsThousandSeparator(segment.value)} ${unit}</td>
-            </tr>
-        `)
+        <tr>
+            <td>
+                <span style="
+                    display:inline-block;
+                    width:10px;
+                    height:10px;
+                    border-radius:50%;
+                    background:${color};
+                    margin-right:6px;
+                "></span>${segment.label}
+            </td>
+            <td style="text-align:right">${spaceAsThousandSeparator(segment.value)} ${unit}</td>
+        </tr>
+    `)
     }
 
     buf.push(`</tbody></table></div>`)

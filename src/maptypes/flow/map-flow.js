@@ -31,7 +31,7 @@ export const map = function (config) {
 
     // sankey settings
     out.flowColor_ = '#72bb6f'
-    out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // exporter, importers
+    out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
