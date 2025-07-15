@@ -13,6 +13,7 @@
                 .map('choropleth')
                 .title('Population in Europe')
                 .insets('default')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .scale('60M')
                 .nutsLevel(2)
                 .classificationMethod('threshold')
@@ -23,6 +24,10 @@
                 .drawGraticule(true)
                 .labelsToShow(['seas', 'values'])
                 .tooltip({
+                    textFunction: (d) => {
+                        const value = map.statData().get(d.properties.id)?.value
+                        return `<div style='padding:5px;'><b>${d.properties.na}</b><hr>Population: ${value}</div>`
+                    },
                     //   maxWidth: "200px",
                     //   fontSize: "16px",
                     //   background: "white",

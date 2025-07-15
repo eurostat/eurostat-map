@@ -65,6 +65,10 @@ export const legend = function (map, config) {
         //draw legend background box
         out.makeBackgroundBox()
 
+        //titles
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
+
         // legend for sizes
         if (map.sizeClassifier_) {
             buildSizeLegend()

@@ -155,6 +155,46 @@ export const legend = function (map) {
         out.lgg.append('rect').attr('id', 'legendBR').attr('class', 'em-legend-background').style('opacity', out.boxOpacity)
     }
 
+    out.addTitle = function () {
+        if (out.title) {
+            const titlesContainer = out.lgg.append('g').attr('id', 'em-legend-titles')
+            let cssFontSize = getFontSizeFromClass('em-legend-title')
+            titlesContainer
+                .append('text')
+                .attr('class', 'em-legend-title')
+                .attr('x', out.boxPadding)
+                .attr('y', out.boxPadding + cssFontSize)
+                .text(out.title)
+        }
+    }
+
+    out.addSubtitle = function () {
+        if (out.subtitle) {
+            const titlesContainer = out.lgg.select('#em-legend-titles')
+            let titleFontSize = getFontSizeFromClass('em-legend-title')
+            let subtitleFontSize = getFontSizeFromClass('em-legend-subtitle')
+            titlesContainer
+                .append('text')
+                .attr('class', 'em-legend-subtitle')
+                .attr('x', out.boxPadding)
+                .attr('y', out.boxPadding + titleFontSize + subtitleFontSize + 3) // 3px padding after title
+                .text(out.subtitle)
+        }
+    }
+
+    // get the initial y position for the legend elements within the legend box (boxPadding + titles + padding)
+    out.getBaseY = function () {
+        return (
+            out.boxPadding +
+            (out.title ? getFontSizeFromClass('em-legend-title') : 0) +
+            (out.subtitle ? getFontSizeFromClass('em-legend-subtitle') : 0) +
+            10
+        )
+    }
+    out.getBaseX = function () {
+        return out.boxPadding
+    }
+
     /** Set legend box dimensions, ensuring it has suitable dimensions to fit to all legend graphic elements */
     out.setBoxDimension = function () {
         if (out.lgg.node()) {

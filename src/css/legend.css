@@ -15,6 +15,15 @@
     font-size: 16px;
     fill: #333333;
 }
+.em-size-legend-title {
+    font-size: 16px;
+    fill: #333333;
+}
+.em-legend-subtitle {
+    font-size: 14px;
+    fill: #333333;
+    opacity: 0.8;
+}
 .em-legend-separator {
     stroke: white;
     stroke-width: 1;

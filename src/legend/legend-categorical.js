@@ -44,15 +44,9 @@ export const legend = function (map, config) {
             //draw legend background box
             out.makeBackgroundBox()
 
-            //draw title
-            if (out.title) {
-                container
-                    .append('text')
-                    .attr('class', 'em-legend-title')
-                    .attr('x', out.boxPadding)
-                    .attr('y', out.boxPadding + out.titleFontSize)
-                    .text(out.title)
-            }
+            //titles
+            if (out.title) out.addTitle()
+            if (out.subtitle) out.addSubtitle()
 
             //get category codes
             const domain = map.classToFillStyle() ? Object.keys(map.classToFillStyle()) : map.classifier_.domain()

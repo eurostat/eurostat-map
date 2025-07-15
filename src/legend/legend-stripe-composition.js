@@ -45,14 +45,9 @@ export const legend = function (map, config) {
         //draw legend background box
         out.makeBackgroundBox()
 
-        //draw title
-        if (out.title) {
-            lgg.append('text')
-                .attr('class', 'em-legnd-title')
-                .attr('x', out.boxPadding)
-                .attr('y', out.boxPadding + out.titleFontSize)
-                .text(out.title)
-        }
+        //titles
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
 
         //draw legend elements for classes: rectangle + label
         let i = 0
@@ -162,37 +157,37 @@ export const legend = function (map, config) {
     }
 
     function highlightRegions(map, code) {
-        const allRegions = map.svg_.selectAll('pattern').selectAll('rect');
-    
+        const allRegions = map.svg_.selectAll('pattern').selectAll('rect')
+
         // Save original colors if not already stored
         allRegions.each(function () {
-            const el = select(this);
+            const el = select(this)
             if (!el.attr('data-original-fill')) {
-                el.attr('data-original-fill', el.style('fill'));
+                el.attr('data-original-fill', el.style('fill'))
             }
-            el.style('fill', 'white'); // Set all regions to white
-        });
-    
+            el.style('fill', 'white') // Set all regions to white
+        })
+
         // Highlight only the selected regions by restoring their original color
-        const selectedRegions = map.svg_.selectAll("pattern").selectAll("rect[code='" + code + "']");
+        const selectedRegions = map.svg_.selectAll('pattern').selectAll("rect[code='" + code + "']")
         selectedRegions.each(function () {
-            const el = select(this);
-            el.style('fill', el.attr('data-original-fill')); // Restore original fill
-        });
+            const el = select(this)
+            el.style('fill', el.attr('data-original-fill')) // Restore original fill
+        })
     }
-    
+
     function unhighlightRegions(map) {
-        const allRegions = map.svg_.selectAll('pattern').selectAll('rect');
-    
+        const allRegions = map.svg_.selectAll('pattern').selectAll('rect')
+
         // Restore each region's original color from the stored attribute
         allRegions.each(function () {
-            const el = select(this);
-            const originalFill = el.attr('data-original-fill');
+            const el = select(this)
+            const originalFill = el.attr('data-original-fill')
             if (originalFill) {
-                el.style('fill', originalFill);
+                el.style('fill', originalFill)
             }
-        });
+        })
     }
-    
+
     return out
 }

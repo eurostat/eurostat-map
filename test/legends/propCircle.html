@@ -41,8 +41,16 @@
                 .legend({
                     x: 10,
                     y: 220,
-                    title: 'Test 1',
-                    colorLegend: { labelType: 'ranges', labels: ['my', 'own', 'labels'] },
+                    title: 'Main title',
+                    subtitle: 'Subtitle',
+                    boxOpacity: 0.95,
+                    sizeLegend: {
+                        title: 'Size legend title',
+                        noData: true,
+                        noDataText: 'No data available',
+                        labelFormatter: eurostatmap.spaceAsThousandSeparator,
+                    },
+                    colorLegend: { labelType: 'ranges', labels: ['my', 'very', 'own', 'custom', 'labels'] },
                 })
 
             map.statData('size').setData({

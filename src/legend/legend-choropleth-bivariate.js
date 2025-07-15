@@ -77,15 +77,9 @@ export const legend = function (map, config) {
         // Draw background box
         out.makeBackgroundBox()
 
-        // Draw title
-        if (out.title) {
-            out.lgg
-                .append('text')
-                .attr('class', 'em-legend-title')
-                .attr('x', xc + out._horizontalOffset)
-                .attr('y', out.boxPadding + out.titleFontSize)
-                .text(out.title)
-        }
+        //titles
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
 
         // The vertical position of the legend element
         out._y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0)

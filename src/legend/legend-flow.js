@@ -65,6 +65,11 @@ export const legend = function (map, config) {
         //draw legend background box
         out.makeBackgroundBox()
 
+        //titles
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
+
+        // draw legend elements
         buildFlowLegend()
 
         //set legend box dimensions
@@ -77,7 +82,27 @@ export const legend = function (map, config) {
      * @param {*} map map instance
      * @param {*} container parent legend object from core/legend.js
      */
-    function buildFlowLegend(m) {}
+    function buildFlowLegend(m) {
+        const x = 10
+        const y = 10
+
+        buildFlowWidthLegend(m, x, y)
+
+        if (m.flowDonuts_) {
+            const offset = 20
+            buildCircleSizeLegend(m, x, y + offset)
+        }
+    }
+
+    function buildFlowWidthLegend(m, x, y) {
+        const container = out.lgg.append('g').attr('id', 'em-flow-width-legend').attr('class', 'em-flow-width-legend')
+        // Draw title
+        container.append('text').attr('x', x).attr('y', y).text(out.title).attr('class', 'em-legend-label').attr('id', 'line-width-legend-title')
+    }
+
+    function buildCircleSizeLegend(m, x, y) {
+        const container = out.lgg.append('g').attr('id', 'em-flow-circle-size-legend').attr('class', 'em-flow-circle-size-legend')
+    }
 
     return out
 }

@@ -82,19 +82,11 @@ export const legend = function (map, config) {
 
         if (out.lgg.node()) {
             const map = out.map
-            const container = out.lgg
 
             // Draw legend background box and title if provided
             out.makeBackgroundBox()
-            if (out.title) {
-                let cssFontSize = getFontSizeFromClass('em-legend-title')
-                container
-                    .append('text')
-                    .attr('class', 'em-legend-title')
-                    .attr('x', out.boxPadding)
-                    .attr('y', out.boxPadding + cssFontSize)
-                    .text(out.title)
-            }
+            if (out.title) out.addTitle()
+            if (out.subtitle) out.addSubtitle()
 
             //exit early if no classifier
             if (!map.classToFillStyle()) return
@@ -102,13 +94,27 @@ export const legend = function (map, config) {
             //set default point of divergence if applicable
             if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
 
+            // initial x and y positions for the internal legend elements
+            const baseY = out.getBaseY()
+            const baseX = out.getBaseX()
+
             if (out.histogram) {
-                createHistogramLegend(out, getThresholds(), getColors(), getData(), getLabelFormatter(), highlightRegions, unhighlightRegions)
+                createHistogramLegend(
+                    out,
+                    baseX,
+                    baseY,
+                    getThresholds(),
+                    getColors(),
+                    getData(),
+                    getLabelFormatter(),
+                    highlightRegions,
+                    unhighlightRegions
+                )
             } else if (map.colorSchemeType_ === 'continuous') {
-                createContinuousLegend()
+                createContinuousLegend(baseX, baseY)
             } else {
-                if (out.labelType === 'ranges') createRangesLegend()
-                else createThresholdsLegend()
+                if (out.labelType === 'ranges') createRangesLegend(baseX, baseY)
+                else createThresholdsLegend(baseX, baseY)
             }
 
             // Get the total height of the choropleth legend box
@@ -120,7 +126,7 @@ export const legend = function (map, config) {
                 shapeHeight: out.shapeHeight,
                 labelOffset: out.labelOffset,
                 boxPadding: out.boxPadding,
-                offsetY: legendHeight + out.boxPadding + 5, // << this shifts pattern legend down
+                offsetY: legendHeight + out.boxPadding + 5, //  shifts pattern legend down
             })
 
             // Set legend box dimensions
@@ -177,13 +183,14 @@ export const legend = function (map, config) {
     // Stretched interpolators (e.g., stretchedColor using .valueTransform)
     // D3 diverging scales (d3.scaleDiverging(...).domain([-60, 0, 38.7]))
     // All of the above with or without .valueTransform / .valueUntransform
-    function createContinuousLegend() {
+    function createContinuousLegend(baseX, baseY) {
         const m = out.map
         const container = out.lgg.append('g').attr('class', 'em-continuous-legend')
         const isVertical = out.continuousOrientation === 'vertical'
         const legendId = 'legend-gradient-' + Math.random().toString(36).substr(2, 5)
         const domain = getColorDomain(m)
-        const { legendWidth, legendHeight, baseY } = computeLayoutBasics(out, isVertical)
+        const legendWidth = out.width || out.shapeWidth * 6
+        const legendHeight = isVertical ? out.shapeWidth : out.shapeHeight
 
         createLegendGradient(container, m, legendId, isVertical)
         drawLegendRect(container, legendId, out, baseY, legendWidth, legendHeight, isVertical)
@@ -203,13 +210,6 @@ export const legend = function (map, config) {
         return typeof map.colorFunction_?.domain === 'function' ? map.colorFunction_.domain() : map.domain_ || [0, 1]
     }
 
-    function computeLayoutBasics(out, isVertical) {
-        const width = out.width || out.shapeWidth * 6
-        const height = isVertical ? out.shapeWidth : out.shapeHeight
-        let y = out.boxPadding
-        if (out.title) y += getFontSizeFromClass('em-legend-title') + 10
-        return { legendWidth: width, legendHeight: height, baseY: y }
-    }
     function createLegendGradient(container, map, gradientId, isVertical) {
         const isD3Scale = typeof map.colorFunction_?.domain === 'function'
         const isDiverging = map.isDiverging?.() || false
@@ -400,16 +400,15 @@ export const legend = function (map, config) {
             .text(out.noDataText)
     }
 
-    function createThresholdsLegend() {
+    function createThresholdsLegend(baseX, baseY) {
         const m = out.map
         const lgg = out.lgg
-        let baseY = out.boxPadding
+
         // Label formatter
         const labelFormatter = getLabelFormatter()
-        if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
         for (let i = 0; i < m.numberOfClasses_; i++) {
             const y = baseY + i * out.shapeHeight
-            const x = out.boxPadding
+            const x = baseX
             const ecl = out.ascending ? m.numberOfClasses() - i - 1 : i
             const fillColor = m.classToFillStyle()(ecl, m.numberOfClasses_)
 
@@ -514,18 +513,15 @@ export const legend = function (map, config) {
         }
     }
 
-    function createRangesLegend() {
+    function createRangesLegend(baseX, baseY) {
         const map = out.map
         const container = out.lgg
         const labelFormatter = getLabelFormatter()
 
-        let baseY = out.boxPadding
-        if (out.title) baseY = baseY + getFontSizeFromClass('em-legend-title') + 8 // title size + padding
-
         // for each class
         for (let i = 0; i < map.numberOfClasses_; i++) {
             let y = baseY + i * out.shapeHeight
-            const x = out.boxPadding
+            const x = baseX
             const ecl = out.ascending ? map.numberOfClasses() - i - 1 : i
             const fillColor = map.classToFillStyle()(ecl, map.numberOfClasses_)
             const itemContainer = container.append('g').attr('class', 'em-legend-item')

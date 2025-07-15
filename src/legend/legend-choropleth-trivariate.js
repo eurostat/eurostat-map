@@ -38,13 +38,16 @@ export const legend = function (map, config) {
         out.updateConfig()
         out.updateContainer()
         const lgg = out.lgg
-        const numberOfClasses = out.map.numberOfClasses()
 
         // Remove previous content
         lgg.selectAll('*').remove()
 
         // Draw background box
         out.makeBackgroundBox()
+
+        //titles
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
 
         // Apply padding to the main <g> group
         const paddedGroup = lgg.append('g').attr('transform', `translate(${out.boxPadding}, ${out.boxPadding})`)

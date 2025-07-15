@@ -21,12 +21,13 @@
                 .colors(['#723078', '#CB86CF', '#EDD6EF', '#CBD2EE', '#6378C8', '#15246B'])
                 .thresholds([100, 200, 300, 400, 500])
                 .legend({
+                    title: 'Inh per km2',
+                    subtitle: '2020',
                     x: 550,
                     y: 40,
                     ascending: true,
                     labelType: 'ranges',
                     svgId: 'eurostatmap-legend-europe-template',
-                    title: '',
                     fontFill: '#000',
                     noData: true,
                     noDataText: 'Data not available',
@@ -35,15 +36,15 @@
                 })
                 .build()
 
-            setTimeout(() => {
-                map.legend({
-                    x: 500,
-                    y: 10,
-                    title: 'Inh per km2',
-                    labelType: 'thresholds',
-                    pointOfDivergenceLabel: 'Increase|decrease',
-                })
-            }, 1000)
+            // setTimeout(() => {
+            //     map.legend({
+            //         x: 500,
+            //         y: 10,
+            //         title: 'Inh per km2',
+            //         labelType: 'thresholds',
+            //         pointOfDivergenceLabel: 'Increase|decrease',
+            //     })
+            // }, 1000)
 
             // setTimeout(() => {
             //     map.legend(false)

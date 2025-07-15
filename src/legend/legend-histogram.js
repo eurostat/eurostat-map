@@ -4,7 +4,7 @@ import { axisLeft, axisBottom } from 'd3-axis'
 import { max } from 'd3-array'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
-export const createHistogramLegend = (legend, thresholds, colors, data, labelFormatter, highlightRegions, unhighlightRegions) => {
+export const createHistogramLegend = (legend, baseX, baseY, thresholds, colors, data, labelFormatter, highlightRegions, unhighlightRegions) => {
     const orientation = legend.histogram.orientation || 'horizontal'
     const showCounts = legend.histogram.showCounts
     const showPercentages = legend.histogram.showPercentages
@@ -24,8 +24,7 @@ export const createHistogramLegend = (legend, thresholds, colors, data, labelFor
     const reversedCounts = counts.slice().reverse()
     const total = counts.reduce((sum, d) => sum + d, 0)
     const reversedPercentages = reversedCounts.map((d) => (total > 0 ? (d / total) * 100 : 0))
-    const baseY = legend.boxPadding + (legend.title ? getFontSizeFromClass('em-legend-title') + 10 : 30)
-    const barGroup = legend.lgg.append('g').attr('class', 'em-legend-histogram').attr('transform', `translate(0, ${baseY})`)
+    const barGroup = legend.lgg.append('g').attr('class', 'em-legend-histogram').attr('transform', `translate(${baseX}, ${baseY})`)
 
     if (orientation === 'vertical') {
         drawVerticalHistogram(barGroup)
