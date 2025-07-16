@@ -502,9 +502,8 @@ export const getTextColorForBackground = function (backgroundColor) {
         r = parseInt(hex.substring(0, 2), 16)
         g = parseInt(hex.substring(2, 4), 16)
         b = parseInt(hex.substring(4, 6), 16)
-    }
-    // Handle RGB colors like 'rgb(255,255,255)'
-    else {
+    } else {
+        // Handle RGB colors like 'rgb(255,255,255)'
         const rgb = backgroundColor.match(/\d+/g)
         r = parseInt(rgb[0])
         g = parseInt(rgb[1])
@@ -515,6 +514,7 @@ export const getTextColorForBackground = function (backgroundColor) {
     const luminance = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
 
     // Return black for light backgrounds, white for dark backgrounds
+    console.log(`Background color: ${backgroundColor}, Luminance: ${luminance}`)
     return luminance > 0.5 ? 'black' : 'white'
 }
 

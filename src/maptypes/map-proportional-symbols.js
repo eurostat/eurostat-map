@@ -295,8 +295,6 @@ export const map = function (config) {
                 if (out.simulation) stopSimulation()
             }
 
-            appendLabelsToSymbols(map, sizeData)
-
             // set style of symbols
             const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
@@ -322,6 +320,7 @@ export const map = function (config) {
             }
 
             setSymbolStyles(symb)
+            appendLabelsToSymbols(map, sizeData)
 
             addMouseEvents(map)
 
@@ -365,7 +364,10 @@ export const map = function (config) {
                     if (out.psShape_ === 'square') factor = factor - 0.4
                     return `${radius * factor}px`
                 })
-                .attr('fill', getTextColorForBackground(out.psFill_))
+                .attr('fill', function () {
+                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill
+                    return getTextColorForBackground(fill)
+                })
                 .attr('dy', (d) => (out.labels_?.values && sizeData.get(d.properties.id)?.value ? '-0.3em' : '0'))
         }
 
@@ -391,8 +393,11 @@ export const map = function (config) {
                     const radius = datum ? out.classifierSize_(datum.value) : 0
                     return `${radius * 0.4}px`
                 })
-                .attr('fill', getTextColorForBackground(out.psFill_))
-                .attr('dy', (d) => (out.psCodeLabels_ ? '0.6em' : '0'))
+                .attr('fill', function () {
+                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
+                    return getTextColorForBackground(fill)
+                })
+                .attr('dy', (d) => (out.psCodeLabels_ ? '0.8em' : '0'))
         }
     }
 

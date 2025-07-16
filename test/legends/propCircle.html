@@ -27,8 +27,9 @@
                 .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
                 .psCodeLabels(true)
                 .psFill('#e04a28')
-                .psMaxSize(40)
-                .psMinSize(8)
+                .psMaxSize(50)
+                .dorling(true)
+                .psMinSize(12)
                 .processCentroids((centroidFeatures) => {
                     return centroidFeatures.map((feature) => {
                         if (feature.properties.id == 'TR') {
