@@ -154,8 +154,12 @@ export const legend = function (map, config) {
         if (!map.psCustomSVG_ && map.psShape_ == 'circle') {
             buildCircleLegend(baseX, baseY)
             if (out.sizeLegend.noData) {
-                let y = baseY + out._sizeLegendContainer.node().getBBox().height + 25
-                appendNoDataLegend(baseX, y, out.sizeLegend.noDataText)
+                let y = out._sizeLegendContainer.node().getBBox().height + 25
+                const container = out._sizeLegendContainer
+                    .append('g')
+                    .attr('class', 'em-no-data-legend')
+                    .attr('transform', `translate(${baseX},${y})`)
+                appendNoDataLegend(container, out.sizeLegend.noDataText)
             }
             return
         } else if (map.psShape_ == 'spike') {
@@ -210,7 +214,7 @@ export const legend = function (map, config) {
         }
     }
 
-    function buildSpikeLegend(map, sizeLegendConfig) {
+    function buildSpikeLegend(map) {
         const spike = (length, width = map.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
 
         let maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
@@ -610,13 +614,14 @@ export const legend = function (map, config) {
         return thresholds
     }
 
-    function buildColorRangesLegend() {
+    function buildColorRangesLegend(baseX) {
         const map = out.map
         const f = out.colorLegend.labelFormatter || spaceAsThousandSeparator
         const thresholds = getColorThresholds()
         const numberOfClasses = map.psClasses_
         const container = out._colorLegendContainer
         const x = 0 // x position of color legend cells
+        let y
 
         //title
         if (out.colorLegend.title) {
@@ -629,7 +634,7 @@ export const legend = function (map, config) {
         }
 
         for (let i = 0; i < numberOfClasses; i++) {
-            let y =
+            y =
                 out.titleFontSize +
                 out.colorLegend.titlePadding +
                 out.colorLegend.marginTop +
@@ -676,12 +681,13 @@ export const legend = function (map, config) {
 
         // Optionally add no-data
         if (out.colorLegend.noData) {
-            let y = out.titleFontSize + out.colorLegend.marginTop + numberOfClasses * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
-            appendNoDataLegend(x, y, out.colorLegend.noDataText)
+            y += out._colorLegendContainer.node().getBBox().height
+            const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
+            appendNoDataLegend(container, out.colorLegend.noDataText)
         }
     }
 
-    function buildColorThresholdsLegend(baseX, baseY) {
+    function buildColorThresholdsLegend(baseX) {
         //define format for labels
         const labelFormatter = out.colorLegend.labelFormatter || spaceAsThousandSeparator
 
@@ -770,8 +776,9 @@ export const legend = function (map, config) {
 
         //'no data' legend box
         if (out.colorLegend.noData) {
-            let y = out.titleFontSize + out.colorLegend.marginTop + numberOfClasses * out.colorLegend.shapeHeight + 20 // add 20 to separate it from the rest
-            appendNoDataLegend(x, y, out.colorLegend.noDataText)
+            let y = out._colorLegendContainer.node().getBBox().height + 25
+            const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${baseX},${y})`)
+            appendNoDataLegend(container, out.colorLegend.noDataText)
         }
     }
 

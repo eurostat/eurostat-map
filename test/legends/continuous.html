@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('continuous color scheme legend')
+                .subtitle('diverges at 0')
+                .stat({
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT', time: 2022 },
+                    unitText: '‰',
+                })
+                .nutsLevel(3)
+                .zoomExtent([1, 1000])
+                .numberOfClasses(6)
+                .colorFunction(d3.interpolateRdBu)
+                .colorSchemeType('continuous')
+                .pointOfDivergence(0)
+                .legend({
+                    title: 'Population change',
+                    subtitle: 'per 1000 inhabitants',
+                    x: 550,
+                    y: 100,
+                    width: 200,
+                    noDataText: 'Data not available',
+                    pointOfDivergenceLabel: '',
+                    pointOfDivergence: 3,
+                })
+                .build()
+        </script>
+    </body>
+</html>

@@ -5,7 +5,7 @@ import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
-import * as ChoroplethLegend from '../legend/legend-choropleth'
+import * as ChoroplethLegend from '../legend/choropleth/legend-choropleth'
 import {
     centerDivergingColorFunction,
     checkIfDiverging,
@@ -51,7 +51,7 @@ export const map = function (config) {
     out.colorSchemeType_ = 'discrete' // or 'continuous'
     out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
-    out.divergencePoint_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
+    out.pointOfDivergence = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -73,8 +73,7 @@ export const map = function (config) {
         'colorSchemeType_',
         'valueTransform_',
         'valueUntransform_',
-        'divergencePoint_',
-        'isDiverging_',
+        'pointOfDivergence_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -162,7 +161,7 @@ export const map = function (config) {
 
                 if (!isFullScale) {
                     if (isDiverging) {
-                        const divergence = valueTransform(out.divergencePoint_ ?? 0)
+                        const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
                         const maxOffset = Math.max(Math.abs(maxVal - divergence), Math.abs(minVal - divergence))
                         out.domain_ = [divergence - maxOffset, divergence + maxOffset]
                     } else {

@@ -2,7 +2,7 @@ import { select } from 'd3-selection'
 import { scaleQuantile, scaleThreshold } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
-import * as BivariateLegend from '../legend/legend-choropleth-bivariate'
+import * as BivariateLegend from '../legend/choropleth/legend-choropleth-bivariate'
 import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 
 /**

@@ -4,7 +4,7 @@ import { line, area } from 'd3-shape'
 import { extent, min, max } from 'd3-array'
 import { axisBottom, axisLeft, axisRight } from 'd3-axis'
 import * as StatMap from '../core/stat-map'
-import * as lgch from '../legend/legend-choropleth'
+import * as lgch from '../legend/choropleth/legend-choropleth'
 import { getRegionsSelector } from '../core/utils'
 import * as StatisticalData from '../core/stat-data'
 /**

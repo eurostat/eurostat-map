@@ -1,8 +1,7 @@
 import { select } from 'd3-selection'
 import { scaleQuantile } from 'd3-scale'
-import { interpolateRgb } from 'd3-interpolate'
 import * as StatMap from '../core/stat-map'
-import * as TrivariateLegend from '../legend/legend-choropleth-trivariate'
+import * as TrivariateLegend from '../legend/choropleth/legend-choropleth-trivariate'
 import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, multiplyBlendMultipleHex, getRegionsSelector } from '../core/utils'
 
 /**

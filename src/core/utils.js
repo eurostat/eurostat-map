@@ -257,7 +257,7 @@ export const getURLParameterByName = function (name) {
 }
 
 export const checkIfDiverging = function (map) {
-    return map.isDiverging_ === true || map.divergencePoint_ !== null
+    return map.pointOfDivergence_ !== null
 }
 
 /**

@@ -72,22 +72,6 @@ export const legend = function (map) {
         if (map.legend_) {
             deepMergeExistingKeys(out, map.legend_)
         }
-
-        //ps
-        // // update legend parameters if necessary
-        // if (m.legend_)
-        //     for (let key in m.legend_) {
-        //         if (key == 'colorLegend' || key == 'sizeLegend') {
-        //             for (let p in out[key]) {
-        //                 //override each property in size and color legend m.legend_
-        //                 if (m.legend_[key][p] !== undefined) {
-        //                     out[key][p] = m.legend_[key][p]
-        //                 }
-        //             }
-        //         } else {
-        //             out[key] = m.legend_[key]
-        //         }
-        //     }
     }
 
     //It performs a shallow copy — nested objects will be copied by reference, not duplicated.
