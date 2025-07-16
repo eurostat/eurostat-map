@@ -2,8 +2,8 @@
 // Sequential interpolators (like d3.interpolatePurples)
 // Stretched interpolators (e.g., stretchedColor using .valueTransform)
 // D3 diverging scales (d3.scaleDiverging(...).domain([-60, 0, 38.7]))
-
-import { executeForAllInsets } from '../../core/utils'
+import { select } from 'd3-selection'
+import { checkIfDiverging, executeForAllInsets } from '../../core/utils'
 import { getLabelFormatter, highlightRegions, unhighlightRegions } from './legend-choropleth'
 
 // All of the above with or without .valueTransform / .valueUntransform
@@ -22,7 +22,7 @@ export function createContinuousLegend(out, baseX, baseY) {
     if (hasTicks(out)) {
         drawTickLabels(container, out, domain, legendWidth, baseY, isVertical)
     } else {
-        drawLowHighLabels(container, out, domain, baseY, legendWidth, legendHeight, isVertical)
+        drawLowHighLabels(container, out, baseY, legendWidth, legendHeight, isVertical)
     }
 
     if (out.noData) {
@@ -36,7 +36,7 @@ function getColorDomain(map) {
 
 function createLegendGradient(container, map, gradientId, isVertical) {
     const isD3Scale = typeof map.colorFunction_?.domain === 'function'
-    const isDiverging = map.isDiverging?.() || false
+    const isDiverging = checkIfDiverging(map)
     const valueTransform = map.valueTransform_ || ((d) => d)
     const steps = 20
 
@@ -56,27 +56,22 @@ function createLegendGradient(container, map, gradientId, isVertical) {
         .attr('y2', isVertical ? '0%' : '0%')
 
     for (let i = 0; i <= steps; i++) {
-        let t = i / steps
-
-        // Flip diverging full-scale gradients in horizontal layout
-        let tNorm = t
-        if (!isVertical && isD3Scale && isDiverging && rawDomain.length === 3 && rawDomain[0] < rawDomain[2]) {
-            tNorm = 1 - t
-        }
+        const t = i / steps
 
         let val
         if (domain.length === 3) {
-            // Diverging interpolator or diverging scale with 3-point domain
-            val = tNorm < 0.5 ? d0 + (d1 - d0) * (tNorm * 2) : d1 + (d2 - d1) * ((tNorm - 0.5) * 2)
+            // Diverging domain: interpolate in two halves
+            val = t < 0.5 ? d0 + (d1 - d0) * (t * 2) : d1 + (d2 - d1) * ((t - 0.5) * 2)
         } else {
-            val = d0 + tNorm * (d2 - d0)
+            // Sequential domain: linear interpolation
+            val = d0 + t * (d2 - d0)
         }
 
-        const color = map.colorFunction_(isD3Scale ? val : tNorm)
+        const color = map.colorFunction_(isD3Scale ? val : t)
 
         gradient
             .append('stop')
-            .attr('offset', `${t * 100}%`) // use unflipped t here for visual layout
+            .attr('offset', `${t * 100}%`)
             .attr('stop-color', color)
     }
 }
@@ -101,10 +96,11 @@ function drawTickLabels(container, out, domain, legendWidth, baseY, isVertical) 
     const labelFormatter = getLabelFormatter(out)
     const transform = m.valueTransform_ || ((d) => d)
 
+    // Generate the tick values in transformed space
     const raw =
         Array.isArray(out.continuousTickValues) && out.continuousTickValues.length > 0
             ? out.continuousTickValues.map(transform)
-            : Array.from({ length: out.continuousTicks }, (_, i) => domain[0] + (i / (out.continuousTicks - 1)) * (domain[1] - domain[0]))
+            : generateTickValues(domain, out.continuousTicks, transform)
 
     raw.forEach((val, i) => {
         const t = computeNormalizedTickPosition(val, domain)
@@ -139,6 +135,30 @@ function drawTickLabels(container, out, domain, legendWidth, baseY, isVertical) 
     })
 }
 
+/**
+ * Generate evenly spaced tick values across a domain.
+ * Supports both 2-point (sequential) and 3-point (diverging) domains.
+ *
+ * @param {number[]} domain - The domain array: [min, max] or [min, divergence, max]
+ * @param {number} count - Number of ticks to generate
+ * @param {Function} transform - Optional value transform function
+ * @returns {number[]} Array of transformed tick values
+ */
+function generateTickValues(domain, count, transform = (x) => x) {
+    if (Array.isArray(domain) && domain.length === 3) {
+        const [min, center, max] = domain
+        return Array.from({ length: count }, (_, i) => {
+            const t = i / (count - 1)
+            const raw = t < 0.5 ? min + (center - min) * (t * 2) : center + (max - center) * ((t - 0.5) * 2)
+            return transform(raw)
+        })
+    }
+
+    // Default: sequential 2-point domain
+    const [start, end] = domain
+    return Array.from({ length: count }, (_, i) => transform(start + (i / (count - 1)) * (end - start)))
+}
+
 function computeNormalizedTickPosition(val, domain) {
     if (domain.length === 3) {
         const [d0, d1, d2] = domain
@@ -148,46 +168,79 @@ function computeNormalizedTickPosition(val, domain) {
     }
 }
 
-function drawLowHighLabels(container, out, domain, baseY, width, height, isVertical) {
-    const m = out.map
-    const labelFormatter = getLabelFormatter(out)
-    const low = out.lowLabel ?? labelFormatter(m.valueUntransform_ ? m.valueUntransform_(domain[0]) : domain[0])
-    const high = out.highLabel ?? labelFormatter(m.valueUntransform_ ? m.valueUntransform_(domain[1]) : domain[1])
+function drawLowHighLabels(container, out, baseY, width, height, isVertical) {
+    const labelX = out.boxPadding + (isVertical ? height + 5 : 0)
+    const labelY = baseY + (isVertical ? out.boxPadding : height + 15)
+    const labelWidth = isVertical ? width : width
+    const boxPadding = out.boxPadding
+
+    const low = out.lowLabel
+    const high = out.highLabel
+    const mid = out.pointOfDivergenceLabel
 
     if (isVertical) {
-        container
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding + height + 5)
-            .attr('y', baseY + out.boxPadding + width - 15)
-            .attr('text-anchor', 'start')
-            .attr('dy', '0.35em')
-            .text(low)
+        // Low (bottom)
+        if (low) {
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', labelX)
+                .attr('y', baseY + boxPadding + labelWidth - 15)
+                .attr('text-anchor', 'start')
+                .attr('dy', '0.35em')
+                .text(low)
+        }
 
-        container
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding + height + 5)
-            .attr('y', baseY + out.boxPadding)
-            .attr('text-anchor', 'start')
-            .attr('dy', '0.35em')
-            .text(high)
+        // High (top)
+        if (high) {
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', labelX)
+                .attr('y', baseY + boxPadding)
+                .attr('text-anchor', 'start')
+                .attr('dy', '0.35em')
+                .text(high)
+        }
+
+        // Mid (center)
+        if (mid) {
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', labelX)
+                .attr('y', baseY + boxPadding + labelWidth / 2)
+                .attr('text-anchor', 'start')
+                .attr('dy', '0.35em')
+                .text(mid)
+        }
     } else {
-        container
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding)
-            .attr('y', baseY + height + 15)
-            .attr('text-anchor', 'start')
-            .text(low)
+        // Low (left)
+        if (low) {
+            container.append('text').attr('class', 'em-legend-label').attr('x', boxPadding).attr('y', labelY).attr('text-anchor', 'start').text(low)
+        }
 
-        container
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding + width)
-            .attr('y', baseY + height + 15)
-            .attr('text-anchor', 'end')
-            .text(high)
+        // High (right)
+        if (high) {
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', boxPadding + width)
+                .attr('y', labelY)
+                .attr('text-anchor', 'end')
+                .text(high)
+        }
+
+        // Mid (center)
+        if (mid) {
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', boxPadding + width / 2)
+                .attr('y', labelY)
+                .attr('text-anchor', 'middle')
+                .text(mid)
+        }
     }
 }
 

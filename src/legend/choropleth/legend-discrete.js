@@ -1,5 +1,6 @@
 import { executeForAllInsets } from '../../core/utils'
 import { getLabelFormatter, highlightRegions, unhighlightRegions } from './legend-choropleth'
+import { select } from 'd3-selection'
 
 export function createThresholdsLegend(out, baseX, baseY) {
     const m = out.map

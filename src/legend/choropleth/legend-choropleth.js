@@ -48,8 +48,8 @@ export const legend = function (map, config) {
     out.divergingArrowLength = undefined
 
     //continuous legend
-    out.lowLabel = undefined //'Low'
-    out.highLabel = undefined //'High'
+    out.lowLabel = 'Low' //'Low'
+    out.highLabel = 'High' //'High'
     out.continuousTicks = 0 // Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels)
     out.continuousTickValues = [] // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
     out.continuousTickLabels = [] // Custom tick labels for continuous legend (if empty, will use continuousTickValues)

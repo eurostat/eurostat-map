@@ -70,6 +70,7 @@ export const map = function (config) {
         'noDataFillStyle_',
         'classifier_',
         'colors_',
+        'colorFunction_',
         'colorSchemeType_',
         'valueTransform_',
         'valueUntransform_',
@@ -121,7 +122,7 @@ export const map = function (config) {
             'colorFunction',
             'classToFillStyle',
             'noDataFillStyle',
-            'colors_',
+            'colors',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
@@ -162,8 +163,7 @@ export const map = function (config) {
                 if (!isFullScale) {
                     if (isDiverging) {
                         const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
-                        const maxOffset = Math.max(Math.abs(maxVal - divergence), Math.abs(minVal - divergence))
-                        out.domain_ = [divergence - maxOffset, divergence + maxOffset]
+                        out.domain_ = [minVal, divergence, maxVal]
                     } else {
                         out.domain_ = [minVal, maxVal]
                     }
@@ -345,6 +345,37 @@ export const map = function (config) {
             })
     }
 
+    function getContinuousColor(value, map) {
+        const colorFn = map.colorFunction_
+        const domain = map.domain_ || [0, 1]
+        const isD3Scale = typeof colorFn?.domain === 'function'
+        const valueTransform = map.valueTransform_ || ((d) => d)
+        const transformed = valueTransform(value)
+
+        if (isNaN(transformed)) return map.noDataFillStyle_ || 'gray'
+
+        if (isD3Scale) {
+            // e.g. d3.scaleDiverging, d3.scaleSequential
+            return colorFn(transformed)
+        }
+
+        // Interpolator logic (e.g. d3.interpolateRdBu)
+        let t
+
+        if (domain.length === 3) {
+            const [d0, , d2] = domain
+            const divergence = map.pointOfDivergence_ ?? 0
+            const divT = valueTransform(divergence)
+
+            t = transformed < divT ? (0.5 * (transformed - d0)) / (divT - d0) : 0.5 + (0.5 * (transformed - divT)) / (d2 - divT)
+        } else {
+            const [d0, d1] = domain
+            t = (transformed - d0) / (d1 - d0)
+        }
+
+        return colorFn(Math.min(Math.max(t, 0), 1))
+    }
+
     const regionsFillFunction = function (rg) {
         const ecl = select(this).attr('ecl') // may be a class index or a raw value
         const colorSchemeType = out.colorSchemeType_ || 'discrete'
@@ -366,21 +397,7 @@ export const map = function (config) {
         // Continuous color scheme
         if (colorSchemeType === 'continuous') {
             const rawValue = +ecl
-            if (isNaN(rawValue)) return out.noDataFillStyle?.() || 'gray'
-            // If colorFunction_ has a .domain method, it's a full D3 scale (e.g. scaleDiverging)
-            const isFullScale = typeof out.colorFunction_?.domain === 'function'
-
-            const valueTransform = out.valueTransform_ || ((d) => d)
-            const transformed = valueTransform(rawValue)
-
-            if (isFullScale) {
-                return out.colorFunction_(transformed)
-            } else {
-                // if it's a plain interpolator, we need to normalize
-                const domain = out.domain_ || [0, 1]
-                const t = (transformed - domain[0]) / (domain[1] - domain[0])
-                return out.colorFunction_(Math.min(Math.max(t, 0), 1))
-            }
+            return getContinuousColor(rawValue, out)
         }
 
         // Discrete color scheme

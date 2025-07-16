@@ -19,12 +19,15 @@
                 .map('ps')
                 .title('Proportional circles')
                 .subtitle('test')
-                //.position({ x: 3900000, y: 3085423, z: 6000 })
-                //.dorling(true)
-                //.backgroundMap(false)
+                .stat('size', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Million EUR',
+                    filters: { unit: 'MIO_EUR', time: '2023' },
+                })
+                .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
                 .psCodeLabels(true)
                 .psFill('#e04a28')
-                .psMaxSize(70)
+                .psMaxSize(40)
                 .psMinSize(8)
                 .processCentroids((centroidFeatures) => {
                     return centroidFeatures.map((feature) => {
@@ -39,8 +42,8 @@
                 .labels({ values: true })
                 .nutsLevel('mixed')
                 .legend({
-                    x: 10,
-                    y: 220,
+                    x: 610,
+                    y: 10,
                     title: 'Main title',
                     subtitle: 'Subtitle',
                     boxOpacity: 0.95,
@@ -117,29 +120,6 @@
             })
 
             map.build()
-
-            // setTimeout(() => {
-            //     map.psCodeLabels(false).labels({ values: false })
-            //     map.psMaxSize(60)
-            //     //.dorlingStrength({ x: 3, y: 3 })
-            //     map.stamp({
-            //         x: 230,
-            //         y: 100,
-            //         size: 60,
-            //         text: 'Hello~world¶New~Line¶Another~Line',
-            //         stampColor: '#3792B6',
-            //         textColor: '#3792B6',
-            //         strokeWidth: 5,
-            //     })
-            //     map.updateStatValues()
-            //     map.legend({ x: 10, y: 220, title: 'Test 2', svgId: 'legend' })
-            // }, 2000)
-
-            // setTimeout(() => {
-            //     map.legend(false)
-            //     map.psCodeLabels(true)
-            //     map.updateStatValues()
-            // }, 5000)
         </script>
     </body>
 </html>

@@ -11,6 +11,7 @@
         <script src="https://d3js.org/d3.v7.min.js"></script>
 
         <script>
+            const customColorFunction = d3.scaleDiverging().domain([-109, 0, 64]).interpolator(d3.interpolateRdBu)
             const map = eurostatmap
                 .map('choropleth')
                 .title('continuous color scheme legend')
@@ -23,18 +24,21 @@
                 .nutsLevel(3)
                 .zoomExtent([1, 1000])
                 .numberOfClasses(6)
+                //.colorFunction(customColorFunction)
                 .colorFunction(d3.interpolateRdBu)
                 .colorSchemeType('continuous')
                 .pointOfDivergence(0)
                 .legend({
                     title: 'Population change',
                     subtitle: 'per 1000 inhabitants',
-                    x: 550,
-                    y: 100,
-                    width: 200,
+                    x: 500,
+                    y: 190,
+                    width: 270,
+                    boxOpacity: 1,
                     noDataText: 'Data not available',
-                    pointOfDivergenceLabel: '',
-                    pointOfDivergence: 3,
+                    lowLabel: 'Decrease',
+                    highLabel: 'Increase',
+                    pointOfDivergenceLabel: 'no change',
                 })
                 .build()
         </script>

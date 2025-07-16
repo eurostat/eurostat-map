@@ -74,8 +74,6 @@
     stroke-width: 0.15;
 }
 
-
-
 /* dont fill certain elements */
 .em-frame,
 .em-graticule,
@@ -89,7 +87,7 @@
     fill: none;
 }
 
-/* target non cc/eu/efta borders */
-/* .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-    stroke-width: 0;
-} */
+/* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
+g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0px;
+}
