@@ -226,7 +226,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
                 .attr('y', y + config.shapeHeight * 0.5)
-                .attr('dominant-baseline', 'middle')
+                .attr('dy', '0.35em') // ~vertical centering
                 .text(map.catLabels()[code] || code)
 
             i++
@@ -269,6 +269,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
                 .attr('y', y + config.shapeHeight * 0.5)
+                .attr('dy', '0.35em') // ~vertical centering
                 .text(config.noDataText)
         }
     }

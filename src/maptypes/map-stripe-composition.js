@@ -283,7 +283,7 @@ export const map = function (config) {
 
         let html = ''
         // Header with region name and ID
-        html += `<div class="estat-vis-tooltip-bar">
+        html += `<div class="em-tooltip-bar">
         <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
     </div>`
 

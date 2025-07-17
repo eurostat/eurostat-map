@@ -25,7 +25,7 @@ export const tooltip = function (config) {
         tooltip = select('#' + config.div)
         if (tooltip.empty()) tooltip = select('body').append('div').attr('id', config.div)
 
-        tooltip.attr('class', 'tooltip-eurostat')
+        tooltip.attr('class', 'em-tooltip')
     }
 
     my.mouseover = function (html) {

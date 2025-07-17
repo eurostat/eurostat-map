@@ -514,7 +514,6 @@ export const getTextColorForBackground = function (backgroundColor) {
     const luminance = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
 
     // Return black for light backgrounds, white for dark backgrounds
-    console.log(`Background color: ${backgroundColor}, Luminance: ${luminance}`)
     return luminance > 0.5 ? 'black' : 'white'
 }
 

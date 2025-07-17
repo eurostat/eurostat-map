@@ -97,13 +97,13 @@ const flowMapTooltipFunction = function (link, map) {
     // Header with region name and ID
     const title = `${link.source.name || link.source.id} to ${link.target.name || link.target.id}`
     buf.push(`
-        <div class="estat-vis-tooltip-bar">
+        <div class="em-tooltip-bar">
             <b>${title}</b>
         </div>
     `)
 
     // Value
-    buf.push(`<div class='estat-vis-tooltip-text'>
+    buf.push(`<div class='em-tooltip-text'>
                 <table class="nuts-table">
                     <tbody>
                         <tr><td>${spaceAsThousandSeparator(link.value)} ${unit}</td></tr>

@@ -93,10 +93,10 @@ function donutMouseoverFunction(d, out, event) {
     const buf = []
 
     // Header
-    buf.push(`<div class="estat-vis-tooltip-bar"><b>${name}</b></div>`)
+    buf.push(`<div class="em-tooltip-bar"><b>${name}</b></div>`)
 
     // Donut breakdown
-    buf.push(`<div class='estat-vis-tooltip-text'>
+    buf.push(`<div class='em-tooltip-text'>
                 <table class="nuts-table"><tbody>`)
 
     for (const segment of node.donutValues) {

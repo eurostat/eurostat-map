@@ -430,7 +430,7 @@ export const map = function (config) {
         let html = ''
 
         // Header
-        html += `<div class="estat-vis-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
+        html += `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
         if (!data || data.length === 0) {
             html += `<div>${out.noDataText()}</div>`

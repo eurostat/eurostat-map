@@ -103,9 +103,9 @@ or for a specific inset use:
 ## Tootlip
 
 ```css
-.tooltip-eurostat
-.estat-vis-tooltip-text
-.estat-vis-tooltip-bar
+.em-tooltip
+.em-tooltip-text
+.em-tooltip-bar
 .em-tooltip-piechart-breakdown
 .em-tooltip-piechart-container
 ```

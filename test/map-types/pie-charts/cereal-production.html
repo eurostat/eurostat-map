@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            let map = eurostatmap
+                .map('pie')
+                .svgId('pie')
+                .title('Cereal production')
+                .subtitle('')
+                .scale('60M')
+                .nutsLvl(2)
+                //.dorling(true)
+                .geoCenter([5000000, 3500000])
+                .statPie(
+                    {
+                        eurostatDatasetCode: 'apro_cpshr',
+                        filters: { strucpro: 'PR_HU_EU', time: '2022' },
+                        unitText: '1 000 tonnes',
+                    },
+                    'crops', //parameter that the categories belong to
+                    cropOptions.map((d) => d.value), //category codes
+                    cropOptions.map((d) => d.text), //category labels
+                    ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
+                    'C0000' //code for the total (all causes of death)
+                )
+                .pieOtherColor('#FFCC80')
+                .pieOtherText('Other')
+                .pieMinRadius(6)
+
+                .legend({
+                    x: 480,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: '1 000 tonnes',
+                        titlePadding: 10,
+                        values: [500, 6000],
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>

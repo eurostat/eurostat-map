@@ -479,7 +479,7 @@ const choroplethTooltipFunction = function (region, map) {
     const regionName = region.properties.na || region.properties.name
     const regionId = region.properties.id
     buf.push(`
-        <div class="estat-vis-tooltip-bar">
+        <div class="em-tooltip-bar">
             <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
         </div>
     `)
@@ -492,7 +492,7 @@ const choroplethTooltipFunction = function (region, map) {
     // No data case
     if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
         buf.push(`
-            <div class="estat-vis-tooltip-text no-data">
+            <div class="em-tooltip-text no-data">
                 <table class="nuts-table">
                     <tbody>
                         <tr><td>${map.noDataText_}</td></tr>
@@ -505,7 +505,7 @@ const choroplethTooltipFunction = function (region, map) {
 
     // Data display
     buf.push(`
-        <div class="estat-vis-tooltip-text">
+        <div class="em-tooltip-text">
             <table class="nuts-table">
                 <tbody>
                     <tr><td>${spaceAsThousandSeparator(sv.value)} ${unit}</td></tr>

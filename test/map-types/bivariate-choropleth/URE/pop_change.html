@@ -59,14 +59,14 @@
                         const regionName = rg.properties.na || rg.properties.name
                         const regionId = rg.properties.id
                         buf.push(`
-                        <div class="estat-vis-tooltip-bar">
+                        <div class="em-tooltip-bar">
                             <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
                         </div>
                     `)
 
                         //start table
                         buf.push(`
-                    <div class="estat-vis-tooltip-text no-data">
+                    <div class="em-tooltip-text no-data">
                         <table class="nuts-table">
                             <tbody>
                                 <tr><td>`)

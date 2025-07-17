@@ -43,7 +43,7 @@
                 .labels({ values: true })
                 .nutsLevel('mixed')
                 .legend({
-                    x: 610,
+                    x: 580,
                     y: 10,
                     title: 'Main title',
                     subtitle: 'Subtitle',
@@ -54,7 +54,7 @@
                         noDataText: 'No data available',
                         labelFormatter: eurostatmap.spaceAsThousandSeparator,
                     },
-                    colorLegend: { labelType: 'ranges', labels: ['my', 'very', 'own', 'custom', 'labels'] },
+                    colorLegend: { title: 'color legend title', labelType: 'ranges', labels: ['my', 'very', 'own', 'custom', 'labels'] },
                 })
 
             map.statData('size').setData({

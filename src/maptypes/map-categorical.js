@@ -272,10 +272,10 @@ const tooltipTextFunCat = function (rg, map) {
     const buf = []
     if (rg.properties.id) {
         //name and code
-        buf.push('<div class="estat-vis-tooltip-bar">' + rg.properties.na + ' (' + rg.properties.id + ') </div>')
+        buf.push('<div class="em-tooltip-bar">' + rg.properties.na + ' (' + rg.properties.id + ') </div>')
     } else {
         //region name
-        buf.push('<div class="estat-vis-tooltip-bar">' + rg.properties.na + '</div>')
+        buf.push('<div class="em-tooltip-bar">' + rg.properties.na + '</div>')
     }
     //get stat value
     const sv = map.statData().get(rg.properties.id)
@@ -289,7 +289,7 @@ const tooltipTextFunCat = function (rg, map) {
         const lbl = map.classToText_[val]
         //display label and value
         buf.push(`
-    <div class="estat-vis-tooltip-text">
+    <div class="em-tooltip-text">
     <table class="nuts-table">
     <tbody>
     <tr>
@@ -305,7 +305,7 @@ const tooltipTextFunCat = function (rg, map) {
     }
     //display just value
     buf.push(`
-    <div class="estat-vis-tooltip-text">
+    <div class="em-tooltip-text">
     <table class="nuts-table">
     <tbody>
     <tr>

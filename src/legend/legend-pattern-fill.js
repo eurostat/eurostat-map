@@ -1,6 +1,3 @@
-import { select } from 'd3-selection'
-import { getFontSizeFromClass } from '../core/utils'
-
 export function appendPatternFillLegend(map, container, options = {}) {
     const {
         shapeWidth = 25,

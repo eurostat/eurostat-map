@@ -31,6 +31,9 @@ export const legend = function (map) {
     // we now use CSS instead of inline styles
     out.labelFontSize = getFontSizeFromClass('em-legend-label')
 
+    //gap between legend and 'no data' legend
+    out.noDataPadding = 5
+
     /** Build legend. */
     out.build = function () {
         //set SVG element and add main drawing group
@@ -189,10 +192,45 @@ export const legend = function (map) {
             out.svg
                 .select('#legendBR')
                 .attr('x', bb.x - p)
-                .attr('y', bb.y - p)
+                .attr('y', bb.y - p - 2) // -2 to account for the title height
                 .attr('width', bb.width + 2 * p)
                 .attr('height', bb.height + 2 * p)
         }
+    }
+
+    //'no data' legend box
+    out.appendNoDataLegend = function (container, noDataText, highlightRegions, unhighlightRegions) {
+        const map = out.map
+
+        //append symbol & style
+        container
+            .append('rect')
+            .attr('class', 'em-legend-rect')
+            .style('fill', map.noDataFillStyle())
+            .attr('y', out.noDataPadding)
+            .attr('width', out.colorLegend ? out.colorLegend.shapeWidth : out.noDataShapeWidth)
+            .attr('height', out.colorLegend ? out.colorLegend.shapeHeight : out.noDataShapeHeight)
+            .on('mouseover', function () {
+                highlightRegions(map, 'nd')
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
+                }
+            })
+            .on('mouseout', function () {
+                unhighlightRegions(map)
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions, 'nd')
+                }
+            })
+
+        //'no data' label
+        container
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('dy', '0.35em') // ~vertical centering
+            .attr('x', out.colorLegend ? out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x : out.noDataShapeWidth + 5)
+            .attr('y', (out.colorLegend ? out.colorLegend.shapeHeight / 2 : out.noDataShapeHeight / 2) + out.noDataPadding)
+            .text(noDataText)
     }
 
     return out

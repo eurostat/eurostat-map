@@ -314,10 +314,10 @@ const tooltipTextFunBiv = function (rg, map) {
     const regionName = rg.properties.na || rg.properties.name
     if (rg.properties.id) {
         //name and code
-        buf.push('<div class="estat-vis-tooltip-bar" >' + regionName + ' (' + rg.properties.id + ') </div>')
+        buf.push('<div class="em-tooltip-bar" >' + regionName + ' (' + rg.properties.id + ') </div>')
     } else {
         //region name
-        buf.push('<div class="estat-vis-tooltip-bar" >' + regionName + '</div>')
+        buf.push('<div class="em-tooltip-bar" >' + regionName + '</div>')
     }
 
     //stat 1 value
@@ -328,7 +328,7 @@ const tooltipTextFunBiv = function (rg, map) {
     const unit2 = map.statData('v2').unitText()
 
     buf.push(`
-        <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
+        <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
         <table class="nuts-table">
         <tbody>
         <tr>

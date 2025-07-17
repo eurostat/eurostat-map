@@ -4,7 +4,7 @@ import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
 import * as StatMap from '../core/stat-map'
-import * as ProportionalSymbolLegend from '../legend/legend-proportional-symbols'
+import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
 import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
@@ -818,38 +818,38 @@ const tooltipTextFunPs = function (region, map) {
     if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
         return '' // Skip tooltip for omitted regions
     }
-    const buf = []
 
-    // Header with region name and ID
     const regionName = region.properties.na
     const regionId = region.properties.id
-    buf.push(`
-        <div class="estat-vis-tooltip-bar">
-            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-        </div>
-    `)
 
-    //stat 1 value
+    // Stat 1
     const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
     const sv1 = v1.get(region.properties.id)
-    if (!sv1 || (sv1.value != 0 && !sv1.value)) {
-        buf.push(map.noDataText_)
-    } else {
-        //unit 1
-        const unit1 = v1.unitText()
-        buf.push(`<div class="estat-vis-tooltip-text">${spaceAsThousandSeparator(sv1.value)} ${unit1 ? unit1 : ' '}</div>`)
+    const hasV1 = sv1 && (sv1.value === 0 || !!sv1.value)
+    const unit1 = hasV1 ? v1.unitText() : null
+    const row1 = `<tr><td>${hasV1 ? spaceAsThousandSeparator(sv1.value) + ' ' + (unit1 || '') : map.noDataText_}</td></tr>`
+
+    // Stat 2 (optional)
+    let row2 = ''
+    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null
+    if (v2) {
+        const sv2 = v2.get(region.properties.id)
+        const hasV2 = sv2 && (sv2.value === 0 || !!sv2.value)
+        const unit2 = hasV2 ? v2.unitText() : null
+        row2 = `<tr><td>${hasV2 ? spaceAsThousandSeparator(sv2.value) + ' ' + (unit2 || '') : map.noDataText_}</td></tr>`
     }
 
-    //stat 2 value
-    if (map.statData('color').getArray()) {
-        const sv2 = map.statData('color').get(region.properties.id)
-        if (!sv2 || (sv2.value != 0 && !sv2.value)) buf.push(map.noDataText_)
-        else {
-            //stat 2
-            const unit2 = map.statData('color').unitText()
-            buf.push(`<div class="estat-vis-tooltip-text">${spaceAsThousandSeparator(sv2.value)} ${unit2 ? unit2 : ' '}</div>`)
-        }
-    }
-
-    return buf.join('')
+    return `
+        <div class="em-tooltip-bar">
+            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+        </div>
+        <div class="em-tooltip-text">
+            <table class="nuts-table">
+                <tbody>
+                    ${row1}
+                    ${row2}
+                </tbody>
+            </table>
+        </div>
+    `.trim()
 }

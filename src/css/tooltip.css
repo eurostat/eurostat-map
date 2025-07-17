@@ -1,16 +1,16 @@
-.estat-vis-tooltip-text {
+.em-tooltip-text {
     background: #ffffff;
     color: #171a22;
     padding: 4px;
     font-size: 16px;
 }
-.estat-vis-tooltip-bar {
+.em-tooltip-bar {
     background: #515560;
     color: #ffffff;
     padding: 6px;
     font-size: 16px;
 }
-.tooltip-eurostat {
+.em-tooltip {
     font-family: Arial;
     max-width: 250px;
     overflow: hidden;

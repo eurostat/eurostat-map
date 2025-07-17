@@ -370,7 +370,7 @@ export const map = function (config) {
         const regionName = region.properties.na
         const regionId = region.properties.id
         buf.push(`
-                <div class="estat-vis-tooltip-bar">
+                <div class="em-tooltip-bar">
                     <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
                 </div>
             `)

@@ -10773,14 +10773,14 @@
                             var n = []
                             t.properties.id
                                 ? n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;"><b>' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;"><b>' +
                                           t.properties.na +
                                           '</b> (' +
                                           t.properties.id +
                                           ') </div>'
                                   )
                                 : n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;"><b>' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;"><b>' +
                                           t.properties.na +
                                           '</b></div>'
                                   )
@@ -10789,7 +10789,7 @@
                             if (!r || (0 !== r.value && !r.value) || ':' == r.value)
                                 return (
                                     n.push(
-                                        '\n            <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n            <table class="nuts-table">\n            <tbody>\n            <tr>\n            <td>\n            '.concat(
+                                        '\n            <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n            <table class="nuts-table">\n            <tbody>\n            <tr>\n            <td>\n            '.concat(
                                             e.noDataText_,
                                             ' \n            </td>\n            </tr>\n            </tbody>\n            </table>\n            </div>\n        '
                                         )
@@ -10797,7 +10797,7 @@
                                     n.join('')
                                 )
                             n.push(
-                                '\n        <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n        <table class="nuts-table">\n        <tbody>\n        <tr>\n        <td>\n        '
+                                '\n        <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n        <table class="nuts-table">\n        <tbody>\n        <tr>\n        <td>\n        '
                                     .concat(Zo(r.value), ' ')
                                     .concat(i || '', '\n        </td>\n        </tr>\n        </tbody>\n        </table>\n        </div>\n    ')
                             )
@@ -11699,14 +11699,14 @@
                             var n = []
                             t.properties.id
                                 ? n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                           t.properties.na +
                                           ' (' +
                                           t.properties.id +
                                           ') </div>'
                                   )
                                 : n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                           t.properties.na +
                                           '</div>'
                                   )
@@ -11716,7 +11716,7 @@
                             else {
                                 var a = r.unitText()
                                 n.push(
-                                    '<div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">'
+                                    '<div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">'
                                         .concat(Zo(i.value), ' ')
                                         .concat(a || ' ', '</div>')
                                 )
@@ -11727,7 +11727,7 @@
                                 else {
                                     var s = e.statData('color').unitText()
                                     n.push(
-                                        '<div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;padding-top:0px">'
+                                        '<div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;padding-top:0px">'
                                             .concat(Zo(o.value), ' ')
                                             .concat(s || ' ', '</div>')
                                     )
@@ -12049,14 +12049,14 @@
                             var n = []
                             t.properties.id
                                 ? n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                           t.properties.na +
                                           ' (' +
                                           t.properties.id +
                                           ') </div>'
                                   )
                                 : n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                           t.properties.na +
                                           '</div>'
                                   )
@@ -12067,7 +12067,7 @@
                                 var a = e.classToText_[i]
                                 return (
                                     n.push(
-                                        '\n    <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n    <table class="nuts-table">\n    <tbody>\n    <tr>\n    <td>\n    '.concat(
+                                        '\n    <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n    <table class="nuts-table">\n    <tbody>\n    <tr>\n    <td>\n    '.concat(
                                             a || i,
                                             '\n    </td>\n    </tr>\n    </tbody>\n    </table>\n    </div>\n'
                                         )
@@ -12077,7 +12077,7 @@
                             }
                             return (
                                 n.push(
-                                    '\n    <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n    <table class="nuts-table">\n    <tbody>\n    <tr>\n    <td>\n    '.concat(
+                                    '\n    <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n    <table class="nuts-table">\n    <tbody>\n    <tr>\n    <td>\n    '.concat(
                                         i,
                                         '\n    </td>\n    </tr>\n    </tbody>\n    </table>\n    </div>\n'
                                     )
@@ -12367,14 +12367,14 @@
                             var n = []
                             t.properties.id
                                 ? n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                           t.properties.na +
                                           ' (' +
                                           t.properties.id +
                                           ') </div>'
                                   )
                                 : n.push(
-                                      '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                      '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                           t.properties.na +
                                           '</div>'
                                   )
@@ -12384,7 +12384,7 @@
                                 o = e.statData('v2').unitText()
                             return (
                                 n.push(
-                                    '\n        <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n        <table class="nuts-table">\n        <tbody>\n        <tr>\n        <td>\n        '
+                                    '\n        <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n        <table class="nuts-table">\n        <tbody>\n        <tr>\n        <td>\n        '
                                         .concat(r && r.value ? Zo(r.value) : '', ' ')
                                         .concat(i && r && r.value ? i : '', '\n        ')
                                         .concat(
@@ -14125,7 +14125,7 @@
                                                                 ? i
                                                                       .append('div')
                                                                       .html(
-                                                                          '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                                                          '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                                                               t.properties.na +
                                                                               ' (' +
                                                                               t.properties.id +
@@ -14134,7 +14134,7 @@
                                                                 : i
                                                                       .append('div')
                                                                       .html(
-                                                                          '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                                                          '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                                                               t.properties.na +
                                                                               '</div>'
                                                                       )
@@ -14878,7 +14878,7 @@
                         textFunction: function (e, t) {
                             let a = []
                             a.push(
-                                '<div class="estat-vis-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
+                                '<div class="em-tooltip-bar" style="background: #515560;color: #ffffff;padding: 6px;font-size:15px;">' +
                                     e.properties.na +
                                     ' (' +
                                     e.properties.id +
@@ -14888,21 +14888,21 @@
                             if (!i || (0 !== i.value && !i.value))
                                 return (
                                     a.push(
-                                        '\n            <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n            <table class="nuts-table">\n            <tbody>\n            <tr>\n            <td>\n            No input added\n            </td>\n            </tr>\n            </tbody>\n            </table>\n            </div>\n        '
+                                        '\n            <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n            <table class="nuts-table">\n            <tbody>\n            <tr>\n            <td>\n            No input added\n            </td>\n            </tr>\n            </tbody>\n            </table>\n            </div>\n        '
                                     ),
                                     a.join('')
                                 )
                             if (':' === i.value)
                                 return (
                                     a.push(
-                                        `\n            <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n            <table class="nuts-table">\n            <tbody>\n            <tr>\n            <td>\n            ${t.noDataText_}\n            </td>\n            </tr>\n            </tbody>\n            </table>\n            </div>\n        `
+                                        `\n            <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n            <table class="nuts-table">\n            <tbody>\n            <tr>\n            <td>\n            ${t.noDataText_}\n            </td>\n            </tr>\n            </tbody>\n            </table>\n            </div>\n        `
                                     ),
                                     a.join('')
                                 )
                             let o = t.statData('default').unitText()
                             return (
                                 a.push(
-                                    `\n        <div class="estat-vis-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n        <table class="nuts-table">\n        <tbody>\n        <tr>\n        <td>\n        ${
+                                    `\n        <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">\n        <table class="nuts-table">\n        <tbody>\n        <tr>\n        <td>\n        ${
                                         ((l = i.value), l.toLocaleString('en').replace(/,/gi, ' '))
                                     } ${o || ''}\n        </td>\n        </tr>\n        </tbody>\n        </table>\n        </div>\n        `
                                 ),
