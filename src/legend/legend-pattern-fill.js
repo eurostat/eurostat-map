@@ -57,9 +57,18 @@ export function appendPatternFillLegend(out, container) {
 // Highlight selected regions on mouseover
 function highlightPatternFillRegions(map, patternId) {
     const targetFill = `url(#${patternId})`
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Set all regions (except overlays) to white
+    allRegions
+        .filter(function () {
+            return !select(this).classed('pattern-fill-overlay')
+        })
+        .style('fill', 'white')
 
     // Dim all overlays
-    map.svg_.selectAll('.pattern-fill-overlay').style('opacity', 0.1)
+    map.svg_.selectAll('.pattern-fill-overlay').style('opacity', 0) //.style('fill', 'unset')
 
     // Brighten only overlays with matching pattern fill
     map.svg_
@@ -68,8 +77,21 @@ function highlightPatternFillRegions(map, patternId) {
             return select(this).attr('fill') === targetFill
         })
         .style('opacity', 1)
+    //.style('fill', 'red')
 }
 
 function unhighlightPatternFillRegions(map) {
-    map.svg_.selectAll('.pattern-fill-overlay').style('opacity', 1)
+    map.svg_.selectAll('.pattern-fill-overlay').style('opacity', 1) //.style('fill', 'unset')
+
+    // Restore base region fills
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    allRegions
+        .filter(function () {
+            return !select(this).classed('pattern-fill-overlay')
+        })
+        .each(function () {
+            select(this).style('fill', select(this).attr('fill___'))
+        })
 }
