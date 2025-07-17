@@ -1,12 +1,12 @@
-import * as Choropleth from './maptypes/map-choropleth'
-import * as ProportionalSymbol from './maptypes/map-proportional-symbols'
-import * as Categorical from './maptypes/map-categorical'
-import * as BivariateChoropleth from './maptypes/map-choropleth-bivariate'
-import * as TrivariateChoropleth from './maptypes/map-choropleth-trivariate'
-import * as StripeComposition from './maptypes/map-stripe-composition'
-import * as PieCharts from './maptypes/map-piecharts'
-import * as Sparklines from './maptypes/map-sparklines'
-import * as FlowMap from './maptypes/flow/map-flow'
+import * as Choropleth from './map-types/map-choropleth'
+import * as ProportionalSymbol from './map-types/map-proportional-symbols'
+import * as Categorical from './map-types/map-categorical'
+import * as BivariateChoropleth from './map-types/map-choropleth-bivariate'
+import * as TrivariateChoropleth from './map-types/map-choropleth-trivariate'
+import * as StripeComposition from './map-types/map-stripe-composition'
+import * as PieCharts from './map-types/map-piecharts'
+import * as Sparklines from './map-types/map-sparklines'
+import * as FlowMap from './map-types/flow/map-flow'
 import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/labels'
 
@@ -23,7 +23,7 @@ export const map = function (type, config) {
         //categorical map
         if (type == 'categorical' || type == 'ct') return Categorical.map(config)
         //proportionnal symbols map
-        if (type == 'proportionalSymbol' || type == 'ps') return ProportionalSymbol.map(config)
+        if (type == 'proportionalSymbol' || type == 'proportionalSymbols' || type == 'ps') return ProportionalSymbol.map(config)
         //bivariate choropleth
         if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
         //trivariate choropleth

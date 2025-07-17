@@ -1,0 +1,855 @@
+import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
+import { extent } from 'd3-array'
+import { select } from 'd3-selection'
+import { interpolateOrRd } from 'd3-scale-chromatic'
+import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
+import * as StatMap from '../core/stat-map'
+import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-proportional-symbols'
+import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
+import { applyPatternFill } from '../core/pattern-fill'
+
+/**
+ * Returns a proportional symbol map.
+ *
+ * @param {*} config
+ */
+export const map = function (config) {
+    //create map object to return, using the template
+    const out = StatMap.statMap(config, true, 'ps')
+
+    //shape
+    out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
+    out.psCustomShape_ // see http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT
+    out.psCustomSVG_ // see http://bl.ocks.org/jessihamel/9648495
+    out.psSpikeWidth_ = 7 // 'spike' shape widths
+    out.psOffset_ = { x: 0, y: 0 }
+
+    //size
+    out.psMaxSize_ = 30 // max symbol size
+    out.psMinSize_ = 5 // min symbol size
+    out.psBarWidth_ = 10 //for vertical bars
+    out.psMaxValue_ = undefined // allow the user to manually define the domain of the sizing scale. E.g. if the user wants to use the same scale across different maps.
+    out.psMinValue_ = undefined
+    out.psSizeScale_ = undefined // 'sqrt' or 'linear'
+
+    //colour
+    out.psFill_ = '#2d50a0' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
+    out.psFillOpacity_ = 1
+    out.psStroke_ = '#ffffff'
+    out.psStrokeWidth_ = 0.2
+    out.psClasses_ = 5 // number of classes to use for colouring
+    out.psColors_ = null //colours to use for threshold colouring
+    out.psColorFun_ = interpolateOrRd
+    out.psClassToFillStyle_ = undefined //a function returning the color from the class i
+
+    //the threshold, when the classification method is 'threshold'
+    out.psThresholds_ = [0]
+    //the classification method
+    out.psClassificationMethod_ = 'quantile' // or: equinter, threshold
+    //when computed automatically, ensure the threshold are nice rounded values
+    out.makeClassifNice_ = true
+    //
+    //the classifier: a function which return the symbol size/color from the stat value.
+    out.classifierSize_ = undefined
+    out.classifierColor_ = undefined
+    //specific tooltip text function
+    out.tooltip_.textFunction = tooltipTextFunPs
+
+    //dorling cartogram
+    out.dorling_ = false
+    out.dorlingStrength_ = { x: 1, y: 1 }
+    out.dorlingIterations_ = 1
+    out.psCodeLabels_ = false // show country codes in symbols
+
+    /**
+     * Definition of getters/setters for all previously defined attributes.
+     * Each method follow the same pattern:
+     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+     *  - To get the attribute value, call the method without argument.
+     *  - To set the attribute value, call the same method with the new value as single argument.
+     */
+    ;[
+        'psMaxSize_',
+        'psMinSize_',
+        'psMaxValue_',
+        'psMinValue_',
+        'psFill_',
+        'psFillOpacity_',
+        'psStroke_',
+        'psStrokeWidth_',
+        'classifierSize_',
+        'classifierColor_',
+        'psShape_',
+        'psCustomShape_',
+        'psBarWidth_',
+        'psClassToFillStyle_',
+        'psColorFun_',
+        'psSizeScale_',
+        'noDataFillStyle_',
+        'psThresholds_',
+        'psColors_',
+        'psCustomSVG_',
+        'psOffset_',
+        'psClassificationMethod_',
+        'psClasses_',
+        'dorling_',
+        'dorlingStrength_',
+        'psSpikeWidth_',
+        'psCodeLabels_',
+        'dorlingIterations_',
+    ].forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
+
+    //override attribute values with config values
+    if (config)
+        [
+            'psMaxSize',
+            'psMinSize',
+            'psFill',
+            'psFillOpacity',
+            'psStroke',
+            'psStrokeWidth',
+            'classifierSize',
+            'classifierColor',
+            'psShape',
+            'psCustomShape',
+            'psBarWidth',
+            'psClassToFillStyle',
+            'psColorFun',
+            'noDataFillStyle',
+            'psThreshold',
+            'psColors',
+            'psCustomSVG',
+            'psOffset',
+            'psClassificationMethod',
+            'psClasses',
+            'dorlingIterations_',
+        ].forEach(function (key) {
+            if (config[key] != undefined) out[key](config[key])
+        })
+
+    //override of some special getters/setters
+    out.psColorFun = function (v) {
+        if (!arguments.length) return out.psColorFun_
+        out.psColorFun_ = v
+        out.psClassToFillStyle_ = getColorLegend(out.psColorFun_, out.psColors_)
+        return out
+    }
+    out.psThresholds = function (v) {
+        if (!arguments.length) return out.psThresholds_
+        out.psThresholds_ = v
+        out.psClasses(v.length + 1)
+        return out
+    }
+
+    //@override
+    out.updateClassification = function () {
+        try {
+            //define classifiers for sizing and colouring (out.classifierSize_ & out.classifierColor_)
+            defineClassifiers()
+
+            // apply classification to all insets that are outside of the main map's SVG
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+            }
+
+            // apply to main map
+            applyClassificationToMap(out)
+
+            return out
+        } catch (e) {
+            console.error('Error in proportional symbols classification: ' + e.message)
+            console.error(e)
+        }
+    }
+
+    /**
+     * @description assigns a color to each symbol, based on their statistical value
+     * @param {*} map
+     */
+    function applyClassificationToMap(map) {
+        if (map.svg_) {
+            if (out.classifierColor_) {
+                //assign color class to each symbol, based on their value
+                // at this point, the symbol path hasnt been appended. Only the parent g element (.em-centroid)
+                const colorData = map.statData('color')
+                map.svg_.selectAll('.em-centroid').attr('ecl', function (rg) {
+                    const sv = colorData.get(rg.properties.id)
+                    if (!sv) {
+                        return 'nd'
+                    }
+                    const v = sv.value
+                    if ((v !== 0 && !v) || v == ':') {
+                        return 'nd'
+                    }
+                    let c = +out.classifierColor_(+v)
+                    return c
+                })
+            }
+        }
+    }
+
+    /**
+     * @description defines classifier functions (out.classifierColor and out.classifierSize) for both symbol size and color
+     */
+    function defineClassifiers() {
+        // set default scale
+        if (!out.psSizeScale_) {
+            if (out.psShape_ == 'spike') {
+                out.psSizeScale_ = 'linear'
+            } else {
+                out.psSizeScale_ = 'sqrt'
+            }
+        }
+
+        //simply return the array [0,1,2,3,...,nb-1]
+        const getA = function (nb) {
+            return [...Array(nb).keys()]
+        }
+
+        // use size dataset
+        let rawData = out.statData('size').getArray() || out.statData().getArray()
+        let data = rawData.filter((d) => typeof d === 'number' && !isNaN(d) && isFinite(d))
+        let [minVal, maxVal] = extent(data)
+        let min = out.psMinValue_ ?? minVal
+        let max = out.psMaxValue_ ?? maxVal
+        let sizeDomain = data ? [min, max] : [out.statData().getMin(), out.statData().getMax()]
+
+        let scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
+        out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
+
+        // colour
+        if (out.statData('color').getArray()) {
+            //use suitable classification type for colouring
+            if (out.psClassificationMethod_ === 'quantile') {
+                //https://github.com/d3/d3-scale#quantile-scales
+                const domain = out.statData('color').getArray()
+                const range = getA(out.psClasses_)
+                out.classifierColor(scaleQuantile().domain(domain).range(range))
+            } else if (out.psClassificationMethod_ === 'equinter') {
+                //https://github.com/d3/d3-scale#quantize-scales
+                const domain = out.statData('color').getArray()
+                const range = getA(out.psClasses_)
+                out.classifierColor(
+                    scaleQuantize()
+                        .domain([min(domain), max(domain)])
+                        .range(range)
+                )
+                if (out.makeClassifNice_) out.classifierColor().nice()
+            } else if (out.psClassificationMethod_ === 'threshold') {
+                //https://github.com/d3/d3-scale#threshold-scales
+                out.psClasses(out.psThresholds().length + 1)
+                const range = getA(out.psClasses_)
+                out.classifierColor(scaleThreshold().domain(out.psThresholds()).range(range))
+            }
+        }
+    }
+
+    /**
+     * Applies proportional symbol styling to a map object
+     *
+     * @param {*} map
+     * @returns
+     */
+    function applyStyleToMap(map) {
+        //see https://bl.ocks.org/mbostock/4342045 and https://bost.ocks.org/mike/bubble-map/
+        //define style per class
+        if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
+
+        // if size dataset not defined then use default
+        let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
+
+        if (map.svg_) {
+            //clear previous centroids
+            let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-centroid > *')
+            prevSymbols.remove()
+
+            // 'small' centroids on top of big ones
+            updateSymbolsDrawOrder(map)
+
+            // append symbols to centroids
+            let symb
+            if (out.psCustomSVG_) {
+                symb = appendCustomSymbolsToMap(map, sizeData)
+            } else if (out.psShape_ == 'bar') {
+                symb = appendBarsToMap(map, sizeData)
+            } else if (out.psShape_ == 'circle') {
+                symb = appendCirclesToMap(map, sizeData)
+            } else if (out.psShape_ == 'spike') {
+                symb = appendSpikesToMap(map, sizeData)
+            } else {
+                // circle, cross, star, triangle, diamond, square, wye or custom
+                symb = appendD3SymbolsToMap(map, sizeData)
+            }
+
+            // dorling cartogram
+            if (out.dorling_) {
+                applyDorlingForce(map, sizeData)
+            } else {
+                if (out.simulation) stopSimulation()
+            }
+
+            // set style of symbols
+            const selector = getRegionsSelector(map)
+            let regions = map.svg().selectAll(selector)
+
+            if (map.geo_ !== 'WORLD') {
+                if (map.nutsLevel_ == 'mixed') {
+                    addSymbolsToMixedNUTS(map, sizeData, regions)
+                }
+
+                // apply 'nd' class to no data regions for legend item hover
+                regions.attr('ecl', function (rg) {
+                    const sv = sizeData.get(rg.properties.id)
+                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                        // NO INPUT
+                        return 'ni'
+                    } else if (sv && sv.value) {
+                        if (sv.value == ':') {
+                            // DATA NOT AVAILABLE (no data)
+                            return 'nd'
+                        }
+                    }
+                })
+            }
+
+            setSymbolStyles(symb)
+            appendLabelsToSymbols(map, sizeData)
+
+            addMouseEvents(map)
+
+            // Update labels for statistical values if required
+            if (out.labels_?.values) {
+                out.updateValuesLabels(map)
+            }
+
+            //add hatching if needed
+            if (out.patternFill_) {
+                applyPatternFill(map, out.patternFill_)
+            }
+        }
+        return map
+    }
+
+    const appendLabelsToSymbols = function (map, sizeData) {
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
+        //country code labels
+        if (out.psCodeLabels_) {
+            const countryCodeLabel = symbolContainers
+                .filter((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value !== ':' && datum?.value != null // Ignore `':'`, `null`, and `undefined`
+                })
+                .append('text')
+                .attr('class', 'em-circle-code-label')
+                .text((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value === ':' ? '' : d.properties.id // Hide text if value is ':'
+                })
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .attr('font-family', 'sans-serif')
+                .style('font-size', (d) => {
+                    // calculate radius
+                    const datum = sizeData.get(d.properties.id)
+                    const radius = datum ? out.classifierSize_(datum.value) : 0
+                    // size adjustment factor depends on symbol type, and whether stat values are also added to the circles
+                    let factor = out.labels_?.values && sizeData.get(d.properties.id)?.value ? 0.8 : 0.9
+                    if (out.psShape_ === 'square') factor = factor - 0.4
+                    return `${radius * factor}px`
+                })
+                .attr('fill', function () {
+                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill
+                    return getTextColorForBackground(fill)
+                })
+                .attr('dy', (d) => (out.labels_?.values && sizeData.get(d.properties.id)?.value ? '-0.3em' : '0'))
+        }
+
+        //stat labels
+        if (out.labels_?.values) {
+            const statLabels = symbolContainers
+                .filter((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value !== ':' && datum?.value != null // Ignore `':'`, `null`, and `undefined`
+                })
+                .append('text')
+                .attr('class', 'em-circle-stat-label')
+                .text((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    if (datum?.value) return datum.value
+                })
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .attr('font-family', 'sans-serif')
+                .style('font-size', (d) => {
+                    // calculate radius
+                    const datum = sizeData.get(d.properties.id)
+                    const radius = datum ? out.classifierSize_(datum.value) : 0
+                    return `${radius * 0.4}px`
+                })
+                .attr('fill', function () {
+                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
+                    return getTextColorForBackground(fill)
+                })
+                .attr('dy', (d) => (out.psCodeLabels_ ? '0.8em' : '0'))
+        }
+    }
+
+    const addMouseEvents = function (map) {
+        let symbols = map.svg().selectAll('g.em-centroid')
+        symbols
+            .on('mouseover', function (e, rg) {
+                const sel = select(this.childNodes[0])
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e, rg) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function (e) {
+                const sel = select(this.childNodes[0])
+                let newFill = sel.attr('fill___')
+                if (newFill) {
+                    sel.style('fill', newFill)
+                    if (out._tooltip) out._tooltip.mouseout()
+                }
+            })
+    }
+
+    /**
+     * @description sets color/stroke/opacity styles of all symbols
+     * @param {d3.selection} symb symbols d3 selection
+     */
+    function setSymbolStyles(symb) {
+        symb.style('fill-opacity', out.psFillOpacity())
+            .style('stroke', out.psStroke())
+            .style('stroke-width', out.psStrokeWidth())
+            .style('fill', function () {
+                if (out.classifierColor_) {
+                    //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
+                    const ecl = select(this.parentNode).attr('ecl')
+                    if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
+                    let color = out.psClassToFillStyle_(ecl, out.psClasses_)
+                    return color
+                } else {
+                    return out.psFill_
+                }
+            })
+            .attr('fill___', function () {
+                let fill = select(this).style('fill')
+                return fill // save for legend mouseover
+            })
+    }
+
+    /**
+     * @description Updates the draw order of the symbols according to their data values
+     * @param {*} map map instance
+     */
+    function updateSymbolsDrawOrder(map) {
+        const gcp = map.svg_.select('#em-prop-symbols')
+        const sizeData = map.statData('size')?.getArray?.() ? map.statData('size') : map.statData()
+
+        // 1. Filter and sort features with data
+        if (map.Geometries.centroidFeatures) {
+            const sorted = map.Geometries.centroidFeatures
+                .filter((f) => {
+                    const v = sizeData.get?.(f.properties.id)?.value
+                    return v != null && v !== ':'
+                })
+                .sort((a, b) => {
+                    return sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value
+                })
+
+            // 2. Clear and rebind
+            gcp.selectAll('g.em-centroid').remove()
+
+            gcp.selectAll('g.em-centroid')
+                .data(sorted, (d) => d.properties.id)
+                .enter()
+                .append('g')
+                .attr('class', 'em-centroid')
+                .attr('id', (d) => 'ps' + d.properties.id)
+                .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
+
+            // 3. add the ecl attribute back to the newly created g elements
+            applyClassificationToMap(map) //
+        }
+    }
+
+    function appendSpikesToMap(map, sizeData) {
+        //The spike function creates a triangular path of the given length (height) with a base width of 7 pixels.
+        const spike = (length, width = out.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
+
+        // Append circles to each symbol container
+        const spikes = symbolContainers
+            .append('path')
+            .attr('d', (d) => {
+                const datum = sizeData.get(d.properties.id)
+                const value = datum ? out.classifierSize_(datum.value) : 0
+                let path = spike(value)
+                return path
+            })
+            .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
+            //.attr('fill', map.psFill_)
+            .attr('fill-opacity', map.psFillOpacity_)
+            .attr('stroke', map.psStroke_)
+            .attr('stroke-width', map.psStrokeWidth_)
+
+        return spikes
+    }
+
+    /**
+     * @description Appends <circle> elements for each region in the map SVG
+     * @param {*} map map instance
+     * @param {*} sizeData statistical data for size e.g. map.statData('size')
+     * @return {void}
+     */
+    function appendCirclesToMap(map, sizeData) {
+        // Append circles to each symbol container
+        const circles = map
+            .svg()
+            .selectAll('g.em-centroid')
+            .filter((d) => {
+                const datum = sizeData.get(d.properties.id)
+                return datum && datum.value !== ':' && datum.value
+            })
+            .append('circle')
+            .attr('r', function (d) {
+                const datum = sizeData.get(d.properties.id)
+                const radius = out.classifierSize_(datum.value)
+                if (radius < 0) console.error('Negative radius for circle:', d.properties.id)
+                if (isNaN(radius)) console.error('NaN radius for circle:', d.properties.id)
+                return radius
+            })
+
+        return circles
+    }
+
+    function applyDorlingForce(map, sizeData) {
+        let symbolContainers = map.svg().selectAll('g.em-centroid')
+
+        if (out.simulation) {
+            stopSimulation()
+        }
+
+        // Initialize the force simulation
+        console.log('new dorling simulation')
+        out.simulation = forceSimulation(map.Geometries.centroidFeatures)
+            .force(
+                'x',
+                forceX((d) => d.properties.centroid[0]).strength(out.dorlingStrength_.x) // Stronger pull to original x
+            )
+            .force(
+                'y',
+                forceY((d) => d.properties.centroid[1]).strength(out.dorlingStrength_.y) // Stronger pull to original y
+            )
+            .force(
+                'collide',
+                forceCollide((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    let size = datum ? out.classifierSize_(datum.value) : 0
+
+                    if (out.psShape_ === 'square') {
+                        return (size / 2) * Math.SQRT2 // Adjust for diagonal size
+                    }
+
+                    return size // Default for circles
+                }).iterations(out.dorlingIterations_) // More iterations to improve collision handling
+            )
+            //.alphaTarget(0.3) // Helps keep centroids anchored
+            .on('tick', () => {
+                // Update elements with the new positions and radii
+                symbolContainers.attr('transform', (d) => 'translate(' + d.x + ',' + d.y + ')')
+            })
+
+        //out.simulation.alpha(1).restart() // Ensures simulation starts with full strength
+    }
+
+    function stopSimulation() {
+        out.simulation.stop() // Stops the internal tick loop
+        out.simulation.on('tick', null) // Remove tick event listener
+        out.simulation.on('end', null) // Remove end event listener
+        out.simulation = null // Remove reference
+    }
+
+    /**
+     * @description Appends <path> elements containing symbols for each region in the map SVG
+     * @param {*} map map instance
+     * @param {*} sizeData e.g. map.statData('size')
+     * @return {*}
+     */
+    function appendD3SymbolsToMap(map, sizeData) {
+        return map
+            .svg()
+            .selectAll('g.em-centroid')
+            .append('path')
+            .filter((rg) => {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv && sv.value !== ':') return rg
+            })
+            .attr('class', 'ps')
+            .attr('d', (rg) => {
+                //calculate size
+                if (!sizeData) return
+                const sv = sizeData.get(rg.properties.id)
+                if (sv != 0 && !sv) return
+                let size = out.classifierSize_(+sv.value) || 0
+
+                //apply size to shape
+                if (out.psCustomShape_) {
+                    return out.psCustomShape_.size(size * size)()
+                } else {
+                    const symbolType = symbolsLibrary[out.psShape_] || symbolsLibrary['circle']
+                    return symbol()
+                        .type(symbolType)
+                        .size(size * size)()
+                }
+            })
+    }
+
+    /**
+     * @description Appends <rect> elements containing bars for each region in the map SVG
+     * @param {*} map map instance
+     * @param {*} sizeData e.g. map.statData('size')
+     * @return {*}
+     */
+    function appendBarsToMap(map, sizeData) {
+        return (
+            map
+                .svg()
+                .select('#em-prop-symbols')
+                .selectAll('g.em-centroid')
+                .append('rect')
+                .filter((rg) => {
+                    const sv = sizeData.get(rg.properties.id)
+                    if (sv && sv.value !== ':') return rg
+                })
+                .attr('width', out.psBarWidth_)
+                //for vertical bars we scale the height attribute using the classifier
+                .attr('height', function (rg) {
+                    const sv = sizeData.get(rg.properties.id)
+                    if (!sv || !sv.value) {
+                        return 0
+                    }
+                    let v = out.classifierSize_(+sv.value)
+                    return v
+                })
+                .attr('transform', function () {
+                    let bRect = this.getBoundingClientRect()
+                    return `translate(${-this.getAttribute('width') / 2}` + `, -${this.getAttribute('height')})`
+                })
+            // to use transitions we need to refactor the drawing functions to promises e.g. appendBarsToMap().then(()=>{})
+            //this is because .attr('fill___', function () {select(this).style('fill')}) doesnt work unless you execute it after the transition ends.
+            // e.g.
+            // .transition()
+            // .duration(out.transitionDuration())
+            // .style('fill', function (rg) {})
+            // .end()
+            // .then()
+        )
+    }
+
+    /**
+     * @description Appends custom SVG symbols for each region in the map
+     * @param {*} map
+     * @param {*} sizeData
+     * @return {*}
+     */
+    function appendCustomSymbolsToMap(map, sizeData) {
+        return map
+            .svg()
+            .select('#em-prop-symbols')
+            .selectAll('g.em-centroid')
+            .append('g')
+            .filter((rg) => {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv && sv.value !== ':') return rg
+            })
+            .attr('class', 'ps')
+            .html(out.psCustomSVG_)
+            .attr('transform', (rg) => {
+                //calculate size
+                const sv = sizeData.get(rg.properties.id)
+                let size = out.classifierSize_(+sv.value)
+                if (size) {
+                    return `translate(${out.psOffset_.x * size},${out.psOffset_.y * size}) scale(${size})`
+                }
+            })
+    }
+
+    /**
+     * @description adds proportional symbols to each regions in a map with mixed NUTS levels (IMAGE)
+     * @param {*} map
+     * @param {*} sizeData
+     * @param {*} regions
+     * @return {*}
+     */
+    function addSymbolsToMixedNUTS(map, sizeData, regions) {
+        // toggle display of mixed NUTS levels
+        regions.style('display', function (rg) {
+            if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
+            const sv = sizeData.get(rg.properties.id)
+            if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                // no symbol for no data
+                return 'none'
+            } else if (map.geo_ == 'WORLD') {
+                return 'block'
+            }
+        })
+
+        // nuts border stroke
+        regions
+            .style('stroke', function (rg) {
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const stroke = sel.style('stroke')
+                const sv = sizeData.get(rg.properties.id)
+                if (!sv || !sv.value) {
+                    return
+                } else {
+                    if (lvl !== '0') {
+                        return stroke || '#777'
+                    }
+                }
+            })
+
+            // nuts border stroke width
+            .style('stroke-width', function (rg) {
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const strokeWidth = sel.style('stroke-width')
+                const sv = sizeData.get(rg.properties.id)
+                if (!sv || !sv.value) {
+                    return
+                } else if (out.geo_ == 'WORLD') {
+                    if (lvl !== '0') {
+                        return strokeWidth || '#777'
+                    }
+                }
+            })
+    }
+
+    //@override
+    out.updateStyle = function () {
+        try {
+            // apply to main map
+            applyStyleToMap(out)
+
+            // apply style to insets
+            // apply classification to all insets
+            if (out.insetTemplates_) {
+                for (const geo in out.insetTemplates_) {
+                    if (Array.isArray(out.insetTemplates_[geo])) {
+                        for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                            // insets with same geo that do not share the same parent inset
+                            if (Array.isArray(out.insetTemplates_[geo][i])) {
+                                // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
+                                for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
+                                    if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
+                                }
+                            } else {
+                                if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
+                            }
+                        }
+                    } else {
+                        // unique inset geo_
+                        if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
+                    }
+                }
+            }
+
+            return out
+        } catch (e) {
+            console.error('Error in proportional symbols styling: ' + e.message)
+            console.error(e)
+        }
+    }
+
+    //@override
+    out.getLegendConstructor = function () {
+        return ProportionalSymbolLegend.legend
+    }
+
+    return out
+}
+
+//build a color legend object
+export const getColorLegend = function (colorFun, colorArray) {
+    colorFun = colorFun || interpolateOrRd
+    if (colorArray) {
+        return function (ecl, numberOfClasses) {
+            return colorArray[ecl]
+        }
+    }
+    return function (ecl, numberOfClasses) {
+        return colorFun(ecl / (numberOfClasses - 1))
+    }
+}
+
+/**
+ * @description give a d3 symbol from a shape name
+ */
+export const symbolsLibrary = {
+    cross: symbolCross,
+    square: symbolSquare,
+    diamond: symbolDiamond,
+    triangle: symbolTriangle,
+    star: symbolStar,
+    wye: symbolWye,
+    circle: symbolCircle,
+}
+
+/**
+ * Specific function for tooltip text.
+ *
+ * @param {*} rg The region to show information on.
+ * @param {*} map The map element
+ */
+
+const tooltipTextFunPs = function (region, map) {
+    if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
+        return '' // Skip tooltip for omitted regions
+    }
+
+    const regionName = region.properties.na
+    const regionId = region.properties.id
+
+    // Stat 1
+    const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
+    const sv1 = v1.get(region.properties.id)
+    const hasV1 = sv1 && (sv1.value === 0 || !!sv1.value)
+    const unit1 = hasV1 ? v1.unitText() : null
+    const row1 = `<tr><td>${hasV1 ? spaceAsThousandSeparator(sv1.value) + ' ' + (unit1 || '') : map.noDataText_}</td></tr>`
+
+    // Stat 2 (optional)
+    let row2 = ''
+    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null
+    if (v2) {
+        const sv2 = v2.get(region.properties.id)
+        const hasV2 = sv2 && (sv2.value === 0 || !!sv2.value)
+        const unit2 = hasV2 ? v2.unitText() : null
+        row2 = `<tr><td>${hasV2 ? spaceAsThousandSeparator(sv2.value) + ' ' + (unit2 || '') : map.noDataText_}</td></tr>`
+    }
+
+    return `
+        <div class="em-tooltip-bar">
+            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+        </div>
+        <div class="em-tooltip-text">
+            <table class="nuts-table">
+                <tbody>
+                    ${row1}
+                    ${row2}
+                </tbody>
+            </table>
+        </div>
+    `.trim()
+}

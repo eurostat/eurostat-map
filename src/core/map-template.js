@@ -462,16 +462,23 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    /**
-     * Build a map object, including container, frame, map svg, insets and d3 zoom
-     */
-    out.buildMapTemplateBase = function () {
+    const createMapSVG = function (out) {
         //get svg element. Create it if it does not exists
         let svg = select('#' + out.svgId())
         if (svg.size() == 0) {
             svg = select('body').append('svg').attr('id', out.svgId())
         }
         svg.attr('class', 'em-map')
+        //add mapType css class
+        svg.classed('em--' + out._mapType, true)
+        return svg
+    }
+
+    /**
+     * Build a map object, including container, frame, map svg, insets and d3 zoom
+     */
+    out.buildMapTemplateBase = function () {
+        const svg = createMapSVG(out)
         out.svg_ = svg
 
         //set container for cases where container contains various maps

@@ -1,3 +1,5 @@
+@import './map-types/proportional-symbol.css';
+
 /* General text settings */
 text {
     pointer-events: none;

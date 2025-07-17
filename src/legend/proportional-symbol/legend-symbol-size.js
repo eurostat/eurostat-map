@@ -1,5 +1,5 @@
 import { getFontSizeFromClass } from '../../core/utils'
-import { symbolsLibrary } from '../../maptypes/map-proportional-symbols'
+import { symbolsLibrary } from '../../map-types/map-proportional-symbols'
 import { symbol } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { max } from 'd3-array'
