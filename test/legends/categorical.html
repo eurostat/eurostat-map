@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg height="700" width="700">
+            <g id="map"></g>
+            <g id="legend" transform="translate(10,200)"></g>
+        </svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            let map = eurostatmap
+                .map('ct')
+                .title('NUTS urban/rural typology')
+                .nutsLevel('mixed')
+                .classToFillStyle({ a: '#fdb462', b: '#ffffb3', c: '#ccebc5' })
+                .classToText({ a: 'category 1', b: 'category 2', c: 'category 3' })
+                .legend({
+                    svgId: 'legend',
+                    labelFontSize: 14,
+                    shapeWidth: 20,
+                    shapeHeight: 18,
+                    noDataShapeWidth: 20,
+                    noDataShapeHeight: 18,
+                })
+
+            map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'c', IT: 'c', SI: 'c', RO: 'c', PL: 'b', PT: 'b', RU: 'c', RS: ':' })
+            map.build()
+        </script>
+    </body>
+</html>

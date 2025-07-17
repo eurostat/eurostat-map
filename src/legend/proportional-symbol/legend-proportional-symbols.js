@@ -33,7 +33,7 @@ export const legend = function (map, config) {
     out.sizeLegend = {
         title: null,
         titleFontSize: 12,
-        titlePadding: 5, //padding between title and legend body
+        titlePadding: 10, //padding between title and legend body
         values: undefined, //manually define raw data values
         cellNb: 3, //number of elements in the legend
         shapePadding: 5, //the y distance between consecutive legend shape elements
@@ -120,15 +120,12 @@ export const legend = function (map, config) {
             }
 
             // Append pattern fill legend items BELOW the main legend
-            // Get the total height of the choropleth legend box
             const legendHeight = out.lgg.node().getBBox().height
-            appendPatternFillLegend(map, out.lgg, {
-                shapeWidth: out.shapeWidth,
-                shapeHeight: out.shapeHeight,
-                labelOffset: out.labelOffset,
-                boxPadding: out.boxPadding,
-                offsetY: legendHeight + out.boxPadding + 5, // << this shifts pattern legend down
-            })
+            const patternContainer = out.lgg
+                .append('g')
+                .attr('class', 'pattern-fill-legend')
+                .attr('transform', `translate(${out.getBaseX()}, ${legendHeight + out.boxPadding + 5})`)
+            appendPatternFillLegend(out, patternContainer)
 
             //set legend box dimensions
             out.setBoxDimension()

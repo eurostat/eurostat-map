@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('categorical')
+                .scale('60M')
+                .title('EU / EFTA / Candidate countries')
+                .subtitle('Countries by membership status')
+                .nutsLevel('mixed')
+                .classToFillStyle({ eu: '#6e91d3', cc: '#eda87b', efta: '#34aaaa' })
+                .classToText({ efta: 'EFTA', eu: 'EU', cc: 'Candidate' })
+                .patternFill([
+                    {
+                        pattern: 'hatching',
+                        regionIds: [
+                            'AT',
+                            'BE',
+                            'HR',
+                            'CY',
+                            'EE',
+                            'FI',
+                            'FR',
+                            'DE',
+                            'EL',
+                            'IE',
+                            'IT',
+                            'LV',
+                            'LT',
+                            'LU',
+                            'MT',
+                            'NL',
+                            'PT',
+                            'SK',
+                            'SI',
+                            'ES',
+                        ],
+                        legendLabel: 'Eurozone',
+                        color: '#000',
+                        strokeWidth: 1,
+                    },
+                    {
+                        pattern: 'dots',
+                        regionIds: [
+                            'AT',
+                            'BE',
+                            'CZ',
+                            'DK',
+                            'EE',
+                            'FI',
+                            'FR',
+                            'DE',
+                            'EL',
+                            'HU',
+                            'IS',
+                            'IT',
+                            'LV',
+                            'LI',
+                            'LT',
+                            'LU',
+                            'MT',
+                            'NL',
+                            'NO',
+                            'PL',
+                            'PT',
+                            'SK',
+                            'SI',
+                            'ES',
+                            'SE',
+                            'CH',
+                            'HR',
+                        ],
+                        legendLabel: 'Schengen Area',
+                        color: 'black',
+                        strokeWidth: 1.2,
+                    },
+                    // {
+                    //   customPattern: `<pattern id="myRedCircles" patternUnits="userSpaceOnUse" width="10" height="10">
+                    //                       <circle cx="5" cy="5" r="3" fill="red"/>
+                    //                   </pattern>`,
+                    //   regionIds: ["BY"],
+                    //   legendLabel: "Custom Red Circles"
+                    // }
+                ])
+                .legend({
+                    x: 600,
+                    y: 60,
+                    labelFontSize: 14,
+                    shapeWidth: 20,
+                    shapeHeight: 18,
+                })
+
+            map.statData().setData({
+                AT: 'eu',
+                BE: 'eu',
+                BG: 'eu',
+                HR: 'eu',
+                CY: 'eu',
+                CZ: 'eu',
+                DK: 'eu',
+                EE: 'eu',
+                FI: 'eu',
+                FR: 'eu',
+                DE: 'eu',
+                EL: 'eu',
+                HU: 'eu',
+                IE: 'eu',
+                IT: 'eu',
+                LV: 'eu',
+                LT: 'eu',
+                LU: 'eu',
+                MT: 'eu',
+                NL: 'eu',
+                PL: 'eu',
+                PT: 'eu',
+                RO: 'eu',
+                SK: 'eu',
+                SI: 'eu',
+                ES: 'eu',
+                SE: 'eu',
+                AL: 'cc',
+                BA: 'cc',
+                GE: 'cc',
+                MD: 'cc',
+                ME: 'cc',
+                MK: 'cc',
+                RS: 'cc',
+                TR: 'cc',
+                UA: 'cc',
+                IS: 'efta',
+                LI: 'efta',
+                NO: 'efta',
+                CH: 'efta',
+            })
+
+            map.build()
+        </script>
+    </body>
+</html>

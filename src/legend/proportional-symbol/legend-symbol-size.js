@@ -12,12 +12,26 @@ import { highlightRegions, unhighlightRegions } from './legend-proportional-symb
  */
 export function buildSizeLegend(out, baseX, baseY) {
     const map = out.map
+
+    //container for size legend
     out._sizeLegendContainer = out.lgg
         .append('g')
         .attr('class', 'size-legend-container')
         .attr('id', 'size-legend-container')
         .attr('transform', `translate(${baseX},${baseY})`)
 
+    //draw size legend title
+    if (out.sizeLegend.title) {
+        let titleFontSize = getFontSizeFromClass('em-size-legend-title')
+        out._sizeLegendContainer
+            .append('text')
+            .attr('class', 'em-size-legend-title')
+            .attr('id', 'em-size-legend-title')
+            .attr('y', titleFontSize)
+            .text(out.sizeLegend.title)
+    }
+
+    //draw legend
     if (!map.psCustomSVG_ && map.psShape_ == 'circle') {
         buildCircleLegend(out)
         if (out.sizeLegend.noData) {
@@ -68,6 +82,7 @@ export function buildSizeLegend(out, baseX, baseY) {
         }
     }
 
+    //no data item
     if (out.sizeLegend.noData) {
         let y = out._sizeLegendContainer.node().getBBox().height
 
@@ -83,7 +98,8 @@ export function buildSizeLegend(out, baseX, baseY) {
  */
 function buildCircleLegend(out) {
     const map = out.map
-    let y = 0
+    const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
+    let y = out.sizeLegend.title ? sizeLegendTitleFontSize + out.sizeLegend.titlePadding : 0
 
     //assign default circle radiuses if none specified by user
     let domain = map.classifierSize_.domain()
@@ -93,21 +109,6 @@ function buildCircleLegend(out) {
     } else {
         // user defined legend values
         out._sizeLegendValues = out.sizeLegend.values
-    }
-
-    //draw size legend title
-
-    if (out.sizeLegend.title) {
-        let titleFontSize = getFontSizeFromClass('em-size-legend-title')
-        y = titleFontSize
-        out._sizeLegendContainer
-            .append('text')
-            .attr('class', 'em-size-legend-title')
-            .attr('id', 'em-size-legend-title')
-            .attr('y', y)
-            .text(out.sizeLegend.title)
-
-        y += titleFontSize
     }
 
     let maxRadius = map.classifierSize_(max(out._sizeLegendValues)) //maximum circle radius to be shown in legend

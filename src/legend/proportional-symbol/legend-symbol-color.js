@@ -1,4 +1,4 @@
-import { executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
+import { executeForAllInsets, getFontSizeFromClass, spaceAsThousandSeparator } from '../../core/utils'
 import { highlightRegions, unhighlightRegions } from './legend-proportional-symbols'
 
 /**
@@ -10,6 +10,7 @@ export function buildColorLegend(out, baseX, baseY) {
     // color legend main container
     out._colorLegendContainer = out.lgg.append('g').attr('class', 'color-legend-container')
 
+    //container position
     if (out._sizeLegendContainer) {
         // position it below size legend ( + out.colorLegend.marginTop)
         out._colorLegendContainer.attr(
@@ -20,6 +21,17 @@ export function buildColorLegend(out, baseX, baseY) {
         out._colorLegendContainer.attr('transform', `translate(${baseX},${baseY})`)
     }
 
+    //title
+    if (out.colorLegend.title) {
+        out._colorLegendContainer
+            .append('text')
+            .attr('class', 'em-legend-title em-color-legend-title')
+            .attr('x', 0)
+            .attr('y', out.titleFontSize + out.colorLegend.marginTop)
+            .text(out.colorLegend.title)
+    }
+
+    //legend
     if (out.colorLegend.labelType === 'ranges') {
         buildColorRangesLegend(out)
     } else {
@@ -28,7 +40,7 @@ export function buildColorLegend(out, baseX, baseY) {
 
     // Optionally add no-data
     if (out.colorLegend.noData) {
-        const y = baseY + out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding)
+        const y = baseY + out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding) + getFontSizeFromClass('em-legend-title')
         const x = 0
         const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
         out.appendNoDataLegend(container, out.colorLegend.noDataText, highlightRegions, unhighlightRegions)
@@ -56,16 +68,6 @@ function buildColorRangesLegend(out) {
     const container = out._colorLegendContainer
     const x = 0 // x position of color legend cells
     let y
-
-    //title
-    if (out.colorLegend.title) {
-        container
-            .append('text')
-            .attr('class', 'em-legend-title')
-            .attr('x', x)
-            .attr('y', out.titleFontSize + out.colorLegend.marginTop)
-            .text(out.colorLegend.title)
-    }
 
     for (let i = 0; i < numberOfClasses; i++) {
         y =
@@ -117,17 +119,6 @@ function buildColorRangesLegend(out) {
 function buildColorThresholdsLegend(out) {
     //define format for labels
     const labelFormatter = out.colorLegend.labelFormatter || spaceAsThousandSeparator
-
-    //title
-    if (out.colorLegend.title) {
-        out._colorLegendContainer
-            .append('text')
-            .attr('class', 'em-legend-title')
-            .attr('x', out.boxPadding)
-            .attr('y', out.titleFontSize + out.colorLegend.marginTop)
-            .text(out.colorLegend.title)
-    }
-
     // x position of color legend cells
     let x = 0
 

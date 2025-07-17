@@ -64,7 +64,7 @@ export function applyPatternFill(map, configs = []) {
                     select(clone)
                         .attr('fill', `url(#${patternId})`)
                         .attr('pointer-events', 'none')
-                        .attr('class', (original.attr('class') || '') + ' pattern-fill-overlay')
+                        .attr('class', (original.attr('class') || '') + 'pattern-fill-overlay')
 
                     select(this.parentNode).append(() => clone)
                 })

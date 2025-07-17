@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { getFontSizeFromClass } from '../core/utils'
+import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 
 /**
  * A eurostat-map legend. This is an abstract method.
@@ -31,8 +31,15 @@ export const legend = function (map) {
     // we now use CSS instead of inline styles
     out.labelFontSize = getFontSizeFromClass('em-legend-label')
 
+    //the width of the legend box elements
+    out.shapeWidth = 25
+    //the height of the legend box elements
+    out.shapeHeight = 20
+
     //gap between legend and 'no data' legend
     out.noDataPadding = 5
+    out.noDataShapeWidth = 25
+    out.noDataShapeHeight = 20
 
     /** Build legend. */
     out.build = function () {
@@ -192,7 +199,7 @@ export const legend = function (map) {
             out.svg
                 .select('#legendBR')
                 .attr('x', bb.x - p)
-                .attr('y', bb.y - p - 2) // -2 to account for the title height
+                .attr('y', bb.y - p) // -2 to account for the title height
                 .attr('width', bb.width + 2 * p)
                 .attr('height', bb.height + 2 * p)
         }
@@ -208,8 +215,8 @@ export const legend = function (map) {
             .attr('class', 'em-legend-rect')
             .style('fill', map.noDataFillStyle())
             .attr('y', out.noDataPadding)
-            .attr('width', out.colorLegend ? out.colorLegend.shapeWidth : out.noDataShapeWidth)
-            .attr('height', out.colorLegend ? out.colorLegend.shapeHeight : out.noDataShapeHeight)
+            .attr('width', out.noDataShapeWidth)
+            .attr('height', out.noDataShapeHeight)
             .on('mouseover', function () {
                 highlightRegions(map, 'nd')
                 if (map.insetTemplates_) {
@@ -228,8 +235,8 @@ export const legend = function (map) {
             .append('text')
             .attr('class', 'em-legend-label')
             .attr('dy', '0.35em') // ~vertical centering
-            .attr('x', out.colorLegend ? out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x : out.noDataShapeWidth + 5)
-            .attr('y', (out.colorLegend ? out.colorLegend.shapeHeight / 2 : out.noDataShapeHeight / 2) + out.noDataPadding)
+            .attr('x', out.noDataShapeWidth + 5)
+            .attr('y', out.noDataShapeHeight / 2 + out.noDataPadding)
             .text(noDataText)
     }
 

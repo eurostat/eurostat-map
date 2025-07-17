@@ -20,10 +20,6 @@ export const legend = function (map, config) {
     out.labelType = 'thresholds' // thresholds || ranges
     //the order of the legend elements. Set to false to invert.
     out.ascending = true
-    //the width of the legend box elements
-    out.shapeWidth = 25
-    //the height of the legend box elements
-    out.shapeHeight = 20
     //the separation line length
     out.sepLineLength = out.shapeWidth
     //tick line length in pixels
@@ -101,7 +97,7 @@ export const legend = function (map, config) {
             const baseX = out.getBaseX()
 
             if (out.histogram) {
-                createHistogramLegend(out, baseX, baseY, highlightRegions, unhighlightRegions)
+                createHistogramLegend(out, baseX, baseY)
             } else if (map.colorSchemeType_ === 'continuous') {
                 createContinuousLegend(out, baseX, baseY)
             } else {
@@ -113,17 +109,13 @@ export const legend = function (map, config) {
                 }
             }
 
-            // Get the total height of the choropleth legend box
-            const legendHeight = out.lgg.node().getBBox().height
-
             // Append pattern fill legend items BELOW the main legend
-            appendPatternFillLegend(map, out.lgg, {
-                shapeWidth: out.shapeWidth,
-                shapeHeight: out.shapeHeight,
-                labelOffset: out.labelOffset,
-                boxPadding: out.boxPadding,
-                offsetY: legendHeight + out.boxPadding + 5, //  shifts pattern legend down
-            })
+            const legendHeight = out.lgg.node().getBBox().height
+            const patternContainer = out.lgg
+                .append('g')
+                .attr('class', 'pattern-fill-legend')
+                .attr('transform', `translate(${out.getBaseX()}, ${legendHeight + out.boxPadding + 5})`)
+            appendPatternFillLegend(out, patternContainer)
 
             // Set legend box dimensions
             out.setBoxDimension()

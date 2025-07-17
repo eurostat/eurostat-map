@@ -2,6 +2,9 @@ import { executeForAllInsets } from '../../core/utils'
 import { getLabelFormatter, highlightRegions, unhighlightRegions } from './legend-choropleth'
 import { select } from 'd3-selection'
 
+// discrete legends for choropleth maps
+// can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
+
 export function createThresholdsLegend(out, baseX, baseY) {
     const m = out.map
     const lgg = out.lgg
@@ -65,7 +68,17 @@ export function createThresholdsLegend(out, baseX, baseY) {
                 .attr('y', y + out.shapeHeight)
                 //.attr('dominant-baseline', 'middle')
                 .attr('dy', '0.35em') // ~vertical centering
-                .text(out.labels ? out.labels[i] : labelFormatter(m.classifier().invertExtent(ecl)[out.ascending ? 0 : 1]))
+                .text(() => {
+                    if (out.labels) return out.labels[i]
+
+                    const classifier = m.classifier?.()
+                    if (classifier?.invertExtent) {
+                        const range = classifier.invertExtent(ecl)
+                        return labelFormatter(range[out.ascending ? 0 : 1])
+                    }
+
+                    return map.noDataText_ || ''
+                })
 
             // mark label so we can move it in drawDivergingLine
             if (out.pointOfDivergenceLabel && i == out.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
