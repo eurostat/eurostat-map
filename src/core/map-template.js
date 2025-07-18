@@ -57,11 +57,17 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()
     out.filterGeometriesFunction_ = undefined // user defined filter function
     out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
+    out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
+
+    // pan & zoom
     out.zoomExtent_ = undefined
+    out.lockPanUntilZoom_ = true // if true, user can pan only after zooming once
     out.maxBounds_ = { xMin: -Infinity, yMin: -Infinity, xMax: Infinity, yMax: Infinity }
+    out.onZoomEnd_ = undefined // user function to call when zoom ends
+
+    // geometries
     out.geometries_ = undefined // [{id:String, data:geojson, class:function}] user-defined geometries
     out.processCentroids_ = undefined // runs over symbol centroids
-    out.position_ = { x: undefined, y: undefined, z: undefined } // map view
 
     //map title
     out.title_ = ''
@@ -141,9 +147,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     //style for no data regions
     out.noDataFillStyle_ = '#bcbcbc'
-
-    //event handlers
-    out.onZoomEnd_ = undefined // user function to call when zoom ends
 
     /**
      * Insets.

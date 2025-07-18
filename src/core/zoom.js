@@ -5,9 +5,10 @@ import { getCurrentBbox } from './utils'
 export const defineMapZoom = function (map) {
     let svg = select('#' + map.svgId())
     let previousT = zoomIdentity
+    let panUnlocked = false // Always start locked, unlock only after zoom
+
     map.__zoomBehavior = zoom()
         .filter(function (event) {
-            // Prevent zoom if interacting with a zoom button
             const target = event.target
             return !target.closest('.em-zoom-buttons') && !target.closest('.em-button')
         })
@@ -17,21 +18,24 @@ export const defineMapZoom = function (map) {
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
 
             if (t.k !== previousT.k) {
+                // User zoomed → permanently unlock panning if locking is enabled
+                if (map.lockPanUntilZoom_) panUnlocked = true
                 zoomHandler(e, previousT, map)
-                //  Store zoom level (k) in the DOM (e.g. to be used in mouseover events)
                 zoomGroup.attr('data-zoom', t.k)
-            } else {
+                zoomGroup.attr('transform', t)
+            } else if (!map.lockPanUntilZoom_ || panUnlocked) {
+                // Panning allowed (lock disabled OR unlocked after zoom)
                 panHandler(e, map)
+                zoomGroup.attr('transform', t)
+            } else {
+                // Lock active & not unlocked yet → cancel pan
+                svg.call(map.__zoomBehavior.transform, previousT)
             }
 
-            // apply default transform to map
-            zoomGroup.attr('transform', t)
             previousT = t
         })
         .on('end', function (e) {
-            if (map.onZoomEnd_) {
-                map.onZoomEnd_(e, map)
-            }
+            if (map.onZoomEnd_) map.onZoomEnd_(e, map)
         })
 
     svg.call(map.__zoomBehavior)
