@@ -1,6 +1,6 @@
 import { executeForAllInsets, getFontSizeFromClass, spaceAsThousandSeparator } from '../../core/utils'
 import { highlightRegions, unhighlightRegions } from './legend-proportional-symbols'
-
+import { format } from 'd3-format'
 /**
  * Builds a legend illustrating the statistical values of different symbol colours
  *
@@ -47,27 +47,13 @@ export function buildColorLegend(out, baseX, baseY) {
     }
 }
 
-function getColorThresholds(out) {
-    const map = out.map
-    const thresholds =
-        map.psThresholds_.length > 1
-            ? map.psThresholds_
-            : Array.from({ length: map.psClasses_ })
-                  .map((_, index) => {
-                      return map.classifierColor_.invertExtent(index)[out.ascending ? 0 : 1]
-                  })
-                  .slice(1) // Remove the first entry and return the rest as an array
-    return thresholds
-}
-
 function buildColorRangesLegend(out) {
     const map = out.map
-    const f = out.colorLegend.labelFormatter || spaceAsThousandSeparator
-    const thresholds = getColorThresholds(out)
     const numberOfClasses = map.psClasses_
     const container = out._colorLegendContainer
     const x = 0 // x position of color legend cells
     let y
+    const labelFormatter = getLabelFormatter(out)
 
     for (let i = 0; i < numberOfClasses; i++) {
         y =
@@ -76,7 +62,7 @@ function buildColorRangesLegend(out) {
             out.colorLegend.marginTop +
             i * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding)
 
-        const ecl = out.ascending ? i : numberOfClasses - i - 1
+        const ecl = out.ascending ? numberOfClasses - i - 1 : i
 
         const itemContainer = container.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-item')
 
@@ -107,16 +93,14 @@ function buildColorRangesLegend(out) {
             .attr('dy', '0.35em') // ~vertical centering
             .attr('x', out.colorLegend.shapeWidth + out.colorLegend.labelOffset.x)
             .attr('y', out.colorLegend.shapeHeight / 2)
-            .text(() => {
-                if (out.colorLegend.labels) return out.colorLegend.labels[i] // user-defined labels
-                if (i === 0) return `> ${f(thresholds[thresholds.length - 1])}`
-                if (i === thresholds.length) return `< ${f(thresholds[0])}`
-                return `${f(thresholds[thresholds.length - i - 1])} - < ${f(thresholds[thresholds.length - i])}`
-            })
+            .text(
+                out.colorLegend.labels ? out.colorLegend.labels[i] : labelFormatter(map.classifierColor().invertExtent(ecl)[out.ascending ? 0 : 1], i)
+            )
     }
 }
 
 function buildColorThresholdsLegend(out) {
+    const map = out.map
     //define format for labels
     const labelFormatter = out.colorLegend.labelFormatter || spaceAsThousandSeparator
     // x position of color legend cells
@@ -130,7 +114,7 @@ function buildColorThresholdsLegend(out) {
         let y = out.titleFontSize + out.colorLegend.titlePadding + out.colorLegend.marginTop + i * out.colorLegend.shapeHeight // account for title + margin
 
         //the class number, depending on order
-        const ecl = out.ascending ? i : numberOfClasses - i - 1
+        const ecl = out.ascending ? numberOfClasses - i - 1 : i
 
         let itemContainer = out._colorLegendContainer.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-legend-item')
 
@@ -184,11 +168,48 @@ function buildColorThresholdsLegend(out) {
                 .attr('dy', '0.35em') // ~vertical centering
                 .attr('x', out.colorLegend.sepLineLength + out.colorLegend.tickLength + out.colorLegend.labelOffset.x)
                 .attr('y', out.colorLegend.shapeHeight)
-                .text(
-                    out.colorLegend.labels
-                        ? out.colorLegend.labels[i]
-                        : labelFormatter(map.classifierColor_.invertExtent(out.ascending ? ecl + 1 : ecl - 1)[out.ascending ? 0 : 1])
-                )
+                .text(() => {
+                    if (out.colorLegend.labels) return out.colorLegend.labels[i]
+
+                    const classifier = map.classifierColor_
+                    if (classifier?.invertExtent) {
+                        const range = classifier.invertExtent(ecl)
+                        if (!range || range.some((v) => v == null)) return ''
+                        return labelFormatter(range[out.ascending ? 0 : 1])
+                    }
+
+                    return ''
+                })
         }
     }
+}
+
+function getLabelFormatter(out) {
+    if (out.colorLegend.labelType == 'ranges') {
+        const thresholds = getColorThresholds(out)
+        const defaultLabeller = (label, i) => {
+            const decimalFormatter = format(`.${out.decimals}f`)
+            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}` //top
+            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
+            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
+        }
+        return out.labelFormatter || defaultLabeller
+    } else if (out.labelType == 'thresholds') {
+        return out.labelFormatter || format(`.${out.decimals}f`)
+    } else {
+        return out.labelFormatter || format(`.${out.decimals}f`)
+    }
+}
+
+function getColorThresholds(out) {
+    const map = out.map
+    const thresholds =
+        map.psThresholds_.length > 1
+            ? map.psThresholds_
+            : Array.from({ length: map.psClasses_ })
+                  .map((_, index) => {
+                      return map.classifierColor_.invertExtent(index)[out.ascending ? 0 : 1]
+                  })
+                  .slice(1) // Remove the first entry and return the rest as an array
+    return thresholds
 }

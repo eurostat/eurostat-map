@@ -5,26 +5,39 @@ import { select } from 'd3-selection'
 // discrete legends for choropleth maps
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
 export function createDiscreteLegend(out, baseX, baseY) {
+    out._discreteLegendContainer = out.lgg.append('g').attr('class', 'discrete-legend-container').attr('transform', `translate(${baseX},${baseY})`)
     if (out.labelType === 'ranges') {
-        createRangesLegend(out, baseX, baseY)
+        createRangesLegend(out)
     } else {
-        createThresholdsLegend(out, baseX, baseY)
+        createThresholdsLegend(out)
+    }
+
+    // Optionally add no-data
+    if (out.noData) {
+        let y = map.numberOfClasses_ * out.shapeHeight + 5 // 5px padding
+        const x = 0
+        if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
+        //const y = baseY + out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding) + getFontSizeFromClass('em-legend-title')
+        const container = out._discreteLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
+        out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
     }
 }
-function createThresholdsLegend(out, baseX, baseY) {
+
+function createThresholdsLegend(out) {
     const m = out.map
-    const lgg = out.lgg
+    const container = out._discreteLegendContainer
 
     // Label formatter
     const labelFormatter = getLabelFormatter(out)
     for (let i = 0; i < m.numberOfClasses_; i++) {
-        const y = baseY + i * out.shapeHeight
-        const x = baseX
+        const y = i * out.shapeHeight
+        const x = 0
         const ecl = out.ascending ? m.numberOfClasses() - i - 1 : i
         const fillColor = m.classToFillStyle()(ecl, m.numberOfClasses_)
 
         // Append rectangle for each class
-        lgg.append('rect')
+        container
+            .append('rect')
             .attr('class', 'em-legend-rect')
             .attr('x', x)
             .attr('y', y)
@@ -44,33 +57,29 @@ function createThresholdsLegend(out, baseX, baseY) {
                 }
             })
 
-        // Append separation line
+        // Append separation line asdasd
         if (i > 0) {
-            lgg.append('line')
-                .attr('class', 'em-legend-separator')
-                .attr('x1', out.boxPadding)
-                .attr('y1', y)
-                .attr('x2', out.boxPadding + out.sepLineLength)
-                .attr('y2', y)
+            container.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', out.sepLineLength).attr('y2', y)
         }
 
         // Append tick line
         if (i > 0) {
-            lgg.append('line')
+            container
+                .append('line')
                 .attr('class', 'em-legend-tick')
-                .attr('x1', out.boxPadding + out.sepLineLength)
+                .attr('x1', out.sepLineLength)
                 .attr('y1', y)
-                .attr('x2', out.boxPadding + out.sepLineLength + out.tickLength)
+                .attr('x2', out.sepLineLength + out.tickLength)
                 .attr('y2', y)
         }
 
         // Append label
         if (i < m.numberOfClasses() - 1) {
             // mark label so we can move it in drawDivergingLine
-            const label = lgg
+            const label = container
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
+                .attr('x', Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
                 .attr('y', y + out.shapeHeight)
                 //.attr('dominant-baseline', 'middle')
                 .attr('dy', '0.35em') // ~vertical centering
@@ -94,55 +103,24 @@ function createThresholdsLegend(out, baseX, baseY) {
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
     if (out.pointOfDivergenceLabel) {
         for (let i = 0; i < map.numberOfClasses_; i++) {
-            let y = baseY + i * out.shapeHeight
+            let y = i * out.shapeHeight
             // point of divergence indicator
             if (i == out.pointOfDivergence) {
                 drawDivergingLine(out, y)
             }
         }
     }
-
-    // 'No data' box and label if applicable
-    if (out.noData) {
-        const y = baseY + m.numberOfClasses() * out.shapeHeight + out.boxPadding
-        lgg.append('rect')
-            .attr('class', 'em-legend-rect')
-            .attr('x', out.boxPadding)
-            .attr('y', y)
-            .attr('width', out.shapeWidth)
-            .attr('height', out.shapeHeight)
-            .style('fill', out.map.noDataFillStyle_)
-            .on('mouseover', function () {
-                highlightRegions(out.map, 'nd')
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
-                }
-            })
-            .on('mouseout', function () {
-                unhighlightRegions(out.map)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
-                }
-            })
-
-        lgg.append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
-            .attr('y', y + out.shapeHeight * 0.5)
-            .attr('dy', '0.35em')
-            .text(out.noDataText)
-    }
 }
 
-function createRangesLegend(out, baseX, baseY) {
+function createRangesLegend(out) {
     const map = out.map
-    const container = out.lgg
+    const container = out._discreteLegendContainer
     const labelFormatter = getLabelFormatter(out)
 
     // for each class
     for (let i = 0; i < map.numberOfClasses_; i++) {
-        let y = baseY + i * out.shapeHeight
-        const x = baseX
+        let y = i * out.shapeHeight
+        const x = 0
         const ecl = out.ascending ? map.numberOfClasses() - i - 1 : i
         const fillColor = map.classToFillStyle()(ecl, map.numberOfClasses_)
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
@@ -175,20 +153,14 @@ function createRangesLegend(out, baseX, baseY) {
 
         // Append separation line
         if (i > 0) {
-            itemContainer
-                .append('line')
-                .attr('class', 'em-legend-separator')
-                .attr('x1', out.boxPadding)
-                .attr('y1', y)
-                .attr('x2', out.boxPadding + out.sepLineLength)
-                .attr('y2', y)
+            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', out.sepLineLength).attr('y2', y)
         }
 
         // Append labels
         itemContainer
             .append('text')
             .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding + Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
+            .attr('x', Math.max(out.shapeWidth, out.sepLineLength + out.tickLength) + out.labelOffset)
             .attr('y', y + out.shapeHeight / 2)
             .attr('dy', '0.35em')
             .text(out.labels ? out.labels[i] : labelFormatter(map.classifier().invertExtent(ecl)[out.ascending ? 0 : 1], i))
@@ -197,34 +169,25 @@ function createRangesLegend(out, baseX, baseY) {
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
     if (out.pointOfDivergenceLabel) {
         for (let i = 0; i < map.numberOfClasses_; i++) {
-            let y = baseY + i * out.shapeHeight
+            let y = i * out.shapeHeight
             // point of divergence indicator
             if (i == out.pointOfDivergence) {
                 drawDivergingLine(out, y)
             }
         }
     }
-
-    // Optionally add no-data
-    if (out.noData) {
-        let y = baseY + map.numberOfClasses_ * out.shapeHeight + out.boxPadding
-        if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
-        //const y = baseY + out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding) + getFontSizeFromClass('em-legend-title')
-        const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
-    }
 }
 
 function drawDivergingLine(out, y) {
-    const container = out.lgg.append('g').attr('class', 'em-legend-divergence-container')
+    const container = out._discreteLegendContainer.append('g').attr('class', 'em-legend-divergence-container')
     const markerHeight = 6
-    const x = out.boxPadding
+    const x = 0
     if (out.labelType == 'ranges') y = y + out.pointOfDivergencePadding / 2 // move to the middle of the space between legend item
-    const maxLabelLength = out.lgg
+    const maxLabelLength = out._discreteLegendContainer
         .selectAll('.em-legend-label')
         .nodes()
         .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
-    const lineLength = out.divergingLineLength || maxLabelLength + out.boxPadding + out.shapeWidth + 10 // + padding
+    const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffset + maxLabelLength + out.labelOffset + 15 // rect > offset > label > offset > padding > vertical line
 
     // Draw the horizontal divergence line
     container
@@ -304,7 +267,7 @@ function drawDivergingLine(out, y) {
     if (out.labelType == 'thresholds') {
         if (labels.length > 1) {
             // move it to end of line
-            out.lgg.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)
+            container.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)
             // Append tick line
             // container
             //     .append('line')
@@ -315,7 +278,7 @@ function drawDivergingLine(out, y) {
             //     .attr('y2', y)
         } else {
             //remove it so it doesnt clash with pointOfDivergenceLabel
-            out.lgg.selectAll('.em-legend-label-divergence').remove()
+            container.selectAll('.em-legend-label-divergence').remove()
         }
     }
 }

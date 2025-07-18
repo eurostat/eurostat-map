@@ -28,7 +28,7 @@ a text {
 /* Title and subtitle styling */
 .em-title,
 .em-inset-title {
-    fill: #333333;
+    fill: #696969;
     stroke: none;
 }
 
@@ -92,7 +92,7 @@ a text {
     /* pointer-events: none; */
 }
 .em-scalebar-line {
-    stroke: #333333;
+    stroke: #696969;
     stroke-width: 0.8px;
 }
 .em-scalebar-label {
@@ -135,7 +135,7 @@ a text {
 .em-flow-labels {
     font-size: 15px;
     stroke-width: 1px;
-    fill: #333333;
+    fill: #696969;
     pointer-events: none;
 }
 .em-flow-labels-halo {

@@ -1,17 +1,8 @@
 import { select } from 'd3-selection'
 import * as Legend from '../legend'
-import { formatDefaultLocale } from 'd3-format'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { buildSizeLegend } from './legend-symbol-size'
 import { buildColorLegend } from './legend-symbol-color'
-
-//set legend labels locale
-formatDefaultLocale({
-    decimal: '.',
-    thousands: ' ',
-    grouping: [3],
-    currency: ['', '€'],
-})
 
 /**
  * A legend for proportional symbol map
@@ -21,13 +12,6 @@ formatDefaultLocale({
 export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
-
-    out.ascending = false //the order of the legend elements. Set to false to invert.
-    out.legendSpacing = 35 //spacing between color & size legends (if applicable)
-    out.labelFontSize = 12 //the font size of the legend labels
-
-    out.noDataShapeWidth = 25
-    out.noDataShapeHeight = 20
 
     //size legend config (legend illustrating the values of different symbol sizes)
     out.sizeLegend = {
@@ -125,7 +109,7 @@ export const legend = function (map, config) {
                 const patternContainer = out.lgg
                     .append('g')
                     .attr('class', 'pattern-fill-legend')
-                    .attr('transform', `translate(${out.getBaseX()}, ${legendHeight + out.boxPadding + 5})`)
+                    .attr('transform', `translate(${baseX}, ${legendHeight + out.boxPadding + 5})`)
                 appendPatternFillLegend(out, patternContainer)
             }
 
@@ -142,28 +126,28 @@ export function highlightRegions(map, ecl) {
     //for ps, the symbols are the children of each em-prop-symbols element
     const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
 
-    // Set all symbols to white
+    // Set all symbols to visible
     allSymbols.each(function (d, i) {
-        let symbol = select(this.childNodes[0])
-        symbol.style('fill', 'white')
+        let symbol = select(this)
+        symbol.style('opacity', '0')
     })
 
-    // Highlight only the selected regions by restoring their original color
+    // Highlight only the selected regions by restoring their original opacity
     const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
     selectedSymbols.each(function (d, i) {
-        let symbol = select(this.childNodes[0])
-        symbol.style('fill', symbol.attr('fill___')) // Restore original color for selected regions
+        let symbol = select(this)
+        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
     })
 }
 
-// Reset all regions to their original colors on mouseout
+// Reset all regions to their original opacitys on mouseout
 export function unhighlightRegions(map) {
     //for ps, the symbols are the children of each em-prop-symbols element
     const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
 
-    // Restore each region's original color from the fill___ attribute
+    // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {
-        let symbol = select(this.childNodes[0])
-        symbol.style('fill', symbol.attr('fill___')) // Restore original color for selected regions
+        let symbol = select(this)
+        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
     })
 }

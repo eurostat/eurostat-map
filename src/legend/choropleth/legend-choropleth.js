@@ -18,8 +18,6 @@ export const legend = function (map, config) {
     const out = Legend.legend(map)
 
     out.labelType = 'thresholds' // thresholds || ranges
-    //the order of the legend elements. Set to false to invert.
-    out.ascending = true
     //the separation line length
     out.sepLineLength = out.shapeWidth
     //tick line length in pixels
@@ -28,8 +26,7 @@ export const legend = function (map, config) {
     out.decimals = 0
     //the distance between the legend box elements to the corresponding text label
     out.labelOffset = 3
-    //labelFormatter function
-    out.labelFormatter = null
+
     // manually define labels
     out.labels = null
 
@@ -50,11 +47,6 @@ export const legend = function (map, config) {
     out.continuousTickValues = [] // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
     out.continuousTickLabels = [] // Custom tick labels for continuous legend (if empty, will use continuousTickValues)
     out.continuousOrientation = 'horizontal' // or 'vertical'
-
-    //show no data
-    out.noData = true
-    //no data text label
-    out.noDataText = 'No data'
 
     //override attribute values with config values
     if (config) {

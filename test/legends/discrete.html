@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            const customColorFunction = d3.scaleDiverging().domain([-109, 0, 64]).interpolator(d3.interpolateRdBu)
+            const map = eurostatmap
+                .map('choropleth')
+                .title('discrete color scheme legend')
+                .subtitle('discrete color scheme')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .nutsLevel(3)
+                .zoomExtent([1, 1000])
+                .numberOfClasses(6)
+                //.colorFunction(customColorFunction)
+                .colorFunction(d3.interpolateBlues)
+                .legend({
+                    title: 'Population change',
+                    subtitle: 'per 1000 inhabitants',
+                    x: 620,
+                    y: 10,
+                    width: 200,
+                    boxOpacity: 1,
+                    noDataText: 'Data not available',
+                })
+                .build()
+        </script>
+    </body>
+</html>

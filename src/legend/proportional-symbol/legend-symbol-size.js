@@ -16,8 +16,8 @@ export function buildSizeLegend(out, baseX, baseY) {
     //container for size legend
     out._sizeLegendContainer = out.lgg
         .append('g')
-        .attr('class', 'size-legend-container')
-        .attr('id', 'size-legend-container')
+        .attr('class', 'em-size-legend-container')
+        .attr('id', 'em-size-legend-container')
         .attr('transform', `translate(${baseX},${baseY})`)
 
     //draw size legend title
@@ -47,10 +47,6 @@ export function buildSizeLegend(out, baseX, baseY) {
 
     //define format for labels
     let labelFormatter = out.sizeLegend.labelFormatter || spaceAsThousandSeparator
-    //draw title
-    if (out.sizeLegend.title) {
-        out._sizeLegendContainer.append('text').attr('class', 'em-legend-title').attr('x', baseX).attr('y', baseY).text(out.sizeLegend.title)
-    }
 
     let domain = map.classifierSize_.domain()
     let maxVal = domain[1] //maximum value of dataset (used for first or last symbol by default)
@@ -74,18 +70,17 @@ export function buildSizeLegend(out, baseX, baseY) {
         let symbolSize = map.classifierSize_(val)
 
         if (map.psShape_ == 'bar') {
-            buildBarsItem(map, val, symbolSize, i, labelFormatter)
+            buildBarsItem(out, val, symbolSize, i, labelFormatter)
         } else if (map.psShape_ == 'custom' || map.psCustomSVG_) {
-            buildCustomSVGItem(map, val, symbolSize, i, labelFormatter)
+            buildCustomSVGItem(out, val, symbolSize, i, labelFormatter)
         } else {
-            buildD3SymbolItem(map, val, symbolSize, i, labelFormatter)
+            buildD3SymbolItem(out, val, symbolSize, i, labelFormatter)
         }
     }
 
     //no data item
     if (out.sizeLegend.noData) {
         let y = out._sizeLegendContainer.node().getBBox().height
-
         let x = 0
         const container = out._sizeLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
         out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightRegions, unhighlightRegions)
@@ -238,7 +233,7 @@ function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter) {
     let itemContainer = out._sizeLegendContainer.append('g').attr('transform', `translate(${x},${y})`).attr('class', 'em-size-legend-item')
 
     // draw D3 symbol
-    let shape = getShape()
+    let shape = getShape(out)
     let d = shape.size(symbolSize * symbolSize)()
     itemContainer
         .append('g')
@@ -277,7 +272,7 @@ function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter) {
  * @param {*} index
  * @param {*} labelFormatter
  */
-function buildCustomSVGItem(value, symbolSize, index, labelFormatter) {
+function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
     const map = out.map
     let x = out.boxPadding //set X offset
     let y
@@ -340,7 +335,7 @@ function buildCustomSVGItem(value, symbolSize, index, labelFormatter) {
  * @param {*} m
  * @param {*} symbolSize
  */
-function buildBarsItem(value, symbolSize, index, labelFormatter) {
+function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
     const map = out.map
     // for vertical bars we dont use a dynamic X offset because all bars have the same width
     let x = out.boxPadding
@@ -350,7 +345,7 @@ function buildBarsItem(value, symbolSize, index, labelFormatter) {
     out.sizeLegend._totalBarsHeight += symbolSize + 10
 
     //set shape size and define 'd' attribute
-    let shape = getShape()
+    let shape = getShape(out)
     let d = shape.size(symbolSize * symbolSize)()
 
     //container for symbol and label
@@ -392,7 +387,7 @@ function buildBarsItem(value, symbolSize, index, labelFormatter) {
  * @description returns the d3.symbol object chosen by the user
  * @return {d3.shape || SVG}
  */
-function getShape() {
+function getShape(out) {
     const map = out.map
     let shape
     if (map.psCustomSVG_) {

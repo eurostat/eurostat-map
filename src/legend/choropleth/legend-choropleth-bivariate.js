@@ -39,15 +39,6 @@ export const legend = function (map, config) {
     out.yAxisTitleOffset = { x: 0, y: 0 }
     out.xAxisTitleOffset = { x: 0, y: 0 }
 
-    //show no data
-    out.noData = true
-    //show no data
-    out.noDataShapeHeight = 20
-    out.noDataShapeWidth = 25
-
-    //no data text label
-    out.noDataText = 'No data'
-
     //override padding
     out.boxPadding = out.labelFontSize
 

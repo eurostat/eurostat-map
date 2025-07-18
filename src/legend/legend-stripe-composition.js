@@ -12,21 +12,6 @@ export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
 
-    //the width of the legend box elements
-    out.shapeWidth = 25
-    //the height of the legend box elements
-    out.shapeHeight = 20
-    //the distance between consecutive legend box elements
-    out.shapePadding = 5
-    //the font size of the legend label
-    out.labelFontSize = 12
-    //the distance between the legend box elements to the corresponding text label
-    out.labelOffset = 5
-    //show no data
-    out.noData = true
-    //no data label text
-    out.noDataText = 'No data'
-
     //override attribute values with config values
     if (config) for (let key in config) out[key] = config[key]
 

@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
+import { formatDefaultLocale } from 'd3'
 
 /**
  * A eurostat-map legend. This is an abstract method.
@@ -28,18 +29,42 @@ export const legend = function (map) {
     out.title = ''
     // we now use CSS instead of inline styles
     out.titleFontSize = getFontSizeFromClass('em-legend-title')
-    // we now use CSS instead of inline styles
-    out.labelFontSize = getFontSizeFromClass('em-legend-label')
 
+    //padding between title and body
+    out.titlePadding = 5
     //the width of the legend box elements
     out.shapeWidth = 25
     //the height of the legend box elements
     out.shapeHeight = 20
+    //the distance between consecutive legend shape elements
+    out.shapePadding = 5
 
+    // we now use CSS instead of inline styles
+    out.labelFontSize = getFontSizeFromClass('em-legend-label')
+    //the distance between the legend box elements to the corresponding text label
+    out.labelOffset = 5
+    //labelFormatter function
+    out.labelFormatter = null
+    //set legend labels locale
+    formatDefaultLocale({
+        decimal: '.',
+        thousands: ' ',
+        grouping: [3],
+        currency: ['', '€'],
+    })
+
+    //show no data
+    out.noData = true
+    //no data label text
+    out.noDataText = 'No data'
     //gap between legend and 'no data' legend
     out.noDataPadding = 5
     out.noDataShapeWidth = 25
     out.noDataShapeHeight = 20
+
+    //the order of the legend elements where applicable. Set to false to invert.
+    out.ascending = true
+    out.decimals = 0
 
     /** Build legend. */
     out.build = function () {

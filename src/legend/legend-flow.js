@@ -1,15 +1,4 @@
-import { format } from 'd3-format'
-import { select } from 'd3-selection'
 import * as Legend from './legend'
-import { formatDefaultLocale } from 'd3-format'
-
-//set legend labels locale
-formatDefaultLocale({
-    decimal: '.',
-    thousands: ' ',
-    grouping: [3],
-    currency: ['', '€'],
-})
 
 /**
  * A legend for proportional symbol map

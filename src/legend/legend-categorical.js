@@ -11,18 +11,6 @@ import { appendPatternFillLegend } from './legend-pattern-fill'
 export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
-    //padding between title and body
-    out.titlePadding = 5
-    //the distance between consecutive legend box elements
-    out.shapePadding = 5
-    //the font size of the legend label
-    out.labelFontSize = 12
-    //the distance between the legend box elements to the corresponding text label
-    out.labelOffset = 5
-    //show no data
-    out.noData = true
-    //no data label text
-    out.noDataText = 'No data'
     // allow the user to define the order of the legend elements manually as an array
     out.order = undefined
 

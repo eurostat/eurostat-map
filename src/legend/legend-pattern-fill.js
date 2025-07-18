@@ -3,14 +3,14 @@ import { select } from 'd3-selection'
 
 export function appendPatternFillLegend(out, container) {
     const map = out.map
-    const offsetY = 5 // offset for the pattern fill legend
+    const offsetY = 15 // offset for the pattern fill legend
 
     if (!map.patternFill_) return
 
     map.patternFill_.forEach((cfg, index) => {
         if (!cfg.legendLabel) return // skip if no label
 
-        const y = offsetY + index * out.shapeHeight + index * out.shapePadding
+        const y = index * out.shapeHeight + index * out.shapePadding + offsetY
 
         const item = container.append('g').attr('class', 'em-legend-item em-pattern-legend-item')
 
