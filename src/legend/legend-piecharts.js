@@ -13,9 +13,6 @@ export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
 
-    //spacing between color & size legends (if applicable)
-    out.legendSpacing = 15
-
     //size legend config (legend illustrating the values of different pie sizes)
     out.sizeLegend = {
         title: null,
@@ -26,10 +23,12 @@ export const legend = function (map, config) {
     //colour legend config (legend illustrating the values of different pie colours)
     out.colorLegend = {
         title: null,
+        titlePadding: 10, //padding between title and body
+        marginTop: 33, // margin top (distance between color and size legend)
         labelOffset: 5, //the distance between the legend box elements to the corresponding text label
         shapeWidth: 25, //the width of the legend box elements
         shapeHeight: 20, //the height of the legend box elements
-        shapePadding: 5, //the distance between consecutive legend box elements
+        shapePadding: 1, //the distance between consecutive legend box elements
         noData: true, //show no data
         noDataText: 'No data', //no data label text
     }
@@ -69,13 +68,17 @@ export const legend = function (map, config) {
         if (out.title) out.addTitle()
         if (out.subtitle) out.addSubtitle()
 
+        // initial x and y positions for the internal legend elements
+        const baseY = out.getBaseY()
+        const baseX = out.getBaseX()
+
         // legend for sizes
         if (map.sizeClassifier_) {
-            buildSizeLegend()
+            buildSizeLegend(out, baseX, baseY)
         }
 
         // legend for ps color values
-        buildColorLegend()
+        buildColorLegend(out, baseX, baseY)
 
         //set legend box dimensions
         out.setBoxDimension()
@@ -88,10 +91,10 @@ export const legend = function (map, config) {
      * @param {*} lgg parent legend object from core/legend.js
      * @param {*} config size legend config object (sizeLegend object specified as property of legend() config object)
      */
-    function buildSizeLegend() {
+    function buildSizeLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.sizeLegend
-        const container = out.lgg.append('g').attr('class', 'em-pie-size-legend')
+        out._sizeLegendContainer = out.lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
         const domain = map.sizeClassifier_.domain()
 
@@ -107,22 +110,22 @@ export const legend = function (map, config) {
         if (!config.title && out.title) config.title = out.title // Allow root legend title
         let titleHeight = 0 // This will be adjusted based on whether the title exists
         if (config.title) {
-            container
+            out._sizeLegendContainer
                 .append('text')
-                .attr('class', 'em-legend-title')
+                .attr('class', 'em-size-legend-title')
                 .attr('x', 0) // Position the title at the left edge
-                .attr('y', out.boxPadding + out.titleFontSize) // Title at top, within padding
+                .attr('y', out.titleFontSize) // Title at top, within padding
                 .text(config.title)
 
             // Adjust title height (using the title font size as a proxy)
-            titleHeight = out.titleFontSize + out.boxPadding + config.titlePadding
+            titleHeight = out.titleFontSize + config.titlePadding
         }
 
         // Now position the circles **below** the title
-        let y = titleHeight + out.boxPadding + maxSize * 2 // Position circles after title height
+        const y = titleHeight + out.sizeLegend.titlePadding + maxSize * 2 // Position circles after title height
 
         // Append the legend circles
-        const legendItems = container
+        const legendItems = out._sizeLegendContainer
             .selectAll('g')
             .data(config.values)
             .join('g')
@@ -166,19 +169,28 @@ export const legend = function (map, config) {
      * Builds a legend illustrating the statistical values of the pie charts' different colours
      *
      */
-    function buildColorLegend() {
+    function buildColorLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.colorLegend
         //container
-        const container = out.lgg.append('g').attr('class', 'em-pie-color-legend')
+        out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend')
+
+        //container position
+        if (out._sizeLegendContainer) {
+            // position it below size legend
+            const sizeLegendHeight = out._sizeLegendContainer.node().getBBox().height
+            out._colorLegendContainer.attr('transform', `translate(${baseX},${sizeLegendHeight + out.colorLegend.marginTop})`)
+        } else {
+            out._colorLegendContainer.attr('transform', `translate(${baseX},${baseY})`)
+        }
 
         //draw title
         if (config.title) {
-            container
+            out._colorLegendContainer
                 .append('text')
                 .attr('class', 'em-color-legend-title')
-                .attr('x', out.boxPadding)
-                .attr('y', out._sizeLegendHeight + out.legendSpacing + out.boxPadding + out.titleFontSize)
+                .attr('x', 0)
+                .attr('y', out.titleFontSize)
                 .text(config.title)
         }
 
@@ -187,20 +199,15 @@ export const legend = function (map, config) {
         const scs = map.catColors()
         for (let code in scs) {
             //the vertical position of the legend element
-            const y =
-                out._sizeLegendHeight +
-                out.legendSpacing +
-                out.boxPadding +
-                (config.title ? out.titleFontSize + out.boxPadding : 0) +
-                i * (config.shapeHeight + config.shapePadding)
+            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
             //the color
             const col = map.catColors()[code] || 'lightgray'
 
             //rectangle
-            container
+            out._colorLegendContainer
                 .append('rect')
                 .attr('class', 'em-legend-rect')
-                .attr('x', out.boxPadding)
+                .attr('x', 0)
                 .attr('y', y)
                 .attr('width', config.shapeWidth)
                 .attr('height', config.shapeHeight)
@@ -221,10 +228,10 @@ export const legend = function (map, config) {
                 })
 
             //label
-            container
+            out._colorLegendContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
+                .attr('x', config.shapeWidth + config.labelOffset)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dy', '0.35em') // ~vertical centering
                 .text(map.catLabels()[code] || code)
@@ -236,41 +243,13 @@ export const legend = function (map, config) {
         if (config.noData) {
             const y =
                 out._sizeLegendHeight +
-                out.legendSpacing +
+                out.colorLegend.marginTop +
                 out.boxPadding +
                 (config.title ? out.titleFontSize + out.boxPadding : 0) +
                 i * (config.shapeHeight + config.shapePadding)
 
-            //rectangle
-            container
-                .append('rect')
-                .attr('class', 'em-legend-rect')
-                .attr('x', out.boxPadding)
-                .attr('y', y)
-                .attr('width', config.shapeWidth)
-                .attr('height', config.shapeHeight)
-                .style('fill', map.noDataFillStyle())
-                .on('mouseover', function () {
-                    highlightRegions(out.map, 'nd')
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, 'nd')
-                    }
-                })
-                .on('mouseout', function () {
-                    unhighlightRegions(out.map)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, 'nd')
-                    }
-                })
-
-            //'no data' label
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + config.shapeWidth + config.labelOffset)
-                .attr('y', y + config.shapeHeight * 0.5)
-                .attr('dy', '0.35em') // ~vertical centering
-                .text(config.noDataText)
+            const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
+            out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
         }
     }
 

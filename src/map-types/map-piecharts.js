@@ -419,6 +419,23 @@ export const map = function (config) {
     }
 
     //specific tooltip text function
+    // tooltip chart dimensions
+    const width = 150
+    const height = 120
+    const margin = 10
+    const radius = Math.min(width, height) / 2 - margin
+
+    // Generate pie and arcs
+    const pie_ = pie()
+        .sort(null)
+        .value((d) => d.value)
+    const innerArc = arc()
+        .innerRadius(0)
+        .outerRadius(radius * 0.8)
+    const outerArc = arc()
+        .innerRadius(radius * 0.9)
+        .outerRadius(radius * 0.9)
+    // Tooltip function for pie charts
     const pieChartTooltipFunction = function (rg, map) {
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
@@ -437,23 +454,6 @@ export const map = function (config) {
             return html
         }
 
-        // Chart dimensions
-        const width = 150
-        const height = 150
-        const margin = 25
-        const radius = Math.min(width, height) / 2 - margin
-
-        // Generate pie and arcs
-        const pie_ = pie()
-            .sort(null)
-            .value((d) => d.value)
-        const innerArc = arc()
-            .innerRadius(0)
-            .outerRadius(radius * 0.8)
-        const outerArc = arc()
-            .innerRadius(radius * 0.9)
-            .outerRadius(radius * 0.9)
-
         const pieData = pie_(data)
 
         let paths = ''
@@ -465,7 +465,7 @@ export const map = function (config) {
             const dPath = innerArc(d)
             paths += `<path d="${dPath}" fill="${fill}" stroke="white" stroke-width="1" opacity="0.7"></path>`
 
-            if (d.data.value > 0.02) {
+            if (d.data.value > 0.1) {
                 const posA = innerArc.centroid(d)
                 const posB = outerArc.centroid(d)
                 const posC = outerArc.centroid(d)
@@ -488,7 +488,7 @@ export const map = function (config) {
         }
 
         const svg = `
-        <div style="display: flex; justify-content: center;">
+        <div class='em-tooltip-piechart-container'>
             <svg viewBox="${-width / 2} ${-height / 2} ${width} ${height}" width="${width}" height="${height - margin / 2}">
                 <g transform="translate(0,0)">
                     ${paths}
@@ -506,13 +506,25 @@ export const map = function (config) {
         for (const sc of out.statCodes_) {
             const s = out.statData(sc).get(regionId)
             if (s && s.value !== undefined && s.value !== null) {
-                html += `<span>${out.catLabels_[sc]}</span>: ${s.value.toFixed()}<br>`
+                const color = out.catColors()[sc] || '#666'
+                html += `
+            <div class="em-breakdown-item">
+                <span class="em-breakdown-color" style="background:${color}"></span>
+                <span class="em-breakdown-label">${out.catLabels_[sc]}</span>
+                <span class="em-breakdown-value">${s.value.toFixed()}</span>
+            </div>
+        `
             }
         }
 
         const total = getRegionTotal(regionId)
         if (total !== undefined && total !== null) {
-            html += `<span>Total</span>: ${total.toFixed()}<br>`
+            html += `
+        <div class="em-breakdown-item em-total">
+            <span class="em-breakdown-label">Total</span>
+            <span class="em-breakdown-value">${total.toFixed()}</span>
+        </div>
+    `
         }
 
         html += `</div>`

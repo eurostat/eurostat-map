@@ -19,8 +19,12 @@
     font-size: 16px;
     fill: #696969;
 }
+.em-color-legend-title {
+    font-size: 16px;
+    fill: #696969;
+}
 .em-legend-subtitle {
-    font-size: 14px;
+    font-size: 15px;
     fill: #696969;
     opacity: 0.8;
 }

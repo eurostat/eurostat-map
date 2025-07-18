@@ -174,10 +174,10 @@ function buildSpikeLegend(out) {
     const fontSize = getFontSizeFromClass('em-legend-label') // Adjust font size
     const labelSpacing = fontSize - 2 // Ensure labels are just below the spikes
 
-    const legend = out._sizeLegendContainer
+    const container = out._sizeLegendContainer
         .append('g')
         .attr('id', 'em-spike-legend')
-        .attr('transform', `translate(${out.boxPadding + 5},0)`)
+        .attr('transform', `translate(${out.boxPadding},${out.sizeLegend.titlePadding})`)
         .attr('fill', 'black')
         .attr('text-anchor', 'middle')
         .style('font-size', `${fontSize}px`)
@@ -187,7 +187,7 @@ function buildSpikeLegend(out) {
         .attr('transform', (d, i) => `translate(${40 * i + out.boxPadding},${maxSize + 5})`) // Increase spacing
 
     // Append spikes
-    legend
+    container
         .append('path')
         .attr('fill', map.psFill_)
         .attr('fill-opacity', map.psFillOpacity_)
@@ -196,7 +196,7 @@ function buildSpikeLegend(out) {
         .attr('d', (d) => spike(map.classifierSize_(d))) // Correctly maps values to spike size
 
     // Append labels directly below each spike
-    legend
+    container
         .append('text')
         .attr('class', 'em-legend-label')
         .attr('dy', labelSpacing) // Ensure text is right below spikes

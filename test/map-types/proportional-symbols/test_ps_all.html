@@ -140,7 +140,6 @@
                     },
                     colorLegend: {
                         title: '% of total utilised agricultural area',
-                        shapePadding: 2,
                     },
                     legendSpacing: 50,
                 })
@@ -182,14 +181,11 @@
                         title: 'Total organic arable land (HA)',
                         cellNb: 3,
                         labelFormatter: d3.format(',.2r'),
-                        shapePadding: 15,
-                        titlePadding: 30,
                         shapeOffset: { x: 0, y: -10 },
                         labelOffset: { x: 50, y: -30 },
                     },
                     colorLegend: {
                         title: '% of total utilised agricultural area',
-                        shapePadding: 2,
                     },
                     legendSpacing: 80,
                 })
@@ -240,9 +236,8 @@
                     },
                     colorLegend: {
                         title: '% change compared to 2019',
-                        shapePadding: 1,
+                        marginTop: 20,
                     },
-                    legendSpacing: 45,
                 })
                 .build()
 
@@ -259,7 +254,7 @@
                 })
                 .stat('color', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
                 .psShape('spike') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
-                .psFill('#35aeff')
+                .psFill('grey')
                 .psMaxSize(70)
                 .psBarWidth(20)
                 .psFillOpacity(1)
@@ -274,9 +269,11 @@
                         title: 'Total population',
                         cellNb: 3,
                         labelFormatter: d3.format(',.2r'),
+                        titlePadding: 20,
                     },
                     colorLegend: {
                         title: 'Inhabitants per km²',
+                        marginTop: 20,
                     },
                 })
                 .build()

@@ -8,15 +8,13 @@ import { format } from 'd3-format'
  */
 export function buildColorLegend(out, baseX, baseY) {
     // color legend main container
-    out._colorLegendContainer = out.lgg.append('g').attr('class', 'color-legend-container')
+    out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-color-legend-container').attr('id', 'em-color-legend-container')
 
     //container position
     if (out._sizeLegendContainer) {
         // position it below size legend ( + out.colorLegend.marginTop)
-        out._colorLegendContainer.attr(
-            'transform',
-            `translate(${baseX},${out._sizeLegendContainer.node().getBBox().height + out.colorLegend.marginTop})`
-        )
+        const sizeLegendHeight = out._sizeLegendContainer.node().getBBox().height
+        out._colorLegendContainer.attr('transform', `translate(${baseX},${sizeLegendHeight + out.colorLegend.marginTop})`)
     } else {
         out._colorLegendContainer.attr('transform', `translate(${baseX},${baseY})`)
     }
@@ -40,7 +38,14 @@ export function buildColorLegend(out, baseX, baseY) {
 
     // Optionally add no-data
     if (out.colorLegend.noData) {
-        const y = baseY + out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding) + getFontSizeFromClass('em-legend-title')
+        const y =
+            out.titleFontSize +
+            out.colorLegend.titlePadding +
+            out.colorLegend.marginTop +
+            out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding)
+
+        //if (out.pointOfDivergence) y += out.pointOfDivergencePadding //TODO: diverging prop symbol legends
+        //const legendHeight = out._colorLegendContainer.node().getBBox().height //doesnt work
         const x = 0
         const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
         out.appendNoDataLegend(container, out.colorLegend.noDataText, highlightRegions, unhighlightRegions)

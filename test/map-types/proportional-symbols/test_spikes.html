@@ -13,16 +13,17 @@
             // basic barebones proportional circles example
             let map = eurostatmap
                 .map('proportionalSymbol')
-                .psShape('circle')
+                .title('Spikes')
+                .subtitle('good for densely packed counts')
+                .psShape('spike')
                 .psSpikeWidth(7)
                 .nutsLevel('mixed')
-                .title('Spikes')
-                .width(800)
-                // .stat('size', {
-                //     eurostatDatasetCode: 'nama_10r_3gdp',
-                //     unitText: 'Million EUR',
-                //     filters: { unit: 'MIO_EUR', time: '2018' },
-                // })
+                .stat('size', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Million EUR',
+                    filters: { unit: 'MIO_EUR', time: '2018' },
+                })
+                .nutsLevel(3)
                 .legend({ title: 'Million EUR', x: 550, y: 90, boxOpacity: 0, sizeLegend: { noData: true } })
                 .insets(false)
                 .psStroke('white')

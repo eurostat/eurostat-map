@@ -7,7 +7,7 @@ import { select } from 'd3-selection'
 export const tooltip = function (config) {
     config = config || {}
     config.containerId = config.containerId || 'map'
-    config.div = config.div || 'tooltip_eurostat'
+    config.div = config.div || 'em-tooltip'
     config.maxWidth = config.maxWidth || '200px'
     config.fontSize = config.fontSize || '14px'
     config.background = config.background || 'white'
