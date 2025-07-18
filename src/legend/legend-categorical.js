@@ -11,7 +11,8 @@ import { appendPatternFillLegend } from './legend-pattern-fill'
 export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
-
+    //padding between title and body
+    out.titlePadding = 5
     //the distance between consecutive legend box elements
     out.shapePadding = 5
     //the font size of the legend label
@@ -46,13 +47,14 @@ export const legend = function (map, config) {
             createCategoricalLegend(out)
 
             // Append pattern fill legend items BELOW the main legend
-            // Get the total height of the choropleth legend box
-            const legendHeight = out.lgg.node().getBBox().height
-            const patternContainer = out.lgg
-                .append('g')
-                .attr('class', 'pattern-fill-legend')
-                .attr('transform', `translate(${baseX}, ${baseY + legendHeight + out.boxPadding + 5})`)
-            appendPatternFillLegend(out, patternContainer)
+            if (out.map.patternFill_) {
+                const legendHeight = out.lgg.node().getBBox().height
+                const patternContainer = out.lgg
+                    .append('g')
+                    .attr('class', 'pattern-fill-legend')
+                    .attr('transform', `translate(${baseX}, ${legendHeight + 15})`)
+                appendPatternFillLegend(out, patternContainer)
+            }
 
             // Optionally add no-data
             if (out.noData) {
@@ -63,7 +65,7 @@ export const legend = function (map, config) {
                 const container = out.lgg
                     .append('g')
                     .attr('class', 'em-no-data-legend')
-                    .attr('transform', `translate(${x},${baseY + legendHeight + out.boxPadding + 5})`)
+                    .attr('transform', `translate(${x},${legendHeight + 15})`)
                 out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
             }
 
@@ -88,7 +90,7 @@ export const legend = function (map, config) {
             const fillColor = map.classToFillStyle_[ecl_]
 
             //the vertical position of the legend element
-            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
+            const y = out.titlePadding + i * (out.shapeHeight + out.shapePadding)
 
             //rectangle
             container

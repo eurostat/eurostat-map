@@ -120,12 +120,14 @@ export const legend = function (map, config) {
             }
 
             // Append pattern fill legend items BELOW the main legend
-            const legendHeight = out.lgg.node().getBBox().height
-            const patternContainer = out.lgg
-                .append('g')
-                .attr('class', 'pattern-fill-legend')
-                .attr('transform', `translate(${out.getBaseX()}, ${legendHeight + out.boxPadding + 5})`)
-            appendPatternFillLegend(out, patternContainer)
+            if (out.map.patternFill_) {
+                const legendHeight = out.lgg.node().getBBox().height
+                const patternContainer = out.lgg
+                    .append('g')
+                    .attr('class', 'pattern-fill-legend')
+                    .attr('transform', `translate(${out.getBaseX()}, ${legendHeight + out.boxPadding + 5})`)
+                appendPatternFillLegend(out, patternContainer)
+            }
 
             //set legend box dimensions
             out.setBoxDimension()
