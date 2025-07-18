@@ -501,28 +501,42 @@ export const map = function (config) {
         html += svg
 
         // Breakdown
+        // Breakdown (sorted by value)
+        // Breakdown (sorted by value, with percentages)
         html += `<div class="em-tooltip-piechart-breakdown">`
 
-        for (const sc of out.statCodes_) {
-            const s = out.statData(sc).get(regionId)
-            if (s && s.value !== undefined && s.value !== null) {
-                const color = out.catColors()[sc] || '#666'
-                html += `
-            <div class="em-breakdown-item">
-                <span class="em-breakdown-color" style="background:${color}"></span>
-                <span class="em-breakdown-label">${out.catLabels_[sc]}</span>
-                <span class="em-breakdown-value">${s.value.toFixed()}</span>
-            </div>
-        `
-            }
+        // Collect all values, compute total, and sort descending
+        const breakdownData = out.statCodes_
+            .map((sc) => {
+                const s = out.statData(sc).get(regionId)
+                return s && s.value !== undefined && s.value !== null
+                    ? { code: sc, label: out.catLabels_[sc], value: s.value, color: out.catColors()[sc] || '#666' }
+                    : null
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.value - a.value)
+
+        const total = getRegionTotal(regionId) || breakdownData.reduce((sum, d) => sum + d.value, 0)
+
+        // Render each category
+        for (const item of breakdownData) {
+            const percent = total ? ((item.value / total) * 100).toFixed(0) : 0
+            html += `
+        <div class="em-breakdown-item">
+            <span class="em-breakdown-color" style="background:${item.color}"></span>
+            <span class="em-breakdown-label">${item.label}</span>
+            <span class="em-breakdown-value">${item.value.toFixed()} (${percent}%)</span>
+        </div>
+    `
         }
 
-        const total = getRegionTotal(regionId)
+        // Total (always last, no percentage)
         if (total !== undefined && total !== null) {
+            const unit = out.statData(out.statCodes_[0]).unitText() || ''
             html += `
         <div class="em-breakdown-item em-total">
             <span class="em-breakdown-label">Total</span>
-            <span class="em-breakdown-value">${total.toFixed()}</span>
+            <span class="em-breakdown-value">${total.toFixed()} ${unit}</span>
         </div>
     `
         }
