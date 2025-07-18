@@ -4,8 +4,14 @@ import { select } from 'd3-selection'
 
 // discrete legends for choropleth maps
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
-
-export function createThresholdsLegend(out, baseX, baseY) {
+export function createDiscreteLegend(out, baseX, baseY) {
+    if (out.labelType === 'ranges') {
+        createRangesLegend(out, baseX, baseY)
+    } else {
+        createThresholdsLegend(out, baseX, baseY)
+    }
+}
+function createThresholdsLegend(out, baseX, baseY) {
     const m = out.map
     const lgg = out.lgg
 
@@ -128,7 +134,7 @@ export function createThresholdsLegend(out, baseX, baseY) {
     }
 }
 
-export function createRangesLegend(out, baseX, baseY) {
+function createRangesLegend(out, baseX, baseY) {
     const map = out.map
     const container = out.lgg
     const labelFormatter = getLabelFormatter(out)
@@ -199,40 +205,13 @@ export function createRangesLegend(out, baseX, baseY) {
         }
     }
 
-    // 'No data' box and label if applicable
+    // Optionally add no-data
     if (out.noData) {
-        const noDataItemContainer = container.append('g').attr('class', 'em-legend-item')
-        let y = baseY + map.numberOfClasses() * out.shapeHeight + out.boxPadding
-        //if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
-        noDataItemContainer
-            .append('rect')
-            .attr('class', 'em-legend-rect')
-            .attr('x', out.boxPadding)
-            .attr('y', y)
-            .attr('width', out.shapeWidth)
-            .attr('height', out.shapeHeight)
-            .style('fill', out.map.noDataFillStyle_)
-            .on('mouseover', function () {
-                select(this).raise()
-                highlightRegions(map, 'nd')
-                if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
-                }
-            })
-            .on('mouseout', function () {
-                unhighlightRegions(map)
-                if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
-                }
-            })
-
-        noDataItemContainer
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
-            .attr('y', y + out.shapeHeight * 0.5)
-            .attr('dy', '0.35em')
-            .text(out.noDataText)
+        let y = baseY + map.numberOfClasses_ * out.shapeHeight + out.boxPadding
+        if (out.pointOfDivergence) y += out.pointOfDivergencePadding // shift legend items down after point of divergence
+        //const y = baseY + out.map.psClasses_ * (out.colorLegend.shapeHeight + out.colorLegend.shapePadding) + getFontSizeFromClass('em-legend-title')
+        const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
+        out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
     }
 }
 
@@ -241,7 +220,7 @@ function drawDivergingLine(out, y) {
     const markerHeight = 6
     const x = out.boxPadding
     if (out.labelType == 'ranges') y = y + out.pointOfDivergencePadding / 2 // move to the middle of the space between legend item
-    let maxLabelLength = out.lgg
+    const maxLabelLength = out.lgg
         .selectAll('.em-legend-label')
         .nodes()
         .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
@@ -256,9 +235,9 @@ function drawDivergingLine(out, y) {
         .attr('y2', y)
         .attr('class', 'em-legend-diverging-line')
 
-    // divergence line with up and down arrows
     const labels = out.pointOfDivergenceLabel.split('|')
     if (labels.length > 1) {
+        // divergence line with up and down arrows
         const directionLineLength = out.divergingArrowLength || 30
         const directionLineX = x + lineLength
         // Add arrowhead marker definition

@@ -6,7 +6,7 @@ import { getLegendRegionsSelector } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from './legend-continuous'
-import { createRangesLegend, createThresholdsLegend } from './legend-discrete'
+import { createDiscreteLegend } from './legend-discrete'
 
 /**
  * A legend for choropleth maps
@@ -101,12 +101,7 @@ export const legend = function (map, config) {
             } else if (map.colorSchemeType_ === 'continuous') {
                 createContinuousLegend(out, baseX, baseY)
             } else {
-                //discrete legends
-                if (out.labelType === 'ranges') {
-                    createRangesLegend(out, baseX, baseY)
-                } else {
-                    createThresholdsLegend(out, baseX, baseY)
-                }
+                createDiscreteLegend(out, baseX, baseY)
             }
 
             // Append pattern fill legend items BELOW the main legend

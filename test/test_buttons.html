@@ -39,6 +39,7 @@
                 .position({ x: 4400000, y: 3100000, z: 1400 })
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .zoomExtent([-100, 1000])
+                .lockPanUntilZoom(true)
                 .showZoomButtons(true)
                 .showInsetsButton(true)
                 .onZoomEnd((e) => {
