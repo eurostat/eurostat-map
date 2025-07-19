@@ -175,6 +175,8 @@ export const statData = function (config) {
     out.filters_ = { lastTimePeriod: 1 }
     /** The precision (number of decimal places) */
     out.precision_ = 2
+    /** Dataset label/name */
+    out.label_ = undefined
 
     /**
      * Return promise for Eurobase/jsonstat data.

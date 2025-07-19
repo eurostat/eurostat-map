@@ -1,4 +1,4 @@
-import { scaleLinear } from 'd3'
+import { color, scaleLinear } from 'd3'
 
 // e.g. to be used with deprecated .style() functions. They will now update CSS classes.
 export function updateCSSRule(selector, property, value) {
@@ -460,6 +460,33 @@ export const multiplyBlendMultipleHex = (colors) => {
 
     // Return the blended color as a hex code
     return rgbToHex(blended)
+}
+
+export function averageBlendHex(colors) {
+    const parsed = colors.map((c) => color(c).rgb())
+    const avg = {
+        r: parsed.reduce((sum, c) => sum + c.r, 0) / parsed.length,
+        g: parsed.reduce((sum, c) => sum + c.g, 0) / parsed.length,
+        b: parsed.reduce((sum, c) => sum + c.b, 0) / parsed.length,
+    }
+    return `rgb(${avg.r},${avg.g},${avg.b})`
+}
+
+/**
+ * interpolateIntensity
+ *
+ * Adjusts the brightness of a base color based on a class index or relative position.
+ * Typically used to differentiate quantile levels (e.g., low, medium, high) by making
+ * lower classes appear lighter and higher classes closer to the base hue.
+ *
+ * @param {string} baseColor - The original color to adjust (hex or CSS string).
+ * @param {number} idx - The class index (0 for lowest, 1 for mid, 2 for highest in 3-class scales).
+ * @returns {string} - The adjusted color as a hex string.
+ */
+export function interpolateIntensity(baseColor, idx) {
+    const f = idx / 2 // 0, 0.5, 1
+    const c = color(baseColor)
+    return c.brighter(1.5 - f).formatHex() // make low brighter
 }
 
 // convert rect attributes into an SVG path string

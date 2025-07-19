@@ -503,7 +503,7 @@ export const map = function (config) {
         // Breakdown
         // Breakdown (sorted by value)
         // Breakdown (sorted by value, with percentages)
-        html += `<div class="em-tooltip-piechart-breakdown">`
+        html += `<div class="em-tooltip-breakdown">`
 
         // Collect all values, compute total, and sort descending
         const breakdownData = out.statCodes_

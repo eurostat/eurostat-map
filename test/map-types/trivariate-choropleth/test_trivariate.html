@@ -15,28 +15,31 @@
                 .title('test')
                 .subtitle('test')
                 .nutsLevel(2)
-                //.stat("v1", { eurostatDatasetCode:"demo_r_gind3", filters: { indic_de: "GROWRT", time: 2016 }, unitText: "‰" } )
-                // .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
-                // .stat('v2', {
-                //     eurostatDatasetCode: 'lfst_r_lfu3rt',
-                //     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
-                //     unitText: '%',
-                // })
+                // .color1('#AA4A44') //red
+                // .color2('#00FF00') //green
+                // .color3('#0000FF') //blue
+                .stat('v1', {
+                    label: 'Population change',
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT', time: 2016 },
+                    unitText: '‰',
+                }) //population change
+                .stat('v2', { label: 'Population density', eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } }) //population density
+                .stat('v3', {
+                    label: 'Unemployment rate',
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                    unitText: '%',
+                }) //unemployent rate
                 .legend({
-                    //rotation: -45,
-                    // squareSize: 100,
-                    // label1: 'Inhabitants per km²',
-                    // label2: '% unemployed',
-                    // breaks1: [1, 2, 3],
-                    // breaks2: [1, 2, 3],
-                    // showBreaks: true,
-                    x: 490,
-                    y: 90,
+                    x: 600,
+                    y: 130,
+                    labels: ['Population change', 'Population density', 'Unemployment rate'],
                 })
 
-            map.statData('v1').setData(variable1)
-            map.statData('v2').setData(variable2)
-            map.statData('v3').setData(variable3)
+            // map.statData('v1').setData(variable1)
+            // map.statData('v2').setData(variable2)
+            // map.statData('v3').setData(variable3)
             map.build()
         </script>
     </body>

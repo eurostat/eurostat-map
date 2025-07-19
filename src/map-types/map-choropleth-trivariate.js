@@ -2,7 +2,16 @@ import { select } from 'd3-selection'
 import { scaleQuantile } from 'd3-scale'
 import * as StatMap from '../core/stat-map'
 import * as TrivariateLegend from '../legend/choropleth/legend-choropleth-trivariate'
-import { getCSSPropertyFromClass, spaceAsThousandSeparator, executeForAllInsets, multiplyBlendMultipleHex, getRegionsSelector } from '../core/utils'
+import {
+    getCSSPropertyFromClass,
+    spaceAsThousandSeparator,
+    executeForAllInsets,
+    averageBlendHex,
+    getRegionsSelector,
+    multiplyBlendMultipleHex,
+} from '../core/utils'
+import { color, lab } from 'd3-color'
+import { interpolateLab } from 'd3-interpolate'
 
 /**
  * Return a trivariate choropleth map.
@@ -19,16 +28,17 @@ export const map = function (config) {
     //stevens.greenblue
     //TODO make it possible to use diverging color ramps ?
     out.startColor_ = '#e8e8e8'
-    out.color1_ = '#09F8FF'
-    out.color2_ = '#F5D300'
-    out.color3_ = '#FF1493'
-    out.endColor_ = '#2a5a5b'
+    out.color1_ = '#e41a1c' // Red
+    out.color2_ = '#4daf4a' // Green
+    out.color3_ = '#377eb8' // Blue
+    out.colorMode_ = 'LAB' // default
     //a function returning the colors for the classes i,j
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
     out.classifier1_ = undefined
     out.classifier2_ = undefined
     out.classifier3_ = undefined
+    out.trivariateRelationship_ = 'quantile' // or 'presence'
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunctionTrivariate
 
@@ -45,12 +55,13 @@ export const map = function (config) {
         'color1_',
         'color2_',
         'color3_',
-        'endColor_',
         'classToFillStyle_',
         'noDataFillStyle_',
         'classifier1_',
         'classifier2_',
         'classifier3_',
+        'trivariateRelationship_',
+        'colorMode_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -79,158 +90,162 @@ export const map = function (config) {
     }
 
     function applyClassificationToMap(map) {
-        //set classifiers
-        let stat1 = out.statData('v1').getArray()
-        let stat2 = out.statData('v2').getArray()
-        let stat3 = out.statData('v3').getArray()
+        const stat1 = out.statData('v1').getArray()
+        const stat2 = out.statData('v2').getArray()
+        const stat3 = out.statData('v3').getArray()
 
-        const range = [...Array(7).keys()]
-        if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range(range))
-        if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range(range))
-        if (!out.classifier3_) out.classifier3(scaleQuantile().domain(stat3).range(range))
+        if (out.trivariateRelationship() === 'quantile') {
+            if (!out.classifier1_) out.classifier1(scaleQuantile().domain(stat1).range([0, 1, 2]))
+            if (!out.classifier2_) out.classifier2(scaleQuantile().domain(stat2).range([0, 1, 2]))
+            if (!out.classifier3_) out.classifier3(scaleQuantile().domain(stat3).range([0, 1, 2]))
+        }
 
-        //assign class to nuts regions, based on their value
         const selector = getRegionsSelector(map)
-        if (map.svg_) {
-            let regions = map.svg().selectAll(selector)
-            regions
-                .attr('ecl1', function (rg) {
-                    const sv = out.statData('v1').get(rg.properties.id)
-                    if (!sv) return
-                    const v = sv.value
-                    if ((v != 0 && !v) || v == ':') return 'nd'
-                    return +out.classifier1_(+v)
-                })
-                .attr('ecl2', function (rg) {
-                    const sv = out.statData('v2').get(rg.properties.id)
-                    if (!sv) return
-                    const v = sv.value
-                    if ((v != 0 && !v) || v == ':') return 'nd'
-                    return +out.classifier2_(+v)
-                })
-                .attr('ecl3', function (rg) {
-                    const sv = out.statData('v3').get(rg.properties.id)
-                    if (!sv) return
-                    const v = sv.value
-                    if ((v != 0 && !v) || v == ':') return 'nd'
-                    return +out.classifier3_(+v)
-                })
-                .attr('regionClass', function (rg) {
-                    const ecl1 = select(this).attr('ecl1')
-                    const ecl2 = select(this).attr('ecl2')
-                    const ecl3 = select(this).attr('ecl3')
+        if (!map.svg_) return
 
-                    if (ecl1 === 'nd' || ecl2 === 'nd' || ecl3 === 'nd') return 'nd' // Handle 'no data'
+        const regions = map.svg().selectAll(selector)
+        regions.each(function (rg) {
+            const sv1 = out.statData('v1').get(rg.properties.id)
+            const sv2 = out.statData('v2').get(rg.properties.id)
+            const sv3 = out.statData('v3').get(rg.properties.id)
 
-                    // Combine the classifier results into a single class (1-7)
-                    if (ecl1 && !ecl2 && !ecl3) return 1 // only variable 1 present
-                    if (!ecl1 && ecl2 && !ecl3) return 2 // only variable 2 present
-                    if (!ecl1 && !ecl2 && ecl3) return 3 // only variable 3 present
-                    if (ecl1 && ecl2 && !ecl3) return 4 // variables 1 & 2 present
-                    if (ecl1 && !ecl2 && ecl3) return 5 // variables 1 & 3 present
-                    if (!ecl1 && ecl2 && ecl3) return 6 // variables 2 & 3 present
-                    if (ecl1 && ecl2 && ecl3) return 7 // all present
-                })
-            // .attr('nd', function (rg) {
-            //     const sv1 = out.statData('v1').get(rg.properties.id) || out.statData().get(rg.properties.id)
-            //     const sv2 = out.statData('v2').get(rg.properties.id)
-            //     if (!sv1 || !sv2) return
-            //     let v = sv1.value
-            //     if ((v != 0 && !v) || v == ':') return 'nd'
-            //     v = sv2.value
-            //     if ((v != 0 && !v) || v == ':') return 'nd'
-            //     return ''
-            // })
+            const v1 = sv1 && sv1.value !== ':' ? +sv1.value : null
+            const v2 = sv2 && sv2.value !== ':' ? +sv2.value : null
+            const v3 = sv3 && sv3.value !== ':' ? +sv3.value : null
 
-            //when mixing NUTS, level 0 is separated from the rest (class nutsrg0)
-            if (map.nutsLevel_ == 'mixed') {
-                map.svg()
-                    .selectAll('path.em-nutsrg0')
-                    .attr('ecl1', function (rg) {
-                        const sv = out.statData('v1').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier1_(+v)
-                    })
-                    .attr('ecl2', function (rg) {
-                        const sv = out.statData('v2').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier2_(+v)
-                    })
-                    .attr('ecl3', function (rg) {
-                        const sv = out.statData('v3').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier3_(+v)
-                    })
+            if (v1 == null || v2 == null || v3 == null) {
+                select(this).attr('regionClass', 'nd')
+                return
             }
 
-            //define trivariate scale
-            if (!out.classToFillStyle()) {
-                const scale = scaleTrivariate(out.color1(), out.color2(), out.color3())
-                out.classToFillStyle(scale)
+            if (out.trivariateRelationship() === 'presence') {
+                const c1 = v1 > 0
+                const c2 = v2 > 0
+                const c3 = v3 > 0
+                const classId =
+                    c1 && !c2 && !c3
+                        ? 1
+                        : !c1 && c2 && !c3
+                          ? 2
+                          : !c1 && !c2 && c3
+                            ? 3
+                            : c1 && c2 && !c3
+                              ? 4
+                              : c1 && !c2 && c3
+                                ? 5
+                                : !c1 && c2 && c3
+                                  ? 6
+                                  : c1 && c2 && c3
+                                    ? 7
+                                    : 0
+                select(this).attr('regionClass', classId)
+            } else {
+                const c1 = out.classifier1_(v1)
+                const c2 = out.classifier2_(v2)
+                const c3 = out.classifier3_(v3)
+                const combinedClass = c1 * 9 + c2 * 3 + c3 // 0–26
+                select(this).attr('ecl1', c1).attr('ecl2', c2).attr('ecl3', c3).attr('regionClass', combinedClass)
             }
+        })
 
-            //when mixing NUTS, level 0 is separated from the rest (using class nutsrg0)
-            if (out.nutsLevel_ == 'mixed') {
-                map.svg_
-                    .selectAll('path.em-nutsrg0')
-                    .attr('ecl1', function (rg) {
-                        const sv = out.statData('v2').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier1_(+v)
-                    })
-                    .attr('ecl2', function (rg) {
-                        const sv = out.statData('v2').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier2_(+v)
-                    })
-                    .attr('ecl3', function (rg) {
-                        const sv = out.statData('v3').get(rg.properties.id)
-                        if (!sv) return
-                        const v = sv.value
-                        if ((v != 0 && !v) || v == ':') return 'nd'
-                        return +out.classifier3_(+v)
-                    })
+        if (!out.classToFillStyle()) {
+            out.classToFillStyle(
+                out.trivariateRelationship() === 'presence'
+                    ? generatePresenceScale(out.color1(), out.color2(), out.color3())
+                    : generateQuantileScale(out.color1(), out.color2(), out.color3(), out.colorMode())
+            )
+        }
+    }
+
+    function generatePresenceScale(c1, c2, c3) {
+        const overlap = (a, b) => averageBlendHex([a, b])
+        return function (classId) {
+            switch (+classId) {
+                case 1:
+                    return c1
+                case 2:
+                    return c2
+                case 3:
+                    return c3
+                case 4:
+                    return overlap(c1, c2)
+                case 5:
+                    return overlap(c1, c3)
+                case 6:
+                    return overlap(c2, c3)
+                case 7:
+                    return averageBlendHex([c1, c2, c3])
+                default:
+                    return '#ccc'
             }
         }
     }
 
-    const scaleTrivariate = function (color1, color2, color3) {
-        // Blending primary colors and their overlaps
-        const overlapColors = [
-            multiplyBlendMultipleHex([color1, color2]), // Class 4 (Overlap of color1 and color2)
-            multiplyBlendMultipleHex([color2, color3]), // Class 5 (Overlap of color2 and color3)
-            multiplyBlendMultipleHex([color1, color3]), // Class 6 (Overlap of color1 and color3)
-            multiplyBlendMultipleHex([color1, color2, color3]), // Class 7 (Overlap of all three)
-        ]
+    function generateQuantileScale(c1, c2, c3, mode = 'LAB') {
+        const colors = []
+        const intensities = [0.5, 0.8, 1.0] // low, medium, high scaling
 
-        // Class-to-color mapping
-        const classColors = [
-            color1, // Class 1 (First color)
-            color2, // Class 2 (Second color)
-            color3, // Class 3 (Third color)
-            overlapColors[0], // Class 4 (Overlap of color1 and color2)
-            overlapColors[1], // Class 5 (Overlap of color2 and color3)
-            overlapColors[2], // Class 6 (Overlap of color1 and color3)
-            overlapColors[3], // Class 7 (Overlap of all three)
-        ]
+        // Ensure final colors span a usable lightness range
+        const adjustLightness = (hex) => {
+            const cLab = lab(hex)
+            // Stretch final lightness so the 27 colors cover the full visual range
+            cLab.l = Math.max(40, Math.min(85, cLab.l))
+            cLab.a *= 1.1
+            cLab.b *= 1.1
+            return cLab.formatHex()
+        }
 
-        // Return function to get color based on region's class (1 to 7)
-        return function (classIndex) {
-            if (classIndex >= 1 && classIndex <= 7) {
-                return classColors[classIndex - 1]
-            } else {
-                return null // Return null or a default color if the classIndex is out of range
+        const mixLAB = (cols) => {
+            const [a, b, c] = cols.map((d) => color(d))
+            const ab = interpolateLab(a, b)(0.5)
+            const mixed = interpolateLab(ab, c)(0.5)
+            return adjustLightness(mixed)
+        }
+
+        const mixRGB = (cols) => {
+            const scaled = cols.map((col, idx) => scaleColor(col, intensities[idx % 3], 'RGB'))
+            return multiplyBlendMultipleHex(scaled)
+        }
+
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+                for (let k = 0; k < 3; k++) {
+                    const quantileColors = [
+                        scaleColor(c1, intensities[i], mode),
+                        scaleColor(c2, intensities[j], mode),
+                        scaleColor(c3, intensities[k], mode),
+                    ]
+                    const blended = mode === 'LAB' ? mixLAB(quantileColors) : mixRGB(quantileColors)
+                    colors.push(adjustLightness(blended))
+                }
             }
+        }
+
+        return (idx) => colors[+idx] || '#ccc'
+    }
+
+    function scaleColor(baseColor, factor, mode = 'LAB') {
+        if (mode === 'LAB') {
+            let cLab = lab(baseColor)
+
+            // Normalize primaries to start balanced around mid-lightness
+            const baseL = 65
+            const targetL = baseL * Math.pow(factor, 0.6) // gamma correction
+
+            cLab.l = Math.max(35, Math.min(85, targetL))
+
+            // Boost chroma slightly to avoid gray mixes
+            cLab.a *= 1.15
+            cLab.b *= 1.15
+
+            return cLab.formatHex()
+        } else {
+            const c = color(baseColor).rgb()
+            const gamma = (x) => Math.pow(x / 255, 0.6) * 255
+            c.r = Math.min(255, gamma(c.r) * factor)
+            c.g = Math.min(255, gamma(c.g) * factor)
+            c.b = Math.min(255, gamma(c.b) * factor)
+            return `rgb(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)})`
         }
     }
 
@@ -366,12 +381,15 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
 
     //stat 1 value
     const sv1 = map.statData('v1').get(rg.properties.id)
+    const sv1Label = map.statData('v1').label_
     const unit1 = map.statData('v1').unitText()
     //stat 2 value
     const sv2 = map.statData('v2').get(rg.properties.id)
+    const sv2Label = map.statData('v2').label_
     const unit2 = map.statData('v2').unitText()
     //stat 3 value
     const sv3 = map.statData('v3').get(rg.properties.id)
+    const sv3Label = map.statData('v3').label_
     const unit3 = map.statData('v2').unitText()
 
     buf.push(`
@@ -380,19 +398,19 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
         <tbody>
         <tr>
         <td>
-        Variable 1: ${sv1 && sv1.value ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && sv1.value ? unit1 : ''}
+        ${sv1Label || 'Variable 1'}: ${sv1 && sv1.value ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && sv1.value ? unit1 : ''}
         ${!sv1 || (sv1.value != 0 && !sv1.value) ? map.noDataText_ : ''}
         </td>
         </tr>
         <tr>
         <td>
-         Variable 2: ${sv2 && sv2.value ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && sv2.value ? unit2 : ''}
+        ${sv2Label || 'Variable 2'}: ${sv2 && sv2.value ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && sv2.value ? unit2 : ''}
         ${!sv2 || (sv2.value != 0 && !sv2.value) ? map.noDataText_ : ''}
         </td>
         </tr>
         <tr>
         <td>
-         Variable 3: ${sv3 && sv3.value ? spaceAsThousandSeparator(sv3.value) : ''} ${unit3 && sv3 && sv3.value ? unit3 : ''}
+        ${sv3Label || 'Variable 3'}: ${sv3 && sv3.value ? spaceAsThousandSeparator(sv3.value) : ''} ${unit3 && sv3 && sv3.value ? unit3 : ''}
         ${!sv3 || (sv3.value != 0 && !sv3.value) ? map.noDataText_ : ''}
         </td>
         </tr>

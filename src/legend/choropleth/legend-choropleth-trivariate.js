@@ -1,6 +1,7 @@
 import * as Legend from '../legend'
 import { select, selectAll } from 'd3-selection'
-import { executeForAllInsets, getFontSizeFromClass, multiplyBlendMultipleHex } from '../../core/utils'
+import { executeForAllInsets, getFontSizeFromClass, averageBlendHex, interpolateIntensity } from '../../core/utils'
+import { color } from 'd3'
 
 /**
  * A legend for choropleth-trivariate maps
@@ -62,17 +63,81 @@ export const legend = function (map, config) {
         const labels = [out.label1, out.label2, out.label3]
         const colors = [out.map.color1_, out.map.color2_, out.map.color3_]
 
-        drawTrivariateVennDiagram(paddedGroup, colors, labels)
+        const mode = out.map.trivariateRelationship()
 
-        // Handle trivariate (Venn Diagram) or bivariate (grid) legend
-        // if (numberOfClasses === 7) {
-        //     drawTrivariateVennDiagram(lgg, out)
-        // } else {
-        //     drawTrivariateTernaryPlot(lgg, out, numberOfClasses)
-        // }
+        if (mode === 'presence') {
+            drawTrivariateVennDiagram(paddedGroup, colors, labels)
+            //drawPresenceLegend(svg, map);
+        } else {
+            drawQuantileLegend(out)
+        }
     }
 
     return out
+}
+
+function drawQuantileLegend(out) {
+    const map = out.map
+    const svg = out.lgg
+    const colors = map.classToFillStyle()
+    const g = svg.append('g').attr('class', 'trivariate-legend')
+
+    const size = 160
+    const h = (Math.sqrt(3) / 2) * size
+    const n = 3 // quantiles per variable
+
+    const vertices = [
+        [size / 2, 0], // Var1 (top)
+        [0, h], // Var2 (bottom-left)
+        [size, h], // Var3 (bottom-right)
+    ]
+
+    g.append('polygon')
+        .attr('points', vertices.map((d) => d.join(',')).join(' '))
+        .attr('stroke', '#555')
+        .attr('fill', 'none')
+
+    // Plot 27 discrete color cells as circles
+    const step = size / (n * 2) // spacing between points
+    let idx = 0
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            for (let k = 0; k < n; k++) {
+                if (i + j + k !== n - 1) continue // enforce barycentric grid
+
+                const u = i / (n - 1)
+                const v = j / (n - 1)
+                const w = k / (n - 1)
+
+                const x = u * vertices[0][0] + v * vertices[1][0] + w * vertices[2][0]
+                const y = u * vertices[0][1] + v * vertices[1][1] + w * vertices[2][1]
+
+                g.append('circle').attr('cx', x).attr('cy', y).attr('r', 5).attr('fill', colors(idx)).attr('stroke', '#333')
+
+                idx++
+            }
+        }
+    }
+
+    // Labels
+    g.append('text')
+        .attr('x', size / 2)
+        .attr('y', -10)
+        .attr('text-anchor', 'middle')
+        .text(out.label1 || 'Variable 1')
+
+    g.append('text')
+        .attr('x', -10)
+        .attr('y', h + 20)
+        .attr('text-anchor', 'start')
+        .text(out.label2 || 'Variable 2')
+
+    g.append('text')
+        .attr('x', size + 10)
+        .attr('y', h + 20)
+        .attr('text-anchor', 'end')
+        .text(out.label3 || 'Variable 3')
 }
 
 function drawTrivariateVennDiagram(container, colors, labels) {
@@ -193,11 +258,11 @@ function drawTrivariateVennDiagram(container, colors, labels) {
 
         let color
         if (index == 0) {
-            color = multiplyBlendMultipleHex([colors[2], colors[0]]) // pink + cyan
+            color = averageBlendHex([colors[2], colors[0]])
         } else if (index == 1) {
-            color = multiplyBlendMultipleHex([colors[1], colors[0]]) // cyan + yellow
+            color = averageBlendHex([colors[1], colors[0]])
         } else if (index == 2) {
-            color = multiplyBlendMultipleHex([colors[1], colors[2]]) // pink + yellow
+            color = averageBlendHex([colors[1], colors[2]])
         }
 
         container.append('path').attr('d', shape).attr('class', 'segment').attr('fill', color).attr('opacity', 1)
@@ -207,7 +272,7 @@ function drawTrivariateVennDiagram(container, colors, labels) {
     roundedTriPoints.forEach((points, index) => {
         const ptCycle = points.map((i) => xPoints[i - 1]).concat(points.map((i) => yPoints[i - 1]))
         const shape = makeRoundedTri(ptCycle)
-        const color = multiplyBlendMultipleHex(colors)
+        const color = averageBlendHex(colors)
 
         container.append('path').attr('d', shape).attr('class', 'segment').attr('fill', color).attr('opacity', 1)
     })
