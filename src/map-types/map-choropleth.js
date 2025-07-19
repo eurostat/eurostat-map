@@ -86,7 +86,6 @@ export const map = function (config) {
     //override of some special getters/setters
     out.colorFunction = function (v) {
         if (!arguments.length) return out.colorFunction_
-        console.log('Setting color function:', out.svgId_)
         out.colorFunction_ = v
         if (out.filtersDefinitionFunction_) {
             // dot density style

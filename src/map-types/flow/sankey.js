@@ -116,8 +116,8 @@ function addOverlayPolygons(out, graph) {
 // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
 function addCoordinatesToGraph(out, graph) {
     graph.nodes.forEach((node) => {
-        if (!node.x && !node.y && out.Geometries.centroidFeatures) {
-            const centroid = out.Geometries.centroidFeatures.find((feature) => {
+        if (!node.x && !node.y && out.Geometries.centroidsFeatures) {
+            const centroid = out.Geometries.centroidsFeatures.find((feature) => {
                 if (node.id == feature.properties.id) return feature
             })
 

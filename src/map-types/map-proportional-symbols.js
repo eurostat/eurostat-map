@@ -271,7 +271,7 @@ export const map = function (config) {
             prevSymbols.remove()
 
             // 'small' centroids on top of big ones
-            updateSymbolsDrawOrder(map)
+            out.updateSymbolsDrawOrder(map)
 
             // append symbols to centroids
             let symb
@@ -302,6 +302,15 @@ export const map = function (config) {
             if (map.geo_ !== 'WORLD') {
                 if (map.nutsLevel_ == 'mixed') {
                     addSymbolsToMixedNUTS(map, sizeData, regions)
+                    // Build centroidFeatures so Dorling has something to simulate
+                    const centroids = []
+                    map.svg()
+                        .selectAll('g.em-centroid')
+                        .each(function (d) {
+                            if (!d.properties?.centroid) return
+                            centroids.push(d) // d already has properties and id
+                        })
+                    map.Geometries.centroidsFeatures = centroids
                 }
 
                 // apply 'nd' class to no data regions for legend item hover
@@ -452,35 +461,42 @@ export const map = function (config) {
      * @description Updates the draw order of the symbols according to their data values
      * @param {*} map map instance
      */
-    function updateSymbolsDrawOrder(map) {
+    out.updateSymbolsDrawOrder = function (map) {
         const gcp = map.svg_.select('#em-prop-symbols')
         const sizeData = map.statData('size')?.getArray?.() ? map.statData('size') : map.statData()
 
-        // 1. Filter and sort features with data
-        if (map.Geometries.centroidFeatures) {
-            const sorted = map.Geometries.centroidFeatures
-                .filter((f) => {
-                    const v = sizeData.get?.(f.properties.id)?.value
-                    return v != null && v !== ':'
-                })
-                .sort((a, b) => {
-                    return sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value
-                })
-
-            // 2. Clear and rebind
-            gcp.selectAll('g.em-centroid').remove()
-
-            gcp.selectAll('g.em-centroid')
-                .data(sorted, (d) => d.properties.id)
-                .enter()
-                .append('g')
-                .attr('class', 'em-centroid')
-                .attr('id', (d) => 'ps' + d.properties.id)
-                .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
-
-            // 3. add the ecl attribute back to the newly created g elements
-            applyClassificationToMap(map) //
+        // Ensure centroidFeatures is populated (important for mixed)
+        if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
+            // Build features from whatever is currently bound to centroids
+            map.Geometries.centroidsFeatures = map
+                .svg()
+                .selectAll('g.em-centroid')
+                .data()
+                .filter((d) => d?.properties?.centroid)
         }
+
+        // Sort features by descending value (largest first so small ones are on top)
+        const sorted = map.Geometries.centroidsFeatures
+            .filter((f) => {
+                const v = sizeData.get?.(f.properties.id)?.value
+                return v != null && v !== ':' // exclude no-data
+            })
+            .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
+
+        // Clear old symbol containers
+        gcp.selectAll('g.em-centroid').remove()
+
+        // Recreate sorted symbol containers
+        gcp.selectAll('g.em-centroid')
+            .data(sorted, (d) => d.properties.id)
+            .enter()
+            .append('g')
+            .attr('class', 'em-centroid')
+            .attr('id', (d) => 'ps' + d.properties.id)
+            .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
+
+        // Re-apply classification to the new containers
+        applyClassificationToMap(map)
     }
 
     function appendSpikesToMap(map, sizeData) {
@@ -542,7 +558,7 @@ export const map = function (config) {
 
         // Initialize the force simulation
         console.log('new dorling simulation')
-        out.simulation = forceSimulation(map.Geometries.centroidFeatures)
+        out.simulation = forceSimulation(map.Geometries.centroidsFeatures)
             .force(
                 'x',
                 forceX((d) => d.properties.centroid[0]).strength(out.dorlingStrength_.x) // Stronger pull to original x

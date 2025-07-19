@@ -934,12 +934,15 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
 
-        // calculate screen coordinates and save centroids to map
-        map.Geometries.centroidFeatures = centroidFeatures.map((d) => {
-            let coords = map._projection(d.geometry.coordinates)
+        // Project coordinates and save as the working centroids array
+        map.Geometries.centroidsFeatures = centroidFeatures.map((d) => {
+            const coords = map._projection(d.geometry.coordinates)
             d.properties.centroid = coords
             return d
         })
+
+        // Keep a permanent unfiltered master copy so we can rebuild later
+        map.Geometries._allCentroidsFeatures = [...map.Geometries.centroidsFeatures]
 
         // em-prop-symbols is the g element containing all proportional symbols for the map
         const zg = map.svg().select('#em-zoom-group-' + map.svgId_)
@@ -949,7 +952,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // then symbols are drawn/appended to these containers in the map-type js file
         const symbolContainers = gcp
             .selectAll('g')
-            .data(map.Geometries.centroidFeatures)
+            .data(map.Geometries.centroidsFeatures)
             .enter()
             .append('g')
             .attr('transform', function (d) {

@@ -32,8 +32,9 @@ export const Geometries = function (map, withCenterPoints) {
     out.statisticalRegions = undefined
 
     //centroids for prop symbols etc
-    out.centroidsData = undefined //raw
-    out.centroidsFeatures = undefined //geojson features
+    out.centroidsData = undefined // raw TopoJSON centroids (all levels)
+    out.centroidsFeatures = undefined // filtered + projected centroids for rendering
+    out._allCentroidsFeatures = undefined // unfiltered master copy for rebuilding
 
     // get geojson features of all statistical regions
     out.getRegionFeatures = function () {

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -18,6 +18,7 @@
                 .height(mapHeight)
                 .legend({ x: 500, y: 100, title: 'Test' })
                 .nutsLevel('mixed')
+                .dorling(true)
                 .psFill('#4ac499')
                 .nutsYear(2016)
 
@@ -38,6 +39,73 @@
                 ES11: 10,
                 ES12: 5,
             })
+
+            setTimeout(() => {
+                map.statData('size').setData({
+                    AL: 100,
+                    IT: 10,
+                    AT: 5,
+                    RO: 3,
+                    HU: 4,
+                    NO: 1,
+                    CY: 9,
+                    EL: 8,
+                    DE1: 4,
+                    DE2: 4,
+                    DE3: 4,
+                    DE4: 4,
+                    DE5: 4,
+                    DE11: 10,
+                    DE12: 5,
+                    PL: 23,
+                })
+                map.updateStatValues()
+            }, 1000)
+
+            setTimeout(() => {
+                map.statData('size').setData({
+                    AL: 100,
+                    IT: 10,
+                    AT: 5,
+                    RO: 3,
+                    HU: 4,
+                    NO: 1,
+                    CY: 9,
+                    EL: 8,
+                    DE1: 4,
+                    DE2: 4,
+                    DE3: 4,
+                    DE4: 4,
+                    DE5: 4,
+                    DE11: 10,
+                    DE12: 5,
+                    PT: 23,
+                })
+                map.updateStatValues()
+            }, 2000)
+
+            setTimeout(() => {
+                map.statData('size').setData({
+                    AL: 100,
+                    IT: 10,
+                    AT: 5,
+                    RO: 3,
+                    HU: 4,
+                    NO: 1,
+                    CY: 9,
+                    EL: 8,
+                    DE1: 4,
+                    DE2: 4,
+                    DE3: 4,
+                    DE4: 4,
+                    DE5: 4,
+                    DE11: 10,
+                    DE12: 5,
+                    PL: 23,
+                })
+                map.updateStatValues()
+            }, 3000)
+
             map.build()
         </script>
     </body>
