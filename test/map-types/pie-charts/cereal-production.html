@@ -11,6 +11,16 @@
         <script src="../../../build/eurostatmap.js"></script>
 
         <script>
+            const cropOptions = [
+                { value: 'C1110', text: 'Common wheat and spelt' },
+                { value: 'C1500', text: 'Grain maize and corn-cob mix' },
+                { value: 'C1300', text: 'Barley' },
+                { value: 'C1600', text: 'Triticale' },
+                { value: 'C1200', text: 'Rye and winter cereal mixtures (maslin)' },
+                { value: 'C1120', text: 'Durum wheat' },
+                { value: 'C1410', text: 'Oats' },
+                { value: 'C2000', text: 'Rice' },
+            ]
             let map = eurostatmap
                 .map('pie')
                 .svgId('pie')

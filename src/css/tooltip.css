@@ -27,24 +27,20 @@
     opacity: 0;
     z-index: 99999999;
 }
-.em-tooltip-piechart-breakdown {
-    padding: 10px;
-    padding-top: 0px;
-    font-size: 14px;
-}
 .em-tooltip-piechart-container {
     text-align: center;
     fill: #383838;
     display: flex;
     justify-content: center;
 }
-.em-tooltip-piechart-breakdown {
+.em-tooltip-breakdown {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.2;
-    padding-top: 4px;
+    padding: 10px;
+    padding-top: 3px;
 }
 
 .em-breakdown-item {
@@ -82,4 +78,47 @@
     margin-top: 3px;
     padding-top: 3px;
     font-weight: bold;
+}
+
+.em-cx-breakdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.em-tooltip-cx {
+    line-height: 1;
+    padding: 0px;
+}
+
+.em-tooltip-cx .em-breakdown-value,
+.em-tooltip-cx .em-breakdown-label,
+.em-tooltip-cx .em-breakdown-color {
+    margin: 0;
+    font-size: 11px; /* Smaller text for compactness */
+    white-space: nowrap;
+}
+
+.em-tooltip-cx-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.em-tooltip-cx-table th,
+.em-tooltip-cx-table td {
+    padding: 2px 4px; /* Minimal padding */
+    border: 1px solid #eee;
+    text-align: center;
+}
+
+.em-tooltip-cx-table th {
+    background: #f7f7f7;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+.em-tooltip-cx-table td {
+    font-size: 11px;
+    white-space: nowrap;
 }

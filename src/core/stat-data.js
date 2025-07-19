@@ -200,6 +200,7 @@ export const statData = function (config) {
         out._data_ = null
 
         getEurobasePromise(nutsLevel, lang).then(function (data___) {
+            if (data___.error) return console.error('Error retrieving Eurostat data: ' + data___.error[0]?.label)
             //decode stat data
             const jsd = JSONstat(data___)
 

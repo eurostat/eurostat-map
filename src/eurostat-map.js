@@ -7,6 +7,7 @@ import * as StripeComposition from './map-types/map-stripe-composition'
 import * as PieCharts from './map-types/map-piecharts'
 import * as Sparklines from './map-types/map-sparklines'
 import * as FlowMap from './map-types/flow/map-flow'
+import * as Coxcomb from './map-types/map-coxcomb'
 import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/labels'
 
@@ -36,6 +37,8 @@ export const map = function (type, config) {
         if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return Sparklines.map(config)
         //flow maps
         if (type == 'flow' || type == 'flowmap') return FlowMap.map(config)
+        //coxcomb maps
+        if (type == 'coxcomb' || type == 'polar') return Coxcomb.map(config)
 
         //add new map types here
         //if(type == "XX") return mapXX.map(config);

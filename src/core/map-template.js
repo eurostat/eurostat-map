@@ -474,6 +474,10 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         svg.attr('class', 'em-map')
         //add mapType css class
         svg.classed('em--' + out._mapType, true)
+        // pies and coxcombs are proportional symbols, so add proportional-symbols class too
+        if (out._mapType === 'pie' || out._mapType === 'coxcomb') {
+            svg.classed('em--ps', true)
+        }
         return svg
     }
 

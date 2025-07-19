@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .em-tooltip {
+                max-width: 300px !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            let map = eurostatmap
+                .map('coxcomb') // loads map-coxcomb.js internally
+                .title('Causes of death')
+                .subtitle('2022')
+                .scale('60M')
+                .nutsLevel(0)
+                //.dorling(true) // works the same if you want Dorling centroids
+                .geoCenter([5000000, 3500000])
+                .statCoxcomb(
+                    // use https://ec.europa.eu/eurostat/web/query-builder/tool to build filters
+                    {
+                        eurostatDatasetCode: 'hlth_cd_mro',
+                        filters: { age: 'TOTAL', unit: 'NR', sex: 'T', resid: 'TOT_RESID' }, // shared filters
+                        unitText: 'Deaths per 100k',
+                    },
+                    [
+                        '2022-01',
+                        '2022-02',
+                        '2022-03',
+                        '2022-04',
+                        '2022-05',
+                        '2022-06',
+                        '2022-07',
+                        '2022-08',
+                        '2022-09',
+                        '2022-10',
+                        '2022-11',
+                        '2022-12',
+                    ], // months (radial axis)
+                    'ICD10', // dimension for cause codes
+                    ['U071', 'C', 'I', 'J'], // Eurostat cause codes //TOTAL, U071(covid), C (cancer), E (endocrine), I (circulatory), J (respiratory), K (digestive)
+                    ['COVID-19', 'Cancer', 'Circulatory', 'Respiratory'], // labels
+                    ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'], // colors
+                    'TOTAL' // optional total for "Other" category
+                )
+                .coxcombMinRadius(5)
+                .coxcombMaxRadius(40)
+                .coxcombStrokeFill('white')
+                .coxcombStrokeWidth(0.1)
+                .legend({
+                    x: 480,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: 'Total deaths',
+                        titlePadding: 10,
+                        values: [55000, 2000],
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>
