@@ -158,7 +158,6 @@ export const map = function (config) {
                 const maxVal = max(transformedValues)
                 const isDiverging = checkIfDiverging(out)
                 const isFullScale = typeof out.colorFunction_?.domain === 'function'
-                console.log(valueTransform, minVal, maxVal, isDiverging, isFullScale)
 
                 if (!isFullScale) {
                     if (isDiverging) {

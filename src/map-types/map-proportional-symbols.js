@@ -8,6 +8,7 @@ import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
 import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
+import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling'
 
 /**
  * Returns a proportional symbol map.
@@ -290,9 +291,13 @@ export const map = function (config) {
 
             // dorling cartogram
             if (out.dorling_) {
-                applyDorlingForce(map, sizeData)
+                runDorlingSimulation(out, (d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    const r = datum ? out.classifierSize_(datum.value) : 0
+                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                })
             } else {
-                if (out.simulation) stopSimulation()
+                stopDorlingSimulation(out)
             }
 
             // set style of symbols

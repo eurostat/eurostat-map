@@ -12,6 +12,18 @@
 
         <script>
             const customColorFunction = d3.scaleDiverging().domain([-109, 0, 64]).interpolator(d3.interpolateRdBu)
+            const legendLabelType = 'specific' // 'generic', 'specific'
+            const tickLength = 10 // Length of the ticks in the legend
+            const orientation = 'horizontal' // 'horizontal', 'vertical'
+            function signedSqrtTransform(x) {
+                const sign = x < 0 ? -1 : 1
+                return sign * Math.sqrt(Math.abs(x))
+            }
+
+            function signedSqrtUntransform(y) {
+                const sign = y < 0 ? -1 : 1
+                return sign * (y * y)
+            }
             const map = eurostatmap
                 .map('choropleth')
                 .title('continuous color scheme legend')
@@ -24,14 +36,18 @@
                 .nutsLevel(3)
                 .zoomExtent([1, 1000])
                 .numberOfClasses(6)
-                //.colorFunction(customColorFunction)
-                .colorFunction(d3.interpolateRdBu)
                 .colorSchemeType('continuous')
+                .colorFunction(d3.interpolateRdBu)
                 .pointOfDivergence(0)
+
+                // stretching the values for better distribution
+                .valueTransform(signedSqrtTransform)
+                .valueUntransform(signedSqrtUntransform)
+
                 .legend({
                     title: 'Population change',
                     subtitle: 'per 1000 inhabitants',
-                    x: 620,
+                    x: 520,
                     y: 10,
                     width: 200,
                     boxOpacity: 1,
@@ -39,7 +55,10 @@
                     lowLabel: 'Decrease',
                     highLabel: 'Increase',
                     pointOfDivergenceLabel: 'no change',
-                    continuousOrientation: 'vertical',
+                    continuousOrientation: orientation,
+                    tickLength: tickLength,
+                    continuousTickValues: [-100, 0, 60],
+                    continuousTicks: legendLabelType == 'generic' ? 0 : 3, // defaults to 'low' and 'high' when unspecified
                 })
                 .build()
         </script>
