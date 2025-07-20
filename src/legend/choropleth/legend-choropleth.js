@@ -7,6 +7,7 @@ import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from './legend-continuous'
 import { createDiscreteLegend } from './legend-discrete'
+import { createAlphaLegend } from './legend-value-by-alpha'
 
 /**
  * A legend for choropleth maps
@@ -94,6 +95,12 @@ export const legend = function (map, config) {
                 createContinuousLegend(out, baseX, baseY)
             } else {
                 createDiscreteLegend(out, baseX, baseY)
+            }
+
+            // Draw opacity legend if value-by-alpha is active
+            if (map.opacityScale_) {
+                const offsetY = out.lgg.node().getBBox().height + 10 // 10px spacing below color legend
+                createAlphaLegend(out, baseX, baseY + offsetY)
             }
 
             // Append pattern fill legend items BELOW the main legend

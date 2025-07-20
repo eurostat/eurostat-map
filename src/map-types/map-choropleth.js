@@ -51,7 +51,7 @@ export const map = function (config) {
     out.colorSchemeType_ = 'discrete' // or 'continuous'
     out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
-    out.pointOfDivergence = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
+    out.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -158,6 +158,7 @@ export const map = function (config) {
                 const maxVal = max(transformedValues)
                 const isDiverging = checkIfDiverging(out)
                 const isFullScale = typeof out.colorFunction_?.domain === 'function'
+                console.log(valueTransform, minVal, maxVal, isDiverging, isFullScale)
 
                 if (!isFullScale) {
                     if (isDiverging) {
@@ -344,28 +345,23 @@ export const map = function (config) {
             })
     }
 
-    function getContinuousColor(value, map) {
-        const colorFn = map.colorFunction_
-        const domain = map.domain_ || [0, 1]
+    function getContinuousColor(value, out) {
+        const colorFn = out.colorFunction_
+        const domain = out.domain_ || [0, 1]
         const isD3Scale = typeof colorFn?.domain === 'function'
-        const valueTransform = map.valueTransform_ || ((d) => d)
-        const transformed = valueTransform(value)
+        const transform = out.valueTransform_ || ((d) => d)
 
-        if (isNaN(transformed)) return map.noDataFillStyle_ || 'gray'
+        const transformed = transform(value)
+        if (isNaN(transformed)) return out.noDataFillStyle_ || 'gray'
 
         if (isD3Scale) {
-            // e.g. d3.scaleDiverging, d3.scaleSequential
             return colorFn(transformed)
         }
 
-        // Interpolator logic (e.g. d3.interpolateRdBu)
         let t
-
         if (domain.length === 3) {
             const [d0, , d2] = domain
-            const divergence = map.pointOfDivergence_ ?? 0
-            const divT = valueTransform(divergence)
-
+            const divT = transform(out.pointOfDivergence_ ?? 0)
             t = transformed < divT ? (0.5 * (transformed - d0)) / (divT - d0) : 0.5 + (0.5 * (transformed - divT)) / (d2 - divT)
         } else {
             const [d0, d1] = domain

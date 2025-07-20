@@ -2,8 +2,7 @@
 // Sequential interpolators (like d3.interpolatePurples)
 // Stretched interpolators (e.g., stretchedColor using .valueTransform)
 // D3 diverging scales (d3.scaleDiverging(...).domain([-60, 0, 38.7]))
-import { select } from 'd3-selection'
-import { checkIfDiverging, executeForAllInsets } from '../../core/utils'
+import { executeForAllInsets } from '../../core/utils'
 import { getLabelFormatter, highlightRegions, unhighlightRegions } from './legend-choropleth'
 
 // All of the above with or without .valueTransform / .valueUntransform
@@ -36,7 +35,6 @@ function getColorDomain(map) {
 
 function createLegendGradient(container, map, gradientId, isVertical) {
     const isD3Scale = typeof map.colorFunction_?.domain === 'function'
-    const isDiverging = checkIfDiverging(map)
     const valueTransform = map.valueTransform_ || ((d) => d)
     const steps = 20
 

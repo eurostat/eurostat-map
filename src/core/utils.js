@@ -266,17 +266,17 @@ export const checkIfDiverging = function (map) {
  *
  * @param {function} colorFunc - A diverging color interpolator (e.g. d3.interpolateRdBu)
  * @param {[number, number]} domain - Raw data domain (min, max) before transformation
- * @param {number} divergencePoint - The central value of interest (e.g. 0 for positive vs. negative)
+ * @param {number} pointOfDivergence - The central value of interest (e.g. 0 for positive vs. negative)
  * @param {function} transform - A value transform function (e.g. Math.log, Math.asinh)
  * @returns {function} - A color function that accepts raw values and returns color strings
  */
-export const centerDivergingColorFunction = function (colorFunc, domain, divergencePoint = 0, transform = (d) => d) {
+export const centerDivergingColorFunction = function (colorFunc, domain, pointOfDivergence = 0, transform = (d) => d) {
     // Apply valueTransform to all domain boundaries and divergence point
     const valueTransform = transform || ((d) => d)
 
     const tMin = valueTransform(domain[0]) // Transformed lower bound
     const tMax = valueTransform(domain[1]) // Transformed upper bound
-    const tDiv = valueTransform(divergencePoint) // Transformed center/divergence point
+    const tDiv = valueTransform(pointOfDivergence) // Transformed center/divergence point
 
     // Create a diverging scale: [min → center → max] → [0 → 0.5 → 1]
     const scaled = scaleLinear().domain([tMin, tDiv, tMax]).range([0, 0.5, 1]).clamp(true) // Prevent extrapolation beyond 0–1

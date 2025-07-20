@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('alpha')
+                .title('Value by alpha test')
+                .subtitle('Population density and GDP per inhabitant')
+                .stat({
+                    label: 'GDP',
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .stat('alpha', {
+                    label: 'Population density',
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                    filters: { TIME: '2020' },
+                })
+                .nutsLevel(3)
+                .legend({ x: 0, y: 140, title: 'Euro per inhabitant', boxOpacity: 0, histogram: false })
+                .drawCoastalMargin(false)
+                .insets('default')
+                .zoomExtent([1, 10])
+
+                //continuous
+                // .colorSchemeType('continuous')
+                // .colorFunction(d3.interpolateYlGnBu)
+                // .valueTransform(Math.log) // for distribution stretching in continuous mode
+                // .valueUntransform(Math.exp) // the legends need to 'untransform' the value to show the original value
+                .build()
+
+            // // Create a log scale for opacity
+            map.opacityScale(
+                d3
+                    .scaleLinear()
+                    .domain([0, 200]) // adjust to your alpha dataset range
+                    .range([0.1, 1]) // min and max opacity
+                    .clamp(true) // keep within range)
+            )
+        </script>
+    </body>
+</html>
