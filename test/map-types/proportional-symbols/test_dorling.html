@@ -15,19 +15,33 @@
             let map = eurostatmap
                 .map('ps')
                 .nutsLevel(2)
-                .title('Total GDP')
+                .scale('60M')
+                .title('Total GDP and GDP per inhabitant')
+                .subtitle('2022')
                 .width(800)
                 .stat('size', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
-                    filters: { unit: 'MIO_EUR', time: '2018' },
+                    filters: { unit: 'MIO_EUR', time: '2022' },
                 })
                 .stat('color', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Million EUR',
-                    filters: { unit: 'MIO_EUR', time: '2018' },
+                    unitText: 'Euro per inhabitant',
+                    filters: { unit: 'EUR_HAB', time: '2022' },
                 })
-                .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0 })
+                .legend({
+                    x: 590,
+                    y: 20,
+                    boxOpacity: 1,
+                    sizeLegend: { title: 'Million EUR', values: [800000, 10000] },
+                    colorLegend: {
+                        title: 'EUR per inhabitant',
+                        marginTop: 20,
+                        labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
+                    },
+                })
+                .psThresholds([10000, 20000, 30000, 40000])
+                .psColors(['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'])
                 .psShape('circle')
                 .psMaxSize(15)
                 .transitionDuration(900)
