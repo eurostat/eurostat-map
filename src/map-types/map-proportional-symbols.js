@@ -426,7 +426,7 @@ export const map = function (config) {
                 if (out._tooltip) out._tooltip.mousemove(e)
                 if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             })
-            .on('mouseout', function (e) {
+            .on('mouseout', function (e, rg) {
                 const sel = select(this.childNodes[0])
                 let newFill = sel.attr('fill___')
                 if (newFill) {
