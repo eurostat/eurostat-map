@@ -241,16 +241,19 @@ export const map = function (config) {
                 const sel = select(this)
                 sel.style('fill', map.hoverColor_) // Apply highlight color
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 if (out._tooltip) out._tooltip.mousemove(e)
+                if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             })
             .on('mouseout', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', sel.attr('fill___')) // Revert to original color
                 if (out._tooltip) out._tooltip.mouseout()
+                if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
             })
     }
 

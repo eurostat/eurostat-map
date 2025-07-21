@@ -63,11 +63,25 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.zoomExtent_ = undefined
     out.lockPanUntilZoom_ = true // if true, user can pan only after zooming once
     out.maxBounds_ = { xMin: -Infinity, yMin: -Infinity, xMax: Infinity, yMax: Infinity }
+
+    //events
     out.onZoomEnd_ = undefined // user function to call when zoom ends
+    out.onRegionMouseOver_ = undefined // user function to call when mouseover a region
+    out.onRegionMouseMove_ = undefined // user function to call when mousemove over a region
+    out.onRegionMouseOut_ = undefined // user function to call when mouseout of a region
 
     // geometries
     out.geometries_ = undefined // [{id:String, data:geojson, class:function}] user-defined geometries
     out.processCentroids_ = undefined // runs over symbol centroids
+
+    //dorling cartograms (used for ps and pie maps)
+    out.dorling_ = false
+    out.animateDorling_ = true
+    out.dorlingStrength_ = { x: 1, y: 1 }
+    out.dorlingIterations_ = 1
+    out.onDorlingProgress_ = undefined
+    out.dorlingWorker_ = false // use a web worker for (non-animated) dorling cartograms to not block the main thread
+    out.dorlingWorkerD3URL_ = undefined
 
     //map title
     out.title_ = ''

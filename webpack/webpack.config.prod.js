@@ -12,6 +12,7 @@ module.exports = {
         library: 'eurostatmap',
         libraryTarget: 'umd',
         publicPath: '/build/', // Optional: if resources are served from this path
+        clean: true, // Clean the output directory before emit
     },
     devtool: false,
     plugins: [

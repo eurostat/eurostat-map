@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Test')
+                .subtitle('test')
+                .classificationMethod('ckmeans')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 1 })
+                .zoomExtent([1, 10])
+                .onZoomEnd(function (event, map) {
+                    console.log('Zoom ended', event)
+                    console.log('Map position:', map.position())
+                })
+                .onRegionMouseOver(function (e, feature, element, map) {
+                    console.log('Region mouse over:', feature.properties.id)
+                    element.style.fill = 'orange' // Example action on mouse over
+                })
+                .onRegionMouseMove(function (e, feature, element, map) {
+                    console.log('Region mouse move:', feature.properties.id)
+                    // Additional actions can be added here
+                })
+                .onRegionMouseOut(function (e, feature, element, map) {
+                    console.log('Region mouse out:', feature.properties.id)
+                    element.style.fill = '' // Revert to original color
+                })
+                .position({ x: 2200000, y: 3000000, z: 7000 })
+                .maxBounds({ xMin: 2000000, xMax: 7000000, yMin: 1500000, yMax: 5500000 })
+                .build()
+        </script>
+    </body>
+</html>

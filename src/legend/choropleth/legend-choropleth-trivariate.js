@@ -2,6 +2,7 @@ import * as Legend from '../legend'
 import { select, selectAll } from 'd3-selection'
 import { executeForAllInsets, getFontSizeFromClass, averageBlendHex, interpolateIntensity } from '../../core/utils'
 import { color } from 'd3'
+import { getTrivariateColor } from '../../map-types/map-choropleth-trivariate'
 
 /**
  * A legend for choropleth-trivariate maps
@@ -20,7 +21,6 @@ export const legend = function (map, config) {
     out.label3 = 'Variable 3' // Add a label for the third variable
     out.axisTitleFontSize = getFontSizeFromClass('em-bivariate-axis-title')
     out.showBreaks = false
-    out.boxPadding = 60 // depends on variable 1 label length really
     out.noDataYOffset = 20
     out.arrowHeight = 15
     out.arrowWidth = 14
@@ -39,105 +39,108 @@ export const legend = function (map, config) {
         // Remove previous content
         lgg.selectAll('*').remove()
 
-        // Draw background box
-        out.makeBackgroundBox()
+        if (out.lgg.node()) {
+            // Draw background box
+            out.makeBackgroundBox()
 
-        //titles
-        if (out.title) out.addTitle()
-        if (out.subtitle) out.addSubtitle()
+            //titles
+            if (out.title) out.addTitle()
+            if (out.subtitle) out.addSubtitle()
 
-        // Apply padding to the main <g> group
-        const paddedGroup = lgg.append('g').attr('transform', `translate(${out.boxPadding}, ${out.boxPadding})`)
+            // Apply padding to the main <g> group
+            const baseX = out.getBaseX()
+            const baseY = out.getBaseY()
 
-        // Draw title
-        if (out.title) {
-            paddedGroup
-                .append('text')
-                .attr('class', 'em-legend-title')
-                .attr('x', 0) // Start at 0 within the padded group
-                .attr('y', out.titleFontSize) // Vertical positioning
-                .text(out.title)
+            // Draw the trivariate Venn diagram
+            const labels = [out.label1, out.label2, out.label3]
+            const colors = [out.map.color1_, out.map.color2_, out.map.color3_]
+
+            const mode = out.map.trivariateRelationship()
+            out._trivariateContainer = lgg.append('g').attr('transform', `translate(${baseX}, ${baseY})`).attr('class', 'em-trivariate-legend')
+
+            if (mode === 'presence') {
+                drawTrivariateVennDiagram(out._trivariateContainer, colors, labels)
+                //drawPresenceLegend(svg, map);
+            } else {
+                drawTernaryLegend(out)
+            }
         }
 
-        // Draw the trivariate Venn diagram
-        const labels = [out.label1, out.label2, out.label3]
-        const colors = [out.map.color1_, out.map.color2_, out.map.color3_]
-
-        const mode = out.map.trivariateRelationship()
-
-        if (mode === 'presence') {
-            drawTrivariateVennDiagram(paddedGroup, colors, labels)
-            //drawPresenceLegend(svg, map);
-        } else {
-            drawQuantileLegend(out)
-        }
+        // Set legend box dimensions
+        out.setBoxDimension()
     }
 
     return out
 }
 
-function drawQuantileLegend(out) {
-    const map = out.map
-    const svg = out.lgg
-    const colors = map.classToFillStyle()
-    const g = svg.append('g').attr('class', 'trivariate-legend')
+/**
+ * Draws a trivariate legend as a ternary color triangle.
+ * Uses the same fill logic as the map (regionsFillFunction).
+ *
+ * @param {d3.Selection} container The D3 selection to append the legend to
+ * @param {object} out Legend context (contains map, labels, etc.)
+ */
+function drawTernaryLegend(out) {
+    const size = out.width - out.boxPadding * 2
+    const height = (Math.sqrt(3) / 2) * size
 
-    const size = 160
-    const h = (Math.sqrt(3) / 2) * size
-    const n = 3 // quantiles per variable
-
+    // Triangle vertices
     const vertices = [
-        [size / 2, 0], // Var1 (top)
-        [0, h], // Var2 (bottom-left)
-        [size, h], // Var3 (bottom-right)
+        { x: 0, y: -height / 2 }, // Top (Variable 1)
+        { x: -size / 2, y: height / 2 }, // Bottom-left (Variable 2)
+        { x: size / 2, y: height / 2 }, // Bottom-right (Variable 3)
     ]
 
-    g.append('polygon')
-        .attr('points', vertices.map((d) => d.join(',')).join(' '))
-        .attr('stroke', '#555')
+    // Draw triangle outline
+    out._trivariateContainer
+        .append('polygon')
+        .attr('points', vertices.map((d) => `${d.x},${d.y}`).join(' '))
         .attr('fill', 'none')
+        .attr('stroke', '#444')
 
-    // Plot 27 discrete color cells as circles
-    const step = size / (n * 2) // spacing between points
-    let idx = 0
+    // Vertex labels
+    const labels = [out.label1, out.label2, out.label3]
+    vertices.forEach((v, i) => {
+        out._trivariateContainer
+            .append('text')
+            .attr('x', v.x)
+            .attr('y', v.y + (i === 0 ? -10 : 20))
+            .attr('text-anchor', 'middle')
+            .attr('class', 'ternary-label')
+            .text(labels[i])
+    })
 
-    for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n; j++) {
-            for (let k = 0; k < n; k++) {
-                if (i + j + k !== n - 1) continue // enforce barycentric grid
+    // Fill triangle interior with a dense color field
+    const resolution = 100 // number of samples along each side (smooth gradient)
+    const dotSize = size / (resolution * 3.5) // scale marker size based on resolution
 
-                const u = i / (n - 1)
-                const v = j / (n - 1)
-                const w = k / (n - 1)
+    for (let i = 0; i <= resolution; i++) {
+        for (let j = 0; j <= resolution - i; j++) {
+            const k = resolution - i - j
+            const p1 = i / resolution
+            const p2 = j / resolution
+            const p3 = k / resolution
 
-                const x = u * vertices[0][0] + v * vertices[1][0] + w * vertices[2][0]
-                const y = u * vertices[0][1] + v * vertices[1][1] + w * vertices[2][1]
+            // Convert barycentric coordinates to (x, y)
+            const x = vertices[0].x * p1 + vertices[1].x * p2 + vertices[2].x * p3
+            const y = vertices[0].y * p1 + vertices[1].y * p2 + vertices[2].y * p3
 
-                g.append('circle').attr('cx', x).attr('cy', y).attr('r', 5).attr('fill', colors(idx)).attr('stroke', '#333')
+            // Get blended color using map logic
+            const color = out.map.regionsFillFunction
+                ? getTrivariateColor(p1, p2, p3, out.map.color1(), out.map.color2(), out.map.color3(), 1)
+                : '#ccc'
 
-                idx++
-            }
+            // Draw as a tiny rectangle
+            out._trivariateContainer
+                .append('rect')
+                .attr('x', x - dotSize / 2)
+                .attr('y', y - dotSize / 2)
+                .attr('width', dotSize)
+                .attr('height', dotSize)
+                .attr('fill', color)
+                .attr('stroke', 'none')
         }
     }
-
-    // Labels
-    g.append('text')
-        .attr('x', size / 2)
-        .attr('y', -10)
-        .attr('text-anchor', 'middle')
-        .text(out.label1 || 'Variable 1')
-
-    g.append('text')
-        .attr('x', -10)
-        .attr('y', h + 20)
-        .attr('text-anchor', 'start')
-        .text(out.label2 || 'Variable 2')
-
-    g.append('text')
-        .attr('x', size + 10)
-        .attr('y', h + 20)
-        .attr('text-anchor', 'end')
-        .text(out.label3 || 'Variable 3')
 }
 
 function drawTrivariateVennDiagram(container, colors, labels) {
@@ -307,142 +310,4 @@ function drawTrivariateVennDiagram(container, colors, labels) {
         .attr('y', yCenter3 + circleRad + 15)
         .attr('class', 'venn-label')
         .attr('text-anchor', 'middle')
-}
-
-/**
- * Draws a trivariate legend as a Venn Diagram
- */
-function drawTrivariateVennDiagram2(svg, containerWidth, containerHeight, labels, colors) {
-    const radius = containerWidth / 5 // Radius of each circle
-    const centerX = containerWidth / 2
-    const centerY = containerHeight / 2
-    const offset = radius / 1.5
-
-    // Define circle positions
-    const circles = [
-        { id: 'circle1', cx: centerX - offset, cy: centerY, label: labels[0], color: colors[0] },
-        { id: 'circle2', cx: centerX + offset, cy: centerY, label: labels[1], color: colors[1] },
-        { id: 'circle3', cx: centerX, cy: centerY + offset * 1.5, label: labels[2], color: colors[2] },
-    ]
-
-    // Draw circles
-    circles.forEach(({ id, cx, cy, label, color }, index) => {
-        svg.append('circle').attr('id', id).attr('cx', cx).attr('cy', cy).attr('r', radius).style('fill', color).style('opacity', 1)
-
-        // Add labels with specific positioning
-        const labelX =
-            index === 0
-                ? cx - radius - 10 // Left of the first circle
-                : index === 1
-                  ? cx + radius + 10 // Right of the second circle
-                  : cx // Below the third circle
-
-        const labelY = index < 2 ? cy : cy + radius + 20 // Same y for first two circles, below for the third
-
-        svg.append('text')
-            .attr('x', labelX)
-            .attr('y', labelY)
-            .attr('text-anchor', index < 2 ? (index === 0 ? 'end' : 'start') : 'middle') // Adjust alignment
-            .attr('class', 'venn-label')
-            .text(label)
-            .style('font-size', '12px')
-    })
-}
-
-/**
- * Draws a trivariate legend as a ternary plot
- */
-function drawTrivariateTernaryPlot(lgg, out, numberOfClasses) {
-    const size = out.squareSize // Size of the legend area
-    const padding = 20 // Padding around the plot
-    const radius = 5 // Radius of each class point
-    const triangleHeight = (Math.sqrt(3) / 2) * size
-
-    const ternaryGroup = lgg
-        .append('g')
-        .attr('class', 'trivariate-ternary-plot')
-        .attr('transform', `translate(${out.boxPadding + size / 2}, ${out.boxPadding + triangleHeight / 2})`)
-
-    // Draw the triangle
-    const vertices = [
-        { x: 0, y: -triangleHeight / 2 }, // Top vertex (Variable 1)
-        { x: -size / 2, y: triangleHeight / 2 }, // Bottom-left vertex (Variable 2)
-        { x: size / 2, y: triangleHeight / 2 }, // Bottom-right vertex (Variable 3)
-    ]
-
-    ternaryGroup
-        .append('polygon')
-        .attr('points', vertices.map((d) => `${d.x},${d.y}`).join(' '))
-        .attr('fill', 'none')
-        .attr('stroke', 'black')
-
-    // Label the vertices
-    const labels = [out.label1, out.label2, out.label3]
-    vertices.forEach((vertex, i) => {
-        ternaryGroup
-            .append('text')
-            .attr('x', vertex.x)
-            .attr('y', vertex.y - (i === 0 ? 10 : -20)) // Offset labels
-            .attr('class', 'ternary-label')
-            .attr('text-anchor', 'middle')
-            .text(labels[i])
-    })
-
-    // Plot the points inside the ternary plot
-    for (let i = 0; i < numberOfClasses; i++) {
-        for (let j = 0; j < numberOfClasses - i; j++) {
-            const k = numberOfClasses - i - j - 1 // Ensure sum of i + j + k = numberOfClasses - 1
-            const x = ((j - k) * size) / (2 * (numberOfClasses - 1)) // Horizontal position
-            const y = (i * -triangleHeight) / (numberOfClasses - 1) // Vertical position
-
-            const fill = out.map.classToFillStyle()(i, j, k)
-
-            ternaryGroup
-                .append('circle')
-                .attr('cx', x)
-                .attr('cy', y)
-                .attr('r', radius)
-                .attr('fill', fill)
-                .on('mouseover', function () {
-                    highlightRegions(out.map, i, j, k)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, i, j, k)
-                    }
-                })
-                .on('mouseout', function () {
-                    unhighlightRegions(out.map)
-                    if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, i, j, k)
-                    }
-                })
-        }
-    }
-
-    // Highlight selected regions on mouseover
-    function highlightRegions(map, ecl1, ecl2) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
-
-        // Set all regions to white
-        allRegions.style('fill', 'white')
-
-        // Highlight only the selected regions by restoring their original color
-        const selectedRegions = allRegions.filter(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
-        selectedRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-        })
-    }
-
-    // Reset all regions to their original colors on mouseout
-    function unhighlightRegions(map) {
-        let selector = out.geo_ === 'WORLD' ? '#em-worldrg' : '#em-nutsrg'
-        if (map.Geometries.userGeometries) selector = '#em-user-regions' // for user-defined geometries
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
-
-        // Restore each region's original color from the fill___ attribute
-        allRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
-        })
-    }
 }

@@ -8,7 +8,7 @@ import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
 import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
-import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling'
+import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
 
 /**
  * Returns a proportional symbol map.
@@ -57,10 +57,6 @@ export const map = function (config) {
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunPs
 
-    //dorling cartogram
-    out.dorling_ = false
-    out.dorlingStrength_ = { x: 1, y: 1 }
-    out.dorlingIterations_ = 1
     out.psCodeLabels_ = false // show country codes in symbols
 
     /**
@@ -96,9 +92,10 @@ export const map = function (config) {
         'psClasses_',
         'dorling_',
         'dorlingStrength_',
+        'dorlingIterations_',
+        'animateDorling_',
         'psSpikeWidth_',
         'psCodeLabels_',
-        'dorlingIterations_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -336,7 +333,7 @@ export const map = function (config) {
             setSymbolStyles(symb)
             appendLabelsToSymbols(map, sizeData)
 
-            addMouseEvents(map)
+            addMouseEventsToRegions(map)
 
             // Update labels for statistical values if required
             if (out.labels_?.values) {
@@ -415,7 +412,7 @@ export const map = function (config) {
         }
     }
 
-    const addMouseEvents = function (map) {
+    const addMouseEventsToRegions = function (map) {
         let symbols = map.svg().selectAll('g.em-centroid')
         symbols
             .on('mouseover', function (e, rg) {
@@ -423,9 +420,11 @@ export const map = function (config) {
                 sel.attr('fill___', sel.style('fill'))
                 sel.style('fill', out.hoverColor_)
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (out._tooltip) out._tooltip.mousemove(e)
+                if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             })
             .on('mouseout', function (e) {
                 const sel = select(this.childNodes[0])
@@ -434,6 +433,7 @@ export const map = function (config) {
                     sel.style('fill', newFill)
                     if (out._tooltip) out._tooltip.mouseout()
                 }
+                if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
             })
     }
 

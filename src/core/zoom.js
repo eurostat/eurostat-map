@@ -5,7 +5,8 @@ import { getCurrentBbox } from './utils'
 export const defineMapZoom = function (map) {
     let svg = select('#' + map.svgId())
     let previousT = zoomIdentity
-    let panUnlocked = false // Always start locked, unlock only after zoom
+    let panUnlocked = false // Always start locked until user zooms
+    let snappingBack = false // Guard to prevent recursion when snapping
 
     map.__zoomBehavior = zoom()
         .filter(function (event) {
@@ -17,22 +18,29 @@ export const defineMapZoom = function (map) {
             const t = e.transform
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
 
+            // If this zoom event was triggered by a snap-back, skip it
+            if (snappingBack) {
+                snappingBack = false
+                return
+            }
+
             if (t.k !== previousT.k) {
                 // User zoomed → permanently unlock panning if locking is enabled
                 if (map.lockPanUntilZoom_) panUnlocked = true
                 zoomHandler(e, previousT, map)
                 zoomGroup.attr('data-zoom', t.k)
                 zoomGroup.attr('transform', t)
+                previousT = t
             } else if (!map.lockPanUntilZoom_ || panUnlocked) {
                 // Panning allowed (lock disabled OR unlocked after zoom)
                 panHandler(e, map)
                 zoomGroup.attr('transform', t)
+                previousT = t
             } else {
-                // Lock active & not unlocked yet → cancel pan
+                // Lock active & not unlocked yet → cancel pan safely
+                snappingBack = true
                 svg.call(map.__zoomBehavior.transform, previousT)
             }
-
-            previousT = t
         })
         .on('end', function (e) {
             if (map.onZoomEnd_) map.onZoomEnd_(e, map)

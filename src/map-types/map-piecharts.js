@@ -6,7 +6,7 @@ import { interpolateOrRd, schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as PiechartLegend from '../legend/legend-piecharts'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
-import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling'
+import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
 
 /**
  * Returns a proportional pie chart map.
@@ -18,6 +18,7 @@ export const map = function (config) {
     const out = StatMap.statMap(config, true, 'pie')
 
     out.dorling_ = config?.dorling || false
+    out.animateDorling_ = true
 
     // pie charts
     out.pieMinRadius_ = 5
@@ -66,6 +67,7 @@ export const map = function (config) {
         'pieStrokeFill_',
         'pieStrokeWidth_',
         'dorling_',
+        'animateDorling_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]

@@ -9,11 +9,12 @@
     <body>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
+        <!-- <script src="../../../build/eurostatmap.min.js"></script> -->
         <script>
             // basic barebones proportional circles example
             let map = eurostatmap
                 .map('ps')
-                .nutsLevel(0)
+                .nutsLevel(2)
                 .title('Total GDP')
                 .width(800)
                 .stat('size', {
@@ -23,9 +24,17 @@
                 })
                 .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0 })
                 .psShape('circle')
+                .psMaxSize(15)
                 .dorling(true)
+                .dorlingStrength({ x: 0.1, y: 0.1 })
+                .dorlingIterations(1)
+                .animateDorling(false)
+                .dorlingWorker(false) // You can use a web worker for (non-animated) dorling cartograms in order to not block the main thread
+                //.dorlingWorkerD3URL('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js') // Use this in case you need its D3 dependency to be internally hosted.
+                .onDorlingProgress(function (progress, map) {
+                    console.log('Dorling progress:', progress)
+                })
                 .insets(false)
-                .psMaxSize(40) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
             map.build()
         </script>

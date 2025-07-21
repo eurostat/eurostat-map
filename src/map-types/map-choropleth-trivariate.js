@@ -181,71 +181,20 @@ export const map = function (config) {
         }
     }
 
-    function generateQuantileScale(c1, c2, c3, mode = 'LAB') {
-        const colors = []
-        const intensities = [0.5, 0.8, 1.0] // low, medium, high scaling
+    function generateQuantileScale(c1, c2, c3) {
+        // Precompute maxMagnitude across dataset (for lightness scaling)
+        const allTotals = out
+            .statData('v1')
+            .getArray()
+            .map((d, i) => d + out.statData('v2').getArray()[i] + out.statData('v3').getArray()[i])
+            .filter((d) => !isNaN(d))
+        const maxMagnitude = Math.max(...allTotals)
 
-        // Ensure final colors span a usable lightness range
-        const adjustLightness = (hex) => {
-            const cLab = lab(hex)
-            // Stretch final lightness so the 27 colors cover the full visual range
-            cLab.l = Math.max(40, Math.min(85, cLab.l))
-            cLab.a *= 1.1
-            cLab.b *= 1.1
-            return cLab.formatHex()
-        }
-
-        const mixLAB = (cols) => {
-            const [a, b, c] = cols.map((d) => color(d))
-            const ab = interpolateLab(a, b)(0.5)
-            const mixed = interpolateLab(ab, c)(0.5)
-            return adjustLightness(mixed)
-        }
-
-        const mixRGB = (cols) => {
-            const scaled = cols.map((col, idx) => scaleColor(col, intensities[idx % 3], 'RGB'))
-            return multiplyBlendMultipleHex(scaled)
-        }
-
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++) {
-                for (let k = 0; k < 3; k++) {
-                    const quantileColors = [
-                        scaleColor(c1, intensities[i], mode),
-                        scaleColor(c2, intensities[j], mode),
-                        scaleColor(c3, intensities[k], mode),
-                    ]
-                    const blended = mode === 'LAB' ? mixLAB(quantileColors) : mixRGB(quantileColors)
-                    colors.push(adjustLightness(blended))
-                }
-            }
-        }
-
-        return (idx) => colors[+idx] || '#ccc'
-    }
-
-    function scaleColor(baseColor, factor, mode = 'LAB') {
-        if (mode === 'LAB') {
-            let cLab = lab(baseColor)
-
-            // Normalize primaries to start balanced around mid-lightness
-            const baseL = 65
-            const targetL = baseL * Math.pow(factor, 0.6) // gamma correction
-
-            cLab.l = Math.max(35, Math.min(85, targetL))
-
-            // Boost chroma slightly to avoid gray mixes
-            cLab.a *= 1.15
-            cLab.b *= 1.15
-
-            return cLab.formatHex()
-        } else {
-            const c = color(baseColor).rgb()
-            const gamma = (x) => Math.pow(x / 255, 0.6) * 255
-            c.r = Math.min(255, gamma(c.r) * factor)
-            c.g = Math.min(255, gamma(c.g) * factor)
-            c.b = Math.min(255, gamma(c.b) * factor)
-            return `rgb(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)})`
+        return (classId, d) => {
+            const v1 = +out.statData('v1').get(d.properties.id)?.value || 0
+            const v2 = +out.statData('v2').get(d.properties.id)?.value || 0
+            const v3 = +out.statData('v3').get(d.properties.id)?.value || 0
+            return getTrivariateColor(v1, v2, v3, c1, c2, c3, maxMagnitude)
         }
     }
 
@@ -273,22 +222,7 @@ export const map = function (config) {
             regions
                 .transition()
                 .duration(out.transitionDuration())
-                .style('fill', function (rg) {
-                    const ecl1 = select(this).attr('ecl1')
-                    const ecl2 = select(this).attr('ecl2')
-                    const ecl3 = select(this).attr('ecl3')
-                    if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
-                    if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
-                    if (ecl3 === 'nd') return out.noDataFillStyle() || 'gray'
-
-                    if (!ecl1 && !ecl2 && !ecl3) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
-
-                    let regionClass = select(this).attr('regionClass')
-                    let color = out.classToFillStyle_(regionClass)
-                    return color
-
-                    //return getCSSPropertyFromClass('em-nutsrg', 'fill')
-                })
+                .style('fill', out.regionsFillFunction)
                 .end()
                 .then(
                     () => {
@@ -332,7 +266,72 @@ export const map = function (config) {
         return TrivariateLegend.legend
     }
 
+    out.regionsFillFunction = function (rg) {
+        // Stat values
+        const v1 = +out.statData('v1').get(rg.properties.id)?.value || 0
+        const v2 = +out.statData('v2').get(rg.properties.id)?.value || 0
+        const v3 = +out.statData('v3').get(rg.properties.id)?.value || 0
+        const total = v1 + v2 + v3
+
+        // Handle no data
+        if (!total || total <= 0 || isNaN(total)) return out.noDataFillStyle() || 'gray'
+
+        // Cache max total across dataset for lightness scaling
+        if (!out._maxTriTotal) {
+            const totals = out
+                .statData('v1')
+                .getArray()
+                .map((d, i) => d + out.statData('v2').getArray()[i] + out.statData('v3').getArray()[i])
+                .filter((d) => !isNaN(d))
+            out._maxTriTotal = Math.max(...totals)
+        }
+
+        return getTrivariateColor(v1, v2, v3, out.color1(), out.color2(), out.color3(), out._maxTriTotal)
+    }
+
     return out
+}
+
+export /**
+ * Get a trivariate color using barycentric CIELAB blending.
+ *
+ * @param {number} v1 Value for Variable 1
+ * @param {number} v2 Value for Variable 2
+ * @param {number} v3 Value for Variable 3
+ * @param {string} c1 Corner color for Variable 1 (e.g., '#e41a1c')
+ * @param {string} c2 Corner color for Variable 2 (e.g., '#4daf4a')
+ * @param {string} c3 Corner color for Variable 3 (e.g., '#377eb8')
+ * @param {number} maxMagnitude Max total (v1+v2+v3) for scaling lightness
+ * @returns {string} Hex color
+ */
+function getTrivariateColor(v1, v2, v3, c1, c2, c3, maxMagnitude) {
+    const total = v1 + v2 + v3
+    if (!total || total <= 0 || isNaN(total)) return '#ccc' // No data
+
+    // Normalize to proportions (sum = 1)
+    const p1 = v1 / total
+    const p2 = v2 / total
+    const p3 = v3 / total
+
+    // Convert corner colors to LAB
+    const c1Lab = lab(c1)
+    const c2Lab = lab(c2)
+    const c3Lab = lab(c3)
+
+    // Weighted average in LAB space
+    const mixed = lab(
+        p1 * c1Lab.l + p2 * c2Lab.l + p3 * c3Lab.l,
+        p1 * c1Lab.a + p2 * c2Lab.a + p3 * c3Lab.a,
+        p1 * c1Lab.b + p2 * c2Lab.b + p3 * c3Lab.b
+    )
+
+    // Optional: adjust lightness by magnitude (fades low totals)
+    if (maxMagnitude) {
+        const mRatio = Math.min(1, total / maxMagnitude)
+        mixed.l = mixed.l * (0.4 + 0.6 * mRatio) // Fade towards 40% for low totals
+    }
+
+    return mixed.formatHex()
 }
 
 const styleMixedNUTS = function (map) {

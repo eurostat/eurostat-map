@@ -258,10 +258,12 @@ export const map = function (config) {
                 if (shouldOmit(rg.properties.id)) return
                 select(this).style('fill', map.hoverColor_)
                 out._tooltip?.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 out._tooltip?.mousemove(e)
+                if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             })
             .on('mouseout', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
@@ -271,6 +273,7 @@ export const map = function (config) {
                     sel.style('fill', newFill)
                     out._tooltip?.mouseout()
                 }
+                if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
             })
     }
 
