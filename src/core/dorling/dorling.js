@@ -12,6 +12,13 @@ export function runDorlingSimulation(map, radiusAccessor) {
     const strengthY = map.dorlingStrength_?.y ?? 1
     const iterations = map.dorlingIterations_ ?? 1
 
+    // Make sure each node starts at the projected centroid location.
+    for (const n of nodes) {
+        const [px, py] = map._projection(n.geometry.coordinates)
+        n.x = px
+        n.y = py
+    }
+
     const useWorker = map.dorlingWorker_ !== false
     const d3URL = map.dorlingWorkerD3URL_ || 'https://unpkg.com/d3@7/dist/d3.min.js'
 

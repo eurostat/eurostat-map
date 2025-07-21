@@ -22,13 +22,19 @@
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
+                .stat('color', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Million EUR',
+                    filters: { unit: 'MIO_EUR', time: '2018' },
+                })
                 .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0 })
                 .psShape('circle')
                 .psMaxSize(15)
+                .transitionDuration(900)
                 .dorling(true)
                 .dorlingStrength({ x: 0.1, y: 0.1 })
                 .dorlingIterations(1)
-                .animateDorling(false)
+                .animateDorling(true) // Set to false for non-animated dorling cartograms
                 .dorlingWorker(false) // You can use a web worker for (non-animated) dorling cartograms in order to not block the main thread
                 //.dorlingWorkerD3URL('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js') // Use this in case you need its D3 dependency to be internally hosted.
                 .onDorlingProgress(function (progress, map) {

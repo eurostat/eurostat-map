@@ -543,6 +543,8 @@ export const map = function (config) {
                 return datum && datum.value !== ':' && datum.value
             })
             .append('circle')
+            .transition()
+            .duration(out.transitionDuration())
             .attr('r', function (d) {
                 const datum = sizeData.get(d.properties.id)
                 const radius = out.classifierSize_(datum.value)
@@ -552,53 +554,6 @@ export const map = function (config) {
             })
 
         return circles
-    }
-
-    function applyDorlingForce(map, sizeData) {
-        let symbolContainers = map.svg().selectAll('g.em-centroid')
-
-        if (out.simulation) {
-            stopSimulation()
-        }
-
-        // Initialize the force simulation
-        console.log('new dorling simulation')
-        out.simulation = forceSimulation(map.Geometries.centroidsFeatures)
-            .force(
-                'x',
-                forceX((d) => d.properties.centroid[0]).strength(out.dorlingStrength_.x) // Stronger pull to original x
-            )
-            .force(
-                'y',
-                forceY((d) => d.properties.centroid[1]).strength(out.dorlingStrength_.y) // Stronger pull to original y
-            )
-            .force(
-                'collide',
-                forceCollide((d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    let size = datum ? out.classifierSize_(datum.value) : 0
-
-                    if (out.psShape_ === 'square') {
-                        return (size / 2) * Math.SQRT2 // Adjust for diagonal size
-                    }
-
-                    return size // Default for circles
-                }).iterations(out.dorlingIterations_) // More iterations to improve collision handling
-            )
-            //.alphaTarget(0.3) // Helps keep centroids anchored
-            .on('tick', () => {
-                // Update elements with the new positions and radii
-                symbolContainers.attr('transform', (d) => 'translate(' + d.x + ',' + d.y + ')')
-            })
-
-        //out.simulation.alpha(1).restart() // Ensures simulation starts with full strength
-    }
-
-    function stopSimulation() {
-        out.simulation.stop() // Stops the internal tick loop
-        out.simulation.on('tick', null) // Remove tick event listener
-        out.simulation.on('end', null) // Remove end event listener
-        out.simulation = null // Remove reference
     }
 
     /**
