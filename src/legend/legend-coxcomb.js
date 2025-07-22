@@ -67,7 +67,7 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         if (map.sizeClassifier_) {
-            buildSizeLegend(out, baseX, baseY)
+            drawSizeLegend(out, baseX, baseY)
         }
 
         buildColorLegend(out, baseX, baseY)
@@ -77,7 +77,7 @@ export const legend = function (map, config) {
         out.setBoxDimension()
     }
 
-    function buildSizeLegend(out, baseX, baseY) {
+    function drawSizeLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.sizeLegend
         out._sizeLegendContainer = out.lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)

@@ -30,18 +30,21 @@
                 .psMaxSize(50)
                 .dorling(true)
                 .psMinSize(12)
-                .processCentroids((centroidFeatures) => {
-                    return centroidFeatures.map((feature) => {
-                        if (feature.properties.id == 'TR') {
-                            feature.geometry.coordinates[0] = 6000000
-                        } else if (feature.properties.id == 'CY') {
-                            feature.geometry.coordinates[0] = 6000000
-                        }
-                        return feature
-                    })
-                })
-                .labels({ values: true })
+                // .processCentroids((centroidFeatures) => {
+                //     return centroidFeatures.map((feature) => {
+                //         if (feature.properties.id == 'TR') {
+                //             feature.geometry.coordinates[0] = 6000000
+                //         } else if (feature.properties.id == 'CY') {
+                //             feature.geometry.coordinates[0] = 6000000
+                //         }
+                //         return feature
+                //     })
+                // })
+                //.labels({ values: true })
                 .nutsLevel('mixed')
+                .psClassificationMethod('threshold')
+                .psThreshold([10000, 30000, 40000, 50000, 70000])
+                .psColors(['#B0DCB0', '#93CD93', '#76C076', '#5CB35C', '#3CA43C', '#177217'])
                 .legend({
                     x: 580,
                     y: 10,
@@ -50,11 +53,17 @@
                     boxOpacity: 0.95,
                     sizeLegend: {
                         title: 'Size legend title',
-                        noData: false,
+                        noData: true,
                         noDataText: 'No data available',
                         labelFormatter: eurostatmap.spaceAsThousandSeparator,
                     },
-                    colorLegend: { title: 'color legend title', labelType: 'ranges', labels: ['my', 'very', 'own', 'custom', 'labels'] },
+                    colorLegend: {
+                        title: 'color legend title',
+                        noData: true,
+                        noDataText: 'No data!',
+                        //labelType: 'ranges',
+                        //labels: ['my', 'very', 'own', 'custom', 'labels'],
+                    },
                 })
 
             map.statData('size').setData({

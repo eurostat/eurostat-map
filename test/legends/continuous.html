@@ -14,7 +14,8 @@
             const customColorFunction = d3.scaleDiverging().domain([-109, 0, 64]).interpolator(d3.interpolateRdBu)
             const legendLabelType = 'specific' // 'generic', 'specific'
             const tickLength = 10 // Length of the ticks in the legend
-            const orientation = 'horizontal' // 'horizontal', 'vertical'
+            const orientation = 'vertical' // 'horizontal', 'vertical'
+
             function signedSqrtTransform(x) {
                 const sign = x < 0 ? -1 : 1
                 return sign * Math.sqrt(Math.abs(x))
@@ -59,6 +60,7 @@
                     tickLength: tickLength,
                     tickValues: [-100, 0, 60],
                     ticks: legendLabelType == 'generic' ? 0 : 3, // defaults to 'low' and 'high' when unspecified
+                    highlightTolerance: 10,
                 })
                 .build()
         </script>

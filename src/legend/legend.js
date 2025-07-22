@@ -30,7 +30,7 @@ export const legend = function (map) {
     // we now use CSS instead of inline styles
     out.titleFontSize = getFontSizeFromClass('em-legend-title')
     // width
-    out.width = 300
+    out.width = 150
     //padding between title and body
     out.titlePadding = 5
     //the width of the legend box elements

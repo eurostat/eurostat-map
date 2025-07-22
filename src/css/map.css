@@ -104,7 +104,7 @@ a text {
 .em-footnote {
     fill: #848280;
     pointer-events: all;
-    cursor: default;
+    cursor: pointer;
     font-size: 11px;
     transform: translate(5px, -5px);
 }

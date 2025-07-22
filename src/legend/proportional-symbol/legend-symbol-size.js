@@ -3,14 +3,14 @@ import { symbolsLibrary } from '../../map-types/map-proportional-symbols'
 import { symbol } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { max } from 'd3-array'
-import { highlightRegions, unhighlightRegions } from './legend-proportional-symbols'
+import { highlightPsRegions, unhighlightPsRegions } from './legend-proportional-symbols'
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
  *
  * @param {*} map map instance
  * @param {*} container parent legend object from core/legend.js
  */
-export function buildSizeLegend(out, baseX, baseY) {
+export function drawSizeLegend(out, baseX, baseY) {
     const map = out.map
 
     //container for size legend
@@ -37,7 +37,7 @@ export function buildSizeLegend(out, baseX, baseY) {
         if (out.sizeLegend.noData) {
             let y = out._sizeLegendContainer.node().getBBox().height + 15 // padding after the circle legend
             const container = out._sizeLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${0},${y})`)
-            out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightRegions, unhighlightRegions)
+            out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightPsRegions, unhighlightPsRegions)
         }
         return
     } else if (map.psShape_ == 'spike') {
@@ -83,7 +83,7 @@ export function buildSizeLegend(out, baseX, baseY) {
         let y = out._sizeLegendContainer.node().getBBox().height
         let x = 0
         const container = out._sizeLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightRegions, unhighlightRegions)
+        out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightPsRegions, unhighlightPsRegions)
     }
 }
 
@@ -207,7 +207,7 @@ function buildSpikeLegend(out) {
         let y = maxSize + labelSpacing + fontSize + 5 // Adjust position below the labels
         let x = out.boxPadding
         const container = out._sizeLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightRegions, unhighlightRegions)
+        out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightPsRegions, unhighlightPsRegions)
     }
 }
 

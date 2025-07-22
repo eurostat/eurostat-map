@@ -32,6 +32,9 @@
     stroke: white;
     stroke-width: 1;
 }
+.em-legend-gradient {
+    cursor: pointer;
+}
 .em-legend-tick {
     stroke: #696969;
     stroke-width: 1;

@@ -2,7 +2,7 @@
 import { min, max } from 'd3-array'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { select } from 'd3-selection'
-import { getLabelFormatter } from './legend-choropleth'
+import { getChoroplethLabelFormatter } from './legend-choropleth'
 
 /**
  * Create a legend for the opacity (alpha) channel.
@@ -17,7 +17,7 @@ export function createAlphaLegend(out, baseX, baseY) {
     // const maxVal = alphaData.getMax()
     const minVal = scale.domain()[0]
     const maxVal = scale.domain()[1]
-    const labelFormatter = getLabelFormatter(out)
+    const labelFormatter = getChoroplethLabelFormatter(out)
 
     // Container for the alpha legend
     out._alphaLegendContainer = out.lgg.append('g').attr('class', 'alpha-legend-container').attr('transform', `translate(${baseX},${baseY})`)

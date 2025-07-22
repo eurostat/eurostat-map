@@ -5,8 +5,8 @@ import * as Legend from '../legend'
 import { getLegendRegionsSelector } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
-import { createContinuousLegend } from './legend-continuous'
-import { createDiscreteLegend } from './legend-discrete'
+import { createContinuousLegend } from '../legend-continuous'
+import { drawDiscreteLegend } from '../legend-discrete'
 import { createAlphaLegend } from './legend-value-by-alpha'
 
 /**
@@ -26,7 +26,7 @@ export const legend = function (map, config) {
     //the number of decimal for the legend labels
     out.decimals = 0
     //the distance between the legend box elements to the corresponding text label
-    out.labelOffset = 3
+    out.labelOffset = { x: 3, y: 0 }
 
     // manually define labels
     out.labels = null
@@ -94,7 +94,7 @@ export const legend = function (map, config) {
             } else if (map.colorSchemeType_ === 'continuous') {
                 createContinuousLegend(out, baseX, baseY)
             } else {
-                createDiscreteLegend(out, baseX, baseY)
+                drawDiscreteLegend(out, baseX, baseY)
             }
 
             // Draw opacity legend if value-by-alpha is active
@@ -137,7 +137,7 @@ export function getThresholds(out) {
     return thresholds
 }
 
-export function getLabelFormatter(out) {
+export function getChoroplethLabelFormatter(out) {
     if (out.labelType == 'ranges') {
         const thresholds = getThresholds(out)
         const defaultLabeller = (label, i) => {
@@ -152,30 +152,4 @@ export function getLabelFormatter(out) {
     } else {
         return out.labelFormatter || format(`.${out.decimals}f`)
     }
-}
-
-// Highlight selected regions on mouseover
-export function highlightRegions(map, ecl) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Set all regions to white
-    allRegions.style('fill', 'white')
-
-    // Highlight only the selected regions by restoring their original color
-    const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
-    selectedRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-    })
-}
-
-// Reset all regions to their original colors on mouseout
-export function unhighlightRegions(map) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Restore each region's original color from the fill___ attribute
-    allRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___'))
-    })
 }

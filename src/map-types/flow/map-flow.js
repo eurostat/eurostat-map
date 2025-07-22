@@ -42,15 +42,24 @@ export const map = function (config) {
     /**
      * flowmap-specific setters/getters
      */
-    ;['flowGraph_', 'flowColor_', 'flowOverlayColors_', 'flowArrows_', 'flowMaxWidth_', 'flowMinWidth_', 'flowOutlines_', 'flowGradient_'].forEach(
-        function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
+    ;[
+        'flowGraph_',
+        'flowColor_',
+        'flowOverlayColors_',
+        'flowArrows_',
+        'flowMaxWidth_',
+        'flowMinWidth_',
+        'flowOutlines_',
+        'flowGradient_',
+        'flowStack_',
+        'flowDonuts_',
+    ].forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
         }
-    )
+    })
 
     //@override
     out.updateStyle = function () {

@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import { axisLeft, axisBottom } from 'd3-axis'
 import { max } from 'd3-array'
 import { executeForAllInsets, getFontSizeFromClass } from '../../core/utils'
-import { getLabelFormatter, getThresholds, unhighlightRegions, highlightRegions } from './legend-choropleth'
+import { getChoroplethLabelFormatter, getThresholds, unhighlightRegions, highlightRegions } from './legend-choropleth'
 
 export const createHistogramLegend = (out, baseX, baseY) => {
     const orientation = out.histogram.orientation || 'horizontal'
@@ -18,7 +18,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
     const data = getData(out)
     const colors = getColors(out)
     const thresholds = getThresholds(out)
-    const labelFormatter = getLabelFormatter(out)
+    const labelFormatter = getChoroplethLabelFormatter(out)
 
     data.forEach((value) => {
         const classIndex = out.map.classifier()(value)

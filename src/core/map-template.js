@@ -153,7 +153,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     //default copyright and disclaimer text
     out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9UN-FAO \u00A9INSTAT \u00A9Turkstat' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
     out.footnoteTooltipText_ =
-        'The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.'
+        '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
 
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'

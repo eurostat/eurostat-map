@@ -74,7 +74,7 @@ export const legend = function (map, config) {
 
         // legend for sizes
         if (map.sizeClassifier_) {
-            buildSizeLegend(out, baseX, baseY)
+            drawSizeLegend(out, baseX, baseY)
         }
 
         // legend for ps color values
@@ -91,7 +91,7 @@ export const legend = function (map, config) {
      * @param {*} lgg parent legend object from core/legend.js
      * @param {*} config size legend config object (sizeLegend object specified as property of legend() config object)
      */
-    function buildSizeLegend(out, baseX, baseY) {
+    function drawSizeLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.sizeLegend
         out._sizeLegendContainer = out.lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
