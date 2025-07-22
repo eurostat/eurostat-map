@@ -393,7 +393,7 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
 
     buf.push(`
         <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
-        <table class="nuts-table">
+        <table class="em-tooltip-table">
         <tbody>
         <tr>
         <td>

@@ -104,7 +104,7 @@ const flowMapTooltipFunction = function (link, map) {
 
     // Value
     buf.push(`<div class='em-tooltip-text'>
-                <table class="nuts-table">
+                <table class="em-tooltip-table">
                     <tbody>
                         <tr><td>${spaceAsThousandSeparator(link.value)} ${unit}</td></tr>
                     </tbody>

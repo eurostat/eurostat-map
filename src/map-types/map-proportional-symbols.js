@@ -820,7 +820,7 @@ const tooltipTextFunPs = function (region, map) {
             <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
         </div>
         <div class="em-tooltip-text">
-            <table class="nuts-table">
+            <table class="em-tooltip-table">
                 <tbody>
                     ${row1}
                     ${row2}

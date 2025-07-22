@@ -44,10 +44,10 @@ export const legend = function (map, config) {
     //continuous legend
     out.lowLabel = 'Low' //'Low'
     out.highLabel = 'High' //'High'
-    out.continuousTicks = 0 // Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels)
-    out.continuousTickValues = [] // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
-    out.continuousTickLabels = [] // Custom tick labels for continuous legend (if empty, will use continuousTickValues)
-    out.continuousOrientation = 'horizontal' // or 'vertical'
+    out.ticks = 0 // Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels)
+    out.tickValues = undefined // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
+    out.tickLabels = undefined // Custom tick labels for continuous legend (if empty, will use tickValues)
+    out.orientation = 'vertical' // or 'vertical'
 
     //override attribute values with config values
     if (config) {

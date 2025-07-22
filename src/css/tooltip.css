@@ -27,6 +27,9 @@
     opacity: 0;
     z-index: 99999999;
 }
+.em-tooltip-table {
+    margin: 0px;
+}
 .em-tooltip-piechart-container {
     text-align: center;
     fill: #383838;

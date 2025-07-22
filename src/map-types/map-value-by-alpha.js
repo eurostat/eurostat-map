@@ -106,7 +106,7 @@ export const map = function (config) {
         if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
             buf.push(`
         <div class="em-tooltip-text no-data">
-            <table class="nuts-table">
+            <table class="em-tooltip-table">
                 <tbody>
                     <tr><td>${map.noDataText_}</td></tr>
                 </tbody>
@@ -119,7 +119,7 @@ export const map = function (config) {
         // Build a single table for both dataset and alpha values
         buf.push(`
     <div class="em-tooltip-text">
-        <table class="nuts-table">
+        <table class="em-tooltip-table">
             <tbody>
                 <tr>
                     <td>${datasetLabel}${spaceAsThousandSeparator(sv.value)} ${unit}</td>

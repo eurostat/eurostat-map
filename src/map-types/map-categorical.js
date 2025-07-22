@@ -293,7 +293,7 @@ const tooltipTextFunCat = function (rg, map) {
         //display label and value
         buf.push(`
     <div class="em-tooltip-text">
-    <table class="nuts-table">
+    <table class="em-tooltip-table">
     <tbody>
     <tr>
     <td>
@@ -309,7 +309,7 @@ const tooltipTextFunCat = function (rg, map) {
     //display just value
     buf.push(`
     <div class="em-tooltip-text">
-    <table class="nuts-table">
+    <table class="em-tooltip-table">
     <tbody>
     <tr>
     <td>

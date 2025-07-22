@@ -151,7 +151,6 @@ export const map = function (config) {
             // Now derive "other" by subtracting specified causes from the total
             months.forEach((month) => {
                 const totalData = out.statData(`${month}:total`)
-                console.log(totalData)
                 if (!totalData || typeof totalData.data !== 'function') return
 
                 const perRegionValues = {}
@@ -217,6 +216,25 @@ export const map = function (config) {
             }
         }
 
+        try {
+            // apply style to insets
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            }
+
+            // apply to main map
+            applyStyleToMap(out)
+
+            return out
+        } catch (e) {
+            console.error('Error in updateStyle:', e.message)
+            console.error(e)
+        }
+
+        return out
+    }
+
+    function applyStyleToMap(map) {
         out.catLabels_ = out.catLabels_ || {}
 
         if (out.svg_) {
@@ -239,76 +257,45 @@ export const map = function (config) {
                 })
 
                 // Hover behavior (skip no-data regions)
-                const selector = getRegionsSelector(out)
-                const regions = out.svg().selectAll(selector)
-                regions
-                    .on('mouseover', function (e, rg) {
-                        if (!getRegionTotal(rg.properties.id)) return
-                        const sel = select(this)
-                        sel.attr('fill___', sel.style('fill'))
-                        sel.style('fill', out.hoverColor_)
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    })
-                    .on('mousemove', function (e, rg) {
-                        if (!getRegionTotal(rg.properties.id)) return
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    })
-                    .on('mouseout', function () {
-                        const sel = select(this)
-                        const newFill = sel.attr('fill___')
-                        if (newFill) {
-                            sel.style('fill', newFill)
-                            if (out._tooltip) out._tooltip.mouseout()
-                        }
-                    })
+                addMouseEventsToRegions(map)
 
                 addCoxcombChartsToMap(regionFeatures)
             }
         }
-        return out
     }
 
-    function getComposition(id) {
-        const comp = {}
-        let sumCauses = 0
-
-        // Collect all specified categories
-        for (const sc of out.statCodes_) {
-            const s = out.statData(sc)?.get(id)
-            if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
-                if (out.showOnlyWhenComplete()) return undefined
-                continue
-            }
-            comp[sc] = s.value
-            sumCauses += s.value
-        }
-
-        // If there's a total code, use it to compute "other"
-        if (out.totalCode_) {
-            const totalStat = out.statData(`${out._coxcombMonths[0]}:total`)
-                ? out.statData(`${out._coxcombMonths[0]}:total`).get(id)
-                : out.statData(out.totalCode_)?.get(id) // fallback if single total series
-
-            const totalVal = totalStat?.value || 0
-
-            // Only add "other" if there’s a positive remainder
-            const otherVal = Math.max(totalVal - sumCauses, 0)
-            if (otherVal > 0) {
-                comp['other'] = otherVal
-
-                // Ensure color/label defaults
-                out.catColors_ = out.catColors_ || {}
-                out.catLabels_ = out.catLabels_ || {}
-                if (!out.catColors_['other']) out.catColors_['other'] = '#FFCC80'
-                if (!out.catLabels_['other']) out.catLabels_['other'] = 'Other'
-            }
-        }
-
-        // If there’s no data at all
-        const total = Object.values(comp).reduce((a, b) => a + b, 0)
-        if (total === 0) return undefined
-
-        return comp
+    function addMouseEventsToRegions(map) {
+        const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
+        const selector = getRegionsSelector(map)
+        const regions = map.svg().selectAll(selector)
+        const symbols = map.svg().selectAll('g.em-centroid')
+        ;[
+            // Merge selections so we apply handlers to both regions and charts
+            regions,
+            symbols,
+        ].forEach((sel) => {
+            sel.on('mouseover', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
+                if (!getRegionTotal(rg.properties.id)) return
+                const sel = select(this)
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+                .on('mouseout', function (e, rg) {
+                    if (shouldOmit(rg.properties.id)) return
+                    if (!getRegionTotal(rg.properties.id)) return
+                    const sel = select(this)
+                    sel.style('fill', sel.attr('fill___') || out.noDataFillStyle_)
+                    sel.attr('fill___', null)
+                    if (out._tooltip) out._tooltip.mouseout()
+                })
+                .on('click', function (e, rg) {
+                    if (shouldOmit(rg.properties.id)) return
+                    if (!getRegionTotal(rg.properties.id)) return
+                    if (out._tooltip) out._tooltip.click(rg, out)
+                })
+        })
     }
 
     function getDatasetMaxMin() {
@@ -409,10 +396,10 @@ export const map = function (config) {
             const arcGen = arc()
                 .startAngle((d) => angle(d.data.month))
                 .endAngle((d) => angle(d.data.month) + angle.bandwidth())
-                .innerRadius((d) => rScale(d[0]))
+                .innerRadius((d) => (d[0] === 0 ? 0 : rScale(d[0]))) // force zero for the bottom layer
                 .outerRadius((d) => rScale(d[1]))
                 .padAngle(0.01)
-                .padRadius(out.coxcombInnerRadius_ || 0)
+                .padRadius(0)
 
             const node = out.svg().selectAll('#cox_' + regionId)
 
@@ -446,43 +433,32 @@ export const map = function (config) {
         const regionId = rg.properties.id
 
         const months = out._coxcombMonths || []
-        const causes = out._coxcombCauses || []
+        const causes = out.totalCode_ ? [...out._coxcombCauses, 'other'] : [...out._coxcombCauses]
 
         let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
-        // Build table header: Month + each cause label
+        // Table header (color the labels)
         const headerCells = [`<th class="em-breakdown-label">Month</th>`]
         causes.forEach((cause) => {
             const label = out.catLabels_[cause] || cause
-            headerCells.push(`<th class="em-breakdown-label">${label}</th>`)
+            const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
+            headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
         })
         const headerRow = `<tr>${headerCells.join('')}</tr>`
 
-        // Build month rows
+        // Month rows
         const rows = months.map((month) => {
             const cells = [`<td class="em-breakdown-label">${month}</td>`]
 
             causes.forEach((cause) => {
                 const s = out.statData(`${month}:${cause}`)?.get(regionId)
                 const val = s?.value || 0
-                if (val > 0) {
-                    const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
-                    cells.push(`
-                    <td>
-                        <span class="em-breakdown-color" style="background:${color}"></span>
-                        <span class="em-breakdown-value">${val.toFixed()}</span>
-                    </td>
-                `)
-                } else {
-                    // Keep empty cell for alignment
-                    cells.push(`<td></td>`)
-                }
+                cells.push(val > 0 ? `<td><span class="em-breakdown-value">${val.toFixed()}</span></td>` : `<td></td>`)
             })
 
             return `<tr>${cells.join('')}</tr>`
         })
 
-        // Compute region total (includes "other" if totalCode_ used)
         const total = getRegionTotal(regionId)
         const unit = out.statData(out.statCodes_[0])?.unitText() || ''
 

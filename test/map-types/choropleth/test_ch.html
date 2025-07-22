@@ -20,12 +20,20 @@
                     unitText: 'euro per inhabitant',
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
-                //.classificationMethod('ckmeans')
                 .numberOfClasses(6)
-                //.threshold([-45, -35, -30, -25, -20])
                 .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .colorSchemeType('continuous')
                 .nutsLevel(2)
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, histogram: false })
+                .legend({
+                    x: 10,
+                    y: 120,
+                    width: 200,
+                    title: 'Test',
+                    boxOpacity: 0,
+                    histogram: false,
+                    orientation: 'vertical',
+                    // ticks: 2,
+                })
                 .drawCoastalMargin(false)
                 .insets('default')
                 .zoomExtent([1, 10])

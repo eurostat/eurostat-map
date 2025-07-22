@@ -30,7 +30,7 @@ export const map = function (config) {
     //the number of classes
     out.numberOfClasses_ = 7
     //the classification method
-    out.classificationMethod_ = 'quantile' // or: equinter, threshold
+    out.classificationMethod_ = 'quantile' // or: ckmeans, jenks, equinter, threshold
     //the threshold, when the classification method is 'threshold'
     out.thresholds_ = [0]
     //colors to use for classes
@@ -490,7 +490,7 @@ const choroplethTooltipFunction = function (region, map) {
     if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
         buf.push(`
             <div class="em-tooltip-text no-data">
-                <table class="nuts-table">
+                <table class="em-tooltip-table">
                     <tbody>
                         <tr><td>${map.noDataText_}</td></tr>
                     </tbody>
@@ -503,7 +503,7 @@ const choroplethTooltipFunction = function (region, map) {
     // Data display
     buf.push(`
         <div class="em-tooltip-text">
-            <table class="nuts-table">
+            <table class="em-tooltip-table">
                 <tbody>
                     <tr><td>${spaceAsThousandSeparator(sv.value)} ${unit}</td></tr>
                 </tbody>

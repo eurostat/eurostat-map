@@ -97,7 +97,7 @@ function donutMouseoverFunction(d, out, event) {
 
     // Donut breakdown
     buf.push(`<div class='em-tooltip-text'>
-                <table class="nuts-table"><tbody>`)
+                <table class="em-tooltip-table"><tbody>`)
 
     for (const segment of node.donutValues) {
         const color =

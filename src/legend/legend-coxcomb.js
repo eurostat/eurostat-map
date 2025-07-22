@@ -3,6 +3,7 @@ import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
+import { arc } from 'd3'
 
 /**
  * Legend for Coxcomb (polar area) maps
@@ -28,6 +29,11 @@ export const legend = function (map, config) {
         shapePadding: 1,
         noData: true,
         noDataText: 'No data',
+    }
+
+    out.monthLegend = {
+        title: null,
+        marginTop: 60,
     }
 
     out._sizeLegendHeight = 0
@@ -65,6 +71,8 @@ export const legend = function (map, config) {
         }
 
         buildColorLegend(out, baseX, baseY)
+
+        buildCoxcombMonthLegend(out, baseX, baseY)
 
         out.setBoxDimension()
     }
@@ -198,6 +206,73 @@ export const legend = function (map, config) {
             const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
             out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
         }
+    }
+
+    /**
+     * Adds a Coxcomb month-segment legend showing how wedges represent months.
+     * Labels each segment (e.g., Jan, Feb) around the circle.
+     */
+    function buildCoxcombMonthLegend(out, baseX, baseY) {
+        const months = out.map._coxcombMonths || []
+        if (!months.length) return
+
+        let y = baseY + (out.monthLegend?.marginTop || 0)
+        let x = baseX
+
+        if (out._sizeLegendContainer) {
+            y += out._sizeLegendContainer.node().getBBox().height
+        }
+        if (out._colorLegendContainer) {
+            y += out._colorLegendContainer.node().getBBox().height
+            y += out.colorLegend.marginTop || 0
+        }
+
+        const radius = 40
+        const labelOffset = 18 // extra spacing for labels
+        const angleStep = (2 * Math.PI) / months.length
+
+        const colorLegendWidth = out._colorLegendContainer?.node()?.getBBox().width || 0
+        const centerX = x + colorLegendWidth / 2 + labelOffset
+
+        const container = out.lgg
+            .append('g')
+            .attr('class', 'em-coxcomb-month-legend')
+            .attr('transform', `translate(${centerX}, ${y + radius})`)
+
+        const arcGen = arc()
+            .innerRadius(0)
+            .outerRadius(radius)
+            .startAngle((d, i) => i * angleStep)
+            .endAngle((d, i) => (i + 1) * angleStep)
+
+        // Draw faint wedges
+        container
+            .selectAll('path')
+            .data(months)
+            .join('path')
+            .attr('d', (d, i) => arcGen(d, i))
+            .attr('fill', '#ccc')
+            .attr('stroke', '#444')
+            .attr('stroke-width', 0.3)
+            .attr('opacity', 0.4)
+
+        const labelRadius = radius + labelOffset
+        const monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+        // Place horizontal labels around the circle (no flipping)
+        container
+            .selectAll('text.month-label')
+            .data(months)
+            .join('text')
+            .attr('class', 'em-legend-label month-label')
+            .attr('x', (d, i) => Math.sin(i * angleStep + angleStep / 2) * labelRadius)
+            .attr('y', (d, i) => -Math.cos(i * angleStep + angleStep / 2) * labelRadius)
+            .attr('text-anchor', 'middle')
+            .attr('alignment-baseline', 'middle')
+            .text((d) => {
+                const monthNum = d.toString().slice(5, 7)
+                return monthAbbr[parseInt(monthNum, 10) - 1] || d
+            })
     }
 
     function highlightRegions(map, code) {

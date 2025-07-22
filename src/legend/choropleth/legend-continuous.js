@@ -9,7 +9,7 @@ import { getLabelFormatter, highlightRegions, unhighlightRegions } from './legen
 export function createContinuousLegend(out, baseX, baseY) {
     const m = out.map
     const container = out.lgg.append('g').attr('class', 'em-continuous-legend')
-    const isVertical = out.continuousOrientation === 'vertical'
+    const isVertical = out.orientation === 'vertical'
     const legendId = 'legend-gradient-' + Math.random().toString(36).substr(2, 5)
     const domain = getColorDomain(m)
     const legendWidth = out.width || out.shapeWidth * 6
@@ -85,7 +85,7 @@ function drawLegendRect(container, gradientId, out, baseY, width, height, isVert
 }
 
 function hasTicks(out) {
-    return out.continuousTicks > 1 || out.continuousTickValues.length > 1
+    return out.ticks > 1 || out.tickValues
 }
 
 function drawTickLabels(container, out, domain, legendWidth, baseY, isVertical) {
@@ -95,10 +95,7 @@ function drawTickLabels(container, out, domain, legendWidth, baseY, isVertical) 
     const transform = m.valueTransform_ || ((d) => d)
 
     // Generate the tick values in transformed space
-    const raw =
-        Array.isArray(out.continuousTickValues) && out.continuousTickValues.length > 0
-            ? out.continuousTickValues.map(transform)
-            : generateTickValues(domain, out.continuousTicks, transform)
+    const raw = Array.isArray(out.tickValues) && out.tickValues ? out.tickValues.map(transform) : generateTickValues(domain, out.ticks, transform)
 
     raw.forEach((val, i) => {
         const t = computeNormalizedTickPosition(val, domain)
