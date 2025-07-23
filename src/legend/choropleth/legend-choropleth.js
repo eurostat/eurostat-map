@@ -153,3 +153,29 @@ export function getChoroplethLabelFormatter(out) {
         return out.labelFormatter || format(`.${out.decimals}f`)
     }
 }
+
+// Highlight selected regions on mouseover
+export function highlightRegions(map, ecl) {
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Set all regions to white
+    allRegions.style('fill', 'white')
+
+    // Highlight only the selected regions by restoring their original color
+    const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
+    selectedRegions.each(function () {
+        select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+    })
+}
+
+// Reset all regions to their original colors on mouseout
+export function unhighlightRegions(map) {
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Restore each region's original color from the fill___ attribute
+    allRegions.each(function () {
+        select(this).style('fill', select(this).attr('fill___'))
+    })
+}

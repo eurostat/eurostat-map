@@ -3,7 +3,8 @@ import { symbolsLibrary } from '../../map-types/map-proportional-symbols'
 import { symbol } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { max } from 'd3-array'
-import { highlightPsRegions, unhighlightPsRegions } from './legend-proportional-symbols'
+import { select } from 'd3-selection'
+
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
  *
@@ -411,4 +412,34 @@ function getShape(out) {
         shape = symbol().type(symbolType)
     }
     return shape
+}
+
+function highlightPsRegions(map, ecl) {
+    //for ps, the symbols are the children of each em-prop-symbols element
+    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+
+    // Set all symbols to visible
+    allSymbols.each(function (d, i) {
+        let symbol = select(this)
+        symbol.style('opacity', '0')
+    })
+
+    // Highlight only the selected regions by restoring their original opacity
+    const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
+    selectedSymbols.each(function (d, i) {
+        let symbol = select(this)
+        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+    })
+}
+
+// Reset all regions to their original opacitys on mouseout
+function unhighlightPsRegions(map) {
+    //for ps, the symbols are the children of each em-prop-symbols element
+    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+
+    // Restore each region's original opacity from the fill___ attribute
+    allSymbols.each(function (d, i) {
+        let symbol = select(this)
+        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+    })
 }

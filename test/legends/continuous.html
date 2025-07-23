@@ -42,8 +42,8 @@
                 .pointOfDivergence(0)
 
                 // stretching the values for better distribution
-                .valueTransform(signedSqrtTransform)
-                .valueUntransform(signedSqrtUntransform)
+                // .valueTransform(signedSqrtTransform)
+                // .valueUntransform(signedSqrtUntransform)
 
                 .legend({
                     title: 'Population change',
@@ -60,7 +60,7 @@
                     tickLength: tickLength,
                     tickValues: [-100, 0, 60],
                     ticks: legendLabelType == 'generic' ? 0 : 3, // defaults to 'low' and 'high' when unspecified
-                    highlightTolerance: 10,
+                    highlightTolerance: 2,
                 })
                 .build()
         </script>

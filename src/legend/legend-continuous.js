@@ -147,6 +147,8 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
     const untransform = map.valueUntransform_ || ((d) => d)
     const container = out._continuousLegendContainer
     const titlePadding = getTitlePadding(out)
+    const highlightFunction = getHighlightFunction(map)
+    const unhighlightFunction = getUnHighlightFunction(map)
 
     rect.on('mousemove', function (event) {
         const [mx, my] = pointer(event, this)
@@ -218,13 +220,13 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
             .text(labelFormatter(rawVal))
 
         //highlight on map
-        highlightRegions(map, rawVal)
+        highlightFunction(map, rawVal)
     })
 
     rect.on('mouseout', function () {
         container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label').remove()
         //highlight on map
-        unhighlightRegions(map)
+        unhighlightFunction(map)
     })
 }
 
@@ -387,7 +389,18 @@ function getHighlightTolerance(map) {
     return tolerance
 }
 
+function getHighlightFunction(map) {
+    if (map._mapType == 'ps') return highlightPsSymbols
+    return highlightRegions
+}
+
+function getUnHighlightFunction(map) {
+    if (map._mapType == 'ps') return unhighlightPsSymbols
+    return unhighlightRegions
+}
+
 // Highlight selected regions on mouseover
+//TODO: merge these with legend-choropleth.js and legend-proportional-symbols.js highlight functions
 function highlightRegions(map, rawVal) {
     const tolerance = getHighlightTolerance(map)
     // Select all regions
@@ -424,5 +437,44 @@ function unhighlightRegions(map) {
     // Restore each region's original color from the fill___ attribute
     allRegions.each(function () {
         select(this).style('fill', select(this).attr('fill___'))
+    })
+}
+
+function highlightPsSymbols(map, rawVal) {
+    const tolerance = getHighlightTolerance(map)
+    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+
+    allSymbols.each(function () {
+        const symbol = select(this)
+        const ecl = symbol.attr('ecl')
+
+        // Handle no-data
+        if (!ecl || ecl === 'nd') {
+            if (rawVal === 'nd') {
+                // Don't dim if we're hovering "no data"
+                symbol.style('opacity', map.psFillOpacity_)
+                return
+            }
+            symbol.style('opacity', 0) // Dim "no data" if hovering a value
+            return
+        }
+
+        const val = +ecl // raw stat value
+        if (val >= rawVal - tolerance && val <= rawVal + tolerance) {
+            // Within range: keep full opacity
+            symbol.style('opacity', map.psFillOpacity_)
+        } else {
+            // Outside range: dim
+            symbol.style('opacity', 0)
+        }
+    })
+}
+
+function unhighlightPsSymbols(map) {
+    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+
+    // Restore all to default opacity
+    allSymbols.each(function () {
+        select(this).style('opacity', map.psFillOpacity_)
     })
 }

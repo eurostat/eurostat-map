@@ -7,13 +7,22 @@ export const defineMapZoom = function (map) {
     let previousT = zoomIdentity
     let panUnlocked = false // Always start locked until user zooms
     let snappingBack = false // Guard to prevent recursion when snapping
+    const zoomExtent = map.zoomExtent_ || [0, 0]
 
     map.__zoomBehavior = zoom()
         .filter(function (event) {
             const target = event.target
             return !target.closest('.em-zoom-buttons') && !target.closest('.em-button')
         })
-        .scaleExtent(map.zoomExtent())
+        .extent([
+            [0, 0],
+            [map.width_, map.height_],
+        ])
+        .scaleExtent(zoomExtent)
+        .translateExtent([
+            [0, 0],
+            [map.width_, map.height_],
+        ])
         .on('zoom', function (e) {
             const t = e.transform
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
@@ -53,55 +62,21 @@ export const defineMapZoom = function (map) {
 const panHandler = function (event, map) {
     const transform = event.transform
 
-    // Compute the projected center
+    // Compute projected center from current transform
     const centerX = (map.width_ / 2 - transform.x) / transform.k
     const centerY = (map.height_ / 2 - transform.y) / transform.k
-    let [geoX, geoY] = map._projection.invert([centerX, centerY])
+    const [geoX, geoY] = map._projection.invert([centerX, centerY])
 
-    // Clamp geoX and geoY to max bounds and adjust the event transform
-    if (map.maxBounds_.xMin !== undefined && geoX < map.maxBounds_.xMin) {
-        geoX = map.maxBounds_.xMin
-        transform.x = map.width_ / 2 - map._projection([geoX, geoY])[0] * transform.k
-    }
-    if (map.maxBounds_.yMin !== undefined && geoY < map.maxBounds_.yMin) {
-        geoY = map.maxBounds_.yMin
-        transform.y = map.height_ / 2 - map._projection([geoX, geoY])[1] * transform.k
-    }
-    if (map.maxBounds_.xMax !== undefined && geoX > map.maxBounds_.xMax) {
-        geoX = map.maxBounds_.xMax
-        transform.x = map.width_ / 2 - map._projection([geoX, geoY])[0] * transform.k
-    }
-    if (map.maxBounds_.yMax !== undefined && geoY > map.maxBounds_.yMax) {
-        geoY = map.maxBounds_.yMax
-        transform.y = map.height_ / 2 - map._projection([geoX, geoY])[1] * transform.k
-    }
-
-    // set new position
+    // Update stored map position
     map.position_.x = geoX
     map.position_.y = geoY
 
-    //emit custom event with new position
+    // Emit custom event with new position
     window.dispatchEvent(
         new CustomEvent('estatmap:zoomed-' + map.svgId_, {
             detail: map,
         })
     )
-}
-
-/**
- * @description get the current view's metres per pixel, based on a zoomFactor
- * @param {number} zoomFactor this zoom / previous zoom
- * @return {number}
- */
-const getMetresPerPixel = function (zoomFactor, map) {
-    // Get current bounding box width in meters
-    const bbox = getCurrentBbox(map)
-    const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
-
-    // Calculate meters per pixel
-    const metersPerPixel = bboxWidth / (map.width_ * zoomFactor)
-
-    return metersPerPixel
 }
 
 // Zoom handler function
@@ -111,7 +86,7 @@ const zoomHandler = function (event, previousT, map) {
     const centerX = (map.width_ / 2 - transform.x) / transform.k
     const centerY = (map.height_ / 2 - transform.y) / transform.k
 
-    // Use the projection to get the projected center in EPSG:3035
+    // Use the projection to get the projected center
     const [projectedX, projectedY] = map._projection.invert([centerX, centerY])
 
     // set new position
@@ -130,6 +105,22 @@ const zoomHandler = function (event, previousT, map) {
 
     //emit custom event with map object
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
+}
+
+/**
+ * @description get the current view's metres per pixel, based on a zoomFactor
+ * @param {number} zoomFactor this zoom / previous zoom
+ * @return {number}
+ */
+const getMetresPerPixel = function (zoomFactor, map) {
+    // Get current bounding box width in meters
+    const bbox = getCurrentBbox(map)
+    const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
+
+    // Calculate meters per pixel
+    const metersPerPixel = bboxWidth / (map.width_ * zoomFactor)
+
+    return metersPerPixel
 }
 
 /**

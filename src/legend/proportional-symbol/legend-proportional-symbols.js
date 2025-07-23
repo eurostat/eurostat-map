@@ -128,37 +128,6 @@ export const legend = function (map, config) {
     return out
 }
 
-// Highlight selected regions on mouseover
-export function highlightPsRegions(map, ecl) {
-    //for ps, the symbols are the children of each em-prop-symbols element
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
-
-    // Set all symbols to visible
-    allSymbols.each(function (d, i) {
-        let symbol = select(this)
-        symbol.style('opacity', '0')
-    })
-
-    // Highlight only the selected regions by restoring their original opacity
-    const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
-    selectedSymbols.each(function (d, i) {
-        let symbol = select(this)
-        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
-    })
-}
-
-// Reset all regions to their original opacitys on mouseout
-export function unhighlightPsRegions(map) {
-    //for ps, the symbols are the children of each em-prop-symbols element
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
-
-    // Restore each region's original opacity from the fill___ attribute
-    allSymbols.each(function (d, i) {
-        let symbol = select(this)
-        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
-    })
-}
-
 function getColorThresholds(out) {
     const map = out.map
     const thresholds =
@@ -187,4 +156,35 @@ export function getPropSymbolLabelFormatter(out) {
     } else {
         return out.labelFormatter || format(`.${out.decimals}f`)
     }
+}
+
+// Highlight selected regions on mouseover
+export function highlightPsSymbols(map, ecl) {
+    //for ps, the symbols are the children of each em-prop-symbols element
+    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+
+    // Set all symbols to visible
+    allSymbols.each(function (d, i) {
+        let symbol = select(this)
+        symbol.style('opacity', '0')
+    })
+
+    // Highlight only the selected regions by restoring their original opacity
+    const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
+    selectedSymbols.each(function (d, i) {
+        let symbol = select(this)
+        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+    })
+}
+
+// Reset all regions to their original opacitys on mouseout
+export function unhighlightPsSymbols(map) {
+    //for ps, the symbols are the children of each em-prop-symbols element
+    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+
+    // Restore each region's original opacity from the fill___ attribute
+    allSymbols.each(function (d, i) {
+        let symbol = select(this)
+        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+    })
 }

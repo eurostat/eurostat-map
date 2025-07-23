@@ -16,7 +16,7 @@ export function applyPatternFill(map, configs = []) {
     const regionToPatternIds = {}
 
     configs.forEach((config) => {
-        const { pattern = 'hatching', regionIds = [], color = '#000', strokeWidth = 1, customPattern } = config
+        const { pattern = 'hatching', regionIds = [], color = '#000', strokeWidth = 1, customPattern, spacing } = config
 
         let patternId
 
@@ -35,7 +35,7 @@ export function applyPatternFill(map, configs = []) {
         } else {
             const colorKey = color.replace('#', '').toLowerCase()
             patternId = `${pattern}-${colorKey}-sw${strokeWidth}`
-            definePattern(map, patternId, pattern, color, strokeWidth)
+            definePattern(map, patternId, pattern, color, strokeWidth, spacing)
         }
 
         config.patternId = patternId
@@ -72,7 +72,7 @@ export function applyPatternFill(map, configs = []) {
         })
 }
 
-function definePattern(map, patternId, patternName, color, strokeWidth) {
+function definePattern(map, patternId, patternName, color, strokeWidth, spacing = 8) {
     const defs = map.svg().select('defs')
 
     if (
@@ -81,17 +81,48 @@ function definePattern(map, patternId, patternName, color, strokeWidth) {
             .select(`#${CSS.escape(patternId)}`)
             .empty()
     ) {
-        const pattern = defs.append('pattern').attr('id', patternId).attr('patternUnits', 'userSpaceOnUse').attr('width', 8).attr('height', 8)
+        const pattern = defs
+            .append('pattern')
+            .attr('id', patternId)
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('width', spacing)
+            .attr('height', spacing)
 
         if (patternName === 'hatching') {
-            pattern.append('path').attr('d', 'M-1,1 l2,-2 M0,8 l8,-8 M7,9 l2,-2').attr('stroke', color).attr('stroke-width', strokeWidth)
+            // Diagonal stripes, scaled to spacing
+            pattern
+                .append('path')
+                .attr(
+                    'd',
+                    `M-${spacing / 8},${spacing / 8} l${spacing / 4},-${spacing / 4} M0,${spacing} l${spacing},-${spacing} M${spacing - spacing / 8},${spacing + spacing / 8} l${spacing / 4},-${spacing / 4}`
+                )
+                .attr('stroke', color)
+                .attr('stroke-width', strokeWidth)
         } else if (patternName === 'crosshatch') {
-            pattern.append('path').attr('d', 'M0,0 l8,8 M8,0 l-8,8').attr('stroke', color).attr('stroke-width', strokeWidth)
+            // X shape
+            pattern
+                .append('path')
+                .attr('d', `M0,0 l${spacing},${spacing} M${spacing},0 l-${spacing},${spacing}`)
+                .attr('stroke', color)
+                .attr('stroke-width', strokeWidth)
         } else if (patternName === 'dots') {
-            pattern.append('circle').attr('cx', 4).attr('cy', 4).attr('r', strokeWidth).attr('fill', color)
+            // Center dot, radius proportional
+            pattern
+                .append('circle')
+                .attr('cx', spacing / 2)
+                .attr('cy', spacing / 2)
+                .attr('r', strokeWidth)
+                .attr('fill', color)
         } else {
             console.warn(`Unknown pattern "${patternName}", defaulting to hatching.`)
-            pattern.append('path').attr('d', 'M-1,1 l2,-2 M0,8 l8,-8 M7,9 l2,-2').attr('stroke', color).attr('stroke-width', strokeWidth)
+            pattern
+                .append('path')
+                .attr(
+                    'd',
+                    `M-${spacing / 8},${spacing / 8} l${spacing / 4},-${spacing / 4} M0,${spacing} l${spacing},-${spacing} M${spacing - spacing / 8},${spacing + spacing / 8} l${spacing / 4},-${spacing / 4}`
+                )
+                .attr('stroke', color)
+                .attr('stroke-width', strokeWidth)
         }
     }
 }

@@ -46,6 +46,7 @@
                         legendLabel: 'Eurozone',
                         color: '#000',
                         strokeWidth: 1,
+                        spacing: 12,
                     },
                     {
                         pattern: 'dots',
@@ -79,16 +80,17 @@
                             'HR',
                         ],
                         legendLabel: 'Schengen Area',
-                        color: 'black',
+                        color: '#700000',
                         strokeWidth: 1.2,
+                        spacing: 10,
                     },
-                    // {
-                    //   customPattern: `<pattern id="myRedCircles" patternUnits="userSpaceOnUse" width="10" height="10">
-                    //                       <circle cx="5" cy="5" r="3" fill="red"/>
-                    //                   </pattern>`,
-                    //   regionIds: ["BY"],
-                    //   legendLabel: "Custom Red Circles"
-                    // }
+                    {
+                        customPattern: `<pattern id="myRedCircles" patternUnits="userSpaceOnUse" width="10" height="10">
+                                          <circle cx="5" cy="5" r="3" fill="salmon"/>
+                                      </pattern>`,
+                        regionIds: ['BY'],
+                        legendLabel: 'Custom pattern',
+                    },
                 ])
                 .legend({
                     title: 'test title',
@@ -96,6 +98,7 @@
                     x: 600,
                     y: 60,
                     labelFontSize: 14,
+                    boxOpacity: 1,
                 })
 
             map.statData().setData({

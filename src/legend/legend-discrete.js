@@ -1,8 +1,8 @@
 // legends for discrete color scales
-import { map } from 'd3'
-import { executeForAllInsets } from '../core/utils'
-import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
-import { getPropSymbolLabelFormatter } from './proportional-symbol/legend-proportional-symbols'
+import { select } from 'd3-selection'
+import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
+import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
+import { getPropSymbolLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
 export function drawDiscreteLegend(out, x, y) {
@@ -35,8 +35,20 @@ export function drawDiscreteLegend(out, x, y) {
         const x = 0
         if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding // shift legend items down after point of divergence
         const container = out._discreteLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        out.appendNoDataLegend(container, config.noDataText, getHighlightRegionsFunction(out), getUnhighlightRegionsFunction(out))
+        const highlightFunction = getHighlightFunction(out.map)
+        const unhighlightFunction = getUnHighlightFunction(out.map)
+        out.appendNoDataLegend(container, config.noDataText, highlightFunction, unhighlightFunction)
     }
+}
+
+function getHighlightFunction(map) {
+    if (map._mapType == 'ps') return highlightPsSymbols
+    return highlightRegions
+}
+
+function getUnHighlightFunction(map) {
+    if (map._mapType == 'ps') return unhighlightPsSymbols
+    return unhighlightRegions
 }
 
 function getNumberOfClasses(out) {
@@ -51,20 +63,6 @@ function getLabelFormatter(out) {
     const mapType = map._mapType
     const labelFormatter = mapType === 'ps' ? getPropSymbolLabelFormatter(out) : getChoroplethLabelFormatter(out)
     return labelFormatter
-}
-
-function getHighlightRegionsFunction(out) {
-    const map = out.map
-    const mapType = map._mapType
-    const highlightRegions = mapType === 'ps' ? highlightPsRegions : highlightRegions
-    return highlightRegions
-}
-
-function getUnhighlightRegionsFunction(out) {
-    const map = out.map
-    const mapType = map._mapType
-    const unhighlightRegions = mapType === 'ps' ? unhighlightPsRegions : unhighlightRegions
-    return unhighlightRegions
 }
 
 function getClassToFillStyle(out) {
@@ -92,6 +90,8 @@ function createThresholdsLegend(out, config) {
     const container = out._discreteLegendContainer
     const numberOfClasses = getNumberOfClasses(out)
     const titlePadding = getTitlePadding(out)
+    const highlightFunction = getHighlightFunction(map)
+    const unhighlightFunction = getUnHighlightFunction(map)
 
     // Label formatter
     const labelFormatter = getLabelFormatter(out)
@@ -111,15 +111,16 @@ function createThresholdsLegend(out, config) {
             .attr('height', config.shapeHeight)
             .style('fill', fillColor)
             .on('mouseover', function () {
-                getHighlightRegionsFunction(out)(out.map, ecl)
+                select(this).raise()
+                highlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, getHighlightRegionsFunction(out), ecl)
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
                 }
             })
             .on('mouseout', function () {
-                getUnhighlightRegionsFunction(out)(out.map)
+                unhighlightFunction(map)
                 if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, getUnhighlightRegionsFunction(out), ecl)
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
                 }
             })
 
@@ -181,12 +182,14 @@ function createRangesLegend(out, config) {
     const container = out._discreteLegendContainer
     const labelFormatter = getLabelFormatter(out)
     const numberOfClasses = getNumberOfClasses(out)
+    const highlightFunction = getHighlightFunction(map)
+    const unhighlightFunction = getUnHighlightFunction(map)
 
     // for each class
     for (let i = 0; i < numberOfClasses; i++) {
         let y = i * config.shapeHeight + getTitlePadding(out)
         const x = 0
-        const ecl = out.ascending ? numberOfClasses() - i - 1 : i
+        const ecl = out.ascending ? numberOfClasses - i - 1 : i
         const fillColor = map.classToFillStyle()(ecl, numberOfClasses)
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
@@ -204,15 +207,15 @@ function createRangesLegend(out, config) {
             .style('fill', fillColor)
             .on('mouseover', function () {
                 select(this).raise()
-                highlightRegions(out.map, ecl)
+                highlightFunction(out.map, ecl)
                 if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl)
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
                 }
             })
             .on('mouseout', function () {
-                unhighlightRegions(out.map)
+                unhighlightFunction(out.map)
                 if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl)
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
                 }
             })
 
@@ -258,7 +261,7 @@ function drawDivergingLine(out, y, config) {
         .selectAll('.em-legend-label')
         .nodes()
         .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
-    const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffset + maxLabelLength + out.labelOffset + 15 // rect > offset > label > offset > padding > vertical line
+    const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffset?.x + maxLabelLength + out.labelOffset?.x + 15 // rect > offset > label > offset > padding > vertical line
 
     // Draw the horizontal divergence line
     container
@@ -344,30 +347,4 @@ function drawDivergingLine(out, y, config) {
             container.selectAll('.em-legend-label-divergence').remove()
         }
     }
-}
-
-// Highlight selected regions on mouseover
-function highlightRegions(map, ecl) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Set all regions to white
-    allRegions.style('fill', 'white')
-
-    // Highlight only the selected regions by restoring their original color
-    const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
-    selectedRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-    })
-}
-
-// Reset all regions to their original colors on mouseout
-function unhighlightRegions(map) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Restore each region's original color from the fill___ attribute
-    allRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___'))
-    })
 }
