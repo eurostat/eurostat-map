@@ -432,6 +432,68 @@ export const map = function (config) {
             })
     }
 
+    // Manually highlight a region by ID (simulate mouseover)
+    out.highlightRegion = function (regionId) {
+        if (!out.svg_) return out
+
+        const selector = getRegionsSelector(out)
+        const region = out
+            .svg()
+            .selectAll(selector)
+            .filter((d) => d.properties.id === regionId)
+
+        if (!region.empty()) {
+            const rg = region.datum()
+            const sel = region
+            sel.style('fill', out.hoverColor_ || 'orange')
+
+            if (out._tooltip) {
+                const html = out.tooltip_.textFunction(rg, out)
+                out._tooltip.mouseover(html)
+
+                // Get region bounds (in SVG space)
+                const bbox = region.node().getBBox()
+
+                // Apply current zoom/pan transform
+                const transform = out.__lastTransform || { x: 0, y: 0, k: 1 }
+                const scaledX = (bbox.x + bbox.width / 2) * transform.k + transform.x
+                const scaledY = (bbox.y + bbox.height / 2) * transform.k + transform.y
+
+                // Convert to screen coords
+                const mapRect = out.svg().node().getBoundingClientRect()
+                const x = mapRect.left + scaledX
+                const y = mapRect.top + scaledY
+
+                out._tooltip.ensureTooltipOnScreen(x, y)
+            }
+
+            if (out.onRegionMouseOver_) {
+                out.onRegionMouseOver_(null, rg, region.node(), out)
+            }
+        }
+        return out
+    }
+
+    // Manually clear the highlight (simulate mouseout)
+    out.clearHighlight = function () {
+        if (!out.svg_) return out
+
+        const selector = getRegionsSelector(out)
+        out.svg()
+            .selectAll(selector)
+            .each(function () {
+                const sel = select(this)
+                const original = sel.attr('fill___')
+                if (original) sel.style('fill', original)
+            })
+
+        if (out._tooltip) {
+            out._tooltip.mouseout()
+        }
+
+        return out
+    }
+
     return out
 }
 

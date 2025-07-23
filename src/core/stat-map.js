@@ -149,7 +149,8 @@ export const statMap = function (config, withCenterPoints, mapType) {
             out._tooltip = tp.tooltip(out.tooltip_)
         } else {
             //no config specified, use default
-            out._tooltip = tp.tooltip()
+            if (!out.tooltip_) out.tooltip_ = { id: out.svgId() }
+            out._tooltip = tp.tooltip(out.tooltip_)
         }
 
         //launch geo data retrieval

@@ -11,9 +11,10 @@ import { buildInsets, removeInsets } from './insets'
 import { appendStamp } from './stamps'
 import { buildGridCartogramBase } from './cartograms'
 import { appendMinimap } from './minimaps'
-import { defineMapZoom } from './zoom'
+import { defineMapZoom, setMapView } from './zoom'
 import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
+import { zoomIdentity } from 'd3-zoom'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -66,6 +67,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     //events
     out.onZoomEnd_ = undefined // user function to call when zoom ends
+    out.onZoom_ = undefined // user function to call when zooming
     out.onRegionMouseOver_ = undefined // user function to call when mouseover a region
     out.onRegionMouseMove_ = undefined // user function to call when mousemove over a region
     out.onRegionMouseOut_ = undefined // user function to call when mouseout of a region
@@ -439,6 +441,13 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         out.labels_ = v
         //update
         updateLabels(out)
+        return out
+    }
+
+    out.position = function (v) {
+        if (!arguments.length) return out.position_
+        out.position_ = v
+        setMapView(out, v)
         return out
     }
 

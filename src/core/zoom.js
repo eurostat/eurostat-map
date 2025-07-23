@@ -1,19 +1,15 @@
 import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
-import { getCurrentBbox } from './utils'
 
 export const defineMapZoom = function (map) {
-    let svg = select('#' + map.svgId())
+    const svg = select('#' + map.svgId())
     let previousT = zoomIdentity
-    let panUnlocked = false // Always start locked until user zooms
-    let snappingBack = false // Guard to prevent recursion when snapping
+    let panUnlocked = false
+    let snappingBack = false
     const zoomExtent = map.zoomExtent_ || [0, 0]
 
     map.__zoomBehavior = zoom()
-        .filter(function (event) {
-            const target = event.target
-            return !target.closest('.em-zoom-buttons') && !target.closest('.em-button')
-        })
+        .filter((e) => !e.target.closest('.em-zoom-buttons') && !e.target.closest('.em-button'))
         .extent([
             [0, 0],
             [map.width_, map.height_],
@@ -23,106 +19,106 @@ export const defineMapZoom = function (map) {
             [0, 0],
             [map.width_, map.height_],
         ])
-        .on('zoom', function (e) {
+        .on('zoom', (e) => {
             const t = e.transform
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
 
-            // If this zoom event was triggered by a snap-back, skip it
             if (snappingBack) {
                 snappingBack = false
                 return
             }
 
+            map.__lastTransform = t
+
             if (t.k !== previousT.k) {
-                // User zoomed → permanently unlock panning if locking is enabled
                 if (map.lockPanUntilZoom_) panUnlocked = true
                 zoomHandler(e, previousT, map)
-                zoomGroup.attr('data-zoom', t.k)
-                zoomGroup.attr('transform', t)
+                zoomGroup.attr('data-zoom', t.k).attr('transform', t)
                 previousT = t
             } else if (!map.lockPanUntilZoom_ || panUnlocked) {
-                // Panning allowed (lock disabled OR unlocked after zoom)
                 panHandler(e, map)
                 zoomGroup.attr('transform', t)
                 previousT = t
             } else {
-                // Lock active & not unlocked yet → cancel pan safely
                 snappingBack = true
                 svg.call(map.__zoomBehavior.transform, previousT)
             }
         })
-        .on('end', function (e) {
-            if (map.onZoomEnd_) map.onZoomEnd_(e, map)
-        })
+        .on('end', (e) => map.onZoomEnd_?.(e, map))
+
+    map.__lastTransform = previousT
+
+    // Compute baseline metres per pixel (k=1) from left/right edges
+    if (!map.__baseZ) {
+        const centerY = map.height_ / 2
+        const [geoLeftX] = map._projection.invert([0, centerY])
+        const [geoRightX] = map._projection.invert([map.width_, centerY])
+        map.__baseZ = (geoRightX - geoLeftX) / map.width_
+    }
 
     svg.call(map.__zoomBehavior)
 }
 
-// Pan handler function
-const panHandler = function (event, map) {
-    const transform = event.transform
+export function setMapView(map, pos) {
+    if (!map.svg_ || !map.__zoomBehavior) return
+    const svg = map.svg_
+    const zoomGroup = svg.select('#em-zoom-group-' + map.svgId_)
 
-    // Compute projected center from current transform
-    const centerX = (map.width_ / 2 - transform.x) / transform.k
-    const centerY = (map.height_ / 2 - transform.y) / transform.k
-    const [geoX, geoY] = map._projection.invert([centerX, centerY])
+    const k = map.__baseZ / pos.z
+    const [projX, projY] = map._projection([pos.x, pos.y])
+    const tx = map.width_ / 2 - projX * k
+    const ty = map.height_ / 2 - projY * k
 
-    // Update stored map position
+    const newTransform = zoomIdentity.translate(tx, ty).scale(k)
+    map.__programmaticZoom = { x: pos.x, y: pos.y, z: pos.z }
+    map.__lastTransform = newTransform
+
+    svg.call(map.__zoomBehavior.transform, newTransform)
+    zoomGroup.attr('data-zoom', k)
+
+    map.position_.x = pos.x
+    map.position_.y = pos.y
+    map.position_.z = pos.z
+}
+
+const panHandler = (event, map) => {
+    const t = event.transform
+    const cx = (map.width_ / 2 - t.x) / t.k
+    const cy = (map.height_ / 2 - t.y) / t.k
+    const [geoX, geoY] = map._projection.invert([cx, cy])
+
     map.position_.x = geoX
     map.position_.y = geoY
 
-    // Emit custom event with new position
-    window.dispatchEvent(
-        new CustomEvent('estatmap:zoomed-' + map.svgId_, {
-            detail: map,
-        })
-    )
-}
-
-// Zoom handler function
-const zoomHandler = function (event, previousT, map) {
-    const transform = event.transform
-    // Compute the projected center
-    const centerX = (map.width_ / 2 - transform.x) / transform.k
-    const centerY = (map.height_ / 2 - transform.y) / transform.k
-
-    // Use the projection to get the projected center
-    const [projectedX, projectedY] = map._projection.invert([centerX, centerY])
-
-    // set new position
-    map.position_.x = projectedX
-    map.position_.y = projectedY
-    map.position_.z = getMetresPerPixel(transform.k / previousT.k, map)
-
-    // adjust stroke dynamically according to zoom
-    scaleStrokeWidths(transform, map)
-
-    // adjust stroke dynamically according to zoom
-    if (map.labels_?.values) scaleLabelTexts(transform, map)
-
-    // adjust stroke dynamically according to zoom
-    if (map.labels_?.backgrounds) scaleLabelBackgrounds(transform, map)
-
-    //emit custom event with map object
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
+    if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
 }
 
-/**
- * @description get the current view's metres per pixel, based on a zoomFactor
- * @param {number} zoomFactor this zoom / previous zoom
- * @return {number}
- */
-const getMetresPerPixel = function (zoomFactor, map) {
-    // Get current bounding box width in meters
-    const bbox = getCurrentBbox(map)
-    const bboxWidth = bbox[2] - bbox[0] // BBOX width in meters
+const zoomHandler = (event, previousT, map) => {
+    const t = event.transform
+    const cx = (map.width_ / 2 - t.x) / t.k
+    const cy = (map.height_ / 2 - t.y) / t.k
+    const [projectedX, projectedY] = map._projection.invert([cx, cy])
 
-    // Calculate meters per pixel
-    const metersPerPixel = bboxWidth / (map.width_ * zoomFactor)
+    if (map.__programmaticZoom) {
+        const p = map.__programmaticZoom
+        map.position_.x = p.x
+        map.position_.y = p.y
+        map.position_.z = p.z
+        delete map.__programmaticZoom
+    } else {
+        map.position_.x = projectedX
+        map.position_.y = projectedY
+        map.position_.z = map.__baseZ / t.k
+    }
 
-    return metersPerPixel
+    scaleStrokeWidths(t, map)
+    if (map.labels_?.values) scaleLabelTexts(t, map)
+    if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
+
+    window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
+    if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
 }
-
 /**
  * @description adjusts text elements dynamically according to zoom
  * @param {*} transform

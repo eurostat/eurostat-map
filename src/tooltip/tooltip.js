@@ -6,16 +6,10 @@ import { select } from 'd3-selection'
  */
 export const tooltip = function (config) {
     config = config || {}
-    config.containerId = config.containerId || 'map'
-    config.div = config.div || 'em-tooltip'
-    config.maxWidth = config.maxWidth || '200px'
-    config.fontSize = config.fontSize || '14px'
-    config.background = config.background || 'white'
-    config.padding = config.padding || '0px'
-    config.border = config.border || '0px'
-    config.borderRadius = config.borderRadius || '0px'
-    config.boxShadow = config.boxShadow || '0px 0px 0px grey'
-    config.transitionDuration = config.transitionDuration || 0
+
+    config.containerId = config.containerId || config.svgId || 'map'
+    config.div = config.div || `em-tooltip-${config.containerId}`
+    config.id = config.id || config.div
     config.xOffset = config.xOffset || 30
     config.yOffset = config.yOffset || 20
 
@@ -23,8 +17,9 @@ export const tooltip = function (config) {
 
     function my() {
         tooltip = select('#' + config.div)
-        if (tooltip.empty()) tooltip = select('body').append('div').attr('id', config.div)
-
+        if (tooltip.empty()) {
+            tooltip = select('body').append('div').attr('id', config.id)
+        }
         tooltip.attr('class', 'em-tooltip')
     }
 
