@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <svg id="map2"></svg>
+        <script src="../build/eurostatmap.js"></script>
+
+        <script>
+            const mapHeight = 500
+            const mapWidth = 500
+            let syncing = false
+            const map1 = eurostatmap
+                .map('choropleth')
+                .title('Map 1')
+                .height(mapHeight)
+                .width(mapWidth)
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .zoomExtent([1, 10])
+                .onZoom(function (event, map) {
+                    if (syncing) return // avoid recursive sync
+                    syncing = true
+                    map2.position(map.position())
+                    syncing = false
+                })
+                .onRegionMouseOver(function (event, feature, element, map) {
+                    map2.highlightRegion(feature.properties.id)
+                })
+                .onRegionMouseOut(function (event, feature, element, map) {
+                    map2.clearHighlight()
+                })
+                .build()
+
+            const map2 = eurostatmap
+                .map('choropleth')
+                .title('Map 2')
+                .svgId('map2')
+                .height(mapHeight)
+                .width(mapWidth)
+                // .minimap({
+                //     x: 400,
+                //     size: 90,
+                //     width: 150,
+                //     height: 150,
+                //     zoomExtent: [1, 10],
+                // })
+                .onZoomEnd(function (event, map) {
+                    console.log(map2.position())
+                })
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>

@@ -63,7 +63,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     // pan & zoom
     out.zoomExtent_ = undefined
     out.lockPanUntilZoom_ = true // if true, user can pan only after zooming once
-    out.maxBounds_ = { xMin: -Infinity, yMin: -Infinity, xMax: Infinity, yMax: Infinity }
 
     //events
     out.onZoomEnd_ = undefined // user function to call when zoom ends
