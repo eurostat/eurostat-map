@@ -11,6 +11,7 @@
 .em-label-background {
     fill: #ffffff;
     pointer-events: none;
+    opacity: 0.9;
 }
 .em-label-shadow {
     font-size: 12px;
@@ -74,9 +75,10 @@
     font-size: 13px;
     fill: #333333;
     font-weight: bold;
+    opacity: 0.9;
 }
 .em-flow-label-shadow {
     font-size: 13px;
-    stroke-width: 4px;
+    stroke-width: 3px;
     stroke: white;
 }

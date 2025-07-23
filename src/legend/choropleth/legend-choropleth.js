@@ -26,7 +26,7 @@ export const legend = function (map, config) {
     //the number of decimal for the legend labels
     out.decimals = 0
     //the distance between the legend box elements to the corresponding text label
-    out.labelOffset = { x: 3, y: 0 }
+    out.labelOffsets = { x: 3, y: 0 }
 
     // manually define labels
     out.labels = null

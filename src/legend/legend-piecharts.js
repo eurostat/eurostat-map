@@ -3,6 +3,7 @@ import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
+import { drawCircleLegend } from './legend-circle-size'
 
 /**
  * A legend for proportional symbol map
@@ -16,7 +17,7 @@ export const legend = function (map, config) {
     //size legend config (legend illustrating the values of different pie sizes)
     out.sizeLegend = {
         title: null,
-        titlePadding: 30, //padding between title and body
+        titlePadding: 10, //padding between title and body
         values: null,
     }
 
@@ -25,7 +26,7 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 10, //padding between title and body
         marginTop: 33, // margin top (distance between color and size legend)
-        labelOffset: 5, //the distance between the legend box elements to the corresponding text label
+        labelOffsets: { x: 5, y: 5 }, //the distance between the legend box elements to the corresponding text label
         shapeWidth: 25, //the width of the legend box elements
         shapeHeight: 20, //the height of the legend box elements
         shapePadding: 1, //the distance between consecutive legend box elements
@@ -73,8 +74,13 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         // legend for sizes
-        if (map.sizeClassifier_) {
-            drawSizeLegend(out, baseX, baseY)
+        if (map.classifierSize_) {
+            //circle size legend
+            out._sizeLegendContainer = lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
+            const x = 0
+            const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
+            const y = baseY + out.sizeLegend.title ? sizeLegendTitleFontSize + out.sizeLegend.titlePadding : 0
+            drawCircleLegend(out, x, y, out._sizeLegendContainer, out.sizeLegend.values, map.classifierSize_)
         }
 
         // legend for ps color values
@@ -82,87 +88,6 @@ export const legend = function (map, config) {
 
         //set legend box dimensions
         out.setBoxDimension()
-    }
-
-    /**
-     * Builds a legend which illustrates the statistical values of different pie chart sizes
-     *
-     * @param {*} m map
-     * @param {*} lgg parent legend object from core/legend.js
-     * @param {*} config size legend config object (sizeLegend object specified as property of legend() config object)
-     */
-    function drawSizeLegend(out, baseX, baseY) {
-        const map = out.map
-        const config = out.sizeLegend
-        out._sizeLegendContainer = out.lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
-
-        const domain = map.sizeClassifier_.domain()
-
-        // Assign default circle radii if none specified by user
-        if (!config.values) {
-            config.values = [Math.floor(domain[1]), Math.floor(domain[0])]
-        }
-
-        // Calculate the maximum circle size to be displayed in the legend
-        let maxSize = map.sizeClassifier_(max(config.values))
-
-        // Add the title to the container if available
-        if (!config.title && out.title) config.title = out.title // Allow root legend title
-        let titleHeight = 0 // This will be adjusted based on whether the title exists
-        if (config.title) {
-            out._sizeLegendContainer
-                .append('text')
-                .attr('class', 'em-size-legend-title')
-                .attr('x', 0) // Position the title at the left edge
-                .attr('y', out.titleFontSize) // Title at top, within padding
-                .text(config.title)
-
-            // Adjust title height (using the title font size as a proxy)
-            titleHeight = out.titleFontSize + config.titlePadding
-        }
-
-        // Now position the circles **below** the title
-        const y = titleHeight + out.sizeLegend.titlePadding + maxSize * 2 // Position circles after title height
-
-        // Append the legend circles
-        const legendItems = out._sizeLegendContainer
-            .selectAll('g')
-            .data(config.values)
-            .join('g')
-            .attr('class', 'em-pie-size-legend-item')
-            .attr('transform', `translate(${maxSize + out.boxPadding}, ${y})`) // Dynamically move the circles down
-
-        // Append circles to each group
-        legendItems
-            .append('circle')
-            .attr('class', 'em-pie-size-legend-circle')
-            .style('fill', 'none')
-            .attr('stroke', 'black')
-            .attr('cy', (d) => -map.sizeClassifier_(d)) // Position circles based on their size
-            .attr('r', map.sizeClassifier_) // Radius is calculated from size classifier
-
-        // Append labels to each group
-        legendItems
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('y', (d) => -2 * map.sizeClassifier_(d) - out.labelFontSize - 2) // Position labels relative to circles
-            .attr('x', 30) // Set the x-position for the labels
-            .attr('dy', '1.2em')
-            .attr('xml:space', 'preserve')
-            .text((d) => d.toLocaleString('en').replace(/,/gi, ' ')) // Format the label text
-
-        // Add lines pointing to the top of the corresponding circle
-        legendItems
-            .append('line')
-            .attr('class', 'em-pie-size-legend-line')
-            .attr('x1', 2)
-            .attr('x2', 30)
-            .attr('y1', (d) => -2 * map.sizeClassifier_(d)) // Position lines relative to circles
-            .attr('y2', (d) => -2 * map.sizeClassifier_(d)) // Same position for the y2 to make a horizontal line
-
-        // Save the height value for positioning the color legend (if needed)
-        out._sizeLegendHeight = y
-        return out
     }
 
     /**
@@ -231,7 +156,7 @@ export const legend = function (map, config) {
             out._colorLegendContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', config.shapeWidth + config.labelOffset)
+                .attr('x', config.shapeWidth + config.labelOffsets.x)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dy', '0.35em') // ~vertical centering
                 .text(map.catLabels()[code] || code)
@@ -241,8 +166,12 @@ export const legend = function (map, config) {
 
         //'no data' legend box
         if (config.noData) {
+            let sizeLegendHeight = 0
+            if (out._sizeLegendContainer) {
+                sizeLegendHeight = out._sizeLegendContainer.node().getBBox().height
+            }
             const y =
-                out._sizeLegendHeight +
+                sizeLegendHeight +
                 out.colorLegend.marginTop +
                 out.boxPadding +
                 (config.title ? out.titleFontSize + out.boxPadding : 0) +

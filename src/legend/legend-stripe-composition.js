@@ -72,7 +72,7 @@ export const legend = function (map, config) {
             //label
             lgg.append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
+                .attr('x', out.boxPadding + out.shapeWidth + out.labelOffsets.x)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .text(m.catLabels()[code] || code)
                 .on('mouseover', function () {
@@ -121,7 +121,7 @@ export const legend = function (map, config) {
             //'no data' label
             lgg.append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + out.shapeWidth + out.labelOffset)
+                .attr('x', out.boxPadding + out.shapeWidth + out.labelOffsets.x)
                 .attr('y', y + out.shapeHeight * 0.5)
                 .text(out.noDataText)
                 .on('mouseover', function () {

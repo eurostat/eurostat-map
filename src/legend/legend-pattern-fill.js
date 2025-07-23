@@ -46,7 +46,7 @@ export function appendPatternFillLegend(out, container) {
         // Add label
         item.append('text')
             .attr('class', 'em-legend-label')
-            .attr('x', out.shapeWidth + out.labelOffset)
+            .attr('x', out.shapeWidth + out.labelOffsets.x)
             .attr('y', y + out.shapeHeight / 2)
             .attr('dominant-baseline', 'middle')
             .attr('dy', '0.35em') // ~vertical centering

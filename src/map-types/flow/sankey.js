@@ -70,7 +70,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     }
 
     // Add labels to nodes
-    if (out.labels_) addLabels(sankeyContainer, nodes)
+    if (out.labels_) addLabels(out, sankeyContainer, nodes)
 
     return svg.node()
 }
@@ -160,7 +160,7 @@ function addArrowMarker(out, defs, id, color) {
         .attr('id', id)
         .attr('markerHeight', 7)
         .attr('markerWidth', 7)
-        .attr('refX', 1)
+        .attr('refX', 0.5)
         .attr('refY', 1.5)
         .attr('orient', 'auto')
         .append('path')
@@ -172,7 +172,7 @@ function addArrowMarker(out, defs, id, color) {
         .attr('id', id + 'mouseover')
         .attr('markerHeight', 7)
         .attr('markerWidth', 7)
-        .attr('refX', 1)
+        .attr('refX', 0.5)
         .attr('refY', 1.5)
         .attr('orient', 'auto')
         .append('path')
@@ -225,13 +225,11 @@ function sankey(out, { nodes, links }) {
  */
 function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradientIds) {
     const flowsGroup = container.append('g').attr('class', 'em-flows-group')
-    const outlines = flowsGroup.append('g').attr('class', 'em-flow-outlines')
-    const flows = flowsGroup.append('g').attr('class', 'em-flow-flows')
 
     links.forEach((link, i) => {
         // Outline path
         if (out.flowOutlines_) {
-            outlines
+            flowsGroup
                 .append('path')
                 .attr('d', sankeyLinkHorizontal()(link))
                 .attr('fill', 'none')
@@ -242,7 +240,7 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
         }
 
         // Main path
-        flows
+        flowsGroup
             .append('path')
             .attr('d', sankeyLinkHorizontal()(link))
             .attr('fill', 'none')
@@ -441,7 +439,7 @@ const sankeyLinkHorizontal = function () {
  * Add labels for data points.
  * @param {Object} svg - D3 selection of the SVG element.
  */
-function addLabels(svg, nodes) {
+function addLabels(out, svg, nodes) {
     // Filter the nodes
     const filteredNodes = nodes.filter((node) => node.targetLinks && node.sourceLinks.length === 0)
     const container = svg.append('g').attr('class', 'em-flow-labels')
@@ -454,8 +452,8 @@ function addLabels(svg, nodes) {
             .data(filteredNodes)
             .join('text')
             .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
-            .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.labelOffsetX : d.x - out.labelOffsetX))
-            .attr('y', (d) => d.y + out.labelOffsetY)
+            .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.flowLabelOffsets_.x : d.x - out.flowLabelOffsets_.x))
+            .attr('y', (d) => d.y + out.flowLabelOffsets_.y)
             .text((d) => out.labelFormatter(d.value))
     }
 
@@ -474,8 +472,8 @@ function addLabels(svg, nodes) {
         .append('text')
         .attr('class', 'em-label-text')
         .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
-        .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.labelOffsetX : -out.labelOffsetX))
-        .attr('y', out.labelOffsetY)
+        .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.flowLabelOffsets_.x : -out.flowLabelOffsets_.x))
+        .attr('y', out.flowLabelOffsets_.y)
         .text((d) => out.labelFormatter(d.value))
 
     // Add background rectangles after text is rendered

@@ -261,7 +261,7 @@ In addition to [the default legend parameters](#map-legend), choropleth maps hav
 | **sepLineLength**            | Number                   | _17_                              | The separation line length.                                                                                                                                                               |
 | **decimals**                 | String                   | _0_                               | The number of decimal places for the legend labels.                                                                                                                                       |
 | **labelType**                | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                                                                                                                                |
-| **labelOffset**              | Object                   | _3_                               | The distance between the legend box elements to the corresponding text label.                                                                                                             |
+| **labelOffsets**             | Object                   | _{x:3,y:0}_                       | The distance between the legend box elements to the corresponding text label.                                                                                                             |
 | **labelFormatter**           | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                                                                                                                |
 | **labels**                   | String[]                 | _null_                            | Manually define the labels to be used in the legend as an array.                                                                                                                          |
 | **noData**                   | Boolean                  | _true_                            | Show 'no data' style.                                                                                                                                                                     |
@@ -383,9 +383,9 @@ The following parameters are properties of the sizeLegend object:
 | **values**         | Number   | _undefined_                       | Manually set the raw data values to be used in the legend                                     |
 | **cellNb**         | Number   | _4_                               | Number of symbols to be shown in the legend (when values are not set manually)                |
 | **shapePadding**   | Number   | _10_                              | The padding between consecutive legend shape elements                                         |
-| **shapeOffset**    | Object   | _{x:0, y:0}_                      | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
+| **shapeOffsets**   | Object   | _{x:0, y:0}_                      | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
 | **shapeFill**      | String   | _white_                           | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
-| **labelOffset**    | Number   | _25_                              | The distance between the legend box elements to the corresponding text label.                 |
+| **labelOffsets**   | Object   | _{x:25, y:0}_                     | The distance between the legend box elements to the corresponding text label.                 |
 | **decimals**       | Number   | _0_                               | The number of decimals for each label.                                                        |
 | **labelFormatter** | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                    |
 | **noData**         | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
@@ -404,7 +404,7 @@ The following parameters are properties of the colorLegend object:
 | **shapeHeight**        | Number   | _13_                              | The height of the legend box elements                                         |
 | **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
 | **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
-| **labelOffset**        | Number   | _25_                              | The distance between the legend box elements to the corresponding text label. |
+| **labelOffsets**       | Object   | _{x:3,y:0}_                       | The distance between the legend box elements to the corresponding text label. |
 | **decimals**           | Number   | _0_                               | The number of decimals for each label.                                        |
 | **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
 | **labels**             | Array    | _undefined_                       | Specify your own legend labels as an array of strings.                        |
@@ -524,7 +524,7 @@ The following parameters are properties of the **colorLegend** object:
 | **shapeWidth**([*value*])   | number  | _13_          | Width of the legend box elements.                                         |
 | **shapeHeight**([*value*])  | number  | _15_          | Height of the legend box elements.                                        |
 | **shapePadding**([*value*]) | number  | _5_           | Distance between consecutive legend box elements.                         |
-| **labelOffset**([*value*])  | number  | _5_           | Distance between the legend box elements to the corresponding text label. |
+| **labelOffsets**            | Object  | _{x:3,y:0}_   | Distance between the legend box elements to the corresponding text label. |
 | **noData**([*value*])       | boolean | _true_        | Show/hide 'no data' legend box element.                                   |
 | **noDataText**([*value*])   | string  | _"No data"_   | 'No data' label text.                                                     |
 
@@ -566,7 +566,7 @@ In addition to [the default legend parameters](#map-legend), categorical maps ha
 | **shapeHeight**   | int     | _13_          | The cell height.                                                                                                                                      |
 | **shapePadding**  | number  | _5_           | The distance between consecutive legend elements                                                                                                      |
 | **labelFontSize** | int     | _13_          | The label font size.                                                                                                                                  |
-| **labelOffset**   | int     | _5_           | The distance between the legend box elements to the corresponding text label.                                                                         |
+| **labelOffsets**  | Object  | _{x:3,y:0}_   | The distance between the legend box elements to the corresponding text label.                                                                         |
 | **noData**        | boolean | _true_        | Show 'no data' style.                                                                                                                                 |
 | **noDataText**    | Text    | _"No data"_   | 'No data' text label.                                                                                                                                 |
 | **order**         | array   | _"undefined"_ | The order in which the legend classes should be drawn. E.g. ['urb','int','rur']. If left undefined, eurostatmap will order the classes automatically. |

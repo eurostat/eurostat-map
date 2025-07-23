@@ -44,7 +44,7 @@ export const map = function (config) {
     //Otherwise, consider the regions as being with no data at all.
     out.showOnlyWhenComplete_ = false
 
-    out.sizeClassifier_ = null //d3 scale for scaling pie sizes
+    out.classifierSize_ = null //d3 scale for scaling pie sizes
     out.statPie_ = null
 
     /**
@@ -186,7 +186,7 @@ export const map = function (config) {
         //define size scaling function
         let domain = getDatasetMaxMin()
         if (!isNaN(domain[0])) {
-            out.sizeClassifier_ = scaleSqrt().domain(domain).range([out.pieMinRadius_, out.pieMaxRadius_])
+            out.classifierSize_ = scaleSqrt().domain(domain).range([out.pieMinRadius_, out.pieMaxRadius_])
         }
 
         return out
@@ -255,7 +255,7 @@ export const map = function (config) {
 
             runDorlingSimulation(out, (d) => {
                 const total = getRegionTotal(d.properties.id) || 0
-                return out.sizeClassifier_(total) || 0
+                return out.classifierSize_(total) || 0
             })
         } else {
             stopDorlingSimulation(out)
@@ -395,7 +395,7 @@ export const map = function (config) {
             let nodes = out.svg().selectAll('#pie_' + regionId)
 
             // define radius
-            const r = out.sizeClassifier_(getRegionTotal(regionId))
+            const r = out.classifierSize_(getRegionTotal(regionId))
             const ir = out.pieChartInnerRadius_
 
             //make pie chart. See https://observablehq.com/@d3/pie-chart

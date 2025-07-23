@@ -19,8 +19,6 @@ export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config, true, 'flow')
     out.strokeWidthScale = scaleLinear()
-    out.labelOffsetX = 15
-    out.labelOffsetY = 5
     out.labelFormatter = (d) => format('.2s')(d)
     out.tooltip_.textFunction = flowMapTooltipFunction
 
@@ -38,6 +36,7 @@ export const map = function (config) {
     out.flowOutlines_ = true
     out.flowGradient_ = true
     out.flowStack_ = false // Default to no stacking
+    out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
 
     /**
      * flowmap-specific setters/getters
@@ -53,6 +52,7 @@ export const map = function (config) {
         'flowGradient_',
         'flowStack_',
         'flowDonuts_',
+        'flowLabelOffsets_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]

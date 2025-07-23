@@ -82,7 +82,7 @@ function getColorClassifier(out) {
 function getTitlePadding(out) {
     // Calculate the padding between the title and the first legend item
     const map = out.map
-    return map._mapType == 'ps' ? out.titleFontSize : 0
+    return map._mapType == 'ps' ? out.sizeLegend.titlePadding : 0
 }
 
 function createThresholdsLegend(out, config) {
@@ -146,7 +146,7 @@ function createThresholdsLegend(out, config) {
             const label = container
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffset.x || 0))
+                .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
                 .attr('y', y + config.shapeHeight)
                 //.attr('dominant-baseline', 'middle')
                 .attr('dy', '0.35em') // ~vertical centering
@@ -234,7 +234,7 @@ function createRangesLegend(out, config) {
         itemContainer
             .append('text')
             .attr('class', 'em-legend-label')
-            .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffset.x || 0))
+            .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
             .attr('y', y + config.shapeHeight / 2)
             .attr('dy', '0.35em')
             .text(config.labels ? config.labels[i] : labelFormatter(map.classifier().invertExtent(ecl)[out.ascending ? 0 : 1], i))
@@ -261,7 +261,7 @@ function drawDivergingLine(out, y, config) {
         .selectAll('.em-legend-label')
         .nodes()
         .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
-    const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffset?.x + maxLabelLength + out.labelOffset?.x + 15 // rect > offset > label > offset > padding > vertical line
+    const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffsets?.x + maxLabelLength + out.labelOffsets?.x + 15 // rect > offset > label > offset > padding > vertical line
 
     // Draw the horizontal divergence line
     container

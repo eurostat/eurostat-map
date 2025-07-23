@@ -22,10 +22,10 @@ export const legend = function (map, config) {
         values: undefined, //manually define raw data values
         cellNb: 3, //number of elements in the legend
         shapePadding: 5, //the y distance between consecutive legend shape elements
-        shapeOffset: { x: 0, y: 0 },
+        shapeOffsets: { x: 0, y: 0 },
         shapeFill: 'white',
         shapeStroke: null,
-        labelOffset: { x: 10, y: 0 }, //the distance between the legend box elements to the corresponding text label
+        labelOffsets: { x: 10, y: 0 }, //the distance between the legend box elements to the corresponding text label
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,
         noData: false, // show no data legend item
@@ -43,7 +43,7 @@ export const legend = function (map, config) {
         shapeWidth: 25, //the width of the legend box elements
         shapeHeight: 20, //the height of the legend box elements
         shapePadding: 1, //the distance between consecutive legend shape elements in the color legend
-        labelOffset: { x: 5, y: 0 }, //distance (x) between label text and its corresponding shape element
+        labelOffsets: { x: 5, y: 0 }, //distance (x) between label text and its corresponding shape element
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined, // user-defined d3 format function
         labelType: 'thresholds', // type of labels to show: thresholds or ranges

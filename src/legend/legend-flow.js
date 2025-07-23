@@ -59,7 +59,7 @@ export const legend = function (map, config) {
         if (out.subtitle) out.addSubtitle()
 
         // draw legend elements
-        buildFlowLegend()
+        buildFlowLegend(out)
 
         //set legend box dimensions
         out.setBoxDimension()
@@ -68,18 +68,17 @@ export const legend = function (map, config) {
     /**
      * Builds a legend which illustrates the statistical values of different flow symbol sizes
      *
-     * @param {*} map map instance
-     * @param {*} container parent legend object from core/legend.js
      */
-    function buildFlowLegend(m) {
+    function buildFlowLegend(out) {
+        const map = out.map
         const x = 10
         const y = 10
 
-        buildFlowWidthLegend(m, x, y)
+        buildFlowWidthLegend(out, x, y)
 
-        if (m.flowDonuts_) {
+        if (map.flowDonuts_) {
             const offset = 20
-            buildCircleSizeLegend(m, x, y + offset)
+            buildCircleSizeLegend(out, x, y + offset)
         }
     }
 
@@ -89,6 +88,7 @@ export const legend = function (map, config) {
         container.append('text').attr('x', x).attr('y', y).text(out.title).attr('class', 'em-legend-label').attr('id', 'line-width-legend-title')
     }
 
+    //TODO: reuse prop symbol size legend
     function buildCircleSizeLegend(m, x, y) {
         const container = out.lgg.append('g').attr('id', 'em-flow-circle-size-legend').attr('class', 'em-flow-circle-size-legend')
     }

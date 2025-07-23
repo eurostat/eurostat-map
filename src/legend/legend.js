@@ -43,7 +43,7 @@ export const legend = function (map) {
     // we now use CSS instead of inline styles
     out.labelFontSize = getFontSizeFromClass('em-legend-label')
     //the distance between the legend box elements to the corresponding text label
-    out.labelOffset = 5
+    out.labelOffsets = { x: 5, y: 5 }
     //labelFormatter function
     out.labelFormatter = null
     //set legend labels locale

@@ -50,6 +50,14 @@
                 .flowColor('#72bb6f')
                 .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
                 .flowArrows(false)
+                .flowOutlines(false)
+                .flowDonuts(false)
+                .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+                .labels({
+                    values: true,
+                    backgrounds: true,
+                    shadows: true,
+                })
                 .nutsLevel(0)
                 .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, histogram: false })
                 .drawCoastalMargin(false)

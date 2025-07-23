@@ -25,7 +25,7 @@ export const map = function (config) {
     out.catLabels_ = undefined
     out.showOnlyWhenComplete_ = false
 
-    out.sizeClassifier_ = null
+    out.classifierSize_ = null
     ;[
         'catColors_',
         'catLabels_',
@@ -202,7 +202,7 @@ export const map = function (config) {
         }
         const domain = getDatasetMaxMin()
         if (!isNaN(domain[0])) {
-            out.sizeClassifier_ = scaleRadial().domain(domain).range([out.coxcombMinRadius_, out.coxcombMaxRadius_])
+            out.classifierSize_ = scaleRadial().domain(domain).range([out.coxcombMinRadius_, out.coxcombMaxRadius_])
         }
         return out
     }
@@ -387,8 +387,8 @@ export const map = function (config) {
             // Max total for scaling
             const maxTotal = Math.max(...monthData.map((d) => keys.reduce((sum, k) => sum + (d[k] || 0), 0)))
 
-            const rScale = out.sizeClassifier_
-                ? (v) => out.sizeClassifier_(v)
+            const rScale = out.classifierSize_
+                ? (v) => out.classifierSize_(v)
                 : scaleSqrt()
                       .domain([0, maxTotal])
                       .range([out.coxcombMinRadius_ || 0, out.coxcombMaxRadius_])

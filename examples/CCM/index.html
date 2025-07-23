@@ -12565,9 +12565,9 @@
                                     e.selectAll('*').remove(),
                                         n.makeBackgroundBox(),
                                         e.style('font-family', t.fontFamily_),
-                                        t.sizeClassifier_ &&
+                                        t.classifierSize_ &&
                                             (function (t, e, r) {
-                                                var i = t.sizeClassifier_.domain()
+                                                var i = t.classifierSize_.domain()
                                                 r.values || (r.values = [Math.floor(i[1]), Math.floor(i[0])]),
                                                     !r.title && n.title && (r.title = n.title),
                                                     r.title &&
@@ -12580,7 +12580,7 @@
                                                             .style('font-weight', n.titleFontWeight)
                                                             .style('font-family', t.fontFamily_)
                                                             .style('fill', n.fontFill)
-                                                var a = t.sizeClassifier_(St(r.values)),
+                                                var a = t.classifierSize_(St(r.values)),
                                                     o = n.boxPadding + (r.title ? n.titleFontSize + n.boxPadding + r.titlePadding : 0) + 2 * a,
                                                     s = e
                                                         .append('g')
@@ -12595,14 +12595,14 @@
                                                     .attr('fill', 'none')
                                                     .attr('stroke', 'black')
                                                     .attr('cy', function (e) {
-                                                        return -t.sizeClassifier_(e)
+                                                        return -t.classifierSize_(e)
                                                     })
-                                                    .attr('r', t.sizeClassifier_),
+                                                    .attr('r', t.classifierSize_),
                                                     s
                                                         .append('text')
                                                         .style('font-size', n.labelFontSize + 'px')
                                                         .attr('y', function (e, r) {
-                                                            return -1 - 2 * t.sizeClassifier_(e) - n.labelFontSize
+                                                            return -1 - 2 * t.classifierSize_(e) - n.labelFontSize
                                                         })
                                                         .attr('x', 30)
                                                         .attr('dy', '1.2em')
@@ -12616,12 +12616,12 @@
                                                         .style('stroke', 'grey')
                                                         .attr('x1', 2)
                                                         .attr('y1', function (e, n) {
-                                                            return -1 - 2 * t.sizeClassifier_(e)
+                                                            return -1 - 2 * t.classifierSize_(e)
                                                         })
                                                         .attr('xml:space', 'preserve')
                                                         .attr('x2', 30)
                                                         .attr('y2', function (e, n) {
-                                                            return -1 - 2 * t.sizeClassifier_(e)
+                                                            return -1 - 2 * t.classifierSize_(e)
                                                         }),
                                                     (n._sizeLegendHeight = o)
                                             })(t, e, n.sizeLegend),
@@ -13900,7 +13900,7 @@
                                                     (e.pieOtherColor_ = '#FFCC80'),
                                                     (e.pieOtherText_ = 'Other'),
                                                     (e.showOnlyWhenComplete_ = !1),
-                                                    (e.sizeClassifier_ = null),
+                                                    (e.classifierSize_ = null),
                                                     (e.statPie_ = null),
                                                     [
                                                         'catColors_',
@@ -13991,7 +13991,7 @@
                                                                 }),
                                                             Fs(i))
                                                     return (
-                                                        isNaN(a[0]) || (e.sizeClassifier_ = $s().domain(a).range([e.pieMinRadius_, e.pieMaxRadius_])),
+                                                        isNaN(a[0]) || (e.classifierSize_ = $s().domain(a).range([e.pieMinRadius_, e.pieMaxRadius_])),
                                                         e
                                                     )
                                                 }
@@ -14048,7 +14048,7 @@
                                                                     for (var i in r) n.push({ code: i, value: r[i] })
                                                                     if (n && 0 != n.length) {
                                                                         var s = e.svg().selectAll('#pie_' + t),
-                                                                            l = e.sizeClassifier_(o(t)),
+                                                                            l = e.classifierSize_(o(t)),
                                                                             u = e.pieChartInnerRadius_,
                                                                             c = Fl()
                                                                                 .sort(null)

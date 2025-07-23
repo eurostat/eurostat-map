@@ -23,7 +23,7 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 10,
         marginTop: 33,
-        labelOffset: 5,
+        labelOffsets: { x: 5, y: 5 },
         shapeWidth: 25,
         shapeHeight: 20,
         shapePadding: 1,
@@ -66,7 +66,7 @@ export const legend = function (map, config) {
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
 
-        if (map.sizeClassifier_) {
+        if (map.classifierSize_) {
             drawSizeLegend(out, baseX, baseY)
         }
 
@@ -82,13 +82,13 @@ export const legend = function (map, config) {
         const config = out.sizeLegend
         out._sizeLegendContainer = out.lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
-        const domain = map.sizeClassifier_.domain()
+        const domain = map.classifierSize_.domain()
 
         if (!config.values) {
             config.values = [Math.floor(domain[1]), Math.floor(domain[0])]
         }
 
-        const maxSize = map.sizeClassifier_(max(config.values))
+        const maxSize = map.classifierSize_(max(config.values))
 
         if (!config.title && out.title) config.title = out.title
         let titleHeight = 0
@@ -111,13 +111,13 @@ export const legend = function (map, config) {
             .attr('class', 'em-coxcomb-size-legend-circle')
             .style('fill', 'none')
             .attr('stroke', 'black')
-            .attr('cy', (d) => -map.sizeClassifier_(d))
-            .attr('r', map.sizeClassifier_)
+            .attr('cy', (d) => -map.classifierSize_(d))
+            .attr('r', map.classifierSize_)
 
         legendItems
             .append('text')
             .attr('class', 'em-legend-label')
-            .attr('y', (d) => -2 * map.sizeClassifier_(d) - out.labelFontSize - 2)
+            .attr('y', (d) => -2 * map.classifierSize_(d) - out.labelFontSize - 2)
             .attr('x', 30)
             .attr('dy', '1.2em')
             .attr('xml:space', 'preserve')
@@ -128,8 +128,8 @@ export const legend = function (map, config) {
             .attr('class', 'em-coxcomb-size-legend-line')
             .attr('x1', 2)
             .attr('x2', 30)
-            .attr('y1', (d) => -2 * map.sizeClassifier_(d))
-            .attr('y2', (d) => -2 * map.sizeClassifier_(d))
+            .attr('y1', (d) => -2 * map.classifierSize_(d))
+            .attr('y2', (d) => -2 * map.classifierSize_(d))
 
         out._sizeLegendHeight = y
         return out
@@ -188,7 +188,7 @@ export const legend = function (map, config) {
             out._colorLegendContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', config.shapeWidth + config.labelOffset)
+                .attr('x', config.shapeWidth + config.labelOffsets.x)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dy', '0.35em')
                 .text(map.catLabels()[code] || code)
