@@ -130,3 +130,17 @@
     font-size: 11px;
     white-space: nowrap;
 }
+
+/* Make the Total value bold and right-aligned */
+.em-tooltip-cx-table .em-total td[colspan] {
+    text-align: right;
+    font-weight: bold !important;
+}
+
+/* Also make the inner number span bold */
+.em-tooltip-cx-table .em-total td[colspan] .em-breakdown-value {
+    font-weight: bold !important;
+}
+.em-total {
+    font-weight: bold !important;
+}

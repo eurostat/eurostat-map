@@ -26,7 +26,7 @@
                     title: 'Causes of death',
                     subtitle: '2022',
                     nutsLevel: 0,
-                    sizeLegend: { title: 'Total deaths', titlePadding: 10, values: [55000, 2000] },
+                    sizeLegend: { title: 'Total deaths', titlePadding: 10 },
                     colorLegend: { title: 'Cause', marginTop: 50 },
                     data: [
                         {
@@ -59,7 +59,7 @@
                     title: 'Tourism',
                     subtitle: 'Nights spent in tourist accommodation',
                     nutsLevel: 0,
-                    sizeLegend: { title: 'Total nights spent', titlePadding: 10, values: [40000000, 1000000] },
+                    sizeLegend: { title: 'Total nights spent', titlePadding: 10 },
                     colorLegend: { title: 'Country of residence', marginTop: 50 },
                     data: [
                         {
@@ -100,8 +100,8 @@
                     .scale('60M')
                     .nutsLevel(config.nutsLevel)
                     .statCoxcomb(...config.data)
-                    .coxcombMinRadius(5)
-                    .coxcombMaxRadius(40)
+                    .coxcombMinRadius(15)
+                    .coxcombMaxRadius(50)
                     .coxcombStrokeFill('white')
                     .coxcombStrokeWidth(0.1)
                     .legend({

@@ -1,10 +1,10 @@
 import { scaleSqrt, scaleBand, scaleRadial } from 'd3-scale'
 import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
-import { extent } from 'd3-array'
+import { extent, max } from 'd3-array'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
-import { executeForAllInsets, getRegionsSelector } from '../core/utils'
+import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import * as CoxcombLegend from '../legend/legend-coxcomb'
 
 /**
@@ -15,8 +15,8 @@ import * as CoxcombLegend from '../legend/legend-coxcomb'
 export const map = function (config) {
     const out = StatMap.statMap(config, true, 'coxcomb')
 
-    out.coxcombMinRadius_ = 5
-    out.coxcombMaxRadius_ = 15
+    out.coxcombMinRadius_ = 10
+    out.coxcombMaxRadius_ = 80
     out.coxcombInnerRadius_ = 0
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
@@ -62,39 +62,6 @@ export const map = function (config) {
     out.statCodes_ = undefined
     out.totalCode_ = undefined
 
-    // Allow manual Coxcomb data injection
-    out.coxcombData_ = undefined
-    out.coxcombData = function (dataObject) {
-        // Infer months and categories from first region
-        const months = Object.keys(dataObject[Object.keys(dataObject)[0]])
-        out._coxcombMonths = months
-
-        // Store causes (stack keys)
-        const firstRegion = dataObject[Object.keys(dataObject)[0]]
-        const firstMonthData = firstRegion[months[0]]
-        out._coxcombCauses = Object.keys(firstMonthData)
-
-        // Load each month × cause into statData
-        months.forEach((month) => {
-            out._coxcombCauses.forEach((cause) => {
-                const statData = StatisticalData.statData()
-                const perRegionValues = {}
-
-                for (const regionId in dataObject) {
-                    const regionValues = dataObject[regionId]
-                    const monthData = regionValues[month] || {}
-                    perRegionValues[regionId] = monthData[cause] || 0
-                }
-
-                const key = `${month}:${cause}`
-                statData.setData(perRegionValues)
-                out.stat(key, statData)
-            })
-        })
-
-        return out
-    }
-
     // Helper for Eurostat datasets (like statSpark or statPie)
     out.statCoxcomb = function (stat, months, dimension, causes, labels, colors, totalCode) {
         out._coxcombMonths = months
@@ -129,65 +96,17 @@ export const map = function (config) {
             })
         })
 
-        // Optional: add an "Other" slice by using the total code
+        // Just register the total stat like in pies. (data will be available at render time)
         if (totalCode) {
             out.totalCode_ = totalCode
+            stat.filters[dimension] = totalCode
+            const sc_ = {}
+            for (let key in stat) sc_[key] = stat[key]
+            sc_.filters = { ...stat.filters }
+            out.stat(totalCode, sc_)
 
-            months.forEach((month) => {
-                // Fetch the total stat for this month
-                stat.filters.time = month
-                stat.filters[dimension] = totalCode
-
-                const sc_ = {}
-                for (let key in stat) sc_[key] = stat[key]
-                sc_.filters = {}
-                for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
-
-                const totalKey = `${month}:total`
-                out.stat(totalKey, sc_)
-            })
-
-            // Now derive "other" by subtracting specified causes from the total
-            months.forEach((month) => {
-                const totalData = out.statData(`${month}:total`)
-                if (!totalData || typeof totalData.data !== 'function') return
-
-                const perRegionValues = {}
-                const totalValues = totalData.data()
-
-                for (const regionId in totalValues) {
-                    const totalVal = totalValues[regionId]?.value || 0
-                    const sumCauses = causes.reduce((sum, c) => {
-                        const s = out.statData(`${month}:${c}`)?.get(regionId)
-                        return sum + (s?.value || 0)
-                    }, 0)
-
-                    const diff = totalVal - sumCauses
-                    perRegionValues[regionId] = diff > 0 ? diff : 0
-                }
-
-                const statData = StatisticalData.statData()
-                statData.setData(perRegionValues)
-
-                // Copy unit text from the total series so the tooltip can display properly
-                if (typeof totalData.unitText === 'function') {
-                    statData.unitText(totalData.unitText())
-                }
-
-                const key = `${month}:other`
-                out.stat(key, statData)
-
-                // Ensure it's part of statCodes so classification and tooltips can access it
-                out.statCodes_ = out.statCodes_ || []
-                out.statCodes_.push(key)
-            })
-
-            // Register "Other" category and push it for stacking
-            out.catColors_ = out.catColors_ || {}
-            out.catLabels_ = out.catLabels_ || {}
             out.catColors_['other'] = '#FFCC80'
             out.catLabels_['other'] = 'Other'
-            out._coxcombCauses.push('other')
         }
         return out
     }
@@ -209,7 +128,7 @@ export const map = function (config) {
         }
         const domain = getDatasetMaxMin()
         if (!isNaN(domain[0])) {
-            out.classifierSize_ = scaleRadial().domain(domain).range([out.coxcombMinRadius_, out.coxcombMaxRadius_])
+            out.classifierSize_ = scaleRadial().domain(domain).range([0, out.coxcombMaxRadius_])
         }
         return out
     }
@@ -289,6 +208,11 @@ export const map = function (config) {
                 sel.style('fill', out.hoverColor_)
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
+                .on('mousemove', function (e, rg) {
+                    if (shouldOmit(rg.properties.id)) return
+                    if (!getRegionTotal(rg.properties.id)) return
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                })
                 .on('mouseout', function (e, rg) {
                     if (shouldOmit(rg.properties.id)) return
                     if (!getRegionTotal(rg.properties.id)) return
@@ -343,16 +267,34 @@ export const map = function (config) {
     function addCoxcombChartsToMap(regionFeatures) {
         const months = out._coxcombMonths
         const causes = out._coxcombCauses
+        const angle = createAngleScale(months)
 
-        const angle = scaleBand()
-            .domain(months)
-            .range([0, 2 * Math.PI])
-            .align(0)
+        const rScale = createRadiusScale(regionFeatures, months, causes)
 
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
 
-            const monthData = months.map((month) => {
+            const monthData = buildMonthData(regionId, months, causes)
+            if (!monthData.length) return
+
+            const keys = getActiveKeys(monthData, causes)
+
+            const stackGen = stack().keys(keys)
+            const stacked = stackGen(monthData)
+
+            drawCoxcomb(regionId, stacked, keys, angle, rScale)
+        })
+    }
+
+    function getActiveKeys(monthData, causes) {
+        const keys = [...causes]
+        if (monthData.some((d) => (d['other'] || 0) > 0)) keys.push('other')
+        return keys
+    }
+
+    function buildMonthData(regionId, months, causes) {
+        return months
+            .map((month) => {
                 const row = { month }
                 let sumCauses = 0
 
@@ -364,68 +306,88 @@ export const map = function (config) {
                 })
 
                 if (out.totalCode_) {
-                    const totalStat = out.statData(`${month}:total`)?.get(regionId)
+                    const totalStat = out.statData(out.totalCode_)?.get(regionId)
                     const totalVal = totalStat?.value || 0
-                    const otherVal = Math.max(totalVal - sumCauses, 0)
-
-                    row['other'] = otherVal
-
-                    // Store for tooltip access
-                    const otherKey = `${month}:other`
-                    let sd = out.statData(otherKey)
-                    if (!sd) {
-                        sd = StatisticalData.statData()
-                        out.stat(otherKey, sd)
-                    }
-                    sd.set(regionId, { value: otherVal })
+                    const otherVal = totalVal > sumCauses ? totalVal - sumCauses : 0
+                    if (otherVal > 0) row['other'] = otherVal
                 }
 
-                return row
+                const hasData = Object.values(row).some((v) => v && v > 0)
+                return hasData ? row : null
             })
-
-            const keys = out.totalCode_ ? [...causes, 'other'] : causes
-
-            const stackGen = stack().keys(keys)
-            const stacked = stackGen(monthData)
-            const maxTotal = Math.max(...monthData.map((d) => keys.reduce((sum, k) => sum + (d[k] || 0), 0)))
-
-            const rScale = out.classifierSize_
-                ? (v) => out.classifierSize_(v)
-                : scaleSqrt()
-                      .domain([0, maxTotal])
-                      .range([out.coxcombMinRadius_ || 0, out.coxcombMaxRadius_])
-
-            const arcGen = arc()
-                .startAngle((d) => angle(d.data.month))
-                .endAngle((d) => angle(d.data.month) + angle.bandwidth())
-                .innerRadius((d) => (d[0] === 0 ? 0 : rScale(d[0])))
-                .outerRadius((d) => rScale(d[1]))
-                .padAngle(0.01)
-                .padRadius(0)
-
-            const node = out.svg().selectAll('#cox_' + regionId)
-
-            keys.forEach((key, i) => {
-                node.append('g')
-                    .attr('class', 'coxcombchart')
-                    .attr('stroke', out.coxcombStrokeFill_)
-                    .attr('stroke-width', out.coxcombStrokeWidth_)
-                    .selectAll('path')
-                    .data(stacked[i])
-                    .join('path')
-                    .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
-                    .attr('fill___', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
-                    .attr('code', key)
-                    .attr('d', arcGen)
-                    .append('title')
-                    .text((d) => {
-                        const val = d[1] - d[0]
-                        return `${d.data.month} – ${out.catLabels_[key] || key}: ${val.toFixed(1)}`
-                    })
-            })
-        })
+            .filter(Boolean)
     }
 
+    function createAngleScale(months) {
+        return scaleBand()
+            .domain(months)
+            .range([0, 2 * Math.PI])
+            .align(0)
+    }
+
+    function createRadiusScale(regionFeatures, months, causes) {
+        const totals = []
+        regionFeatures.forEach((region) => {
+            const id = region.properties.id
+            months.forEach((month) => {
+                let total = 0
+                causes.forEach((cause) => {
+                    const v = out.statData(`${month}:${cause}`)?.get(id)?.value
+                    if (!isNaN(v)) total += v || 0
+                })
+                if (out.totalCode_) {
+                    const t = out.statData(out.totalCode_)?.get(id)?.value
+                    if (!isNaN(t)) total = Math.max(total, t)
+                }
+                if (total > 0) totals.push(total)
+            })
+        })
+
+        const globalMax = totals.length ? Math.max(...totals) : 0
+        out._coxcombGlobalMax = globalMax
+
+        const minRadius = out.coxcombMinRadius_ || 0
+        const maxRadius = out.coxcombMaxRadius_ || 80
+
+        // Scale values to radii *increment* beyond min radius
+        const incScale = scaleSqrt()
+            .domain([0, globalMax])
+            .range([0, maxRadius - minRadius])
+
+        // Always return a full radius (min + increment)
+        return (v) => minRadius + incScale(v)
+    }
+
+    function drawCoxcomb(regionId, stackedData, keys, angle, rScale) {
+        const node = out.svg().selectAll('#cox_' + regionId)
+
+        const arcGen = arc()
+            .startAngle((d) => angle(d.data.month))
+            .endAngle((d) => angle(d.data.month) + angle.bandwidth())
+            .innerRadius((d) => rScale(d[0]))
+            .outerRadius((d) => rScale(d[1]))
+            .padAngle(0.01)
+            .padRadius(0)
+
+        keys.forEach((key) => {
+            node.append('g')
+                .attr('class', 'coxcombchart')
+                .attr('stroke', out.coxcombStrokeFill_)
+                .attr('stroke-width', out.coxcombStrokeWidth_)
+                .selectAll('path')
+                .data(stackedData[keys.indexOf(key)])
+                .join('path')
+                .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
+                .attr('fill___', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
+                .attr('code', key)
+                .attr('d', arcGen)
+                .append('title')
+                .text((d) => {
+                    const val = d[1] - d[0]
+                    return `${d.data.month} – ${out.catLabels_[key] || key}: ${val.toFixed(1)}`
+                })
+        })
+    }
     out.getLegendConstructor = function () {
         return CoxcombLegend.legend // Could implement a Coxcomb-specific legend later
     }
@@ -435,12 +397,19 @@ export const map = function (config) {
         const regionId = rg.properties.id
 
         const months = out._coxcombMonths || []
-        // Include all causes, including 'other' if present
         const causes = [...out._coxcombCauses]
+
+        // Add "other" if totals exceed sum of causes
+        const includeOther = months.some((m) => {
+            const totalVal = out.statData(out.totalCode_)?.get(regionId)?.value || 0
+            const sumCauses = causes.reduce((a, c) => a + (out.statData(`${m}:${c}`)?.get(regionId)?.value || 0), 0)
+            return totalVal > sumCauses
+        })
+        if (includeOther) causes.push('other')
 
         let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
-        // Header row with color labels
+        // Header row
         const headerCells = [`<th class="em-breakdown-label">Month</th>`]
         causes.forEach((cause) => {
             const label = out.catLabels_[cause] || cause
@@ -449,34 +418,46 @@ export const map = function (config) {
         })
         const headerRow = `<tr>${headerCells.join('')}</tr>`
 
-        // Build rows for each month
+        // Data rows for each month
         const rows = months.map((month) => {
             const cells = [`<td class="em-breakdown-label">${month}</td>`]
             causes.forEach((cause) => {
-                // For 'other', pull the explicitly stored stat
-                const key = cause === 'other' ? `${month}:other` : `${month}:${cause}`
-                const s = out.statData(key)?.get(regionId)
-                const val = s?.value || 0
-                cells.push(val > 0 ? `<td><span class="em-breakdown-value">${val.toFixed()}</span></td>` : `<td></td>`)
+                let rawVal = 0
+                if (cause === 'other') {
+                    const totalVal = out.statData(out.totalCode_)?.get(regionId)?.value || 0
+                    const sumCauses = causes
+                        .filter((c) => c !== 'other')
+                        .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                    rawVal = Math.max(totalVal - sumCauses, 0)
+                } else {
+                    rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                }
+
+                if (rawVal > 0) {
+                    const formatted = spaceAsThousandSeparator(rawVal)
+                    cells.push(`<td><span class="em-breakdown-value">${formatted}</span></td>`)
+                } else {
+                    cells.push('<td></td>')
+                }
             })
             return `<tr>${cells.join('')}</tr>`
         })
 
+        // Total row
         const total = getRegionTotal(regionId)
         const unit = out.statData(out.statCodes_[0])?.unitText() || ''
 
         html += `<div class="em-tooltip-breakdown em-tooltip-cx"><table class="em-tooltip-cx-table">`
-        html += headerRow
-        html += rows.join('')
+        html += headerRow + rows.join('')
         if (total !== undefined && total !== null) {
+            const formattedTotal = spaceAsThousandSeparator(total)
             html += `
-      <tr class="em-total">
-        <td class="em-breakdown-label">Total</td>
-        <td colspan="${causes.length}">
-          <span class="em-breakdown-value">${total.toFixed()} ${unit}</span>
-        </td>
-      </tr>
-    `
+          <tr class="em-total">
+            <td class="em-breakdown-label">Total</td>
+            <td colspan="${causes.length}">
+              <span class="em-breakdown-value">${formattedTotal} ${unit}</span>
+            </td>
+          </tr>`
         }
         html += `</table></div>`
 
