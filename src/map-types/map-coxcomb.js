@@ -130,7 +130,6 @@ export const map = function (config) {
         })
 
         // Optional: add an "Other" slice by using the total code
-        // Optional: add an "Other" slice by using the total code
         if (totalCode) {
             out.totalCode_ = totalCode
 
@@ -154,12 +153,10 @@ export const map = function (config) {
                 if (!totalData || typeof totalData.data !== 'function') return
 
                 const perRegionValues = {}
-                const totalValues = totalData.data() // usually returns { regionId: {value, unit,...}, ... }
+                const totalValues = totalData.data()
 
                 for (const regionId in totalValues) {
                     const totalVal = totalValues[regionId]?.value || 0
-
-                    // Sum all specified causes for this region+month
                     const sumCauses = causes.reduce((sum, c) => {
                         const s = out.statData(`${month}:${c}`)?.get(regionId)
                         return sum + (s?.value || 0)
@@ -171,7 +168,18 @@ export const map = function (config) {
 
                 const statData = StatisticalData.statData()
                 statData.setData(perRegionValues)
-                out.stat(`${month}:other`, statData)
+
+                // Copy unit text from the total series so the tooltip can display properly
+                if (typeof totalData.unitText === 'function') {
+                    statData.unitText(totalData.unitText())
+                }
+
+                const key = `${month}:other`
+                out.stat(key, statData)
+
+                // Ensure it's part of statCodes so classification and tooltips can access it
+                out.statCodes_ = out.statCodes_ || []
+                out.statCodes_.push(key)
             })
 
             // Register "Other" category and push it for stacking
@@ -181,7 +189,6 @@ export const map = function (config) {
             out.catLabels_['other'] = 'Other'
             out._coxcombCauses.push('other')
         }
-
         return out
     }
 
@@ -312,7 +319,6 @@ export const map = function (config) {
         let sumCauses = 0
         let hasValue = false
 
-        // Sum only specified causes
         for (const sc of out.statCodes_) {
             const s = out.statData(sc)?.get(id)
             if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
@@ -323,22 +329,14 @@ export const map = function (config) {
             hasValue = true
         }
 
-        // If there’s a totalCode_, use it for overall scaling (includes "other")
+        // If totalCode_ is present, also add "other" explicitly
         if (out.totalCode_) {
-            const totalStat = out.statData(`${out._coxcombMonths?.[0]}:total`)
-                ? out.statData(`${out._coxcombMonths[0]}:total`).get(id)
-                : out.statData(out.totalCode_)?.get(id)
-
-            const totalVal = totalStat?.value || 0
-
-            // If total > 0, return total (so radii reflect the full total, not just specified causes)
-            if (totalVal > 0) return totalVal
-
-            // If no total, fall back to specified causes
-            return hasValue ? sumCauses : undefined
+            const sOther = out.statData(`${out._coxcombMonths?.[0]}:other`)?.get(id)
+            if (sOther && !isNaN(sOther.value)) {
+                sumCauses += sOther.value
+            }
         }
 
-        // If no totalCode_, just return the sum of specified causes
         return hasValue ? sumCauses : undefined
     }
 
@@ -354,12 +352,10 @@ export const map = function (config) {
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
 
-            // Assemble monthly data, including dynamically computed "other"
             const monthData = months.map((month) => {
                 const row = { month }
-
-                // Sum specified causes
                 let sumCauses = 0
+
                 causes.forEach((cause) => {
                     const s = out.statData(`${month}:${cause}`)?.get(regionId)
                     const val = s?.value || 0
@@ -367,24 +363,30 @@ export const map = function (config) {
                     sumCauses += val
                 })
 
-                // If totalCode is specified, compute "other" as the remainder
                 if (out.totalCode_) {
                     const totalStat = out.statData(`${month}:total`)?.get(regionId)
                     const totalVal = totalStat?.value || 0
                     const otherVal = Math.max(totalVal - sumCauses, 0)
+
                     row['other'] = otherVal
+
+                    // Store for tooltip access
+                    const otherKey = `${month}:other`
+                    let sd = out.statData(otherKey)
+                    if (!sd) {
+                        sd = StatisticalData.statData()
+                        out.stat(otherKey, sd)
+                    }
+                    sd.set(regionId, { value: otherVal })
                 }
 
                 return row
             })
 
-            // Build stack keys (causes plus "other" if present)
             const keys = out.totalCode_ ? [...causes, 'other'] : causes
 
             const stackGen = stack().keys(keys)
             const stacked = stackGen(monthData)
-
-            // Max total for scaling
             const maxTotal = Math.max(...monthData.map((d) => keys.reduce((sum, k) => sum + (d[k] || 0), 0)))
 
             const rScale = out.classifierSize_
@@ -396,7 +398,7 @@ export const map = function (config) {
             const arcGen = arc()
                 .startAngle((d) => angle(d.data.month))
                 .endAngle((d) => angle(d.data.month) + angle.bandwidth())
-                .innerRadius((d) => (d[0] === 0 ? 0 : rScale(d[0]))) // force zero for the bottom layer
+                .innerRadius((d) => (d[0] === 0 ? 0 : rScale(d[0])))
                 .outerRadius((d) => rScale(d[1]))
                 .padAngle(0.01)
                 .padRadius(0)
@@ -409,7 +411,7 @@ export const map = function (config) {
                     .attr('stroke', out.coxcombStrokeFill_)
                     .attr('stroke-width', out.coxcombStrokeWidth_)
                     .selectAll('path')
-                    .data(stacked[i]) // slice per category
+                    .data(stacked[i])
                     .join('path')
                     .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                     .attr('fill___', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
@@ -433,11 +435,12 @@ export const map = function (config) {
         const regionId = rg.properties.id
 
         const months = out._coxcombMonths || []
-        const causes = out.totalCode_ ? [...out._coxcombCauses, 'other'] : [...out._coxcombCauses]
+        // Include all causes, including 'other' if present
+        const causes = [...out._coxcombCauses]
 
         let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
-        // Table header (color the labels)
+        // Header row with color labels
         const headerCells = [`<th class="em-breakdown-label">Month</th>`]
         causes.forEach((cause) => {
             const label = out.catLabels_[cause] || cause
@@ -446,16 +449,16 @@ export const map = function (config) {
         })
         const headerRow = `<tr>${headerCells.join('')}</tr>`
 
-        // Month rows
+        // Build rows for each month
         const rows = months.map((month) => {
             const cells = [`<td class="em-breakdown-label">${month}</td>`]
-
             causes.forEach((cause) => {
-                const s = out.statData(`${month}:${cause}`)?.get(regionId)
+                // For 'other', pull the explicitly stored stat
+                const key = cause === 'other' ? `${month}:other` : `${month}:${cause}`
+                const s = out.statData(key)?.get(regionId)
                 const val = s?.value || 0
                 cells.push(val > 0 ? `<td><span class="em-breakdown-value">${val.toFixed()}</span></td>` : `<td></td>`)
             })
-
             return `<tr>${cells.join('')}</tr>`
         })
 
@@ -467,13 +470,13 @@ export const map = function (config) {
         html += rows.join('')
         if (total !== undefined && total !== null) {
             html += `
-            <tr class="em-total">
-                <td class="em-breakdown-label">Total</td>
-                <td colspan="${causes.length}">
-                    <span class="em-breakdown-value">${total.toFixed()} ${unit}</span>
-                </td>
-            </tr>
-        `
+      <tr class="em-total">
+        <td class="em-breakdown-label">Total</td>
+        <td colspan="${causes.length}">
+          <span class="em-breakdown-value">${total.toFixed()} ${unit}</span>
+        </td>
+      </tr>
+    `
         }
         html += `</table></div>`
 

@@ -385,8 +385,8 @@ function drawLowHighLabels(out, width, height, isVertical) {
 }
 
 function getHighlightTolerance(map) {
-    const tolerance = map.legend_.highlightTolerance || map.legend_.colorLegend?.highlightTolerance || 1 // Default tolerance for highlighting
-    return tolerance
+    if (!map || !map.legend_) return 1 // default if map or legend is undefined
+    return map.legend_.highlightTolerance ?? map.legend_.colorLegend?.highlightTolerance ?? 1
 }
 
 function getHighlightFunction(map) {

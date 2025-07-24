@@ -7,11 +7,12 @@ import { select } from 'd3-selection'
 export const tooltip = function (config) {
     config = config || {}
 
-    config.containerId = config.containerId || config.svgId || 'map'
-    config.div = config.div || `em-tooltip-${config.containerId}`
-    config.id = config.id || config.div
+    config.containerId = config.containerId || config.svgId || 'map' // the maximum bounds of the tooltip
+    config.customElement = config.customElement // for users to specify custom tooltip elements
+    config.id = config.id || `em-tooltip-${config.containerId}` // id of the tooltip div
     config.xOffset = config.xOffset || 30
     config.yOffset = config.yOffset || 20
+    config.transitionDuration = 0
 
     let tooltip
 
@@ -29,6 +30,12 @@ export const tooltip = function (config) {
             let x = event.pageX
             let y = event.pageY
             my.ensureTooltipOnScreen(x, y)
+            // Fade in
+            tooltip
+                .interrupt() // cancel ongoing transitions
+                .transition()
+                .duration(config.transitionDuration) // fade
+                .style('opacity', 1)
         }
     }
 
@@ -39,7 +46,8 @@ export const tooltip = function (config) {
     }
 
     my.mouseout = function () {
-        tooltip.style('opacity', 0)
+        // Fade out
+        tooltip.interrupt().transition().duration(config.transitionDuration).style('opacity', 0)
     }
 
     my.style = function (k, v) {
@@ -59,7 +67,6 @@ export const tooltip = function (config) {
      * @description Prevents the tooltip from overflowing off screen
      */
     my.ensureTooltipOnScreen = function (eventX, eventY) {
-        tooltip.style('opacity', 1)
         let node = tooltip.node()
 
         node.style.left = eventX + config.xOffset + 'px'
