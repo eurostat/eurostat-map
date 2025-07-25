@@ -1,4 +1,5 @@
 @import './map-types/proportional-symbol.css';
+@import './map-types/coxcomb.css';
 
 /* General text settings */
 text {

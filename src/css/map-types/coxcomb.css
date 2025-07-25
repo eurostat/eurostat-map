@@ -1,0 +1,12 @@
+/*   muted country boundaries */
+.em--coxcomb .em-cntbn {
+    stroke: grey;
+    stroke-width: 0.25px;
+}
+
+/* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
+.em--ps .em-bn-co,
+.em--pie .em-bn-co {
+    stroke: grey;
+    stroke-width: 0.1px;
+}

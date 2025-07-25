@@ -16,13 +16,13 @@ export const legend = function (map, config) {
 
     out.sizeLegend = {
         title: null,
-        titlePadding: 30,
+        titlePadding: 15,
         values: null,
     }
 
     out.colorLegend = {
         title: null,
-        titlePadding: 10,
+        titlePadding: 15,
         marginTop: 23,
         labelOffsets: { x: 5, y: 5 },
         shapeWidth: 25,
@@ -227,20 +227,20 @@ export const legend = function (map, config) {
             .on('mouseover', function (event, month) {
                 const hoveredMonth = month // "YYYY-MM" format
                 const mapSvg = out.map.svg_ || out.map.svg()
-                const allSegments = mapSvg.selectAll('.coxcombchart path')
+                const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
 
                 allSegments.style('opacity', (d) => (d.data.month === hoveredMonth ? 1 : 0))
                 select(this).style('stroke-width', 1.5).style('opacity', 0.8)
             })
             .on('mouseout', function () {
                 const mapSvg = out.map.svg_ || out.map.svg()
-                mapSvg.selectAll('.coxcombchart path').style('opacity', 1)
+                mapSvg.selectAll('.em-coxcomb-chart path').style('opacity', 1)
                 select(this).style('stroke-width', 0.3).style('opacity', 0.4)
             })
     }
 
     function highlightRegions(map, code) {
-        const allSegments = map.svg_.selectAll('.coxcombchart').selectAll('path[code]')
+        const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
         allSegments.style('fill', 'white')
         const selected = allSegments.filter("path[code='" + code + "']")
         selected.each(function () {
@@ -249,7 +249,7 @@ export const legend = function (map, config) {
     }
 
     function unhighlightRegions(map) {
-        const allSegments = map.svg_.selectAll('.coxcombchart').selectAll('path[code]')
+        const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
         allSegments.each(function () {
             select(this).style('fill', select(this).attr('fill___'))
         })

@@ -6,6 +6,7 @@ import { schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import * as CoxcombLegend from '../legend/legend-coxcomb'
+import { interpolate } from 'd3'
 
 /**
  * Returns a coxcomb (polar area) chart map.
@@ -17,26 +18,14 @@ export const map = function (config) {
 
     out.coxcombMinRadius_ = 10
     out.coxcombMaxRadius_ = 80
-    out.coxcombInnerRadius_ = 0
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
     out.coxcombRings_ = true // Show outer rings by default
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
-    out.showOnlyWhenComplete_ = false
     out.classifierSize_ = null
-    ;[
-        'catColors_',
-        'catLabels_',
-        'showOnlyWhenComplete_',
-        'noDataFillStyle_',
-        'coxcombMaxRadius_',
-        'coxcombMinRadius_',
-        'coxcombInnerRadius_',
-        'coxcombStrokeFill_',
-        'coxcombStrokeWidth_',
-    ].forEach(function (att) {
+    ;['catColors_', 'catLabels_', 'noDataFillStyle_', 'coxcombMaxRadius_', 'coxcombMinRadius_', 'coxcombRings_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -45,17 +34,7 @@ export const map = function (config) {
     })
 
     if (config)
-        [
-            'catColors',
-            'catLabels',
-            'showOnlyWhenComplete',
-            'noDataFillStyle',
-            'coxcombMaxRadius',
-            'coxcombMinRadius',
-            'coxcombInnerRadius',
-            'coxcombStrokeFill',
-            'coxcombStrokeWidth',
-        ].forEach(function (key) {
+        ['catColors', 'catLabels', 'noDataFillStyle', 'coxcombMaxRadius', 'coxcombMinRadius', 'coxcombInnerRadius'].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
 
@@ -282,41 +261,51 @@ export const map = function (config) {
     function drawCoxcomb(regionId, stackedData, keys, angle) {
         const node = out.svg().selectAll('#cox_' + regionId)
 
+        // Draw outer ring (animate it growing)
         if (out.coxcombRings_) {
-            // Draw outer ring for the region
             const yearlyTotal = out.yearlyTotals[regionId] || 0
-            const targetOuter = out.classifierSize_(yearlyTotal) // Legend scale gives outer radius
+            const targetOuter = out.classifierSize_(yearlyTotal) // legend-based scale
             node.append('circle')
                 .attr('class', 'em-coxcomb-max-outline')
-                .attr('r', targetOuter)
+                .attr('r', 0) // start collapsed
                 .attr('fill', 'none')
                 .attr('stroke', '#000')
                 .attr('stroke-width', 0.3)
                 .attr('opacity', 0.5)
                 .attr('pointer-events', 'none')
+                .transition()
+                .duration(out.transitionDuration_ / 2)
+                .attr('r', targetOuter)
         }
 
+        // Arc generator (shared for tween)
         const arcGen = arc()
             .startAngle((d) => angle(d.data.month))
             .endAngle((d) => angle(d.data.month) + angle.bandwidth())
-            .innerRadius((d) => out.classifierChartSize_(d[0], regionId))
-            .outerRadius((d) => out.classifierChartSize_(d[1], regionId))
             .padAngle(0.01)
             .padRadius(0)
 
+        // Draw stacked wedges with animated "grow out" effect
         keys.forEach((key) => {
             node.append('g')
-                .attr('class', 'coxcombchart')
-                .attr('stroke', out.coxcombStrokeFill_)
-                .attr('stroke-width', out.coxcombStrokeWidth_)
+                .attr('class', 'em-coxcomb-chart')
+                .attr('stroke', '#ffffff')
+                .attr('stroke-width', 0.3)
                 .selectAll('path')
                 .data(stackedData[keys.indexOf(key)])
                 .join('path')
                 .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                 .attr('fill___', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                 .attr('code', key)
-                .attr('month', (d) => d.data.month) // store the month for cross-selection
-                .attr('d', arcGen)
+                .attr('month', (d) => d.data.month)
+                .transition()
+                .delay((d, i) => i * 120)
+                .duration(out.transitionDuration_)
+                .attrTween('d', function (d) {
+                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId))
+                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId))
+                    return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
+                })
         })
     }
 
@@ -336,6 +325,8 @@ export const map = function (config) {
                 const sel = select(this)
                 sel.attr('fill___', sel.style('fill'))
                 sel.style('fill', out.hoverColor_)
+                // Thicken the first circle (outline) inside the symbol group
+                sel.select('circle.em-coxcomb-max-outline').attr('stroke-width', 2) // temporarily increase stroke
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
                 .on('mousemove', function (e, rg) {
@@ -349,6 +340,8 @@ export const map = function (config) {
                     const sel = select(this)
                     sel.style('fill', sel.attr('fill___') || out.noDataFillStyle_)
                     sel.attr('fill___', null)
+                    // Thicken the first circle (outline) inside the symbol group
+                    sel.select('circle.em-coxcomb-max-outline').attr('stroke-width', 0.3) // temporarily increase stroke
                     if (out._tooltip) out._tooltip.mouseout()
                 })
                 .on('click', function (e, rg) {
