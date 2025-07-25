@@ -14,30 +14,43 @@
                 .map('trivariateChoropleth')
                 .title('test')
                 .subtitle('test')
-                .nutsLevel(2)
-                // .color1('#AA4A44') //red
-                // .color2('#00FF00') //green
-                // .color3('#0000FF') //blue
+                .nutsLevel(3)
+                //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_pjanind3?format=JSON&unit=PC&indic_de=PC_Y75_MAX&lang=EN
                 .stat('v1', {
-                    label: 'Population change',
-                    eurostatDatasetCode: 'demo_r_gind3',
-                    filters: { indic_de: 'GROWRT', time: 2016 },
-                    unitText: '‰',
-                }) //population change
-                .stat('v2', { label: 'Population density', eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } }) //population density
-                .stat('v3', {
-                    label: 'Unemployment rate',
-                    eurostatDatasetCode: 'lfst_r_lfu3rt',
-                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                    label: 'Population aged 75 and over',
+                    eurostatDatasetCode: 'demo_r_pjanind3',
+                    filters: { indic_de: 'PC_Y75_MAX', time: 2023, unit: 'PC' },
                     unitText: '%',
-                }) //unemployent rate
+                }) // old
+                .stat('v2', {
+                    label: 'Population aged 20-64',
+                    eurostatDatasetCode: 'demo_r_pjanind3',
+                    filters: { indic_de: 'PC_Y20_64', time: 2023, unit: 'PC' },
+                    unitText: '%',
+                }) // middle-aged
+                .stat('v3', {
+                    label: 'Population aged 15-29',
+                    eurostatDatasetCode: 'demo_r_pjanind3',
+                    filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+                    unitText: '%',
+                }) // young
                 .legend({
-                    x: 500,
-                    y: 130,
-                    width: 200,
+                    x: 570,
+                    y: 10,
+                    width: 210,
                     boxOpacity: 1,
-                    // boxPadding: 0,
-                    labels: ['Population change', 'Population density', 'Unemployment rate'],
+                    topText: '20-64',
+                    leftText: ' 75 and over',
+                    rightText: '15-29',
+                    texts: {
+                        0: 'Mostly 75+ population',
+                        1: 'Mostly 20-64 population',
+                        2: 'Mostly 15-29 population',
+                        m12: '20-64 + 15-29 mix',
+                        m02: '75+ + 15-29 mix',
+                        m01: '75+ + 20-64 mix',
+                        center: 'Balanced mix of all three',
+                    },
                 })
 
             // map.statData('v1').setData(variable1)

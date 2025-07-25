@@ -1,0 +1,17 @@
+/*   muted country fill */
+.em--alpha .em-cntrg,
+.em--alpha .em-cntrg {
+    fill: #f2f2f2;
+}
+
+/*   muted nuts fill */
+.em--alpha .em-nutsrg,
+.em--alpha .em-nutsrg {
+    fill: #fdfdfd;
+}
+
+/* Coastlines should not be drawn for choropleths, however for alpha maps with white regions they can be necessary */
+.em--alpha .em-bn-co {
+    stroke: grey;
+    stroke-width: 0.1px;
+}
