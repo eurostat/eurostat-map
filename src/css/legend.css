@@ -87,3 +87,13 @@
 .em-legend-histogram-bar {
     cursor: pointer;
 }
+.em-month-label {
+    font-size: 13px;
+}
+.em-legend-month-segment {
+    stroke: #444;
+    stroke-width: 0.3;
+    opacity: 0.4;
+    fill: #ccc;
+    cursor: pointer;
+}

@@ -20,6 +20,7 @@ export const map = function (config) {
     out.coxcombInnerRadius_ = 0
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
+    out.coxcombRings_ = true // Show outer rings by default
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
@@ -179,41 +180,29 @@ export const map = function (config) {
         const totalsByRegion = out.yearlyTotals
         return totalsByRegion[id] !== undefined ? totalsByRegion[id] : undefined
     }
-    function getDatasetMaxMin() {
-        const totals = Object.values(out.yearlyTotals)
-        return [Math.min(...totals), Math.max(...totals)]
-    }
 
     function defineSizeScales() {
         const yearlyValues = Object.values(out.yearlyTotals)
-        const allMonthlyStacks = []
-
-        // Collect all stacked monthly totals (max d[1]) for charts
-        for (const regionId in out.yearlyTotals) {
-            out._coxcombMonths.forEach((month) => {
-                const vals = out._coxcombCauses.map((c) => out.statData(`${month}:${c}`)?.get(regionId)?.value || 0)
-                if (out.totalCode_) {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const sumCauses = vals.reduce((a, b) => a + b, 0)
-                    vals.push(Math.max(totalVal - sumCauses, 0)) // "other"
-                }
-                const cumulative = vals.reduce((a, b) => a + b, 0)
-                allMonthlyStacks.push(cumulative)
-            })
-        }
-
-        const globalYearlyMax = max(yearlyValues) || 0 // For legend
-        const globalMonthlyMax = max(allMonthlyStacks) || 0 // For chart scaling
-
         const minRadius = out.coxcombMinRadius_ || 0
         const maxRadius = out.coxcombMaxRadius_ || 80
 
-        // Scale for legend (year totals)
-        out.classifierSize_ = scaleRadial().domain([0, globalYearlyMax]).range([minRadius, maxRadius])
+        const globalMin = min(yearlyValues) || 0
+        const globalMax = max(yearlyValues) || 0
 
-        // Scale for charts (monthly max)
-        out.classifierChartSize_ = scaleRadial().domain([0, globalMonthlyMax]).range([minRadius, maxRadius])
+        // Scale yearly totals → outer chart radius (ensures area ∝ total)
+        const outerScale = scaleRadial().domain([globalMin, globalMax]).range([minRadius, maxRadius])
+
+        // Scale individual stacked values so that wedge areas stay proportional
+        out.classifierChartSize_ = (v, regionId) => {
+            const targetOuter = outerScale(out.yearlyTotals[regionId] || 0)
+            const regionMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 1 }))
+            const proportion = v / regionMax
+            return Math.sqrt(proportion) * targetOuter // sqrt keeps area consistent
+        }
+
+        out.classifierSize_ = outerScale
     }
+
     //@override
     out.updateStyle = function () {
         if (!out.catColors_) {
@@ -293,24 +282,25 @@ export const map = function (config) {
     function drawCoxcomb(regionId, stackedData, keys, angle) {
         const node = out.svg().selectAll('#cox_' + regionId)
 
-        // Find the region’s true outermost cumulative value (max d[1] across all stacks)
-        const maxStackedEnd = Math.max(...stackedData.flatMap((layer) => layer.map((d) => d[1])))
-        const maxRadiusForRegion = out.classifierChartSize_(maxStackedEnd)
-
-        // Draw a faint circle showing the chart’s max radius
-        node.append('circle')
-            .attr('class', 'em-coxcomb-max-outline')
-            .attr('r', maxRadiusForRegion)
-            .attr('fill', 'none')
-            .attr('stroke', '#000')
-            .attr('stroke-width', 0.3)
-            .attr('pointer-events', 'none')
+        if (out.coxcombRings_) {
+            // Draw outer ring for the region
+            const yearlyTotal = out.yearlyTotals[regionId] || 0
+            const targetOuter = out.classifierSize_(yearlyTotal) // Legend scale gives outer radius
+            node.append('circle')
+                .attr('class', 'em-coxcomb-max-outline')
+                .attr('r', targetOuter)
+                .attr('fill', 'none')
+                .attr('stroke', '#000')
+                .attr('stroke-width', 0.3)
+                .attr('opacity', 0.5)
+                .attr('pointer-events', 'none')
+        }
 
         const arcGen = arc()
             .startAngle((d) => angle(d.data.month))
             .endAngle((d) => angle(d.data.month) + angle.bandwidth())
-            .innerRadius((d) => out.classifierChartSize_(d[0]))
-            .outerRadius((d) => out.classifierChartSize_(d[1]))
+            .innerRadius((d) => out.classifierChartSize_(d[0], regionId))
+            .outerRadius((d) => out.classifierChartSize_(d[1], regionId))
             .padAngle(0.01)
             .padRadius(0)
 
@@ -325,6 +315,7 @@ export const map = function (config) {
                 .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                 .attr('fill___', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                 .attr('code', key)
+                .attr('month', (d) => d.data.month) // store the month for cross-selection
                 .attr('d', arcGen)
         })
     }
@@ -375,7 +366,7 @@ export const map = function (config) {
     }
 
     function buildMonthData(regionId, months, causes) {
-        return months
+        const rows = months
             .map((month) => {
                 const row = { month }
                 let sumCauses = 0
@@ -388,7 +379,6 @@ export const map = function (config) {
                 })
 
                 if (out.totalCode_) {
-                    // Use the month-specific TOTAL stat, not the global
                     const totalStat = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)
                     const totalVal = totalStat?.value || 0
                     const otherVal = totalVal > sumCauses ? totalVal - sumCauses : 0
@@ -399,6 +389,17 @@ export const map = function (config) {
                 return hasData ? row : null
             })
             .filter(Boolean)
+
+        // *** Remove "other" column if it’s zero for every row ***
+        const hasOther = rows.some((r) => (r['other'] || 0) > 0)
+        if (!hasOther) {
+            rows.forEach((r) => delete r['other'])
+            // Also drop the color & label entry for "other" so it won't appear in legend
+            delete out.catColors_?.other
+            delete out.catLabels_?.other
+        }
+
+        return rows
     }
 
     function createAngleScale(months) {
