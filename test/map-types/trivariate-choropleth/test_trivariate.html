@@ -12,43 +12,45 @@
         <script>
             const map = eurostatmap
                 .map('trivariateChoropleth')
-                .title('test')
-                .subtitle('test')
+                .title('Age Structure')
                 .nutsLevel(3)
-                //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_r_pjanind3?format=JSON&unit=PC&indic_de=PC_Y75_MAX&lang=EN
                 .stat('v1', {
-                    label: 'Population aged 75 and over',
+                    label: 'Population 75+',
                     eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y75_MAX', time: 2023, unit: 'PC' },
+                    filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
                     unitText: '%',
-                }) // old
+                })
                 .stat('v2', {
-                    label: 'Population aged 20-64',
+                    label: 'Population 45–64',
                     eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y20_64', time: 2023, unit: 'PC' },
+                    filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
                     unitText: '%',
-                }) // middle-aged
+                })
                 .stat('v3', {
-                    label: 'Population aged 15-29',
+                    label: 'Population 15–29',
                     eurostatDatasetCode: 'demo_r_pjanind3',
                     filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
                     unitText: '%',
-                }) // young
+                })
+                // New parameters here:
+                .center([0.3, 0.4, 0.3]) // expected balanced mix
+                .centerCoefficient(0.25) // size of neutral zone
+                .elderlyThreshold(0.15) // turn regions red if 75+ > 15%
                 .legend({
                     x: 570,
                     y: 10,
                     width: 210,
                     boxOpacity: 1,
-                    topText: '20-64',
-                    leftText: ' 75 and over',
-                    rightText: '15-29',
+                    topText: '45–64',
+                    leftText: '75+',
+                    rightText: '15–29',
                     texts: {
                         0: 'Mostly 75+ population',
-                        1: 'Mostly 20-64 population',
-                        2: 'Mostly 15-29 population',
-                        m12: '20-64 + 15-29 mix',
-                        m02: '75+ + 15-29 mix',
-                        m01: '75+ + 20-64 mix',
+                        1: 'Mostly 45–64 population',
+                        2: 'Mostly 15–29 population',
+                        m12: '45–64 + 15–29 mix',
+                        m02: '75+ + 15–29 mix',
+                        m01: '75+ + 45–64 mix',
                         center: 'Balanced mix of all three',
                     },
                 })

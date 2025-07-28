@@ -121,7 +121,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         yOffset: 0,
         textFunction: null,
         showFlags: false,
-        omitList: false, // if specified, tooltip will not show the list of regions
+        omitRegions: ['RU', 'BY', 'IL', 'PS'], // if specified, tooltip will not work for these regions
     } //  See tooltip.js for more details
 
     // region mouseover color

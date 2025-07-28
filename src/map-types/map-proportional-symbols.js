@@ -39,6 +39,7 @@ export const map = function (config) {
     out.psFillOpacity_ = 1
     out.psStroke_ = '#ffffff'
     out.psStrokeWidth_ = 0.2
+    out.psStrokeOpacity_ = 1
     out.psClasses_ = 5 // number of classes to use for colouring
     out.psColors_ = null //colours to use for threshold colouring
     out.psColorFun_ = interpolateOrRd
@@ -73,6 +74,7 @@ export const map = function (config) {
         'psMinValue_',
         'psFill_',
         'psFillOpacity_',
+        'psStrokeOpacity_',
         'psStroke_',
         'psStrokeWidth_',
         'classifierSize_',
@@ -442,9 +444,10 @@ export const map = function (config) {
      * @param {d3.selection} symb symbols d3 selection
      */
     function setSymbolStyles(symb) {
-        symb.style('fill-opacity', out.psFillOpacity())
-            .style('stroke', out.psStroke())
-            .style('stroke-width', out.psStrokeWidth())
+        symb.attr('fill-opacity', out.psFillOpacity())
+            .attr('stroke-opacity', out.psStrokeOpacity())
+            .attr('stroke', out.psStroke())
+            .attr('stroke-width', out.psStrokeWidth())
             .style('fill', function () {
                 if (out.classifierColor_) {
                     //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
@@ -543,6 +546,11 @@ export const map = function (config) {
                 return datum && datum.value !== ':' && datum.value
             })
             .append('circle')
+            .attr('stroke-width', out.psStrokeWidth())
+            .attr('stroke', out.psStroke())
+            .attr('fill-opacity', out.psFillOpacity())
+            .attr('stroke-opacity', out.psStrokeOpacity())
+            .style('pointer-events', 'none') // disable interaction during transition
             .transition()
             .duration(out.transitionDuration())
             .attr('r', function (d) {
@@ -551,6 +559,10 @@ export const map = function (config) {
                 if (radius < 0) console.error('Negative radius for circle:', d.properties.id)
                 if (isNaN(radius)) console.error('NaN radius for circle:', d.properties.id)
                 return radius
+            })
+            .on('end', function () {
+                // Re-enable after animation completes
+                select(this).style('pointer-events', null)
             })
 
         return circles
