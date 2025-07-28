@@ -9,22 +9,52 @@
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
+            //const numberOfClasses = 6
             const map = eurostatmap
                 .map('choropleth')
                 .title('Dot density')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
                 // define dot density pattern
-                .filtersDefinitionFunction(
-                    eurostatmap.getFillPatternDefinitionFun({
-                        patternSize: 5,
-                        shape: 'circle',
-                        bckColor: 'white',
-                        symbColor: 'black',
-                    })
-                )
+                .filtersDefinitionFunction((svg, numberOfClasses) => {
+                    svg.selectAll('.em-fill-pattern').remove()
+                    const minSize = 1
+                    const maxSize = 6
+                    const patternSize = 5
+                    for (let i = 0; i < numberOfClasses; i++) {
+                        const si = minSize + ((maxSize - minSize) * i) / (numberOfClasses - 1)
+                        svg.append('pattern')
+                            .attr('class', 'em-fill-pattern')
+                            .attr('id', 'pattern_' + i)
+                            .attr('x', '0')
+                            .attr('y', '0')
+                            .attr('width', patternSize)
+                            .attr('height', patternSize)
+                            .attr('patternUnits', 'userSpaceOnUse')
+                            .append('circle')
+                            .attr('cx', patternSize / 2)
+                            .attr('cy', patternSize / 2)
+                            .attr('r', si / 2)
+                    }
+                })
+                // .filtersDefinitionFunction(
+                //     eurostatmap.getFillPatternDefinitionFunction({
+                //         patternSize: 5,
+                //         shape: 'circle',
+                //         bckColor: 'white',
+                //         symbColor: 'black',
+                //     })
+                // )
+                //.numberOfClasses(numberOfClasses)
+                .legend(true)
                 .scale('60M')
                 .nutsLevel(2)
-                .classificationMethod('threshold')
-                .threshold([50, 75, 100, 150, 300, 850])
+                .classificationMethod('quantile')
+                .zoomExtent([1, 10])
+
             map.build()
         </script>
     </body>

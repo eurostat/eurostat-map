@@ -187,6 +187,7 @@ export const map = function (config) {
             const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
             regions
+                .style('pointer-events', 'none') // disable interaction during transition
                 .transition()
                 .duration(out.transitionDuration())
                 .style('fill', function (rg) {
@@ -201,6 +202,9 @@ export const map = function (config) {
                 .end()
                 .then(
                     () => {
+                        // Re-enable after animation completes
+                        regions.style('pointer-events', null)
+
                         // Store the original color for each region
                         regions.each(function () {
                             const sel = select(this)

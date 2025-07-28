@@ -228,8 +228,13 @@ export const map = function (config) {
                         .attr('code', code)
                         .style('fill', col)
                         //transition along x
+                        .style('pointer-events', 'none') // disable interaction during transition
                         .transition()
                         .duration(out.transitionDuration())
+                        .on('end', function () {
+                            // Re-enable after animation completes
+                            select(this).style('pointer-events', null)
+                        })
                         .attr('width', dx)
                     x += dx
                 }

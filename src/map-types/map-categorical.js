@@ -138,11 +138,14 @@ export const map = function (config) {
 
             // Apply transition and set initial fill colors with data-driven logic
             regions
+                .style('pointer-events', 'none') // disable interaction during transition
                 .transition()
                 .duration(out.transitionDuration())
                 .style('fill', regionsFillFunction)
                 .end()
                 .then(() => {
+                    // Re-enable interaction after the transition
+                    regions.style('pointer-events', null)
                     // Store the original color for each region
                     regions.each(function () {
                         const sel = select(this)

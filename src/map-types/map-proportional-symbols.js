@@ -634,14 +634,6 @@ export const map = function (config) {
                     let bRect = this.getBoundingClientRect()
                     return `translate(${-this.getAttribute('width') / 2}` + `, -${this.getAttribute('height')})`
                 })
-            // to use transitions we need to refactor the drawing functions to promises e.g. appendBarsToMap().then(()=>{})
-            //this is because .attr('fill___', function () {select(this).style('fill')}) doesnt work unless you execute it after the transition ends.
-            // e.g.
-            // .transition()
-            // .duration(out.transitionDuration())
-            // .style('fill', function (rg) {})
-            // .end()
-            // .then()
         )
     }
 

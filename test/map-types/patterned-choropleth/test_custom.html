@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <select id="pattern-select">
+            <option value="circle">Circle</option>
+            <option value="square">Square</option>
+        </select>
+        <br />
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            const patternFunctions = {
+                circle: (svg, numberOfClasses) => {
+                    svg.selectAll('.em-fill-pattern').remove()
+                    const minSize = 1
+                    const maxSize = 6
+                    const patternSize = 5
+                    for (let i = 0; i < numberOfClasses; i++) {
+                        const si = minSize + ((maxSize - minSize) * i) / (numberOfClasses - 1)
+                        svg.append('pattern')
+                            .attr('class', 'em-fill-pattern')
+                            .attr('id', 'pattern_' + i)
+                            .attr('x', '0')
+                            .attr('y', '0')
+                            .attr('width', patternSize)
+                            .attr('height', patternSize)
+                            .attr('patternUnits', 'userSpaceOnUse')
+                            .append('circle')
+                            .attr('cx', patternSize / 2)
+                            .attr('cy', patternSize / 2)
+                            .attr('r', si / 2)
+                    }
+                },
+                square: (svg, numberOfClasses) => {
+                    svg.selectAll('.em-fill-pattern').remove()
+                    const minSize = 1
+                    const maxSize = 6
+                    const patternSize = 5
+                    for (let i = 0; i < numberOfClasses; i++) {
+                        const si = minSize + ((maxSize - minSize) * i) / (numberOfClasses - 1)
+                        svg.append('pattern')
+                            .attr('class', 'em-fill-pattern')
+                            .attr('id', 'pattern_' + i)
+                            .attr('x', '0')
+                            .attr('y', '0')
+                            .attr('width', patternSize)
+                            .attr('height', patternSize)
+                            .attr('patternUnits', 'userSpaceOnUse')
+                            .append('rect')
+                            .attr('x', 0)
+                            .attr('y', 0)
+                            .attr('width', si)
+                            .attr('height', si)
+                    }
+                },
+            }
+            function buildMap(patternType) {
+                const map = eurostatmap
+                    .map('choropleth')
+                    .title('Dot density')
+                    .stat({
+                        eurostatDatasetCode: 'nama_10r_3gdp',
+                        unitText: 'euro per inhabitant',
+                        filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                    })
+                    .filtersDefinitionFunction(patternFunctions[patternType])
+                    .transitionDuration(0)
+                    .legend(true)
+                    .scale('60M')
+                    .nutsLevel(2)
+                    .classificationMethod('quantile')
+
+                map.build()
+            }
+
+            // Build initial map with "circle"
+            buildMap('circle')
+
+            // Rebuild on select change
+            document.getElementById('pattern-select').addEventListener('change', (e) => {
+                buildMap(e.target.value)
+            })
+        </script>
+    </body>
+</html>

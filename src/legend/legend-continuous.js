@@ -242,43 +242,70 @@ function drawTickLabels(out, legendLength, legendThickness, isVertical) {
     const transform = map.valueTransform_ || ((d) => d)
     const titleOffset = getTitlePadding(out)
 
-    // Generate tick values
     const raw = Array.isArray(out.tickValues) && out.tickValues ? out.tickValues.map(transform) : generateTickValues(domain, out.ticks, transform)
 
     raw.forEach((val, i) => {
-        const t = computeNormalizedTickPosition(val, domain)
-        const along = legendLength - t * legendLength // position along the gradient (top to bottom)
-        const perp = legendThickness // thickness offset (horizontal for vertical bar)
+        const t = computeNormalizedTickPosition(val, domain) // 0..1
 
-        const x = isVertical ? perp : along
-        const y = isVertical ? along + titleOffset : legendThickness + titleOffset
+        if (isVertical) {
+            // existing vertical logic (works fine)
+            const along = legendLength - t * legendLength
+            const x = legendThickness
+            const y = along + titleOffset
 
-        // Tick line
-        tickGroup
-            .append('line')
-            .attr('class', 'em-legend-tick')
-            .attr('x1', x)
-            .attr('y1', y)
-            .attr('x2', isVertical ? x + out.tickLength : x)
-            .attr('y2', isVertical ? y : y + out.tickLength)
+            tickGroup
+                .append('line')
+                .attr('class', 'em-legend-tick')
+                .attr('x1', x)
+                .attr('y1', y)
+                .attr('x2', x + out.tickLength)
+                .attr('y2', y)
 
-        // Label
-        const label =
-            Array.isArray(out.tickLabels) && out.tickLabels[i] != null
-                ? out.tickLabels[i]
-                : map.valueUntransform_
-                  ? labelFormatter(map.valueUntransform_(val))
-                  : labelFormatter(val)
+            const label =
+                Array.isArray(out.tickLabels) && out.tickLabels[i] != null
+                    ? out.tickLabels[i]
+                    : map.valueUntransform_
+                      ? labelFormatter(map.valueUntransform_(val))
+                      : labelFormatter(val)
 
-        tickGroup
-            .append('text')
-            .attr('class', 'em-legend-label em-legend-ticklabel')
-            .attr('x', isVertical ? x + out.tickLength + 3 : x)
-            .attr('y', isVertical ? y : y + out.tickLength + 10)
-            .attr('dy', '0.35em')
-            .attr('text-anchor', isVertical ? 'start' : i === 0 ? 'start' : i === raw.length - 1 ? 'end' : 'middle')
-            .attr('dominant-baseline', isVertical ? 'middle' : null)
-            .text(label)
+            tickGroup
+                .append('text')
+                .attr('class', 'em-legend-label em-legend-ticklabel')
+                .attr('x', x + out.tickLength + 3)
+                .attr('y', y)
+                .attr('dy', '0.35em')
+                .attr('text-anchor', 'start')
+                .text(label)
+        } else {
+            // Fixed horizontal logic
+            const along = t * legendLength // left to right
+            const x = along
+            const y = legendThickness + titleOffset
+
+            tickGroup
+                .append('line')
+                .attr('class', 'em-legend-tick')
+                .attr('x1', x)
+                .attr('y1', y)
+                .attr('x2', x)
+                .attr('y2', y + out.tickLength)
+
+            const label =
+                Array.isArray(out.tickLabels) && out.tickLabels[i] != null
+                    ? out.tickLabels[i]
+                    : map.valueUntransform_
+                      ? labelFormatter(map.valueUntransform_(val))
+                      : labelFormatter(val)
+
+            tickGroup
+                .append('text')
+                .attr('class', 'em-legend-label em-legend-ticklabel')
+                .attr('x', x)
+                .attr('y', y + out.tickLength + 10) // below tick
+                .attr('dy', '0') // no vertical baseline offset
+                .attr('text-anchor', i === 0 ? 'start' : i === raw.length - 1 ? 'end' : 'middle')
+                .text(label)
+        }
     })
 }
 
@@ -316,70 +343,71 @@ function computeNormalizedTickPosition(val, domain) {
 }
 
 function drawLowHighLabels(out, width, height, isVertical) {
-    const labelX = isVertical ? height + 5 : 0
-    const labelY = isVertical ? 0 : height + 15
-    const labelWidth = isVertical ? width : width
-
+    const titleOffset = getTitlePadding(out)
     const low = out.lowLabel
     const high = out.highLabel
-    const mid = out.pointOfDivergenceLabel
+    const divergence = out.pointOfDivergenceLabel
     const container = out._continuousLegendContainer
+
     if (isVertical) {
-        // Low (bottom)
+        const barLength = width // vertical length of gradient
+        const barThickness = height // horizontal thickness
+        const xPos = barThickness + 5
+
+        // Low (exactly at bottom edge of gradient)
         if (low) {
             container
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', labelX)
-                .attr('y', labelWidth - 15)
+                .attr('x', xPos)
+                .attr('y', titleOffset + barLength)
+                .attr('dy', '-0.2em') // no offset, baseline sits at edge
                 .attr('text-anchor', 'start')
-                .attr('dy', '0.35em')
                 .text(low)
         }
 
-        // High (top)
+        // High (exactly at top edge of gradient)
         if (high) {
             container
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', labelX)
-                .attr('y', 0)
+                .attr('x', xPos)
+                .attr('y', titleOffset)
+                .attr('dy', '0.8em') // no offset, baseline sits at edge
                 .attr('text-anchor', 'start')
-                .attr('dy', '0.35em')
                 .text(high)
         }
 
-        // Mid (center)
-        if (mid) {
+        // Divergence (center)
+        if (divergence) {
             container
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', labelX)
-                .attr('y', labelWidth / 2)
+                .attr('x', xPos)
+                .attr('y', titleOffset + barLength / 2)
+                .attr('dy', '0.35em') // center text vertically
                 .attr('text-anchor', 'start')
-                .attr('dy', '0.35em')
-                .text(mid)
+                .text(divergence)
         }
     } else {
-        // Low (left)
+        const barY = height + titleOffset + 10 // 10px below horizontal bar
+
         if (low) {
-            container.append('text').attr('class', 'em-legend-label').attr('x', 0).attr('y', labelY).attr('text-anchor', 'start').text(low)
+            container.append('text').attr('class', 'em-legend-label').attr('x', 0).attr('y', barY).attr('text-anchor', 'start').text(low)
         }
 
-        // High (right)
         if (high) {
-            container.append('text').attr('class', 'em-legend-label').attr('x', width).attr('y', labelY).attr('text-anchor', 'end').text(high)
+            container.append('text').attr('class', 'em-legend-label').attr('x', width).attr('y', barY).attr('text-anchor', 'end').text(high)
         }
 
-        // Mid (center)
-        if (mid) {
+        if (divergence) {
             container
                 .append('text')
                 .attr('class', 'em-legend-label')
                 .attr('x', width / 2)
-                .attr('y', labelY)
+                .attr('y', barY)
                 .attr('text-anchor', 'middle')
-                .text(mid)
+                .text(divergence)
         }
     }
 }
