@@ -1,8 +1,6 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
-import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
-import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
-import { getPropSymbolLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
+import { executeForAllInsets } from '../core/utils'
 
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
 export function drawDiscreteLegend(out, x, y) {
@@ -23,7 +21,7 @@ export function drawDiscreteLegend(out, x, y) {
     const config = out.map._mapType == 'ps' ? out.colorLegend : out // Use out.colorLegend for proportional symbols, out for choropleth
 
     // thresholds vs ranges
-    if (out.labelType === 'ranges') {
+    if (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges') {
         createRangesLegend(out, config)
     } else {
         createThresholdsLegend(out, config)
@@ -31,52 +29,14 @@ export function drawDiscreteLegend(out, x, y) {
 
     // Optionally add no-data
     if (config.noData) {
-        let y = getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3 // 3px padding
+        let y = out.getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3 // 3px padding
         const x = 0
         if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding // shift legend items down after point of divergence
         const container = out._discreteLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        const highlightFunction = getHighlightFunction(out.map)
-        const unhighlightFunction = getUnHighlightFunction(out.map)
+        const highlightFunction = out.getHighlightFunction(out.map)
+        const unhighlightFunction = out.getUnHighlightFunction(out.map)
         out.appendNoDataLegend(container, config.noDataText, highlightFunction, unhighlightFunction)
     }
-}
-
-function getHighlightFunction(map) {
-    if (map._mapType == 'ps') return highlightPsSymbols
-    return highlightRegions
-}
-
-function getUnHighlightFunction(map) {
-    if (map._mapType == 'ps') return unhighlightPsSymbols
-    return unhighlightRegions
-}
-
-function getNumberOfClasses(out) {
-    const map = out.map
-    const mapType = map._mapType
-    const numberOfClasses = mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_ //prop symbols or choropleth
-    return numberOfClasses
-}
-
-function getLabelFormatter(out) {
-    const map = out.map
-    const mapType = map._mapType
-    const labelFormatter = mapType === 'ps' ? getPropSymbolLabelFormatter(out) : getChoroplethLabelFormatter(out)
-    return labelFormatter
-}
-
-function getClassToFillStyle(out) {
-    const map = out.map
-    const mapType = map._mapType
-    const classToFillStyle = mapType === 'ps' ? map.psClassToFillStyle_ : map.classToFillStyle_
-    return classToFillStyle
-}
-
-function getColorClassifier(out) {
-    const map = out.map
-    const mapType = map._mapType
-    const colorClassifier = mapType === 'ps' ? map.classifierColor_ : map.classifier_
-    return colorClassifier
 }
 
 function getTitlePadding(out) {
@@ -88,18 +48,20 @@ function getTitlePadding(out) {
 function createThresholdsLegend(out, config) {
     const map = out.map
     const container = out._discreteLegendContainer
-    const numberOfClasses = getNumberOfClasses(out)
+    const numberOfClasses = out.getNumberOfClasses(out)
     const titlePadding = getTitlePadding(out)
-    const highlightFunction = getHighlightFunction(map)
-    const unhighlightFunction = getUnHighlightFunction(map)
+    const highlightFunction = out.getHighlightFunction(map)
+    const unhighlightFunction = out.getUnHighlightFunction(map)
+    const classifier = out.getColorClassifier(out)
+    const classToFillStyle = out.getClassToFillStyle(out)
 
     // Label formatter
-    const labelFormatter = getLabelFormatter(out)
+    const labelFormatter = out.getLabelFormatter(out)
     for (let i = 0; i < numberOfClasses; i++) {
         const y = i * config.shapeHeight + titlePadding
         const x = 0
         const ecl = out.ascending ? numberOfClasses - i - 1 : i
-        const fillColor = getClassToFillStyle(out)(ecl, numberOfClasses)
+        const fillColor = classToFillStyle(ecl, numberOfClasses)
 
         // Append rectangle for each class
         container
@@ -152,7 +114,7 @@ function createThresholdsLegend(out, config) {
                 .attr('dy', '0.35em') // ~vertical centering
                 .text(() => {
                     if (config.labels) return config.labels[i]
-                    const classifier = getColorClassifier(out)
+
                     if (classifier?.invertExtent) {
                         const range = classifier.invertExtent(ecl)
                         return labelFormatter(range[out.ascending ? 0 : 1])
@@ -180,17 +142,19 @@ function createThresholdsLegend(out, config) {
 function createRangesLegend(out, config) {
     const map = out.map
     const container = out._discreteLegendContainer
-    const labelFormatter = getLabelFormatter(out)
-    const numberOfClasses = getNumberOfClasses(out)
-    const highlightFunction = getHighlightFunction(map)
-    const unhighlightFunction = getUnHighlightFunction(map)
+    const labelFormatter = out.getLabelFormatter(out)
+    const numberOfClasses = out.getNumberOfClasses(out)
+    const highlightFunction = out.getHighlightFunction(map)
+    const unhighlightFunction = out.getUnHighlightFunction(map)
+    const classToFillStyle = out.getClassToFillStyle(out)
+    const colorClassifier = out.getColorClassifier(out)
 
     // for each class
     for (let i = 0; i < numberOfClasses; i++) {
         let y = i * config.shapeHeight + getTitlePadding(out)
         const x = 0
         const ecl = out.ascending ? numberOfClasses - i - 1 : i
-        const fillColor = map.classToFillStyle()(ecl, numberOfClasses)
+        const fillColor = classToFillStyle(ecl, numberOfClasses)
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
         // shift legend items down after point of divergence if applicable
@@ -237,7 +201,7 @@ function createRangesLegend(out, config) {
             .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
             .attr('y', y + config.shapeHeight / 2)
             .attr('dy', '0.35em')
-            .text(config.labels ? config.labels[i] : labelFormatter(map.classifier().invertExtent(ecl)[out.ascending ? 0 : 1], i))
+            .text(config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i))
     }
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
@@ -338,7 +302,7 @@ function drawDivergingLine(out, y, config) {
     }
 
     //move threshold label out of the way of the line
-    if (out.labelType == 'thresholds') {
+    if (out.labelType == 'thresholds' || out.colorLegend?.labelType == 'thresholds') {
         if (labels.length > 1) {
             // move it to end of line
             container.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)

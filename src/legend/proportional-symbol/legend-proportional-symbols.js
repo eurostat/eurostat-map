@@ -151,7 +151,7 @@ export function getPropSymbolLabelFormatter(out) {
             return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
         }
         return out.labelFormatter || defaultLabeller
-    } else if (out.labelType == 'thresholds') {
+    } else if (out.colorLegend.labelType == 'thresholds') {
         return out.labelFormatter || format(`.${out.decimals}f`)
     } else {
         return out.labelFormatter || format(`.${out.decimals}f`)

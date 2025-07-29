@@ -21,7 +21,7 @@ export function drawCircleLegend(out, x, y, container, values, sizeScale) {
     let domain = sizeScale.domain()
     if (!values) {
         // default legend values if unspecified by user
-        values = [Math.floor(domain[1]), Math.floor(domain[1] / 2), Math.floor(domain[0])]
+        values = [Math.floor(domain[1]), Math.floor(domain[0])]
     }
 
     let maxRadius = sizeScale(max(values)) //maximum circle radius to be shown in legend

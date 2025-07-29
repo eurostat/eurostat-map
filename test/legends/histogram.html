@@ -15,6 +15,7 @@
         <script src="../../../build/eurostatmap.js"></script>
         <!-- <script src="https://unpkg.com/eurostat-map@4.2.0"></script> -->
         <script>
+            const horizontal = false // true for horizontal, false for vertical histogram
             let map = eurostatmap
                 .map('choropleth')
                 .position({ x: 5110000, y: 3500000, z: 6200 })
@@ -34,19 +35,19 @@
                 .legend({
                     title: 'test title',
                     subtitle: 'test subtitle',
-                    x: 540,
+                    x: horizontal ? 530 : 540,
                     y: 10,
                     boxOpacity: 0.9,
                     title: 'Euro per inhabitant',
-                    labelType: 'ranges',
+                    labelType: 'thresholds',
                     histogram: {
-                        height: 280,
-                        width: 190,
-                        orientation: 'vertical',
-                        showCounts: false,
+                        height: horizontal ? 190 : 190,
+                        width: horizontal ? 240 : 190,
+                        orientation: horizontal ? 'horizontal' : 'vertical',
+                        //showCounts: true,
                         showPercentages: true,
-                        labelRotation: 90,
-                        margin: { top: 0, right: 0, bottom: 0, left: 120 },
+                        labelRotation: horizontal ? 80 : 90,
+                        margin: { top: 0, right: 0, bottom: 0, left: horizontal ? 0 : 120 },
                     },
                 })
 
