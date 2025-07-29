@@ -1,4 +1,6 @@
+import { spaceAsThousandSeparator } from '../core/utils'
 import * as Legend from './legend'
+import { drawCircleLegend } from './legend-circle-size'
 
 /**
  * A legend for proportional symbol map
@@ -8,6 +10,24 @@ import * as Legend from './legend'
 export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
+
+    out.sizeLegend = {
+        title: null,
+        titlePadding: 17,
+        values: null,
+    }
+
+    out.colorLegend = {
+        title: null,
+        titlePadding: 15,
+        marginTop: 23,
+        labelOffsets: { x: 5, y: 5 },
+        shapeWidth: 25,
+        shapeHeight: 20,
+        shapePadding: 1,
+        noData: true,
+        noDataText: 'No data',
+    }
 
     //override attribute values with config values
     if (config)
@@ -71,26 +91,137 @@ export const legend = function (map, config) {
      */
     function buildFlowLegend(out) {
         const map = out.map
-        const x = 10
-        const y = 10
+        let x = out.getBaseX()
+        let y = out.getBaseY()
 
-        buildFlowWidthLegend(out, x, y)
+        buildFlowWidthLegend(out, x, y + 12)
 
         if (map.flowDonuts_) {
-            const offset = 20
-            buildCircleSizeLegend(out, x, y + offset)
+            if (map.donutSizeScale) {
+                // donut size legend
+                const yOffset = out._sizeLegendContainer.node().getBBox().height
+                out._sizeLegendContainer = out.lgg
+                    .append('g')
+                    .attr('class', 'em-donut-size-legend')
+                    .attr('transform', `translate(${baseX}, ${baseY + yOffset})`)
+
+                drawCircleLegend(out, 0, 0, out._sizeLegendContainer, out.sizeLegend.values, map.donutSizeScale)
+
+                // donut color legend
+                const donutYOffset = out._sizeLegendContainer.node().getBBox().height + 10
+                drawDonutColorLegend(out, 0, baseY + donutYOffset)
+            }
         }
+
+        const colorYOffset = out._sizeLegendContainer.node().getBBox().height + 10
+        drawColorLegend(out, baseX, baseY + colorYOffset)
     }
 
-    function buildFlowWidthLegend(m, x, y) {
-        const container = out.lgg.append('g').attr('id', 'em-flow-width-legend').attr('class', 'em-flow-width-legend')
-        // Draw title
-        container.append('text').attr('x', x).attr('y', y).text(out.title).attr('class', 'em-legend-label').attr('id', 'line-width-legend-title')
+    function buildFlowWidthLegend(out, x, y) {
+        const map = out.map
+        if (!map.strokeWidthScale) return
+
+        out._sizeLegendContainer = out.lgg.append('g').attr('id', 'em-size-legend').attr('class', 'em-size-legend')
+        const container = out._sizeLegendContainer.append('g').attr('class', 'em-flow-width-legend')
+
+        if (out.sizeLegend.title) {
+            container
+                .append('text')
+                .attr('x', x)
+                .attr('y', y)
+                .attr('class', 'em-legend-label')
+                .text(out.sizeLegend.title || 'Flow width')
+        }
+
+        const scale = map.strokeWidthScale
+
+        // Representative values (min, mid, max or user-defined)
+        const domain = scale.domain()
+        const values = out.sizeLegend.values || [domain[0], domain[domain.length - 1]]
+
+        let currentY = y + (out.sizeLegend.titlePadding || 10)
+        const padding = 7 // extra spacing between items
+
+        values.forEach((val, i) => {
+            const strokeWidth = scale(val)
+
+            // Space relative to previous line (half previous + half current + padding)
+            if (i > 0) {
+                const prevStrokeWidth = scale(values[i - 1])
+                currentY += prevStrokeWidth / 2 + strokeWidth / i + padding
+            }
+
+            container
+                .append('line')
+                .attr('x1', x)
+                .attr('x2', x + 40)
+                .attr('y1', currentY)
+                .attr('y2', currentY)
+                .attr('stroke', '#444')
+                .attr('stroke-width', strokeWidth)
+
+            container
+                .append('text')
+                .attr('x', x + 50)
+                .attr('y', currentY)
+                .attr('dy', '0.35em')
+                .attr('class', 'em-legend-label')
+                .text(spaceAsThousandSeparator(val))
+        })
     }
 
-    //TODO: reuse prop symbol size legend
-    function buildCircleSizeLegend(m, x, y) {
-        const container = out.lgg.append('g').attr('id', 'em-flow-circle-size-legend').attr('class', 'em-flow-circle-size-legend')
+    function drawDonutColorLegend(out, x, y) {
+        const map = out.map
+        out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-color-legend').attr('transform', `translate(${x}, ${y})`)
+        const container = out._colorLegendContainer.append('g').attr('class', 'em-flow-donut-color-legend')
+        out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
+        const items = {
+            'Net Exporter': out.flowOverlayColors_[0],
+            'Net Importer': out.flowOverlayColors_[1],
+        }
+        // Draw the legend items
+        Object.entries(items).forEach(([label, color], i) => {
+            container
+                .append('rect')
+                .attr('x', 0)
+                .attr('y', i * 20)
+                .attr('width', 18)
+                .attr('height', 18)
+                .attr('fill', color)
+
+            container
+                .append('text')
+                .attr('x', 25)
+                .attr('y', i * 20 + 15)
+                .attr('class', 'em-legend-label')
+                .text(label)
+        })
+    }
+
+    function drawColorLegend(out, x, y) {
+        const container = out.lgg.append('g').attr('class', 'em-color-legend').attr('transform', `translate(${x}, ${y})`)
+        const map = out.map
+        const items = {
+            'Net Exporter': map.flowOverlayColors_[0],
+            'Net Importer': map.flowOverlayColors_[1],
+        }
+        // Draw the legend items
+        Object.entries(items).forEach(([label, color], i) => {
+            container
+                .append('rect')
+                .attr('x', 0)
+                .attr('y', i * 20)
+                .attr('width', 18)
+                .attr('height', 18)
+                .attr('fill', color)
+
+            container
+                .append('text')
+                .attr('x', 25)
+                .attr('y', i * 20 + 15)
+                .attr('class', 'em-legend-label')
+                .text(label)
+        })
     }
 
     return out

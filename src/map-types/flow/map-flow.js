@@ -1,7 +1,7 @@
 // Import required D3 modules
 // import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
 
-import { max } from 'd3-array'
+import { min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
 import * as StatMap from '../../core/stat-map'
 import * as FlowLegend from '../../legend/legend-flow'
@@ -38,6 +38,13 @@ export const map = function (config) {
     out.flowStack_ = false // Default to no stacking
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
 
+    //donuts
+    out.flowDonutColors_ = {
+        incoming: '#2ca02c',
+        outgoing: '#d62728',
+        internal: '#9467bd',
+    }
+
     /**
      * flowmap-specific setters/getters
      */
@@ -53,6 +60,9 @@ export const map = function (config) {
         'flowStack_',
         'flowDonuts_',
         'flowLabelOffsets_',
+        'flowDonutColors_',
+        'flowMapType_',
+        'flowDonutSizeScale_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -73,7 +83,7 @@ export const map = function (config) {
         // update stroke width function
         const data = out.flowGraph_.links
         out.strokeWidthScale = scaleLinear()
-            .domain([0, max(data, (d) => d.value)])
+            .domain([min(data, (d) => d.value), max(data, (d) => d.value)])
             .range([out.flowMinWidth_, out.flowMaxWidth_])
 
         // Define our container SVG

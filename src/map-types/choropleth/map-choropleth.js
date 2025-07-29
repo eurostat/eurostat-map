@@ -30,8 +30,22 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    let eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#1d2b6f']
-    out.colorFunction_ = (t) => piecewise(interpolateLab, eurostatMultihue)(Math.min(Math.max(0, t), 1)) // default
+    const eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#1d2b6f']
+    const paletteA = [
+        '#E9ECF6',
+        '#D4DAF0',
+        '#C1C9EB',
+        '#A8B4E6',
+        '#93A2DC',
+        '#7C90D6',
+        '#677CD2',
+        '#5169BE',
+        '#3C57B0',
+        '#2644A7',
+        '#15246B',
+        '#081132',
+    ]
+    out.colorFunction_ = (t) => piecewise(interpolateLab, paletteA)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.

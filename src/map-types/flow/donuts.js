@@ -9,19 +9,14 @@ export function addDonutsToNodes(out, container, nodes) {
     const group = container.append('g').attr('class', 'em-flow-donuts').attr('id', 'em-flow-donuts')
 
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
-    const sizeScale = scaleSqrt().domain([0, maxValue]).range([6, 18])
-    const colorByLabel = {
-        Incoming: '#1f77b4', // blue
-        Outgoing: '#ff7f0e', // orange
-        Internal: out.internalColor || '#999999', // gray (optional)
-    }
+    out.donutSizeScale = out.flowDonutSizeScale_ || scaleSqrt().domain([0, maxValue]).range([6, 18])
 
     const arcFunction = arc()
         .innerRadius(0)
         .outerRadius((d) => {
             const values = d.data?.parent?.donutValues ?? []
             const total = sum(values, (v) => v.value)
-            return sizeScale(total)
+            return out.donutSizeScale(total)
         })
 
     const pieFunction = pie().value((d) => d.value)
@@ -41,7 +36,7 @@ export function addDonutsToNodes(out, container, nodes) {
         })
         .join('path')
         .attr('d', arcFunction)
-        .attr('fill', (d) => colorByLabel[d.data.label] || '#ccc')
+        .attr('fill', (d) => out.flowDonutColors_[d.data.label] || '#ccc')
 
     if (out._tooltip) {
         nodeGroups
@@ -100,12 +95,7 @@ function donutMouseoverFunction(d, out, event) {
                 <table class="em-tooltip-table"><tbody>`)
 
     for (const segment of node.donutValues) {
-        const color =
-            {
-                Incoming: '#1f77b4',
-                Outgoing: '#ff7f0e',
-                Internal: out.internalColor || '#999999',
-            }[segment.label] || '#ccc'
+        const color = out.flowDonutColors_[segment.label] || '#ccc'
 
         buf.push(`
         <tr>
