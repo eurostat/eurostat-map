@@ -36,7 +36,7 @@ export function addDonutsToNodes(out, container, nodes) {
         })
         .join('path')
         .attr('d', arcFunction)
-        .attr('fill', (d) => out.flowDonutColors_[d.data.label] || '#ccc')
+        .attr('fill', (d) => out.flowDonutColors_[d.data.label.toLowerCase()] || '#ccc')
 
     if (out._tooltip) {
         nodeGroups
@@ -95,7 +95,7 @@ function donutMouseoverFunction(d, out, event) {
                 <table class="em-tooltip-table"><tbody>`)
 
     for (const segment of node.donutValues) {
-        const color = out.flowDonutColors_[segment.label] || '#ccc'
+        const color = out.flowDonutColors_[segment.label.toLowerCase()] || '#ccc'
 
         buf.push(`
         <tr>

@@ -70,7 +70,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     }
 
     // Add labels to nodes
-    if (out.labels_) addLabels(out, sankeyContainer, nodes)
+    if (out.labels_?.values) addLabels(out, sankeyContainer, nodes)
 
     return svg.node()
 }

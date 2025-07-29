@@ -51,15 +51,21 @@
                 .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
                 .flowArrows(false)
                 .flowOutlines(false)
-                .flowDonuts(false)
+                .flowDonuts(true)
                 .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
                 .labels({
-                    values: true,
+                    values: false,
                     backgrounds: true,
-                    shadows: true,
+                    shadows: false,
                 })
                 .nutsLevel(0)
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, sizeLegend: { title: 'Trade volume', values: [6500000, 40000000, 80000000] } })
+                .legend({
+                    x: 570,
+                    y: 10,
+                    boxOpacity: 1,
+                    flowSizeLegend: { title: 'Flow trade volume' },
+                    nodeSizeLegend: { title: 'Cumulative trade volume' },
+                })
                 .drawCoastalMargin(false)
                 .insets(false)
                 .zoomExtent([1, 10])

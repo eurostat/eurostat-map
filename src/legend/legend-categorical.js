@@ -46,9 +46,7 @@ export const legend = function (map, config) {
 
             // Optionally add no-data
             if (out.noData) {
-                const legendHeight = out.lgg.node().getBBox().height
-                const map = out.map
-                const domain = map.classToFillStyle() ? Object.keys(map.classToFillStyle()) : map.classifier_.domain()
+                const legendHeight = out.lgg.node().getBBox().height + 10 // Add some space below the legend
                 const x = baseX
                 const container = out.lgg
                     .append('g')

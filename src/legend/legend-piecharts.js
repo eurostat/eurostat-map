@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
-import { drawCircleLegend } from './legend-circle-size'
+import { drawCircleSizeLegend } from './legend-circle-size'
 
 /**
  * A legend for proportional symbol map
@@ -77,10 +77,14 @@ export const legend = function (map, config) {
         if (map.classifierSize_) {
             //circle size legend
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
-            const x = 0
-            const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
-            const y = baseY + out.sizeLegend.title ? sizeLegendTitleFontSize + out.sizeLegend.titlePadding : 0
-            drawCircleLegend(out, x, y, out._sizeLegendContainer, out.sizeLegend.values, map.classifierSize_)
+            drawCircleSizeLegend(
+                out,
+                out._sizeLegendContainer,
+                out.sizeLegend.values,
+                map.classifierSize_,
+                out.sizeLegend.title,
+                out.sizeLegend.titlePadding
+            )
         }
 
         // legend for ps color values

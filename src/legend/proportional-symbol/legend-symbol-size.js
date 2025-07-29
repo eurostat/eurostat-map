@@ -4,7 +4,7 @@ import { symbol } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 
 import { select } from 'd3-selection'
-import { drawCircleLegend } from '../legend-circle-size'
+import { drawCircleSizeLegend } from '../legend-circle-size'
 
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
@@ -25,14 +25,19 @@ export function drawSizeLegend(out, baseX, baseY) {
     //draw legend
     if (!map.psCustomSVG_ && map.psShape_ == 'circle') {
         //circle size legend
-        const x = 0
-        const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
-        let y = out.sizeLegend.title ? sizeLegendTitleFontSize + out.sizeLegend.titlePadding : 0
-        drawCircleLegend(out, x, y, out._sizeLegendContainer, out.sizeLegend.values, map.classifierSize_)
+        drawCircleSizeLegend(
+            out,
+            out._sizeLegendContainer,
+            out.sizeLegend.values,
+            map.classifierSize_,
+            out.sizeLegend.title,
+            out.sizeLegend.titlePadding
+        )
 
         // no data legend
         if (out.sizeLegend.noData) {
             let y = out._sizeLegendContainer.node().getBBox().height + 15 // padding after the circle legend
+            const x = 0
             const container = out._sizeLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
             out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightPsRegions, unhighlightPsRegions)
         }

@@ -4,7 +4,7 @@ import { max } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 import { arc } from 'd3'
-import { drawCircleLegend } from './legend-circle-size'
+import { drawCircleSizeLegend } from './legend-circle-size'
 
 /**
  * Legend for Coxcomb (polar area) maps
@@ -68,9 +68,9 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         if (map.classifierSize_) {
-            const container = lgg.append('g').attr('class', 'em-coxcomb-size-legend')
+            const container = lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             out._sizeLegendContainer = container
-            drawCircleLegend(out, baseX, baseY, container, out.sizeLegend.values, out.map.classifierSize_)
+            drawCircleSizeLegend(out, container, out.sizeLegend.values, out.map.classifierSize_, out.sizeLegend.title, out.sizeLegend.titlePadding)
         }
 
         buildColorLegend(out, baseX, baseY)

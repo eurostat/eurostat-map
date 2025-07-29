@@ -5,7 +5,7 @@ import { executeForAllInsets } from '../core/utils'
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
 export function drawDiscreteLegend(out, x, y) {
     // container
-    out._discreteLegendContainer = out.lgg.append('g').attr('class', 'discrete-legend-container').attr('transform', `translate(${x},${y})`)
+    out._discreteLegendContainer = out.lgg.append('g').attr('class', 'em-discrete-legend-container').attr('transform', `translate(${x},${y})`)
 
     // title
     if (out.colorLegend?.title) {
@@ -42,7 +42,7 @@ export function drawDiscreteLegend(out, x, y) {
 function getTitlePadding(out) {
     // Calculate the padding between the title and the first legend item
     const map = out.map
-    return map._mapType == 'ps' ? out.sizeLegend.titlePadding : 0
+    return map._mapType == 'ps' ? out.colorLegend.titlePadding : 0
 }
 
 function createThresholdsLegend(out, config) {

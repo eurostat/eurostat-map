@@ -5,16 +5,19 @@ import { getFontSizeFromClass } from '../core/utils'
  * @description builds a nested circle legend for proportional circles
  * @param {*} out legend object
  */
-export function drawCircleLegend(out, x, y, container, values, sizeScale) {
+export function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePadding = 16) {
     //draw size legend title
-    if (out.sizeLegend.title) {
-        let titleFontSize = getFontSizeFromClass('em-size-legend-title')
+    if (title) {
+        const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
+        titlePadding += sizeLegendTitleFontSize // add title font size to padding
+        // append title to the legend
         container
             .append('text')
             .attr('class', 'em-size-legend-title')
             .attr('id', 'em-size-legend-title')
-            .attr('y', titleFontSize)
-            .text(out.sizeLegend.title)
+            .attr('x', 0)
+            .attr('y', sizeLegendTitleFontSize)
+            .text(title)
     }
 
     //assign default circle radiuses if none specified by user
@@ -25,8 +28,8 @@ export function drawCircleLegend(out, x, y, container, values, sizeScale) {
     }
 
     let maxRadius = sizeScale(max(values)) //maximum circle radius to be shown in legend
-    x += maxRadius
-    y += maxRadius * 2 + getTitlePadding(out) // y position of the first circle
+    let x = maxRadius
+    let y = maxRadius * 2 + titlePadding // y position of the first circle
 
     const itemContainer = container
         .append('g')
@@ -79,9 +82,4 @@ export function drawCircleLegend(out, x, y, container, values, sizeScale) {
         })
 
     return out
-}
-
-function getTitlePadding(out) {
-    // Return the padding between title and legend
-    return out.sizeLegend?.titlePadding || out.titlePadding
 }

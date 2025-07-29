@@ -17,8 +17,7 @@ export const legend = function (map, config) {
     //size legend config (legend illustrating the values of different symbol sizes)
     out.sizeLegend = {
         title: null,
-        titleFontSize: 12,
-        titlePadding: 10, //padding between title and legend body
+        titlePadding: 15, //padding between title and legend body
         values: undefined, //manually define raw data values
         cellNb: 3, //number of elements in the legend
         shapePadding: 5, //the y distance between consecutive legend shape elements
@@ -37,9 +36,8 @@ export const legend = function (map, config) {
     // color legend config (legend illustrating the data-driven colour classes)
     out.colorLegend = {
         title: null,
-        titleFontSize: 12,
         titlePadding: 10, //padding between title and legend body
-        marginTop: 33, // margin top (distance between color and size legend)
+        marginTop: 30, // margin top (distance between color and size legend)
         shapeWidth: 25, //the width of the legend box elements
         shapeHeight: 20, //the height of the legend box elements
         shapePadding: 1, //the distance between consecutive legend shape elements in the color legend
