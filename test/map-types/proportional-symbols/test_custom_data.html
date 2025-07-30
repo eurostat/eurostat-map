@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            path[ecl='nd'] {
+                fill: rgb(70, 70, 70);
+            }
+        </style>
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <svg id-="legend"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // basic barebones proportional circles example
+
+            let map = eurostatmap
+                .map('ps')
+                .title('Total GDP')
+                .nutsLevel('mixed')
+                .psShape('circle')
+                .psMinSize(1)
+                .psMaxSize(15) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psStrokeWidth(0.1)
+                .psStroke('white')
+                .psFillOpacity(1)
+                .psStrokeOpacity(0.9)
+                .zoomExtent([1, 10])
+
+            map.statData('size').setData({
+                DE: 6,
+                FR: 10,
+                IT: 8,
+                ES: 7,
+                BE: 5,
+                NL: 4,
+                CH: 3,
+                PL: 2,
+                PT: 1,
+                AT: 2,
+                CZ: 3,
+                MT: 1,
+                IE: 2,
+                RO: 3,
+                DK: 2,
+                HU: 3,
+                SK: 2,
+                LU: 1,
+                SI: 2,
+                LT: 2,
+                RS: 1,
+                IS: ':',
+                LV: 2,
+                HR: 2,
+            })
+
+            map.build()
+        </script>
+    </body>
+</html>

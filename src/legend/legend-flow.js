@@ -11,20 +11,21 @@ export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
 
-    out.flowSizeLegend = {
+    out.flowWidthLegend = {
         title: null,
         titlePadding: 17,
         values: null,
+        marginTop: 5,
     }
 
-    out.nodeSizeLegend = {
+    out.donutSizeLegend = {
         title: null,
         titlePadding: 25,
         values: null,
         marginTop: 20,
     }
 
-    out.nodeColorLegend = {
+    out.donutColorLegend = {
         title: null,
         titlePadding: 15,
         marginTop: 23,
@@ -33,13 +34,19 @@ export const legend = function (map, config) {
     out.regionColorLegend = {
         title: null,
         titlePadding: 15,
-        marginTop: 23,
+        marginTop: 35,
     }
 
     //override attribute values with config values
     if (config)
         for (let key in config) {
-            if (key == 'colorLegend' || key == 'flowSizeLegend' || key == 'nodeSizeLegend') {
+            if (
+                key == 'colorLegend' ||
+                key == 'flowWidthLegend' ||
+                key == 'donutSizeLegend' ||
+                key == 'donutColorLegend' ||
+                key == 'regionColorLegend'
+            ) {
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
@@ -63,7 +70,13 @@ export const legend = function (map, config) {
         // update legend parameters if necessary
         if (m.legend_)
             for (let key in m.legend_) {
-                if (key == 'colorLegend' || key == 'flowSizeLegend' || key == 'nodeSizeLegend') {
+                if (
+                    key == 'colorLegend' ||
+                    key == 'flowWidthLegend' ||
+                    key == 'donutSizeLegend' ||
+                    key == 'donutColorLegend' ||
+                    key == 'regionColorLegend'
+                ) {
                     for (let p in out[key]) {
                         //override each property in size and color legend m.legend_
                         if (m.legend_[key][p] !== undefined) {
@@ -102,7 +115,7 @@ export const legend = function (map, config) {
         let baseY = out.getBaseY()
 
         // line widths
-        buildFlowWidthLegend(out, baseX, baseY + 12)
+        buildFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop)
 
         const flowWidthLegendHeight = out._flowWidthContainer.node().getBBox().height
 
@@ -118,31 +131,33 @@ export const legend = function (map, config) {
             out._donutSizeContainer = out._donutLegendContainer
                 .append('g')
                 .attr('class', 'em-donut-size-legend')
-                .attr('transform', `translate(${0}, ${out.nodeSizeLegend.marginTop})`)
+                .attr('transform', `translate(${0}, ${out.donutSizeLegend.marginTop})`)
 
             //draw circle size legend
             drawCircleSizeLegend(
                 out,
                 out._donutSizeContainer,
-                out.nodeSizeLegend.values,
+                out.donutSizeLegend.values,
                 map.donutSizeScale,
-                out.nodeSizeLegend.title,
-                out.nodeSizeLegend.titlePadding
+                out.donutSizeLegend.title,
+                out.donutSizeLegend.titlePadding
             )
 
             // donut color legend
-            const donutColorYOffset = out._donutSizeContainer.node().getBBox().height + 10 + out.nodeColorLegend.marginTop
+            const donutColorYOffset =
+                out.donutSizeLegend.marginTop + out._donutSizeContainer.node().getBBox().height + 10 + out.donutColorLegend.marginTop
             drawDonutColorLegend(out, 0, donutColorYOffset)
         }
 
         // region fill colors
-        let colorYOffset = flowWidthLegendHeight + out.regionColorLegend.marginTop
-        if (map.flowDonuts_ && map.donutSizeScale) {
-            colorYOffset += out._donutLegendContainer.node().getBBox().height
-            colorYOffset += out.nodeColorLegend.marginTop
-            colorYOffset += out.nodeSizeLegend.marginTop
+        if (map.importerRegionIds.length > 0 || map.exporterRegionIds.length > 0) {
+            let colorYOffset = baseY + out.flowWidthLegend.marginTop + flowWidthLegendHeight + out.regionColorLegend.marginTop
+            if (map.flowDonuts_ && map.donutSizeScale) {
+                colorYOffset += out.donutSizeLegend.marginTop
+                colorYOffset += out._donutLegendContainer.node().getBBox().height
+            }
+            drawOverlayColorLegend(out, baseX, colorYOffset)
         }
-        drawOverlayColorLegend(out, baseX, colorYOffset)
     }
 
     function buildFlowWidthLegend(out, baseX, baseY) {
@@ -151,22 +166,22 @@ export const legend = function (map, config) {
 
         out._flowWidthContainer = out.lgg.append('g').attr('class', 'em-flow-width-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
-        if (out.flowSizeLegend.title) {
+        if (out.flowWidthLegend.title) {
             out._flowWidthContainer
                 .append('text')
                 // .attr('x', x)
                 // .attr('y', y)
                 .attr('class', 'em-size-legend-title')
-                .text(out.flowSizeLegend.title || 'Flow width')
+                .text(out.flowWidthLegend.title || 'Flow width')
         }
 
         const scale = map.strokeWidthScale
 
         // Representative values (min, mid, max or user-defined)
         const domain = scale.domain()
-        const values = out.flowSizeLegend.values || [domain[0], domain[domain.length - 1]]
+        const values = out.flowWidthLegend.values || [domain[0], domain[domain.length - 1]]
 
-        let currentY = out.flowSizeLegend.titlePadding || 10
+        let currentY = out.flowWidthLegend.titlePadding || 10
         const padding = 7 // extra spacing between items
         let x = 0
 
@@ -225,11 +240,17 @@ export const legend = function (map, config) {
         })
     }
 
-    function drawOverlayColorLegend(out, x, y) {
+    function drawOverlayColorLegend(out, baseX, baseY) {
         if (!out._colorLegendContainer) {
-            out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-color-legend').attr('transform', `translate(${x}, ${y})`)
+            out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-color-legend').attr('transform', `translate(${baseX}, ${baseY})`)
         }
         const container = out._colorLegendContainer.append('g').attr('class', 'em-flow-overlay-color-legend')
+
+        const title = container
+            .append('text')
+            .attr('class', 'em-color-legend-title')
+            .attr('dy', '0.35em')
+            .text(out.regionColorLegend.title || 'Region fill colors')
 
         const map = out.map
         const items = {
@@ -237,19 +258,21 @@ export const legend = function (map, config) {
             'Net Importer': map.flowOverlayColors_[1],
         }
         // Draw the legend items
+        let x = 0
+        let y = out.regionColorLegend.titlePadding
         Object.entries(items).forEach(([label, color], i) => {
             container
                 .append('rect')
                 .attr('x', 0)
-                .attr('y', i * 20)
-                .attr('width', 18)
-                .attr('height', 18)
+                .attr('y', y + i * 20)
+                .attr('width', out.shapeWidth)
+                .attr('height', out.shapeHeight)
                 .attr('fill', color)
 
             container
                 .append('text')
-                .attr('x', 25)
-                .attr('y', i * 20 + 15)
+                .attr('x', out.shapeWidth + 5)
+                .attr('y', y + i * 20 + 15)
                 .attr('class', 'em-legend-label')
                 .text(label)
         })

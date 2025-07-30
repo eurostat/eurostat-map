@@ -55,9 +55,6 @@ export function createSankeyFlowMap(out, sankeyContainer) {
         addFlowGradients(out, defs, gradientIds, links)
     }
 
-    // Add geographical layers
-    addOverlayPolygons(out, graph)
-
     // Add Sankey flows
     addSankeyFlows(out, sankeyContainer, links, arrowId, arrowOutlineId, gradientIds)
 
@@ -69,48 +66,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
         addDonutsToNodes(out, sankeyContainer, nodes)
     }
 
-    // Add labels to nodes
-    if (out.labels_?.values) addLabels(out, sankeyContainer, nodes)
-
     return svg.node()
-}
-
-/**
- * Adds geographical layers (regions, POI overlay, borders)
- */
-function addOverlayPolygons(out, graph) {
-    const importerIds = []
-    const exporterIds = []
-    const features = out.Geometries.getRegionFeatures()
-    if (features) {
-        graph.nodes.forEach((node) => {
-            const overlay = features.find((feature) => {
-                if (node.id == feature.properties.id) return feature
-            })
-
-            if (overlay) {
-                let isImporter = graph.links.some((link) => link.source == node.id)
-                if (isImporter) {
-                    importerIds.push(node.id)
-                } else {
-                    exporterIds.push(node.id)
-                }
-            } else {
-                console.error('could not find geometry for', node.id)
-            }
-        })
-
-        //update existing region fills
-        const selector = getRegionsSelector(out)
-        const allRegions = out.svg_.selectAll(selector)
-
-        allRegions.each(function () {
-            select(this).style('fill', (region) => {
-                if (importerIds.includes(region.properties.id)) return out.flowOverlayColors_[0]
-                if (exporterIds.includes(region.properties.id)) return out.flowOverlayColors_[1]
-            })
-        })
-    }
 }
 
 // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
@@ -433,67 +389,4 @@ const id = (d) => d.id // used in sankey import
 
 const sankeyLinkHorizontal = function () {
     return linkHorizontal().source(horizontalSource).target(horizontalTarget)
-}
-
-/**
- * Add labels for data points.
- * @param {Object} svg - D3 selection of the SVG element.
- */
-function addLabels(out, svg, nodes) {
-    // Filter the nodes
-    const filteredNodes = nodes.filter((node) => node.targetLinks && node.sourceLinks.length === 0)
-    const container = svg.append('g').attr('class', 'em-flow-labels')
-
-    // Add halo effect
-    if (out.labels_?.shadows) {
-        const labelsShadowGroup = container.append('g').attr('class', 'em-flow-label-shadow')
-        labelsShadowGroup
-            .selectAll('text')
-            .data(filteredNodes)
-            .join('text')
-            .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
-            .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.flowLabelOffsets_.x : d.x - out.flowLabelOffsets_.x))
-            .attr('y', (d) => d.y + out.flowLabelOffsets_.y)
-            .text((d) => out.labelFormatter(d.value))
-    }
-
-    // Add labels
-    const labelsGroup = container.append('g').attr('class', 'em-flow-label')
-    //add background
-    // Add background rectangles and text
-    const labelElements = labelsGroup
-        .selectAll('g') // Use a group for each label to combine rect and text
-        .data(filteredNodes)
-        .join('g') // Append a group for each label
-        .attr('transform', (d) => `translate(${d.x}, ${d.y})`) // Position group at the node
-
-    // Add text first to calculate its size
-    labelElements
-        .append('text')
-        .attr('class', 'em-label-text')
-        .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
-        .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.flowLabelOffsets_.x : -out.flowLabelOffsets_.x))
-        .attr('y', out.flowLabelOffsets_.y)
-        .text((d) => out.labelFormatter(d.value))
-
-    // Add background rectangles after text is rendered
-
-    if (out.labels_.backgrounds) {
-        labelElements.each(function () {
-            const textElement = select(this).select('text')
-            const bbox = textElement.node().getBBox() // Get bounding box of the text
-
-            const paddingX = 5 // Horizontal padding
-            const paddingY = 2 // Vertical padding
-
-            // Add rectangle centered behind the text
-            select(this)
-                .insert('rect', 'text') // Insert rect before text in DOM
-                .attr('class', 'em-label-background')
-                .attr('x', bbox.x - paddingX)
-                .attr('y', bbox.y - paddingY)
-                .attr('width', bbox.width + 2 * paddingX)
-                .attr('height', bbox.height + 2 * paddingY)
-        })
-    }
 }

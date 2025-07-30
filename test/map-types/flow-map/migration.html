@@ -118,13 +118,25 @@
                 .subtitle('number of applicants in EU countries, 2024')
                 .flowGraph(JSON.parse(JSON.stringify(graphData)))
                 .flowColor('#72bb6f')
-                .flowMaxWidth(20)
+                .flowMaxWidth(10)
                 .flowMinWidth(2)
-                .flowOutlines(false)
+                .flowOutlines(true)
                 .flowGradient(false)
                 .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowArrows(false)
-                .flowTargetOffset(1)
+                .flowArrows(true)
+                .legend({
+                    title: '',
+                    x: 830,
+                    y: 180,
+                    flowSizeLegend: { title: 'Flow trade volume' },
+                    donutSizeLegend: { title: 'Cumulative trade volume' },
+                    donutColorLegend: { title: 'Cumulative trade volume' },
+                    regionsColorLegend: {
+                        title: 'Region fill colors',
+                        titlePadding: 10,
+                        marginTop: 30,
+                    },
+                })
                 .stamp({
                     text: 'Total applicants to the EU 911 000',
                     size: 45,
@@ -132,7 +144,7 @@
                     y: 150,
                 })
                 .nutsLevel(0)
-                .zoomExtent([0.5, 10])
+                .zoomExtent([1, 10])
                 .build()
         </script>
     </body>
