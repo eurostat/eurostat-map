@@ -10,6 +10,8 @@ import { format } from 'd3-format'
 import { createSankeyFlowMap } from './sankey'
 import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { createFlowMap } from './straight'
+import { computeDonutLocationStats, computeDonutValues, drawDonuts } from './donuts'
+import { scaleOrdinal } from 'd3-scale'
 
 /**
  * Returns a flow map.
@@ -39,6 +41,7 @@ export const map = function (config) {
     out.flowStack_ = false // Default to no stacking
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
+    out.flowInternal_ = true // Whether to include internal flows in donuts
 
     //donuts
     out.flowDonutColors_ = {
@@ -66,6 +69,7 @@ export const map = function (config) {
         'flowMapType_',
         'flowDonutSizeScale_',
         'flowOpacity_',
+        'flowInternal_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -89,7 +93,8 @@ export const map = function (config) {
             .domain([min(data, (d) => d.value), max(data, (d) => d.value)])
             .range([out.flowMinWidth_, out.flowMaxWidth_])
 
-        calculateNodeTotals(out)
+        // some pre-calculations
+        prepareFlowGraph(out)
 
         // Define our container SVG
         const zoomGroup = select('#em-zoom-group-' + out.svgId_)
@@ -106,8 +111,15 @@ export const map = function (config) {
             createFlowMap(out, sankeyContainer)
         }
 
+        // donuts
+        if (out.flowDonuts_) {
+            computeDonutValues(out)
+            computeDonutLocationStats(out, true) // include internal flows
+            drawDonuts(out, sankeyContainer)
+        }
+
         // Add labels to nodes
-        if (out.labels_?.values) addLabels(out, sankeyContainer, nodes)
+        if (out.labels_?.values) addLabels(out, sankeyContainer)
     }
 
     //@override
@@ -120,6 +132,98 @@ export const map = function (config) {
     }
 
     return out
+}
+
+function prepareFlowGraph(out) {
+    // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
+    addCoordinatesToGraph(out)
+    projectAllNodeCoordinates(out)
+    calculateNodeTotals(out)
+    computeNodeLinks(out)
+
+    const nodes = out.flowGraph_.nodes
+    const uniqueLocations = Array.from(nodes).sort((a, b) => b.value - a.value)
+    const topLocationsN = 10 // Number of top locations to show
+    const topLocations = [...uniqueLocations].slice(0, topLocationsN)
+    out.topLocationKeys = new Set(topLocations.map((loc) => loc.id))
+    out.locationColorScale = scaleOrdinal()
+        .domain(topLocations.map((d) => d.id))
+        //.range(d3.schemeCategory10) // Or any custom palette of 4 colors
+        .range([
+            '#00B3E3', // bright turquoise
+            '#FBBA00', // golden yellow
+            '#2BA966', // medium green
+            '#D23142', // red pink
+            '#005289', // deep blue
+            '#93397F', // deep mauve
+            '#E73E11', // bright red orange
+            '#4E4084', // muted purple
+            '#056731', // dark green
+            '#00667E', // teal blue
+            '#B5B900', // light green
+        ])
+}
+
+// if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
+function addCoordinatesToGraph(out) {
+    out.flowGraph_.nodes.forEach((node) => {
+        if (typeof node.x !== 'number' || typeof node.y !== 'number') {
+            if (out.Geometries.centroidsFeatures) {
+                const centroid = out.Geometries.centroidsFeatures.find((feature) => {
+                    return node.id == feature.properties.id
+                })
+                if (centroid) {
+                    const [x, y] = centroid.geometry.coordinates
+                    node.x = x
+                    node.y = y
+                } else {
+                    console.error('could not find coordinates for', node.id)
+                }
+            } else {
+                const features = out.Geometries.getRegionFeatures?.()
+                const feature = features?.find((f) => f.properties.id === node.id)
+                const centroid = feature?.properties?.centroid || out._pathFunction.centroid(feature)
+                const [x, y] = centroid
+                node.x = x
+                node.y = y
+            }
+        }
+    })
+}
+
+function projectAllNodeCoordinates(out) {
+    const nodes = out.flowGraph_.nodes
+    for (const node of nodes) {
+        const screenCoords = out._projection([node.x, node.y])
+        node.x = screenCoords[0]
+        node.y = screenCoords[1]
+    }
+}
+
+export function computeNodeLinks(out) {
+    const nodes = out.flowGraph_.nodes
+    const links = out.flowGraph_.links
+    const id = (d) => d.id
+    for (const [i, node] of nodes.entries()) {
+        node.index = i
+        node.sourceLinks = []
+        node.targetLinks = []
+    }
+    const nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d]))
+    for (const [i, link] of links.entries()) {
+        link.index = i
+        let { source, target } = link
+        if (typeof source !== 'object') source = link.source = find(nodeById, source)
+        if (typeof target !== 'object') target = link.target = find(nodeById, target)
+        source.sourceLinks.push(link)
+        target.targetLinks.push(link)
+    }
+}
+
+function find(nodeById, id) {
+    const node = nodeById.get(id)
+    if (!node) throw new Error('missing: ' + id)
+    return node
 }
 
 function calculateNodeTotals(out) {
@@ -192,8 +296,9 @@ function addOverlayPolygons(out) {
  * Add labels for data points.
  * @param {Object} svg - D3 selection of the SVG element.
  */
-function addLabels(out, svg, nodes) {
+function addLabels(out, svg) {
     // Filter the nodes
+    const nodes = out.flowGraph_.nodes
     const filteredNodes = nodes.filter((node) => node.targetLinks && node.sourceLinks.length === 0)
     const container = svg.append('g').attr('class', 'em-flow-labels')
 

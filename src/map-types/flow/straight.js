@@ -1,4 +1,3 @@
-import { scaleOrdinal } from 'd3-scale'
 import { select } from 'd3-selection'
 
 /**
@@ -21,26 +20,6 @@ function drawStraightLinesByFlow(out, container) {
     const lineGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines')
 
     const { nodes, links } = out.flowGraph_
-    const uniqueLocations = Array.from(nodes).sort((a, b) => b.value - a.value)
-    const topLocationsN = 10 // Number of top locations to show
-    const topLocations = [...uniqueLocations].slice(0, topLocationsN)
-    const topLocationKeys = new Set(topLocations.map((loc) => `${loc.x},${loc.y}`))
-    const locationColor = scaleOrdinal()
-        .domain([...topLocations].map((d) => `${d.x},${d.y}`))
-        //.range(d3.schemeCategory10) // Or any custom palette of 4 colors
-        .range([
-            '#00B3E3', // bright turquoise
-            '#FBBA00', // golden yellow
-            '#2BA966', // medium green
-            '#D23142', // red pink
-            '#005289', // deep blue
-            '#93397F', // deep mauve
-            '#E73E11', // bright red orange
-            '#4E4084', // muted purple
-            '#056731', // dark green
-            '#00667E', // teal blue
-            '#B5B900', // light green
-        ])
 
     // Build a quick lookup for node coordinates
     const nodeMap = new Map(nodes.map((n) => [n.id, [n.x, n.y]]))
@@ -49,8 +28,11 @@ function drawStraightLinesByFlow(out, container) {
     const routeMap = new Map()
 
     links.forEach((link) => {
-        const origin = nodeMap.get(link.source)
-        const dest = nodeMap.get(link.target)
+        const sourceId = typeof link.source === 'object' ? link.source.id : link.source
+        const targetId = typeof link.target === 'object' ? link.target.id : link.target
+
+        const origin = nodeMap.get(sourceId)
+        const dest = nodeMap.get(targetId)
         if (!origin || !dest) return // skip invalid links
 
         // Use a consistent key for grouping regardless of direction
@@ -76,18 +58,16 @@ function drawStraightLinesByFlow(out, container) {
     // Step 2: Draw each direction (halfway from origin to destination)
     for (const route of routeMap.values()) {
         const { coordsA, coordsB, flowAB, flowBA } = route
-        const aProj = out._projection(coordsA)
-        const bProj = out._projection(coordsB)
-        const midX = (aProj[0] + bProj[0]) / 2
-        const midY = (aProj[1] + bProj[1]) / 2
+        const midX = (coordsA[0] + coordsB[0]) / 2
+        const midY = (coordsA[1] + coordsB[1]) / 2
 
         const abStroke = () => {
             const locKey = `${coordsB[0]},${coordsB[1]}`
-            return topLocationKeys.has(locKey) ? locationColor(locKey) : out.flowColor_
+            return out.topLocationKeys.has(locKey) ? out.locationColorScale(locKey) : out.flowColor_
         }
         const baStroke = () => {
             const locKey = `${coordsA[0]},${coordsA[1]}`
-            return topLocationKeys.has(locKey) ? locationColor(locKey) : out.flowColor_
+            return out.topLocationKeys.has(locKey) ? out.locationColorScale(locKey) : out.flowColor_
         }
 
         // A → B line
@@ -101,8 +81,8 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('data-nb', flow)
                 .attr('x1', midX)
                 .attr('y1', midY)
-                .attr('x2', bProj[0])
-                .attr('y2', bProj[1])
+                .attr('x2', coordsB[0])
+                .attr('y2', coordsB[1])
                 .attr('data-origin', `${origin[0]},${origin[1]}`)
                 .attr('data-dest', `${dest[0]},${dest[1]}`)
                 .attr('stroke', abStroke)
@@ -125,8 +105,8 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('data-nb', flow)
                 .attr('x1', midX)
                 .attr('y1', midY)
-                .attr('x2', aProj[0])
-                .attr('y2', aProj[1])
+                .attr('x2', coordsA[0])
+                .attr('y2', coordsA[1])
                 .attr('data-origin', `${origin[0]},${origin[1]}`)
                 .attr('data-dest', `${dest[0]},${dest[1]}`)
                 .attr('stroke', baStroke)

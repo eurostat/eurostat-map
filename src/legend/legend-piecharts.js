@@ -117,6 +117,7 @@ export const legend = function (map, config) {
         if (config.title) {
             out._colorLegendContainer
                 .append('text')
+                .attr('id', 'em-color-legend-title')
                 .attr('class', 'em-color-legend-title')
                 .attr('x', 0)
                 .attr('y', out.titleFontSize)

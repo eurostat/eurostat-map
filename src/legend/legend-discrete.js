@@ -12,6 +12,7 @@ export function drawDiscreteLegend(out, x, y) {
         out._discreteLegendContainer
             .append('text')
             .attr('class', 'em-legend-title em-color-legend-title')
+            .attr('id', 'em-color-legend-title')
             .attr('x', 0)
             .attr('y', 0)
             .text(out.colorLegend.title)

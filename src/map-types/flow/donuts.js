@@ -4,12 +4,58 @@ import { arc, pie } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { select } from 'd3-selection'
 
-export function addDonutsToNodes(out, container, nodes) {
+export function drawDonuts(out, container) {
+    const donutContainer = container.append('g').attr('class', 'donuts').attr('id', 'donuts')
+    const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
+    out.donutSizeScale = out.flowDonutSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
+    const arcGen = arc().innerRadius(5)
+    const pieGen = pie()
+        .value((d) => d.value)
+        .sort(null)
+
+    Object.entries(out.locationStats).forEach(([locKey, stats]) => {
+        const { x, y, incoming, outgoing, internal } = stats
+        const total = out.flowInternal_ ? incoming + outgoing + internal : incoming + outgoing
+        if (total === 0) return
+
+        const outgoingBreakdown = getOutgoingBreakdownByDestination(locKey, out)
+        const color = out.topLocationKeys.has(locKey) ? out.locationColorScale(locKey) : '#666'
+
+        const donutData = [
+            {
+                key: 'incoming',
+                value: out.flowInternal_ ? incoming + internal : incoming,
+                color,
+                x,
+                y,
+            },
+            ...outgoingBreakdown,
+        ]
+
+        const g = donutContainer.append('g').attr('class', 'donut-group').attr('transform', `translate(${x},${y})`).attr('data-total', total)
+
+        // Outer donut ring
+        g.selectAll('path')
+            .data(pieGen(donutData))
+            .join('path')
+            .attr('d', arcGen.innerRadius(out.donutSizeScale(total) * 0.4).outerRadius(out.donutSizeScale(total)))
+            .attr('fill', (d) => d.data.color)
+            .attr('stroke', 'white')
+            .attr('stroke-width', 0.5)
+
+        // Inner circle
+        g.append('circle')
+            .attr('r', out.donutSizeScale(total) * 0.4)
+            .attr('fill', 'white')
+    })
+}
+
+export function addDonutsToNodes(out, container) {
+    const nodes = out.flowGraph_.nodes
     container.select('.em-flow-donuts')?.remove()
     const group = container.append('g').attr('class', 'em-flow-donuts').attr('id', 'em-flow-donuts')
 
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
-    out.donutSizeScale = out.flowDonutSizeScale_ || scaleSqrt().domain([0, maxValue]).range([6, 18])
 
     const arcFunction = arc()
         .innerRadius(0)
@@ -52,26 +98,85 @@ export function addDonutsToNodes(out, container, nodes) {
     }
 }
 
-export function computeDonutValues(nodes) {
-    for (const node of nodes) {
-        const inValue = sum(node.targetLinks, (d) => d.value)
-        const outValue = sum(node.sourceLinks, (d) => d.value)
-        const selfValue = node.sourceLinks.some((l) => l.target === node)
-            ? sum(
-                  node.sourceLinks.filter((l) => l.target === node),
-                  (d) => d.value
-              )
-            : 0
+export function computeDonutLocationStats(out) {
+    const statsByLoc = {}
 
-        node.donutValues = [
-            { label: 'Incoming', value: inValue },
-            { label: 'Outgoing', value: outValue },
-        ]
-
-        // Include internal/self loops if present
-        if (selfValue > 0) {
-            node.donutValues.push({ label: 'Internal', value: selfValue })
+    for (const node of out.flowGraph_.nodes) {
+        statsByLoc[node.id] = {
+            x: node.x,
+            y: node.y,
+            incoming: 0,
+            outgoing: 0,
+            internal: 0,
         }
+    }
+
+    for (const link of out.flowGraph_.links) {
+        const srcKey = link.source.id
+        const tgtKey = link.target.id
+
+        // Outgoing for source
+        if (statsByLoc[srcKey]) statsByLoc[srcKey].outgoing += link.value
+        // Incoming for target
+        if (statsByLoc[tgtKey]) statsByLoc[tgtKey].incoming += link.value
+        // Internal if same node
+        if (srcKey === tgtKey) statsByLoc[srcKey].internal += link.value
+    }
+
+    out.locationStats = statsByLoc
+}
+
+function getOutgoingBreakdownByDestination(locationKey, out) {
+    const topKeys = out.topLocationKeys
+    const color = (key) => out.locationColorScale(key)
+
+    const breakdown = {}
+
+    for (const link of out.flowGraph_.links) {
+        const srcKey = link.source.id
+        const tgtKey = link.target.id
+
+        if (srcKey === locationKey && srcKey !== tgtKey) {
+            const key = topKeys.has(tgtKey) ? tgtKey : 'Other'
+            breakdown[key] = (breakdown[key] || 0) + link.value
+        }
+    }
+
+    return Object.entries(breakdown).map(([key, value]) => ({
+        key,
+        value,
+        color: key === 'Other' ? '#666' : color(key),
+    }))
+}
+
+export function computeDonutValues(out) {
+    const nodes = out.flowGraph_.nodes
+    const topKeys = out.topLocationKeys || new Set()
+    const colorScale = out.locationColorScale
+
+    for (const node of nodes) {
+        const valuesMap = new Map()
+
+        // Incoming flows
+        for (const link of node.targetLinks) {
+            const sourceKey = link.source.id
+            const key = topKeys.has(sourceKey) ? sourceKey : 'Other'
+            valuesMap.set(key, (valuesMap.get(key) || 0) + link.value)
+        }
+
+        // Outgoing flows
+        for (const link of node.sourceLinks) {
+            const targetKey = link.target.id
+            const key = topKeys.has(targetKey) ? targetKey : 'Other'
+            valuesMap.set(key, (valuesMap.get(key) || 0) + link.value)
+        }
+
+        // Convert map to donutValues array with color
+        node.donutValues = Array.from(valuesMap.entries()).map(([key, value]) => ({
+            label: key,
+            value,
+            color: key === 'Other' ? '#ccc' : colorScale(key),
+        }))
     }
 }
 

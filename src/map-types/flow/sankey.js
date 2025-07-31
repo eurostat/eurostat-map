@@ -2,7 +2,6 @@ import { generateUniqueId, getRegionsSelector } from '../../core/utils'
 import { linkHorizontal } from 'd3-shape'
 import { sum } from 'd3-array'
 import { select } from 'd3-selection'
-import { addDonutsToNodes, computeDonutValues } from './donuts'
 
 // spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
 // See https://observablehq.com/@joewdavies/flow-map-of-europe
@@ -25,10 +24,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     const svg = out.svg_
     const graph = out.flowGraph_
 
-    // if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
-    addCoordinatesToGraph(out, graph)
-
-    var { nodes, links } = sankey(out, graph)
+    const { nodes, links } = sankey(out, graph)
 
     if (!out.flowStack_) {
         // Collapse all links at origin Y (or middle of the node height)
@@ -61,48 +57,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     // Add additional nodes (fill gaps)
     addFillGaps(out, sankeyContainer, nodes)
 
-    if (out.flowDonuts_) {
-        computeDonutValues(nodes)
-        addDonutsToNodes(out, sankeyContainer, nodes)
-    }
-
     return svg.node()
-}
-
-// if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
-function addCoordinatesToGraph(out, graph) {
-    graph.nodes.forEach((node) => {
-        if (!node.x && !node.y && out.Geometries.centroidsFeatures) {
-            const centroid = out.Geometries.centroidsFeatures.find((feature) => {
-                if (node.id == feature.properties.id) return feature
-            })
-
-            if (centroid) {
-                const screenCoords = out._projection([centroid.geometry.coordinates[0], centroid.geometry.coordinates[1]])
-                node.x = screenCoords[0]
-                node.y = screenCoords[1]
-            } else {
-                console.error('could not find coordinates for', node.id)
-            }
-        } else {
-            if (node.x && node.y) {
-                // user coords to screen coords
-                const screenCoords = out._projection([node.x, node.y])
-                node.x = screenCoords[0]
-                node.y = screenCoords[1]
-                return
-            }
-            // no centroids data, calculate on the fly
-            const features = out.Geometries.getRegionFeatures()
-            const feature = features.find((feature) => {
-                if (node.id == feature.properties.id) return feature
-            })
-            const centroid = feature.properties.centroid || out._pathFunction.centroid(feature)
-            const screenCoords = out._projection([centroid[0], centroid[1]])
-            node.x = screenCoords[0]
-            node.y = screenCoords[1]
-        }
-    })
 }
 
 /**
@@ -143,8 +98,9 @@ function addArrowMarker(out, defs, id, color) {
  * @param {Array} links - Sankey links data
  */
 function addFlowGradients(out, defs, gradientIds, links) {
+    const safeLinks = links.filter((d) => d.source?.x1 != null && d.target?.x0 != null && d.y0 != null && d.y1 != null)
     defs.selectAll('linearGradient')
-        .data(links)
+        .data(safeLinks)
         .join('linearGradient')
         .attr('id', (_, i) => gradientIds[i])
         .attr('gradientUnits', 'userSpaceOnUse')
@@ -160,9 +116,8 @@ function clone({ nodes, links }) {
     return { nodes: nodes.map((d) => Object.assign({}, d)), links: links.map((d) => Object.assign({}, d)) }
 }
 
-function sankey(out, { nodes, links }) {
-    const graph = clone({ nodes, links })
-    computeNodeLinks(graph)
+function sankey(out) {
+    const graph = out.flowGraph_
     computeNodeValues(graph)
     computeNodeDepths(graph)
     computeNodeHeights(graph)
@@ -255,35 +210,6 @@ function addFillGaps(out, container, nodes) {
         .attr('width', 1)
         .attr('height', (d) => d.y1 - d.y0)
         .attr('fill', out.flowColor_)
-}
-
-function computeNodeLinks({ nodes, links }) {
-    for (const [i, node] of nodes.entries()) {
-        node.index = i
-        node.sourceLinks = []
-        node.targetLinks = []
-    }
-    const nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d]))
-    for (const [i, link] of links.entries()) {
-        link.index = i
-        let { source, target } = link
-        if (typeof source !== 'object') source = link.source = find(nodeById, source)
-        if (typeof target !== 'object') target = link.target = find(nodeById, target)
-        source.sourceLinks.push(link)
-        target.targetLinks.push(link)
-    }
-    // if (linkSort != null) {
-    //     for (const { sourceLinks, targetLinks } of nodes) {
-    //         sourceLinks.sort(linkSort)
-    //         targetLinks.sort(linkSort)
-    //     }
-    // }
-}
-
-function find(nodeById, id) {
-    const node = nodeById.get(id)
-    if (!node) throw new Error('missing: ' + id)
-    return node
 }
 
 function computeNodeDepths({ nodes }) {
@@ -384,8 +310,6 @@ function reorderLinks(nodes) {
 
 const ascendingTargetY = (a, b) => a.target.y - b.target.y
 const ascendingSourceY = (a, b) => a.source.y - b.source.y
-
-const id = (d) => d.id // used in sankey import
 
 const sankeyLinkHorizontal = function () {
     return linkHorizontal().source(horizontalSource).target(horizontalTarget)

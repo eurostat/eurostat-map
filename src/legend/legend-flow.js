@@ -215,28 +215,32 @@ export const legend = function (map, config) {
 
     function drawDonutColorLegend(out, x, y) {
         const map = out.map
+        const topKeys = Array.from(map.topLocationKeys || [])
+        const colorScale = map.locationColorScale
+
+        // Create/clear container
+        out._donutColorContainer?.remove()
         out._donutColorContainer = out._donutLegendContainer
             .append('g')
             .attr('class', 'em-donut-color-legend')
             .attr('transform', `translate(${x}, ${y})`)
 
-        const items = map.flowDonutColors_
-        // Draw the legend items
-        Object.entries(items).forEach(([label, color], i) => {
-            out._donutColorContainer
-                .append('rect')
-                .attr('x', 0)
-                .attr('y', i * 20)
-                .attr('width', 18)
-                .attr('height', 18)
-                .attr('fill', color)
+        // Build legend items from top keys + Other
+        const legendItems = topKeys.map((key) => ({
+            label: key,
+            color: colorScale(key),
+        }))
 
-            out._donutColorContainer
-                .append('text')
-                .attr('x', 25)
-                .attr('y', i * 20 + 15)
-                .attr('class', 'em-legend-label')
-                .text(label)
+        // Always append the "Other" category last
+        legendItems.push({ label: 'Other', color: '#ccc' })
+
+        // Draw each legend row
+        legendItems.forEach((item, i) => {
+            const row = out._donutColorContainer.append('g').attr('transform', `translate(0, ${i * 20})`)
+
+            row.append('rect').attr('width', 18).attr('height', 18).attr('fill', item.color)
+
+            row.append('text').attr('x', 25).attr('y', 14).attr('class', 'em-legend-label').text(item.label)
         })
     }
 
@@ -249,6 +253,7 @@ export const legend = function (map, config) {
         const title = container
             .append('text')
             .attr('class', 'em-color-legend-title')
+            .attr('id', 'em-color-legend-title')
             .attr('dy', '0.35em')
             .text(out.regionColorLegend.title || 'Region fill colors')
 
