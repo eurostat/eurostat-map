@@ -120,7 +120,7 @@
                 .subtitle('number of applicants in EU countries, 2024')
                 .flowMapType('straight')
                 .flowTopLocations(5)
-                .flowTopLocationsType('origin')
+                .flowTopLocationsType('origin') // 'origin' or 'destination'
                 .flowGraph(JSON.parse(JSON.stringify(graphData)))
                 .flowMaxWidth(10)
                 .flowMinWidth(2)
@@ -133,8 +133,8 @@
                     title: '',
                     x: width - 210,
                     y: height - 440,
-                    flowWidthLegend: { title: 'Flow trade volume' },
-                    donutSizeLegend: { title: 'Cumulative trade volume' },
+                    flowWidthLegend: { title: 'Number of applicants' },
+                    donutSizeLegend: { title: 'Cumulative volume' },
                     donutColorLegend: { title: 'Origin' },
                     regionsColorLegend: {
                         title: 'Region fill colors',

@@ -15,7 +15,6 @@ export function drawDonuts(out, container) {
         .value((d) => d.value)
         .sort(null)
 
-    const nodeNameMap = new Map(out.flowGraph_.nodes.map((n) => [n.id, n.name || n.id]))
     Object.entries(out.locationStats).forEach(([locKey, stats]) => {
         const { x, y, incoming, outgoing, internal } = stats
         const total = out.flowInternal_ ? incoming + outgoing + internal : incoming + outgoing
@@ -46,7 +45,7 @@ export function drawDonuts(out, container) {
         pieData.forEach((segment) => {
             segment.data.parent = {
                 id: locKey,
-                name: nodeNameMap.get(locKey) || locKey,
+                name: out.nodeNameMap.get(locKey) || locKey,
                 donutValues, // full breakdown for tooltip
             }
         })
@@ -157,7 +156,7 @@ function donutMouseoverFunction(d, out) {
                             border-radius:50%;
                             background:${segment.color};
                             margin-right:6px;
-                        "></span> ${segment.key}
+                        "></span> ${segment.name || segment.key}
                     </td>
                     <td style="text-align:right">
                         ${spaceAsThousandSeparator(segment.value)} (${percent})
@@ -190,7 +189,7 @@ function donutMouseoverFunction(d, out) {
                             border-radius:50%;
                             background:${segment.color};
                             margin-right:6px;
-                        "></span> ${segment.key}
+                        "></span> ${segment.name || segment.key}
                     </td>
                     <td style="text-align:right">
                         ${spaceAsThousandSeparator(segment.value)} (${percent})
@@ -244,7 +243,6 @@ const unhighlightDonut = (event, svg) => {
 // === Incoming Breakdown ===
 function getIncomingBreakdownByOrigin(nodeId, out) {
     const topKeys = out.topLocationKeys
-    const color = (key) => out.locationColorScale(key)
     const type = out.flowTopLocationsType_
     const includeInternal = out.flowInternal_
 
@@ -286,6 +284,7 @@ function getIncomingBreakdownByOrigin(nodeId, out) {
     return sortBreakdown(
         Object.entries(breakdown).map(([key, value]) => ({
             key,
+            name: out.nodeNameMap?.get(key) || key, //  Human-readable name
             value,
             color: getSegmentColor(key, nodeId, out),
         }))
@@ -336,6 +335,7 @@ function getOutgoingBreakdownByDestination(nodeId, out) {
     return sortBreakdown(
         Object.entries(breakdown).map(([key, value]) => ({
             key,
+            name: out.nodeNameMap?.get(key) || key, //  Human-readable name
             value,
             color: getSegmentColor(key, nodeId, out),
         }))

@@ -137,6 +137,8 @@ function prepareFlowGraph(out) {
     calculateNodeTotals(out)
     computeNodeLinks(out)
     computeTopFlowLocations(out) // compute top locations based on user-selected type
+
+    out.nodeNameMap = new Map(out.flowGraph_.nodes.map((n) => [n.id, n.name || n.id]))
 }
 
 /**

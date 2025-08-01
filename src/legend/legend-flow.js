@@ -232,9 +232,9 @@ export const legend = function (map, config) {
             .attr('dy', '0.35em')
             .text(out.donutColorLegend.title || 'Destination')
 
-        // Build legend items from top keys + Other
+        // Build a map of node IDs to names for better legend labels
         const legendItems = topKeys.map((key) => ({
-            label: key,
+            label: map.nodeNameMap.get(key) || key, // ✅ show location name if exists
             color: colorScale(key),
         }))
 
