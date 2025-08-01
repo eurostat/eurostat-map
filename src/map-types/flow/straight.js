@@ -36,46 +36,36 @@ function drawStraightLinesByFlow(out, container) {
         if (!origin || !dest) return // skip invalid links
 
         // Use a consistent key for grouping regardless of direction
-        const originKey = `${origin[0]},${origin[1]}`
-        const destKey = `${dest[0]},${dest[1]}`
-        const key = originKey < destKey ? `${originKey}|${destKey}` : `${destKey}|${originKey}`
+        const key = sourceId < targetId ? `${sourceId}|${targetId}` : `${targetId}|${sourceId}`
 
         if (!routeMap.has(key)) {
             routeMap.set(key, {
-                coordsA: originKey < destKey ? origin : dest,
-                coordsB: originKey < destKey ? dest : origin,
+                idA: sourceId < targetId ? sourceId : targetId,
+                idB: sourceId < targetId ? targetId : sourceId,
+                coordsA: sourceId < targetId ? origin : dest,
+                coordsB: sourceId < targetId ? dest : origin,
                 flowAB: 0,
                 flowBA: 0,
             })
         }
 
         const route = routeMap.get(key)
-        if (originKey < destKey) route.flowAB += link.value
+        if (sourceId < targetId) route.flowAB += link.value
         else route.flowBA += link.value
     })
 
-    // Step 2: Draw each direction (halfway from origin to destination)
-    // Step 2: Draw each direction (halfway from origin to destination)
+    // Step 2: Draw each direction
     for (const route of routeMap.values()) {
-        const { coordsA, coordsB, flowAB, flowBA } = route
+        const { idA, idB, coordsA, coordsB, flowAB, flowBA } = route
         const midX = (coordsA[0] + coordsB[0]) / 2
         const midY = (coordsA[1] + coordsB[1]) / 2
 
-        const abStroke = () => {
-            const locKey = `${coordsB[0]},${coordsB[1]}`
-            return out.topLocationKeys.has(locKey) ? out.locationColorScale(locKey) : out.flowColor_
-        }
-        const baStroke = () => {
-            const locKey = `${coordsA[0]},${coordsA[1]}`
-            return out.topLocationKeys.has(locKey) ? out.locationColorScale(locKey) : out.flowColor_
-        }
+        const abStroke = () => (out.topLocationKeys.has(idB) ? out.locationColorScale(idB) : out.flowColor_)
+        const baStroke = () => (out.topLocationKeys.has(idA) ? out.locationColorScale(idA) : out.flowColor_)
 
         // A → B line
         if (flowAB > 0) {
             const flow = flowAB
-            const origin = coordsA
-            const dest = coordsB
-
             lineGroup
                 .append('line')
                 .attr('data-nb', flow)
@@ -83,13 +73,13 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('y1', midY)
                 .attr('x2', coordsB[0])
                 .attr('y2', coordsB[1])
-                .attr('data-origin', `${origin[0]},${origin[1]}`)
-                .attr('data-dest', `${dest[0]},${dest[1]}`)
+                .attr('data-origin', idA)
+                .attr('data-dest', idB)
                 .attr('stroke', abStroke)
                 .attr('stroke-width', out.strokeWidthScale(flow).toFixed(1))
                 .attr('stroke-opacity', out.flowOpacity_)
                 .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, origin, dest, flow))
+                .on('mouseover', onFlowLineMouseOver(out, idA, idB, flow))
                 .on('mousemove', onFlowLineMouseMove(out))
                 .on('mouseout', onFlowLineMouseOut(out, abStroke))
         }
@@ -97,9 +87,6 @@ function drawStraightLinesByFlow(out, container) {
         // B → A line
         if (flowBA > 0) {
             const flow = flowBA
-            const origin = coordsB
-            const dest = coordsA
-
             lineGroup
                 .append('line')
                 .attr('data-nb', flow)
@@ -107,50 +94,42 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('y1', midY)
                 .attr('x2', coordsA[0])
                 .attr('y2', coordsA[1])
-                .attr('data-origin', `${origin[0]},${origin[1]}`)
-                .attr('data-dest', `${dest[0]},${dest[1]}`)
+                .attr('data-origin', idB)
+                .attr('data-dest', idA)
                 .attr('stroke', baStroke)
                 .attr('stroke-width', out.strokeWidthScale(flow).toFixed(1))
                 .attr('stroke-opacity', out.flowOpacity_)
                 .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, origin, dest, flow))
+                .on('mouseover', onFlowLineMouseOver(out, idB, idA, flow))
                 .on('mousemove', onFlowLineMouseMove(out))
                 .on('mouseout', onFlowLineMouseOut(out, baStroke))
         }
     }
 
     // Hover handler
-    function onFlowLineMouseOver(out, origin, dest, flow) {
+    function onFlowLineMouseOver(out, sourceId, targetId, flow) {
         return function (e) {
             const hoveredColor = out.hoverColor_ || 'black'
             select(this).attr('stroke', hoveredColor)
 
             if (out._tooltip) {
-                // Find node objects by coords
-                const sourceNode = out.flowGraph_.nodes.find((n) => n.x === origin[0] && n.y === origin[1]) || { id: `${origin[0]},${origin[1]}` }
-                const targetNode = out.flowGraph_.nodes.find((n) => n.x === dest[0] && n.y === dest[1]) || { id: `${dest[0]},${dest[1]}` }
-
-                // Build the proper link object for your tooltip
+                const sourceNode = out.flowGraph_.nodes.find((n) => n.id === sourceId)
+                const targetNode = out.flowGraph_.nodes.find((n) => n.id === targetId)
                 const linkObj = { source: sourceNode, target: targetNode, value: flow }
-
                 out._tooltip.mouseover(out.tooltip_.textFunction(linkObj, out))
             }
         }
     }
 
-    // Move handler
     function onFlowLineMouseMove(out) {
         return function (e) {
             if (out._tooltip) out._tooltip.mousemove(e)
         }
     }
 
-    // Out handler
     function onFlowLineMouseOut(out, strokeFn) {
         return function () {
-            // Revert to the data-driven color
             select(this).attr('stroke', strokeFn())
-
             if (out._tooltip) out._tooltip.mouseout()
         }
     }

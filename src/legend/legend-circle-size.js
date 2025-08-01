@@ -1,5 +1,5 @@
 import { max } from 'd3-array'
-import { getFontSizeFromClass } from '../core/utils'
+import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * @description builds a nested circle legend for proportional circles
@@ -53,6 +53,7 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         .attr('r', sizeScale)
 
     //labels
+    const labelFormatter = out.sizeLegend.labelFormatter || spaceAsThousandSeparator
     itemContainer
         .append('text')
         .attr('class', 'em-legend-label')
@@ -63,7 +64,7 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         })
         .attr('x', maxRadius + 5)
         .text((d) => {
-            return d.toLocaleString('en').replace(/,/gi, ' ')
+            return labelFormatter(d)
         })
     //line pointing to top of corresponding circle:
     itemContainer

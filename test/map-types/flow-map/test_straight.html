@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
+
+        <style>
+            .em-flow-link-outline {
+                stroke-width: 0.5px !important;
+            }
+            .em-flow-flows {
+                opacity: 0.9 !important;
+            }
+        </style>
+
+        <script>
+            //data
+            const graphData = {
+                nodes: [
+                    { id: 'SY', name: 'Syria' },
+                    { id: 'VE', name: 'Venezuela' },
+                    { id: 'AF', name: 'Afghanistan' },
+                    { id: 'CO', name: 'Colombia' },
+                    { id: 'TR', name: 'Türkiye' },
+                    { id: 'BD', name: 'Bangladesh' },
+                    { id: 'PE', name: 'Peru' },
+                    // { id:'XX',name: 'Other non-EU countries' },
+                    { id: 'DE', name: 'DE' },
+                    { id: 'ES', name: 'ES' },
+                    { id: 'IT', name: 'IT' },
+                    { id: 'FR', name: 'FR' },
+                    { id: 'EL', name: 'EL' },
+                    { id: 'BE', name: 'BE' },
+                    // { name: 'Rest of EU' },
+                ],
+                links: [
+                    { source: 'SY', target: 'DE', value: 76765 },
+                    { source: 'SY', target: 'ES', value: 1260 },
+                    { source: 'SY', target: 'IT', value: 365 },
+                    { source: 'SY', target: 'FR', value: 1980 },
+                    { source: 'SY', target: 'EL', value: 21875 },
+                    { source: 'SY', target: 'BE', value: 5340 },
+                    // { source: 'SY', target: 'Rest of EU', value: 40375 },
+
+                    { source: 'VE', target: 'DE', value: 3005 },
+                    { source: 'VE', target: 'ES', value: 65460 },
+                    { source: 'VE', target: 'IT', value: 2385 },
+                    { source: 'VE', target: 'FR', value: 830 },
+                    { source: 'VE', target: 'EL', value: 10 },
+                    { source: 'VE', target: 'BE', value: 380 },
+                    // { source: 'VE', target: 'Rest of EU', value: 715 },
+
+                    { source: 'AF', target: 'DE', value: 34150 },
+                    { source: 'AF', target: 'ES', value: 515 },
+                    { source: 'AF', target: 'IT', value: 2035 },
+                    { source: 'AF', target: 'FR', value: 10375 },
+                    { source: 'AF', target: 'EL', value: 15155 },
+                    { source: 'AF', target: 'BE', value: 1870 },
+                    // { source: 'AF', target: 'Rest of EU', value: 8060 },
+
+                    { source: 'CO', target: 'DE', value: 3840 },
+                    { source: 'CO', target: 'ES', value: 39765 },
+                    { source: 'CO', target: 'IT', value: 3325 },
+                    { source: 'CO', target: 'FR', value: 1510 },
+                    { source: 'CO', target: 'EL', value: 5 },
+                    { source: 'CO', target: 'BE', value: 545 },
+                    // { source: 'CO', target: 'Rest of EU', value: 1325 },
+
+                    { source: 'TR', target: 'DE', value: 29175 },
+                    { source: 'TR', target: 'ES', value: 40 },
+                    { source: 'TR', target: 'IT', value: 1295 },
+                    { source: 'TR', target: 'FR', value: 5870 },
+                    { source: 'TR', target: 'EL', value: 4230 },
+                    { source: 'TR', target: 'BE', value: 1995 },
+                    // { source: 'TR', target: 'Rest of EU', value: 4230 },
+
+                    { source: 'BD', target: 'DE', value: 155 },
+                    { source: 'BD', target: 'ES', value: 410 },
+                    { source: 'BD', target: 'IT', value: 32865 },
+                    { source: 'BD', target: 'FR', value: 5395 },
+                    { source: 'BD', target: 'EL', value: 770 },
+                    { source: 'BD', target: 'BE', value: 20 },
+                    // { source: 'BD', target: 'Rest of EU', value: 1620 },
+
+                    { source: 'PE', target: 'DE', value: 175 },
+                    { source: 'PE', target: 'ES', value: 10360 },
+                    { source: 'PE', target: 'IT', value: 15595 },
+                    { source: 'PE', target: 'FR', value: 415 },
+                    { source: 'PE', target: 'EL', value: 5 },
+                    { source: 'PE', target: 'BE', value: 150 },
+                    // { source: 'PE', target: 'Rest of EU', value: 220 },
+
+                    // { source: 'Other non-EU countries', target: 'DE', value: 82430 },
+                    // { source: 'Other non-EU countries', target: 'ES', value: 46200 },
+                    // { source: 'Other non-EU countries', target: 'IT', value: 93255 },
+                    // { source: 'Other non-EU countries', target: 'FR', value: 104485 },
+                    // { source: 'Other non-EU countries', target: 'EL', value: 26945 },
+                    // { source: 'Other non-EU countries', target: 'BE', value: 22750 },
+                    // { source: 'Other non-EU countries', target: 'Rest of EU', value: 77665 },
+                ],
+            }
+            //map
+            const map = eurostatmap
+                .map('flow')
+                .geo('world')
+                .width(960)
+                .height(500)
+                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(300).translate([530, 290]))
+                .title('First-time asylum applicants')
+                .subtitle('number of applicants in EU countries, 2024')
+                .flowMapType('straight')
+                .flowGraph(JSON.parse(JSON.stringify(graphData)))
+                .flowColor('#72bb6f')
+                .flowMaxWidth(10)
+                .flowMinWidth(2)
+                .flowOutlines(true)
+                .flowGradient(false)
+                .flowDonuts(true)
+                .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+                .flowArrows(true)
+                .legend({
+                    title: '',
+                    x: 830,
+                    y: 180,
+                    flowSizeLegend: { title: 'Flow trade volume' },
+                    donutSizeLegend: { title: 'Cumulative trade volume' },
+                    donutColorLegend: { title: 'Cumulative trade volume' },
+                    regionsColorLegend: {
+                        title: 'Region fill colors',
+                        titlePadding: 10,
+                        marginTop: 30,
+                    },
+                })
+                .stamp({
+                    text: 'Total applicants to the EU 911 000',
+                    size: 45,
+                    x: 200,
+                    y: 150,
+                })
+                .nutsLevel(0)
+                .zoomExtent([0.01, 10])
+                .build()
+        </script>
+    </body>
+</html>

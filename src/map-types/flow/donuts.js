@@ -3,9 +3,11 @@ import { scaleSqrt } from 'd3-scale'
 import { arc, pie } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { select } from 'd3-selection'
+import { format } from 'd3'
 
 export function drawDonuts(out, container) {
     const donutContainer = container.append('g').attr('class', 'donuts').attr('id', 'donuts')
+    const nodes = out.flowGraph_.nodes
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
     out.donutSizeScale = out.flowDonutSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
     const arcGen = arc().innerRadius(5)
@@ -21,27 +23,51 @@ export function drawDonuts(out, container) {
         const outgoingBreakdown = getOutgoingBreakdownByDestination(locKey, out)
         const color = out.topLocationKeys.has(locKey) ? out.locationColorScale(locKey) : '#666'
 
-        const donutData = [
+        const donutValues = [
             {
-                key: 'incoming',
+                label: 'Incoming', // ✅ match tooltip
                 value: out.flowInternal_ ? incoming + internal : incoming,
                 color,
-                x,
-                y,
             },
-            ...outgoingBreakdown,
+            ...outgoingBreakdown.map((d) => ({
+                label: d.key, // ✅ unify key→label
+                value: d.value,
+                color: d.color,
+            })),
         ]
+
+        // 🔹 Generate pie segments and attach parent reference
+        const pieData = pieGen(donutValues)
+        pieData.forEach((segment) => {
+            segment.data.parent = {
+                id: locKey,
+                name: locKey,
+                donutValues, // full breakdown for tooltip
+            }
+        })
 
         const g = donutContainer.append('g').attr('class', 'donut-group').attr('transform', `translate(${x},${y})`).attr('data-total', total)
 
         // Outer donut ring
         g.selectAll('path')
-            .data(pieGen(donutData))
+            .data(pieData)
             .join('path')
             .attr('d', arcGen.innerRadius(out.donutSizeScale(total) * 0.4).outerRadius(out.donutSizeScale(total)))
             .attr('fill', (d) => d.data.color)
             .attr('stroke', 'white')
             .attr('stroke-width', 0.5)
+            .style('cursor', 'pointer')
+            .on('mouseover', function (event, d) {
+                if (out._tooltip) out._tooltip.mouseover(donutMouseoverFunction(d, out))
+                highlightDonut(event, out.svg_)
+            })
+            .on('mousemove', function (event, d) {
+                if (out._tooltip) out._tooltip.mousemove(event)
+            })
+            .on('mouseout', function (event, d) {
+                if (out._tooltip) out._tooltip.mouseout()
+                unhighlightDonut(event, out.svg_)
+            })
 
         // Inner circle
         g.append('circle')
@@ -50,52 +76,154 @@ export function drawDonuts(out, container) {
     })
 }
 
-export function addDonutsToNodes(out, container) {
-    const nodes = out.flowGraph_.nodes
-    container.select('.em-flow-donuts')?.remove()
-    const group = container.append('g').attr('class', 'em-flow-donuts').attr('id', 'em-flow-donuts')
+function donutMouseoverFunction(d, out) {
+    const percentFormat = format('.0%')
+    const includeInternal = out.flowInternal_
 
-    const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
+    const node = d.data.parent
+    const donutValues = node.donutValues
+    const total = sum(donutValues, (v) => v.value)
+    const statData = out.statData?.()
+    const unit = statData?.unitText?.() || ''
 
-    const arcFunction = arc()
-        .innerRadius(0)
-        .outerRadius((d) => {
-            const values = d.data?.parent?.donutValues ?? []
-            const total = sum(values, (v) => v.value)
-            return out.donutSizeScale(total)
-        })
+    // Prepare breakdown segments
+    const incomingSegment = donutValues.find((v) => v.label === 'Incoming')
+    const internalSegment = donutValues.find((v) => v.label === 'Internal')
+    const outgoingSegments = donutValues.filter((v) => v.label !== 'Incoming' && v.label !== 'Internal')
 
-    const pieFunction = pie().value((d) => d.value)
+    const buf = []
 
-    const nodeGroups = group
-        .selectAll('g')
-        .data(nodes.filter((n) => n.donutValues && sum(n.donutValues, (d) => d.value) > 0))
-        .join('g')
-        .attr('transform', (d) => `translate(${d.x},${d.y})`)
+    // --- Header ---
+    buf.push(`
+        <div class="em-tooltip-bar">
+            <b>${node.name || node.id || 'Unknown location'}</b>
+        </div>
+    `)
 
-    nodeGroups
-        .selectAll('path')
-        .data((d) => {
-            const pieData = pieFunction(d.donutValues)
-            pieData.forEach((segment) => (segment.data.parent = d))
-            return pieData
-        })
-        .join('path')
-        .attr('d', arcFunction)
-        .attr('fill', (d) => out.flowDonutColors_[d.data.label.toLowerCase()] || '#ccc')
+    // --- Content wrapper ---
+    buf.push(`<div class="em-tooltip-text"><table class="em-tooltip-table"><tbody>`)
 
-    if (out._tooltip) {
-        nodeGroups
-            .selectAll('path')
-            .on('mouseover', function (event, d) {
-                out._tooltip.mouseover(donutMouseoverFunction(d, out, event))
-            })
-            .on('mousemove', (event) => out._tooltip.mousemove(event))
-            .on('mouseout', (event, d) => {
-                out._tooltip.mouseout()
-                donutMouseoutFunction(d, out, event)
-            })
+    // Incoming row
+    if (incomingSegment) {
+        const percent = percentFormat(incomingSegment.value / total)
+        buf.push(`
+            <tr>
+                <td>
+                    <span style="
+                        display:inline-block;
+                        width:10px;
+                        height:10px;
+                        border-radius:50%;
+                        background:${incomingSegment.color};
+                        margin-right:6px;
+                    "></span> Incoming
+                </td>
+                <td style="text-align:right">
+                    ${spaceAsThousandSeparator(incomingSegment.value)} (${percent})
+                </td>
+            </tr>
+        `)
     }
+
+    // Internal row (optional)
+    if (includeInternal && internalSegment && internalSegment.value > 0) {
+        const percent = percentFormat(internalSegment.value / total)
+        buf.push(`
+            <tr>
+                <td>
+                    <span style="
+                        display:inline-block;
+                        width:10px;
+                        height:10px;
+                        border-radius:50%;
+                        background:${internalSegment.color};
+                        margin-right:6px;
+                    "></span> Internal
+                </td>
+                <td style="text-align:right">
+                    ${spaceAsThousandSeparator(internalSegment.value)} (${percent})
+                </td>
+            </tr>
+        `)
+    }
+
+    // Outgoing breakdown
+    const totalOutgoing = sum(outgoingSegments, (v) => v.value)
+    const outgoingPercent = percentFormat(totalOutgoing / total)
+
+    // Outgoing header
+    buf.push(`
+        <tr>
+            <td style="padding-top:3px;">
+                Outgoing: 
+            </td><td>${spaceAsThousandSeparator(totalOutgoing)} (${outgoingPercent})</td>
+        </tr>
+    `)
+
+    outgoingSegments.forEach((segment) => {
+        const percent = percentFormat(segment.value / total)
+        buf.push(`
+            <tr>
+                <td style="padding-left:1.5em;">
+                    <span style="
+                        display:inline-block;
+                        width:10px;
+                        height:10px;
+                        border-radius:50%;
+                        background:${segment.color};
+                        margin-right:6px;
+                    "></span> ${segment.label}
+                </td>
+                <td style="text-align:right">
+                    ${spaceAsThousandSeparator(segment.value)} (${percent})
+                </td>
+            </tr>
+        `)
+    })
+
+    // Total row
+    buf.push(`
+        <tr class="em-tooltip-total">
+            <td colspan="2" style="padding-top:4px; font-weight:bold;">
+                Total: ${spaceAsThousandSeparator(total)} ${unit}
+            </td>
+        </tr>
+    `)
+
+    // Close table and wrapper
+    buf.push(`</tbody></table></div>`)
+
+    return buf.join('')
+}
+
+function donutMouseoutFunction(d, out, event) {
+    unhighlightDonut(event, out.svg_)
+}
+const highlightDonut = (event, svg) => {
+    const currentZoom = +svg.attr('data-zoom') || 1
+
+    select(event.target.parentNode) // the <g> group around the donut arcs
+        .selectAll('path')
+        .each(function () {
+            const el = select(this)
+            const current = +el.attr('stroke-width') || 0
+            el.attr('data-stroke-width', current) // store original value
+        })
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2 / currentZoom) // scale line width to zoom
+}
+
+const unhighlightDonut = (event, svg) => {
+    const currentZoom = +svg.attr('data-zoom') || 1
+
+    select(event.target.parentNode)
+        .selectAll('path')
+        .attr('stroke', 'white')
+        .attr('stroke-width', function () {
+            const el = select(this)
+            const original = +el.attr('data-stroke-width') || 0
+            return original / currentZoom
+        })
 }
 
 export function computeDonutLocationStats(out) {
@@ -178,78 +306,4 @@ export function computeDonutValues(out) {
             color: key === 'Other' ? '#ccc' : colorScale(key),
         }))
     }
-}
-
-function donutMouseoverFunction(d, out, event) {
-    highlightDonut(event, out.svg_)
-    const node = d.data.parent
-    const label = d.data.label
-    const value = d.data.value
-    const statData = out.statData?.()
-    const unit = statData?.unitText?.() || ''
-
-    const name = node.name || node.id || 'Unknown location'
-
-    const buf = []
-
-    // Header
-    buf.push(`<div class="em-tooltip-bar"><b>${name}</b></div>`)
-
-    // Donut breakdown
-    buf.push(`<div class='em-tooltip-text'>
-                <table class="em-tooltip-table"><tbody>`)
-
-    for (const segment of node.donutValues) {
-        const color = out.flowDonutColors_[segment.label.toLowerCase()] || '#ccc'
-
-        buf.push(`
-        <tr>
-            <td>
-                <span style="
-                    display:inline-block;
-                    width:10px;
-                    height:10px;
-                    border-radius:50%;
-                    background:${color};
-                    margin-right:6px;
-                "></span>${segment.label}
-            </td>
-            <td style="text-align:right">${spaceAsThousandSeparator(segment.value)} ${unit}</td>
-        </tr>
-    `)
-    }
-
-    buf.push(`</tbody></table></div>`)
-
-    return buf.join('')
-}
-
-function donutMouseoutFunction(d, out, event) {
-    unhighlightDonut(event, out.svg_)
-}
-const highlightDonut = (event, svg) => {
-    const currentZoom = +svg.attr('data-zoom') || 1
-
-    select(event.target.parentNode) // the <g> group around the donut arcs
-        .selectAll('path')
-        .each(function () {
-            const el = select(this)
-            const current = +el.attr('stroke-width') || 0
-            el.attr('data-stroke-width', current) // store original value
-        })
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2 / currentZoom) // scale line width to zoom
-}
-
-const unhighlightDonut = (event, svg) => {
-    const currentZoom = +svg.attr('data-zoom') || 1
-
-    select(event.target.parentNode)
-        .selectAll('path')
-        .attr('stroke', 'white')
-        .attr('stroke-width', function () {
-            const el = select(this)
-            const original = +el.attr('data-stroke-width') || 0
-            return original / currentZoom
-        })
 }
