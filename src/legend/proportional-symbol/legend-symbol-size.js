@@ -48,7 +48,7 @@ export function drawSizeLegend(out, baseX, baseY) {
     }
 
     //define format for labels
-    let labelFormatter = out.sizeLegend.labelFormatter || spaceAsThousandSeparator
+    const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
 
     let domain = map.classifierSize_.domain()
     let maxVal = domain[1] //maximum value of dataset (used for first or last symbol by default)

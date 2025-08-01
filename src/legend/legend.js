@@ -218,7 +218,7 @@ export const legend = function (map) {
     out.getLabelFormatter = function (out) {
         const map = out.map
         const mapType = map._mapType
-        const labelFormatter = mapType === 'ps' ? getPropSymbolLabelFormatter(out) : getChoroplethLabelFormatter(out)
+        const labelFormatter = mapType === 'ps' ? getPropSymbolColorLabelFormatter(out) : getChoroplethLabelFormatter(out)
         return labelFormatter
     }
 

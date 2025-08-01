@@ -135,7 +135,7 @@ function sankey(out) {
  * @param {Array} gradientIds - Gradient IDs
  */
 function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradientIds) {
-    const flowsGroup = container.append('g').attr('class', 'em-flows-group')
+    const flowsGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines')
 
     links.forEach((link, i) => {
         // Outline path

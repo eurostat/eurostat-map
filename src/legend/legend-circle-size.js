@@ -53,7 +53,7 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         .attr('r', sizeScale)
 
     //labels
-    const labelFormatter = out.sizeLegend.labelFormatter || spaceAsThousandSeparator
+    const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
     itemContainer
         .append('text')
         .attr('class', 'em-legend-label')

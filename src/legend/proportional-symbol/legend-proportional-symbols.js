@@ -139,7 +139,7 @@ function getColorThresholds(out) {
     return thresholds
 }
 
-export function getPropSymbolLabelFormatter(out) {
+export function getPropSymbolColorLabelFormatter(out) {
     if (out.colorLegend.labelType == 'ranges') {
         const thresholds = getColorThresholds(out)
         const defaultLabeller = (label, i) => {
@@ -148,11 +148,11 @@ export function getPropSymbolLabelFormatter(out) {
             if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
             return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
         }
-        return out.labelFormatter || defaultLabeller
+        return out.colorLegend.labelFormatter || defaultLabeller
     } else if (out.colorLegend.labelType == 'thresholds') {
-        return out.labelFormatter || format(`.${out.decimals}f`)
+        return out.colorLegend.labelFormatter || format(`.${out.decimals}f`)
     } else {
-        return out.labelFormatter || format(`.${out.decimals}f`)
+        return out.colorLegend.labelFormatter || format(`.${out.decimals}f`)
     }
 }
 

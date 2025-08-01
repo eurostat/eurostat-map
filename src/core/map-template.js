@@ -62,6 +62,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     // pan & zoom
     out.zoomExtent_ = undefined
+    out.translateExtent_ = undefined //d3 zoom.translateExtent
     out.lockPanUntilZoom_ = true // if true, user can pan only after zooming once
 
     //events

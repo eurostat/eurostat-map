@@ -4,9 +4,19 @@ import { select } from 'd3-selection'
 export const defineMapZoom = function (map) {
     const svg = select('#' + map.svgId())
     let previousT = zoomIdentity
-    let panUnlocked = false
+    let panUnlocked = !map.lockPanUntilZoom_
     let snappingBack = false
     const zoomExtent = map.zoomExtent_ || [0, 0]
+    const translateExtent =
+        map.translateExtent_ || !map.lockPanUntilZoom_
+            ? [
+                  [-map.width_, -map.height_], // allow dragging 1x map outside
+                  [map.width_ * 2, map.height_ * 2], // bottom-right
+              ]
+            : [
+                  [0, 0], // strict, no pan until zoom
+                  [map.width_, map.height_],
+              ]
 
     map.__zoomBehavior = zoom()
         .filter((e) => !e.target.closest('.em-zoom-buttons') && !e.target.closest('.em-button'))
@@ -15,10 +25,7 @@ export const defineMapZoom = function (map) {
             [map.width_, map.height_],
         ])
         .scaleExtent(zoomExtent)
-        .translateExtent([
-            [0, 0],
-            [map.width_, map.height_],
-        ])
+        .translateExtent(translateExtent)
         .on('zoom', (e) => {
             const t = e.transform
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)

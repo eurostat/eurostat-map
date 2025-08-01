@@ -1,6 +1,7 @@
 import { spaceAsThousandSeparator } from '../core/utils'
 import * as Legend from './legend'
 import { drawCircleSizeLegend } from './legend-circle-size'
+import { select } from 'd3-selection'
 
 /**
  * A legend for proportional symbol map
@@ -27,14 +28,14 @@ export const legend = function (map, config) {
 
     out.donutColorLegend = {
         title: null,
-        titlePadding: 15,
-        marginTop: 23,
+        titlePadding: 0, // Padding between title and legend body
+        marginTop: 33,
     }
 
     out.regionColorLegend = {
         title: null,
         titlePadding: 15,
-        marginTop: 35,
+        marginTop: 30,
     }
 
     //override attribute values with config values
@@ -144,8 +145,7 @@ export const legend = function (map, config) {
             )
 
             // donut color legend
-            const donutColorYOffset =
-                out.donutSizeLegend.marginTop + out._donutSizeContainer.node().getBBox().height + 10 + out.donutColorLegend.marginTop
+            const donutColorYOffset = out.donutSizeLegend.marginTop + out._donutSizeContainer.node().getBBox().height + out.donutColorLegend.marginTop
             drawDonutColorLegend(out, 0, donutColorYOffset)
         }
 
@@ -225,6 +225,13 @@ export const legend = function (map, config) {
             .attr('class', 'em-donut-color-legend')
             .attr('transform', `translate(${x}, ${y})`)
 
+        const title = out._donutColorContainer
+            .append('text')
+            .attr('class', 'em-color-legend-title')
+            .attr('id', 'em-color-legend-title')
+            .attr('dy', '0.35em')
+            .text(out.donutColorLegend.title || 'Destination')
+
         // Build legend items from top keys + Other
         const legendItems = topKeys.map((key) => ({
             label: key,
@@ -235,8 +242,44 @@ export const legend = function (map, config) {
         legendItems.push({ label: 'Other', color: '#ccc' })
 
         // Draw each legend row
+        const titleOffset = title.node().getBBox().height + out.donutColorLegend.titlePadding
+
+        // Add hover interaction for flow lines
+        const highlightLinesByColor = (color) => {
+            map.svg_
+                .selectAll('g.em-flow-container line')
+                .classed('highlighted', function () {
+                    return this.getAttribute('stroke') === color
+                })
+                .classed('dimmed', function () {
+                    return this.getAttribute('stroke') !== color
+                })
+        }
+        const clearHighlights = () => {
+            map.svg_.selectAll('g.em-flow-container line').classed('highlighted', false).classed('dimmed', false)
+        }
+
+        // Draw legend rows with mouseover
         legendItems.forEach((item, i) => {
-            const row = out._donutColorContainer.append('g').attr('transform', `translate(0, ${i * 20})`)
+            const row = out._donutColorContainer
+                .append('g')
+                .attr('class', 'em-donut-color-item')
+                .attr('transform', `translate(0, ${i * 22 + titleOffset})`)
+                .style('cursor', 'pointer')
+                .on('mouseover', function () {
+                    highlightLinesByColor(item.color)
+
+                    // bold text + stroke rect
+                    select(this).select('text').style('font-weight', 'bold')
+                    select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2)
+                })
+                .on('mouseout', function () {
+                    clearHighlights()
+
+                    // reset text + rect
+                    select(this).select('text').style('font-weight', 'normal')
+                    select(this).select('rect').attr('stroke', 'none')
+                })
 
             row.append('rect').attr('width', 18).attr('height', 18).attr('fill', item.color)
 

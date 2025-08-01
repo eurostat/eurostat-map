@@ -42,13 +42,17 @@
             // Final graph object
             const exampleGraph = { nodes, links }
 
+            const type = 'destination' // 'origin' or 'destination'
+            const topLocations = 4 // Number of top locations to highlight
+
             const map = eurostatmap
                 .map('flow')
                 .title('Test')
                 .subtitle('test')
                 .flowGraph(exampleGraph)
                 .flowMapType('straight')
-                .flowColor('#72bb6f')
+                .flowTopLocations(topLocations) // Top N locations by flow volume
+                .flowTopLocationsType(type)
                 .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
                 .flowArrows(false)
                 .flowOutlines(false)
@@ -61,7 +65,7 @@
                     shadows: true,
                 })
                 .nutsLevel(0)
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, histogram: false })
+                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, donutColorLegend: { title: type } })
                 .drawCoastalMargin(false)
                 .insets(false)
                 .zoomExtent([0.03, 1000])

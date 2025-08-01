@@ -10,8 +10,10 @@ export const tooltip = function (config) {
     config.containerId = config.containerId || config.svgId || 'map' // the maximum bounds of the tooltip
     config.customElement = config.customElement // for users to specify custom tooltip elements
     config.id = config.id || `em-tooltip-${config.containerId}` // id of the tooltip div
-    config.xOffset = config.xOffset || 30
-    config.yOffset = config.yOffset || 20
+    config.offset = {
+        x: config.offset?.x || config.xOffset || 30, // x offset of the tooltip
+        y: config.offset?.y || config.yOffset || 20, // y offset of the tooltip
+    }
     config.transitionDuration = 0
 
     let tooltip
@@ -69,8 +71,8 @@ export const tooltip = function (config) {
     my.ensureTooltipOnScreen = function (eventX, eventY) {
         let node = tooltip.node()
 
-        node.style.left = eventX + config.xOffset + 'px'
-        node.style.top = eventY - config.yOffset + 'px'
+        node.style.left = eventX + config.offset.x + 'px'
+        node.style.top = eventY - config.offset.y + 'px'
 
         let parent = document.getElementById(config.containerId)
         let rect = parent.getBoundingClientRect() // get the bounding rectangle
@@ -80,15 +82,15 @@ export const tooltip = function (config) {
         //too far right
         //taking into account off screen space but shouldnt be
         if (node.offsetLeft > rect.left + parentWidth - node.clientWidth) {
-            let left = eventX - node.clientWidth - config.xOffset
+            let left = eventX - node.clientWidth - config.offset.x
             node.style.left = left + 'px'
             // check if mouse covers tooltip
             if (node.offsetLeft + node.clientWidth > eventX) {
                 //move tooltip left so it doesnt cover mouse
-                let left2 = eventX - node.clientWidth - config.xOffset
+                let left2 = eventX - node.clientWidth - config.offset.x
                 node.style.left = left2 + 'px'
             }
-            // node.style.top = node.offsetTop + config.yOffset + "px";
+            // node.style.top = node.offsetTop + config.offset.y + "px";
         }
 
         //too far down

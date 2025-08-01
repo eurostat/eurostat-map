@@ -54,21 +54,21 @@ function drawStraightLinesByFlow(out, container) {
         else route.flowBA += link.value
     })
 
-    // Step 2: Draw each direction
+    // Step 2: Draw each route
     for (const route of routeMap.values()) {
         const { idA, idB, coordsA, coordsB, flowAB, flowBA } = route
         const midX = (coordsA[0] + coordsB[0]) / 2
         const midY = (coordsA[1] + coordsB[1]) / 2
 
-        const abStroke = () => (out.topLocationKeys.has(idB) ? out.locationColorScale(idB) : out.flowColor_)
-        const baStroke = () => (out.topLocationKeys.has(idA) ? out.locationColorScale(idA) : out.flowColor_)
+        const abStroke = () => getFlowStroke(out, idA, idB)
+        const baStroke = () => getFlowStroke(out, idB, idA)
 
-        // A → B line
-        if (flowAB > 0) {
-            const flow = flowAB
+        // --- CASE 1: bidirectional (draw two half-lines)
+        if (flowAB > 0 && flowBA > 0) {
+            // A → B half-line
             lineGroup
                 .append('line')
-                .attr('data-nb', flow)
+                .attr('data-nb', flowAB)
                 .attr('x1', midX)
                 .attr('y1', midY)
                 .attr('x2', coordsB[0])
@@ -76,20 +76,17 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('data-origin', idA)
                 .attr('data-dest', idB)
                 .attr('stroke', abStroke)
-                .attr('stroke-width', out.strokeWidthScale(flow).toFixed(1))
+                .attr('stroke-width', out.strokeWidthScale(flowAB).toFixed(1))
                 .attr('stroke-opacity', out.flowOpacity_)
                 .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, idA, idB, flow))
+                .on('mouseover', onFlowLineMouseOver(out, idA, idB, flowAB))
                 .on('mousemove', onFlowLineMouseMove(out))
                 .on('mouseout', onFlowLineMouseOut(out, abStroke))
-        }
 
-        // B → A line
-        if (flowBA > 0) {
-            const flow = flowBA
+            // B → A half-line
             lineGroup
                 .append('line')
-                .attr('data-nb', flow)
+                .attr('data-nb', flowBA)
                 .attr('x1', midX)
                 .attr('y1', midY)
                 .attr('x2', coordsA[0])
@@ -97,12 +94,71 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('data-origin', idB)
                 .attr('data-dest', idA)
                 .attr('stroke', baStroke)
-                .attr('stroke-width', out.strokeWidthScale(flow).toFixed(1))
+                .attr('stroke-width', out.strokeWidthScale(flowBA).toFixed(1))
                 .attr('stroke-opacity', out.flowOpacity_)
                 .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, idB, idA, flow))
+                .on('mouseover', onFlowLineMouseOver(out, idB, idA, flowBA))
                 .on('mousemove', onFlowLineMouseMove(out))
                 .on('mouseout', onFlowLineMouseOut(out, baStroke))
+        }
+
+        // --- CASE 2: unidirectional A → B
+        else if (flowAB > 0 && flowBA === 0) {
+            lineGroup
+                .append('line')
+                .attr('data-nb', flowAB)
+                .attr('x1', coordsA[0])
+                .attr('y1', coordsA[1])
+                .attr('x2', coordsB[0])
+                .attr('y2', coordsB[1])
+                .attr('data-origin', idA)
+                .attr('data-dest', idB)
+                .attr('stroke', abStroke)
+                .attr('stroke-width', out.strokeWidthScale(flowAB).toFixed(1))
+                .attr('stroke-opacity', out.flowOpacity_)
+                .style('cursor', 'pointer')
+                .on('mouseover', onFlowLineMouseOver(out, idA, idB, flowAB))
+                .on('mousemove', onFlowLineMouseMove(out))
+                .on('mouseout', onFlowLineMouseOut(out, abStroke))
+        }
+
+        // --- CASE 3: unidirectional B → A
+        else if (flowBA > 0 && flowAB === 0) {
+            lineGroup
+                .append('line')
+                .attr('data-nb', flowBA)
+                .attr('x1', coordsB[0])
+                .attr('y1', coordsB[1])
+                .attr('x2', coordsA[0])
+                .attr('y2', coordsA[1])
+                .attr('data-origin', idB)
+                .attr('data-dest', idA)
+                .attr('stroke', baStroke)
+                .attr('stroke-width', out.strokeWidthScale(flowBA).toFixed(1))
+                .attr('stroke-opacity', out.flowOpacity_)
+                .style('cursor', 'pointer')
+                .on('mouseover', onFlowLineMouseOver(out, idB, idA, flowBA))
+                .on('mousemove', onFlowLineMouseMove(out))
+                .on('mouseout', onFlowLineMouseOut(out, baStroke))
+        }
+    }
+
+    function getFlowStroke(out, originId, destId, direction) {
+        const type = out.flowTopLocationsType_ || 'sum'
+
+        if (type === 'origin') {
+            // Color by origin
+            return out.topLocationKeys.has(originId) ? out.locationColorScale(originId) : out.flowColor_
+        } else if (type === 'destination') {
+            // Color by destination
+            return out.topLocationKeys.has(destId) ? out.locationColorScale(destId) : out.flowColor_
+        } else {
+            // Default: color by whichever is in top set
+            return out.topLocationKeys.has(destId)
+                ? out.locationColorScale(destId)
+                : out.topLocationKeys.has(originId)
+                  ? out.locationColorScale(originId)
+                  : out.flowColor_
         }
     }
 

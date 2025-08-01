@@ -108,17 +108,20 @@
                 ],
             }
             //map
+            const width = window.innerWidth - 20
+            const height = window.innerHeight - 20
             const map = eurostatmap
                 .map('flow')
                 .geo('world')
-                .width(960)
-                .height(500)
-                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(300).translate([530, 290]))
+                .width(width)
+                .height(height)
+                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(460).translate([730, 290]))
                 .title('First-time asylum applicants')
                 .subtitle('number of applicants in EU countries, 2024')
                 .flowMapType('straight')
+                .flowTopLocations(5)
+                .flowTopLocationsType('origin')
                 .flowGraph(JSON.parse(JSON.stringify(graphData)))
-                .flowColor('#72bb6f')
                 .flowMaxWidth(10)
                 .flowMinWidth(2)
                 .flowOutlines(true)
@@ -128,25 +131,27 @@
                 .flowArrows(true)
                 .legend({
                     title: '',
-                    x: 830,
-                    y: 180,
-                    flowSizeLegend: { title: 'Flow trade volume' },
+                    x: width - 210,
+                    y: height - 440,
+                    flowWidthLegend: { title: 'Flow trade volume' },
                     donutSizeLegend: { title: 'Cumulative trade volume' },
-                    donutColorLegend: { title: 'Cumulative trade volume' },
+                    donutColorLegend: { title: 'Origin' },
                     regionsColorLegend: {
                         title: 'Region fill colors',
-                        titlePadding: 10,
-                        marginTop: 30,
                     },
                 })
                 .stamp({
                     text: 'Total applicants to the EU 911 000',
                     size: 45,
-                    x: 200,
-                    y: 150,
+                    x: width - 90,
+                    y: 60,
+                    stampColor: 'grey',
+                    textColor: 'grey',
                 })
                 .nutsLevel(0)
                 .zoomExtent([0.01, 10])
+                .lockPanUntilZoom(false)
+                .tooltip({ offset: { x: 100, y: -100 } })
                 .build()
         </script>
     </body>

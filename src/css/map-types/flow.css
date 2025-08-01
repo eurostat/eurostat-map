@@ -1,0 +1,7 @@
+/* Legend hover classes for lines */
+.em-flow-lines line.dimmed {
+    opacity: 0;
+}
+.em-flow-lines line.highlighted {
+    opacity: 1;
+}

@@ -31,7 +31,7 @@ export const map = function (config) {
     out.flowDonuts_ = true // whether to add donuts to nodes
 
     // sankey settings
-    out.flowColor_ = '#72bb6f'
+    out.flowColor_ = '#848484ff'
     out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
@@ -42,13 +42,8 @@ export const map = function (config) {
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
     out.flowInternal_ = true // Whether to include internal flows in donuts
-
-    //donuts
-    out.flowDonutColors_ = {
-        incoming: '#2ca02c',
-        outgoing: '#d62728',
-        internal: '#9467bd',
-    }
+    out.flowTopLocations_ = 5 // Number of top locations to colour
+    out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
 
     /**
      * flowmap-specific setters/getters
@@ -65,11 +60,12 @@ export const map = function (config) {
         'flowStack_',
         'flowDonuts_',
         'flowLabelOffsets_',
-        'flowDonutColors_',
         'flowMapType_',
         'flowDonutSizeScale_',
         'flowOpacity_',
         'flowInternal_',
+        'flowTopLocations_',
+        'flowTopLocationsType_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -140,15 +136,47 @@ function prepareFlowGraph(out) {
     projectAllNodeCoordinates(out)
     calculateNodeTotals(out)
     computeNodeLinks(out)
+    computeTopFlowLocations(out) // compute top locations based on user-selected type
+}
 
+/**
+ * Compute top N flow locations based on user-selected type:
+ *  - 'sum'         => incoming + outgoing
+ *  - 'origin'      => outgoing only
+ *  - 'destination' => incoming only
+ *
+ * Updates:
+ *   out.topLocationKeys (Set of IDs)
+ *   out.locationColorScale (Ordinal scale for coloring)
+ */
+function computeTopFlowLocations(out) {
     const nodes = out.flowGraph_.nodes
-    const uniqueLocations = Array.from(nodes).sort((a, b) => b.value - a.value)
-    const topLocationsN = 10 // Number of top locations to show
-    const topLocations = [...uniqueLocations].slice(0, topLocationsN)
+    const topN = out.flowTopLocations_
+    const topType = out.flowTopLocationsType_ || 'sum'
+
+    // Calculate score for each node based on selected type
+    nodes.forEach((node) => {
+        const outgoing = node.sourceLinks.reduce((sum, l) => sum + l.value, 0)
+        const incoming = node.targetLinks.reduce((sum, l) => sum + l.value, 0)
+
+        if (topType === 'origin') {
+            node.topScore = outgoing
+        } else if (topType === 'destination') {
+            node.topScore = incoming
+        } else {
+            node.topScore = outgoing + incoming
+        }
+    })
+
+    // Sort by score descending and select top N
+    const topLocations = [...nodes].sort((a, b) => b.topScore - a.topScore).slice(0, topN)
+
+    // Save results
     out.topLocationKeys = new Set(topLocations.map((loc) => loc.id))
+
+    // Assign colors to top locations
     out.locationColorScale = scaleOrdinal()
         .domain(topLocations.map((d) => d.id))
-        //.range(d3.schemeCategory10) // Or any custom palette of 4 colors
         .range([
             '#00B3E3', // bright turquoise
             '#FBBA00', // golden yellow
@@ -249,47 +277,56 @@ function addOverlayPolygons(out) {
     const importerIds = []
     const exporterIds = []
     const features = out.Geometries.getRegionFeatures()
-    if (features) {
-        graph.nodes.forEach((node) => {
-            const overlay = features.find((feature) => {
-                if (node.id == feature.properties.id) return feature
-            })
 
-            if (overlay) {
-                let isImporter = graph.links.some((link) => link.source == node.id)
-                if (isImporter) {
-                    importerIds.push(node.id)
-                } else {
-                    exporterIds.push(node.id)
-                }
-            } else {
-                console.warn('could not find region geometry for', node.id)
-            }
-        })
+    if (!features) return
 
-        out.importerRegionIds = importerIds
-        out.exporterRegionIds = exporterIds
+    graph.nodes.forEach((node) => {
+        // Compute totals for this node
+        const outgoing = node.sourceLinks.reduce((sum, l) => sum + l.value, 0)
+        const incoming = node.targetLinks.reduce((sum, l) => sum + l.value, 0)
 
-        if (importerIds.length === 0 && exporterIds.length === 0) {
-            return console.warn('No importer or exporter regions found in the flow graph.')
+        // Skip nodes that aren't in the geometry features
+        const overlay = features.find((f) => f.properties.id === node.id)
+        if (!overlay) {
+            console.warn('could not find region geometry for', node.id)
+            return
         }
 
-        //update existing region fills
-        const selector = getRegionsSelector(out)
-        const allRegions = out.svg_.selectAll(selector)
+        // Classify based on net flow
+        if (incoming > outgoing) {
+            importerIds.push(node.id)
+        } else if (outgoing > incoming) {
+            exporterIds.push(node.id)
+        }
+        // optional: else neither if incoming == outgoing
+    })
 
-        allRegions.each(function () {
-            select(this)
-                .style('fill', (region) => {
-                    if (importerIds.includes(region.properties.id)) return out.flowOverlayColors_[0]
-                    if (exporterIds.includes(region.properties.id)) return out.flowOverlayColors_[1]
-                })
-                .attr('class', (region) => {
-                    if (importerIds.includes(region.properties.id)) return 'em-flow-importer'
-                    if (exporterIds.includes(region.properties.id)) return 'em-flow-exporter'
-                })
-        })
+    out.importerRegionIds = importerIds
+    out.exporterRegionIds = exporterIds
+
+    if (importerIds.length === 0 && exporterIds.length === 0) {
+        console.warn('No importer or exporter regions found in the flow graph.')
+        return
     }
+
+    // Update region fills and classes
+    const selector = getRegionsSelector(out)
+    const allRegions = out.svg_.selectAll(selector)
+
+    allRegions.each(function () {
+        const id = this.__data__.properties.id
+        select(this)
+            .style('fill', () => {
+                if (importerIds.includes(id)) return out.flowOverlayColors_[1] // net importer color
+                if (exporterIds.includes(id)) return out.flowOverlayColors_[0] // net exporter color
+                return null
+            })
+            .attr('class', () => {
+                if (importerIds.includes(id)) return 'em-flow-importer'
+                if (exporterIds.includes(id)) return 'em-flow-exporter'
+                return null
+            })
+    })
 }
 
 /**
