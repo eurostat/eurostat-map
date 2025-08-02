@@ -191,13 +191,13 @@ export const legend = function (map, config) {
     function highlightRegions(map, code) {
         const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
 
-        // Set all segments to white
-        allSegments.style('fill', 'white')
+        // Set all segments to transparent
+        allSegments.style('opacity', 0)
 
         // Highlight only the selected segments by restoring their original color
         const selectedSegments = allSegments.filter("path[code='" + code + "']")
         selectedSegments.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected segments
+            select(this).style('opacity', 1) // Restore original color for selected segments
         })
     }
 
@@ -207,7 +207,7 @@ export const legend = function (map, config) {
 
         // Restore each segments's original color from the fill___ attribute
         allSegments.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
+            select(this).style('opacity', 1)
         })
     }
 

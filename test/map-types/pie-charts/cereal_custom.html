@@ -21,6 +21,7 @@
                 .scale('60M')
                 .nutsLevel('mixed')
                 .geoCenter([5000000, 3500000])
+                .zoomExtent([1, 100])
                 .pieOtherColor('#FFCC80')
                 .pieOtherText('Other')
                 .pieMaxRadius(20)
@@ -33,7 +34,7 @@
                     titleFontWeight: 'bold',
                     sizeLegend: {
                         title: '1 000 tonnes',
-                        titlePadding: 10,
+                        titlePadding: 22,
                         values: [50, 6000],
                     },
                     colorLegend: {
@@ -53,7 +54,7 @@
                 code: 'C0000',
                 unitText: '1 000 tonnes',
             }) // add 'all crops'
-            map.totalCode_ = 'C0000' //set total code to show on map
+            map.pieTotalCode('C0000') //set total code to show on map
 
             //set stat codes to show on map
             map.statCodes_ = Object.keys(pieStats)

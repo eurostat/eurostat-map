@@ -305,7 +305,7 @@ export const map = function (config) {
 
             if (map.geo_ !== 'WORLD') {
                 if (map.nutsLevel_ == 'mixed') {
-                    addSymbolsToMixedNUTS(map, sizeData, regions)
+                    styleMixedNUTSRegions(map, sizeData, regions)
                     // Build centroidFeatures so Dorling has something to simulate
                     const centroids = []
                     map.svg()
@@ -672,7 +672,7 @@ export const map = function (config) {
      * @param {*} regions
      * @return {*}
      */
-    function addSymbolsToMixedNUTS(map, sizeData, regions) {
+    function styleMixedNUTSRegions(map, sizeData, regions) {
         // toggle display of mixed NUTS levels
         regions.style('display', function (rg) {
             if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions

@@ -36,7 +36,7 @@ export const map = function (config) {
     //labels - indexed by category code
     out.catLabels_ = undefined
 
-    // 'other' section of the pie chart for when 'out.totalCode_' is defined
+    // 'other' section of the pie chart for when 'out.pieTotalCode_' is defined
     out.pieOtherColor_ = '#FFCC80'
     out.pieOtherText_ = 'Other'
 
@@ -46,6 +46,8 @@ export const map = function (config) {
 
     out.classifierSize_ = null //d3 scale for scaling pie sizes
     out.statPie_ = null
+    /** The code of the "total" category in the eurostat database */
+    out.pieTotalCode_ = undefined
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -68,6 +70,7 @@ export const map = function (config) {
         'pieStrokeWidth_',
         'dorling_',
         'animateDorling_',
+        'pieTotalCode_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -96,8 +99,6 @@ export const map = function (config) {
 
     /** The codes of the categories to consider for the composition. */
     out.statCodes_ = undefined
-    /** The code of the "total" category in the eurostat database */
-    out.totalCode_ = undefined
 
     /**
      * A function to define a pie chart map easily, without repetition of information.
@@ -142,15 +143,17 @@ export const map = function (config) {
         //set out.statCodes_
         out.statCodes_ = codes
 
-        //set out.totalCode_
+        //set out.pieTotalCode_
         if (tCode) {
-            out.totalCode_ = tCode
+            out.pieTotalCode_ = tCode
             stat.filters[dim] = tCode
             const sc_ = {}
             for (let key in stat) sc_[key] = stat[key]
             sc_.filters = {}
             for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
             out.stat(tCode, sc_)
+        } else {
+            out.pieTotalCode_ = undefined
         }
 
         return out
@@ -190,20 +193,54 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
-        //if not specified, build default color ramp
-        if (!out.catColors_) {
-            out.catColors({})
-            for (let i = 0; i < out.statCodes_.length; i++) out.catColors_[out.statCodes_[i]] = schemeCategory10[i % 10]
-        }
-        if (out.totalCode_) {
-            //when total code is used, an 'other' section is added to the pie
-            out.catColors_['other'] = out.pieOtherColor_
-            out.catLabels_['other'] = out.pieOtherText_
-        }
+        try {
+            //if not specified, build default color ramp
+            if (!out.catColors_) {
+                out.catColors({})
+                for (let i = 0; i < out.statCodes_.length; i++) out.catColors_[out.statCodes_[i]] = schemeCategory10[i % 10]
+            }
+            if (out.pieTotalCode_) {
+                //when total code is used, an 'other' section is added to the pie
+                out.catColors_['other'] = out.pieOtherColor_
+                out.catLabels_['other'] = out.pieOtherText_
+            }
 
-        //if not specified, initialise category labels
-        out.catLabels_ = out.catLabels_ || {}
+            //if not specified, initialise category labels
+            out.catLabels_ = out.catLabels_ || {}
+            // apply to main map
+            applyStyleToMap(out)
 
+            // apply style to insets
+            // apply classification to all insets
+            if (out.insetTemplates_) {
+                for (const geo in out.insetTemplates_) {
+                    if (Array.isArray(out.insetTemplates_[geo])) {
+                        for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
+                            // insets with same geo that do not share the same parent inset
+                            if (Array.isArray(out.insetTemplates_[geo][i])) {
+                                // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
+                                for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
+                                    if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
+                                }
+                            } else {
+                                if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
+                            }
+                        }
+                    } else {
+                        // unique inset geo_
+                        if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
+                    }
+                }
+            }
+
+            return out
+        } catch (e) {
+            console.error('Error in pie symbols styling: ' + e.message)
+            console.error(e)
+        }
+    }
+
+    function applyStyleToMap(map) {
         //build and assign pie charts to the regions
         //collect nuts ids from g elements. TODO: find better way of sharing regions with pies
         let regionFeatures = []
@@ -221,6 +258,21 @@ export const map = function (config) {
                 // set region hover function
                 const selector = getRegionsSelector(out)
                 let regions = out.svg().selectAll(selector)
+
+                if (map.geo_ !== 'WORLD') {
+                    if (map.nutsLevel_ == 'mixed') {
+                        styleMixedNUTSRegions(map, regions)
+                        // Build centroidFeatures so Dorling has something to simulate
+                        const centroids = []
+                        map.svg()
+                            .selectAll('g.em-centroid')
+                            .each(function (d) {
+                                if (!d.properties?.centroid) return
+                                centroids.push(d) // d already has properties and id
+                            })
+                        out.Geometries.centroidsFeatures = centroids
+                    }
+                }
                 regions
                     .on('mouseover', function (e, rg) {
                         const sel = select(this)
@@ -261,124 +313,6 @@ export const map = function (config) {
         } else {
             stopDorlingSimulation(out)
         }
-
-        return out
-    }
-
-    /**
-     * Function to compute composition for region id, for each category.
-     * Return an object with, for each category, the share [0,1] of the category.
-     * @param {*} id
-     */
-    const getComposition = function (id) {
-        let comp = {},
-            sum = 0
-        //get stat value for each category. Compute the sum.
-        for (let i = 0; i < out.statCodes_.length; i++) {
-            //retrieve code and stat value
-            const sc = out.statCodes_[i]
-            const s = out.statData(sc).get(id)
-
-            //case when some data is missing
-            if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
-                if (out.showOnlyWhenComplete()) return undefined
-                else continue
-            }
-
-            comp[sc] = s.value
-            sum += s.value
-        }
-
-        // when out.totalCode_ is specified, use it as the sum instead of the sum of the specified categories.
-        if (out.totalCode_) {
-            const totalData = out.statData(out.totalCode_)
-            console.log(totalData)
-            let s = totalData.get(id)
-            if (s) {
-                sum = s.value
-            } else {
-                sum == 0
-            }
-        }
-
-        //case when no data
-        if (sum == 0) return undefined
-
-        //compute ratios
-        for (let i = 0; i < out.statCodes_.length; i++) {
-            comp[out.statCodes_[i]] /= sum
-        }
-
-        //add "other" category when out.totalCode_ is used
-        if (out.totalCode_) {
-            let totalPerc = 0
-            for (let key in comp) {
-                totalPerc = totalPerc + comp[key]
-            }
-            comp['other'] = 1 - totalPerc
-        }
-
-        return comp
-    }
-
-    /**
-     * @function getDatasetMaxMin
-     * @description gets the maximum and minimum total of all dimensions combined for each region. Used to define the domain of the pie size scaling function.
-     * @returns [min,max]
-     */
-    function getDatasetMaxMin() {
-        let totals = []
-        let sel = out.svg().selectAll('#em-prop-symbols').selectAll('g.em-centroid').data()
-
-        sel.forEach((rg) => {
-            let id = rg.properties.id
-            let total = getRegionTotal(id)
-            if (total) {
-                totals.push(total)
-            }
-        })
-
-        let minmax = extent(totals)
-        return minmax
-    }
-
-    /**
-     * Get absolute total value of combined statistical values for a specific region. E.g total livestock
-     * @param {*} id nuts region id
-     */
-    const getRegionTotal = function (id) {
-        let sum = 0
-        let s
-        if (out.totalCode_) {
-            //when total is a stat code
-            const totalData = out.statData(out.totalCode_)
-            s = totalData.get(id)
-            //case when some data is missing
-            if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
-                if (out.showOnlyWhenComplete()) {
-                    sum = undefined
-                }
-            } else {
-                sum = s.value
-            }
-        } else {
-            //get stat value for each category. Compute the sum.
-            for (let i = 0; i < out.statCodes_.length; i++) {
-                //retrieve code and stat value
-                const sc = out.statCodes_[i]
-                s = out.statData(sc).get(id)
-                //case when some data is missing
-                if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
-                    if (out.showOnlyWhenComplete()) return undefined
-                    else continue
-                }
-                sum += s.value
-            }
-        }
-
-        //case when no data
-        if (sum == 0) return undefined
-        return sum
     }
 
     function addPieChartsToMap(regionFeatures) {
@@ -440,6 +374,157 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })
+    }
+
+    function styleMixedNUTSRegions(map, regions) {
+        regions.each(function (rg) {
+            const sel = select(this)
+
+            if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
+
+            const lvl = sel.attr('lvl')
+            //const total = getRegionTotal(rg.properties.id)
+            const comp = getComposition(rg.properties.id)
+
+            // Determine if region has data
+            const hasData = comp //|| (total && (total.value || total.value === 0 || total === 0))
+
+            // Compute styles
+            let display = hasData ? (map.geo_ === 'WORLD' ? 'block' : null) : 'none'
+            let stroke = null
+            let strokeWidth = null
+
+            if (hasData) {
+                if (lvl !== '0') {
+                    stroke = sel.style('stroke') || '#777'
+                    if (map.geo_ === 'WORLD') {
+                        strokeWidth = sel.style('stroke-width') || '#777'
+                    }
+                }
+            }
+
+            // Apply all styles at once
+            sel.style('display', display).style('stroke', stroke).style('stroke-width', strokeWidth)
+        })
+    }
+
+    /**
+     * Function to compute composition for region id, for each category.
+     * Return an object with, for each category, the share [0,1] of the category.
+     * @param {*} id
+     */
+    const getComposition = function (id) {
+        const comp = {}
+        let sum = 0
+        const codes = out.statCodes_
+
+        // Compute category values and sum
+        for (let i = 0; i < codes.length; i++) {
+            const sc = codes[i]
+            const s = out.statData(sc).get(id)
+            const val = s?.value
+
+            // Skip invalid or NaN values
+            if (val === null || val === undefined || isNaN(val)) {
+                if (out.showOnlyWhenComplete()) return undefined
+                continue
+            }
+
+            comp[sc] = val
+            sum += val
+        }
+
+        // Override sum if a total stat is specified
+        if (out.pieTotalCode_) {
+            const totalData = out.statData(out.pieTotalCode_)
+            const totalEntry = totalData.get(id)
+            const totalVal = totalEntry?.value
+
+            if (totalVal === null || totalVal === undefined || isNaN(totalVal)) {
+                // No valid total => treat as zero
+                sum = 0
+            } else {
+                sum = totalVal
+            }
+        }
+
+        // Return undefined if no data or sum is zero
+        if (!sum || isNaN(sum)) return undefined
+
+        // Compute ratios
+        for (const sc of codes) {
+            if (comp[sc] !== undefined) {
+                comp[sc] /= sum
+            }
+        }
+
+        // Compute "other" if using total
+        if (out.pieTotalCode_) {
+            const totalPerc = Object.values(comp).reduce((a, b) => a + b, 0)
+            comp['other'] = Math.max(0, 1 - totalPerc) // protect against floating-point drift
+        }
+
+        return comp
+    }
+
+    /**
+     * @function getDatasetMaxMin
+     * @description gets the maximum and minimum total of all dimensions combined for each region. Used to define the domain of the pie size scaling function.
+     * @returns [min,max]
+     */
+    function getDatasetMaxMin() {
+        let totals = []
+        let sel = out.svg().selectAll('#em-prop-symbols').selectAll('g.em-centroid').data()
+
+        sel.forEach((rg) => {
+            let id = rg.properties.id
+            let total = getRegionTotal(id)
+            if (total) {
+                totals.push(total)
+            }
+        })
+
+        let minmax = extent(totals)
+        return minmax
+    }
+
+    /**
+     * Get absolute total value of combined statistical values for a specific region. E.g total livestock
+     * @param {*} id nuts region id
+     */
+    const getRegionTotal = function (id) {
+        let sum = 0
+        let s
+        if (out.pieTotalCode_) {
+            //when total is a stat code
+            const totalData = out.statData(out.pieTotalCode_)
+            s = totalData.get(id)
+            //case when some data is missing
+            if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
+                if (out.showOnlyWhenComplete()) {
+                    sum = undefined
+                }
+            } else {
+                sum = s.value
+            }
+        } else {
+            //get stat value for each category. Compute the sum.
+            for (let i = 0; i < out.statCodes_.length; i++) {
+                //retrieve code and stat value
+                const sc = out.statCodes_[i]
+                s = out.statData(sc).get(id)
+                //case when some data is missing
+                if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
+                    if (out.showOnlyWhenComplete()) return undefined
+                    else continue
+                }
+                sum += s.value
+            }
+        }
+
+        //case when no data
+        if (sum == 0) return undefined
+        return sum
     }
 
     //@override
