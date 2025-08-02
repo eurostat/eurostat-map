@@ -36,7 +36,7 @@ export const map = function (config) {
     //labels - indexed by category code
     out.catLabels_ = undefined
 
-    // 'other' section of the pie chart for when 'out.totalCode_' is defined with statPie()
+    // 'other' section of the pie chart for when 'out.totalCode_' is defined
     out.pieOtherColor_ = '#FFCC80'
     out.pieOtherText_ = 'Other'
 
@@ -97,7 +97,7 @@ export const map = function (config) {
     /** The codes of the categories to consider for the composition. */
     out.statCodes_ = undefined
     /** The code of the "total" category in the eurostat database */
-    out.totalCode__ = undefined
+    out.totalCode_ = undefined
 
     /**
      * A function to define a pie chart map easily, without repetition of information.
@@ -151,10 +151,6 @@ export const map = function (config) {
             sc_.filters = {}
             for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
             out.stat(tCode, sc_)
-
-            //when total code is used, an 'other' section is added to the pie
-            out.catColors_['other'] = out.pieOtherColor_
-            out.catLabels_['other'] = out.pieOtherText_
         }
 
         return out
@@ -198,6 +194,11 @@ export const map = function (config) {
         if (!out.catColors_) {
             out.catColors({})
             for (let i = 0; i < out.statCodes_.length; i++) out.catColors_[out.statCodes_[i]] = schemeCategory10[i % 10]
+        }
+        if (out.totalCode_) {
+            //when total code is used, an 'other' section is added to the pie
+            out.catColors_['other'] = out.pieOtherColor_
+            out.catLabels_['other'] = out.pieOtherText_
         }
 
         //if not specified, initialise category labels
@@ -290,7 +291,9 @@ export const map = function (config) {
 
         // when out.totalCode_ is specified, use it as the sum instead of the sum of the specified categories.
         if (out.totalCode_) {
-            let s = out.statData(out.totalCode_).get(id)
+            const totalData = out.statData(out.totalCode_)
+            console.log(totalData)
+            let s = totalData.get(id)
             if (s) {
                 sum = s.value
             } else {
@@ -348,7 +351,8 @@ export const map = function (config) {
         let s
         if (out.totalCode_) {
             //when total is a stat code
-            s = out.statData(out.totalCode_).get(id)
+            const totalData = out.statData(out.totalCode_)
+            s = totalData.get(id)
             //case when some data is missing
             if (!s || (s.value != 0 && !s.value) || isNaN(s.value)) {
                 if (out.showOnlyWhenComplete()) {
@@ -550,7 +554,7 @@ export const map = function (config) {
         <div class="em-breakdown-item">
             <span class="em-breakdown-color" style="background:${item.color}"></span>
             <span class="em-breakdown-label">${item.label}</span>
-            <span class="em-breakdown-value">${item.value.toFixed()} (${percent}%)</span>
+            <span class="em-breakdown-value">${item.value?.toFixed ? item.value.toFixed() : 0} (${isNaN(percent) ? 0 : percent}%)</span>
         </div>
     `
         }

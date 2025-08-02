@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="./pieStats.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('pie')
+                .dorling(true)
+                .animateDorling(false)
+                .title('Cereal production')
+                .subtitle('2022')
+                .scale('60M')
+                .nutsLevel('mixed')
+                .geoCenter([5000000, 3500000])
+                .pieOtherColor('#FFCC80')
+                .pieOtherText('Other')
+                .pieMaxRadius(20)
+                .pieMinRadius(2)
+                .catLabels(Object.fromEntries(Object.entries(pieStats).map(([key, value]) => [key, value.name])))
+                .legend({
+                    x: 540,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: '1 000 tonnes',
+                        titlePadding: 10,
+                        values: [50, 6000],
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                    },
+                })
+
+            //add our own stat data objects
+            for (let k in pieStats) {
+                map.stat(k, {
+                    code: k,
+                    unitText: '1 000 tonnes',
+                }) // adds 'stat' object to map.statData_ during build
+            }
+            // all crops
+            map.stat('C0000', {
+                code: 'C0000',
+                unitText: '1 000 tonnes',
+            }) // add 'all crops'
+            map.totalCode_ = 'C0000' //set total code to show on map
+
+            //set stat codes to show on map
+            map.statCodes_ = Object.keys(pieStats)
+
+            map.build()
+
+            // update our stat data after build
+            for (let key in map.statData_) {
+                if (pieStats[key]) {
+                    map.statData_[key].setData({ ...pieStats[key].data })
+                }
+            }
+
+            // add totals dataset
+            map.statData_['C0000'].setData({ ...allCrops })
+
+            map.updateStatValues()
+        </script>
+    </body>
+</html>
