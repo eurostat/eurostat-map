@@ -262,49 +262,25 @@ export const map = function (config) {
                 if (map.geo_ !== 'WORLD') {
                     if (map.nutsLevel_ == 'mixed') {
                         styleMixedNUTSRegions(map, regions)
-                        // Build centroidFeatures so Dorling has something to simulate
-                        const centroids = []
-                        map.svg()
-                            .selectAll('g.em-centroid')
-                            .each(function (d) {
-                                if (!d.properties?.centroid) return
-                                centroids.push(d) // d already has properties and id
-                            })
-                        out.Geometries.centroidsFeatures = centroids
                     }
                 }
-                regions
-                    .on('mouseover', function (e, rg) {
-                        const sel = select(this)
-                        sel.attr('fill___', sel.style('fill'))
-                        sel.style('fill', out.hoverColor_)
-                        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                    })
-                    .on('mousemove', function (e, rg) {
-                        if (out._tooltip) out._tooltip.mousemove(e)
-                    })
-                    .on('mouseout', function () {
-                        const sel = select(this)
-                        let newFill = sel.attr('fill___')
-                        if (newFill) {
-                            sel.style('fill', sel.attr('fill___'))
-                            if (out._tooltip) out._tooltip.mouseout()
-                        }
-                    })
-
                 addPieChartsToMap(regionFeatures)
+
+                // Set up mouse events
+                addMouseEventsToRegions(map, regions)
             }
         }
 
         if (out.dorling_) {
             // Build centroidsFeatures so Dorling has something to simulate
-            const centroids = []
-            out.svg()
-                .selectAll('g.em-centroid')
-                .each(function (d) {
-                    if (d?.properties?.centroid) centroids.push(d)
-                })
-            out.Geometries.centroidsFeatures = centroids
+            // const centroids = []
+            // out.svg()
+            //     .selectAll('g.em-centroid')
+            //     .each(function (d) {
+            //         const hasData = getComposition(d?.properties?.id)
+            //         if (d?.properties?.centroid && hasData) centroids.push(d)
+            //     })
+            // out.Geometries.centroidsFeatures = centroids // now handled by out.refreshCentroids
 
             runDorlingSimulation(out, (d) => {
                 const total = getRegionTotal(d.properties.id) || 0
@@ -313,6 +289,27 @@ export const map = function (config) {
         } else {
             stopDorlingSimulation(out)
         }
+    }
+
+    function addMouseEventsToRegions(map, regions) {
+        regions
+            .on('mouseover', function (e, rg) {
+                const sel = select(this)
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e, rg) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function () {
+                const sel = select(this)
+                let newFill = sel.attr('fill___')
+                if (newFill) {
+                    sel.style('fill', sel.attr('fill___'))
+                    if (out._tooltip) out._tooltip.mouseout()
+                }
+            })
     }
 
     function addPieChartsToMap(regionFeatures) {
@@ -328,7 +325,7 @@ export const map = function (config) {
                 return
             }
 
-            //create svg for pie chart
+            // create svg for pie chart
             // can be more than one center point for each nuts ID (e.g. Malta when included in insets)
             let nodes = out.svg().selectAll('#pie_' + regionId)
 
@@ -340,37 +337,41 @@ export const map = function (config) {
             const pie_ = pie()
                 .sort(null)
                 .value((d) => d.value)
-            nodes
+            const arcFunction = arc().innerRadius(ir).outerRadius(r)
+
+            const chartsnodes = nodes
                 .append('g')
+                .attr('class', 'piechart')
                 .attr('stroke', out.pieStrokeFill_)
                 .attr('stroke-width', out.pieStrokeWidth_ + 'px')
-                .attr('class', 'piechart')
+                .style('pointer-events', 'none') // disable during transition
+            // Transition the parent g for the stroke animation
+            chartsnodes
+                .transition()
+                .duration(out.transitionDuration())
+                .on('end', function () {
+                    select(this).style('pointer-events', null) // re-enable after transition
+                })
+
+            // Draw pie segments
+            chartsnodes
                 .selectAll('path')
                 .data(pie_(data))
                 .join('path')
-                .style('fill', (d) => {
-                    return out.catColors_[d.data.code] || 'lightgray'
-                })
-                .attr('fill___', (d) => {
-                    return out.catColors_[d.data.code] || 'lightgray'
-                })
-                .attr('code', (d) => d.data.code) //for mouseover legend highlighting function
-                .attr('d', arc().innerRadius(ir).outerRadius(r))
+                .attr('d', arcFunction)
+                .attr('code', (d) => d.data.code)
+                .attr('fill', (d) => out.catColors_[d.data.code] || 'lightgray')
                 .on('mouseover', function (e, rg) {
-                    const sel = select(this)
-                    // Apply a thick stroke width to the parent element
-                    const parent = select(sel.node().parentNode)
-                    parent.style('stroke-width', '1px').style('stroke', 'black') // Set stroke
+                    const parent = select(this.parentNode)
+                    parent.style('stroke-width', '1px').style('stroke', 'black')
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(region, out))
                 })
-                .on('mousemove', function (e, rg) {
+                .on('mousemove', function (e) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    const sel = select(this)
-                    // Reset stroke
-                    const parent = select(sel.node().parentNode)
-                    parent.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_) // Set stroke
+                    const parent = select(this.parentNode)
+                    parent.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_)
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })

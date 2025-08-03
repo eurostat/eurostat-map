@@ -255,9 +255,11 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * If the stat data sources have changed, call *updateStatData* instead.
      */
     out.updateStatValues = function () {
-        if (out._mapType === 'ps' && out.nutsLevel_ === 'mixed') {
-            rebuildCentroidsForMixedNUTS(out)
-        }
+        // if (out._mapType === 'ps' && out.nutsLevel_ === 'mixed') {
+        //     //rebuildCentroidsForMixedNUTS(out)
+
+        // }
+        if (withCenterPoints) out.refreshCentroids(out)
 
         out.updateClassification()
         out.updateStyle()

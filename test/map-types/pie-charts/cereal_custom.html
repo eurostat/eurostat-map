@@ -15,7 +15,10 @@
             const map = eurostatmap
                 .map('pie')
                 .dorling(true)
-                .animateDorling(false)
+                .animateDorling(true)
+                .dorlingStrength({ x: 1, y: 1 })
+                .dorlingIterations(0.5)
+                .transitionDuration(500)
                 .title('Cereal production')
                 .subtitle('2022')
                 .scale('60M')

@@ -742,6 +742,116 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
+    const addCentroidsToMap = function (map) {
+        let centroidFeatures
+
+        if (!map.Geometries.centroidsData) {
+            // if centroids data is absent (e.g. for world maps) then calculate manually
+            if (map.geo_ == 'WORLD') {
+                centroidFeatures = []
+                map.Geometries.geoJSONs.worldrg.forEach((feature) => {
+                    let newFeature = { ...feature }
+                    // exception for France (because guyane)
+                    if (feature.properties.id == 'FR') {
+                        newFeature.geometry = {
+                            coordinates: [2.2, 46.2],
+                            type: 'Point',
+                        }
+                    } else {
+                        newFeature.geometry = {
+                            coordinates: geoCentroid(feature),
+                            type: 'Point',
+                        }
+                    }
+                    centroidFeatures.push(newFeature)
+                })
+            }
+        } else {
+            if (map.nutsLevel_ == 'mixed') {
+                centroidFeatures = [
+                    ...map.Geometries.centroidsData[0].features,
+                    ...map.Geometries.centroidsData[1].features,
+                    ...map.Geometries.centroidsData[2].features,
+                    ...map.Geometries.centroidsData[3].features,
+                ]
+            } else {
+                centroidFeatures = map.Geometries.centroidsData.features
+            }
+        }
+
+        if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
+
+        // Project and save coordinates
+        // Before filtering
+        const projectedCentroids = centroidFeatures.map((d) => {
+            const coords = map._projection(d.geometry.coordinates)
+            d.properties.centroid = coords
+            return d
+        })
+
+        // Keep an unfiltered copy
+        map.Geometries._allCentroidsFeatures = [...projectedCentroids]
+
+        // Filter to only centroids that have statistical data
+        map.Geometries.centroidsFeatures = projectedCentroids.filter((d) => hasStatData(d.properties.id, map))
+
+        // Append container if not existing
+        const gcp = map.svg().select('#em-prop-symbols').empty()
+            ? map
+                  .svg()
+                  .select('#em-zoom-group-' + map.svgId_)
+                  .append('g')
+                  .attr('id', 'em-prop-symbols')
+            : map.svg().select('#em-prop-symbols')
+
+        // Join pattern for centroids
+        gcp.selectAll('g.em-centroid')
+            .data(map.Geometries.centroidsFeatures, (d) => d.properties.id)
+            .join(
+                (enter) =>
+                    enter
+                        .append('g')
+                        .attr('class', 'em-centroid')
+                        .attr('id', (d) => 'ps' + d.properties.id)
+                        .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`),
+                (update) => update,
+                (exit) => exit.remove()
+            )
+    }
+
+    // This will remove any centroids with no statistical data and re-add centroids for regions that just got data.
+    out.refreshCentroids = function (map) {
+        const allCentroids = map.Geometries._allCentroidsFeatures
+        if (!allCentroids) return
+        map.Geometries.centroidsFeatures = allCentroids.filter((d) => hasStatData(d.properties.id, map))
+
+        const gcp = map.svg().select('#em-prop-symbols')
+
+        gcp.selectAll('g.em-centroid')
+            .data(map.Geometries.centroidsFeatures, (d) => d.properties.id)
+            .join(
+                (enter) =>
+                    enter
+                        .append('g')
+                        .attr('class', 'em-centroid')
+                        .attr('id', (d) => 'ps' + d.properties.id)
+                        .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`),
+                (update) => update,
+                (exit) => exit.remove()
+            )
+
+        return map
+    }
+
+    // Small helper to check if region has statistical data
+    const hasStatData = function (id, map) {
+        if (!map.statCodes_) return true // if no data yet, keep everything
+        return map.statCodes_.some((code) => {
+            const s = map.statData(code)?.get(id)
+            return s && !isNaN(s.value) && s.value !== 0
+        })
+    }
+
     const drawBackgroundMap = function (out) {
         //draw background map
         const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
@@ -920,73 +1030,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 .append('path')
                 .attr('d', out._pathFunction)
         }
-    }
-
-    const addCentroidsToMap = function (map) {
-        let centroidFeatures
-
-        if (!map.Geometries.centroidsData) {
-            // if centroids data is absent (e.g. for world maps) then calculate manually
-            if (map.geo_ == 'WORLD') {
-                centroidFeatures = []
-                map.Geometries.geoJSONs.worldrg.forEach((feature) => {
-                    let newFeature = { ...feature }
-                    // exception for France (because guyane)
-                    if (feature.properties.id == 'FR') {
-                        newFeature.geometry = {
-                            coordinates: [2.2, 46.2],
-                            type: 'Point',
-                        }
-                    } else {
-                        newFeature.geometry = {
-                            coordinates: geoCentroid(feature),
-                            type: 'Point',
-                        }
-                    }
-                    centroidFeatures.push(newFeature)
-                })
-            }
-        } else {
-            if (map.nutsLevel_ == 'mixed') {
-                centroidFeatures = [
-                    ...map.Geometries.centroidsData[0].features,
-                    ...map.Geometries.centroidsData[1].features,
-                    ...map.Geometries.centroidsData[2].features,
-                    ...map.Geometries.centroidsData[3].features,
-                ]
-            } else {
-                centroidFeatures = map.Geometries.centroidsData.features
-            }
-        }
-
-        if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
-
-        // Project coordinates and save as the working centroids array
-        map.Geometries.centroidsFeatures = centroidFeatures.map((d) => {
-            const coords = map._projection(d.geometry.coordinates)
-            d.properties.centroid = coords
-            return d
-        })
-
-        // Keep a permanent unfiltered master copy so we can rebuild later
-        map.Geometries._allCentroidsFeatures = [...map.Geometries.centroidsFeatures]
-
-        // em-prop-symbols is the g element containing all proportional symbols for the map
-        const zg = map.svg().select('#em-zoom-group-' + map.svgId_)
-        const gcp = zg.append('g').attr('id', 'em-prop-symbols')
-
-        // add centroid elements
-        // then symbols are drawn/appended to these containers in the map-type js file
-        const symbolContainers = gcp
-            .selectAll('g')
-            .data(map.Geometries.centroidsFeatures)
-            .enter()
-            .append('g')
-            .attr('transform', function (d) {
-                return 'translate(' + d.properties.centroid[0].toFixed(3) + ',' + d.properties.centroid[1].toFixed(3) + ')'
-            })
-            .attr('class', 'em-centroid') // OUR SYMBOL CONTAINER
-            .attr('id', (d) => 'ps' + d.properties.id)
     }
 
     /**
