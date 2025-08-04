@@ -144,8 +144,9 @@ function drawStraightLinesByFlow(out, container) {
     }
 
     function getFlowStroke(out, originId, destId, direction) {
-        const type = out.flowTopLocationsType_ || 'sum'
+        if (!out.topLocationKeys || !out.flowTopLocations_) return out.flowColor_
 
+        const type = out.flowTopLocationsType_ || 'sum'
         if (type === 'origin') {
             // Color by origin
             return out.topLocationKeys.has(originId) ? out.locationColorScale(originId) : out.flowColor_

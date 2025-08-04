@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const exampleGraph = {
+                nodes: [
+                    { id: 'FR', name: 'France' },
+                    { id: 'DE', name: 'Germany' },
+                    { id: 'IT' },
+                    { id: 'ES' },
+                    { id: 'BE' },
+                    { id: 'NL' },
+                    { id: 'CH' },
+                    { id: 'PL' },
+                    { id: 'PT' },
+                    { id: 'AT' },
+                    { id: 'CZ' },
+                ],
+                links: [
+                    { source: 'FR', target: 'DE', value: 82018369 },
+                    { source: 'FR', target: 'IT', value: 49697198 },
+                    { source: 'FR', target: 'ES', value: 45422327 },
+                    { source: 'FR', target: 'BE', value: 43038180 },
+                    { source: 'FR', target: 'NL', value: 34453478 },
+                    { source: 'FR', target: 'CH', value: 16164188 },
+                    { source: 'FR', target: 'PL', value: 12673336 },
+                    { source: 'FR', target: 'PT', value: 7178656 },
+                    { source: 'FR', target: 'AT', value: 6305366 },
+                    { source: 'FR', target: 'CZ', value: 5883790 },
+                    { source: 'ES', target: 'IT', value: 5883790 },
+                ],
+            }
+
+            //  // total trade
+            //`https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ext_tec10?format=json&lang=en&unit=THS_EUR&sizeclas=TOTAL&stk_flow=EXP&partner=${exporter.value}&time=2021&geoLevel=country`
+            //[{"id":"DE","value":82018369.72,"name":"Germany"},{"id":"IT","value":49697198.92,"name":"Italy"},{"id":"ES","value":45422327.56,"name":"Spain"},{"id":"BE","value":43038180.93,"name":"Belgium"},{"id":"NL","value":34453478.99,"name":"Netherlands"},{"id":"CH","value":16164188.98,"name":"Switzerland"},{"id":"PL","value":12673336.04,"name":"Poland"},{"id":"PT","value":7178656.08,"name":"Portugal"},{"id":"AT","value":6305366.1,"name":"Austria"},{"id":"CZ","value":5883790.49,"name":"Czechia"},{"id":"IE","value":5287477.09,"name":"Ireland"},{"id":"RO","value":4460277.11,"name":"Romania"},{"id":"DK","value":3843262.72,"name":"Denmark"},{"id":"HU","value":3624585.56,"name":"Hungary"},{"id":"SK","value":3003919.1,"name":"Slovakia"},{"id":"LU","value":2206077.33,"name":"Luxembourg"},{"id":"SI","value":1538814.42,"name":"Slovenia"},{"id":"LT","value":737286.81,"name":"Lithuania"},{"id":"RS","value":602221.24,"name":"Serbia"},{"id":"IS","value":405879.59,"name":"Iceland"},{"id":"LV","value":374371.49,"name":"Latvia"},{"id":"HR","value":371224.02,"name":"Croatia"},{"id":"MT","value":160032.27,"name":"Malta"},{"id":"MK","value":71053.23,"name":"North Macedonia"},{"id":"CY","value":42471.05,"name":"Cyprus"},{"id":"BG","value":null,"name":"Bulgaria"},{"id":"EE","value":null,"name":"Estonia"},{"id":"EL","value":null,"name":"Greece"},{"id":"FR","value":null,"name":"France"},{"id":"FI","value":null,"name":"Finland"},{"id":"SE","value":null,"name":"Sweden"},{"id":"NO","value":null,"name":"Norway"},{"id":"UK","value":null,"name":"United Kingdom"},{"id":"BA","value":null,"name":"Bosnia and Herzegovina"},{"id":"TR","value":null,"name":"Türkiye"},{"id":"XK","value":null,"name":"Kosovo*"}]
+            const map = eurostatmap
+                .map('flow')
+                .scale('60M')
+                .title('Flow map')
+                .subtitle('with share of incoming/outgoing')
+                .flowGraph(exampleGraph)
+                .flowMapType('straight')
+                .flowDonuts(true)
+                .flowColor('#72bb6f')
+                .flowTopLocations(0) // Disable top locations coloring
+                .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+                .flowArrows(false)
+                .nutsLevel(0)
+                .legend({
+                    x: 10,
+                    y: 120,
+                    boxOpacity: 0,
+                    flowWidthLegend: { title: 'Flow volume' },
+                    donutSizeLegend: { title: 'Donut size' },
+                    flowColorLegend: { title: 'Flow color' },
+                    regionColorLegend: { title: 'Region color' },
+                })
+                .drawCoastalMargin(false)
+                .insets(false)
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>

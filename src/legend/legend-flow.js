@@ -26,7 +26,7 @@ export const legend = function (map, config) {
         marginTop: 20,
     }
 
-    out.donutColorLegend = {
+    out.flowColorLegend = {
         title: null,
         titlePadding: 0, // Padding between title and legend body
         marginTop: 33,
@@ -45,7 +45,7 @@ export const legend = function (map, config) {
                 key == 'colorLegend' ||
                 key == 'flowWidthLegend' ||
                 key == 'donutSizeLegend' ||
-                key == 'donutColorLegend' ||
+                key == 'flowColorLegend' ||
                 key == 'regionColorLegend'
             ) {
                 for (let p in out[key]) {
@@ -75,7 +75,7 @@ export const legend = function (map, config) {
                     key == 'colorLegend' ||
                     key == 'flowWidthLegend' ||
                     key == 'donutSizeLegend' ||
-                    key == 'donutColorLegend' ||
+                    key == 'flowColorLegend' ||
                     key == 'regionColorLegend'
                 ) {
                     for (let p in out[key]) {
@@ -145,8 +145,8 @@ export const legend = function (map, config) {
             )
 
             // donut color legend
-            const donutColorYOffset = out.donutSizeLegend.marginTop + out._donutSizeContainer.node().getBBox().height + out.donutColorLegend.marginTop
-            drawDonutColorLegend(out, 0, donutColorYOffset)
+            const donutColorYOffset = out.donutSizeLegend.marginTop + out._donutSizeContainer.node().getBBox().height + out.flowColorLegend.marginTop
+            drawflowColorLegend(out, 0, donutColorYOffset)
         }
 
         // region fill colors
@@ -213,7 +213,7 @@ export const legend = function (map, config) {
         })
     }
 
-    function drawDonutColorLegend(out, x, y) {
+    function drawflowColorLegend(out, x, y) {
         const map = out.map
         const topKeys = Array.from(map.topLocationKeys || [])
         const colorScale = map.locationColorScale
@@ -230,7 +230,7 @@ export const legend = function (map, config) {
             .attr('class', 'em-color-legend-title')
             .attr('id', 'em-color-legend-title')
             .attr('dy', '0.35em')
-            .text(out.donutColorLegend.title || 'Destination')
+            .text(out.flowColorLegend.title || 'Destination')
 
         // Build a map of node IDs to names for better legend labels
         const legendItems = topKeys.map((key) => ({
@@ -242,7 +242,7 @@ export const legend = function (map, config) {
         legendItems.push({ label: 'Other', color: '#ccc' })
 
         // Draw each legend row
-        const titleOffset = title.node().getBBox().height + out.donutColorLegend.titlePadding
+        const titleOffset = title.node().getBBox().height + out.flowColorLegend.titlePadding
 
         // Add hover interaction for flow lines
         const highlightLinesByColor = (color) => {

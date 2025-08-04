@@ -1,0 +1,40 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <svg id-="legend"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // basic barebones proportional circles example
+
+            let map = eurostatmap
+                .map('ps')
+                .title('Attracting migrant talent from outside the EU')
+                .subtitle('number of authorisations issued, 2023')
+                .scale('60M')
+                .stat('size', {
+                    //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/migr_resbc1?format=json&lang=en&time=2023&unit=PER&isco08=TOTAL&citizen=TOTAL&decision=GRNT&geoLevel=country<!doctype html>
+                    eurostatDatasetCode: 'migr_resbc1',
+                    unitText: 'people',
+                    filters: { unit: 'PER', time: '2023', isco08: 'TOTAL', citizen: 'TOTAL', decision: 'GRNT' },
+                })
+                .nutsLevel(0)
+                .psShape('circle')
+                .psMinSize(5)
+                .psMaxSize(60) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psStrokeWidth(1)
+                .psStroke('white')
+                .psFillOpacity(1)
+                .psStrokeOpacity(0.9)
+                .zoomExtent([1, 10])
+                .legend({ title: 'EU blue cards issued', x: 580, y: 20 })
+
+            map.build()
+        </script>
+    </body>
+</html>

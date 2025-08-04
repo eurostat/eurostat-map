@@ -30,7 +30,7 @@ export const map = function (config) {
     //add proportional donuts to nodes
     out.flowDonuts_ = false // whether to add donuts to nodes
 
-    // sankey settings
+    // flow settings
     out.flowColor_ = '#848484ff'
     out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
     out.flowMaxWidth_ = 30
@@ -42,7 +42,7 @@ export const map = function (config) {
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
     out.flowInternal_ = true // Whether to include internal flows in donuts
-    out.flowTopLocations_ = 5 // Number of top locations to colour. currently only for flowMapType_ 'straight'
+    out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowMapType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
 
     /**
@@ -88,6 +88,11 @@ export const map = function (config) {
         out.strokeWidthScale = scaleLinear()
             .domain([min(data, (d) => d.value), max(data, (d) => d.value)])
             .range([out.flowMinWidth_, out.flowMaxWidth_])
+
+        // if donuts are enabled, flows must have categorical colors
+        if (out.flowDonuts_ && out.flowTopLocations_ == 0) {
+            out.flowTopLocations_ = 4 // force top locations to enable categorical coloring
+        }
 
         // some pre-calculations
         prepareFlowGraph(out)
@@ -136,7 +141,7 @@ function prepareFlowGraph(out) {
     projectAllNodeCoordinates(out)
     calculateNodeTotals(out)
     computeNodeLinks(out)
-    computeTopFlowLocations(out) // compute top locations based on user-selected type
+    if (out.flowTopLocations_) computeTopFlowLocations(out) // compute top locations based on user-selected type
 
     out.nodeNameMap = new Map(out.flowGraph_.nodes.map((n) => [n.id, n.name || n.id]))
 }

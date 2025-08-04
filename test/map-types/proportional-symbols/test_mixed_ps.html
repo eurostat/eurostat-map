@@ -12,7 +12,7 @@
             let mapWidth = 800
             let mapHeight = 600
 
-            map = eurostatmap
+            const map = eurostatmap
                 .map('ps')
                 .width(mapWidth)
                 .height(mapHeight)
@@ -20,10 +20,12 @@
                 .nutsLevel('mixed')
                 .dorling(true)
                 .psFill('#4ac499')
+                .psMaxSize(100)
+                .psMinSize(5)
                 .nutsYear(2016)
 
             map.statData('size').setData({
-                TR834: 100,
+                TR834: '100',
                 DE: 10,
                 BE: 5,
                 BG: 3,
@@ -42,7 +44,7 @@
 
             setTimeout(() => {
                 map.statData('size').setData({
-                    AL: 100,
+                    AL: '100',
                     IT: 10,
                     AT: 5,
                     RO: 3,
@@ -64,7 +66,7 @@
 
             setTimeout(() => {
                 map.statData('size').setData({
-                    AL: 100,
+                    AL: '100',
                     IT: 10,
                     AT: 5,
                     RO: 3,
@@ -86,12 +88,12 @@
 
             setTimeout(() => {
                 map.statData('size').setData({
-                    AL: 100,
-                    IT: 10,
-                    AT: 5,
-                    RO: 3,
-                    HU: 4,
-                    NO: 1,
+                    AL: '90',
+                    IT: '10',
+                    AT: '5',
+                    RO: '3',
+                    HU: '4',
+                    NO: '1',
                     CY: 9,
                     EL: 8,
                     DE1: 4,
@@ -99,9 +101,9 @@
                     DE3: 4,
                     DE4: 4,
                     DE5: 4,
-                    DE11: 10,
-                    DE12: 5,
-                    PL: 23,
+                    DE11: '10',
+                    DE12: '5',
+                    PL: '23',
                 })
                 map.updateStatValues()
             }, 3000)

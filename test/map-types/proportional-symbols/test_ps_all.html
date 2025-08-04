@@ -29,16 +29,6 @@
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
 
         <script>
-            //set legend labels locale
-            d3.formatDefaultLocale({
-                decimal: ',',
-                thousands: ' ',
-                grouping: [3],
-                currency: ['', '€'],
-            })
-
-            // for optimized (single path) svg icons check out https://materialdesignicons.com/
-
             let euSVG = `<svg height="10px" width="10px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 	 viewBox="0 0 512 512" xml:space="preserve">
 <path style="" d="M434.439,110.654C401.178,45.876,334.359,0.003,255.98,0v101.329
@@ -74,7 +64,6 @@
 	c45.535-42.867,114.172-54.571,171.321-28.799c68.228,30.767,105.971,108.144,87.651,180.845
 	C405.459,245.986,402.37,254.739,398.59,263.184C396.502,267.811,400.132,259.739,398.59,263.184"/>
 </svg>`
-
             // semi-circles, farmland
             //Custom Semi Circle, accurate center and size
             // Define the custom shape circle
@@ -140,8 +129,8 @@
                     },
                     colorLegend: {
                         title: '% of total utilised agricultural area',
+                        marginTop: 90,
                     },
-                    legendSpacing: 50,
                 })
                 .build()
 
@@ -186,6 +175,7 @@
                     },
                     colorLegend: {
                         title: '% of total utilised agricultural area',
+                        marginTop: 90,
                     },
                     legendSpacing: 80,
                 })
@@ -221,7 +211,7 @@
                 .psFill('#fa8dfc')
                 .psStroke('white')
                 .psStrokeWidth('1')
-                .psMaxSize(30)
+                .psMaxSize(70)
                 .tooltipShowFlags('long')
                 .psColors(['#fee5d9', '#fcbba1', '#fc9272', '#fb6a4a', '#de2d26', '#a50f15'].reverse())
                 .legend({
@@ -236,7 +226,7 @@
                     },
                     colorLegend: {
                         title: '% change compared to 2019',
-                        marginTop: 20,
+                        marginTop: 80,
                     },
                 })
                 .build()
@@ -261,7 +251,7 @@
                 .psStroke('black')
                 .psStrokeWidth('1')
                 .tooltipShowFlags('long')
-                .psColorFun(d3.interpolateCividis)
+                .psColorFun(d3.interpolateReds)
                 .legend({
                     x: 610,
                     boxPadding: 10,
@@ -273,7 +263,7 @@
                     },
                     colorLegend: {
                         title: 'Inhabitants per km²',
-                        marginTop: 20,
+                        marginTop: 60,
                     },
                 })
                 .build()

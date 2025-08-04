@@ -199,7 +199,16 @@ export const map = function (config) {
      * @description defines classifier functions (out.classifierColor and out.classifierSize) for both symbol size and color
      */
     function defineClassifiers() {
-        // set default scale
+        defineSizeClassifier()
+
+        // colour
+        if (out.statData('color').getArray()) {
+            defineColorClassifier()
+        }
+    }
+
+    function defineSizeClassifier() {
+        // set default scale type
         if (!out.psSizeScale_) {
             if (out.psShape_ == 'spike') {
                 out.psSizeScale_ = 'linear'
@@ -208,46 +217,57 @@ export const map = function (config) {
             }
         }
 
+        // use size dataset
+        let rawData = out.statData('size').getArray() || out.statData().getArray()
+
+        // Filter numeric values > 0 only, since 0 is never visualized
+        let data = rawData
+            .map((d) => +d) // convert string numbers to real numbers
+            .filter((d) => isFinite(d) && d > 0)
+
+        let [minVal, maxVal] = extent(data)
+        let min = out.psMinValue_ ?? minVal
+        let max = out.psMaxValue_ ?? maxVal
+
+        // Fallback to full statData if somehow no positive values exist
+        if (!isFinite(min) || !isFinite(max)) {
+            min = out.statData().getMin()
+            max = out.statData().getMax()
+        }
+
+        const sizeDomain = [min, max]
+        const scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
+
+        // our final classifier function
+        out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
+    }
+
+    function defineColorClassifier() {
         //simply return the array [0,1,2,3,...,nb-1]
         const getA = function (nb) {
             return [...Array(nb).keys()]
         }
-
-        // use size dataset
-        let rawData = out.statData('size').getArray() || out.statData().getArray()
-        let data = rawData.filter((d) => typeof d === 'number' && !isNaN(d) && isFinite(d))
-        let [minVal, maxVal] = extent(data)
-        let min = out.psMinValue_ ?? minVal
-        let max = out.psMaxValue_ ?? maxVal
-        let sizeDomain = data ? [min, max] : [out.statData().getMin(), out.statData().getMax()]
-
-        let scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
-        out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
-
-        // colour
-        if (out.statData('color').getArray()) {
-            //use suitable classification type for colouring
-            if (out.psClassificationMethod_ === 'quantile') {
-                //https://github.com/d3/d3-scale#quantile-scales
-                const domain = out.statData('color').getArray()
-                const range = getA(out.psClasses_)
-                out.classifierColor(scaleQuantile().domain(domain).range(range))
-            } else if (out.psClassificationMethod_ === 'equinter') {
-                //https://github.com/d3/d3-scale#quantize-scales
-                const domain = out.statData('color').getArray()
-                const range = getA(out.psClasses_)
-                out.classifierColor(
-                    scaleQuantize()
-                        .domain([min(domain), max(domain)])
-                        .range(range)
-                )
-                if (out.makeClassifNice_) out.classifierColor().nice()
-            } else if (out.psClassificationMethod_ === 'threshold') {
-                //https://github.com/d3/d3-scale#threshold-scales
-                out.psClasses(out.psThresholds().length + 1)
-                const range = getA(out.psClasses_)
-                out.classifierColor(scaleThreshold().domain(out.psThresholds()).range(range))
-            }
+        //use suitable classification type for colouring
+        if (out.psClassificationMethod_ === 'quantile') {
+            //https://github.com/d3/d3-scale#quantile-scales
+            const domain = out.statData('color').getArray()
+            const range = getA(out.psClasses_)
+            out.classifierColor(scaleQuantile().domain(domain).range(range))
+        } else if (out.psClassificationMethod_ === 'equinter') {
+            //https://github.com/d3/d3-scale#quantize-scales
+            const domain = out.statData('color').getArray()
+            const range = getA(out.psClasses_)
+            out.classifierColor(
+                scaleQuantize()
+                    .domain([min(domain), max(domain)])
+                    .range(range)
+            )
+            if (out.makeClassifNice_) out.classifierColor().nice()
+        } else if (out.psClassificationMethod_ === 'threshold') {
+            //https://github.com/d3/d3-scale#threshold-scales
+            out.psClasses(out.psThresholds().length + 1)
+            const range = getA(out.psClasses_)
+            out.classifierColor(scaleThreshold().domain(out.psThresholds()).range(range))
         }
     }
 
@@ -292,7 +312,7 @@ export const map = function (config) {
             if (out.dorling_) {
                 runDorlingSimulation(out, (d) => {
                     const datum = sizeData.get(d.properties.id)
-                    const r = datum ? out.classifierSize_(datum.value) : 0
+                    const r = datum ? out.classifierSize_(+datum.value) : 0
                     return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                 })
             } else {
@@ -371,7 +391,7 @@ export const map = function (config) {
                 .style('font-size', (d) => {
                     // calculate radius
                     const datum = sizeData.get(d.properties.id)
-                    const radius = datum ? out.classifierSize_(datum.value) : 0
+                    const radius = datum ? out.classifierSize_(+datum.value) : 0
                     // size adjustment factor depends on symbol type, and whether stat values are also added to the circles
                     let factor = out.labels_?.values && sizeData.get(d.properties.id)?.value ? 0.8 : 0.9
                     if (out.psShape_ === 'square') factor = factor - 0.4
@@ -403,7 +423,7 @@ export const map = function (config) {
                 .style('font-size', (d) => {
                     // calculate radius
                     const datum = sizeData.get(d.properties.id)
-                    const radius = datum ? out.classifierSize_(datum.value) : 0
+                    const radius = datum ? out.classifierSize_(+datum.value) : 0
                     return `${radius * 0.4}px`
                 })
                 .attr('fill', function () {
@@ -517,7 +537,7 @@ export const map = function (config) {
             .append('path')
             .attr('d', (d) => {
                 const datum = sizeData.get(d.properties.id)
-                const value = datum ? out.classifierSize_(datum.value) : 0
+                const value = datum ? out.classifierSize_(+datum.value) : 0
                 let path = spike(value)
                 return path
             })
@@ -555,7 +575,7 @@ export const map = function (config) {
             .duration(out.transitionDuration())
             .attr('r', function (d) {
                 const datum = sizeData.get(d.properties.id)
-                const radius = out.classifierSize_(datum.value)
+                const radius = out.classifierSize_(+datum.value)
                 if (radius < 0) console.error('Negative radius for circle:', d.properties.id)
                 if (isNaN(radius)) console.error('NaN radius for circle:', d.properties.id)
                 return radius
