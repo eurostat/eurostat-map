@@ -7,6 +7,7 @@ import * as StatMap from '../core/stat-map'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import * as CoxcombLegend from '../legend/legend-coxcomb'
 import { interpolate } from 'd3'
+import { runDorlingSimulation } from '../core/dorling/dorling'
 
 /**
  * Returns a coxcomb (polar area) chart map.
@@ -25,7 +26,16 @@ export const map = function (config) {
     out.catColors_ = undefined
     out.catLabels_ = undefined
     out.classifierSize_ = null
-    ;['catColors_', 'catLabels_', 'noDataFillStyle_', 'coxcombMaxRadius_', 'coxcombMinRadius_', 'coxcombRings_'].forEach(function (att) {
+    ;[
+        'catColors_',
+        'catLabels_',
+        'noDataFillStyle_',
+        'coxcombMaxRadius_',
+        'coxcombMinRadius_',
+        'coxcombRings_',
+        'coxcombStrokeFill_',
+        'coxcombStrokeWidth_',
+    ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -34,7 +44,16 @@ export const map = function (config) {
     })
 
     if (config)
-        ['catColors', 'catLabels', 'noDataFillStyle', 'coxcombMaxRadius', 'coxcombMinRadius', 'coxcombInnerRadius'].forEach(function (key) {
+        [
+            'catColors',
+            'catLabels',
+            'noDataFillStyle',
+            'coxcombMaxRadius',
+            'coxcombMinRadius',
+            'coxcombInnerRadius',
+            'coxcombStrokeFill',
+            'coxcombStrokeWidth',
+        ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
 
@@ -234,7 +253,18 @@ export const map = function (config) {
                 // Hover behavior (skip no-data regions)
                 addMouseEventsToRegions(map)
 
+                // append charts to regions
                 addCoxcombChartsToMap(regionFeatures)
+
+                //run dorling (prevent overlapping)
+                if (out.dorling_) {
+                    runDorlingSimulation(out, (d) => {
+                        const total = getRegionTotal(d.properties.id) || 0
+                        return out.classifierSize_(total) || 0
+                    })
+                } else {
+                    stopDorlingSimulation(out)
+                }
             }
         }
     }

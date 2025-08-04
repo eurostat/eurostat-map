@@ -479,6 +479,77 @@ If the sum of the chosen categories do not represent the complete total for that
           )
 ```
 
+To add data manually you can use the following methods:
+
+```javascript
+const cropStats = {
+    C1600: {
+        name: 'Triticale',
+        data: {
+            DE1: 2,
+            //etc
+        },
+    },
+    C1200: {
+        name: 'Rye and maslin',
+        data: {
+            DE1: 2,
+            //etc
+        },
+    },
+    C1110: {
+        name: 'Common wheat and spelt',
+        data: {
+            DE1: 2,
+            //etc
+        },
+    },
+    C1300: {
+        name: 'Barley',
+        data: {
+            DE1: 2,
+            //etc
+        },
+    },
+    //etc
+}
+const totalStats = {
+    DE1: 10,
+    //etc
+}
+
+//add our own stat data objects
+for (let k in cropStats) {
+    map.stat(k, {
+        code: k,
+        unitText: '1 000 tonnes',
+    })
+}
+// all crops
+map.stat('C0000', {
+    code: 'C0000',
+    unitText: '1 000 tonnes',
+}) // add 'all crops'
+map.pieTotalCode('C0000') //set total code to show on map
+
+//set stat codes to show on map
+map.statCodes(Object.keys(cropStats))
+
+map.build()
+
+// update our stat data after build
+for (let key in map.statData_) {
+    if (cropStats[key]) {
+        map.statData(key).setData({ ...cropStats[key].data })
+    }
+}
+
+// add totals dataset, to calculate 'other' category
+map.statData(['C0000']).setData({ ...totalStats })
+
+map.updateStatValues()
+```
+
 | Method                                    | Type    | Default value | Description                                                                                                                                                                 |
 | ----------------------------------------- | ------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**pieMaxRadius**([*value*])         | Number  | _15_          | The maximum radius of the pie chart.                                                                                                                                        |

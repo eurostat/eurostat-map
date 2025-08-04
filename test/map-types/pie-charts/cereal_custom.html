@@ -53,7 +53,7 @@
                 map.stat(k, {
                     code: k,
                     unitText: '1 000 tonnes',
-                }) // adds 'stat' object to map.statData_ during build
+                })
             }
             // all crops
             map.stat('C0000', {
@@ -63,19 +63,19 @@
             map.pieTotalCode('C0000') //set total code to show on map
 
             //set stat codes to show on map
-            map.statCodes_ = Object.keys(pieStats)
+            map.statCodes(Object.keys(pieStats))
 
             map.build()
 
             // update our stat data after build
             for (let key in map.statData_) {
                 if (pieStats[key]) {
-                    map.statData_[key].setData({ ...pieStats[key].data })
+                    map.statData(key).setData({ ...pieStats[key].data })
                 }
             }
 
             // add totals dataset
-            map.statData_['C0000'].setData({ ...allCrops })
+            map.statData(['C0000']).setData({ ...allCrops })
 
             map.updateStatValues()
         </script>

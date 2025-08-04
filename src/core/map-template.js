@@ -845,6 +845,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     // Small helper to check if region has statistical data
     const hasStatData = function (id, map) {
+        //TODO: statCodes_ is only for coxcomb and pie maps, ps maps should also be contemplated here
         if (!map.statCodes_) return true // if no data yet, keep everything
         return map.statCodes_.some((code) => {
             const s = map.statData(code)?.get(id)

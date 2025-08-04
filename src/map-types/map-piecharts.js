@@ -49,6 +49,9 @@ export const map = function (config) {
     /** The code of the "total" category in the eurostat database */
     out.pieTotalCode_ = undefined
 
+    /** The codes of the categories to consider for the composition. */
+    out.statCodes_ = undefined
+
     /**
      * Definition of getters/setters for all previously defined attributes.
      * Each method follow the same pattern:
@@ -71,6 +74,7 @@ export const map = function (config) {
         'dorling_',
         'animateDorling_',
         'pieTotalCode_',
+        'statCodes_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -93,12 +97,10 @@ export const map = function (config) {
             'pieOtherText',
             'pieStrokeFill',
             'pieStrokeWidth',
+            'statCodes',
         ].forEach(function (key) {
             if (config[key] != undefined) out[key](config[key])
         })
-
-    /** The codes of the categories to consider for the composition. */
-    out.statCodes_ = undefined
 
     /**
      * A function to define a pie chart map easily, without repetition of information.
@@ -272,16 +274,6 @@ export const map = function (config) {
         }
 
         if (out.dorling_) {
-            // Build centroidsFeatures so Dorling has something to simulate
-            // const centroids = []
-            // out.svg()
-            //     .selectAll('g.em-centroid')
-            //     .each(function (d) {
-            //         const hasData = getComposition(d?.properties?.id)
-            //         if (d?.properties?.centroid && hasData) centroids.push(d)
-            //     })
-            // out.Geometries.centroidsFeatures = centroids // now handled by out.refreshCentroids
-
             runDorlingSimulation(out, (d) => {
                 const total = getRegionTotal(d.properties.id) || 0
                 return out.classifierSize_(total) || 0

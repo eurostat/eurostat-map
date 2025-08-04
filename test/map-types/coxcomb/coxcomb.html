@@ -95,6 +95,7 @@
                 const config = configs[dataset]
                 const map = eurostatmap
                     .map('coxcomb')
+                    .dorling(true)
                     .title(config.title)
                     .subtitle(config.subtitle)
                     .scale('60M')
