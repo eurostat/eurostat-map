@@ -25,10 +25,10 @@ export const map = function (config) {
     out.labelFormatter = (d) => format('.2s')(d)
     out.tooltip_.textFunction = flowMapTooltipFunction
 
-    out.flowMapType_ = 'sankey' // type of flow map values: sankey, multiDirectional,
+    out.flowMapType_ = 'sankey' // type of flow map values: sankey || straight,
 
     //add proportional donuts to nodes
-    out.flowDonuts_ = true // whether to add donuts to nodes
+    out.flowDonuts_ = false // whether to add donuts to nodes
 
     // sankey settings
     out.flowColor_ = '#848484ff'
@@ -42,7 +42,7 @@ export const map = function (config) {
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
     out.flowInternal_ = true // Whether to include internal flows in donuts
-    out.flowTopLocations_ = 5 // Number of top locations to colour
+    out.flowTopLocations_ = 5 // Number of top locations to colour. currently only for flowMapType_ 'straight'
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
 
     /**
