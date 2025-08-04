@@ -8,104 +8,54 @@
 
     <body>
         <svg id="map"></svg>
-        <svg id="map2"></svg>
         <script src="../../../build/eurostatmap.js"></script>
+        <!-- <script src="../../../build/eurostatmap.min.js"></script> -->
         <script>
-            // size and color proportional circles example
-
+            // basic barebones proportional circles example
             let map = eurostatmap
                 .map('ps')
-                .nutsLevel(0)
-                .title('Total GDP')
+                .nutsLevel(2)
+                .scale('60M')
+                .title('Total GDP and GDP per inhabitant')
+                .subtitle('2022')
                 .width(800)
-
+                .stat('size', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Million EUR',
+                    filters: { unit: 'MIO_EUR', time: '2022' },
+                })
+                .stat('color', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { unit: 'EUR_HAB', time: '2022' },
+                })
                 .legend({
-                    x: 570,
+                    x: 590,
+                    y: 20,
+                    boxOpacity: 1,
+                    sizeLegend: { title: 'Million EUR', values: [800000, 10000] },
                     colorLegend: {
-                        labelType: 'ranges',
-                        labels: ['test1', 'test2', 'test3', 'test4'],
-                    },
-                    sizeLegend: {
-                        //values: [50000, 5000000],
+                        title: 'EUR per inhabitant',
+                        labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
                     },
                 })
+                .psThresholds([10000, 20000, 30000, 40000])
+                .psColors(['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'])
                 .psShape('circle')
+                .psMaxSize(15)
+                .transitionDuration(900)
+                .dorling(true)
+                .dorlingStrength({ x: 0.1, y: 0.1 })
+                .dorlingIterations(1)
+                .animateDorling(true) // Set to false for non-animated dorling cartograms
+                .dorlingWorker(false) // You can use a web worker for (non-animated) dorling cartograms in order to not block the main thread
+                //.dorlingWorkerD3URL('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js') // Use this in case you need its D3 dependency to be internally hosted.
+                .onDorlingProgress(function (progress, map) {
+                    console.log('Dorling progress:', progress)
+                })
                 .insets(false)
-                .psMinSize(1)
-                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
-                .psMinValue(3)
-                .psMaxValue(20)
-            // .stat('size', {
-            //     eurostatDatasetCode: 'nama_10r_3gdp',
-            //     unitText: 'Million EUR',
-            //     filters: { unit: 'MIO_EUR', time: '2023' },
-            // })
-            // .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
-            map.statData('size').setData({
-                ES: 3,
-                FR: 2,
-                IT: 3,
-                RO: 10,
-                DE: 4,
-                PL: 5,
-                NL: 6,
-                BE: 7,
-                CZ: 8,
-                AT: 9,
-                DK: 10,
-                SE: 11,
-                FI: 12,
-                RU: 20,
-            })
 
             map.build()
-
-            let map2 = eurostatmap
-                .map('ps')
-                .svgId('map2')
-                .nutsLevel('mixed')
-                .title('Total GDP')
-                .width(800)
-                .legend({
-                    x: 570,
-                    colorLegend: {
-                        labelType: 'ranges',
-                        labels: ['test1', 'test2', 'test3', 'test4'],
-                    },
-                    sizeLegend: {
-                        //values: [50000, 5000000],
-                    },
-                })
-                .psShape('circle')
-                .insets(false)
-                .psMinSize(1)
-                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
-                .psMinValue(3)
-                .psMaxValue(20)
-            // .stat('size', {
-            //     eurostatDatasetCode: 'nama_10r_3gdp',
-            //     unitText: 'Million EUR',
-            //     filters: { unit: 'MIO_EUR', time: '2023' },
-            // })
-            // .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
-            map2.statData('size').setData({
-                ES: 9,
-                FR: 12,
-                IT: 13,
-                RO: 10,
-                DE: 14,
-                PL: 15,
-                NL: 16,
-                BE: 17,
-                CZ: 18,
-                AT: 19,
-                DK: 10,
-                SE: 11,
-                FI: 12,
-                RU: 20,
-            })
-
-            map2.build()
         </script>
     </body>
 </html>

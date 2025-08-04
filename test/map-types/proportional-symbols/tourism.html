@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <!-- <script src="../../../build/eurostatmap.min.js"></script> -->
+        <script>
+            // basic barebones proportional circles example
+            let map = eurostatmap
+                .map('ps')
+                .nutsLevel(2)
+                .scale('60M')
+                .title('Tourism')
+                .subtitle('Nights spent in tourist accommodation and share of foreign tourists in total nights spent, 2022')
+                .width(800)
+                .stat('size', {
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    unitText: 'Nights spent',
+                    filters: { c_resid: 'TOTAL', unit: 'NR', time: '2023', nace_r2: 'I551-I553' },
+                })
+                .stat('color', {
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    unitText: 'share of foreign tourists',
+                    filters: { c_resid: 'FOR', unit: 'PC_TOT', time: '2023', nace_r2: 'I551-I553' },
+                })
+                .legend({
+                    x: 590,
+                    y: 20,
+                    boxOpacity: 1,
+                    sizeLegend: { title: 'Nights spent' },
+                    colorLegend: {
+                        title: 'share of foreign tourists',
+                    },
+                })
+                .psThresholds([10000, 20000, 30000, 40000])
+                .psColors(['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'])
+                .psShape('circle')
+                .psMaxSize(15)
+                .transitionDuration(900)
+                .dorling(true)
+                .dorlingStrength({ x: 0.1, y: 0.1 })
+                .dorlingIterations(1)
+                .animateDorling(true) // Set to false for non-animated dorling cartograms
+                .insets(false)
+
+            map.build()
+        </script>
+    </body>
+</html>

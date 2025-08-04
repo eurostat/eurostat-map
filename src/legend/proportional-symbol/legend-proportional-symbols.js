@@ -52,6 +52,12 @@ export const legend = function (map, config) {
         sepLineStroke: 'black', //the separation line color
         sepLineStrokeWidth: 1, //the separation line width
         tickLength: 5, // threshold ticks length in px
+        //diverging line for diverging color legends
+        pointOfDivergenceLabel: undefined,
+        pointOfDivergence: undefined,
+        pointOfDivergencePadding: 7,
+        divergingLineLength: undefined,
+        divergingArrowLength: undefined,
     }
 
     //override attribute values with config values

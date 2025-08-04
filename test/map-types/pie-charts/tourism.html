@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('pie')
+                .dorling(true) // Enable Dorling cartogram
+                .title('Tourism')
+                .subtitle('Nights spent in tourist accommodation and share of foreign tourists, 2022')
+                .scale('60M')
+                .nutsLevel(2)
+                //.dorling(true)
+                .geoCenter([5000000, 3500000])
+                .statPie(
+                    {
+                        eurostatDatasetCode: 'tour_occ_nin2',
+                        filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                        unitText: '1 000 tonnes',
+                    },
+                    'c_resid', //parameter that the categories belong to
+                    ['FOR', 'DOM'], //category codes
+                    ['Foreign', 'Domestic'], //category labels
+                    ['#7fc97f', '#beaed4', '#666666'] //colours
+                    //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
+                )
+                .pieMinRadius(6)
+                .legend({
+                    x: 650,
+                    y: 30,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: '1 000 tonnes',
+                        titlePadding: 20,
+                    },
+                    colorLegend: {
+                        title: 'Tourist origin',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>

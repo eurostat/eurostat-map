@@ -112,7 +112,7 @@ function createThresholdsLegend(out, config) {
                 .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
                 .attr('y', y + config.shapeHeight)
                 //.attr('dominant-baseline', 'middle')
-                .attr('dy', '0.35em') // ~vertical centering
+                .attr('dy', '0.3em') // ~vertical centering
                 .text(() => {
                     if (config.labels) return config.labels[i]
 
@@ -131,7 +131,7 @@ function createThresholdsLegend(out, config) {
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
     if (config.pointOfDivergenceLabel) {
         for (let i = 0; i < numberOfClasses; i++) {
-            let y = i * config.shapeHeight
+            let y = i * config.shapeHeight + titlePadding
             // point of divergence indicator
             if (i == config.pointOfDivergence) {
                 drawDivergingLine(out, y, config)
@@ -149,10 +149,11 @@ function createRangesLegend(out, config) {
     const unhighlightFunction = out.getUnHighlightFunction(map)
     const classToFillStyle = out.getClassToFillStyle(out)
     const colorClassifier = out.getColorClassifier(out)
+    const titlePadding = getTitlePadding(out)
 
     // for each class
     for (let i = 0; i < numberOfClasses; i++) {
-        let y = i * config.shapeHeight + getTitlePadding(out)
+        let y = i * config.shapeHeight + titlePadding
         const x = 0
         const ecl = out.ascending ? numberOfClasses - i - 1 : i
         const fillColor = classToFillStyle(ecl, numberOfClasses)
@@ -201,14 +202,14 @@ function createRangesLegend(out, config) {
             .attr('class', 'em-legend-label')
             .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
             .attr('y', y + config.shapeHeight / 2)
-            .attr('dy', '0.35em')
+            .attr('dy', '0.3em')
             .text(config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i))
     }
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
     if (config.pointOfDivergenceLabel) {
         for (let i = 0; i < numberOfClasses; i++) {
-            let y = i * config.shapeHeight
+            let y = i * config.shapeHeight + titlePadding
             // point of divergence indicator
             if (i == config.pointOfDivergence) {
                 drawDivergingLine(out, y, config)
@@ -281,7 +282,7 @@ function drawDivergingLine(out, y, config) {
             .attr('class', 'em-legend-label')
             .attr('x', directionLineX + 10)
             .attr('y', y - directionLineLength + 10)
-            .attr('dy', '0.35em')
+            .attr('dy', '0.3em')
             .text(labels[0])
 
         container
@@ -289,7 +290,7 @@ function drawDivergingLine(out, y, config) {
             .attr('class', 'em-legend-label')
             .attr('x', directionLineX + 10)
             .attr('y', y + directionLineLength - 10)
-            .attr('dy', '0.35em')
+            .attr('dy', '0.3em')
             .text(labels[1])
     } else {
         // just the single label
@@ -298,7 +299,7 @@ function drawDivergingLine(out, y, config) {
             .attr('class', 'em-legend-diverging-label em-legend-label')
             .attr('x', x + lineLength + 5)
             .attr('y', y)
-            .attr('dy', '0.35em')
+            .attr('dy', '0.3em')
             .text(out.pointOfDivergenceLabel)
     }
 
@@ -306,10 +307,10 @@ function drawDivergingLine(out, y, config) {
     if (out.labelType == 'thresholds' || out.colorLegend?.labelType == 'thresholds') {
         if (labels.length > 1) {
             // move it to end of line
-            container.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)
+            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)
         } else {
             // remove it so it doesnt clash with pointOfDivergenceLabel
-            container.selectAll('.em-legend-label-divergence').remove()
+            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
         }
     }
 }
