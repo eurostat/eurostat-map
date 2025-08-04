@@ -19,6 +19,9 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 10, //padding between title and body
         values: null,
+        labelFormatter: undefined, // user-defined format function
+        noData: false, // show no data legend item
+        noDataText: 'No data', //no data text label
     }
 
     //colour legend config (legend illustrating the values of different pie colours)
@@ -46,6 +49,7 @@ export const legend = function (map, config) {
                         out[key][p] = config[key][p]
                     }
                 }
+                if (config.colorLegend == false) out.colorLegend = false
             } else {
                 out[key] = config[key]
             }

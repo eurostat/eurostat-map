@@ -615,8 +615,6 @@ export const map = function (config) {
     `
         html += svg
 
-        // Breakdown
-        // Breakdown (sorted by value)
         // Breakdown (sorted by value, with percentages)
         html += `<div class="em-tooltip-breakdown">`
 
@@ -640,7 +638,7 @@ export const map = function (config) {
         <div class="em-breakdown-item">
             <span class="em-breakdown-color" style="background:${item.color}"></span>
             <span class="em-breakdown-label">${item.label}</span>
-            <span class="em-breakdown-value">${item.value?.toFixed ? item.value.toFixed() : 0} (${isNaN(percent) ? 0 : percent}%)</span>
+            <span class="em-breakdown-value">${item.value?.toFixed ? spaceAsThousandSeparator(item.value) : 0} (${isNaN(percent) ? 0 : percent}%)</span>
         </div>
     `
         }
@@ -651,7 +649,7 @@ export const map = function (config) {
             html += `
         <div class="em-breakdown-item em-total">
             <span class="em-breakdown-label">Total</span>
-            <span class="em-breakdown-value">${total.toFixed()} ${unit}</span>
+            <span class="em-breakdown-value">${spaceAsThousandSeparator(total)} ${unit}</span>
         </div>
     `
         }

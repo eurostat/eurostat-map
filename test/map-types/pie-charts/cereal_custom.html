@@ -39,6 +39,9 @@
                         title: '1 000 tonnes',
                         titlePadding: 22,
                         values: [50, 6000],
+                        labelFormatter: (d) => {
+                            return d.toLocaleString('en-US', { maximumFractionDigits: 0 })
+                        },
                     },
                     colorLegend: {
                         title: 'Cereal type',
