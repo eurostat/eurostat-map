@@ -7,6 +7,7 @@ import * as StatMap from '../core/stat-map'
 import * as PiechartLegend from '../legend/legend-piecharts'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
+import { interpolate } from 'd3'
 
 /**
  * Returns a proportional pie chart map.
@@ -320,33 +321,47 @@ export const map = function (config) {
                 .attr('class', 'piechart')
                 .attr('stroke', out.pieStrokeFill_)
                 .attr('stroke-width', out.pieStrokeWidth_ + 'px')
-                .style('pointer-events', 'none') // disable during transition
-            // Transition the parent g for the stroke animation
-            chartsnodes
-                .transition()
-                .duration(out.transitionDuration())
-                .on('end', function () {
-                    select(this).style('pointer-events', null) // re-enable after transition
-                })
+                .style('pointer-events', 'none') // optional: block during transition
 
             // Draw pie segments
-            chartsnodes
+            const pieData = pie_(data)
+
+            const paths = chartsnodes
                 .selectAll('path')
-                .data(pie_(data))
+                .data(pieData)
                 .join('path')
-                .attr('d', arcFunction)
-                .attr('code', (d) => d.data.code)
                 .attr('fill', (d) => out.catColors_[d.data.code] || 'lightgray')
+                .attr('code', (d) => d.data.code)
+
+                .each(function (d) {
+                    this._current = { startAngle: d.startAngle, endAngle: d.startAngle }
+                }) // start collapsed
+                .transition()
+                .delay((d, i) => i * 150) // progressive segment delay
+                .duration(out.transitionDuration_)
+                .attrTween('d', function (d) {
+                    const interpolater = interpolate(this._current, d)
+                    this._current = interpolater(1)
+                    return function (t) {
+                        return arcFunction(interpolater(t))
+                    }
+                })
+                .on('end', function () {
+                    select(chartsnodes.node()).style('pointer-events', null) // enable interaction after last slice
+                })
+
+            // add mouse events to pies
+            chartsnodes
                 .on('mouseover', function (e, rg) {
-                    const parent = select(this.parentNode)
+                    const parent = select(this)
                     parent.style('stroke-width', '1px').style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(region, out))
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 })
                 .on('mousemove', function (e) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    const parent = select(this.parentNode)
+                    const parent = select(this)
                     parent.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_)
                     if (out._tooltip) out._tooltip.mouseout()
                 })
