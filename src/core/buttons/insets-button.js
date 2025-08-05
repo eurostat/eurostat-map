@@ -6,7 +6,9 @@ export const appendInsetsButton = (map) => {
 
     const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
 
-    const insetButton = svg.append('g').attr('class', 'em-insets-button em-button')
+    const insetButton = svg.append('g').attr('class', 'em-insets-button em-button').attr('id', 'em-insets-button')
+    //tooltip
+    insetButton.append('title').text('Show/hide inset maps')
     // Add rectangle for button background
     insetButton.append('rect').attr('width', buttonSize).attr('height', buttonSize)
     // Add Font Awesome copyright comment
