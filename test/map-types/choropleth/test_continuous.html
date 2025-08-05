@@ -33,6 +33,7 @@
                 .valueTransform(Math.log) // for distribution stretching in continuous mode
                 .valueUntransform(Math.exp) // the legends need to 'untransform' the value to show the original value
                 .nutsLevel(2)
+                .placenames(true)
                 .legend({
                     title: 'Test',
                     x: 10,
@@ -48,6 +49,7 @@
                     highLabel: 'High',
                     orientation: 'vertical', // 'vertical' or 'horizontal'
                     boxOpacity: 0,
+                    highlightTolerance: 1000,
                 })
                 .zoomExtent([1, 10])
                 .insets('default')

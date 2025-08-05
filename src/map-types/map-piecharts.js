@@ -197,6 +197,8 @@ export const map = function (config) {
     //@override
     out.updateStyle = function () {
         try {
+            if (!out.classifierSize_) return //cannot style without classifier
+
             //if not specified, build default color ramp
             if (!out.catColors_) {
                 out.catColors({})
@@ -354,7 +356,7 @@ export const map = function (config) {
             chartsnodes
                 .on('mouseover', function (e, rg) {
                     const parent = select(this)
-                    parent.style('stroke-width', '1px').style('stroke', 'black')
+                    parent.style('stroke-width', out.pieStrokeWidth_ + 1).style('stroke', 'black')
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 })
                 .on('mousemove', function (e) {

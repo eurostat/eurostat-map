@@ -560,10 +560,44 @@ export const getLegendRegionsSelector = (map) => {
     return '#em-nutsrg, #em-cntrg'
 }
 
-// Helper function to calculate current view as bbox
-export const getCurrentBbox = function (map) {
+// Helper functions to calculate current view as bbox
+
+/**
+ * Approximate geographic bbox based on map.position_ (linear, equirectangular assumption)
+ * Works before projection is created.
+ * @returns [minLon, minLat, maxLon, maxLat]
+ */
+export const getApproxCurrentGeoBbox = function (map) {
     const halfWidth = 0.5 * map.position_.z * map.width_
     const halfHeight = 0.5 * map.position_.z * map.height_
-    const bbox = [map.position_.x - halfWidth, map.position_.y - halfHeight, map.position_.x + halfWidth, map.position_.y + halfHeight]
-    return bbox
+    return [map.position_.x - halfWidth, map.position_.y - halfHeight, map.position_.x + halfWidth, map.position_.y + halfHeight]
+}
+
+/**
+ * Exact geographic bbox using the current projection (requires map._projection)
+ * Computes bbox by inverting the screen corners to lon/lat.
+ * @returns [minLon, minLat, maxLon, maxLat]
+ */
+export const getExactCurrentGeoBbox = function (map) {
+    if (!map._projection) {
+        console.warn('getExactCurrentGeoBbox called before projection exists; returning approx bbox')
+        return getApproxCurrentGeoBbox(map)
+    }
+
+    const width = map.width_
+    const height = map.height_
+
+    const corners = [
+        [0, 0],
+        [width, 0],
+        [width, height],
+        [0, height],
+    ]
+
+    const projected = corners.map((pt) => map._projection.invert(pt)).filter(Boolean) // in case projection clips some corners
+
+    const lons = projected.map((p) => p[0])
+    const lats = projected.map((p) => p[1])
+
+    return [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)]
 }

@@ -2,7 +2,14 @@ import { select, selectAll } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
-import { getBBOXAsGeoJSON, executeForAllInsets, getFontSizeFromClass, getParameterByName, convertRectanglesToPaths, getCurrentBbox } from './utils'
+import {
+    getBBOXAsGeoJSON,
+    executeForAllInsets,
+    getFontSizeFromClass,
+    getParameterByName,
+    convertRectanglesToPaths,
+    getApproxCurrentGeoBbox,
+} from './utils'
 import { appendAnnotations } from './annotations'
 import { addLabelsToMap, updateLabels, updateValuesLabels } from './labels'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -14,7 +21,8 @@ import { appendMinimap } from './minimaps'
 import { defineMapZoom, setMapView } from './zoom'
 import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
-import { zoomIdentity } from 'd3-zoom'
+import { addPlacenameLabels } from './placenames.js'
+import { initProj4 } from './proj4.js'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -23,6 +31,8 @@ formatDefaultLocale({
     grouping: [3],
     currency: ['', '€'],
 })
+
+initProj4()
 
 /**
  * The map template: only the geometrical part.
@@ -59,6 +69,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.filterGeometriesFunction_ = undefined // user defined filter function
     out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
+    out.placenames_ = false // load placenames from placenames.js
 
     // pan & zoom
     out.zoomExtent_ = undefined
@@ -644,6 +655,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             out.annotationsAdded = true
         }
 
+        //placenames
+        if (out.placenames_) {
+            addPlacenameLabels(out)
+        }
+
         //title
         if (out.title()) {
             //define default position
@@ -958,7 +974,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 out.projectionFunction_ ||
                 geoIdentity()
                     .reflectY(true)
-                    .fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getCurrentBbox(out)))
+                    .fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getApproxCurrentGeoBbox(out)))
         }
     }
 

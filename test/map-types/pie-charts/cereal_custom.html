@@ -18,7 +18,7 @@
                 .animateDorling(true)
                 .dorlingStrength({ x: 1, y: 1 })
                 .dorlingIterations(0.5)
-                .transitionDuration(5000)
+                .transitionDuration(500)
                 .title('Cereal production')
                 .subtitle('2022')
                 .scale('60M')
@@ -30,7 +30,11 @@
                 .pieMaxRadius(20)
                 .pieMinRadius(2)
                 .catLabels(Object.fromEntries(Object.entries(pieStats).map(([key, value]) => [key, value.name])))
+                .insets('default')
+                .insetBoxPosition([10, 100])
+                .insetsButton(true)
                 .zoomButtons(true)
+                .placenames(true)
                 .legend({
                     x: 540,
                     y: 10,

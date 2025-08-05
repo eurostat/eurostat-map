@@ -7,13 +7,6 @@ import proj4 from 'proj4'
 export const appendMinimap = (map) => {
     if (!map.svg_) return
 
-    // Load proj4 definitions for dynamic minimaps that are linked to the main map view
-    if (map.proj_ === '3035') {
-        proj4.defs('EPSG:3035', '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs')
-    } else if (map.proj_ === '54030') {
-        proj4.defs('EPSG:54030', '+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs')
-    }
-
     // Retrieve geometries from map or load default if not available
     if (map.Geometries.geoJSONs.worldrg) {
         drawMinimap(map)

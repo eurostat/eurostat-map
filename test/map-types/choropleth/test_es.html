@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -47,6 +47,8 @@
                     ],
                     insetBoxPosition: [380, 370],
                     legend: { decimals: 1, x: 13, y: 60, boxOpacity: 0, boxPadding: 7, title: 'Rate (%)', noData: false },
+                    placenames: true,
+                    zoomExtent: [1, 100],
                     callback: function () {
                         //set title with date
                         map.title(map.title() + ' in ' + map.getTime())
