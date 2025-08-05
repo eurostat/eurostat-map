@@ -111,8 +111,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.minimap_ = undefined
 
     //buttons
-    out.showZoomButtons_ = false // show zoom buttons
-    out.showInsetsButton_ = false // show insets button
+    out.zoomButtons_ = false // show zoom buttons
+    out.insetsButton_ = false // show insets button
 
     //tooltip
     out.tooltip_ = {
@@ -615,7 +615,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             definePathFunction()
 
             // d3 zoom
-            if (out.zoomExtent() || out.showZoomButtons_) {
+            if (out.zoomExtent() || out.zoomButtons_) {
                 if (!out.zoomExtent_) {
                     console.warn('Zoom buttons are enabled, but no zoom extent is defined. Setting default extent to map.zoomExtent([1,10]).')
                     out.zoomExtent_ = [1, 10]
@@ -734,12 +734,12 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         //zoom buttons
-        if (out.showZoomButtons_) {
+        if (out.zoomButtons_) {
             appendZoomButtons(out)
         }
 
         //insets buttons
-        if (out.showInsetsButton_) {
+        if (out.insetsButton_) {
             appendInsetsButton(out)
         }
 

@@ -31,7 +31,7 @@ export const appendInsetsButton = (map) => {
         event.preventDefault()
         event.stopPropagation()
         //show or hide insets
-        let container = select('#em-insets-group')
+        let container = svg.select('#em-insets-group')
         if (container.style('display') === 'none' || container.style('display') === '') {
             container.style('display', 'block')
         } else {

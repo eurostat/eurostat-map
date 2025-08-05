@@ -1225,7 +1225,7 @@ map.minimap({
 
 ## Buttons
 
-You can add zoom buttons with map.showZoomButtons(true) and an inset toggle with map.showInsetButton(true). See ui.css for their styling.
+You can add zoom buttons with map.zoomButtons(true) and an inset toggle with map.showInsetButton(true). See ui.css for their styling.
 
 ## Export
 

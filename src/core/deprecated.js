@@ -6,6 +6,9 @@ import { updateCSSRule } from './utils.js'
 // To be removed when completely phased out.
 
 export const defineDeprecatedFunctions = (out) => {
+    // buttons
+    out.showZoomButtons = (v) => (console.warn('showZoomButtons() is now DEPRECATED, please use zoomButtons() instead'), out.zoomButtons_ = v, out);
+    out.showInsetsButton = (v) => (console.warn('showInsetsButton() is now DEPRECATED, please use insetsButton() instead'), out.insetsButton_ = v, out);
     // styles
     out.seaFillStyle = (v) => (console.warn('seaFillStyle() is now DEPRECATED, please use the .em-sea CSS class'), updateCSSRule('.em-sea','fill',v), out);
     out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'),updateCSSRule('.em-cntrg','fill',v), out);
@@ -104,10 +107,10 @@ export const defineDeprecatedFunctions = (out) => {
 
    //other
     out.psClassifMethod = (v) => (console.warn('psClassifMethod() is now DEPRECATED. please use psClassificationMethod instead'),out.psClassificationMethod_ = v, out);
-    out.geoCenter = (v) => (console.warn('map.geoCenter() is now deprecated. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
-    out.pixelSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
-    out.pixSize = (v) => (console.warn('map.pixelSize() is now deprecated. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
-    out.tooltipText = (v) => (console.warn('map.tooltipText() is now deprecated. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
+    out.geoCenter = (v) => (console.warn('map.geoCenter() is now DEPRECATED. Please use map.position({x,y,z}) instead.'), out.position_.x = v[0], out.position_.y = v[1], out);
+    out.pixelSize = (v) => (console.warn('map.pixelSize() is now DEPRECATED. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
+    out.pixSize = (v) => (console.warn('map.pixelSize() is now DEPRECATED. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
+    out.tooltipText = (v) => (console.warn('map.tooltipText() is now DEPRECATED. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
     out.classifMethod = (v) => (console.warn('map.classifMethod() is now DEPRECATED. please use map.classificationMethod() instead.'), out.classificationMethod_ = v,out);
     out.threshold = (v) => (console.warn('map.threshold() is now DEPRECATED. please use map.thresholds() instead.'), out.thresholds_ = v,out);
     out.psThreshold = (v) => (console.warn('map.psThreshold() is now DEPRECATED. please use map.psThresholds() instead.'), out.psThresholds_ = v,out);

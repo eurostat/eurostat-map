@@ -24,6 +24,9 @@
                 .scale('60M')
                 .nutsLevel(2)
                 .showZoomButtons(true)
+                .insetsButton(true)
+                .insetBoxPosition([570, 60])
+                .insets('default')
                 //.dorling(true)
                 .geoCenter([5000000, 3500000])
                 .statPie(
@@ -40,9 +43,9 @@
                 )
                 .pieMinRadius(6)
                 .legend({
-                    x: 650,
-                    y: 30,
-                    boxOpacity: 1,
+                    x: 10,
+                    y: 120,
+                    boxOpacity: 0.5,
                     titleFontWeight: 'bold',
                     sizeLegend: {
                         title: '1 000 tonnes',
