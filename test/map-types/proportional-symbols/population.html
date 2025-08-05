@@ -11,10 +11,137 @@
         <script src="../../../build/eurostatmap.js"></script>
         <!-- <script src="../../../build/eurostatmap.min.js"></script> -->
         <script>
-            const nutsLevel = 2 // Change this to 0, 1, 2, or 3 for different NUTS levels
+            const nutsLevel = 3 // Change this to 0, 1, 2, or 3 for different NUTS levels
+            const h = 60
+            const w = 70
+            const s = 70 // inset size
+            const p = 4 // inset padding
+            const insetBoxX = 0 // x position of inset box is already defined by map.insetBoxPosition([])
+            const insetBoxY = 0
+            const insets = [
+                {
+                    /* first row, rightmost inset */ geo: 'IC',
+                    x: insetBoxX,
+                    y: insetBoxY,
+                    width: w,
+                    height: h,
+                    title: 'Canarias (ES)',
+                    titlePosition: [2, 11],
+                    position: { x: 410000, y: 3180000, z: 8000 },
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* first row, leftmost inset */ geo: 'GP',
+                    x: insetBoxX - w - p,
+                    y: insetBoxY,
+                    width: w,
+                    height: h,
+                    title: 'Guadeloupe (FR)',
+                    titlePosition: [2, 11],
+                    position: { x: 660000, y: 1810000, z: 2000 },
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* inset inside the Guadeloupe inset */ geo: 'GP',
+                    x: insetBoxX - w + 5,
+                    y: insetBoxY + 15,
+                    width: 23,
+                    height: 15,
+                    titlePosition: [2, 11],
+                    position: { x: 493000, y: 1999000, z: 1500 },
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* second row, rightmost inset */ geo: 'GF',
+                    x: insetBoxX,
+                    y: insetBoxY + h * 1 + p * 1,
+                    width: w,
+                    height: h,
+                    title: 'Guyane (FR)',
+                    titlePosition: [2, 11],
+                    position: { x: 295852, y: 484074, z: 9000 },
+                    scalebarPosition: [45, 65],
+                },
+                {
+                    /* second row, leftmost inset */ geo: 'MQ',
+                    x: insetBoxX - w - p,
+                    y: insetBoxY + h + p,
+                    width: w,
+                    height: h,
+                    title: 'Martinique (FR)',
+                    titlePosition: [2, 11],
+                    position: { x: 716521, y: 1621322, z: 1500 },
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* third row, rightmost inset */ geo: 'YT',
+                    x: insetBoxX,
+                    y: insetBoxY + h * 2 + p * 2,
+                    width: w,
+                    height: h,
+                    title: 'Mayotte (FR)',
+                    position: { z: 1000 },
+                    titlePosition: [2, 11],
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* third row, leftmost inset */ geo: 'RE',
+                    x: insetBoxX - w - p,
+                    y: insetBoxY + h * 2 + p * 2,
+                    width: w,
+                    height: h,
+                    title: 'Réunion (FR)',
+                    position: { x: 340011, y: 7671627, z: 2000 },
+                    titlePosition: [2, 11],
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* fourth row, rightmost inset */ geo: 'PT20',
+                    x: insetBoxX,
+                    y: insetBoxY + h * 3 + p * 3,
+                    width: w,
+                    height: h,
+                    title: 'Açores (PT)',
+                    titlePosition: [2, 11],
+                    position: { x: 440000, y: 4360000, z: 4000 },
+                    scalebarPosition: [48, 65],
+                },
+                {
+                    /* inset inside the Açores inset */ geo: 'PT20',
+                    x: insetBoxX + 10,
+                    y: insetBoxY + h * 3 + p * 3 + 17,
+                    width: 23,
+                    height: 30,
+                    titlePosition: [2, 11],
+                    position: { x: 650000, y: 4150000, z: 5000 },
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* inset inside the Açores inset */ geo: 'PT20',
+                    x: insetBoxX + 40,
+                    y: insetBoxY + h * 3 + p * 3 + 17,
+                    width: 15,
+                    height: 20,
+                    titlePosition: [2, 11],
+                    position: { x: 140000, y: 4390000, z: 3500 },
+                    scalebarPosition: [1, 65],
+                },
+                {
+                    /* fourth row, leftmost inset */ geo: 'PT30',
+                    x: insetBoxX - w - p,
+                    y: insetBoxY + h * 3 + p * 3,
+                    width: w,
+                    height: h,
+                    title: 'Madeira (PT)',
+                    scalebarPosition: [1, 65],
+                    titlePosition: [2, 11],
+                },
+            ]
             const map = eurostatmap
                 .map('proportionalSymbol')
                 .dorling(true)
+                .animateDorling(false)
+                .dorlingWorker(true)
                 .title('Total population & population change')
                 .subtitle('2023')
                 .nutsLevel(nutsLevel)
@@ -58,6 +185,11 @@
                         pointOfDivergenceLabel: 'Increase|Decrease',
                     },
                 })
+                .insets(insets)
+                .insetBoxPosition([500, 40])
+                .showInsetsButton(true)
+                .showZoomButtons(true)
+                .zoomExtent([1, 10])
                 .build()
         </script>
     </body>

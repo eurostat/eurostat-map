@@ -271,6 +271,10 @@ export const map = function (config) {
         }
     }
 
+    function getSizeStatData(map) {
+        return map.statData('size').getArray() ? map.statData('size') : map.statData()
+    }
+
     /**
      * Applies proportional symbol styling to a map object
      *
@@ -283,7 +287,7 @@ export const map = function (config) {
         if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
 
         // if size dataset not defined then use default
-        let sizeData = map.statData('size').getArray() ? map.statData('size') : map.statData()
+        const sizeData = getSizeStatData(map)
 
         if (map.svg_) {
             //clear previous centroids
@@ -306,17 +310,6 @@ export const map = function (config) {
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
                 symb = appendD3SymbolsToMap(map, sizeData)
-            }
-
-            // dorling cartogram
-            if (out.dorling_) {
-                runDorlingSimulation(out, (d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    const r = datum ? out.classifierSize_(+datum.value) : 0
-                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
-                })
-            } else {
-                stopDorlingSimulation(out)
             }
 
             // set style of symbols
@@ -491,7 +484,7 @@ export const map = function (config) {
      */
     out.updateSymbolsDrawOrder = function (map) {
         const gcp = map.svg_.select('#em-prop-symbols')
-        const sizeData = map.statData('size')?.getArray?.() ? map.statData('size') : map.statData()
+        const sizeData = getSizeStatData(map)
 
         // Ensure centroidFeatures is populated (important for mixed)
         if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
@@ -744,26 +737,20 @@ export const map = function (config) {
             applyStyleToMap(out)
 
             // apply style to insets
-            // apply classification to all insets
             if (out.insetTemplates_) {
-                for (const geo in out.insetTemplates_) {
-                    if (Array.isArray(out.insetTemplates_[geo])) {
-                        for (var i = 0; i < out.insetTemplates_[geo].length; i++) {
-                            // insets with same geo that do not share the same parent inset
-                            if (Array.isArray(out.insetTemplates_[geo][i])) {
-                                // this is the case when there are more than 2 different insets with the same geo. E.g. 3 insets for PT20
-                                for (var c = 0; c < out.insetTemplates_[geo][i].length; c++) {
-                                    if (out.insetTemplates_[geo][i][c].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i][c])
-                                }
-                            } else {
-                                if (out.insetTemplates_[geo][i].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo][i])
-                            }
-                        }
-                    } else {
-                        // unique inset geo_
-                        if (out.insetTemplates_[geo].svgId_ !== out.svgId_) applyStyleToMap(out.insetTemplates_[geo])
-                    }
-                }
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            }
+
+            // dorling cartogram
+            if (out.dorling_) {
+                const sizeData = getSizeStatData(out)
+                runDorlingSimulation(out, (d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    const r = datum ? out.classifierSize_(+datum.value) : 0
+                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                })
+            } else {
+                stopDorlingSimulation(out)
             }
 
             return out

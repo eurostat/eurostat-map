@@ -219,6 +219,17 @@ export const map = function (config) {
             // apply to main map
             applyStyleToMap(out)
 
+            // dorling cartogram
+            if (out.dorling_) {
+                runDorlingSimulation(out, (d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    const r = datum ? out.classifierSize_(+datum.value) : 0
+                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                })
+            } else {
+                stopDorlingSimulation(out)
+            }
+
             return out
         } catch (e) {
             console.error('Error in updateStyle:', e.message)

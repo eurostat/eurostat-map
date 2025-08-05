@@ -796,13 +796,13 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         map.Geometries.centroidsFeatures = projectedCentroids.filter((d) => hasStatData(d.properties.id, map))
 
         // Append container if not existing
-        const gcp = map.svg().select('#em-prop-symbols').empty()
+        const gcp = map.svg().select(`#em-prop-symbols-${map.svgId_}`).empty()
             ? map
                   .svg()
                   .select('#em-zoom-group-' + map.svgId_)
                   .append('g')
-                  .attr('id', 'em-prop-symbols')
-            : map.svg().select('#em-prop-symbols')
+                  .attr('id', `em-prop-symbols-${map.svgId_}`)
+            : map.svg().select(`#em-prop-symbols-${map.svgId_}`)
 
         // Join pattern for centroids
         gcp.selectAll('g.em-centroid')
@@ -823,9 +823,10 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.refreshCentroids = function (map) {
         const allCentroids = map.Geometries._allCentroidsFeatures
         if (!allCentroids) return
+
         map.Geometries.centroidsFeatures = allCentroids.filter((d) => hasStatData(d.properties.id, map))
 
-        const gcp = map.svg().select('#em-prop-symbols')
+        const gcp = map.svg().select(`#em-prop-symbols-${map.svgId_}`)
 
         gcp.selectAll('g.em-centroid')
             .data(map.Geometries.centroidsFeatures, (d) => d.properties.id)
