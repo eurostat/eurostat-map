@@ -615,7 +615,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             definePathFunction()
 
             // d3 zoom
-            if (out.zoomExtent()) {
+            if (out.zoomExtent() || out.showZoomButtons_) {
+                if (!out.zoomExtent_) {
+                    console.warn('Zoom buttons are enabled, but no zoom extent is defined. Setting default extent to map.zoomExtent([1,10]).')
+                    out.zoomExtent_ = [1, 10]
+                }
                 defineMapZoom(out)
             }
 

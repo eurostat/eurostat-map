@@ -12,7 +12,7 @@ export const appendZoomButtons = (map) => {
 
     const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
 
-    const zoomInBtn = buttonGroup.append('g').attr('class', 'em-zoom-in em-button')
+    const zoomInBtn = buttonGroup.append('g').attr('class', 'em-zoom-in em-button').attr('title', 'Zoom in').style('cursor', 'pointer')
     zoomInBtn.append('rect').attr('width', buttonSize).attr('height', buttonSize)
     zoomInBtn
         .append('text')
@@ -23,6 +23,8 @@ export const appendZoomButtons = (map) => {
     const zoomOutBtn = buttonGroup
         .append('g')
         .attr('class', 'em-zoom-out em-button')
+        .attr('title', 'Zoom out')
+        .style('cursor', 'pointer')
         .attr('transform', `translate(0, ${buttonSize})`)
         .style('cursor', 'pointer')
     zoomOutBtn.append('rect').attr('width', buttonSize).attr('height', buttonSize)

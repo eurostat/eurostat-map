@@ -65,7 +65,16 @@
                     shadows: true,
                 })
                 .nutsLevel(0)
-                .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 0, donutColorLegend: { title: type } })
+                .legend({
+                    x: 10,
+                    y: 120,
+                    title: 'Test',
+                    boxOpacity: 0,
+                    flowWidthLegend: { title: 'Flow volume' },
+                    donutSizeLegend: { title: 'Donut size' },
+                    flowColorLegend: { title: 'Flow color' },
+                    regionColorLegend: { title: 'Region color' },
+                })
                 .drawCoastalMargin(false)
                 .insets(false)
                 .zoomExtent([0.03, 1000])
