@@ -340,8 +340,7 @@ function getShape(out) {
 }
 
 function highlightPsRegions(map, ecl) {
-    //for ps, the symbols are the children of each em-prop-symbols element
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -359,8 +358,7 @@ function highlightPsRegions(map, ecl) {
 
 // Reset all regions to their original opacitys on mouseout
 function unhighlightPsRegions(map) {
-    //for ps, the symbols are the children of each em-prop-symbols element
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {

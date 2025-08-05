@@ -483,7 +483,7 @@ export const map = function (config) {
      * @param {*} map map instance
      */
     out.updateSymbolsDrawOrder = function (map) {
-        const gcp = map.svg_.select('#em-prop-symbols')
+        const gcp = out.getCentroidsGroup(map)
         const sizeData = getSizeStatData(map)
 
         // Ensure centroidFeatures is populated (important for mixed)
@@ -625,8 +625,7 @@ export const map = function (config) {
     function appendBarsToMap(map, sizeData) {
         return (
             map
-                .svg()
-                .select('#em-prop-symbols')
+                .getCentroidsGroup(map)
                 .selectAll('g.em-centroid')
                 .append('rect')
                 .filter((rg) => {
@@ -658,8 +657,7 @@ export const map = function (config) {
      */
     function appendCustomSymbolsToMap(map, sizeData) {
         return map
-            .svg()
-            .select('#em-prop-symbols')
+            .getCentroidsGroup(map)
             .selectAll('g.em-centroid')
             .append('g')
             .filter((rg) => {

@@ -222,9 +222,8 @@ export const map = function (config) {
             // dorling cartogram
             if (out.dorling_) {
                 runDorlingSimulation(out, (d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    const r = datum ? out.classifierSize_(+datum.value) : 0
-                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                    const total = getRegionTotal(d.properties.id) || 0
+                    return out.classifierSize_(total) || 0
                 })
             } else {
                 stopDorlingSimulation(out)
@@ -243,7 +242,7 @@ export const map = function (config) {
         out.catLabels_ = out.catLabels_ || {}
 
         if (out.svg_) {
-            const s = out.svg_.selectAll('#em-prop-symbols')
+            const s = map.getCentroidsGroup(map)
             if (s) {
                 const sym = s.selectAll('g.em-centroid')
 

@@ -255,10 +255,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * If the stat data sources have changed, call *updateStatData* instead.
      */
     out.updateStatValues = function () {
-        // if (out._mapType === 'ps' && out.nutsLevel_ === 'mixed') {
-        //     //rebuildCentroidsForMixedNUTS(out)
-
-        // }
+        // filter out centroids without stat data
         if (withCenterPoints) out.refreshCentroids(out)
 
         out.updateClassification()
@@ -267,39 +264,6 @@ export const statMap = function (config, withCenterPoints, mapType) {
         if (out.legend_ && out.legendObj()) out.legendObj().update()
 
         return out
-    }
-
-    /**
-     * Ensures all centroid symbol containers exist for mixed NUTS levels.
-     * Rebuilds `g.em-centroid` groups and updates `centroidFeatures`
-     * so Dorling and styling work after stat data changes.
-     *
-     * @param {*} map The map instance
-     */
-    function rebuildCentroidsForMixedNUTS(map) {
-        const gcp = map.svg_.select('#em-prop-symbols')
-        const sizeData = map.statData('size')?.getArray?.() ? map.statData('size') : map.statData()
-
-        // Always filter from the unmodified master list
-        const source = map.Geometries._allCentroidsFeatures || []
-        const withData = source.filter((f) => {
-            const v = sizeData.get?.(f.properties.id)?.value
-            return v != null && v !== ':'
-        })
-
-        // Update the "active" centroids list
-        map.Geometries.centroidsFeatures = withData
-
-        // Clear and redraw centroid groups
-        gcp.selectAll('g.em-centroid').remove()
-
-        gcp.selectAll('g.em-centroid')
-            .data(withData, (d) => d.properties.id)
-            .enter()
-            .append('g')
-            .attr('class', 'em-centroid')
-            .attr('id', (d) => 'ps' + d.properties.id)
-            .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
     }
 
     /**

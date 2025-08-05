@@ -214,7 +214,7 @@ export const map = function (config) {
         //build and assign pie charts to the regions
         //collect nuts ids from g elements. TODO: find better way of getting IDs
         let nutsIds = []
-        let s = out.svg().selectAll('#em-prop-symbols')
+        let s = out.getCentroidsGroup(out)
         let sym = s.selectAll('g.em-centroid').attr('id', (rg) => {
             nutsIds.push(rg.properties.id)
             return 'spark_' + rg.properties.id
@@ -411,7 +411,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         const maxs = []
-        const sel = out.svg().selectAll('#em-prop-symbols').selectAll('g.em-centroid').data()
+        const sel = out.getCentroidsGroup(out).selectAll('g.em-centroid').data()
 
         sel.forEach((rg) => {
             const id = rg.properties.id

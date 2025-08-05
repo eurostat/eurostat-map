@@ -240,7 +240,7 @@ export const map = function (config) {
         //collect nuts ids from g elements. TODO: find better way of sharing regions with pies
         let regionFeatures = []
         if (out.svg_) {
-            let s = out.svg_.selectAll('#em-prop-symbols')
+            let s = map.getCentroidsGroup(map)
             if (s) {
                 let sym = s.selectAll('g.em-centroid')
                 sym.append('g')
@@ -451,7 +451,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         let totals = []
-        let sel = out.svg().selectAll('#em-prop-symbols').selectAll('g.em-centroid').data()
+        let sel = out.getCentroidsGroup(out).selectAll('g.em-centroid').data()
 
         sel.forEach((rg) => {
             let id = rg.properties.id

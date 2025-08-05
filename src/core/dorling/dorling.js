@@ -27,7 +27,7 @@ export function runDorlingSimulation(map, radiusAccessor) {
             }
         }
 
-        const containers = singleMap.svg().select(`#em-prop-symbols-${singleMap.svgId_}`).selectAll('g.em-centroid')
+        const containers = map.getCentroidsGroup(singleMap).selectAll('g.em-centroid')
 
         const tickTransform = (sel) => {
             sel.attr('transform', (d) => {

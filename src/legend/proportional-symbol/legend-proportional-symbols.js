@@ -164,8 +164,7 @@ export function getPropSymbolColorLabelFormatter(out) {
 
 // Highlight selected regions on mouseover
 export function highlightPsSymbols(map, ecl) {
-    //for ps, the symbols are the children of each em-prop-symbols element
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -183,8 +182,7 @@ export function highlightPsSymbols(map, ecl) {
 
 // Reset all regions to their original opacitys on mouseout
 export function unhighlightPsSymbols(map) {
-    //for ps, the symbols are the children of each em-prop-symbols element
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {

@@ -470,7 +470,7 @@ function unhighlightRegions(map) {
 
 function highlightPsSymbols(map, rawVal) {
     const tolerance = getHighlightTolerance(map)
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     allSymbols.each(function () {
         const symbol = select(this)
@@ -499,7 +499,7 @@ function highlightPsSymbols(map, rawVal) {
 }
 
 function unhighlightPsSymbols(map) {
-    const allSymbols = map.svg_.selectAll('#em-prop-symbols').selectAll('[ecl]')
+    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore all to default opacity
     allSymbols.each(function () {
