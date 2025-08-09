@@ -61,56 +61,70 @@ export const map = function (config) {
     out.totalCode_ = undefined
 
     // Helper for Eurostat datasets (like statSpark or statPie)
-    out.statCoxcomb = function (stat, months, dimension, causes, labels, colors, totalCode) {
-        out._coxcombMonths = months
-        out._coxcombCauses = [...causes] // clone so we can append "other" later safely
-        out._coxcombDim = dimension
+    // .statCoxcomb({
+    //     filters: {
+    //       //data/tour_occ_nin2m?format=JSON&unit=NR&c_resid=TOTAL&nace_r2=I551-I553&month=M01&lang=EN
+    //       eurostatDatasetCode: "tour_occ_nin2m",
+    //       filters: { unit: "NR", nace_r2: "I551-I553", TIME: 2022 }, // shared filters
+    //       unitText: "Nights spent",
+    //     },
+    //     timeParameter: "month",
+    //     times: ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12"],
+    //     categoryParameter: "c_resid",
+    //     categoryCodes: ["DOM", "FOR"],
+    //     categoryLabels: ["Domestic", "Foreign"],
+    //     categoryColors: ["#1b9e77", "#d95f02"],
+    //     totalCode: "TOTAL",
+    //   })
+    out.statCoxcomb = function (config) {
+        out._coxTimes = config.times
+        out._coxCategoryCodes = [...config.categoryCodes] // clone so we can append "other" later safely
 
-        stat.filters = stat.filters || {}
+        config.filters = config.filters || {}
 
-        // Load each cause × month
-        months.forEach((month) => {
-            causes.forEach((cause) => {
-                stat.filters.time = month
-                stat.filters[dimension] = cause
+        // Load each category × time
+        config.times.forEach((time) => {
+            config.categoryCodes.forEach((category) => {
+                config.stat.filters[config.timeParameter] = time
+                config.stat.filters[config.categoryParameter] = category
 
                 const sc_ = {}
-                for (let key in stat) sc_[key] = stat[key]
+                for (let key in config.stat) sc_[key] = config.stat[key]
                 sc_.filters = {}
-                for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
+                for (let key in config.stat.filters) sc_.filters[key] = config.stat.filters[key]
 
-                const key = `${month}:${cause}`
+                const key = `${time}:${category}`
                 out.stat(key, sc_)
 
                 // Assign labels/colors
-                if (colors) {
+                if (config.categoryColors) {
                     out.catColors_ = out.catColors_ || {}
-                    out.catColors_[cause] = colors[causes.indexOf(cause)]
+                    out.catColors_[category] = config.categoryColors[config.categoryCodes.indexOf(category)]
                 }
-                if (labels) {
+                if (config.categoryLabels) {
                     out.catLabels_ = out.catLabels_ || {}
-                    out.catLabels_[cause] = labels[causes.indexOf(cause)]
+                    out.catLabels_[category] = config.categoryLabels[config.categoryCodes.indexOf(category)]
                 }
             })
 
             // Also load TOTAL for each month (if available)
-            if (totalCode) {
-                stat.filters.time = month
-                stat.filters[dimension] = totalCode
+            if (config.totalCode) {
+                config.stat.filters[config.timeParameter] = time
+                config.stat.filters[config.categoryParameter] = config.totalCode
 
                 const scTotal = {}
-                for (let key in stat) scTotal[key] = stat[key]
+                for (let key in config.stat) scTotal[key] = config.stat[key]
                 scTotal.filters = {}
-                for (let key in stat.filters) scTotal.filters[key] = stat.filters[key]
+                for (let key in config.stat.filters) scTotal.filters[key] = config.stat.filters[key]
 
-                const totalKey = `${month}:${totalCode}`
+                const totalKey = `${time}:${config.totalCode}`
                 out.stat(totalKey, scTotal)
             }
         })
 
         // Store totalCode so buildMonthData() and tooltips know it exists
-        if (totalCode) {
-            out.totalCode_ = totalCode
+        if (config.totalCode) {
+            out.totalCode_ = config.totalCode
             out.catColors_['other'] = '#FFCC80'
             out.catLabels_['other'] = 'Other'
         }
@@ -136,7 +150,7 @@ export const map = function (config) {
 
         if (out.totalCode_) {
             // Use month-specific TOTAL series for each region (loaded as `${month}:${totalCode_}`)
-            out._coxcombMonths.forEach((month) => {
+            out._coxTimes.forEach((month) => {
                 const stat = out.statData(`${month}:${out.totalCode_}`)
                 if (!stat || !stat._data_) return
 
@@ -149,10 +163,10 @@ export const map = function (config) {
             })
         } else {
             // Fallback: sum all causes per month for each region
-            out._coxcombMonths.forEach((month) => {
+            out._coxTimes.forEach((month) => {
                 const perRegionMonthSum = {}
 
-                out._coxcombCauses.forEach((cause) => {
+                out._coxCategoryCodes.forEach((cause) => {
                     const stat = out.statData(`${month}:${cause}`)
                     if (!stat || !stat._data_) return
 
@@ -279,8 +293,8 @@ export const map = function (config) {
         }
     }
     function addCoxcombChartsToMap(regionFeatures) {
-        const months = out._coxcombMonths
-        const causes = out._coxcombCauses
+        const months = out._coxTimes
+        const causes = out._coxCategoryCodes
         const angle = createAngleScale(months)
 
         regionFeatures.forEach((region) => {
@@ -450,13 +464,13 @@ export const map = function (config) {
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
 
-        const months = out._coxcombMonths || []
-        const causes = [...out._coxcombCauses]
+        const months = out._coxTimes || []
+        const causes = [...out._coxCategoryCodes]
 
         // Add "other" if any month has TOTAL > sum of causes
         const includeOther = months.some((month) => {
             const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-            const sumCauses = out._coxcombCauses.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+            const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
             return totalVal > sumCauses
         })
 

@@ -159,7 +159,7 @@ export const legend = function (map, config) {
      * Labels each segment (e.g., Jan, Feb) around the circle.
      */
     function buildCoxcombMonthLegend(out, baseX, baseY) {
-        const months = out.map._coxcombMonths || []
+        const months = out.map._coxTimes || []
         const radius = 40
 
         if (!months.length) return

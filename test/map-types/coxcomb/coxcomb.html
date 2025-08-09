@@ -28,13 +28,14 @@
                     nutsLevel: 0,
                     sizeLegend: { title: 'Total deaths', titlePadding: 15 },
                     colorLegend: { title: 'Cause' },
-                    data: [
-                        {
+                    data: {
+                        stat: {
                             eurostatDatasetCode: 'hlth_cd_mro',
                             filters: { age: 'TOTAL', unit: 'NR', sex: 'T', resid: 'TOT_RESID' },
                             unitText: 'Deaths per 100k',
                         },
-                        [
+                        timeParameter: 'TIME',
+                        times: [
                             '2022-01',
                             '2022-02',
                             '2022-03',
@@ -48,12 +49,12 @@
                             '2022-11',
                             '2022-12',
                         ],
-                        'ICD10',
-                        ['U071', 'C', 'I', 'J'],
-                        ['COVID-19', 'Cancer', 'Circulatory', 'Respiratory'],
-                        ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'],
-                        'TOTAL',
-                    ],
+                        categoryParameter: 'ICD10',
+                        categoryCodes: ['U071', 'C', 'I', 'J'],
+                        categoryLabels: ['COVID-19', 'Cancer', 'Circulatory', 'Respiratory'],
+                        categoryColors: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'],
+                        totalCode: 'TOTAL',
+                    },
                 },
                 tourism: {
                     title: 'Tourism',
@@ -61,13 +62,14 @@
                     nutsLevel: 0,
                     sizeLegend: { title: 'Total nights spent', titlePadding: 15 },
                     colorLegend: { title: 'Country of residence' },
-                    data: [
-                        {
+                    data: {
+                        stat: {
                             eurostatDatasetCode: 'tour_occ_nim',
                             filters: { unit: 'NR', c_resid: 'TOTAL', nace_r2: 'I551-I553' },
                             unitText: 'Nights spent',
                         },
-                        [
+                        timeParameter: 'TIME',
+                        times: [
                             '2022-01',
                             '2022-02',
                             '2022-03',
@@ -81,12 +83,12 @@
                             '2022-11',
                             '2022-12',
                         ],
-                        'c_resid',
-                        ['DOM', 'FOR'],
-                        ['Domestic', 'Foreign'],
-                        ['#1b9e77', '#d95f02'],
-                        'TOTAL',
-                    ],
+                        categoryParameter: 'c_resid',
+                        categoryCodes: ['DOM', 'FOR'],
+                        categoryLabels: ['Domestic', 'Foreign'],
+                        categoryColors: ['#1b9e77', '#d95f02'],
+                        totalCode: 'TOTAL',
+                    },
                 },
             }
 
@@ -100,7 +102,7 @@
                     .subtitle(config.subtitle)
                     .scale('60M')
                     .nutsLevel(config.nutsLevel)
-                    .statCoxcomb(...config.data)
+                    .statCoxcomb(config.data)
                     .coxcombMinRadius(10)
                     .coxcombMaxRadius(60)
                     .transitionDuration(2000)
