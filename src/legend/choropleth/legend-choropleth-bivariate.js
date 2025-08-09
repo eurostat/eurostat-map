@@ -382,13 +382,13 @@ export const legend = function (map, config) {
     // Highlight selected regions on mouseover
     function highlightRegions(map, ecl1, ecl2) {
         const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
+        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1],[ecl2]')
 
         // Set all regions to white
         allRegions.style('fill', 'white')
 
         // Highlight only the selected regions by restoring their original color
-        const selectedRegions = allRegions.filter(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`)
+        const selectedRegions = allRegions.filter(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`).filter(':not([nd])')
         selectedRegions.each(function () {
             select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
         })
@@ -397,7 +397,7 @@ export const legend = function (map, config) {
     // Reset all regions to their original colors on mouseout
     function unhighlightRegions(map) {
         const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll(`[ecl1]`)
+        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1],[ecl2]')
 
         // Restore each region's original color from the fill___ attribute
         allRegions.each(function () {

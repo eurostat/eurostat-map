@@ -140,12 +140,13 @@ export const map = function (config) {
                 .attr('nd', function (rg) {
                     const sv1 = out.statData('v1').get(rg.properties.id)
                     const sv2 = out.statData('v2').get(rg.properties.id)
-                    if (!sv1 || !sv2) return
-                    let v = sv1.value
-                    if ((v != 0 && !v) || v == ':') return 'nd'
-                    v = sv2.value
-                    if ((v != 0 && !v) || v == ':') return 'nd'
-                    return ''
+                    if (sv1 || sv2) {
+                        let v = sv1?.value
+                        if ((v != 0 && !v) || v == ':') return 'nd'
+                        v = sv2?.value
+                        if ((v != 0 && !v) || v == ':') return 'nd'
+                        return
+                    }
                 })
         }
 
@@ -191,8 +192,10 @@ export const map = function (config) {
                 .transition()
                 .duration(out.transitionDuration())
                 .style('fill', function (rg) {
+                    const nd = select(this).attr('nd')
+                    if (nd) return out.noDataFillStyle() || 'gray'
+
                     const ecl1 = select(this).attr('ecl1')
-                    if (ecl1 === 'nd') return out.noDataFillStyle() || 'gray'
                     const ecl2 = select(this).attr('ecl2')
                     if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
                     if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
