@@ -34,7 +34,7 @@ export const legend = function (map, config) {
 
     out.monthLegend = {
         title: null,
-        marginTop: 10,
+        marginTop: 20,
     }
 
     out._sizeLegendHeight = 0
@@ -147,8 +147,10 @@ export const legend = function (map, config) {
             const y =
                 sizeLegendHeight +
                 out.colorLegend.marginTop +
+                out.colorLegend.titlePadding +
                 (config.title ? out.titleFontSize + out.boxPadding : 0) +
-                i * (config.shapeHeight + config.shapePadding)
+                i * config.shapeHeight +
+                i * config.shapePadding
             const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
             out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
         }
@@ -205,7 +207,9 @@ export const legend = function (map, config) {
             .attr('class', 'em-legend-month-segment')
 
         const labelRadius = radius + labelOffset
-        const monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        const monthAbbr = map._coxTimeLabels
+            ? map._coxTimeLabels
+            : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
         // Place horizontal labels around the circle (no flipping)
         container
@@ -217,9 +221,8 @@ export const legend = function (map, config) {
             .attr('y', (d, i) => -Math.cos(i * angleStep + angleStep / 2) * labelRadius)
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
-            .text((d) => {
-                const monthNum = d.toString().slice(5, 7)
-                return monthAbbr[parseInt(monthNum, 10) - 1] || d
+            .text((d, i) => {
+                return monthAbbr[i] || d
             })
 
         // Highlight behavior for month hover

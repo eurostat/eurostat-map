@@ -70,6 +70,7 @@ export const map = function (config) {
     //     },
     //     timeParameter: "month",
     //     times: ["M01", "M02", "M03", "M04", "M05", "M06", "M07", "M08", "M09", "M10", "M11", "M12"],
+    //     timeLabels:['Jan','Feb','March']
     //     categoryParameter: "c_resid",
     //     categoryCodes: ["DOM", "FOR"],
     //     categoryLabels: ["Domestic", "Foreign"],
@@ -79,6 +80,7 @@ export const map = function (config) {
     out.statCoxcomb = function (config) {
         out._coxTimes = config.times
         out._coxCategoryCodes = [...config.categoryCodes] // clone so we can append "other" later safely
+        out._coxTimeLabels = config.timeLabels
 
         config.filters = config.filters || {}
 
@@ -134,17 +136,28 @@ export const map = function (config) {
 
     //@override
     out.updateClassification = function () {
+        // apply classification to all insets that are outside of the main map's SVG
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+        }
+
+        //main map
+        applyClassificationToMap()
+
+        return out
+    }
+
+    function applyClassificationToMap(map) {
         if (!out.statCodes_) {
             out.statCodes_ = Object.keys(out.statData_)
             const index = out.statCodes_.indexOf('default')
             if (index > -1) out.statCodes_.splice(index, 1)
         }
-        getTotals()
-        defineSizeScales()
-        return out
+        getTotals(map)
+        defineSizeScales(map)
     }
 
-    function getTotals() {
+    function getTotals(map) {
         const yearlyTotals = {}
         const monthlyTotals = {} // regionId -> { month: total }
 
@@ -193,7 +206,7 @@ export const map = function (config) {
         return totalsByRegion[id] !== undefined ? totalsByRegion[id] : undefined
     }
 
-    function defineSizeScales() {
+    function defineSizeScales(map) {
         const yearlyValues = Object.values(out.yearlyTotals)
         const minRadius = out.coxcombMinRadius_ || 0
         const maxRadius = out.coxcombMaxRadius_ || 80
@@ -278,7 +291,7 @@ export const map = function (config) {
                 addMouseEventsToRegions(map)
 
                 // append charts to regions
-                addCoxcombChartsToMap(regionFeatures)
+                addCoxcombChartsToMap(regionFeatures, map)
 
                 //run dorling (prevent overlapping)
                 if (out.dorling_) {
@@ -292,7 +305,7 @@ export const map = function (config) {
             }
         }
     }
-    function addCoxcombChartsToMap(regionFeatures) {
+    function addCoxcombChartsToMap(regionFeatures, map) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
         const angle = createAngleScale(months)
@@ -308,12 +321,12 @@ export const map = function (config) {
             const stackGen = stack().keys(keys)
             const stacked = stackGen(monthData)
 
-            drawCoxcomb(regionId, stacked, keys, angle)
+            drawCoxcomb(regionId, stacked, keys, angle, map)
         })
     }
 
-    function drawCoxcomb(regionId, stackedData, keys, angle) {
-        const node = out.svg().selectAll('#cox_' + regionId)
+    function drawCoxcomb(regionId, stackedData, keys, angle, map) {
+        const node = map.svg().selectAll('#cox_' + regionId)
 
         // Draw outer ring (animate it growing)
         if (out.coxcombRings_) {
@@ -494,8 +507,8 @@ export const map = function (config) {
         const regionYearly = yearlyTotals[regionId] || 0
 
         // Data rows for each month
-        const rows = months.map((month) => {
-            const cells = [`<td class="em-breakdown-label">${month}</td>`]
+        const rows = months.map((month, i) => {
+            const cells = [`<td class="em-breakdown-label">${out._coxTimeLabels ? out._coxTimeLabels[i] : month}</td>`]
             let monthSum = monthlyTotals[regionId]?.[month] || 0
 
             causes.forEach((cause) => {

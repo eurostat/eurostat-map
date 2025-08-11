@@ -1,4 +1,4 @@
-import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL } from './utils'
+import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL, executeForAllInsets } from './utils'
 import * as MapTemplate from './map-template'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
@@ -256,7 +256,14 @@ export const statMap = function (config, withCenterPoints, mapType) {
      */
     out.updateStatValues = function () {
         // filter out centroids without stat data
-        if (withCenterPoints) out.refreshCentroids(out)
+        if (withCenterPoints) {
+            // insets
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, out.refreshCentroids)
+            }
+            //main map
+            out.refreshCentroids(out)
+        }
 
         out.updateClassification()
         out.updateStyle()

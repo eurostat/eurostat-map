@@ -19,6 +19,9 @@
         <br />
         <svg id="map"></svg>
 
+        <svg id="inset1"></svg>
+        <svg id="inset2" x="200" y="500"></svg>
+
         <script src="../../../build/eurostatmap.js"></script>
         <script>
             const map = eurostatmap
@@ -37,6 +40,7 @@
                     },
                     timeParameter: 'month',
                     times: ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12'],
+                    timeLabels: ['jan', 'feb', 'march', 'apr', 'may', 'june', 'july', 'august', 'sept', 'oct', 'nov', 'dec'],
                     categoryParameter: 'c_resid',
                     categoryCodes: ['DOM', 'FOR'],
                     categoryLabels: ['Domestic', 'Foreign'],
@@ -47,12 +51,17 @@
                 .coxcombMaxRadius(20)
                 .transitionDuration(2000)
                 .legend({
-                    x: 570,
-                    y: 10,
+                    x: 50,
+                    y: 120,
                     boxOpacity: 1,
                     boxPadding: 7,
                     titleFontWeight: 'bold',
                 })
+                .insets([
+                    { geo: 'MT', svgId: 'inset1' },
+                    { geo: 'GP', svgId: 'inset2' },
+                ])
+                .insetBoxPosition([540, 20])
                 .zoomExtent([1, 10])
             map.build()
         </script>
