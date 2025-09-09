@@ -664,12 +664,13 @@ Here is [an example](https://eurostat.github.io/eurostat-map/examples/flowmap.ht
 ```javascript
 const exampleGraph = {
     nodes: [
-        // the ids of the nodes and links correspond with the ids of the map's regions (e.g. NUTS id)
+        // the ids of the nodes and links correspond with the ids of the map's statistical regions (e.g. NUTS id)
         { id: 'FR' },
         { id: 'DE' },
         { id: 'IT' },
         { id: 'ES' },
         { id: 'BE' },
+`       // alternatively, specify custom nodes with their own x/y
         { id: 'Custom', x: 420000, y: 320000 },
     ],
     links: [
