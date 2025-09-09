@@ -12,13 +12,10 @@
             - [Custom JS](#custom-js)
     - [Map types](#map-types)
         - [Choropleth map](#choropleth-map)
-            - [Choropleth legends](#choropleth-legends)
         - [Proportional symbol map](#proportional-symbol-map)
-            - [Proportional symbol legends](#proportional-symbol-legends)
         - [Proportional pie chart map](#proportional-pie-chart-map)
         - [Categorical map](#categorical-map)
         - [Bivariate choropleth map](#bivariate-choropleth-map)
-            - [Bivariate choropleth legends](#bivariate-choropleth-legends)
         - [Stripe composition map](#stripe-composition-map)
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
@@ -32,6 +29,11 @@
         - [Stamps](#stamps)
         - [Footnotes](#footnotes)
     - [Map legend](#map-legend)
+		- [Choropleth legends](#choropleth-legends)
+		- [Bivariate choropleth legends](#bivariate-choropleth-legends)
+		- [Proportional symbol legends](#proportional-symbol-legends)
+		- [Pie chart legends](#pie-chart-legends)
+		- [Categorical legends](#categorical-legends)
     - [Scalebar](#scalebar)
     - [Tooltip](#tooltip)
     - [Styling](#styling)
@@ -245,57 +247,8 @@ eurostatmap
 | _map_.**noDataFillStyle**([*value*])      | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                                         |
 | _map_.**colorSchemeType**([*value*])      | String    | _"discrete"_           | Discrete or continuous                                                                                                                                                                    |
 | _map_.**valueTransform**([*value*])       | Function  | _"(val)=>val"_         | Transform your data for distribution stretching when using continuous colour schemes.                                                                                                     |
-| _map_.**valueUntransform**([*value*])     | Function  | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in legends.                                                                    |
+| _map_.**valueUntransform**([*value*])     | Function  | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in .                                                                    |
 | _map_.**pointOfDivergence**([*value*])    | Function  | _"undefined"_          | Set point of divergence for diverging continuous color schemes.                                                                                                                           |
-
-#### Choropleth legends
-
-In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
-
-| Parameter                    | Type                     | Default value                     | Description                                                                                                                                                                               |
-| ---------------------------- | ------------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ascending**                | String                   | _true_                            | The legend cells order. Set to false to invert.                                                                                                                                           |
-| **shapeWidth**               | Number                   | _15_                              | The cell width.                                                                                                                                                                           |
-| **shapeHeight**              | Number                   | _13_                              | The cell height.                                                                                                                                                                          |
-| **sepLineLength**            | Number                   | _17_                              | The separation line length.                                                                                                                                                               |
-| **decimals**                 | String                   | _0_                               | The number of decimal places for the legend labels.                                                                                                                                       |
-| **labelType**                | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                                                                                                                                |
-| **labelOffsets**             | Object                   | _{x:3,y:0}_                       | The distance between the legend box elements to the corresponding text label.                                                                                                             |
-| **labelFormatter**           | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                                                                                                                |
-| **labels**                   | String[]                 | _null_                            | Manually define the labels to be used in the legend as an array.                                                                                                                          |
-| **noData**                   | Boolean                  | _true_                            | Show 'no data' style.                                                                                                                                                                     |
-| **noDataText**               | String                   | _"No data"_                       | 'No data' text label.                                                                                                                                                                     |
-| **histogram**                | Object                   | _undefined_                       | When specified, the legend is shown as a histogram using these settings. See example below.                                                                                               |
-| **orientation**              | String                   | 'vertical'                        | Continuous color legend orientation.                                                                                                                                                      |
-| **ticks**                    | Array                    | _0_                               | Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels).                                                                                      |
-| **tickValues**               | Array                    | _undefined_                       | Values to show next to the ticks.                                                                                                                                                         |
-| **tickLabels**               | Array                    | _undefined_                       | Labels to show next to the ticks.                                                                                                                                                         |
-| **lowLabel**                 | String                   | 'Low'                             | Label for 'low'.                                                                                                                                                                          |
-| **highLabel**                | String                   | 'High'                            | Label for 'high'.                                                                                                                                                                         |
-| **pointOfDivergence**        | Number                   | undefined                         | The point at which your diverging colour scheme diverges.                                                                                                                                 |
-| **pointOfDivergenceLabel**   | String                   | undefined                         | The label to show at the point of divergence (e.g. 'policy target'). To show two arrows pointing in opposite directions with labels, use the pipe symbol like so: 'Increase \| Decrease'. |
-| **divergingLineLength**      | Number                   | undefined                         | Manually override the length of the divergence line.                                                                                                                                      |
-| **divergingArrowLength**     | Number                   | undefined                         | Manually override the length of the divergence arrows (when using the pipe symbol in your pointOfDivergenceLabel).                                                                        |
-| **pointOfDivergencePadding** | Number                   | 7                                 | The amount of padding in pixels between the line of divergence and the other legend elements.                                                                                             |
-
-For histogram legends you can use the following settings:
-
-```javascript
-.legend({
-    title: 'histogram',
-    x: 580,
-    labelType: 'ranges',
-    histogram: {
-        height: 150,
-        width: 200,
-        orientation: 'horizontal',
-        showCounts: false,
-        showPercentages: true,
-        labelRotation: 70,
-        margin: { top: 0, right: 0, bottom: 0, left: 0 },
-    },
-})
-```
 
 ### Proportional symbol map
 
@@ -358,60 +311,7 @@ Please be aware that by using this method you will essentially be turning the ma
 | _map_.**psColors**([*value*])               | Array            | null                 | The colours to be using data-driven colour. The number of colours specified in the array should match the number of classes (specified using psClasses())                                |
 | _map_.**noDataFillStyle**([*value*])        | String           | _"lightgray"_        | The fill style to be used for regions where no data is available.                                                                                                                        |
 
-#### Proportional symbol legends
 
-In addition to [the default legend parameters](#map-legend), proportional symbol maps have the following specific legend parameters:
-As proportional symbol maps allow for two visual variables (size and colour), a legend configuration object can be specified for each variable (sizeLegend and colorLegend).
-
-| Parameter               | Type    | Default value | Description                                                                                     |
-| ----------------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------- |
-| _map_.**ascending**     | Boolean | _false_       | The order of the legend elements. Set to true to invert.                                        |
-| _map_.**legendSpacing** | Number  | _35_          | Spacing between the color & size legends (if applicable)                                        |
-| _map_.**labelFontSize** | Number  | _12_          | The font size of the legend labels                                                              |
-| _map_.**sizeLegend**    | Object  | see below     | The configuration object of the legend which illustrates the values of different symbol sizes   |
-| _map_.**colorLegend**   | Object  | see below     | The configuration object of the legend which illustrates the values of different symbol colours |
-
-**sizeLegend**
-
-The following parameters are properties of the sizeLegend object:
-
-| Parameter          | Type     | Default value                     | Description                                                                                   |
-| ------------------ | -------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
-| **title**          | String   | _null_                            | Title of the size legend                                                                      |
-| **titlePadding**   | Number   | _10_                              | Padding between the legend title and legend body                                              |
-| **values**         | Number   | _undefined_                       | Manually set the raw data values to be used in the legend                                     |
-| **cellNb**         | Number   | _4_                               | Number of symbols to be shown in the legend (when values are not set manually)                |
-| **shapePadding**   | Number   | _10_                              | The padding between consecutive legend shape elements                                         |
-| **shapeOffsets**   | Object   | _{x:0, y:0}_                      | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
-| **shapeFill**      | String   | _white_                           | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
-| **labelOffsets**   | Object   | _{x:25, y:0}_                     | The distance between the legend box elements to the corresponding text label.                 |
-| **decimals**       | Number   | _0_                               | The number of decimals for each label.                                                        |
-| **labelFormatter** | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                    |
-| **noData**         | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
-| **noDataText**     | String   | _'No data'_                       | Text shown in the 'no data' legend item in the size legend.                                   |
-
-**colorLegend**
-
-The following parameters are properties of the colorLegend object:
-
-| Parameter              | Type     | Default value                     | Description                                                                   |
-| ---------------------- | -------- | --------------------------------- | ----------------------------------------------------------------------------- |
-| **title**              | String   | _null_                            | Title of the size legend                                                      |
-| **titlePadding**       | Number   | _10_                              | Padding between the legend title and legend body                              |
-| **marginTop**          | Number   | _35_                              | Margin top in pixels. Distance between size and color legends                 |
-| **shapeWidth**         | Number   | _13_                              | The width of the legend box elements                                          |
-| **shapeHeight**        | Number   | _13_                              | The height of the legend box elements                                         |
-| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
-| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
-| **labelOffsets**       | Object   | _{x:3,y:0}_                       | The distance between the legend box elements to the corresponding text label. |
-| **decimals**           | Number   | _0_                               | The number of decimals for each label.                                        |
-| **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
-| **labels**             | Array    | _undefined_                       | Specify your own legend labels as an array of strings.                        |
-| **noData**             | Boolean  | _true_                            | Show a legend element that represents "no data" values.                       |
-| **noDataText**         | String   | _No data_                         | No data element label text.                                                   |
-| **sepLineLength**      | Number   | _17_                              | The length of the separation line between classes.                            |
-| **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
-| **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
 
 ### Proportional pie chart map
 
@@ -564,39 +464,8 @@ map.updateStatValues()
 | _map_.**pieOtherText**([*value*])         | string  | _Other_       | The colour of the "other" segments of the pie charts (only applicable when the total is calculated using a separate category code, specified in the statPie method)         |
 | _map_.**pieOtherColor**([*value*])        | string  | _"#FFCC80"_   | The colour of the "other" segments of the pie charts (only applicable when the total is calculated using a separate category code, specified in the statPie method)         |
 
-In addition to [the default legend parameters](#map-legend), proportional pie chart maps have the following specific legend parameters:
+In addition to [the default legend parameters](#map-legend), proportional pie chart maps have the [these specific legend parameters](#pie-chart-legends):
 
-| Method                             | Type   | Default value | Description                                                                                   |
-| ---------------------------------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
-| _map_.**labelFontSize**([*value*]) | int    | _12_          | Font size of the legend label.                                                                |
-| _map_.**legendSpacing**            | Number | _35_          | Spacing between the color & size legends (if applicable).                                     |
-| _map_.**sizeLegend**               | Object | see below     | The configuration object of the legend which illustrates the values of different pie sizes.   |
-| _map_.**colorLegend**              | Object | see below     | The configuration object of the legend which illustrates the values of different pie colours. |
-
-**sizeLegend**
-
-The following parameters are properties of the **sizeLegend** object:
-
-| Parameter        | Type   | Default value             | Description                                                                                                                    |
-| ---------------- | ------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **title**        | String | _null_                    | Title of the size legend.                                                                                                      |
-| **titlePadding** | Number | _10_                      | Padding between the legend title and legend body.                                                                              |
-| **values**       | Array  | auto (max and min radius) | The values used to size the pie charts in the legend. If unspecified, the highest and lowest values shown on the map are used. |
-
-**colorLegend**
-
-The following parameters are properties of the **colorLegend** object:
-
-| Parameter                   | Type    | Default value | Description                                                               |
-| --------------------------- | ------- | ------------- | ------------------------------------------------------------------------- |
-| **title**                   | String  | _null_        | Title of the size legend.                                                 |
-| **titlePadding**            | Number  | _10_          | Padding between the legend title and legend body.                         |
-| **shapeWidth**([*value*])   | number  | _13_          | Width of the legend box elements.                                         |
-| **shapeHeight**([*value*])  | number  | _15_          | Height of the legend box elements.                                        |
-| **shapePadding**([*value*]) | number  | _5_           | Distance between consecutive legend box elements.                         |
-| **labelOffsets**            | Object  | _{x:3,y:0}_   | Distance between the legend box elements to the corresponding text label. |
-| **noData**([*value*])       | boolean | _true_        | Show/hide 'no data' legend box element.                                   |
-| **noDataText**([*value*])   | string  | _"No data"_   | 'No data' label text.                                                     |
 
 ### Categorical map
 
@@ -628,18 +497,8 @@ eurostatmap
 | _map_.**classToText**([*value*])      | Object | _auto_        | An object giving the legend label text depending on the class code. If not specified, use the class code. |
 | _map_.**noDataFillStyle**([*value*])  | String | _"lightgray"_ | The fill style to be used for regions where no data is available.                                         |
 
-In addition to [the default legend parameters](#map-legend), categorical maps have the following specific legend parameters:
+In addition to [the default legend parameters](#map-legend), categorical maps have [these specific legend parameters](#categorical-legends):
 
-| Parameter         | Type    | Default value | Description                                                                                                                                           |
-| ----------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **shapeWidth**    | int     | _15_          | The cell width.                                                                                                                                       |
-| **shapeHeight**   | int     | _13_          | The cell height.                                                                                                                                      |
-| **shapePadding**  | number  | _5_           | The distance between consecutive legend elements                                                                                                      |
-| **labelFontSize** | int     | _13_          | The label font size.                                                                                                                                  |
-| **labelOffsets**  | Object  | _{x:3,y:0}_   | The distance between the legend box elements to the corresponding text label.                                                                         |
-| **noData**        | boolean | _true_        | Show 'no data' style.                                                                                                                                 |
-| **noDataText**    | Text    | _"No data"_   | 'No data' text label.                                                                                                                                 |
-| **order**         | array   | _"undefined"_ | The order in which the legend classes should be drawn. E.g. ['urb','int','rur']. If left undefined, eurostatmap will order the classes automatically. |
 
 ### Bivariate choropleth map
 
@@ -676,33 +535,6 @@ eurostatmap
 | _map_.**classToFillStyle**([*value*]) | Function | _auto_        | A function returning the colors for each pair of classes i,j.                                                    |
 | _map_.**noDataFillStyle**([*value*])  | color    | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                |
 
-#### Bivariate choropleth legends
-
-In addition to [the default legend parameters](#map-legend), bivariate choropleth maps have the following specific legend parameters:
-
-| Parameter             | Type     | Default value    | Description                                                                                 |
-| --------------------- | -------- | ---------------- | ------------------------------------------------------------------------------------------- |
-| **squareSize**        | number   | _50_             | The size, in pixel, of the legend square.                                                   |
-| **rotation**          | number   | _0_              | The rotation to apply to the main legend. Recommended values are either 0 or -45            |
-| **label1**            | string   | _"Variable 1"_   | The text for the label of variable 1.                                                       |
-| **label2**            | string   | _"Variable 2"_   | The text for the label of variable 1.                                                       |
-| **showBreaks**        | boolean  | _false_          | If set to true and breaks1 and breaks2 are undefined then breaks are automatically defined. |
-| **breaks1**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 1                                     |
-| **breaks2**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 2                                     |
-| **labelFontSize**     | int      | _12_             | The font size of the legend label.                                                          |
-| **noData**            | boolean  | _true_           | Show/hide 'no data' style in the legend.                                                    |
-| **noDataShapeHeight** | number   | _15_             | The height, in pixel, of the 'No data' legend shape.                                        |
-| **noDataShapeWidth**  | number   | _15_             | The width, in pixel, of the 'No data' legend shape.                                         |
-| **noDataText**        | Text     | _"No data"_      | 'No data' text label.                                                                       |
-| **noDataYOffset**     | Text     | 0                | Add distance between the main legend and the 'no data' item in pixels                       |
-| **yAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks1                                         |
-| **xAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks2                                         |
-| **yAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
-| **xAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
-| **axisArrows**        | boolean  | _true_           | Show axis arrows                                                                            |
-| **arrowHeight**       | number   | _15_             | Height of axis arrows                                                                       |
-| **arrowWidth**        | number   | _14_             | Width of axis arrows                                                                        |
-| **arrowPadding**      | number   | _10_             | Padding between arrow and axis label                                                        |
 
 ### Stripe composition map
 
@@ -1107,8 +939,191 @@ map = eurostatmap.map(...)
 For legends of specific map types please refer to their own sections:
 
 - [Choropleth legends](#choropleth-legends)
-- [Proportional symbol legends](#proportional-symbol-legends)
 - [Bivariate choropleth legends](#bivariate-choropleth-legends)
+- [Proportional symbol legends](#proportional-symbol-legends)
+- [Pie chart legends](#pie-chart-legends)
+- [Categorical legends](#categorical-legends)
+
+### Choropleth legends
+
+In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
+
+| Parameter                    | Type                     | Default value                     | Description                                                                                                                                                                               |
+| ---------------------------- | ------------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ascending**                | String                   | _true_                            | The legend cells order. Set to false to invert.                                                                                                                                           |
+| **shapeWidth**               | Number                   | _15_                              | The cell width.                                                                                                                                                                           |
+| **shapeHeight**              | Number                   | _13_                              | The cell height.                                                                                                                                                                          |
+| **sepLineLength**            | Number                   | _17_                              | The separation line length.                                                                                                                                                               |
+| **decimals**                 | String                   | _0_                               | The number of decimal places for the legend labels.                                                                                                                                       |
+| **labelType**                | 'ranges' or 'thresholds' | _thresholds_                      | The type of legend labels to be generated.                                                                                                                                                |
+| **labelOffsets**             | Object                   | _{x:3,y:0}_                       | The distance between the legend box elements to the corresponding text label.                                                                                                             |
+| **labelFormatter**           | Function                 | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                                                                                                                |
+| **labels**                   | String[]                 | _null_                            | Manually define the labels to be used in the legend as an array.                                                                                                                          |
+| **noData**                   | Boolean                  | _true_                            | Show 'no data' style.                                                                                                                                                                     |
+| **noDataText**               | String                   | _"No data"_                       | 'No data' text label.                                                                                                                                                                     |
+| **histogram**                | Object                   | _undefined_                       | When specified, the legend is shown as a histogram using these settings. See example below.                                                                                               |
+| **orientation**              | String                   | 'vertical'                        | Continuous color legend orientation.                                                                                                                                                      |
+| **ticks**                    | Array                    | _0_                               | Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels).                                                                                      |
+| **tickValues**               | Array                    | _undefined_                       | Values to show next to the ticks.                                                                                                                                                         |
+| **tickLabels**               | Array                    | _undefined_                       | Labels to show next to the ticks.                                                                                                                                                         |
+| **lowLabel**                 | String                   | 'Low'                             | Label for 'low'.                                                                                                                                                                          |
+| **highLabel**                | String                   | 'High'                            | Label for 'high'.                                                                                                                                                                         |
+| **pointOfDivergence**        | Number                   | undefined                         | The point at which your diverging colour scheme diverges.                                                                                                                                 |
+| **pointOfDivergenceLabel**   | String                   | undefined                         | The label to show at the point of divergence (e.g. 'policy target'). To show two arrows pointing in opposite directions with labels, use the pipe symbol like so: 'Increase \| Decrease'. |
+| **divergingLineLength**      | Number                   | undefined                         | Manually override the length of the divergence line.                                                                                                                                      |
+| **divergingArrowLength**     | Number                   | undefined                         | Manually override the length of the divergence arrows (when using the pipe symbol in your pointOfDivergenceLabel).                                                                        |
+| **pointOfDivergencePadding** | Number                   | 7                                 | The amount of padding in pixels between the line of divergence and the other legend elements.                                                                                             |
+
+For histogram legends you can use the following settings:
+
+```javascript
+.legend({
+    title: 'histogram',
+    x: 580,
+    labelType: 'ranges',
+    histogram: {
+        height: 150,
+        width: 200,
+        orientation: 'horizontal',
+        showCounts: false,
+        showPercentages: true,
+        labelRotation: 70,
+        margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    },
+})
+```
+
+### Bivariate choropleth legends
+
+In addition to [the default legend parameters](#map-legend), bivariate choropleth maps have the following specific legend parameters:
+
+| Parameter             | Type     | Default value    | Description                                                                                 |
+| --------------------- | -------- | ---------------- | ------------------------------------------------------------------------------------------- |
+| **squareSize**        | number   | _50_             | The size, in pixel, of the legend square.                                                   |
+| **rotation**          | number   | _0_              | The rotation to apply to the main legend. Recommended values are either 0 or -45            |
+| **label1**            | string   | _"Variable 1"_   | The text for the label of variable 1.                                                       |
+| **label2**            | string   | _"Variable 2"_   | The text for the label of variable 1.                                                       |
+| **showBreaks**        | boolean  | _false_          | If set to true and breaks1 and breaks2 are undefined then breaks are automatically defined. |
+| **breaks1**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 1                                     |
+| **breaks2**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 2                                     |
+| **labelFontSize**     | int      | _12_             | The font size of the legend label.                                                          |
+| **noData**            | boolean  | _true_           | Show/hide 'no data' style in the legend.                                                    |
+| **noDataShapeHeight** | number   | _15_             | The height, in pixel, of the 'No data' legend shape.                                        |
+| **noDataShapeWidth**  | number   | _15_             | The width, in pixel, of the 'No data' legend shape.                                         |
+| **noDataText**        | Text     | _"No data"_      | 'No data' text label.                                                                       |
+| **noDataYOffset**     | Text     | 0                | Add distance between the main legend and the 'no data' item in pixels                       |
+| **yAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks1                                         |
+| **xAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks2                                         |
+| **yAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
+| **xAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
+| **axisArrows**        | boolean  | _true_           | Show axis arrows                                                                            |
+| **arrowHeight**       | number   | _15_             | Height of axis arrows                                                                       |
+| **arrowWidth**        | number   | _14_             | Width of axis arrows                                                                        |
+| **arrowPadding**      | number   | _10_             | Padding between arrow and axis label                                                        |
+
+
+### Proportional symbol legends
+
+In addition to [the default legend parameters](#map-legend), proportional symbol maps have the following specific legend parameters:
+As proportional symbol maps allow for two visual variables (size and colour), a legend configuration object can be specified for each variable (sizeLegend and colorLegend).
+
+| Parameter               | Type    | Default value | Description                                                                                     |
+| ----------------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------- |
+| _map_.**ascending**     | Boolean | _false_       | The order of the legend elements. Set to true to invert.                                        |
+| _map_.**legendSpacing** | Number  | _35_          | Spacing between the color & size legends (if applicable)                                        |
+| _map_.**labelFontSize** | Number  | _12_          | The font size of the legend labels                                                              |
+| _map_.**sizeLegend**    | Object  | see below     | The configuration object of the legend which illustrates the values of different symbol sizes   |
+| _map_.**colorLegend**   | Object  | see below     | The configuration object of the legend which illustrates the values of different symbol colours |
+
+**sizeLegend**
+
+The following parameters are properties of the sizeLegend object:
+
+| Parameter          | Type     | Default value                     | Description                                                                                   |
+| ------------------ | -------- | --------------------------------- | --------------------------------------------------------------------------------------------- |
+| **title**          | String   | _null_                            | Title of the size legend                                                                      |
+| **titlePadding**   | Number   | _10_                              | Padding between the legend title and legend body                                              |
+| **values**         | Number   | _undefined_                       | Manually set the raw data values to be used in the legend                                     |
+| **cellNb**         | Number   | _4_                               | Number of symbols to be shown in the legend (when values are not set manually)                |
+| **shapePadding**   | Number   | _10_                              | The padding between consecutive legend shape elements                                         |
+| **shapeOffsets**   | Object   | _{x:0, y:0}_                      | The offset applied to the shape elements in the legend. Applicable for use with psCustomSVG() |
+| **shapeFill**      | String   | _white_                           | The colour of the symbols in the size legend. If unspecified, the colour of psFill() is used. |
+| **labelOffsets**   | Object   | _{x:25, y:0}_                     | The distance between the legend box elements to the corresponding text label.                 |
+| **decimals**       | Number   | _0_                               | The number of decimals for each label.                                                        |
+| **labelFormatter** | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                                    |
+| **noData**         | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
+| **noDataText**     | String   | _'No data'_                       | Text shown in the 'no data' legend item in the size legend.                                   |
+
+**colorLegend**
+
+The following parameters are properties of the colorLegend object:
+
+| Parameter              | Type     | Default value                     | Description                                                                   |
+| ---------------------- | -------- | --------------------------------- | ----------------------------------------------------------------------------- |
+| **title**              | String   | _null_                            | Title of the size legend                                                      |
+| **titlePadding**       | Number   | _10_                              | Padding between the legend title and legend body                              |
+| **marginTop**          | Number   | _35_                              | Margin top in pixels. Distance between size and color legends                 |
+| **shapeWidth**         | Number   | _13_                              | The width of the legend box elements                                          |
+| **shapeHeight**        | Number   | _13_                              | The height of the legend box elements                                         |
+| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
+| **shapePadding**       | Number   | _10_                              | The padding between consecutive legend shape elements                         |
+| **labelOffsets**       | Object   | _{x:3,y:0}_                       | The distance between the legend box elements to the corresponding text label. |
+| **decimals**           | Number   | _0_                               | The number of decimals for each label.                                        |
+| **labelFormatter**     | Function | _d3.format("." + decimals + "f")_ | A function used to format the values of the legend labels.                    |
+| **labels**             | Array    | _undefined_                       | Specify your own legend labels as an array of strings.                        |
+| **noData**             | Boolean  | _true_                            | Show a legend element that represents "no data" values.                       |
+| **noDataText**         | String   | _No data_                         | No data element label text.                                                   |
+| **sepLineLength**      | Number   | _17_                              | The length of the separation line between classes.                            |
+| **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
+| **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
+
+
+### Pie chart legends
+| Method                             | Type   | Default value | Description                                                                                   |
+| ---------------------------------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
+| _map_.**labelFontSize**([*value*]) | int    | _12_          | Font size of the legend label.                                                                |
+| _map_.**legendSpacing**            | Number | _35_          | Spacing between the color & size legends (if applicable).                                     |
+| _map_.**sizeLegend**               | Object | see below     | The configuration object of the legend which illustrates the values of different pie sizes.   |
+| _map_.**colorLegend**              | Object | see below     | The configuration object of the legend which illustrates the values of different pie colours. |
+
+**sizeLegend**
+
+The following parameters are properties of the **sizeLegend** object:
+
+| Parameter        | Type   | Default value             | Description                                                                                                                    |
+| ---------------- | ------ | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| **title**        | String | _null_                    | Title of the size legend.                                                                                                      |
+| **titlePadding** | Number | _10_                      | Padding between the legend title and legend body.                                                                              |
+| **values**       | Array  | auto (max and min radius) | The values used to size the pie charts in the legend. If unspecified, the highest and lowest values shown on the map are used. |
+
+**colorLegend**
+
+The following parameters are properties of the **colorLegend** object:
+
+| Parameter                   | Type    | Default value | Description                                                               |
+| --------------------------- | ------- | ------------- | ------------------------------------------------------------------------- |
+| **title**                   | String  | _null_        | Title of the size legend.                                                 |
+| **titlePadding**            | Number  | _10_          | Padding between the legend title and legend body.                         |
+| **shapeWidth**([*value*])   | number  | _13_          | Width of the legend box elements.                                         |
+| **shapeHeight**([*value*])  | number  | _15_          | Height of the legend box elements.                                        |
+| **shapePadding**([*value*]) | number  | _5_           | Distance between consecutive legend box elements.                         |
+| **labelOffsets**            | Object  | _{x:3,y:0}_   | Distance between the legend box elements to the corresponding text label. |
+| **noData**([*value*])       | boolean | _true_        | Show/hide 'no data' legend box element.                                   |
+| **noDataText**([*value*])   | string  | _"No data"_   | 'No data' label text.                                                     |
+
+### Categorical legends
+
+| Parameter         | Type    | Default value | Description                                                                                                                                           |
+| ----------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **shapeWidth**    | int     | _15_          | The cell width.                                                                                                                                       |
+| **shapeHeight**   | int     | _13_          | The cell height.                                                                                                                                      |
+| **shapePadding**  | number  | _5_           | The distance between consecutive legend elements                                                                                                      |
+| **labelFontSize** | int     | _13_          | The label font size.                                                                                                                                  |
+| **labelOffsets**  | Object  | _{x:3,y:0}_   | The distance between the legend box elements to the corresponding text label.                                                                         |
+| **noData**        | boolean | _true_        | Show 'no data' style.                                                                                                                                 |
+| **noDataText**    | Text    | _"No data"_   | 'No data' text label.                                                                                                                                 |
+| **order**         | array   | _"undefined"_ | The order in which the legend classes should be drawn. E.g. ['urb','int','rur']. If left undefined, eurostatmap will order the classes automatically. |
+
 
 ## Scalebar
 
