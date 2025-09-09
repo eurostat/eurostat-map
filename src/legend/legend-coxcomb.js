@@ -32,7 +32,7 @@ export const legend = function (map, config) {
         noDataText: 'No data',
     }
 
-    out.monthLegend = {
+    out.timeLegend = {
         title: null,
         marginTop: 20,
     }
@@ -75,7 +75,7 @@ export const legend = function (map, config) {
 
         buildColorLegend(out, baseX, baseY)
 
-        buildCoxcombMonthLegend(out, baseX, baseY)
+        buildCoxcombTimeLegend(out, baseX, baseY)
 
         out.setBoxDimension()
     }
@@ -160,11 +160,11 @@ export const legend = function (map, config) {
      * Adds a Coxcomb month-segment legend showing how wedges represent months.
      * Labels each segment (e.g., Jan, Feb) around the circle.
      */
-    function buildCoxcombMonthLegend(out, baseX, baseY) {
-        const months = out.map._coxTimes || []
+    function buildCoxcombTimeLegend(out, baseX, baseY) {
+        const times = out.map._coxTimes || []
         const radius = 40
 
-        if (!months.length) return
+        if (!times.length) return
 
         let y = baseY
         let x = baseX
@@ -177,18 +177,18 @@ export const legend = function (map, config) {
             y += out.colorLegend.marginTop || 0
         }
 
-        y += out.monthLegend?.marginTop || 0
+        y += out.timeLegend?.marginTop || 0
         y += radius
 
         const labelOffset = 18 // extra spacing for labels
-        const angleStep = (2 * Math.PI) / months.length
+        const angleStep = (2 * Math.PI) / times.length
 
         const colorLegendWidth = out._colorLegendContainer?.node()?.getBBox().width || 0
         const centerX = x + colorLegendWidth / 2 + labelOffset
 
         const container = out.lgg
             .append('g')
-            .attr('class', 'em-coxcomb-month-legend')
+            .attr('class', 'em-coxcomb-time-legend')
             .attr('transform', `translate(${centerX}, ${y + radius})`)
 
         const arcGen = arc()
@@ -200,40 +200,40 @@ export const legend = function (map, config) {
         // Draw faint wedges
         container
             .selectAll('path')
-            .data(months)
+            .data(times)
             .join('path')
             .attr('d', (d, i) => arcGen(d, i))
             .attr('fill', '#ccc')
-            .attr('class', 'em-legend-month-segment')
+            .attr('class', 'em-legend-time-segment')
 
         const labelRadius = radius + labelOffset
-        const monthAbbr = map._coxTimeLabels
+        const timeAbbr = map._coxTimeLabels
             ? map._coxTimeLabels
             : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
         // Place horizontal labels around the circle (no flipping)
         container
-            .selectAll('text.month-label')
-            .data(months)
+            .selectAll('text.time-label')
+            .data(times)
             .join('text')
-            .attr('class', 'em-legend-label em-month-label')
+            .attr('class', 'em-legend-label em-time-label')
             .attr('x', (d, i) => Math.sin(i * angleStep + angleStep / 2) * labelRadius)
             .attr('y', (d, i) => -Math.cos(i * angleStep + angleStep / 2) * labelRadius)
             .attr('text-anchor', 'middle')
             .attr('alignment-baseline', 'middle')
             .text((d, i) => {
-                return monthAbbr[i] || d
+                return timeAbbr[i] || d
             })
 
         // Highlight behavior for month hover
         container
             .selectAll('path')
-            .on('mouseover', function (event, month) {
-                const hoveredMonth = month // "YYYY-MM" format
+            .on('mouseover', function (event, time) {
+                const hoveredTime = time // "YYYY-MM" format
                 const mapSvg = out.map.svg_ || out.map.svg()
                 const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
 
-                allSegments.style('opacity', (d) => (d.data.month === hoveredMonth ? 1 : 0))
+                allSegments.style('opacity', (d) => (d.data.time === hoveredTime ? 1 : 0))
                 select(this).style('stroke-width', 1.5).style('opacity', 0.8)
             })
             .on('mouseout', function () {
