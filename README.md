@@ -33,8 +33,6 @@
     - [Table of Contents](#table-of-contents)
     - [Examples](#examples)
     - [Installation](#installation)
-        - [Node.js](#nodejs)
-        - [Standalone](#standalone)
     - [Documentation](#documentation)
     - [Technical details](#technical-details)
     - [About](#about)
@@ -117,14 +115,14 @@ For detailed documentation see the **[API reference page](docs/reference.md)**.
 
 Code examples:
 
-- For a [choropleth map](docs/reference.md#choropleth-map),
-- For a [proportional symbol map](docs/reference.md#proportional-symbol-map),
-- For a [proportional pie chart map](docs/reference.md#proportional-pie-chart-map),
-- For a [categorical map](docs/reference.md#categorical-map).
-- For a [bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
-- For a [stripe composition map](docs/reference.md#stripe-composition-map).
-- For a [sparkline map](docs/reference.md#sparkline-map).
-- For a [flow map](docs/reference.md#flow-map).
+- [choropleth map](docs/reference.md#choropleth-map),
+- [proportional symbol map](docs/reference.md#proportional-symbol-map),
+- [proportional pie chart map](docs/reference.md#proportional-pie-chart-map),
+- [categorical map](docs/reference.md#categorical-map).
+- [bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
+- [stripe composition map](docs/reference.md#stripe-composition-map).
+- [sparkline map](docs/reference.md#sparkline-map).
+- [flow map](docs/reference.md#flow-map).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
 
