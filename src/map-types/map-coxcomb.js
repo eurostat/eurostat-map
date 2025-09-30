@@ -26,22 +26,22 @@ export const map = function (config) {
     out.catColors_ = undefined
     out.catLabels_ = undefined
     out.classifierSize_ = null
-    ;[
-        'catColors_',
-        'catLabels_',
-        'noDataFillStyle_',
-        'coxcombMaxRadius_',
-        'coxcombMinRadius_',
-        'coxcombRings_',
-        'coxcombStrokeFill_',
-        'coxcombStrokeWidth_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
-        }
-    })
+        ;[
+            'catColors_',
+            'catLabels_',
+            'noDataFillStyle_',
+            'coxcombMaxRadius_',
+            'coxcombMinRadius_',
+            'coxcombRings_',
+            'coxcombStrokeFill_',
+            'coxcombStrokeWidth_',
+        ].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
+        })
 
     if (config)
         [
@@ -381,42 +381,48 @@ export const map = function (config) {
         const selector = getRegionsSelector(map)
         const regions = map.svg().selectAll(selector)
         const symbols = map.svg().selectAll('g.em-centroid')
-        ;[
-            // Merge selections so we apply handlers to both regions and charts
-            regions,
-            symbols,
-        ].forEach((sel) => {
-            sel.on('mouseover', function (e, rg) {
+        // ;[
+        //     // Merge selections so we apply handlers to both regions and charts
+        //     regions,
+        //     symbols,
+        // ].forEach((sel) => {
+        symbols.on('mouseover', function (e, rg) {
+            if (shouldOmit(rg.properties.id)) return
+            if (!getRegionTotal(rg.properties.id)) return
+            const sel = select(this)
+            sel.attr('fill___', sel.style('fill'))
+            sel.style('fill', out.hoverColor_)
+            // Thicken the first circle (outline) inside the symbol group
+            const k = out._lastZoomK || 1;
+            sel.select('circle.em-coxcomb-max-outline')
+                .node()
+                .style.setProperty('stroke-width', `${2 / k}px`, 'important');
+            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+        })
+            .on('mousemove', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
+                if (!getRegionTotal(rg.properties.id)) return
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mouseout', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 if (!getRegionTotal(rg.properties.id)) return
                 const sel = select(this)
-                sel.attr('fill___', sel.style('fill'))
-                sel.style('fill', out.hoverColor_)
+                sel.style('fill', sel.attr('fill___') || out.noDataFillStyle_)
+                sel.attr('fill___', null)
                 // Thicken the first circle (outline) inside the symbol group
-                sel.select('circle.em-coxcomb-max-outline').attr('stroke-width', 2) // temporarily increase stroke
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                const k = out._lastZoomK || 1;
+                sel.select('circle.em-coxcomb-max-outline')
+                    .node()
+                    .style.setProperty('stroke-width', `${0.3 / k}px`, 'important'); // restore base
+                if (out._tooltip) out._tooltip.mouseout()
             })
-                .on('mousemove', function (e, rg) {
-                    if (shouldOmit(rg.properties.id)) return
-                    if (!getRegionTotal(rg.properties.id)) return
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                })
-                .on('mouseout', function (e, rg) {
-                    if (shouldOmit(rg.properties.id)) return
-                    if (!getRegionTotal(rg.properties.id)) return
-                    const sel = select(this)
-                    sel.style('fill', sel.attr('fill___') || out.noDataFillStyle_)
-                    sel.attr('fill___', null)
-                    // Thicken the first circle (outline) inside the symbol group
-                    sel.select('circle.em-coxcomb-max-outline').attr('stroke-width', 0.3) // temporarily increase stroke
-                    if (out._tooltip) out._tooltip.mouseout()
-                })
-                .on('click', function (e, rg) {
-                    if (shouldOmit(rg.properties.id)) return
-                    if (!getRegionTotal(rg.properties.id)) return
-                    if (out._tooltip) out._tooltip.click(rg, out)
-                })
-        })
+            .on('click', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
+                if (!getRegionTotal(rg.properties.id)) return
+                if (out._tooltip) out._tooltip.click(rg, out)
+            })
+        // })
     }
 
     function getActiveKeys(monthData, causes) {

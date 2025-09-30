@@ -10,13 +10,13 @@ export const defineMapZoom = function (map) {
     const translateExtent =
         map.translateExtent_ || !map.lockPanUntilZoom_
             ? [
-                  [-map.width_, -map.height_], // allow dragging 1x map outside
-                  [map.width_ * 2, map.height_ * 2], // bottom-right
-              ]
+                [-map.width_, -map.height_], // allow dragging 1x map outside
+                [map.width_ * 2, map.height_ * 2], // bottom-right
+            ]
             : [
-                  [0, 0], // strict, no pan until zoom
-                  [map.width_, map.height_],
-              ]
+                [0, 0], // strict, no pan until zoom
+                [map.width_, map.height_],
+            ]
 
     map.__zoomBehavior = zoom()
         .filter((e) => !e.target.closest('.em-zoom-buttons') && !e.target.closest('.em-button'))
@@ -118,6 +118,9 @@ const zoomHandler = (event, previousT, map) => {
         map.position_.y = projectedY
         map.position_.z = map.__baseZ / t.k
     }
+
+    //  Store current zoom scale for later use (hover, click, etc.)
+    map._lastZoomK = t.k;
 
     scaleStrokeWidths(t, map)
     if (map.labels_?.values) scaleLabelTexts(t, map)
