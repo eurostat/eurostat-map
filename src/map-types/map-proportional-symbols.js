@@ -1,5 +1,5 @@
 import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { extent } from 'd3-array'
+import { max } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
@@ -60,51 +60,51 @@ export const map = function (config) {
 
     out.psCodeLabels_ = false // show country codes in symbols
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
-    ;[
-        'psMaxSize_',
-        'psMinSize_',
-        'psMaxValue_',
-        'psMinValue_',
-        'psFill_',
-        'psFillOpacity_',
-        'psStrokeOpacity_',
-        'psStroke_',
-        'psStrokeWidth_',
-        'classifierSize_',
-        'classifierColor_',
-        'psShape_',
-        'psCustomShape_',
-        'psBarWidth_',
-        'psClassToFillStyle_',
-        'psColorFun_',
-        'psSizeScale_',
-        'noDataFillStyle_',
-        'psThresholds_',
-        'psColors_',
-        'psCustomSVG_',
-        'psOffset_',
-        'psClassificationMethod_',
-        'psClasses_',
-        'dorling_',
-        'dorlingStrength_',
-        'dorlingIterations_',
-        'animateDorling_',
-        'psSpikeWidth_',
-        'psCodeLabels_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
-        }
-    })
+        /**
+         * Definition of getters/setters for all previously defined attributes.
+         * Each method follow the same pattern:
+         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+         *  - To get the attribute value, call the method without argument.
+         *  - To set the attribute value, call the same method with the new value as single argument.
+         */
+        ;[
+            'psMaxSize_',
+            'psMinSize_',
+            'psMaxValue_',
+            'psMinValue_',
+            'psFill_',
+            'psFillOpacity_',
+            'psStrokeOpacity_',
+            'psStroke_',
+            'psStrokeWidth_',
+            'classifierSize_',
+            'classifierColor_',
+            'psShape_',
+            'psCustomShape_',
+            'psBarWidth_',
+            'psClassToFillStyle_',
+            'psColorFun_',
+            'psSizeScale_',
+            'noDataFillStyle_',
+            'psThresholds_',
+            'psColors_',
+            'psCustomSVG_',
+            'psOffset_',
+            'psClassificationMethod_',
+            'psClasses_',
+            'dorling_',
+            'dorlingStrength_',
+            'dorlingIterations_',
+            'animateDorling_',
+            'psSpikeWidth_',
+            'psCodeLabels_',
+        ].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
+        })
 
     //override attribute values with config values
     if (config)
@@ -208,39 +208,52 @@ export const map = function (config) {
     }
 
     function defineSizeClassifier() {
-        // set default scale type
+        // default scale choice
         if (!out.psSizeScale_) {
-            if (out.psShape_ == 'spike') {
-                out.psSizeScale_ = 'linear'
-            } else {
-                out.psSizeScale_ = 'sqrt'
-            }
+            out.psSizeScale_ = (out.psShape_ === 'spike') ? 'linear' : 'sqrt';
         }
 
-        // use size dataset
-        let rawData = out.statData('size').getArray() || out.statData().getArray()
+        // raw values
+        const rawData = out.statData('size').getArray() || out.statData().getArray();
 
-        // Filter numeric values > 0 only, since 0 is never visualized
-        let data = rawData
-            .map((d) => +d) // convert string numbers to real numbers
-            .filter((d) => isFinite(d) && d > 0)
+        // numeric positives for max calculation
+        const positives = rawData
+            .map(d => +d)
+            .filter(d => Number.isFinite(d) && d > 0);
 
-        let [minVal, maxVal] = extent(data)
-        let min = out.psMinValue_ ?? minVal
-        let max = out.psMaxValue_ ?? maxVal
-
-        // Fallback to full statData if somehow no positive values exist
-        if (!isFinite(min) || !isFinite(max)) {
-            min = out.statData().getMin()
-            max = out.statData().getMax()
+        // compute max; fallbacks
+        let maxVal = max(positives);
+        if (!Number.isFinite(maxVal)) {
+            maxVal = out.statData().getMax();
+        }
+        if (!Number.isFinite(maxVal) || maxVal <= 0) {
+            maxVal = 1; // safe guard: avoid NaN domains
         }
 
-        const sizeDomain = [min, max]
-        const scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
+        // allow manual override for the upper bound
+        const upper = (out.psMaxValue_ ?? maxVal);
 
-        // our final classifier function
-        out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
+        // Build base scale with ZERO as lower bound
+        const Scale = (out.psSizeScale_ === 'sqrt') ? scaleSqrt : scaleLinear;
+        const base = Scale()
+            .domain([0, upper])
+            .range([0, out.psMaxSize_])
+            .clamp(true);
+
+        // Visual minimum radius for positive values (0 must stay 0)
+        const minR = Math.max(0, out.psMinSize_ || 0);
+
+        // Final classifier: 0/NaN/negatives → radius 0 (don’t draw)
+        // positives → at least minR
+        const classifier = (v) => {
+            const x = +v;
+            if (!Number.isFinite(x) || x <= 0) return 0;
+            return Math.max(minR, base(x));
+        };
+
+        out.classifierSize(classifier);
     }
+
 
     function defineColorClassifier() {
         //simply return the array [0,1,2,3,...,nb-1]

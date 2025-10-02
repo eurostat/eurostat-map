@@ -69,9 +69,13 @@
                 eurostatDatasetCode: 'nama_10r_3gdp',
                 unitText: 'Million EUR',
                 filters: { unit: 'MIO_EUR', time: '2023' }
+            }).legend({
+                title: 'Total GDP',
+                subtitle: 'Million EUR',
+                x:590
             })
             .psShape('circle')
-            .psMinSize(1)
+            .psMinSize(2)
             .psMaxSize(15)
             .psStrokeWidth(0.1)
             .psStroke('white')
@@ -86,7 +90,7 @@
         const select = document.getElementById('nutsLevel');
         select.addEventListener('change', e => {
             const level = +e.target.value; // number 0–3
-            map.nutsLevel(level).build();  // reapply and rebuild
+            map.nutsLevel(level).psMaxSize([55,20,20,15][level]).build();  // reapply and rebuild
         });
     </script>
 </body>
