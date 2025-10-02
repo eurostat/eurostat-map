@@ -129,6 +129,7 @@ const zoomHandler = (event, previousT, map) => {
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
     if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
 }
+
 /**
  * @description adjusts text elements dynamically according to zoom
  * @param {*} transform

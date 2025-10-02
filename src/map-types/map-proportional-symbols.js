@@ -343,6 +343,13 @@ export const map = function (config) {
                         }
                     }
                 })
+
+                //style regions with no data
+                regions.filter((rg) => {
+                    const sv = sizeData.get(rg.properties.id)
+                    return sv && sv.value === ':'
+                }).style('fill', out.noDataFillStyle())
+
             }
 
             setSymbolStyles(symb)

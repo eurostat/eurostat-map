@@ -408,7 +408,7 @@ export const map = function (config) {
                 if (shouldOmit(rg.properties.id)) return
                 if (!getRegionTotal(rg.properties.id)) return
                 const sel = select(this)
-                sel.style('fill', sel.attr('fill___') || out.noDataFillStyle_)
+                sel.style('fill', sel.attr('fill___') || '')
                 sel.attr('fill___', null)
                 // Thicken the first circle (outline) inside the symbol group
                 const k = out._lastZoomK || 1;

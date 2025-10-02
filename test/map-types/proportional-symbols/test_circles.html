@@ -1,36 +1,94 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>eurostat-map.js</title>
-    </head>
 
-    <body>
-        <svg id="map"></svg>
-        <svg id-="legend"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
-        <script>
-            // basic barebones proportional circles example
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eurostat-map.js</title>
+    <style>
+        .nuts-label {
+            font-family: system-ui, sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 8px;
+            color: #333;
+        }
 
-            let map = eurostatmap
-                .map('ps')
-                .title('Total GDP')
-                .stat('size', {
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Million EUR',
-                    filters: { unit: 'MIO_EUR', time: '2018' },
-                })
-                .psShape('circle')
-                .psMinSize(1)
-                .psMaxSize(15) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
-                .psStrokeWidth(0.1)
-                .psStroke('white')
-                .psFillOpacity(1)
-                .psStrokeOpacity(0.9)
-                .zoomExtent([1, 10])
+        .nuts-select {
+            padding: 6px 12px;
+            font-size: 14px;
+            font-family: system-ui, sans-serif;
+            font-weight: 500;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
 
-            map.build()
-        </script>
-    </body>
+        .nuts-select:hover {
+            border-color: #0078d7;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .nuts-select:focus {
+            outline: none;
+            border-color: #0078d7;
+            box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- dropdown to select nuts level -->
+    <div>
+        <label for="nutsLevel" class="nuts-label">NUTS level:</label>
+        <select id="nutsLevel" class="nuts-select">
+            <option value="0">NUTS0</option>
+            <option value="1">NUTS1</option>
+            <option value="2">NUTS2</option>
+            <option value="3" selected>NUTS3</option>
+        </select>
+
+
+    </div>
+    </div>
+    <svg id="map"></svg>
+    <svg id="legend"></svg>
+    </div>
+
+    <script src="../../../build/eurostatmap.js"></script>
+    <script>
+        // barebones proportional circles example
+        let map = eurostatmap
+            .map('ps')
+            .title('Total GDP')
+            .stat('size', {
+                eurostatDatasetCode: 'nama_10r_3gdp',
+                unitText: 'Million EUR',
+                filters: { unit: 'MIO_EUR', time: '2023' }
+            })
+            .psShape('circle')
+            .psMinSize(1)
+            .psMaxSize(15)
+            .psStrokeWidth(0.1)
+            .psStroke('white')
+            .psFillOpacity(1)
+            .psStrokeOpacity(0.9)
+            .zoomExtent([1, 10])
+            .nutsLevel(3); // default
+
+        map.build();
+
+        // handle dropdown changes
+        const select = document.getElementById('nutsLevel');
+        select.addEventListener('change', e => {
+            const level = +e.target.value; // number 0–3
+            map.nutsLevel(level).build();  // reapply and rebuild
+        });
+    </script>
+</body>
+
 </html>

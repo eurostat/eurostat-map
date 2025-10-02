@@ -220,6 +220,11 @@ export const statData = function (config) {
             out._data_ = jsonstatToIndex(jsd)
             //TODO: use maybe https://github.com/badosa/JSON-stat/blob/master/utils/fromtable.md to build directly an index ?
 
+            // #172 when using jsonstat-toolkit, values of null mean 'no data' and are converted to ":"
+            Object.keys(out._data_).forEach((k) => {
+                if (out._data_[k].value === null) out._data_[k].value = ':'
+            })
+            
             if (callback) callback()
         })
     }
