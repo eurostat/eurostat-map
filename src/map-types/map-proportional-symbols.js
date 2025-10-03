@@ -251,6 +251,12 @@ export const map = function (config) {
             return Math.max(minR, base(x));
         };
 
+        // Proxy D3 scale methods so legacy code still works:
+        classifier.domain = (...args) => {
+            if (args.length) { base.domain(...args); return classifier; }
+            return base.domain();
+        };
+
         out.classifierSize(classifier);
     }
 

@@ -92,7 +92,7 @@
 }
 .em-legend-month-segment {
     stroke: #444;
-    stroke-width: 0.3;
+    stroke-width: 0.5;
     opacity: 0.4;
     fill: #ccc;
     cursor: pointer;

@@ -1,0 +1,37 @@
+html,
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(76, 75, 75);
+}
+#content {
+  max-height: calc(99vh - 100px);
+  display: flex;
+  flex-direction: column;
+}
+
+#europe-template {
+  flex: 1;
+  max-height: 100%;
+  width: auto;
+  max-width: 100%;
+  align-self: start;
+}
+#header {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.container {
+  max-height: 100vh;
+}
+.titles {
+  color: rgb(76, 75, 75);
+  display: inline-block;
+  width: 100%;
+}
+#title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+#subtitle {
+  font-size: 1.1rem;
+}
