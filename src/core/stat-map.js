@@ -5,6 +5,8 @@ import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
 
+let _renderScheduled = false;
+
 /**
  * An abstract statistical map: A map template with statistical data, without any particular styling rule.
  *
@@ -75,22 +77,22 @@ export const statMap = function (config, withCenterPoints, mapType) {
     //legend object
     out.legendObj_ = undefined
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
-    ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'callback_'].forEach(
-        function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
+        /**
+         * Definition of getters/setters for all previously defined attributes.
+         * Each method follow the same pattern:
+         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+         *  - To get the attribute value, call the method without argument.
+         *  - To set the attribute value, call the same method with the new value as single argument.
+         */
+        ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'callback_'].forEach(
+            function (att) {
+                out[att.substring(0, att.length - 1)] = function (v) {
+                    if (!arguments.length) return out[att]
+                    out[att] = v
+                    return out
+                }
             }
-        }
-    )
+        )
 
     //override attribute values with config values
     if (config) for (let key in config) if (out[key] && config[key] != undefined) out[key](config[key])
@@ -203,17 +205,17 @@ export const statMap = function (config, withCenterPoints, mapType) {
      */
     out.updateGeoData = function () {
         out.updateGeoMapTemplate(() => {
-            //if stat datasets have not been loaded, wait again
-            if (!isStatDataReady()) return
-
-            //proceed with map construction
-            out.updateStatValues()
-            //execute callback function
-            if (out.callback()) out.callback()(out)
-        })
-
-        return out
-    }
+            if (!isStatDataReady()) return;
+            if (_renderScheduled) return;
+            _renderScheduled = true;
+            Promise.resolve().then(() => { // microtask to coalesce
+                _renderScheduled = false;
+                out.updateStatValues();
+                if (out.callback()) out.callback()(out);
+            });
+        });
+        return out;
+    };
 
     /**
      * Launch map geo stat datasets retrieval, and make/update the map once received.
@@ -237,12 +239,16 @@ export const statMap = function (config, withCenterPoints, mapType) {
                 if (nl === 'mixed') nl = 0
 
                 statData.retrieveFromRemote(nl, out.language(), () => {
-                    if (!out.Geometries.isGeoReady()) return
-                    if (!isStatDataReady()) return
-
-                    out.updateStatValues()
-                    if (out.callback()) out.callback()(out)
-                })
+                    if (!out.Geometries.isGeoReady()) return;
+                    if (!isStatDataReady()) return;
+                    if (_renderScheduled) return;
+                    _renderScheduled = true;
+                    Promise.resolve().then(() => {
+                        _renderScheduled = false;
+                        out.updateStatValues();
+                        if (out.callback()) out.callback()(out);
+                    });
+                });
             }
         }
 

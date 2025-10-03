@@ -12,7 +12,7 @@
         <script>
             const map = eurostatmap
                 .map('choropleth')
-                .title('stamp test')
+                .title('stamp test').stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
                 .stamp({
                     x: 230,
                     y: 100,

@@ -326,15 +326,24 @@ export const map = function (config) {
     }
 
     function drawCoxcomb(regionId, stackedData, keys, angle, map) {
-        const node = map.svg().selectAll('#cox_' + regionId)
+        // 1) Anchor to the centroid group for this region
+        const centroid = map.svg().select('#ps' + regionId);
+        if (centroid.empty()) return; // centroid not created yet (Dorling/centroids not ready)
 
-        // Draw outer ring (animate it growing)
+        // 2) Ensure a single container per region (remove then re-create OR use a join)
+        centroid.selectAll('g.em-coxcomb').remove();
+        const node = centroid
+            .append('g')
+            .attr('class', 'em-coxcomb')
+            .attr('id', 'cox_' + regionId);
+
+        // 3) Outer ring
         if (out.coxcombRings_) {
-            const yearlyTotal = out.yearlyTotals[regionId] || 0
-            const targetOuter = out.classifierSize_(yearlyTotal) // legend-based scale
+            const yearlyTotal = out.yearlyTotals[regionId] || 0;
+            const targetOuter = out.classifierSize_(yearlyTotal);
             node.append('circle')
                 .attr('class', 'em-coxcomb-max-outline')
-                .attr('r', 0) // start collapsed
+                .attr('r', 0)
                 .attr('fill', 'none')
                 .attr('stroke', '#000')
                 .attr('stroke-width', 0.3)
@@ -342,38 +351,37 @@ export const map = function (config) {
                 .attr('pointer-events', 'none')
                 .transition()
                 .duration(out.transitionDuration_ / 2)
-                .attr('r', targetOuter)
+                .attr('r', targetOuter);
         }
 
-        // Arc generator (shared for tween)
+        // 4) Arc generator (shared for tween)
         const arcGen = arc()
-            .startAngle((d) => angle(d.data.month))
-            .endAngle((d) => angle(d.data.month) + angle.bandwidth())
+            .startAngle(d => angle(d.data.month))
+            .endAngle(d => angle(d.data.month) + angle.bandwidth())
             .padAngle(0.01)
-            .padRadius(0)
+            .padRadius(0);
 
-        // Draw stacked wedges with animated "grow out" effect
-        keys.forEach((key) => {
+        // 5) Stacked wedges
+        keys.forEach((key, ki) => {
             node.append('g')
                 .attr('class', 'em-coxcomb-chart')
                 .attr('stroke', '#ffffff')
                 .attr('stroke-width', 0.3)
                 .selectAll('path')
-                .data(stackedData[keys.indexOf(key)])
+                .data(stackedData[ki])
                 .join('path')
                 .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
-                .attr('fill___', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                 .attr('code', key)
-                .attr('month', (d) => d.data.month)
+                .attr('month', d => d.data.month)
                 .transition()
                 .delay((d, i) => i * 120)
                 .duration(out.transitionDuration_)
                 .attrTween('d', function (d) {
-                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId))
-                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId))
-                    return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
-                })
-        })
+                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId));
+                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId));
+                    return t => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d);
+                });
+        });
     }
 
     function addMouseEventsToRegions(map) {

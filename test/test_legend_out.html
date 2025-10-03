@@ -22,7 +22,7 @@
         <script>
             const map = eurostatmap
                 .map('choropleth')
-                .width(500)
+                .width(500).stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
                 .nutsLevel('mixed')
                 .scale('60M')
                 .legend({

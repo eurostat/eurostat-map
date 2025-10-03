@@ -13,7 +13,7 @@
             const map = eurostatmap
                 .map('choropleth')
                 .nutsLevel(0)
-                .title('basic test')
+                .title('basic test').stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
                 .patternFill([
                     { pattern: 'dots', regionIds: ['DE', 'IT'], legendLabel: 'EU Founding Members', color: 'orange', strokeWidth: 1 },
                     { pattern: 'hatching', regionIds: ['ES', 'FR'], legendLabel: 'High Inflation', color: 'grey', strokeWidth: 1 },
