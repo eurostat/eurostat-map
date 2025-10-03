@@ -279,29 +279,11 @@ export const map = function (config) {
                     return getRegionTotal(id) !== undefined // has non-zero or valid data
                 })
 
-                // Append container groups correctly (filter by bound data, not id)
-                regionFeatures.forEach((rg) => {
-                    sym.filter((d) => d.properties.id === rg.properties.id)
-                        .append('g')
-                        .attr('class', 'em-coxcomb')
-                        .attr('id', 'cox_' + rg.properties.id)
-                })
-
                 // Hover behavior (skip no-data regions)
                 addMouseEventsToRegions(map)
 
                 // append charts to regions
                 addCoxcombChartsToMap(regionFeatures, map)
-
-                //run dorling (prevent overlapping)
-                if (out.dorling_) {
-                    runDorlingSimulation(out, (d) => {
-                        const total = getRegionTotal(d.properties.id) || 0
-                        return out.classifierSize_(total) || 0
-                    })
-                } else {
-                    stopDorlingSimulation(out)
-                }
             }
         }
     }
@@ -328,16 +310,24 @@ export const map = function (config) {
     function drawCoxcomb(regionId, stackedData, keys, angle, map) {
         // 1) Anchor to the centroid group for this region
         const centroid = map.svg().select('#ps' + regionId);
-        if (centroid.empty()) return; // centroid not created yet (Dorling/centroids not ready)
+        if (centroid.empty()) return;
 
-        // 2) Ensure a single container per region (remove then re-create OR use a join)
-        centroid.selectAll('g.em-coxcomb').remove();
+        // 2) One container per region, keyed join
         const node = centroid
-            .append('g')
-            .attr('class', 'em-coxcomb')
-            .attr('id', 'cox_' + regionId);
+            .selectAll('g.em-coxcomb')
+            .data([regionId], d => d) // stable key
+            .join(
+                enter => enter.append('g')
+                    .attr('class', 'em-coxcomb')
+                    .attr('id', 'cox_' + regionId),
+                update => update,
+                exit => exit.remove()
+            );
 
-        // 3) Outer ring
+        // 3) Clear children before (re)building chart contents
+        node.selectAll('*').remove();
+
+        // 4) Outer ring
         if (out.coxcombRings_) {
             const yearlyTotal = out.yearlyTotals[regionId] || 0;
             const targetOuter = out.classifierSize_(yearlyTotal);
