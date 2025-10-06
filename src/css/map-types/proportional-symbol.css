@@ -30,10 +30,10 @@
     fill: #f2f2f2;
 }
 
-/*  nuts fill */
+/*  nuts fill (regions with data) */
 .em--ps .em-nutsrg,
 .em--pie .em-nutsrg {
-    fill: #fffeed;
+    fill: #fffee7;
 }
 
 /*  regions without data input */

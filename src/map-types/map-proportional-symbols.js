@@ -455,6 +455,9 @@ export const map = function (config) {
 
     const addMouseEventsToRegions = function (map) {
         let symbols = map.svg().selectAll('g.em-centroid')
+        let regions = map.svg().selectAll(getRegionsSelector(map))
+
+        //symbols
         symbols
             .on('mouseover', function (e, rg) {
                 const sel = select(this.childNodes[0])
@@ -475,6 +478,41 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mouseout()
                 }
                 if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
+            })
+
+        //regions
+        const sizeData = getSizeStatData(map)
+        regions.on('mouseover', function (e, rg) {
+            // only show tooltip for polygons of regions with values of 0
+            const sv = sizeData.get(rg.properties.id)
+            if (sv?.value === 0) {
+                select(this).style('fill', map.hoverColor_) // Apply highlight color
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
+            } else {
+                return; // skip regions with no data or value > 0
+            }
+        })
+            .on('mousemove', function (e, rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv?.value === 0) {
+                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
+                } else {
+                    return; // skip regions with no data or value > 0
+                }
+
+            })
+            .on('mouseout', function (e, rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv?.value === 0) {
+                    const sel = select(this)
+                    sel.style('fill', sel.attr('fill___')) // Revert to original color
+                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
+                } else {
+                    return; // skip regions with no data or value > 0
+                }
             })
     }
 

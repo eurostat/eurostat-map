@@ -17,22 +17,24 @@
                 .title('Attracting migrant talent from outside the EU')
                 .subtitle('number of authorisations issued, 2023')
                 .scale('60M')
-                .stat('size', {
-                    //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/migr_resbc1?format=json&lang=en&time=2023&unit=PER&isco08=TOTAL&citizen=TOTAL&decision=GRNT&geoLevel=country<!doctype html>
-                    eurostatDatasetCode: 'migr_resbc1',
-                    unitText: 'people',
-                    filters: { unit: 'PER', time: '2023', isco08: 'TOTAL', citizen: 'TOTAL', decision: 'GRNT' },
-                })
+                // .stat('size', {
+                //     //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/migr_resbc1?format=json&lang=en&time=2023&unit=PER&isco08=TOTAL&citizen=TOTAL&decision=GRNT&geoLevel=country<!doctype html>
+                //     eurostatDatasetCode: 'migr_resbc1',
+                //     unitText: 'people',
+                //     filters: { unit: 'PER', time: '2023', isco08: 'TOTAL', citizen: 'TOTAL', decision: 'GRNT' },
+                // })
                 .nutsLevel(0)
                 .psShape('circle')
                 .psMinSize(5)
-                .psMaxSize(60) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
                 .psStrokeWidth(1)
                 .psStroke('white')
                 .psFillOpacity(1)
                 .psStrokeOpacity(0.9)
                 .zoomExtent([1, 10])
                 .legend({ title: 'EU blue cards issued', x: 580, y: 20 })
+
+                map.statData().setData({ES:0,FR:2,DE:3,IT:4,BE:5,NL:6,LU:7,IE:8,AT:9,PL:10,CZ:11,SK:12,HU:13,SI:14,HR:15,FI:16,SE:17,DK:18,BG:19,RO:20,GR:21,CY:22,MT:23,LT:24,LV:25,EE:26});
 
             map.build()
         </script>
