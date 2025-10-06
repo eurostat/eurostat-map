@@ -24,21 +24,27 @@
     stroke-width: 0.07px;
 }
 
-/*   muted country fill */
+/*  muted country fill */
 .em--ps .em-cntrg,
 .em--pie .em-cntrg {
     fill: #f2f2f2;
 }
 
-/*   muted nuts fill */
+/*  nuts fill */
 .em--ps .em-nutsrg,
 .em--pie .em-nutsrg {
-    fill: #fdfdfd;
+    fill: #fffeed;
+}
+
+/*  regions without data input */
+.em--ps [ecl="ni"],
+.em--pie [ecl="ni"] {
+    fill: #f2f2f2;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
-.em--ps g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta),
-.em--pie g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+.em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta),
+.em--pie g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
     stroke-width: 0px;
 }
 

@@ -154,6 +154,7 @@ export const map = function (config) {
             if (index > -1) out.statCodes_.splice(index, 1)
         }
         getTotals(map)
+        computeCoxStatusMap(map);
         defineSizeScales(map)
     }
 
@@ -199,6 +200,52 @@ export const map = function (config) {
 
         out.yearlyTotals = yearlyTotals
         out.monthlyTotals = monthlyTotals
+    }
+
+    function computeCoxStatusMap(map) {
+        const months = out._coxTimes || [];
+        const cats = out._coxCategoryCodes || [];
+        const useTotal = !!out.totalCode_;
+        const status = new Map(); // id -> {value: ':'} for ND, {value:0} for HAS (incl. zero), null for NI
+
+        // Collect region ids seen in any relevant series
+        const regionIds = new Set();
+        const addIdsFrom = (key) => {
+            const st = out.statData(key);
+            if (st && st._data_) Object.keys(st._data_).forEach(id => regionIds.add(id));
+        };
+        months.forEach(m => {
+            if (useTotal) addIdsFrom(`${m}:${out.totalCode_}`);
+            else cats.forEach(c => addIdsFrom(`${m}:${c}`));
+        });
+
+        // Determine status for each region
+        regionIds.forEach(id => {
+            let seenAny = false, seenND = false, seenNumeric = false;
+            months.forEach(m => {
+                if (useTotal) {
+                    const e = out.statData(`${m}:${out.totalCode_}`)?.get(id);
+                    if (!e) return;
+                    seenAny = true;
+                    if (e.value === ':') seenND = true;
+                    else if (typeof e.value === 'number') seenNumeric = true; // zero counts as data
+                } else {
+                    cats.forEach(c => {
+                        const e = out.statData(`${m}:${c}`)?.get(id);
+                        if (!e) return;
+                        seenAny = true;
+                        if (e.value === ':') seenND = true;
+                        else if (typeof e.value === 'number') seenNumeric = true; // zero counts as data
+                    });
+                }
+            });
+
+            if (seenND) status.set(id, { value: ':' });      // ND
+            else if (seenAny || seenNumeric) status.set(id, { value: 0 }); // HAS (incl. all-zero)
+            else status.set(id, null);                        // NI
+        });
+
+        out.coxStatus_ = status;
     }
 
     function getRegionTotal(id) {
@@ -279,6 +326,8 @@ export const map = function (config) {
                     return getRegionTotal(id) !== undefined // has non-zero or valid data
                 })
 
+                applyStyleToRegionPolygons(map)
+
                 // Hover behavior (skip no-data regions)
                 addMouseEventsToRegions(map)
 
@@ -287,6 +336,60 @@ export const map = function (config) {
             }
         }
     }
+
+    function applyStyleToRegionPolygons(map) {
+        const selector = getRegionsSelector(map);
+        let regions = map.svg().selectAll(selector);
+        const status = out.coxStatus_; // id -> {...} or null
+
+        if (map.geo_ !== 'WORLD') {
+            if (map.nutsLevel_ == 'mixed') {
+                styleMixedNUTSRegions(map, status, regions); // pass status instead of sizeData
+                // (centroids build stays the same)
+            }
+
+            // set ecl for legend/hover
+            regions.attr('ecl', (rg) => {
+                const sv = status.get(rg.properties.id);
+                if (sv == null) return 'ni';         // no input
+                if (sv?.value === ':') return 'nd';  // not available
+                return null;                         // has data
+            });
+
+            // color ND polygons
+            regions
+                .filter(rg => status.get(rg.properties.id)?.value === ':')
+                .style('fill', out.noDataFillStyle());
+        }
+    }
+
+    function styleMixedNUTSRegions(map, status, regions) {
+        regions.style('display', function (rg) {
+            if (this.parentNode.classList.contains('em-cntrg')) return;
+            const sv = status.get(rg.properties.id);
+            if (sv == null) return 'none';  // NI: hide
+            return 'block';
+        });
+
+        regions
+            .style('stroke', function (rg) {
+                const sel = select(this);
+                const lvl = sel.attr('lvl');
+                const sv = status.get(rg.properties.id);
+                if (!sv || sv.value == null) return;
+                if (lvl !== '0') return sel.style('stroke') || '#777';
+            })
+            .style('stroke-width', function (rg) {
+                const sel = select(this);
+                const lvl = sel.attr('lvl');
+                const sv = status.get(rg.properties.id);
+                if (!sv || sv.value == null) return;
+                if (out.geo_ == 'WORLD') return;
+                if (lvl !== '0') return sel.style('stroke-width') || 1;
+            });
+    }
+
+
     function addCoxcombChartsToMap(regionFeatures, map) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
