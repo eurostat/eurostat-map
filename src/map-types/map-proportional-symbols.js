@@ -1,5 +1,5 @@
 import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { max } from 'd3-array'
+import { max,min } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
@@ -223,6 +223,7 @@ export const map = function (config) {
 
         // compute max; fallbacks
         let maxVal = max(positives);
+        let minVal = min(positives);
         if (!Number.isFinite(maxVal)) {
             maxVal = out.statData().getMax();
         }
@@ -254,7 +255,7 @@ export const map = function (config) {
         // Proxy D3 scale methods so legacy code still works:
         classifier.domain = (...args) => {
             if (args.length) { base.domain(...args); return classifier; }
-            return base.domain();
+            return [minVal, maxVal]; // here we return actual data min/max
         };
 
         out.classifierSize(classifier);
