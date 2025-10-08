@@ -24,7 +24,10 @@
 <div align="center">
 <em>Based on D3 and designed for Eurostat data but compatible with custom geometries and stats.</em>
 </div>
-
+<div align="center">
+Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
+</div>
+  
 ---
 
 ## Table of Contents
