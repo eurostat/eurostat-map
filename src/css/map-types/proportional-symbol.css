@@ -33,7 +33,7 @@
 /*  nuts fill (regions with data) */
 .em--ps .em-nutsrg,
 .em--pie .em-nutsrg {
-    fill: #fffee7;
+    fill: #59c77024; /* very light green */
 }
 
 /*  regions without data input */

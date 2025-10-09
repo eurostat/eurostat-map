@@ -118,7 +118,7 @@
                 .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(460).translate([730, 290]))
                 .title('First-time asylum applicants')
                 .subtitle('number of applicants in EU countries, 2024')
-                .flowMapType('straight')
+                .flowLineType('straight')
                 .flowTopLocations(5)
                 .flowTopLocationsType('origin') // 'origin' or 'destination'
                 .flowGraph(JSON.parse(JSON.stringify(graphData)))

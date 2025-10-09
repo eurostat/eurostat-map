@@ -1,5 +1,5 @@
 import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { max,min } from 'd3-array'
+import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
@@ -35,7 +35,7 @@ export const map = function (config) {
     out.psSizeScale_ = undefined // 'sqrt' or 'linear'
 
     //colour
-    out.psFill_ = '#2d50a0' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
+    out.psFill_ = '#009569' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
     out.psFillOpacity_ = 1
     out.psStroke_ = '#ffffff'
     out.psStrokeWidth_ = 0.2
@@ -334,7 +334,7 @@ export const map = function (config) {
 
             // set style of symbols
             const selector = getRegionsSelector(map)
-            let regions = map.svg().selectAll(selector)
+            const regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD') {
                 if (map.nutsLevel_ == 'mixed') {
@@ -364,12 +364,16 @@ export const map = function (config) {
                     }
                 })
 
-                //style regions with no data
-                regions.filter((rg) => {
-                    const sv = sizeData.get(rg.properties.id)
-                    return sv && sv.value === ':'
-                }).style('fill', out.noDataFillStyle())
+                // 1) clear any previous inline fill so CSS can apply to regions that now have data
+                regions.style('fill', null)
 
+                // 2) apply gray only to current no-data (":") regions
+                regions
+                    .filter((rg) => {
+                        const sv = sizeData.get(rg.properties.id)
+                        return sv && sv.value === ':'
+                    })
+                    .style('fill', out.noDataFillStyle())
             }
 
             setSymbolStyles(symb)
