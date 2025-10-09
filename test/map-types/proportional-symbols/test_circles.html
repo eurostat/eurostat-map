@@ -73,7 +73,8 @@
             }).legend({
                 title: 'Total GDP',
                 subtitle: 'Million EUR',
-                x:590
+                x:5,
+                y:125
             })
             .psShape('circle')
             .psMinSize(2)
@@ -82,7 +83,7 @@
             .psStroke('white')
             .psFillOpacity(1)
             .psStrokeOpacity(0.9)
-            .zoomExtent([1, 10])
+            .zoomExtent([1, 10]).insets('default')
             .nutsLevel(3); // default
 
         map.build();

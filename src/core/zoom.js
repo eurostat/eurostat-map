@@ -18,7 +18,7 @@ export const defineMapZoom = function (map) {
 
     const translateExtent = map.translateExtent_
         ? map.translateExtent_
-        : [[-padX, -padY], [map.width_ + padX, map.height_ + padY]]
+        : needsPad ? [[-padX, -padY], [map.width_ + padX, map.height_ + padY]] : [[0, 0], [map.width_, map.height_]]
 
 
 
