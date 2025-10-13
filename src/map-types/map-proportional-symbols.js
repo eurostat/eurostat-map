@@ -6,9 +6,10 @@ import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forc
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground, updateCSSRule } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
+import { color as d3color } from 'd3-color';
 
 /**
  * Returns a proportional symbol map.
@@ -253,9 +254,10 @@ export const map = function (config) {
         };
 
         // Proxy D3 scale methods so legacy code still works:
+        const nextMin = Math.min(...positives.filter(v => v > 0));
         classifier.domain = (...args) => {
             if (args.length) { base.domain(...args); return classifier; }
-            return [minVal, maxVal]; // here we return actual data min/max
+            return [nextMin, maxVal]; // here we return actual data min/max
         };
 
         out.classifierSize(classifier);
@@ -302,7 +304,9 @@ export const map = function (config) {
      * @returns
      */
     function applyStyleToMap(map) {
-        //see https://bl.ocks.org/mbostock/4342045 and https://bost.ocks.org/mike/bubble-map/
+        // update region color according to symbol color
+        updateBackgroundColor(map)
+
         //define style per class
         if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
 
@@ -838,6 +842,53 @@ export const map = function (config) {
 
     return out
 }
+
+function updateBackgroundColor(map) {
+    const symbolColor = map.psFill?.() || '#ffffff';
+    const c = d3color(symbolColor);
+    const hexColor = c ? c.formatHex() : '#ffffff';
+
+    const mapId = map.svgId_ || '';
+    const backgroundColor = getBackgroundColor(hexColor);
+
+    updateCSSRule(`#${mapId}.em--ps .em-nutsrg`, 'fill', backgroundColor);
+}
+
+function getBackgroundColor(fillColor) {
+    return brightenHex(fillColor)
+}
+
+
+function brightenHex(hex) {
+    // const c = color(hex);
+    // if (c) {
+    //     return c.brighter(2).formatHex();
+    // } else {
+    //manual method if d3-color fails
+    const factor = 0.9; // Brightening factor (0 to 1)
+    // Ensure valid hex
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+
+    // Parse RGB
+    const num = parseInt(hex, 16);
+    let r = (num >> 16) & 255;
+    let g = (num >> 8) & 255;
+    let b = num & 255;
+
+    // Increase brightness
+    r = Math.min(255, Math.round(r + (255 - r) * factor));
+    g = Math.min(255, Math.round(g + (255 - g) * factor));
+    b = Math.min(255, Math.round(b + (255 - b) * factor));
+
+    // Return new hex
+    return `#${(1 << 24 | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+    // }
+
+}
+
 
 //build a color legend object
 export const getColorLegend = function (colorFun, colorArray) {

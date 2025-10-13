@@ -23,8 +23,7 @@
 
 /*  nuts fill (regions with data) */
 .em--ps .em-nutsrg {
-    fill: #c9ffd524; /* very light green */
-    /*fill: #fffee724;  very light yellow */
+    /* see updateBackgroundColor */
 }
 
 /*  regions without data input */
