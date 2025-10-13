@@ -17,7 +17,7 @@
         const MAPWIDTH = 800
         const zoom = 6500
         const MAP1 = eurostatmap
-            .map('sparkline').scale('60M').insets('default').insetBoxPosition([570,60]).nutsLevel('1')
+            .map('sparkline').scale('60M').insets('default').insetBoxPosition([570, 60]).nutsLevel('1')
             .width(MAPWIDTH)
             .title('Absolute population change across Europe over time')
             .subtitle(
@@ -25,7 +25,7 @@
             )
             //.position({ x: 4900000, y: 3500000, z: zoom })
             .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
-            
+
             .statSpark(
                 { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
                 ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
@@ -33,7 +33,7 @@
             )
             .sparkType('line')
             .sparkLineWidth(30)
-            .sparkLineHeight(10)
+            .sparkLineHeight(10).transitionDuration(2000)
             .sparkLineStrokeWidth((data, index) => {
                 // console.log(data, index)
                 let val = data[data.length - 1]?.value
@@ -67,7 +67,7 @@
         // using custom chart function for log scale
         const MAP2 = eurostatmap
             .map('sparkline')
-            .svgId('map2').scale('60M').insets('default').insetBoxPosition([570,60])
+            .svgId('map2').scale('60M').insets('default').insetBoxPosition([570, 60])
             .width(MAPWIDTH)
             .title('Percentage population change across Europe over time')
             .subtitle(
@@ -82,8 +82,8 @@
                     filters: { indic_de: 'GROWRT' },
                     unitText: 'Population change',
                 },
-                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019','2020', '2021', '2022', '2023'], //dates
-                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019','2020', '2021', '2022', '2023'] //labels
+                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
+                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
             )
             .sparkType('line')
             .sparkLineChartFunction((node, data, width, height, isForTooltip) => {
@@ -135,12 +135,24 @@
                 })();
                 const strokeColor = lastIdx >= 0 && logY[lastIdx] >= 0 ? '#1f77b4' : '#d62728';
 
-                node.append('path')
+                const path = node.append('path')
                     .datum(data)
                     .attr('fill', 'none')
                     .attr('stroke', strokeColor)
                     .attr('stroke-width', 1)
                     .attr('d', lineGenerator);
+
+                //transition animation
+                if (!isForTooltip) {
+                    const totalLength = path.node().getTotalLength();
+                    path
+                        .attr('stroke-dasharray', totalLength)
+                        .attr('stroke-dashoffset', totalLength)
+                        .transition()
+                        .duration(1000) // or out.transitionDuration() if available
+                        .ease(d3.easeLinear)
+                        .attr('stroke-dashoffset', 0);
+                }
 
                 // 6) Axes & zero line for tooltip only
                 if (isForTooltip) {

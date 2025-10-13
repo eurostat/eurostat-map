@@ -7,6 +7,7 @@ import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/choropleth/legend-choropleth'
 import { executeForAllInsets, getRegionsSelector } from '../core/utils'
 import * as StatisticalData from '../core/stat-data'
+
 /**
  * Returns a sparkline map.
  *
@@ -245,7 +246,7 @@ export const map = function (config) {
         addSparkLinesToMap(nutsIds)
         addMouseEventsToRegions(map)
         return map
-        
+
     }
 
     function setRegionStyles(map) {
@@ -371,16 +372,28 @@ export const map = function (config) {
                 )
         }
 
-        node.append('path')
+        const path = node.append('path')
             .datum(scaledData)
             .attr('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
-            .attr('stroke', typeof out.sparkLineColor_ === 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
-            .attr(
-                'stroke-width',
-                typeof out.sparkLineStrokeWidth_ === 'function' ? (d, i) => out.sparkLineStrokeWidth_(d, i) : out.sparkLineStrokeWidth_ + 'px'
-            )
-            .attr('d', lineGenerator)
+            .attr('stroke', typeof out.sparkLineColor_ === 'function'
+                ? (d, i) => out.sparkLineColor_(d, i)
+                : out.sparkLineColor_)
+            .attr('stroke-width', typeof out.sparkLineStrokeWidth_ === 'function'
+                ? (d, i) => out.sparkLineStrokeWidth_(d, i)
+                : out.sparkLineStrokeWidth_ + 'px')
+            .attr('d', lineGenerator);
+
+        // === Progressive draw animation ===
+        if (!isForTooltip) {
+            const totalLength = path.node().getTotalLength();
+            path
+                .attr('stroke-dasharray', totalLength)
+                .attr('stroke-dashoffset', totalLength)
+                .transition()
+                .duration(out.transitionDuration())
+                .attr('stroke-dashoffset', 0);
+        }
 
         node.selectAll('circle')
             .data(scaledData)
