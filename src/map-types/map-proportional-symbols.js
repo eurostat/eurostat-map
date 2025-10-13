@@ -305,7 +305,7 @@ export const map = function (config) {
      */
     function applyStyleToMap(map) {
         // update region color according to symbol color
-        updateBackgroundColor(map)
+        updateBackgroundColor(map, out.psFill_)
 
         //define style per class
         if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
@@ -843,11 +843,10 @@ export const map = function (config) {
     return out
 }
 
-function updateBackgroundColor(map) {
-    const symbolColor = map.psFill?.() || '#ffffff';
+function updateBackgroundColor(map, symbolFill) {
+    const symbolColor = symbolFill || '#ffffff';
     const c = d3color(symbolColor);
     const hexColor = c ? c.formatHex() : '#ffffff';
-
     const mapId = map.svgId_ || '';
     const backgroundColor = getBackgroundColor(hexColor);
 

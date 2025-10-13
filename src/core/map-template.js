@@ -216,35 +216,35 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    //special ones which affect also the insets
-    ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
+        //special ones which affect also the insets
+        ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
 
-            if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
-                //override default properties
-                for (const p in v) {
-                    out[att][p] = v[p]
+                if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+                    //override default properties
+                    for (const p in v) {
+                        out[att][p] = v[p]
+                    }
+                } else {
+                    out[att] = v
                 }
-            } else {
-                out[att] = v
-            }
 
-            //recursive call to inset components
-            if (out.insetTemplates_) {
-                executeForAllInsets(
-                    out.insetTemplates_,
-                    out.svgId_,
-                    (inset, value) => {
-                        const fnName = att.substring(0, att.length - 1)
-                        inset[fnName](value)
-                    },
-                    v
-                )
+                //recursive call to inset components
+                if (out.insetTemplates_) {
+                    executeForAllInsets(
+                        out.insetTemplates_,
+                        out.svgId_,
+                        (inset, value) => {
+                            const fnName = att.substring(0, att.length - 1)
+                            inset[fnName](value)
+                        },
+                        v
+                    )
+                }
+                return out
             }
-            return out
-        }
-    })
+        })
 
     //title getter and setter
     out.title = function (v) {
@@ -581,7 +581,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // build insets
         removeInsets(out) //remove existing
-        buildInsets(out, withCenterPoints) //build new
+        buildInsets(out, withCenterPoints, out._mapType) //build new
 
         //draw frame
         dg.append('rect')
@@ -818,11 +818,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // Append container if not existing
         const gcp = out.getCentroidsGroup(map).empty()
             ? map
-                  .svg()
-                  .select('#em-zoom-group-' + map.svgId_)
-                  .append('g')
-                  .attr('id', `em-centroids-${map.svgId_}`)
-                  .attr('class', 'em-centroids')
+                .svg()
+                .select('#em-zoom-group-' + map.svgId_)
+                .append('g')
+                .attr('id', `em-centroids-${map.svgId_}`)
+                .attr('class', 'em-centroids')
             : out.getCentroidsGroup(map)
 
         // Join pattern for centroids
