@@ -333,7 +333,7 @@ export const map = function (config) {
             }
 
 
-            setRegionStyles(map)
+            setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
             appendLabelsToSymbols(map, sizeData)
             addMouseEventsToRegions(map)
@@ -351,7 +351,7 @@ export const map = function (config) {
         return map
     }
 
-    const setRegionStyles = function (map) {
+    const setRegionStyles = function (map, sizeData) {
         // set style of symbols
         const selector = getRegionsSelector(map)
         const regions = map.svg().selectAll(selector)
