@@ -1,0 +1,46 @@
+/* Sparkline maps */
+
+/*   muted country boundaries */
+.em--spark .em-cntbn {
+    stroke: grey;
+    stroke-width: 0.2px;
+}
+
+/*   muted nuts boundaries */
+.em--spark .em-bn-1,
+.em--spark .em-bn-2,
+.em--spark .em-bn-3,
+.em--spark .em-nutsrg [lvl='3'],
+.em--spark .em-nutsrg [lvl='2'],
+.em--spark .em-nutsrg [lvl='1'],
+.em--spark .em-bn-co {
+    stroke-width: 0.07px;
+}
+
+/*  muted country fill */
+.em--spark .em-cntrg {
+    fill: #f2f2f2;
+}
+
+/*  nuts fill (regions with data) */
+.em--spark .em-nutsrg {
+    fill: #fffeef;
+    /*fill: #c9ffd524;  very light green */
+    /*fill: #fffee724;  very light yellow */
+}
+
+/*  regions without data input */
+.em--spark [ecl="ni"] {
+    fill: #f2f2f2;
+}
+
+/* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
+.em--spark g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0px;
+}
+
+/* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
+.em--spark .em-bn-co {
+    stroke: grey;
+    stroke-width: 0.1px;
+}

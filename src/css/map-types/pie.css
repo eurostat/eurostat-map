@@ -1,0 +1,43 @@
+/* Proportional pie chart maps */
+
+/*   muted country boundaries */
+.em--pie .em-cntbn {
+    stroke: grey;
+}
+
+/*   muted nuts boundaries */
+.em--pie .em-bn-1,
+.em--pie .em-bn-2,
+.em--pie .em-bn-3,
+.em--pie .em-nutsrg [lvl='3'],
+.em--pie .em-nutsrg [lvl='2'],
+.em--pie .em-nutsrg [lvl='1'],
+.em--pie .em-bn-co {
+    stroke-width: 0.07px;
+}
+
+/*  muted country fill */
+.em--pie .em-cntrg {
+    fill: #f2f2f2;
+}
+
+/*  nuts fill (regions with data) */
+.em--pie .em-nutsrg {
+    fill: #fffeef;
+}
+
+/*  regions without data input */
+.em--pie [ecl="ni"] {
+    fill: #f2f2f2;
+}
+
+/* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
+.em--pie g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+    stroke-width: 0px;
+}
+
+/* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
+.em--pie .em-bn-co {
+    stroke: grey;
+    stroke-width: 0.2px;
+}

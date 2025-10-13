@@ -1,32 +1,23 @@
 /* Proportional symbol and pie styles */
 
 /*   muted country boundaries */
-.em--ps .em-cntbn,
-.em--pie .em-cntbn {
+.em--ps .em-cntbn {
     stroke: grey;
 }
 
 /*   muted nuts boundaries */
 .em--ps .em-bn-1,
-.em--pie .em-bn-1,
 .em--ps .em-bn-2,
-.em--pie .em-bn-2,
 .em--ps .em-bn-3,
-.em--pie .em-bn-3,
 .em--ps .em-nutsrg [lvl='3'],
-.em--pie .em-nutsrg [lvl='3'],
 .em--ps .em-nutsrg [lvl='2'],
-.em--pie .em-nutsrg [lvl='2'],
 .em--ps .em-nutsrg [lvl='1'],
-.em--pie .em-nutsrg [lvl='1'],
-.em--ps .em-bn-co,
-.em--pie .em-bn-co {
+.em--ps .em-bn-co {
     stroke-width: 0.07px;
 }
 
 /*  muted country fill */
-.em--ps .em-cntrg,
-.em--pie .em-cntrg {
+.em--ps .em-cntrg {
     fill: #f2f2f2;
 }
 
@@ -36,25 +27,18 @@
     /*fill: #fffee724;  very light yellow */
 }
 
-.em--pie .em-nutsrg {
-    fill: #fffee7; /* very light yellow */
-}
-
 /*  regions without data input */
-.em--ps [ecl="ni"],
-.em--pie [ecl="ni"] {
+.em--ps [ecl="ni"] {
     fill: #f2f2f2;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
-.em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta),
-.em--pie g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+.em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
     stroke-width: 0px;
 }
 
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
-.em--ps .em-bn-co,
-.em--pie .em-bn-co {
+.em--ps .em-bn-co {
     stroke: grey;
     stroke-width: 0.2px;
 }

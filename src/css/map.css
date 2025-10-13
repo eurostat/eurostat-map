@@ -2,6 +2,8 @@
 @import './map-types/coxcomb.css';
 @import './map-types/alpha.css';
 @import './map-types/flow.css';
+@import './map-types/pie.css';
+@import './map-types/sparkline.css';
 
 /* General text settings */
 text {

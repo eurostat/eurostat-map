@@ -332,53 +332,10 @@ export const map = function (config) {
                 symb = appendD3SymbolsToMap(map, sizeData)
             }
 
-            // set style of symbols
-            const selector = getRegionsSelector(map)
-            const regions = map.svg().selectAll(selector)
 
-            if (map.geo_ !== 'WORLD') {
-                if (map.nutsLevel_ == 'mixed') {
-                    styleMixedNUTSRegions(map, sizeData, regions)
-                    // Build centroidFeatures so Dorling has something to simulate
-                    const centroids = []
-                    map.svg()
-                        .selectAll('g.em-centroid')
-                        .each(function (d) {
-                            if (!d.properties?.centroid) return
-                            centroids.push(d) // d already has properties and id
-                        })
-                    map.Geometries.centroidsFeatures = centroids
-                }
-
-                // apply 'nd' class to no data regions for legend item hover
-                regions.attr('ecl', function (rg) {
-                    const sv = sizeData.get(rg.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        // NO INPUT
-                        return 'ni'
-                    } else if (sv && sv.value) {
-                        if (sv.value == ':') {
-                            // DATA NOT AVAILABLE (no data)
-                            return 'nd'
-                        }
-                    }
-                })
-
-                // 1) clear any previous inline fill so CSS can apply to regions that now have data
-                regions.style('fill', null)
-
-                // 2) apply gray only to current no-data (":") regions
-                regions
-                    .filter((rg) => {
-                        const sv = sizeData.get(rg.properties.id)
-                        return sv && sv.value === ':'
-                    })
-                    .style('fill', out.noDataFillStyle())
-            }
-
+            setRegionStyles(map)
             setSymbolStyles(symb)
             appendLabelsToSymbols(map, sizeData)
-
             addMouseEventsToRegions(map)
 
             // Update labels for statistical values if required
@@ -393,6 +350,53 @@ export const map = function (config) {
         }
         return map
     }
+
+    const setRegionStyles = function (map) {
+        // set style of symbols
+        const selector = getRegionsSelector(map)
+        const regions = map.svg().selectAll(selector)
+
+        if (map.geo_ !== 'WORLD') {
+            if (map.nutsLevel_ == 'mixed') {
+                styleMixedNUTSRegions(map, sizeData, regions)
+                // Build centroidFeatures so Dorling has something to simulate
+                const centroids = []
+                map.svg()
+                    .selectAll('g.em-centroid')
+                    .each(function (d) {
+                        if (!d.properties?.centroid) return
+                        centroids.push(d) // d already has properties and id
+                    })
+                map.Geometries.centroidsFeatures = centroids
+            }
+
+            // apply 'nd' class to no data regions for legend item hover
+            regions.attr('ecl', function (rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                    // NO INPUT
+                    return 'ni'
+                } else if (sv && sv.value) {
+                    if (sv.value == ':') {
+                        // DATA NOT AVAILABLE (no data)
+                        return 'nd'
+                    }
+                }
+            })
+
+            // 1) clear any previous inline fill so CSS can apply to regions that now have data
+            regions.style('fill', null)
+
+            // 2) apply gray only to current no-data (":") regions
+            regions
+                .filter((rg) => {
+                    const sv = sizeData.get(rg.properties.id)
+                    return sv && sv.value === ':'
+                })
+                .style('fill', out.noDataFillStyle())
+        }
+    }
+
 
     const appendLabelsToSymbols = function (map, sizeData) {
         let symbolContainers = map.svg().selectAll('g.em-centroid')
