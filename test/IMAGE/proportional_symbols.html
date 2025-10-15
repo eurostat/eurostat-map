@@ -277,6 +277,7 @@
             NO09: ':',
             NO0A: ':',
             ME00: ':',
+            DK:0.85
         }
         let data2 = {
             ES: 0,
@@ -291,7 +292,7 @@
             NL: 1000,
             PO: 1100,
             RO: 1200,
-            DE11: 1000,
+            DE11: 1000,DK:0.85
         }
         let test1 = {
             ES: 0,
@@ -309,7 +310,7 @@
             FRY3: 5,
             FRY2: 4,
             FRY1: 0,
-            RS: ':'
+            RS: ':',DK:0.85
         }
         let test2 = {
             ES: 0,
@@ -327,7 +328,8 @@
             FRY3: 5,
             FRY2: 4,
             FRY1: 0,
-            RS: 4
+            RS: 4,
+            DK:0.85
         }
 
         // Compact number formatter (Intl-based)
@@ -342,19 +344,19 @@
             // .insets(insetsConfig)
             // .insetBoxPosition([400, 10])
             .width(mapWidth)
-            .height(mapHeight).psShape('bar')
+            .height(mapHeight).psShape('circle')
             .nutsLevel('mixed')
             .psMinSize(1)
-            .psMaxSize(60)
+            .psMaxSize(20)
             //.psFillOpacity(0.8)
             .legend({
                 //svgId: "eurostatmap-legend",
                 x: 0,
-                y: 60,
+                y: 40,
                 sizeLegend: {
                     title: 'test test test',
                     titlePadding: 10,
-                    values: [20000, 10000, 4000],
+                    //values: [20000, 10000, 4000],
                     labelFormatter: (value) => {
                         return fmtCompact.format(value)
                     },
