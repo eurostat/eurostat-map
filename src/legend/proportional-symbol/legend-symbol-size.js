@@ -83,8 +83,16 @@ export function drawSizeLegend(out, baseX, baseY) {
 
 function addNoDataLegend(out) {
     const bbox = out._sizeLegendContainer.node().getBBox();
-    const padding = out.map.psShape_ === 'bar' ? 40 : 15; // add some extra padding for bars
-    const y = bbox.height + padding; // padding after the size legend
+    const paddings = {
+        default: 20,
+        bar: 35,
+        spike: 30,
+        circle: 1,
+        square: 20
+    }; // add some extra padding for bars and spikes
+    const padding = paddings[out.map.psShape_] || paddings['default'];
+    const noDataHeight = out.noDataShapeHeight
+    const y = bbox.height + padding + (noDataHeight / 2); // padding after the size legend
     const x = 0;
     const container = out._sizeLegendContainer
         .append('g')

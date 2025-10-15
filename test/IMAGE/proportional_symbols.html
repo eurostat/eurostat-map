@@ -330,26 +330,37 @@
             RS: 4
         }
 
-        let map = eurostatmap
+        // Compact number formatter (Intl-based)
+        const fmtCompact = new Intl.NumberFormat('en', {
+            notation: 'compact',
+            compactDisplay: 'short', // "short" → 1.2K, "long" → 1.2 thousand
+            maximumFractionDigits: 1
+        });
+        const map = eurostatmap
             .map('proportionalSymbol').insets('default')
 
             // .insets(insetsConfig)
             // .insetBoxPosition([400, 10])
             .width(mapWidth)
-            .height(mapHeight).psShape('circle')
+            .height(mapHeight).psShape('bar')
             .nutsLevel('mixed')
-            .psMaxSize(50)
+            .psMinSize(1)
+            .psMaxSize(60)
             //.psFillOpacity(0.8)
             .legend({
                 //svgId: "eurostatmap-legend",
-                x: 450,
+                x: 0,
                 y: 60,
                 sizeLegend: {
                     title: 'test test test',
                     titlePadding: 10,
-                    //values: [1000, 200, 1],
+                    values: [20000, 10000, 4000],
+                    labelFormatter: (value) => {
+                        return fmtCompact.format(value)
+                    },
                     noData: true,
                 },
+                //noDataPadding: 0,
                 colorLegend: false,
             })
         map.statData().setData(data)
@@ -358,19 +369,19 @@
         // map.updateStyle()
         map.build()
 
-        setTimeout(() => {
-            map.statData('size').setData(test1)
-            map.updateStatValues()
-            map.updateClassification()
-            map.updateStyle()
-        }, 1000)
+        // setTimeout(() => {
+        //     map.statData('size').setData(test1)
+        //     map.updateStatValues()
+        //     map.updateClassification()
+        //     map.updateStyle()
+        // }, 10000)
 
-        setTimeout(() => {
-            map.statData('size').setData(test2)
-            map.updateStatValues()
-            map.updateClassification()
-            map.updateStyle()
-        }, 2000)
+        // setTimeout(() => {
+        //     map.statData('size').setData(test2)
+        //     map.updateStatValues()
+        //     map.updateClassification()
+        //     map.updateStyle()
+        // }, 20000)
     </script>
 </body>
 
