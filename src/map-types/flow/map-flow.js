@@ -12,6 +12,7 @@ import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { createFlowMap } from './straight'
 import { computeDonutLocationStats, computeDonutValues, drawDonuts } from './donuts'
 import { scaleOrdinal } from 'd3-scale'
+import { addFlowValueLabels, addLabelsToMap } from '../../core/labels'
 
 /**
  * Returns a flow map.
@@ -47,34 +48,34 @@ export const map = function (config) {
     out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
 
-    /**
-     * flowmap-specific setters/getters
-     */
-    ;[
-        'flowGraph_',
-        'flowColor_',
-        'flowOverlayColors_',
-        'flowArrows_',
-        'flowMaxWidth_',
-        'flowMinWidth_',
-        'flowOutlines_',
-        'flowGradient_',
-        'flowStack_',
-        'flowDonuts_',
-        'flowLabelOffsets_',
-        'flowLineType_',
-        'flowDonutSizeScale_',
-        'flowOpacity_',
-        'flowInternal_',
-        'flowTopLocations_',
-        'flowTopLocationsType_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
-        }
-    })
+        /**
+         * flowmap-specific setters/getters
+         */
+        ;[
+            'flowGraph_',
+            'flowColor_',
+            'flowOverlayColors_',
+            'flowArrows_',
+            'flowMaxWidth_',
+            'flowMinWidth_',
+            'flowOutlines_',
+            'flowGradient_',
+            'flowStack_',
+            'flowDonuts_',
+            'flowLabelOffsets_',
+            'flowLineType_',
+            'flowDonutSizeScale_',
+            'flowOpacity_',
+            'flowInternal_',
+            'flowTopLocations_',
+            'flowTopLocationsType_',
+        ].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
+        })
 
     //@override
     out.updateStyle = function () {
@@ -100,33 +101,56 @@ export const map = function (config) {
         prepareFlowGraph(out)
 
         // Define our container SVG
-        const zoomGroup = select('#em-zoom-group-' + out.svgId_)
-        const sankeyContainer = zoomGroup.append('g').attr('class', 'em-flow-container')
+        const zoomGroup = select('#em-zoom-group-' + out.svgId_);
+
+        // Try to select existing container
+        let flowContainer = zoomGroup.select('#em-flow-container');
+
+        // If it doesn't exist, create it
+        if (flowContainer.empty()) {
+            flowContainer = zoomGroup
+                .append('g')
+                .attr('id', 'em-flow-container')
+                .attr('class', 'em-flow-container');
+        } else {
+            // If it exists, clear existing contents
+            flowContainer.selectAll('*').remove();
+        }
+
+        //hacky: move it up one so that it is above the regions but below the labels
+        const node = flowContainer.node();
+        if (node && node.previousSibling) {
+            node.parentNode?.insertBefore(node, node.previousSibling);
+        }
 
         // Add geographical layers
         addOverlayPolygons(out)
 
         if (out.flowLineType_ === 'sankey') {
             // Create the sankey layout
-            createSankeyFlowMap(out, sankeyContainer)
+            createSankeyFlowMap(out, flowContainer)
         } else {
             // Draw straight lines by flow
-            createFlowMap(out, sankeyContainer)
+            createFlowMap(out, flowContainer)
         }
 
         // donuts
         if (out.flowDonuts_) {
             computeDonutValues(out)
             computeDonutLocationStats(out, true) // include internal flows
-            drawDonuts(out, sankeyContainer)
+            drawDonuts(out, flowContainer)
         }
 
         // Add labels to nodes
-        if (out.labels_?.values) addLabels(out, sankeyContainer)
+        if (out.labels_) {
+            const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+            addLabelsToMap(out, zoomGroup)
+            addFlowValueLabels(out, zoomGroup)
+        }
     }
 
     //@override
-    out.updateClassification = function () {}
+    out.updateClassification = function () { }
 
     //@override
     out.getLegendConstructor = function () {
@@ -338,69 +362,7 @@ function addOverlayPolygons(out) {
     })
 }
 
-/**
- * Add labels for data points.
- * @param {Object} svg - D3 selection of the SVG element.
- */
-function addLabels(out, svg) {
-    // Filter the nodes
-    const nodes = out.flowGraph_.nodes
-    const filteredNodes = nodes.filter((node) => node.targetLinks && node.sourceLinks.length === 0)
-    const container = svg.append('g').attr('class', 'em-flow-labels')
 
-    // Add halo effect
-    if (out.labels_?.shadows) {
-        const labelsShadowGroup = container.append('g').attr('class', 'em-flow-label-shadow')
-        labelsShadowGroup
-            .selectAll('text')
-            .data(filteredNodes)
-            .join('text')
-            .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
-            .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.flowLabelOffsets_.x : d.x - out.flowLabelOffsets_.x))
-            .attr('y', (d) => d.y + out.flowLabelOffsets_.y)
-            .text((d) => out.labelFormatter(d.value))
-    }
-
-    // Add labels
-    const labelsGroup = container.append('g').attr('class', 'em-flow-label')
-    //add background
-    // Add background rectangles and text
-    const labelElements = labelsGroup
-        .selectAll('g') // Use a group for each label to combine rect and text
-        .data(filteredNodes)
-        .join('g') // Append a group for each label
-        .attr('transform', (d) => `translate(${d.x}, ${d.y})`) // Position group at the node
-
-    // Add text first to calculate its size
-    labelElements
-        .append('text')
-        .attr('class', 'em-label-text')
-        .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
-        .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.flowLabelOffsets_.x : -out.flowLabelOffsets_.x))
-        .attr('y', out.flowLabelOffsets_.y)
-        .text((d) => out.labelFormatter(d.value))
-
-    // Add background rectangles after text is rendered
-
-    if (out.labels_.backgrounds) {
-        labelElements.each(function () {
-            const textElement = select(this).select('text')
-            const bbox = textElement.node().getBBox() // Get bounding box of the text
-
-            const paddingX = 5 // Horizontal padding
-            const paddingY = 2 // Vertical padding
-
-            // Add rectangle centered behind the text
-            select(this)
-                .insert('rect', 'text') // Insert rect before text in DOM
-                .attr('class', 'em-label-background')
-                .attr('x', bbox.x - paddingX)
-                .attr('y', bbox.y - paddingY)
-                .attr('width', bbox.width + 2 * paddingX)
-                .attr('height', bbox.height + 2 * paddingY)
-        })
-    }
-}
 
 const flowMapTooltipFunction = function (link, map) {
     const buf = []

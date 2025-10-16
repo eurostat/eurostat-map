@@ -1,5 +1,22 @@
 import { color, scaleLinear } from 'd3'
 
+// Ensures a <g> element with the specified class exists within the container.
+// If it exists, clears its contents; if not, creates it.
+export function ensureGroup(
+    container,
+    className
+) {
+    let g = container.select(`g.${className}`);
+
+    if (g.empty()) {
+        g = container.append('g').attr('class', className);
+    } else {
+        g.selectAll('*').remove();
+    }
+
+    return g;
+}
+
 // e.g. to be used with deprecated .style() functions. They will now update CSS classes.
 export function updateCSSRule(selector, property, value) {
     // Validate the selector

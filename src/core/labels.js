@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { spaceAsThousandSeparator, executeForAllInsets } from './utils'
+import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup } from './utils'
 
 // handles all map labels e.g. stat values, or labels specified in map.labels({labels:[text:'myLabel', x:123, y: 123]})
 
@@ -14,7 +14,7 @@ export const addLabelsToMap = function (map, zg) {
     if (!map.labels_.config) map.labels_.config = DEFAULTLABELS
     if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
 
-    // clear existing or append new container
+    // use existing or append new container
     let existing = zg.select('#em-labels')
     let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
 
@@ -26,11 +26,9 @@ export const addLabelsToMap = function (map, zg) {
 
     // append other labels to map
     if (labelsArray) {
-        //common styles between all label shadows
-        const shadowg = labelsContainer.append('g').attr('class', 'em-label-shadows').attr('text-anchor', 'middle')
-
-        //common styles between all labels
-        const labelg = labelsContainer.append('g').attr('class', 'em-labels').attr('text-anchor', 'middle')
+        // create or reuse containers
+        const shadowg = ensureGroup(labelsContainer, 'em-label-shadows');
+        const labelg = ensureGroup(labelsContainer, 'em-labels');
 
         //SHADOWS
         if (map.labels_?.shadows) {
@@ -106,6 +104,74 @@ export const addLabelsToMap = function (map, zg) {
             .text(function (d) {
                 return d.text
             }) // define the text to display
+    }
+}
+
+/**
+* Add labels for data points.
+* @param {Object} svg - D3 selection of the SVG element.
+*/
+export function addFlowValueLabels(out, svg) {
+    // use existing or append new container
+    let existing = svg.select('#em-labels')
+    let labelsContainer = existing.empty() ? svg.append('g').attr('id', 'em-labels') : existing
+    // Filter the nodes
+    const nodes = out.flowGraph_.nodes
+    const filteredNodes = nodes.filter((node) => node.targetLinks && node.sourceLinks.length === 0)
+    // create or reuse container
+    const container = ensureGroup(labelsContainer, 'em-flow-labels');
+
+    // Add halo effect
+    if (out.labels_?.shadows) {
+        const labelsShadowGroup = container.append('g').attr('class', 'em-flow-label-shadow')
+        labelsShadowGroup
+            .selectAll('text')
+            .data(filteredNodes)
+            .join('text')
+            .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
+            .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.flowLabelOffsets_.x : d.x - out.flowLabelOffsets_.x))
+            .attr('y', (d) => d.y + out.flowLabelOffsets_.y)
+            .text((d) => out.labelFormatter(d.value))
+    }
+
+    // Add labels
+    const labelsGroup = container.append('g').attr('class', 'em-flow-label')
+    //add background
+    // Add background rectangles and text
+    const labelElements = labelsGroup
+        .selectAll('g') // Use a group for each label to combine rect and text
+        .data(filteredNodes)
+        .join('g') // Append a group for each label
+        .attr('transform', (d) => `translate(${d.x}, ${d.y})`) // Position group at the node
+
+    // Add text first to calculate its size
+    labelElements
+        .append('text')
+        .attr('class', 'em-label-text')
+        .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
+        .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.flowLabelOffsets_.x : -out.flowLabelOffsets_.x))
+        .attr('y', out.flowLabelOffsets_.y)
+        .text((d) => out.labelFormatter(d.value))
+
+    // Add background rectangles after text is rendered
+
+    if (out.labels_.backgrounds) {
+        labelElements.each(function () {
+            const textElement = select(this).select('text')
+            const bbox = textElement.node().getBBox() // Get bounding box of the text
+
+            const paddingX = 5 // Horizontal padding
+            const paddingY = 2 // Vertical padding
+
+            // Add rectangle centered behind the text
+            select(this)
+                .insert('rect', 'text') // Insert rect before text in DOM
+                .attr('class', 'em-label-background')
+                .attr('x', bbox.x - paddingX)
+                .attr('y', bbox.y - paddingY)
+                .attr('width', bbox.width + 2 * paddingX)
+                .attr('height', bbox.height + 2 * paddingY)
+        })
     }
 }
 
@@ -262,10 +328,11 @@ const defaultStatLabelFilter = (region, map) => {
 
 const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     //values label shadows parent <g>
-    const gsls = labelsContainer.append('g').attr('class', 'em-stat-labels-shadows').attr('text-anchor', 'middle')
+        // create or reuse container
+    const gsls = ensureGroup(labelsContainer, 'em-stat-labels-shadows');
 
     // values labels parent <g>
-    const statLabelsGroup = labelsContainer.append('g').attr('class', 'em-stat-labels').attr('text-anchor', 'middle')
+    const statLabelsGroup = ensureGroup(labelsContainer, 'em-stat-labels');
 
     // our features array
     let statLabelRegions = []
@@ -439,8 +506,9 @@ export const DEFAULTLABELS = {
             { text: 'SPAIN', cc: 'ES', x: 3160096, y: 1850000, class: 'countries', size: 12 },
             { text: 'SWEDEN', cc: 'SE', x: 4630000, y: 4100000, class: 'countries', size: 12, rotate: -75 },
             { text: 'SWITZERLAND', cc: 'CH', x: 4200000, y: 2564000, class: 'countries', size: 7 },
-            { text: 'TURKEY', cc: 'TR', x: 6510000, y: 2100000, class: 'countries', size: 12 },
+            { text: 'TÜRKIYE', cc: 'TR', x: 6510000, y: 2100000, class: 'countries', size: 12 },
             { text: 'U.K.', cc: 'UK', x: 3558000, y: 3250000, class: 'countries', size: 12 },
+            { text: 'UKRAINE', cc: 'UA', x: 5890000, y: 3050000, class: 'countries' },
         ],
         fr: [
             { text: 'MER MÉDITERRANÉE', x: 5472000, y: 1242000, class: 'seas', size: 12 },

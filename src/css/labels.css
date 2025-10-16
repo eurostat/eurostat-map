@@ -4,7 +4,11 @@
     font-family: Arial, Helvetica, sans-serif;
     dominant-baseline: central;
 }
-
+.em-labels {
+    opacity:0.7;
+    font-size: 12px;
+    fill: #505050;
+}
 .em-label {
     font-size: 12px;
 }
