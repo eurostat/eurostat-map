@@ -340,7 +340,7 @@ export const map = function (config) {
             setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
             appendLabelsToSymbols(map, sizeData)
-            addMouseEventsToRegions(map)
+            addMouseEvents(map)
 
             // Update labels for statistical values if required
             if (out.labels_?.values) {
@@ -397,7 +397,7 @@ export const map = function (config) {
                     const sv = sizeData.get(rg.properties.id)
                     return sv && sv.value === ':'
                 })
-                .style('fill', out.noDataFillStyle())
+                .style('fill', out.noDataFillStyle()).attr('fill___', out.noDataFillStyle()) // save for legend mouseover   
         }
     }
 
@@ -466,10 +466,48 @@ export const map = function (config) {
         }
     }
 
+    const addMouseEvents = function (map) {
+        addMouseEventsToSymbols(map)
+        addMouseEventsToRegions(map)
+    }
     const addMouseEventsToRegions = function (map) {
-        let symbols = map.svg().selectAll('g.em-centroid')
-        let regions = map.svg().selectAll(getRegionsSelector(map))
+        const regions = map.svg().selectAll(getRegionsSelector(map))
+        const sizeData = getSizeStatData(map)
+        regions.on('mouseover', function (e, rg) {
+            // only show tooltip for polygons of regions with values of 0
+            const sv = sizeData.get(rg.properties.id)
+            if (sv?.value === 0 || sv?.value === ':') {
+                select(this).style('fill', map.hoverColor_) // Apply highlight color
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
+            } else {
+                return; // skip regions with no input or value > 0
+            }
+        })
+            .on('mousemove', function (e, rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv?.value === 0 || sv?.value === ':') {
+                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
+                } else {
+                    return; // skip regions with no data or value > 0
+                }
 
+            })
+            .on('mouseout', function (e, rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv?.value === 0 || sv?.value === ':') {
+                    const sel = select(this)
+                    sel.style('fill', sel.attr('fill___')) // Revert to original color
+                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
+                } else {
+                    return; // skip regions with no data or value > 0
+                }
+            })
+    }
+    const addMouseEventsToSymbols = function (map) {
+        const symbols = map.svg().selectAll('g.em-centroid')
         //symbols
         symbols
             .on('mouseover', function (e, rg) {
@@ -491,41 +529,6 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mouseout()
                 }
                 if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
-            })
-
-        //regions
-        const sizeData = getSizeStatData(map)
-        regions.on('mouseover', function (e, rg) {
-            // only show tooltip for polygons of regions with values of 0
-            const sv = sizeData.get(rg.properties.id)
-            if (sv?.value === 0) {
-                select(this).style('fill', map.hoverColor_) // Apply highlight color
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
-            } else {
-                return; // skip regions with no data or value > 0
-            }
-        })
-            .on('mousemove', function (e, rg) {
-                const sv = sizeData.get(rg.properties.id)
-                if (sv?.value === 0) {
-                    if (out._tooltip) out._tooltip.mousemove(e)
-                    if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
-                } else {
-                    return; // skip regions with no data or value > 0
-                }
-
-            })
-            .on('mouseout', function (e, rg) {
-                const sv = sizeData.get(rg.properties.id)
-                if (sv?.value === 0) {
-                    const sel = select(this)
-                    sel.style('fill', sel.attr('fill___')) // Revert to original color
-                    if (out._tooltip) out._tooltip.mouseout()
-                    if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
-                } else {
-                    return; // skip regions with no data or value > 0
-                }
             })
     }
 
@@ -924,40 +927,47 @@ export const symbolsLibrary = {
 
 const tooltipTextFunPs = function (region, map) {
     if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
-        return '' // Skip tooltip for omitted regions
+        return ''; // Skip tooltip for omitted regions
     }
 
-    const regionName = region.properties.na
-    const regionId = region.properties.id
+    const regionName = region.properties.na;
+    const regionId = region.properties.id;
+
+
+    const formatValue = (val, unit, noDataText) => {
+        if (val === ':') {
+            return noDataText || 'Data not available';
+        }
+        return spaceAsThousandSeparator(val) + (unit ? ' ' + unit : '');
+    };
 
     // Stat 1
-    const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
-    const sv1 = v1.get(region.properties.id)
-    const hasV1 = sv1 && (sv1.value === 0 || !!sv1.value)
-    const unit1 = hasV1 ? v1.unitText() : null
-    const row1 = `<tr><td>${hasV1 ? spaceAsThousandSeparator(sv1.value) + ' ' + (unit1 || '') : map.noDataText_}</td></tr>`
+    const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData();
+    const sv1 = v1.get(region.properties.id);
+    const unit1 = v1.unitText?.() || '';
+    const row1 = `<tr><td>${formatValue(sv1?.value, unit1, map.noDataText_)}</td></tr>`;
 
     // Stat 2 (optional)
-    let row2 = ''
-    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null
+    let row2 = '';
+    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null;
     if (v2) {
-        const sv2 = v2.get(region.properties.id)
-        const hasV2 = sv2 && (sv2.value === 0 || !!sv2.value)
-        const unit2 = hasV2 ? v2.unitText() : null
-        row2 = `<tr><td>${hasV2 ? spaceAsThousandSeparator(sv2.value) + ' ' + (unit2 || '') : map.noDataText_}</td></tr>`
+        const sv2 = v2.get(region.properties.id);
+        const unit2 = v2.unitText?.() || '';
+        row2 = `<tr><td>${formatValue(sv2?.value, unit2, map.noDataText_)}</td></tr>`;
     }
 
     return `
-        <div class="em-tooltip-bar">
-            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-        </div>
-        <div class="em-tooltip-text">
-            <table class="em-tooltip-table">
-                <tbody>
-                    ${row1}
-                    ${row2}
-                </tbody>
-            </table>
-        </div>
-    `.trim()
-}
+    <div class="em-tooltip-bar">
+      <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+    </div>
+    <div class="em-tooltip-text">
+      <table class="em-tooltip-table">
+        <tbody>
+          ${row1}
+          ${row2}
+        </tbody>
+      </table>
+    </div>
+  `.trim();
+};
+
