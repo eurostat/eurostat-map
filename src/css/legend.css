@@ -97,3 +97,6 @@
     fill: #ccc;
     cursor: pointer;
 }
+#em-legend-background { 
+  filter: drop-shadow(4px 4px 4px rgba(0,0,0,0.4)); 
+}

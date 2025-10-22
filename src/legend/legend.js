@@ -114,7 +114,7 @@ export const legend = function (map) {
 
     /** Draw legend background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'legendBR').attr('class', 'em-legend-background').style('opacity', out.boxOpacity)
+        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background').style('opacity', out.boxOpacity)
     }
 
     out.addTitle = function () {
@@ -165,7 +165,7 @@ export const legend = function (map) {
             //apply to legend box dimensions
             const p = out.boxPadding
             out.svg
-                .select('#legendBR')
+                .select('#em-legend-background')
                 .attr('x', bb.x - p)
                 .attr('y', bb.y - p) // -2 to account for the title height
                 .attr('width', bb.width + 2 * p)
