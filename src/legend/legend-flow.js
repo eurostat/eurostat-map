@@ -211,7 +211,7 @@ export const legend = function (map, config) {
                 .attr('x2', x + 40)
                 .attr('y1', currentY)
                 .attr('y2', currentY)
-                .attr('stroke', out.flowWidthLegend.color ?  out.flowWidthLegend.color : '#6b6b6b')
+                .attr('stroke', out.flowWidthLegend.color ? out.flowWidthLegend.color : '#6b6b6b')
                 .attr('stroke-width', strokeWidth)
 
             out._flowWidthContainer
@@ -249,7 +249,7 @@ export const legend = function (map, config) {
                 legendItems = out.flowColorLegend.items
             } else {
                 legendItems = [
-                    { label:"please specify legend items in legend.flowColorLegend.items like so: { label: 'Other', color: '#ccc' }", color: '#888' },
+                    { label: "please specify legend items in legend.flowColorLegend.items like so: { label: 'Other', color: '#ccc' }", color: '#888' },
                 ]
             }
         } else {
@@ -260,10 +260,11 @@ export const legend = function (map, config) {
                 label: map.nodeNameMap.get(key) || key, // ✅ show location name if exists
                 color: colorScale(key),
             }))
+            // Always append the "Other" category last
+            legendItems.push({ label: 'Other', color: '#ccc' })
         }
 
-        // Always append the "Other" category last
-        legendItems.push({ label: 'Other', color: '#ccc' })
+
 
         // Draw each legend row
         const titleOffset = title.node().getBBox().height + out.flowColorLegend.titlePadding
