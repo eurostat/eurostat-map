@@ -30,24 +30,44 @@
             .then(graphData => {
                 console.log('Loaded freight data:', graphData);
 
+
+                const width = 1050
+                const height = 710;
+
+                const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
+                // const regionColors = {
+                //     "north america": "#fbead7", // pale sand
+                //     "central america and caribbean": "#fcf3d6", // light cream
+                //     "south america": "#d8f0ea", // pale turquoise
+                //     "north africa": "#fce2da", // warm blush
+                //     "rest of africa": "#dee6ea", // misty blue-grey
+                //     "western asia": "#fdeacc", // peach tint
+                //     "southern asia": "#f9dede", // rose tint
+                //     "central asia": "#fdf3d9", // pale yellow
+                //     "eastern asia": "#e6f0ff", // pale lavender-blue (cooler)
+                //     ASEAN: "#e0f8f0", // pale mint-green (warmer)
+                //     "australasia, s.sea is. & antarctica": "#e5ecf0", // fog grey-blue
+                //     EU: "#dde5f0", // very light slate
+                //     "europe except eu": "#E8EEFA", // faint blue-grey
+                //     "eastern africa": "#E6F4EA"
+                // }
                 const regionColors = {
-                    "north america": "#fbead7", // pale sand
-                    "central america and caribbean": "#fcf3d6", // light cream
-                    "south america": "#d8f0ea", // pale turquoise
-                    "north africa": "#fce2da", // warm blush
-                    "rest of africa": "#dee6ea", // misty blue-grey
-                    "western asia": "#fdeacc", // peach tint
-                    "southern asia": "#f9dede", // rose tint
-                    "central asia": "#fdf3d9", // pale yellow
-                    "eastern asia": "#e6f0ff", // pale lavender-blue (cooler)
-                    ASEAN: "#e0f8f0", // pale mint-green (warmer)
-                    "australasia, s.sea is. & antarctica": "#e5ecf0", // fog grey-blue
+                    "north america": greys[0], // pale sand
+                    "central america and caribbean": greys[1], // light cream
+                    "south america": greys[2], // pale turquoise
+                    "north africa": greys[3], // warm blush
+                    "rest of africa": greys[4], // misty blue-grey
+                    "western asia": greys[0], // peach tint
+                    "southern asia": greys[1], // rose tint
+                    "central asia": greys[2], // pale yellow
+                    "eastern asia": greys[3], // pale lavender-blue (cooler)
+                    ASEAN: greys[4], // pale mint-green (warmer)
+                    "australasia, s.sea is. & antarctica": greys[0], // fog grey-blue
                     EU: "#dde5f0", // very light slate
-                    "europe except eu": "#E8EEFA", // faint blue-grey
-                    "eastern africa": "#E6F4EA"
+                    "europe except eu": greys[1], // faint blue-grey
+                    "eastern africa": greys[2]
                 }
 
-                const width = 900
 
                 const worldProjection = d3
                     .geoAzimuthalEquidistant()
@@ -57,9 +77,35 @@
 
                 const valuesLabelFormatter = (d) => d3.format('.2s')(d * 1000)
 
-                const colorFunction = d3.scaleDiverging()
-                    .domain([-1, 0, 1])
-                    .interpolator(d3.interpolateRdBu);
+                // 1) Pick class breaks (in PERCENT points)
+                const breaks = [-20, -10, -5, 0, 5];
+
+                // 2) Choose a diverging palette (low→high). Option A: RdBu[7]
+                const reds = ['#fee5d9', '#fcae91', '#fb6a4a', '#cb181d']
+                const colors = [
+                    reds[3], // strong red (large negative)
+                    reds[2], // medium red
+                    reds[1], // light red
+                    reds[0], // pale red
+                    "#67a9cf", // medium blue
+                    "#2166ac"  // strong blue (large positive)
+                ];
+
+
+                // 3) Discrete diverging scale
+                const colorFunction = d3.scaleThreshold()
+                    .domain(breaks)   // ascending thresholds
+                    .range(colors);   // length = breaks.length + 1
+
+                // 4) Robust parser for your "change" value (handles "12", "12%", or 0.12)
+                function parseChangeToPct(v) {
+                    if (v == null) return NaN;
+                    const s = String(v).trim();
+                    const hasPct = s.includes('%');
+                    let n = parseFloat(s.replace('%', ''));
+                    if (!hasPct && Math.abs(n) <= 1) n *= 100; // interpret small decimals as fractions
+                    return n;
+                }
 
                 const spaceAsThousandSeparator = function (number) {
                     return number.toLocaleString('en').replace(/,/gi, ' ')
@@ -94,7 +140,7 @@
                     .map("flow")
                     .svgId("air-freight-map")
                     .width(width)
-                    .height(width / 1.5)
+                    .height(height)
                     .title("Air freight")
                     .subtitle(
                         "Transport of freight and mail from the EU to outside the EU, 2023"
@@ -115,9 +161,7 @@
                     .flowDonuts(false)
                     // .flowColor("#72bb6f")
                     .flowColor((d) => {
-                        console.log(d)
-                        const change = parseFloat(d.target.change)
-                        return colorFunction(change)
+                        return colorFunction(parseChangeToPct(d.target.change))
                     })
                     .flowOpacity(0.8)
                     .flowArrows(false)
@@ -129,11 +173,11 @@
 
                     // legend
                     .legend({
-                        x: width - 150,
-                        y: 0,
+                        x: width - 210,
+                        y: 2,
                         boxPadding: 10,
                         title: "Freight carried",
-                        subtitle: "(thousand tonnes)",
+                        subtitle: "(tonnes)",
                         flowWidthLegend: {
                             marginTop: -10,
                             values: [3, 500, 2600],
@@ -141,12 +185,18 @@
                         },
                         donutSizeLegend: { title: "Location total" },
                         flowColorLegend: {
-                            title: "Freight line color",
+                            marginTop: 40,
+                            title: "Change vs 2022 (%)",
                             items: [
-                                { color: colorFunction(-1), label: "Decreased significantly" },
-                                { color: colorFunction(0), label: "No change" },
-                                { color: colorFunction(1), label: "Increased significantly" },
-                            ]
+
+                                { color: colorFunction(-21), label: "≤ -20" },
+                                { color: colorFunction(-15), label: "-20 to -10" },
+                                { color: colorFunction(-7), label: "-10 to -5" },
+                                { color: colorFunction(-2), label: "<0" },
+                                { color: colorFunction(2.5), label: "0 to 5" },
+                                { color: colorFunction(8.7), label: "≥ 5" }
+
+                            ].reverse()
                         },
                         regionColorLegend: {
                             title: "Region color",

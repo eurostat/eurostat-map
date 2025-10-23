@@ -17,6 +17,8 @@ export const legend = function (map, config) {
         titlePadding: 17,
         values: null,
         marginTop: 5,
+        labelFormatter: undefined, // function to format legend labels
+        color: '#6b6b6b81', // line color
     }
 
     out.donutSizeLegend = {
@@ -24,13 +26,15 @@ export const legend = function (map, config) {
         titlePadding: 25,
         values: null,
         marginTop: 20,
+        labelFormatter: undefined, // function to format legend labels
     }
 
     out.flowColorLegend = {
         title: null,
         titlePadding: 0, // Padding between title and legend body
         marginTop: 33,
-        items: [], // user-defined legend items for custom flow color function
+        items: [], // user-defined legend items for custom flow color function,
+        ticks: false // use labels as ticks
     }
 
     out.regionColorLegend = {
@@ -207,7 +211,7 @@ export const legend = function (map, config) {
                 .attr('x2', x + 40)
                 .attr('y1', currentY)
                 .attr('y2', currentY)
-                .attr('stroke', '#6b6b6b')
+                .attr('stroke', out.flowWidthLegend.color ?  out.flowWidthLegend.color : '#6b6b6b')
                 .attr('stroke-width', strokeWidth)
 
             out._flowWidthContainer
@@ -216,7 +220,7 @@ export const legend = function (map, config) {
                 .attr('y', currentY)
                 .attr('dy', '0.35em')
                 .attr('class', 'em-legend-label')
-                .text(spaceAsThousandSeparator(val))
+                .text(out.flowWidthLegend.labelFormatter ? out.flowWidthLegend.labelFormatter(val) : spaceAsThousandSeparator(val))
         })
     }
 

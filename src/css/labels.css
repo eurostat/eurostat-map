@@ -13,7 +13,7 @@
     font-size: 12px;
     opacity:0.8;
 }
-.em-label-shadow {
+.em-label-shadow, .em-flow-label-shadow {
     font-size: 12px;
     stroke-width: 2px;
     stroke: white;
