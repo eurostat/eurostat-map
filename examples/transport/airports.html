@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        @import url('./airports.css');
+    </style>
+</head>
+
+<body style="margin:0">
+    <svg id="airport-pairs-map"></svg>
+
+    <svg style='display:none;'>
+        <!-- used for country borders -->
+        <defs>
+            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
+            </filter>
+        </defs>
+    </svg>
+    <script src="../../build/eurostatmap.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./airportLabels.js"></script>
+    <script>
+        fetch('./airportPairsGraph.json')
+            .then(r => r.json())
+            .then(graphData => {
+                console.log('Loaded airport data:', graphData);
+
+                // build map
+                const width = 1000
+                const height = width / 1.5;
+                const projection = d3
+                    .geoAzimuthalEquidistant()
+                    .rotate([2, -35])
+                    .scale(1500)
+                    .translate([width / 2.4, width / 2.3])
+                const map = eurostatmap
+                    .map("flow")
+                    .svgId("airport-pairs-map")
+                    .width(width)
+                    .height(height)
+                    .title("Top 10 flight routes within the EU ✈️")
+                    .subtitle("by most passengers carried, 2023")
+
+                    //projection
+                    .projectionFunction(projection)
+
+                    //geometries
+                    .geo("WORLD")
+                    .proj("4326")
+                    .scale("60M")
+
+                    // flow settings
+                    .flowGraph(graphData)
+                    .flowMinWidth(4)
+                    .flowMaxWidth(15)
+                    .flowMapType('curved')
+                    // .flowDonuts(false)
+                    // .flowDonutSizeScale(d3.scaleSqrt().domain([0, 10783000]).range([3, 20]))
+                    .flowColor("grey")
+                    .flowOpacity(0.5) // NOT WORKING FOR SANKEY
+                    .flowArrows(false)
+                    .flowOutlines(true)
+                    .flowGradient(true)
+                    .flowTopLocations(5)
+
+                    // legend
+                    .legend({
+                        x: width - 180,
+                        y: height - 100,
+                        boxPadding: 10,
+                        title: "Passengers carried",
+                        subtitle: "",
+                        flowWidthLegend: {
+                            marginTop: -10,
+                            values: [1500000, 2200000],
+                            labelFormatter: (value) => value * 1000 //NOT WORKING
+                        },
+                        donutSizeLegend: {
+                            title: "Passengers carried (airport)",
+                            titlePadding: 17,
+                            values: [10000000, 1500000]
+                        },
+                        lineColorLegend: {},
+                        regionColorLegend: {
+                            title: "Region color",
+                            marginTop: 20,
+                            labels: ["a", "b"]
+                        }
+                    })
+
+                    //labels
+                    .labels({
+                        labels: labels,
+                        shadows: true,
+                        values: false
+                        //valuesFormatter
+                    })
+
+                    //annotations
+                    .annotations({
+                        editMode: false,
+                        annotations: [
+                            {
+                                type: "annotationCalloutCircle",
+                                note: {
+                                    label:
+                                        "6 of the top 10 routes either started or ended in Madrid, with a total of over 10.7 million passengers carried.",
+                                    title: "¡Hala Madrid!",
+                                    wrap: 210
+                                },
+                                subject: {
+                                    radius: 30
+                                },
+                                x: projection([-3.55, 40.45])[0],
+                                y: projection([-3.55, 40.45])[1],
+                                dy: -10,
+                                dx: -width / 6,
+                                color:'#E8336D'
+                            },
+                            {
+                                note: {
+                                    label:
+                                        "Mallorca to Barcelona was the busiest route in 2023 with over 2.2 million passengers carried.",
+                                    title: "Busiest route",
+                                    wrap: 210
+                                },
+                                connector: {
+                                    end: 'dot',
+                                    type: 'curve',
+                                    //can also add a curve type, e.g. curve: d3.curveStep
+                                    points: [
+                                        [-10, 50],
+                                    ],
+                                },
+                                x: projection([2.45, 40.3])[0],
+                                y: projection([2.45, 40.3])[1],
+                                dy: 140,
+                                dx: 0,
+                                color:'#E8336D'
+                            }
+                        ]
+                    })
+
+                    //minimap
+                    .position({ x: -3, y: 42 }) //set this so that minimap works
+                    .minimap({
+                        x: width - 100,
+                        y: 95,
+                        z: 200,
+                        color: "lightgrey"
+                    })
+
+                    // zoom min/max
+                    .zoomExtent([0.6, 10])
+                    .zoomButtons(true)
+
+                    // fires when map is built
+                    .callback(() => {
+                        const labels = d3.selectAll("#em-labels");
+                        labels.raise();
+                        const annotations = d3.selectAll(".em-annotation-group");
+                        annotations.raise();
+                        //set font family for export
+                        d3.selectAll("#airport-pairs-map").style("font-family", "Arial");
+
+                        // setTimeout(() => {
+                        //   map.exportMapToSVG();
+                        // }, 3000);
+                    })
+
+                    .footnote(
+                        "Intra-EU flights only. Administrative boundaries: ©EuroGeographics ©UN-FAO @OpenStreetMap"
+                    )
+                    .build();
+            })
+            .catch(err => console.error(err));
+
+    </script>
+</body>
+
+</html>

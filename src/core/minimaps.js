@@ -11,13 +11,13 @@ export const appendMinimap = (map) => {
     if (map.Geometries.geoJSONs.worldrg) {
         drawMinimap(map)
     } else {
-        json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json')
+        json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/world-topo-60M.json')
             .then((topoData) => {
-                const features = feature(topoData, topoData.objects.CNTR_RG_20M_2020_4326).features
+                const features = feature(topoData, topoData.objects.CNTR_RG_60M_2020_4326).features
                 map.Geometries.geoJSONs.worldrg = features // Store for future use
                 drawMinimap(map)
             })
-            .catch((err) => console.error('Failed to load WORLD_4326.json', err))
+            .catch((err) => console.error('Failed to load world-topo-60M.json', err))
     }
 
     // Listen for zoom/pan events to update the minimap dynamically

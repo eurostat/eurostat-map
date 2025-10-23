@@ -32,7 +32,7 @@ export const map = function (config) {
     out.flowDonuts_ = false // whether to add donuts to nodes
 
     // flow settings
-    out.flowLineType_ = 'sankey' // type of flow map values: sankey || straight, TODO: curved
+    out.flowLineType_ = 'curved' // type of flow map values: curved || straight, TODO: curved
     //out.flowThicknessType_ = 'linear' // gradual?
     out.flowColor_ = '#848484ff'
     out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
@@ -126,7 +126,7 @@ export const map = function (config) {
         // Add geographical layers
         addOverlayPolygons(out)
 
-        if (out.flowLineType_ === 'sankey') {
+        if (out.flowLineType_ === 'curved' || out.flowLineType_ === 'sankey') {
             // Create the sankey layout
             createSankeyFlowMap(out, flowContainer)
         } else {
@@ -142,9 +142,8 @@ export const map = function (config) {
         }
 
         // Add labels to nodes
-        if (out.labels_) {
+        if (out.labels_?.values) {
             const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
-            addLabelsToMap(out, zoomGroup)
             addFlowValueLabels(out, zoomGroup)
         }
     }

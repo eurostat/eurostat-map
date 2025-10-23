@@ -1,0 +1,186 @@
+{
+    "nodes": [
+        {
+            "id": "LEBL",
+            "name": "BARCELONA/EL PRAT",
+            "x": 2.07846,
+            "y": 41.2971,
+            "value": 4212609,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LEPA",
+            "name": "PALMA DE MALLORCA",
+            "x": 2.73881,
+            "y": 39.5517,
+            "value": 4318651,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LEMD",
+            "name": "ADOLFO SUAREZ MADRID-BARAJAS",
+            "x": -3.5695,
+            "y": 40.4918,
+            "value": 10783002,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LPPT",
+            "name": "LISBOA",
+            "x": -9.13417,
+            "y": 38.7742,
+            "value": 3412670,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LIRF",
+            "name": "ROMA/FIUMICINO",
+            "x": 12.2389,
+            "y": 41.8003,
+            "value": 3312664,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LFPO",
+            "name": "PARIS-ORLY",
+            "x": 2.37944,
+            "y": 48.7233,
+            "value": 4810506,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LFMN",
+            "name": "NICE-COTE D AZUR",
+            "x": 7.215,
+            "y": 43.6653,
+            "value": 1660471,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "GCLP",
+            "name": "GRAN CANARIA",
+            "x": -15.3866,
+            "y": 27.9319,
+            "value": 1604857,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LICC",
+            "name": "CATANIA/FONTANAROSSA",
+            "x": 15.0664,
+            "y": 37.4668,
+            "value": 1557398,
+            "change": null,
+            "share2023": null
+        },
+        {
+            "id": "LEBL_ALIAS",
+            "name": "BARCELONA/EL PRAT (alias)",
+            "x": 2.07846,
+            "y": 41.2971,
+            "value": 4212609,
+            "change": null,
+            "share2023": null
+        }
+    ],
+    "links": [
+        {
+            "source": "LEBL",
+            "target": "LEPA",
+            "value": 2280861,
+            "year": 2023,
+            "changePct": 12.2,
+            "pax2022": 2033228,
+            "pax2023k": 2.281
+        },
+        {
+            "source": "LEPA",
+            "target": "LEMD",
+            "value": 2037790,
+            "year": 2023,
+            "changePct": 8.5,
+            "pax2022": 1877941,
+            "pax2023k": 2.038
+        },
+        {
+            "source": "LEMD",
+            "target": "LEBL_ALIAS",
+            "value": 1931748,
+            "year": 2023,
+            "changePct": 12.6,
+            "pax2022": 1715598,
+            "pax2023k": 1.932
+        },
+        {
+            "source": "LPPT",
+            "target": "LEMD",
+            "value": 1857988,
+            "year": 2023,
+            "changePct": 20.8,
+            "pax2022": 1538277,
+            "pax2023k": 1.858
+        },
+        {
+            "source": "LEMD",
+            "target": "LIRF",
+            "value": 1755266,
+            "year": 2023,
+            "changePct": 35.9,
+            "pax2022": 1291186,
+            "pax2023k": 1.755
+        },
+        {
+            "source": "LFPO",
+            "target": "LFMN",
+            "value": 1660471,
+            "year": 2023,
+            "changePct": -9.5,
+            "pax2022": 1835263,
+            "pax2023k": 1.66
+        },
+        {
+            "source": "LEMD",
+            "target": "GCLP",
+            "value": 1604857,
+            "year": 2023,
+            "changePct": 12.2,
+            "pax2022": 1430978,
+            "pax2023k": 1.605
+        },
+        {
+            "source": "LEMD",
+            "target": "LFPO",
+            "value": 1595353,
+            "year": 2023,
+            "changePct": 16.3,
+            "pax2022": 1371546,
+            "pax2023k": 1.595
+        },
+        {
+            "source": "LICC",
+            "target": "LIRF",
+            "value": 1557398,
+            "year": 2023,
+            "changePct": 1,
+            "pax2022": 1541879,
+            "pax2023k": 1.557
+        },
+        {
+            "source": "LPPT",
+            "target": "LFPO",
+            "value": 1554682,
+            "year": 2023,
+            "changePct": 21.5,
+            "pax2022": 1279115,
+            "pax2023k": 1.555
+        }
+    ]
+}
