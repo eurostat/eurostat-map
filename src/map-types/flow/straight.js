@@ -16,6 +16,7 @@ export function createFlowMap(out, flowMapContainer) {
     drawStraightLinesByFlow(out, flowMapContainer)
 }
 
+// straight lines that can be bidirectional. If flow is bidirectional, draw two half-lines from midpoint to each node.
 function drawStraightLinesByFlow(out, container) {
     const lineGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines')
 
@@ -60,8 +61,8 @@ function drawStraightLinesByFlow(out, container) {
         const midX = (coordsA[0] + coordsB[0]) / 2
         const midY = (coordsA[1] + coordsB[1]) / 2
 
-        const abStroke = () => getFlowStroke(out, idA, idB)
-        const baStroke = () => getFlowStroke(out, idB, idA)
+        const abStroke = () => getFlowStroke(out, idA, idB, route)
+        const baStroke = () => getFlowStroke(out, idB, idA, route)
 
         // --- CASE 1: bidirectional (draw two half-lines)
         if (flowAB > 0 && flowBA > 0) {
@@ -143,23 +144,26 @@ function drawStraightLinesByFlow(out, container) {
         }
     }
 
-    function getFlowStroke(out, originId, destId) {
+    function getFlowStroke(out, originId, destId, d) {
+        if (typeof out.flowColor_ === 'function') {
+            return out.flowColor_(d)
+        }
         if (!out.topLocationKeys || !out.flowTopLocations_) return out.flowColor_
 
         const type = out.flowTopLocationsType_ || 'sum'
         if (type === 'origin') {
             // Color by origin
-            return out.topLocationKeys.has(originId) ? out.locationColorScale(originId) : out.flowColor_
+            return out.topLocationKeys.has(originId) ? out.topLocationColorScale(originId) : out.flowColor_
         } else if (type === 'destination') {
             // Color by destination
-            return out.topLocationKeys.has(destId) ? out.locationColorScale(destId) : out.flowColor_
+            return out.topLocationKeys.has(destId) ? out.topLocationColorScale(destId) : out.flowColor_
         } else {
             // Default: color by whichever is in top set
             return out.topLocationKeys.has(destId)
-                ? out.locationColorScale(destId)
+                ? out.topLocationColorScale(destId)
                 : out.topLocationKeys.has(originId)
-                  ? out.locationColorScale(originId)
-                  : out.flowColor_
+                    ? out.topLocationColorScale(originId)
+                    : out.flowColor_
         }
     }
 

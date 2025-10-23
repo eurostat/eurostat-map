@@ -294,7 +294,7 @@ function getIncomingBreakdownByOrigin(nodeId, out) {
 // === Outgoing Breakdown ===
 function getOutgoingBreakdownByDestination(nodeId, out) {
     const topKeys = out.topLocationKeys
-    const color = (key) => out.locationColorScale(key)
+    const color = (key) => out.topLocationColorScale(key)
     const type = out.flowTopLocationsType_
     const includeInternal = out.flowInternal_
 
@@ -356,7 +356,7 @@ function sortBreakdown(arr) {
 
 function getSegmentColor(key, nodeId, out) {
     const topKeys = out.topLocationKeys || new Set()
-    const colorScale = out.locationColorScale
+    const colorScale = out.topLocationColorScale
 
     if (key === 'Other') return '#666'
     if (key === 'Internal') return topKeys.has(nodeId) ? colorScale(nodeId) : '#999'
@@ -393,7 +393,7 @@ export function computeDonutLocationStats(out) {
 export function computeDonutValues(out) {
     const nodes = out.flowGraph_.nodes
     const topKeys = out.topLocationKeys || new Set()
-    const colorScale = out.locationColorScale
+    const colorScale = out.topLocationColorScale
     const type = out.flowTopLocationsType_
 
     for (const node of nodes) {

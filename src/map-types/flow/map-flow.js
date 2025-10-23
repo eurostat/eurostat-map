@@ -23,7 +23,6 @@ export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config, true, 'flow')
     out.strokeWidthScale = scaleLinear()
-    out.labelFormatter = (d) => format('.2s')(d)
     out.tooltip_.textFunction = flowMapTooltipFunction
 
 
@@ -179,7 +178,7 @@ function prepareFlowGraph(out) {
  *
  * Updates:
  *   out.topLocationKeys (Set of IDs)
- *   out.locationColorScale (Ordinal scale for coloring)
+ *   out.topLocationColorScale (Ordinal scale for coloring)
  */
 function computeTopFlowLocations(out) {
     const nodes = out.flowGraph_.nodes
@@ -207,7 +206,7 @@ function computeTopFlowLocations(out) {
     out.topLocationKeys = new Set(topLocations.map((loc) => loc.id))
 
     // Assign colors to top locations
-    out.locationColorScale = scaleOrdinal()
+    out.topLocationColorScale = scaleOrdinal()
         .domain(topLocations.map((d) => d.id))
         .range([
             '#00B3E3', // bright turquoise

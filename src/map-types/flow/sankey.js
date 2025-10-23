@@ -135,7 +135,7 @@ function sankey(out) {
  * @param {Array} gradientIds - Gradient IDs
  */
 function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradientIds) {
-    const flowsGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines')
+    const flowsGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines').style('opacity', out.flowOpacity_)
 
     links.forEach((link, i) => {
         // Outline path
@@ -156,11 +156,11 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
             .attr('d', sankeyLinkHorizontal()(link))
             .attr('fill', 'none')
             .attr('class', 'em-flow-link')
-            .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : out.flowColor_)
+            .attr('stroke', (d) => out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out,d))
             .attr('stroke-width', link.width)
             .attr('marker-end', out.flowArrows_ ? `url(#${arrowId})` : '')
             // add hover effect
-            .on('mouseover', function (e) {
+            .on('mouseover', function (e,d) {
                 const hoveredColor = out.hoverColor_
 
                 // Change the stroke color
@@ -175,12 +175,12 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
             .on('mousemove', function (e) {
                 if (out._tooltip) out._tooltip.mousemove(e)
             })
-            .on('mouseout', function () {
+            .on('mouseout', function (e, d) {
                 // Revert the stroke color
                 if (out.flowGradient_) {
                     select(this).attr('stroke', `url(#${gradientIds[i]})`)
                 } else {
-                    select(this).attr('stroke', out.flowColor_)
+                    select(this).attr('stroke', getFlowStroke(out,d))
                 }
 
                 // Revert the marker-end to the original
@@ -190,6 +190,14 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
                 if (out._tooltip) out._tooltip.mouseout()
             })
     })
+}
+
+function getFlowStroke(out, d) {
+    if (typeof out.flowColor_ === 'function') {
+        return out.flowColor_(out, d)
+    }
+
+    return out.flowColor_
 }
 
 /**

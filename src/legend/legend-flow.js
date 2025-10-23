@@ -30,6 +30,7 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 0, // Padding between title and legend body
         marginTop: 33,
+        items: [], // user-defined legend items for custom flow color function
     }
 
     out.regionColorLegend = {
@@ -120,7 +121,7 @@ export const legend = function (map, config) {
 
         const flowWidthLegendHeight = out._flowWidthContainer.node().getBBox().height
 
-        // donut compositions
+        // donut size legend
         if (map.flowDonuts_ && map.donutSizeScale) {
             // donut legends container
             out._donutLegendContainer = out.lgg
@@ -143,10 +144,16 @@ export const legend = function (map, config) {
                 out.donutSizeLegend.title,
                 out.donutSizeLegend.titlePadding
             )
+        }
 
+        // flow colour legend
+        if (map.flowDonuts_ && map.donutSizeScale || typeof map.flowColor_ === 'function') {
             // donut color legend
-            const donutColorYOffset = out.donutSizeLegend.marginTop + out._donutSizeContainer.node().getBBox().height + out.flowColorLegend.marginTop
-            drawflowColorLegend(out, 0, donutColorYOffset)
+            let flowColorLegendYOffset = out.lgg.node().getBBox().height + out.flowColorLegend.marginTop
+            // if (map.flowDonuts_ && map.donutSizeScale) {
+            //     flowColorLegendYOffset += out._donutSizeContainer.node().getBBox().height
+            // }
+            drawflowColorLegend(out, baseX, flowColorLegendYOffset)
         }
 
         // region fill colors
@@ -213,30 +220,43 @@ export const legend = function (map, config) {
         })
     }
 
+    // explain flow line colors
     function drawflowColorLegend(out, x, y) {
         const map = out.map
-        const topKeys = Array.from(map.topLocationKeys || [])
-        const colorScale = map.locationColorScale
 
         // Create/clear container
-        out._donutColorContainer?.remove()
-        out._donutColorContainer = out._donutLegendContainer
+        out._flowColorContainer?.remove()
+        out._flowColorContainer = out.lgg
             .append('g')
-            .attr('class', 'em-donut-color-legend')
+            .attr('class', 'em-flow-color-legend')
             .attr('transform', `translate(${x}, ${y})`)
 
-        const title = out._donutColorContainer
+        const title = out._flowColorContainer
             .append('text')
             .attr('class', 'em-color-legend-title')
             .attr('id', 'em-color-legend-title')
             .attr('dy', '0.35em')
             .text(out.flowColorLegend.title || 'Destination')
 
-        // Build a map of node IDs to names for better legend labels
-        const legendItems = topKeys.map((key) => ({
-            label: map.nodeNameMap.get(key) || key, // ✅ show location name if exists
-            color: colorScale(key),
-        }))
+        let legendItems = []
+        if (typeof map.flowColor_ === 'function') {
+            // user has defined a custom color function
+            if (out.flowColorLegend.items && out.flowColorLegend.items.length > 0) {
+                legendItems = out.flowColorLegend.items
+            } else {
+                legendItems = [
+                    { label:"please specify legend items in legend.flowColorLegend.items like so: { label: 'Other', color: '#ccc' }", color: '#888' },
+                ]
+            }
+        } else {
+            // top locations legend items
+            const colorScale = map.topLocationColorScale
+            const topKeys = Array.from(map.topLocationKeys || [])
+            legendItems = topKeys.map((key) => ({
+                label: map.nodeNameMap.get(key) || key, // ✅ show location name if exists
+                color: colorScale(key),
+            }))
+        }
 
         // Always append the "Other" category last
         legendItems.push({ label: 'Other', color: '#ccc' })
@@ -261,7 +281,7 @@ export const legend = function (map, config) {
 
         // Draw legend rows with mouseover
         legendItems.forEach((item, i) => {
-            const row = out._donutColorContainer
+            const row = out._flowColorContainer
                 .append('g')
                 .attr('class', 'em-donut-color-item')
                 .attr('transform', `translate(0, ${i * 22 + titleOffset})`)

@@ -14,6 +14,9 @@ export const addLabelsToMap = function (map, zg) {
     if (!map.labels_.config) map.labels_.config = DEFAULTLABELS
     if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
 
+    //define formatter
+    map._statLabelFormatter = map.labels_.valuesFormatter ? map.labels_.valuesFormatter : spaceAsThousandSeparator
+
     // use existing or append new container
     let existing = zg.select('#em-labels')
     let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
@@ -131,7 +134,7 @@ export function addFlowValueLabels(out, svg) {
             .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
             .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.flowLabelOffsets_.x : d.x - out.flowLabelOffsets_.x))
             .attr('y', (d) => d.y + out.flowLabelOffsets_.y)
-            .text((d) => out.labelFormatter(d.value))
+            .text((d) => out._statLabelFormatter(d.value))
     }
 
     // Add labels
@@ -151,7 +154,7 @@ export function addFlowValueLabels(out, svg) {
         .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
         .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.flowLabelOffsets_.x : -out.flowLabelOffsets_.x))
         .attr('y', out.flowLabelOffsets_.y)
-        .text((d) => out.labelFormatter(d.value))
+        .text((d) => out._statLabelFormatter(d.value))
 
     // Add background rectangles after text is rendered
 
@@ -305,11 +308,12 @@ export const statLabelsTextFunction = (d, statData) => {
             return ''
         } else {
             if (sv.value !== ':') {
-                return spaceAsThousandSeparator(sv.value)
+                return out._statLabelFormatter(sv.value)
             }
         }
     }
 }
+
 
 /**
  * @description function for filtering statistical labels
@@ -328,7 +332,7 @@ const defaultStatLabelFilter = (region, map) => {
 
 const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     //values label shadows parent <g>
-        // create or reuse container
+    // create or reuse container
     const gsls = ensureGroup(labelsContainer, 'em-stat-labels-shadows');
 
     // values labels parent <g>

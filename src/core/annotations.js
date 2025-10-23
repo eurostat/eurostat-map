@@ -11,7 +11,7 @@ export function appendAnnotations(map) {
     if (map.svg_) {
         const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
         //clear previous
-        zoomGroup.selectAll('.em-annotation-group').remove()
+        zoomGroup.selectAll('.em-annotations').remove()
 
         const annotationsConfig = map.annotations_
 
@@ -34,7 +34,7 @@ export function appendAnnotations(map) {
             const makeAnnotations = annotation().type(annotationLabel).annotations(annotationsWithTypes).editMode(annotationsConfig.editMode)
 
             // append new
-            zoomGroup.append('g').attr('class', 'em-annotation-group').call(makeAnnotations)
+            zoomGroup.append('g').attr('id', 'em-annotations').attr('class', 'em-annotations').call(makeAnnotations)
         }
     }
 }
