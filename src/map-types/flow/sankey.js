@@ -156,7 +156,7 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
             .attr('d', sankeyLinkHorizontal()(link))
             .attr('fill', 'none')
             .attr('class', 'em-flow-link')
-            .attr('stroke', (d) => out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out,d))
+            .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out,link))
             .attr('stroke-width', link.width)
             .attr('marker-end', out.flowArrows_ ? `url(#${arrowId})` : '')
             // add hover effect
@@ -180,7 +180,7 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
                 if (out.flowGradient_) {
                     select(this).attr('stroke', `url(#${gradientIds[i]})`)
                 } else {
-                    select(this).attr('stroke', getFlowStroke(out,d))
+                    select(this).attr('stroke', getFlowStroke(out,link))
                 }
 
                 // Revert the marker-end to the original
@@ -194,7 +194,7 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
 
 function getFlowStroke(out, d) {
     if (typeof out.flowColor_ === 'function') {
-        return out.flowColor_(out, d)
+        return out.flowColor_(d)
     }
 
     return out.flowColor_

@@ -29,8 +29,6 @@
             .then(r => r.json())
             .then(graphData => {
                 console.log('Loaded freight data:', graphData);
-
-
                 const width = 1050
                 const height = 710;
 
@@ -77,10 +75,8 @@
 
                 const valuesLabelFormatter = (d) => d3.format('.2s')(d * 1000)
 
-                // 1) Pick class breaks (in PERCENT points)
                 const breaks = [-20, -10, -5, 0, 5];
 
-                // 2) Choose a diverging palette (low→high). Option A: RdBu[7]
                 const reds = ['#fee5d9', '#fcae91', '#fb6a4a', '#cb181d']
                 const colors = [
                     reds[3], // strong red (large negative)
@@ -91,13 +87,10 @@
                     "#2166ac"  // strong blue (large positive)
                 ];
 
-
-                // 3) Discrete diverging scale
                 const colorFunction = d3.scaleThreshold()
                     .domain(breaks)   // ascending thresholds
                     .range(colors);   // length = breaks.length + 1
 
-                // 4) Robust parser for your "change" value (handles "12", "12%", or 0.12)
                 function parseChangeToPct(v) {
                     if (v == null) return NaN;
                     const s = String(v).trim();
@@ -166,7 +159,7 @@
                     .flowOpacity(0.8)
                     .flowArrows(false)
                     .flowOutlines(true)
-                    .flowGradient(true)
+                    .flowGradient(false)
                     .flowTopLocations(0)
                     //flowWidthGradient(true) //flowColor(()=>) //flowArrowDirection
                     //.flowOverlayColors(["#bbd7ee", "#c7e3c6"]) // exporter, importers only works when polygons have same codes as nodes
@@ -190,10 +183,10 @@
                             items: [
 
                                 { color: colorFunction(-21), label: "≤ -20" },
-                                { color: colorFunction(-15), label: "-20 to -10" },
-                                { color: colorFunction(-7), label: "-10 to -5" },
-                                { color: colorFunction(-2), label: "<0" },
-                                { color: colorFunction(2.5), label: "0 to 5" },
+                                { color: colorFunction(-15), label: "< -10" },
+                                { color: colorFunction(-7), label: "< -5" },
+                                { color: colorFunction(-2), label: "< 0" },
+                                { color: colorFunction(2.5), label: "> 0" },
                                 { color: colorFunction(8.7), label: "≥ 5" }
 
                             ].reverse()
