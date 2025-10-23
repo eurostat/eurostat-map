@@ -926,19 +926,40 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     const defineDefaultPosition = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
-            out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
-        } else if (out.Geometries.defaultGeoData?.bbox) {
-            // default to center of geoData bbox
-            out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
-            out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+        if (out.projectionFunction_) {
+            // Handle custom D3 projection (like geoAzimuthalEquidistant)
+            if (typeof out.projectionFunction_.rotate === 'function') {
+                const r = out.projectionFunction_.rotate(); // [lambda, phi, gamma]
+                if (Array.isArray(r) && r.length >= 2) {
+                    // Invert signs: the map’s visual center is the opposite of its rotation
+                    const lon = -r[0];
+                    const lat = -r[1];
+                    out.position_.x = out.position_.x ?? lon;
+                    out.position_.y = out.position_.y ?? lat;
+                }
+            } else if (typeof out.projectionFunction_.center === 'function') {
+                const c = out.projectionFunction_.center(); // [lon, lat]
+                if (Array.isArray(c) && c.length === 2) {
+                    out.position_.x = out.position_.x ?? c[0];
+                    out.position_.y = out.position_.y ?? c[1];
+                }
+            }
         } else {
-            //TODO: auto-define user=defined geometries geoCenter
-            // out.position_.x = Geometries.userGeometries
-            // out.position_.y = Geometries.userGeometries
+            const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+            if (defaultPosition) {
+                out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
+                out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
+            } else if (out.Geometries.defaultGeoData?.bbox) {
+                // default to center of geoData bbox
+                out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
+                out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+            } else {
+                //TODO: auto-define user=defined geometries geoCenter
+                // out.position_.x = Geometries.userGeometries
+                // out.position_.y = Geometries.userGeometries
+            }
         }
+
 
         // optional: set from URL
         setViewFromURL()

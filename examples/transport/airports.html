@@ -146,12 +146,13 @@
                     })
 
                     //minimap
-                    .position({ x: -3, y: 42 }) //set this so that minimap works
+                    //.position({ x: 2, y: 35 }) //set this so that minimap works
                     .minimap({
                         x: width - 100,
                         y: 95,
                         z: 200,
-                        color: "lightgrey"
+                        color: "lightgrey",
+                        debounce:2
                     })
 
                     // zoom min/max
