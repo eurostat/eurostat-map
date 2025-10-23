@@ -174,7 +174,7 @@
                         flowWidthLegend: {
                             marginTop: -10,
                             values: [3, 500, 2600],
-                            labelFormatter: (value) => value * 1000 //NOT WORKING
+                            labelFormatter: (value) => spaceAsThousandSeparator(value * 1000)
                         },
                         donutSizeLegend: { title: "Location total" },
                         flowColorLegend: {
