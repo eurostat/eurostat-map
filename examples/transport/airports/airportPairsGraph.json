@@ -82,8 +82,8 @@
             "share2023": null
         },
         {
-            "id": "LEBL_ALIAS",
-            "name": "BARCELONA/EL PRAT (alias)",
+            "id": "LEBL",
+            "name": "BARCELONA/EL PRAT",
             "x": 2.07846,
             "y": 41.2971,
             "value": 4212609,
@@ -112,7 +112,7 @@
         },
         {
             "source": "LEMD",
-            "target": "LEBL_ALIAS",
+            "target": "LEBL",
             "value": 1931748,
             "year": 2023,
             "changePct": 12.6,

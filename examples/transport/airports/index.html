@@ -37,6 +37,9 @@
                     .rotate([2, -35])
                     .scale(1500)
                     .translate([width / 2.4, width / 2.3])
+                const spaceAsThousandSeparator = function (number) {
+                    return number.toLocaleString('en').replace(/,/gi, ' ')
+                }
                 const map = eurostatmap
                     .map("flow")
                     .svgId("airport-pairs-map")
@@ -55,9 +58,10 @@
 
                     // flow settings
                     .flowGraph(graphData)
-                    .flowMinWidth(4)
-                    .flowMaxWidth(15)
+                    .flowMinWidth(8)
+                    .flowMaxWidth(20)
                     .flowMapType('curved')
+                    .flowStack(true)
                     // .flowDonuts(false)
                     // .flowDonutSizeScale(d3.scaleSqrt().domain([0, 10783000]).range([3, 20]))
                     .flowColor("grey")
@@ -77,7 +81,7 @@
                         flowWidthLegend: {
                             marginTop: -10,
                             values: [1500000, 2200000],
-                            labelFormatter: (value) => value * 1000 //NOT WORKING
+                            labelFormatter: (value) => spaceAsThousandSeparator(value) //NOT WORKING
                         },
                         donutSizeLegend: {
                             title: "Passengers carried (airport)",
@@ -119,7 +123,7 @@
                                 y: projection([-3.55, 40.45])[1],
                                 dy: -10,
                                 dx: -width / 6,
-                                color:'#E8336D'
+                                color: '#E8336D'
                             },
                             {
                                 note: {
@@ -140,7 +144,7 @@
                                 y: projection([2.45, 40.3])[1],
                                 dy: 140,
                                 dx: 0,
-                                color:'#E8336D'
+                                color: '#E8336D'
                             }
                         ]
                     })
@@ -152,11 +156,11 @@
                         y: 95,
                         z: 200,
                         color: "lightgrey",
-                        debounce:2
+                        debounce: 2
                     })
 
                     // zoom min/max
-                    .zoomExtent([0.6, 10])
+                    .zoomExtent([1, 10])
                     .zoomButtons(true)
 
                     // fires when map is built

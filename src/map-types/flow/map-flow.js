@@ -27,8 +27,7 @@ export const map = function (config) {
 
 
 
-    //add proportional donuts to nodes
-    out.flowDonuts_ = false // whether to add donuts to nodes
+
 
     // flow settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight, TODO: curved
@@ -39,13 +38,21 @@ export const map = function (config) {
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
     out.flowOutlines_ = true
-    out.flowGradient_ = true
-    out.flowStack_ = false // Default to no stacking
+    out.flowColorGradient_ = true
+    out.flowWidthGradient_ = true
+    out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
+
+    //curved
+    out.flowCurvature_ = 0.5 // curvature of curved flow lines
+
+    //add proportional donuts to nodes
+    out.flowDonuts_ = false // whether to add donuts to nodes
     out.flowInternal_ = true // Whether to include internal flows in donuts
     out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
+    out.flowDonutSizeScale_ = null // custom size scale for donuts
 
         /**
          * flowmap-specific setters/getters

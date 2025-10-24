@@ -28,3 +28,6 @@
  #legendBR {
      filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.4));
  }
+ .em-annotations {
+    pointer-events: none !important;
+ }

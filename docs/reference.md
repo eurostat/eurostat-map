@@ -7,49 +7,50 @@ Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-
 ## Contents
 
 - [API reference](#api-reference)
-    - [Map creation](#map-creation)
-        - [Map definition](#map-definition)
-        - [Map geography](#map-geography)
-            - [World maps](#world-maps)
-            - [Custom geometries](#custom-geometries)
-        - [Statistical data](#statistical-data)
-            - [Eurostat database](#eurostat-database)
-            - [CSV](#csv)
-            - [Custom JS](#custom-js)
-    - [Map types](#map-types)
-        - [Choropleth map](#choropleth-map)
-        - [Proportional symbol map](#proportional-symbol-map)
-        - [Proportional pie chart map](#proportional-pie-chart-map)
-        - [Categorical map](#categorical-map)
-        - [Bivariate choropleth map](#bivariate-choropleth-map)
-        - [Stripe composition map](#stripe-composition-map)
-        - [Sparkline map](#sparkline-map)
-        - [Flow map](#flow-map)
-        - [Cartograms](#cartograms)
-            - [Grid Cartograms](#grid-cartograms)
-            - [Dorling Cartograms](#dorling-cartograms)
-    - [Map texts](#map-texts)
-        - [Map title \& subtitle](#map-title--subtitle)
-        - [Labelling](#labelling)
-        - [Annotations](#annotations)
-        - [Stamps](#stamps)
-        - [Footnotes](#footnotes)
-    - [Map legend](#map-legend)
-		- [Choropleth legends](#choropleth-legends)
-		- [Bivariate choropleth legends](#bivariate-choropleth-legends)
-		- [Proportional symbol legends](#proportional-symbol-legends)
-		- [Pie chart legends](#pie-chart-legends)
-		- [Categorical legends](#categorical-legends)
-    - [Scalebar](#scalebar)
-    - [Tooltip](#tooltip)
-    - [Styling](#styling)
-    - [Insets](#insets)
-    - [Minimap](#minimap)
-    - [Buttons](#buttons)
-    - [Export](#export)
-    - [Miscellaneous](#miscellaneous)
-    - [Build and update](#build-and-update)
-    - [Version migration](#version-migration)
+  - [Contents](#contents)
+  - [Map creation](#map-creation)
+    - [Map definition](#map-definition)
+    - [Map geography](#map-geography)
+      - [World maps](#world-maps)
+      - [Custom geometries](#custom-geometries)
+    - [Statistical data](#statistical-data)
+      - [Eurostat database](#eurostat-database)
+      - [CSV](#csv)
+      - [Custom JS](#custom-js)
+  - [Map types](#map-types)
+    - [Choropleth map](#choropleth-map)
+    - [Proportional symbol map](#proportional-symbol-map)
+    - [Proportional pie chart map](#proportional-pie-chart-map)
+    - [Categorical map](#categorical-map)
+    - [Bivariate choropleth map](#bivariate-choropleth-map)
+    - [Stripe composition map](#stripe-composition-map)
+    - [Sparkline map](#sparkline-map)
+    - [Flow map](#flow-map)
+    - [Cartograms](#cartograms)
+      - [Grid Cartograms](#grid-cartograms)
+      - [Dorling Cartograms](#dorling-cartograms)
+  - [Map texts](#map-texts)
+    - [Map title \& subtitle](#map-title--subtitle)
+    - [Labelling](#labelling)
+    - [Annotations](#annotations)
+    - [Stamps](#stamps)
+    - [Footnotes](#footnotes)
+  - [Map legend](#map-legend)
+    - [Choropleth legends](#choropleth-legends)
+    - [Bivariate choropleth legends](#bivariate-choropleth-legends)
+    - [Proportional symbol legends](#proportional-symbol-legends)
+    - [Pie chart legends](#pie-chart-legends)
+    - [Categorical legends](#categorical-legends)
+  - [Scalebar](#scalebar)
+  - [Tooltip](#tooltip)
+  - [Styling](#styling)
+  - [Insets](#insets)
+  - [Minimap](#minimap)
+  - [Buttons](#buttons)
+  - [Export](#export)
+  - [Miscellaneous](#miscellaneous)
+  - [Build and update](#build-and-update)
+  - [Version migration](#version-migration)
 
 ## Map creation
 
@@ -253,7 +254,7 @@ eurostatmap
 | _map_.**noDataFillStyle**([*value*])      | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                                         |
 | _map_.**colorSchemeType**([*value*])      | String    | _"discrete"_           | Discrete or continuous                                                                                                                                                                    |
 | _map_.**valueTransform**([*value*])       | Function  | _"(val)=>val"_         | Transform your data for distribution stretching when using continuous colour schemes.                                                                                                     |
-| _map_.**valueUntransform**([*value*])     | Function  | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in .                                                                    |
+| _map_.**valueUntransform**([*value*])     | Function  | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in .                                                                           |
 | _map_.**pointOfDivergence**([*value*])    | Function  | _"undefined"_          | Set point of divergence for diverging continuous color schemes.                                                                                                                           |
 
 ### Proportional symbol map
@@ -296,28 +297,28 @@ It is also possible to prevent overlapping via the 'dorling' method:
 
 Please be aware that by using this method you will essentially be turning the map into a Cartogram. If deformation is high, please consider hiding the background elements/basemap.
 
-| Method                                      | Type             | Default value        | Description                                                                                                                                                                              |
-| ------------------------------------------- | ---------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**psShape**([*value*])                | string           | _circle_             | The shape of the symbol. Accepted values: circle, spike, bar, square, star, cross, diamond, triangle, wye or custom                                                                      |
-| _map_.**psCustomShape**([*value*])          | Object           | null                 | A custom symbol to be used with d3.symbol when psShape is set to "custom". See http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT                                                     |
-| _map_.**psCustomSVG**([*value*])            | Template Literal | null                 | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psCustomSVG(`<svg width="100" height="100"><rect width="100" height="100" /></svg>`). |
-| _map_.**psOffset**([*value*])               | Object           | {x:0,y:0}            | Defines the offsets to apply to the symbols on the map. Only applicable to symbols where custom svgs are specified ( through psCustomSVG)                                                |
-| _map_.**psMaxSize**([*value*])              | number           | _30_                 | The maximum size of the symbol. For shapes and vertical bars, this value is in pixels, but for psCustomSVG() it represents the scale factor of the transform applied to it.              |
-| _map_.**psMinSize**([*value*])              | number           | _0.8_                | The minimum size / scale of the symbol.                                                                                                                                                  |
-| _map_.**psMaxValue**([*value*])              | number           | _dataset's maximum value_                 | Manually set the maximum value of the data, for example to ensure different maps use the same size scale.              |
-| _map_.**psMinValue**([*value*])              | number           | _dataset's minimum value_                | Manually set the minimum value of the data, for example to ensure different maps use the same size scale.                                                                                                                                                   |
-| _map_.**psBarWidth**([*value*])             | number           | _5_                  | Width in pixels of the vertical bars. Only to be used with a psShape of type "bar"                                                                                                       |
-| _map_.**psFill**([*value*])                 | String           | _"#B45F04"_          | The fill color or pattern of the symbol, for when a colour scheme is not defined.                                                                                                        |
-| _map_.**psFillOpacity**([*value*])          | number           | _0.7_                | The opacity of the symbol, from 0 to 1.                                                                                                                                                  |
-| _map_.**psStroke**([*value*])               | String           | _"#fff"_             | The stroke color of the symbol.                                                                                                                                                          |
-| _map_.**psStrokeWidth**([*value*])          | number           | _0.3_                | The width of the stroke.                                                                                                                                                                 |
-| _map_.**psClasses**([*value*])              | number           | _5_                  | The number of classes to use when applying data-driven colour for the symbols. Similar to numberOfClasses() for choropleth maps.                                                         |
-| _map_.**psColorFun**([*value*])             | function         | _d3.interpolateOrRd_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                        |
-| _map_.**psSizeScale**([*value*])            | string           | 'sqrt' or 'linear'   | The D3 scale function used to define the sizes of the symbols. The following methods are then called internally: psSizeScale().domain(sizeDomain).range([psMinSize, psMaxSize])          |
-| _map_.**psClassificationMethod**([*value*]) | String           | _"quantile"_         | The classification method. Possible values are _"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshold (see threshold method).                      |
-| _map_.**psThresholds**([*value*])           | Array            | _[0]_                | If _psClassificationMethod = "threshold"_, the breaks of the classification.                                                                                                             |
-| _map_.**psColors**([*value*])               | Array            | null                 | The colours to be using data-driven colour. The number of colours specified in the array should match the number of classes (specified using psClasses())                                |
-| _map_.**noDataFillStyle**([*value*])        | String           | _"lightgray"_        | The fill style to be used for regions where no data is available.                                                                                                                        |
+| Method                                      | Type             | Default value             | Description                                                                                                                                                                              |
+| ------------------------------------------- | ---------------- | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**psShape**([*value*])                | string           | _circle_                  | The shape of the symbol. Accepted values: circle, spike, bar, square, star, cross, diamond, triangle, wye or custom                                                                      |
+| _map_.**psCustomShape**([*value*])          | Object           | null                      | A custom symbol to be used with d3.symbol when psShape is set to "custom". See http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT                                                     |
+| _map_.**psCustomSVG**([*value*])            | Template Literal | null                      | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psCustomSVG(`<svg width="100" height="100"><rect width="100" height="100" /></svg>`). |
+| _map_.**psOffset**([*value*])               | Object           | {x:0,y:0}                 | Defines the offsets to apply to the symbols on the map. Only applicable to symbols where custom svgs are specified ( through psCustomSVG)                                                |
+| _map_.**psMaxSize**([*value*])              | number           | _30_                      | The maximum size of the symbol. For shapes and vertical bars, this value is in pixels, but for psCustomSVG() it represents the scale factor of the transform applied to it.              |
+| _map_.**psMinSize**([*value*])              | number           | _0.8_                     | The minimum size / scale of the symbol.                                                                                                                                                  |
+| _map_.**psMaxValue**([*value*])             | number           | _dataset's maximum value_ | Manually set the maximum value of the data, for example to ensure different maps use the same size scale.                                                                                |
+| _map_.**psMinValue**([*value*])             | number           | _dataset's minimum value_ | Manually set the minimum value of the data, for example to ensure different maps use the same size scale.                                                                                |
+| _map_.**psBarWidth**([*value*])             | number           | _5_                       | Width in pixels of the vertical bars. Only to be used with a psShape of type "bar"                                                                                                       |
+| _map_.**psFill**([*value*])                 | String           | _"#B45F04"_               | The fill color or pattern of the symbol, for when a colour scheme is not defined.                                                                                                        |
+| _map_.**psFillOpacity**([*value*])          | number           | _0.7_                     | The opacity of the symbol, from 0 to 1.                                                                                                                                                  |
+| _map_.**psStroke**([*value*])               | String           | _"#fff"_                  | The stroke color of the symbol.                                                                                                                                                          |
+| _map_.**psStrokeWidth**([*value*])          | number           | _0.3_                     | The width of the stroke.                                                                                                                                                                 |
+| _map_.**psClasses**([*value*])              | number           | _5_                       | The number of classes to use when applying data-driven colour for the symbols. Similar to numberOfClasses() for choropleth maps.                                                         |
+| _map_.**psColorFun**([*value*])             | function         | _d3.interpolateOrRd_      | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                        |
+| _map_.**psSizeScale**([*value*])            | string           | 'sqrt' or 'linear'        | The D3 scale function used to define the sizes of the symbols. The following methods are then called internally: psSizeScale().domain(sizeDomain).range([psMinSize, psMaxSize])          |
+| _map_.**psClassificationMethod**([*value*]) | String           | _"quantile"_              | The classification method. Possible values are _"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshold (see threshold method).                      |
+| _map_.**psThresholds**([*value*])           | Array            | _[0]_                     | If _psClassificationMethod = "threshold"_, the breaks of the classification.                                                                                                             |
+| _map_.**psColors**([*value*])               | Array            | null                      | The colours to be using data-driven colour. The number of colours specified in the array should match the number of classes (specified using psClasses())                                |
+| _map_.**noDataFillStyle**([*value*])        | String           | _"lightgray"_             | The fill style to be used for regions where no data is available.                                                                                                                        |
 
 
 
@@ -692,27 +693,36 @@ const map = eurostatmap
     .map('flow')
     .flowGraph(exampleGraph)
     .nutsLevel(0)
-    .flowColor('#72bb6f')
+    .flowColor('#72bb6f') // can be a function
     .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
     .flowArrows(false)
     .flowOutlines(true)
-    .flowGradient(true)
+    .flowColorGradient(true)
     .flowMaxWidth(40)
     .flowMinWidth(1)
 
     .build()
 ```
 
-| Method                                 | Type    | Default                | Description                                                                                                                |
-| -------------------------------------- | ------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**flowGraph**([*value*])         | Object  | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
-| _map_.**flowColor**([*value*])         | String  | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
-| _map_.**flowOverlayColors**([*value*]) | array   | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
-| _map_.**flowArrows**([*value*])        | boolean | true                   | Whether to show arrow tips or not.                                                                                         |
-| _map_.**flowOutlines**([*value*])      | boolean | true                   | Whether to show flow outlines or not.                                                                                      |
-| _map_.**flowGradient**([*value*])      | boolean | true                   | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
-| _map_.**flowMaxWidth**([*value*])      | number  | 30                     | Maximum width of flow lines in px                                                                                          |
-| _map_.**flowMinWidth**([*value*])      | number  | 1                      | Minimum width of flow lines in px                                                                                          |
+| Method                                  | Type               | Default                | Description                                                                                                                |
+| --------------------------------------- | ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**flowGraph**([*value*])          | Object             | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
+| _map_.**flowColor**([*value*])          | String or Function | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
+| _map_.**flowArrows**([*value*])         | boolean            | true                   | Whether to show arrow tips or not.                                                                                         |
+| _map_.**flowOutlines**([*value*])       | boolean            | true                   | Whether to show flow outlines or not.                                                                                      |
+| _map_.**flowColorGradient**([*value*])  | boolean            | true                   | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
+| _map_.**flowWidthGradient**([*value*])  | boolean            | true                   | Whether to gradually scale flow thickness (from origin to destination) or not.                                             |
+| _map_.**flowMaxWidth**([*value*])       | number             | 30                     | Maximum width of flow lines in px                                                                                          |
+| _map_.**flowMinWidth**([*value*])       | number             | 1                      | Minimum width of flow lines in px                                                                                          |
+| _map_.**flowLineType**([*value*])       | string             | 'curved'               | 'curved' (sankey) or 'straight'                                                                                            |
+| _map_.**flowStack**([*value*])          | boolean            | true                   | when flowLineType is curved, this option will stack flows at origin/destination (or not)                                   |
+| _map_.**flowLabelOffsets**([*value*])   | object {x,y}       | { x: 3, y: 0 }         | x and y offsets for flow value labels ( when map.labels({values:true}) )                                                   |
+| _map_.**flowOverlayColors**([*value*])  | array              | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
+| _map_.**flowOpacity**([*value*])        | number             | 0.6                    | The opacity of the flows                                                                                                   |
+| _map_.**flowDonuts**([*value*])         | boolean            | false                  | Create donut charts at each node showing the composition of incoming/outgoing flows                                        |
+| _map_.**flowDonutSizeScale**([*value*]) | function           | null                   | Custom size scale for donut charts                                                                                         |
+| _map_.**flowInternal**([*value*])       | boolean            | true                   | Include internal flows/routes in the donut chart (routes that start and end at the same node).                              |
+| _map_.**flowTopLocations**([*value*])       | number            | 5                   | Number of top locations to colour categorically when using flowDonuts and flowLineType == 'straight'. Set to 0 to disable.                            |
 
 ### Cartograms
 
