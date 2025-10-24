@@ -33,6 +33,7 @@
                 const height = 710;
 
                 const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
+                const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
                 // const regionColors = {
                 //     "north america": "#fbead7", // pale sand
                 //     "central america and caribbean": "#fcf3d6", // light cream
@@ -50,20 +51,20 @@
                 //     "eastern africa": "#E6F4EA"
                 // }
                 const regionColors = {
-                    "north america": greys[0], // pale sand
-                    "central america and caribbean": greys[1], // light cream
-                    "south america": greys[2], // pale turquoise
-                    "north africa": greys[3], // warm blush
-                    "rest of africa": greys[4], // misty blue-grey
-                    "western asia": greys[0], // peach tint
-                    "southern asia": greys[1], // rose tint
-                    "central asia": greys[2], // pale yellow
-                    "eastern asia": greys[3], // pale lavender-blue (cooler)
-                    ASEAN: greys[4], // pale mint-green (warmer)
-                    "australasia, s.sea is. & antarctica": greys[0], // fog grey-blue
-                    EU: "#dde5f0", // very light slate
-                    "europe except eu": greys[1], // faint blue-grey
-                    "eastern africa": greys[2]
+                    "north america": fourColorTheorem[0],
+                    "central america and caribbean": fourColorTheorem[1],
+                    "south america": fourColorTheorem[2],
+                    "north africa": fourColorTheorem[3],
+                    "rest of africa": fourColorTheorem[0],
+                    "western asia": fourColorTheorem[1],
+                    "southern asia": fourColorTheorem[2],
+                    "central asia": "#dde5f0",
+                    "eastern asia": fourColorTheorem[0],
+                    ASEAN: fourColorTheorem[1],
+                    "australasia, s.sea is. & antarctica": fourColorTheorem[2],
+                    EU: fourColorTheorem[0],
+                    "europe except eu": fourColorTheorem[3],
+                    "eastern africa": fourColorTheorem[0]
                 }
 
 
@@ -161,7 +162,7 @@
                         }
                         return colorFunction(parseChangeToPct(d.target.change))
                     })
-                    .flowOpacity(0.8)
+                    .flowOpacity(0.9)
                     .flowArrows(false)
                     .flowOutlines(true)
                     .flowColorGradient(false)
