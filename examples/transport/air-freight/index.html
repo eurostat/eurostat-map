@@ -154,6 +154,10 @@
                     .flowDonuts(false)
                     // .flowColor("#72bb6f")
                     .flowColor((d) => {
+                        if (!d.target || !d.target.change) {
+                            console.log(d)
+                            return '#999999';
+                        }
                         return colorFunction(parseChangeToPct(d.target.change))
                     })
                     .flowOpacity(0.8)
@@ -161,8 +165,9 @@
                     .flowOutlines(true)
                     .flowGradient(false)
                     .flowTopLocations(0)
+                    .flowStack(false)
                     //flowWidthGradient(true) //flowColor(()=>) //flowArrowDirection
-                    //.flowOverlayColors(["#bbd7ee", "#c7e3c6"]) // exporter, importers only works when polygons have same codes as nodes
+                    //.flowRegionColors(["#bbd7ee", "#c7e3c6"]) // exporter, importers only works when polygons have same codes as nodes
 
                     // legend
                     .legend({

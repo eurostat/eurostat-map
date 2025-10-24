@@ -147,4 +147,5 @@ export const defineDeprecatedFunctions = (out) => {
     out.bordersToShow = (v) => (console.warn('map.bordersToShow() is now DEPRECATED. please use the map.filterGeometriesFunction() function if you wish to filter the default geometries.'), out);
     out.flowMapType = (v) => (console.warn('map.flowMapType() is now DEPRECATED. please use flowLineType() instead.'), out.flowLineType_ = v, out);
     out.flowGradient = (v) => (console.warn('map.flowGradient() is now DEPRECATED. please use flowColorGradient() or flowWidthGradient() instead.'), out.flowColorGradient_ = v, out);
+    out.flowRegionColors = (v) => (console.warn('map.flowRegionColors() is now DEPRECATED. please use flowRegionColors() instead.'), out.flowRegionColors_ = v, out);
 }

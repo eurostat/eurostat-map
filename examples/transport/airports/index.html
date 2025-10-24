@@ -62,14 +62,18 @@
                     .flowMaxWidth(20)
                     .flowMapType('curved')
                     .flowStack(true)
-                    // .flowDonuts(false)
-                    // .flowDonutSizeScale(d3.scaleSqrt().domain([0, 10783000]).range([3, 20]))
                     .flowColor("grey")
                     .flowOpacity(0.5) // NOT WORKING FOR SANKEY
                     .flowArrows(false)
                     .flowOutlines(true)
                     .flowGradient(true)
-                    .flowTopLocations(5)
+                    .flowCurvatureSettings({
+                        gapX: 10,        // how far before/after node to begin/end curve
+                        padX: 2,         // horizontal clearance near node stems
+                        padY: 2,         // vertical collision detection padding
+                        bumpY: 5,        // extra height for hop
+                        curvature: 0.5   // 0..1; default sankey smoothness
+                    })
 
                     // legend
                     .legend({

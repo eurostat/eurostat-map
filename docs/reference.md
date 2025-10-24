@@ -694,7 +694,7 @@ const map = eurostatmap
     .flowGraph(exampleGraph)
     .nutsLevel(0)
     .flowColor('#72bb6f') // can be a function
-    .flowOverlayColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
+    .flowRegionColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
     .flowArrows(false)
     .flowOutlines(true)
     .flowColorGradient(true)
@@ -704,25 +704,27 @@ const map = eurostatmap
     .build()
 ```
 
-| Method                                  | Type               | Default                | Description                                                                                                                |
-| --------------------------------------- | ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**flowGraph**([*value*])          | Object             | undefined              | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
-| _map_.**flowColor**([*value*])          | String or Function | '#72bb6f'              | The color of the flows and arrows.                                                                                         |
-| _map_.**flowArrows**([*value*])         | boolean            | true                   | Whether to show arrow tips or not.                                                                                         |
-| _map_.**flowOutlines**([*value*])       | boolean            | true                   | Whether to show flow outlines or not.                                                                                      |
-| _map_.**flowColorGradient**([*value*])  | boolean            | true                   | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
-| _map_.**flowWidthGradient**([*value*])  | boolean            | true                   | Whether to gradually scale flow thickness (from origin to destination) or not.                                             |
-| _map_.**flowMaxWidth**([*value*])       | number             | 30                     | Maximum width of flow lines in px                                                                                          |
-| _map_.**flowMinWidth**([*value*])       | number             | 1                      | Minimum width of flow lines in px                                                                                          |
-| _map_.**flowLineType**([*value*])       | string             | 'curved'               | 'curved' (sankey) or 'straight'                                                                                            |
-| _map_.**flowStack**([*value*])          | boolean            | true                   | when flowLineType is curved, this option will stack flows at origin/destination (or not)                                   |
-| _map_.**flowLabelOffsets**([*value*])   | object {x,y}       | { x: 3, y: 0 }         | x and y offsets for flow value labels ( when map.labels({values:true}) )                                                   |
-| _map_.**flowOverlayColors**([*value*])  | array              | ['#bbd7ee', '#c7e3c6'] | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
-| _map_.**flowOpacity**([*value*])        | number             | 0.6                    | The opacity of the flows                                                                                                   |
-| _map_.**flowDonuts**([*value*])         | boolean            | false                  | Create donut charts at each node showing the composition of incoming/outgoing flows                                        |
-| _map_.**flowDonutSizeScale**([*value*]) | function           | null                   | Custom size scale for donut charts                                                                                         |
-| _map_.**flowInternal**([*value*])       | boolean            | true                   | Include internal flows/routes in the donut chart (routes that start and end at the same node).                              |
-| _map_.**flowTopLocations**([*value*])       | number            | 5                   | Number of top locations to colour categorically when using flowDonuts and flowLineType == 'straight'. Set to 0 to disable.                            |
+| Method                                     | Type               | Default                        | Description                                                                                                                |
+| ------------------------------------------ | ------------------ | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**flowGraph**([*value*])             | Object             | undefined                      | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey. |
+| _map_.**flowColor**([*value*])             | String or Function | '#72bb6f'                      | The color of the flows and arrows.                                                                                         |
+| _map_.**flowArrows**([*value*])            | boolean            | true                           | Whether to show arrow tips or not.                                                                                         |
+| _map_.**flowOutlines**([*value*])          | boolean            | true                           | Whether to show flow outlines or not.                                                                                      |
+| _map_.**flowColorGradient**([*value*])     | boolean            | true                           | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
+| _map_.**flowWidthGradient**([*value*])     | boolean            | true                           | Whether to gradually scale flow thickness (from origin to destination) or not.                                             |
+| _map_.**flowMaxWidth**([*value*])          | number             | 30                             | Maximum width of flow lines in px                                                                                          |
+| _map_.**flowMinWidth**([*value*])          | number             | 1                              | Minimum width of flow lines in px                                                                                          |
+| _map_.**flowLineType**([*value*])          | string             | 'curved'                       | 'curved' (sankey) or 'straight'                                                                                            |
+| _map_.**flowStack**([*value*])             | boolean            | true                           | when flowLineType is curved, this option will stack flows at origin/destination (or not)                                   |
+| _map_.**flowLabelOffsets**([*value*])      | object {x,y}       | { x: 3, y: 0 }                 | x and y offsets for flow value labels ( when map.labels({values:true}) )                                                   |
+| _map_.**flowRegionColors**([*value*])     | array              | ['#bbd7ee', '#c7e3c6']         | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
+| _map_.**flowOpacity**([*value*])           | number             | 0.6                            | The opacity of the flows                                                                                                   |
+| _map_.**flowDonuts**([*value*])            | boolean            | false                          | Create donut charts at each node showing the composition of incoming/outgoing flows                                        |
+| _map_.**flowDonutSizeScale**([*value*])    | function           | null                           | Custom size scale for donut charts                                                                                         |
+| _map_.**flowInternal**([*value*])          | boolean            | true                           | Include internal flows/routes in the donut chart (routes that start and end at the same node).                             |
+| _map_.**flowTopLocations**([*value*])      | number             | 5                              | Number of top locations to colour categorically when using flowDonuts and flowLineType == 'straight'. Set to 0 to disable. |
+| _map_.**flowOrder**([*value*])             | function           | `(a,b) => a.otherY - b.otherY` | The sort function that defines the vertical order of flows at each node.                                                   |
+| _map_.**flowCurvatureSettings**([*value*]) | object             | `{ gapX: 10, padX: 2, padY: 2, bumpY: 1, curvature: 0.5 }` | The settings for curved flows and their collision detection.                                                   |
 
 ### Cartograms
 

@@ -33,7 +33,7 @@ export const map = function (config) {
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight, TODO: curved
     //out.flowThicknessType_ = 'linear' // gradual?
     out.flowColor_ = '#848484ff'
-    out.flowOverlayColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
+    out.flowRegionColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
@@ -45,7 +45,21 @@ export const map = function (config) {
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
 
     //curved
-    out.flowCurvature_ = 0.5 // curvature of curved flow lines
+    out.flowCurvatureSettings_ = {
+        gapX: 10,        // how far before/after node to begin/end curve
+        padX: 2,         // horizontal clearance near node stems
+        padY: 2,         // vertical collision detection padding
+        bumpY: 1,        // extra height for hop
+        curvature: 0.5   // 0..1; default sankey smoothness
+    };
+    out.flowOrder_ = (a, b) => {
+        const dy = a.otherY - b.otherY;          // primary: other end vertical position
+        if (dy) return dy;
+        if (a.at !== b.at) return a.at === "out" ? -1 : 1;  // outgoing above incoming on ties
+        const dv = (b.link.value ?? 0) - (a.link.value ?? 0); // larger value above
+        if (dv) return dv;
+        return String(a.link.id ?? '').localeCompare(String(b.link.id ?? '')); // stable
+    }; //use a custom order function for the flows at nodes
 
     //add proportional donuts to nodes
     out.flowDonuts_ = false // whether to add donuts to nodes
@@ -60,7 +74,7 @@ export const map = function (config) {
         ;[
             'flowGraph_',
             'flowColor_',
-            'flowOverlayColors_',
+            'flowRegionColors_',
             'flowArrows_',
             'flowMaxWidth_',
             'flowMinWidth_',
@@ -75,6 +89,8 @@ export const map = function (config) {
             'flowInternal_',
             'flowTopLocations_',
             'flowTopLocationsType_',
+            'flowCurvatureSettings_',
+            'flowOrder_',
         ].forEach(function (att) {
             out[att.substring(0, att.length - 1)] = function (v) {
                 if (!arguments.length) return out[att]
@@ -355,8 +371,8 @@ function addOverlayPolygons(out) {
         const id = this.__data__.properties.id
         select(this)
             .style('fill', () => {
-                if (importerIds.includes(id)) return out.flowOverlayColors_[1] // net importer color
-                if (exporterIds.includes(id)) return out.flowOverlayColors_[0] // net exporter color
+                if (importerIds.includes(id)) return out.flowRegionColors_[1] // net importer color
+                if (exporterIds.includes(id)) return out.flowRegionColors_[0] // net exporter color
                 return null
             })
             .attr('class', () => {

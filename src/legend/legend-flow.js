@@ -162,12 +162,8 @@ export const legend = function (map, config) {
 
         // region fill colors
         if (map.importerRegionIds.length > 0 || map.exporterRegionIds.length > 0) {
-            let colorYOffset = baseY + out.flowWidthLegend.marginTop + flowWidthLegendHeight + out.regionColorLegend.marginTop
-            if (map.flowDonuts_ && map.donutSizeScale) {
-                colorYOffset += out.donutSizeLegend.marginTop
-                colorYOffset += out._donutLegendContainer.node().getBBox().height
-            }
-            drawOverlayColorLegend(out, baseX, colorYOffset)
+            let regionColorLegendYOffset = out.lgg.node().getBBox().height + out.regionColorLegend.marginTop
+            drawRegionColorLegend(out, baseX, regionColorLegendYOffset)
         }
     }
 
@@ -264,8 +260,6 @@ export const legend = function (map, config) {
             legendItems.push({ label: 'Other', color: '#ccc' })
         }
 
-
-
         // Draw each legend row
         const titleOffset = title.node().getBBox().height + out.flowColorLegend.titlePadding
 
@@ -312,13 +306,15 @@ export const legend = function (map, config) {
         })
     }
 
-    function drawOverlayColorLegend(out, baseX, baseY) {
-        if (!out._colorLegendContainer) {
-            out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-color-legend').attr('transform', `translate(${baseX}, ${baseY})`)
-        }
-        const container = out._colorLegendContainer.append('g').attr('class', 'em-flow-overlay-color-legend')
+    function drawRegionColorLegend(out, baseX, baseY) {
+        // Create/clear container
+        out._regionColorContainer?.remove()
+        out._regionColorContainer = out.lgg
+            .append('g')
+            .attr('class', 'em-flow-region-color-legend')
+            .attr('transform', `translate(${baseX}, ${baseY})`)
 
-        const title = container
+        const title = out._regionColorContainer
             .append('text')
             .attr('class', 'em-color-legend-title')
             .attr('id', 'em-color-legend-title')
@@ -327,14 +323,14 @@ export const legend = function (map, config) {
 
         const map = out.map
         const items = {
-            'Net Exporter': map.flowOverlayColors_[0],
-            'Net Importer': map.flowOverlayColors_[1],
+            'Net Exporter': map.flowRegionColors_[0],
+            'Net Importer': map.flowRegionColors_[1],
         }
         // Draw the legend items
         let x = 0
         let y = out.regionColorLegend.titlePadding
         Object.entries(items).forEach(([label, color], i) => {
-            container
+            out._regionColorContainer
                 .append('rect')
                 .attr('x', 0)
                 .attr('y', y + i * 20)
@@ -342,7 +338,7 @@ export const legend = function (map, config) {
                 .attr('height', out.shapeHeight)
                 .attr('fill', color)
 
-            container
+            out._regionColorContainer
                 .append('text')
                 .attr('x', out.shapeWidth + 5)
                 .attr('y', y + i * 20 + 15)

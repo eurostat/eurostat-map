@@ -44,10 +44,10 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     }
 
     // Add Sankey flows
-    addSankeyFlows(out, sankeyContainer, links, arrowId, arrowOutlineId, gradientIds)
+    addSankeyFlows(out, sankeyContainer, nodes, links, arrowId, arrowOutlineId, gradientIds)
 
-    // Add additional nodes (fill gaps)
-    addFillGaps(out, sankeyContainer, nodes)
+    // Add lines at nodes (stems)
+    addNodeStems(out, sankeyContainer, nodes)
 
     return svg.node()
 }
@@ -100,7 +100,7 @@ function addFlowGradients(out, defs, gradientIds, links) {
         .attr('x2', (d) => d.target.x0)
         .attr('y1', (d) => d.y0)
         .attr('y2', (d) => d.y1)
-        .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', out.flowOverlayColors_[0]))
+        .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', out.flowRegionColors_[0]))
         .call((g) => g.append('stop').attr('offset', '50%').attr('stop-color', out.flowColor_))
 }
 
@@ -126,15 +126,18 @@ function sankey(out) {
  * @param {string} arrowOutlineId - Arrow outline marker ID
  * @param {Array} gradientIds - Gradient IDs
  */
-function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradientIds) {
+function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, gradientIds) {
     const flowsGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines').style('opacity', out.flowOpacity_)
+
+    // obstacles = all nodes, using their stacked bands (after computeLinkBreadths)
+    const linkPath = sankeyLinkAvoidingNodes(nodes, out.flowCurvatureSettings_);
 
     links.forEach((link, i) => {
         // Outline path
         if (out.flowOutlines_) {
             flowsGroup
                 .append('path')
-                .attr('d', sankeyLinkHorizontal(out.flowCurvature_ || 0.5)(link))
+                .attr('d', linkPath(link))
                 .attr('fill', 'none')
                 .attr('stroke', '#ffffff')
                 .attr('class', 'em-flow-link-outline')
@@ -145,7 +148,7 @@ function addSankeyFlows(out, container, links, arrowId, arrowOutlineId, gradient
         // Main path
         flowsGroup
             .append('path')
-            .attr('d', sankeyLinkHorizontal(out.flowCurvature_ || 0.5)(link))
+            .attr('d', linkPath(link))
             .attr('fill', 'none')
             .attr('class', 'em-flow-link')
             .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
@@ -193,14 +196,14 @@ function getFlowStroke(out, d) {
 }
 
 /**
- * Adds rectangles to fill gaps left by Sankey links
+ * Adds rectangles (lines) for node stems
  * @param {Object} container - D3 selection of SVG
  * @param {Array} nodes - Sankey nodes data
  */
-function addFillGaps(out, container, nodes) {
+function addNodeStems(out, container, nodes) {
     container
         .append('g')
-        .attr('class', 'em-flow-fill-in-gaps')
+        .attr('class', 'em-flow-node-stems')
         .selectAll('rect')
         .data(nodes, d => d.id)
         .join('rect')
@@ -328,8 +331,8 @@ function computeLinkBreadths(out, { nodes }) {
 
         // Each side is centered on node.y, but stacked independently.
         // Order by the other end's y so stacks look "pulled" toward destinations/sources.
-        left.sort((a, b) => a.otherY - b.otherY);
-        right.sort((a, b) => a.otherY - b.otherY);
+        left.sort(out.flowOrder_);
+        right.sort(out.flowOrder_);
 
         // Assign y positions on the LEFT side
         let yL = mid - totalLeft / 2;
@@ -354,15 +357,6 @@ function computeLinkBreadths(out, { nodes }) {
     }
 }
 
-
-function horizontalSource(d) {
-    return [d.source.x1, d.y0]
-}
-
-function horizontalTarget(d) {
-    return [d.target.x0, d.y1]
-}
-
 function computeNodeValues({ nodes }) {
     for (const node of nodes) {
         node.value = Math.max(
@@ -379,20 +373,70 @@ function reorderLinks(nodes) {
     }
 }
 
-const sankeyLinkHorizontal = function (curvature = 0.5) {
-  return function(link) {
-    const x0 = link.source.x1,
-          x1 = link.target.x0,
-          y0 = link.y0,
-          y1 = link.y1;
+// Smooth cubic segment builder with curvature
+function cubicSegment(p0, p1, curvature = 0.5) {
+    const [x0, y0] = p0, [x1, y1] = p1;
+    const xi = (t) => x0 + (x1 - x0) * t;
+    const c1x = xi(curvature), c2x = xi(1 - curvature);
+    return `C${c1x},${y0} ${c2x},${y1} ${x1},${y1}`;
+}
 
-    // interpolate x between source and target
-    const xi = d3.interpolateNumber(x0, x1);
+// 
+// Returns a function(link) -> path string, avoiding node stems.
+// obstacles: array of nodes with x0, y0, y1(your stacked extents)
+// opts:
+//   gapX: how far to go left / right of the node before / after the bypass
+//   padX: horizontal "no-go" half - width around the stem(usually small)
+//   padY: vertical clearance outside[y0, y1]
+//   curvature: 0..1; 0.5 ≈ default d3 - sankey feel
+//                 
+function sankeyLinkAvoidingNodes(obstacles, {
+    gapX = 10,
+    padX = 2,
+    padY = 2,
+    bumpY = 0,
+    curvature = 0.5
+} = {}) {
+    return function (link) {
+        const sx = link.source.x1, sy = link.y0;
+        const tx = link.target.x0, ty = link.y1;
 
-    // compute control points based on curvature factor (0–1)
-    const x2 = xi(curvature);
-    const x3 = xi(1 - curvature);
+        const rev = sx > tx;
+        const xA = rev ? tx : sx;
+        const yA = rev ? ty : sy;
+        const xB = rev ? sx : tx;
+        const yB = rev ? sy : ty;
 
-    return `M${x0},${y0}C${x2},${y0} ${x3},${y1} ${x1},${y1}`;
-  };
-};
+        const pts = [[xA, yA]];
+        const yAt = (x) => yA + (yB - yA) * ((x - xA) / (xB - xA));
+
+        for (const n of obstacles) {
+            if (n === link.source || n === link.target) continue;
+
+            const ox = n.x0;
+            if (ox <= xA || ox >= xB) continue;
+
+            const top = (n.y0 ?? n.y) - padY;
+            const bot = (n.y1 ?? n.y) + padY;
+            const leftX = ox - padX, rightX = ox + padX;
+
+            const yline = yAt(ox);
+
+            if (yline >= top && yline <= bot) {
+                // ✅ apply bumpY to lift above/below the band without increasing padY
+                const goAbove = (yline - top) <= (bot - yline);
+                const bypassY = goAbove ? (top - bumpY) : (bot + bumpY);
+
+                pts.push([Math.max(xA, leftX - gapX), bypassY]);
+                pts.push([Math.min(xB, rightX + gapX), bypassY]);
+            }
+        }
+
+        pts.push([xB, yB]);
+        if (rev) pts.reverse();
+
+        let d = `M${pts[0][0]},${pts[0][1]}`;
+        for (let i = 1; i < pts.length; i++) d += cubicSegment(pts[i - 1], pts[i], curvature);
+        return d;
+    };
+}
