@@ -134,58 +134,162 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
 
     links.forEach((link, i) => {
         // Outline path
-        if (out.flowOutlines_) {
-            flowsGroup
-                .append('path')
-                .attr('d', linkPath(link))
-                .attr('fill', 'none')
-                .attr('stroke', '#ffffff')
-                .attr('class', 'em-flow-link-outline')
-                .attr('stroke-width', link.width + 1.5)
-                .attr('marker-end', `url(#${arrowOutlineId})`)
-        }
+        // if (out.flowOutlines_) {
+        //     flowsGroup
+        //         .append('path')
+        //         .attr('d', linkPath(link))
+        //         .attr('fill', 'none')
+        //         .attr('stroke', '#ffffff')
+        //         .attr('class', 'em-flow-link-outline')
+        //         .attr('stroke-width', link.width + 1.5)
+        //         .attr('marker-end', `url(#${arrowOutlineId})`)
+        // }
 
         // Main path
-        flowsGroup
-            .append('path')
-            .attr('d', linkPath(link))
-            .attr('fill', 'none')
-            .attr('class', 'em-flow-link')
-            .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
-            .attr('stroke-width', link.width)
-            .attr('marker-end', out.flowArrows_ ? `url(#${arrowId})` : '')
-            // add hover effect
-            .on('mouseover', function (e, d) {
-                const hoveredColor = out.hoverColor_
+        let flows;
+        const dCenter = linkPath(link);
 
-                // Change the stroke color
-                select(this).attr('stroke', hoveredColor)
+        if (out.flowWidthGradient_) {
+            // main tapered polygon
+            const dPoly = taperedPolygonForLink(
+                link,
+                () => dCenter,
+                {
+                    startRatio: out.flowWidthGradientSettings_.startRatio,
+                    samples: out.flowWidthGradientSettings_.samples,
+                    minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
+                    capEnd: out.flowWidthGradientSettings_.capEnd
+                },
+                0 // no extra pad for the main fill
+            );
 
-                // Update the marker-end dynamically
-                if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId + 'mouseover'})`)
+            // (optional) outline for the filled polygon
+            if (out.flowOutlines_) {
+                const dPolyOutline = taperedPolygonForLink(
+                    link,
+                    () => dCenter,
+                    {
+                        startRatio: out.flowWidthGradientSettings_.startRatio,
+                        samples: out.flowWidthGradientSettings_.samples,
+                        minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
+                        capEnd: out.flowWidthGradientSettings_.capEnd
+                    },
+                    1.5 // <<< outline “halo” thickness in px;
+                );
+                flowsGroup.append('path')
+                    .attr('d', dPolyOutline)
+                    .attr('fill', '#ffffff')
+                    .attr('class', 'em-flow-link-outline');
+            }
 
-                // Tooltip handling
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out))
-            })
-            .on('mousemove', function (e) {
-                if (out._tooltip) out._tooltip.mousemove(e)
-            })
-            .on('mouseout', function (e, d) {
-                // Revert the stroke color
-                if (out.flowGradient_) {
-                    select(this).attr('stroke', `url(#${gradientIds[i]})`)
+            // main filled polygon
+            flows = flowsGroup.append('path')
+                .attr('d', dPoly)
+                .attr('fill', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
+                .attr('class', 'em-flow-link em-flow-link-tapered');
+
+        } else {
+            flows = flowsGroup
+                .append('path')
+                .attr('d', dCenter)
+                .attr('fill', 'none')
+                .attr('class', 'em-flow-link')
+                .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
+                .attr('stroke-width', link.width)
+                .attr('marker-end', out.flowArrows_ ? `url(#${arrowId})` : '');
+        }
+
+
+        // add hover effect
+        flows.on('mouseover', function () {
+            if (out.flowWidthGradient_) {
+                select(this).attr('fill', out.hoverColor_);
+            } else {
+                select(this).attr('stroke', out.hoverColor_);
+                if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId + 'mouseover'})`);
+            }
+            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out));
+        })
+            .on('mousemove', e => { if (out._tooltip) out._tooltip.mousemove(e); })
+            .on('mouseout', function () {
+                if (out.flowWidthGradient_) {
+                    select(this).attr('fill', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
                 } else {
-                    select(this).attr('stroke', getFlowStroke(out, link))
+                    select(this).attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
+                    if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId})`);
                 }
-
-                // Revert the marker-end to the original
-                if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId})`)
-
-                // Tooltip handling
-                if (out._tooltip) out._tooltip.mouseout()
-            })
+                if (out._tooltip) out._tooltip.mouseout();
+            });
     })
 }
+
+// Sample an SVG path string into points using DOM path length
+function samplePathByLength(d, samples = 48) {
+    const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    tmp.setAttribute('d', d);
+    const L = tmp.getTotalLength();
+    const pts = [];
+    for (let i = 0; i <= samples; i++) {
+        const p = tmp.getPointAtLength((L * i) / samples);
+        pts.push([p.x, p.y]);
+    }
+    return pts;
+}
+
+// Build a tapered polygon by offsetting along normals of the centerline.
+// `extraPad` makes the polygon uniformly thicker (used for outlines).
+function taperedPolygonForLink(
+    link,
+    pathFn,
+    {
+        startRatio = 0.25,
+        samples = 48,
+        minStartWidth = 1.5,
+        capEnd = true
+    } = {},
+    extraPad = 0 // for outlines
+) {
+    const center = samplePathByLength(pathFn(link), samples);
+
+    // tangents → unit normals
+    const normals = [];
+    for (let i = 0; i < center.length; i++) {
+        const a = center[Math.max(0, i - 1)];
+        const b = center[Math.min(center.length - 1, i + 1)];
+        const dx = b[0] - a[0], dy = b[1] - a[1];
+        const len = Math.hypot(dx, dy) || 1;
+        normals.push([-dy / len, dx / len]);
+    }
+
+    const wStart = Math.max(minStartWidth, link.width * startRatio);
+    const wEnd = link.width;
+
+    const top = [], bot = [];
+    const n = center.length - 1;
+
+    for (let i = 0; i <= n; i++) {
+        const t = i / n;
+        const width = wStart + (wEnd - wStart) * t;
+        const half = width / 2 + extraPad;  // <<< apply pad here
+        const nx = normals[i][0] * half;
+        const ny = normals[i][1] * half;
+        top.push([center[i][0] + nx, center[i][1] + ny]);
+        bot.push([center[i][0] - nx, center[i][1] - ny]);
+    }
+    bot.reverse();
+
+    // Optional: flatten tail instead of a point
+    if (capEnd) {
+        top[n][1] = bot[0][1] = (top[n][1] + bot[0][1]) / 2;
+    }
+
+    let d = `M${top[0][0]},${top[0][1]}`;
+    for (let i = 1; i < top.length; i++) d += `L${top[i][0]},${top[i][1]}`;
+    for (let i = 0; i < bot.length; i++) d += `L${bot[i][0]},${bot[i][1]}`;
+    d += 'Z';
+    return d;
+}
+
 
 function getFlowStroke(out, d) {
     if (typeof out.flowColor_ === 'function') {
@@ -211,7 +315,7 @@ function addNodeStems(out, container, nodes) {
         .attr('y', d => (out.flowStack_ ? d.y0 : d.y))
         .attr('width', 1)
         .attr('height', d => (out.flowStack_ ? Math.max(0, d.y1 - d.y0) : 0))
-        .attr('fill', out.flowColor_);
+        .attr('fill', '#000');
 }
 
 function computeNodeDepths({ nodes }) {

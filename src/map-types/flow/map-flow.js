@@ -38,8 +38,8 @@ export const map = function (config) {
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
     out.flowOutlines_ = true
-    out.flowColorGradient_ = true
-    out.flowWidthGradient_ = true
+    out.flowColorGradient_ = true // color at origin to color at destination
+    out.flowWidthGradient_ = false // thin at origin to thick at destination
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
@@ -67,37 +67,47 @@ export const map = function (config) {
     out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
     out.flowDonutSizeScale_ = null // custom size scale for donuts
+    out.flowWidthGradientSettings_ = {
+        startRatio: 0.25,   // starting thickness (as a fraction of final width)
+        samples: 48,        // number of resampled points along path (smoothness)
+        minStartWidth: 1.5, // ensures very thin flows don't taper to zero
+        capEnd: true,       // closes the end cleanly (flat tail)
+        curvatureFollow: true // keeps offset normal perpendicular to local tangent
+    };
 
-        /**
-         * flowmap-specific setters/getters
-         */
-        ;[
-            'flowGraph_',
-            'flowColor_',
-            'flowRegionColors_',
-            'flowArrows_',
-            'flowMaxWidth_',
-            'flowMinWidth_',
-            'flowOutlines_',
-            'flowGradient_',
-            'flowStack_',
-            'flowDonuts_',
-            'flowLabelOffsets_',
-            'flowLineType_',
-            'flowDonutSizeScale_',
-            'flowOpacity_',
-            'flowInternal_',
-            'flowTopLocations_',
-            'flowTopLocationsType_',
-            'flowCurvatureSettings_',
-            'flowOrder_',
-        ].forEach(function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
-        })
+    /**
+     * flowmap-specific setters/getters
+     */
+    ;[
+        'flowGraph_',
+        'flowColor_',
+        'flowRegionColors_',
+        'flowArrows_',
+        'flowMaxWidth_',
+        'flowMinWidth_',
+        'flowOutlines_',
+        'flowGradient_',
+        'flowStack_',
+        'flowDonuts_',
+        'flowLabelOffsets_',
+        'flowLineType_',
+        'flowDonutSizeScale_',
+        'flowOpacity_',
+        'flowInternal_',
+        'flowTopLocations_',
+        'flowTopLocationsType_',
+        'flowCurvatureSettings_',
+        'flowOrder_',
+        'flowWidthGradient_',
+        'flowColorGradient_',
+        'flowWidthGradientSettings_'
+    ].forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
 
     //@override
     out.updateStyle = function () {

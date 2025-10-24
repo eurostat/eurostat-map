@@ -66,7 +66,7 @@
                     .flowOpacity(0.5) // NOT WORKING FOR SANKEY
                     .flowArrows(false)
                     .flowOutlines(true)
-                    .flowGradient(true)
+                    .flowWidthGradient(true)
                     .flowCurvatureSettings({
                         gapX: 10,        // how far before/after node to begin/end curve
                         padX: 2,         // horizontal clearance near node stems
@@ -127,7 +127,7 @@
                                 y: projection([-3.55, 40.45])[1],
                                 dy: -10,
                                 dx: -width / 6,
-                                color: '#E8336D'
+                                color: '#696969'
                             },
                             {
                                 note: {
@@ -148,7 +148,7 @@
                                 y: projection([2.45, 40.3])[1],
                                 dy: 140,
                                 dx: 0,
-                                color: '#E8336D'
+                                color: '#696969'
                             }
                         ]
                     })
