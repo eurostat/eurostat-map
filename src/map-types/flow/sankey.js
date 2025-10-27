@@ -1,5 +1,4 @@
 import { generateUniqueId, getRegionsSelector } from '../../core/utils'
-import { linkHorizontal } from 'd3-shape'
 import { sum } from 'd3-array'
 import { select } from 'd3-selection'
 

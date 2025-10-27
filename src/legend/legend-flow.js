@@ -154,10 +154,7 @@ export const legend = function (map, config) {
         if (map.flowDonuts_ && map.donutSizeScale || typeof map.flowColor_ === 'function') {
             // donut color legend
             let flowColorLegendYOffset = out.lgg.node().getBBox().height + out.flowColorLegend.marginTop
-            // if (map.flowDonuts_ && map.donutSizeScale) {
-            //     flowColorLegendYOffset += out._donutSizeContainer.node().getBBox().height
-            // }
-            drawflowColorLegend(out, baseX, flowColorLegendYOffset)
+            drawFlowColorLegend(out, baseX, flowColorLegendYOffset)
         }
 
         // region fill colors
@@ -221,7 +218,7 @@ export const legend = function (map, config) {
     }
 
     // explain flow line colors
-    function drawflowColorLegend(out, x, y) {
+    function drawFlowColorLegend(out, x, y) {
         const map = out.map
 
         // Create/clear container
@@ -264,25 +261,46 @@ export const legend = function (map, config) {
         const titleOffset = title.node().getBBox().height + out.flowColorLegend.titlePadding
 
         // Add hover interaction for flow lines
+        const getFlowSelector = () => {
+            // Straight: earlier code used <line>. Curved: your sankey builds <path class="em-flow-link">
+            return map.flowLineType_ === 'straight'
+                ? 'g.em-flow-container line, g.em-flow-lines line'
+                : 'g.em-flow-container path.em-flow-link, g.em-flow-lines path.em-flow-link';
+        };
+
+        const nodeMatchesColor = function (wanted) {
+            // Prefer the stable key
+            const key = this.getAttribute('data-color');
+            if (key) return key === wanted;
+
+            // Fallback: check stroke/fill (works for non-gradient cases)
+            const stroke = this.getAttribute('stroke');
+            const fill = this.getAttribute('fill');
+
+            // if tapered with gradient, fill will be "url(#...)" which won't equal a color
+            // but if we got here, we don't have data-color; do best effort:
+            return stroke === wanted || fill === wanted;
+        };
+
         const highlightLinesByColor = (color) => {
             map.svg_
-                .selectAll('g.em-flow-container line')
-                .classed('highlighted', function () {
-                    return this.getAttribute('stroke') === color
-                })
-                .classed('dimmed', function () {
-                    return this.getAttribute('stroke') !== color
-                })
-        }
+                .selectAll(getFlowSelector())
+                .classed('highlighted', function () { return nodeMatchesColor.call(this, color); })
+                .classed('dimmed', function () { return !nodeMatchesColor.call(this, color); });
+        };
+
         const clearHighlights = () => {
-            map.svg_.selectAll('g.em-flow-container line').classed('highlighted', false).classed('dimmed', false)
-        }
+            map.svg_
+                .selectAll(getFlowSelector())
+                .classed('highlighted', false)
+                .classed('dimmed', false);
+        };
 
         // Draw legend rows with mouseover
         legendItems.forEach((item, i) => {
             const row = out._flowColorContainer
                 .append('g')
-                .attr('class', 'em-donut-color-item')
+                .attr('class', 'em-color-legend-item')
                 .attr('transform', `translate(0, ${i * 22 + titleOffset})`)
                 .style('cursor', 'pointer')
                 .on('mouseover', function () {

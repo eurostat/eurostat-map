@@ -148,8 +148,9 @@ function drawStraightLinesByFlow(out, container) {
         if (typeof out.flowColor_ === 'function') {
             return out.flowColor_(d)
         }
-        if (!out.topLocationKeys || !out.flowTopLocations_) return out.flowColor_
+        if (!out.topLocationKeys || !out.flowTopLocations_ || !out.flowDonuts_) return out.flowColor_
 
+        // Determine coloring based on top N locations setting
         const type = out.flowTopLocationsType_ || 'sum'
         if (type === 'origin') {
             // Color by origin
