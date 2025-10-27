@@ -158,7 +158,7 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                     startRatio: out.flowWidthGradientSettings_.startRatio,
                     samples: out.flowWidthGradientSettings_.samples,
                     minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                    capEnd: out.flowWidthGradientSettings_.capEnd
+                    capEnd: !out.flowArrows_
                 },
                 0 // no extra pad for the main fill
             );
@@ -172,7 +172,7 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                         startRatio: out.flowWidthGradientSettings_.startRatio,
                         samples: out.flowWidthGradientSettings_.samples,
                         minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                        capEnd: out.flowWidthGradientSettings_.capEnd
+                        capEnd: !out.flowArrows_
                     },
                     1.5 // <<< outline “halo” thickness in px;
                 );
@@ -245,7 +245,7 @@ function taperedPolygonForLink(
         startRatio = 0.25,
         samples = 48,
         minStartWidth = 1.5,
-        capEnd = true
+        capEnd = !out.flowArrows_
     } = {},
     extraPad = 0 // for outlines
 ) {
