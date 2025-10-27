@@ -134,16 +134,16 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
 
     links.forEach((link, i) => {
         // Outline path
-        // if (out.flowOutlines_) {
-        //     flowsGroup
-        //         .append('path')
-        //         .attr('d', linkPath(link))
-        //         .attr('fill', 'none')
-        //         .attr('stroke', '#ffffff')
-        //         .attr('class', 'em-flow-link-outline')
-        //         .attr('stroke-width', link.width + 1.5)
-        //         .attr('marker-end', `url(#${arrowOutlineId})`)
-        // }
+        if (out.flowOutlines_ && !out.flowWidthGradient_) {
+            flowsGroup
+                .append('path')
+                .attr('d', linkPath(link))
+                .attr('fill', 'none')
+                .attr('stroke', '#ffffff')
+                .attr('class', 'em-flow-link-outline')
+                .attr('stroke-width', link.width + 1.5)
+                .attr('marker-end', `url(#${arrowOutlineId})`)
+        }
 
         // Main path
         let flows;
