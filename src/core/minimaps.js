@@ -11,7 +11,10 @@ export const appendMinimap = (map) => {
     if (map.Geometries.geoJSONs.worldrg) {
         drawMinimap(map)
     } else {
-        json('https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/world-topo-60M.json')
+        const worldMapTopojsonURL = window.location.hostname.includes('ec.europa.eu')
+            ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/eurostat-map/world-topo-2024-60M-4326.json'
+            : 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/world-topo-60M.json'
+        json(worldMapTopojsonURL)
             .then((topoData) => {
                 const features = feature(topoData, topoData.objects.CNTR_RG_60M_2024_4326).features
                 map.Geometries.geoJSONs.worldrg = features
@@ -105,28 +108,21 @@ const drawMinimap = (map) => {
             .attr('id', 'em-minimap')
             .attr('transform', `translate(${x},${y})`)
 
-        // Inner circle
+        // Inner circle (white background)
         map._minimapContainer
-            .append('circle')
-            .attr('r', size / 2)
+            .append('circle').attr('class', 'em-minimap-inner-circle')
+            .attr('r', (size / 2))
             .attr('cx', 0)
             .attr('cy', 0)
             .attr('fill', 'white')
-            .attr('stroke', color)
-            .attr('stroke-width', 3)
+            .attr('filter', 'url(#em-minimap-inner-shadow)')
+
 
         // Projection
         defineMinimapProjection(map)
 
         // Clip
-        map._minimapContainer
-            .append('defs')
-            .append('clipPath')
-            .attr('id', 'minimap-clip')
-            .append('circle')
-            .attr('r', size / 2)
-            .attr('cx', 0)
-            .attr('cy', 0)
+        addDefsToMinimap(map, size)
 
         // Globe
         map._minimapGlobe = map._minimapContainer
@@ -161,7 +157,7 @@ const drawMinimap = (map) => {
 
         // Outer circle
         map._minimapContainer
-            .append('circle')
+            .append('circle').attr('class', 'em-minimap-outer-circle')
             .attr('r', size / 2)
             .attr('cx', 0)
             .attr('cy', 0)
@@ -174,6 +170,64 @@ const drawMinimap = (map) => {
     } catch (error) {
         console.error('Error drawing minimap:', error)
     }
+}
+
+function addDefsToMinimap(map, size) {
+    const defs = map._minimapContainer.append('defs')
+    addInnerShadowToDefs(defs)
+
+    defs.append('clipPath')
+        .attr('id', 'minimap-clip')
+        .append('circle')
+        .attr('r', (size / 2) - 3)
+        .attr('cx', 0)
+        .attr('cy', 0)
+}
+
+function addInnerShadowToDefs(defs) {
+    const innerShadow = defs
+        .append('filter')
+        .attr('id', 'em-minimap-inner-shadow')
+        .attr('x', '-50%')
+        .attr('y', '-50%')
+        .attr('width', '200%')
+        .attr('height', '200%')
+        .attr('color-interpolation-filters', 'sRGB')
+
+    innerShadow.append('feGaussianBlur')
+        .attr('in', 'SourceAlpha')
+        .attr('stdDeviation', 3)
+        .attr('result', 'blur')
+
+    innerShadow.append('feOffset')
+        .attr('in', 'blur')
+        .attr('dx', 0)
+        .attr('dy', 0)
+        .attr('result', 'off')
+
+    // Keep only the blurred rim that lies INSIDE the circle
+    innerShadow.append('feComposite')
+        .attr('in', 'SourceAlpha')
+        .attr('in2', 'off')
+        .attr('operator', 'arithmetic')
+        .attr('k2', '1')   // + SourceAlpha
+        .attr('k3', '-1')  // - blurred offset
+        .attr('result', 'inner')
+
+    innerShadow.append('feFlood')
+        .attr('flood-color', '#000')
+        .attr('flood-opacity', 0.4)
+
+    innerShadow.append('feComposite')
+        .attr('in2', 'inner')
+        .attr('operator', 'in')
+        .attr('result', 'shadow')
+
+    // Put shadow ON TOP of the fill (multiply for natural darkening)
+    innerShadow.append('feBlend')
+        .attr('in', 'SourceGraphic')
+        .attr('in2', 'shadow')
+        .attr('mode', 'multiply')
 }
 
 // ---------------------------------------------------------------------------
