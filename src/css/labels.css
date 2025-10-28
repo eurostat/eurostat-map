@@ -3,59 +3,74 @@
     stroke-linejoin: round;
     font-family: Arial, Helvetica, sans-serif;
     dominant-baseline: central;
+    pointer-events: none;
+    paint-order: stroke;
 }
+
 .em-labels {
-    opacity:0.7;
     font-size: 12px;
     fill: #000000;
 }
+
 .em-label {
     font-size: 12px;
-    opacity:0.8;
+    opacity: 0.8;
 }
-.em-label-shadow, .em-flow-label-shadow {
+
+.em-label-shadow,
+.em-flow-label-shadow {
     font-size: 12px;
     stroke-width: 2px;
     stroke: white;
-    opacity:0.8;
+    opacity: 0.8;
 }
+
 .em-label-background {
     fill: #ffffff;
-    pointer-events: none;
     opacity: 0.9;
 }
+
 .em-stat-label {
-    opacity: 1;
     font-size: 13px;
-    stroke-width: 3px;
-    fill: #313131;
-    font-weight: bold;
+    font-weight: 600;
+    fill: #111;
+    opacity: 0.95;
 }
+
 .em-stat-label-shadow {
-    opacity: 1;
     font-size: 13px;
-    stroke-width: 4px;
+
+    stroke:white;
+    stroke-width: 3px;
+    opacity: 0.7;
+    filter: drop-shadow(0 1px 1px rgb(255, 255, 255));
 }
+
 .em-label-cc {
     font-size: 12px;
 }
+
 .em-label-shadow-cc {
     font-size: 12px;
     stroke-width: 3px;
 }
+
 .em-label-countries {
     font-size: 12px;
 }
+
 .em-label-shadow-countries {
     font-size: 12px;
     stroke-width: 3px;
 }
+
 .em-label-seas {
     font-size: 9px;
     fill: #003399;
     stroke: #003399;
     letter-spacing: 3px;
 }
+
 .em-label-shadow-seas {
     font-size: 9px;
     letter-spacing: 3px;
@@ -68,12 +83,14 @@
     font-family: Arial, Helvetica, sans-serif;
     dominant-baseline: central;
 }
+
 .em-flow-label {
     font-size: 13px;
     fill: #333333;
     font-weight: bold;
     opacity: 0.9;
 }
+
 .em-flow-label-shadow {
     font-size: 13px;
     stroke-width: 3px;

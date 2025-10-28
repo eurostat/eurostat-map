@@ -19,7 +19,7 @@ export const addLabelsToMap = function (map, zg) {
 
     // use existing or append new container
     let existing = zg.select('#em-labels')
-    let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels') : existing
+    let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels').attr('class', 'em-labels') : existing
 
     //for statistical values on maps without centroids, we need to add centroids initially, then add text to them later once the stat data is loaded
     if (map.labels_?.values && map._mapType !== 'ps') appendStatLabelCentroidsToMap(map, labelsContainer)
@@ -243,7 +243,7 @@ export const updateValuesLabels = function (map) {
         // .append('text')
         .each(function (d) {
             const sel = select(this)
-            const labelText = statLabelsTextFunction(d, statData) // Use 'd' directly for the label text
+            const labelText = statLabelsTextFunction(d, statData, map) // Use 'd' directly for the label text
 
             // Append rectangle behind label
             if (map.labels_.backgrounds) appendRect(labelText, sel)
@@ -291,7 +291,7 @@ export const updateValuesLabels = function (map) {
             .selectAll('g.em-stat-label-shadow')
             .filter((rg) => filterFunction(rg, map))
             .append('text')
-            .text((d) => statLabelsTextFunction(d, statData)) // Use 'd' directly for the label text)
+            .text((d) => statLabelsTextFunction(d, statData, map)) // Use 'd' directly for the label text)
     }
     return map
 }
@@ -301,14 +301,14 @@ export const updateValuesLabels = function (map) {
  * @param {Object} d d3 selection json data element
  * @return {string}
  */
-export const statLabelsTextFunction = (d, statData) => {
+export const statLabelsTextFunction = (d, statData, map) => {
     if (statData && statData?.get) {
         const sv = statData.get(d.properties.id)
         if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
             return ''
         } else {
             if (sv.value !== ':') {
-                return out._statLabelFormatter(sv.value)
+                return map._statLabelFormatter(sv.value)
             }
         }
     }
