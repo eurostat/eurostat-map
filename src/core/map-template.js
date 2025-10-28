@@ -82,6 +82,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.onRegionMouseOver_ = undefined // user function to call when mouseover a region
     out.onRegionMouseMove_ = undefined // user function to call when mousemove over a region
     out.onRegionMouseOut_ = undefined // user function to call when mouseout of a region
+    out.onRegionClick_ = undefined // user function to call when clicking a region
 
     // geometries
     out.geometries_ = undefined // [{id:String, data:geojson, class:function}] user-defined geometries

@@ -245,27 +245,30 @@ export const Geometries = function (map, withCenterPoints) {
 
         //draw NUTS regions
         if (this.geoJSONs.nutsrg) {
+            let regions
             if (nutsLevel == 'mixed') {
                 this.geoJSONs.mixed.rg0 = this.geoJSONs.nutsrg
                 this.geoJSONs.mixed.rg1 = feature(out.allNUTSGeoData[1], out.allNUTSGeoData[1].objects.nutsrg).features
                 this.geoJSONs.mixed.rg2 = feature(out.allNUTSGeoData[2], out.allNUTSGeoData[2].objects.nutsrg).features
                 this.geoJSONs.mixed.rg3 = feature(out.allNUTSGeoData[3], out.allNUTSGeoData[3].objects.nutsrg).features
 
-                //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
-                // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
-                ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
-                    //append each nuts level to map
-                    container
-                        .append('g')
-                        .attr('id', 'em-nutsrg')
-                        .attr('class', `em-nutsrg em-nutsrg-${i}`)
-                        .selectAll('path')
-                        .data(r)
-                        .enter()
-                        .append('path')
-                        .attr('d', pathFunction)
-                        .attr('lvl', i) //to be able to distinguish nuts levels
-                })
+                    //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
+                    // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
+                    ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
+                        //append each nuts level to map
+                        regions = container
+                            .append('g')
+                            .attr('id', 'em-nutsrg')
+                            .attr('class', `em-nutsrg em-nutsrg-${i}`)
+                            .selectAll('path')
+                            .data(r)
+                            .enter()
+                            .append('path')
+                            .attr('d', pathFunction)
+                            .attr('lvl', i) //to be able to distinguish nuts levels
+
+                        attachClickEventToRegions(regions, map)
+                    })
 
                 //add kosovo
                 if (geo == 'EUR' && (proj == '3035' || proj == '4326')) {
@@ -274,7 +277,7 @@ export const Geometries = function (map, withCenterPoints) {
                 }
             } else {
                 // when nutsLevel is not 'mixed'
-                container
+                regions = container
                     .append('g')
                     .attr('id', 'em-nutsrg')
                     .attr('class', 'em-nutsrg')
@@ -283,6 +286,8 @@ export const Geometries = function (map, withCenterPoints) {
                     .enter()
                     .append('path')
                     .attr('d', pathFunction)
+
+                attachClickEventToRegions(regions, map)
             }
         }
 
@@ -429,4 +434,12 @@ export const Geometries = function (map, withCenterPoints) {
     }
 
     return out
+}
+
+function attachClickEventToRegions(regions, map) {
+    regions
+        .on('click', function (e, rg) {
+            if (map.tooltip_.omitRegions?.includes(rg.properties?.id)) return
+            if (map.onRegionClick_) map.onRegionClick_(e, rg, this, map)
+        })
 }
