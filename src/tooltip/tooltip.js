@@ -19,7 +19,7 @@ export const tooltip = function (config) {
     let tooltip
 
     function my() {
-        tooltip = select('#' + config.div)
+        tooltip = select('#' + config.id)
         if (tooltip.empty()) {
             tooltip = select('body').append('div').attr('id', config.id)
         }
