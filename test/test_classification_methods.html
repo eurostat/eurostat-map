@@ -14,6 +14,7 @@
                 .map('choropleth')
                 .title('Test')
                 .width(1000)
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .subtitle('test')
                 .classificationMethod('jenks')
                 .numberOfClasses(7)

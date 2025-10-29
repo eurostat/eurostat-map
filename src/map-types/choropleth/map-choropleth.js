@@ -174,6 +174,8 @@ export const map = function (config) {
                 out.classifier((val) => val) // identity
             }
 
+            const dataArrayNumeric = [...dataArray].filter(v => !isNaN(parseFloat(v)) && isFinite(v))
+
             switch (out.classificationMethod_) {
                 case 'quantile': {
                     out.classifier(scaleQuantile().domain(dataArray).range(range))
@@ -195,13 +197,13 @@ export const map = function (config) {
                     break
                 }
                 case 'jenks': {
-                    const jenksBreaks = jenks(dataArray, out.numberOfClasses_)
+                    const jenksBreaks = jenks(dataArrayNumeric, out.numberOfClasses_) //data, lowerClassLimits, nClasses
                     const domain = jenksBreaks.slice(1, -1)
                     out.classifier(scaleThreshold().domain(domain).range(range))
                     break
                 }
                 case 'ckmeans': {
-                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((cluster) => cluster.pop())
+                    const ckmeansBreaks = ckmeans(dataArrayNumeric, out.numberOfClasses_).map((cluster) => cluster.pop())
                     const domain = ckmeansBreaks.slice(0, -1)
                     out.classifier(scaleThreshold().domain(domain).range(range))
                     break

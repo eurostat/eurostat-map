@@ -308,7 +308,7 @@ export const statLabelsTextFunction = (d, statData, map) => {
             return ''
         } else {
             if (sv.value !== ':') {
-                return map._statLabelFormatter(sv.value)
+                return map._statLabelFormatter ? map._statLabelFormatter(sv.value) : spaceAsThousandSeparator(sv.value)
             }
         }
     }
