@@ -52,6 +52,8 @@ export function drawDonuts(out, container) {
 
         const g = donutContainer.append('g').attr('class', 'donut-group').attr('transform', `translate(${x},${y})`).attr('data-total', total)
 
+        const mouseoverFunction = out.flowDonutMouseoverFunction_ || donutMouseoverFunction
+
         // Outer donut ring
         g.selectAll('path')
             .data(pieData)
@@ -62,7 +64,7 @@ export function drawDonuts(out, container) {
             .attr('stroke-width', 0.5)
             .style('cursor', 'pointer')
             .on('mouseover', function (event, d) {
-                if (out._tooltip) out._tooltip.mouseover(donutMouseoverFunction(d, out))
+                if (out._tooltip) out._tooltip.mouseover(mouseoverFunction(d, out))
                 highlightDonut(event, out.svg_)
                 highlightLines(event, d)
             })
@@ -83,7 +85,7 @@ export function drawDonuts(out, container) {
             .on('mouseover', function (event) {
                 // Reuse the first arc's data for tooltip content
                 const firstArcDatum = pieData[0]
-                if (out._tooltip) out._tooltip.mouseover(donutMouseoverFunction(firstArcDatum, out))
+                if (out._tooltip) out._tooltip.mouseover(mouseoverFunction(firstArcDatum, out))
                 highlightDonut(event, out.svg_)
                 highlightLines(event, firstArcDatum)
             })

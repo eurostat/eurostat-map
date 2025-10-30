@@ -25,10 +25,6 @@ export const map = function (config) {
     out.strokeWidthScale = scaleLinear()
     out.tooltip_.textFunction = flowMapTooltipFunction
 
-
-
-
-
     // flow settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight, TODO: curved
     //out.flowThicknessType_ = 'linear' // gradual?
@@ -155,7 +151,7 @@ export const map = function (config) {
             node.parentNode?.insertBefore(node, node.previousSibling);
         }
 
-        // Add geographical layers
+        // Show importer/exporter regions by coloring them
         addOverlayPolygons(out)
 
         if (out.flowLineType_ === 'curved' || out.flowLineType_ === 'sankey') {

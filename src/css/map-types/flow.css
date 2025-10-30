@@ -4,12 +4,14 @@
 .em-flow-container path.em-flow-link.dimmed,
 .em-flow-lines path.em-flow-link.dimmed {
   opacity: 0.1;
+  stroke-opacity: 0.1;
 }
 
 /* emphasize the matching ones */
 .em-flow-container line.highlighted,
 .em-flow-lines line.highlighted {
   opacity: 1;
+   stroke-opacity: 1;
 }
 
 .em-flow-container path.em-flow-link.highlighted,
@@ -17,4 +19,5 @@
   /* tapered polygons use FILL */
   filter: brightness(1.05);
   opacity: 1;
+  stroke-opacity: 1;
 }
