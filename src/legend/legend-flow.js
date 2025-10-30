@@ -250,11 +250,11 @@ export const legend = function (map, config) {
             const colorScale = map.topLocationColorScale
             const topKeys = Array.from(map.topLocationKeys || [])
             legendItems = topKeys.map((key) => ({
-                label: map.nodeNameMap.get(key) || key, // ✅ show location name if exists
+                label: map.nodeNameMap.get(key) || key, // show location name if exists
                 color: colorScale(key),
             }))
             // Always append the "Other" category last
-            legendItems.push({ label: 'Other', color: '#ccc' })
+            legendItems.push({ label: 'Other', color: map.flowColor_ })
         }
 
         // Draw each legend row
