@@ -5,6 +5,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trade asymmetry grid cartogram</title>
+
+    <style>
+        .em-grid-cell {
+            fill: #ffffff;
+        }
+
+        .em-grid-cell rect {
+            stroke: lightgrey;
+            stroke-width: 1px;
+            opacity: 1;
+        }
+
+        /* Apply to cells that shouldn’t be clickable */
+        g[ecl="nd"] {
+            fill: url(#hatch-pattern) !important;
+            pointer-events: none;
+            /* prevents interaction */
+        }
+    </style>
 </head>
 
 <body>
@@ -12,10 +31,22 @@
     <script src="https://unpkg.com/eurostat-map"></script>
     <script src="https://d3js.org/d3.v7.js"></script>
     <script src="./data.js"></script>
+
+    <!-- Define a hatched pattern -->
+    <svg width="0" height="0" style="position:absolute">
+        <defs>
+            <pattern id="hatch-pattern" patternUnits="userSpaceOnUse" width="6" height="6"
+                patternTransform="rotate(45)">
+                <line x1="0" y1="0" x2="0" y2="6" stroke="#000" stroke-width="1" opacity="0.3" />
+            </pattern>
+        </defs>
+    </svg>
+
+
     <script>
         let selectedCountry = 'DE'
-        const topN = 5
-        const classes = 5
+        const topN = 27
+        const classes = 6
         const noDataRegions = [
             "MD",
             "UA",
@@ -84,29 +115,15 @@
             const regionName = region.properties.na || region.properties.name;
             const regionId = region.properties.id;
             buf.push(`
-        <div class="em-tooltip-bar">
-            <b>${regionName}</b>${regionId ? ` (${regionId})` : ""}
-        </div>
-    `);
+                <div class="em-tooltip-bar">
+                    <b>${regionName}</b>${regionId ? ` (${regionId})` : ""}
+                </div>
+            `);
 
             // Retrieve region's data value and unit
             const statData = map.statData();
             const sv = statData.get(regionId);
             const unit = statData.unitText() || "";
-
-            // No data case
-            // if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ":") {
-            //   buf.push(`
-            //           <div class="em-tooltip-text no-data">
-            //               <table class="em-tooltip-table">
-            //                   <tbody>
-            //                       <tr><td>${map.noDataText_}</td></tr>
-            //                   </tbody>
-            //               </table>
-            //           </div>
-            //       `);
-            //   return buf.join("");
-            // }
 
             if (regionId == selectedCountry) {
                 // currently selected
@@ -250,18 +267,18 @@
         }
 
         function setSelectedCell() {
-                const cells = d3.selectAll("#em-grid-container g");
+            const cells = d3.selectAll("#em-grid-container g");
 
-                setTimeout(() => {
-                    cells
-                        .filter(function (d) {
-                            console.log(d);
-                            return d && d.properties && d.properties.id === selectedCountry;
-                        })
-                        .style("fill", "#ffd800")
-                        .attr("fill", "#ffd800")
-                        .attr("fill___", "#ffd800");
-                }, 100);
+            setTimeout(() => {
+                cells
+                    .filter(function (d) {
+                        console.log(d);
+                        return d && d.properties && d.properties.id === selectedCountry;
+                    })
+                    .style("fill", "#ffd800")
+                    .attr("fill", "#ffd800")
+                    .attr("fill___", "#ffd800");
+            }, 100);
         }
     </script>
 </body>
