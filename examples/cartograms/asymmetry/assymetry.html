@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trade asymmetry grid cartogram</title>
+</head>
+
+<body>
+    <svg id="map"></svg>
+    <script src="https://unpkg.com/eurostat-map"></script>
+    <script src="https://d3js.org/d3.v7.js"></script>
+    <script src="./data.js"></script>
+    <script>
+        let selectedCountry = 'DE'
+        const topN = 5
+        const classes = 5
+        const noDataRegions = [
+            "MD",
+            "UA",
+            "CZ",
+            "RS",
+            "ME",
+            "AL",
+            "BA",
+            "CH",
+            "NO",
+            "IS",
+            "LI",
+            "UK",
+            "GE",
+            "TR",
+            "MK"
+        ]
+        const stats = getStats()
+        const countryNames = {
+            // --- European Union (EU) ---
+            AT: "Austria",
+            BE: "Belgium",
+            BG: "Bulgaria",
+            HR: "Croatia",
+            CY: "Cyprus",
+            CZ: "Czechia",
+            DK: "Denmark",
+            EE: "Estonia",
+            FI: "Finland",
+            FR: "France",
+            DE: "Germany",
+            EL: "Greece",
+            HU: "Hungary",
+            IE: "Ireland",
+            IT: "Italy",
+            LV: "Latvia",
+            LT: "Lithuania",
+            LU: "Luxembourg",
+            MT: "Malta",
+            NL: "Netherlands",
+            PL: "Poland",
+            PT: "Portugal",
+            RO: "Romania",
+            SK: "Slovakia",
+            SI: "Slovenia",
+            ES: "Spain",
+            SE: "Sweden",
+
+            // --- European Free Trade Association (EFTA) ---
+            IS: "Iceland",
+            LI: "Liechtenstein",
+            NO: "Norway",
+            CH: "Switzerland"
+        }
+
+        const tooltipFunction = function (region, map) {
+            if (
+                map.tooltip_.omitRegions &&
+                map.tooltip_.omitRegions.includes(region.properties.id)
+            ) {
+                return ""; // Skip tooltip for omitted regions
+            }
+            const buf = [];
+
+            // Header with region name and ID
+            const regionName = region.properties.na || region.properties.name;
+            const regionId = region.properties.id;
+            buf.push(`
+        <div class="em-tooltip-bar">
+            <b>${regionName}</b>${regionId ? ` (${regionId})` : ""}
+        </div>
+    `);
+
+            // Retrieve region's data value and unit
+            const statData = map.statData();
+            const sv = statData.get(regionId);
+            const unit = statData.unitText() || "";
+
+            // No data case
+            // if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ":") {
+            //   buf.push(`
+            //           <div class="em-tooltip-text no-data">
+            //               <table class="em-tooltip-table">
+            //                   <tbody>
+            //                       <tr><td>${map.noDataText_}</td></tr>
+            //                   </tbody>
+            //               </table>
+            //           </div>
+            //       `);
+            //   return buf.join("");
+            // }
+
+            if (regionId == selectedCountry) {
+                // currently selected
+                buf.push(`
+                    <div class="em-tooltip-text">
+                        <table class="em-tooltip-table">
+                            <tbody>
+                                <tr><td>currently selected
+                                </td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `);
+            } else {
+                // Data display
+                if (sv) {
+                    buf.push(`
+                    <div class="em-tooltip-text">
+                        <table class="em-tooltip-table">
+                            <tbody>
+                                <tr><td>${parseFloat(sv.value).toFixed(1)}%
+                                </td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `);
+                }
+            }
+
+            return buf.join("");
+        }
+
+
+        // build map
+        const map = eurostatmap
+            .map("choropleth")
+            .gridCartogram(true)
+            .title(
+                `Top ${topN} trade asymmetries for ${countryNames[selectedCountry]}`
+            )
+            .subtitle("2021")
+            .nutsLevel(0)
+            .scale("60M")
+            .classificationMethod("quantile")
+            .colorFunction(d3.interpolateReds)
+            .numberOfClasses(classes)
+            .transitionDuration(0)
+            .hoverColor("rgba(255, 255, 0, 0.5)")
+            .legend({
+                title: "Score (%)",
+                x: 650,
+                y: 10,
+                decimals: 1
+            })
+            .tooltip({
+                omitRegions: noDataRegions,
+                textFunction: tooltipFunction
+            })
+            .onRegionClick(function (e, feature, element, map) {
+                console.log("Region clicked:", feature.properties.id);
+                d3.selectAll("#em-tooltip-map").style("opacity", "0");
+                // Additional actions can be added here
+                selectedCountry = feature.properties.id;
+            });
+
+
+
+        map.statData().setData(stats);
+
+        map.callback(() => {
+            setTimeout(() => {
+                setSelectedCell()
+                const cells = d3.selectAll("#em-grid-container g");
+                cells.on("click", (e, d) => {
+                    d3.selectAll("#em-tooltip-map").style("opacity", "0");
+                    if (!noDataRegions.includes(d.properties.id)) {
+                        selectedCountry = d.properties.id;
+                        updateMap()
+                        hackLegend()
+                        setSelectedCell()
+                    }
+                });
+
+                //hack the legend to show 'selected' colour instead of 'no data'
+                d3.selectAll(".em-no-data-legend rect").style("fill", "#ffd800");
+                d3.selectAll(".em-no-data-legend text").html("Selected");
+                d3.selectAll("#em-legend-background").attr("width", 110);
+            }, 10);
+        });
+
+        map.annotations({
+            editMode: false,
+            annotations: [
+                {
+                    type: "annotationCalloutLabel",
+                    note: {
+                        label: `Click a country to see it's top ${topN} asymmetries`,
+                        //title: "Click a country!",
+                        wrap: 200
+                    },
+                    x: 100,
+                    y: 150,
+                    dy: 0,
+                    dx: 0,
+                    color: "#696969"
+                }
+            ]
+        });
+
+        map.build();
+
+        function getStats() {
+            const stats = Object.fromEntries(
+                [...data]
+                    .filter((d) => d.geo === selectedCountry)
+                    .sort((a, b) => b.score2021 - a.score2021)
+                    .slice(0, topN)
+                    .map((d) => [d.partner, (+d.score2021 * 100).toFixed(3)])
+            )
+
+            let myData = { ...stats };
+
+            for (const region of noDataRegions) {
+                myData[region] = ":"; // set 'no data'
+            }
+            return myData;
+        }
+
+        function updateMap() {
+            map.statData().setData(getStats());
+            map.updateStatValues()
+            map.updateClassification()
+            map.updateStyle()
+        }
+
+        function hackLegend() {
+            //hack the legend to show 'selected' colour instead of 'no data'
+            d3.selectAll(".em-no-data-legend rect").style("fill", "#ffd800");
+            d3.selectAll(".em-no-data-legend text").html("Selected");
+            d3.selectAll("#em-legend-background").attr("width", 110);
+        }
+
+        function setSelectedCell() {
+                const cells = d3.selectAll("#em-grid-container g");
+
+                setTimeout(() => {
+                    cells
+                        .filter(function (d) {
+                            console.log(d);
+                            return d && d.properties && d.properties.id === selectedCountry;
+                        })
+                        .style("fill", "#ffd800")
+                        .attr("fill", "#ffd800")
+                        .attr("fill___", "#ffd800");
+                }, 100);
+        }
+    </script>
+</body>
+
+</html>
