@@ -7,7 +7,7 @@ import * as StatMap from '../core/stat-map'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import * as CoxcombLegend from '../legend/legend-coxcomb'
 import { interpolate } from 'd3'
-import { runDorlingSimulation } from '../core/dorling/dorling'
+import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
 
 /**
  * Returns a coxcomb (polar area) chart map.
@@ -22,6 +22,8 @@ export const map = function (config) {
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
     out.coxcombRings_ = true // Show outer rings by default
+
+    out.hoverColor_ = '#000'
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
@@ -493,11 +495,19 @@ export const map = function (config) {
             const sel = select(this)
             sel.attr('fill___', sel.style('fill'))
             sel.style('fill', out.hoverColor_)
-            // Thicken the first circle (outline) inside the symbol group
+
             const k = out._lastZoomK || 1;
-            sel.select('circle.em-coxcomb-max-outline')
-                .node()
-                .style.setProperty('stroke-width', `${2 / k}px`, 'important');
+            if (out.coxcombRings_) {
+                //highlight ring
+                sel.select('circle.em-coxcomb-max-outline')
+                    .node()
+                    .style.setProperty('stroke-width', `${2 / k}px`, 'important');
+            } else {
+                //highlight chart
+                sel.selectAll('g.em-coxcomb-chart')
+                    .style('stroke', out.hoverColor_);
+            }
+
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
         })
             .on('mousemove', function (e, rg) {
@@ -513,17 +523,18 @@ export const map = function (config) {
                 sel.attr('fill___', null)
                 // Thicken the first circle (outline) inside the symbol group
                 const k = out._lastZoomK || 1;
-                sel.select('circle.em-coxcomb-max-outline')
-                    .node()
-                    .style.setProperty('stroke-width', `${0.3 / k}px`, 'important'); // restore base
+                if (out.coxcombRings_) {
+                    //highlight ring
+                    sel.select('circle.em-coxcomb-max-outline')
+                        .node()
+                        .style.setProperty('stroke-width', `${0.3 / k}px`, 'important'); // restore base
+                } else {
+                    //highlight chart
+                    sel.selectAll('g.em-coxcomb-chart')
+                        .style('stroke', '#ffffff')
+                }
                 if (out._tooltip) out._tooltip.mouseout()
             })
-            .on('click', function (e, rg) {
-                if (shouldOmit(rg.properties.id)) return
-                if (!getRegionTotal(rg.properties.id)) return
-                if (out._tooltip) out._tooltip.click(rg, out)
-            })
-        // })
     }
 
     function getActiveKeys(monthData, causes) {
