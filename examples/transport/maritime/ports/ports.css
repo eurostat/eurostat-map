@@ -1,0 +1,13 @@
+.em-zoom-buttons {
+    transform: translate(94%, 88%)
+}
+
+.em-sea {
+    fill: lightblue
+}
+
+.em-title,
+.em-subtitle {
+    /*     transform: translate(0px, 15px); */
+    filter: brightness(0.5);
+}
