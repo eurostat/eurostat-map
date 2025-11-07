@@ -13,8 +13,8 @@ export const defineMapZoom = function (map) {
     const kmin = Math.max(zoomExtent[0] || 1, 0.01)
     const needsPad = kmin < 1
     const panPadFactor = map.panPadFactor_ ?? 0.1
-    const padX = needsPad ? panPadFactor * (1 / kmin - 1) * map.width_ : map.width_ 
-    const padY = needsPad ? panPadFactor * (1 / kmin - 1) * map.height_ : map.height_ 
+    const padX = needsPad ? panPadFactor * (1 / kmin - 1) * map.width_ : map.width_
+    const padY = needsPad ? panPadFactor * (1 / kmin - 1) * map.height_ : map.height_
 
     const translateExtent = map.translateExtent_
         ? map.translateExtent_
@@ -30,6 +30,13 @@ export const defineMapZoom = function (map) {
         ])
         .scaleExtent(zoomExtent)
         .translateExtent(translateExtent)
+
+        .on('start', (e) => {
+            if (e.sourceEvent && e.sourceEvent.type !== 'wheel') {
+                svg.classed('em-dragging', true);
+            }
+        })
+
         .on('zoom', (e) => {
             const t = e.transform
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
@@ -55,7 +62,10 @@ export const defineMapZoom = function (map) {
                 svg.call(map.__zoomBehavior.transform, previousT)
             }
         })
-        .on('end', (e) => map.onZoomEnd_?.(e, map))
+        .on('end', (e) => {
+            svg.classed('em-dragging', false);
+            map.onZoomEnd_?.(e, map);
+        });
 
     map.__lastTransform = previousT
 

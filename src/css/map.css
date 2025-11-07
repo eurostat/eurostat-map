@@ -20,6 +20,15 @@ a text {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.em-map.em-draggable g {
+  cursor: grab;
+}
+
+.em-map.em-dragging g {
+  cursor: grabbing;
+  cursor: -webkit-grabbing;
+}
+
 /* Coastal margin */
 #em-coast-margin {
     filter: url(#em-coastal-blur);
@@ -71,13 +80,13 @@ a text {
 .em-source-dataset-link {
     font-size: 11px;
     fill: #0e47cb;
-    cursor: pointer;
+    cursor: pointer !important;
     text-decoration: underline;
     transform: translate(-5px, -5px);
 }
 .em-source-dataset-link:hover {
     fill: #082b7a;
-    cursor: pointer;
+    cursor: pointer !important;
     text-decoration: underline;
 }
 
@@ -109,7 +118,7 @@ a text {
 .em-footnote {
     fill: #848280;
     pointer-events: all;
-    cursor: pointer;
+    cursor: pointer !important;
     font-size: 11px;
     transform: translate(5px, -5px);
 }
@@ -122,7 +131,7 @@ a text {
 }
 
 .em-centroid {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 
 /* Graticule styling */
@@ -132,10 +141,10 @@ a text {
 }
 
 .em-flow-link {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 .em-flow-link-outline {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 .em-flow-labels {
     font-size: 15px;
@@ -156,5 +165,5 @@ a text {
 }
 
 .em-flow-donuts {
-    cursor: pointer;
+    cursor: pointer !important;
 }

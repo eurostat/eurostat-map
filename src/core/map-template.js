@@ -633,6 +633,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                     out.zoomExtent_ = [1, 10]
                 }
                 defineMapZoom(out)
+                
+                //add draggable class to map svg
+                out.svg().classed('em-draggable', true)
             }
 
             if (out.backgroundMap_) {
