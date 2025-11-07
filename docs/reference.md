@@ -82,15 +82,15 @@ Specify the map SVG element.
 
 Specify the NUTS geometries and the geographical extent of the map.
 
-| Method                             | Type           | Default value                       | Description                                                                                                                                                                                                                                                                                                                               |
-| ---------------------------------- | -------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**nutsLevel**([*value*])     | int/string     | _3_                                 | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
-| _map_.**nutsYear**([*value*])      | int            | _2016_                              | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
-| _map_.**geo**([*value*])           | String         | _"EUR"_                             | The map geographical territory, by default the entire European territory _"EUR"_. For world maps use "WORLD" and set proj to 54030. Note that world templates are currently only available for choropleth maps. Other possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#overseas-territories---map-insets). |
-| _map_.**proj**([*value*])          | String         | _"3035"_                            | The map projection EPSG code. For world maps: use 54030. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that these values depend on the geographical territory.                                                                                                                               |
-| _map_.**scale**([*value*])         | String         | _"20M"_                             | The simplification level of the map, among _"03M"_, _"10M"_, _"20M"_, _"60M"_ (for Europe). The most simplified version is _"60M"_. The level _"01M"_ is also available for some geographical territories: For more information on possible values by geographical territory, see [Nuts2json](https://github.com/eurostat/Nuts2json/).    |
-| _map_.**position**([*value*])      | Object {x,y,z} | _auto_                              | The geographical coordinates of the position where to center the map view. These coordinates are expected to be expressed in the map projection. If not specified, a position is computed automatically.                                                                                                                                  |
-| _map_.**zoomExtent**([*value*])    | Array          | _undefined_                         | The zoom extent. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both.                                                                                            |
+| Method                             | Type           | Default value                 | Description                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------- | -------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**nutsLevel**([*value*])     | int/string     | _3_                           | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
+| _map_.**nutsYear**([*value*])      | int            | _2016_                        | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
+| _map_.**geo**([*value*])           | String         | _"EUR"_                       | The map geographical territory, by default the entire European territory _"EUR"_. For world maps use "WORLD" and set proj to 54030. Note that world templates are currently only available for choropleth maps. Other possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#overseas-territories---map-insets). |
+| _map_.**proj**([*value*])          | String         | _"3035"_                      | The map projection EPSG code. For world maps: use 54030. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that these values depend on the geographical territory.                                                                                                                               |
+| _map_.**scale**([*value*])         | String         | _"20M"_                       | The simplification level of the map, among _"03M"_, _"10M"_, _"20M"_, _"60M"_ (for Europe). The most simplified version is _"60M"_. The level _"01M"_ is also available for some geographical territories: For more information on possible values by geographical territory, see [Nuts2json](https://github.com/eurostat/Nuts2json/).    |
+| _map_.**position**([*value*])      | Object {x,y,z} | _auto_                        | The geographical coordinates of the position where to center the map view. These coordinates are expected to be expressed in the map projection. If not specified, a position is computed automatically.                                                                                                                                  |
+| _map_.**zoomExtent**([*value*])    | Array          | _undefined_                   | The zoom extent. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both.                                                                                            |
 | _map_.**filterGeometriesFunction** | Function       | _(geometries) =>  geometries_ | You can manipulate the default geometries using your own custom function. For example to omit certain regions.                                                                                                                                                                                                                            |
 
 #### World maps
@@ -294,6 +294,14 @@ It is also possible to prevent overlapping via the 'dorling' method:
 
 ```javascript
    .dorling(true)
+```
+
+and customise it with:
+```javascript
+    .dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
+    .dorlingIterations(1) // iterations of d3-force forceCollide
+    .dorlingWorker(false) // use a web worker for (non-animated) dorling cartograms to not block the main thread
+    .onDorlingProgress(undefined) // track dorling progress when using web workers
 ```
 
 Please be aware that by using this method you will essentially be turning the map into a Cartogram. If deformation is high, please consider hiding the background elements/basemap.
@@ -772,10 +780,18 @@ Here is [an example](https://eurostat.github.io/eurostat-map/examples/grid-carto
 
 #### Dorling Cartograms
 
-Can be used like so:
+Can be used like so for maps with proportional symbols and charts:
 
 ```javascript
-eurostatmap.map('proportionalSymbol').dorling(true).backgroundMap(false).psCodeLabels(true).psFill('#e04a28').psMaxSize(100).psMinSize(8)
+map.dorling(true)
+```
+
+and customised like so:
+```javascript
+    .dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
+    .dorlingIterations(1) // iterations of d3-force forceCollide
+    .dorlingWorker(false) // use a web worker for (non-animated) dorling cartograms to not block the main thread
+    .onDorlingProgress(undefined) // track dorling progress when using web workers
 ```
 
 removing the background map is optional but recommended:
