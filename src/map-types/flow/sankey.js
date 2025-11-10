@@ -138,7 +138,7 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                 .append('path')
                 .attr('d', linkPath(link))
                 .attr('fill', 'none')
-                .attr('stroke', '#ffffff')
+                .attr('stroke', out.flowOutlineColor_)
                 .attr('class', 'em-flow-link-outline')
                 .attr('stroke-width', link.width + out.flowOutlineWidth_)
                 .attr('marker-end', `url(#${arrowOutlineId})`)
@@ -173,11 +173,11 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                         minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
                         capEnd: !out.flowArrows_
                     },
-                    1.5 // <<< outline “halo” thickness in px;
+                    out.flowOutlineWidth_ // <<< outline “halo” thickness in px;
                 );
                 flowsGroup.append('path')
                     .attr('d', dPolyOutline)
-                    .attr('fill', '#ffffff')
+                    .attr('fill', out.flowOutlineColor_)
                     .attr('class', 'em-flow-link-outline');
             }
 
