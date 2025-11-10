@@ -706,6 +706,7 @@ const map = eurostatmap
     .flowRegionColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
     .flowArrows(false)
     .flowOutlines(true)
+    .flowOutlineWidth(1)
     .flowColorGradient(true)
     .flowMaxWidth(40)
     .flowMinWidth(1)
@@ -719,6 +720,7 @@ const map = eurostatmap
 | _map_.**flowColor**([*value*])             | String or Function | '#72bb6f'                                                  | The color of the flows and arrows.                                                                                         |
 | _map_.**flowArrows**([*value*])            | boolean            | true                                                       | Whether to show arrow tips or not.                                                                                         |
 | _map_.**flowOutlines**([*value*])          | boolean            | true                                                       | Whether to show flow outlines or not.                                                                                      |
+| _map_.**flowOutlineWidth**([*value*])      | number             | 1.2                                                        | Width of flow outlines.                                                                                                    |
 | _map_.**flowColorGradient**([*value*])     | boolean            | true                                                       | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
 | _map_.**flowWidthGradient**([*value*])     | boolean            | true                                                       | Whether to gradually scale flow thickness (from origin to destination) or not.                                             |
 | _map_.**flowMaxWidth**([*value*])          | number             | 30                                                         | Maximum width of flow lines in px                                                                                          |
