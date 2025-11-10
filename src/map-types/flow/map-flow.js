@@ -34,6 +34,7 @@ export const map = function (config) {
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
     out.flowOutlines_ = true
+    out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
     out.flowColorGradient_ = true // color at origin to color at destination
     out.flowWidthGradient_ = false // thin at origin to thick at destination
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
@@ -82,6 +83,7 @@ export const map = function (config) {
         'flowMaxWidth_',
         'flowMinWidth_',
         'flowOutlines_',
+        'flowOutlineWidth_',
         'flowGradient_',
         'flowStack_',
         'flowDonuts_',

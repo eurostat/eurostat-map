@@ -140,7 +140,7 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                 .attr('fill', 'none')
                 .attr('stroke', '#ffffff')
                 .attr('class', 'em-flow-link-outline')
-                .attr('stroke-width', link.width + 1.5)
+                .attr('stroke-width', link.width + out.flowOutlineWidth_)
                 .attr('marker-end', `url(#${arrowOutlineId})`)
         }
 
