@@ -34,6 +34,7 @@ export const map = function (config) {
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
+    out.flowArrowScale_ = 0.7 // scale of arrow markers
     out.flowOutlines_ = true
     out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
     out.flowOutlineColor_ = '#ffffff' // color of outline around flow lines
@@ -83,6 +84,7 @@ export const map = function (config) {
         'flowRegionColors_',
         'flowRegionLabels_',
         'flowArrows_',
+        'flowArrowScale_',
         'flowMaxWidth_',
         'flowMinWidth_',
         'flowOutlines_',

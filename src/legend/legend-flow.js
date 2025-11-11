@@ -343,8 +343,8 @@ export const legend = function (map, config) {
 
         const map = out.map
         const items = {
-            'Net Exporter': map.flowRegionColors_[0],
-            'Net Importer': map.flowRegionColors_[1],
+           [map.flowRegionLabels_[0]]: map.flowRegionColors_[0],
+            [map.flowRegionLabels_[1]]: map.flowRegionColors_[1],
         }
         // Draw the legend items
         let x = 0

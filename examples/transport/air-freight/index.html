@@ -136,7 +136,7 @@
                     // flow settings
                     .flowGraph(graphData)
                     .flowMinWidth(10)
-                    .flowMaxWidth(60)
+                    .flowMaxWidth(40)
                     .flowMapType('curved')
                     .flowDonuts(false)
                     // .flowColor("#72bb6f")
@@ -148,7 +148,8 @@
                         return colorFunction(parseChangeToPct(d.target.change))
                     })
                     .flowOpacity(0.9)
-                    .flowArrows(false)
+                    .flowArrows(true)
+                    .flowArrowScale(0.7)
                     .flowOutlines(true)
                     .flowOutlineWidth(2)
                     .flowOutlineColor("white")
@@ -165,13 +166,13 @@
                         title: "Freight carried",
                         subtitle: "(tonnes)",
                         flowWidthLegend: {
-                            marginTop: -10,
+                            marginTop: -5,
                             values: [3, 500, 2700],
                             labelFormatter: (value) => spaceAsThousandSeparator(value * 1000)
                         },
                         donutSizeLegend: { title: "Location total" },
                         flowColorLegend: {
-                            marginTop: 50,
+                            marginTop: 55,
                             title: "Change vs 2022 (%)",
                             items: [
                                 { color: colorFunction(-21), label: "≤ -20" },

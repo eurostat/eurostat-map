@@ -149,11 +149,11 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                 .attr('class', 'em-flow-link-outline')
                 .attr('stroke', out.flowOutlineColor_)
                 .attr('stroke-width', outlineW)
-                .attr('stroke-linecap', 'butt')
+                // .attr('stroke-linecap', 'butt')
                 .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
                 .style('pointer-events', 'none');
 
-            if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline');
+            if (out.flowArrows_ && !out.flowWidthGradient_) applyArrow(outline, arrowIds, 'outline');
         }
 
         // ---------- MAIN ----------
@@ -167,7 +167,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                     startRatio: out.flowWidthGradientSettings_.startRatio,
                     samples: out.flowWidthGradientSettings_.samples,
                     minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                    capEnd: !out.flowArrows_,
+                    capEnd: out.flowArrows_, // if arrows, cap the end
                 },
                 0
             );
@@ -196,7 +196,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                 .attr('class', 'em-flow-link em-flow-link-tapered');
 
             // Arrow carriers (transparent strokes) so markers render at the tip
-            if (out.flowArrows_) {
+            if (out.flowArrows_ && !out.flowWidthGradient_) {
                 // main head
                 const carrierMain = flowsGroup.append('path')
                     .attr('d', dCenter)
@@ -564,7 +564,7 @@ function sankeyLinkAvoidingNodes(obstacles, {
             const yline = yAt(ox);
 
             if (yline >= top && yline <= bot) {
-                // ✅ apply bumpY to lift above/below the band without increasing padY
+                // apply bumpY to lift above/below the band without increasing padY
                 const goAbove = (yline - top) <= (bot - yline);
                 const bypassY = goAbove ? (top - bumpY) : (bot + bumpY);
 
@@ -582,22 +582,22 @@ function sankeyLinkAvoidingNodes(obstacles, {
     };
 }
 
-    function pathLength(d) {
-        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        p.setAttribute('d', d);
-        return p.getTotalLength();
-    }
+function pathLength(d) {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d);
+    return p.getTotalLength();
+}
 
-    function pathDashForBackoff(d, backoffPx) {
-        const L = Math.max(0, pathLength(d));
-        const vis = Math.max(0, L - Math.min(backoffPx, L));
-        const gap = Math.min(backoffPx, L);
-        return [vis, gap];
-    }
+function pathDashForBackoff(d, backoffPx) {
+    const L = Math.max(0, pathLength(d));
+    const vis = Math.max(0, L - Math.min(backoffPx, L));
+    const gap = Math.min(backoffPx, L);
+    return [vis, gap];
+}
 
-    // matches arrows.js defaults: markerWidth = 3 * scale (in strokeWidth units),
-    // and the usable length ~ 0.9 of the marker viewBox
-    function arrowBackoffPxForStroke(strokePx, arrowScale = 1) {
-        const arrowLenPx = strokePx * (3 * arrowScale) * 0.9;
-        return arrowLenPx * 0.85;
-    }
+// matches arrows.js defaults: markerWidth = 3 * scale (in strokeWidth units),
+// and the usable length ~ 0.9 of the marker viewBox
+function arrowBackoffPxForStroke(strokePx, arrowScale = 1) {
+    const arrowLenPx = strokePx * (3 * arrowScale) * 0.9;
+    return arrowLenPx * 0.85;
+}
