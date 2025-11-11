@@ -704,6 +704,7 @@ const map = eurostatmap
     .nutsLevel(0)
     .flowColor('#72bb6f') // can be a function
     .flowRegionColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
+    .flowRegionLabels(['importer','exporter'])
     .flowArrows(false)
     .flowOutlines(true)
     .flowOutlineWidth(1)
@@ -722,7 +723,7 @@ const map = eurostatmap
 | _map_.**flowArrows**([*value*])            | boolean            | true                                                       | Whether to show arrow tips or not.                                                                                         |
 | _map_.**flowOutlines**([*value*])          | boolean            | true                                                       | Whether to show flow outlines or not.                                                                                      |
 | _map_.**flowOutlineWidth**([*value*])      | number             | 1.2                                                        | Width of flow outlines.                                                                                                    |
-| _map_.**flowOutlineColor**([*value*])      | string             | '#ffffff'                                                       | Color of flow outlines.                                                                                                    |
+| _map_.**flowOutlineColor**([*value*])      | string             | '#ffffff'                                                  | Color of flow outlines.                                                                                                    |
 | _map_.**flowColorGradient**([*value*])     | boolean            | true                                                       | Whether to show gradients along the flow line (from origin color to destination color) or not.                             |
 | _map_.**flowWidthGradient**([*value*])     | boolean            | true                                                       | Whether to gradually scale flow thickness (from origin to destination) or not.                                             |
 | _map_.**flowMaxWidth**([*value*])          | number             | 30                                                         | Maximum width of flow lines in px                                                                                          |
@@ -731,6 +732,7 @@ const map = eurostatmap
 | _map_.**flowStack**([*value*])             | boolean            | true                                                       | when flowLineType is curved, this option will stack flows at origin/destination (or not)                                   |
 | _map_.**flowLabelOffsets**([*value*])      | object {x,y}       | { x: 3, y: 0 }                                             | x and y offsets for flow value labels ( when map.labels({values:true}) )                                                   |
 | _map_.**flowRegionColors**([*value*])      | array              | ['#bbd7ee', '#c7e3c6']                                     | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).    |
+| _map_.**flowRegionLabels**([*value*])      | array              | ['importer', 'exporter']                                   | The labels that are shown in the legend to explain the flowRegionColors.                                                   |
 | _map_.**flowOpacity**([*value*])           | number             | 0.6                                                        | The opacity of the flows                                                                                                   |
 | _map_.**flowDonuts**([*value*])            | boolean            | false                                                      | Create donut charts at each node showing the composition of incoming/outgoing flows                                        |
 | _map_.**flowDonutSizeScale**([*value*])    | function           | null                                                       | Custom size scale for donut charts                                                                                         |

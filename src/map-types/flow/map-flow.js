@@ -30,6 +30,7 @@ export const map = function (config) {
     //out.flowThicknessType_ = 'linear' // gradual?
     out.flowColor_ = '#848484ff'
     out.flowRegionColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
+    out.flowRegionLabels_ = ['Exporter', 'Importer']
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
     out.flowArrows_ = true
@@ -80,6 +81,7 @@ export const map = function (config) {
         'flowGraph_',
         'flowColor_',
         'flowRegionColors_',
+        'flowRegionLabels_',
         'flowArrows_',
         'flowMaxWidth_',
         'flowMinWidth_',

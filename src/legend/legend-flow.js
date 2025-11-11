@@ -297,6 +297,8 @@ export const legend = function (map, config) {
         };
 
         // Draw legend rows with mouseover
+        const itemHeight = 22
+        const itemWidth = out.itemHeight || 18
         legendItems.forEach((item, i) => {
             const row = out._flowColorContainer
                 .append('g')
@@ -318,7 +320,7 @@ export const legend = function (map, config) {
                     select(this).select('rect').attr('stroke', 'none')
                 })
 
-            row.append('rect').attr('width', 18).attr('height', 18).attr('fill', item.color)
+            row.append('rect').attr('width', 18).attr('height', itemHeight).attr('fill', item.color)
 
             row.append('text').attr('x', 25).attr('y', 14).attr('class', 'em-legend-label').text(item.label)
         })
