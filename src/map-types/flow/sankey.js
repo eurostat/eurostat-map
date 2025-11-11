@@ -1,6 +1,7 @@
 import { generateUniqueId, getRegionsSelector } from '../../core/utils'
 import { sum } from 'd3-array'
 import { select } from 'd3-selection'
+import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js';
 
 // spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
 // See https://observablehq.com/@joewdavies/flow-map-of-europe
@@ -25,25 +26,25 @@ export function createSankeyFlowMap(out, sankeyContainer) {
 
     const { nodes, links } = sankey(out, graph)
 
-    // Define marker and gradient IDs
-    const defs = svg.append('defs')
-    const arrowId = generateUniqueId('arrow')
-    const arrowOutlineId = generateUniqueId('arrow-outline')
-    const gradientIds = links.map(() => generateUniqueId('gradient'))
+    // shared markers (normal/hover/outline)
+    const arrowIds = out.flowArrows_
+        ? ensureArrowMarkers(svg, {
+            cacheKey: 'sankey',
+            scale: out.flowArrowScale_ || 1,
+            markerUnits: 'strokeWidth',
+            hoverColor: out.hoverColor_ || 'black',
+            outlineColor: out.flowOutlineColor_ || '#ffffff',
+            useContextStroke: true,
+        })
+        : null;
 
-    // Add arrow markers
-    if (out.flowArrows_) {
-        addArrowMarker(out, defs, arrowId, out.flowColor_)
-        addArrowMarker(out, defs, arrowOutlineId, '#ffffff')
-    }
-
-    // Add flow gradients
-    if (out.flowGradient_) {
-        addFlowGradients(out, defs, gradientIds, links)
-    }
+    // gradients
+    const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
+    const gradientIds = links.map(() => generateUniqueId('gradient'));
+    if (out.flowGradient_) addFlowGradients(out, defs, gradientIds, links);
 
     // Add Sankey flows
-    addSankeyFlows(out, sankeyContainer, nodes, links, arrowId, arrowOutlineId, gradientIds)
+    addSankeyFlows(out, sankeyContainer, nodes, links, arrowIds, gradientIds)
 
     // Add lines at nodes (stems)
     addNodeStems(out, sankeyContainer, nodes)
@@ -125,55 +126,63 @@ function sankey(out) {
  * @param {string} arrowOutlineId - Arrow outline marker ID
  * @param {Array} gradientIds - Gradient IDs
  */
-function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, gradientIds) {
-    const flowsGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines').style('opacity', out.flowOpacity_)
+function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
+    const flowsGroup = container.append('g')
+        .attr('class', 'em-flow-lines')
+        .attr('id', 'em-flow-lines')
+        .style('opacity', out.flowOpacity_);
 
-    // obstacles = all nodes, using their stacked bands (after computeLinkBreadths)
     const linkPath = sankeyLinkAvoidingNodes(nodes, out.flowCurvatureSettings_);
 
     links.forEach((link, i) => {
-        // Outline path
-        if (out.flowOutlines_ && !out.flowWidthGradient_) {
-            flowsGroup
-                .append('path')
-                .attr('d', linkPath(link))
-                .attr('fill', 'none')
-                .attr('stroke', out.flowOutlineColor_)
-                .attr('class', 'em-flow-link-outline')
-                .attr('stroke-width', link.width + out.flowOutlineWidth_)
-                .attr('marker-end', `url(#${arrowOutlineId})`)
-        }
-
-        // Main path
-        let flows;
         const dCenter = linkPath(link);
 
+        // ---------- OUTLINE (stroke) ----------
+        if (out.flowOutlines_ && !out.flowWidthGradient_) {
+            const outlineW = link.width + out.flowOutlineWidth_;
+            const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(outlineW, out.flowArrowScale_) : 0;
+            const [dashVis, dashGap] = pathDashForBackoff(dCenter, backoff);
+
+            const outline = flowsGroup.append('path')
+                .attr('d', dCenter)
+                .attr('fill', 'none')
+                .attr('class', 'em-flow-link-outline')
+                .attr('stroke', out.flowOutlineColor_)
+                .attr('stroke-width', outlineW)
+                .attr('stroke-linecap', 'butt')
+                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+                .style('pointer-events', 'none');
+
+            if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline');
+        }
+
+        // ---------- MAIN ----------
+        let mainSel;
+
         if (out.flowWidthGradient_) {
-            // main tapered polygon
+            // Tapered polygon fill
             const dPoly = taperedPolygonForLink(
-                link,
-                () => dCenter,
+                link, () => dCenter,
                 {
                     startRatio: out.flowWidthGradientSettings_.startRatio,
                     samples: out.flowWidthGradientSettings_.samples,
                     minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                    capEnd: !out.flowArrows_
+                    capEnd: !out.flowArrows_,
                 },
-                0 // no extra pad for the main fill
+                0
             );
 
-            // (optional) outline for the filled polygon
+            // optional outline polygon (halo)
             if (out.flowOutlines_) {
                 const dPolyOutline = taperedPolygonForLink(
-                    link,
-                    () => dCenter,
+                    link, () => dCenter,
                     {
                         startRatio: out.flowWidthGradientSettings_.startRatio,
                         samples: out.flowWidthGradientSettings_.samples,
                         minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                        capEnd: !out.flowArrows_
+                        capEnd: !out.flowArrows_,
                     },
-                    out.flowOutlineWidth_ // <<< outline “halo” thickness in px;
+                    out.flowOutlineWidth_
                 );
                 flowsGroup.append('path')
                     .attr('d', dPolyOutline)
@@ -181,31 +190,60 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                     .attr('class', 'em-flow-link-outline');
             }
 
-            // main filled polygon
-            flows = flowsGroup.append('path')
+            mainSel = flowsGroup.append('path')
                 .attr('d', dPoly)
                 .attr('fill', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
                 .attr('class', 'em-flow-link em-flow-link-tapered');
 
+            // Arrow carriers (transparent strokes) so markers render at the tip
+            if (out.flowArrows_) {
+                // main head
+                const carrierMain = flowsGroup.append('path')
+                    .attr('d', dCenter)
+                    .attr('fill', 'none')
+                    .attr('stroke', getFlowStroke(out, link))
+                    .attr('stroke-opacity', 0)
+                    .attr('stroke-width', link.width)
+                    .attr('stroke-linecap', 'butt');
+                applyArrow(carrierMain, arrowIds, 'normal');
+
+                // outline head (only if outlines are on)
+                if (out.flowOutlines_) {
+                    const carrierOutline = flowsGroup.append('path')
+                        .attr('d', dCenter)
+                        .attr('fill', 'none')
+                        .attr('stroke', out.flowOutlineColor_)
+                        .attr('stroke-opacity', 0)
+                        .attr('stroke-width', link.width + out.flowOutlineWidth_)
+                        .attr('stroke-linecap', 'butt');
+                    applyArrow(carrierOutline, arrowIds, 'outline');
+                }
+            }
+
         } else {
-            flows = flowsGroup
-                .append('path')
+            // Simple stroked path
+            const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(link.width, out.flowArrowScale_) : 0;
+            const [dashVis, dashGap] = pathDashForBackoff(dCenter, backoff);
+
+            mainSel = flowsGroup.append('path')
                 .attr('d', dCenter)
                 .attr('fill', 'none')
                 .attr('class', 'em-flow-link')
                 .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
                 .attr('stroke-width', link.width)
-                .attr('marker-end', out.flowArrows_ ? `url(#${arrowId})` : '');
+                .attr('stroke-linecap', 'butt')
+                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null);
+
+            if (out.flowArrows_) applyArrow(mainSel, arrowIds, 'normal');
         }
 
-
-        // add hover effect
-        flows.on('mouseover', function () {
+        // ---------- HOVER ----------
+        mainSel.on('mouseover', function () {
             if (out.flowWidthGradient_) {
                 select(this).attr('fill', out.hoverColor_);
             } else {
                 select(this).attr('stroke', out.hoverColor_);
-                if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId + 'mouseover'})`);
+                if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true);
             }
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out));
         })
@@ -215,11 +253,11 @@ function addSankeyFlows(out, container, nodes, links, arrowId, arrowOutlineId, g
                     select(this).attr('fill', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
                 } else {
                     select(this).attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
-                    if (out.flowArrows_) select(this).attr('marker-end', `url(#${arrowId})`);
+                    if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false);
                 }
                 if (out._tooltip) out._tooltip.mouseout();
             });
-    })
+    });
 }
 
 // Sample an SVG path string into points using DOM path length
@@ -543,3 +581,23 @@ function sankeyLinkAvoidingNodes(obstacles, {
         return d;
     };
 }
+
+    function pathLength(d) {
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        p.setAttribute('d', d);
+        return p.getTotalLength();
+    }
+
+    function pathDashForBackoff(d, backoffPx) {
+        const L = Math.max(0, pathLength(d));
+        const vis = Math.max(0, L - Math.min(backoffPx, L));
+        const gap = Math.min(backoffPx, L);
+        return [vis, gap];
+    }
+
+    // matches arrows.js defaults: markerWidth = 3 * scale (in strokeWidth units),
+    // and the usable length ~ 0.9 of the marker viewBox
+    function arrowBackoffPxForStroke(strokePx, arrowScale = 1) {
+        const arrowLenPx = strokePx * (3 * arrowScale) * 0.9;
+        return arrowLenPx * 0.85;
+    }

@@ -57,7 +57,8 @@ export function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.normal, {
             markerUnits,
             scale,
-            fill: useContextStroke ? "context-stroke" : hoverColor, // fallback if you disable context-stroke
+            fill: useContextStroke ? "context-stroke" : hoverColor,
+            out: opts.out,                 // 👈 add this
         });
     }
     if (defs.select(`#${ids.hover}`).empty()) {
@@ -65,13 +66,15 @@ export function ensureArrowMarkers(svgRoot, opts = {}) {
             markerUnits,
             scale,
             fill: hoverColor,
+            out: opts.out,
         });
     }
     if (defs.select(`#${ids.outline}`).empty()) {
         createMarker(defs, ids.outline, {
             markerUnits,
             scale,
-            fill: outlineColor,
+            fill: opts.out?.flowOutlineColor_ || outlineColor,
+            out: opts.out,
         });
     }
 
@@ -101,32 +104,29 @@ export function setHoverArrow(selection, ids, on) {
  * You can tweak geometry here and it’ll propagate everywhere.
  */
 function createMarker(defs, id, {
-    markerUnits = "strokeWidth",
-    scale = 1,
-    fill = "context-stroke"
+  markerUnits = "strokeWidth",
+  scale = 1,
+  fill = "context-stroke",
 }) {
-    // Marker viewport in its own coordinate system (independent of CSS pixels)
-    const VB = 10;          // viewBox width/height
-    const PAD = 1;          // keep the tip away from the box edge to avoid clipping
-    const TIP_X = VB - PAD; // arrow tip x within the viewBox (<= VB)
+  const VB = 10, PAD = 0.1;
+  const TIP_X = VB - PAD, MID_Y = VB / 2;
+  const size = 3.0 * scale;
 
-    // Visual size of the marker. With markerUnits="strokeWidth", this means
-    // "in multiples of the referencing element's stroke width".
-    const size = 3.0 * scale; // make smaller/larger globally via flowArrowScale_
+  const m = defs.append("marker")
+    .attr("id", id)
+    .attr("markerUnits", markerUnits)       // scales with line/outline width
+    .attr("markerWidth", size)
+    .attr("markerHeight", size)
+    .attr("viewBox", `0 0 ${VB} ${VB}`)
+    .attr("refX", TIP_X)                    // tip exactly at line end
+    .attr("refY", MID_Y)
+    .attr("orient", "auto");
 
-    const m = defs.append("marker")
-        .attr("id", id)
-        .attr("markerUnits", markerUnits)
-        .attr("markerWidth", size)
-        .attr("markerHeight", size)
-        .attr("viewBox", `0 0 ${VB} ${VB}`)  // <<< prevents clipping
-        .attr("refX", TIP_X)                 // place the tip right at the line end
-        .attr("refY", VB / 2)
-        .attr("orient", "auto");
-
-    // Compact triangular arrow with a small inner notch to read at tiny sizes.
-    // All coordinates are inside [0..VB], so no clipping regardless of size.
-    m.append("path")
-        .attr("fill", fill)
-        .attr("d", `M0,0 L${TIP_X},${VB / 2} L0,${VB} L${VB * 0.25},${VB / 2} Z`);
+  // single filled arrow; outline comes from the *outline line*'s own marker
+  m.append("path")
+    .attr("fill", fill)
+    .attr("d", `M0,0 L${TIP_X},${MID_Y} L0,${VB} L${VB*0.22},${MID_Y} Z`);
 }
+
+
+
