@@ -34,27 +34,11 @@
 
                 const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
                 const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
-                // const regionColors = {
-                //     "north america": "#fbead7", // pale sand
-                //     "central america and caribbean": "#fcf3d6", // light cream
-                //     "south america": "#d8f0ea", // pale turquoise
-                //     "north africa": "#fce2da", // warm blush
-                //     "rest of africa": "#dee6ea", // misty blue-grey
-                //     "western asia": "#fdeacc", // peach tint
-                //     "southern asia": "#f9dede", // rose tint
-                //     "central asia": "#fdf3d9", // pale yellow
-                //     "eastern asia": "#e6f0ff", // pale lavender-blue (cooler)
-                //     ASEAN: "#e0f8f0", // pale mint-green (warmer)
-                //     "australasia, s.sea is. & antarctica": "#e5ecf0", // fog grey-blue
-                //     EU: "#dde5f0", // very light slate
-                //     "europe except eu": "#E8EEFA", // faint blue-grey
-                //     "eastern africa": "#E6F4EA"
-                // }
                 const regionColors = {
                     "north america": fourColorTheorem[0],
                     "central america and caribbean": fourColorTheorem[1],
                     "south america": fourColorTheorem[2],
-                    "north africa": fourColorTheorem[3],
+                    "eastern africa": fourColorTheorem[2],
                     "rest of africa": fourColorTheorem[0],
                     "western asia": fourColorTheorem[1],
                     "southern asia": fourColorTheorem[2],
@@ -63,8 +47,7 @@
                     ASEAN: fourColorTheorem[1],
                     "australasia, s.sea is. & antarctica": fourColorTheorem[2],
                     EU: fourColorTheorem[0],
-                    "europe except eu": fourColorTheorem[3],
-                    "eastern africa": fourColorTheorem[0]
+                    "europe except eu": fourColorTheorem[2]
                 }
 
 
@@ -122,7 +105,9 @@
                         <table class="em-tooltip-table">
                             <tbody>
                                 <tr><td>${spaceAsThousandSeparator(link.value * 1000)} tonnes</td></tr>
-                                <tr><td>Change: ${link.target.change}</td></tr>
+                        <tr><td>Change since 2022: <span style='color:${colorFunction(
+                        parseChangeToPct(link.target.change)
+                    )}'>${link.target.change}</span></td></tr>
                             </tbody>
                         </table> 
                     </div>`)
@@ -152,7 +137,7 @@
                     .flowGraph(graphData)
                     .flowMinWidth(10)
                     .flowMaxWidth(60)
-                    .flowMapType('curved')
+                    .flowMapType('straight')
                     .flowDonuts(false)
                     // .flowColor("#72bb6f")
                     .flowColor((d) => {
@@ -163,10 +148,12 @@
                         return colorFunction(parseChangeToPct(d.target.change))
                     })
                     .flowOpacity(0.9)
-                    .flowArrows(false)
-                    .flowOutlines(false)
+                    .flowArrows(true)
+                    .flowOutlines(true)
+                    .flowOutlineWidth(2)
+                    .flowOutlineColor("white")
                     .flowColorGradient(false)
-                    .flowWidthGradient(true)
+                    .flowWidthGradient(false)
                     .flowTopLocations(0)
                     .flowStack(false)
 
@@ -187,14 +174,12 @@
                             marginTop: 50,
                             title: "Change vs 2022 (%)",
                             items: [
-
-                                { color: colorFunction(-21), label: "≤ -20 (decrease)" },
+                                { color: colorFunction(-21), label: "≤ -20" },
                                 { color: colorFunction(-15), label: "< -10" },
                                 { color: colorFunction(-7), label: "< -5" },
-                                { color: colorFunction(-2), label: "< 0" },
-                                { color: colorFunction(2.5), label: "> 0" },
-                                { color: colorFunction(8.7), label: "≥ 5 (increase)" }
-
+                                { color: colorFunction(-2), label: "< 0 decrease↓" },
+                                { color: colorFunction(2.5), label: "> 0 increase ↑" },
+                                { color: colorFunction(8.7), label: "≥ 5" }
                             ].reverse()
                         },
                         regionColorLegend: {

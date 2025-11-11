@@ -85,6 +85,7 @@ export const map = function (config) {
         'flowMinWidth_',
         'flowOutlines_',
         'flowOutlineWidth_',
+        'flowOutlineColor_',
         'flowGradient_',
         'flowStack_',
         'flowDonuts_',
