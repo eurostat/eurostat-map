@@ -39,6 +39,7 @@ export const map = function (config) {
     out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
     out.flowOutlineColor_ = '#ffffff' // color of outline around flow lines
     out.flowColorGradient_ = true // color at origin to color at destination
+    out.flowOpacityGradient_ = true // 0 origin to 1 at destination
     out.flowWidthGradient_ = false // thin at origin to thick at destination
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
@@ -90,7 +91,7 @@ export const map = function (config) {
         'flowOutlines_',
         'flowOutlineWidth_',
         'flowOutlineColor_',
-        'flowGradient_',
+        'flowColorGradient_',
         'flowStack_',
         'flowDonuts_',
         'flowLabelOffsets_',
@@ -104,6 +105,7 @@ export const map = function (config) {
         'flowOrder_',
         'flowWidthGradient_',
         'flowColorGradient_',
+        'flowOpacityGradient_',
         'flowWidthGradientSettings_'
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {

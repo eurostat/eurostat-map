@@ -235,26 +235,24 @@ export const legend = function (map, config) {
             .attr('dy', '0.35em')
             .text(out.flowColorLegend.title || 'Destination')
 
-        let legendItems = []
+        let legendItems = [];
         if (typeof map.flowColor_ === 'function') {
-            // user has defined a custom color function
             if (out.flowColorLegend.items && out.flowColorLegend.items.length > 0) {
-                legendItems = out.flowColorLegend.items
+                // allow user-provided items; add key if provided
+                legendItems = out.flowColorLegend.items.map(d => ({ label: d.label, color: d.color, key: d.key ?? null }));
             } else {
-                legendItems = [
-                    { label: "please specify legend items in legend.flowColorLegend.items like so: { label: 'Other', color: '#ccc' }", color: '#888' },
-                ]
+                legendItems = [{ label: "please specify legend items ...", color: "#888", key: null }];
             }
         } else {
-            // top locations legend items
-            const colorScale = map.topLocationColorScale
-            const topKeys = Array.from(map.topLocationKeys || [])
-            legendItems = topKeys.map((key) => ({
-                label: map.nodeNameMap.get(key) || key, // show location name if exists
+            // “top destinations” case
+            const colorScale = map.topLocationColorScale;
+            const topKeys = Array.from(map.topLocationKeys || []);
+            legendItems = topKeys.map(key => ({
+                key,                                 // <<< NEW: stable key for matching
+                label: map.nodeNameMap.get(key) || key,
                 color: colorScale(key),
-            }))
-            // Always append the "Other" category last
-            legendItems.push({ label: 'Other', color: map.flowColor_ })
+            }));
+            legendItems.push({ key: 'Other', label: 'Other', color: map.flowColor_ });
         }
 
         // Draw each legend row
@@ -268,25 +266,22 @@ export const legend = function (map, config) {
                 : 'g.em-flow-container path.em-flow-link, g.em-flow-lines path.em-flow-link';
         };
 
-        const nodeMatchesColor = function (wanted) {
-            // Prefer the stable key
-            const key = this.getAttribute('data-color');
-            if (key) return key === wanted;
+        // Match by stable key first; fall back to a solid paint comparison (non-gradient cases)
+        const nodeMatchesItem = function (item) {
+            // First, try our stable key
+            const keyAttr = this.getAttribute('data-color-key');
+            if (keyAttr && item.key != null) return keyAttr === String(item.key);
 
-            // Fallback: check stroke/fill (works for non-gradient cases)
-            const stroke = this.getAttribute('stroke');
-            const fill = this.getAttribute('fill');
-
-            // if tapered with gradient, fill will be "url(#...)" which won't equal a color
-            // but if we got here, we don't have data-color; do best effort:
-            return stroke === wanted || fill === wanted;
+            // Fallback for non-keyed setups: compare solid paint (only works when not gradient)
+            const dc = this.getAttribute('data-color'); // set only for non-gradient paints
+            return dc && item.color && dc === item.color;
         };
 
-        const highlightLinesByColor = (color) => {
+        const highlightLinesByItem = (item) => {
             map.svg_
                 .selectAll(getFlowSelector())
-                .classed('highlighted', function () { return nodeMatchesColor.call(this, color); })
-                .classed('dimmed', function () { return !nodeMatchesColor.call(this, color); });
+                .classed('highlighted', function () { return nodeMatchesItem.call(this, item); })
+                .classed('dimmed', function () { return !nodeMatchesItem.call(this, item); });
         };
 
         const clearHighlights = () => {
@@ -306,19 +301,19 @@ export const legend = function (map, config) {
                 .attr('transform', `translate(0, ${i * 22 + titleOffset})`)
                 .style('cursor', 'pointer')
                 .on('mouseover', function () {
-                    highlightLinesByColor(item.color)
+                    highlightLinesByItem(item); // <<< was highlightLinesByColor(item.color)
 
                     // bold text + stroke rect
-                    select(this).select('text').style('font-weight', 'bold')
-                    select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2)
+                    select(this).select('text').style('font-weight', 'bold');
+                    select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2);
                 })
                 .on('mouseout', function () {
-                    clearHighlights()
+                    clearHighlights();
 
                     // reset text + rect
-                    select(this).select('text').style('font-weight', 'normal')
-                    select(this).select('rect').attr('stroke', 'none')
-                })
+                    select(this).select('text').style('font-weight', 'normal');
+                    select(this).select('rect').attr('stroke', 'none');
+                });
 
             row.append('rect').attr('width', 18).attr('height', itemHeight).attr('fill', item.color)
 
@@ -343,7 +338,7 @@ export const legend = function (map, config) {
 
         const map = out.map
         const items = {
-           [map.flowRegionLabels_[0]]: map.flowRegionColors_[0],
+            [map.flowRegionLabels_[0]]: map.flowRegionColors_[0],
             [map.flowRegionLabels_[1]]: map.flowRegionColors_[1],
         }
         // Draw the legend items
@@ -369,3 +364,5 @@ export const legend = function (map, config) {
 
     return out
 }
+
+

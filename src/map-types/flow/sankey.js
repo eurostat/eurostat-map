@@ -23,6 +23,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     out = out
     const svg = out.svg_
     const graph = out.flowGraph_
+    const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_;
 
     const { nodes, links } = sankey(out, graph)
 
@@ -41,7 +42,8 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     // gradients
     const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
     const gradientIds = links.map(() => generateUniqueId('gradient'));
-    if (out.flowGradient_) addFlowGradients(out, defs, gradientIds, links);
+    if (usesGradient) addFlowGradients(out, defs, gradientIds, links);
+
 
     // Add Sankey flows
     addSankeyFlows(out, sankeyContainer, nodes, links, arrowIds, gradientIds)
@@ -85,23 +87,46 @@ function addArrowMarker(out, defs, id, color) {
 
 /**
  * Adds linear gradient definitions for flow links
- * @param {Object} defs - D3 selection of defs
- * @param {Array} gradientIds - Array of gradient IDs
- * @param {Array} links - Sankey links data
  */
 function addFlowGradients(out, defs, gradientIds, links) {
-    const safeLinks = links.filter((d) => d.source?.x1 != null && d.target?.x0 != null && d.y0 != null && d.y1 != null)
+    // one gradient per link (keep indices aligned with `links`)
     defs.selectAll('linearGradient')
-        .data(safeLinks)
+        .data(links)
         .join('linearGradient')
         .attr('id', (_, i) => gradientIds[i])
         .attr('gradientUnits', 'userSpaceOnUse')
-        .attr('x1', (d) => d.source.x1)
-        .attr('x2', (d) => d.target.x0)
-        .attr('y1', (d) => d.y0)
-        .attr('y2', (d) => d.y1)
-        .call((g) => g.append('stop').attr('offset', '5%').attr('stop-color', out.flowRegionColors_[0]))
-        .call((g) => g.append('stop').attr('offset', '50%').attr('stop-color', out.flowColor_))
+        .attr('x1', d => d?.source?.x1 ?? d?.target?.x0 ?? 0)
+        .attr('x2', d => d?.target?.x0 ?? d?.source?.x1 ?? 0)
+        .attr('y1', d => d?.y0 ?? d?.y1 ?? 0)
+        .attr('y2', d => d?.y1 ?? d?.y0 ?? 0)
+        .each(function (d) {
+            const g = select(this);
+            g.selectAll('stop').remove();
+
+            // Colors: if color gradient is ON, blend from region color → flow color.
+            // Otherwise keep a flat color (whatever getFlowStroke returns).
+            const startColor = out.flowColorGradient_
+                ? (out.flowRegionColors_?.[0] ?? getFlowStroke(out, d))
+                : getFlowStroke(out, d);
+
+            const endColor = out.flowColorGradient_
+                ? (typeof out.flowColor_ === 'function' ? out.flowColor_(d) : out.flowColor_)
+                : getFlowStroke(out, d);
+
+            // Opacity: if opacity gradient is ON, start at 0 → 1; else keep at 1.
+            const startOpacity = out.flowOpacityGradient_ ? 0 : 1;
+            const endOpacity = 1;
+
+            g.append('stop')
+                .attr('offset', '0%')
+                .attr('stop-color', startColor)
+                .attr('stop-opacity', startOpacity);
+
+            g.append('stop')
+                .attr('offset', '100%')
+                .attr('stop-color', endColor)
+                .attr('stop-opacity', endOpacity);
+        });
 }
 
 function clone({ nodes, links }) {
@@ -127,6 +152,8 @@ function sankey(out) {
  * @param {Array} gradientIds - Gradient IDs
  */
 function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
+    const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_;
+
     const flowsGroup = container.append('g')
         .attr('class', 'em-flow-lines')
         .attr('id', 'em-flow-lines')
@@ -136,6 +163,11 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
 
     links.forEach((link, i) => {
         const dCenter = linkPath(link);
+        const colorKey =
+            (out.topLocationKeys && out.topLocationKeys?.has?.(link?.target?.id))
+                ? link.target.id
+                : (link?.target?.id ?? link?.source?.id ?? 'Other');
+        const paint = usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link);
 
         // ---------- OUTLINE (stroke) ----------
         if (out.flowOutlines_ && !out.flowWidthGradient_) {
@@ -191,9 +223,15 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
             }
 
             mainSel = flowsGroup.append('path')
-                .attr('d', dPoly)
-                .attr('fill', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
-                .attr('class', 'em-flow-link em-flow-link-tapered');
+                .attr('d', dCenter)
+                .attr('fill', 'none')
+                .attr('class', 'em-flow-link')
+                .attr('stroke', paint)
+                .attr('stroke-width', link.width)
+                .attr('stroke-linecap', 'butt')
+                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+                .attr('data-color-key', colorKey)     // for legends
+                .attr('data-color', usesGradient ? null : paint); // solid color fallback
 
             // Arrow carriers (transparent strokes) so markers render at the tip
             if (out.flowArrows_ && !out.flowWidthGradient_) {
@@ -229,7 +267,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                 .attr('d', dCenter)
                 .attr('fill', 'none')
                 .attr('class', 'em-flow-link')
-                .attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
+                .attr('stroke', usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
                 .attr('stroke-width', link.width)
                 .attr('stroke-linecap', 'butt')
                 .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null);
@@ -250,9 +288,9 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
             .on('mousemove', e => { if (out._tooltip) out._tooltip.mousemove(e); })
             .on('mouseout', function () {
                 if (out.flowWidthGradient_) {
-                    select(this).attr('fill', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
+                    select(this).attr('fill', usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
                 } else {
-                    select(this).attr('stroke', out.flowGradient_ ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
+                    select(this).attr('stroke', usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
                     if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false);
                 }
                 if (out._tooltip) out._tooltip.mouseout();
