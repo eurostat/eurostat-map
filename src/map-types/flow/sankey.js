@@ -143,159 +143,162 @@ function sankey(out) {
     return graph
 }
 
-/**
- * Adds Sankey flows (links with markers and gradients)
- * @param {Object} container - D3 selection of SVG
- * @param {Array} links - Sankey links data
- * @param {string} arrowId - Arrow marker ID
- * @param {string} arrowOutlineId - Arrow outline marker ID
- * @param {Array} gradientIds - Gradient IDs
- */
 function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
     const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_;
-
-    const flowsGroup = container.append('g')
-        .attr('class', 'em-flow-lines')
-        .attr('id', 'em-flow-lines')
-        .style('opacity', out.flowOpacity_);
-
+    const flowsGroup = buildFlowsGroup(container, out);
     const linkPath = sankeyLinkAvoidingNodes(nodes, out.flowCurvatureSettings_);
 
     links.forEach((link, i) => {
         const dCenter = linkPath(link);
-        const colorKey =
-            (out.topLocationKeys && out.topLocationKeys?.has?.(link?.target?.id))
-                ? link.target.id
-                : (link?.target?.id ?? link?.source?.id ?? 'Other');
+        const colorKey = computeColorKey(out, link);
         const paint = usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link);
 
-        // ---------- OUTLINE (stroke) ----------
+        // Outline behind the main symbol (only for simple stroke variant)
         if (out.flowOutlines_ && !out.flowWidthGradient_) {
-            const outlineW = link.width + out.flowOutlineWidth_;
-            const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(outlineW, out.flowArrowScale_) : 0;
-            const [dashVis, dashGap] = pathDashForBackoff(dCenter, backoff);
-
-            const outline = flowsGroup.append('path')
-                .attr('d', dCenter)
-                .attr('fill', 'none')
-                .attr('class', 'em-flow-link-outline')
-                .attr('stroke', out.flowOutlineColor_)
-                .attr('stroke-width', outlineW)
-                // .attr('stroke-linecap', 'butt')
-                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
-                .style('pointer-events', 'none');
-
-            if (out.flowArrows_ && !out.flowWidthGradient_) applyArrow(outline, arrowIds, 'outline');
+            buildOutlinePath(out, flowsGroup, dCenter, link, arrowIds);
         }
 
-        // ---------- MAIN ----------
-        let mainSel;
+        // Main symbol
+        const mainSel = out.flowWidthGradient_
+            ? buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey)
+            : buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds);
 
-        if (out.flowWidthGradient_) {
-            // Tapered polygon fill
-            const dPoly = taperedPolygonForLink(
-                link, () => dCenter,
-                {
-                    startRatio: out.flowWidthGradientSettings_.startRatio,
-                    samples: out.flowWidthGradientSettings_.samples,
-                    minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                    capEnd: out.flowArrows_, // if arrows, cap the end
-                },
-                0
-            );
+        // Mouse/tooltip/arrow hover
+        addMouseEvents(out, mainSel, {
+            usesGradient,
+            paint,
+            link,
+            arrowIds
+        });
+    });
+}
 
-            // optional outline polygon (halo)
-            if (out.flowOutlines_) {
-                const dPolyOutline = taperedPolygonForLink(
-                    link, () => dCenter,
-                    {
-                        startRatio: out.flowWidthGradientSettings_.startRatio,
-                        samples: out.flowWidthGradientSettings_.samples,
-                        minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                        capEnd: !out.flowArrows_,
-                    },
-                    out.flowOutlineWidth_
-                );
-                flowsGroup.append('path')
-                    .attr('d', dPolyOutline)
-                    .attr('fill', out.flowOutlineColor_)
-                    .attr('class', 'em-flow-link-outline');
-            }
+/* ----------------- helpers ----------------- */
 
-            mainSel = flowsGroup.append('path')
-                .attr('d', dCenter)
-                .attr('fill', 'none')
-                .attr('class', 'em-flow-link')
-                .attr('stroke', paint)
-                .attr('stroke-width', link.width)
-                .attr('stroke-linecap', 'butt')
-                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
-                .attr('data-color-key', colorKey)     // for legends
-                .attr('data-color', usesGradient ? null : paint); // solid color fallback
+function buildFlowsGroup(container, out) {
+    return container.append('g')
+        .attr('class', 'em-flow-lines')
+        .attr('id', 'em-flow-lines')
+        .style('opacity', out.flowOpacity_);
+}
 
-            // Arrow carriers (transparent strokes) so markers render at the tip
-            if (out.flowArrows_ && !out.flowWidthGradient_) {
-                // main head
-                const carrierMain = flowsGroup.append('path')
-                    .attr('d', dCenter)
-                    .attr('fill', 'none')
-                    .attr('stroke', getFlowStroke(out, link))
-                    .attr('stroke-opacity', 0)
-                    .attr('stroke-width', link.width)
-                    .attr('stroke-linecap', 'butt');
-                applyArrow(carrierMain, arrowIds, 'normal');
+function computeColorKey(out, link) {
+    // Stable key used by legend hover
+    if (out.topLocationKeys && out.topLocationKeys.has?.(link?.target?.id)) return link.target.id;
+    return link?.target?.id ?? link?.source?.id ?? 'Other';
+}
 
-                // outline head (only if outlines are on)
-                if (out.flowOutlines_) {
-                    const carrierOutline = flowsGroup.append('path')
-                        .attr('d', dCenter)
-                        .attr('fill', 'none')
-                        .attr('stroke', out.flowOutlineColor_)
-                        .attr('stroke-opacity', 0)
-                        .attr('stroke-width', link.width + out.flowOutlineWidth_)
-                        .attr('stroke-linecap', 'butt');
-                    applyArrow(carrierOutline, arrowIds, 'outline');
-                }
-            }
+function getBackoffAndDash(out, strokePx, dCenter) {
+    const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(strokePx, out.flowArrowScale_) : 0;
+    const [dashVis, dashGap] = pathDashForBackoff(dCenter, backoff);
+    return { backoff, dashVis, dashGap };
+}
 
-        } else {
-            // Simple stroked path
-            const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(link.width, out.flowArrowScale_) : 0;
-            const [dashVis, dashGap] = pathDashForBackoff(dCenter, backoff);
+function buildOutlinePath(out, flowsGroup, dCenter, link, arrowIds) {
+    const outlineW = link.width + out.flowOutlineWidth_;
+    const { dashVis, dashGap } = getBackoffAndDash(out, outlineW, dCenter);
 
-            mainSel = flowsGroup.append('path')
-                .attr('d', dCenter)
-                .attr('fill', 'none')
-                .attr('class', 'em-flow-link')
-                .attr('stroke', usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link))
-                .attr('stroke-width', link.width)
-                .attr('stroke-linecap', 'butt')
-                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null);
+    const outline = flowsGroup.append('path')
+        .attr('d', dCenter)
+        .attr('fill', 'none')
+        .attr('class', 'em-flow-link-outline')
+        .attr('stroke', out.flowOutlineColor_)
+        .attr('stroke-width', outlineW)
+        .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+        .style('pointer-events', 'none');
 
-            if (out.flowArrows_) applyArrow(mainSel, arrowIds, 'normal');
-        }
+    if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline');
+    return outline;
+}
 
-        // ---------- HOVER ----------
-        mainSel.on('mouseover', function () {
+function buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey) {
+    // Build the tapered polygon
+    const dPoly = taperedPolygonForLink(
+        link, () => dCenter,
+        {
+            startRatio: out.flowWidthGradientSettings_.startRatio,
+            samples: out.flowWidthGradientSettings_.samples,
+            minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
+            capEnd: out.flowArrows_,  // cap so the arrow marker (if any) has a clean tip
+        },
+        0
+    );
+
+    // Optional halo polygon around the tapered main
+    if (out.flowOutlines_) {
+        const dPolyOutline = taperedPolygonForLink(
+            link, () => dCenter,
+            {
+                startRatio: out.flowWidthGradientSettings_.startRatio,
+                samples: out.flowWidthGradientSettings_.samples,
+                minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
+                capEnd: !out.flowArrows_,
+            },
+            out.flowOutlineWidth_
+        );
+        flowsGroup.append('path')
+            .attr('d', dPolyOutline)
+            .attr('fill', out.flowOutlineColor_)
+            .attr('class', 'em-flow-link-outline');
+    }
+
+    // The main tapered symbol uses FILL (so it stays curved on hover)
+    const mainSel = flowsGroup.append('path')
+        .attr('d', dPoly)
+        .attr('fill', paint)
+        .attr('class', 'em-flow-link em-flow-link-tapered')
+        .attr('data-color-key', colorKey)
+        .attr('data-color', paint.startsWith('url(') ? null : paint);
+
+    // Note: we skip arrow carriers for tapered; markers can be applied to centerline if needed
+    return mainSel;
+}
+
+function buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds) {
+    const { dashVis, dashGap } = getBackoffAndDash(out, link.width, dCenter);
+
+    const mainSel = flowsGroup.append('path')
+        .attr('d', dCenter)
+        .attr('fill', 'none')
+        .attr('class', 'em-flow-link')
+        .attr('stroke', paint)
+        .attr('stroke-width', link.width)
+        .attr('stroke-linecap', 'butt')
+        .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+        .attr('data-color-key', colorKey)
+        .attr('data-color', paint.startsWith('url(') ? null : paint);
+
+    if (out.flowArrows_) applyArrow(mainSel, arrowIds, 'normal');
+    return mainSel;
+}
+
+function addMouseEvents(out, mainSel, ctx) {
+    const { usesGradient, paint, link, arrowIds } = ctx;
+
+    mainSel
+        .on('mouseover', function () {
             if (out.flowWidthGradient_) {
+                // Tapered uses fill
                 select(this).attr('fill', out.hoverColor_);
             } else {
+                // Simple uses stroke
                 select(this).attr('stroke', out.hoverColor_);
                 if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true);
             }
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out));
         })
-            .on('mousemove', e => { if (out._tooltip) out._tooltip.mousemove(e); })
-            .on('mouseout', function () {
-                if (out.flowWidthGradient_) {
-                    select(this).attr('fill', usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
-                } else {
-                    select(this).attr('stroke', usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link));
-                    if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false);
-                }
-                if (out._tooltip) out._tooltip.mouseout();
-            });
-    });
+        .on('mousemove', e => {
+            if (out._tooltip) out._tooltip.mousemove(e);
+        })
+        .on('mouseout', function () {
+            if (out.flowWidthGradient_) {
+                select(this).attr('fill', paint);   // restore polygon fill
+            } else {
+                select(this).attr('stroke', paint); // restore stroke
+                if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false);
+            }
+            if (out._tooltip) out._tooltip.mouseout();
+        });
 }
 
 // Sample an SVG path string into points using DOM path length
