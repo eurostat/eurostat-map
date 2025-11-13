@@ -402,26 +402,45 @@ function addOverlayPolygons(out) {
 
 
 const flowMapTooltipFunction = function (link, map) {
-    const buf = []
-    const statData = map.statData()
-    const unit = statData.unitText() || ''
+    const buf = [];
+    const statData = map.statData();
+    const unit = statData.unitText() || '';
 
-    // Header with region name and ID
-    const title = `${link.source.name || link.source.id} to ${link.target.name || link.target.id}`
+    // ---- FIX: determine true origin/destination for split flows ----
+    const originId =
+        link.originId ??
+        (link.source.isMidpoint ? null : link.source.id);
+
+    const destId =
+        link.destId ??
+        (link.target.isMidpoint ? null : link.target.id);
+
+    const nodeById = map._nodeById || new Map();
+
+    const originNode = nodeById.get(originId) || { id: originId, name: originId };
+    const destNode = nodeById.get(destId) || { id: destId, name: destId };
+
+    const originName = originNode.name || originNode.id;
+    const destName = destNode.name || destNode.id;
+
+    // Header
+    const title = `${originName} to ${destName}`;
     buf.push(`
         <div class="em-tooltip-bar">
             <b>${title}</b>
         </div>
-    `)
+    `);
 
     // Value
-    buf.push(`<div class='em-tooltip-text'>
-                <table class="em-tooltip-table">
-                    <tbody>
-                        <tr><td>${spaceAsThousandSeparator(link.value)} ${unit}</td></tr>
-                    </tbody>
-                </table> 
-            </div>`)
+    buf.push(`
+        <div class='em-tooltip-text'>
+            <table class="em-tooltip-table">
+                <tbody>
+                    <tr><td>${spaceAsThousandSeparator(link.value)} ${unit}</td></tr>
+                </tbody>
+            </table>
+        </div>
+    `);
 
-    return buf.join('')
-}
+    return buf.join('');
+};

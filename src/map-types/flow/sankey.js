@@ -148,13 +148,30 @@ function sankey(out, baseGraph) {
     computeNodeBreadths(out, graph);
     computeLinkBreadths(out, graph);
 
+    //  fix midpoint Y so split flows meet at the true midpoint, not its location on the stem
+    adjustMidpointNodes(graph);
+
     return graph;
 }
 
 function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
     const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_;
     const flowsGroup = buildFlowsGroup(container, out);
-    const linkPath = sankeyLinkAvoidingNodes(nodes, out.flowCurvatureSettings_);
+    // Allow per-link curvature: split flows (midpoint source) get half curvature
+    const baseCurvSettings = out.flowCurvatureSettings_ || {};
+    const baseCurv = baseCurvSettings.curvature ?? 0.5;
+
+    const linkPath = sankeyLinkAvoidingNodes(nodes, {
+        ...baseCurvSettings,
+        curvature: typeof baseCurvSettings.curvature === 'function'
+            ? baseCurvSettings.curvature
+            : (link) => {
+                // If the link starts at a synthetic midpoint node,
+                // treat it as a "half" and reduce curvature.
+                const isHalf = link.source && link.source.isMidpoint;
+                return isHalf ? baseCurv * 0.5 : baseCurv;
+            }
+    });
 
     links.forEach((link, i) => {
         const dCenter = linkPath(link);
@@ -541,6 +558,16 @@ function computeLinkBreadths(out, { nodes }) {
     for (const node of nodes) {
         const mid = node.y;
 
+        // 🔧 Special case: synthetic midpoints for split flows
+        // All links should meet exactly at node.y, not be stacked.
+        if (node.isMidpoint) {
+            for (const l of node.sourceLinks) l.y0 = mid;
+            for (const l of node.targetLinks) l.y1 = mid;
+            node.y0 = mid;
+            node.y1 = mid;
+            continue;
+        }
+
         // Collapse mode: both ends meet at the node center
         if (!out.flowStack_) {
             for (const l of node.sourceLinks) l.y0 = mid;
@@ -551,9 +578,6 @@ function computeLinkBreadths(out, { nodes }) {
         }
 
         // --- STACK MODE: two independent stacks, one per side of the node ---
-        // Classify links by which SIDE (left/right) they attach to at THIS node.
-        // For a link where this node is the source, "other end" is target.
-        // For a link where this node is the target, "other end" is source.
         const left = [];
         const right = [];
 
@@ -571,16 +595,12 @@ function computeLinkBreadths(out, { nodes }) {
             (other.x < node.x ? left : right).push(item);
         }
 
-        // Totals per side
         const totalLeft = left.reduce((s, d) => s + d.width, 0);
         const totalRight = right.reduce((s, d) => s + d.width, 0);
 
-        // Each side is centered on node.y, but stacked independently.
-        // Order by the other end's y so stacks look "pulled" toward destinations/sources.
         left.sort(out.flowOrder_);
         right.sort(out.flowOrder_);
 
-        // Assign y positions on the LEFT side
         let yL = mid - totalLeft / 2;
         for (const d of left) {
             const yMid = yL + d.width / 2;
@@ -588,7 +608,6 @@ function computeLinkBreadths(out, { nodes }) {
             yL += d.width;
         }
 
-        // Assign y positions on the RIGHT side
         let yR = mid - totalRight / 2;
         for (const d of right) {
             const yMid = yR + d.width / 2;
@@ -596,10 +615,53 @@ function computeLinkBreadths(out, { nodes }) {
             yR += d.width;
         }
 
-        // The node stem should span the larger side only (NOT sum of both).
         const span = Math.max(totalLeft, totalRight);
         node.y0 = mid - span / 2;
         node.y1 = mid + span / 2;
+    }
+}
+
+// After link positions are computed, adjust synthetic midpoint nodes so they
+// sit at the true midpoint of THEIR two incident links (using the stacked
+// y-positions, not the node centres).
+function adjustMidpointNodes({ nodes }) {
+    for (const node of nodes) {
+        if (!node.isMidpoint) continue;
+
+        const incident = [
+            ...(node.sourceLinks || []),
+            ...(node.targetLinks || [])
+        ];
+
+        if (incident.length !== 2) continue; // sanity: we expect exactly two halves
+
+        const ends = [];
+
+        for (const link of incident) {
+            if (link.source === node) {
+                // midpoint -> real node
+                ends.push({ x: link.target.x0, y: link.y1 });
+            } else if (link.target === node) {
+                // real node -> midpoint (just in case)
+                ends.push({ x: link.source.x1, y: link.y0 });
+            }
+        }
+
+        if (ends.length !== 2) continue;
+
+        // Y midpoint of the *actual* stacked link endpoints
+        const midY = (ends[0].y + ends[1].y) / 2;
+
+        // Keep x as-is (geometric middle already fine); just fix Y
+        node.y = midY;
+        node.y0 = midY;
+        node.y1 = midY;
+
+        // Snap both halves to the corrected midpoint Y
+        for (const link of incident) {
+            if (link.source === node) link.y0 = midY;
+            if (link.target === node) link.y1 = midY;
+        }
     }
 }
 
@@ -651,7 +713,7 @@ function sankeyLinkAvoidingNodes(obstacles, {
     padX = 2,
     padY = 2,
     bumpY = 0,
-    curvature = 0.5
+    curvature = 0.5   // may be number OR function(link) -> number
 } = {}) {
     return function (link) {
         const sx = link.source.x1, sy = link.y0;
@@ -749,9 +811,12 @@ function sankeyLinkAvoidingNodes(obstacles, {
         pts.push([xB, yB]);
         if (rev) pts.reverse();
 
+        //  per-link curvature: number OR function(link) -> number
+        const c = (typeof curvature === 'function') ? curvature(link) : curvature;
+
         let d = `M${pts[0][0]},${pts[0][1]}`;
         for (let i = 1; i < pts.length; i++) {
-            d += cubicSegment(pts[i - 1], pts[i], curvature);
+            d += cubicSegment(pts[i - 1], pts[i], c);
         }
         return d;
     };

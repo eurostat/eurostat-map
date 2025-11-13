@@ -25,6 +25,11 @@
     opacity: 0.7;
 }
 
+.em-flow-node-stems {
+    opacity: 0.1 !important;
+}
+
+
 text#em-label-RUSSIA\:-BLACK-SEA, text#em-label-shadow-RUSSIA\:-BLACK-SEA {
     transform: translate(75px, 5px);
 }
@@ -47,6 +52,7 @@ text#em-label-TÜRKIYE, text#em-label-shadow-TÜRKIYE {
 transform: translate(20px, 15px);
 }
 
-.em-flow-node-stems {
-    opacity: 0.1 !important;
+text#em-label-UNITED-KINGDOM, text#em-label-shadow-UNITED-KINGDOM {
+transform: translate(-50px, 7px);
 }
+

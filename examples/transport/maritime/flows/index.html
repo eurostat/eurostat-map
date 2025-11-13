@@ -78,10 +78,10 @@
             //.flowWidthGradient(true)
             .flowStack(true)
             .flowCurvatureSettings({
-                gapX: 0,        // how far before/after node to begin/end curve
+                gapX: 1,        // how far before/after node to begin/end curve
                 padX: 0,         // horizontal clearance near node stems
-                padY: 0,         // vertical collision detection padding
-                bumpY: 0,        // extra height for hop
+                padY: 1,         // vertical collision detection padding
+                bumpY: 5,        // extra height for hop
                 curvature: 0.3   // 0..1; default sankey smoothness
             }).flowOrder((a, b) => {
                 // Prefer originId if present (from expandRoutesToSankeyMidpointGraph),
