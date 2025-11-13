@@ -4,42 +4,35 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-        @import url('./flows.css');
-    </style>
+    <link rel="stylesheet" href="./flows.css" />
 </head>
 
 <body style="margin:0">
     <svg id="maritime-flow-map"></svg>
 
-    <svg style='display:none;'>
-        <!-- used for country borders -->
-        <defs>
-            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
-            </filter>
-        </defs>
-    </svg>
     <script src="../../../../build/eurostatmap.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/proj4"></script>
     <script src="./maritimeFlowGraph.js"></script>
 
     <script id="our-map-code">
-        const width = 800
+        const width = 900
+        const height = width / 1.5
         const worldProjection = d3
             .geoAzimuthalEquidistant()
             .rotate([0, 0])
-            .scale(200)
+            //.center([10, 52])       // center on Europe
+            .scale(270)
             .translate([width / 2.4, width / 2.3])
         const spaceAsThousandSeparator = function (number) {
             return number.toLocaleString("en").replace(/,/gi, " ");
         }
+        const euCoords = [12,49];
         const map = eurostatmap
             .map("flow")
             .svgId("maritime-flow-map")
             .width(width)
-            .height(width / 1.5)
+            .height(height)
             .title("Maritime freight")
             .subtitle("Top 15 flows of goods handled by EU ports")
 
@@ -59,23 +52,42 @@
                 }
                 return map.flowRegionColors_[0];
             })
-            .flowMinWidth(4)
+            .flowMinWidth(7)
             .flowMaxWidth(30)
             .flowLineType("curved")
             .flowDonuts(false)
-            .flowOpacity(0.9)
+            .flowOpacity(0.8)
             .flowArrows(false)
             .flowOutlines(true)
+            .flowOutlineColor('white')
+            .flowOutlineWidth(0.2)
             .flowColorGradient(false)
-            .flowWidthGradient(true)
+            .flowWidthGradient(false)
             //.flowTopLocations(0)
             //.flowWidthGradient(true)
             .flowStack(false)
+            .flowCurvatureSettings({
+                gapX: 10,        // how far before/after node to begin/end curve
+                padX: -10,         // horizontal clearance near node stems
+                padY: 1,         // vertical collision detection padding
+                bumpY: 20,        // extra height for hop
+                curvature: 0.7   // 0..1; default sankey smoothness 
+            })
+            .labels({
+                labels: [
+                    {
+                        text: "EU",
+                        x: euCoords[0],
+                        y: euCoords[1],
+                    },
+                ],
+                shadows:true
+            })
 
             // legend
             .legend({
-                x: width - 170,
-                y: 0,
+                x: width - 140,
+                y: height - 190,
                 boxPadding: 10,
                 title: "Freight carried",
                 subtitle: "(tonnes)",
@@ -86,27 +98,15 @@
                 },
                 flowColorLegend: false,
                 regionColorLegend: {
-                    marginTop: 40,
+                    marginTop: 20,
                     title: " ",
-                    labels: ["import", "export"]
+                    labels: ["imports", "exports"]
                 }
             })
-
-            //labels
-            // .labels({
-            //   labels: regionLabels,
-            //   shadows: true,
-            //   values: true,
-            //   valuesFormatter: (d) => d3.format(".2s")(d * 1000)
-            // })
 
             .footnote(
                 "Freight includes both loaded and unloaded. Administrative boundaries: ©EuroGeographics ©UN-FAO @OpenStreetMap"
             )
-            // .tooltip({
-            //   textFunction: freightTooltipFunction
-            // })
-
             // zoom min/max
             .zoomExtent([0.6, 10])
             .zoomButtons(true)

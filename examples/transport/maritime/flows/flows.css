@@ -2,12 +2,21 @@
     transform: translate(94%, 88%) !important;
 }
 
-.em-sea {
-    fill: lightblue
-}
-
 .em-title,
 .em-subtitle {
     /*     transform: translate(0px, 15px); */
     filter: brightness(0.5);
+}
+.em-worldbn {
+    stroke: grey !important;
+    stroke-width: 0.5px !important;
+    stroke-opacity: 0.5 !important;
+}
+
+.em-flow-exporter, .em-flow-importer {
+    opacity:0.5;
+}
+
+.em-zoom-buttons {
+    transform: translate(95%,2%) !important;
 }

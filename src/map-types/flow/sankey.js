@@ -1,4 +1,4 @@
-import { generateUniqueId, getRegionsSelector } from '../../core/utils'
+import { generateUniqueId } from '../../core/utils'
 import { sum } from 'd3-array'
 import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js';
@@ -52,37 +52,6 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     addNodeStems(out, sankeyContainer, nodes)
 
     return svg.node()
-}
-
-/**
- * Adds an arrow marker to the defs section
- * @param {Object} defs - D3 selection of defs
- * @param {string} id - Marker ID
- * @param {string} color - Fill color of the marker
- */
-function addArrowMarker(out, defs, id, color) {
-    defs.append('marker')
-        .attr('id', id)
-        .attr('markerHeight', 7)
-        .attr('markerWidth', 7)
-        .attr('refX', 0.5)
-        .attr('refY', 1.5)
-        .attr('orient', 'auto')
-        .append('path')
-        .attr('fill', color)
-        .attr('d', 'M0,0 q0,1,0.5,1.5 q-0.5,0.5,-0.5,1.5 q0.75,-0.75,2,-1.5 q-1.25,-0.75,-2,-1.5Z')
-
-    // add a copy for mouseover with hovered color
-    defs.append('marker')
-        .attr('id', id + 'mouseover')
-        .attr('markerHeight', 7)
-        .attr('markerWidth', 7)
-        .attr('refX', 0.5)
-        .attr('refY', 1.5)
-        .attr('orient', 'auto')
-        .append('path')
-        .attr('fill', out.hoverColor_)
-        .attr('d', 'M0,0 q0,1,0.5,1.5 q-0.5,0.5,-0.5,1.5 q0.75,-0.75,2,-1.5 q-1.25,-0.75,-2,-1.5Z')
 }
 
 /**
@@ -232,7 +201,7 @@ function buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey) {
                 startRatio: out.flowWidthGradientSettings_.startRatio,
                 samples: out.flowWidthGradientSettings_.samples,
                 minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                capEnd: !out.flowArrows_,
+                capEnd: out.flowArrows_,
             },
             out.flowOutlineWidth_
         );

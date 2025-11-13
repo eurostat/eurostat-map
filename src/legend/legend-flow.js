@@ -41,6 +41,7 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 15,
         marginTop: 30,
+        labels: ['Exporter', 'Importer'],
     }
 
     //override attribute values with config values
@@ -339,8 +340,8 @@ export const legend = function (map, config) {
 
         const map = out.map
         const items = {
-            [map.flowRegionLabels_[0]]: map.flowRegionColors_[0],
-            [map.flowRegionLabels_[1]]: map.flowRegionColors_[1],
+            [out.regionColorLegend.labels[0]]: map.flowRegionColors_[0],
+            [out.regionColorLegend.labels[1]]: map.flowRegionColors_[1],
         }
         // Draw the legend items
         let x = 0
