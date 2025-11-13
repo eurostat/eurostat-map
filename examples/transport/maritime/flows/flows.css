@@ -14,7 +14,7 @@
 }
 
 .em-flow-exporter, .em-flow-importer {
-    opacity:0.5;
+    opacity:0.3;
 }
 
 .em-zoom-buttons {
@@ -45,4 +45,8 @@ text#em-label-CHINA, text#em-label-shadow-CHINA {
 
 text#em-label-TÜRKIYE, text#em-label-shadow-TÜRKIYE {
 transform: translate(20px, 15px);
+}
+
+.em-flow-node-stems {
+    opacity: 0.1 !important;
 }

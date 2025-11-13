@@ -76,14 +76,41 @@
             .flowWidthGradient(false)
             //.flowTopLocations(0)
             //.flowWidthGradient(true)
-            .flowStack(false)
+            .flowStack(true)
             .flowCurvatureSettings({
-                gapX: 10,        // how far before/after node to begin/end curve
-                padX: -10,         // horizontal clearance near node stems
-                padY: 10,         // vertical collision detection padding
-                bumpY: -20,        // extra height for hop
-                curvature: 0.7   // 0..1; default sankey smoothness 
+                gapX: 0,        // how far before/after node to begin/end curve
+                padX: 0,         // horizontal clearance near node stems
+                padY: 0,         // vertical collision detection padding
+                bumpY: 0,        // extra height for hop
+                curvature: 0.3   // 0..1; default sankey smoothness
+            }).flowOrder((a, b) => {
+                // Prefer originId if present (from expandRoutesToSankeyMidpointGraph),
+                // fall back to link.source.id.
+                const srcA = a.link.originId ?? (a.link.source && a.link.source.id);
+                const srcB = b.link.originId ?? (b.link.source && b.link.source.id);
+                const morocco = a.link.target.id === 'MA' || b.link.target.id === 'MA';
+
+                // Edge case: move India flow above Turkey
+                if (srcA === 'IN' && srcB === 'TR') return -1; // IN above TR
+                if (srcA === 'TR' && srcB === 'IN') return 1;  // TR below IN
+
+                //brasil above algeria and morocco
+                if (srcA === 'BR' && (srcB === 'DZ' || morocco)) return -1;
+                if ((srcA === 'DZ' || morocco) && srcB === 'BR') return 1;
+
+                // Default ordering: by otherY (pulls toward the other end of the link)
+                const dy = a.otherY - b.otherY;
+                if (dy !== 0) return dy;
+
+                // Tie-break by source id so sort is stable/deterministic
+                if (srcA && srcB && srcA !== srcB) {
+                    return srcA < srcB ? -1 : 1;
+                }
+
+                return 0;
             })
+
+
             .labels({
                 labels: getRegionLabels(maritimeFlowGraph),
                 shadows: true

@@ -636,6 +636,16 @@ function cubicSegment(p0, p1, curvature = 0.5) {
 //   padY: vertical clearance outside[y0, y1]
 //   curvature: 0..1; 0.5 ≈ default d3 - sankey feel
 //                 
+// 
+// Returns a function(link) -> path string, avoiding node stems.
+// obstacles: array of nodes with x0, y0, y1 (your stacked extents)
+// opts:
+//   gapX: how far to go left / right of the node before / after the bypass
+//   padX: horizontal "no-go" half-width around the stem
+//   padY: vertical clearance outside [y0, y1]
+//   bumpY: extra lift above/below the obstacle band
+//   curvature: 0..1; 0.5 ≈ default d3-sankey feel
+//
 function sankeyLinkAvoidingNodes(obstacles, {
     gapX = 10,
     padX = 2,
@@ -647,6 +657,11 @@ function sankeyLinkAvoidingNodes(obstacles, {
         const sx = link.source.x1, sy = link.y0;
         const tx = link.target.x0, ty = link.y1;
 
+        // If source and target have same x, just draw a straight segment.
+        if (sx === tx) {
+            return `M${sx},${sy}L${tx},${ty}`;
+        }
+
         const rev = sx > tx;
         const xA = rev ? tx : sx;
         const yA = rev ? ty : sy;
@@ -654,7 +669,14 @@ function sankeyLinkAvoidingNodes(obstacles, {
         const yB = rev ? sy : ty;
 
         const pts = [[xA, yA]];
-        const yAt = (x) => yA + (yB - yA) * ((x - xA) / (xB - xA));
+
+        const yAt = (x) => {
+            const t = (xB === xA) ? 0 : ((x - xA) / (xB - xA));
+            return yA + (yB - yA) * t;
+        };
+
+        // 1) Collect bypass segments that actually intersect this link
+        const segments = [];
 
         for (const n of obstacles) {
             if (n === link.source || n === link.target) continue;
@@ -662,30 +684,79 @@ function sankeyLinkAvoidingNodes(obstacles, {
             const ox = n.x0;
             if (ox <= xA || ox >= xB) continue;
 
-            const top = (n.y0 ?? n.y) - padY;
-            const bot = (n.y1 ?? n.y) + padY;
-            const leftX = ox - padX, rightX = ox + padX;
+            const nodeTop = (n.y0 ?? n.y);
+            const nodeBot = (n.y1 ?? n.y);
+            const nodeMid = (nodeTop + nodeBot) / 2;
+
+            const leftX = ox - padX;
+            const rightX = ox + padX;
 
             const yline = yAt(ox);
 
-            if (yline >= top && yline <= bot) {
-                // apply bumpY to lift above/below the band without increasing padY
-                const goAbove = (yline - top) <= (bot - yline);
-                const bypassY = goAbove ? (top - bumpY) : (bot + bumpY);
+            // Is the link passing above or below the node centre?
+            const isBelow = yline >= nodeMid;      // larger y = visually "below"
 
-                pts.push([Math.max(xA, leftX - gapX), bypassY]);
-                pts.push([Math.min(xB, rightX + gapX), bypassY]);
+            // Apply pad only on the side where the link lies
+            const top = nodeTop - (isBelow ? 0 : padY);
+            const bot = nodeBot + (isBelow ? padY : 0);
+
+            // Only treat as collision if the link actually enters this one-sided band
+            if (yline >= top && yline <= bot) {
+                const bypassY = isBelow
+                    ? (bot + bumpY)   // link is below → push further down
+                    : (top - bumpY);  // link is above → push further up
+
+                const x1 = Math.max(xA, leftX - gapX);
+                const x2 = Math.min(xB, rightX + gapX);
+                if (x2 <= x1) continue; // degenerate
+
+                segments.push({ x1, x2, y: bypassY });
             }
         }
 
+        if (segments.length) {
+            // 2) Merge overlapping segments horizontally
+            segments.sort((a, b) => a.x1 - b.x1);
+            const merged = [];
+            for (const seg of segments) {
+                if (!merged.length || seg.x1 > merged[merged.length - 1].x2) {
+                    merged.push({ ...seg });
+                } else {
+                    const last = merged[merged.length - 1];
+                    last.x2 = Math.max(last.x2, seg.x2);
+                    // keep the latest y (they should be same-side already)
+                    last.y = seg.y;
+                }
+            }
+
+            // 3) Emit bypass points, enforcing monotonic X
+            for (const seg of merged) {
+                const startX = Math.max(xA, seg.x1);
+                const endX = Math.min(xB, seg.x2);
+                let lastX = pts[pts.length - 1][0];
+
+                if (startX > lastX) {
+                    pts.push([startX, seg.y]);
+                    lastX = startX;
+                }
+                if (endX > lastX) {
+                    pts.push([endX, seg.y]);
+                }
+            }
+        }
+
+        // Always end at the target
         pts.push([xB, yB]);
         if (rev) pts.reverse();
 
         let d = `M${pts[0][0]},${pts[0][1]}`;
-        for (let i = 1; i < pts.length; i++) d += cubicSegment(pts[i - 1], pts[i], curvature);
+        for (let i = 1; i < pts.length; i++) {
+            d += cubicSegment(pts[i - 1], pts[i], curvature);
+        }
         return d;
     };
 }
+
 
 function pathLength(d) {
     const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');

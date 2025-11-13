@@ -69,10 +69,10 @@
             .flowDonuts(false)
             .flowCurvatureSettings({
                 gapX: 10,        // how far before/after node to begin/end curve
-                padX: -20,         // horizontal clearance near node stems
+                padX: -10,         // horizontal clearance near node stems
                 padY: 1,         // vertical collision detection padding
-                bumpY: 5,        // extra height for hop
-                curvature: 0.4   // 0..1; default sankey smoothness 
+                bumpY: 10,        // extra height for hop
+                curvature: 0.1   // 0..1; default sankey smoothness 
             })
             .flowOrder((a, b) => {
                 //edge case: put FR>BE link on top of FR>DE
