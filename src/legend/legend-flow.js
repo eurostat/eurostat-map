@@ -123,7 +123,8 @@ export const legend = function (map, config) {
         // line widths
         buildFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop)
 
-        const flowWidthLegendHeight = out._flowWidthContainer.node().getBBox().height
+        const flowWidthNode = out._flowWidthContainer.node()
+        const flowWidthLegendHeight = flowWidthNode.getBBox().height
 
         // donut size legend
         if (map.flowDonuts_ && map.donutSizeScale) {
@@ -151,14 +152,14 @@ export const legend = function (map, config) {
         }
 
         // flow colour legend
-        if (map.flowDonuts_ && map.donutSizeScale || typeof map.flowColor_ === 'function') {
+        if ((map.flowDonuts_ && map.donutSizeScale || typeof map.flowColor_ === 'function') && out.flowColorLegend) {
             // donut color legend
             let flowColorLegendYOffset = out.lgg.node().getBBox().height + out.flowColorLegend.marginTop
             drawFlowColorLegend(out, baseX, flowColorLegendYOffset)
         }
 
         // region fill colors
-        if (map.importerRegionIds.length > 0 || map.exporterRegionIds.length > 0) {
+        if ((map.importerRegionIds.length > 0 || map.exporterRegionIds.length > 0) && out.regionColorLegend) {
             let regionColorLegendYOffset = out.lgg.node().getBBox().height + out.regionColorLegend.marginTop
             drawRegionColorLegend(out, baseX, regionColorLegendYOffset)
         }

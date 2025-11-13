@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        @import url('./flows.css');
+    </style>
+</head>
+
+<body style="margin:0">
+    <svg id="maritime-flow-map"></svg>
+
+    <svg style='display:none;'>
+        <!-- used for country borders -->
+        <defs>
+            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
+            </filter>
+        </defs>
+    </svg>
+    <script src="../../../../build/eurostatmap.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/proj4"></script>
+    <script src="./maritimeFlowGraph.js"></script>
+
+    <script id="our-map-code">
+        const width = 800
+        const worldProjection = d3
+            .geoAzimuthalEquidistant()
+            .rotate([0, 0])
+            .scale(200)
+            .translate([width / 2.4, width / 2.3])
+        const spaceAsThousandSeparator = function (number) {
+            return number.toLocaleString("en").replace(/,/gi, " ");
+        }
+        const map = eurostatmap
+            .map("flow")
+            .svgId("maritime-flow-map")
+            .width(width)
+            .height(width / 1.5)
+            .title("Maritime freight")
+            .subtitle("Top 15 flows of goods handled by EU ports")
+
+            //projection
+            .projectionFunction(worldProjection)
+
+            //geometries
+            .geo("WORLD")
+            .proj("4326")
+            .scale("60M")
+
+            // flow settings
+            .flowGraph(maritimeFlowGraph)
+            .flowColor((d) => {
+                if (d.source.id == "EU") {
+                    return map.flowRegionColors_[1];
+                }
+                return map.flowRegionColors_[0];
+            })
+            .flowMinWidth(4)
+            .flowMaxWidth(30)
+            .flowLineType("curved")
+            .flowDonuts(false)
+            .flowOpacity(0.9)
+            .flowArrows(false)
+            .flowOutlines(true)
+            .flowColorGradient(false)
+            .flowWidthGradient(true)
+            //.flowTopLocations(0)
+            //.flowWidthGradient(true)
+            .flowStack(false)
+
+            // legend
+            .legend({
+                x: width - 170,
+                y: 0,
+                boxPadding: 10,
+                title: "Freight carried",
+                subtitle: "(tonnes)",
+                flowWidthLegend: {
+                    marginTop: -10,
+                    //values: [3, 500, 2600],
+                    labelFormatter: (value) => spaceAsThousandSeparator(value * 1000)
+                },
+                flowColorLegend: false,
+                regionColorLegend: {
+                    marginTop: 40,
+                    title: " ",
+                    labels: ["import", "export"]
+                }
+            })
+
+            //labels
+            // .labels({
+            //   labels: regionLabels,
+            //   shadows: true,
+            //   values: true,
+            //   valuesFormatter: (d) => d3.format(".2s")(d * 1000)
+            // })
+
+            .footnote(
+                "Freight includes both loaded and unloaded. Administrative boundaries: ©EuroGeographics ©UN-FAO @OpenStreetMap"
+            )
+            // .tooltip({
+            //   textFunction: freightTooltipFunction
+            // })
+
+            // zoom min/max
+            .zoomExtent([0.6, 10])
+            .zoomButtons(true)
+            .lockPanUntilZoom(false)
+
+            .build();
+
+
+    </script>
+</body>
+
+</html>
