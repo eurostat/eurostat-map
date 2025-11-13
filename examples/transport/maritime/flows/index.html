@@ -57,7 +57,7 @@
             // flow settings
             .flowGraph(maritimeFlowGraph)
             .flowColor((d) => {
-                if (d.source.id == "EU") {
+                if (d.meta.direction =='Outwards') {
                     return map.flowRegionColors_[1];
                 }
                 return map.flowRegionColors_[0];
