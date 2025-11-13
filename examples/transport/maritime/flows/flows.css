@@ -20,3 +20,29 @@
 .em-zoom-buttons {
     transform: translate(95%,2%) !important;
 }
+
+.em-labels {
+    opacity: 0.7;
+}
+
+text#em-label-RUSSIA\:-BLACK-SEA, text#em-label-shadow-RUSSIA\:-BLACK-SEA {
+    transform: translate(75px, 5px);
+}
+text#em-label-UKRAINE, text#em-label-shadow-UKRAINE {
+    transform: translate(35px, 5px);
+}
+text#em-label-MOROCCO, text#em-label-shadow-MOROCCO {
+    transform: translate(-28px, 10px);
+}
+text#em-label-ALGERIA, text#em-label-shadow-ALGERIA,
+text#em-label-LIBYA, text#em-label-shadow-LIBYA,
+text#em-label-EGYPT, text#em-label-shadow-EGYPT,
+text#em-label-NIGERIA, text#em-label-shadow-NIGERIA,
+text#em-label-INDIA, text#em-label-shadow-INDIA,
+text#em-label-CHINA, text#em-label-shadow-CHINA {
+    transform: translate(0px, 15px);
+}
+
+text#em-label-TÜRKIYE, text#em-label-shadow-TÜRKIYE {
+transform: translate(20px, 15px);
+}

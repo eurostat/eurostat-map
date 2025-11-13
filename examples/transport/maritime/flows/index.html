@@ -16,8 +16,9 @@
     <script src="./maritimeFlowGraph.js"></script>
 
     <script id="our-map-code">
-        const width = 900
+        const width = 1080
         const height = width / 1.5
+        const euCoords = [12, 49];
         const worldProjection = d3
             .geoAzimuthalEquidistant()
             .rotate([0, 0])
@@ -27,7 +28,16 @@
         const spaceAsThousandSeparator = function (number) {
             return number.toLocaleString("en").replace(/,/gi, " ");
         }
-        const euCoords = [12,49];
+        const getRegionLabels = function (graph) {
+            let labs = [];
+            let offsets = { x: -2, y: 0 };
+            graph.nodes.forEach((d) => {
+                labs.push({ text: d.name, x: d.x + offsets.x, y: d.y + offsets.y });
+            });
+            return labs;
+        }
+
+
         const map = eurostatmap
             .map("flow")
             .svgId("maritime-flow-map")
@@ -54,13 +64,14 @@
             })
             .flowMinWidth(7)
             .flowMaxWidth(30)
-            .flowLineType("curved")
+            .flowLineType("straight")
+            //.flowLineType("curved")
             .flowDonuts(false)
-            .flowOpacity(0.8)
+            .flowOpacity(0.9)
             .flowArrows(false)
             .flowOutlines(true)
             .flowOutlineColor('white')
-            .flowOutlineWidth(0.2)
+            .flowOutlineWidth(1)
             .flowColorGradient(false)
             .flowWidthGradient(false)
             //.flowTopLocations(0)
@@ -69,19 +80,13 @@
             .flowCurvatureSettings({
                 gapX: 10,        // how far before/after node to begin/end curve
                 padX: -10,         // horizontal clearance near node stems
-                padY: 1,         // vertical collision detection padding
-                bumpY: 20,        // extra height for hop
+                padY: 10,         // vertical collision detection padding
+                bumpY: -20,        // extra height for hop
                 curvature: 0.7   // 0..1; default sankey smoothness 
             })
             .labels({
-                labels: [
-                    {
-                        text: "EU",
-                        x: euCoords[0],
-                        y: euCoords[1],
-                    },
-                ],
-                shadows:true
+                labels: getRegionLabels(maritimeFlowGraph),
+                shadows: true
             })
 
             // legend
@@ -100,7 +105,7 @@
                 regionColorLegend: {
                     marginTop: 20,
                     title: " ",
-                    labels: ["imports", "exports"]
+                    labels: ["Imports", "Exports"]
                 }
             })
 

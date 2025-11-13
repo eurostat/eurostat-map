@@ -2,6 +2,7 @@ import { generateUniqueId } from '../../core/utils'
 import { sum } from 'd3-array'
 import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js';
+import { buildBidirectionalRouteMap, expandRoutesToDirectionalLinks } from './flow-bidirectional.js';
 
 // spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
 // See https://observablehq.com/@joewdavies/flow-map-of-europe

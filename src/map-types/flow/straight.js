@@ -1,7 +1,6 @@
 import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
-
-
+import { buildBidirectionalRouteMap } from './flow-bidirectional.js'
 
 /**
  * Function to create a flow map with straight lines.
@@ -16,13 +15,11 @@ export function createFlowMap(out, flowMapContainer) {
 
 // straight lines that can be bidirectional. If flow is bidirectional, draw two half-lines from midpoint to each node.
 function drawStraightLinesByFlow(out, container) {
-    const arrowScale = Math.max(0.1, +out.flowArrowScale_ || 1);
     const lineGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines')
 
     const { nodes, links } = out.flowGraph_
 
-    // Build lookups
-    const nodeMap = new Map(nodes.map((n) => [n.id, [n.x, n.y]]))
+    // Build node lookup for other parts of the renderer
     out._nodeById = out._nodeById || new Map(nodes.map((n) => [n.id, n]))
 
     // --- ARROWS: create shared markers (once per renderer) ---
@@ -35,46 +32,19 @@ function drawStraightLinesByFlow(out, container) {
             hoverColor: out.hoverColor_ || "black",
             outlineColor: out.flowOutlineColor_ || "#ffffff",
             useContextStroke: true,
-            out,                        // 👈 gives marker access to flowOutlineWidth_ / Color_
         })
         : null;
 
-    // Step 1: Group flows by unordered route key but track direction separately
-    const routeMap = new Map()
-
-    links.forEach((link) => {
-        const sourceId = typeof link.source === 'object' ? link.source.id : link.source
-        const targetId = typeof link.target === 'object' ? link.target.id : link.target
-
-        const origin = nodeMap.get(sourceId)
-        const dest = nodeMap.get(targetId)
-        if (!origin || !dest) return // skip invalid links
-
-        // Use a consistent key for grouping regardless of direction
-        const key = sourceId < targetId ? `${sourceId}|${targetId}` : `${targetId}|${sourceId}`
-
-        if (!routeMap.has(key)) {
-            routeMap.set(key, {
-                idA: sourceId < targetId ? sourceId : targetId,
-                idB: sourceId < targetId ? targetId : sourceId,
-                coordsA: sourceId < targetId ? origin : dest,
-                coordsB: sourceId < targetId ? dest : origin,
-                flowAB: 0,
-                flowBA: 0
-            })
-        }
-
-        const route = routeMap.get(key)
-        if (sourceId < targetId) route.flowAB += link.value
-        else route.flowBA += link.value
-    })
+    // Step 1: shared bidirectional aggregation
+    const routeMap = buildBidirectionalRouteMap(nodes, links);
 
     // Step 2: Draw each route
     for (const route of routeMap.values()) {
-        const { idA, idB, coordsA, coordsB, flowAB, flowBA } = route
+        const { idA, idB, nodeA, nodeB, flowAB, flowBA } = route
+        const coordsA = [nodeA.x, nodeA.y]
+        const coordsB = [nodeB.x, nodeB.y]
         const midX = (coordsA[0] + coordsB[0]) / 2
         const midY = (coordsA[1] + coordsB[1]) / 2
-
         const abStroke = () => getFlowStroke(out, idA, idB, route, flowAB)
         const baStroke = () => getFlowStroke(out, idB, idA, route, flowBA)
 
