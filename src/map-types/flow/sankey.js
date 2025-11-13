@@ -2,7 +2,7 @@ import { generateUniqueId } from '../../core/utils'
 import { sum } from 'd3-array'
 import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js';
-import { buildBidirectionalRouteMap, expandRoutesToDirectionalLinks } from './flow-bidirectional.js';
+import { expandRoutesToSankeyMidpointGraph } from './flow-bidirectional.js';
 
 // spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
 // See https://observablehq.com/@joewdavies/flow-map-of-europe
@@ -21,12 +21,18 @@ import { buildBidirectionalRouteMap, expandRoutesToDirectionalLinks } from './fl
      */
 
 export function createSankeyFlowMap(out, sankeyContainer) {
-    out = out
-    const svg = out.svg_
-    const graph = out.flowGraph_
+    const svg = out.svg_;
+    const baseGraph = out.flowGraph_;
     const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_;
 
-    const { nodes, links } = sankey(out, graph)
+    // Needed by the colour helpers (same pattern as straight.js)
+    out._nodeById = out._nodeById || new Map(baseGraph.nodes.map(n => [n.id, n]));
+
+    // 1) Build a derived graph where bi-directional flows are split into two half-links.
+    const sankeyInput = expandRoutesToSankeyMidpointGraph(baseGraph.nodes, baseGraph.links);
+
+    // 2) Run the spatial-sankey layout on that derived graph
+    const { nodes, links } = sankey(out, sankeyInput);
 
     // shared markers (normal/hover/outline)
     const arrowIds = out.flowArrows_
@@ -45,14 +51,13 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     const gradientIds = links.map(() => generateUniqueId('gradient'));
     if (usesGradient) addFlowGradients(out, defs, gradientIds, links);
 
-
     // Add Sankey flows
-    addSankeyFlows(out, sankeyContainer, nodes, links, arrowIds, gradientIds)
+    addSankeyFlows(out, sankeyContainer, nodes, links, arrowIds, gradientIds);
 
-    // Add lines at nodes (stems)
-    addNodeStems(out, sankeyContainer, nodes)
+    // Add lines at nodes (stems) – skip synthetic midpoints
+    addNodeStems(out, sankeyContainer, nodes);
 
-    return svg.node()
+    return svg.node();
 }
 
 /**
@@ -99,18 +104,51 @@ function addFlowGradients(out, defs, gradientIds, links) {
         });
 }
 
-function clone({ nodes, links }) {
-    return { nodes: nodes.map((d) => Object.assign({}, d)), links: links.map((d) => Object.assign({}, d)) }
+function cloneGraph({ nodes, links }) {
+    return {
+        nodes: nodes.map((d) => ({ ...d })),
+        links: links.map((d) => ({ ...d })),
+    };
 }
 
-function sankey(out) {
-    const graph = out.flowGraph_
-    computeNodeValues(graph)
-    computeNodeDepths(graph)
-    computeNodeHeights(graph)
-    computeNodeBreadths(out, graph)
-    computeLinkBreadths(out, graph)
-    return graph
+function initGraphLinks(graph) {
+    const { nodes, links } = graph;
+    const id = (d) => d.id;
+
+    // Reset per-node arrays
+    for (const [i, node] of nodes.entries()) {
+        node.index = i;
+        node.sourceLinks = [];
+        node.targetLinks = [];
+    }
+
+    const nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d]));
+
+    // Attach link.source / link.target as node objects & fill sourceLinks/targetLinks
+    for (const [i, link] of links.entries()) {
+        link.index = i;
+        let { source, target } = link;
+
+        if (typeof source !== 'object') source = link.source = nodeById.get(source);
+        if (typeof target !== 'object') target = link.target = nodeById.get(target);
+        if (!source || !target) continue;
+
+        source.sourceLinks.push(link);
+        target.targetLinks.push(link);
+    }
+}
+
+function sankey(out, baseGraph) {
+    const graph = cloneGraph(baseGraph);
+    initGraphLinks(graph);
+
+    computeNodeValues(graph);
+    computeNodeDepths(graph);
+    computeNodeHeights(graph);
+    computeNodeBreadths(out, graph);
+    computeLinkBreadths(out, graph);
+
+    return graph;
 }
 
 function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
@@ -339,12 +377,66 @@ function taperedPolygonForLink(
 }
 
 
-function getFlowStroke(out, d) {
+function getFlowStroke(out, link) {
+    const fallback = typeof out.flowColor_ === 'string' ? out.flowColor_ : '#999999';
+
+    // Prefer explicit originId/destId from expandRoutesToSankeyMidpointGraph
+    const originId =
+        link.originId ??
+        (typeof link.source === 'object' ? link.source.id : link.source);
+
+    const destId =
+        link.destId ??
+        (typeof link.target === 'object' ? link.target.id : link.target);
+
+    const halfValue = link.value;
+    const route = link.route;
+
+    const nodeById =
+        out._nodeById || new Map(out.flowGraph_.nodes.map(n => [n.id, n]));
+
+    const source = nodeById.get(originId) || { id: originId };
+    const target = nodeById.get(destId) || { id: destId };
+
+    const linkLike = { source, target, value: halfValue, route };
+
+    // Same calling convention as straight.js
     if (typeof out.flowColor_ === 'function') {
-        return out.flowColor_(d)
+        let color;
+        try { color = out.flowColor_(linkLike); } catch (_) { }
+        if (color == null && out.flowColor_.length >= 3) {
+            try { color = out.flowColor_(originId, destId, route); } catch (_) { }
+        }
+        if (color != null) return color;
     }
 
-    return out.flowColor_
+    return colorByTopN(out, originId, destId, fallback);
+}
+
+// Copied from straight.js so "top N" behaves identically
+function colorByTopN(out, originId, destId, fallback) {
+    if (!out.topLocationKeys || !out.flowTopLocations_ || !out.flowDonuts_) return fallback;
+
+    const type = out.flowTopLocationsType_ || 'sum';
+
+    if (type === 'origin') {
+        return out.topLocationKeys.has(originId)
+            ? out.topLocationColorScale(originId)
+            : fallback;
+    }
+
+    if (type === 'destination') {
+        return out.topLocationKeys.has(destId)
+            ? out.topLocationColorScale(destId)
+            : fallback;
+    }
+
+    // default: 'sum' / mixed – prefer destination if in top list, else origin
+    return out.topLocationKeys.has(destId)
+        ? out.topLocationColorScale(destId)
+        : (out.topLocationKeys.has(originId)
+            ? out.topLocationColorScale(originId)
+            : fallback);
 }
 
 /**
@@ -353,16 +445,18 @@ function getFlowStroke(out, d) {
  * @param {Array} nodes - Sankey nodes data
  */
 function addNodeStems(out, container, nodes) {
+    const visibleNodes = nodes.filter((d) => !d.isMidpoint); // 👈 skip synthetic midpoints
+
     container
         .append('g')
         .attr('class', 'em-flow-node-stems')
         .selectAll('rect')
-        .data(nodes, d => d.id)
+        .data(visibleNodes, (d) => d.id)
         .join('rect')
-        .attr('x', d => d.x0 - 0.5)
-        .attr('y', d => (out.flowStack_ ? d.y0 : d.y))
+        .attr('x', (d) => d.x0 - 0.5)
+        .attr('y', (d) => (out.flowStack_ ? d.y0 : d.y))
         .attr('width', 1)
-        .attr('height', d => (out.flowStack_ ? Math.max(0, d.y1 - d.y0) : 0))
+        .attr('height', (d) => (out.flowStack_ ? Math.max(0, d.y1 - d.y0) : 0))
         .attr('fill', '#000');
 }
 
