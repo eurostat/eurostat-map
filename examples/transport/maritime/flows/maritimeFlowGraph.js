@@ -5,7 +5,7 @@ const maritimeFlowGraph = {
         { "id": "GB", "name": "UNITED KINGDOM", "y": 55, "x": -2 },
         { "id": "NO", "name": "NORWAY", "y": 61, "x": 8 },
         { "id": "CN", "name": "CHINA", "y": 39, "x": 103 },
-        { "id": "BR", "name": "BRAZIL", "y": -5, "x": -55 },
+        { "id": "BR", "name": "BRAZIL", "y": -3, "x": -55 },
         { "id": "TR", "name": "TÜRKIYE", "y": 39, "x": 35 },
         { "id": "EG", "name": "EGYPT", "y": 26.5, "x": 30 },
         { "id": "RU", "name": "RUSSIA: BLACK SEA", "y": 44.6, "x": 38.9 },

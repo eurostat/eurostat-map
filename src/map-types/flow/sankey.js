@@ -397,7 +397,18 @@ function taperedPolygonForLink(
 function getFlowStroke(out, link) {
     const fallback = typeof out.flowColor_ === 'string' ? out.flowColor_ : '#999999';
 
-    // Prefer explicit originId/destId from expandRoutesToSankeyMidpointGraph
+    // Let the user’s flowColor function have first say, with the REAL link
+    if (typeof out.flowColor_ === 'function') {
+        try {
+            const c = out.flowColor_(link);
+            if (c != null) return c;
+        } catch (e) {
+            // swallow and fall back to top-N / default
+            console.warn('flowColor_ threw in sankey getFlowStroke:', e);
+        }
+    }
+
+    // Then our "top N" logic, using origin/destination IDs
     const originId =
         link.originId ??
         (typeof link.source === 'object' ? link.source.id : link.source);
@@ -405,27 +416,6 @@ function getFlowStroke(out, link) {
     const destId =
         link.destId ??
         (typeof link.target === 'object' ? link.target.id : link.target);
-
-    const halfValue = link.value;
-    const route = link.route;
-
-    const nodeById =
-        out._nodeById || new Map(out.flowGraph_.nodes.map(n => [n.id, n]));
-
-    const source = nodeById.get(originId) || { id: originId };
-    const target = nodeById.get(destId) || { id: destId };
-
-    const linkLike = { source, target, value: halfValue, route };
-
-    // Same calling convention as straight.js
-    if (typeof out.flowColor_ === 'function') {
-        let color;
-        try { color = out.flowColor_(linkLike); } catch (_) { }
-        if (color == null && out.flowColor_.length >= 3) {
-            try { color = out.flowColor_(originId, destId, route); } catch (_) { }
-        }
-        if (color != null) return color;
-    }
 
     return colorByTopN(out, originId, destId, fallback);
 }
@@ -689,16 +679,7 @@ function cubicSegment(p0, p1, curvature = 0.5) {
     return `C${c1x},${y0} ${c2x},${y1} ${x1},${y1}`;
 }
 
-// 
-// Returns a function(link) -> path string, avoiding node stems.
-// obstacles: array of nodes with x0, y0, y1(your stacked extents)
-// opts:
-//   gapX: how far to go left / right of the node before / after the bypass
-//   padX: horizontal "no-go" half - width around the stem(usually small)
-//   padY: vertical clearance outside[y0, y1]
-//   curvature: 0..1; 0.5 ≈ default d3 - sankey feel
-//                 
-// 
+
 // Returns a function(link) -> path string, avoiding node stems.
 // obstacles: array of nodes with x0, y0, y1 (your stacked extents)
 // opts:
@@ -770,7 +751,7 @@ function sankeyLinkAvoidingNodes(obstacles, {
 
                 const x1 = Math.max(xA, leftX - gapX);
                 const x2 = Math.min(xB, rightX + gapX);
-                if (x2 <= x1) continue; // degenerate
+                if (x2 < x1) continue; // degenerate; allow x1 === x2
 
                 segments.push({ x1, x2, y: bypassY });
             }

@@ -24,7 +24,6 @@ export function buildBidirectionalRouteMap(nodes, links) {
         const targetNode = nodeById.get(targetId);
         if (!sourceNode || !targetNode) continue;
 
-        // Unordered key: A|B
         const key = sourceId < targetId ? `${sourceId}|${targetId}` : `${targetId}|${sourceId}`;
 
         if (!routeMap.has(key)) {
@@ -41,15 +40,21 @@ export function buildBidirectionalRouteMap(nodes, links) {
                 coordsB: [nodeB.x, nodeB.y],
                 flowAB: 0,
                 flowBA: 0,
+                // NEW: keep a representative link for each direction
+                sampleAB: null,
+                sampleBA: null,
             });
         }
 
         const route = routeMap.get(key);
-        // flowAB = A→B, flowBA = B→A in the (idA,idB) ordering
+        const v = +link.value || 0;
+
         if (sourceId === route.idA && targetId === route.idB) {
-            route.flowAB += link.value;
+            route.flowAB += v;
+            if (!route.sampleAB) route.sampleAB = link;
         } else {
-            route.flowBA += link.value;
+            route.flowBA += v;
+            if (!route.sampleBA) route.sampleBA = link;
         }
     }
 
@@ -82,76 +87,84 @@ export function expandRoutesToDirectionalLinks(nodes, links) {
  *    so visually you get two half-ribbons meeting in the middle.
  */
 export function expandRoutesToSankeyMidpointGraph(nodes, links) {
-  const routeMap = buildBidirectionalRouteMap(nodes, links);
-  const nodeById = new Map(nodes.map((n) => [n.id, n]));
+    const routeMap = buildBidirectionalRouteMap(nodes, links);
+    const nodeById = new Map(nodes.map((n) => [n.id, n]));
 
-  const newNodes = nodes.map((n) => ({ ...n })); // clone
-  const newLinks = [];
-  let midIndex = 0;
+    const newNodes = nodes.map((n) => ({ ...n }));
+    const newLinks = [];
+    let midIndex = 0;
 
-  for (const route of routeMap.values()) {
-    const { idA, idB, coordsA, coordsB, flowAB, flowBA } = route;
-    const nodeA = nodeById.get(idA);
-    const nodeB = nodeById.get(idB);
-    if (!nodeA || !nodeB) continue;
+    for (const route of routeMap.values()) {
+        const { idA, idB, coordsA, coordsB, flowAB, flowBA, sampleAB, sampleBA } = route;
+        const nodeA = nodeById.get(idA);
+        const nodeB = nodeById.get(idB);
+        if (!nodeA || !nodeB) continue;
 
-    if (flowAB > 0 && flowBA > 0) {
-      // Bi-directional: split at midpoint
-      const midId = `__mid__${idA}__${idB}__${midIndex++}`;
-      const midNode = {
-        id: midId,
-        x: (coordsA[0] + coordsB[0]) / 2,
-        y: (coordsA[1] + coordsB[1]) / 2,
-        isMidpoint: true,
-      };
-      newNodes.push(midNode);
+        // helper: shallow-copy extras from a sample link
+        const extraAB = sampleAB ? { ...sampleAB } : {};
+        const extraBA = sampleBA ? { ...sampleBA } : {};
+        // remove structural bits we’re going to overwrite
+        delete extraAB.source; delete extraAB.target; delete extraAB.value;
+        delete extraBA.source; delete extraBA.target; delete extraBA.value;
 
-      // A→B half
-      newLinks.push({
-        source: midId,
-        target: idB,
-        value: flowAB,
-        route,
-        originId: idA,
-        destId: idB,
-        dir: 'AtoB',
-      });
+        if (flowAB > 0 && flowBA > 0) {
+            const midId = `__mid__${idA}__${idB}__${midIndex++}`;
+            const midNode = {
+                id: midId,
+                x: (coordsA[0] + coordsB[0]) / 2,
+                y: (coordsA[1] + coordsB[1]) / 2,
+                isMidpoint: true,
+            };
+            newNodes.push(midNode);
 
-      // B→A half
-      newLinks.push({
-        source: midId,
-        target: idA,
-        value: flowBA,
-        route,
-        originId: idB,
-        destId: idA,
-        dir: 'BtoA',
-      });
-    } else if (flowAB > 0) {
-      // Only A→B
-      newLinks.push({
-        source: idA,
-        target: idB,
-        value: flowAB,
-        route,
-        originId: idA,
-        destId: idB,
-        dir: 'AtoB',
-      });
-    } else if (flowBA > 0) {
-      // Only B→A
-      newLinks.push({
-        source: idB,
-        target: idA,
-        value: flowBA,
-        route,
-        originId: idB,
-        destId: idA,
-        dir: 'BtoA',
-      });
+            // A→B half (midpoint -> B)
+            newLinks.push({
+                ...extraAB,
+                source: midId,
+                target: idB,
+                value: flowAB,
+                route,
+                originId: idA,
+                destId: idB,
+                dir: 'AtoB',
+            });
+
+            // B→A half (midpoint -> A)
+            newLinks.push({
+                ...extraBA,
+                source: midId,
+                target: idA,
+                value: flowBA,
+                route,
+                originId: idB,
+                destId: idA,
+                dir: 'BtoA',
+            });
+        } else if (flowAB > 0) {
+            newLinks.push({
+                ...extraAB,
+                source: idA,
+                target: idB,
+                value: flowAB,
+                route,
+                originId: idA,
+                destId: idB,
+                dir: 'AtoB',
+            });
+        } else if (flowBA > 0) {
+            newLinks.push({
+                ...extraBA,
+                source: idB,
+                target: idA,
+                value: flowBA,
+                route,
+                originId: idB,
+                destId: idA,
+                dir: 'BtoA',
+            });
+        }
     }
-  }
 
-  return { nodes: newNodes, links: newLinks };
+    return { nodes: newNodes, links: newLinks };
 }
 

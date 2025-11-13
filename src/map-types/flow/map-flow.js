@@ -104,7 +104,6 @@ export const map = function (config) {
         'flowCurvatureSettings_',
         'flowOrder_',
         'flowWidthGradient_',
-        'flowColorGradient_',
         'flowOpacityGradient_',
         'flowWidthGradientSettings_'
     ].forEach(function (att) {
