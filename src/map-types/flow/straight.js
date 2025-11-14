@@ -53,6 +53,10 @@ function drawStraightLinesByFlow(out, container) {
             const innerWidth = +out.strokeWidthScale(value).toFixed(1);
             const segLen = Math.hypot(x2 - x1, y2 - y1) || 1;
 
+            // Solid base color, used both for painting and legend matching
+            const baseColor = strokeFn();                // getFlowStroke(...) result
+            const colorKey = computeColorKey(out, originId, destId); // stable key for top-N case
+
             // backoff in px so the last px of the line is invisible under the arrow,
             // but the marker is still anchored at the true endpoint (x2,y2).
             const backoffMain = out.flowArrows_ ? arrowBackoffPxForStroke(innerWidth) : 0;
@@ -76,7 +80,7 @@ function drawStraightLinesByFlow(out, container) {
                     .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
                     .style('pointer-events', 'none');
 
-                //if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline'); //  put the arrow on the outline line TODO: fix
+                // if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline');
             }
 
             // --- MAIN STROKE (on top) ---
@@ -85,18 +89,20 @@ function drawStraightLinesByFlow(out, container) {
 
             const main = lineGroup.append('line')
                 .attr('data-nb', value)
-                .attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2) // endpoint stays at node
+                .attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
                 .attr('data-origin', originId)
                 .attr('data-dest', destId)
-                .attr('stroke', strokeFn)
+                .attr('stroke', baseColor)         // use solid base color
                 .attr('stroke-width', innerWidth)
                 .attr('stroke-opacity', out.flowOpacity_)
                 .attr('stroke-linecap', 'butt')
                 .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+                .attr('data-color', baseColor)     // 👈 for legend hover by color
+                .attr('data-color-key', colorKey)  // 👈 for legend hover by key (top-N)
                 .style('cursor', 'pointer')
                 .on('mouseover', onFlowLineMouseOver(out, originId, destId, value, arrowIds))
                 .on('mousemove', onFlowLineMouseMove(out))
-                .on('mouseout', onFlowLineMouseOut(out, strokeFn, arrowIds));
+                .on('mouseout', onFlowLineMouseOut(out, baseColor, arrowIds)); // use baseColor
 
             if (out.flowArrows_) applyArrow(main, arrowIds, 'normal');
         };
@@ -183,6 +189,25 @@ function drawStraightLinesByFlow(out, container) {
             : (out.topLocationKeys.has(originId) ? out.topLocationColorScale(originId) : fallback)
     }
 
+    function computeColorKey(out, originId, destId) {
+        if (!out.topLocationKeys) return null;
+
+        const type = out.flowTopLocationsType_ || 'sum';
+
+        if (type === 'origin') {
+            return out.topLocationKeys.has(originId) ? originId : 'Other';
+        }
+
+        if (type === 'destination') {
+            return out.topLocationKeys.has(destId) ? destId : 'Other';
+        }
+
+        // default: 'sum' / mixed – prefer destination if in top list, else origin, else "Other"
+        if (out.topLocationKeys.has(destId)) return destId;
+        if (out.topLocationKeys.has(originId)) return originId;
+        return 'Other';
+    }
+
     // Hover handlers (arrow swap aware)
     function onFlowLineMouseOver(out, sourceId, targetId, flow, arrowIds) {
         return function (e) {
@@ -205,21 +230,14 @@ function drawStraightLinesByFlow(out, container) {
         }
     }
 
-    function onFlowLineMouseOut(out, strokeFn, arrowIds) {
+ function onFlowLineMouseOut(out, baseColor, arrowIds) {
         return function () {
-            select(this).attr('stroke', strokeFn())
+            select(this).attr('stroke', baseColor)   // restore solid base color
             if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false)
             if (out._tooltip) out._tooltip.mouseout()
         }
     }
 
-    // helper: move endpoint back by backoffPx along the segment direction
-    function backoffPoint(x1, y1, x2, y2, backoffPx) {
-        const dx = x2 - x1, dy = y2 - y1;
-        const len = Math.hypot(dx, dy) || 1;
-        const k = backoffPx / len;
-        return [x2 - dx * k, y2 - dy * k];
-    }
     // estimate arrow length (px) for a given stroke width (px), matched to arrows.js createMarker()
     function arrowBackoffPxForStroke(strokePx) {
         // match arrows.js createMarker(): markerWidth = 3 * scale, tip at ~90% of viewBox
