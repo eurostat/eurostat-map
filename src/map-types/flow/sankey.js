@@ -157,7 +157,6 @@ function sankey(out, baseGraph) {
 function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
     const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_;
     const flowsGroup = buildFlowsGroup(container, out);
-    // Allow per-link curvature: split flows (midpoint source) get half curvature
     const baseCurvSettings = out.flowCurvatureSettings_ || {};
     const baseCurv = baseCurvSettings.curvature ?? 0.5;
 
@@ -166,8 +165,6 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
         curvature: typeof baseCurvSettings.curvature === 'function'
             ? baseCurvSettings.curvature
             : (link) => {
-                // If the link starts at a synthetic midpoint node,
-                // treat it as a "half" and reduce curvature.
                 const isHalf = link.source && link.source.isMidpoint;
                 return isHalf ? baseCurv * 0.5 : baseCurv;
             }
@@ -176,7 +173,12 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
     links.forEach((link, i) => {
         const dCenter = linkPath(link);
         const colorKey = computeColorKey(out, link);
-        const paint = usesGradient ? `url(#${gradientIds[i]})` : getFlowStroke(out, link);
+
+        //  always compute a solid base color for matching
+        const baseColor = getFlowStroke(out, link);
+
+        // What we actually paint with: either gradient or solid
+        const paint = usesGradient ? `url(#${gradientIds[i]})` : baseColor;
 
         // Outline behind the main symbol (only for simple stroke variant)
         if (out.flowOutlines_ && !out.flowWidthGradient_) {
@@ -185,13 +187,13 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
 
         // Main symbol
         const mainSel = out.flowWidthGradient_
-            ? buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey)
-            : buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds);
+            ? buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey, baseColor)
+            : buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds, baseColor);
 
         // Mouse/tooltip/arrow hover
         addMouseEvents(out, mainSel, {
             usesGradient,
-            paint,
+            paint,       // paint to restore on mouseout
             link,
             arrowIds
         });
@@ -236,20 +238,19 @@ function buildOutlinePath(out, flowsGroup, dCenter, link, arrowIds) {
     return outline;
 }
 
-function buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey) {
-    // Build the tapered polygon
+function buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey, baseColor) {
+    // Build the tapered polygon...
     const dPoly = taperedPolygonForLink(
         link, () => dCenter,
         {
             startRatio: out.flowWidthGradientSettings_.startRatio,
             samples: out.flowWidthGradientSettings_.samples,
             minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-            capEnd: out.flowArrows_,  // cap so the arrow marker (if any) has a clean tip
+            capEnd: out.flowArrows_,
         },
         0
     );
 
-    // Optional halo polygon around the tapered main
     if (out.flowOutlines_) {
         const dPolyOutline = taperedPolygonForLink(
             link, () => dCenter,
@@ -267,19 +268,18 @@ function buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey) {
             .attr('class', 'em-flow-link-outline');
     }
 
-    // The main tapered symbol uses FILL (so it stays curved on hover)
     const mainSel = flowsGroup.append('path')
         .attr('d', dPoly)
         .attr('fill', paint)
         .attr('class', 'em-flow-link em-flow-link-tapered')
         .attr('data-color-key', colorKey)
-        .attr('data-color', paint.startsWith('url(') ? null : paint);
+        // 👇 always the solid base color, never the gradient URL
+        .attr('data-color', baseColor);
 
-    // Note: we skip arrow carriers for tapered; markers can be applied to centerline if needed
     return mainSel;
 }
 
-function buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds) {
+function buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds, baseColor) {
     const { dashVis, dashGap } = getBackoffAndDash(out, link.width, dCenter);
 
     const mainSel = flowsGroup.append('path')
@@ -291,7 +291,8 @@ function buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowI
         .attr('stroke-linecap', 'butt')
         .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
         .attr('data-color-key', colorKey)
-        .attr('data-color', paint.startsWith('url(') ? null : paint);
+        //  again: always the solid base color
+        .attr('data-color', baseColor);
 
     if (out.flowArrows_) applyArrow(mainSel, arrowIds, 'normal');
     return mainSel;
