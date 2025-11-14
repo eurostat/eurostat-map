@@ -69,6 +69,7 @@ export const legend = function (map) {
     out.ascending = true
     out.decimals = 0
 
+
     /** Build legend. */
     out.build = function () {
         //set SVG element and add main drawing group
