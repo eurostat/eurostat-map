@@ -7,7 +7,7 @@ const portsAnnotations = [
         },
         className: "rotterdam",
         x: 257,
-        y: 334,
+        y: 340,
         dy: -20,
         dx: 0
     },
@@ -28,8 +28,8 @@ const portsAnnotations = [
             align: "left"
         },
         className: "center-vertically",
-        x: 330,
-        y: 360,
+        x: 328,
+        y: 358,
         dy: 0,
         dx: 30
     },
