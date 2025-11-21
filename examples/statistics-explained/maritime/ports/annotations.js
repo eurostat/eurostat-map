@@ -20,7 +20,7 @@ const portsAnnotations = [
         x: 258,
         y: 399,
         dy: 0,
-        dx: 50
+        dx: 30
     },
     {
         note: {
@@ -29,8 +29,8 @@ const portsAnnotations = [
         },
         className: "center-vertically",
         x: 328,
-        y: 358,
-        dy: 0,
+        y: 355,
+        dy: 10,
         dx: 30
     },
     {

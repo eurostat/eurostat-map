@@ -30,6 +30,9 @@
     <script id="'our-map">
         const portsWidth = 795;
         const portsHeight = 437;
+        const rankingX = portsWidth - 230;
+        const rankingY = 10;
+
         proj4.defs(
             "EPSG:3035",
             "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 " +
@@ -109,12 +112,12 @@
             .title("Freight handled by maritime ports")
             .subtitle("Both incoming and outgoing, 2024")
             .footnote(
-                      "Shows data for ports with at least 2 million tonnes of freight handled. Top 5 labelled. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCartography: GISCO. Boundaries: ©EuroGeographics ©OSM"
+                "Shows data for ports with at least 2 million tonnes of freight handled. Top 5 labelled. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCartography: GISCO. Boundaries: ©EuroGeographics ©OSM"
             )
             .legend({
                 title: "Tonnes of freight",
-                x: portsWidth - 200,
-                y: 10,
+                x: portsWidth - 162,
+                y: 260,
                 sizeLegend: {
                     values: [397000000, 200000000, 50000000, 2000000],
                     labelFormatter: (l) => l / 1000000 + " million"
@@ -170,7 +173,7 @@
                     return hasPort ? "rgba(178, 232, 215,0.4)" : "#F2F2F2";
                 });
 
-                createTopCountriesOverlay("#ports-map", sums, portsWidth - 230, 180);
+                createTopCountriesOverlay("#ports-map", sums, rankingX, rankingY);
             })
             .annotations({ annotations: portsAnnotations })
             .build();

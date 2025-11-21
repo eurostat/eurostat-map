@@ -8,10 +8,10 @@
     stroke-width: 1.5px;
 }
 
-.map-ranking,
+.map-ranking rect,
 .em-legend-background {
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
-    opacity: 0.9;
+    opacity: 0.9 !important;
 }
 
 #ports-map .em-zoom-buttons {
