@@ -10,7 +10,7 @@
 
 #maritime-flow-map .em-worldbn {
     stroke: grey !important;
-    stroke-width: 1px !important;
+    stroke-width: 0.8px !important;
     opacity: 0.5;
 }
 
