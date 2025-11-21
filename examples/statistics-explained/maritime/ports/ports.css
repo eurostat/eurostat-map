@@ -4,7 +4,7 @@
 #psTR02TRIZT circle,
 #psTR02TRALI circle, .em-legend-circle {
     stroke: #5b5b5b !important;
-    stroke-width:1px;
+    stroke-width:1.5px;
 }
 
 .map-ranking,

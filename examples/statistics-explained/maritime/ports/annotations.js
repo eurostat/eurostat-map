@@ -7,20 +7,20 @@ const portsAnnotations = [
         },
         className: "rotterdam",
         x: 257,
-        y: 324,
+        y: 334,
         dy: -20,
         dx: 0
     },
     {
         note: {
             title: "Antwerp-Bruges",
-            align: "right"
+            align: "left"
         },
         className: "center-vertically",
-        x: 248,
+        x: 258,
         y: 399,
         dy: 0,
-        dx: -50
+        dx: 50
     },
     {
         note: {
@@ -28,8 +28,8 @@ const portsAnnotations = [
             align: "left"
         },
         className: "center-vertically",
-        x: 340,
-        y: 356,
+        x: 330,
+        y: 360,
         dy: 0,
         dx: 30
     },
@@ -39,10 +39,10 @@ const portsAnnotations = [
             align: "left"
         },
         className: "center-vertically",
-        x: 575,
+        x: 565,
         y: 566,
         dy: 0,
-        dx: 10
+        dx: 15
     },
     {
         note: {
@@ -50,10 +50,10 @@ const portsAnnotations = [
             align: "left"
         },
         className: "center-vertically",
-        x: 604,
+        x: 595,
         y: 536,
         dy: 0,
-        dx: 10
+        dx: 15
     }
 
 ].map((a) => {
