@@ -1,3 +1,8 @@
+.em-legend-background {
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
+    opacity: 0.9;
+}
+
 #airport-pairs-map .em-zoom-buttons {
     transform: translate(.5%, 86%);
 }
@@ -52,6 +57,7 @@
 #em-label-shadow-GRAN-CANARIA {
     transform: translate(5px, 20px) !important;
 }
+
 #em-label-TENERIFE-NORTE,
 #em-label-shadow-TENERIFE-NORTE {
     transform: translate(2px, -5px) !important;

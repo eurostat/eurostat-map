@@ -2,13 +2,14 @@
 #psBE00BE003 circle,
 #psDE01DEHAM circle,
 #psTR02TRIZT circle,
-#psTR02TRALI circle, .em-legend-circle {
+#psTR02TRALI circle,
+.em-legend-circle {
     stroke: #5b5b5b !important;
-    stroke-width:1.5px;
+    stroke-width: 1.5px;
 }
 
 .map-ranking,
-.em-legend rect {
+.em-legend-background {
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
     opacity: 0.9;
 }
@@ -16,6 +17,7 @@
 #ports-map .em-zoom-buttons {
     transform: translate(94%, 86%) !important;
 }
+
 .em-cntbn {
     opacity: 0.4;
     stroke: lightgrey;

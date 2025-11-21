@@ -22,13 +22,22 @@
         </defs>
     </svg>
     <script src="../eurostatmap.min.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="../../d3.v7.min.js"></script>
     <script src="./regionLabels.js"></script>
     <script src="./regions.js"></script>
     <script src="./configs.js"></script>
     <script>
 
         const year = 2024
+        const width = 1080
+        const height = width / 1.7
+        const worldProjection = d3
+            .geoAzimuthalEquidistant()
+            .rotate([-10, -10])
+            .scale(200)
+            .translate([width / 2.4, width / 2.6])
+
+
         const makeLegendItems = () =>
             airMapConfigs[year].freight.legend.labels
                 .map((label, i) => ({
@@ -40,9 +49,6 @@
         fetch(`./airFreightGraph${year}.json`)
             .then(r => r.json())
             .then(graphData => {
-                console.log('Loaded freight data:', graphData);
-                const width = 1050
-                const height = 710;
 
                 const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
                 const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
@@ -61,13 +67,6 @@
                     EU: fourColorTheorem[0],
                     "europe except eu": fourColorTheorem[2]
                 }
-
-
-                const worldProjection = d3
-                    .geoAzimuthalEquidistant()
-                    .rotate([0, 0])
-                    .scale(200)
-                    .translate([width / 2.4, width / 2.3])
 
                 const valuesLabelFormatter = (d) => d3.format('.2s')(d)
 
@@ -127,6 +126,9 @@
                     return buf.join('')
                 }
 
+                // sort links by value descending
+                graphData.links.sort((a, b) => b.value - a.value);
+
                 const map = eurostatmap
                     .map("flow")
                     .svgId("air-freight-map")
@@ -169,6 +171,44 @@
                     .flowWidthGradient(false)
                     .flowTopLocations(0)
                     .flowStack(false)
+                    //only for when stacked
+                    // .flowOrder((a, b) => {
+                    //     console.log(a, b);
+                    //     // Helper to extract ID whether link.source is object or string
+                    //     const getId = (it) =>
+                    //         typeof it === "object" ? it.id : it;
+
+                    //     // Extract IDs for a
+                    //     const aSrc = getId(a.link?.source);
+                    //     const aTgt = getId(a.link?.target);
+
+                    //     // Extract IDs for b
+                    //     const bSrc = getId(b.link?.source);
+                    //     const bTgt = getId(b.link?.target);
+
+                    //     // Region membership helpers
+                    //     const isCentralAsia = (id) => id === "ASI_C";
+                    //     const isEasternAsia = (id) => id === "ASI_E";
+
+                    //     // Does link involve either region?
+                    //     const aInCentral = isCentralAsia(aSrc) || isCentralAsia(aTgt);
+                    //     const bInCentral = isCentralAsia(bSrc) || isCentralAsia(bTgt);
+
+                    //     const aInEastern = isEasternAsia(aSrc) || isEasternAsia(aTgt);
+                    //     const bInEastern = isEasternAsia(bSrc) || isEasternAsia(bTgt);
+
+                    //     // --- PRIORITY RULE ---
+                    //     // Central Asia ABOVE Eastern Asia
+                    //     if (aInCentral && !bInCentral) return -1;  // a above b
+                    //     if (bInCentral && !aInCentral) return 1;   // b above a
+
+                    //     if (aInEastern && !bInEastern) return -1;  // Eastern above rest
+                    //     if (bInEastern && !aInEastern) return 1;
+
+                    //     // --- FALLBACK ---
+                    //     return a.otherY - b.otherY || b.width - a.width;
+                    // }
+                    // )
 
                     // legend
                     .legend({

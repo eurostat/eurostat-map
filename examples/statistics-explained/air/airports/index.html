@@ -23,7 +23,7 @@
     </svg>
     <script src="../eurostatmap.min.js"></script>
     <!-- <script src="https://unpkg.com/eurostat-map@4.3.31"></script> -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="../../d3.v7.min.js"></script>
     <script src="./airportLabels.js"></script>
     <script src="./configs.js"></script>
     <script>
@@ -104,6 +104,9 @@
 
                     return buf.join("");
                 }
+
+                // sort links by value descending
+                graphData.links.sort((a, b) => b.value - a.value);
 
                 const map = eurostatmap
                     .map("flow").fontFamily("Arial")

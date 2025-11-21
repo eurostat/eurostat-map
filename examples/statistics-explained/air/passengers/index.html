@@ -22,13 +22,21 @@
         </defs>
     </svg>
     <script src="../eurostatmap.min.js"></script>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="../../d3.v7.min.js"></script>
     <script src="./regionLabels.js"></script>
     <script src="./regions.js"></script>
     <script src="./configs.js"></script>
     <script>
 
         const year = 2024
+        const width = 1080
+        const height = width / 1.7
+        const worldProjection = d3
+            .geoAzimuthalEquidistant()
+            .rotate([-10, -10])
+            .scale(200)
+            .translate([width / 2.4, width / 2.6])
+
         const makeLegendItems = () =>
             airMapConfigs[year].passengers.legend.labels
                 .map((label, i) => ({
@@ -40,9 +48,6 @@
         fetch(`./passengersGraph${year}.json`)
             .then(r => r.json())
             .then(graphData => {
-                console.log('Loaded passengers data:', graphData);
-                const width = 1050
-                const height = 710;
 
                 const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
                 const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
@@ -64,11 +69,7 @@
                 };
 
 
-                const worldProjection = d3
-                    .geoAzimuthalEquidistant()
-                    .rotate([0, 0])
-                    .scale(200)
-                    .translate([width / 2.4, width / 2.3])
+
 
                 const valuesLabelFormatter = (d) => d3.format('.2s')(d)
 
@@ -173,7 +174,7 @@
 
                     // legend
                     .legend({
-                        x: width - 170,
+                        x: width - 180,
                         y: 0,
                         boxPadding: 10,
                         title: "passengers carried",
@@ -226,11 +227,9 @@
                     })
                     .build();
 
-                    
+
             })
             .catch(err => console.error(err));
-
-           
 
 
         function getContrastTextColor(hex) {

@@ -2,6 +2,11 @@
     transform: translate(94%, 88%) !important;
 }
 
+.em-legend-background {
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
+    opacity: 0.9;
+}
+
 .em-title,
 .em-subtitle {
     /*     transform: translate(0px, 15px); */
@@ -42,7 +47,7 @@ text#em-label-EU,
 text#em-label-shadow-EU {
     transform: translate(6px, 5px);
     font-size: 19px;
-    font-weight:600;
+    font-weight: 600;
     opacity: 0.7;
 }
 
