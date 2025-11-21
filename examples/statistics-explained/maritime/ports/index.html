@@ -20,12 +20,13 @@
             </filter>
         </defs>
     </svg>
-    <script src="../eurostatmap.min.js"></script>
+    <script src="../../../../build/eurostatmap.js"></script>
     <script src="../../d3.v7.min.js"></script>
-    <script src="https://unpkg.com/proj4"></script>
+    <script src="../../proj4-src.js"></script>
     <script src="./portsData.js"></script>
     <script src="./annotations.js"></script>
     <script src="./ranking.js"></script>
+    <script src="./insets.js"></script>
 
     <script id="'our-map">
         const portsWidth = 795;
@@ -33,12 +34,17 @@
         const rankingX = portsWidth - 230;
         const rankingY = 10;
 
+        // eu
         proj4.defs(
             "EPSG:3035",
             "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 " +
             "+ellps=GRS80 +units=m +no_defs +type=crs"
         )
+        // canarias
+        proj4.defs("EPSG:32628", "+proj=utm +zone=28 +datum=WGS84 +units=m +no_defs");
+        const to32628 = ([lon, lat]) => proj4("EPSG:4326", "EPSG:32628", [lon, lat]);
         const to3035 = ([lon, lat]) => proj4("EPSG:4326", "EPSG:3035", [lon, lat])
+
         function indexByCode(portsData, valueKey = "tonnes_2024") {
             return Object.fromEntries(portsData.map((p) => [p.code, p[valueKey]]));
         }
@@ -105,7 +111,7 @@
 
         const map = eurostatmap
             .map("ps")
-            .svgId("ports-map").dorling(false)
+            .svgId("ports-map").dorling(false).insets(insets).insetBoxPosition([insetsX, insetsY])
             .nutsLevel(0)
             .psMinSize(3)
             .psMaxSize(30)
@@ -124,12 +130,10 @@
                 }
             })
             .filterGeometriesFunction((geometries) => {
-                console.log(geometries);
                 //remove greenland to stop title overlap
                 let nuts2json = geometries[0];
                 let countries = nuts2json.objects.cntrg.geometries;
                 countries = countries.filter((f) => {
-                    console.log(f.properties.id);
                     if (f.properties.id !== "GL" && f.properties.na !== "Greenland") {
                         return f;
                     } else {
@@ -139,21 +143,80 @@
                 nuts2json.objects.cntrg.geometries = countries;
 
                 // add ports to centroids array
+                // each port location must be reprojected to the map projection
                 let centroids = geometries[1];
                 [...portsData].forEach((d) => {
-                    let coords = to3035([d.lon, d.lat]);
-                    let newCentroid = {
-                        type: "Feature",
-                        geometry: {
-                            coordinates: coords,
-                            type: "Point"
-                        },
-                        properties: {
-                            centroid: portsProjection(coords),
-                            id: d.code,
-                            na: d.name
-                        }
-                    };
+                    let newCentroid
+                    if (d.code == 'ES02ESLPA') {
+                        // handle canarias (inset map)
+                        let coords = to32628([d.lon, d.lat]);
+                        newCentroid = {
+                            type: "Feature",
+                            geometry: {
+                                coordinates: coords, // IC_32628 fixed position in inset
+                                type: "Point"
+                            },
+                            properties: {
+                                centroid: undefined,
+                                id: d.code,
+                                na: d.name
+                            }
+                        };
+                    } else if (d.code == 'FR04GPPTP') {
+                        newCentroid = {
+                            type: "Feature",
+                            geometry: {
+                                coordinates: [669498, 1784552], // GP_32620 fixed position in inset
+                                type: "Point"
+                            },
+                            properties: {
+                                centroid: undefined,
+                                id: d.code,
+                                na: d.name
+                            }
+                        };
+                    } else if (d.code == 'FR04MQFDF') {
+                        newCentroid = {
+                            type: "Feature",
+                            geometry: {
+                                coordinates: [716521, 1621322], // MQ_32620 fixed position in inset
+                                type: "Point"
+                            },
+                            properties: {
+                                centroid: undefined,
+                                id: d.code,
+                                na: d.name
+                            }
+                        };
+                    } else if (d.code == 'FR05RELPT') {
+                        newCentroid = {
+                            type: "Feature",
+                            geometry: {
+                                coordinates: [348011, 7661627], // RE_32740 fixed position in inset
+                                type: "Point"
+                            },
+                            properties: {
+                                centroid: undefined,
+                                id: d.code,
+                                na: d.name
+                            }
+                        };
+                    } else {
+                        let coords = to3035([d.lon, d.lat]);
+                        newCentroid = {
+                            type: "Feature",
+                            geometry: {
+                                coordinates: coords,
+                                type: "Point"
+                            },
+                            properties: {
+                                centroid: portsProjection(coords),
+                                id: d.code,
+                                na: d.name
+                            }
+                        };
+                    }
+
                     centroids.features.push(newCentroid);
                 });
                 return geometries;

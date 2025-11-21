@@ -33,3 +33,11 @@
 .center-vertically .annotation-note-title {
     transform: translate(0px, -10px)
 }
+
+.em-insets .em-frame {
+    stroke-width: 0.6px !important;
+}
+
+/* .em-inset {
+    filter: drop-shadow(0.5px 0.5px 0.5px rgba(0, 0, 0, 0.5)) !important;
+} */
