@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        @import url('./air-freight.css');
+    </style>
+</head>
+
+<body style="margin:0">
+    <svg id="air-freight-map"></svg>
+
+    <svg style='display:none;'>
+        <!-- used for country borders -->
+        <defs>
+            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
+            </filter>
+        </defs>
+    </svg>
+    <script src="../eurostatmap.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./regionLabels.js"></script>
+    <script src="./regions.js"></script>
+    <script src="./configs.js"></script>
+    <script>
+
+        const year = 2024
+        const makeLegendItems = () =>
+            airMapConfigs[year].freight.legend.labels
+                .map((label, i) => ({
+                    color: airMapConfigs[year].freight.colors[i],
+                    label
+                }))
+                .reverse()
+
+        fetch(`./airFreightGraph${year}.json`)
+            .then(r => r.json())
+            .then(graphData => {
+                console.log('Loaded freight data:', graphData);
+                const width = 1050
+                const height = 710;
+
+                const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
+                const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
+                const regionColors = {
+                    "north america": fourColorTheorem[0],
+                    "central america and caribbean": fourColorTheorem[1],
+                    "south america": fourColorTheorem[2],
+                    "eastern africa": fourColorTheorem[0],
+                    "rest of africa": fourColorTheorem[2],
+                    "western asia": fourColorTheorem[1],
+                    "southern asia": fourColorTheorem[2],
+                    "central asia": "#93ffc4",
+                    "eastern asia": fourColorTheorem[0],
+                    ASEAN: fourColorTheorem[1],
+                    "australasia, s.sea is. & antarctica": fourColorTheorem[2],
+                    EU: fourColorTheorem[0],
+                    "europe except eu": fourColorTheorem[2]
+                }
+
+
+                const worldProjection = d3
+                    .geoAzimuthalEquidistant()
+                    .rotate([0, 0])
+                    .scale(200)
+                    .translate([width / 2.4, width / 2.3])
+
+                const valuesLabelFormatter = (d) => d3.format('.2s')(d)
+
+                const colorFunction = d3.scaleThreshold()
+                    .domain(airMapConfigs[year].freight.breaks)   // ascending thresholds
+                    .range(airMapConfigs[year].freight.colors);   // length = breaks.length + 1
+
+                function parseChangeToPct(v) {
+                    if (v == null) return NaN;
+                    const s = String(v).trim();
+                    const hasPct = s.includes('%');
+                    let n = parseFloat(s.replace('%', ''));
+                    if (!hasPct && Math.abs(n) <= 1) n *= 100; // interpret small decimals as fractions
+                    return n;
+                }
+
+                const spaceAsThousandSeparator = function (number) {
+                    return number.toLocaleString('en').replace(/,/gi, ' ')
+                }
+                const tooltipFunction = function (link, map) {
+                    const buf = []
+                    const statData = map.statData()
+                    const unit = statData.unitText() || ''
+
+                    // Header with region name and ID
+                    const title = `${link.source.name || link.source.id} to ${link.target.name || link.target.id}`
+                    buf.push(`
+                        <div class="em-tooltip-bar">
+                            <b>${title}</b>
+                        </div>
+                    `)
+
+                    // Value
+                    buf.push(`<div class='em-tooltip-text'>
+                        <table class="em-tooltip-table">
+                            <tbody>
+                                <tr><td>Tonnes of freight: ${spaceAsThousandSeparator(link.value)}</td></tr>
+                                <tr>
+                            <td>
+                                Change since ${year - 1}: 
+                                <span
+                                style="
+                                    background:${colorFunction(parseChangeToPct(link.target.change))};
+                                    color:${getContrastTextColor(colorFunction(parseChangeToPct(link.target.change)))};
+                                    padding:2px 4px;
+                                    border-radius:3px;
+                                "
+                                >
+                                ${link.target.change}
+                                </span>
+                            </td>
+                            </tr>
+                            </tbody>
+                        </table> 
+                    </div>`)
+
+                    return buf.join('')
+                }
+
+                const map = eurostatmap
+                    .map("flow")
+                    .svgId("air-freight-map")
+                    .width(width)
+                    .height(height)
+                    .title("Air freight")
+                    .subtitle(
+                        `Transport of freight and mail from the EU to outside the EU, ${year}`
+                    )
+
+                    //projection
+                    .projectionFunction(worldProjection)
+
+                    //geometries
+                    .geo("WORLD")
+                    .proj("4326")
+                    .scale("60M")
+
+                    // flow settings
+                    .flowGraph(graphData)
+                    .flowMinWidth(10)
+                    .flowMaxWidth(40)
+                    .flowMapType('curved')
+                    .flowDonuts(false)
+                    // .flowColor("#72bb6f")
+                    .flowColor((d) => {
+                        if (!d.target || !d.target.change) {
+                            console.log(d)
+                            return '#999999';
+                        }
+                        return colorFunction(parseChangeToPct(d.target.change))
+                    })
+                    .flowOpacity(0.9)
+                    .flowArrows(false)
+                    .flowArrowScale(0.7)
+                    .flowOutlines(true)
+                    .flowOutlineWidth(2)
+                    .flowOutlineColor("white")
+                    .flowColorGradient(false)
+                    .flowWidthGradient(false)
+                    .flowTopLocations(0)
+                    .flowStack(false)
+
+                    // legend
+                    .legend({
+                        x: width - 170,
+                        y: 0,
+                        boxPadding: 10,
+                        title: "Freight carried",
+                        subtitle: "(tonnes)",
+                        flowWidthLegend: {
+                            marginTop: -10,
+                            values: airMapConfigs[year].freight.legend.sizeLegend.values,
+                            labelFormatter: (value) => spaceAsThousandSeparator(value)
+                        },
+                        flowColorLegend: {
+                            marginTop: 50,
+                            title: airMapConfigs[year].freight.legend.title,
+                            items: makeLegendItems(year)
+                        }
+                    })
+
+                    //labels
+                    .labels({
+                        labels: regionLabels,
+                        shadows: true,
+                        values: true,
+                        valuesFormatter: valuesLabelFormatter
+                    })
+
+                    .tooltip({
+                        textFunction: tooltipFunction
+                    })
+
+                    .footnote(
+                        "Freight includes both loaded and unloaded. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Cartography: GISCO. Boundaries: ©EuroGeographics @OSM"
+                    )
+
+                    // zoom min/max
+                    .zoomExtent([0.6, 10])
+                    .zoomButtons(true)
+
+                    .callback(() => {
+                        // set fill of regions
+                        const countries = d3.selectAll("#air-freight-map .em-worldrg path");
+                        countries.style("fill", (d) => {
+                            for (const [regionName, codes] of Object.entries(regions)) {
+                                if (codes.includes(d.id)) {
+                                    return regionColors[regionName];
+                                }
+                            }
+                        });
+                        // raise labels (fixed in next version of estatmap)
+                        const labels = d3.selectAll("#em-labels");
+                        labels.raise();
+                    })
+                    .build();
+            })
+            .catch(err => console.error(err));
+
+
+        function getContrastTextColor(hex) {
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(c => c + c).join('');
+            }
+
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+
+            // Perceived luminance
+            const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            return luminance > 140 ? 'black' : 'white';
+        }
+    </script>
+</body>
+
+</html>

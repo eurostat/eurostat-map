@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./ports.css" />
+</head>
+
+<body style="margin:0">
+    <svg id="ports-map"></svg>
+
+    <svg style='display:none;'>
+        <!-- used for country borders -->
+        <defs>
+            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
+            </filter>
+        </defs>
+    </svg>
+    <script src="../eurostatmap.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/proj4"></script>
+    <script src="./portsData.js"></script>
+    <script src="./annotations.js"></script>
+    <script src="./ranking.js"></script>
+
+    <script id="'our-map">
+        const portsWidth = 795;
+        const portsHeight = 437;
+        proj4.defs(
+            "EPSG:3035",
+            "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 " +
+            "+ellps=GRS80 +units=m +no_defs +type=crs"
+        )
+        const to3035 = ([lon, lat]) => proj4("EPSG:4326", "EPSG:3035", [lon, lat])
+        function indexByCode(portsData, valueKey = "tonnes_2024") {
+            return Object.fromEntries(portsData.map((p) => [p.code, p[valueKey]]));
+        }
+        const getApproxCurrentGeoBbox = function () {
+            const defaultPosition = { x: 4790000, y: 3420000 };
+            const halfWidth = 0.5 * defaultPosition.z * portsWidth;
+            const halfHeight = 0.5 * defaultPosition.z * portsHeight;
+            return [
+                defaultPosition.x - halfWidth,
+                defaultPosition.y - halfHeight,
+                defaultPosition.x + halfWidth,
+                defaultPosition.y + halfHeight
+            ];
+        }
+        const getBBOXAsGeoJSON = function (bb) {
+            return {
+                type: "Feature",
+                geometry: {
+                    type: "MultiPoint",
+                    coordinates: [
+                        [bb[0], bb[1]],
+                        [bb[2], bb[3]]
+                    ]
+                }
+            };
+        }
+
+        const portsProjection = d3
+            .geoIdentity()
+            .reflectY(true)
+            .fitSize(
+                [portsWidth, portsHeight],
+                getBBOXAsGeoJSON(getApproxCurrentGeoBbox())
+            )
+        const portsSizeData = indexByCode([...portsData])
+        const sums = {
+            NL: 538119805,
+            TR: 524711145,
+            IT: 488555725,
+            ES: 485995823,
+            BE: 274894445,
+            DE: 273907907,
+            FR: 269749807,
+            NO: 212081153,
+            GR: 173190413,
+            SE: 163757127,
+            PL: 124238426,
+            DK: 93755257,
+            FI: 93023995,
+            PT: 85669179,
+            RO: 59553853,
+            IE: 51162680,
+            LT: 39492591,
+            LV: 33577482,
+            BG: 29522559,
+            SI: 21779651,
+            EE: 21721978,
+            HR: 20853544,
+            CY: 8944881,
+            IS: 7223088,
+            MT: 4479015,
+            ME: 2464492
+        }
+
+        const map = eurostatmap
+            .map("ps")
+            .svgId("ports-map")
+            .nutsLevel(0)
+            .psMinSize(3)
+            .psMaxSize(50)
+            .title("Freight handled by maritime ports")
+            .subtitle("Both incoming and outgoing, 2024")
+            .footnote(
+                      "Shows data for ports with at least 2 million tonnes of freight handled. Top 5 labelled. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCartography: GISCO. Boundaries: ©EuroGeographics ©OSM"
+            )
+            .legend({
+                title: "Tonnes of freight",
+                x: portsWidth - 200,
+                y: 10,
+                sizeLegend: {
+                    values: [397000000, 200000000, 50000000, 2000000],
+                    labelFormatter: (l) => l / 1000000 + " million"
+                }
+            })
+            .filterGeometriesFunction((geometries) => {
+                console.log(geometries);
+                //remove greenland to stop title overlap
+                let nuts2json = geometries[0];
+                let countries = nuts2json.objects.cntrg.geometries;
+                countries = countries.filter((f) => {
+                    console.log(f.properties.id);
+                    if (f.properties.id !== "GL" && f.properties.na !== "Greenland") {
+                        return f;
+                    } else {
+                        return false;
+                    }
+                });
+                nuts2json.objects.cntrg.geometries = countries;
+
+                // add ports to centroids array
+                let centroids = geometries[1];
+                [...portsData].forEach((d) => {
+                    let coords = to3035([d.lon, d.lat]);
+                    let newCentroid = {
+                        type: "Feature",
+                        geometry: {
+                            coordinates: coords,
+                            type: "Point"
+                        },
+                        properties: {
+                            centroid: portsProjection(coords),
+                            id: d.code,
+                            na: d.name
+                        }
+                    };
+                    centroids.features.push(newCentroid);
+                });
+                return geometries;
+            })
+            //.insets("default")
+            // add insets for canarias, reunion, guadeloupe, malta, martinique
+            .zoomButtons(true)
+            .callback(() => {
+                const portKeys = Object.keys(portsSizeData);
+                //color regions
+                d3.selectAll("#ports-map .em-nutsrg path").style("fill", (d) => {
+                    const iso = d.properties.id; // e.g. "NL"
+
+                    // Check if ANY port key starts with this ISO
+                    const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == "EL";
+
+                    return hasPort ? "rgba(178, 232, 215,0.4)" : "#F2F2F2";
+                });
+
+                createTopCountriesOverlay("#ports-map", sums, portsWidth - 230, 180);
+            })
+            .annotations({ annotations: portsAnnotations })
+            .build();
+
+        map.statData("size").setData(portsSizeData);
+
+    </script>
+</body>
+
+</html>
