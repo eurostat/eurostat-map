@@ -38,6 +38,14 @@
     opacity: 0.1 !important;
 }
 
+text#em-label-EU,
+text#em-label-shadow-EU {
+    transform: translate(6px, 5px);
+    font-size: 19px;
+    font-weight:600;
+    opacity: 0.7;
+}
+
 
 text#em-label-RUSSIA\:-BLACK-SEA,
 text#em-label-shadow-RUSSIA\:-BLACK-SEA {
@@ -51,7 +59,7 @@ text#em-label-shadow-UKRAINE {
 
 text#em-label-MOROCCO,
 text#em-label-shadow-MOROCCO {
-    transform: translate(-28px, 10px);
+    transform: translate(0px, 20px);
 }
 
 text#em-label-ALGERIA,
