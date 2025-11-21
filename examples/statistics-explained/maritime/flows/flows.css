@@ -30,7 +30,8 @@
 }
 
 .em-labels {
-    opacity: 0.7;
+    fill: #343434;
+    opacity: 0.9;
 }
 
 .em-flow-node-stems {
