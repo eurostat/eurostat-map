@@ -20,7 +20,7 @@
             </filter>
         </defs>
     </svg>
-    <script src="../../../../build/eurostatmap.js"></script>
+    <script src="../eurostatmap.min.js"></script>
     <script src="../../d3.v7.min.js"></script>
     <script src="../../proj4-src.js"></script>
     <script src="./portsData.js"></script>
@@ -34,15 +34,12 @@
         const rankingX = portsWidth - 230;
         const rankingY = 10;
 
-        // eu
+        // european projection
         proj4.defs(
             "EPSG:3035",
             "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 " +
             "+ellps=GRS80 +units=m +no_defs +type=crs"
         )
-        // canarias
-        proj4.defs("EPSG:32628", "+proj=utm +zone=28 +datum=WGS84 +units=m +no_defs");
-        const to32628 = ([lon, lat]) => proj4("EPSG:4326", "EPSG:32628", [lon, lat]);
         const to3035 = ([lon, lat]) => proj4("EPSG:4326", "EPSG:3035", [lon, lat])
 
         function indexByCode(portsData, valueKey = "tonnes_2024") {
@@ -149,11 +146,10 @@
                     let newCentroid
                     if (d.code == 'ES02ESLPA') {
                         // handle canarias (inset map)
-                        let coords = to32628([d.lon, d.lat]);
                         newCentroid = {
                             type: "Feature",
                             geometry: {
-                                coordinates: coords, // IC_32628 fixed position in inset
+                                coordinates: [443468, 3145647], // IC_32628 fixed position in inset
                                 type: "Point"
                             },
                             properties: {
