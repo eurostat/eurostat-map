@@ -12,7 +12,8 @@
   }
 
   #air-freight-map .em-worldbn,
-  .em-bn-d {
+  .em-bn-d,
+  .em-kosovo-bn {
       stroke-width: 0px !important;
   }
 
@@ -72,7 +73,7 @@
       transform: translate(-30px, 0px);
   }
 
-  /* text#em-label-Eastern-Asia,
+  text#em-label-Eastern-Asia,
   text#em-label-shadow-Eastern-Asia {
       transform: translate(50px, 0px);
-  } */
+  }
