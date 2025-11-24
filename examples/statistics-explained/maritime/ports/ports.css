@@ -38,6 +38,10 @@
     stroke-width: 0.6px !important;
 }
 
+.em-inset-title {
+    font-size: 10px !important;
+}
+
 /* .em-inset {
     filter: drop-shadow(0.5px 0.5px 0.5px rgba(0, 0, 0, 0.5)) !important;
 } */

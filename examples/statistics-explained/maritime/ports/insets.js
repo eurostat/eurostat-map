@@ -1,4 +1,4 @@
-const insetWidth = 90;
+const insetWidth = 85;
 const insetHeight = 60;
 const insetsX = 5;
 const insetsY = 150;
@@ -10,6 +10,7 @@ const insets = [
         geo: 'IC',
         x: 0,
         y: 0,
+        position: { z: 6400 },
         width: insetWidth,
         height: insetHeight,
     },
@@ -30,6 +31,7 @@ const insets = [
         geo: 'MQ',
         x: 0,
         y: insetHeight * 2 + 20,
+        position: { z: 2000 },
         width: insetWidth,
         height: insetHeight,
     },
@@ -38,6 +40,7 @@ const insets = [
         geo: 'RE',
         x: 0,
         y: insetHeight * 3 + 30,
+        position: { x: 348011, y: 7661627, z: 2600 },
         width: insetWidth,
         height: insetHeight,
     },
