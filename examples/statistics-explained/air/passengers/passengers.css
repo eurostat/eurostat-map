@@ -27,13 +27,13 @@
       transform: translate(5px, 0px);
   }
 
-  #em-labels .em-label,
+  .em-labels .em-label,
   .em-label-shadow,
   .em-flow-label,
   .em-flow-label-shadow {
       font-family: "Arial" !important;
       font-size: 15px !important;
-      opacity: 0.6 !important;
+      opacity: 0.5 !important;
       font-weight: bold;
       fill: #333333 !important;
   }

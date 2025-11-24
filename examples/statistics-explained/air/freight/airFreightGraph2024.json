@@ -13,7 +13,7 @@
             "id": "AFR_C +AFR_N+AFR_S+AFR_W",
             "name": "Rest of Africa",
             "x": 10,
-            "y": 10,
+            "y": 13,
             "value": 401000,
             "share": "3.4%",
             "change": "-0.9%"
@@ -66,8 +66,8 @@
         {
             "id": "ASI_E",
             "name": "Eastern Asia",
-            "x": 105,
-            "y": 29,
+            "x": 104,
+            "y": 30,
             "value": 3023000,
             "share": "25.5%",
             "change": "12.8%"
