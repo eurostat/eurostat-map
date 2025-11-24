@@ -807,7 +807,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // Project and save coordinates
         // Before filtering
-        console.log(map.geo_, centroidFeatures)
+        // console.log(map.geo_, centroidFeatures)
         const projectedCentroids = centroidFeatures.map((d) => {
             const coords = map._projection(d.geometry.coordinates)
             d.properties.centroid = coords

@@ -123,11 +123,7 @@ export const map = function (config) {
         // target: "ES"
         // value: 45422327.56
 
-        // update stroke width function
-        const data = out.flowGraph_.links
-        out.strokeWidthScale = scaleLinear()
-            .domain([min(data, (d) => d.value), max(data, (d) => d.value)])
-            .range([out.flowMinWidth_, out.flowMaxWidth_])
+
 
         // if donuts are enabled, flows must have categorical colors
         if (out.flowDonuts_ && out.flowTopLocations_ == 0) {
@@ -136,6 +132,9 @@ export const map = function (config) {
 
         // some pre-calculations
         prepareFlowGraph(out)
+
+        // update stroke width function
+        defineWidthScale(out)
 
         // Define our container SVG
         const zoomGroup = select('#em-zoom-group-' + out.svgId_);
@@ -195,6 +194,40 @@ export const map = function (config) {
     }
 
     return out
+}
+
+function defineWidthScale(out) {
+    const data = out.flowGraph_.links
+    // data: array of links with .value
+    const positives = data.map(d => d.value).filter(v => v > 0);
+    const upper = max(positives);
+    const smallestPositive = min(positives);
+
+    // visual params
+    const minW = Math.max(0, out.flowMinWidth_ || 0); // visible floor (px)
+    const maxW = out.flowMaxWidth_;                   // max stroke width (px)
+
+    // Base linear scale for positives only
+    const base = scaleLinear()
+        .domain([0, upper])
+        .range([0, maxW])
+        .clamp(true);
+
+
+    // Final classifier, force min width
+    const strokeWidthScale = (v) => {
+        const x = +v;
+        if (!Number.isFinite(x) || x <= 0) return 0;
+        return Math.max(minW, base(x));
+    };
+
+    // Optional: expose domain method to be compatible with legacy code
+    strokeWidthScale.domain = (...args) => {
+        if (args.length) { base.domain(...args); return strokeWidthScale; }
+        return base.domain();
+    };
+
+    out.strokeWidthScale = strokeWidthScale;
 }
 
 function prepareFlowGraph(out) {

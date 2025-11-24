@@ -18,6 +18,7 @@ export const legend = function (map, config) {
         values: null,
         marginTop: 5,
         labelFormatter: undefined, // function to format legend labels
+        labels: null, // manual override for legend labels
         color: '#6b6b6b81', // line color
     }
 
@@ -200,6 +201,9 @@ export const legend = function (map, config) {
                 currentY += prevStrokeWidth / 2 + strokeWidth / i + padding
             }
 
+            let label = out.flowWidthLegend.labelFormatter ? out.flowWidthLegend.labelFormatter(val) : spaceAsThousandSeparator(val)
+            if (out.flowWidthLegend.labels && out.flowWidthLegend.labels[i]) label = out.flowWidthLegend.labels[i];//manual override
+
             out._flowWidthContainer
                 .append('line')
                 .attr('x1', x)
@@ -215,7 +219,7 @@ export const legend = function (map, config) {
                 .attr('y', currentY)
                 .attr('dy', '0.35em')
                 .attr('class', 'em-legend-label')
-                .text(out.flowWidthLegend.labelFormatter ? out.flowWidthLegend.labelFormatter(val) : spaceAsThousandSeparator(val))
+                .text(label)
         })
     }
 

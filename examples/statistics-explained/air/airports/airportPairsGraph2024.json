@@ -1,1 +1,137 @@
-{"nodes":[{"id":"LEBL","name":"BARCELONA/EL PRAT","x":2.07846,"y":41.2971,"value":5700734,"change":null,"share2023":null},{"id":"LEPA","name":"PALMA DE MALLORCA","x":2.73881,"y":39.5517,"value":4318840,"change":null,"share2023":null},{"id":"LEMD","name":"ADOLFO SUAREZ MADRID-BARAJAS","x":-3.5695,"y":40.4918,"value":10615482,"change":null,"share2023":null},{"id":"LIRF","name":"ROMA/FIUMICINO","x":12.2389,"y":41.8003,"value":6193366,"change":null,"share2023":null},{"id":"GCLP","name":"GRAN CANARIA","x":-15.3866,"y":27.9319,"value":1604867,"change":null,"share2023":null},{"id":"LICC","name":"CATANIA/FONTANAROSSA","x":15.0664,"y":37.4668,"value":1557398,"change":null,"share2023":null},{"id":"LPPT","name":"LISBOA","x":-9.13417,"y":38.7742,"value":1857988,"change":null,"share2023":null},{"id":"GCXO","name":"TENERIFE NORTE","x":-16.3415,"y":28.4827,"value":1427756,"change":null,"share2023":null},{"id":"LICJ","name":"PALERMO/PUNTA RAISI","x":13.091,"y":38.1759,"value":1392767,"change":null,"share2023":null}],"links":[{"source":"LEBL","target":"LEPA","value":2281017,"year":2024,"changePct":1.8},{"source":"LEPA","target":"LEMD","value":2037823,"year":2024,"changePct":8.3},{"source":"LEBL","target":"LEMD","value":1931782,"year":2024,"changePct":5.4},{"source":"LEMD","target":"LIRF","value":1755266,"year":2024,"changePct":12.8},{"source":"LEMD","target":"GCLP","value":1604867,"year":2024,"changePct":22.8},{"source":"LICC","target":"LIRF","value":1557398,"year":2024,"changePct":24.7},{"source":"LPPT","target":"LEMD","value":1857988,"year":2024,"changePct":2.6},{"source":"GCXO","target":"LEMD","value":1427756,"year":2024,"changePct":25.1},{"source":"LEBL","target":"LIRF","value":1487935,"year":2024,"changePct":14.7},{"source":"LICJ","target":"LIRF","value":1392767,"year":2024,"changePct":20.3}]}
+{
+    "nodes": [
+        {
+            "id": "LEBL",
+            "name": "BARCELONA/EL PRAT",
+            "x": 2.07846,
+            "y": 41.2971,
+            "value": 5700734
+        },
+        {
+            "id": "LEPA",
+            "name": "PALMA DE MALLORCA",
+            "x": 2.83881,
+            "y": 39.5517,
+            "value": 4318840
+        },
+        {
+            "id": "LEMD",
+            "name": "ADOLFO SUAREZ MADRID-BARAJAS",
+            "x": -3.5695,
+            "y": 40.4918,
+            "value": 10615482
+        },
+        {
+            "id": "LIRF",
+            "name": "ROMA/FIUMICINO",
+            "x": 12.2389,
+            "y": 41.8003,
+            "value": 6193366
+        },
+        {
+            "id": "GCLP",
+            "name": "GRAN CANARIA",
+            "x": -15.3866,
+            "y": 27.9319,
+            "value": 1604867
+        },
+        {
+            "id": "LICC",
+            "name": "CATANIA/FONTANAROSSA",
+            "x": 15.0664,
+            "y": 37.4668,
+            "value": 1557398
+        },
+        {
+            "id": "LPPT",
+            "name": "LISBOA",
+            "x": -9.13417,
+            "y": 38.7742,
+            "value": 1857988
+        },
+        {
+            "id": "GCXO",
+            "name": "TENERIFE NORTE",
+            "x": -16.3415,
+            "y": 28.4827
+        },
+        {
+            "id": "LICJ",
+            "name": "PALERMO/PUNTA RAISI",
+            "x": 13.091,
+            "y": 38.1759
+        }
+    ],
+    "links": [
+        {
+            "source": "LEBL",
+            "target": "LEPA",
+            "value": 2323085,
+            "value2023": 2281017,
+            "changePct": 1.8
+        },
+        {
+            "source": "LEPA",
+            "target": "LEMD",
+            "value": 2206891,
+            "value2023": 2037823,
+            "changePct": 8.3
+        },
+        {
+            "source": "LEBL",
+            "target": "LEMD",
+            "value": 2036488,
+            "value2023": 1931782,
+            "changePct": 5.4
+        },
+        {
+            "source": "LEMD",
+            "target": "LIRF",
+            "value": 1979946,
+            "value2023": 1755266,
+            "changePct": 12.8
+        },
+        {
+            "source": "LEMD",
+            "target": "GCLP",
+            "value": 1970045,
+            "value2023": 1604867,
+            "changePct": 22.8
+        },
+        {
+            "source": "LICC",
+            "target": "LIRF",
+            "value": 1941657,
+            "value2023": 1557398,
+            "changePct": 24.7
+        },
+        {
+            "source": "LPPT",
+            "target": "LEMD",
+            "value": 1906228,
+            "value2023": 1857988,
+            "changePct": 2.6
+        },
+        {
+            "source": "GCXO",
+            "target": "LEMD",
+            "value": 1785863,
+            "value2023": 1427756,
+            "changePct": 25.1
+        },
+        {
+            "source": "LEBL",
+            "target": "LIRF",
+            "value": 1706636,
+            "value2023": 1487935,
+            "changePct": 14.7
+        },
+        {
+            "source": "LICJ",
+            "target": "LIRF",
+            "value": 1675982,
+            "value2023": 1392767,
+            "changePct": 20.3
+        }
+    ]
+}

@@ -22,7 +22,6 @@
         </defs>
     </svg>
     <script src="../eurostatmap.min.js"></script>
-    <!-- <script src="https://unpkg.com/eurostat-map@4.3.31"></script> -->
     <script src="../../d3.v7.min.js"></script>
     <script src="./airportLabels.js"></script>
     <script src="./configs.js"></script>
@@ -33,8 +32,6 @@
         fetch(`./airportPairsGraph${year}.json`)
             .then(r => r.json())
             .then(graphData => {
-                console.log('Loaded airport data:', graphData);
-
                 // build map
                 const width = 1000
                 const height = width / 1.5;
@@ -48,7 +45,12 @@
                 }
                 const fmtCompact = new Intl.NumberFormat('en', {
                     notation: 'compact',
-                    compactDisplay: 'short', // "short" → 1.2K, "long" → 1.2 thousand
+                    compactDisplay: 'short', // "short" → 1.2K,
+                    maximumFractionDigits: 1
+                });
+                const fmtLong = new Intl.NumberFormat('en', {
+                    notation: 'compact',
+                    compactDisplay: 'long', // "long" → 1.2 thousand
                     maximumFractionDigits: 1
                 });
 
@@ -127,8 +129,8 @@
 
                     // flow settings
                     .flowGraph(graphData)
-                    .flowMinWidth(7)
-                    .flowMaxWidth(35)
+                    .flowMinWidth(3)
+                    .flowMaxWidth(15)
                     .flowMapType('curved')
                     .flowStack(true)
                     .flowColor((d) => {
@@ -154,15 +156,15 @@
 
                     // legend
                     .legend({
-                        x: width - 170,
+                        x: width - 190,
                         y: height - 315,
                         boxPadding: 10,
                         title: "Passengers carried",
                         subtitle: "",
                         flowWidthLegend: {
                             marginTop: -10,
-                            values: [1400000, 1700000, 2200000],
-                            labelFormatter: (value) => spaceAsThousandSeparator(value)
+                            values: [1600000, 2200000],
+                            labels: ['1.6 million (min)', '2.3 million (max)']
                         },
                         donutSizeLegend: {
                             title: "Passengers carried (airport)",
@@ -225,7 +227,7 @@
                             {
                                 type: "annotationCalloutCircle",
                                 note: {
-                                    label: `6 of the top 10 routes either started or ended in Madrid, with a total of over ${year == 2024 ? 10.6 : 10.7
+                                    label: `6 of the top 10 routes either started or ended in Madrid, with a total of over ${year == 2024 ? 11.8 : 10.7
                                         } million passengers carried. `,
                                     title: "Madrid moves millions",
                                     wrap: 210
@@ -241,7 +243,7 @@
                             },
                             {
                                 note: {
-                                    label: `Barcelona to Mallorca was the busiest route in ${year} with over 2.2 million passengers carried. `,
+                                    label: `Barcelona to Mallorca was the busiest route in ${year} with over 2.3 million passengers carried. `,
                                     title: "Busiest route",
                                     wrap: 210
                                 },
@@ -286,6 +288,7 @@
                         // setTimeout(() => {
                         //   map.exportMapToSVG();
                         // }, 3000);
+                        d3.selectAll('[data-color-key="LEMD"][data-color="#c6dbef"]').raise();
                     })
 
                     .footnote(
