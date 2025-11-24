@@ -129,7 +129,10 @@
 
         const map = eurostatmap
             .map("ps")
-            .svgId("ports-map").dorling(false).insets(insets).insetBoxPosition([insetsX, insetsY])
+            .svgId("ports-map")
+            .hoverColor('#ffc700')
+            .insets(insets)
+            .insetBoxPosition([insetsX, insetsY])
             .nutsLevel(0)
             .psMinSize(3)
             .psMaxSize(30)
