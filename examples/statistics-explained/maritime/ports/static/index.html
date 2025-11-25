@@ -10,11 +10,18 @@
 </head>
 
 <body style="margin:0">
-    <svg id="ports-map"></svg>
-    <button id="export-annotations-btn" type="button">Export Annotations</button>
-    <button id="toggle-edit-mode-btn" type="button">Toggle edit mode</button>
-    <button id="export-png-btn" type="button">Export as PNG</button>
-    <button id="export-svg-btn" type="button">Export as SVG</button>
+    <div>
+
+        <button id="toggle-edit-mode-btn" type="button">Toggle edit mode</button>
+        <button id="export-annotations-btn" type="button">Export Annotations</button>
+        |
+        <button id="export-png-btn" type="button">Export map as PNG</button>
+        <button id="export-svg-btn" type="button">Export map as SVG</button>
+    </div>
+    <div>
+        <svg id="ports-map"></svg>
+    </div>
+
     <svg style='display:none;'>
         <!-- used for country borders -->
         <defs>
