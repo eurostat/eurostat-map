@@ -23,7 +23,7 @@ import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
 import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
-import estatLogo from '../assets/logos/ESTAT.svg';
+import { addEurostatLogo } from './logo.js'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -172,6 +172,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.footnoteWrap_ = 40 //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined
     out.showEstatLogo_ = false
+
     out.logoPosition_ = undefined
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
@@ -706,7 +707,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         //logo
         if (out.showEstatLogo_) {
-            addEurostatLogo()
+            addEurostatLogo(out)
         }
 
         //source dataset URL
@@ -1079,24 +1080,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 if (out.footnoteTooltipText_) out._tooltip.mouseout();
                 out._tooltip.style("max-width", out._tooltip.mw___);
             });
-    };
-
-    const addEurostatLogo = function () {
-        const svg = out.svg();
-        const logoWidth = 200;
-        const logoHeight = 40;
-        const margin = 10;
-        const x = out.logoPosition_ ? out.logoPosition_[0] : out.width_ - logoWidth - margin;
-        const y = out.logoPosition_ ? out.logoPosition_[1] : out.height_ - logoHeight - margin;
-
-        svg.selectAll(".em-eurostat-logo").remove();
-        svg.append("image")
-            .attr("href", estatLogo)
-            .attr("width", logoWidth)
-            .attr("height", logoHeight)
-            .attr("x", x)
-            .attr("y", y)
-            .attr("class", "em-eurostat-logo");
     };
 
     const addCoastalMarginToMap = function () {

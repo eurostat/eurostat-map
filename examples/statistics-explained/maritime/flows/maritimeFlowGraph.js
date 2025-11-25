@@ -7,7 +7,7 @@ const maritimeFlowGraph = {
             "x": 12
         },
         {
-            "id": "US_ATL",
+            "id": "US",
             "name": "USA: East coast",
             "y": 36.8,
             "x": -75.6
@@ -21,8 +21,8 @@ const maritimeFlowGraph = {
         {
             "id": "NO",
             "name": "NORWAY",
-            "y": 67,
-            "x": 13
+            "y": 61,
+            "x": 7
         },
         {
             "id": "CN",
@@ -55,7 +55,7 @@ const maritimeFlowGraph = {
             "x": 37.9
         },
         {
-            "id": "CA1-2",
+            "id": "CA",
             "name": "CANADA: East coast",
             "y": 47,
             "x": -64
@@ -105,12 +105,12 @@ const maritimeFlowGraph = {
     ],
     "links": [
         {
-            "source": "US_ATL",
+            "source": "US",
             "target": "EU",
             "value": 172400000,
             "meta": {
                 "direction": "Inwards",
-                "partner": "US_ATL",
+                "partner": "US",
                 "label": "USA: East coast",
                 "share": 0.087
             }
@@ -194,11 +194,11 @@ const maritimeFlowGraph = {
         },
         {
             "source": "EU",
-            "target": "US_ATL",
+            "target": "US",
             "value": 48500000,
             "meta": {
                 "direction": "Outwards",
-                "partner": "US_ATL",
+                "partner": "US",
                 "label": "USA: East coast",
                 "share": 0.024
             }
@@ -226,12 +226,12 @@ const maritimeFlowGraph = {
             }
         },
         {
-            "source": "CA1-2",
+            "source": "CA",
             "target": "EU",
             "value": 39000000,
             "meta": {
                 "direction": "Inwards",
-                "partner": "CA1-2",
+                "partner": "CA",
                 "label": "CANADA: East coast",
                 "share": 0.02
             }

@@ -19,10 +19,6 @@ module.exports = {
                 test: /\.css$/i,
                 use: ['style-loader', 'css-loader'], // For CSS files
             },
-            {
-                test: /\.svg$/i,
-                type: 'asset/resource' // emits a file and returns its URL
-            },
         ],
     },
     plugins: [new LiveReloadPlugin()],

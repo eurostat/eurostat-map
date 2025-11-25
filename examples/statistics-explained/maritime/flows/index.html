@@ -11,7 +11,7 @@
 <body style="margin:0">
     <svg id="maritime-flow-map"></svg>
 
-    <script src="../eurostatmap.min.js"></script>
+    <script src="../../eurostatmap.min.js"></script>
     <script src="../../d3.v7.min.js"></script>
     <script src="../../proj4-src.js"></script>
     <script src="./maritimeFlowGraph.js"></script>
@@ -24,7 +24,7 @@
             .geoAzimuthalEquidistant()
             .rotate([10, -10])
             //.center([10, 52])       // center on Europe
-            .scale(300)
+            .scale(350)
             .translate([width / 2.4, width / 2.3])
         const spaceAsThousandSeparator = function (number) {
             return number.toLocaleString("en").replace(/,/gi, " ");
@@ -45,8 +45,8 @@
             .hoverColor('#ffc700')
             .width(width)
             .height(height)
-            .title("Maritime freight")
-            .subtitle("Top 20 flows of goods handled by EU ports")
+            .title("Top 20 main extra-EU flows")
+            .subtitle("by gross weight of goods handled in main ports, EU, 2024")
 
             //projection
             .projectionFunction(worldProjection)
@@ -86,25 +86,27 @@
                 bumpY: 5,        // extra height for hop
                 curvature: 0.3   // 0..1; default sankey smoothness
             }).flowOrder((a, b) => {
-                // Prefer originId if present (from expandRoutesToSankeyMidpointGraph),
-                // fall back to link.source.id.
                 const srcA = a.link.originId ?? (a.link.source && a.link.source.id);
-                const srcB = b.link.originId ?? (b.link.source && b.link.source.id);
+                const srcB = b.link.originId ?? (a.link.source && a.link.source.id);
                 const morocco = a.link.target.id === 'MA' || b.link.target.id === 'MA';
 
-                // Edge case: move India flow above Turkey
-                if (srcA === 'IN' && srcB === 'TR') return -1; // IN above TR
-                if (srcA === 'TR' && srcB === 'IN') return 1;  // TR below IN
+                // India above Turkey
+                if (srcA === 'IN' && srcB === 'TR') return -1;
+                if (srcA === 'TR' && srcB === 'IN') return 1;
 
-                //brasil above algeria and morocco
+                // Brasil above Algeria and Morocco
                 if (srcA === 'BR' && (srcB === 'DZ' || morocco)) return -1;
                 if ((srcA === 'DZ' || morocco) && srcB === 'BR') return 1;
 
-                // Default ordering: by otherY (pulls toward the other end of the link)
+                // Canada should go below the UK
+                if (srcA === 'CA' && srcB === 'UK') return 1;   // CA after UK
+                if (srcA === 'UK' && srcB === 'CA') return -1;  // UK before CA
+
+                // Default ordering: by otherY
                 const dy = a.otherY - b.otherY;
                 if (dy !== 0) return dy;
 
-                // Tie-break by source id so sort is stable/deterministic
+                // Stable fallback
                 if (srcA && srcB && srcA !== srcB) {
                     return srcA < srcB ? -1 : 1;
                 }
@@ -120,7 +122,7 @@
 
             // legend
             .legend({
-                x: width - 180,
+                x: width - 190,
                 y: height - 225,
                 boxPadding: 10,
                 title: "Freight carried",
@@ -128,24 +130,34 @@
                 flowWidthLegend: {
                     marginTop: -10,
                     values: [27000000, 100000000, 172000000],
-                    labelFormatter: (value) => spaceAsThousandSeparator(value)
+                    labels: ['25 million (min)', '100 million', '172 million (max)']
                 },
                 flowColorLegend: false,
                 regionColorLegend: {
                     marginTop: 20,
                     title: " ",
-                    labels: ["Imports", "Exports"]
+                    labels: ["Inwards (import)", "Outwards (export)"]
                 }
             })
-
-            .footnote(
-                "Freight includes both loaded and unloaded. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Cartography:GISCO. Boundaries: ©EuroGeographics @OSM"
-            )
             // zoom min/max
             .zoomExtent([0.6, 10])
             .zoomButtons(true)
             .lockPanUntilZoom(false)
             .flowRegionColors(["#2171b5", "#51824f"])
+            .footnote(false)
+            .showEstatLogo(true)
+            .logoPosition([3, height - 35])
+            .callback(() => {
+                // --- REMOVE if it already exists ---
+                d3.select("#maritime-flow-map #em-footnote-2").remove();
+                d3.selectAll("#maritime-flow-map")
+                    .append('text')
+                    .attr('x', width - 310)
+                    .attr('y', height)
+                    .attr('class', 'em-footnote')
+                    .attr('id', 'em-footnote-2')
+                    .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
+            })
 
             .build();
 

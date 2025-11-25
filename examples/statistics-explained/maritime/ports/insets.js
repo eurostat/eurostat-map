@@ -1,6 +1,6 @@
 const insetWidth = 85;
 const insetHeight = 60;
-
+const padding = 5
 
 const insets = [
     //Canarias, Martinique, Guadeloupe, Réunion
@@ -17,7 +17,7 @@ const insets = [
         title: 'Guadeloupe (FR)',
         geo: 'GP',
         x: 0,
-        y: insetHeight + 10,
+        y: insetHeight + padding,
         width: insetWidth,
         height: insetHeight,
         position: { x: 680000, y: 1810000, z: 2000 },
@@ -29,7 +29,7 @@ const insets = [
         title: 'Martinique (FR)',
         geo: 'MQ',
         x: 0,
-        y: insetHeight * 2 + 20,
+        y: insetHeight * 2 + padding * 2,
         position: { z: 2000 },
         width: insetWidth,
         height: insetHeight,
@@ -38,7 +38,7 @@ const insets = [
         title: 'Reunion (FR)',
         geo: 'RE',
         x: 0,
-        y: insetHeight * 3 + 30,
+        y: insetHeight * 3 + padding * 3,
         position: { x: 348011, y: 7661627, z: 2600 },
         width: insetWidth,
         height: insetHeight,

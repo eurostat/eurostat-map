@@ -69,7 +69,7 @@
             .footnote(
                 "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). EU ports reporting more than 47 million tonnes are labelled."
             )
-            .footnoteWrap(100)
+            .footnoteWrap(90)
             .footnotePosition([10, 665])
             .legend({
                 title: "Tonnes of freight",
@@ -184,11 +184,14 @@
                     return hasPort ? "rgba(178, 232, 215,0.4)" : "#F2F2F2";
                 });
 
+                // --- REMOVE if it already exists ---
+                d3.select("#ports-map #em-footnote-2").remove();
                 d3.selectAll("#ports-map")
                     .append('text')
                     .attr('x', 480)
-                    .attr('y', 680)
+                    .attr('y', 675)
                     .attr('class', 'em-footnote')
+                    .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
 
                 //createTopCountriesOverlay("#ports-map", sums, rankingX, rankingY);
