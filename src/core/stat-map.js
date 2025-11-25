@@ -1,4 +1,4 @@
-import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL, executeForAllInsets } from './utils'
+import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL, executeForAllInsets, applyComputedStylesToSVG, ensureSvgSize } from './utils'
 import * as MapTemplate from './map-template'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
@@ -361,8 +361,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
         // Temporarily append the clone to the document to compute styles
         document.body.appendChild(svgNodeClone)
 
-        // Convert CSS to inline styles before saving the SVG
-        applyInlineStylesFromCSS(svgNodeClone)
+        // inline the actual computed styles 
+        applyComputedStylesToSVG(svgNodeClone);
+        //set explicit width / height / viewBox for reliable export
+        ensureSvgSize(svgNodeClone);
 
         // Remove the cloned SVG from the document after applying styles
         document.body.removeChild(svgNodeClone)
@@ -385,60 +387,126 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * @description Exports the current map with styling to PNG and downloads it
      *
      */
-    out.exportMapToPNG = function (width, height) {
-        const svgNodeClone = out.svg_.node().cloneNode(true)
-        // Convert CSS to inline styles before saving the SVG
-        applyInlineStylesFromCSS(svgNodeClone)
+    out.exportMapToPNG = async function (width, height) {
+        // Clone original SVG
+        const svgNodeClone = out.svg_.node().cloneNode(true);
 
-        // Step 1: Serialize the SVG node to a string
-        const serializer = new XMLSerializer()
-        const svgString = serializer.serializeToString(svgNodeClone)
+        // Ensure xml namespaces
+        if (!svgNodeClone.hasAttribute('xmlns')) svgNodeClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        if (!svgNodeClone.hasAttribute('xmlns:xlink')) svgNodeClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
 
-        // Step 2: Create a Blob from the serialized SVG
-        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+        // Append clone so getComputedStyle & fonts resolve correctly
+        document.body.appendChild(svgNodeClone);
 
-        // Step 3: Create a URL for the Blob
-        const url = URL.createObjectURL(svgBlob)
-
-        // Get the width and height attributes from the SVG
-        width = width || svgNodeClone.getAttribute('width')
-        height = height || svgNodeClone.getAttribute('height')
-
-        if (!width || !height) {
-            throw new Error('SVG width or height attributes are missing or invalid.')
+        // Wait for webfonts (if any) to load
+        if (document.fonts && document.fonts.ready) {
+            try { await document.fonts.ready; } catch (e) { console.warn('document.fonts.ready failed', e); }
         }
 
-        // Step 4: Create an Image element and load the Blob URL
-        const img = new Image()
+        // Inline computed styles and set explicit size/viewBox (must run while clone is in DOM)
+        applyComputedStylesToSVG(svgNodeClone);
+        ensureSvgSize(svgNodeClone);
+
+        // Insert white background rect as first child if none present
+        if (!svgNodeClone.querySelector('rect[data-export-background]')) {
+            const w = svgNodeClone.getAttribute('width') || svgNodeClone.viewBox.baseVal.width || svgNodeClone.getBoundingClientRect().width;
+            const h = svgNodeClone.getAttribute('height') || svgNodeClone.viewBox.baseVal.height || svgNodeClone.getBoundingClientRect().height;
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            bg.setAttribute('x', 0);
+            bg.setAttribute('y', 0);
+            bg.setAttribute('width', String(w));
+            bg.setAttribute('height', String(h));
+            bg.setAttribute('fill', '#ffffff');
+            bg.setAttribute('data-export-background', 'true');
+            svgNodeClone.insertBefore(bg, svgNodeClone.firstElementChild);
+        }
+
+        // Serialize while still in DOM
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svgNodeClone);
+
+        // Remove clone from DOM now
+        document.body.removeChild(svgNodeClone);
+
+        // Create blob URL
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+
+        // Determine pixel dimensions
+        const w = Math.round(width || parseFloat(svgNodeClone.getAttribute('width')) || 800);
+        const h = Math.round(height || parseFloat(svgNodeClone.getAttribute('height')) || 600);
+
+        // Create image and set crossOrigin (best-effort)
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        // Helper to revoke and cleanup
+        const cleanup = (pngUrl) => {
+            try { URL.revokeObjectURL(url); } catch (e) { }
+            if (pngUrl) {
+                try { URL.revokeObjectURL(pngUrl); } catch (e) { }
+            }
+        };
+
         img.onload = function () {
-            // Step 5: Draw the image on a canvas
-            const canvas = document.createElement('canvas')
-            canvas.width = parseFloat(width) // Set canvas width from SVG's width attribute
-            canvas.height = parseFloat(height) // Set canvas height from SVG's height attribute
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
 
-            const context = canvas.getContext('2d')
-            context.drawImage(img, 0, 0, canvas.width, canvas.height)
+                // Fill white background to avoid transparent -> black in some viewers
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, w, h);
 
-            // Step 6: Convert the canvas to a PNG blob
-            canvas.toBlob(function (pngBlob) {
-                // Step 7: Download the PNG file
-                const pngUrl = URL.createObjectURL(pngBlob)
-                const downloadLink = document.createElement('a')
-                downloadLink.href = pngUrl
-                downloadLink.download = 'eurostat-map.png'
-                document.body.appendChild(downloadLink)
-                downloadLink.click()
-                document.body.removeChild(downloadLink)
+                ctx.drawImage(img, 0, 0, w, h);
 
-                // Clean up URLs
-                URL.revokeObjectURL(url)
-                URL.revokeObjectURL(pngUrl)
-            }, 'image/png')
-        }
+                canvas.toBlob(function (pngBlob) {
+                    if (!pngBlob) {
+                        console.error('canvas.toBlob returned null — likely CORS/taint issue.');
+                        // open the serialized SVG for debugging
+                        const debugWin = window.open();
+                        debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>');
+                        cleanup();
+                        return;
+                    }
 
-        // Set the image source to the Blob URL
-        img.src = url
-        return out
+                    const pngUrl = URL.createObjectURL(pngBlob);
+                    const a = document.createElement('a');
+                    a.href = pngUrl;
+                    a.download = 'eurostat-map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+
+                    cleanup(pngUrl);
+                }, 'image/png');
+            } catch (err) {
+                console.error('Error drawing SVG to canvas:', err);
+                // open serialized SVG for debugging
+                const debugWin = window.open();
+                debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>');
+                cleanup();
+            }
+        };
+
+        img.onerror = function (err) {
+            console.error('Image failed to load for export. Likely CORS or invalid SVG. Error:', err);
+            // open serialized SVG for debugging
+            const debugWin = window.open();
+            debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>');
+            cleanup();
+        };
+
+        // start loading
+        img.src = url;
+
+        return out;
+    };
+
+    // small helper to escape HTML for debug window
+    function escapeHtml(str) {
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     return out

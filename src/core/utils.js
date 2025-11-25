@@ -169,6 +169,84 @@ export const applyInlineStylesFromCSS = (svgElement) => {
 }
 
 /**
+ * Copy computed styles (a curated property list) into inline styles for all elements
+ * so the serialized SVG renders the same as in-browser.
+ *
+ * Usage: call this right before serialize(svg) or rasterize(svg)
+ */
+export function applyComputedStylesToSVG(svg) {
+    if (!svg || !(svg instanceof SVGElement)) return;
+
+    const PAINT_PROPS = new Set([
+        'fill', 'fill-opacity', 'fill-rule',
+        'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'stroke-dashoffset'
+    ]);
+
+    const PROPS = [
+        // painting (includes PAINT_PROPS)
+        ...Array.from(PAINT_PROPS),
+        // geometry / alignment
+        'vector-effect', 'shape-rendering', 'text-anchor', 'dominant-baseline',
+        // text
+        'font-family', 'font-size', 'font-style', 'font-weight', 'letter-spacing', 'word-spacing', 'line-height',
+        // layout / visibility
+        'opacity', 'visibility', 'display', 'mix-blend-mode',
+        // filters, marker, etc
+        'filter', 'marker-start', 'marker-mid', 'marker-end',
+        // others
+        'transform'
+    ];
+
+    function inlineComputedStyle(el) {
+        const cs = window.getComputedStyle(el);
+
+        PROPS.forEach((p) => {
+            try {
+                const v = cs.getPropertyValue(p);
+
+                // skip empty / trivial values
+                if (!v || v === '' || v === 'initial') return;
+
+                // Allow 'none' for paint properties (fill/stroke) — these are meaningful
+                if (v === 'none' && !PAINT_PROPS.has(p)) return;
+
+                // Skip '0px' for properties where that is meaningless (but keep it for stroke-width)
+                if (v === '0px' && p !== 'stroke-width') return;
+
+                // Only set if not already present as inline style
+                if (!el.style.getPropertyValue(p)) {
+                    el.style.setProperty(p, v);
+                }
+            } catch (e) {
+                // ignore properties that error for this element
+            }
+        });
+
+        // for text elements ensure font-size is captured if computed
+        if (el.tagName && el.tagName.toLowerCase() === 'text') {
+            const fs = cs.getPropertyValue('font-size');
+            if (fs && !el.style.getPropertyValue('font-size')) el.style.setProperty('font-size', fs);
+        }
+    }
+
+    inlineComputedStyle(svg);
+    svg.querySelectorAll('*').forEach((el) => inlineComputedStyle(el));
+}
+export function ensureSvgSize(svg) {
+    const rect = svg.getBoundingClientRect();
+    // Use integer pixel width/height
+    const w = Math.round(rect.width) || parseInt(svg.getAttribute('width')) || 800;
+    const h = Math.round(rect.height) || parseInt(svg.getAttribute('height')) || 600;
+
+    // If svg already has viewBox, preserve it; else set viewBox to current content box
+    if (!svg.hasAttribute('viewBox')) {
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    }
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+}
+
+/**
  * Return a GeoJSON feature representing a bounding box, with multipoint geometry.
  * This bounding box is an array like the one in topojson bbox element.
  * [xmin,ymin,xmax,ymax]
