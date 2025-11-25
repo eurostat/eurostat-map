@@ -23,6 +23,7 @@ import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
 import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
+import estatLogo from '../assets/logos/ESTAT.svg';
 
 // set default d3 locale
 formatDefaultLocale({
@@ -170,6 +171,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
     out.footnoteWrap_ = 40 //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined
+    out.showEstatLogo_ = false
+    out.logoPosition_ = undefined
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
@@ -701,6 +704,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             addFootnote()
         }
 
+        //logo
+        if (out.showEstatLogo_) {
+            addEurostatLogo()
+        }
+
         //source dataset URL
         if (out.showSourceLink_) {
             let stat
@@ -1071,6 +1079,24 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 if (out.footnoteTooltipText_) out._tooltip.mouseout();
                 out._tooltip.style("max-width", out._tooltip.mw___);
             });
+    };
+
+    const addEurostatLogo = function () {
+        const svg = out.svg();
+        const logoWidth = 200;
+        const logoHeight = 40;
+        const margin = 10;
+        const x = out.logoPosition_ ? out.logoPosition_[0] : out.width_ - logoWidth - margin;
+        const y = out.logoPosition_ ? out.logoPosition_[1] : out.height_ - logoHeight - margin;
+
+        svg.selectAll(".em-eurostat-logo").remove();
+        svg.append("image")
+            .attr("href", estatLogo)
+            .attr("width", logoWidth)
+            .attr("height", logoHeight)
+            .attr("x", x)
+            .attr("y", y)
+            .attr("class", "em-eurostat-logo");
     };
 
     const addCoastalMarginToMap = function () {
