@@ -91,12 +91,10 @@
                 curvature: 0.2   // 0..1; default sankey smoothness
             })
             .flowOrder(flowOrderFunction)
-
-
             .labels({
                 labels: getRegionLabels(maritimeFlowGraph),
                 shadows: true,
-                values: true
+                // values: true
             })
 
             // legend
@@ -136,6 +134,37 @@
                     .attr('class', 'em-footnote')
                     .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
+
+                //annotations were causing z-index issues with labels
+                d3.selectAll("#em-labels").raise()
+
+            })
+            .annotations({
+                annotations: [
+                    {
+                        note: {
+                            label: "The largest extra-EU maritime flow in 2024 was from USA (east coast) to EU, with over 172 million tonnes of goods carried. Representing 8.7% of the total extra-EU maritime freight.",
+                            title: " ",
+                            wrap: 190
+                        },
+                        type: "annotationCallout",
+                        connector: {
+                            end: "dot",
+                            type: "curve",
+                            //can also add a curve type, e.g. curve: d3.curveStep
+                            points: [
+                                [-5, 10],
+                                [-20, 30]
+                            ]
+                        },
+                        x: 400,
+                        y: 240,
+                        dy: 50,
+                        dx: -50,
+                        color: '#666666'
+                    },
+                ],
+                editMode: false
             })
 
             .build();
