@@ -12,7 +12,8 @@
 <body style="margin:0">
     <svg id="ports-map"></svg>
     <button id="export-annotations-btn" type="button">Export Annotations</button>
-
+    <button id="toggle-edit-mode-btn" type="button">Toggle edit mode</button>
+    <button id="export-png-btn" type="button">Export as PNG</button>
     <svg style='display:none;'>
         <!-- used for country borders -->
         <defs>
@@ -32,10 +33,11 @@
 
     <script type="module" id="our-map">
         const portsAnnotations = await(await fetch('./ports-annotations.json')).json();
+        window.portsAnnotations = portsAnnotations;
         const portsWidth = 1080; //social media size
         const portsHeight = 900;
         const insetsX = portsWidth - 120;
-        const insetsY = 170;
+        const insetsY = 10;
 
         const getApproxCurrentGeoBbox = function () {
             const defaultPosition = { x: 4790000, y: 3420000 };
@@ -57,6 +59,7 @@
                 getBBOXAsGeoJSON(getApproxCurrentGeoBbox())
             )
         const portsSizeData = indexByCode([...portsData])
+        let editMode = false;
         const map = eurostatmap
             .map("ps")
             .svgId("ports-map")
@@ -68,17 +71,18 @@
             .nutsLevel(0)
             .psMinSize(3)
             .psMaxSize(30)
+            .psStrokeWidth(0.9)
             .title("Main cargo ports by gross weight of goods handled, 2024")
             .subtitle("(million tonnes)")
             .footnote(
-                "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). EU ports reporting more than 47 million tonnes are labelled."
+                "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). Ports reporting more than 47 million tonnes are labelled."
             )
             .footnoteWrap(100)
-            .footnotePosition([10, portsHeight - 10])
+            .footnotePosition([15, portsHeight - 15])
             .legend({
                 title: "Tonnes of freight",
-                x: portsWidth - 205,
-                y: 40,
+                x: portsWidth - 345,
+                y: 285,
                 sizeLegend: {
                     values: [397000000, 100000000, 2000000],
                     labels: ['397 million (max)', '100 million', '2 million (min)']
@@ -198,10 +202,22 @@
                     .append('tspan')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
             })
-            .annotations({ editMode: true, annotations: portsAnnotations })
+            .annotations({ editMode: editMode, annotations: portsAnnotations })
             .build();
 
         map.statData("size").setData(portsSizeData);
+
+
+        var btn = document.getElementById("toggle-edit-mode-btn");
+        btn.addEventListener("click", function () {
+            editMode = !editMode;
+            map.annotations({ editMode: editMode, annotations: window.portsAnnotations })
+        });
+
+        var exportBtn = document.getElementById("export-png-btn");
+        exportBtn.addEventListener("click", function () {
+            map.exportMapToPNG(1080, 900);
+        });
 
     </script>
 </body>

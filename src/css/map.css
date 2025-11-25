@@ -15,18 +15,21 @@ a text {
 }
 
 /* Main map */
-.em-map,
-.em-legend {
+.em-map text,
+.em-legend text,
+.em-title,
+.em-subtitle,
+.em-footnote {
     font-family: Arial, Helvetica, sans-serif;
 }
 
 .em-map.em-draggable g {
-  cursor: grab;
+    cursor: grab;
 }
 
 .em-map.em-dragging g {
-  cursor: grabbing;
-  cursor: -webkit-grabbing;
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
 }
 
 /* Coastal margin */
@@ -77,6 +80,7 @@ a text {
     font-size: 11px;
     transform: translate(-5px, -5px);
 }
+
 .em-source-dataset-link {
     font-size: 11px;
     fill: #0e47cb;
@@ -84,6 +88,7 @@ a text {
     text-decoration: underline;
     transform: translate(-5px, -5px);
 }
+
 .em-source-dataset-link:hover {
     fill: #082b7a;
     cursor: pointer !important;
@@ -105,10 +110,12 @@ a text {
     fill: white;
     /* pointer-events: none; */
 }
+
 .em-scalebar-line {
     stroke: #696969;
     stroke-width: 0.8px;
 }
+
 .em-scalebar-label {
     font-size: 9px;
     text-anchor: middle;
@@ -122,10 +129,12 @@ a text {
     font-size: 11px;
     transform: translate(5px, -5px);
 }
+
 .em-footnote a {
     fill: #0e47cb;
     text-decoration: underline;
 }
+
 .em-footnote a:hover {
     fill: #0a328e;
 }
@@ -143,15 +152,18 @@ a text {
 .em-flow-link {
     cursor: pointer !important;
 }
+
 .em-flow-link-outline {
     cursor: pointer !important;
 }
+
 .em-flow-labels {
     font-size: 15px;
     stroke-width: 1px;
     fill: #696969;
     pointer-events: none;
 }
+
 .em-flow-labels-halo {
     font-size: 15px;
     stroke-width: 2px;
