@@ -12,7 +12,7 @@ import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { createFlowMap } from './straight'
 import { computeDonutLocationStats, computeDonutValues, drawDonuts } from './donuts'
 import { scaleOrdinal } from 'd3-scale'
-import { addFlowValueLabels, addLabelsToMap } from '../../core/labels'
+import { addFlowValueLabels } from '../../core/labels'
 
 /**
  * Returns a flow map.

@@ -218,14 +218,14 @@
         map.statData("size").setData(portsSizeData);
 
 
-        var btn = document.getElementById("toggle-edit-mode-btn");
-        btn.addEventListener("click", function () {
+        var editModeBtn = document.getElementById("toggle-edit-mode-btn");
+        editModeBtn.addEventListener("click", function () {
             editMode = !editMode;
             map.annotations({ editMode: editMode, annotations: window.portsAnnotations })
         });
 
-        var exportBtn = document.getElementById("export-png-btn");
-        exportBtn.addEventListener("click", function () {
+        var exportBtnPNG = document.getElementById("export-png-btn");
+        exportBtnPNG.addEventListener("click", function () {
             map.exportMapToPNG(1080, 900);
         });
 

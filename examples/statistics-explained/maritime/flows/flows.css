@@ -39,6 +39,10 @@
     opacity: 0.9;
 }
 
+.em-annotations text {
+    font-size: 14px;
+}
+
 .em-flow-node-stems {
     opacity: 0.6 !important;
 }
