@@ -1,0 +1,47 @@
+#psNL00NLRTM circle,
+#psBE00BE003 circle,
+#psDE01DEHAM circle,
+#psTR02TRIZT circle,
+#psTR02TRALI circle,
+.em-legend-circle {
+    stroke: #5b5b5b !important;
+    stroke-width: 1.5px;
+}
+
+.map-ranking rect,
+.em-legend-background {
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
+    opacity: 0.9 !important;
+}
+
+#ports-map .em-zoom-buttons {
+    transform: translate(94%, 86%) !important;
+}
+
+.em-cntbn {
+    opacity: 0.4;
+    stroke: lightgrey;
+}
+
+.annotation-note-title {
+    font-family: Arial;
+    font-size: 14px !important;
+    font-weight: normal;
+    transform: translate(10px, 5px)
+}
+
+.center-vertically .annotation-note-title {
+    transform: translate(0px, -10px)
+}
+
+.em-insets .em-frame {
+    stroke-width: 0.6px !important;
+}
+
+.em-inset-title {
+    font-size: 12px !important;
+}
+
+/* .em-inset {
+    filter: drop-shadow(0.5px 0.5px 0.5px rgba(0, 0, 0, 0.5)) !important;
+} */

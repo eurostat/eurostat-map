@@ -22,6 +22,38 @@ const countryNames = {
   SI: "Slovenia"
 }
 
+const sums = {
+  NL: 538119805,
+  TR: 524711145,
+  IT: 488555725,
+  ES: 485995823,
+  BE: 274894445,
+  DE: 273907907,
+  FR: 269749807,
+  NO: 212081153,
+  GR: 173190413,
+  SE: 163757127,
+  PL: 124238426,
+  DK: 93755257,
+  FI: 93023995,
+  PT: 85669179,
+  RO: 59553853,
+  IE: 51162680,
+  LT: 39492591,
+  LV: 33577482,
+  BG: 29522559,
+  SI: 21779651,
+  EE: 21721978,
+  HR: 20853544,
+  CY: 8944881,
+  IS: 7223088,
+  MT: 4479015,
+  ME: 2464492
+}
+
+const rankingX = portsWidth - 230;
+const rankingY = 10;
+
 function createTopCountriesOverlay(svgSelector, sums, x, y) {
   const svg = d3.select(svgSelector);
   if (svg.empty()) throw new Error("SVG not found: " + svgSelector);

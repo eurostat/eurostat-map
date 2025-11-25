@@ -1,7 +1,6 @@
 const insetWidth = 85;
 const insetHeight = 60;
-const insetsX = 5;
-const insetsY = 150;
+
 
 const insets = [
     //Canarias, Martinique, Guadeloupe, Réunion

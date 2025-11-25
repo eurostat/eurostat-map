@@ -168,7 +168,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
     out.footnoteTooltipText_ =
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
-
+    out.footnoteWrap_ = 40 //number of characters at which the footnote is wrapped
+    out.footnotePosition_ = undefined
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
@@ -1019,26 +1020,58 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     const addFootnote = function () {
-        out.svg()
-            .append('text')
-            .attr('id', 'em-footnote')
-            .attr('class', 'em-footnote')
-            .attr('x', 0)
-            .attr('y', out.height_)
-            .html(out.footnote_)
-            .on('mouseover', function () {
-                out._tooltip.mw___ = out._tooltip.style('max-width')
-                out._tooltip.style('max-width', '400px')
-                if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_)
+        const wrap = out.footnoteWrap_ || Infinity;   // e.g. user sets map.footnoteWrap(500)
+        const text = out.footnote_ || "";
+        const position = out.footnotePosition_ ? out.footnotePosition_ : [10, out.height_];
+
+        const svg = out.svg();
+
+        const foot = svg.append("text")
+            .attr("id", "em-footnote")
+            .attr("class", "em-footnote")
+            .attr("x", position[0])
+            .attr("y", position[1]);
+
+        // --- wrapping into tspans ---
+        const words = text.split(/(\s+)/);  // keep whitespace tokens
+        let line = "";
+        let lineIndex = 0;
+
+        for (const w of words) {
+            if ((line + w).length > wrap && line.length > 0) {
+                foot.append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", lineIndex === 0 ? 0 : "1.2em")
+                    .html(line.trim());
+                line = w;
+                lineIndex++;
+            } else {
+                line += w;
+            }
+        }
+
+        // last line
+        if (line.trim().length > 0) {
+            foot.append("tspan")
+                .attr("x", 0)
+                .attr("dy", lineIndex === 0 ? 0 : "1.2em")
+                .html(line.trim());
+        }
+
+        // --- tooltip logic ---
+        foot.on("mouseover", function () {
+            out._tooltip.mw___ = out._tooltip.style("max-width");
+            out._tooltip.style("max-width", "400px");
+            if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_);
+        })
+            .on("mousemove", function (e) {
+                if (out.footnoteTooltipText_) out._tooltip.mousemove(e);
             })
-            .on('mousemove', function (e) {
-                if (out.footnoteTooltipText_) out._tooltip.mousemove(e)
-            })
-            .on('mouseout', function (e) {
-                if (out.footnoteTooltipText_) out._tooltip.mouseout(e)
-                out._tooltip.style('max-width', out._tooltip.mw___)
-            })
-    }
+            .on("mouseout", function () {
+                if (out.footnoteTooltipText_) out._tooltip.mouseout();
+                out._tooltip.style("max-width", out._tooltip.mw___);
+            });
+    };
 
     const addCoastalMarginToMap = function () {
         const zg = out.svg().select('#em-zoom-group-' + out.svgId_)

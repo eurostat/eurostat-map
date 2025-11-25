@@ -1,0 +1,58 @@
+[
+  {
+    "note": {
+      "title": "Rotterdam",
+      "wrap": 150,
+      "align": "middle"
+    },
+    "className": "rotterdam",
+    "x": 349,
+    "y": 462,
+    "dy": -24,
+    "dx": -10
+  },
+  {
+    "note": {
+      "title": "Antwerp-Bruges",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 355,
+    "y": 529,
+    "dy": 29,
+    "dx": -1
+  },
+  {
+    "note": {
+      "title": "Hamburg",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 450,
+    "y": 467,
+    "dy": 10,
+    "dx": 30
+  },
+  {
+    "note": {
+      "title": "Aliaga",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 766,
+    "y": 769,
+    "dy": 0,
+    "dx": 15
+  },
+  {
+    "note": {
+      "title": "Izmit",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 804,
+    "y": 716,
+    "dy": 0,
+    "dx": 15
+  }
+]
