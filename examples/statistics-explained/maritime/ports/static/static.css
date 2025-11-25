@@ -33,8 +33,9 @@ circle {
  }
 
  .em-cntbn {
-     opacity: 0.4;
+     opacity: 0.3;
      stroke: lightgrey;
+     stroke-opacity: 0.5
  }
 
  .annotation-connector path {
