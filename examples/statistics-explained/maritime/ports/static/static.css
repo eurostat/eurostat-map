@@ -35,7 +35,19 @@ circle {
  .em-cntbn {
      stroke: rgb(156, 156, 156) !important;
      stroke-opacity: 0.5 !important;
-     opacity: 0.5 !important
+     opacity: 0.5 !important;
+     stroke-width: 1 !important;
+ }
+
+ .em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+     stroke-width: 1 !important;
+ }
+
+ .em-kosovo-bn {
+     stroke: #5c5c5c !important;
+     stroke-width: 0.4 !important;
+     opacity: 0.3 !important;
+     stroke-opacity: 0.7 !important;
  }
 
  .annotation-connector path {
