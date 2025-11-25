@@ -20,7 +20,7 @@
             </filter>
         </defs>
     </svg>
-    <script src="../eurostatmap.min.js"></script>
+    <script src="../../../../build/eurostatmap.js"></script>
     <script src="../../d3.v7.min.js"></script>
     <script src="../../proj4-src.js"></script>
     <script src="./portsData.js"></script>
@@ -136,18 +136,18 @@
             .nutsLevel(0)
             .psMinSize(3)
             .psMaxSize(30)
-            .title("Freight handled by maritime ports")
-            .subtitle("Both incoming and outgoing, 2024")
+            .title("Main cargo ports by gross weight of goods handled, 2024")
+            .subtitle("million tonnes")
             .footnote(
                 "Shows data for ports with at least 2 million tonnes of freight handled. Top 5 labelled. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspCartography: GISCO. Boundaries: ©EuroGeographics ©OSM"
             )
             .legend({
                 title: "Tonnes of freight",
                 x: portsWidth - 162,
-                y: 260,
+                y: 20,
                 sizeLegend: {
                     values: [397000000, 200000000, 50000000, 2000000],
-                    labelFormatter: (l) => l / 1000000 + " million"
+                    labels: ['397 million (max)', '200 million', '50 million', '2 million (min)']
                 }
             })
             .filterGeometriesFunction((geometries) => {
@@ -256,7 +256,7 @@
                     return hasPort ? "rgba(178, 232, 215,0.4)" : "#F2F2F2";
                 });
 
-                createTopCountriesOverlay("#ports-map", sums, rankingX, rankingY);
+                //createTopCountriesOverlay("#ports-map", sums, rankingX, rankingY);
             })
             .annotations({ annotations: portsAnnotations })
             .build();

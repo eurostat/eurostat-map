@@ -27,6 +27,7 @@ export const legend = function (map, config) {
         labelOffsets: { x: 10, y: 0 }, //the distance between the legend box elements to the corresponding text label
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,
+        labels: null, // user-defined labels for each size
         noData: false, // show no data legend item
         noDataText: 'No data', //no data text label
         _totalBarsHeight: 0,
@@ -138,10 +139,10 @@ function getColorThresholds(out) {
         map.psThresholds_.length > 1
             ? map.psThresholds_
             : Array.from({ length: map.psClasses_ })
-                  .map((_, index) => {
-                      return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
-                  })
-                  .slice(1) // Remove the first entry and return the rest as an array
+                .map((_, index) => {
+                    return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
+                })
+                .slice(1) // Remove the first entry and return the rest as an array
     return thresholds
 }
 

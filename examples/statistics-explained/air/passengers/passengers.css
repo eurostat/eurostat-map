@@ -62,3 +62,8 @@
   .em-annotation-group {
       pointer-events: none !important;
   }
+
+  text#em-label-Southern-Asia,
+  text#em-label-shadow-Southern-Asia {
+      transform: translate(5px, -15px);
+  }

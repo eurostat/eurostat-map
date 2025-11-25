@@ -151,7 +151,7 @@
                     // flow settings
                     .flowGraph(graphData)
                     .flowMinWidth(4)
-                    .flowMaxWidth(55)
+                    .flowMaxWidth(70)
                     .flowMapType('curved')
                     .flowDonuts(false)
                     // .flowColor("#72bb6f")
@@ -175,14 +175,14 @@
 
                     // legend
                     .legend({
-                        x: width - 180,
-                        y: 0,
+                        x: width - 205,
+                        y: 5,
                         boxPadding: 10,
                         title: "Passengers carried",
                         flowWidthLegend: {
                             marginTop: -10,
                             values: airMapConfigs[year].passengers.legend.sizeLegend.values,
-                            labelFormatter: (value) => spaceAsThousandSeparator(value)
+                            labels: ['290 thousand (min)', '50 million', '290 million (max)']
                         },
                         flowColorLegend: {
                             marginTop: 50,

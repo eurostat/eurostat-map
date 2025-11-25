@@ -66,7 +66,10 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
             return y
         })
         .attr('x', maxRadius + 5)
-        .text((d) => {
+        .text((d, i) => {
+            if (out.sizeLegend?.labels && out.sizeLegend.labels[i]) {
+                return out.sizeLegend.labels[i]
+            }
             return labelFormatter(d)
         })
     //line pointing to top of corresponding circle:

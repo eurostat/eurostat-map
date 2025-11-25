@@ -115,8 +115,9 @@
     cursor: pointer;
 }
 
-#em-legend-background {
-    filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.4));
+.em-legend-background {
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+    opacity: 0.9;
 }
 
 /* Data extent labels (min/max) – slightly lighter */
