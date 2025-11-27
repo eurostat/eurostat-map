@@ -169,7 +169,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
     out.footnoteTooltipText_ =
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
-    out.footnoteWrap_ = 40 //number of characters at which the footnote is wrapped
+    out.footnoteWrap_ = false //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined
     out.showEstatLogo_ = false
 

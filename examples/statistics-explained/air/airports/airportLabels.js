@@ -13,7 +13,7 @@ const labels = {
         {
             "text": "BARCELONA/EL PRAT",
             "x": 2.07846,
-            "y": 41.2971
+            "y": 41
         },
         {
             "text": "PALMA DE MALLORCA",
