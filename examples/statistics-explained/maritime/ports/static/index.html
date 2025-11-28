@@ -90,12 +90,12 @@
             .footnoteWrap(100)
             .footnotePosition([15, portsHeight - 15])
             .legend({
-                title: "Tonnes of freight",
+                title: "Million tonnes",
                 x: portsWidth - 345,
                 y: 285,
                 sizeLegend: {
                     values: [397000000, 100000000, 2000000],
-                    labels: ['397 million (max)', '100 million', '2 million (min)']
+                    labels: ['397 (max)', '100 ', '2 (min)']
                 }
             })
             .filterGeometriesFunction((geometries) => {
@@ -212,7 +212,9 @@
                     .append('tspan')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
             })
-            .annotations({ editMode: editMode, annotations: portsAnnotations })
+            .annotations({ editMode: editMode, annotations: portsAnnotations }).tooltip({
+                textFunction: tooltipTextFunction
+            })
             .build();
 
         map.statData("size").setData(portsSizeData);
@@ -234,6 +236,34 @@
             map.exportMapToSVG(1080, 900);
         });
 
+
+        function tooltipTextFunction(region, map) {
+            if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
+                return ''; // Skip tooltip for omitted regions
+            }
+
+            const regionName = region.properties.na;
+            const regionId = region.properties.id;
+
+            // Stat 1
+            const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData();
+            const sv1 = v1.get(region.properties.id);
+            const unit1 = v1.unitText?.() || '';
+            const row1 = `<tr><td>${(sv1?.value / 1000000).toFixed(1) + ' million tonnes'}</td></tr>`;
+
+            return `
+    <div class="em-tooltip-bar">
+      <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+    </div>
+    <div class="em-tooltip-text">
+      <table class="em-tooltip-table">
+        <tbody>
+          ${row1}
+        </tbody>
+      </table>
+    </div>
+  `.trim();
+        };
     </script>
 </body>
 

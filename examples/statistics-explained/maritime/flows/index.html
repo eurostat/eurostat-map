@@ -99,11 +99,11 @@
                 y: height - 225,
                 boxPadding: 10,
                 title: "Freight carried",
-                subtitle: "(tonnes)",
+                subtitle: "million tonnes",
                 flowWidthLegend: {
                     marginTop: -10,
                     values: [27000000, 100000000, 172000000],
-                    labels: ['25 million (min)', '100 million', '172 million (max)']
+                    labels: ['25 (min)', '100', '172 (max)']
                 },
                 flowColorLegend: false,
                 regionColorLegend: {
@@ -141,7 +141,7 @@
                 annotations: [
                     {
                         note: {
-                            label: "The largest extra-EU maritime flow in 2024 was from USA (east coast) to EU, with over 172 million tonnes of goods carried. Representing 8.7% of the total extra-EU maritime freight.",
+                            label: "The largest extra-EU maritime flow in 2024 was from USA (east coast) to EU, with over 172 million tonnes of goods handled. Representing 8.7% of the total extra-EU maritime freight.",
                             title: " ",
                             wrap: 190
                         },
@@ -205,7 +205,7 @@
             <table class="em-tooltip-table">
                 <tbody>
                     <tr>
-                        <td>Tonnes carried: ${spaceAsThousandSeparator(link.value)} ${unit}</td>
+                        <td>Goods handled: ${(link.value / 1000000).toFixed(1)} million tonnes ${unit}</td>
                     </tr>
                       <tr>
                         <td>Share of total extra-EU: ${(link.meta.share * 100).toFixed(1)}%</td>

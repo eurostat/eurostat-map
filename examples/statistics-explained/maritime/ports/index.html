@@ -67,18 +67,18 @@
             .title("Main cargo ports by gross weight of goods handled, 2024")
             .subtitle("million tonnes")
             .footnote(
-                "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). EU ports reporting more than 47 million tonnes are labelled."
+                "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). Top 5 ports are labelled."
             )
             .footnoteWrap(90)
             .footnotePosition([10, 665])
 
             .legend({
-                title: "Tonnes of freight",
+                title: "Million tonnes",
                 x: portsWidth - 205,
                 y: 40,
                 sizeLegend: {
                     values: [397000000, 100000000, 2000000],
-                    labels: ['397 million (max)', '100 million', '2 million (min)']
+                    labels: ['397 (max)', '100 ', '2 (min)']
                 }
             })
             .filterGeometriesFunction((geometries) => {
@@ -173,6 +173,9 @@
                 return geometries;
             })
             .zoomButtons(true)
+            .tooltip({
+                textFunction: tooltipTextFunction
+            })
             .callback(() => {
                 const portKeys = Object.keys(portsSizeData);
                 //color regions
@@ -202,6 +205,34 @@
 
         map.statData("size").setData(portsSizeData);
 
+
+        function tooltipTextFunction(region, map) {
+            if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
+                return ''; // Skip tooltip for omitted regions
+            }
+
+            const regionName = region.properties.na;
+            const regionId = region.properties.id;
+
+            // Stat 1
+            const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData();
+            const sv1 = v1.get(region.properties.id);
+            const unit1 = v1.unitText?.() || '';
+            const row1 = `<tr><td>${(sv1?.value / 1000000).toFixed(1) + ' million tonnes'}</td></tr>`;
+
+            return `
+    <div class="em-tooltip-bar">
+      <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+    </div>
+    <div class="em-tooltip-text">
+      <table class="em-tooltip-table">
+        <tbody>
+          ${row1}
+        </tbody>
+      </table>
+    </div>
+  `.trim();
+        };
 
 
     </script>
