@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        @import url('./airports.css');
+    </style>
+</head>
+
+<body style="margin:0">
+    <svg id="airport-pairs-map"></svg>
+
+    <svg style='display:none;'>
+        <!-- used for country borders -->
+        <defs>
+            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
+            </filter>
+        </defs>
+    </svg>
+    <script src="../../../build/eurostatmap.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="./airportLabels.js"></script>
+    <script>
+        fetch('./airportPairsGraph.json')
+            .then(r => r.json())
+            .then(graphData => {
+                console.log('Loaded airport data:', graphData);
+
+                // build map
+                const width = 1000
+                const height = width / 1.5;
+                const projection = d3
+                    .geoAzimuthalEquidistant()
+                    .rotate([2, -35])
+                    .scale(1500)
+                    .translate([width / 2.4, width / 2.3])
+                const spaceAsThousandSeparator = function (number) {
+                    return number.toLocaleString('en').replace(/,/gi, ' ')
+                }
+                const fmtCompact = new Intl.NumberFormat('en', {
+                    notation: 'compact',
+                    compactDisplay: 'short', // "short" → 1.2K, "long" → 1.2 thousand
+                    maximumFractionDigits: 1
+                });
+
+
+                const breaks = [0, 15, 20, 30]; // 6 thresholds → 7 bins
+                const red = "#cb181d";
+                const blues = d3.schemeBlues[5].slice(1); // 6 blues, remove the first for better contrast with white background
+
+                const airportChangeColorFunction = d3
+                    .scaleThreshold()
+                    .domain(breaks)
+                    .range([red, ...blues]);
+
+                const airportTooltipFunction = function (link, map) {
+                    const buf = [];
+                    const statData = map.statData();
+                    const unit = statData.unitText() || "";
+
+                    // Header with region name and ID
+                    const title = `${link.source.name || link.source.id} to ${link.target.name || link.target.id
+                        }`;
+                    buf.push(`
+                        <div class="em-tooltip-bar">
+                            <b>${title}</b>
+                        </div>
+                    `);
+
+                    // Value
+                    buf.push(`<div class='em-tooltip-text'>
+                        <table class="em-tooltip-table">
+                            <tbody>
+                                <tr><td>Passengers carried: ${spaceAsThousandSeparator(
+                        link.value
+                    )} </td></tr>
+                                <tr><td>Change since 2022: <span style='color:${airportChangeColorFunction(
+                        link.changePct
+                    )}'>${link.changePct}%</span></td></tr>
+                            </tbody>
+                        </table> 
+                    </div>`);
+
+                    return buf.join("");
+                }
+
+                const map = eurostatmap
+                    .map("flow")
+                    .svgId("airport-pairs-map")
+                    .width(width)
+                    .height(height)
+                    .title("Top 10 flight routes within the EU ✈️")
+                    .subtitle("by most passengers carried, 2023")
+
+                    //projection
+                    .projectionFunction(projection)
+
+                    //geometries
+                    .geo("WORLD")
+                    .proj("4326")
+                    .scale("60M")
+
+                    // flow settings
+                    .flowGraph(graphData)
+                    .flowMinWidth(8)
+                    .flowMaxWidth(20)
+                    .flowMapType('curved')
+                    .flowStack(true)
+                    .flowColor((d) => {
+                        if (!d || !d.changePct) {
+                            console.log(d);
+                            return "#999999";
+                        }
+                        return airportChangeColorFunction(d.changePct);
+                    })
+                    .flowOpacity(0.99)
+                    .flowArrows(false)
+                    .flowOutlines(true)
+                    .flowWidthGradient(true)
+                    .flowColorGradient(false)
+                    .flowCurvatureSettings({
+                        gapX: 0,        // how far before/after node to begin/end curve
+                        padX: 0,         // horizontal clearance near node stems
+                        padY: 1,         // vertical collision detection padding
+                        bumpY: 5,        // extra height for hop
+                        curvature: 0.5   // 0..1; default sankey smoothness
+                    })
+                    .flowOrder((a, b) => {
+                        // Is this the LPPT → LFPO incoming item?
+                        const isLPPTtoLFPOIn = (it) =>
+                            it.at === "in" &&
+                            it.link.source.id === "LPPT" &&
+                            it.link.target.id === "LFPO";
+
+                        // Hard priority: LPPT→LFPO should be on top
+                        const aTop = isLPPTtoLFPOIn(a);
+                        const bTop = isLPPTtoLFPOIn(b);
+                        if (aTop && !bTop) return -1; // a above b
+                        if (bTop && !aTop) return 1; // b above a
+
+                        // Otherwise sort by otherY (and tie-break by width for stability)
+                        return a.otherY - b.otherY || b.width - a.width;
+                    })
+
+                    // legend
+                    .legend({
+                        x: width - 180,
+                        y: height - 270,
+                        boxPadding: 10,
+                        title: "Passengers carried",
+                        subtitle: "",
+                        flowWidthLegend: {
+                            marginTop: -10,
+                            values: [1500000, 2200000],
+                            labelFormatter: (value) => spaceAsThousandSeparator(value)
+                        },
+                        donutSizeLegend: {
+                            title: "Passengers carried (airport)",
+                            titlePadding: 17,
+                            values: [10000000, 1500000]
+                        },
+                        flowColorLegend: {
+                            marginTop: 50,
+                            title: "Change vs 2022",
+                            items: [
+                                { color: airportChangeColorFunction(-1), label: "↓ -9.5%  " },
+                                { color: airportChangeColorFunction(3), label: "↑ 0 - 15% " },
+                                { color: airportChangeColorFunction(16), label: "> 15%" }, // (15,20]
+                                { color: airportChangeColorFunction(21), label: "> 20%" }, // (20,30]
+                                { color: airportChangeColorFunction(31), label: "> 30%" } // (30,∞)
+                            ].reverse()
+                        },
+                        regionColorLegend: {
+                            title: "Region color",
+                            marginTop: 20,
+                            labels: ["a", "b"]
+                        }
+                    })
+
+                    //labels
+                    .labels({
+                        labels: labels,
+                        shadows: true,
+                        values: false,
+                        valuesFormatter: (value) => fmtCompact.format(value)
+                    })
+
+                    .tooltip({
+                        textFunction: airportTooltipFunction
+                    })
+
+                    //annotations
+                    .annotations({
+                        editMode: false,
+                        annotations: [
+                            {
+                                type: "annotationCalloutCircle",
+                                note: {
+                                    label:
+                                        "6 of the top 10 routes either started or ended in Madrid, with a total of over 10.7 million passengers carried.",
+                                    title: "¡Hala Madrid!",
+                                    wrap: 210
+                                },
+                                subject: {
+                                    radius: 30
+                                },
+                                x: projection([-3.55, 40.45])[0],
+                                y: projection([-3.55, 40.45])[1],
+                                dy: -10,
+                                dx: -width / 6,
+                                color: '#696969'
+                            },
+                            {
+                                note: {
+                                    label:
+                                        "Mallorca to Barcelona was the busiest route in 2023 with over 2.2 million passengers carried.",
+                                    title: "Busiest route",
+                                    wrap: 210
+                                },
+                                connector: {
+                                    end: 'dot',
+                                    type: 'curve',
+                                    //can also add a curve type, e.g. curve: d3.curveStep
+                                    points: [
+                                        [-10, 50],
+                                    ],
+                                },
+                                x: projection([2.45, 40.3])[0],
+                                y: projection([2.45, 40.3])[1],
+                                dy: 140,
+                                dx: 0,
+                                color: '#696969'
+                            }
+                        ]
+                    })
+
+                    //minimap
+                    //.position({ x: 2, y: 35 }) //set this so that minimap works
+                    .minimap({
+                        x: width - 100,
+                        y: 95,
+                        z: 200,
+                        color: "lightgrey",
+                        debounce: 2
+                    })
+
+                    // zoom min/max
+                    .zoomExtent([1, 10])
+                    .zoomButtons(true)
+
+                    // fires when map is built
+                    .callback(() => {
+                        const labels = d3.selectAll("#em-labels");
+                        labels.raise();
+                        const annotations = d3.selectAll(".em-annotations");
+                        annotations.raise();
+                        //set font family for export
+                        d3.selectAll("#airport-pairs-map").style("font-family", "Arial");
+
+                        // setTimeout(() => {
+                        //   map.exportMapToSVG();
+                        // }, 3000);
+                    })
+
+                    .footnote(
+                        "Intra-EU flights only. Administrative boundaries: ©EuroGeographics ©UN-FAO @OpenStreetMap"
+                    )
+                    .build();
+            })
+            .catch(err => console.error(err));
+
+    </script>
+</body>
+
+</html>

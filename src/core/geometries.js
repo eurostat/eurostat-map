@@ -6,6 +6,39 @@ import { kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
 import { get, set } from 'idb-keyval'
 
+//helpers for when indexedDB is not supported
+const memCache = new Map();
+const TTL_MS = 24 * 60 * 60 * 1000; // 24h
+function canUseIDB() {
+    if (typeof window === 'undefined') return false;
+    // Allow HTTPS or localhost only. IndexedDB can also be blocked in iframes.
+    const secure = (window.isSecureContext === true) ||
+        location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    // If you're embedding, storage may still be blocked even if secure.
+    return secure && typeof indexedDB !== 'undefined';
+}
+async function safeGetIDB(key) {
+    if (!canUseIDB()) return null;
+    try {
+        return await get(key);
+    } catch (e) {
+        // SecurityError / "operation is insecure" shows up here; ignore it.
+        console.warn('[IDB] read skipped:', e?.name || e);
+        return null;
+    }
+}
+async function safeSetIDB(key, value) {
+    if (!canUseIDB()) return false;
+    try {
+        await set(key, value);
+        return true;
+    } catch (e) {
+        console.warn('[IDB] write skipped:', e?.name || e);
+        return false;
+    }
+}
+
+
 // Geometries class wrapped as a function
 export const Geometries = function (map, withCenterPoints) {
     let out = {}
@@ -56,14 +89,14 @@ export const Geometries = function (map, withCenterPoints) {
         const promises = out.getDefaultGeoDataPromise()
         return Promise.all(promises)
             .then((results) => {
-                if (filterGeometriesFunction) {
-                    results = filterGeometriesFunction(results)
-                }
-                out.allNUTSGeoData = results
-                out.defaultGeoData = results[0]
+                const filtered = typeof filterGeometriesFunction === 'function'
+                    ? filterGeometriesFunction(results)
+                    : results;
+                out.allNUTSGeoData = filtered
+                out.defaultGeoData = filtered[0]
 
                 if (withCenterPoints) {
-                    out.centroidsData = nutsLevel === 'mixed' ? [results[4], results[5], results[6], results[7]] : results[1]
+                    out.centroidsData = nutsLevel === 'mixed' ? [filtered[4], filtered[5], filtered[6], filtered[7]] : filtered[1]
                 }
 
                 const isWorld = geo === 'WORLD'
@@ -81,7 +114,7 @@ export const Geometries = function (map, withCenterPoints) {
                     out.geoJSONs.cntbn = feature(out.defaultGeoData, out.defaultGeoData.objects.cntbn).features
                 }
 
-                return results
+                return filtered
             })
             .catch((err) => {
                 return Promise.reject(err)
@@ -104,37 +137,36 @@ export const Geometries = function (map, withCenterPoints) {
             return path
         }
 
-        const TTL_MS = 24 * 60 * 60 * 1000 // cache refreshes every 24 hours
-
         const fetchWithCache = async (url) => {
-            const cacheKey = `geojson-cache:${url}`
+            const cacheKey = `geojson-cache:${url}`;
 
-            try {
-                const cached = await get(cacheKey)
-                if (cached) {
-                    const { timestamp, data } = cached
-                    const isFresh = Date.now() - timestamp < TTL_MS
-                    if (isFresh) return data
-                }
-            } catch (e) {
-                console.warn(`Error reading from IndexedDB cache for ${url}:`, e)
-                throw e // Optionally allow failure to propagate
+            // 1) In-memory cache (fastest)
+            const mem = memCache.get(cacheKey);
+            if (mem && (Date.now() - mem.timestamp) < TTL_MS) {
+                return mem.data;
             }
 
-            const data = await json(url)
-
-            try {
-                await set(cacheKey, {
-                    timestamp: Date.now(),
-                    data: data,
-                })
-            } catch (e) {
-                console.warn(`Could not cache data in IndexedDB for ${url}:`, e)
-                throw e // Optionally allow failure to propagate
+            // 2) IndexedDB (best-effort; never throw)
+            const cached = await safeGetIDB(cacheKey);
+            if (cached && (Date.now() - cached.timestamp) < TTL_MS) {
+                // refresh mem
+                memCache.set(cacheKey, cached);
+                return cached.data;
             }
 
-            return data
-        }
+            // 3) Network
+            const data = await json(url).catch(err => {
+                // If IDB had a stale record, consider using it as a last resort
+                if (cached?.data) return cached.data;
+                throw new Error(`Fetch failed for ${url}: ${err?.message || err}`);
+            });
+
+            const record = { timestamp: Date.now(), data };
+            memCache.set(cacheKey, record);         // always keep in-memory
+            await safeSetIDB(cacheKey, record);     // best-effort; ignore failures
+
+            return data;
+        };
 
         if (!map || !map.nuts2jsonBaseURL_) {
             throw new Error('Missing required map context or configuration')
@@ -245,27 +277,30 @@ export const Geometries = function (map, withCenterPoints) {
 
         //draw NUTS regions
         if (this.geoJSONs.nutsrg) {
+            let regions
             if (nutsLevel == 'mixed') {
                 this.geoJSONs.mixed.rg0 = this.geoJSONs.nutsrg
                 this.geoJSONs.mixed.rg1 = feature(out.allNUTSGeoData[1], out.allNUTSGeoData[1].objects.nutsrg).features
                 this.geoJSONs.mixed.rg2 = feature(out.allNUTSGeoData[2], out.allNUTSGeoData[2].objects.nutsrg).features
                 this.geoJSONs.mixed.rg3 = feature(out.allNUTSGeoData[3], out.allNUTSGeoData[3].objects.nutsrg).features
 
-                //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
-                // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
-                ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
-                    //append each nuts level to map
-                    container
-                        .append('g')
-                        .attr('id', 'em-nutsrg')
-                        .attr('class', `em-nutsrg em-nutsrg-${i}`)
-                        .selectAll('path')
-                        .data(r)
-                        .enter()
-                        .append('path')
-                        .attr('d', pathFunction)
-                        .attr('lvl', i) //to be able to distinguish nuts levels
-                })
+                    //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
+                    // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
+                    ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
+                        //append each nuts level to map
+                        regions = container
+                            .append('g')
+                            .attr('id', 'em-nutsrg')
+                            .attr('class', `em-nutsrg em-nutsrg-${i}`)
+                            .selectAll('path')
+                            .data(r)
+                            .enter()
+                            .append('path')
+                            .attr('d', pathFunction)
+                            .attr('lvl', i) //to be able to distinguish nuts levels
+
+                        attachClickEventToRegions(regions, map)
+                    })
 
                 //add kosovo
                 if (geo == 'EUR' && (proj == '3035' || proj == '4326')) {
@@ -274,7 +309,7 @@ export const Geometries = function (map, withCenterPoints) {
                 }
             } else {
                 // when nutsLevel is not 'mixed'
-                container
+                regions = container
                     .append('g')
                     .attr('id', 'em-nutsrg')
                     .attr('class', 'em-nutsrg')
@@ -283,6 +318,8 @@ export const Geometries = function (map, withCenterPoints) {
                     .enter()
                     .append('path')
                     .attr('d', pathFunction)
+
+                attachClickEventToRegions(regions, map)
             }
         }
 
@@ -429,4 +466,12 @@ export const Geometries = function (map, withCenterPoints) {
     }
 
     return out
+}
+
+function attachClickEventToRegions(regions, map) {
+    regions
+        .on('click', function (e, rg) {
+            if (map.tooltip_.omitRegions?.includes(rg.properties?.id)) return
+            if (map.onRegionClick_) map.onRegionClick_(e, rg, this, map)
+        })
 }

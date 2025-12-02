@@ -49,6 +49,9 @@ export const legend = function (map, config) {
     out.tickLabels = undefined // Custom tick labels for continuous legend (if empty, will use tickValues)
     out.orientation = 'vertical' // or 'vertical'
 
+    // discrete legends
+    out.showMaxMin = false //whether to show min and max labels for discrete legends
+
     //override attribute values with config values
     if (config) {
         for (let key in config) {
@@ -130,10 +133,10 @@ export function getThresholds(out) {
         map.thresholds_.length > 1
             ? map.thresholds_
             : Array.from({ length: map.numberOfClasses_ })
-                  .map((_, index) => {
-                      return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
-                  })
-                  .slice(1) // Remove the first entry and return the rest as an array
+                .map((_, index) => {
+                    return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
+                })
+                .slice(1) // Remove the first entry and return the rest as an array
     return thresholds
 }
 
@@ -178,4 +181,28 @@ export function unhighlightRegions(map) {
     allRegions.each(function () {
         select(this).style('fill', select(this).attr('fill___'))
     })
+}
+
+
+/**
+ * Threshold ticks + dataset min/max at the ends.
+ * Example: thresholds [10, 20, 30], data in [3, 42]
+ *  -> [3, 10, 20, 30, 42]  (or reversed if !ascending)
+ */
+export function getThresholdTicksWithExtents(out) {
+    const thresholds = getThresholds(out)
+    const maxVal = out.map.statData().getMax()
+    const minVal = out.map.statData().getMin()
+
+    if (!maxVal && !minVal) return thresholds
+
+
+    // Build [min, ...thresholds, max] and dedupe
+    const vals = [minVal, ...thresholds, maxVal]
+    const uniq = Array.from(new Set(vals)) // preserve order, avoid dupes
+
+    // Sort according to legend direction
+    uniq.sort((a, b) => (out.ascending ? a - b : b - a))
+
+    return uniq
 }

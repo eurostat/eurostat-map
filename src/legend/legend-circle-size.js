@@ -24,7 +24,7 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
     let domain = sizeScale.domain()
     if (!values) {
         // default legend values if unspecified by user
-        values = [Math.floor(domain[1]), Math.floor(domain[0])]
+        values = [domain[1], domain[0]]
     }
 
     let maxRadius = sizeScale(max(values)) //maximum circle radius to be shown in legend
@@ -53,7 +53,10 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         .attr('r', sizeScale)
 
     //labels
-    const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
+    let labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
+    if (out.donutSizeLegend?.labelFormatter) {
+        labelFormatter = out.donutSizeLegend.labelFormatter
+    }
     itemContainer
         .append('text')
         .attr('class', 'em-legend-label')
@@ -63,7 +66,10 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
             return y
         })
         .attr('x', maxRadius + 5)
-        .text((d) => {
+        .text((d, i) => {
+            if (out.sizeLegend?.labels && out.sizeLegend.labels[i]) {
+                return out.sizeLegend.labels[i]
+            }
             return labelFormatter(d)
         })
     //line pointing to top of corresponding circle:

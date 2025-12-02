@@ -14,8 +14,8 @@
                 .map('choropleth')
                 .title('Test')
                 .subtitle('test')
-                .classificationMethod('ckmeans')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .classificationMethod('ckmeans').nutsLevel(0)
+                //.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .legend({ x: 10, y: 120, title: 'Test', boxOpacity: 1, noData: false })
                 .zoomExtent([1, 10])
                 .onZoomEnd(function (event, map) {
@@ -32,10 +32,16 @@
                 })
                 .onRegionMouseOut(function (e, feature, element, map) {
                     console.log('Region mouse out:', feature.properties.id)
-                    element.style.fill = '' // Revert to original color
+                    //element.style.fill = '' // custom
+                })
+                .onRegionClick(function (e, feature, element, map) {
+                    console.log('Region clicked:', feature.properties.id)
+                    // Additional actions can be added here
                 })
                 .position({ x: 2200000, y: 3000000, z: 7000 })
-                .build()
+
+                map.statData().setData({ES:1234, FR:2345, DE:3456, IT:4567, BE:5678, NL:6789, LU:7890, CZ:8901, PL:9012, AT:10123})
+                map.build()
         </script>
     </body>
 </html>

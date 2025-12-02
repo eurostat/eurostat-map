@@ -1,13 +1,15 @@
 import { select } from 'd3-selection'
 import { mapTemplate } from './map-template'
+import { map } from 'd3'
 
 /**
  * Build inset maps for a map template
  */
-export const buildInsets = function (out, withCenterPoints) {
+export const buildInsets = function (out, withCenterPoints, mapType) {
     if (!out.insetBoxPosition_) {
         out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_]
     }
+
 
     // add container to drawing group
     // Cannot read properties of undefined (reading 'svgId')
@@ -47,11 +49,11 @@ export const buildInsets = function (out, withCenterPoints) {
         // GISCO-2676 - PT azores inset has 2 insets with the same Geo, so second was overriding first:
         if (out.insetTemplates_[config.geo]) {
             //if inset already exists in map with same geo, then push both to an array
-            let inset = buildInset(config, out, withCenterPoints)
+            let inset = buildInset(config, out, withCenterPoints, mapType)
             inset.buildMapTemplateBase()
             out.insetTemplates_[config.geo] = [out.insetTemplates_[config.geo], inset]
         } else {
-            let inset = buildInset(config, out, withCenterPoints)
+            let inset = buildInset(config, out, withCenterPoints, mapType)
             let drawnInset = inset.buildMapTemplateBase()
             out.insetTemplates_[config.geo] = drawnInset
         }
@@ -61,7 +63,7 @@ export const buildInsets = function (out, withCenterPoints) {
 }
 
 /** Build template for inset, based on main one */
-const buildInset = function (config, out, withCenterPoints) {
+const buildInset = function (config, out, withCenterPoints, mapType) {
     //TODO find a better way to do that
 
     //copy map
@@ -69,7 +71,7 @@ const buildInset = function (config, out, withCenterPoints) {
     //mt[key__] = map[key__];
     //}
 
-    const mt = mapTemplate(config, withCenterPoints)
+    const mt = mapTemplate(config, withCenterPoints, mapType)
 
     //define default values for inset configs
     config = config || {}
@@ -84,35 +86,35 @@ const buildInset = function (config, out, withCenterPoints) {
     config.insetTemplates = config.insetTemplates || {}
     config.callback = config.callback || undefined
 
-    //copy main map attributes
-    ;[
-        'nutsLevel_',
-        'nutsYear_',
-        'hoverColor_',
-        //'nutsbnStroke_', // DEPRECATED
-        // 'nutsbnStrokeWidth_', // DEPRECATED
-        'cntrgFillStyle_', // DEPRECATED
-        'cntbnStroke_', // DEPRECATED
-        'cntbnStrokeWidth_', // DEPRECATED
-        'seaFillStyle_', // DEPRECATED
-        'drawCoastalMargin_',
-        'coastalMarginColor_', // DEPRECATED
-        'coastalMarginWidth_', // DEPRECATED
-        'coastalMarginStdDev_',
-        'graticuleStroke_', // DEPRECATED
-        'graticuleStrokeWidth_', // DEPRECATED
-        'lg_',
-        'projectionFunction_',
-        'filterGeometriesFunction_',
-        'processCentroids_',
-    ].forEach(function (att) {
-        mt[att] = out[att]
-    })
+        //copy main map attributes
+        ;[
+            'nutsLevel_',
+            'nutsYear_',
+            'hoverColor_',
+            //'nutsbnStroke_', // DEPRECATED
+            // 'nutsbnStrokeWidth_', // DEPRECATED
+            'cntrgFillStyle_', // DEPRECATED
+            'cntbnStroke_', // DEPRECATED
+            'cntbnStrokeWidth_', // DEPRECATED
+            'seaFillStyle_', // DEPRECATED
+            'drawCoastalMargin_',
+            'coastalMarginColor_', // DEPRECATED
+            'coastalMarginWidth_', // DEPRECATED
+            'coastalMarginStdDev_',
+            'graticuleStroke_', // DEPRECATED
+            'graticuleStrokeWidth_', // DEPRECATED
+            'lg_',
+            'projectionFunction_',
+            'filterGeometriesFunction_',
+            'processCentroids_',
+        ].forEach(function (att) {
+            mt[att] = out[att]
+        })
 
-    //copy stat map attributes/methods
-    ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', 'classToText_'].forEach(function (att) {
-        mt[att] = out[att]
-    })
+        //copy stat map attributes/methods
+        ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', 'classToText_'].forEach(function (att) {
+            mt[att] = out[att]
+        })
 
     //apply config values for inset
     for (let key in config) mt[key + '_'] = config[key]
@@ -197,9 +199,9 @@ const defaultInsetConfig = function (s, p) {
             height: 0.25 * s,
         },
         /*{geo:"IC", x:0, y:0}, {geo:"RE", x:dd, y:0}, {geo:"YT", x:2*dd, y:0},
-		{geo:"GP", x:0, y:dd}, {geo:"MQ", x:dd, y:dd}, {geo:"GF",scale:"10M", x:2*dd, y:dd},
-		{geo:"PT20", x:0, y:2*dd}, {geo:"PT30", x:dd, y:2*dd}, {geo:"MT", x:2*dd, y:2*dd},
-		{geo:"LI",scale:"01M", x:0, y:3*dd}, {geo:"SJ_SV", x:dd, y:3*dd}, {geo:"SJ_JM",scale:"01M", x:2*dd, y:3*dd},*/
+        {geo:"GP", x:0, y:dd}, {geo:"MQ", x:dd, y:dd}, {geo:"GF",scale:"10M", x:2*dd, y:dd},
+        {geo:"PT20", x:0, y:2*dd}, {geo:"PT30", x:dd, y:2*dd}, {geo:"MT", x:2*dd, y:2*dd},
+        {geo:"LI",scale:"01M", x:0, y:3*dd}, {geo:"SJ_SV", x:dd, y:3*dd}, {geo:"SJ_JM",scale:"01M", x:2*dd, y:3*dd},*/
         //{geo:"CARIB", x:0, y:330}, {geo:"IS", x:dd, y:330}
     ]
     //hide graticule for insets

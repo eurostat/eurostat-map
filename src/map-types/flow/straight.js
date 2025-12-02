@@ -1,173 +1,219 @@
 import { select } from 'd3-selection'
+import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
+import { buildBidirectionalRouteMap } from './flow-bidirectional.js'
 
 /**
-     * Function to create a flow map with straight lines.
-     * exampleGraph = {
-                nodes: [
-                    { id: 'FR', x: 681.1851800759263, y: 230.31124763648583 },
-                    { id: 'DE', x: 824.5437782154489, y: 123.70302649032199 },
-                ],
-                links: [
-                    { source: 'FR', target: 'DE', value: 82018369.72 },
-                ],
-            }
-     */
+ * Function to create a flow map with straight lines.
+ * exampleGraph = {
+ *   nodes:[{id:'FR',x:681.18,y:230.31},{id:'DE',x:824.54,y:123.70}],
+ *   links:[{source:'FR',target:'DE',value:82018369.72}],
+ * }
+ */
 export function createFlowMap(out, flowMapContainer) {
     drawStraightLinesByFlow(out, flowMapContainer)
 }
 
+// straight lines that can be bidirectional. If flow is bidirectional, draw two half-lines from midpoint to each node.
 function drawStraightLinesByFlow(out, container) {
     const lineGroup = container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines')
 
     const { nodes, links } = out.flowGraph_
 
-    // Build a quick lookup for node coordinates
-    const nodeMap = new Map(nodes.map((n) => [n.id, [n.x, n.y]]))
+    // Build node lookup for other parts of the renderer
+    out._nodeById = out._nodeById || new Map(nodes.map((n) => [n.id, n]))
 
-    // Step 1: Group flows by unordered route key but track direction separately
-    const routeMap = new Map()
+    // --- ARROWS: create shared markers (once per renderer) ---
+    const svgRoot = out.svg_ || container
+    const arrowIds = out.flowArrows_
+        ? ensureArrowMarkers(svgRoot, {
+            cacheKey: "straight",
+            scale: out.flowArrowScale_ || 1,
+            markerUnits: "strokeWidth",
+            hoverColor: out.hoverColor_ || "black",
+            outlineColor: out.flowOutlineColor_ || "#ffffff",
+            useContextStroke: true,
+        })
+        : null;
 
-    links.forEach((link) => {
-        const sourceId = typeof link.source === 'object' ? link.source.id : link.source
-        const targetId = typeof link.target === 'object' ? link.target.id : link.target
-
-        const origin = nodeMap.get(sourceId)
-        const dest = nodeMap.get(targetId)
-        if (!origin || !dest) return // skip invalid links
-
-        // Use a consistent key for grouping regardless of direction
-        const key = sourceId < targetId ? `${sourceId}|${targetId}` : `${targetId}|${sourceId}`
-
-        if (!routeMap.has(key)) {
-            routeMap.set(key, {
-                idA: sourceId < targetId ? sourceId : targetId,
-                idB: sourceId < targetId ? targetId : sourceId,
-                coordsA: sourceId < targetId ? origin : dest,
-                coordsB: sourceId < targetId ? dest : origin,
-                flowAB: 0,
-                flowBA: 0,
-            })
-        }
-
-        const route = routeMap.get(key)
-        if (sourceId < targetId) route.flowAB += link.value
-        else route.flowBA += link.value
-    })
+    // Step 1: shared bidirectional aggregation
+    const routeMap = buildBidirectionalRouteMap(nodes, links);
 
     // Step 2: Draw each route
     for (const route of routeMap.values()) {
-        const { idA, idB, coordsA, coordsB, flowAB, flowBA } = route
+        const { idA, idB, nodeA, nodeB, flowAB, flowBA } = route
+        const coordsA = [nodeA.x, nodeA.y]
+        const coordsB = [nodeB.x, nodeB.y]
         const midX = (coordsA[0] + coordsB[0]) / 2
         const midY = (coordsA[1] + coordsB[1]) / 2
+        const abStroke = () => getFlowStroke(out, idA, idB, route, flowAB)
+        const baStroke = () => getFlowStroke(out, idB, idA, route, flowBA)
 
-        const abStroke = () => getFlowStroke(out, idA, idB)
-        const baStroke = () => getFlowStroke(out, idB, idA)
+        // helper to draw one segment (with optional outline + arrows)
+        const drawSegment = (x1, y1, x2, y2, originId, destId, value, strokeFn) => {
+            const innerWidth = +out.strokeWidthScale(value).toFixed(1);
+            const segLen = Math.hypot(x2 - x1, y2 - y1) || 1;
 
-        // --- CASE 1: bidirectional (draw two half-lines)
+            // Solid base color, used both for painting and legend matching
+            const baseColor = strokeFn();                // getFlowStroke(...) result
+            const colorKey = computeColorKey(out, originId, destId); // stable key for top-N case
+
+            // backoff in px so the last px of the line is invisible under the arrow,
+            // but the marker is still anchored at the true endpoint (x2,y2).
+            const backoffMain = out.flowArrows_ ? arrowBackoffPxForStroke(innerWidth) : 0;
+
+            // --- OUTLINE (behind) ---
+            if (out.flowOutlines_) {
+                const outlineColor = getFlowOutlineColor(out, originId, destId, route, value, strokeFn);
+                const outlinePad = getFlowOutlineWidth(out, originId, destId, route, value);
+                const outlineWidth = Math.max(0, innerWidth + 2 * outlinePad);
+                const backoffOutline = out.flowArrows_ ? arrowBackoffPxForStroke(outlineWidth) : 0;
+
+                const dashVis = Math.max(0, segLen - backoffOutline);
+                const dashGap = Math.min(backoffOutline, segLen); // cap
+
+                const outline = lineGroup.append('line')
+                    .attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
+                    .attr('stroke', outlineColor)
+                    .attr('stroke-width', outlineWidth)
+                    .attr('stroke-opacity', out.flowOutlineOpacity_ ?? out.flowOpacity_ ?? 1)
+                    .attr('stroke-linecap', 'butt')
+                    .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+                    .style('pointer-events', 'none');
+
+                // if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline');
+            }
+
+            // --- MAIN STROKE (on top) ---
+            const dashVis = Math.max(0, segLen - backoffMain);
+            const dashGap = Math.min(backoffMain, segLen);
+
+            const main = lineGroup.append('line')
+                .attr('data-nb', value)
+                .attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2)
+                .attr('data-origin', originId)
+                .attr('data-dest', destId)
+                .attr('stroke', baseColor)         // use solid base color
+                .attr('stroke-width', innerWidth)
+                .attr('stroke-opacity', out.flowOpacity_)
+                .attr('stroke-linecap', 'butt')
+                .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
+                .attr('data-color', baseColor)     // 👈 for legend hover by color
+                .attr('data-color-key', colorKey)  // 👈 for legend hover by key (top-N)
+                .style('cursor', 'pointer')
+                .on('mouseover', onFlowLineMouseOver(out, originId, destId, value, arrowIds))
+                .on('mousemove', onFlowLineMouseMove(out))
+                .on('mouseout', onFlowLineMouseOut(out, baseColor, arrowIds)); // use baseColor
+
+            if (out.flowArrows_) applyArrow(main, arrowIds, 'normal');
+        };
+
+
+        // --- CASES ---
         if (flowAB > 0 && flowBA > 0) {
-            // A → B half-line
-            lineGroup
-                .append('line')
-                .attr('data-nb', flowAB)
-                .attr('x1', midX)
-                .attr('y1', midY)
-                .attr('x2', coordsB[0])
-                .attr('y2', coordsB[1])
-                .attr('data-origin', idA)
-                .attr('data-dest', idB)
-                .attr('stroke', abStroke)
-                .attr('stroke-width', out.strokeWidthScale(flowAB).toFixed(1))
-                .attr('stroke-opacity', out.flowOpacity_)
-                .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, idA, idB, flowAB))
-                .on('mousemove', onFlowLineMouseMove(out))
-                .on('mouseout', onFlowLineMouseOut(out, abStroke))
-
-            // B → A half-line
-            lineGroup
-                .append('line')
-                .attr('data-nb', flowBA)
-                .attr('x1', midX)
-                .attr('y1', midY)
-                .attr('x2', coordsA[0])
-                .attr('y2', coordsA[1])
-                .attr('data-origin', idB)
-                .attr('data-dest', idA)
-                .attr('stroke', baStroke)
-                .attr('stroke-width', out.strokeWidthScale(flowBA).toFixed(1))
-                .attr('stroke-opacity', out.flowOpacity_)
-                .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, idB, idA, flowBA))
-                .on('mousemove', onFlowLineMouseMove(out))
-                .on('mouseout', onFlowLineMouseOut(out, baStroke))
-        }
-
-        // --- CASE 2: unidirectional A → B
-        else if (flowAB > 0 && flowBA === 0) {
-            lineGroup
-                .append('line')
-                .attr('data-nb', flowAB)
-                .attr('x1', coordsA[0])
-                .attr('y1', coordsA[1])
-                .attr('x2', coordsB[0])
-                .attr('y2', coordsB[1])
-                .attr('data-origin', idA)
-                .attr('data-dest', idB)
-                .attr('stroke', abStroke)
-                .attr('stroke-width', out.strokeWidthScale(flowAB).toFixed(1))
-                .attr('stroke-opacity', out.flowOpacity_)
-                .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, idA, idB, flowAB))
-                .on('mousemove', onFlowLineMouseMove(out))
-                .on('mouseout', onFlowLineMouseOut(out, abStroke))
-        }
-
-        // --- CASE 3: unidirectional B → A
-        else if (flowBA > 0 && flowAB === 0) {
-            lineGroup
-                .append('line')
-                .attr('data-nb', flowBA)
-                .attr('x1', coordsB[0])
-                .attr('y1', coordsB[1])
-                .attr('x2', coordsA[0])
-                .attr('y2', coordsA[1])
-                .attr('data-origin', idB)
-                .attr('data-dest', idA)
-                .attr('stroke', baStroke)
-                .attr('stroke-width', out.strokeWidthScale(flowBA).toFixed(1))
-                .attr('stroke-opacity', out.flowOpacity_)
-                .style('cursor', 'pointer')
-                .on('mouseover', onFlowLineMouseOver(out, idB, idA, flowBA))
-                .on('mousemove', onFlowLineMouseMove(out))
-                .on('mouseout', onFlowLineMouseOut(out, baStroke))
+            // A → B half
+            drawSegment(midX, midY, coordsB[0], coordsB[1], idA, idB, flowAB, abStroke)
+            // B → A half
+            drawSegment(midX, midY, coordsA[0], coordsA[1], idB, idA, flowBA, baStroke)
+        } else if (flowAB > 0) {
+            drawSegment(coordsA[0], coordsA[1], coordsB[0], coordsB[1], idA, idB, flowAB, abStroke)
+        } else if (flowBA > 0) {
+            drawSegment(coordsB[0], coordsB[1], coordsA[0], coordsA[1], idB, idA, flowBA, baStroke)
         }
     }
 
-    function getFlowStroke(out, originId, destId, direction) {
-        if (!out.topLocationKeys || !out.flowTopLocations_) return out.flowColor_
+    // ----------  outline helpers ----------
+    function getFlowOutlineColor(out, originId, destId, route, halfValue, innerStrokeFn) {
+        const val = out.flowOutlineColor_
+        if (typeof val === 'function') {
+            const nodeById = out._nodeById || new Map(out.flowGraph_.nodes.map(n => [n.id, n]))
+            const linkLike = {
+                source: nodeById.get(originId) || { id: originId },
+                target: nodeById.get(destId) || { id: destId },
+                value: halfValue, route,
+                innerColor: (typeof innerStrokeFn === 'function') ? innerStrokeFn() : innerStrokeFn
+            }
+            let c
+            try { c = val(linkLike) } catch (_) { }
+            if (c == null && val.length >= 3) {
+                try { c = val(originId, destId, route) } catch (_) { }
+            }
+            return c ?? (out.flowOutlineFallback_ ?? '#ffffff')
+        }
+        return val ?? (out.flowOutlineFallback_ ?? '#ffffff')
+    }
 
+    function getFlowOutlineWidth(out, originId, destId, route, halfValue) {
+        const w = out.flowOutlineWidth_
+        if (typeof w === 'function') {
+            const nodeById = out._nodeById || new Map(out.flowGraph_.nodes.map(n => [n.id, n]))
+            const linkLike = { source: nodeById.get(originId) || { id: originId }, target: nodeById.get(destId) || { id: destId }, value: halfValue, route }
+            let res
+            try { res = w(linkLike) } catch (_) { }
+            if (res == null && w.length >= 3) {
+                try { res = w(originId, destId, route) } catch (_) { }
+            }
+            return Math.max(0, +res || 0)
+        }
+        return Math.max(0, +w || 1)
+    }
+
+    function getFlowStroke(out, originId, destId, route, halfValue) {
+        const fallback = typeof out.flowColor_ === 'string' ? out.flowColor_ : '#999999'
+        const nodeById = out._nodeById || new Map(out.flowGraph_.nodes.map(n => [n.id, n]))
+        const source = nodeById.get(originId) || { id: originId }
+        const target = nodeById.get(destId) || { id: destId }
+        const linkLike = { source, target, value: halfValue, route }
+
+        if (typeof out.flowColor_ === 'function') {
+            let color
+            try { color = out.flowColor_(linkLike) } catch (_) { }
+            if (color == null && out.flowColor_.length >= 3) {
+                try { color = out.flowColor_(originId, destId, route) } catch (_) { }
+            }
+            if (color != null) return color
+        }
+        return colorByTopN(out, originId, destId, fallback)
+    }
+
+    function colorByTopN(out, originId, destId, fallback) {
+        if (!out.topLocationKeys || !out.flowTopLocations_ || !out.flowDonuts_) return fallback
         const type = out.flowTopLocationsType_ || 'sum'
         if (type === 'origin') {
-            // Color by origin
-            return out.topLocationKeys.has(originId) ? out.locationColorScale(originId) : out.flowColor_
-        } else if (type === 'destination') {
-            // Color by destination
-            return out.topLocationKeys.has(destId) ? out.locationColorScale(destId) : out.flowColor_
-        } else {
-            // Default: color by whichever is in top set
-            return out.topLocationKeys.has(destId)
-                ? out.locationColorScale(destId)
-                : out.topLocationKeys.has(originId)
-                  ? out.locationColorScale(originId)
-                  : out.flowColor_
+            return out.topLocationKeys.has(originId) ? out.topLocationColorScale(originId) : fallback
         }
+        if (type === 'destination') {
+            return out.topLocationKeys.has(destId) ? out.topLocationColorScale(destId) : fallback
+        }
+        return out.topLocationKeys.has(destId)
+            ? out.topLocationColorScale(destId)
+            : (out.topLocationKeys.has(originId) ? out.topLocationColorScale(originId) : fallback)
     }
 
-    // Hover handler
-    function onFlowLineMouseOver(out, sourceId, targetId, flow) {
+    function computeColorKey(out, originId, destId) {
+        if (!out.topLocationKeys) return null;
+
+        const type = out.flowTopLocationsType_ || 'sum';
+
+        if (type === 'origin') {
+            return out.topLocationKeys.has(originId) ? originId : 'Other';
+        }
+
+        if (type === 'destination') {
+            return out.topLocationKeys.has(destId) ? destId : 'Other';
+        }
+
+        // default: 'sum' / mixed – prefer destination if in top list, else origin, else "Other"
+        if (out.topLocationKeys.has(destId)) return destId;
+        if (out.topLocationKeys.has(originId)) return originId;
+        return 'Other';
+    }
+
+    // Hover handlers (arrow swap aware)
+    function onFlowLineMouseOver(out, sourceId, targetId, flow, arrowIds) {
         return function (e) {
             const hoveredColor = out.hoverColor_ || 'black'
             select(this).attr('stroke', hoveredColor)
+            if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true)
 
             if (out._tooltip) {
                 const sourceNode = out.flowGraph_.nodes.find((n) => n.id === sourceId)
@@ -184,10 +230,20 @@ function drawStraightLinesByFlow(out, container) {
         }
     }
 
-    function onFlowLineMouseOut(out, strokeFn) {
+ function onFlowLineMouseOut(out, baseColor, arrowIds) {
         return function () {
-            select(this).attr('stroke', strokeFn())
+            select(this).attr('stroke', baseColor)   // restore solid base color
+            if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false)
             if (out._tooltip) out._tooltip.mouseout()
         }
     }
+
+    // estimate arrow length (px) for a given stroke width (px), matched to arrows.js createMarker()
+    function arrowBackoffPxForStroke(strokePx) {
+        // match arrows.js createMarker(): markerWidth = 3 * scale, tip at ~90% of viewBox
+        const arrowLenPx = strokePx * (3 * (out.flowArrowScale_ || 1)) * 0.9;
+        return arrowLenPx * 0.7; // slightly less so the base tucks under cleanly
+    }
 }
+
+

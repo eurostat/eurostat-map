@@ -5,8 +5,9 @@ import { extent, min, max } from 'd3-array'
 import { axisBottom, axisLeft, axisRight } from 'd3-axis'
 import * as StatMap from '../core/stat-map'
 import * as lgch from '../legend/choropleth/legend-choropleth'
-import { getRegionsSelector } from '../core/utils'
+import { executeForAllInsets, getRegionsSelector } from '../core/utils'
 import * as StatisticalData from '../core/stat-data'
+
 /**
  * Returns a sparkline map.
  *
@@ -39,32 +40,32 @@ export const map = function (config) {
     out.statSpark_ = null
     out.sparkHeightClassifier_ = null
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
-    ;[
-        'sparkLineColor_',
-        'showOnlyWhenComplete_',
-        'sparkType_',
-        'sparkLineWidth_',
-        'sparkLineHeight_',
-        'sparkLineStrokeWidth_',
-        'sparkLineOpacity_',
-        'sparkLineCircleRadius_',
-        'sparkLineAreaColor_',
-        'sparkTooltipChart_',
-        'sparkLineChartFunction_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
-        }
-    })
+        /**
+         * Definition of getters/setters for all previously defined attributes.
+         * Each method follow the same pattern:
+         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+         *  - To get the attribute value, call the method without argument.
+         *  - To set the attribute value, call the same method with the new value as single argument.
+         */
+        ;[
+            'sparkLineColor_',
+            'showOnlyWhenComplete_',
+            'sparkType_',
+            'sparkLineWidth_',
+            'sparkLineHeight_',
+            'sparkLineStrokeWidth_',
+            'sparkLineOpacity_',
+            'sparkLineCircleRadius_',
+            'sparkLineAreaColor_',
+            'sparkTooltipChart_',
+            'sparkLineChartFunction_',
+        ].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
+        })
 
     //override attribute values with config values
     if (config)
@@ -211,17 +212,50 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
+        try {
+            // apply to main map
+            applyStyleToMap(out)
+
+            // apply style to insets
+            if (out.insetTemplates_) {
+                executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            }
+
+            return out
+        } catch (e) {
+            console.error('Error in proportional symbols styling: ' + e.message)
+            console.error(e)
+        }
+
+
+        return out
+    }
+
+    function applyStyleToMap(map) {
+
         //build and assign pie charts to the regions
         //collect nuts ids from g elements. TODO: find better way of getting IDs
         let nutsIds = []
-        let s = out.getCentroidsGroup(out)
+        let s = map.getCentroidsGroup(map)
         let sym = s.selectAll('g.em-centroid').attr('id', (rg) => {
             nutsIds.push(rg.properties.id)
             return 'spark_' + rg.properties.id
         })
 
+        setRegionStyles(map)
+        addSparkLinesToMap(nutsIds)
+        addMouseEventsToRegions(map)
+        return map
+
+    }
+
+    function setRegionStyles(map) {
+
+    }
+
+    function addMouseEventsToRegions(map) {
         // set region hover function
-        const selector = getRegionsSelector(out)
+        const selector = getRegionsSelector(map)
         let regions = out.svg().selectAll(selector)
         regions
             .on('mouseover', function (e, rg) {
@@ -248,9 +282,6 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mouseout()
                 }
             })
-
-        addSparkLinesToMap(nutsIds)
-        return out
     }
 
     function addSparkLinesToMap(ids) {
@@ -341,16 +372,28 @@ export const map = function (config) {
                 )
         }
 
-        node.append('path')
+        const path = node.append('path')
             .datum(scaledData)
             .attr('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
-            .attr('stroke', typeof out.sparkLineColor_ === 'function' ? (d, i) => out.sparkLineColor_(d, i) : out.sparkLineColor_)
-            .attr(
-                'stroke-width',
-                typeof out.sparkLineStrokeWidth_ === 'function' ? (d, i) => out.sparkLineStrokeWidth_(d, i) : out.sparkLineStrokeWidth_ + 'px'
-            )
-            .attr('d', lineGenerator)
+            .attr('stroke', typeof out.sparkLineColor_ === 'function'
+                ? (d, i) => out.sparkLineColor_(d, i)
+                : out.sparkLineColor_)
+            .attr('stroke-width', typeof out.sparkLineStrokeWidth_ === 'function'
+                ? (d, i) => out.sparkLineStrokeWidth_(d, i)
+                : out.sparkLineStrokeWidth_ + 'px')
+            .attr('d', lineGenerator);
+
+        // === Progressive draw animation ===
+        if (!isForTooltip) {
+            const totalLength = path.node().getTotalLength();
+            path
+                .attr('stroke-dasharray', totalLength)
+                .attr('stroke-dashoffset', totalLength)
+                .transition()
+                .duration(out.transitionDuration())
+                .attr('stroke-dashoffset', 0);
+        }
 
         node.selectAll('circle')
             .data(scaledData)

@@ -1,114 +1,123 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </head>
 
-    <body>
-        <svg id="map"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
-        <script>
-            let mapWidth = 800
-            let mapHeight = 600
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-            const map = eurostatmap
-                .map('ps')
-                .width(mapWidth)
-                .height(mapHeight)
-                .legend({ x: 500, y: 100, title: 'Test' })
-                .nutsLevel('mixed')
-                .dorling(true)
-                .psFill('#4ac499')
-                .psMaxSize(100)
-                .psMinSize(5)
-                .nutsYear(2016)
+<body>
+    <svg id="map"></svg>
+    <script src="../../../build/eurostatmap.js"></script>
+    <script>
+        let mapWidth = 800
+        let mapHeight = 600
 
+        const map = eurostatmap
+            .map('ps')
+            .width(mapWidth)
+            .height(mapHeight)
+            .legend({ x: 500, y: 100, title: 'Test' })
+            .nutsLevel('mixed')
+            .dorling(true)
+            .psFill('#4ac499')
+            .psMaxSize(30)
+            .psMinSize(5)
+            .nutsYear(2016)
+
+        map.statData('size').setData({
+            TR834: '100',
+            RS: 0,
+            DE: 10,
+            BE: 5,
+            BG: 3,
+            DK: 4,
+            SE: 1,
+            FR: 9,
+            ES: 8,
+            ES1: 4,
+            ES2: 4,
+            ES3: 4,
+            ES4: 4,
+            ES5: 4,
+            ES11: 10,
+            ES12: 5,
+        })
+
+        setTimeout(() => {
             map.statData('size').setData({
-                TR834: '100',
-                DE: 10,
-                BE: 5,
-                BG: 3,
-                DK: 4,
-                SE: 1,
-                FR: 9,
-                ES: 8,
-                ES1: 4,
-                ES2: 4,
-                ES3: 4,
-                ES4: 4,
-                ES5: 4,
-                ES11: 10,
-                ES12: 5,
+                AL: '100',
+                IT: 10,
+                RS: 0,
+                AT: 5,
+                RO: 3,
+                HU: 4,
+                NO: 1,
+                CY: 9,
+                EL: 8,
+                DE1: 4,
+                DE2: 4,
+                DE3: 4,
+                DE4: 4,
+                DE5: 4,
+                DE11: 10,
+                DE12: 5,
+                PL: 23,
             })
+            map.psFill('#ff0000')
+            map.updateStatValues()
+        }, 1000)
 
-            setTimeout(() => {
-                map.statData('size').setData({
-                    AL: '100',
-                    IT: 10,
-                    AT: 5,
-                    RO: 3,
-                    HU: 4,
-                    NO: 1,
-                    CY: 9,
-                    EL: 8,
-                    DE1: 4,
-                    DE2: 4,
-                    DE3: 4,
-                    DE4: 4,
-                    DE5: 4,
-                    DE11: 10,
-                    DE12: 5,
-                    PL: 23,
-                })
-                map.updateStatValues()
-            }, 1000)
+        setTimeout(() => {
+            map.statData('size').setData({
+                AL: '100',
+                IT: 10,
+                AT: 5,
+                RO: 3,
+                RS: 0,
+                HU: 4,
+                NO: 1,
+                CY: 9,
+                EL: 8,
+                DE1: 4,
+                DE2: 4,
+                DE3: 4,
+                DE4: 4,
+                DE5: 4,
+                DE11: 10,
+                DE12: 5,
+                PT: 23,
+            })
+            map.psFill('#ff9900')
+            map.updateStatValues()
+        }, 2000)
 
-            setTimeout(() => {
-                map.statData('size').setData({
-                    AL: '100',
-                    IT: 10,
-                    AT: 5,
-                    RO: 3,
-                    HU: 4,
-                    NO: 1,
-                    CY: 9,
-                    EL: 8,
-                    DE1: 4,
-                    DE2: 4,
-                    DE3: 4,
-                    DE4: 4,
-                    DE5: 4,
-                    DE11: 10,
-                    DE12: 5,
-                    PT: 23,
-                })
-                map.updateStatValues()
-            }, 2000)
+        setTimeout(() => {
+            map.statData('size').setData({
+                AL: '9',
+                IT: '10',
+                AT: '5',
+                RO: '3',
+                HU: '4',
+                NO: '1',
+                CY: 9,
+                EL: 8,
+                DE1: 4,
+                DE2: 4,
+                DE3: 4,
+                RS: 0,
+                DE4: 4,
+                DE5: 4,
+                DE11: '10',
+                DE12: '5',
+                PL: '23',
+            })
+            map.psFill('#0000ff')
+            map.updateStatValues()
+        }, 3000)
 
-            setTimeout(() => {
-                map.statData('size').setData({
-                    AL: '90',
-                    IT: '10',
-                    AT: '5',
-                    RO: '3',
-                    HU: '4',
-                    NO: '1',
-                    CY: 9,
-                    EL: 8,
-                    DE1: 4,
-                    DE2: 4,
-                    DE3: 4,
-                    DE4: 4,
-                    DE5: 4,
-                    DE11: '10',
-                    DE12: '5',
-                    PL: '23',
-                })
-                map.updateStatValues()
-            }, 3000)
+        map.build()
+    </script>
+</body>
 
-            map.build()
-        </script>
-    </body>
 </html>

@@ -10,7 +10,7 @@
 .em-cntrg,
 .em-grid-cell,
 #em-user-regions {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 
 /*  boundaries stroke-width */
@@ -25,7 +25,8 @@
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'],
 .em-bn-co {
-    stroke-width: 0.15;
+    stroke-width: 0.3;
+    stroke-opacity: 0.5;
 }
 
 /* all boudnaries and regions linecap/linejoin */
@@ -49,8 +50,9 @@
 
 /* national boundaries */
 .em-cntbn {
-    stroke: #0a0a0a;
-    stroke-width: 0.6px;
+    stroke: #1b1b1b;
+    stroke-width: 1px;
+    stroke-opacity: 0.9;
 }
 
 /* NUTS boundaries stroke color */
@@ -60,7 +62,7 @@
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: #696969;
+    stroke: #474747;
 }
 
 /* coastal boundaries */

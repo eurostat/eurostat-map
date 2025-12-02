@@ -43,7 +43,9 @@ export function drawDiscreteLegend(out, x, y) {
 function getTitlePadding(out) {
     // Calculate the padding between the title and the first legend item
     const map = out.map
-    return map._mapType == 'ps' ? out.colorLegend.titlePadding : 0
+    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : 0;
+    if (out.showMaxMin) p += 10; // extra padding if max/min labels are shown
+    return p
 }
 
 function createThresholdsLegend(out, config) {
@@ -58,14 +60,27 @@ function createThresholdsLegend(out, config) {
 
     // Label formatter
     const labelFormatter = out.getLabelFormatter(out)
+
+    // ---- Correct global min/max from statData ----
+    let globalMin
+    let globalMax
+    if (config.showMaxMin && map.statData) {
+        const stat = map.statData()
+        if (stat?.getMin && stat?.getMax) {
+            globalMin = stat.getMin()
+            globalMax = stat.getMax()
+        }
+    }
+
     for (let i = 0; i < numberOfClasses; i++) {
         const y = i * config.shapeHeight + titlePadding
         const x = 0
         const ecl = out.ascending ? numberOfClasses - i - 1 : i
         const fillColor = classToFillStyle(ecl, numberOfClasses)
+        const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
         // Append rectangle for each class
-        container
+        itemContainer
             .append('rect')
             .attr('class', 'em-legend-rect')
             .attr('x', x)
@@ -87,14 +102,20 @@ function createThresholdsLegend(out, config) {
                 }
             })
 
-        // Append separation line asdasd
+        // Append separation line
         if (i > 0) {
-            container.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', out.sepLineLength).attr('y2', y)
+            itemContainer
+                .append('line')
+                .attr('class', 'em-legend-separator')
+                .attr('x1', 0)
+                .attr('y1', y)
+                .attr('x2', out.sepLineLength)
+                .attr('y2', y)
         }
 
-        // Append tick line
+        // Append tick line at each internal boundary
         if (i > 0) {
-            container
+            itemContainer
                 .append('line')
                 .attr('class', 'em-legend-tick')
                 .attr('x1', config.sepLineLength)
@@ -103,15 +124,18 @@ function createThresholdsLegend(out, config) {
                 .attr('y2', y)
         }
 
-        // Append label
+        // Append label at internal boundaries
         if (i < numberOfClasses - 1) {
             // mark label so we can move it in drawDivergingLine
-            const label = container
+            const label = itemContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
+                .attr(
+                    'x',
+                    Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) +
+                        (config.labelOffsets.x || 0)
+                )
                 .attr('y', y + config.shapeHeight)
-                //.attr('dominant-baseline', 'middle')
                 .attr('dy', '0.3em') // ~vertical centering
                 .text(() => {
                     if (config.labels) return config.labels[i]
@@ -124,11 +148,57 @@ function createThresholdsLegend(out, config) {
                 })
 
             // mark label so we can move it in drawDivergingLine
-            if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
+            if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1)
+                label.attr('class', 'em-legend-label em-legend-label-divergence')
         }
     }
 
-    // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
+    // Add MIN and MAX ticks at the ends of the scale using statData extent
+    if (config.showMaxMin && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
+        const tickX1 = 0
+        const tickX2 = config.sepLineLength + config.tickLength
+        const labelX =
+            Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
+
+        // Top boundary (MAX)
+        const yTop = titlePadding
+        container
+            .append('line')
+            .attr('class', 'em-legend-tick em-legend-tick-max')
+            .attr('x1', tickX1)
+            .attr('y1', yTop)
+            .attr('x2', tickX2)
+            .attr('y2', yTop)
+
+        container
+            .append('text')
+            .attr('class', 'em-legend-label em-legend-label-max')
+            .attr('x', labelX)
+            .attr('y', yTop)
+            .attr('dy', '0.3em')
+            .text(labelFormatter(globalMax) + ' (max)')
+
+        // Bottom boundary (MIN)
+        const yBottom = numberOfClasses * config.shapeHeight + titlePadding
+        container
+            .append('line')
+            .attr('class', 'em-legend-tick em-legend-tick-min')
+            .attr('x1', tickX1)
+            .attr('y1', yBottom)
+            .attr('x2', tickX2)
+            .attr('y2', yBottom)
+
+        container
+            .append('text')
+            .attr('class', 'em-legend-label em-legend-label-min')
+            .attr('x', labelX)
+            .attr('y', yBottom)
+            .attr('dy', '0.3em')
+            .text(labelFormatter(globalMin) + ' (min)')
+    }
+
+    // Draw diverging line if applicable. We draw it afterwards so that we can calculate
+    // the max length of the legend labels so it doesnt cover them
     if (config.pointOfDivergenceLabel) {
         for (let i = 0; i < numberOfClasses; i++) {
             let y = i * config.shapeHeight + titlePadding
@@ -139,6 +209,8 @@ function createThresholdsLegend(out, config) {
         }
     }
 }
+
+
 
 function createRangesLegend(out, config) {
     const map = out.map

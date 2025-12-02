@@ -1,0 +1,684 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+    <!-- Import CSS -->
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./map.css" />
+    <link rel="stylesheet" href="./custom-select.css" />
+    <!-- Import eurostat-map -->
+    <script class="eurostat-map-dependency" src="../../../build/eurostatmap.js"></script>
+
+    <style>
+      .em-coxcomb-time-legend {
+        transform: translate(70px, 270px);
+      }
+    </style>
+  </head>
+  <body style="margin: 0px">
+    <div class="container">
+      <div id="header">
+        <div class="titles">
+          <span id="title">Title goes here</span>
+          <br />
+          <span id="subtitle">subtitle here</span>
+        </div>
+
+         <div id="dropdown-container">
+          <div id="dropdown-label">
+            Select time period:
+          </div>
+          <div id="select-wrapper" class="custom-select-wrapper">
+            <div class="custom-select">
+              <div class="select-trigger" tabindex="0">Select an option</div>
+              <ul class="custom-options">
+              </ul>
+            </div>
+          </div>
+        </div> 
+        
+      </div>
+      <div id="content">
+        <svg
+        id="europe-template"
+        viewBox="0 0 797 697"
+        xmlns="http://www.w3.org/2000/svg">
+          <g id="map-texts" style="fill: rgb(76, 75, 75); box-sizing: inherit; transform: translate(0px, -95px)">
+            <!-- <text id="'title" width="714.5px" x="5px" y="36px" style="font-size: 30px; font-weight: bold; box-sizing: inherit; pointer-events: none;">Female life expectancy at birth</text>
+                                                            <text id="subtitle" x="5px" y="64px" style="font-size: 20px; box-sizing: inherit; pointer-events: none;">(years, by NUTS 2 regions, 2023)</text> -->
+            <text
+              id="copyright-text"
+              text-anchor="end"
+              x="787"
+              y="735"
+              style="font-size: 11px; opacity: 0.9; box-sizing: inherit; pointer-events: none">
+              Administrative boundaries: © EuroGeographics © OpenStreetMap
+            </text>
+            <text
+              id="cartography-text"
+              text-anchor="end"
+              x="787"
+              y="749"
+              style="opacity: 0.9; font-size: 11px; box-sizing: inherit; pointer-events: none">
+              Cartography: Eurostat – IMAGE, 08/2025
+            </text>
+            <!----><!---->
+            <text id="footnotes-text" style="box-sizing: inherit; pointer-events: none">
+              <tspan
+                x="10"
+                y="735px"
+                class="ng-star-inserted"
+                style="font-size: 11px; opacity: 0.9; box-sizing: inherit">
+                By NUTS 1 regions. Note: guest nights spent at short-stay accommodation offered via 
+              </tspan>
+              <tspan
+                x="10"
+                y="749px"
+                class="ng-star-inserted"
+                style="font-size: 11px; opacity: 0.9; box-sizing: inherit">
+                selected booking platforms. EU shares were 13.4% during the 1st quarter, 25.0% during  
+              </tspan>
+              <tspan
+              x="10"
+              y="764px"
+              class="ng-star-inserted"
+              style="font-size: 11px; opacity: 0.9; box-sizing: inherit">
+               the 2nd quarter, 43.2% during the 3rd quarter and 18.4% during the 4th quarter.
+            </tspan>
+              
+              <!---->
+            </text>
+            <text id="source-text" style="box-sizing: inherit; pointer-events: none">
+              <tspan x="10" y="779" class="ng-star-inserted" style="font-size: 11px; opacity: 0.9; box-sizing: inherit">
+                Source: Eurostat (online data code: tour_ce_omn12)
+              </tspan>
+              <!---->
+            </text>
+          </g>
+          <g id="map-container" transform="translate(0,0)" style="box-sizing: inherit">
+            <g
+              id="europe-template-map"
+              class="em-map em--ch"
+              width="797"
+              height="625"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+          </g>
+          <g
+            id="eurostatmap-legend-europe-template"
+            transform="translate(5,100)"
+            style="display: block; box-sizing: inherit">
+            <g
+              id="em-legend-eurostatmap-legend-europe-template"
+              class="em-legend"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif">
+            </g>
+          </g>
+          <defs id="blur-gradient-defs" style="box-sizing: inherit">
+            <linearGradient
+              id="gradBottom"
+              x1="100%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+              gradientUnits="objectBoundingBox"
+              style="box-sizing: inherit">
+              <stop offset="0" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+              <stop offset="1" stop-opacity="0.1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+            </linearGradient>
+            <linearGradient
+              id="gradTop"
+              x1="100%"
+              y1="100%"
+              x2="100%"
+              y2="0%"
+              gradientUnits="objectBoundingBox"
+              style="box-sizing: inherit">
+              <stop offset="0" stop-opacity="0.1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+              <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+            </linearGradient>
+            <linearGradient
+              id="gradLeft"
+              x1="70%"
+              y1="100%"
+              x2="0%"
+              y2="100%"
+              gradientUnits="objectBoundingBox"
+              style="box-sizing: inherit">
+              <stop offset="0" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+              <stop offset="1" stop-opacity="0.1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+            </linearGradient>
+            <linearGradient
+              id="gradRight"
+              x1="0%"
+              y1="100%"
+              x2="100%"
+              y2="100%"
+              gradientUnits="objectBoundingBox"
+              style="box-sizing: inherit">
+              <stop offset="0" stop-opacity="0.1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+              <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+            </linearGradient>
+            <linearGradient
+              id="gradAfrica"
+              x1="100%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+              gradientUnits="objectBoundingBox"
+              style="box-sizing: inherit">
+              <stop offset="0" stop-opacity="0.1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+              <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+            </linearGradient>
+          </defs>
+          <g id="blur-rects" class="ng-star-inserted" style="box-sizing: inherit; transform: translate(0px, -75px)">
+            <rect x="83" height="20" width="258" fill="url(#gradAfrica)" y="682" style="box-sizing: inherit"></rect>
+            <rect x="628" height="20" width="179" fill="url(#gradAfrica)" y="682" style="box-sizing: inherit"></rect>
+            <rect width="20" fill="url(#gradRight)" x="778" y="75" height="625" style="box-sizing: inherit"></rect>
+            <rect x="500" height="20" fill="url(#gradTop)" y="73" width="297" style="box-sizing: inherit"></rect>
+          </g>
+          <!---->
+          <g
+            id="europe-template-insets-layout-new"
+            class="ng-star-inserted"
+            style="display: block; box-sizing: inherit; transform: translate(0px, -75px)">
+            <rect x="545" y="81" height="265px" width="243px" style="fill: white; box-sizing: inherit"></rect>
+            <g
+              id="inset-0-0d1928f0b574a8"
+              index="0"
+              transform="translate(553,89)"
+              class="em-map em--undefined"
+              width="70.5"
+              height="69.3"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-1-efdad98ed2f7c8"
+              index="1"
+              transform="translate(635.5,89)"
+              class="em-map em--undefined"
+              width="78.75"
+              height="75.6"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-2-3aefd3b058a728"
+              index="2"
+              transform="translate(635.5,107)"
+              class="em-map em--undefined"
+              width="23"
+              height="15"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-3-d33c180c12f148"
+              index="3"
+              transform="translate(718.75,89)"
+              class="em-map em--undefined"
+              width="63"
+              height="61.949999999999996"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-4-6bae8f04fa60c8"
+              index="4"
+              transform="translate(553,186.5)"
+              class="em-map em--undefined"
+              width="73.5"
+              height="94.5"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-5-e82404a16d9ff"
+              index="5"
+              transform="translate(635.5,173.6)"
+              class="em-map em--undefined"
+              width="75.75"
+              height="94.5"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-6-744e63ef895368"
+              index="6"
+              transform="translate(718.75,153.95)"
+              class="em-map em--undefined"
+              width="63"
+              height="61.949999999999996"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-7-ea235aec92e71"
+              index="7"
+              transform="translate(718.75,218.89999999999998)"
+              class="em-map em--undefined"
+              width="63"
+              height="61.949999999999996"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-8-cdbd04a7a0e55"
+              index="8"
+              transform="translate(553,277.85)"
+              class="em-map em--undefined"
+              width="53.34"
+              height="60.9"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-9-c85641df9018d"
+              index="9"
+              transform="translate(556,293.85)"
+              class="em-map em--undefined"
+              width="20"
+              height="20"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-10-5736dea5bb323"
+              index="10"
+              transform="translate(583,293.85)"
+              class="em-map em--undefined"
+              width="20"
+              height="22"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-11-5249699a537288"
+              index="11"
+              transform="translate(609.34,277.85)"
+              class="em-map em--undefined"
+              width="53.34"
+              height="60.9"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-12-ed60ddd03ed088"
+              index="12"
+              transform="translate(668.1800000000001,294.85)"
+              class="em-map em--undefined"
+              width="48.34"
+              height="40.9"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <g
+              id="inset-13-a867182e9de79"
+              index="13"
+              transform="translate(722.02,277.85)"
+              class="em-map em--undefined"
+              width="53.34"
+              height="60.9"
+              style="box-sizing: inherit; font-family: Arial, Helvetica, sans-serif"></g>
+            <!---->
+            <g
+              id="insets-separator-lines"
+              height="265px"
+              width="243px"
+              transform="translate(545,81)"
+              style="box-sizing: inherit">
+              <line
+                x1="160"
+                y1="18"
+                x2="170"
+                y2="60"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="170"
+                y1="60"
+                x2="152"
+                y2="92"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="152"
+                y1="92"
+                x2="90"
+                y2="83"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="152"
+                y1="92"
+                x2="172"
+                y2="131"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="172"
+                y1="131"
+                x2="171"
+                y2="184"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="172"
+                y1="131"
+                x2="235"
+                y2="139"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="170"
+                y1="60"
+                x2="235"
+                y2="70"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+              <line
+                x1="91"
+                y1="192"
+                x2="235"
+                y2="192"
+                style="stroke: black; stroke-width: 0.3; box-sizing: inherit"></line>
+              <line
+                x1="10"
+                y1="192"
+                x2="78"
+                y2="192"
+                style="stroke: black; stroke-width: 0.3; box-sizing: inherit"></line>
+              <line
+                x1="84"
+                y1="25"
+                x2="84"
+                y2="185"
+                style="stroke: black; stroke-width: 0.3; box-sizing: inherit"></line>
+              <line
+                x1="10"
+                y1="92"
+                x2="78"
+                y2="92"
+                style="stroke: black; stroke-width: 0.3; box-sizing: inherit"></line>
+              <line
+                x1="117"
+                y1="213"
+                x2="117"
+                y2="254"
+                style="stroke: black; stroke-width: 0.3; box-sizing: inherit"></line>
+              <line
+                x1="178"
+                y1="213"
+                x2="178"
+                y2="254"
+                style="stroke: black; stroke-width: 0.3; box-sizing: inherit"></line>
+              <line
+                x1="66"
+                y1="213"
+                x2="66"
+                y2="254"
+                style="stroke: black; stroke-width: 0.1; box-sizing: inherit"></line>
+            </g>
+            <g id="insets-blurs" height="265px" width="243px" transform="translate(545,81)" style="box-sizing: inherit">
+              <defs style="box-sizing: inherit">
+                <linearGradient
+                  id="gradL"
+                  x1="100%"
+                  y1="100%"
+                  x2="0%"
+                  y2="100%"
+                  gradientUnits="objectBoundingBox"
+                  style="box-sizing: inherit">
+                  <stop
+                    offset="0"
+                    stop-opacity="0.1"
+                    stop-color="rgb(255, 255, 255)"
+                    style="box-sizing: inherit"></stop>
+                  <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+                </linearGradient>
+                <linearGradient
+                  id="gradR"
+                  x1="0%"
+                  y1="100%"
+                  x2="100%"
+                  y2="100%"
+                  gradientUnits="objectBoundingBox"
+                  style="box-sizing: inherit">
+                  <stop
+                    offset="0"
+                    stop-opacity="0.1"
+                    stop-color="rgb(255, 255, 255)"
+                    style="box-sizing: inherit"></stop>
+                  <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+                </linearGradient>
+                <linearGradient
+                  id="gradB"
+                  x1="100%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                  gradientUnits="objectBoundingBox"
+                  style="box-sizing: inherit">
+                  <stop
+                    offset="0"
+                    stop-opacity="0.1"
+                    stop-color="rgb(255, 255, 255)"
+                    style="box-sizing: inherit"></stop>
+                  <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+                </linearGradient>
+                <linearGradient
+                  id="gradT"
+                  x1="100%"
+                  y1="100%"
+                  x2="100%"
+                  y2="0%"
+                  gradientUnits="objectBoundingBox"
+                  style="box-sizing: inherit">
+                  <stop
+                    offset="0"
+                    stop-opacity="0.1"
+                    stop-color="rgb(255, 255, 255)"
+                    style="box-sizing: inherit"></stop>
+                  <stop offset="1" stop-color="rgb(255, 255, 255)" style="box-sizing: inherit"></stop>
+                </linearGradient>
+              </defs>
+              <rect x="92" y="180" height="10" width="75" fill="url(#gradB)" style="box-sizing: inherit"></rect>
+              <rect x="90" y="106" height="79" width="10" fill="url(#gradL)" style="box-sizing: inherit"></rect>
+              <rect x="123" y="213" height="42" width="5" fill="url(#gradL)" style="box-sizing: inherit"></rect>
+              <rect x="167" y="213" height="42" width="5" fill="url(#gradR)" style="box-sizing: inherit"></rect>
+              <rect x="123" y="251" height="5" width="50" fill="url(#gradB)" style="box-sizing: inherit"></rect>
+              <rect x="123" y="213" height="5" width="50" fill="url(#gradT)" style="box-sizing: inherit"></rect>
+            </g>
+            <g
+              id="insets-LI-title"
+              height="265px"
+              width="243px"
+              transform="translate(545,81)"
+              style="box-sizing: inherit">
+              <text
+                id="subtitleLI"
+                x="122"
+                y="207.85"
+                class="em-inset-title"
+                style="
+                  box-sizing: inherit;
+                  pointer-events: none !important;
+                  fill: rgb(76, 75, 75) !important;
+                  stroke: none !important;
+                  font-size: 8.5px !important;
+                  stroke-linejoin: round !important;
+                  paint-order: stroke !important;
+                ">
+                Liechtenstein
+              </text>
+            </g>
+          </g>
+          <!---->
+          <g
+            id="eurostat-ribbon"
+            transform="translate(687, 655)"
+            viewBox="0 0 140 63"
+            width="140"
+            height="63"
+            xmlns="http://www.w3.org/2000/svg"
+            style="display: none; box-sizing: inherit">
+            <defs style="box-sizing: inherit">
+              <linearGradient
+                id="linear-gradient"
+                x1="0.155"
+                y1="1"
+                x2="0.837"
+                y2="0.011"
+                gradientUnits="objectBoundingBox"
+                style="box-sizing: inherit">
+                <stop offset="0" stop-color="#082b7a" style="box-sizing: inherit"></stop>
+                <stop offset="0.5" stop-color="#0e47cb" style="box-sizing: inherit"></stop>
+              </linearGradient>
+              <linearGradient
+                id="linear-gradient-2"
+                x1="0.759"
+                y1="0.991"
+                x2="0.243"
+                y2="0.013"
+                gradientUnits="objectBoundingBox"
+                style="box-sizing: inherit">
+                <stop offset="0" stop-color="#f4f5f5" style="box-sizing: inherit"></stop>
+                <stop offset="1" stop-color="#7d8088" style="box-sizing: inherit"></stop>
+              </linearGradient>
+              <linearGradient
+                id="linear-gradient-3"
+                x1="0.17"
+                y1="0.979"
+                x2="0.843"
+                y2="0.002"
+                gradientUnits="objectBoundingBox"
+                style="box-sizing: inherit">
+                <stop offset="0" stop-color="#fffcf2" style="box-sizing: inherit"></stop>
+                <stop offset="0.5" stop-color="#fc0" style="box-sizing: inherit"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              id="Path_7400"
+              data-name="Path 7400"
+              d="M 106.522 4.981 L 90.628 4.981 L 55.252 47.137 L 71.146 47.137 L 106.522 4.981 Z"
+              class="cls-1"
+              style="fill: url('#linear-gradient'); box-sizing: inherit"></path>
+            <path
+              id="Path_7401"
+              data-name="Path 7401"
+              d="M 37.563 26.06 L 53.459 26.06 L 71.146 47.138 L 55.252 47.138 L 37.563 26.06 Z"
+              class="cls-2"
+              style="fill: url('#linear-gradient-2'); box-sizing: inherit"></path>
+            <path
+              id="Path_7402"
+              data-name="Path 7402"
+              d="M 53.456 26.06 L 37.56 26.06 L 2.184 68.216 L 18.079 68.216 L 53.456 26.06 Z"
+              class="cls-3"
+              style="fill: url('#linear-gradient-3'); box-sizing: inherit"></path>
+            <path
+              d="M 45.491 35.489 L 56.975 49.192 L 34.006 49.192 L 45.491 35.489 Z"
+              bx:shape="triangle 34.006 35.489 22.969 13.703 0.5 0 1@35ebc8e0"
+              class="logo-ribbon-cut-fill"
+              style="fill: rgb(255, 255, 255); box-sizing: inherit"></path>
+            <path
+              d="M 106.491 4.983 L 142.184 47.529 L 70.797 47.529 L 106.491 4.983 Z"
+              bx:shape="triangle 70.797 4.983 71.387 42.546 0.5 0 1@f96aa82c"
+              style="fill: rgb(255, 255, 255); box-sizing: inherit"></path>
+          </g>
+
+          <svg class="image-template-logo" x="-10" y="600" height="41" width="150" style="box-sizing: inherit">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              version="1.1"
+              id="Livello_1"
+              x="0px"
+              y="0px"
+              viewBox="0 0 684.9 222.8"
+              style="box-sizing: inherit"
+              xml:space="preserve">
+              <style type="text/css" style="box-sizing: inherit">
+                .estat-logo-background {
+                  fill: #ffffff;
+                }
+                .st1 {
+                  fill: #003399;
+                }
+                .st2 {
+                  fill: #ffcc00;
+                }
+                .estat-logo-text {
+                  fill: #7d8088;
+                }
+              </style>
+
+              <g style="transform: translate(0px, -35px); box-sizing: inherit">
+                <rect
+                  x="501"
+                  y="74.1"
+                  class="st1"
+                  width="110.4"
+                  height="74.1"
+                  style="box-sizing: inherit; fill: rgb(0, 51, 153)"></rect>
+                <polygon
+                  class="st2"
+                  points="558.1,85.3 561.8,85.3 558.8,87.7 560,91.4 557,89.1 554,91.4 555.2,87.7 552.2,85.3 555.9,85.3   557,81.7  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="558.2,134.7 561.9,134.7 558.9,136.9 560.1,140.5 557.1,138.3 554.2,140.5 555.3,136.9 552.3,134.7   556,134.7 557.1,131.2  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="570.4,131.4 574,131.4 571.1,133.7 572.2,137.2 569.3,135 566.3,137.2 567.5,133.7 564.5,131.4   568.2,131.4 569.3,128  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="570.4,88.6 574,88.6 571.1,90.9 572.2,94.4 569.3,92.2 566.3,94.4 567.5,90.9 564.5,88.6 568.2,88.6   569.3,85.2  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="579.4,97.7 583.1,97.7 580.1,99.9 581.2,103.5 578.3,101.3 575.3,103.5 576.5,99.9 573.5,97.7   577.2,97.7 578.3,94.2  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="579.4,122.5 583.1,122.5 580.1,124.7 581.2,128.3 578.3,126.1 575.3,128.3 576.5,124.7 573.5,122.5   577.2,122.5 578.3,119  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="582.7,109.9 586.4,109.9 583.5,112.1 584.6,115.7 581.7,113.5 578.7,115.7 579.9,112.1 576.9,109.9   580.5,109.9 581.7,106.4  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="545.7,88.7 549.4,88.7 546.4,90.9 547.6,94.5 544.6,92.3 541.7,94.5 542.8,90.9 539.8,88.7   543.5,88.7 544.6,85.2  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="537,97.7 540.7,97.7 537.7,100 538.8,103.5 535.9,101.3 532.9,103.5 534.1,100 531.1,97.7 534.8,97.7   535.9,94.3  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="533.7,109.9 537.4,109.9 534.4,112.2 535.6,115.7 532.6,113.5 529.7,115.7 530.8,112.2 527.8,109.9   531.5,109.9 532.6,106.5  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="537,122.5 540.7,122.5 537.7,124.8 538.8,128.3 535.9,126.1 532.9,128.3 534.1,124.8 531.1,122.5   534.8,122.5 535.9,119.1  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <polygon
+                  class="st2"
+                  points="545.8,131.5 549.5,131.5 546.6,133.7 547.7,137.3 544.8,135.1 541.8,137.3 543,133.7 540,131.5   543.6,131.5 544.8,128  "
+                  style="box-sizing: inherit; fill: rgb(255, 204, 0)"></polygon>
+                <path
+                  class="estat-logo-text"
+                  d="M60.6,112.7c0.1-1.1,0.3-2.4,0.7-3.9c0.4-1.4,1.1-2.8,2.2-4.1c1-1.3,2.4-2.4,4.1-3.2c1.7-0.9,3.9-1.3,6.4-1.3   c3.9,0,6.9,1.1,8.8,3.2s3.3,5.2,4,9.3H60.6z M96.7,98.7c-2.4-3.3-5.4-5.9-9.2-7.8c-3.7-1.9-8-2.9-13-2.9c-4.5,0-8.6,0.8-12.2,2.4   c-3.7,1.6-6.8,3.8-9.5,6.5c-2.7,2.8-4.7,6.1-6.1,9.8c-1.4,3.8-2.2,7.9-2.2,12.3c0,4.6,0.7,8.7,2.1,12.5c1.4,3.8,3.4,7.1,6,9.8   s5.7,4.8,9.4,6.3c3.7,1.5,7.9,2.2,12.5,2.2c6.7,0,12.4-1.5,17.1-4.6c4.7-3,8.2-8.1,10.5-15.1H87.8c-0.5,1.8-2,3.5-4.3,5.2   c-2.4,1.6-5.2,2.4-8.4,2.4c-4.6,0-8-1.2-10.5-3.5c-2.4-2.4-3.8-6.1-4-11.4H103c0.3-4.6-0.1-8.9-1.1-13.1   C100.8,105.7,99.1,102,96.7,98.7"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M485.2,102.1V88.9h-10.5V73.2h-15.8V89h-10.5v13.1h10.5v33.2c0,2.9,0,5.3,1,7.1s1.9,3.2,3.6,4.2s3.6,1.7,5.8,2   c2.2,0.3,4.5,0.5,7,0.5c1.6,0,3,0,4.7-0.1c1.7,0,4.2-0.2,4.2-0.4V136c0,0.2-1.2,0.3-2,0.4c-0.9,0.1-1.3,0.1-2.2,0.1   c-2.7,0-4.4-0.5-5.3-1.4s-1-2.7-1-5.4v-27.6L485.2,102.1z"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M424.8,129.5c-0.2,1.5-0.4,3-1.2,4.5c-0.9,1.5-2.1,2.7-3.8,3.8c-1.7,1.1-4.2,1.6-7.3,1.6   c-1.3,0-2.5-0.1-3.7-0.3c-1.2-0.3-2.2-0.6-3.2-1.2c-0.9-0.6-1.6-1.3-2.1-2.3s-0.8-2.2-0.8-3.6c0-1.5,0.3-2.7,0.8-3.7   c0.6-1,1.2-1.8,2.1-2.4s1.9-1.1,3.1-1.5c1.1-0.4,2.3-0.7,3.5-0.9c1.3-0.3,2.5-0.4,3.8-0.6c1.3-0.1,2.4-0.3,3.6-0.6   c1.1-0.2,2.1-0.5,3.1-0.8c1-0.4,2.2-0.8,2.2-1.4v6C424.7,126.8,425,128,424.8,129.5 M440.5,135.5v-30.4c0-3.5-0.3-6.4-1.9-8.5   s-3.1-3.8-5.6-5s-5.3-2-8.2-2.4c-3-0.4-6-0.6-8.9-0.6c-3.2,0-6.4,0.3-9.6,0.9c-3.2,0.6-6.1,1.6-8.6,3.1c-2.6,1.5-4.6,3.3-6.3,5.8   c-1.7,2.5-2.6,6.4-2.8,9h16.1c0.3-2.6,1.4-5,3.1-6.4c1.8-1.4,4.3-1.7,7.4-1.7c1.4,0,2.8,0.1,4,0.3c1.3,0.2,2.3,0.6,3.3,1.1   c0.9,0.6,1.7,1.4,2.2,2.3c0.6,1,0.8,2.4,0.8,4.1c0.1,1.6-0.4,2.9-1.5,3.8c-1,0.9-2.5,1.5-4.2,2c-1.8,0.5-3.9,0.8-6.2,1   c-2.3,0.3-4.7,0.5-7.1,0.9s-4.8,0.9-7.2,1.5c-2.4,0.6-4.5,1.6-6.3,2.9c-1.9,1.3-3.3,3-4.5,5.1s-1.8,4.9-1.8,8.2   c0,3,0.5,5.6,1.5,7.8s2.4,4,4.2,5.4c1.8,1.4,3.9,2.5,6.3,3.2s5,1,7.8,1c3.6,0,7.1-0.6,10.6-1.6s6.4-2.9,9-5.5c0.1,1,0.2,2,0.4,2.9   c0.2,0.9,0.4,1.9,0.7,2.8l16.2-0.1c-0.8-1.2-1.5-3-1.8-5.4C441.1,140.6,440.5,138.1,440.5,135.5"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M366.9,73.2h-15.8V89h-7.9v13.1h7.9v33.2c0,2.9,0.8,5.3,1.8,7.1c0.9,1.8,2.6,3.2,4.3,4.2c1.7,1,3.7,1.7,5.9,2   c2.2,0.3,4.6,0.5,7.1,0.5c1.6,0,3.3,0,5-0.1c1.7,0,2.1-0.2,4.8-0.4V136c0,0.2-1.9,0.3-2.7,0.4c-0.8,0.1-2.1,0.1-3,0.1   c-2.7,0-4.7-0.5-5.6-1.4s-1.8-2.7-1.8-5.4v-27.6H380V88.9h-13.1V73.2z"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M332.1,118.3c-1.7-1.2-3.7-2.2-5.9-3c-2.2-0.8-4.5-1.4-6.8-1.9s-4.5-1-6.7-1.4s-4.1-1-5.8-1.5   c-1.6-0.6-3.1-1.3-4.1-2.2c-1.1-0.9-1.6-2-1.6-3.5c0-1.2,0.3-2.2,0.9-2.9c0.6-0.7,1.4-1.2,2.2-1.6c0.9-0.4,1.8-0.6,2.9-0.7   s2-0.2,2.9-0.2c2.8,0,5.3,0.6,7.4,1.7s3.2,3.7,3.5,6.3h15.2c-0.3-2.6-1.2-6.7-2.7-9.1c-1.6-2.4-3.5-4.4-5.8-5.8   c-2.4-1.5-5-2.5-8-3.1c-3-0.6-6-0.9-9.2-0.9s-6.3,0.3-9.2,0.8c-3,0.6-5.8,1.6-8.2,3c-2.4,1.4-4.3,3.3-5.8,5.7   c-1.5,2.4-2.2,5.5-2.2,9.2c0,2.6,0.5,4.7,1.6,6.5s2.4,3.2,4.2,4.4c1.8,1.1,3.7,2.1,5.9,2.8c2.2,0.7,4.5,1.3,6.8,1.9   c5.7,1.2,10.2,2.4,13.4,3.6c3.2,1.2,4.8,3,4.8,5.4c0,1.4-0.4,2.6-1,3.6c-0.7,0.9-1.5,1.7-2.5,2.2c-1,0.6-2.1,1-3.4,1.2   c-1.2,0.2-2.4,0.3-3.6,0.3c-1.6,0-3.1-0.2-4.5-0.6c-1.5-0.3-2.8-1.1-3.9-1.9c-1.1-0.8-2.1-2.1-2.8-3.3c-0.7-1.3-1.1-2.4-1.1-5.1   h-15.2c0.2,5.3,1,7.7,2.6,10.4c1.6,2.6,3.7,5.2,6.2,6.8s5.4,2.7,8.7,3.4c3.2,0.7,6.5,1,9.9,1c3.3,0,6.6-0.3,9.8-1   c3.2-0.7,6-1.7,8.5-3.3s4.5-3.7,6.1-6.3c1.5-2.6,2.3-5.8,2.3-9.6c0-2.7-0.5-5-1.6-6.8C335.2,121.1,333.8,119.5,332.1,118.3"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M261.9,126.2c-0.5,2.2-1.2,4.2-2.3,6c-1.1,1.8-2.5,3.2-4.4,4.2c-1.8,1-4.1,1.6-6.8,1.6s-5-0.5-6.8-1.6   s-3.3-2.5-4.4-4.2c-1.1-1.8-1.8-3.8-2.3-6s-0.7-4.5-0.7-6.8s0.2-4.7,0.7-6.9c0.4-2.2,1.2-4.2,2.3-6c1.1-1.7,2.5-3.2,4.4-4.3   c1.8-1.1,4-1.6,6.8-1.6c2.7,0,4.9,0.5,6.8,1.6c1.8,1.1,3.3,2.5,4.4,4.3c1.1,1.7,1.9,3.7,2.3,6s0.6,4.6,0.6,6.9   S262.3,123.9,261.9,126.2 M270.3,96.9c-2.6-2.6-5.8-4.7-9.5-6.2c-3.7-1.4-7.9-2.2-12.5-2.2s-8.7,0.7-12.4,2.2s-6.9,3.6-9.5,6.2   c-2.6,2.7-4.7,5.9-6.1,9.7c-1.4,3.8-2.2,8-2.2,12.8c0,4.6,0.7,8.9,2.2,12.6c1.4,3.8,3.5,7,6.1,9.7s5.8,4.7,9.5,6.1   c3.7,1.4,7.8,2.2,12.4,2.2c4.6,0,8.7-0.7,12.5-2.2c3.7-1.4,6.9-3.5,9.5-6.1c2.6-2.7,4.6-5.9,6.1-9.7c1.4-3.8,2.1-8,2.1-12.6   c0-4.7-0.7-9-2.1-12.8C275,102.8,273,99.6,270.3,96.9"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M214,88.6c-2,0-3.7,0.4-5.5,1c-1.9,0.6-3.7,1.6-5.3,2.7c-1.6,1.1-3.1,2.7-4.4,4.2c-1,1.2-1.9,2.4-2.6,4.2V88.9   h-15.8v60.4h15.8v-27.2c0-2.6,0.3-5.1,0.8-7.3c0.5-2.3,1.5-4.2,2.7-5.9c1.2-1.7,2.8-3,4.8-4c2.1-1,4.5-1.5,7.4-1.5   c1,0,1.8,0.1,2.9,0.1c1,0.2,2.4,0.3,2.4,0.4V89.1C217.2,88.7,215.1,88.6,214,88.6"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+                <path
+                  class="estat-logo-text"
+                  d="M151.2,120.7c0,5.9-1.2,10.2-3.2,12.8s-5.4,3.9-9.7,3.9c-3.9,0-6.6-1.2-8.2-3.6c-1.5-2.3-2.5-6-2.5-10.8V88.9   h-15.8V126c0,3.6,0.5,6.9,1.1,9.9s1.9,5.5,3.5,7.6s3.7,3.8,6.5,4.9c2.8,1.1,6.3,1.8,10.5,1.8c3.4,0,6.7-0.5,9.9-2s5.8-4.1,7.9-6.7   v7.8H167V88.9h-15.8V120.7z"
+                  style="box-sizing: inherit; fill: rgb(125, 128, 136)"></path>
+              </g>
+            </svg>
+          </svg>
+        </svg>
+      </div>
+    </div>
+
+    <!-- call our scripts -->
+ <script src="./dropdown.js"></script> 
+    <script src="./stats.js"></script>
+    <script src="./options.js"></script>
+    <script src="./map.js"></script>
+  </body>
+</html>

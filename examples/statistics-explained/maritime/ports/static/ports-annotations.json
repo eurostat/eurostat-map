@@ -1,0 +1,201 @@
+[
+  {
+    "note": {
+      "title": "Rotterdam",
+      "wrap": 150,
+      "align": "middle"
+    },
+    "className": "rotterdam",
+    "x": 347,
+    "y": 465,
+    "dy": -15,
+    "dx": -10
+  },
+  {
+    "note": {
+      "title": "Antwerp-Bruges",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 370,
+    "y": 523,
+    "dy": 12,
+    "dx": 19
+  },
+  {
+    "note": {
+      "title": "Hamburg",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 450,
+    "y": 467,
+    "dy": 8,
+    "dx": 16
+  },
+  {
+    "note": {
+      "title": "Aliaga",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 764,
+    "y": 768,
+    "dy": 0,
+    "dx": 15
+  },
+  {
+    "note": {
+      "title": "Izmit",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 804,
+    "y": 716,
+    "dy": 0,
+    "dx": 15
+  },
+  {
+    "note": {
+      "title": "Algeciras",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 153,
+    "y": 843,
+    "dy": 10,
+    "dx": 14
+  },
+  {
+    "note": {
+      "title": "Amsterdam",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 370,
+    "y": 483,
+    "dy": 15,
+    "dx": 23
+  },
+  {
+    "note": {
+      "title": "HAROPA",
+      "align": "right"
+    },
+    "className": "",
+    "x": 292,
+    "y": 546,
+    "dy": -14,
+    "dx": -11
+  },
+  {
+    "note": {
+      "title": "Gdańsk",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 567,
+    "y": 437,
+    "dy": 7,
+    "dx": 15
+  },
+  {
+    "note": {
+      "title": "İskenderun",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 933,
+    "y": 779,
+    "dy": 13,
+    "dx": 14
+  },
+  {
+    "note": {
+      "title": "Bergen",
+      "align": "right"
+    },
+    "className": "",
+    "x": 378,
+    "y": 293,
+    "dy": -9,
+    "dx": -13
+  },
+  {
+    "note": {
+      "title": "Marseille ",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 356,
+    "y": 701,
+    "dy": 10,
+    "dx": 13
+  },
+  {
+    "note": {
+      "title": "Valencia",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 260,
+    "y": 783,
+    "dy": 13,
+    "dx": 15
+  },
+  {
+    "note": {
+      "title": "Constanța",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 762,
+    "y": 641,
+    "dy": 0,
+    "dx": 15
+  },
+  {
+    "note": {
+      "title": "Barcelona",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 310,
+    "y": 741,
+    "dy": 11,
+    "dx": 14
+  },
+  {
+    "note": {
+      "title": "Trieste",
+      "align": "left"
+    },
+    "className": "center-vertically",
+    "x": 510,
+    "y": 638,
+    "dy": 1,
+    "dx": 24
+  },
+  {
+    "note": {
+      "title": "Genova",
+      "align": "left"
+    },
+    "className": "shift-left",
+    "x": 423,
+    "y": 664,
+    "dy": -10,
+    "dx": 2
+  },
+  {
+    "note": {
+      "title": "Tekirdağ",
+      "align": "right"
+    },
+    "className": "",
+    "x": 744,
+    "y": 714,
+    "dy": -2,
+    "dx": -30
+  }
+]

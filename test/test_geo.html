@@ -48,7 +48,7 @@
         eurostatmap
             .map("ch")
             .svgId("map_"+geo)
-            .geo(geo).proj(geos[geo])
+            .geo(geo).proj(geos[geo]).stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
             .title(geo)
             .width(250)
             .height(250)

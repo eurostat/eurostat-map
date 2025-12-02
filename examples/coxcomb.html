@@ -1,130 +1,177 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>eurostat-map.js</title>
-        <style>
-            .em-tooltip {
-                max-width: 300px !important;
-            }
-        </style>
-    </head>
-    <body>
-        <label for="dataset">Select a theme:</label>
-        <select id="dataset" name="dataset">
-            <option value="death" selected>Causes of death</option>
-            <option value="tourism">Tourism</option>
-        </select>
-        <br />
-        <svg id="map"></svg>
 
-        <script src="../build/eurostatmap.js"></script>
-        <script>
-            const configs = {
-                death: {
-                    title: 'Causes of death',
-                    subtitle: '2022',
-                    nutsLevel: 0,
-                    sizeLegend: { title: 'Total deaths', titlePadding: 10, values: [55000, 2000] },
-                    colorLegend: { title: 'Cause', marginTop: 50 },
-                    data: [
-                        {
-                            eurostatDatasetCode: 'hlth_cd_mro',
-                            filters: { age: 'TOTAL', unit: 'NR', sex: 'T', resid: 'TOT_RESID' },
-                            unitText: 'Deaths per 100k',
-                        },
-                        [
-                            '2022-01',
-                            '2022-02',
-                            '2022-03',
-                            '2022-04',
-                            '2022-05',
-                            '2022-06',
-                            '2022-07',
-                            '2022-08',
-                            '2022-09',
-                            '2022-10',
-                            '2022-11',
-                            '2022-12',
-                        ],
-                        'ICD10',
-                        ['U071', 'C', 'I', 'J'],
-                        ['COVID-19', 'Cancer', 'Circulatory', 'Respiratory'],
-                        ['#1b9e77', '#d95f02', '#7570b3', '#e7298a', '#66a61e', '#e6ab02'],
-                        'TOTAL',
-                    ],
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eurostat-map.js</title>
+    <style>
+        .em-tooltip {
+            max-width: 300px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <label for="dataset">Select a theme:</label>
+    <select id="dataset" name="dataset">
+        <option value="death" selected>Causes of death</option>
+        <option value="tourism">Tourism</option>
+    </select>
+    <br />
+    <svg id="map"></svg>
+
+    <script src="../build/eurostatmap.js"></script>
+    <script>
+        const configs = {
+            death: {
+                title: "Deaths from COVID-19",
+                subtitle: "2022",
+                nutsLevel: 0,
+                sizeLegend: {
+                    title: "Total deaths",
+                    titlePadding: 15
+                    //values: [20000, 700000]
                 },
-                tourism: {
-                    title: 'Tourism',
-                    subtitle: 'Nights spent in tourist accommodation',
-                    nutsLevel: 0,
-                    sizeLegend: { title: 'Total nights spent', titlePadding: 10, values: [40000000, 1000000] },
-                    colorLegend: { title: 'Country of residence', marginTop: 50 },
-                    data: [
-                        {
-                            eurostatDatasetCode: 'tour_occ_nim',
-                            filters: { unit: 'NR', c_resid: 'TOTAL', nace_r2: 'I551-I553' },
-                            unitText: 'Nights spent',
-                        },
-                        [
-                            '2022-01',
-                            '2022-02',
-                            '2022-03',
-                            '2022-04',
-                            '2022-05',
-                            '2022-06',
-                            '2022-07',
-                            '2022-08',
-                            '2022-09',
-                            '2022-10',
-                            '2022-11',
-                            '2022-12',
-                        ],
-                        'c_resid',
-                        ['DOM', 'FOR'],
-                        ['Domestic', 'Foreign'],
-                        ['#1b9e77', '#d95f02'],
-                        'TOTAL',
-                    ],
+                colorLegend: {
+                    title: "Cause of death",
+                    marginTop: 40,
+                    noData: false
                 },
-            }
+                data: {
+                    stat: {
+                        eurostatDatasetCode: "hlth_cd_mro",
+                        filters: { age: "TOTAL", unit: "NR", sex: "T", resid: "TOT_RESID" },
+                        unitText: "Deaths per 100k"
+                    },
+                    timeParameter: "TIME",
+                    times: [
+                        "2022-01",
+                        "2022-02",
+                        "2022-03",
+                        "2022-04",
+                        "2022-05",
+                        "2022-06",
+                        "2022-07",
+                        "2022-08",
+                        "2022-09",
+                        "2022-10",
+                        "2022-11",
+                        "2022-12"
+                    ],
+                    categoryParameter: "ICD10",
+                    categoryCodes: ["U071", "C", "I"],
+                    categoryLabels: ["COVID-19", "Cancer", "Circulatory"],
+                    categoryColors: [
+                        "#1b9e77",
+                        "#d95f02",
+                        "#7570b3",
+                        "#e7298a",
+                        "#66a61e",
+                        "#e6ab02"
+                    ],
+                    totalCode: "TOTAL"
+                }
+            },
+            tourism: {
+                title: "Tourism",
+                subtitle: "Nights spent in tourist accomodation, 2022",
+                nutsLevel: 1,
+                sizeLegend: {
+                    title: "Total nights spent",
+                    titlePadding: 15,
+                    values: [
+                        [1000000, 52000000]
+                    ]
+                },
+                colorLegend: {
+                    title: "Residence of guest",
+                    marginTop: 40,
+                    noData: false
+                },
+                data: {
+                    stat: {
+                        //data/tour_ce_omn12?format=JSON&unit=NR&indic_to=NGT_SP&c_resid=TOTAL&month=M01&lang=EN
+                        eurostatDatasetCode: "tour_ce_omn12",
+                        filters: { unit: "NR", indic_to: "NGT_SP", TIME: 2023 }, // shared filters
+                        unitText: "Nights spent"
+                    },
+                    timeParameter: "month",
+                    times: [
+                        "M01",
+                        "M02",
+                        "M03",
+                        "M04",
+                        "M05",
+                        "M06",
+                        "M07",
+                        "M08",
+                        "M09",
+                        "M10",
+                        "M11",
+                        "M12"
+                    ],
+                    timeLabels: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sept",
+                        "Oct",
+                        "Nov",
+                        "Dec"
+                    ],
+                    categoryParameter: "c_resid",
+                    categoryCodes: ["DOM", "FOR"],
+                    categoryLabels: ["Domestic", "Foreign"],
+                    categoryColors: ["#1b9e77", "#d95f02"],
+                    totalCode: "TOTAL"
 
-            // Build the map dynamically
-            function buildMap(dataset) {
-                const config = configs[dataset]
-                const map = eurostatmap
-                    .map('coxcomb')
-                    .title(config.title)
-                    .subtitle(config.subtitle)
-                    .scale('60M')
-                    .nutsLevel(config.nutsLevel)
-                    .statCoxcomb(...config.data)
-                    .coxcombMinRadius(5)
-                    .coxcombMaxRadius(40)
-                    .coxcombStrokeFill('white')
-                    .coxcombStrokeWidth(0.1)
-                    .legend({
-                        x: 570,
-                        y: 0,
-                        boxOpacity: 1,
-                        boxPadding: 20,
-                        titleFontWeight: 'bold',
-                        sizeLegend: config.sizeLegend,
-                        colorLegend: config.colorLegend,
-                    })
-                map.build()
+                }
             }
+        }
 
-            // Initial render
-            let currentDataset = 'death'
+        // Build the map dynamically
+        function buildMap(dataset) {
+            const config = configs[dataset]
+            const map = eurostatmap
+                .map('coxcomb').dorling(true)
+                .title(config.title)
+                .subtitle(config.subtitle)
+                .scale('60M')
+                .nutsLevel(config.nutsLevel)
+                .statCoxcomb(config.data)
+                .coxcombMinRadius(5)
+                .coxcombMaxRadius(40)
+                .coxcombStrokeFill('white')
+                .coxcombStrokeWidth(0.1)
+                .coxcombRings(false)
+                .legend({
+                    x: 570,
+                    y: 0,
+                    boxOpacity: 1,
+                    boxPadding: 20,
+                    titleFontWeight: 'bold',
+                    sizeLegend: config.sizeLegend,
+                    colorLegend: config.colorLegend,
+                })
+            map.build()
+        }
+
+        // Initial render
+        let currentDataset = 'death'
+        buildMap(currentDataset)
+
+        // Rebuild on dropdown change
+        document.getElementById('dataset').addEventListener('change', function (e) {
+            currentDataset = e.target.value
             buildMap(currentDataset)
+        })
+    </script>
+</body>
 
-            // Rebuild on dropdown change
-            document.getElementById('dataset').addEventListener('change', function (e) {
-                currentDataset = e.target.value
-                buildMap(currentDataset)
-            })
-        </script>
-    </body>
 </html>

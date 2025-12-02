@@ -11,7 +11,7 @@
 
         <script>
             const map = eurostatmap
-                .map('choropleth', { nutsLevel: 'mixed', title: 'Test using config', subtitle: 'map built using json config', zoomExtent: [1, 1000] })
+                .map('choropleth', { nutsLevel: 'mixed', title: 'Test using config', subtitle: 'map built using json config', zoomExtent: [1, 1000] }).stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
                 .build()
         </script>
     </body>

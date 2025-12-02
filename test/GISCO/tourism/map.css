@@ -1,0 +1,210 @@
+/* buttons */
+.em-zoom-buttons {
+  transform: translate(94%, 78%) !important;
+}
+
+.em-insets-button {
+  transform: translate(95%, 0.5%) !important;
+}
+
+/* insets */
+#europe-template-insets-layout-new {
+  transform: translate(4px, -39px) !important;
+}
+
+/* blurs */
+#blur-rects {
+  display: none;
+}
+
+/* legends */
+.em-legend {
+  fill: rgb(76, 75, 75);
+}
+
+/*NUTS region stroke*/
+/* .em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-nutsrg [lvl="3"],
+.em-nutsrg [lvl="2"],
+.em-nutsrg [lvl="1"] {
+  stroke: #696969 !important;
+} */
+
+/* Kosovo border */
+.em-kosovo-bn {
+  stroke: #000;
+  stroke-width: 0.15;
+}
+
+/* Legend title and labels */
+.em-legend-title,
+.em-legend-label {
+  fill: #4c4b4b !important;
+}
+
+.em-legend-title {
+  font-size: 15px !important;
+  transform: translate(0px, 2px);
+}
+
+.em-legend-background {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Legend label font size */
+.em-legend-label {
+  font-size: 14px !important;
+}
+
+/* Insets */
+#titleLI,
+#subtitleLI {
+  pointer-events: none !important;
+  stroke: none !important;
+  stroke-linejoin: round !important;
+  paint-order: stroke !important;
+}
+
+.em-inset-title,
+.em-inset-subtitle,
+#titleLI,
+#subtitleLI {
+  font-size: 8.5px !important;
+}
+
+.em-inset-title,
+.em-inset-subtitle,
+#subtitleLI {
+  fill: #4c4b4b !important;
+}
+
+/* titleLI is actually the Liechtenstein halo. subtitleLI acts as the title */
+#titleLI {
+  fill: white !important;
+  stroke-width: 2px !important;
+  stroke: white !important;
+  opacity: 0.8 !important;
+}
+
+/* Apply frame stroke to PT20 apart from main one (index8) */
+#em-frame-PT20 {
+  stroke-width: 0.2px;
+}
+
+g[index="8"] #em-frame-PT20 {
+  stroke-width: 0px !important;
+}
+
+/* Apply frame stroke to GP apart from main one (index1) */
+#em-frame-GP {
+  stroke-width: 0.2px;
+}
+
+g[index="1"] #em-frame-GP {
+  stroke-width: 0px !important;
+}
+
+.em-scalebar-label {
+  font-size: 8px !important;
+  fill: #878787 !important;
+}
+
+.em-scalebar-line {
+  stroke: #878787 !important;
+}
+
+/* World maps */
+#em-sphere {
+  stroke: none !important;
+}
+
+.em-bn-d {
+  /* disputed */
+  stroke: #000 !important;
+  stroke-width: 0.1 !important;
+  fill: none !important;
+  stroke-dasharray: 1, 1 !important;
+  /* Adjust the values for dash and gap lengths */
+}
+
+#em-tooltip {
+  z-index: 999999;
+  font-family: "Myriad-Pro", Arial, Helvetica, sans-serif !important;
+  border-radius: 0 !important;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px !important;
+}
+
+/* labels */
+.em-label-seas {
+  opacity: 0.5;
+}
+
+/* sparkline */
+.em--spark .em-nutsrg {
+  fill: #ffffff !important;
+}
+
+.em--spark .em-cntrg {
+  fill: #f7f7f7 !important;
+}
+
+.em--spark .em-bn-co {
+  stroke: grey !important;
+  opacity: 0.9;
+  stroke-width: 0.15px !important;
+}
+
+.em--spark .em-cntbn,
+.em--spark g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+  stroke-width: 0.2px !important;
+  stroke: #3a3a3a !important;
+}
+
+.em--spark .em-bn-1,
+.em--spark.em-bn-2,
+.em--spark .em-bn-3,
+.em--spark .em-nutsrg [lvl='3'],
+.em--spark .em-nutsrg [lvl='2'],
+.em--spark .em-nutsrg [lvl='1'] {
+  stroke-width: 0.1px !important;
+  opacity: 0.5;
+}
+
+/* Default region color */
+/* .em-nutsrg {
+  fill: #e1e1e1 !important;
+}
+.em-cntrg {
+  fill: #e1e1e1 !important;
+} */
+
+/* NUTS region stroke width */
+/* .em-bn-1,
+    .em-bn-2,
+    .em-bn-3,
+    .em-nutsrg [lvl='3'],
+    .em-nutsrg [lvl='2'],
+    .em-nutsrg [lvl='1'] {
+  stroke-width: 0.15px !important;
+} */
+
+/*Coastline stroke*/
+/* .em-bn-co {
+  stroke: #ffffff !important;
+  stroke-width: 0.15px !important;
+} */
+
+/* National border stroke */
+/* .em-cntbn,
+g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+  stroke-width: 0.6px !important;
+  stroke: #000 !important;
+} */
+
+/* data not available */
+[ecl="nd"] {
+  fill: #adadad;
+}

@@ -1,0 +1,9 @@
+.em-minimap-outer-circle {
+      filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.3))
+          drop-shadow(0 0 12px rgba(0, 0, 0, 0.15));
+      opacity:0.5
+}
+
+.em-minimap-inner-circle {
+
+}

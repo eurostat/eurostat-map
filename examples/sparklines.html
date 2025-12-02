@@ -1,141 +1,209 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>eurostat-map.js</title>
-    </head>
 
-    <body>
-        <svg id="map"></svg>
-        <svg id="map2"></svg>
-        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
-        <script src="../build/eurostatmap.js"></script>
-        <script>
-            const MAPWIDTH = 800
-            const zoom = 6500
-            const MAP1 = eurostatmap
-                .map('sparkline')
-                .width(MAPWIDTH)
-                .title('Population change across Europe over time')
-                .subtitle(
-                    '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> = overall increase, <tspan style="fill:#d62728">red</tspan> = overall decrease.'
-                )
-                //.position({ x: 4900000, y: 3500000, z: zoom })
-                .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
-                .nutsLevel(1)
-                .statSpark(
-                    { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
-                )
-                .sparkType('line')
-                .sparkLineWidth(30)
-                .sparkLineHeight(200)
-                .sparkLineStrokeWidth((data, index) => {
-                    // console.log(data, index)
-                    let val = data[data.length - 1]?.value
-                    if (val > 10000000) return 3
-                    if (val > 5000000) return 2.5
-                    if (val > 2000000) return 2
-                    if (val > 1000000) return 1.5
-                    return 1
-                })
-                .sparkLineColor((dataArray, i) => {
-                    const startPopulation = dataArray[0].value
-                    const endPopulation = dataArray[dataArray.length - 1].value
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eurostat-map.js</title>
+</head>
 
-                    return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
-                })
-                // .sparkLineOpacity((data, index) => {
-                //     let val = data[data.length - 1]?.value
-                //     if (val > 10000000) return 1
-                //     if (val > 5000000) return 0.75
-                //     if (val > 2000000) return 0.5
-                //     if (val > 1000000) return 0.25
-                //     return 0.15
-                // })
-                .sparkLineCircleRadius(0)
-                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })
-                .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
-                .tooltip({
-                    xOffset: 30,
-                    yOffset: 10,
-                    fontSize: '12px',
-                    maxWidth: Math.min(400, window.innerWidth),
-                })
-                .sparkTooltipChart({
-                    width: 150,
-                    height: 150,
-                    margin: { left: 60, right: 40, top: 20, bottom: 40 },
-                    circleRadius: 1.5,
-                })
-                .nutsrgSelFillSty('yellow')
-                .build()
+<body>
+    <svg id="map"></svg>
+    <svg id="map2"></svg>
+    <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+    <script src="../build/eurostatmap.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        const MAPWIDTH = 800
+        const zoom = 6500
+        const MAP1 = eurostatmap
+            .map('sparkline').scale('60M').insets('default').insetBoxPosition([570, 60]).nutsLevel('1')
+            .width(MAPWIDTH)
+            .title('Absolute population change across Europe over time')
+            .subtitle(
+                '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> = overall increase, <tspan style="fill:#d62728">red</tspan> = overall decrease.'
+            )
+            //.position({ x: 4900000, y: 3500000, z: zoom })
+            .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
 
-            const MAP2 = eurostatmap
-                .map('sparkline')
-                .svgId('map2')
-                .width(MAPWIDTH)
-                .title('Percentage population change across Europe over time')
-                .subtitle(
-                    '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
-                )
-                .position({ x: 4900000, y: 3500000, z: zoom })
-                .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
-                .nutsLevel(1)
-                .sparkPercentageChange(true)
-                .statSpark(
-                    { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
-                )
-                .sparkType('line')
-                .sparkLineWidth(35)
-                .sparkLineHeight(20)
-                .sparkLineStrokeWidth((data, index) => {
-                    // console.log(data, index)
-                    let val = data[data.length - 1]?.value
-                    if (val > 10000000) return 3
-                    if (val > 5000000) return 2.5
-                    if (val > 2000000) return 2
-                    if (val > 1000000) return 1.5
-                    return 1
-                })
-                .sparkLineColor((dataArray, i) => {
-                    const startPopulation = dataArray[0].value
-                    const endPopulation = dataArray[dataArray.length - 1].value
-                    return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
-                })
-                // .sparkLineOpacity((data, index) => {
-                //     let val = data[data.length - 1]?.value
-                //     if (val > 10000000) return 1
-                //     if (val > 5000000) return 0.75s
-                //     if (val > 2000000) return 0.5
-                //     if (val > 1000000) return 0.25
-                //     return 0.15
-                // })
-                .sparkLineCircleRadius(0)
-                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'black', co: 'black' })
-                .nutsbnStrokeWidth({ 0: 0.2, 1: 0.1, 2: 0, 3: 0, oth: 0.1, co: 0.2 })
-                .tooltip({
-                    xOffset: 30,
-                    yOffset: 10,
-                    fontSize: '12px',
-                    maxWidth: Math.min(400, window.innerWidth),
-                })
-                .sparkTooltipChart({
-                    width: 150,
-                    height: 150,
-                    margin: { left: 60, right: 40, top: 20, bottom: 40 },
-                    circleRadius: 1.5,
-                })
-                .nutsrgSelFillSty('yellow')
-                .build()
+            .statSpark(
+                { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
+                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
+                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
+            )
+            .sparkType('line')
+            .sparkLineWidth(30)
+            .sparkLineHeight(10).transitionDuration(2000)
+            .sparkLineStrokeWidth((data, index) => {
+                // console.log(data, index)
+                let val = data[data.length - 1]?.value
+                if (val > 10000000) return 3
+                if (val > 5000000) return 2.5
+                if (val > 2000000) return 2
+                if (val > 1000000) return 1.5
+                return 1
+            })
+            .sparkLineColor((dataArray, i) => {
+                const startPopulation = dataArray[0].value
+                const endPopulation = dataArray[dataArray.length - 1].value
+                return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
+            })
+            .sparkLineCircleRadius(0)
+            .tooltip({
+                xOffset: 30,
+                yOffset: 10,
+                fontSize: '12px',
+                maxWidth: Math.min(400, window.innerWidth),
+            })
+            .sparkTooltipChart({
+                width: 150,
+                height: 150,
+                margin: { left: 60, right: 40, top: 20, bottom: 40 },
+                circleRadius: 1.5,
+            })
+            .hoverColor('yellow')
+            .build()
 
-            // setTimeout(() => {
-            //     MAP2.exportMapToPNG()
-            // }, 3000)
-        </script>
-    </body>
+        // using custom chart function for log scale
+        const MAP2 = eurostatmap
+            .map('sparkline')
+            .svgId('map2').scale('60M').insets('default').insetBoxPosition([570, 60])
+            .width(MAPWIDTH)
+            .title('Percentage population change across Europe over time')
+            .subtitle(
+                '2009 - 2023. <tspan style="fill:#1f77b4 ">Blue</tspan> represents an overall increase in total population and <tspan style="fill:#d62728">red</tspan> an overall decrease.'
+            )
+            .position({ x: 4900000, y: 3500000, z: zoom })
+            .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
+            .nutsLevel(1)
+            .statSpark(
+                {
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT' },
+                    unitText: 'Population change',
+                },
+                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
+                ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
+            )
+            .sparkType('line')
+            .sparkLineChartFunction((node, data, width, height, isForTooltip) => {
+                // 1) Convert % changes to multiplicative factors (1 + r)
+                //    Handle null/NaN gracefully: treat as missing (break the line).
+                const factors = data.map(d => {
+                    const r = +d.value; // % change for the period
+                    return Number.isFinite(r) ? (1 + r / 100) : null;
+                });
+
+                // 2) Build cumulative factor series from baseline = 1
+                //    First point is 1 (0% change vs baseline). Each next multiplies previous by factor.
+                const cum = [];
+                let acc = 1; // cumulative factor
+                for (let i = 0; i < factors.length; i++) {
+                    if (i === 0) {
+                        cum.push(1); // baseline
+                        continue;
+                    }
+                    const f = factors[i];
+                    if (f === null || f <= 0) { // invalid or impossible drop (<= -100%)
+                        cum.push(NaN);            // break the line
+                    } else {
+                        acc *= f;
+                        cum.push(acc);
+                    }
+                }
+
+                // 3) Transform to log space (ln of cumulative factor)
+                const logY = cum.map(v => (Number.isFinite(v) ? Math.log(v) : NaN));
+
+                // 4) Scales
+                const xScale = d3.scaleLinear().domain([0, data.length - 1]).range([0, width]);
+
+                // symmetric domain around 0 (so +100% and -50% have equal magnitude)
+                const maxAbs = d3.max(logY, v => (Number.isFinite(v) ? Math.abs(v) : 0)) || 0.001;
+                const yScale = d3.scaleLinear().domain([-maxAbs, maxAbs]).range([height, 0]);
+
+                // 5) Line (breaks on gaps)
+                const lineGenerator = d3.line()
+                    .defined((_, i) => Number.isFinite(logY[i]))
+                    .x((_, i) => xScale(i))
+                    .y((_, i) => yScale(logY[i]));
+
+                // Color by latest sign (blue up, red down)
+                const lastIdx = (() => {
+                    for (let i = logY.length - 1; i >= 0; i--) if (Number.isFinite(logY[i])) return i;
+                    return -1;
+                })();
+                const strokeColor = lastIdx >= 0 && logY[lastIdx] >= 0 ? '#1f77b4' : '#d62728';
+
+                const path = node.append('path')
+                    .datum(data)
+                    .attr('fill', 'none')
+                    .attr('stroke', strokeColor)
+                    .attr('stroke-width', 1)
+                    .attr('d', lineGenerator);
+
+                //transition animation
+                if (!isForTooltip) {
+                    const totalLength = path.node().getTotalLength();
+                    path
+                        .attr('stroke-dasharray', totalLength)
+                        .attr('stroke-dashoffset', totalLength)
+                        .transition()
+                        .duration(1000) // or out.transitionDuration() if available
+                        .ease(d3.easeLinear)
+                        .attr('stroke-dashoffset', 0);
+                }
+
+                // 6) Axes & zero line for tooltip only
+                if (isForTooltip) {
+                    node.append('g')
+                        .attr('class', 'axis-x')
+                        .attr('transform', `translate(0, ${height})`)
+                        .call(d3.axisBottom(xScale).ticks(data.length).tickFormat((d, i) => i));
+
+                    // Helpful tick labels in % terms around 0 using nice factors
+                    // Map nice factors → labels (e.g., 0.5→-50%, 2→+100%)
+                    const niceFactors = [0.5, 0.67, 0.8, 1, 1.25, 1.5, 2];
+                    const tickVals = niceFactors
+                        .map(f => Math.log(f))
+                        .filter(v => v >= -maxAbs && v <= maxAbs);
+
+                    node.append('g')
+                        .attr('class', 'axis-y')
+                        .call(
+                            d3.axisLeft(yScale)
+                                .tickValues(tickVals)
+                                .tickFormat(v => {
+                                    const pct = (Math.exp(v) - 1) * 100;
+                                    // round to neat labels like -50%, +25%, etc.
+                                    const rounded = Math.round(pct);
+                                    return (rounded > 0 ? `+${rounded}` : `${rounded}`) + '%';
+                                })
+                        );
+
+                    // Zero line at ln(1) = 0
+                    const zeroY = yScale(0);
+                    node.append('line')
+                        .attr('x1', 0)
+                        .attr('x2', width)
+                        .attr('y1', zeroY)
+                        .attr('y2', zeroY)
+                        .attr('stroke', 'gray')
+                        .attr('stroke-dasharray', '2,2')
+                        .attr('stroke-width', 1);
+                }
+            })
+
+            .tooltip({
+                xOffset: 30,
+                yOffset: 10,
+                fontSize: '12px',
+                maxWidth: Math.min(400, window.innerWidth),
+            })
+            .build()
+
+
+    </script>
+</body>
+
 </html>

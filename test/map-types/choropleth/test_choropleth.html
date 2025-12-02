@@ -14,7 +14,7 @@
                 .map('choropleth')
                 .title('Test')
                 // .width(1000)
-                .subtitle('test')
+                .subtitle('test').scale("60M").nutsLevel(1)
                 .stat({
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
@@ -23,7 +23,7 @@
                 .numberOfClasses(6)
                 .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
                 .colorSchemeType('continuous')
-                .nutsLevel(2)
+
                 .legend({
                     x: 10,
                     y: 120,

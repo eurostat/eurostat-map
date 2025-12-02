@@ -1,0 +1,83 @@
+.em-legend-background {
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
+    opacity: 0.9;
+}
+
+#airport-pairs-map .em-zoom-buttons {
+    transform: translate(.5%, 86%);
+}
+
+#airport-pairs-map .em-worldbn {
+    stroke-width: 0.3px !important;
+    stroke: grey !important;
+    /*      filter: url(#blur-effect); */
+    opacity: 0.8;
+
+}
+
+#airport-pairs-map .em-kosovo-bn {
+    stroke-width: 0.1px !important;
+    stroke: grey !important;
+}
+
+#airport-pairs-map .em-label,
+#airport-pairs-map .em-label-shadow {
+    transform: translate(0px, -14px);
+    text-anchor: start;
+    opacity: 0.8;
+    font-size: 12px !important;
+}
+
+#airport-pairs-map #em-label-ADOLFO-SUAREZ-MADRID-BARAJAS,
+#airport-pairs-map #em-label-shadow-ADOLFO-SUAREZ-MADRID-BARAJAS {
+    transform: translate(-115px, -40px);
+}
+
+#em-label-BARCELONA\/EL-PRAT,
+#em-label-shadow-BARCELONA\/EL-PRAT {
+    transform: translate(5px, -1px) !important;
+}
+
+#em-label-PALMA-DE-MALLORCA,
+#em-label-shadow-PALMA-DE-MALLORCA {
+    transform: translate(10px, 5px) !important;
+}
+
+#em-label-CATANIA\/FONTANAROSSA,
+#em-label-shadow-CATANIA\/FONTANAROSSA {
+    transform: translate(10px, 5px) !important;
+}
+
+#em-label-PALERMO\/PUNTA-RAISI,
+#em-label-shadow-PALERMO\/PUNTA-RAISI {
+    transform: translate(2px, 0px) !important;
+}
+
+#em-label-GRAN-CANARIA,
+#em-label-shadow-GRAN-CANARIA {
+    transform: translate(5px, 20px) !important;
+}
+
+#em-label-TENERIFE-NORTE,
+#em-label-shadow-TENERIFE-NORTE {
+    transform: translate(2px, -5px) !important;
+}
+
+#legendBR {
+    filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.4));
+}
+
+.em-annotations {
+    pointer-events: none !important;
+}
+
+.em-labels .em-label,
+.em-label-shadow,
+.em-flow-label,
+.em-flow-label-shadow {
+    font-family: "Arial" !important;
+    font-size: 15px !important;
+    opacity: 0.5 !important;
+    font-weight: bold;
+    fill: #333333 !important;
+}

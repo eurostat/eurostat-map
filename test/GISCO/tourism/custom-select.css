@@ -1,0 +1,85 @@
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  /* margin-left: auto;
+  margin-right: auto; */
+}
+.custom-select {
+  position: relative;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  padding-right: 40px; /* Space for the dropdown arrow */
+  box-sizing: border-box;
+  box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.3);
+  align-content: center;
+  height: 38px;
+}
+.select-trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.custom-options {
+  display: none;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  left: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 99;
+}
+.custom-options.open {
+  display: block;
+}
+.custom-option {
+  padding: 10px;
+  cursor: pointer;
+}
+.custom-option:hover {
+  background-color: #f0f0f0;
+}
+.custom-option.selected {
+  background-color: #0e47cb;
+  color: white;
+}
+#select-wrapper::after {
+  content: "▼";
+  font-size: 12px;
+  color: white;
+  background-color: #0e47cb;
+  padding: 0; /* Remove padding to ensure it fills the container */
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px; /* Define a fixed width for the dropdown arrow container */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 4px 4px 0;
+  pointer-events: none;
+}
+#dropdown-container {
+  display: flex;
+}
+#dropdown-label {
+  align-content: center;
+  margin-right:10px;
+}

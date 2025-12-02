@@ -23,6 +23,7 @@ import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
 import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
+import { addEurostatLogo } from './logo.js'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -82,6 +83,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.onRegionMouseOver_ = undefined // user function to call when mouseover a region
     out.onRegionMouseMove_ = undefined // user function to call when mousemove over a region
     out.onRegionMouseOut_ = undefined // user function to call when mouseout of a region
+    out.onRegionClick_ = undefined // user function to call when clicking a region
 
     // geometries
     out.geometries_ = undefined // [{id:String, data:geojson, class:function}] user-defined geometries
@@ -164,10 +166,14 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.showSourceLink_ = true
 
     //default copyright and disclaimer text
-    out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9UN-FAO \u00A9INSTAT \u00A9Turkstat' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
+    out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
     out.footnoteTooltipText_ =
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
+    out.footnoteWrap_ = false //number of characters at which the footnote is wrapped
+    out.footnotePosition_ = undefined
+    out.showEstatLogo_ = false
 
+    out.logoPosition_ = undefined
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
@@ -216,35 +222,35 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    //special ones which affect also the insets
-    ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
+        //special ones which affect also the insets
+        ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
 
-            if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
-                //override default properties
-                for (const p in v) {
-                    out[att][p] = v[p]
+                if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+                    //override default properties
+                    for (const p in v) {
+                        out[att][p] = v[p]
+                    }
+                } else {
+                    out[att] = v
                 }
-            } else {
-                out[att] = v
-            }
 
-            //recursive call to inset components
-            if (out.insetTemplates_) {
-                executeForAllInsets(
-                    out.insetTemplates_,
-                    out.svgId_,
-                    (inset, value) => {
-                        const fnName = att.substring(0, att.length - 1)
-                        inset[fnName](value)
-                    },
-                    v
-                )
+                //recursive call to inset components
+                if (out.insetTemplates_) {
+                    executeForAllInsets(
+                        out.insetTemplates_,
+                        out.svgId_,
+                        (inset, value) => {
+                            const fnName = att.substring(0, att.length - 1)
+                            inset[fnName](value)
+                        },
+                        v
+                    )
+                }
+                return out
             }
-            return out
-        }
-    })
+        })
 
     //title getter and setter
     out.title = function (v) {
@@ -581,7 +587,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // build insets
         removeInsets(out) //remove existing
-        buildInsets(out, withCenterPoints) //build new
+        buildInsets(out, withCenterPoints, out._mapType) //build new
 
         //draw frame
         dg.append('rect')
@@ -632,6 +638,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                     out.zoomExtent_ = [1, 10]
                 }
                 defineMapZoom(out)
+
+                //add draggable class to map svg
+                out.svg().classed('em-draggable', true)
             }
 
             if (out.backgroundMap_) {
@@ -694,6 +703,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         //bottom text
         if (out.footnote_) {
             addFootnote()
+        }
+
+        //logo
+        if (out.showEstatLogo_) {
+            addEurostatLogo(out)
         }
 
         //source dataset URL
@@ -803,6 +817,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // Project and save coordinates
         // Before filtering
+        // console.log(map.geo_, centroidFeatures)
         const projectedCentroids = centroidFeatures.map((d) => {
             const coords = map._projection(d.geometry.coordinates)
             d.properties.centroid = coords
@@ -818,11 +833,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // Append container if not existing
         const gcp = out.getCentroidsGroup(map).empty()
             ? map
-                  .svg()
-                  .select('#em-zoom-group-' + map.svgId_)
-                  .append('g')
-                  .attr('id', `em-centroids-${map.svgId_}`)
-                  .attr('class', 'em-centroids')
+                .svg()
+                .select('#em-zoom-group-' + map.svgId_)
+                .append('g')
+                .attr('id', `em-centroids-${map.svgId_}`)
+                .attr('class', 'em-centroids')
             : out.getCentroidsGroup(map)
 
         // Join pattern for centroids
@@ -926,19 +941,40 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     const defineDefaultPosition = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
-            out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
-        } else if (out.Geometries.defaultGeoData?.bbox) {
-            // default to center of geoData bbox
-            out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
-            out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+        if (out.projectionFunction_) {
+            // Handle custom D3 projection (like geoAzimuthalEquidistant)
+            if (typeof out.projectionFunction_.rotate === 'function') {
+                const r = out.projectionFunction_.rotate(); // [lambda, phi, gamma]
+                if (Array.isArray(r) && r.length >= 2) {
+                    // Invert signs: the map’s visual center is the opposite of its rotation
+                    const lon = -r[0];
+                    const lat = -r[1];
+                    out.position_.x = out.position_.x ?? lon;
+                    out.position_.y = out.position_.y ?? lat;
+                }
+            } else if (typeof out.projectionFunction_.center === 'function') {
+                const c = out.projectionFunction_.center(); // [lon, lat]
+                if (Array.isArray(c) && c.length === 2) {
+                    out.position_.x = out.position_.x ?? c[0];
+                    out.position_.y = out.position_.y ?? c[1];
+                }
+            }
         } else {
-            //TODO: auto-define user=defined geometries geoCenter
-            // out.position_.x = Geometries.userGeometries
-            // out.position_.y = Geometries.userGeometries
+            const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+            if (defaultPosition) {
+                out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
+                out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
+            } else if (out.Geometries.defaultGeoData?.bbox) {
+                // default to center of geoData bbox
+                out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
+                out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+            } else {
+                //TODO: auto-define user=defined geometries geoCenter
+                // out.position_.x = Geometries.userGeometries
+                // out.position_.y = Geometries.userGeometries
+            }
         }
+
 
         // optional: set from URL
         setViewFromURL()
@@ -993,26 +1029,58 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     const addFootnote = function () {
-        out.svg()
-            .append('text')
-            .attr('id', 'em-footnote')
-            .attr('class', 'em-footnote')
-            .attr('x', 0)
-            .attr('y', out.height_)
-            .html(out.footnote_)
-            .on('mouseover', function () {
-                out._tooltip.mw___ = out._tooltip.style('max-width')
-                out._tooltip.style('max-width', '400px')
-                if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_)
+        const wrap = out.footnoteWrap_ || Infinity;   // e.g. user sets map.footnoteWrap(500)
+        const text = out.footnote_ || "";
+        const position = out.footnotePosition_ ? out.footnotePosition_ : [10, out.height_];
+
+        const svg = out.svg();
+
+        const foot = svg.append("text")
+            .attr("id", "em-footnote")
+            .attr("class", "em-footnote")
+            .attr("x", position[0])
+            .attr("y", position[1]);
+
+        // --- wrapping into tspans ---
+        const words = text.split(/(\s+)/);  // keep whitespace tokens
+        let line = "";
+        let lineIndex = 0;
+
+        for (const w of words) {
+            if ((line + w).length > wrap && line.length > 0) {
+                foot.append("tspan")
+                    .attr("x", 0)
+                    .attr("dy", lineIndex === 0 ? 0 : "1.2em")
+                    .html(line.trim());
+                line = w;
+                lineIndex++;
+            } else {
+                line += w;
+            }
+        }
+
+        // last line
+        if (line.trim().length > 0) {
+            foot.append("tspan")
+                .attr("x", 0)
+                .attr("dy", lineIndex === 0 ? 0 : "1.2em")
+                .html(line.trim());
+        }
+
+        // --- tooltip logic ---
+        foot.on("mouseover", function () {
+            out._tooltip.mw___ = out._tooltip.style("max-width");
+            out._tooltip.style("max-width", "400px");
+            if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_);
+        })
+            .on("mousemove", function (e) {
+                if (out.footnoteTooltipText_) out._tooltip.mousemove(e);
             })
-            .on('mousemove', function (e) {
-                if (out.footnoteTooltipText_) out._tooltip.mousemove(e)
-            })
-            .on('mouseout', function (e) {
-                if (out.footnoteTooltipText_) out._tooltip.mouseout(e)
-                out._tooltip.style('max-width', out._tooltip.mw___)
-            })
-    }
+            .on("mouseout", function () {
+                if (out.footnoteTooltipText_) out._tooltip.mouseout();
+                out._tooltip.style("max-width", out._tooltip.mw___);
+            });
+    };
 
     const addCoastalMarginToMap = function () {
         const zg = out.svg().select('#em-zoom-group-' + out.svgId_)

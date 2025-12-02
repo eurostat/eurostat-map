@@ -30,9 +30,7 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    const eurostatMultihue = ['#FFEB99', '#D1E9B0', '#8DD6B9', '#58C1C0', '#3792B6', '#134891', '#1d2b6f']
     const paletteA = [
-        '#E9ECF6',
         '#D4DAF0',
         '#C1C9EB',
         '#A8B4E6',
@@ -43,7 +41,6 @@ export const map = function (config) {
         '#3C57B0',
         '#2644A7',
         '#15246B',
-        '#081132',
     ]
     out.colorFunction_ = (t) => piecewise(interpolateLab, paletteA)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
@@ -177,6 +174,8 @@ export const map = function (config) {
                 out.classifier((val) => val) // identity
             }
 
+            const dataArrayNumeric = [...dataArray].filter(v => !isNaN(parseFloat(v)) && isFinite(v))
+
             switch (out.classificationMethod_) {
                 case 'quantile': {
                     out.classifier(scaleQuantile().domain(dataArray).range(range))
@@ -198,13 +197,13 @@ export const map = function (config) {
                     break
                 }
                 case 'jenks': {
-                    const jenksBreaks = jenks(dataArray, out.numberOfClasses_)
+                    const jenksBreaks = jenks(dataArrayNumeric, out.numberOfClasses_) //data, lowerClassLimits, nClasses
                     const domain = jenksBreaks.slice(1, -1)
                     out.classifier(scaleThreshold().domain(domain).range(range))
                     break
                 }
                 case 'ckmeans': {
-                    const ckmeansBreaks = ckmeans(dataArray, out.numberOfClasses_).map((cluster) => cluster.pop())
+                    const ckmeansBreaks = ckmeans(dataArrayNumeric, out.numberOfClasses_).map((cluster) => cluster.pop())
                     const domain = ckmeansBreaks.slice(0, -1)
                     out.classifier(scaleThreshold().domain(domain).range(range))
                     break

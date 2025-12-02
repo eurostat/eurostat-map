@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Airports map</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        @import url('./airports.css');
+    </style>
+</head>
+
+<body style="margin:0">
+    <svg id="airport-pairs-map"></svg>
+
+    <svg style='display:none;'>
+        <!-- used for country borders -->
+        <defs>
+            <filter id="blur-effect" x="-50%" y="-50%" width="150%" height="150%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation=".6" />
+            </filter>
+        </defs>
+    </svg>
+    <script src="../../eurostatmap.min.js"></script>
+    <script src="../../d3.v7.min.js"></script>
+    <script src="./airportLabels.js"></script>
+    <script src="./configs.js"></script>
+    <script>
+
+        const year = 2024;
+
+        fetch(`./airportPairsGraph${year}.json`)
+            .then(r => r.json())
+            .then(graphData => {
+                // build map
+                const width = 1000
+                const height = width / 1.5;
+                const projection = d3
+                    .geoAzimuthalEquidistant()
+                    .rotate([2, -35])
+                    .scale(1500)
+                    .translate([width / 2.4, width / 2.3])
+                const spaceAsThousandSeparator = function (number) {
+                    return number.toLocaleString('en').replace(/,/gi, ' ')
+                }
+                const fmtCompact = new Intl.NumberFormat('en', {
+                    notation: 'compact',
+                    compactDisplay: 'short', // "short" → 1.2K,
+                    maximumFractionDigits: 1
+                });
+                const fmtLong = new Intl.NumberFormat('en', {
+                    notation: 'compact',
+                    compactDisplay: 'long', // "long" → 1.2 thousand
+                    maximumFractionDigits: 1
+                });
+
+
+                const breaks = [0, 15, 20, 30]; // 6 thresholds → 7 bins
+                const red = "#cb181d";
+                const blues = d3.schemeBlues[5].slice(1); // 6 blues, remove the first for better contrast with white background
+
+                const airportChangeColorFunction = d3
+                    .scaleThreshold()
+                    .domain(mapConfigs[year].breaks)
+                    .range(mapConfigs[year].colors);
+
+                const airportTooltipFunction = function (link, map) {
+                    const buf = [];
+                    const statData = map.statData();
+                    const unit = statData.unitText() || "";
+
+                    // Header with region name and ID
+                    const title = `${link.source.name || link.source.id} to ${link.target.name || link.target.id
+                        }`;
+                    buf.push(`
+                        <div class="em-tooltip-bar">
+                            <b>${title}</b>
+                        </div>
+                    `);
+
+                    // Value
+                    buf.push(`<div class='em-tooltip-text'>
+                        <table class="em-tooltip-table">
+                            <tbody>
+                                <tr><td>Passengers carried: ${spaceAsThousandSeparator(
+                        link.value
+                    )} </td>
+                            <tr>
+                            <td>
+                                Increase since 2023: 
+                                <span
+                                style="
+                                    background:${airportChangeColorFunction(link.changePct)};
+                                    color:${getContrastTextColor(airportChangeColorFunction(link.changePct))};
+                                    padding:2px 4px;
+                                    border-radius:3px;
+                                "
+                                >
+                                ${link.changePct}%
+                                </span>
+                            </td>
+                            </tr>
+                            </tbody>
+                        </table> 
+                    </div>`);
+
+                    return buf.join("");
+                }
+
+                // sort links by value descending
+                graphData.links.sort((a, b) => b.value - a.value);
+
+                const map = eurostatmap
+                    .map("flow").fontFamily("Arial")
+                    .svgId("airport-pairs-map")
+                    .width(width)
+                    .height(height)
+                    .title("Top 10 flight routes within the EU ✈️")
+                    .subtitle("by most passengers carried, 2024")
+                    .hoverColor('#ffc700')
+
+                    //projection
+                    .projectionFunction(projection)
+
+                    //geometries
+                    .geo("WORLD")
+                    .proj("4326")
+                    .scale("60M")
+
+                    // flow settings
+                    .flowGraph(graphData)
+                    .flowMinWidth(3)
+                    .flowMaxWidth(15)
+                    .flowMapType('curved')
+                    .flowStack(true)
+                    .flowColor((d) => {
+                        if (!d || !d.changePct) {
+                            console.log(d);
+                            return "#999999";
+                        }
+                        return airportChangeColorFunction(d.changePct);
+                    })
+                    .flowOpacity(0.99)
+                    .flowArrows(false)
+                    .flowOutlines(true)
+                    .flowWidthGradient(true)
+                    .flowColorGradient(false)
+                    .flowCurvatureSettings({
+                        gapX: 0,        // how far before/after node to begin/end curve
+                        padX: 0,         // horizontal clearance near node stems
+                        padY: 1,         // vertical collision detection padding
+                        bumpY: 5,        // extra height for hop
+                        curvature: 0.5   // 0..1; default sankey smoothness
+                    })
+                    .flowOrder(mapConfigs[year].flowOrder)
+
+                    // legend
+                    .legend({
+                        x: width - 190,
+                        y: height - 315,
+                        boxPadding: 10,
+                        title: "Passengers carried",
+                        subtitle: "",
+                        flowWidthLegend: {
+                            marginTop: -10,
+                            values: [1600000, 2200000],
+                            labels: ['1.6 million (min)', '2.3 million (max)']
+                        },
+                        donutSizeLegend: {
+                            title: "Passengers carried (airport)",
+                            titlePadding: 17,
+                            values: [10000000, 1500000]
+                        },
+                        flowColorLegend: {
+                            marginTop: 35,
+                            title: mapConfigs[year].legend.title,
+                            items: [
+                                {
+                                    color: mapConfigs[year].colors[0],
+                                    label: mapConfigs[year].legend.labels[0]
+                                },
+                                {
+                                    color: mapConfigs[year].colors[1],
+                                    label: mapConfigs[year].legend.labels[1]
+                                },
+                                {
+                                    color: mapConfigs[year].colors[2],
+                                    label: mapConfigs[year].legend.labels[2]
+                                },
+                                {
+                                    color: mapConfigs[year].colors[3],
+                                    label: mapConfigs[year].legend.labels[3]
+                                },
+                                {
+                                    color: mapConfigs[year].colors[4],
+                                    label: mapConfigs[year].legend.labels[4]
+                                },
+                                {
+                                    color: mapConfigs[year].colors[5],
+                                    label: mapConfigs[year].legend.labels[5]
+                                }
+                            ].reverse()
+                        },
+                        regionColorLegend: {
+                            title: "Region color",
+                            marginTop: 20,
+                            labels: ["a", "b"]
+                        }
+                    })
+
+                    //labels
+                    .labels({
+                        labels: labels[year],
+                        shadows: true,
+                        values: false,
+                        valuesFormatter: (value) => fmtCompact.format(value)
+                    })
+
+                    .tooltip({
+                        textFunction: airportTooltipFunction
+                    })
+
+                    //annotations
+                    .annotations({
+                        editMode: false,
+                        annotations: [
+                            {
+                                type: "annotationCalloutCircle",
+                                note: {
+                                    label: `6 of the top 10 routes either started or ended in Madrid, with a total of over ${year == 2024 ? 11.8 : 10.7
+                                        } million passengers carried. `,
+                                    title: "Madrid moves millions",
+                                    wrap: 210
+                                },
+                                subject: {
+                                    radius: 30
+                                },
+                                x: projection([-3.55, 40.45])[0],
+                                y: projection([-3.55, 40.45])[1],
+                                dy: -10,
+                                dx: -width / 6,
+                                color: "#696969"
+                            },
+                            {
+                                note: {
+                                    label: `Barcelona to Mallorca was the busiest route in ${year} with over 2.3 million passengers carried. `,
+                                    title: "Busiest route",
+                                    wrap: 210
+                                },
+                                connector: {
+                                    end: "dot",
+                                    type: "curve",
+                                    //can also add a curve type, e.g. curve: d3.curveStep
+                                    points: [[-10, 50]]
+                                },
+                                x: projection([2.45, 40.3])[0],
+                                y: projection([2.45, 40.3])[1],
+                                dy: 140,
+                                dx: 0,
+                                color: "#696969"
+                            }
+                        ]
+                    })
+
+                    //minimap
+                    //.position({ x: 2, y: 35 }) //set this so that minimap works
+                    .minimap({
+                        x: width - 90,
+                        y: 80,
+                        z: 200,
+                        color: "lightgrey",
+                        debounce: 2
+                    })
+
+                    // zoom min/max
+                    .zoomExtent([1, 10])
+                    .zoomButtons(true)
+
+                    // fires when map is built
+                    .callback(() => {
+                        const labels = d3.selectAll("#em-labels");
+                        labels.raise();
+                        const annotations = d3.selectAll(".em-annotations");
+                        annotations.raise();
+                        //set font family for export
+                        d3.selectAll("#airport-pairs-map").style("font-family", "Arial");
+
+                        // setTimeout(() => {
+                        //   map.exportMapToSVG();
+                        // }, 3000);
+                        d3.selectAll('[data-color-key="LEMD"][data-color="#c6dbef"]').raise();
+                    })
+
+                    .footnote(
+                        "Intra-EU flights only. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Cartography: GISCO. Boundaries: ©EuroGeographics @OSM"
+                    ).footnoteWrap(false)
+                    .build();
+            })
+            .catch(err => console.error(err));
+
+
+        function getContrastTextColor(hex) {
+            hex = hex.replace('#', '');
+            if (hex.length === 3) {
+                hex = hex.split('').map(c => c + c).join('');
+            }
+
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+
+            // Perceived luminance
+            const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            return luminance > 140 ? 'black' : 'white';
+        }
+
+    </script>
+</body>
+
+</html>

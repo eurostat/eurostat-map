@@ -204,7 +204,7 @@ export const legend = function (map, config) {
             .join('path')
             .attr('d', (d, i) => arcGen(d, i))
             .attr('fill', '#ccc')
-            .attr('class', 'em-legend-time-segment')
+            .attr('class', 'em-legend-month-segment')
 
         const labelRadius = radius + labelOffset
         const timeAbbr = map._coxTimeLabels
@@ -213,10 +213,10 @@ export const legend = function (map, config) {
 
         // Place horizontal labels around the circle (no flipping)
         container
-            .selectAll('text.time-label')
+            .selectAll('text.month-label')
             .data(times)
             .join('text')
-            .attr('class', 'em-legend-label em-time-label')
+            .attr('class', 'em-legend-label em-month-label')
             .attr('x', (d, i) => Math.sin(i * angleStep + angleStep / 2) * labelRadius)
             .attr('y', (d, i) => -Math.cos(i * angleStep + angleStep / 2) * labelRadius)
             .attr('text-anchor', 'middle')
@@ -233,13 +233,15 @@ export const legend = function (map, config) {
                 const mapSvg = out.map.svg_ || out.map.svg()
                 const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
 
-                allSegments.style('opacity', (d) => (d.data.time === hoveredTime ? 1 : 0))
-                select(this).style('stroke-width', 1.5).style('opacity', 0.8)
+                allSegments.style('opacity', (d) => {
+                    return d.data.month === hoveredTime ? 1 : 0
+                })
+                select(this).style('stroke-width', 3).style('opacity', 0.8).raise()
             })
             .on('mouseout', function () {
                 const mapSvg = out.map.svg_ || out.map.svg()
                 mapSvg.selectAll('.em-coxcomb-chart path').style('opacity', 1)
-                select(this).style('stroke-width', 0.3).style('opacity', 0.4)
+                select(this).style('stroke-width', 0.5).style('opacity', 0.4).raise()
             })
     }
 

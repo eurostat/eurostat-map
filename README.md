@@ -1,8 +1,4 @@
-<div align="center">
 
-# [eurostat-map](https://github.com/eurostat/eurostat-map)
-
-</div>
 
 <div align="center">
   <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
@@ -10,37 +6,39 @@
   <img src="https://img.shields.io/badge/license-EUPL-success" alt="license">
   <a href="http://www.awesomeofficialstatistics.org"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Official Statistics"></a>
 </div>
-
+<br>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/eurostat-map-logo-cropped.png" alt="examples" width="400"/>
+</div>
 <div align="center">
   <em>Customizable thematic maps. See <strong><a href="docs/reference.md">documentation</a></strong>.</em>
 </div>
 
-<br>
+<hr>
 
+<div align="center">
+Based on D3 and designed for Eurostat data but compatible with custom geometries and stats. 
+</div>
+<div align="center">
+    Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
+</div>
+<br>
 <div align="center">
 <a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"> <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/examples.gif" alt="examples" width="600"/> </a>
-</div>
-
-<div align="center">
-<em>Based on D3 and designed for Eurostat data but compatible with custom geometries and stats.</em>
 </div>
 
 ---
 
 ## Table of Contents
 
-- [eurostat-map](#eurostat-map)
-    - [Table of Contents](#table-of-contents)
-    - [Examples](#examples)
-    - [Installation](#installation)
-        - [Node.js](#nodejs)
-        - [Standalone](#standalone)
-    - [Documentation](#documentation)
-    - [Technical details](#technical-details)
-    - [About](#about)
-    - [Contribute](#contribute)
-    - [Copyright](#copyright)
-    - [Disclaimer](#disclaimer)
+- [Examples](#examples)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Technical details](#technical-details)
+- [About](#about)
+- [Contribute](#contribute)
+- [Copyright](#copyright)
+- [Disclaimer](#disclaimer)
 
 ---
 
@@ -62,7 +60,6 @@ https://observablehq.com/@joewdavies/eurostat-map-js
 
 - [Population density](https://eurostat.github.io/eurostat-map/examples/population-density.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-density.html))
 - [Population map with proportional circles](https://eurostat.github.io/eurostat-map/examples/prop-circles.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-circles.html))
-- [GDP map with custom proportional symbols](https://eurostat.github.io/eurostat-map/examples/prop-symbols.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-symbols.html))
 - [Causes of death with proportional pie charts](https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-piecharts.html))
 - [Population change ](https://eurostat.github.io/eurostat-map/examples/population-change.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-change.html))
 - [NUTS typology as a categorical map](https://eurostat.github.io/eurostat-map/examples/categorical.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/categorical.html))
@@ -117,14 +114,14 @@ For detailed documentation see the **[API reference page](docs/reference.md)**.
 
 Code examples:
 
-- For a [choropleth map](docs/reference.md#choropleth-map),
-- For a [proportional symbol map](docs/reference.md#proportional-symbol-map),
-- For a [proportional pie chart map](docs/reference.md#proportional-pie-chart-map),
-- For a [categorical map](docs/reference.md#categorical-map).
-- For a [bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
-- For a [stripe composition map](docs/reference.md#stripe-composition-map).
-- For a [sparkline map](docs/reference.md#sparkline-map).
-- For a [flow map](docs/reference.md#flow-map).
+- [choropleth map](docs/reference.md#choropleth-map),
+- [proportional symbol map](docs/reference.md#proportional-symbol-map),
+- [proportional pie chart map](docs/reference.md#proportional-pie-chart-map),
+- [categorical map](docs/reference.md#categorical-map).
+- [bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
+- [stripe composition map](docs/reference.md#stripe-composition-map).
+- [sparkline map](docs/reference.md#sparkline-map).
+- [flow map](docs/reference.md#flow-map).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
 

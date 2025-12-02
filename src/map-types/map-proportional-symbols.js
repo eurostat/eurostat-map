@@ -1,14 +1,15 @@
 import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
-import { extent } from 'd3-array'
+import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
+import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground, updateCSSRule } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
+import { color as d3color } from 'd3-color';
 
 /**
  * Returns a proportional symbol map.
@@ -35,7 +36,7 @@ export const map = function (config) {
     out.psSizeScale_ = undefined // 'sqrt' or 'linear'
 
     //colour
-    out.psFill_ = '#2d50a0' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
+    out.psFill_ = '#009569' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
     out.psFillOpacity_ = 1
     out.psStroke_ = '#ffffff'
     out.psStrokeWidth_ = 0.2
@@ -60,51 +61,51 @@ export const map = function (config) {
 
     out.psCodeLabels_ = false // show country codes in symbols
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
-    ;[
-        'psMaxSize_',
-        'psMinSize_',
-        'psMaxValue_',
-        'psMinValue_',
-        'psFill_',
-        'psFillOpacity_',
-        'psStrokeOpacity_',
-        'psStroke_',
-        'psStrokeWidth_',
-        'classifierSize_',
-        'classifierColor_',
-        'psShape_',
-        'psCustomShape_',
-        'psBarWidth_',
-        'psClassToFillStyle_',
-        'psColorFun_',
-        'psSizeScale_',
-        'noDataFillStyle_',
-        'psThresholds_',
-        'psColors_',
-        'psCustomSVG_',
-        'psOffset_',
-        'psClassificationMethod_',
-        'psClasses_',
-        'dorling_',
-        'dorlingStrength_',
-        'dorlingIterations_',
-        'animateDorling_',
-        'psSpikeWidth_',
-        'psCodeLabels_',
-    ].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
-        }
-    })
+        /**
+         * Definition of getters/setters for all previously defined attributes.
+         * Each method follow the same pattern:
+         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+         *  - To get the attribute value, call the method without argument.
+         *  - To set the attribute value, call the same method with the new value as single argument.
+         */
+        ;[
+            'psMaxSize_',
+            'psMinSize_',
+            'psMaxValue_',
+            'psMinValue_',
+            'psFill_',
+            'psFillOpacity_',
+            'psStrokeOpacity_',
+            'psStroke_',
+            'psStrokeWidth_',
+            'classifierSize_',
+            'classifierColor_',
+            'psShape_',
+            'psCustomShape_',
+            'psBarWidth_',
+            'psClassToFillStyle_',
+            'psColorFun_',
+            'psSizeScale_',
+            'noDataFillStyle_',
+            'psThresholds_',
+            'psColors_',
+            'psCustomSVG_',
+            'psOffset_',
+            'psClassificationMethod_',
+            'psClasses_',
+            'dorling_',
+            'dorlingStrength_',
+            'dorlingIterations_',
+            'animateDorling_',
+            'psSpikeWidth_',
+            'psCodeLabels_',
+        ].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
+        })
 
     //override attribute values with config values
     if (config)
@@ -208,39 +209,60 @@ export const map = function (config) {
     }
 
     function defineSizeClassifier() {
-        // set default scale type
+        // default scale choice
         if (!out.psSizeScale_) {
-            if (out.psShape_ == 'spike') {
-                out.psSizeScale_ = 'linear'
-            } else {
-                out.psSizeScale_ = 'sqrt'
-            }
+            out.psSizeScale_ = (out.psShape_ === 'spike') ? 'linear' : 'sqrt';
         }
 
-        // use size dataset
-        let rawData = out.statData('size').getArray() || out.statData().getArray()
+        // raw values
+        const rawData = out.statData('size').getArray() || out.statData().getArray();
 
-        // Filter numeric values > 0 only, since 0 is never visualized
-        let data = rawData
-            .map((d) => +d) // convert string numbers to real numbers
-            .filter((d) => isFinite(d) && d > 0)
+        // numeric positives for max calculation
+        const positives = rawData
+            .map(d => +d)
+            .filter(d => Number.isFinite(d) && d > 0);
 
-        let [minVal, maxVal] = extent(data)
-        let min = out.psMinValue_ ?? minVal
-        let max = out.psMaxValue_ ?? maxVal
-
-        // Fallback to full statData if somehow no positive values exist
-        if (!isFinite(min) || !isFinite(max)) {
-            min = out.statData().getMin()
-            max = out.statData().getMax()
+        // compute max; fallbacks
+        let maxVal = max(positives);
+        let minVal = min(positives);
+        if (!Number.isFinite(maxVal)) {
+            maxVal = out.statData().getMax();
+        }
+        if (!Number.isFinite(maxVal) || maxVal <= 0) {
+            maxVal = 1; // safe guard: avoid NaN domains
         }
 
-        const sizeDomain = [min, max]
-        const scale = out.psSizeScale_ == 'sqrt' ? scaleSqrt : scaleLinear
+        // allow manual override for the upper bound
+        const upper = (out.psMaxValue_ ?? maxVal);
 
-        // our final classifier function
-        out.classifierSize(scale().domain(sizeDomain).range([out.psMinSize_, out.psMaxSize_]))
+        // Build base scale with ZERO as lower bound
+        const Scale = (out.psSizeScale_ === 'sqrt') ? scaleSqrt : scaleLinear;
+        const base = Scale()
+            .domain([0, upper])
+            .range([0, out.psMaxSize_])
+            .clamp(true);
+
+        // Visual minimum radius for positive values (0 must stay 0)
+        const minR = Math.max(0, out.psMinSize_ || 0);
+
+        // Final classifier: 0/NaN/negatives → radius 0 (don’t draw)
+        // positives → at least minR
+        const classifier = (v) => {
+            const x = +v;
+            if (!Number.isFinite(x) || x <= 0) return 0;
+            return Math.max(minR, base(x));
+        };
+
+        // Proxy D3 scale methods so legacy code still works:
+        const nextMin = Math.min(...positives.filter(v => v > 0));
+        classifier.domain = (...args) => {
+            if (args.length) { base.domain(...args); return classifier; }
+            return [nextMin, maxVal]; // here we return actual data min/max
+        };
+
+        out.classifierSize(classifier);
     }
+
 
     function defineColorClassifier() {
         //simply return the array [0,1,2,3,...,nb-1]
@@ -282,7 +304,9 @@ export const map = function (config) {
      * @returns
      */
     function applyStyleToMap(map) {
-        //see https://bl.ocks.org/mbostock/4342045 and https://bost.ocks.org/mike/bubble-map/
+        // update region color according to symbol color
+        updateBackgroundColor(map, out.psFill_)
+
         //define style per class
         if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
 
@@ -312,43 +336,11 @@ export const map = function (config) {
                 symb = appendD3SymbolsToMap(map, sizeData)
             }
 
-            // set style of symbols
-            const selector = getRegionsSelector(map)
-            let regions = map.svg().selectAll(selector)
 
-            if (map.geo_ !== 'WORLD') {
-                if (map.nutsLevel_ == 'mixed') {
-                    styleMixedNUTSRegions(map, sizeData, regions)
-                    // Build centroidFeatures so Dorling has something to simulate
-                    const centroids = []
-                    map.svg()
-                        .selectAll('g.em-centroid')
-                        .each(function (d) {
-                            if (!d.properties?.centroid) return
-                            centroids.push(d) // d already has properties and id
-                        })
-                    map.Geometries.centroidsFeatures = centroids
-                }
-
-                // apply 'nd' class to no data regions for legend item hover
-                regions.attr('ecl', function (rg) {
-                    const sv = sizeData.get(rg.properties.id)
-                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
-                        // NO INPUT
-                        return 'ni'
-                    } else if (sv && sv.value) {
-                        if (sv.value == ':') {
-                            // DATA NOT AVAILABLE (no data)
-                            return 'nd'
-                        }
-                    }
-                })
-            }
-
+            setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
             appendLabelsToSymbols(map, sizeData)
-
-            addMouseEventsToRegions(map)
+            addMouseEvents(map)
 
             // Update labels for statistical values if required
             if (out.labels_?.values) {
@@ -362,6 +354,53 @@ export const map = function (config) {
         }
         return map
     }
+
+    const setRegionStyles = function (map, sizeData) {
+        // set style of symbols
+        const selector = getRegionsSelector(map)
+        const regions = map.svg().selectAll(selector)
+
+        if (map.geo_ !== 'WORLD') {
+            if (map.nutsLevel_ == 'mixed') {
+                styleMixedNUTSRegions(map, sizeData, regions)
+                // Build centroidFeatures so Dorling has something to simulate
+                const centroids = []
+                map.svg()
+                    .selectAll('g.em-centroid')
+                    .each(function (d) {
+                        if (!d.properties?.centroid) return
+                        centroids.push(d) // d already has properties and id
+                    })
+                map.Geometries.centroidsFeatures = centroids
+            }
+
+            // apply 'nd' class to no data regions for legend item hover
+            regions.attr('ecl', function (rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
+                    // NO INPUT
+                    return 'ni'
+                } else if (sv && sv.value) {
+                    if (sv.value == ':') {
+                        // DATA NOT AVAILABLE (no data)
+                        return 'nd'
+                    }
+                }
+            })
+
+            // 1) clear any previous inline fill so CSS can apply to regions that now have data
+            regions.style('fill', null)
+
+            // 2) apply gray only to current no-data (":") regions
+            regions
+                .filter((rg) => {
+                    const sv = sizeData.get(rg.properties.id)
+                    return sv && sv.value === ':'
+                })
+                .style('fill', out.noDataFillStyle()).attr('fill___', out.noDataFillStyle()) // save for legend mouseover   
+        }
+    }
+
 
     const appendLabelsToSymbols = function (map, sizeData) {
         let symbolContainers = map.svg().selectAll('g.em-centroid')
@@ -427,8 +466,49 @@ export const map = function (config) {
         }
     }
 
+    const addMouseEvents = function (map) {
+        addMouseEventsToSymbols(map)
+        addMouseEventsToRegions(map)
+    }
     const addMouseEventsToRegions = function (map) {
-        let symbols = map.svg().selectAll('g.em-centroid')
+        const regions = map.svg().selectAll(getRegionsSelector(map))
+        const sizeData = getSizeStatData(map)
+        regions.on('mouseover', function (e, rg) {
+            // only show tooltip for polygons of regions with values of 0
+            const sv = sizeData.get(rg.properties.id)
+            if (sv?.value === 0 || sv?.value === ':') {
+                select(this).style('fill', map.hoverColor_) // Apply highlight color
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
+            } else {
+                return; // skip regions with no input or value > 0
+            }
+        })
+            .on('mousemove', function (e, rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv?.value === 0 || sv?.value === ':') {
+                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
+                } else {
+                    return; // skip regions with no data or value > 0
+                }
+
+            })
+            .on('mouseout', function (e, rg) {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv?.value === 0 || sv?.value === ':') {
+                    const sel = select(this)
+                    sel.style('fill', sel.attr('fill___')) // Revert to original color
+                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
+                } else {
+                    return; // skip regions with no data or value > 0
+                }
+            })
+    }
+    const addMouseEventsToSymbols = function (map) {
+        const symbols = map.svg().selectAll('g.em-centroid')
+        //symbols
         symbols
             .on('mouseover', function (e, rg) {
                 const sel = select(this.childNodes[0])
@@ -766,6 +846,52 @@ export const map = function (config) {
     return out
 }
 
+function updateBackgroundColor(map, symbolFill) {
+    const symbolColor = symbolFill || '#ffffff';
+    const c = d3color(symbolColor);
+    const hexColor = c ? c.formatHex() : '#ffffff';
+    const mapId = map.svgId_ || '';
+    const backgroundColor = getBackgroundColor(hexColor);
+
+    updateCSSRule(`#${mapId}.em--ps .em-nutsrg`, 'fill', backgroundColor);
+}
+
+function getBackgroundColor(fillColor) {
+    return brightenHex(fillColor)
+}
+
+
+function brightenHex(hex) {
+    // const c = color(hex);
+    // if (c) {
+    //     return c.brighter(2).formatHex();
+    // } else {
+    //manual method if d3-color fails
+    const factor = 0.9; // Brightening factor (0 to 1)
+    // Ensure valid hex
+    hex = hex.replace(/^#/, '');
+    if (hex.length === 3) {
+        hex = hex.split('').map(c => c + c).join('');
+    }
+
+    // Parse RGB
+    const num = parseInt(hex, 16);
+    let r = (num >> 16) & 255;
+    let g = (num >> 8) & 255;
+    let b = num & 255;
+
+    // Increase brightness
+    r = Math.min(255, Math.round(r + (255 - r) * factor));
+    g = Math.min(255, Math.round(g + (255 - g) * factor));
+    b = Math.min(255, Math.round(b + (255 - b) * factor));
+
+    // Return new hex
+    return `#${(1 << 24 | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+    // }
+
+}
+
+
 //build a color legend object
 export const getColorLegend = function (colorFun, colorArray) {
     colorFun = colorFun || interpolateOrRd
@@ -801,40 +927,47 @@ export const symbolsLibrary = {
 
 const tooltipTextFunPs = function (region, map) {
     if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
-        return '' // Skip tooltip for omitted regions
+        return ''; // Skip tooltip for omitted regions
     }
 
-    const regionName = region.properties.na
-    const regionId = region.properties.id
+    const regionName = region.properties.na;
+    const regionId = region.properties.id;
+
+
+    const formatValue = (val, unit, noDataText) => {
+        if (val === ':') {
+            return noDataText || 'Data not available';
+        }
+        return spaceAsThousandSeparator(val) + (unit ? ' ' + unit : '');
+    };
 
     // Stat 1
-    const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
-    const sv1 = v1.get(region.properties.id)
-    const hasV1 = sv1 && (sv1.value === 0 || !!sv1.value)
-    const unit1 = hasV1 ? v1.unitText() : null
-    const row1 = `<tr><td>${hasV1 ? spaceAsThousandSeparator(sv1.value) + ' ' + (unit1 || '') : map.noDataText_}</td></tr>`
+    const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData();
+    const sv1 = v1.get(region.properties.id);
+    const unit1 = v1.unitText?.() || '';
+    const row1 = `<tr><td>${formatValue(sv1?.value, unit1, map.noDataText_)}</td></tr>`;
 
     // Stat 2 (optional)
-    let row2 = ''
-    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null
+    let row2 = '';
+    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null;
     if (v2) {
-        const sv2 = v2.get(region.properties.id)
-        const hasV2 = sv2 && (sv2.value === 0 || !!sv2.value)
-        const unit2 = hasV2 ? v2.unitText() : null
-        row2 = `<tr><td>${hasV2 ? spaceAsThousandSeparator(sv2.value) + ' ' + (unit2 || '') : map.noDataText_}</td></tr>`
+        const sv2 = v2.get(region.properties.id);
+        const unit2 = v2.unitText?.() || '';
+        row2 = `<tr><td>${formatValue(sv2?.value, unit2, map.noDataText_)}</td></tr>`;
     }
 
     return `
-        <div class="em-tooltip-bar">
-            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-        </div>
-        <div class="em-tooltip-text">
-            <table class="em-tooltip-table">
-                <tbody>
-                    ${row1}
-                    ${row2}
-                </tbody>
-            </table>
-        </div>
-    `.trim()
-}
+    <div class="em-tooltip-bar">
+      <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+    </div>
+    <div class="em-tooltip-text">
+      <table class="em-tooltip-table">
+        <tbody>
+          ${row1}
+          ${row2}
+        </tbody>
+      </table>
+    </div>
+  `.trim();
+};
+

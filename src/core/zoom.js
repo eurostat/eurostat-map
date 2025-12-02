@@ -7,16 +7,20 @@ export const defineMapZoom = function (map) {
     let panUnlocked = !map.lockPanUntilZoom_
     let snappingBack = false
     const zoomExtent = map.zoomExtent_ || [0, 0]
-    const translateExtent =
-        map.translateExtent_ || !map.lockPanUntilZoom_
-            ? [
-                  [-map.width_, -map.height_], // allow dragging 1x map outside
-                  [map.width_ * 2, map.height_ * 2], // bottom-right
-              ]
-            : [
-                  [0, 0], // strict, no pan until zoom
-                  [map.width_, map.height_],
-              ]
+
+    // If the user allows zoom < 1 (e.g. [0.1, 10]), pad translateExtent based on kmin.
+    // This keeps panning possible even when zoomed out.
+    const kmin = Math.max(zoomExtent[0] || 1, 0.01)
+    const needsPad = kmin < 1
+    const panPadFactor = map.panPadFactor_ ?? 0.1
+    const padX = needsPad ? panPadFactor * (1 / kmin - 1) * map.width_ : map.width_
+    const padY = needsPad ? panPadFactor * (1 / kmin - 1) * map.height_ : map.height_
+
+    const translateExtent = map.translateExtent_
+        ? map.translateExtent_
+        : needsPad ? [[-padX, -padY], [map.width_ + padX, map.height_ + padY]] : [[0, 0], [map.width_, map.height_]]
+
+
 
     map.__zoomBehavior = zoom()
         .filter((e) => !e.target.closest('.em-zoom-buttons') && !e.target.closest('.em-button'))
@@ -26,6 +30,13 @@ export const defineMapZoom = function (map) {
         ])
         .scaleExtent(zoomExtent)
         .translateExtent(translateExtent)
+
+        .on('start', (e) => {
+            if (e.sourceEvent && e.sourceEvent.type !== 'wheel') {
+                svg.classed('em-dragging', true);
+            }
+        })
+
         .on('zoom', (e) => {
             const t = e.transform
             const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
@@ -51,7 +62,10 @@ export const defineMapZoom = function (map) {
                 svg.call(map.__zoomBehavior.transform, previousT)
             }
         })
-        .on('end', (e) => map.onZoomEnd_?.(e, map))
+        .on('end', (e) => {
+            svg.classed('em-dragging', false);
+            map.onZoomEnd_?.(e, map);
+        });
 
     map.__lastTransform = previousT
 
@@ -119,6 +133,9 @@ const zoomHandler = (event, previousT, map) => {
         map.position_.z = map.__baseZ / t.k
     }
 
+    //  Store current zoom scale for later use (hover, click, etc.)
+    map._lastZoomK = t.k;
+
     scaleStrokeWidths(t, map)
     if (map.labels_?.values) scaleLabelTexts(t, map)
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
@@ -126,6 +143,7 @@ const zoomHandler = (event, previousT, map) => {
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
     if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
 }
+
 /**
  * @description adjusts text elements dynamically according to zoom
  * @param {*} transform

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eurostat-map.js</title>
+</head>
+
+<body>
+    <svg id="map"></svg>
+    <script src="https://unpkg.com/eurostat-map"></script>
+    <script>
+        // basic barebones proportional circles example
+        let map = eurostatmap
+            .map('ps').scale('60M')
+            .nutsLevel(0)
+            .title('Total GDP')
+            .width(800)
+            .stat('size', {
+                eurostatDatasetCode: 'nama_10r_3gdp',
+                unitText: 'Million EUR',
+                filters: { unit: 'MIO_EUR', time: '2018' },
+            })
+            .legend({ title: 'Million EUR', x: 500, y: 130, boxOpacity: 0, sizeLegend: { values: [3000000, 1000000, 100000] } })
+            .psShape('circle') // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+            .dorling(true)
+            .insets(false)
+            .psMaxSize(40)
+
+        map.build()
+    </script>
+</body>
+
+</html>
