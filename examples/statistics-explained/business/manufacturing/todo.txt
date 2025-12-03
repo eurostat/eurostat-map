@@ -1,0 +1,2 @@
+Proportional symbol map: (dataset code sbs_r_nuts2021) ( Europe_ps_G2.xlsx) with a drop down menu for three main variables: LOC_NR, EMP_LOC_NR, WAGE_LOC_MEUR.
+Choropleth map: (dataset code sbs_r_nuts2021)  (Europe_ch_G2.xlsx) ) with a drop down menu with two variables: EMP_PLOC_NR; LC_EMP_LOC_TEUR.
