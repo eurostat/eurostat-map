@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="63" viewBox="0 0 140 63">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.155" y1="1" x2="0.837" y2="0.011" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#082b7a" />
+      <stop offset="0.5" stop-color="#0e47cb" />
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.759" y1="0.991" x2="0.243" y2="0.013" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#f4f5f5" />
+      <stop offset="1" stop-color="#7d8088" />
+    </linearGradient>
+    <linearGradient id="linear-gradient-3" x1="0.17" y1="0.979" x2="0.843" y2="0.002" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#fffcf2" />
+      <stop offset="0.5" stop-color="#fc0" />
+    </linearGradient>
+  </defs>
+
+  <g id="eurostat-ribbon">
+    <path d="M106.522 4.981L90.628 4.981L55.252 47.137L71.146 47.137L106.522 4.981Z"
+          fill="url(#linear-gradient)" />
+    <path d="M37.563 26.06L53.459 26.06L71.146 47.138L55.252 47.138L37.563 26.06Z"
+          fill="url(#linear-gradient-2)" />
+    <path d="M53.456 26.06L37.56 26.06L2.184 68.216L18.079 68.216L53.456 26.06Z"
+          fill="url(#linear-gradient-3)" />
+    <path d="M45.491 35.489L56.975 49.192L34.006 49.192L45.491 35.489Z"
+          class="logo-ribbon-cut-fill"
+          fill="#fff" />
+    <path d="M106.491 4.983L142.184 47.529L70.797 47.529L106.491 4.983Z"
+          fill="#fff" />
+  </g>
+</svg>

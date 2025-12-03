@@ -23,7 +23,7 @@ import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
 import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
-import { addEurostatLogo } from './logo.js'
+import { addEurostatLogo, addEurostatRibbon } from './logo.js'
 import { addCoastalMarginToMap, appendCoastalMargin } from './coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './texts.js'
 import { addScalebarToMap } from './scalebar.js'
@@ -178,9 +178,15 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
     out.footnoteWrap_ = false //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined
-    out.showEstatLogo_ = false
 
+    out.showEstatLogo_ = false
+    out.showEstatRibbon_ = false
     out.logoPosition_ = undefined
+    out.ribbonPosition_ = undefined
+    out.ribbonWidth_ = undefined
+    out.ribbonHeight_ = undefined
+    out.logoWidth_ = undefined
+    out.logoHeight_ = undefined
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
@@ -625,6 +631,10 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         //logo
         if (out.showEstatLogo_) {
             addEurostatLogo(out)
+        }
+
+        if (out.showEstatRibbon_) {
+            addEurostatRibbon(out)
         }
 
         //source dataset URL

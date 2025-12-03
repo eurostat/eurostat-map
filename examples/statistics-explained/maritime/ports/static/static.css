@@ -32,16 +32,14 @@ circle {
      transform: translate(94%, 86%) !important;
  }
 
- .em-cntbn {
+ .em-cntbn,
+ .em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
      stroke: rgb(156, 156, 156) !important;
-     stroke-opacity: 0.5 !important;
-     opacity: 0.5 !important;
-     stroke-width: 1 !important;
+     stroke-opacity: 0.3 !important;
+     opacity: 1 !important;
+     stroke-width: 1.5 !important;
  }
 
- .em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-     stroke-width: 1 !important;
- }
 
  .em-kosovo-bn {
      stroke: #5c5c5c !important;
