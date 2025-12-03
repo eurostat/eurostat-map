@@ -49,14 +49,15 @@ circle {
  }
 
  .annotation-connector path {
-     stroke: #5c5c5c
+     stroke: #3a3a3a
  }
 
  .annotation-note-title {
      font-family: Arial;
      font-size: 14px !important;
      font-weight: normal;
-     transform: translate(10px, 5px)
+     transform: translate(10px, 5px);
+     fill: #4c4b4b;
  }
 
  .center-vertically .annotation-note-title {

@@ -60,7 +60,8 @@ a text {
 
 .em-subtitle,
 .em-inset-subtitle {
-    fill: #848280;
+    fill: #4c4b4b;
+    fill-opacity: 0.9;
     stroke: none;
     stroke-linejoin: round;
     paint-order: stroke;

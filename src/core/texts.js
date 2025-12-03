@@ -65,7 +65,7 @@ export const addFootnote = function (out) {
         // Footer is its own translated group; Y should be small padding only
         position = out.footnotePosition_
             ? [out.footnotePosition_[0], out.footnotePosition_[1]]
-            : [5, 20];
+            : [5, 10];
     } else {
         // Legacy mode: footnote drawn directly on SVG, use bottom of map area
         position = out.footnotePosition_ ? out.footnotePosition_ : [10, out.height_];

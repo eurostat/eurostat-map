@@ -29,3 +29,7 @@
 .em-insets-button {
     transform: translate(94%, 2%);
 }
+
+.em-logo-group {
+    pointer-events: none;
+}
