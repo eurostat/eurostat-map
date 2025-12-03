@@ -1,101 +1,107 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </head>
 
-    <body>
-        <svg id="map"></svg>
-        <svg id="map2"></svg>
-        <svg id="map3"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
-        <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
-        <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
-        <style>.em-worldbn{stroke-width:0.1px;}</style>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-        <script>
-            const exampleGraph = {
-                nodes: [
-                    { id: 'FR' },
-                    { id: 'US' },
-                    { id: 'ZA' },
-                    { id: 'BR' },
-                    { id: 'CA' },
-                    { id: 'CN' },
-                    { id: 'SA' },
-                    { id: 'AR' },
-                    { id: 'AU' },
-                    { id: 'IN' },
-                    { id: 'JP' },
-                    { id: 'NZ' },
-                ],
-                links: [
-                    { source: 'FR', target: 'US', value: 82018369 },
-                    { source: 'FR', target: 'ZA', value: 49697198 },
-                    { source: 'FR', target: 'BR', value: 45422327 },
-                    { source: 'FR', target: 'CA', value: 43038180 },
-                    { source: 'FR', target: 'CN', value: 34453478 },
-                    { source: 'FR', target: 'SA', value: 16164188 },
-                    { source: 'FR', target: 'AR', value: 12673336 },
-                    { source: 'FR', target: 'AU', value: 7178656 },
-                    { source: 'FR', target: 'IN', value: 6305366 },
-                    { source: 'FR', target: 'JP', value: 5883790 },
-                    { source: 'FR', target: 'NZ', value: 5883790 },
-                ],
-            }
+<body>
+    <svg id="map"></svg>
+    <svg id="map2"></svg>
+    <svg id="map3"></svg>
+    <script src="../../../build/eurostatmap.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
+    <style>
+        .em-worldbn {
+            stroke-width: 0.1px;
+        }
+    </style>
 
-            const labels = [{"text":"Eastern Asia","x":105,"y":35},{"text":"North America","x":-100,"y":45},{"text":"Western Asia","x":45,"y":33},{"text":"Europe except EU","x":9,"y":60},{"text":"South America","x":-60,"y":-15},{"text":"Rest of Africa","x":20,"y":0},{"text":"ASEAN","x":105,"y":5},{"text":"Southern Asia","x":80,"y":20},{"text":"Eastern Africa","x":38,"y":0.5},{"text":"Central America and Caribbean","x":-85,"y":15},{"text":"Central Asia","x":70,"y":45},{"text":"Australasia, S. Sea Is. & Antarctica","x":135,"y":-25},{"text":"Unknown","x":null,"y":null}]
+    <script>
+        const exampleGraph = {
+            nodes: [
+                { id: 'FR' },
+                { id: 'US' },
+                { id: 'ZA' },
+                { id: 'BR' },
+                { id: 'CA' },
+                { id: 'CN' },
+                { id: 'SA' },
+                { id: 'AR' },
+                { id: 'AU' },
+                { id: 'IN' },
+                { id: 'JP' },
+                { id: 'NZ' },
+            ],
+            links: [
+                { source: 'FR', target: 'US', value: 82018369 },
+                { source: 'FR', target: 'ZA', value: 49697198 },
+                { source: 'FR', target: 'BR', value: 45422327 },
+                { source: 'FR', target: 'CA', value: 43038180 },
+                { source: 'FR', target: 'CN', value: 34453478 },
+                { source: 'FR', target: 'SA', value: 16164188 },
+                { source: 'FR', target: 'AR', value: 12673336 },
+                { source: 'FR', target: 'AU', value: 7178656 },
+                { source: 'FR', target: 'IN', value: 6305366 },
+                { source: 'FR', target: 'JP', value: 5883790 },
+                { source: 'FR', target: 'NZ', value: 5883790 },
+            ],
+        }
 
-            //  // total trade
-            //`https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ext_tec10?format=json&lang=en&unit=THS_EUR&sizeclas=TOTAL&stk_flow=EXP&partner=${exporter.value}&time=2021&geoLevel=country`
-            //[{"id":"DE","value":82018369.72,"name":"Germany"},{"id":"IT","value":49697198.92,"name":"Italy"},{"id":"ES","value":45422327.56,"name":"Spain"},{"id":"BE","value":43038180.93,"name":"Belgium"},{"id":"NL","value":34453478.99,"name":"Netherlands"},{"id":"CH","value":16164188.98,"name":"Switzerland"},{"id":"PL","value":12673336.04,"name":"Poland"},{"id":"PT","value":7178656.08,"name":"Portugal"},{"id":"AT","value":6305366.1,"name":"Austria"},{"id":"CZ","value":5883790.49,"name":"Czechia"},{"id":"IE","value":5287477.09,"name":"Ireland"},{"id":"RO","value":4460277.11,"name":"Romania"},{"id":"DK","value":3843262.72,"name":"Denmark"},{"id":"HU","value":3624585.56,"name":"Hungary"},{"id":"SK","value":3003919.1,"name":"Slovakia"},{"id":"LU","value":2206077.33,"name":"Luxembourg"},{"id":"SI","value":1538814.42,"name":"Slovenia"},{"id":"LT","value":737286.81,"name":"Lithuania"},{"id":"RS","value":602221.24,"name":"Serbia"},{"id":"IS","value":405879.59,"name":"Iceland"},{"id":"LV","value":374371.49,"name":"Latvia"},{"id":"HR","value":371224.02,"name":"Croatia"},{"id":"MT","value":160032.27,"name":"Malta"},{"id":"MK","value":71053.23,"name":"North Macedonia"},{"id":"CY","value":42471.05,"name":"Cyprus"},{"id":"BG","value":null,"name":"Bulgaria"},{"id":"EE","value":null,"name":"Estonia"},{"id":"EL","value":null,"name":"Greece"},{"id":"FR","value":null,"name":"France"},{"id":"FI","value":null,"name":"Finland"},{"id":"SE","value":null,"name":"Sweden"},{"id":"NO","value":null,"name":"Norway"},{"id":"UK","value":null,"name":"United Kingdom"},{"id":"BA","value":null,"name":"Bosnia and Herzegovina"},{"id":"TR","value":null,"name":"Türkiye"},{"id":"XK","value":null,"name":"Kosovo*"}]
-            const map = eurostatmap
-                .map('flow')
-                .geo('world')
-                .width(900)
-                .height(700)
-                .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(180).translate([370, 340]))
-                .title('Flow map with geoAzimuthalEquidistant projection')
-                .subtitle('test')
-                .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
-                .flowColor('#72bb6f')
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowOutlines(true)
-                .flowMaxWidth(20)
-                .nutsLevel(0)
-                .zoomExtent([0.5, 10])
+        const labels = [{ "text": "Eastern Asia", "x": 105, "y": 35 }, { "text": "North America", "x": -100, "y": 45 }, { "text": "Western Asia", "x": 45, "y": 33 }, { "text": "Europe except EU", "x": 9, "y": 60 }, { "text": "South America", "x": -60, "y": -15 }, { "text": "Rest of Africa", "x": 20, "y": 0 }, { "text": "South Eastern Asia", "x": 105, "y": 5 }, { "text": "Southern Asia", "x": 80, "y": 20 }, { "text": "Eastern Africa", "x": 38, "y": 0.5 }, { "text": "Central America and Caribbean", "x": -85, "y": 15 }, { "text": "Central Asia", "x": 70, "y": 45 }, { "text": "Oceania and southern polar regions", "x": 135, "y": -25 }, { "text": "Unknown", "x": null, "y": null }]
 
-                .labels({ values: true})
-                .build()
+        //  // total trade
+        //`https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ext_tec10?format=json&lang=en&unit=THS_EUR&sizeclas=TOTAL&stk_flow=EXP&partner=${exporter.value}&time=2021&geoLevel=country`
+        //[{"id":"DE","value":82018369.72,"name":"Germany"},{"id":"IT","value":49697198.92,"name":"Italy"},{"id":"ES","value":45422327.56,"name":"Spain"},{"id":"BE","value":43038180.93,"name":"Belgium"},{"id":"NL","value":34453478.99,"name":"Netherlands"},{"id":"CH","value":16164188.98,"name":"Switzerland"},{"id":"PL","value":12673336.04,"name":"Poland"},{"id":"PT","value":7178656.08,"name":"Portugal"},{"id":"AT","value":6305366.1,"name":"Austria"},{"id":"CZ","value":5883790.49,"name":"Czechia"},{"id":"IE","value":5287477.09,"name":"Ireland"},{"id":"RO","value":4460277.11,"name":"Romania"},{"id":"DK","value":3843262.72,"name":"Denmark"},{"id":"HU","value":3624585.56,"name":"Hungary"},{"id":"SK","value":3003919.1,"name":"Slovakia"},{"id":"LU","value":2206077.33,"name":"Luxembourg"},{"id":"SI","value":1538814.42,"name":"Slovenia"},{"id":"LT","value":737286.81,"name":"Lithuania"},{"id":"RS","value":602221.24,"name":"Serbia"},{"id":"IS","value":405879.59,"name":"Iceland"},{"id":"LV","value":374371.49,"name":"Latvia"},{"id":"HR","value":371224.02,"name":"Croatia"},{"id":"MT","value":160032.27,"name":"Malta"},{"id":"MK","value":71053.23,"name":"North Macedonia"},{"id":"CY","value":42471.05,"name":"Cyprus"},{"id":"BG","value":null,"name":"Bulgaria"},{"id":"EE","value":null,"name":"Estonia"},{"id":"EL","value":null,"name":"Greece"},{"id":"FR","value":null,"name":"France"},{"id":"FI","value":null,"name":"Finland"},{"id":"SE","value":null,"name":"Sweden"},{"id":"NO","value":null,"name":"Norway"},{"id":"UK","value":null,"name":"United Kingdom"},{"id":"BA","value":null,"name":"Bosnia and Herzegovina"},{"id":"TR","value":null,"name":"Türkiye"},{"id":"XK","value":null,"name":"Kosovo*"}]
+        const map = eurostatmap
+            .map('flow')
+            .geo('world')
+            .width(900)
+            .height(700)
+            .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(180).translate([370, 340]))
+            .title('Flow map with geoAzimuthalEquidistant projection')
+            .subtitle('test')
+            .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
+            .flowColor('#72bb6f')
+            .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+            .flowOutlines(true)
+            .flowMaxWidth(20)
+            .nutsLevel(0)
+            .zoomExtent([0.5, 10])
 
-            // const map2 = eurostatmap
-            // .map('flow')
-            // .geo('world')
-            // .svgId('map2')
-            // .projectionFunction(d3.geoAzimuthalEqualArea().rotate([-10, -30]).scale(130).translate([260, 220]))
-            // .title('Flow map with geoAzimuthalEqualArea projection')
-            // .subtitle('test')
-            // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
-            // .flowColor('#72bb6f')
-            // .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-            // .nutsLevel(0)
-            // .zoomExtent([0.5, 10])
-            // .build()
+            .labels({ values: true })
+            .build()
 
-            // const map3 = eurostatmap
-            // .map('flow')
-            // .svgId('map3')
-            // .geo('world')
-            // .title('Flow map with Robinson projection')
-            // .subtitle('test')
-            // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
-            // .flowColor('#72bb6f')
-            // .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-            // .nutsLevel(0)
-            // .zoomExtent([0.5, 10])
-            // .build()
-        </script>
-    </body>
+        // const map2 = eurostatmap
+        // .map('flow')
+        // .geo('world')
+        // .svgId('map2')
+        // .projectionFunction(d3.geoAzimuthalEqualArea().rotate([-10, -30]).scale(130).translate([260, 220]))
+        // .title('Flow map with geoAzimuthalEqualArea projection')
+        // .subtitle('test')
+        // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
+        // .flowColor('#72bb6f')
+        // .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+        // .nutsLevel(0)
+        // .zoomExtent([0.5, 10])
+        // .build()
+
+        // const map3 = eurostatmap
+        // .map('flow')
+        // .svgId('map3')
+        // .geo('world')
+        // .title('Flow map with Robinson projection')
+        // .subtitle('test')
+        // .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
+        // .flowColor('#72bb6f')
+        // .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+        // .nutsLevel(0)
+        // .zoomExtent([0.5, 10])
+        // .build()
+    </script>
+</body>
+
 </html>

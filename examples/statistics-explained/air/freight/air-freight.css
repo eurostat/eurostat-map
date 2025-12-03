@@ -6,6 +6,15 @@
       font-family: "Arial" !important;
   }
 
+  .em-title {
+      font-size: 25px !important;
+  }
+
+  .em-subtitle {
+      font-size: 20px !important;
+  }
+
+
   .em-legend-background {
       filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
       opacity: 0.9;
@@ -34,7 +43,7 @@
   .em-flow-label-shadow {
       font-family: "Arial" !important;
       font-size: 15px !important;
-      opacity: 0.5 !important;
+      opacity: 0.8 !important;
       font-weight: bold;
       fill: #333333 !important;
   }

@@ -7,8 +7,8 @@ const regions = {
     "southern asia": ["AF", "BD", "BT", "XD", "XE", "XH", "XC", "IN", "IR", "MV", "NP", "PK", "LK"],
     "central asia": ["KZ", "KG", "TJ", "TM", "UZ"],
     "eastern asia": ["CN", "HK", "JP", "KP", "KR", "MN", "MO", "TW"],
-    "ASEAN": ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
-    "australasia, s.sea is. & antarctica": ["AU", "NZ", "PG", "FJ", "SB", "VU", "WS", "TO", "TV", "KI", "FM", "MH", "PW", "NR", "NU", "CK", "PN", "TK", "AQ"],
+    "South Eastern Asia": ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
+    "Oceania and southern polar regions": ["AU", "NZ", "PG", "FJ", "SB", "VU", "WS", "TO", "TV", "KI", "FM", "MH", "PW", "NR", "NU", "CK", "PN", "TK", "AQ"],
     "EU": ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "EL"],
     "europe except eu": ["AL", "AD", "BA", "CH", "IS", "LI", "MD", "MC", "ME", "MK", "NO", "RS", "SM", "UA", "GB", "BY", "XK", "RU", "GL", "UK"]
 }

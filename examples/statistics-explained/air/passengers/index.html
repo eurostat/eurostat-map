@@ -11,6 +11,10 @@
 </head>
 
 <body style="margin:0">
+    <div>
+        <button id="export-png-btn" type="button">Export map as PNG</button>
+        <button id="export-svg-btn" type="button">Export map as SVG</button>
+    </div>
     <svg id="air-passengers-map"></svg>
 
     <svg style='display:none;'>
@@ -49,8 +53,13 @@
             .then(r => r.json())
             .then(graphData => {
 
-                const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
-                const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
+                const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F'];
+                const fourColorTheorem = [
+                    "#388AE2", // blue
+                    "#B09120", // yellow
+                    "#33A033", // green
+                    "#E04040"  // red
+                ];
                 const regionColors = {
                     "north america": fourColorTheorem[0],
                     "central america and caribbean": fourColorTheorem[1],
@@ -62,16 +71,23 @@
                     "southern asia": fourColorTheorem[2],
                     "central asia": fourColorTheorem[1],
                     "eastern asia": fourColorTheorem[0],
-                    ASEAN: fourColorTheorem[1],
-                    "australasia, s.sea is. & antarctica": fourColorTheorem[2],
-                    EU: fourColorTheorem[0],
-                    "europe except eu": fourColorTheorem[2]
+                    "South Eastern Asia": fourColorTheorem[1],
+                    "Oceania and southern polar regions": fourColorTheorem[2],
+                    EU: '#003399',
+                    "europe except eu": fourColorTheorem[2],
                 };
 
 
+                const truncateSI = d => {
+                    const abs = Math.abs(d);
 
+                    if (abs >= 1e9) return Math.floor(d / 1e9) + "B";
+                    if (abs >= 1e6) return Math.floor(d / 1e6) + "M";
+                    if (abs >= 1e3) return Math.floor(d / 1e3) + "k";
+                    return d.toString();
+                };
 
-                const valuesLabelFormatter = (d) => d3.format('.2s')(d)
+                const valuesLabelFormatter = truncateSI;
 
                 const colorFunction = d3.scaleThreshold()
                     .domain(airMapConfigs[year].passengers.breaks)   // ascending thresholds
@@ -131,6 +147,19 @@
 
                 const map = eurostatmap
                     .map("flow")
+
+                    //static settings
+                    .header(true)
+                    .footer(true)
+                    .zoomButtons(false)
+                    .showEstatLogo(true)
+                    .showEstatRibbon(true)
+                    .logoPosition([2, height + 42])
+                    .ribbonPosition([width - 180, height + 20])
+                    .ribbonWidth(300)
+                    .ribbonHeight(50)
+                    //end static settings
+
                     .svgId("air-passengers-map")
                     .hoverColor('#ffc700')
                     .width(width)
@@ -176,13 +205,13 @@
                     // legend
                     .legend({
                         x: width - 205,
-                        y: 5,
+                        y: 60,
                         boxPadding: 10,
                         title: "Passengers carried",
                         flowWidthLegend: {
                             marginTop: -10,
                             values: airMapConfigs[year].passengers.legend.sizeLegend.values,
-                            labels: ['290 thousand (min)', '50 million', '290 million (max)']
+                            labels: ['290 thousand', '50 million', '295 million']
                         },
                         flowColorLegend: {
                             marginTop: 60,
@@ -204,12 +233,12 @@
                     })
 
                     .footnote(
-                        "Passengers carried includes both arrivals and departures. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Cartography: GISCO. Boundaries: ©EuroGeographics @OSM"
-                    ).footnoteWrap(false)
+                        "Note: Passengers carried includes both arrivals and departures. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_paexcc)"
+                    ).footnoteWrap(150)
 
                     // zoom min/max
                     .zoomExtent([0.6, 10])
-                    .zoomButtons(true)
+
 
                     .callback(() => {
                         // set fill of regions
@@ -224,9 +253,30 @@
                         // raise labels (fixed in next version of estatmap)
                         const labels = d3.selectAll("#em-labels");
                         labels.raise();
+
+                        //add cartography text
+                        // --- REMOVE if it already exists ---
+                        d3.select("#air-passengers-map #em-footnote-2").remove();
+
+                        d3.selectAll("#air-passengers-map")
+                            .append('text')
+                            .attr('x', width - 315)
+                            .attr('y', height + 100)
+                            .attr('class', 'em-footnote').attr('id', 'em-footnote-2')
+                            .append('tspan')
+                            .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM');
                     })
                     .build();
 
+                const exportBtnPNG = document.getElementById("export-png-btn");
+                exportBtnPNG.addEventListener("click", function () {
+                    map.exportMapToPNG(1080, 752.4941184099982);
+                });
+
+                const exportBtnSVG = document.getElementById("export-svg-btn");
+                exportBtnSVG.addEventListener("click", function () {
+                    map.exportMapToSVG();
+                });
 
             })
             .catch(err => console.error(err));
@@ -247,6 +297,8 @@
 
             return luminance > 140 ? 'black' : 'white';
         }
+
+
     </script>
 </body>
 

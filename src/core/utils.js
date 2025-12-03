@@ -449,13 +449,23 @@ export const lowerCaseAllWordsExceptFirstLetters = (string) =>
 
 export function getDownloadURL(svgNode) {
     // Create XML header to ensure the SVG is recognized properly
-    const xmlHeader = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
+    const xmlHeader = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n';
 
-    // create blob
-    const svgContent = xmlHeader + svgNode.outerHTML
-    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
-    const svgUrl = URL.createObjectURL(svgBlob)
-    return svgUrl
+    // Serialize SVG (outerHTML keeps entities)
+    let svgContent = xmlHeader + svgNode.outerHTML;
+
+    // --- 🔒 Sanitize invalid HTML entities ---
+    svgContent = svgContent
+        .replace(/&nbsp;/g, '&#160;')  // non-breaking space
+        .replace(/&copy;/g, '&#169;')  // © if used anywhere
+        .replace(/&reg;/g, '&#174;')   // ® if used anywhere
+        .replace(/&times;/g, '&#215;') // × sign if used in labels
+        .replace(/&deg;/g, '&#176;');  // ° degrees symbol if used
+
+    // Create blob and return URL
+    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    return svgUrl;
 }
 
 // Rasterize function with additional error handling

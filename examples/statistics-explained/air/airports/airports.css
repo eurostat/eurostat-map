@@ -3,6 +3,14 @@
     opacity: 0.9;
 }
 
+.em-title {
+    font-size: 25px !important;
+}
+
+.em-subtitle {
+    font-size: 20px !important;
+}
+
 #airport-pairs-map .em-zoom-buttons {
     transform: translate(.5%, 86%);
 }

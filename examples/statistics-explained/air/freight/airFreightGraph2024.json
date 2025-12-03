@@ -13,7 +13,7 @@
             "id": "AFR_C +AFR_N+AFR_S+AFR_W",
             "name": "Rest of Africa",
             "x": 10,
-            "y": 13,
+            "y": 19,
             "value": 401000,
             "share": "3.4%",
             "change": "-0.9%"
@@ -30,7 +30,7 @@
         {
             "id": "AME_N",
             "name": "Northern America",
-            "x": -100,
+            "x": -70,
             "y": 45,
             "value": 2496000,
             "share": "21.0%",
@@ -48,7 +48,7 @@
         {
             "id": "AME_S",
             "name": "South America",
-            "x": -60,
+            "x": -50,
             "y": -15,
             "value": 562000,
             "share": "4.7%",
@@ -58,7 +58,7 @@
             "id": "ASI_C",
             "name": "Central Asia",
             "x": 70,
-            "y": 47,
+            "y": 50,
             "value": 282000,
             "share": "2.4%",
             "change": "47.5%"
@@ -66,8 +66,8 @@
         {
             "id": "ASI_E",
             "name": "Eastern Asia",
-            "x": 105,
-            "y": 29,
+            "x": 108,
+            "y": 27,
             "value": 3023000,
             "share": "25.5%",
             "change": "12.8%"
@@ -75,15 +75,15 @@
         {
             "id": "ASI_S",
             "name": "Southern Asia",
-            "x": 80,
-            "y": 20,
+            "x": 75,
+            "y": 25,
             "value": 381000,
             "share": "3.2%",
             "change": "8.8%"
         },
         {
             "id": "ASI_S_E",
-            "name": "ASEAN",
+            "name": "South Eastern Asia",
             "x": 105,
             "y": 5,
             "value": 447000,
@@ -93,17 +93,17 @@
         {
             "id": "ASI_W",
             "name": "Western Asia",
-            "x": 45,
-            "y": 25,
+            "x": 42,
+            "y": 30,
             "value": 2561000,
             "share": "21.6%",
             "change": "24.4%"
         },
         {
             "id": "OCE_PLR",
-            "name": "Australasia, S. Sea Is. & Antarctica",
-            "x": 135,
-            "y": -20,
+            "name": "Oceania and southern polar regions",
+            "x": 132,
+            "y": -18,
             "value": 3000,
             "share": "0.0%",
             "change": "18.5%"

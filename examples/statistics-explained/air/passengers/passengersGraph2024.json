@@ -22,7 +22,7 @@
             "id": "AFR_N",
             "name": "North Africa",
             "x": 5,
-            "y": 25,
+            "y": 29,
             "value": 47752000,
             "share": "9.2%",
             "change": "14.3%"
@@ -83,7 +83,7 @@
         },
         {
             "id": "ASI_S_E",
-            "name": "ASEAN",
+            "name": "South Eastern Asia",
             "x": 105,
             "y": 5,
             "value": 6934000,
@@ -101,7 +101,7 @@
         },
         {
             "id": "OCE_PLR",
-            "name": "Australasia, S. Sea Is. & Antarctica",
+            "name": "Oceania and southern polar regions",
             "x": 135,
             "y": -20,
             "value": 294000,
@@ -122,7 +122,7 @@
         {
             "source": "EU",
             "target": "EUR_OTH + EX_SU_EUR",
-            "value": 293600000
+            "value": 295670000
         },
         {
             "source": "EU",

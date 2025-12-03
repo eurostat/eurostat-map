@@ -1,1 +1,183 @@
-{"nodes":[{"id":"ASI_E","name":"Eastern Asia","x":105,"y":29,"value":2680000,"share":"25.0%","change":"3.4%"},{"id":"AME_N","name":"North America","x":-100,"y":45,"value":2511000,"share":"23.4%","change":"-12.0%"},{"id":"ASI_W","name":"Western Asia","x":45,"y":25,"value":2064000,"share":"19.2%","change":"-7.1%"},{"id":"EUR_OTH + EX_SU_EUR","name":"Europe except EU","x":9,"y":60,"value":1038000,"share":"9.7%","change":"-10.8%"},{"id":"AME_S","name":"South America","x":-60,"y":-15,"value":514000,"share":"4.8%","change":"1.9%"},{"id":"AFR_C +AFR_N+AFR_S+AFR_W","name":"Rest of Africa","x":10,"y":10,"value":404000,"share":"3.8%","change":"-2.1%"},{"id":"ASI_S_E","name":"ASEAN","x":105,"y":5,"value":394000,"share":"3.7%","change":"-3.9%"},{"id":"ASI_S","name":"Southern Asia","x":80,"y":20,"value":351000,"share":"3.3%","change":"8.7%"},{"id":"AFR_E","name":"Eastern Africa","x":38,"y":-8.5,"value":300000,"share":"2.8%","change":"-2.0%"},{"id":"AME_C_CRB","name":"Central America and Caribbean","x":-85,"y":15,"value":288000,"share":"2.7%","change":"-3.3%"},{"id":"ASI_C","name":"Central Asia","x":70,"y":47,"value":191000,"share":"1.8%","change":"-21.8%"},{"id":"OCE_PLR","name":"Australasia, S. Sea Is. & Antarctica","x":135,"y":-20,"value":3000,"share":"0.0%","change":"-7.3%"},{"id":"EU","name":"European Union","x":10,"y":50,"value":0,"share":null,"change":null}],"links":[{"source":"EU","target":"ASI_E","value":2680000},{"source":"EU","target":"AME_N","value":2511000},{"source":"EU","target":"ASI_W","value":2064000},{"source":"EU","target":"EUR_OTH + EX_SU_EUR","value":1038000},{"source":"EU","target":"AME_S","value":514000},{"source":"EU","target":"AFR_C +AFR_N+AFR_S+AFR_W","value":404000},{"source":"EU","target":"ASI_S_E","value":394000},{"source":"EU","target":"ASI_S","value":351000},{"source":"EU","target":"AFR_E","value":300000},{"source":"EU","target":"AME_C_CRB","value":288000},{"source":"EU","target":"ASI_C","value":191000},{"source":"EU","target":"OCE_PLR","value":3000}]}
+{
+    "nodes": [
+        {
+            "id": "ASI_E",
+            "name": "Eastern Asia",
+            "x": 105,
+            "y": 29,
+            "value": 2680000,
+            "share": "25.0%",
+            "change": "3.4%"
+        },
+        {
+            "id": "AME_N",
+            "name": "North America",
+            "x": -100,
+            "y": 45,
+            "value": 2511000,
+            "share": "23.4%",
+            "change": "-12.0%"
+        },
+        {
+            "id": "ASI_W",
+            "name": "Western Asia",
+            "x": 45,
+            "y": 25,
+            "value": 2064000,
+            "share": "19.2%",
+            "change": "-7.1%"
+        },
+        {
+            "id": "EUR_OTH + EX_SU_EUR",
+            "name": "Europe except EU",
+            "x": 9,
+            "y": 60,
+            "value": 1038000,
+            "share": "9.7%",
+            "change": "-10.8%"
+        },
+        {
+            "id": "AME_S",
+            "name": "South America",
+            "x": -60,
+            "y": -15,
+            "value": 514000,
+            "share": "4.8%",
+            "change": "1.9%"
+        },
+        {
+            "id": "AFR_C +AFR_N+AFR_S+AFR_W",
+            "name": "Rest of Africa",
+            "x": 10,
+            "y": 10,
+            "value": 404000,
+            "share": "3.8%",
+            "change": "-2.1%"
+        },
+        {
+            "id": "ASI_S_E",
+            "name": "South Eastern Asia",
+            "x": 105,
+            "y": 5,
+            "value": 394000,
+            "share": "3.7%",
+            "change": "-3.9%"
+        },
+        {
+            "id": "ASI_S",
+            "name": "Southern Asia",
+            "x": 80,
+            "y": 20,
+            "value": 351000,
+            "share": "3.3%",
+            "change": "8.7%"
+        },
+        {
+            "id": "AFR_E",
+            "name": "Eastern Africa",
+            "x": 38,
+            "y": -8.5,
+            "value": 300000,
+            "share": "2.8%",
+            "change": "-2.0%"
+        },
+        {
+            "id": "AME_C_CRB",
+            "name": "Central America and Caribbean",
+            "x": -85,
+            "y": 15,
+            "value": 288000,
+            "share": "2.7%",
+            "change": "-3.3%"
+        },
+        {
+            "id": "ASI_C",
+            "name": "Central Asia",
+            "x": 70,
+            "y": 47,
+            "value": 191000,
+            "share": "1.8%",
+            "change": "-21.8%"
+        },
+        {
+            "id": "OCE_PLR",
+            "name": "Oceania and southern polar regions",
+            "x": 135,
+            "y": -20,
+            "value": 3000,
+            "share": "0.0%",
+            "change": "-7.3%"
+        },
+        {
+            "id": "EU",
+            "name": "European Union",
+            "x": 10,
+            "y": 50,
+            "value": 0,
+            "share": null,
+            "change": null
+        }
+    ],
+    "links": [
+        {
+            "source": "EU",
+            "target": "ASI_E",
+            "value": 2680000
+        },
+        {
+            "source": "EU",
+            "target": "AME_N",
+            "value": 2511000
+        },
+        {
+            "source": "EU",
+            "target": "ASI_W",
+            "value": 2064000
+        },
+        {
+            "source": "EU",
+            "target": "EUR_OTH + EX_SU_EUR",
+            "value": 1038000
+        },
+        {
+            "source": "EU",
+            "target": "AME_S",
+            "value": 514000
+        },
+        {
+            "source": "EU",
+            "target": "AFR_C +AFR_N+AFR_S+AFR_W",
+            "value": 404000
+        },
+        {
+            "source": "EU",
+            "target": "ASI_S_E",
+            "value": 394000
+        },
+        {
+            "source": "EU",
+            "target": "ASI_S",
+            "value": 351000
+        },
+        {
+            "source": "EU",
+            "target": "AFR_E",
+            "value": 300000
+        },
+        {
+            "source": "EU",
+            "target": "AME_C_CRB",
+            "value": 288000
+        },
+        {
+            "source": "EU",
+            "target": "ASI_C",
+            "value": 191000
+        },
+        {
+            "source": "EU",
+            "target": "OCE_PLR",
+            "value": 3000
+        }
+    ]
+}

@@ -119,6 +119,18 @@
                     .subtitle("by most passengers carried, 2024")
                     .hoverColor('#ffc700')
 
+                    //static settings
+                    .header(true)
+                    .footer(true)
+                    .zoomButtons(false)
+                    .showEstatLogo(true)
+                    .showEstatRibbon(true)
+                    .logoPosition([2, height + 42])
+                    .ribbonPosition([width - 180, height + 20])
+                    .ribbonWidth(300)
+                    .ribbonHeight(50)
+                    //end static settings
+
                     //projection
                     .projectionFunction(projection)
 

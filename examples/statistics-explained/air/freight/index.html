@@ -51,7 +51,12 @@
             .then(graphData => {
 
                 const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']; // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
-                const fourColorTheorem = ["#2B6CB0", "#D69E2E", "#2F855A", "#C53030"];
+                const fourColorTheorem = [
+                    "#388AE2", // blue
+                    "#B09120", // yellow
+                    "#33A033", // green
+                    "#E04040"  // red
+                ];
                 const regionColors = {
                     "north america": fourColorTheorem[0],
                     "central america and caribbean": fourColorTheorem[1],
@@ -62,13 +67,22 @@
                     "southern asia": fourColorTheorem[2],
                     "central asia": fourColorTheorem[1],
                     "eastern asia": fourColorTheorem[0],
-                    ASEAN: fourColorTheorem[1],
-                    "australasia, s.sea is. & antarctica": fourColorTheorem[2],
+                    "south eastern asia": fourColorTheorem[1],
+                    "Oceania and southern polar regions": fourColorTheorem[2],
                     EU: fourColorTheorem[0],
                     "europe except eu": fourColorTheorem[2]
                 }
 
-                const valuesLabelFormatter = (d) => d3.format('.2s')(d)
+                const truncateSI = d => {
+                    const abs = Math.abs(d);
+
+                    if (abs >= 1e9) return Math.floor(d / 1e9) + "B";
+                    if (abs >= 1e6) return Math.floor(d / 1e6) + "M";
+                    if (abs >= 1e3) return Math.floor(d / 1e3) + "k";
+                    return d.toString();
+                };
+
+                const valuesLabelFormatter = truncateSI;
 
                 const colorFunction = d3.scaleThreshold()
                     .domain(airMapConfigs[year].freight.breaks)   // ascending thresholds
@@ -139,6 +153,18 @@
                     .subtitle(
                         `Transport of freight and mail from the EU to outside the EU, ${year}`
                     )
+
+                    //static settings
+                    .header(true)
+                    .footer(true)
+                    .zoomButtons(false)
+                    .showEstatLogo(true)
+                    .showEstatRibbon(true)
+                    .logoPosition([2, height + 42])
+                    .ribbonPosition([width - 180, height + 20])
+                    .ribbonWidth(300)
+                    .ribbonHeight(50)
+                    //end static settings
 
                     //projection
                     .projectionFunction(worldProjection)
@@ -214,14 +240,14 @@
                     // legend
                     .legend({
                         x: width - 185,
-                        y: 0,
+                        y: 50,
                         boxPadding: 10,
                         title: "Freight carried",
                         subtitle: "(tonnes)",
                         flowWidthLegend: {
                             marginTop: -10,
                             values: airMapConfigs[year].freight.legend.sizeLegend.values,
-                            labels: ['3 thousand (min)', '1 million', '2.6 million (max)']
+                            labels: ['3 thousand', '1 million', '2.6 million']
                         },
                         flowColorLegend: {
                             marginTop: 50,
@@ -243,13 +269,11 @@
                     })
 
                     .footnote(
-                        "Freight includes both loaded and unloaded. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Cartography: GISCO. Boundaries: ©EuroGeographics @OSM"
-                    )
-                    .footnoteWrap(false)
+                        "Note: Freight includes both loaded and unloaded. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_paexcc)"
+                    ).footnoteWrap(150)
 
                     // zoom min/max
                     .zoomExtent([0.6, 10])
-                    .zoomButtons(true)
 
                     .callback(() => {
                         // set fill of regions

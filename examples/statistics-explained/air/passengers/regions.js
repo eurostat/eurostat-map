@@ -120,8 +120,8 @@ const regions = {
   "southern asia": ["AF", "BD", "BT", "IN", "IR", "MV", "NP", "PK", "LK"],
   "central asia": ["KZ", "KG", "TJ", "TM", "UZ"],
   "eastern asia": ["CN", "HK", "JP", "KP", "KR", "MN", "MO", "TW"],
-  ASEAN: ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
-  "australasia, s.sea is. & antarctica": [
+  "South Eastern Asia": ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
+  "Oceania and southern polar regions": [
     "AU",
     "NZ",
     "PG",
@@ -193,5 +193,14 @@ const regions = {
     "RU",
     "GL",
     "UK"
+  ],
+  "eu": [
+    "AT", "BE", "BG", "HR", "CY",
+    "CZ", "DK", "EE", "FI", "FR",
+    "DE", "EL", "HU", "IE", "IT",
+    "LV", "LT", "LU", "MT", "NL",
+    "PL", "PT", "RO", "SK", "SI",
+    "ES", // Spain
+    "SE"  // Sweden
   ]
 }

@@ -216,7 +216,7 @@
                     .attr('y', portsHeight + 100)
                     .attr('class', 'em-footnote').attr('id', 'em-footnote-2')
                     .append('tspan')
-                    .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
+                    .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM');
             })
             .annotations({ editMode: editMode, annotations: portsAnnotations }).tooltip({
                 textFunction: tooltipTextFunction
@@ -234,12 +234,12 @@
 
         var exportBtnPNG = document.getElementById("export-png-btn");
         exportBtnPNG.addEventListener("click", function () {
-            map.exportMapToPNG(1080, 900);
+            map.exportMapToPNG(1080, 978);
         });
 
         var exportBtnSVG = document.getElementById("export-svg-btn");
         exportBtnSVG.addEventListener("click", function () {
-            map.exportMapToSVG(1080, 900);
+            map.exportMapToSVG();
         });
 
 
