@@ -15,7 +15,7 @@ export const legend = function (map) {
     out.map = map
 
     //the SVG where to make the legend
-    out.svgId = 'legend_' + Math.round(10e15 * Math.random())
+    out.svgId = 'em-legend-container-' + Math.round(10e4 * Math.random())
     out.svg = undefined
     out.lgg = undefined
 
@@ -75,11 +75,11 @@ export const legend = function (map) {
         //set SVG element and add main drawing group
         out.svg = select('#' + out.svgId)
         // clear previous legend(s)
-        out.svg.selectAll('#em-legend-' + out.svgId).remove()
+        out.svg.selectAll('*').remove()
         // append new legend group
         out.lgg = out.svg
-            .append('g')
-            .attr('id', 'em-legend-' + out.svgId)
+            // .append('g')
+            // .attr('id', 'em-legend-' + out.svgId)
             .attr('class', 'em-legend')
     }
 

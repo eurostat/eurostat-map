@@ -6,7 +6,7 @@ const portsData = [
     { "country": "TR", "code": "TR02TRIZT", "name": "Izmit", "sea": "Mediterranean sea", "tonnes_2024": 82735638, "lat": 40.766, "lon": 29.789 },
     { "country": "ES", "code": "ES02ESALG", "name": "Algeciras", "sea": "Mediterranean sea", "tonnes_2024": 81549379, "lat": 36.131, "lon": -5.436 },
     { "country": "NL", "code": "NL00NLAMS", "name": "Amsterdam", "sea": "North sea", "tonnes_2024": 78756421, "lat": 52.414, "lon": 4.844 },
-    { "country": "FR", "code": "FR01FR001", "name": "HAROPA – Le Havre", "sea": "North East Atlantic Ocean", "tonnes_2024": 76737908, "lat": 49.25, "lon": 0.75 },
+    { "country": "FR", "code": "FR01FR001", "name": "HAROPA", "sea": "North East Atlantic Ocean", "tonnes_2024": 76737908, "lat": 49.25, "lon": 0.75 },
     { "country": "PL", "code": "PL00PLGDN", "name": "Gdansk", "sea": "Baltic sea", "tonnes_2024": 71039711, "lat": 54.389, "lon": 18.688 },
     { "country": "TR", "code": "TR02TRISK", "name": "Iskenderun- Hatay", "sea": "Mediterranean sea", "tonnes_2024": 68150345, "lat": 36.65, "lon": 36.197 },
     { "country": "NO", "code": "NO00NOBGO", "name": "Bergen", "sea": "North sea", "tonnes_2024": 66838711, "lat": 60.395, "lon": 5.305 },

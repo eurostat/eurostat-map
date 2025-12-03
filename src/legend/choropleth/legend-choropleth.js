@@ -51,6 +51,7 @@ export const legend = function (map, config) {
 
     // discrete legends
     out.showMaxMin = false //whether to show min and max labels for discrete legends
+    out.maxMinLabels = [' (min)', ' (max)'] // Labels for max and min if showMaxMin is true
 
     //override attribute values with config values
     if (config) {

@@ -31,7 +31,7 @@
         </defs>
     </svg>
 
-    <script src="../../../eurostatmap.min.js"></script>
+    <script src="../../../../../build/eurostatmap.js"></script>
     <script src="../../../d3.v7.min.js"></script>
     <script src="../../../proj4-src.js"></script>
     <script src="../portsData.js"></script>
@@ -43,7 +43,7 @@
         const portsAnnotations = await(await fetch('./ports-annotations.json')).json();
         window.portsAnnotations = portsAnnotations;
         const portsWidth = 1080; //social media size
-        const portsHeight = 900;
+        const portsHeight = 850;
         const insetsX = portsWidth - 120;
         const insetsY = 10;
 
@@ -70,6 +70,7 @@
         let editMode = false;
         const map = eurostatmap
             .map("ps")
+            .header(true).footer(true)
             .svgId("ports-map")
             .height(portsHeight) //social media size
             .width(portsWidth)
@@ -77,7 +78,7 @@
             .insets(insets)
             .insetBoxPosition([insetsX, insetsY])
             .showEstatLogo(true)
-            .logoPosition([portsWidth - 120, portsHeight - 50])
+            .logoPosition([0, portsHeight + 25])
             .nutsLevel(0)
             .psMinSize(3)
             .psMaxSize(30)
@@ -88,14 +89,14 @@
                 "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). Ports reporting more than 47 million tonnes are labelled."
             )
             .footnoteWrap(100)
-            .footnotePosition([15, portsHeight - 15])
+            //.footnotePosition([15, portsHeight - 15])
             .legend({
                 title: "Million tonnes",
-                x: portsWidth - 345,
-                y: 285,
+                x: 10,
+                y: 240,
                 sizeLegend: {
                     values: [397000000, 100000000, 2000000],
-                    labels: ['397 (max)', '100 ', '2 (min)']
+                    labels: ['397 (Rotterdam)', '100 ', '2 (Umea)']
                 }
             })
             .filterGeometriesFunction((geometries) => {
@@ -207,7 +208,7 @@
                 d3.selectAll("#ports-map")
                     .append('text')
                     .attr('x', portsWidth - 315)
-                    .attr('y', portsHeight)
+                    .attr('y', portsHeight + 100)
                     .attr('class', 'em-footnote').attr('id', 'em-footnote-2')
                     .append('tspan')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');

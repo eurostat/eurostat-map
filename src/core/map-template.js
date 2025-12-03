@@ -24,6 +24,9 @@ import { appendInsetsButton } from './buttons/insets-button'
 import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
 import { addEurostatLogo } from './logo.js'
+import { addCoastalMarginToMap, appendCoastalMargin } from './coastal-margin.js'
+import { addFootnote, addSubtitle, addTitle } from './texts.js'
+import { addScalebarToMap } from './scalebar.js'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -97,6 +100,10 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.onDorlingProgress_ = undefined
     out.dorlingWorker_ = false // use a web worker for (non-animated) dorling cartograms to not block the main thread
     out.dorlingWorkerD3URL_ = undefined
+
+    //header/footer
+    out.header_ = false // add titles to separate header section
+    out.footer_ = false // add footnotes to separate footer section
 
     //map title
     out.title_ = ''
@@ -328,92 +335,12 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     //coastal margin override
     out.drawCoastalMargin = function (v) {
+        //get
         if (!arguments.length) return out.drawCoastalMargin_
+        //set
         out.drawCoastalMargin_ = v
-
-        //update existing
-        if (out.svg_) {
-            let margin = selectAll('#em-coast-margin')
-            let filter = select('#em-coastal-blur')
-            let zg = select('#em-zoom-group-' + out.svgId_) || null
-            if (margin._groups[0][0] && v == false) {
-                // remove existing
-                margin.remove()
-            } else if (v == true && out._pathFunction && zg) {
-                //remove existing graticule
-                margin.remove()
-                filter.remove()
-                //add filter
-                out.svg_
-                    .append('filter')
-                    .attr('id', 'em-coastal-blur')
-                    .attr('x', '-200%')
-                    .attr('y', '-200%')
-                    .attr('width', '400%')
-                    .attr('height', '400%')
-                    .append('feGaussianBlur')
-                    .attr('in', 'SourceGraphic')
-                    .attr('stdDeviation', out.coastalMarginStdDev_)
-
-                //draw for main map - geometries are still in memory so no rebuild needed
-                const drawNewCoastalMargin = (map) => {
-                    // zoom group might not be inside main map (out.svg_)
-                    const zoomGroup = select('#em-zoom-group-' + map.svgId_)
-                    //draw new coastal margin
-                    const cg = zoomGroup.append('g').attr('id', 'em-coast-margin')
-
-                    //countries bn
-                    if (map._geom.cntbn)
-                        cg.append('g')
-                            .attr('id', 'em-coast-margin-cnt')
-                            .selectAll('path')
-                            .data(map._geom.cntbn)
-                            .enter()
-                            .filter(function (bn) {
-                                return bn.properties.co === 'T'
-                            })
-                            .append('path')
-                            .attr('d', map._pathFunction)
-                    //nuts bn
-                    if (map._geom.nutsbn)
-                        cg.append('g')
-                            .attr('id', 'em-coast-margin-nuts')
-                            .selectAll('path')
-                            .data(map._geom.nutsbn)
-                            .enter()
-                            .filter(function (bn) {
-                                return bn.properties.co === 'T'
-                            })
-                            .append('path')
-                            .attr('d', map._pathFunction)
-                    //world bn
-                    if (map._geom.worldbn)
-                        cg.append('g')
-                            .attr('id', 'em-coast-margin-nuts')
-                            .selectAll('path')
-                            .data(map._geom.worldbn)
-                            .enter()
-                            .filter(function (bn) {
-                                return bn.properties.COAS_FLAG === 'T'
-                            })
-                            .append('path')
-                            .attr('d', map._pathFunction)
-                }
-
-                //draw for insets - requires geometries so we have to rebuild base template
-                if (out.insetTemplates_ && out.drawCoastalMargin_) {
-                    executeForAllInsets(out.insetTemplates_, out.svgId_, drawNewCoastalMargin)
-                    drawNewCoastalMargin(out)
-                }
-
-                // move margin to back (in front of sea)
-                selectAll('#em-coast-margin').each(function () {
-                    out.geo_ == 'WORLD'
-                        ? this.parentNode.insertBefore(this, this.parentNode.childNodes[3])
-                        : this.parentNode.insertBefore(this, this.parentNode.childNodes[1])
-                })
-            }
-        }
+        //update
+        appendCoastalMargin(out)
         return out
     }
 
@@ -551,13 +478,16 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (!out.height()) out.height(0.85 * out.width())
         svg.attr('width', out.width()).attr('height', out.height())
 
-        // each map template needs a clipPath to avoid overflow. See GISCO-2707
-        svg.append('defs')
-            .attr('class', 'em-defs')
-            .append('clipPath')
+        // define clipPath relative to the drawing group (map area)
+        const defs = svg.append('defs').attr('class', 'em-defs');
+
+        defs.append('clipPath')
             .attr('id', out.svgId_ + '-clip-path')
-            .append('path')
-            .attr('d', convertRectanglesToPaths(0, 0, out.width_, out.height_))
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', out.width_)
+            .attr('height', out.height_);
 
         if (out.drawCoastalMargin_) {
             //define filter for coastal margin
@@ -572,18 +502,26 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 .attr('stdDeviation', out.coastalMarginStdDev_)
         }
 
-        //create drawing group, as first child
-        const dg = svg
-            .insert('g', ':first-child')
-            .attr('id', 'em-drawing-' + out.svgId_)
-            .attr('class', 'em-drawing-group')
-            .attr('clip-path', 'url(#' + out.svgId_ + '-clip-path' + ')')
+        // create header, drawing and footer groups (stacked blocks)
+        // header (top)
+        svg.append('g')
+            .attr('id', 'em-header-' + out.svgId_)
+            .attr('class', 'em-header')
 
-        //create main zoom group
-        const zg = dg
-            .append('g')
+        // drawing group (middle). clip-path will be updated by recalculateLayout()
+        const dg = svg.append('g')
+            .attr('id', 'em-drawing-' + out.svgId_)
+            .attr('class', 'em-drawing-group').attr('clip-path', `url(#${out.svgId_}-clip-path)`); //  apply clipPath here
+
+        // main zoom group inside drawing
+        const zg = dg.append('g')
             .attr('id', 'em-zoom-group-' + out.svgId_)
-            .attr('class', 'em-zoom-group') //out.geo changed to out.svgId in order to be unique
+            .attr('class', 'em-zoom-group')
+
+        // footer (bottom)
+        svg.append('g')
+            .attr('id', 'em-footer-' + out.svgId_)
+            .attr('class', 'em-footer')
 
         // build insets
         removeInsets(out) //remove existing
@@ -596,7 +534,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', out.width_)
-            .attr('height', out.height_)
+            .attr('height', out.height_);
 
         if (out.stamp_) {
             appendStamp(out.stamp_, out)
@@ -671,38 +609,17 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         //title
         if (out.title()) {
-            //define default position
-            let cssClass = out.isInset ? 'em-inset-title' : 'em-title'
-            if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass(cssClass) + (out.isInset ? 0 : 10)])
-            //draw title
-            out.svg()
-                .append('text')
-                .attr('id', 'title' + out.geo_)
-                .attr('class', cssClass)
-                .attr('x', out.titlePosition()[0])
-                .attr('y', out.titlePosition()[1])
-                .html(out.title())
+            addTitle(out)
         }
 
         //subtitle
         if (out.subtitle()) {
-            let cssSubtitleClass = out.isInset ? 'em-inset-subtitle' : 'em-subtitle'
-            let cssTitleClass = out.isInset ? 'em-inset-title' : 'em-title'
-            //define default position
-            if (!out.subtitlePosition()) out.subtitlePosition([10, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
-            //draw subtitle
-            out.svg()
-                .append('text')
-                .attr('id', 'subtitle' + out.geo_)
-                .attr('class', cssSubtitleClass)
-                .attr('x', out.subtitlePosition()[0])
-                .attr('y', out.subtitlePosition()[1])
-                .html(out.subtitle())
+            addSubtitle(out)
         }
 
         //bottom text
         if (out.footnote_) {
-            addFootnote()
+            addFootnote(out)
         }
 
         //logo
@@ -755,7 +672,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 out.scalebarPosition_[0] = 15
                 out.scalebarPosition_[1] = out.height_ - 50
             }
-            addScalebarToMap()
+            addScalebarToMap(out)
         }
 
         //minimap
@@ -773,6 +690,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             appendInsetsButton(out)
         }
 
+        //header/footer
+        setTimeout(() => out.recalculateLayout(), 20);
         return out
     }
 
@@ -920,7 +839,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // coastal margin
         if (out.drawCoastalMargin_) {
-            addCoastalMarginToMap()
+            addCoastalMarginToMap(out)
         }
 
         // draw polygons and borders
@@ -1028,274 +947,73 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (z != null && z != undefined && !isNaN(+z)) out.position_.z = +z
     }
 
-    const addFootnote = function () {
-        const wrap = out.footnoteWrap_ || Infinity;   // e.g. user sets map.footnoteWrap(500)
-        const text = out.footnote_ || "";
-        const position = out.footnotePosition_ ? out.footnotePosition_ : [10, out.height_];
-
+    out.recalculateLayout = function () {
         const svg = out.svg();
+        const header = svg.select('#em-header-' + out.svgId_);
+        const drawing = svg.select('#em-drawing-' + out.svgId_);
+        const footer = svg.select('#em-footer-' + out.svgId_);
+        const frame = drawing.select('#em-frame-' + out.geo_);
+        const clipRect = svg.select(`#${out.svgId_}-clip-path rect`);
 
-        const foot = svg.append("text")
-            .attr("id", "em-footnote")
-            .attr("class", "em-footnote")
-            .attr("x", position[0])
-            .attr("y", position[1]);
+        let headerHeight = 0;
+        let footerHeight = 0;
 
-        // --- wrapping into tspans ---
-        const words = text.split(/(\s+)/);  // keep whitespace tokens
-        let line = "";
-        let lineIndex = 0;
+        // --- Define consistent vertical padding between header and map ---
+        const headerMapPadding = 20; // px (tweak visually as needed)
+        const footerMapPadding = 10; // px below map before footer
 
-        for (const w of words) {
-            if ((line + w).length > wrap && line.length > 0) {
-                foot.append("tspan")
-                    .attr("x", 0)
-                    .attr("dy", lineIndex === 0 ? 0 : "1.2em")
-                    .html(line.trim());
-                line = w;
-                lineIndex++;
-            } else {
-                line += w;
-            }
+        // --- Measure header height ---
+        if (out.header_ && !header.empty()) {
+            const hb = header.node()?.getBBox?.();
+            if (hb) headerHeight = hb.height + headerMapPadding;
         }
 
-        // last line
-        if (line.trim().length > 0) {
-            foot.append("tspan")
-                .attr("x", 0)
-                .attr("dy", lineIndex === 0 ? 0 : "1.2em")
-                .html(line.trim());
+        // --- Measure footer height ---
+        if (out.footer_ && !footer.empty()) {
+            const fb = footer.node()?.getBBox?.();
+            if (fb) footerHeight = fb.height + footerMapPadding;
         }
 
-        // --- tooltip logic ---
-        foot.on("mouseover", function () {
-            out._tooltip.mw___ = out._tooltip.style("max-width");
-            out._tooltip.style("max-width", "400px");
-            if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_);
-        })
-            .on("mousemove", function (e) {
-                if (out.footnoteTooltipText_) out._tooltip.mousemove(e);
-            })
-            .on("mouseout", function () {
-                if (out.footnoteTooltipText_) out._tooltip.mouseout();
-                out._tooltip.style("max-width", out._tooltip.mw___);
-            });
+        // --- Move the map group below the header ---
+        drawing.attr('transform', `translate(0, ${headerHeight})`);
+
+        // --- Move footer below map ---
+        footer.attr('transform', `translate(0, ${headerHeight + out.height_ + footerMapPadding})`);
+
+        // --- Frame bounds ---
+        frame
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', out.width_)
+            .attr('height', out.height_);
+
+        // --- Update clipRect (same dimensions as map area) ---
+        clipRect
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', out.width_)
+            .attr('height', out.height_);
+
+        // --- Resize entire SVG ---
+        const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding;
+        svg.attr('width', out.width_).attr('height', totalHeight);
+
+        // --- Optional: Debug overlay ---
+        // drawing.selectAll('.debug-clip').remove();
+        // drawing.append('rect')
+        //     .attr('class', 'debug-clip')
+        //     .attr('x', 0)
+        //     .attr('y', 0)
+        //     .attr('width', out.width_)
+        //     .attr('height', out.height_)
+        //     .attr('fill', 'none')
+        //     .attr('stroke', 'magenta')
+        //     .attr('stroke-width', 1)
+        //     .attr('pointer-events', 'none');
     };
 
-    const addCoastalMarginToMap = function () {
-        const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
-        //draw coastal margin
-        const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
 
-        //countries bn
-        if (out.Geometries.geoJSONs.cntbn) {
-            cg.append('g')
-                .attr('id', 'em-coast-margin-cnt')
-                .attr('class', 'em-coast-margin-cnt')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.cntbn)
-                .enter()
-                .filter(function (bn) {
-                    return bn.properties.co === 'T'
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
 
-        //nuts bn
-        if (out.Geometries.geoJSONs.nutsbn) {
-            cg.append('g')
-                .attr('id', 'em-coast-margin-nuts')
-                .attr('class', 'em-coast-margin-nuts')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.nutsbn)
-                .enter()
-                .filter(function (bn) {
-                    return bn.properties.co === 'T'
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-
-        //world bn
-        if (out.Geometries.geoJSONs.worldbn) {
-            cg.append('g')
-                .attr('id', 'em-coast-margin-world')
-                .attr('class', 'em-coast-margin-world')
-                .selectAll('path')
-                .data(out.Geometries.geoJSONs.worldbn)
-                .enter()
-                .filter(function (bn) {
-                    return bn.properties.COAS_FLAG === 'T'
-                })
-                .append('path')
-                .attr('d', out._pathFunction)
-        }
-    }
-
-    /**
-     * @function addScalebarToMap
-     * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
-     */
-    const addScalebarToMap = function () {
-        // Julien's nice scalebars
-        const marginLeft = 5
-        const maxLengthPix = out.scalebarMaxWidth_
-        const textOffsetX = out.scalebarTextOffset_[0]
-        const textOffsetY = out.scalebarTextOffset_[1]
-        const pixelSizeM = out.position_.z
-        const maxLengthM = maxLengthPix * pixelSizeM
-        const niceLengthM = niceScaleBarLength(maxLengthM)
-        const niceLengthPixel = niceLengthM[0] / pixelSizeM
-        const scaleBarStartDigit = niceLengthM[1]
-        const subdivisionNbs = {
-            1: 4,
-            2: 2,
-            5: 5,
-        }
-
-        const scalebarGroup = out
-            .svg()
-            .append('g')
-            .attr('class', 'em-scalebar')
-            .attr('transform', `translate(${out.scalebarPosition_[0]},${out.scalebarPosition_[1]})`)
-            .attr('width', maxLengthPix + 20)
-            .attr('height', out.scalebarHeight_)
-
-        // top line full width
-        // scalebarGroup
-        //     .append('line')
-        //     .attr('class', 'em-scalebar-line')
-        //     .attr('x1', marginLeft)
-        //     .attr('y1', 1)
-        //     .attr('x2', niceLengthPixel + marginLeft)
-        //     .attr('y2', 1)
-
-        //bottom line full width
-        // scalebarGroup
-        //     .append('line')
-        //     .attr('class', 'em-scalebar-line')
-        //     .attr('x1', marginLeft)
-        //     .attr('y1', out.scalebarSegmentHeight_)
-        //     .attr('x2', niceLengthPixel + marginLeft)
-        //     .attr('y2', out.scalebarSegmentHeight_)
-
-        //first tick
-        scalebarGroup
-            .append('line')
-            .attr('class', 'em-scalebar-line')
-            .attr('x1', marginLeft)
-            .attr('y1', 1)
-            .attr('x2', marginLeft)
-            .attr('y2', out.scalebarTickHeight_)
-
-        scalebarGroup
-            .append('text')
-            .attr('class', 'em-scalebar-label')
-            .attr('x', marginLeft + textOffsetX)
-            .attr('y', out.scalebarTickHeight_ + textOffsetY)
-            .text('0')
-
-        //middle ticks
-        const subdivisionNb = subdivisionNbs[scaleBarStartDigit]
-        const divisionWidth = niceLengthPixel / subdivisionNb
-        const divisionMinWidth = 15
-        const midlineY = out.scalebarSegmentHeight_ / 2 + 1
-        if (divisionWidth >= divisionMinWidth) {
-            for (let i = 1; i < subdivisionNb; i++) {
-                scalebarGroup
-                    .append('line')
-                    .attr('class', 'em-scalebar-line')
-                    .attr('x1', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
-                    .attr('y1', 1)
-                    .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
-                    .attr('y2', out.scalebarTickHeight_)
-                scalebarGroup
-                    .append('text')
-                    .attr('class', 'em-scalebar-label')
-                    .attr('x', marginLeft + textOffsetX + i * divisionWidth)
-                    .attr('y', out.scalebarTickHeight_ + textOffsetY)
-                    .text(getScalebarLabel((niceLengthM[0] / subdivisionNb) * i))
-
-                if (i == 1) {
-                    scalebarGroup
-                        .append('line')
-                        .attr('class', 'em-scalebar-line em-scalebar-midline')
-                        .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
-                        .attr('y1', midlineY)
-                        .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
-                        .attr('y2', midlineY)
-                } else {
-                    let x1 = marginLeft + out.scalebarStrokeWidth_ / 2 + (i - 1) * divisionWidth
-                    if (x1 > 0) {
-                        scalebarGroup
-                            .append('line')
-                            .attr('class', 'em-scalebar-line em-scalebar-midline')
-                            .attr('x1', x1)
-                            .attr('y1', midlineY)
-                            .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + i * divisionWidth)
-                            .attr('y2', midlineY)
-                    }
-                }
-            }
-
-            // Draw final midline segment (last segment)
-            if (divisionWidth >= divisionMinWidth) {
-                scalebarGroup
-                    .append('line')
-                    .attr('class', 'em-scalebar-line em-scalebar-midline')
-                    .attr('x1', marginLeft + (subdivisionNb - 1) * divisionWidth)
-                    .attr('y1', midlineY)
-                    .attr('x2', marginLeft + subdivisionNb * divisionWidth)
-                    .attr('y2', midlineY)
-            }
-        } else {
-            // single full-length horizontal mid-line
-            scalebarGroup
-                .append('line')
-                .attr('class', 'em-scalebar-line em-scalebar-midline')
-                .attr('x1', marginLeft + out.scalebarStrokeWidth_ - 1)
-                .attr('y1', midlineY)
-                .attr('x2', marginLeft + out.scalebarStrokeWidth_ / 2 + divisionWidth * subdivisionNb)
-                .attr('y2', midlineY)
-        }
-
-        //last tick
-        scalebarGroup
-            .append('line')
-            .attr('class', 'em-scalebar-line')
-            .attr('x1', niceLengthPixel + marginLeft)
-            .attr('y1', 1)
-            .attr('x2', niceLengthPixel + marginLeft)
-            .attr('y2', out.scalebarTickHeight_)
-        scalebarGroup
-            .append('text')
-            .attr('class', 'em-scalebar-label')
-            .attr('x', niceLengthPixel + marginLeft + textOffsetX)
-            .attr('y', out.scalebarTickHeight_ + textOffsetY)
-            .text(getScalebarLabel(niceLengthM[0]) + out.scalebarUnits_)
-    }
-
-    const niceScaleBarLength = function (scaleBarLength) {
-        //compute the 'nice' power of ten
-        const pow10 = Math.pow(10, Math.floor(Math.log(scaleBarLength) / Math.log(10)))
-
-        //check if 5 times this value fits
-        if (5 * pow10 <= scaleBarLength) return [5 * pow10, 5]
-
-        //check if 2 times this value fits
-        if (2 * pow10 <= scaleBarLength) return [2 * pow10, 2]
-
-        //returns the power of ten
-        return [pow10, 1]
-    }
-
-    const getScalebarLabel = function (valueM) {
-        if (valueM < 0.01) return valueM * 1000 + 'mm'
-        if (valueM < 1) return valueM * 100 + 'cm'
-        if (valueM < 1000) return valueM * 1 + 'm'
-        return valueM / 1000
-    }
 
     return out
 }

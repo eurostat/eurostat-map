@@ -78,7 +78,7 @@
                 y: 40,
                 sizeLegend: {
                     values: [397000000, 100000000, 2000000],
-                    labels: ['397 (max)', '100 ', '2 (min)']
+                    labels: ['397 (Rotterdam)', '100 ', '2 (Umea)']
                 }
             })
             .filterGeometriesFunction((geometries) => {
@@ -222,7 +222,7 @@
 
             return `
     <div class="em-tooltip-bar">
-      <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+      <b>${regionName}</b>
     </div>
     <div class="em-tooltip-text">
       <table class="em-tooltip-table">

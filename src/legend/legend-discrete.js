@@ -133,7 +133,7 @@ function createThresholdsLegend(out, config) {
                 .attr(
                     'x',
                     Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) +
-                        (config.labelOffsets.x || 0)
+                    (config.labelOffsets.x || 0)
                 )
                 .attr('y', y + config.shapeHeight)
                 .attr('dy', '0.3em') // ~vertical centering
@@ -176,7 +176,7 @@ function createThresholdsLegend(out, config) {
             .attr('x', labelX)
             .attr('y', yTop)
             .attr('dy', '0.3em')
-            .text(labelFormatter(globalMax) + ' (max)')
+            .text(labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : ' (max)'))
 
         // Bottom boundary (MIN)
         const yBottom = numberOfClasses * config.shapeHeight + titlePadding
@@ -194,7 +194,7 @@ function createThresholdsLegend(out, config) {
             .attr('x', labelX)
             .attr('y', yBottom)
             .attr('dy', '0.3em')
-            .text(labelFormatter(globalMin) + ' (min)')
+            .text(labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : ' (min)'))
     }
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate
