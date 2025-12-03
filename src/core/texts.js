@@ -140,3 +140,58 @@ export const addFootnote = function (out) {
     return out;
 };
 
+export function addSourceLink(out, withCenterPoints) {
+    const svg = out.svg();
+
+    // --- Choose correct parent group ---
+    let parent;
+    if (out.footer_ && !out.isInset) {
+        parent = svg.select('#em-footer-' + out.svgId_);
+        if (parent.empty()) {
+            parent = svg.append('g')
+                .attr('id', 'em-footer-' + out.svgId_)
+                .attr('class', 'em-footer');
+        }
+    } else {
+        parent = svg;
+    }
+
+    // --- Remove any existing source link ---
+    parent.selectAll('#em-source-link, .em-source-dataset-link, .em-source-pretext').remove();
+
+    // --- Retrieve dataset info ---
+    const stat = withCenterPoints ? out.stat('size') : out.stat();
+    if (!stat || !stat.eurostatDatasetCode) return;
+
+    // --- Compute link URL ---
+    const code = stat.eurostatDatasetCode;
+    const url = `https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`;
+
+    // --- Determine positioning ---
+    // In footer mode → near top of footer; otherwise → bottom of map
+    const yPos = out.footer_ && !out.isInset ? 10 : out.height_;
+    const paddingRight = 10;
+
+    // --- Append dataset link ---
+    const linkText = parent.append('a')
+        .attr('class', 'em-source-dataset-link')
+        .attr('href', url)
+        .attr('target', '_blank')
+        .append('text')
+        .attr('class', 'em-source-dataset-link-text')
+        .attr('x', out.width_ - paddingRight)
+        .attr('y', yPos)
+        .text('EUROSTAT')
+        .attr('text-anchor', 'end');
+
+    const linkWidth = linkText.node().getComputedTextLength();
+
+    // --- Append "Source:" pretext ---
+    parent.append('text')
+        .attr('id', 'em-source-link')
+        .attr('class', 'em-source-pretext')
+        .attr('x', out.width_ - linkWidth - paddingRight - 6)
+        .attr('y', yPos)
+        .text('Source:')
+        .attr('text-anchor', 'end');
+}

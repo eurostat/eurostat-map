@@ -25,7 +25,7 @@ import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
 import { addEurostatLogo } from './logo.js'
 import { addCoastalMarginToMap, appendCoastalMargin } from './coastal-margin.js'
-import { addFootnote, addSubtitle, addTitle } from './texts.js'
+import { addFootnote, addSourceLink, addSubtitle, addTitle } from './texts.js'
 import { addScalebarToMap } from './scalebar.js'
 
 // set default d3 locale
@@ -629,41 +629,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         //source dataset URL
         if (out.showSourceLink_) {
-            let stat
-            if (withCenterPoints) {
-                stat = out.stat('size')
-            } else {
-                stat = out.stat()
-            }
-            if (stat) {
-                if (stat.eurostatDatasetCode) {
-                    //dataset link
-                    let code = stat.eurostatDatasetCode
-                    let url = `https://ec.europa.eu/eurostat/databrowser/view/${code}/default/table?lang=en`
-                    let link = out
-                        .svg()
-                        .append('a')
-                        .attr('class', 'em-source-dataset-link')
-                        .attr('href', url)
-                        .attr('target', '_blank')
-                        .append('text')
-                        .attr('class', 'em-source-dataset-link-text')
-                        .attr('x', out.width_)
-                        .attr('y', out.height_)
-                        .text('EUROSTAT')
-                        .attr('text-anchor', 'end')
-
-                    //pretext "Source:"
-                    let linkW = link.node().getComputedTextLength()
-                    out.svg()
-                        .append('text')
-                        .attr('class', 'em-source-pretext')
-                        .attr('x', out.width_ - linkW - 2)
-                        .attr('y', out.height_)
-                        .text('Source:')
-                        .attr('text-anchor', 'end')
-                }
-            }
+            addSourceLink(out, withCenterPoints)
         }
 
         // scalebar
