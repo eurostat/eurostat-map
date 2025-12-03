@@ -11,6 +11,11 @@
 </head>
 
 <body style="margin:0">
+
+    <div>
+        <button id="export-png-btn" type="button">Export map as PNG</button>
+        <button id="export-svg-btn" type="button">Export map as SVG</button>
+    </div>
     <svg id="air-freight-map"></svg>
 
     <svg style='display:none;'>
@@ -69,7 +74,7 @@
                     "eastern asia": fourColorTheorem[0],
                     "south eastern asia": fourColorTheorem[1],
                     "Oceania and southern polar regions": fourColorTheorem[2],
-                    EU: fourColorTheorem[0],
+                    EU: '#003399',
                     "europe except eu": fourColorTheorem[2]
                 }
 
@@ -188,7 +193,7 @@
                         }
                         return colorFunction(parseChangeToPct(d.target.change))
                     })
-                    .flowOpacity(0.9)
+                    .flowOpacity(1)
                     .flowArrows(false)
                     .flowArrowScale(0.7)
                     .flowOutlines(true)
@@ -247,7 +252,7 @@
                         flowWidthLegend: {
                             marginTop: -10,
                             values: airMapConfigs[year].freight.legend.sizeLegend.values,
-                            labels: ['3 thousand', '1 million', '2.6 million']
+                            labels: ['3 thousand', '1 million', '3 million']
                         },
                         flowColorLegend: {
                             marginTop: 50,
@@ -269,7 +274,7 @@
                     })
 
                     .footnote(
-                        "Note: Freight includes both loaded and unloaded. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_paexcc)"
+                        "Note: Freight includes both loaded and unloaded. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_goexcc)"
                     ).footnoteWrap(150)
 
                     // zoom min/max
@@ -288,8 +293,30 @@
                         // raise labels (fixed in next version of estatmap)
                         const labels = d3.selectAll("#em-labels");
                         labels.raise();
+
+                        //add cartography text
+                        // --- REMOVE if it already exists ---
+                        d3.select("#air-freight-map #em-footnote-2").remove();
+
+                        d3.selectAll("#air-freight-map")
+                            .append('text')
+                            .attr('x', width - 315)
+                            .attr('y', height + 95)
+                            .attr('class', 'em-footnote').attr('id', 'em-footnote-2')
+                            .append('tspan')
+                            .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM');
                     })
                     .build();
+
+                const exportBtnPNG = document.getElementById("export-png-btn");
+                exportBtnPNG.addEventListener("click", function () {
+                    map.exportMapToPNG(1080, 752.4941184099982);
+                });
+
+                const exportBtnSVG = document.getElementById("export-svg-btn");
+                exportBtnSVG.addEventListener("click", function () {
+                    map.exportMapToSVG();
+                });
             })
             .catch(err => console.error(err));
 

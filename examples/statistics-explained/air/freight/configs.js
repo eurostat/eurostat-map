@@ -2,17 +2,17 @@ const airMapConfigs = {
   2024: {
     freight: {
       breaks: [-5, 0, 10, 15, 20, 25],
-      colors: ["#cb181d", "#fcae91", ...d3.schemeBlues[7].slice(2)],
+      colors: [" #E04040", "#FFA3A3", "#C1C9EB", "#93A2DC", "#677CD2", "#3C57B0", "#15246B"],
       legend: {
         title: `Change vs 2023 (%)`,
         labels: [
-          "-6.4",
+          "-6",
           "↓ -5 to 0",
           "↑ 0 to 10",
           "10 to 15",
-          "18.5",
-          "24.4",
-          "47.5"
+          "19",
+          "24",
+          "48"
         ],
         sizeLegend: {
           values: [300000, 1000000, 2600000]

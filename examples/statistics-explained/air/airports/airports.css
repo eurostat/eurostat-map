@@ -16,10 +16,10 @@
 }
 
 #airport-pairs-map .em-worldbn {
-    stroke-width: 0.3px !important;
+    stroke-width: 1.3px !important;
     stroke: grey !important;
     /*      filter: url(#blur-effect); */
-    opacity: 0.8;
+    opacity: 0.5;
 
 }
 
@@ -28,11 +28,22 @@
     stroke: grey !important;
 }
 
+.em-labels .em-label,
+.em-label-shadow,
+.em-flow-label,
+.em-flow-label-shadow {
+    font-family: "Arial" !important;
+    font-size: 15px !important;
+    opacity: 0.9 !important;
+    font-weight: bold;
+    fill: #333333 !important;
+}
+
 #airport-pairs-map .em-label,
 #airport-pairs-map .em-label-shadow {
     transform: translate(0px, -14px);
     text-anchor: start;
-    opacity: 0.8;
+    opacity: 0.9;
     font-size: 12px !important;
 }
 
@@ -63,12 +74,12 @@
 
 #em-label-GRAN-CANARIA,
 #em-label-shadow-GRAN-CANARIA {
-    transform: translate(5px, 20px) !important;
+    transform: translate(-25px, 25px) !important;
 }
 
 #em-label-TENERIFE-NORTE,
 #em-label-shadow-TENERIFE-NORTE {
-    transform: translate(2px, -5px) !important;
+    transform: translate(-72px, -12px) !important;
 }
 
 #legendBR {
@@ -77,15 +88,4 @@
 
 .em-annotations {
     pointer-events: none !important;
-}
-
-.em-labels .em-label,
-.em-label-shadow,
-.em-flow-label,
-.em-flow-label-shadow {
-    font-family: "Arial" !important;
-    font-size: 15px !important;
-    opacity: 0.5 !important;
-    font-weight: bold;
-    fill: #333333 !important;
 }

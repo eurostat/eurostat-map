@@ -6,8 +6,8 @@ const regionLabels = [
     },
     {
         "text": "North America",
-        "x": -88,
-        "y": 39,
+        "x": -102,
+        "y": 45,
     },
     {
         "text": "Western Asia",

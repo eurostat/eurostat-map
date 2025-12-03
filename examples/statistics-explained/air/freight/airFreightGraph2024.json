@@ -30,8 +30,8 @@
         {
             "id": "AME_N",
             "name": "Northern America",
-            "x": -70,
-            "y": 45,
+            "x": -85,
+            "y": 55,
             "value": 2496000,
             "share": "21.0%",
             "change": "-0.4%"

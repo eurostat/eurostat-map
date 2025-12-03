@@ -11,6 +11,11 @@
 </head>
 
 <body style="margin:0">
+
+    <div>
+        <button id="export-png-btn" type="button">Export map as PNG</button>
+        <button id="export-svg-btn" type="button">Export map as SVG</button>
+    </div>
     <svg id="airport-pairs-map"></svg>
 
     <svg style='display:none;'>
@@ -126,7 +131,7 @@
                     .showEstatLogo(true)
                     .showEstatRibbon(true)
                     .logoPosition([2, height + 42])
-                    .ribbonPosition([width - 180, height + 20])
+                    .ribbonPosition([width - 180, height + 35])
                     .ribbonWidth(300)
                     .ribbonHeight(50)
                     //end static settings
@@ -160,23 +165,24 @@
                     .flowCurvatureSettings({
                         gapX: 0,        // how far before/after node to begin/end curve
                         padX: 0,         // horizontal clearance near node stems
-                        padY: 1,         // vertical collision detection padding
-                        bumpY: 5,        // extra height for hop
-                        curvature: 0.5   // 0..1; default sankey smoothness
+                        padY: 2,         // vertical collision detection padding
+                        bumpY: 10,        // extra height for hop
+                        curvature: 0.3   // 0..1; default sankey smoothness
                     })
                     .flowOrder(mapConfigs[year].flowOrder)
 
                     // legend
                     .legend({
                         x: width - 190,
-                        y: height - 315,
+                        y: height - 222,
                         boxPadding: 10,
+                        boxOpacity: 1,
                         title: "Passengers carried",
                         subtitle: "",
                         flowWidthLegend: {
                             marginTop: -10,
                             values: [1600000, 2200000],
-                            labels: ['1.6 million (min)', '2.3 million (max)']
+                            labels: ['1.6 million', '2.3 million']
                         },
                         donutSizeLegend: {
                             title: "Passengers carried (airport)",
@@ -207,10 +213,10 @@
                                     color: mapConfigs[year].colors[4],
                                     label: mapConfigs[year].legend.labels[4]
                                 },
-                                {
-                                    color: mapConfigs[year].colors[5],
-                                    label: mapConfigs[year].legend.labels[5]
-                                }
+                                // {
+                                //     color: mapConfigs[year].colors[5],
+                                //     label: mapConfigs[year].legend.labels[5]
+                                // }
                             ].reverse()
                         },
                         regionColorLegend: {
@@ -278,7 +284,7 @@
                     //.position({ x: 2, y: 35 }) //set this so that minimap works
                     .minimap({
                         x: width - 90,
-                        y: 80,
+                        y: 170,
                         z: 200,
                         color: "lightgrey",
                         debounce: 2
@@ -286,7 +292,6 @@
 
                     // zoom min/max
                     .zoomExtent([1, 10])
-                    .zoomButtons(true)
 
                     // fires when map is built
                     .callback(() => {
@@ -301,12 +306,40 @@
                         //   map.exportMapToSVG();
                         // }, 3000);
                         d3.selectAll('[data-color-key="LEMD"][data-color="#c6dbef"]').raise();
+
+                        //add cartography text
+                        // --- REMOVE if it already exists ---
+                        d3.select("#airport-pairs-map #em-footnote-2").remove();
+
+                        d3.selectAll("#airport-pairs-map")
+                            .append('text')
+                            .attr('x', width - 315)
+                            .attr('y', height + 105)
+                            .attr('class', 'em-footnote').attr('id', 'em-footnote-2')
+                            .append('tspan')
+                            .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM');
                     })
 
                     .footnote(
                         "Intra-EU flights only. &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Cartography: GISCO. Boundaries: ©EuroGeographics @OSM"
                     ).footnoteWrap(false)
+
+                    .footnote(
+                        "Note: Intra-EU flights only. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_pa)"
+                    ).footnoteWrap(150)
+
                     .build();
+
+
+                const exportBtnPNG = document.getElementById("export-png-btn");
+                exportBtnPNG.addEventListener("click", function () {
+                    map.exportMapToPNG(1000, 783.86);
+                });
+
+                const exportBtnSVG = document.getElementById("export-svg-btn");
+                exportBtnSVG.addEventListener("click", function () {
+                    map.exportMapToSVG();
+                });
             })
             .catch(err => console.error(err));
 

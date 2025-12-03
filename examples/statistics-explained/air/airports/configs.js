@@ -1,10 +1,10 @@
 mapConfigs = {
   2024: {
-    breaks: [5, 10, 15, 20, 25],
-    colors: [...d3.schemeBlues[7].slice(1)],
+    breaks: [5, 10, 20, 25],
+    colors: ["#C1C9EB", "#93A2DC", "#677CD2", "#3C57B0", "#15246B"],
     legend: {
       title: `Increase vs 2023`,
-      labels: ["<5%", "5 - 10%", "10 - 15%", "15 - 20%", "20 - 25%", "25%"]
+      labels: ["<5%", "5 - 10%", "10 - 20%", "20 - 25%", "25%"]
     },
     flowOrder: (a, b) => {
       // Helper: LPPT → LFPO incoming
