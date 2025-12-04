@@ -50,7 +50,7 @@ const maritimeFlowGraph = {
         },
         {
             "id": "RU",
-            "name": "RUSSIA: BLACK SEA",
+            "name": "RUSSIA: Black Sea",
             "y": 44.6,
             "x": 37.9
         },
@@ -210,7 +210,7 @@ const maritimeFlowGraph = {
             "meta": {
                 "direction": "Inwards",
                 "partner": "RU",
-                "label": "RUSSIA: BLACK SEA",
+                "label": "RUSSIA: Black Sea",
                 "share": 0.022
             }
         },

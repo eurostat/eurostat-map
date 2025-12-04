@@ -23,12 +23,12 @@ const labels = {
         {
             "text": "ADOLFO SUAREZ MADRID-BARAJAS",
             "x": -3.5695,
-            "y": 40.4918
+            "y": 40.2
         },
         {
             "text": "ROMA/FIUMICINO",
-            "x": 12.2389,
-            "y": 41.8003
+            "x": 12.5,
+            "y": 41.6
         },
         {
             "text": "GRAN CANARIA",
@@ -37,8 +37,8 @@ const labels = {
         },
         {
             "text": "CATANIA/FONTANAROSSA",
-            "x": 15.0664,
-            "y": 37.4668
+            "x": 14.8,
+            "y": 37.6
         },
         {
             "text": "LISBOA",
@@ -51,9 +51,14 @@ const labels = {
             "y": 28.4827
         },
         {
-            "text": "PALERMO/PUNTA RAISI",
-            "x": 13.091,
-            "y": 38.1759
+            "text": "PALERMO/",
+            "x": 10.9,
+            "y": 37
+        },
+        {
+            "text": "PUNTA RAISI",
+            "x": 10.8,
+            "y": 36.5
         }
     ]
 }
