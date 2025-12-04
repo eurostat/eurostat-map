@@ -1,7 +1,7 @@
 export function renderMap(code) {
     // basic barebones proportional circles example
-    const height = 650
-    const width = 800
+    const height = 550
+    const width = 750
     const legendTitles = {
         EMP_PLOC_NR: {
             title: 'Persons employed ',
@@ -20,7 +20,7 @@ export function renderMap(code) {
         .scale('60M')
         .title('Manufacturing sector by region, 2023')
 
-        .position({ x: 4500000, y: 3420000, z: 6400 })
+        .position({ x: 4700000, y: 3420000, z: 7400 })
 
 
         //classification

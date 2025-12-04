@@ -1,7 +1,7 @@
 export function renderMap(code) {
     // basic barebones proportional circles example
-    const height = 650
-    const width = 800
+    const height = 550
+    const width = 750
     const legendTitles = {
         LOC_NR: {
             title: 'Local units',
@@ -20,6 +20,7 @@ export function renderMap(code) {
         .dorling(false)
         .scale('60M')
         .title('Manufacturing')
+        .position({ x: 4800000, y: 3420000, z: 7400 })
         //.subtitle(code)
 
         .psMaxSize(18)

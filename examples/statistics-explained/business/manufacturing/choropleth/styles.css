@@ -7,6 +7,16 @@ body {
     height: 100%;
 }
 
+/* the scrolling box */
+#container {
+    width: 100%;
+    /* whatever fits your layout */
+    height: 100vh;
+    /* keep it constrained so scrolling appears */
+    overflow: auto;
+    /* <-- the important bit */
+}
+
 #dropdown-container {
     position: absolute;
     top: 30px;
@@ -24,7 +34,7 @@ body {
 }
 
 .em-zoom-buttons {
-    transform: translate(95%, 80%) !important;
+    transform: translate(95%, 79%) !important;
 }
 
 .em-legend-title {
