@@ -34,7 +34,16 @@ body {
 }
 
 .em-zoom-buttons {
-    transform: translate(95%, 79%) !important;
+    transform: translate(95%, 78%) !important;
+}
+
+.em-insets-button {
+    transform: translate(95%, 100px) !important;
+    cursor: pointer !important;
+}
+
+.em-insets {
+    display: none;
 }
 
 .em-legend-title {

@@ -30,7 +30,16 @@ body {
 }
 
 .em-zoom-buttons {
-    transform: translate(95%, 80%) !important;
+    transform: translate(95%, 78%) !important;
+}
+
+.em-insets-button {
+    transform: translate(95%, 70px) !important;
+    cursor: pointer !important;
+}
+
+.em-insets {
+    display: none;
 }
 
 #dropdown-label {

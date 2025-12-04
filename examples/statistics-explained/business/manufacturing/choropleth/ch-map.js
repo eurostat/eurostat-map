@@ -21,6 +21,7 @@ export function renderMap(code) {
         .title('Manufacturing sector by region, 2023')
 
         .position({ x: 4700000, y: 3420000, z: 7400 })
+        .insetsButton(true)
 
 
         //classification

@@ -26,6 +26,8 @@ export function renderMap(code) {
         .psMaxSize(18)
         .psMinSize(2)
 
+        .insetsButton(true)
+
         //SE settings
         .header(true)
         .footer(true)
