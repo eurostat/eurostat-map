@@ -13,9 +13,17 @@
     filter: brightness(0.5);
 }
 
+.em-title {
+    font-size: 25px !important;
+}
+
+.em-subtitle {
+    font-size: 20px !important;
+}
+
 #maritime-flow-map .em-worldbn {
     stroke: grey !important;
-    stroke-width: 0.8px !important;
+    stroke-width: 1.2px !important;
     opacity: 0.5;
 }
 
@@ -89,6 +97,11 @@ text#em-label-shadow-CHINA {
 text#em-label-TÜRKIYE,
 text#em-label-shadow-TÜRKIYE {
     transform: translate(20px, 15px);
+}
+
+text#em-label-BRAZIL,
+text#em-label-shadow-BRAZIL {
+    transform: translate(-20px, -15px);
 }
 
 text#em-label-UNITED-KINGDOM,

@@ -13,6 +13,14 @@
     filter: brightness(0.5);
 }
 
+.em-title {
+    font-size: 25px !important;
+}
+
+.em-subtitle {
+    font-size: 20px !important;
+}
+
 #maritime-flow-map .em-worldbn {
     stroke: grey !important;
     stroke-width: 0.8px !important;
@@ -34,9 +42,10 @@
     transform: translate(95%, 2%) !important;
 }
 
-.em-labels {
-    fill: #343434;
-    opacity: 0.9;
+.em-labels,
+.em-label {
+    fill: #000 !important;
+    opacity: 0.9 !important;
 }
 
 .em-annotations text {
@@ -52,46 +61,73 @@ text#em-label-shadow-EU {
     transform: translate(6px, 5px);
     font-size: 19px;
     font-weight: 600;
-    opacity: 0.7;
+    opacity: 0.9;
 }
 
 
-text#em-label-RUSSIA\:-BLACK-SEA,
-text#em-label-shadow-RUSSIA\:-BLACK-SEA {
-    transform: translate(75px, 5px);
+text#em-label-RUSSIA\:-Black-Sea,
+text#em-label-shadow-RUSSIA\:-Black-Sea {
+    transform: translate(68px, 5px);
 }
 
 text#em-label-UKRAINE,
 text#em-label-shadow-UKRAINE {
-    transform: translate(35px, 5px);
+    transform: translate(37px, 5px);
+}
+
+text#em-label-NORWAY,
+text#em-label-shadow-NORWAY {
+    transform: translate(-5px, -12px);
 }
 
 text#em-label-MOROCCO,
 text#em-label-shadow-MOROCCO {
-    transform: translate(0px, 20px);
+    transform: translate(15px, 20px);
 }
 
 text#em-label-ALGERIA,
 text#em-label-shadow-ALGERIA,
-text#em-label-LIBYA,
-text#em-label-shadow-LIBYA,
-text#em-label-EGYPT,
-text#em-label-shadow-EGYPT,
-text#em-label-NIGERIA,
-text#em-label-shadow-NIGERIA,
 text#em-label-INDIA,
-text#em-label-shadow-INDIA,
+text#em-label-shadow-INDIA {
+    transform: translate(0px, 15px);
+}
+
+text#em-label-EGYPT,
+text#em-label-shadow-EGYPT {
+    transform: translate(14px, 21px);
+}
+
+text#em-label-LIBYA,
+text#em-label-shadow-LIBYA {
+    transform: translate(13px, 18px);
+}
+
 text#em-label-CHINA,
 text#em-label-shadow-CHINA {
-    transform: translate(0px, 15px);
+    transform: translate(25px, -5px);
+}
+
+text#em-label-NIGERIA,
+text#em-label-shadow-NIGERIA {
+    transform: translate(15px, 20px);
+}
+
+text#em-label-IRAQ,
+text#em-label-shadow-IRAQ {
+    transform: translate(20px, 15px);
 }
 
 text#em-label-TÜRKIYE,
 text#em-label-shadow-TÜRKIYE {
-    transform: translate(20px, 15px);
+    transform: translate(35px, 15px);
 }
 
 text#em-label-UNITED-KINGDOM,
 text#em-label-shadow-UNITED-KINGDOM {
-    transform: translate(-50px, 7px);
+    transform: translate(-50px, 0px);
+}
+
+text#em-label-BRAZIL,
+text#em-label-shadow-BRAZIL {
+    transform: translate(-10px, -10px);
 }

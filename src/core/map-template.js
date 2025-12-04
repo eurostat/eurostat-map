@@ -104,6 +104,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     //header/footer
     out.header_ = false // add titles to separate header section
     out.footer_ = false // add footnotes to separate footer section
+    out.footerPadding_ = undefined // px padding between map and footer
+    out.headerPadding_ = undefined // px padding between header and map
 
     //map title
     out.title_ = ''
@@ -935,8 +937,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         let footerHeight = 0;
 
         // --- Define consistent vertical padding between header and map ---
-        const headerMapPadding = 20; // px (tweak visually as needed)
-        const footerMapPadding = 10; // px below map before footer
+        const headerMapPadding = out.headerPadding_ ? out.headerPadding_ : 20; // px (tweak visually as needed)
+        const footerMapPadding = out.footerPadding_ ? out.footerPadding_ : 10; // px below map before footer
 
         // --- Measure header height ---
         if (out.header_ && !header.empty()) {

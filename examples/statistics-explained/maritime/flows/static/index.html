@@ -52,8 +52,25 @@
             .hoverColor('#ffc700')
             .width(width)
             .height(height)
-            .title("Top 20 main extra-EU flows")
-            .subtitle("by gross weight of goods handled in main ports, EU, 2024")
+            .title("Top 20 extra-EU maritime flows")
+            .subtitle("by gross weight of goods handled in main ports, 2024")
+
+            //static settings
+            .header(true)
+            .footer(true)
+            .zoomButtons(false)
+            .showEstatLogo(true)
+            .showEstatRibbon(true)
+            .logoPosition([2, height + 65])
+            .ribbonPosition([width - 180, height + 40])
+            .ribbonWidth(300)
+            .ribbonHeight(50)
+            .footnote(
+                "<tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_go)"
+            )
+            .footnotePosition([4, 20])
+            .footerPadding(20)
+            //end static settings
 
             //projection
             .projectionFunction(worldProjection)
@@ -75,7 +92,7 @@
             .flowMaxWidth(30)
             .flowLineType("curved")
             .flowDonuts(false)
-            .flowOpacity(0.9)
+            .flowOpacity(1)
             .flowArrows(false)
             .flowOutlines(true)
             .flowOutlineColor('white')
@@ -88,7 +105,7 @@
                 padX: 0,         // horizontal clearance near node stems
                 padY: 1,         // vertical collision detection padding
                 bumpY: 5,        // extra height for hop
-                curvature: 0.2   // 0..1; default sankey smoothness
+                curvature: 0.2  // 0..1; default sankey smoothness
             })
             .flowOrder(flowOrderFunction)
             .labels({
@@ -99,15 +116,16 @@
 
             // legend
             .legend({
-                x: width - 190,
-                y: height - 225,
+                x: width - 170,
+                y: height - 150,
                 boxPadding: 10,
+                boxOpacity: 1,
                 title: "Freight carried",
                 subtitle: "million tonnes",
                 flowWidthLegend: {
                     marginTop: -10,
                     values: [27000000, 100000000, 172000000],
-                    labels: ['25 (min)', '100', '172 (max)']
+                    labels: ['25', '100', '172']
                 },
                 flowColorLegend: false,
                 regionColorLegend: {
@@ -120,17 +138,30 @@
             .zoomExtent([0.6, 10])
             .zoomButtons(false) //static map, no zoom buttons
             .lockPanUntilZoom(false)
-            .flowRegionColors(["#2171b5", "#51824f"])
-            .footnote(false)
-            .showEstatLogo(true)
-            .logoPosition([3, height - 35])
+            //.flowRegionColors(["#2171b5", "#51824f"])
+            .flowRegionColors(['#007243', '#104F99']) // Eurostat green and blue
             .callback(() => {
+                const euCodes = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "EL"]
+                // set fill of regions
+                const countries = d3.selectAll("#maritime-flow-map .em-worldrg path");
+                countries.style("fill", function (d) {
+                    if (d.id == 'MA') return map.flowRegionColors_[0]; // override 'majority exporter vs importer' fill rule for Morocco
+                    if (d.id == 'UK') return map.flowRegionColors_[0]; // override for United Kingdom
+
+                    if (euCodes.includes(d.id)) {
+                        return 'rgba(0, 51, 153, 0.4)'; // EU blue
+                    }
+                    // Do not change existing fill; return the current one
+                    return this.style.fill || this.getAttribute('fill') || null;
+                });
+
+
                 // --- REMOVE if it already exists ---
                 d3.select("#maritime-flow-map #em-footnote-2").remove();
                 d3.selectAll("#maritime-flow-map")
                     .append('text')
                     .attr('x', width - 310)
-                    .attr('y', height)
+                    .attr('y', height + 110)
                     .attr('class', 'em-footnote')
                     .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
@@ -161,7 +192,7 @@
                         y: 240,
                         dy: 50,
                         dx: -50,
-                        color: '#666666'
+                        color: '#4c4b4b'
                     },
                 ],
                 editMode: false
@@ -171,7 +202,7 @@
 
         var exportBtnPNG = document.getElementById("export-png-btn");
         exportBtnPNG.addEventListener("click", function () {
-            map.exportMapToPNG(width * 2, height * 2);
+            map.exportMapToPNG(width, 759.28);
         });
 
         var exportBtnSVG = document.getElementById("export-svg-btn");

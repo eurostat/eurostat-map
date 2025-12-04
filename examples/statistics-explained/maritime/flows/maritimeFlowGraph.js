@@ -51,14 +51,14 @@ const maritimeFlowGraph = {
         {
             "id": "RU",
             "name": "RUSSIA: Black Sea",
-            "y": 44.6,
-            "x": 37.9
+            "y": 44.5,
+            "x": 40
         },
         {
             "id": "CA",
             "name": "CANADA: East coast",
-            "y": 47,
-            "x": -64
+            "y": 48,
+            "x": -65
         },
         {
             "id": "LY",
@@ -75,8 +75,8 @@ const maritimeFlowGraph = {
         {
             "id": "MA",
             "name": "MOROCCO",
-            "y": 31.8,
-            "x": -7.1
+            "y": 32,
+            "x": -6
         },
         {
             "id": "NG",

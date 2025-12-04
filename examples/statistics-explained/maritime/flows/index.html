@@ -56,6 +56,18 @@
             .proj("4326")
             .scale("60M")
 
+            //static settings
+            .header(true)
+            .footer(true)
+            .zoomButtons(false)
+            .showEstatLogo(true)
+            .showEstatRibbon(true)
+            .logoPosition([2, height + 55])
+            .ribbonPosition([width - 180, height + 30])
+            .ribbonWidth(300)
+            .ribbonHeight(50)
+            //end static settings
+
             // flow settings
             .flowGraph(maritimeFlowGraph)
             .flowColor((d) => {
@@ -103,7 +115,7 @@
                 flowWidthLegend: {
                     marginTop: -10,
                     values: [27000000, 100000000, 172000000],
-                    labels: ['25 (min)', '100', '172 (max)']
+                    labels: ['25', '100', '172']
                 },
                 flowColorLegend: false,
                 regionColorLegend: {
@@ -117,16 +129,17 @@
             .zoomButtons(true)
             .lockPanUntilZoom(false)
             .flowRegionColors(["#2171b5", "#51824f"])
-            .footnote(false)
-            .showEstatLogo(true)
-            .logoPosition([3, height - 35])
+            .footnote(
+                "<tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_go)"
+            )
+
             .callback(() => {
                 // --- REMOVE if it already exists ---
                 d3.select("#maritime-flow-map #em-footnote-2").remove();
                 d3.selectAll("#maritime-flow-map")
                     .append('text')
                     .attr('x', width - 310)
-                    .attr('y', height)
+                    .attr('y', height + 90)
                     .attr('class', 'em-footnote')
                     .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
@@ -159,7 +172,7 @@
                         y: 240,
                         dy: 50,
                         dx: -50,
-                        color: '#666666'
+                        color: '#4c4b4b'
                     },
                 ],
                 editMode: false
