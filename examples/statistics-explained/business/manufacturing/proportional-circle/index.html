@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eurostat-map.js</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div id="container">
+        <div id="dropdown-container">
+            <div id="dropdown-label">Select a variable:</div>
+            <ewc-singleselect id="mySelect" options='[
+    [
+    { "name": "Local units", "code": "LOC_NR", "status": "active" },
+    { "name": "Persons employed in local units", "code": "EMP_LOC_NR", "status": "active" },
+    { "name": "wages and salaries in local units", "code":"WAGE_LOC_MEUR", "status": "active"}
+    ]
+  ]' defaultOption="LOC_NR" activeOption="LOC_NR" dropdownHeight="200px" selectedLabel="Select below"
+                invertColors="false" searchMode=""></ewc-singleselect>
+        </div>
+        <svg id="map"></svg>
+    </div>
+
+    <script src="../../../eurostatmap.min.js"></script>
+    <script type="module" src="./dropdown/dropdown.js"></script>
+    <script type="module" src="./ps-map.js"></script>
+
+    <script type="module">
+        import { showSpinner, hideSpinner } from '../spinner.js'
+        // Keep original fetch
+        const originalFetch = window.fetch
+
+        // Override globally
+        let isLoading = false
+        window.fetch = async (...args) => {
+            isLoading = true
+            showSpinner()
+
+            try {
+                const res = await originalFetch(...args)
+                return res
+            } finally {
+                isLoading = false
+                hideSpinner()
+            }
+        }
+    </script>
+</body>
+
+</html>

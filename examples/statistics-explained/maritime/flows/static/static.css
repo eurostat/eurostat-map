@@ -27,7 +27,8 @@
     opacity: 0.5;
 }
 
-.em-bn-d {
+.em-bn-d,
+.em-kosovo-bn {
     stroke-width: 0.4px !important;
     stroke: rgb(116, 116, 116) !important;
     stroke-dasharray: 2, 1 !important;

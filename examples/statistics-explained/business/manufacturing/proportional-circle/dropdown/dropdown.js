@@ -1,6 +1,6 @@
 
 // import the module that registers <ewc-select>
-import { renderMap } from '../map.js';
+import { renderMap } from '../ps-map.js';
 import './ewc-singleselect.js';
 
 // Wait for the custom element to be defined, then initialize

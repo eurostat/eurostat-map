@@ -9,7 +9,7 @@ body {
 
 #dropdown-container {
     position: absolute;
-    top: 70px;
+    top: 30px;
     left: 2px;
     z-index: 999;
     pointer-events: auto;
@@ -17,6 +17,10 @@ body {
     border-radius: 4px;
     padding: 6px;
 
+}
+
+.em-zoom-buttons {
+    transform: translate(95%, 80%) !important;
 }
 
 #dropdown-label {

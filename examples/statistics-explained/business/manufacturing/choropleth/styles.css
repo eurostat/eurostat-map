@@ -1,0 +1,111 @@
+html,
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+#dropdown-container {
+    position: absolute;
+    top: 30px;
+    left: 2px;
+    z-index: 999;
+    pointer-events: auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    padding: 6px;
+
+}
+
+.em-cntrg {
+    opacity: 0.5;
+}
+
+.em-zoom-buttons {
+    transform: translate(95%, 80%) !important;
+}
+
+.em-legend-title {
+    font-size: 14px !important;
+}
+
+.em-legend-subtitle {
+    font-size: 14px !important;
+}
+
+#dropdown-label {
+    font-size: 14px;
+    font-weight: 100;
+    color: #333;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    padding-left: 2px;
+}
+
+/* spinner overlay */
+#loading-overlay {
+    position: absolute;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6);
+    /* semi-opaque so you still see map faintly */
+    z-index: 9999;
+    /* above dropdown and map */
+    pointer-events: auto;
+    /* prevents interaction while loading */
+}
+
+/* spinner overlay */
+#loading-overlay {
+    position: absolute;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6);
+    /* semi-opaque so you still see map faintly */
+    z-index: 9999;
+    /* above dropdown and map */
+    pointer-events: auto;
+    /* prevents interaction while loading */
+}
+
+/* center spinner */
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid rgba(0, 0, 0, 0.12);
+    border-top-color: rgba(0, 0, 0, 0.65);
+    animation: spinner-rotate 1s linear infinite;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* optional loading text */
+#loading-overlay .loading-label {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #222;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* layout: spinner above label stacked vertically */
+#loading-overlay .spinner-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* animation */
+@keyframes spinner-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
