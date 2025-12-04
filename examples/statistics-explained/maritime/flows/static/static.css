@@ -86,10 +86,13 @@ text#em-label-shadow-MOROCCO {
 }
 
 text#em-label-ALGERIA,
-text#em-label-shadow-ALGERIA,
+text#em-label-shadow-ALGERIA {
+    transform: translate(0px, 15px);
+}
+
 text#em-label-INDIA,
 text#em-label-shadow-INDIA {
-    transform: translate(0px, 15px);
+    transform: translate(15px, 15px);
 }
 
 text#em-label-EGYPT,
