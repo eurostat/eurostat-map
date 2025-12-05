@@ -61,79 +61,60 @@ export const map = function (config) {
 
     out.psCodeLabels_ = false // show country codes in symbols
 
-        /**
-         * Definition of getters/setters for all previously defined attributes.
-         * Each method follow the same pattern:
-         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-         *  - To get the attribute value, call the method without argument.
-         *  - To set the attribute value, call the same method with the new value as single argument.
-         */
-        ;[
-            'psMaxSize_',
-            'psMinSize_',
-            'psMaxValue_',
-            'psMinValue_',
-            'psFill_',
-            'psFillOpacity_',
-            'psStrokeOpacity_',
-            'psStroke_',
-            'psStrokeWidth_',
-            'classifierSize_',
-            'classifierColor_',
-            'psShape_',
-            'psCustomShape_',
-            'psBarWidth_',
-            'psClassToFillStyle_',
-            'psColorFun_',
-            'psSizeScale_',
-            'noDataFillStyle_',
-            'psThresholds_',
-            'psColors_',
-            'psCustomSVG_',
-            'psOffset_',
-            'psClassificationMethod_',
-            'psClasses_',
-            'dorling_',
-            'dorlingStrength_',
-            'dorlingIterations_',
-            'animateDorling_',
-            'psSpikeWidth_',
-            'psCodeLabels_',
-        ].forEach(function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
-        })
+    /**
+     * Definition of getters/setters for all previously defined attributes.
+     * Each method follow the same pattern:
+     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+     *  - To get the attribute value, call the method without argument.
+     *  - To set the attribute value, call the same method with the new value as single argument.
+     */
+    const paramNames = [
+        'psMaxSize_',
+        'psMinSize_',
+        'psMaxValue_',
+        'psMinValue_',
+        'psFill_',
+        'psFillOpacity_',
+        'psStrokeOpacity_',
+        'psStroke_',
+        'psStrokeWidth_',
+        'classifierSize_',
+        'classifierColor_',
+        'psShape_',
+        'psCustomShape_',
+        'psBarWidth_',
+        'psClassToFillStyle_',
+        'psColorFun_',
+        'psSizeScale_',
+        'noDataFillStyle_',
+        'psThresholds_',
+        'psColors_',
+        'psCustomSVG_',
+        'psOffset_',
+        'psClassificationMethod_',
+        'psClasses_',
+        'dorling_',
+        'dorlingStrength_',
+        'dorlingIterations_',
+        'animateDorling_',
+        'psSpikeWidth_',
+        'psCodeLabels_',
+    ]
+    paramNames.forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
 
     //override attribute values with config values
-    if (config)
-        [
-            'psMaxSize',
-            'psMinSize',
-            'psFill',
-            'psFillOpacity',
-            'psStroke',
-            'psStrokeWidth',
-            'classifierSize',
-            'classifierColor',
-            'psShape',
-            'psCustomShape',
-            'psBarWidth',
-            'psClassToFillStyle',
-            'psColorFun',
-            'noDataFillStyle',
-            'psThreshold',
-            'psColors',
-            'psCustomSVG',
-            'psOffset',
-            'psClassificationMethod',
-            'psClasses',
-            'dorlingIterations_',
-        ].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
         })
+    }
 
     //override of some special getters/setters
     out.psColorFun = function (v) {

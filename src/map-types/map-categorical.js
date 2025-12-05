@@ -32,7 +32,8 @@ export const map = function (config) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    ;['classToFillStyle_', 'classToText_', 'noDataFillStyle_', 'tooltipText_', 'classifier_'].forEach(function (att) {
+    const paramNames = ['classToFillStyle_', 'classToText_', 'noDataFillStyle_', 'tooltipText_', 'classifier_']
+    paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -41,10 +42,12 @@ export const map = function (config) {
     })
 
     //override attribute values with config values
-    if (config)
-        ['classToFillStyle', 'classToText', 'noDataFillStyle', 'tooltipText', 'classifier'].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
         })
+    }
 
     //@override
     out.updateClassification = function () {

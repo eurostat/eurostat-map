@@ -40,50 +40,41 @@ export const map = function (config) {
     out.statSpark_ = null
     out.sparkHeightClassifier_ = null
 
-        /**
-         * Definition of getters/setters for all previously defined attributes.
-         * Each method follow the same pattern:
-         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-         *  - To get the attribute value, call the method without argument.
-         *  - To set the attribute value, call the same method with the new value as single argument.
-         */
-        ;[
-            'sparkLineColor_',
-            'showOnlyWhenComplete_',
-            'sparkType_',
-            'sparkLineWidth_',
-            'sparkLineHeight_',
-            'sparkLineStrokeWidth_',
-            'sparkLineOpacity_',
-            'sparkLineCircleRadius_',
-            'sparkLineAreaColor_',
-            'sparkTooltipChart_',
-            'sparkLineChartFunction_',
-        ].forEach(function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
-        })
+    /**
+     * Definition of getters/setters for all previously defined attributes.
+     * Each method follow the same pattern:
+     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+     *  - To get the attribute value, call the method without argument.
+     *  - To set the attribute value, call the same method with the new value as single argument.
+     */
+    const paramNames = [
+        'sparkLineColor_',
+        'showOnlyWhenComplete_',
+        'sparkType_',
+        'sparkLineWidth_',
+        'sparkLineHeight_',
+        'sparkLineStrokeWidth_',
+        'sparkLineOpacity_',
+        'sparkLineCircleRadius_',
+        'sparkLineAreaColor_',
+        'sparkTooltipChart_',
+        'sparkLineChartFunction_',
+    ]
+    paramNames.forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
 
     //override attribute values with config values
-    if (config)
-        [
-            'sparkLineColor',
-            'showOnlyWhenComplete',
-            'sparkType',
-            'sparkLineWidth',
-            'sparkLineHeight',
-            'sparkLineStrokeWidth',
-            'sparkLineOpacity',
-            'sparkLineCircleRadius_',
-            'sparkLineAreaColor',
-            'sparkTooltipChart_',
-            'sparkLineChartFunction_',
-        ].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
         })
+    }
 
     // Allow users manually add sparkline data
     out.sparklineData_ = undefined

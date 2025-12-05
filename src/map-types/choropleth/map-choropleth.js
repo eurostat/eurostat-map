@@ -56,14 +56,8 @@ export const map = function (config) {
     out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
     out.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
-    ;[
+    // Getter/setters for exposed attributes
+    const paramNames = [
         'numberOfClasses_',
         'classificationMethod_',
         'thresholds_',
@@ -78,13 +72,22 @@ export const map = function (config) {
         'valueTransform_',
         'valueUntransform_',
         'pointOfDivergence_',
-    ].forEach(function (att) {
+    ]
+    paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
             return out
         }
     })
+
+    //override attribute values with config values
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
+        })
+    }
 
     //override of some special getters/setters
     out.colorFunction = function (v) {
@@ -113,21 +116,6 @@ export const map = function (config) {
         if (out.svg()) out.filtersDefinitionFunction_(out.svg(), out.numberOfClasses_)
         return out
     }
-
-    //override attribute values with config values
-    if (config)
-        [
-            'numberOfClasses',
-            'classificationMethod',
-            'threshold',
-            'makeClassifNice',
-            'colorFunction',
-            'classToFillStyle',
-            'noDataFillStyle',
-            'colors',
-        ].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
-        })
 
     //@override
     out.updateClassification = function () {

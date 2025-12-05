@@ -28,36 +28,33 @@ export const map = function (config) {
     out.catColors_ = undefined
     out.catLabels_ = undefined
     out.classifierSize_ = null
-        ;[
-            'catColors_',
-            'catLabels_',
-            'noDataFillStyle_',
-            'coxcombMaxRadius_',
-            'coxcombMinRadius_',
-            'coxcombRings_',
-            'coxcombStrokeFill_',
-            'coxcombStrokeWidth_',
-        ].forEach(function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
-        })
+    const paramNames = [
+        'catColors_',
+        'catLabels_',
+        'noDataFillStyle_',
+        'coxcombMaxRadius_',
+        'coxcombMinRadius_',
+        'coxcombRings_',
+        'coxcombStrokeFill_',
+        'coxcombStrokeWidth_',
+        'hoverColor_',
+        'classifierSize_'
+    ]
+    paramNames.forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
 
-    if (config)
-        [
-            'catColors',
-            'catLabels',
-            'noDataFillStyle',
-            'coxcombMaxRadius',
-            'coxcombMinRadius',
-            'coxcombInnerRadius',
-            'coxcombStrokeFill',
-            'coxcombStrokeWidth',
-        ].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
+    //override attribute values with config values
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
         })
+    }
 
     out.statCodes_ = undefined
     out.totalCode_ = undefined

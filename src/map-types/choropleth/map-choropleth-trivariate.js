@@ -27,13 +27,22 @@ export const map = function (config) {
     out.tooltip_.textFunction = tooltipTextFunctionTrivariate
 
     // Getter/setters for exposed attributes
-    ;['color1_', 'color2_', 'color3_', 'centerCoefficient_', 'noDataFillStyle_', 'colorClassifier_'].forEach(function (att) {
+    const paramNames = ['color1_', 'color2_', 'color3_', 'centerCoefficient_', 'noDataFillStyle_', 'colorClassifier_']
+    paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
             return out
         }
     })
+
+    //override attribute values with config values
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[key](config[k])
+        })
+    }
 
     //@override
     out.updateClassification = function () {

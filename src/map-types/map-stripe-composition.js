@@ -39,7 +39,7 @@ export const map = function (config) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    ;[
+    const paramNames = [
         'stripeWidth_',
         'stripeOrientation_',
         'catColors_',
@@ -48,7 +48,8 @@ export const map = function (config) {
         'noDataFillStyle_',
         'pieChartRadius_',
         'pieChartInnerRadius_',
-    ].forEach(function (att) {
+    ]
+    paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -57,19 +58,12 @@ export const map = function (config) {
     })
 
     //override attribute values with config values
-    if (config)
-        [
-            'stripeWidth',
-            'stripeOrientation',
-            'catColors',
-            'catLabels',
-            'showOnlyWhenComplete',
-            'noDataFillStyle',
-            'pieChartRadius',
-            'pieChartInnerRadius',
-        ].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
         })
+    }
 
     /**
      * A function to define a stripe map easily, without repetition of information.

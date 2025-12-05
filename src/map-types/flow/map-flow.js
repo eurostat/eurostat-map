@@ -79,7 +79,7 @@ export const map = function (config) {
     /**
      * flowmap-specific setters/getters
      */
-    ;[
+    const paramNames = [
         'flowGraph_',
         'flowColor_',
         'flowRegionColors_',
@@ -106,13 +106,22 @@ export const map = function (config) {
         'flowWidthGradient_',
         'flowOpacityGradient_',
         'flowWidthGradientSettings_'
-    ].forEach(function (att) {
+    ]
+    paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
             return out
         }
     })
+
+    //override attribute values with config values
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
+        })
+    }
 
     //@override
     out.updateStyle = function () {

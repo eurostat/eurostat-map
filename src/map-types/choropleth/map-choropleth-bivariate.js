@@ -48,7 +48,7 @@ export const map = function (config) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    ;[
+    const paramNames = [
         'numberOfClasses_',
         'breaks1_',
         'breaks2_',
@@ -69,10 +69,13 @@ export const map = function (config) {
     })
 
     //override attribute values with config values
-    if (config)
-        ['numberOfClasses', 'startColor', 'color1', 'color2', 'endColor', 'classToFillStyle', 'noDataFillStyle'].forEach(function (key) {
-            if (config[key] != undefined) out[key](config[key])
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[key](config[k])
         })
+    }
+
 
     //@override
     out.updateClassification = function () {

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    .em-cntbn {
+      stroke-width: 2px !important;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="map"></svg>
+
+  <script src="../../../build/eurostatmap.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <script>
+    const spainProjection = d3.geoAzimuthalEqualArea().rotate([2.3, -41.55]).scale(3500)
+    const spain = eurostatmap.map("choropleth", {
+      title: "Productivity in Spain",
+      projectionFunction: spainProjection,
+      subtitle: "GDP per inhabitant, 2022",
+      titlePosition: [15, 27],
+      subtitlePosition: [15, 47],
+
+      nutsLevel: 3,
+      scale: "10M",
+      stat: {
+        eurostatDatasetCode: "nama_10r_3gdp",
+        unitText: "Euro per inhabitant",
+        filters: { TIME: "2021", UNIT: "EUR_HAB" }
+      },
+
+
+      insets: [
+        {
+          geo: "IC",
+          projectionFunction: null, //force it to use default (EPSG3035)
+          geoCenter: [420000, 3170000],
+          pixSize: 3100,
+          width: 170,
+          height: 90,
+          title: "Canary islands",
+          titleFontSize: 12,
+          titleFontWeight: "",
+          frameStroke: "grey",
+          frameStrokeWidth: "0.3px"
+        }
+      ],
+      insetBoxPosition: [5, 550],
+      legend: {
+        labelDecNb: 0,
+        x: 10,
+        y: 60,
+        boxOpacity: 0,
+        boxPadding: 7,
+        title: "Euro per inhabitant",
+        titleFontSize: 16,
+        shapeWidth: 30,
+        shapeHeight: 20,
+        sepLineLength: 30,
+        noData: true
+      },
+      labels: { values: true, shadows: true },
+      classificationMethod: "threshold",
+      thresholds: [20000, 22000, 24000, 26000, 28000, 30000, 34000],
+      colors: d3.schemeBlues[9].slice(1),
+      minimap: {
+        x: 705,
+        y: 570,
+        z: 200,
+        highlightIds: ["ES"],
+        color: "steelblue"
+      },
+
+    }).build()
+  </script>
+</body>
+
+</html>
