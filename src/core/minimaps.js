@@ -98,7 +98,7 @@ const drawMinimap = (map) => {
         const minimapConfig = map.minimap_ || {}
         const x = minimapConfig.x || 80
         const y = minimapConfig.y || 80
-        const color = minimapConfig.color || '#3792B6'
+        const color = minimapConfig.color || '#929292ff'
         const size = minimapConfig.size || 160
         const geometries = map.Geometries.geoJSONs.worldrg
 

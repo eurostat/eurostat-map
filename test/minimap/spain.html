@@ -26,6 +26,14 @@
       titlePosition: [15, 27],
       subtitlePosition: [15, 47],
 
+      filterGeometriesFunction: (geo) => {
+        const nutsrg = geo[0].objects.nutsrg
+        const nutsbn = geo[0].objects.nutsbn
+        const features = nutsrg.geometries.filter(d => d.properties.id[0] + d.properties.id[1] === "ES")
+        nutsrg.geometries = features
+        return geo
+      },
+
       nutsLevel: 3,
       scale: "10M",
       stat: {
@@ -73,7 +81,7 @@
         y: 570,
         z: 200,
         highlightIds: ["ES"],
-        color: "steelblue"
+        //color: "steelblue"
       },
 
     }).build()
