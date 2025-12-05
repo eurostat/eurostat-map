@@ -31,7 +31,7 @@
 
 /*  regions without data input */
 .em--spark [ecl="ni"] {
-    fill: #f2f2f2;
+    fill: #e9e9e9;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */

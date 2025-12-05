@@ -2,14 +2,18 @@ export function renderMap(code) {
     // basic barebones proportional circles example
     const height = 550
     const width = 750
-    const legendTitles = {
+    const configs = {
         EMP_PLOC_NR: {
-            title: 'Persons employed ',
-            subtitle: 'per local unit'
+            legendTitle: 'Number',
+            colors: ["#FFEB99", "#D0E9B0", "#8AD6B9", "#56C2C0", "#3194B6", "#114891", "#17256B"],
+            //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
+            nbClasses: 7
         },
         LC_EMP_LOC_TEUR: {
-            title: 'Thousand euro',
-            subtitle: ''
+            legendTitle: 'Thousand euro',
+            colors: ["#FFEB99", "#DCEAAA", "#B0E2B6", "#77D1BA", "#56C2C0", "#3BA9BF", "#1C69A4", "#133F88", "#17256B"],
+            //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
+            nbClasses: 9
         }
     }
     let map = eurostatmap
@@ -25,8 +29,10 @@ export function renderMap(code) {
 
 
         //classification
-        .colors(['#eff3ff', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594'])
-        .classificationMethod('quantile')
+        .colors(configs[code].colors)
+        .thresholds(configs[code].thresholds)
+        .numberOfClasses(configs[code].nbClasses)
+        .classificationMethod(configs[code].thresholds ? 'threshold' : 'jenks') //jenks, quantile, equal, threshold
 
 
         //SE settings
@@ -51,9 +57,19 @@ export function renderMap(code) {
         .stat({
             eurostatDatasetCode: 'sbs_r_nuts2021',
             unitText: '',
-            filters: { INDIC_SBS: code, TIME: '2023' },
+            filters: {
+                INDIC_SBS: code,
+                nace_r2: 'C',
+                TIME: '2023'
+            },
         })
-        .legend({ title: legendTitles[code].title, subtitle: legendTitles[code].subtitle, x: 5, y: 200, boxPadding: 4 })
+        .legend({
+            title: configs[code].legendTitle,
+            x: 5,
+            y: 190,
+            boxPadding: 4,
+            boxOpacity: 0.9
+        })
 
 
     map.build()

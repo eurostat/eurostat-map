@@ -45,6 +45,7 @@ export const map = function (config) {
     out.psColors_ = null //colours to use for threshold colouring
     out.psColorFun_ = interpolateOrRd
     out.psClassToFillStyle_ = undefined //a function returning the color from the class i
+    out.psBrightenFactor_ = 0.9 // factor for brightening background color of regions
 
     //the threshold, when the classification method is 'threshold'
     out.psThresholds_ = [0]
@@ -99,6 +100,7 @@ export const map = function (config) {
         'animateDorling_',
         'psSpikeWidth_',
         'psCodeLabels_',
+        'psBrightenFactor_'
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -832,23 +834,24 @@ function updateBackgroundColor(map, symbolFill) {
     const c = d3color(symbolColor);
     const hexColor = c ? c.formatHex() : '#ffffff';
     const mapId = map.svgId_ || '';
-    const backgroundColor = getBackgroundColor(hexColor);
+    const brightenFactor = map.psBrightenFactor_ || 0.9;
+    const backgroundColor = getBackgroundColor(hexColor, brightenFactor);
 
     updateCSSRule(`#${mapId}.em--ps .em-nutsrg`, 'fill', backgroundColor);
 }
 
-function getBackgroundColor(fillColor) {
-    return brightenHex(fillColor)
+function getBackgroundColor(fillColor, brightenFactor) {
+    return brightenHex(fillColor, brightenFactor)
 }
 
 
-function brightenHex(hex) {
+function brightenHex(hex, brightenFactor) {
     // const c = color(hex);
     // if (c) {
     //     return c.brighter(2).formatHex();
     // } else {
     //manual method if d3-color fails
-    const factor = 0.9; // Brightening factor (0 to 1)
+    const factor = brightenFactor; // Brightening factor (0 to 1)
     // Ensure valid hex
     hex = hex.replace(/^#/, '');
     if (hex.length === 3) {
