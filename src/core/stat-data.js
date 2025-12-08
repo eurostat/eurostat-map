@@ -138,6 +138,38 @@ export const statData = function (config) {
                 .reduce((acc, v) => Math.max(acc, v))
         }
     }
+    /** Get max value region. */
+    out.getMaxRegion = function () {
+        if (out._data_) {
+            let maxVal = -Infinity
+            let maxRegion = null
+            for (const regionId in out._data_) {
+                const s = out._data_[regionId]
+                const val = s.value
+                if (val != null && val !== ':' && val > maxVal) {
+                    maxVal = val
+                    maxRegion = regionId
+                }
+            }
+            return maxRegion
+        }
+    }
+    /** Get min value region. */
+    out.getMinRegion = function () {
+        if (out._data_) {
+            let minVal = Infinity
+            let minRegion = null
+            for (const regionId in out._data_) {
+                const s = out._data_[regionId]
+                const val = s.value
+                if (val != null && val !== ':' && val < minVal) {
+                    minVal = val
+                    minRegion = regionId
+                }
+            }
+            return minRegion
+        }
+    }
 
     /** Check if the stat data is ready. */
     out.isReady = function () {
@@ -224,7 +256,7 @@ export const statData = function (config) {
             Object.keys(out._data_).forEach((k) => {
                 if (out._data_[k].value === null) out._data_[k].value = ':'
             })
-            
+
             if (callback) callback()
         })
     }
@@ -274,20 +306,20 @@ export const statData = function (config) {
         })
     }
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
-    ;['unitText_'].forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
-        }
-    })
+        /**
+         * Definition of getters/setters for all previously defined attributes.
+         * Each method follow the same pattern:
+         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+         *  - To get the attribute value, call the method without argument.
+         *  - To set the attribute value, call the same method with the new value as single argument.
+         */
+        ;['unitText_'].forEach(function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
+            }
+        })
 
     //override attribute values with config values
     if (config) for (let key in config) out[key + '_'] = config[key]

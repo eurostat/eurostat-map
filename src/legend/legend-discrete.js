@@ -64,11 +64,17 @@ function createThresholdsLegend(out, config) {
     // ---- Correct global min/max from statData ----
     let globalMin
     let globalMax
+    let globalMinRegion
+    let globalMaxRegion
     if (config.showMaxMin && map.statData) {
         const stat = map.statData()
         if (stat?.getMin && stat?.getMax) {
             globalMin = stat.getMin()
             globalMax = stat.getMax()
+        }
+        if (stat?.getMaxRegion && stat?.getMinRegion) {
+            globalMinRegion = stat.getMinRegion()
+            globalMaxRegion = stat.getMaxRegion()
         }
     }
 
@@ -161,6 +167,15 @@ function createThresholdsLegend(out, config) {
             Math.max(config.shapeWidth, config.sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0) :
             Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
 
+        let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : ' (max)')
+        let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : ' (min)')
+
+        if (config.maxMinRegionLabels && !config.maxMinLabels) {
+            // override with region names
+            maxLabel = `${labelFormatter(globalMax)} (${globalMaxRegion})`
+            minLabel = `${labelFormatter(globalMin)} (${globalMinRegion})`
+        }
+
         // Top boundary (MAX)
         const yTop = titlePadding
         container
@@ -177,7 +192,7 @@ function createThresholdsLegend(out, config) {
             .attr('x', labelX)
             .attr('y', yTop)
             .attr('dy', '0.3em')
-            .text(labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : ' (max)'))
+            .text(maxLabel)
 
         // Bottom boundary (MIN)
         const yBottom = numberOfClasses * config.shapeHeight + titlePadding
@@ -195,7 +210,7 @@ function createThresholdsLegend(out, config) {
             .attr('x', labelX)
             .attr('y', yBottom)
             .attr('dy', '0.3em')
-            .text(labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : ' (min)'))
+            .text(minLabel)
     }
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate

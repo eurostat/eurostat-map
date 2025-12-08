@@ -73,8 +73,8 @@ export function renderMap(code) {
             showMaxMin: true,
             maxMinTickLength:15,
             maxMin: true,
-            //maxMinRegionLabels: true,
-            // maxMinLabels:[]
+            maxMinRegionLabels: true,
+            maxMinLabels: false
         })
 
 
