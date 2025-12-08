@@ -156,8 +156,9 @@ function createThresholdsLegend(out, config) {
     // Add MIN and MAX ticks at the ends of the scale using statData extent
     if (config.showMaxMin && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
         const tickX1 = 0
-        const tickX2 = config.sepLineLength + config.tickLength
-        const labelX =
+        const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
+        const labelX = config.maxMinTickLength ?
+            Math.max(config.shapeWidth, config.sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0) :
             Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
 
         // Top boundary (MAX)

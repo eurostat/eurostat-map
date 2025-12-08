@@ -68,7 +68,13 @@ export function renderMap(code) {
             x: 5,
             y: 190,
             boxPadding: 4,
-            boxOpacity: 0.9
+            boxOpacity: 0.9,
+            tickLength:8,
+            showMaxMin: true,
+            maxMinTickLength:15,
+            maxMin: true,
+            //maxMinRegionLabels: true,
+            // maxMinLabels:[]
         })
 
 
