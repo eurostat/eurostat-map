@@ -77,7 +77,7 @@ https://observablehq.com/@joewdavies/eurostat-map-js
 ### Node.js
 
 ```npm
-npm install eurostatmap
+npm install eurostat-map
 ```
 
 then
