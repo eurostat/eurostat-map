@@ -38,7 +38,7 @@ export function updateCSSRule(selector, property, value) {
             }
         } catch (e) {
             // Some stylesheets (e.g., cross-origin) may not be accessible
-            console.warn(`Could not access rules in stylesheet:`, e)
+            console.log(`Could not access rules in stylesheet:`, e)
         }
     }
 

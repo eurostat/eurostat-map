@@ -9,7 +9,7 @@ export function drawDonuts(out, container) {
     const donutContainer = container.append('g').attr('class', 'donuts').attr('id', 'donuts')
     const nodes = out.flowGraph_.nodes
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
-    out.donutSizeScale = out.flowDonutSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
+    out.donutSizeScale = out.flowNodeSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
     const arcGen = arc().innerRadius(5)
     const pieGen = pie()
         .value((d) => d.value)
@@ -52,7 +52,7 @@ export function drawDonuts(out, container) {
 
         const g = donutContainer.append('g').attr('class', 'donut-group').attr('transform', `translate(${x},${y})`).attr('data-total', total)
 
-        const mouseoverFunction = out.flowDonutMouseoverFunction_ || donutMouseoverFunction
+        const mouseoverFunction = out.flowNodeMouseoverFunction_ || donutMouseoverFunction
 
         // Outer donut ring
         g.selectAll('path')

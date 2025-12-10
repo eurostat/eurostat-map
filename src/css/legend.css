@@ -125,3 +125,9 @@
 .em-legend-label-min {
     opacity: 0.8;
 }
+.em-flow-legend-max-label {
+    text-anchor: end;
+}
+.em-flow-width-horizontal-label{
+    
+}

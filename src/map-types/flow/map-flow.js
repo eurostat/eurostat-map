@@ -4,7 +4,7 @@
 import { min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
 import * as StatMap from '../../core/stat-map'
-import * as FlowLegend from '../../legend/legend-flow'
+import * as FlowLegend from '../../legend/flow/legend-flow'
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import { createSankeyFlowMap } from './sankey'
@@ -62,12 +62,13 @@ export const map = function (config) {
         return String(a.link.id ?? '').localeCompare(String(b.link.id ?? '')); // stable
     }; //use a custom order function for the flows at nodes
 
-    //add proportional donuts to nodes
-    out.flowDonuts_ = false // whether to add donuts to nodes
+    //add proportional symbols to nodes
+    out.flowNodes_ = true // whether to draw proportional symbols at flow nodes
+    out.flowNodeType_ = 'circle' // 'circle' || 'donut' (total count only vs inbound/outbound)
     out.flowInternal_ = true // Whether to include internal flows in donuts
     out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
-    out.flowDonutSizeScale_ = null // custom size scale for donuts
+    out.flowNodeSizeScale_ = null // custom size scale for nodes
     out.flowWidthGradientSettings_ = {
         startRatio: 0.25,   // starting thickness (as a fraction of final width)
         samples: 48,        // number of resampled points along path (smoothness)
@@ -93,10 +94,10 @@ export const map = function (config) {
         'flowOutlineColor_',
         'flowColorGradient_',
         'flowStack_',
-        'flowDonuts_',
+        'flowNodes_',
         'flowLabelOffsets_',
         'flowLineType_',
-        'flowDonutSizeScale_',
+        'flowNodeSizeScale_',
         'flowOpacity_',
         'flowInternal_',
         'flowTopLocations_',
@@ -135,7 +136,7 @@ export const map = function (config) {
 
 
         // if donuts are enabled, flows must have categorical colors
-        if (out.flowDonuts_ && out.flowTopLocations_ == 0) {
+        if (out.flowNodes_ && out.flowNodeType_ === 'donut' && out.flowTopLocations_ == 0) {
             out.flowTopLocations_ = 4 // force top locations to enable categorical coloring
         }
 
@@ -180,7 +181,7 @@ export const map = function (config) {
         }
 
         // donuts
-        if (out.flowDonuts_) {
+        if (out.flowNodes_ && out.flowNodeType_ === 'donut') {
             computeDonutValues(out)
             computeDonutLocationStats(out, true) // include internal flows
             drawDonuts(out, flowContainer)
@@ -246,9 +247,16 @@ function prepareFlowGraph(out) {
     calculateNodeTotals(out)
     computeNodeLinks(out)
     if (out.flowTopLocations_) computeTopFlowLocations(out) // compute top locations based on user-selected type
+    computeMaxMinFlowCounts(out)
 
     out.nodeNameMap = new Map(out.flowGraph_.nodes.map((n) => [n.id, n.name || n.id]))
 }
+
+function computeMaxMinFlowCounts(out) {
+    const values = out.flowGraph_.links.map((l) => l.value).filter((v) => v > 0)
+    out.maxFlowCount = values.length ? max(values) : 0
+    out.minFlowCount = values.length ? min(values) : 0
+}   
 
 /**
  * Compute top N flow locations based on user-selected type:
