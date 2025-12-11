@@ -62,23 +62,6 @@ export function buildBidirectionalRouteMap(nodes, links) {
 }
 
 /**
- * Simple directional expansion used by straight.js:
- *  - A↔B route becomes up to two full-length links: A→B and B→A.
- */
-export function expandRoutesToDirectionalLinks(nodes, links) {
-    const routeMap = buildBidirectionalRouteMap(nodes, links);
-    const outLinks = [];
-
-    for (const route of routeMap.values()) {
-        const { idA, idB, flowAB, flowBA } = route;
-        if (flowAB > 0) outLinks.push({ source: idA, target: idB, value: flowAB, route });
-        if (flowBA > 0) outLinks.push({ source: idB, target: idA, value: flowBA, route });
-    }
-
-    return { nodes, links: outLinks };
-}
-
-/**
  * For sankey.js:
  *  - One-way route: keep a normal link A→B or B→A.
  *  - Two-way route: create a hidden midpoint node M and two half-links:

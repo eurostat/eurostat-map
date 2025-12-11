@@ -24,7 +24,7 @@ export const legend = function (map, config) {
         orientation: 'horizontal', // 'vertical' or 'horizontal'
         segments: 3,
         width: 150,
-        showMaxMin: true,
+        showMaxMin: false,
     }
 
     out.nodeSizeLegend = {
@@ -38,7 +38,7 @@ export const legend = function (map, config) {
     out.flowColorLegend = {
         title: null,
         titlePadding: 0, // Padding between title and legend body
-        marginTop: 33,
+        marginTop: 50,
         items: [], // user-defined legend items for custom flow color function,
         ticks: false // use labels as ticks
     }

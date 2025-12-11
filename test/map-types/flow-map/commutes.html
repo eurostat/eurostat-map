@@ -50,7 +50,7 @@
                 .title('Test')
                 .subtitle('test')
                 .flowGraph(exampleGraph)
-                .flowLineType('straight')
+                .flowLineType('straight').flowBidirectional(false)
                 .flowTopLocations(topLocations) // Top N locations by flow volume
                 .flowTopLocationsType(type)
                 .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
@@ -68,11 +68,11 @@
                 .legend({
                     x: 10,
                     y: 120,
-                    title: 'Test',
+                    //title: 'Test',
                     boxOpacity: 0,
-                    flowWidthLegend: { title: 'Flow volume' },
-                    nodeSizeLegend: { title: 'Donut size' },
-                    flowColorLegend: { title: 'Flow color' },
+                    flowWidthLegend: { title: 'Commutes' },
+                    nodeSizeLegend: { title: 'Total incoming/outgoing' },
+                    flowColorLegend: { title: 'Destination' },
                     regionColorLegend: { title: 'Region color' },
                 })
                 .drawCoastalMargin(false)

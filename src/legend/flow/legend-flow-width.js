@@ -103,12 +103,14 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
         .attr("x", innerStart)
         .attr("y", lineY + maxStroke + 6)
         .attr("class", "em-legend-label em-flow-legend-min-label")
+        .attr('dy', '0.5em')
         .text(comma(Math.round(min)));
 
     texts.append("text")
         .attr("x", innerEnd)
         .attr("y", lineY + maxStroke + 6)
         .attr("class", "em-legend-label em-flow-legend-max-label")
+        .attr('dy', '0.5em')
         .text(comma(Math.round(max)));
 
 }

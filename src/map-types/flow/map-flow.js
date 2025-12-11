@@ -26,8 +26,18 @@ export const map = function (config) {
     out.strokeWidthScale = scaleLinear()
     out.tooltip_.textFunction = flowMapTooltipFunction
 
-    // flow settings
-    out.flowLineType_ = 'curved' // type of flow map values: curved || straight, TODO: curved
+    // flow type settings
+    out.flowLineType_ = 'curved' // type of flow map values: curved || straight
+    out.flowBidirectional_ = true // whether flows are bidirectional (true) or unidirectional (false)
+    out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
+    out.flowCurvatureSettings_ = {
+        gapX: 10,        // how far before/after node to begin/end curve
+        padX: 2,         // horizontal clearance near node stems
+        padY: 2,         // vertical collision detection padding
+        bumpY: 1,        // extra height for hop
+        curvature: 0.5   // 0..1; default sankey smoothness
+    };
+
     //out.flowThicknessType_ = 'linear' // gradual?
     out.flowColor_ = '#848484ff'
     out.flowRegionColors_ = ['#bbd7ee', '#c7e3c6'] // net exporter, net importers
@@ -39,19 +49,10 @@ export const map = function (config) {
     out.flowOutlines_ = true
     out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
     out.flowOutlineColor_ = '#ffffff' // color of outline around flow lines
-
-    out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
 
-    //curved
-    out.flowCurvatureSettings_ = {
-        gapX: 10,        // how far before/after node to begin/end curve
-        padX: 2,         // horizontal clearance near node stems
-        padY: 2,         // vertical collision detection padding
-        bumpY: 1,        // extra height for hop
-        curvature: 0.5   // 0..1; default sankey smoothness
-    };
+
     out.flowOrder_ = (a, b) => {
         const dy = a.otherY - b.otherY;          // primary: other end vertical position
         if (dy) return dy;
@@ -115,7 +116,8 @@ export const map = function (config) {
         'flowOrder_',
         'flowWidthGradient_',
         'flowOpacityGradient_',
-        'flowWidthGradientSettings_'
+        'flowWidthGradientSettings_',
+        'flowBidirectional_'
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
