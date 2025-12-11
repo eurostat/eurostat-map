@@ -1,0 +1,83 @@
+ /* #psNL00NLRTM circle,
+#psBE00BE003 circle,
+#psDE01DEHAM circle,
+#psTR02TRIZT circle,
+#psTR02TRALI circle,
+circle {
+    stroke: rgb(255, 255, 255);
+    stroke-width: 1px;
+    stroke-opacity: 0.9;
+}  */
+ .em-title {
+     font-size: 25px !important;
+ }
+
+ .em-subtitle {
+     font-size: 20px !important;
+ }
+
+ .em-legend-circle {
+     stroke: rgb(0, 0, 0);
+     stroke-width: 1px;
+     stroke-opacity: 0.9;
+ }
+
+ .map-ranking rect,
+ .em-legend-background {
+     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
+     opacity: 0.9 !important;
+ }
+
+ #ports-map .em-zoom-buttons {
+     transform: translate(94%, 86%) !important;
+ }
+
+ .em-cntbn,
+ .em--ps g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+     stroke: rgb(156, 156, 156) !important;
+     stroke-opacity: 0.3 !important;
+     opacity: 1 !important;
+     stroke-width: 1.5 !important;
+ }
+
+
+ .em-kosovo-bn {
+     stroke: #5c5c5c !important;
+     stroke-width: 0.4 !important;
+     opacity: 0.3 !important;
+     stroke-opacity: 0.7 !important;
+ }
+
+ .annotation-connector path {
+     stroke: #3a3a3a
+ }
+
+ .annotation-note-title {
+     font-family: Arial;
+     font-size: 14px !important;
+     font-weight: normal;
+     transform: translate(10px, 5px);
+     fill: #4c4b4b;
+ }
+
+ .center-vertically .annotation-note-title {
+     transform: translate(0px, -10px)
+ }
+
+ .shift-left .annotation-note-title {
+     transform: translate(-10px, 5px)
+ }
+
+ .em-insets .em-frame {
+     stroke-width: 1px !important;
+     stroke-opacity: 0.4;
+     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.2)) !important;
+ }
+
+ .em-inset-title {
+     font-size: 12px !important;
+ }
+
+ /* .em-inset {
+    filter: drop-shadow(0.5px 0.5px 0.5px rgba(0, 0, 0, 0.5)) !important;
+} */

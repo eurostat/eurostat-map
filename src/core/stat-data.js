@@ -139,7 +139,7 @@ export const statData = function (config) {
         }
     }
     /** Get max value region. */
-    out.getMaxRegion = function () {
+    out.getMaxRegionId = function () {
         if (out._data_) {
             let maxVal = -Infinity
             let maxRegion = null
@@ -155,7 +155,7 @@ export const statData = function (config) {
         }
     }
     /** Get min value region. */
-    out.getMinRegion = function () {
+    out.getMinRegionId = function () {
         if (out._data_) {
             let minVal = Infinity
             let minRegion = null

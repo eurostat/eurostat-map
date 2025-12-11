@@ -465,8 +465,33 @@ export const Geometries = function (map, withCenterPoints) {
         })
     }
 
+    // get all statistical region features (e.g. for statistical labelling)
+    out.getAllRegionFeatures = function () {
+        let features = []
+        if (out.geoJSONs.nutsrg) {
+            //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
+            if (map.nutsLevel_ == 'mixed') {
+                features = out.geoJSONs.mixed.rg0.concat(
+                    out.geoJSONs.mixed.rg1,
+                    out.geoJSONs.mixed.rg2,
+                    out.geoJSONs.mixed.rg3,
+                    out.geoJSONs.cntrg // NEW: allow labels for cntrg
+                )
+            } else {
+                features = out.geoJSONs.nutsrg.concat(out.geoJSONs.cntrg)
+            }
+        } else if (out.userGeometries) {
+            // user defined geometries
+            features = out.statisticalRegions.features
+        }
+
+        return features
+    }
+
     return out
 }
+
+
 
 function attachClickEventToRegions(regions, map) {
     regions

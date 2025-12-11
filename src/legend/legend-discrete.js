@@ -64,7 +64,9 @@ function createThresholdsLegend(out, config) {
     // ---- Correct global min/max from statData ----
     let globalMin
     let globalMax
-    let globalMinRegion
+    let globalMinRegionId
+    let globalMaxRegionId
+    let globalMinRegion 
     let globalMaxRegion
     if (config.showMaxMin && map.statData) {
         const stat = map.statData()
@@ -72,9 +74,15 @@ function createThresholdsLegend(out, config) {
             globalMin = stat.getMin()
             globalMax = stat.getMax()
         }
-        if (stat?.getMaxRegion && stat?.getMinRegion) {
-            globalMinRegion = stat.getMinRegion()
-            globalMaxRegion = stat.getMaxRegion()
+        if (stat?.getMaxRegionId && stat?.getMinRegionId) {
+            globalMinRegionId = stat.getMinRegionId()
+            globalMaxRegionId = stat.getMaxRegionId()
+            // get region names from geometries
+            const allFeatures = map.Geometries.getAllRegionFeatures()
+            const minFeature = allFeatures.find(f => f.properties.id === globalMinRegionId)
+            const maxFeature = allFeatures.find(f => f.properties.id === globalMaxRegionId)
+            if (minFeature) globalMinRegion = minFeature.properties?.na || minFeature.properties?.na || globalMinRegionId
+            if (maxFeature) globalMaxRegion = maxFeature.properties?.na || maxFeature.properties?.na || globalMaxRegionId
         }
     }
 
@@ -170,7 +178,7 @@ function createThresholdsLegend(out, config) {
         let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : ' (max)')
         let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : ' (min)')
 
-        if (config.maxMinRegionLabels && !config.maxMinLabels) {
+        if (config.maxMinRegionLabels) {
             // override with region names
             maxLabel = `${labelFormatter(globalMax)} (${globalMaxRegion})`
             minLabel = `${labelFormatter(globalMin)} (${globalMinRegion})`

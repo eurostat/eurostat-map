@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Maritime flow map</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./static.css" />
+</head>
+
+<body style="margin:0">
+    <div>
+        <button id="export-png-btn" type="button">Export map as PNG</button>
+        <button id="export-svg-btn" type="button">Export map as SVG</button>
+    </div>
+    <div>
+        <svg id="maritime-flow-map"></svg>
+    </div>
+
+
+    <script src="../../../../eurostatmap.min.js"></script>
+    <script src="../../../../d3.v7.min.js"></script>
+    <script src="../../../proj4-src.js"></script>
+    <script src="../maritimeFlowGraph.js"></script>
+
+    <script id="our-map-code">
+        const width = 1080
+        const height = width / 1.7
+        const euCoords = [12, 49];
+        const worldProjection = d3
+            .geoAzimuthalEquidistant()
+            .rotate([10, -10])
+            //.center([10, 52])       // center on Europe
+            .scale(350)
+            .translate([width / 2.4, width / 2.3])
+        const spaceAsThousandSeparator = function (number) {
+            return number.toLocaleString("en").replace(/,/gi, " ");
+        }
+        const getRegionLabels = function (graph) {
+            let labs = [];
+            let offsets = { x: -2, y: 0 };
+            graph.nodes.forEach((d) => {
+                labs.push({ text: d.name, x: d.x + offsets.x, y: d.y + offsets.y });
+            });
+            return labs;
+        }
+
+
+        const map = eurostatmap
+            .map("flow")
+            .svgId("maritime-flow-map")
+            .hoverColor('#ffc700')
+            .width(width)
+            .height(height)
+            .title("Top 20 extra-EU maritime flows")
+            .subtitle("by gross weight of goods handled in main ports, 2024")
+
+            //static settings
+            .header(true)
+            .footer(true)
+            .zoomButtons(false)
+            .showEstatLogo(true)
+            .showEstatRibbon(true)
+            .logoPosition([2, height + 65])
+            .ribbonPosition([width - 180, height + 40])
+            .ribbonWidth(300)
+            .ribbonHeight(50)
+            .footnote(
+                "<tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_go)"
+            )
+            .footnotePosition([4, 20])
+            .footerPadding(20)
+            //end static settings
+
+            //projection
+            .projectionFunction(worldProjection)
+
+            //geometries
+            .geo("WORLD")
+            .proj("4326")
+            .scale("60M")
+
+            // flow settings
+            .flowGraph(maritimeFlowGraph)
+            .flowColor((d) => {
+                if (d.meta.direction == 'Outwards') {
+                    return map.flowRegionColors_[1];
+                }
+                return map.flowRegionColors_[0];
+            })
+            .flowMinWidth(5)
+            .flowMaxWidth(30)
+            .flowLineType("curved")
+            .flowDonuts(false)
+            .flowOpacity(1)
+            .flowArrows(false)
+            .flowOutlines(true)
+            .flowOutlineColor('white')
+            .flowOutlineWidth(1)
+            .flowColorGradient(false)
+            .flowWidthGradient(false)
+            .flowStack(true)
+            .flowCurvatureSettings({
+                gapX: 1,        // how far before/after node to begin/end curve
+                padX: 0,         // horizontal clearance near node stems
+                padY: 1,         // vertical collision detection padding
+                bumpY: 5,        // extra height for hop
+                curvature: 0.2  // 0..1; default sankey smoothness
+            })
+            .flowOrder(flowOrderFunction)
+            .labels({
+                labels: getRegionLabels(maritimeFlowGraph),
+                shadows: true,
+                // values: true
+            })
+
+            // legend
+            .legend({
+                x: width - 170,
+                y: height - 150,
+                boxPadding: 10,
+                boxOpacity: 1,
+                title: "Freight carried",
+                subtitle: "million tonnes",
+                flowWidthLegend: {
+                    marginTop: -10,
+                    values: [27000000, 100000000, 172000000],
+                    labels: ['25', '100', '172']
+                },
+                flowColorLegend: false,
+                regionColorLegend: {
+                    marginTop: 20,
+                    title: " ",
+                    labels: ["Inwards", "Outwards"]
+                }
+            })
+            // zoom min/max
+            .zoomExtent([0.6, 10])
+            .zoomButtons(false) //static map, no zoom buttons
+            .lockPanUntilZoom(false)
+            //.flowRegionColors(["#2171b5", "#51824f"])
+            .flowRegionColors(['#007243', '#104F99']) // Eurostat green and blue
+            .callback(() => {
+                const euCodes = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "EL"]
+                // set fill of regions
+                const countries = d3.selectAll("#maritime-flow-map .em-worldrg path");
+                countries.style("fill", function (d) {
+                    if (d.id == 'MA') return map.flowRegionColors_[0]; // override 'majority exporter vs importer' fill rule for Morocco
+                    if (d.id == 'UK') return map.flowRegionColors_[0]; // override for United Kingdom
+
+                    if (euCodes.includes(d.id)) {
+                        return 'rgba(0, 51, 153, 0.4)'; // EU blue
+                    }
+                    // Do not change existing fill; return the current one
+                    return this.style.fill || this.getAttribute('fill') || null;
+                });
+
+
+                // --- REMOVE if it already exists ---
+                d3.select("#maritime-flow-map #em-footnote-2").remove();
+                d3.selectAll("#maritime-flow-map")
+                    .append('text')
+                    .attr('x', width - 310)
+                    .attr('y', height + 110)
+                    .attr('class', 'em-footnote')
+                    .attr('id', 'em-footnote-2')
+                    .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
+
+                //annotations were causing z-index issues with labels
+                d3.selectAll("#em-labels").raise()
+
+            })
+            .annotations({
+                annotations: [
+                    {
+                        note: {
+                            label: "The largest extra-EU maritime flow in 2024 was from USA (east coast) to EU, with over 172 million tonnes of goods handled. Representing 8.7% of the total extra-EU maritime freight.",
+                            title: " ",
+                            wrap: 190
+                        },
+                        type: "annotationCallout",
+                        connector: {
+                            end: "dot",
+                            type: "curve",
+                            //can also add a curve type, e.g. curve: d3.curveStep
+                            points: [
+                                [-5, 10],
+                                [-20, 30]
+                            ]
+                        },
+                        x: 400,
+                        y: 240,
+                        dy: 50,
+                        dx: -50,
+                        color: '#4c4b4b'
+                    },
+                ],
+                editMode: false
+            })
+
+            .build();
+
+        var exportBtnPNG = document.getElementById("export-png-btn");
+        exportBtnPNG.addEventListener("click", function () {
+            map.exportMapToPNG(width, 759.28);
+        });
+
+        var exportBtnSVG = document.getElementById("export-svg-btn");
+        exportBtnSVG.addEventListener("click", function () {
+            map.exportMapToSVG(width, height);
+        });
+
+        function flowOrderFunction(a, b) {
+            const srcA = a.link.originId ?? (a.link.source && a.link.source.id);
+            const srcB = b.link.originId ?? (a.link.source && a.link.source.id);
+            const morocco = a.link.target.id === 'MA' || b.link.target.id === 'MA';
+
+            // India above Turkey
+            if (srcA === 'IN' && srcB === 'TR') return -1;
+            if (srcA === 'TR' && srcB === 'IN') return 1;
+
+            // Brasil above Algeria and Morocco
+            if (srcA === 'BR' && (srcB === 'DZ' || morocco)) return -1;
+            if ((srcA === 'DZ' || morocco) && srcB === 'BR') return 1;
+
+            // Canada should go below the UK
+            if (srcA === 'CA' && srcB === 'UK') return 1;   // CA after UK
+            if (srcA === 'UK' && srcB === 'CA') return -1;  // UK before CA
+
+            // Default ordering: by otherY
+            const dy = a.otherY - b.otherY;
+            if (dy !== 0) return dy;
+
+            // Stable fallback
+            if (srcA && srcB && srcA !== srcB) {
+                return srcA < srcB ? -1 : 1;
+            }
+
+            return 0;
+        }
+
+    </script>
+</body>
+
+</html>

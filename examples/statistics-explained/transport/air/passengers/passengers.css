@@ -1,0 +1,78 @@
+  .em-map,
+  .em-legend,
+  .em-legend-label,
+  #em-labels,
+  .em-flow-labels {
+      font-family: "Arial" !important;
+  }
+
+  .em-title {
+      font-size: 25px !important;
+  }
+
+  .em-subtitle {
+      font-size: 20px !important;
+  }
+
+
+  .em-legend-background {
+      filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
+      opacity: 0.9;
+  }
+
+  #air-passengers-map .em-worldbn,
+  .em-bn-d,
+  .em-kosovo-bn {
+      stroke-width: 0px !important;
+  }
+
+  .em-worldrg {
+      opacity: 0.2
+  }
+
+  #air-passengers-map #em-label-EU,
+  #air-passengers-map #em-label-shadow-EU {
+      opacity: 0.9 !important;
+      font-size: 20px !important;
+      transform: translate(5px, 0px);
+  }
+
+  .em-labels .em-label,
+  .em-label-shadow,
+  .em-flow-label,
+  .em-flow-label-shadow {
+      font-family: "Arial" !important;
+      font-size: 15px !important;
+      opacity: 0.8 !important;
+      font-weight: bold;
+      fill: #333333 !important;
+  }
+
+  #air-passengers-map .em-zoom-buttons {
+      transform: translate(95.5%, 86%);
+  }
+
+  #sphere {
+      display: none;
+  }
+
+  .em-footnote {
+      font-size: 12px;
+  }
+
+  .em-tooltip {
+      max-width: 400px;
+  }
+
+  td {
+      max-width: 240px;
+  }
+
+  .em-annotation-group {
+      pointer-events: none !important;
+  }
+
+  text#em-label-Southern-Asia,
+  text#em-label-shadow-Southern-Asia {
+      transform: translate(5px, -15px);
+  }

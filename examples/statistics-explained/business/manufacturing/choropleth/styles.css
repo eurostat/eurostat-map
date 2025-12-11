@@ -10,23 +10,36 @@ body {
 /* the scrolling box */
 #container {
     width: 100%;
-    /* whatever fits your layout */
     height: 100vh;
-    /* keep it constrained so scrolling appears */
     overflow: auto;
-    /* <-- the important bit */
+    max-width: 100%
+}
+
+#map {
+    max-width: 100%
 }
 
 #dropdown-container {
     position: absolute;
-    top: 30px;
+    top: 50px;
     left: 2px;
     z-index: 999;
     pointer-events: auto;
-    background: rgba(255, 255, 255, 0.9);
+    background: none;
     border-radius: 4px;
     padding: 6px;
+    /* display:inline-flex; */
+}
 
+#dropdown-label {
+    font-size: 14px;
+    font-weight: 100;
+    color: #333;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    padding-left: 2px;
+    align-self: center;
+    margin-right: 10px;
 }
 
 .em-cntrg {
@@ -38,7 +51,7 @@ body {
 }
 
 .em-insets-button {
-    transform: translate(95%, 100px) !important;
+    transform: translate(94.5%, 130px) !important;
     cursor: pointer !important;
 }
 
@@ -54,14 +67,7 @@ body {
     font-size: 14px !important;
 }
 
-#dropdown-label {
-    font-size: 14px;
-    font-weight: 100;
-    color: #333;
-    opacity: 0.9;
-    margin-bottom: 4px;
-    padding-left: 2px;
-}
+
 
 /* spinner overlay */
 #loading-overlay {

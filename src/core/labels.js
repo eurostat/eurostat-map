@@ -339,25 +339,8 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     const statLabelsGroup = ensureGroup(labelsContainer, 'em-stat-labels');
 
     // our features array
-    let statLabelRegions = []
-
-    // deafult geometries
-    if (map.Geometries.geoJSONs.nutsrg) {
-        //allow for stat label positioning by adding a g element here, then adding the values in the mapType updateValuesLabels function
-        if (map.nutsLevel_ == 'mixed') {
-            statLabelRegions = map.Geometries.geoJSONs.mixed.rg0.concat(
-                map.Geometries.geoJSONs.mixed.rg1,
-                map.Geometries.geoJSONs.mixed.rg2,
-                map.Geometries.geoJSONs.mixed.rg3,
-                map.Geometries.geoJSONs.cntrg // NEW: allow labels for cntrg
-            )
-        } else {
-            statLabelRegions = map.Geometries.geoJSONs.nutsrg.concat(map.Geometries.geoJSONs.cntrg)
-        }
-    } else if (map.Geometries.userGeometries) {
-        // user defined geometries
-        statLabelRegions = map.Geometries.statisticalRegions.features
-    }
+    let statLabelRegions = map.Geometries.getAllRegionFeatures()
+    
 
     //TODO: dont add labels for regions that are not visible? what about panning and zooming though. Only really an issue for mixed NUTS.
 

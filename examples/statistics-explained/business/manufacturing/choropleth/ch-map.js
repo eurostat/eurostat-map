@@ -1,10 +1,12 @@
 export function renderMap(code) {
     // basic barebones proportional circles example
-    const height = 550
-    const width = 750
+    const mapHeight = 550
+    const mapWidth = 750
+    const headerPadding = 80
+
     const configs = {
         EMP_PLOC_NR: {
-            legendTitle: 'Number',
+            legendTitle: 'Number of persons',
             colors: ["#FFEB99", "#D0E9B0", "#8AD6B9", "#56C2C0", "#3194B6", "#114891", "#17256B"],
             //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
             nbClasses: 7
@@ -18,13 +20,14 @@ export function renderMap(code) {
     }
     let map = eurostatmap
         .map('ch')
-        .width(width)
-        .height(height)
+        .width(mapWidth)
+        .height(mapHeight)
         .dorling(false)
         .scale('60M')
         .title('Manufacturing sector by region, 2023')
+        .subtitle('Ratio')
 
-        .position({ x: 4700000, y: 3420000, z: 7400 })
+        .position({ x: 4400000, y: 3420000, z: 7400 })
         .insetsButton(true)
 
 
@@ -41,14 +44,14 @@ export function renderMap(code) {
         .zoomButtons(false)
         .showEstatLogo(true)
         .showEstatRibbon(true)
-        .logoPosition([2, height + 65])
-        .ribbonPosition([width - 180, height + 60])
+        .logoPosition([2, mapHeight + headerPadding + 10])
+        .ribbonPosition([mapWidth - 180, mapHeight + headerPadding + 6])
         .ribbonWidth(300)
         .ribbonHeight(50)
         .showSourceLink(false)
         .footnote(' <tspan style="font-style: italic;">Source</tspan>: Eurostat <a href="https://ec.europa.eu/eurostat" target="_blank">(sbs_r_nuts2021)</a>')
         .footnoteTooltipText(false)
-        .headerPadding(75)
+        .headerPadding(headerPadding)
         .showZoomButtons(true)
         .insets('default')
         //end SE settings
@@ -74,7 +77,7 @@ export function renderMap(code) {
             maxMinTickLength:15,
             maxMin: true,
             maxMinRegionLabels: true,
-            maxMinLabels: false
+            //maxMinLabels: ['','']
         })
 
 
