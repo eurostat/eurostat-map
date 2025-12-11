@@ -161,7 +161,7 @@ export const legend = function (map, config) {
         }
 
         // flow colour legend
-        if (out.flowColorLegend_ && ((map.flowNodes_ && map._nodeSizeScale) || (typeof map.flowColor_ === 'function'))) {
+        if (out.flowColorLegend && ((map.flowNodes_ && map._nodeSizeScale) || (typeof map.flowColor_ === 'function'))) {
             // flow color legend
             let flowColorLegendYOffset = out.lgg.node().getBBox().height + out.flowColorLegend.marginTop
             drawFlowColorLegend(out, baseX, flowColorLegendYOffset)

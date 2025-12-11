@@ -133,11 +133,11 @@ function donutMouseoverFunction(d, out) {
     // --- Header ---
     buf.push(`
         <div class="em-tooltip-bar">
-            <b>${node.name || node.id || 'Unknown location'}</b>
+            <b><span class="em-tooltip-label-text">${node.name || node.id || 'Unknown location'}</span></b>
         </div>
     `)
 
-    buf.push(`<div class="em-tooltip-text"><table class="em-tooltip-table"><tbody>`)
+    buf.push(`<div class="em-tooltip-text"><table class="em-tooltip-table em-donut-tooltip-table"><tbody>`)
 
     // === INCOMING BREAKDOWN ===
     const incomingBreakdown = getIncomingBreakdownByOrigin(node.id, out)
@@ -145,7 +145,8 @@ function donutMouseoverFunction(d, out) {
     if (totalIncoming > 0) {
         const incomingPercent = percentFormat(totalIncoming / total)
         buf.push(`
-            <tr><td style="padding-top:3px;">Incoming:</td>
+            <tr class="em-donut-tooltip-section-header">
+                <td>Incoming:</td>
                 <td>${spaceAsThousandSeparator(totalIncoming)} (${incomingPercent})</td>
             </tr>
         `)
@@ -153,18 +154,12 @@ function donutMouseoverFunction(d, out) {
         incomingBreakdown.forEach((segment) => {
             const percent = percentFormat(segment.value / total)
             buf.push(`
-                <tr>
-                    <td style="padding-left:1.5em;">
-                        <span style="
-                            display:inline-block;
-                            width:10px;
-                            height:10px;
-                            border-radius:50%;
-                            background:${segment.color};
-                            margin-right:6px;
-                        "></span> ${segment.name || segment.key}
+                <tr class="em-donut-tooltip-row">
+                    <td class="em-donut-tooltip-label">
+                        <span class="em-donut-tooltip-colorchip" style="background:${segment.color}"></span>
+                        <span class="em-tooltip-label-text">${segment.name || segment.key}</span>
                     </td>
-                    <td style="text-align:right">
+                    <td class="em-donut-tooltip-value">
                         ${spaceAsThousandSeparator(segment.value)} (${percent})
                     </td>
                 </tr>
@@ -178,7 +173,8 @@ function donutMouseoverFunction(d, out) {
     if (totalOutgoing > 0) {
         const outgoingPercent = percentFormat(totalOutgoing / total)
         buf.push(`
-            <tr><td style="padding-top:3px;">Outgoing:</td>
+            <tr class="em-donut-tooltip-section-header">
+                <td>Outgoing:</td>
                 <td>${spaceAsThousandSeparator(totalOutgoing)} (${outgoingPercent})</td>
             </tr>
         `)
@@ -186,18 +182,12 @@ function donutMouseoverFunction(d, out) {
         outgoingBreakdown.forEach((segment) => {
             const percent = percentFormat(segment.value / total)
             buf.push(`
-                <tr>
-                    <td style="padding-left:1.5em;">
-                        <span style="
-                            display:inline-block;
-                            width:10px;
-                            height:10px;
-                            border-radius:50%;
-                            background:${segment.color};
-                            margin-right:6px;
-                        "></span> ${segment.name || segment.key}
+                <tr class="em-donut-tooltip-row">
+                    <td class="em-donut-tooltip-label">
+                        <span class="em-donut-tooltip-colorchip" style="background:${segment.color}"></span>
+                        <span class="em-tooltip-label-text">${segment.name || segment.key}</span>
                     </td>
-                    <td style="text-align:right">
+                    <td class="em-donut-tooltip-value">
                         ${spaceAsThousandSeparator(segment.value)} (${percent})
                     </td>
                 </tr>
@@ -207,10 +197,8 @@ function donutMouseoverFunction(d, out) {
 
     // === TOTAL ROW ===
     buf.push(`
-        <tr class="em-tooltip-total">
-            <td colspan="2" style="padding-top:4px; font-weight:bold;">
-                Total: ${spaceAsThousandSeparator(total)} ${unit}
-            </td>
+        <tr class="em-donut-tooltip-total">
+            <td colspan="2">Total: ${spaceAsThousandSeparator(total)} ${unit}</td>
         </tr>
     `)
 
@@ -218,6 +206,8 @@ function donutMouseoverFunction(d, out) {
 
     return buf.join('')
 }
+
+
 
 const highlightDonut = (event, svg) => {
     const currentZoom = +svg.attr('data-zoom') || 1

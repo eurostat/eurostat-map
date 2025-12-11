@@ -21,3 +21,119 @@
   opacity: 1;
   stroke-opacity: 1;
 }
+
+.em-donut-tooltip-table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed; /* required for ellipsis to work predictably */
+}
+
+.em-donut-tooltip-table td {
+    padding: 3px 0;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+/* First column = labels, second = numeric values */
+.em-donut-tooltip-table td:first-child {
+    width: 68%;
+    padding-right: 6px;
+}
+
+.em-donut-tooltip-table td:last-child {
+    width: 32%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------
+   Label text (with ellipsis!)
+--------------------------------------------------------- */
+
+.em-tooltip-label-text {
+    display: inline-block;
+    max-width: 100%;
+
+    /* Ellipsis magic */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    vertical-align: middle;
+}
+
+
+/* ---------------------------------------------------------
+   Color chips
+--------------------------------------------------------- */
+
+.em-donut-tooltip-colorchip,
+.em-tooltip-colorchip {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+
+/* ---------------------------------------------------------
+   Section headers (Incoming / Outgoing)
+--------------------------------------------------------- */
+
+.em-donut-tooltip-section-header td {
+    padding-top: 6px;
+    font-weight: 600;
+    color: #222;
+}
+
+
+/* ---------------------------------------------------------
+   Breakdown rows
+--------------------------------------------------------- */
+
+.em-donut-tooltip-row td {
+    padding-top: 2px;
+}
+
+.em-donut-tooltip-label {
+    overflow: hidden; /* prevents huge names from breaking container */
+}
+
+
+/* ---------------------------------------------------------
+   Totals footer row
+--------------------------------------------------------- */
+
+.em-donut-tooltip-total td {
+    padding-top: 6px;
+    font-weight: 700;
+    border-top: 1px solid #ddd;
+}
+
+
+/* ---------------------------------------------------------
+   Container bounding box
+   (this matches your <div class="em-tooltip-text">)
+--------------------------------------------------------- */
+
+.em-tooltip-text {
+    max-width: 280px;  /* adjust if you want wider tooltips */
+    box-sizing: border-box;
+}
+
+
+/* ---------------------------------------------------------
+   Responsive (small screens)
+--------------------------------------------------------- */
+
+@media (max-width: 420px) {
+    .em-tooltip-text {
+        max-width: 220px;
+    }
+    .em-tooltip-table td:first-child { width: 60%; }
+    .em-tooltip-table td:last-child { width: 40%; }
+}

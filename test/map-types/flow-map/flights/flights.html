@@ -12,14 +12,6 @@
       height: 100%;
       margin: 0;
     }
-
-    #map {
-      width: 100%;
-      height: 100vh;
-      display: block;
-      background: #fff;
-    }
-
     .em-cntbn {
       /* opacity:0.9; */
       stroke: white !important;
@@ -28,7 +20,11 @@
 </head>
 
 <body>
-  <svg id="map"></svg>
+  <div style="display: flex;">
+    <svg id="map"></svg>
+    <svg id="legend"></svg>
+  </div>
+
 
   <!-- your built bundle (must expose global `eurostatmap`) -->
   <script src="../../../../build/eurostatmap.js"></script>
@@ -38,100 +34,80 @@
   <script type="module">
     import { toFlowGraph } from './parse.js';
 
-    try {
-      // load JSON (parse the response)
-      const data = await fetch('eurostat-flight-data.json').then(r => r.json());
-      const graph = toFlowGraph(data);
+    // load JSON (parse the response)
+    const data = await fetch('eurostat-flight-data.json').then(r => r.json());
+    const graph = toFlowGraph(data);
 
-      // guard: get first node coords if present
-      const firstNode = graph?.nodes?.[0] ?? null;
-      const posX = firstNode ? firstNode.x : 0;
-      const posY = firstNode ? firstNode.y : 0;
+    // guard: get first node coords if present
+    const firstNode = graph?.nodes?.[0] ?? null;
+    const posX = firstNode ? firstNode.x : 0;
+    const posY = firstNode ? firstNode.y : 0;
 
-      // Build the map (assumes eurostatmap is available globally from your bundle)
-      const map = eurostatmap
-        .map('flow')
-        .title('Node proportional circles test')
-        .subtitle(':)')
-        .position({ x: 3900000, y: 2900000, z: 6400 })
+    // Build the map (assumes eurostatmap is available globally from your bundle)
+    const map = eurostatmap
+      .map('flow')
+      .title('Passenger flights, 2024')
+      .header(true).footer(true)
+      .position({ x: 3900000, y: 2900000, z: 6400 })
 
-        .flowGraph(graph)
+      .flowGraph(graph)
 
-        // line type
-        .flowLineType('straight')
-        .flowMaxWidth(2)
-        .flowMinWidth(0.1)
+      // line type
+      .flowLineType('straight')
+      .flowMaxWidth(2)
+      .flowMinWidth(0.1)
 
-        // flow accessories
-        .flowArrows(false)
-        .flowOutlines(false)
+      // flow accessories
+      .flowArrows(false)
+      .flowOutlines(false)
 
-        //nodes
-        .flowNodeType('circle') // donut or circle
+      //nodes
+      .flowNodeType('donut') // donut or circle
 
-        // gradients
-        .flowColorGradient(false)
-        .flowWidthGradient(false)
-        .flowOpacityGradient(false)
+      // gradients
+      .flowColorGradient(false)
+      .flowWidthGradient(false)
+      .flowOpacityGradient(false)
 
-        // sankey-only
-        // .flowStack(false)
+      // sankey-only
+      // .flowStack(false)
 
-        // color
-        //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
-        .flowTopLocations(false) // Top N locations by flow volume
-        //.flowTopLocationsType(type)
-        .flowOpacity(0.5)
+      // color
+      //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
+      .flowTopLocations(12) // Top N locations by flow volume
+      .flowOpacity(0.5)
 
-        .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
-        //.position({ x: posX, y: posY, z: 300 })
-        .labels({
-          values: false,
-          backgrounds: true,
-          shadows: true,
-        })
-        .nutsLevel(0)
-        .legend({
-          x: 10,
-          y: 70,
-          width: 220,
-          title: 'Main legend title',
-          boxOpacity: 0,
-          flowWidthLegend: {
-            title: 'Width legend title',
-            segments: 3,
-            width: 100,
-            titlePadding: 50, // FIXME
-            showMaxMin: false,
-            //orientation:'vertical'
-          },
-          nodeSizeLegend: { title: 'Node size legend title' },
-          flowColorLegend: false,
-          regionColorLegend: { title: 'Region colors' },
-        })
-        .drawCoastalMargin(false)
-        .insets(false)
-        .zoomExtent([0.03, 1000])
-        .build();
-
-      // optionally keep a reference for debugging
-      window._lastFlowMap = map;
-
-    } catch (err) {
-      // show a clear error in console
-      console.error('Failed to build flow map:', err);
-      // optionally show user-visible error
-      const svg = document.getElementById('map');
-      if (svg) {
-        const ns = svg.namespaceURI;
-        const text = document.createElementNS(ns, 'text');
-        text.setAttribute('x', 10);
-        text.setAttribute('y', 20);
-        text.setAttribute('fill', 'red');
-        text.textContent = 'Error: ' + (err.message || err);
-        svg.appendChild(text);
-      }
-    }
+      .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+      //.position({ x: posX, y: posY, z: 300 })
+      .labels({
+        values: false,
+        backgrounds: true,
+        shadows: true,
+      })
+      .nutsLevel(0)
+      .legend({
+        svgId: 'legend',
+        x: 10,
+        y: 70,
+        width: 220,
+        title: 'Main legend title',
+        boxOpacity: 0,
+        flowWidthLegend: {
+          title: 'Width legend title',
+          segments: 3,
+          width: 100,
+          titlePadding: 50, // FIXME
+          showMaxMin: false,
+          //orientation:'vertical'
+        },
+        nodeSizeLegend: { title: 'Node size legend title' },
+        flowColorLegend: { title: 'Destination' },
+        regionColorLegend: { title: 'Region colors' },
+      })
+      .drawCoastalMargin(false)
+      .insets(false)
+      .zoomExtent([0.03, 1000])
+      .build();
   </script>
 </body>
 
