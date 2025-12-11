@@ -25,7 +25,7 @@ export const legend = function (map, config) {
         segments: 3
     }
 
-    out.donutSizeLegend = {
+    out.nodeSizeLegend = {
         title: null,
         titlePadding: 25,
         values: null,
@@ -54,7 +54,7 @@ export const legend = function (map, config) {
             if (
                 key == 'colorLegend' ||
                 key == 'flowWidthLegend' ||
-                key == 'donutSizeLegend' ||
+                key == 'nodeSizeLegend' ||
                 key == 'flowColorLegend' ||
                 key == 'regionColorLegend'
             ) {
@@ -84,7 +84,7 @@ export const legend = function (map, config) {
                 if (
                     key == 'colorLegend' ||
                     key == 'flowWidthLegend' ||
-                    key == 'donutSizeLegend' ||
+                    key == 'nodeSizeLegend' ||
                     key == 'flowColorLegend' ||
                     key == 'regionColorLegend'
                 ) {
@@ -133,34 +133,34 @@ export const legend = function (map, config) {
         const flowWidthNode = out._flowWidthContainer.node()
         const flowWidthLegendHeight = flowWidthNode.getBBox().height
 
-        // donut size legend
-        if (map.flowDonuts_ && map.donutSizeScale) {
-            // donut legends container
-            out._donutLegendContainer = out.lgg
+        // node size legend
+        if (map.flowNodes_ && map._nodeSizeScale) {
+            // node legend container
+            out._nodeLegendContainer = out.lgg
                 .append('g')
-                .attr('class', 'em-donut-legend')
+                .attr('class', 'em-node-color-legend')
                 .attr('transform', `translate(${baseX}, ${baseY + flowWidthLegendHeight})`)
 
-            // donut size legend
-            out._donutSizeContainer = out._donutLegendContainer
+            // node size legend
+            out._nodeSizeContainer = out._nodeLegendContainer
                 .append('g')
-                .attr('class', 'em-donut-size-legend')
-                .attr('transform', `translate(${0}, ${out.donutSizeLegend.marginTop})`)
+                .attr('class', 'em-node-size-legend')
+                .attr('transform', `translate(${0}, ${out.nodeSizeLegend.marginTop})`)
 
             //draw circle size legend
             drawCircleSizeLegend(
                 out,
-                out._donutSizeContainer,
-                out.donutSizeLegend.values,
-                map.donutSizeScale,
-                out.donutSizeLegend.title,
-                out.donutSizeLegend.titlePadding
+                out._nodeSizeContainer,
+                out.nodeSizeLegend.values,
+                map._nodeSizeScale,
+                out.nodeSizeLegend.title,
+                out.nodeSizeLegend.titlePadding
             )
         }
 
         // flow colour legend
-        if ((map.flowDonuts_ && map.donutSizeScale || typeof map.flowColor_ === 'function') && out.flowColorLegend) {
-            // donut color legend
+        if ((map.flowNodes_ && map._nodeSizeScale) || (typeof map.flowColor_ === 'function' && out.flowColorLegend)) {
+            // flow color legend
             let flowColorLegendYOffset = out.lgg.node().getBBox().height + out.flowColorLegend.marginTop
             drawFlowColorLegend(out, baseX, flowColorLegendYOffset)
         }

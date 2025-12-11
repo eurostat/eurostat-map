@@ -6,13 +6,14 @@ import { scaleLinear } from 'd3-scale'
 import * as StatMap from '../../core/stat-map'
 import * as FlowLegend from '../../legend/flow/legend-flow'
 import { select } from 'd3-selection'
-import { format } from 'd3-format'
 import { createSankeyFlowMap } from './sankey'
 import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { createFlowMap } from './straight'
-import { computeDonutLocationStats, computeDonutValues, drawDonuts } from './donuts'
+import { drawNodeDonuts } from './donuts'
+import { drawNodeCircles } from './circles'
 import { scaleOrdinal } from 'd3-scale'
 import { addFlowValueLabels } from '../../core/labels'
+
 
 /**
  * Returns a flow map.
@@ -95,6 +96,7 @@ export const map = function (config) {
         'flowColorGradient_',
         'flowStack_',
         'flowNodes_',
+        'flowNodeType_',
         'flowLabelOffsets_',
         'flowLineType_',
         'flowNodeSizeScale_',
@@ -180,11 +182,13 @@ export const map = function (config) {
             createFlowMap(out, flowContainer)
         }
 
-        // donuts
-        if (out.flowNodes_ && out.flowNodeType_ === 'donut') {
-            computeDonutValues(out)
-            computeDonutLocationStats(out, true) // include internal flows
-            drawDonuts(out, flowContainer)
+        // draw nodes
+        if (out.flowNodes_) {
+            if (out.flowNodeType_ === 'donut') {
+                drawNodeDonuts(out, flowContainer)
+            } else {
+                drawNodeCircles(out, flowContainer)
+            }
         }
 
         // Add labels to nodes
@@ -256,7 +260,7 @@ function computeMaxMinFlowCounts(out) {
     const values = out.flowGraph_.links.map((l) => l.value).filter((v) => v > 0)
     out.maxFlowCount = values.length ? max(values) : 0
     out.minFlowCount = values.length ? min(values) : 0
-}   
+}
 
 /**
  * Compute top N flow locations based on user-selected type:

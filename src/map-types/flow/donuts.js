@@ -5,11 +5,15 @@ import { spaceAsThousandSeparator } from '../../core/utils'
 import { select, selectAll } from 'd3-selection'
 import { format } from 'd3'
 
-export function drawDonuts(out, container) {
+export function drawNodeDonuts(out, container) {
+    //compute composition
+    computeDonutValues(out)
+    computeDonutLocationStats(out)
+
     const donutContainer = container.append('g').attr('class', 'donuts').attr('id', 'donuts')
     const nodes = out.flowGraph_.nodes
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
-    out.donutSizeScale = out.flowNodeSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
+    out._nodeSizeScale = out.flowNodeSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
     const arcGen = arc().innerRadius(5)
     const pieGen = pie()
         .value((d) => d.value)
@@ -58,7 +62,7 @@ export function drawDonuts(out, container) {
         g.selectAll('path')
             .data(pieData)
             .join('path')
-            .attr('d', arcGen.innerRadius(out.donutSizeScale(total) * 0.4).outerRadius(out.donutSizeScale(total)))
+            .attr('d', arcGen.innerRadius(out._nodeSizeScale(total) * 0.4).outerRadius(out._nodeSizeScale(total)))
             .attr('fill', (d) => d.data.color)
             .attr('stroke', 'white')
             .attr('stroke-width', 0.5)
@@ -79,7 +83,7 @@ export function drawDonuts(out, container) {
 
         // Inner circle
         g.append('circle')
-            .attr('r', out.donutSizeScale(total) * 0.4)
+            .attr('r', out._nodeSizeScale(total) * 0.4)
             .attr('fill', 'white')
             .style('cursor', 'pointer')
             .on('mouseover', function (event) {

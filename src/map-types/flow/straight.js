@@ -176,7 +176,7 @@ function drawStraightLinesByFlow(out, container) {
     }
 
     function colorByTopN(out, originId, destId, fallback) {
-        if (!out.topLocationKeys || !out.flowTopLocations_ || !out.flowDonuts_) return fallback
+        if (!out.topLocationKeys || !out.flowTopLocations_) return fallback
         const type = out.flowTopLocationsType_ || 'sum'
         if (type === 'origin') {
             return out.topLocationKeys.has(originId) ? out.topLocationColorScale(originId) : fallback

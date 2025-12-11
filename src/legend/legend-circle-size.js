@@ -54,8 +54,8 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
 
     //labels
     let labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
-    if (out.donutSizeLegend?.labelFormatter) {
-        labelFormatter = out.donutSizeLegend.labelFormatter
+    if (out.nodeSizeLegend?.labelFormatter) {
+        labelFormatter = out.nodeSizeLegend.labelFormatter
     }
     itemContainer
         .append('text')

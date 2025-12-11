@@ -423,7 +423,7 @@ function getFlowStroke(out, link) {
 
 // Copied from straight.js so "top N" behaves identically
 function colorByTopN(out, originId, destId, fallback) {
-    if (!out.topLocationKeys || !out.flowTopLocations_ || !out.flowDonuts_) return fallback;
+    if (!out.topLocationKeys || !out.flowTopLocations_ || !out.flowNodes_) return fallback;
 
     const type = out.flowTopLocationsType_ || 'sum';
 
