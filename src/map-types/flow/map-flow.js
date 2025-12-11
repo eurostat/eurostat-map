@@ -39,9 +39,7 @@ export const map = function (config) {
     out.flowOutlines_ = true
     out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
     out.flowOutlineColor_ = '#ffffff' // color of outline around flow lines
-    out.flowColorGradient_ = false // color at origin to color at destination
-    out.flowOpacityGradient_ = false // 0 origin to 1 at destination
-    out.flowWidthGradient_ = false // thin at origin to thick at destination
+
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
@@ -66,10 +64,19 @@ export const map = function (config) {
     //add proportional symbols to nodes
     out.flowNodes_ = true // whether to draw proportional symbols at flow nodes
     out.flowNodeType_ = 'circle' // 'circle' || 'donut' (total count only vs inbound/outbound)
+    out.flowNodeSizeScale_ = null // custom size scale for nodes
+
+    // include internal flow
     out.flowInternal_ = true // Whether to include internal flows in donuts
+
+    // top N coloring
     out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
-    out.flowNodeSizeScale_ = null // custom size scale for nodes
+
+    // gradients
+    out.flowColorGradient_ = false // color at origin to color at destination
+    out.flowOpacityGradient_ = false // 0 origin to 1 at destination
+    out.flowWidthGradient_ = false // thin at origin to thick at destination
     out.flowWidthGradientSettings_ = {
         startRatio: 0.25,   // starting thickness (as a fraction of final width)
         samples: 48,        // number of resampled points along path (smoothness)

@@ -207,6 +207,7 @@ function drawStraightLinesByFlow(out, container) {
                 .attr('data-color-key', colorKey)
                 .attr('data-color', baseColor)
                 .style('cursor', 'pointer')
+                .style('opacity', out.flowOpacity_)
             // .on('mouseover', onFlowLineMouseOver(out, originId, destId, value, arrowIds))
             // .on('mousemove', onFlowLineMouseMove(out))
             // .on('mouseout', onFlowLineMouseOut(out, baseColor, arrowIds)); // use baseColor

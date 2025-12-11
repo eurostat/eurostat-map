@@ -1,98 +1,105 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </head>
 
-    <body>
-        <svg id="map"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
-        <script src="./commutes.js"></script>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
 
-        <script>
-            // Step 1: Collect all unique coordinates as nodes
-            let nodes = []
-            let nodeMap = new Map() // to quickly find node IDs
+<body>
+    <svg id="map"></svg>
+    <script src="../../../build/eurostatmap.js"></script>
+    <script src="./commutes.js"></script>
 
-            function getNodeId(x, y) {
-                const key = `${x},${y}`
-                if (!nodeMap.has(key)) {
-                    const id = `node${nodeMap.size + 1}`
-                    nodeMap.set(key, id)
-                    if (nodeMap.size == 12) {
-                        const name = 'Katowice'
-                        nodes.push({ id, x, y, name })
-                    } else {
-                        nodes.push({ id, x, y })
-                    }
+    <script>
+        // Step 1: Collect all unique coordinates as nodes
+        let nodes = []
+        let nodeMap = new Map() // to quickly find node IDs
+
+        function getNodeId(x, y) {
+            const key = `${x},${y}`
+            if (!nodeMap.has(key)) {
+                const id = `node${nodeMap.size + 1}`
+                nodeMap.set(key, id)
+                if (nodeMap.size == 12) {
+                    const name = 'Katowice'
+                    nodes.push({ id, x, y, name })
+                } else {
+                    nodes.push({ id, x, y })
                 }
-                return nodeMap.get(key)
             }
+            return nodeMap.get(key)
+        }
 
-            // Step 2: Build links array
-            let links = commutes
-                .filter((d) => d.nb > 100) // threshold for filtering
-                .map((d) => {
-                    const source = getNodeId(d.x_start, d.y_start)
-                    const target = getNodeId(d.x_end, d.y_end)
-                    return { source, target, value: d.nb }
-                })
+        // Step 2: Build links array
+        let links = commutes
+            .filter((d) => d.nb > 100) // threshold for filtering
+            .map((d) => {
+                const source = getNodeId(d.x_start, d.y_start)
+                const target = getNodeId(d.x_end, d.y_end)
+                return { source, target, value: d.nb }
+            })
 
-            // Final graph object
-            const exampleGraph = { nodes, links }
+        // Final graph object
+        const exampleGraph = { nodes, links }
 
-            const type = 'destination' // 'origin' or 'destination'
-            const topLocations = 4 // Number of top locations to highlight
+        const type = 'destination' // 'origin' or 'destination'
+        const topLocations = 4 // Number of top locations to highlight
 
-            const map = eurostatmap
-                .map('flow')
-                .title('Node proportional circles test')
-                .subtitle(':)')
-                .flowGraph(exampleGraph)
-                .flowLineType('straight')
-                .flowTopLocations(topLocations) // Top N locations by flow volume
-                .flowTopLocationsType(type)
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowArrows(false)
-                .flowOutlines(false)
-                .flowNodeType('circle') // donut or circle
-
-                .flowColorGradient(false)
-                //.flowWidthGradient(true)
-                .flowOpacityGradient(true)
-                .flowStack(true)
-                .flowOpacity(0.5)
+        const map = eurostatmap
+            .map('flow')
+            .title('Node proportional circles test')
+            .subtitle(':)')
+            .flowGraph(exampleGraph)
+            .flowLineType('straight')
 
 
+            .flowArrows(false)
+            .flowOutlines(false)
+            .flowNodeType('circle') // donut or circle
 
-                .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
-                .position({ x: nodes[0].x, y: nodes[0].y, z: 300 })
-                .labels({
-                    values: false,
-                    backgrounds: true,
-                    shadows: true,
-                })
-                .nutsLevel(0)
-                .legend({
-                    x: 10,
-                    y: 70,
-                    width:220,
-                    title: 'Main legend title',
-                    boxOpacity: 0,
-                    flowWidthLegend: { 
-                        title: 'Width legend title', 
-                        segments: 5
-                        //orientation:'vertical' 
-                    },
-                    nodeSizeLegend: { title: 'Node size legend title' },
-                    flowColorLegend: { title: 'Flow color legend title' },
-                    regionColorLegend: { title: 'Region colors' },
-                })
-                .drawCoastalMargin(false)
-                .insets(false)
-                .zoomExtent([0.03, 1000])
-                .build()
-        </script>
-    </body>
+            //gradients
+            //.flowColorGradient(false)
+            .flowWidthGradient(false)
+            //.flowOpacityGradient(true)
+            .flowStack(true)
+            .flowOpacity(0.5)
+
+            //color
+            //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
+            .flowTopLocations(false) // Top N locations by flow volume
+            //.flowTopLocationsType(type)
+
+
+
+            .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+            .position({ x: nodes[0].x, y: nodes[0].y, z: 300 })
+            .labels({
+                values: false,
+                backgrounds: true,
+                shadows: true,
+            })
+            .nutsLevel(0)
+            .legend({
+                x: 10,
+                y: 70,
+                width: 220,
+                title: 'Main legend title',
+                boxOpacity: 0,
+                flowWidthLegend: {
+                    title: 'Width legend title',
+                    segments: 5
+                    //orientation:'vertical' 
+                },
+                nodeSizeLegend: { title: 'Node size legend title' },
+                flowColorLegend: false,
+                regionColorLegend: { title: 'Region colors' },
+            })
+            .drawCoastalMargin(false)
+            .insets(false)
+            .zoomExtent([0.03, 1000])
+            .build()
+    </script>
+</body>
+
 </html>
