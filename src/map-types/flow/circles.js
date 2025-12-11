@@ -127,7 +127,10 @@ export function drawNodeCircles(out, container) {
                 if (out._tooltip) out._tooltip.mouseover(makeTooltip(locKey))
                 highlightLines(locKey)
             })
-            .on("mouseout", () => unhighlightLines())
+            .on("mouseout", (event) => {
+                if (out._tooltip) out._tooltip.mouseout(event)
+                unhighlightLines()
+            })
             .on("mousemove", event => {
                 if (out._tooltip) out._tooltip.mousemove(event)
             })

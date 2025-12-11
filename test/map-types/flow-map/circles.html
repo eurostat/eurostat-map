@@ -57,6 +57,15 @@
                 .flowArrows(false)
                 .flowOutlines(false)
                 .flowNodeType('circle') // donut or circle
+
+                .flowColorGradient(false)
+                //.flowWidthGradient(true)
+                .flowOpacityGradient(true)
+                .flowStack(true)
+                .flowOpacity(0.5)
+
+
+
                 .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
                 .position({ x: nodes[0].x, y: nodes[0].y, z: 300 })
                 .labels({
