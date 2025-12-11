@@ -2,6 +2,8 @@ import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
 import { buildBidirectionalRouteMap } from './flow-bidirectional.js'
 import { generateUniqueId } from '../../core/utils.js'
+import { startBundling, bundleSynchronously, stopBundling, applyEdgeBundling } from './bundling.js';
+import { scaleLinear, scaleSqrt } from 'd3';
 
 /**
  * Function to create a flow map with straight lines.
@@ -14,45 +16,176 @@ export function createFlowMap(out, flowMapContainer) {
     drawStraightLinesByFlow(out, flowMapContainer)
 }
 
+// ------------- orchestrator -------------
+function drawStraightLinesByFlow(out, container) {
+    // minimal guard
+    if (!out?.flowGraph_) return;
+
+    // create arrow markers once
+    const svgRoot = out.svg_ || container;
+    const arrowIds = out.flowArrows_
+        ? ensureArrowMarkers(svgRoot, {
+            cacheKey: "straight",
+            scale: out.flowArrowScale_ || 1,
+            markerUnits: "strokeWidth",
+            hoverColor: out.hoverColor_ || "black",
+            outlineColor: out.flowOutlineColor_ || "#ffffff",
+            useContextStroke: true,
+        })
+        : null;
+
+    const segments = buildSegments(out);
+    // optional: run force-based edge bundling to adjust node positions before anchoring segments
+    // minimal integration: run synchronously and write updated positions back into out._nodeById
+    if (out.flowEdgeBundling_) {
+        applyEdgeBundling(
+            out,
+            {
+                nodes: Array.from(out._nodeById.values()),
+                links: out.flowGraph_.links
+            },
+            out._nodeById,
+            {
+                // mimic original bundling scales
+                airports: scaleSqrt().range([4, 18]),
+                segments: 
+                    scaleLinear()
+                    .domain([0, out.hypotenuse || 1000])
+                    .range([1, 10]),
+                width: 
+                    scaleLinear()
+                    .domain([1, out.maxCount || 100])
+                    .range([0.1, out.maxWidth || 4]),
+            }
+        );
+    }
+
+
+    assignWidths(out, segments);
+    anchorSegmentEndpoints(out, segments);
+
+    const gradientIds = prepareGradients(out, container, segments);
+    drawSegments(out, container, segments, gradientIds, arrowIds);
+}
+
 
 // ---------------- helpers ----------------
 const idFor = (v) => (v && typeof v === 'object' ? (v.id ?? v.iata ?? v.code) : v);
 
 // Build segments array depending on out.flowBidirectional_
 function buildSegments(out) {
-    const { nodes = [], links = [] } = out.flowGraph_ || {};
-    // ensure nodeById exists
-    out._nodeById = out._nodeById || new Map(nodes.map((n) => [n.id, n]));
+  const { nodes = [], links = [] } = out.flowGraph_ || {};
+  out._nodeById = out._nodeById || new Map(nodes.map((n) => [n.id, n]));
 
-    const segs = [];
-    if (out.flowBidirectional_) {
-        const routeMap = buildBidirectionalRouteMap(nodes, links);
-        for (const route of routeMap.values()) {
-            const { idA, idB, nodeA, nodeB, flowAB, flowBA } = route;
-            const midX = (nodeA.x + nodeB.x) / 2;
-            const midY = (nodeA.y + nodeB.y) / 2;
+  const segs = [];
 
-            if (flowAB > 0 && flowBA > 0) {
-                segs.push({ originId: idA, destId: idB, x1: midX, y1: midY, x2: nodeB.x, y2: nodeB.y, value: flowAB, route, nodeA, nodeB, isHalf: true });
-                segs.push({ originId: idB, destId: idA, x1: midX, y1: midY, x2: nodeA.x, y2: nodeA.y, value: flowBA, route, nodeA, nodeB, isHalf: true });
-            } else if (flowAB > 0) {
-                segs.push({ originId: idA, destId: idB, x1: nodeA.x, y1: nodeA.y, x2: nodeB.x, y2: nodeB.y, value: flowAB, route, nodeA, nodeB });
-            } else if (flowBA > 0) {
-                segs.push({ originId: idB, destId: idA, x1: nodeB.x, y1: nodeB.y, x2: nodeA.x, y2: nodeA.y, value: flowBA, route, nodeA, nodeB });
-            }
-        }
-    } else {
-        for (const link of (out.flowGraph_?.links || [])) {
-            const sid = idFor(link.source), tid = idFor(link.target);
-            const sourceNode = out._nodeById.get(sid) || (link.source && typeof link.source === 'object' ? link.source : null);
-            const targetNode = out._nodeById.get(tid) || (link.target && typeof link.target === 'object' ? link.target : null);
-            if (!sourceNode || !targetNode) continue;
-            const value = (link.value != null ? +link.value : +link.nb || 0);
-            if (!(value > 0)) continue;
-            segs.push({ originId: sid, destId: tid, x1: sourceNode.x, y1: sourceNode.y, x2: targetNode.x, y2: targetNode.y, value, route: link, nodeA: sourceNode, nodeB: targetNode });
-        }
+  if (out.flowBidirectional_) {
+    // Original bidirectional handling remains the same
+    const routeMap = buildBidirectionalRouteMap(nodes, links);
+    for (const route of routeMap.values()) {
+      const { idA, idB, nodeA, nodeB, flowAB, flowBA } = route;
+      const midX = (nodeA.x + nodeB.x) / 2;
+      const midY = (nodeA.y + nodeB.y) / 2;
+
+      if (flowAB > 0 && flowBA > 0) {
+        segs.push({
+          originId: idA,
+          destId: idB,
+          x1: midX,
+          y1: midY,
+          x2: nodeB.x,
+          y2: nodeB.y,
+          value: flowAB,
+          route,
+          nodeA,
+          nodeB,
+          isHalf: true,
+        });
+        segs.push({
+          originId: idB,
+          destId: idA,
+          x1: midX,
+          y1: midY,
+          x2: nodeA.x,
+          y2: nodeA.y,
+          value: flowBA,
+          route,
+          nodeA,
+          nodeB,
+          isHalf: true,
+        });
+      } else if (flowAB > 0) {
+        segs.push({
+          originId: idA,
+          destId: idB,
+          x1: nodeA.x,
+          y1: nodeA.y,
+          x2: nodeB.x,
+          y2: nodeB.y,
+          value: flowAB,
+          route,
+          nodeA,
+          nodeB,
+        });
+      } else if (flowBA > 0) {
+        segs.push({
+          originId: idB,
+          destId: idA,
+          x1: nodeB.x,
+          y1: nodeB.y,
+          x2: nodeA.x,
+          y2: nodeA.y,
+          value: flowBA,
+          route,
+          nodeA,
+          nodeB,
+        });
+      }
     }
-    return segs;
+  } else {
+    // NEW: Merge both directions into one combined segment
+    const merged = new Map();
+
+    for (const link of links) {
+      const sid = idFor(link.source);
+      const tid = idFor(link.target);
+      if (!sid || !tid || sid === tid) continue;
+
+      const key =
+        sid < tid ? `${sid}|${tid}` : `${tid}|${sid}`; // symmetric key
+      const value = +link.value || +link.nb || 0;
+      if (!(value > 0)) continue;
+
+      const sourceNode =
+        out._nodeById.get(sid) ||
+        (typeof link.source === "object" ? link.source : null);
+      const targetNode =
+        out._nodeById.get(tid) ||
+        (typeof link.target === "object" ? link.target : null);
+      if (!sourceNode || !targetNode) continue;
+
+      const entry = merged.get(key);
+      if (entry) {
+        entry.value += value;
+      } else {
+        merged.set(key, {
+          originId: sid,
+          destId: tid,
+          nodeA: sourceNode,
+          nodeB: targetNode,
+          x1: sourceNode.x,
+          y1: sourceNode.y,
+          x2: targetNode.x,
+          y2: targetNode.y,
+          value,
+        });
+      }
+    }
+
+    segs.push(...merged.values());
+  }
+
+  return segs;
 }
 
 function assignWidths(out, segments) {
@@ -188,33 +321,6 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
     }
 }
 
-// ------------- orchestrator -------------
-export function drawStraightLinesByFlow(out, container) {
-    // minimal guard
-    if (!out?.flowGraph_) return;
-
-    // create arrow markers once
-    const svgRoot = out.svg_ || container;
-    const arrowIds = out.flowArrows_
-        ? ensureArrowMarkers(svgRoot, {
-            cacheKey: "straight",
-            scale: out.flowArrowScale_ || 1,
-            markerUnits: "strokeWidth",
-            hoverColor: out.hoverColor_ || "black",
-            outlineColor: out.flowOutlineColor_ || "#ffffff",
-            useContextStroke: true,
-        })
-        : null;
-
-    const segments = buildSegments(out);
-    assignWidths(out, segments);
-    anchorSegmentEndpoints(out, segments);
-
-    const gradientIds = prepareGradients(out, container, segments);
-    drawSegments(out, container, segments, gradientIds, arrowIds);
-}
-
-
 // estimate arrow length (px) for a given stroke width (px), matched to arrows.js createMarker()
 function arrowBackoffPxForStroke(strokePx) {
     // match arrows.js createMarker(): markerWidth = 3 * scale, tip at ~90% of viewBox
@@ -252,21 +358,6 @@ function colorByTopN(out, originId, destId, fallback) {
     return out.topLocationKeys.has(destId)
         ? out.topLocationColorScale(destId)
         : (out.topLocationKeys.has(originId) ? out.topLocationColorScale(originId) : fallback)
-}
-
-function getFlowOutlineWidth(out, originId, destId, route, halfValue) {
-    const w = out.flowOutlineWidth_
-    if (typeof w === 'function') {
-        const nodeById = out._nodeById || new Map(out.flowGraph_.nodes.map(n => [n.id, n]))
-        const linkLike = { source: nodeById.get(originId) || { id: originId }, target: nodeById.get(destId) || { id: destId }, value: halfValue, route }
-        let res
-        try { res = w(linkLike) } catch (_) { }
-        if (res == null && w.length >= 3) {
-            try { res = w(originId, destId, route) } catch (_) { }
-        }
-        return Math.max(0, +res || 0)
-    }
-    return Math.max(0, +w || 1)
 }
 
 

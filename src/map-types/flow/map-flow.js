@@ -30,6 +30,7 @@ export const map = function (config) {
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight
     out.flowBidirectional_ = true // whether flows are bidirectional (true) or unidirectional (false)
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
+    out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
         gapX: 10,        // how far before/after node to begin/end curve
         padX: 2,         // horizontal clearance near node stems
@@ -117,7 +118,8 @@ export const map = function (config) {
         'flowWidthGradient_',
         'flowOpacityGradient_',
         'flowWidthGradientSettings_',
-        'flowBidirectional_'
+        'flowBidirectional_',
+        'flowEdgeBundling_',
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
