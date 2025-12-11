@@ -19,27 +19,14 @@ body {
 
 #dropdown-container {
     position: absolute;
-    top: 30px;
+    top: 50px;
     left: 2px;
     z-index: 999;
     pointer-events: auto;
-    background: rgba(255, 255, 255, 0.9);
+    background: none;
     border-radius: 4px;
     padding: 6px;
-
-}
-
-.em-zoom-buttons {
-    transform: translate(95%, 78%) !important;
-}
-
-.em-insets-button {
-    transform: translate(95%, 70px) !important;
-    cursor: pointer !important;
-}
-
-.em-insets {
-    display: none;
+    /* display:inline-flex; */
 }
 
 #dropdown-label {
@@ -49,6 +36,21 @@ body {
     opacity: 0.9;
     margin-bottom: 4px;
     padding-left: 2px;
+    align-self: center;
+    margin-right: 10px;
+}
+
+.em-zoom-buttons {
+    transform: translate(95%, 78%) !important;
+}
+
+.em-insets-button {
+    transform: translate(94.5%, 110px) !important;
+    cursor: pointer !important;
+}
+
+.em-insets {
+    display: none;
 }
 
 /* spinner overlay */

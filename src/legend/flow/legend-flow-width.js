@@ -29,7 +29,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
 
     // keep same defaults as your notebook
     const x = cfg.x ?? 0;
-    const totalWidth = out.width;
+    const totalWidth = cfg.width || out.width;
     const segments = cfg.segments ?? 5;
     const labelOffset = cfg.labelOffset ?? 12;
     const pad = cfg.pad ?? 0;
@@ -98,6 +98,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     }
 
     // captions for min/max aligned with baseline ends
+    if (!cfg.showMaxMin) return;
     texts.append("text")
         .attr("x", innerStart)
         .attr("y", lineY + maxStroke + 6)

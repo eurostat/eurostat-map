@@ -22,7 +22,9 @@ export const legend = function (map, config) {
         labels: null, // manual override for legend labels
         color: '#333', // line color
         orientation: 'horizontal', // 'vertical' or 'horizontal'
-        segments: 3
+        segments: 3,
+        width: 150,
+        showMaxMin: true,
     }
 
     out.nodeSizeLegend = {
