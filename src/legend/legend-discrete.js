@@ -183,10 +183,11 @@ function createThresholdsLegend(out, config) {
             maxLabel = `${labelFormatter(globalMax)} (${globalMaxRegion})`
             minLabel = `${labelFormatter(globalMin)} (${globalMinRegion})`
         }
+        const maxMinGroup = container.append('g').attr('class', 'em-legend-max-min-group')
 
         // Top boundary (MAX)
         const yTop = titlePadding
-        container
+        maxMinGroup
             .append('line')
             .attr('class', 'em-legend-tick em-legend-tick-max')
             .attr('x1', tickX1)
@@ -194,7 +195,7 @@ function createThresholdsLegend(out, config) {
             .attr('x2', tickX2)
             .attr('y2', yTop)
 
-        container
+        maxMinGroup
             .append('text')
             .attr('class', 'em-legend-label em-legend-label-max')
             .attr('x', labelX)
@@ -204,7 +205,7 @@ function createThresholdsLegend(out, config) {
 
         // Bottom boundary (MIN)
         const yBottom = numberOfClasses * config.shapeHeight + titlePadding
-        container
+        maxMinGroup
             .append('line')
             .attr('class', 'em-legend-tick em-legend-tick-min')
             .attr('x1', tickX1)
@@ -212,7 +213,7 @@ function createThresholdsLegend(out, config) {
             .attr('x2', tickX2)
             .attr('y2', yBottom)
 
-        container
+        maxMinGroup
             .append('text')
             .attr('class', 'em-legend-label em-legend-label-min')
             .attr('x', labelX)

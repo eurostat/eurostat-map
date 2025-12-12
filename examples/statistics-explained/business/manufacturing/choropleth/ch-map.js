@@ -1,8 +1,6 @@
 export function renderMap(code) {
-    // basic barebones proportional circles example
     const mapHeight = 550
-    const mapWidth = 750
-    const headerPadding = 80
+    const mapWidth = 700
 
     const configs = {
         EMP_PLOC_NR: {
@@ -24,10 +22,9 @@ export function renderMap(code) {
         .height(mapHeight)
         .dorling(false)
         .scale('60M')
-        .title('Manufacturing sector by region, 2023')
-        .subtitle('Ratio')
+        //.title('Manufacturing sector by region, 2023')
 
-        .position({ x: 4400000, y: 3420000, z: 7400 })
+        .position({ x: 4300000, y: 3420000, z: 7400 })
         .insetsButton(true)
 
 
@@ -39,19 +36,20 @@ export function renderMap(code) {
 
 
         //SE settings
-        .header(true)
+        // .header(true)
         .footer(true)
+        //.headerPadding(headerPadding)
         .zoomButtons(false)
         .showEstatLogo(true)
         .showEstatRibbon(true)
-        .logoPosition([2, mapHeight + headerPadding + 10])
-        .ribbonPosition([mapWidth - 180, mapHeight + headerPadding + 6])
+        .logoPosition([2, mapHeight - 30 ])
+        .ribbonPosition([mapWidth - 180, mapHeight - 30 ])
         .ribbonWidth(300)
         .ribbonHeight(50)
         .showSourceLink(false)
         .footnote(' <tspan style="font-style: italic;">Source</tspan>: Eurostat <a href="https://ec.europa.eu/eurostat" target="_blank">(sbs_r_nuts2021)</a>')
         .footnoteTooltipText(false)
-        .headerPadding(headerPadding)
+        
         .showZoomButtons(true)
         .insets('default')
         //end SE settings
@@ -69,15 +67,15 @@ export function renderMap(code) {
         .legend({
             title: configs[code].legendTitle,
             x: 5,
-            y: 190,
+            y: 100,
             boxPadding: 4,
             boxOpacity: 0.9,
             tickLength:8,
             showMaxMin: true,
             maxMinTickLength:15,
             maxMin: true,
-            maxMinRegionLabels: true,
-            //maxMinLabels: ['','']
+            maxMinRegionLabels: false,
+            maxMinLabels: ['','']
         })
 
 

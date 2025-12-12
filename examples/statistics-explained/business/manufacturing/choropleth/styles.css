@@ -7,7 +7,6 @@ body {
     height: 100%;
 }
 
-/* the scrolling box */
 #container {
     width: 100%;
     height: 100vh;
@@ -19,16 +18,17 @@ body {
     max-width: 100%
 }
 
-#dropdown-container {
-    position: absolute;
-    top: 50px;
-    left: 2px;
-    z-index: 999;
-    pointer-events: auto;
-    background: none;
-    border-radius: 4px;
+.map-title {
+    font-weight: bold;
+    color: #4c4b4b;
+    font-size: 21px;
     padding: 6px;
-    /* display:inline-flex; */
+}
+
+#dropdown-container {
+    position: relative;   /* or just remove position entirely */
+    padding: 6px;
+    padding-top:0px;
 }
 
 #dropdown-label {
@@ -47,11 +47,11 @@ body {
 }
 
 .em-zoom-buttons {
-    transform: translate(95%, 78%) !important;
+    transform: translate(94.5%, 79%) !important;
 }
 
 .em-insets-button {
-    transform: translate(94.5%, 130px) !important;
+    transform: translate(94.5%, 10px) !important;
     cursor: pointer !important;
 }
 

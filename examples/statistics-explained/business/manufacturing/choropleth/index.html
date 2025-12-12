@@ -9,19 +9,23 @@
 </head>
 
 <body>
+
     <div id="container">
+        <div class="map-title">Manufacturing sector by region, 2023</div>
         <div id="dropdown-container">
             <div id="dropdown-label">Select a variable:</div>
             <ewc-singleselect id="mySelect" options='[
     [
     { "name": "Persons employed per local unit", "code": "EMP_PLOC_NR", "status": "active" },
-    { "name": "Unit labour costs per person employed in local unit", "code":"LC_EMP_LOC_TEUR", "status": "active" }
+    { "name": "Labour costs per person employed in local unit", "code":"LC_EMP_LOC_TEUR", "status": "active" }
 
     ]
   ]' defaultOption="EMP_PLOC_NR" activeOption="EMP_PLOC_NR" dropdownHeight="200px" selectedLabel="Select below"
                 invertColors="false" searchMode=""></ewc-singleselect>
         </div>
-        <svg id="map"></svg>
+        <div id="map-container">
+            <svg id="map" viewBox="0 0 700 560" ></svg>
+        </div>
     </div>
 
     <script src="../../../eurostatmap.min.js"></script>

@@ -1,8 +1,6 @@
 export function renderMap(code) {
-    // basic barebones proportional circles example
     const mapHeight = 550
-    const mapWidth = 750
-    const headerPadding = 60
+    const mapWidth = 700
 
     const legendTitles = {
         LOC_NR: {
@@ -18,13 +16,14 @@ export function renderMap(code) {
     }
 
     let map = eurostatmap
-        .map('ps').width(mapWidth).height(mapHeight)
-        .dorling(false)
+        .map('ps')
+        .dorling(true)
+        .width(mapWidth)
+        .height(mapHeight)
         .scale('60M')
-        .title('Manufacturing sector by region, 2023')
-        .subtitle('Absolute values')
-        .position({ x: 4800000, y: 3420000, z: 7400 })
-        .nutsLevel(2).dorling(true)
+        //.title('Manufacturing sector by region, 2023')
+        .position({ x: 4300000, y: 3420000, z: 7400 })
+        .nutsLevel(2)
 
         //symbol settings
         .psFill('#005C99')
@@ -33,19 +32,20 @@ export function renderMap(code) {
         .psMinSize(3)
 
         //SE settings
-        .header(true)
+        //.header(true)
+        //.headerPadding(headerPadding)
         .footer(true)
         .zoomButtons(false)
         .showEstatLogo(true)
         .showEstatRibbon(true)
-        .logoPosition([2, mapHeight + headerPadding + 10])
-        .ribbonPosition([mapWidth - 180, mapHeight + headerPadding + 6])
+        .logoPosition([2, mapHeight -30])
+        .ribbonPosition([mapWidth - 180, mapHeight -30])
         .ribbonWidth(300)
         .ribbonHeight(50)
         .showSourceLink(false)
         .footnote(' <tspan style="font-style: italic;">Source</tspan>: Eurostat <a href="https://ec.europa.eu/eurostat" target="_blank">(sbs_r_nuts2021)</a>')
         .footnoteTooltipText(false)
-        .headerPadding(headerPadding)
+
         .showZoomButtons(true)
         .insets('default')
         .insetsButton(true)
@@ -68,7 +68,7 @@ export function renderMap(code) {
             title: legendTitles[code].title,
             subtitle: legendTitles[code].subtitle,
             x: 10,
-            y: 210,
+            y: 110,
             boxOpacity: 0.9
         })
 
