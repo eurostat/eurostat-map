@@ -50,8 +50,8 @@ export const legend = function (map, config) {
     out.orientation = 'vertical' // or 'vertical'
 
     // discrete legends
-    out.showMaxMin = false //whether to show min and max labels for discrete legends
-    out.maxMinLabels = ['', ''] // Labels for max and min if showMaxMin is true
+    out.maxMin = false //whether to show min and max labels for discrete legends
+    out.maxMinLabels = ['', ''] // Labels for max and min if maxMin is true
 
     //override attribute values with config values
     if (config) {

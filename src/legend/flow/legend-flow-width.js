@@ -98,7 +98,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     }
 
     // captions for min/max aligned with baseline ends
-    if (!cfg.showMaxMin) return;
+    if (!cfg.maxMin) return;
     texts.append("text")
         .attr("x", innerStart)
         .attr("y", lineY + maxStroke + 6)

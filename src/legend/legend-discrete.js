@@ -44,7 +44,7 @@ function getTitlePadding(out) {
     // Calculate the padding between the title and the first legend item
     const map = out.map
     let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : 0;
-    if (out.showMaxMin) p += 10; // extra padding if max/min labels are shown
+    if (out.maxMin) p += 10; // extra padding if max/min labels are shown
     return p
 }
 
@@ -68,7 +68,7 @@ function createThresholdsLegend(out, config) {
     let globalMaxRegionId
     let globalMinRegion 
     let globalMaxRegion
-    if (config.showMaxMin && map.statData) {
+    if (config.maxMin && map.statData) {
         const stat = map.statData()
         if (stat?.getMin && stat?.getMax) {
             globalMin = stat.getMin()
@@ -168,7 +168,7 @@ function createThresholdsLegend(out, config) {
     }
 
     // Add MIN and MAX ticks at the ends of the scale using statData extent
-    if (config.showMaxMin && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
+    if (config.maxMin && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
         const tickX1 = 0
         const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
         const labelX = config.maxMinTickLength ?

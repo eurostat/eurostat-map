@@ -24,7 +24,7 @@ export const legend = function (map, config) {
         orientation: 'horizontal', // 'vertical' or 'horizontal'
         segments: 3,
         width: 150,
-        showMaxMin: false,
+        maxMin: false,
     }
 
     out.nodeSizeLegend = {

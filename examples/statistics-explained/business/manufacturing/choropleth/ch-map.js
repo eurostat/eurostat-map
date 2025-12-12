@@ -71,11 +71,11 @@ export function renderMap(code) {
             boxPadding: 4,
             boxOpacity: 0.9,
             tickLength:8,
-            showMaxMin: true,
-            maxMinTickLength:15,
             maxMin: true,
+            maxMinTickLength:15,
             maxMinRegionLabels: false,
-            maxMinLabels: ['','']
+            maxMinLabels: ['',''],
+
         })
 
 

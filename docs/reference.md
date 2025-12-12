@@ -358,7 +358,7 @@ eurostatmap
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { age: 'Y_GE65', sex: 'T', unit: 'NR', time: '2019' },
         unitText: 'people',
-    })
+    })  
     .catLabels({ Y_LT15: '< 15', 'Y15-64': '15 to 64', Y_GE65: '> 65' })
     .catColors({ Y_LT15: '#33a02c', 'Y15-64': '#cab2d6', Y_GE65: '#ff7f00' })
     .legend({ x: 550, y: 200, sizeLegend: { title: 'Total Population' }, colorLegend: { title: 'Population by Age' } })
@@ -735,7 +735,7 @@ const map = eurostatmap
 | _map_.**flowRegionLabels**([*value*])      | array              | ['importer', 'exporter']                                   | The labels that are shown in the legend to explain the flowRegionColors.                                                   |
 | _map_.**flowOpacity**([*value*])           | number             | 0.6                                                        | The opacity of the flows                                                                                                   |
 | _map_.**flowDonuts**([*value*])            | boolean            | false                                                      | Create donut charts at each node showing the composition of incoming/outgoing flows                                        |
-| _map_.**flownodeSizeScale**([*value*])    | function           | null                                                       | Custom size scale for donut charts                                                                                         |
+| _map_.**flownodeSizeScale**([*value*])     | function           | null                                                       | Custom size scale for donut charts                                                                                         |
 | _map_.**flowInternal**([*value*])          | boolean            | true                                                       | Include internal flows/routes in the donut chart (routes that start and end at the same node).                             |
 | _map_.**flowTopLocations**([*value*])      | number             | 5                                                          | Number of top locations to colour categorically when using flowDonuts and flowLineType == 'straight'. Set to 0 to disable. |
 | _map_.**flowOrder**([*value*])             | function           | `(a,b) => a.otherY - b.otherY`                             | The sort function that defines the vertical order of flows at each node.                                                   |
@@ -1007,7 +1007,10 @@ In addition to [the default legend parameters](#map-legend), choropleth maps hav
 | **noDataText**               | String                   | _"No data"_                       | 'No data' text label.                                                                                                                                                                     |
 | **histogram**                | Object                   | _undefined_                       | When specified, the legend is shown as a histogram using these settings. See example below.                                                                                               |
 | **orientation**              | String                   | 'vertical'                        | Continuous color legend orientation.                                                                                                                                                      |
-| **showMaxMin**               | Boolean                  | _false_                           | When labelType is set to 'thresholds', show a tick for max and min values.values.                                                                                                                                                       |
+| **maxMin**                   | Boolean                  | _false_                           | When labelType is set to 'thresholds', show a tick for max and min values.values.                                                                                                         |
+| **maxMinTickLength**         | Boolean                  | _this.sepLineLength_              | Tick length for max and min values.                                                                                                                                                       |
+| **maxMinRegionLabels**       | Array                    | _false_                           | Show the corresponding region names to the max/min values.values.                                                                                                                         |
+| **maxMinLabels**             | Array                    | _['','']_                         | Custom labels to show next to max min values.values.                                                                                                                                      |
 | **ticks**                    | Array                    | _0_                               | Number of tick marks on continuous color legend (set to 0 to disable and just show low/high labels).                                                                                      |
 | **tickValues**               | Array                    | _undefined_                       | Values to show next to the ticks.                                                                                                                                                         |
 | **tickLabels**               | Array                    | _undefined_                       | Labels to show next to the ticks.                                                                                                                                                         |
@@ -1017,6 +1020,7 @@ In addition to [the default legend parameters](#map-legend), choropleth maps hav
 | **pointOfDivergenceLabel**   | String                   | undefined                         | The label to show at the point of divergence (e.g. 'policy target'). To show two arrows pointing in opposite directions with labels, use the pipe symbol like so: 'Increase \| Decrease'. |
 | **divergingLineLength**      | Number                   | undefined                         | Manually override the length of the divergence line.                                                                                                                                      |
 | **divergingArrowLength**     | Number                   | undefined                         | Manually override the length of the divergence arrows (when using the pipe symbol in your pointOfDivergenceLabel).                                                                        |
+| **pointOfDivergencePadding** | Number                   | 7                                 | The amount of padding in pixels between the line of divergence and the other legend elements.                                                                                             |
 | **pointOfDivergencePadding** | Number                   | 7                                 | The amount of padding in pixels between the line of divergence and the other legend elements.                                                                                             |
 
 For histogram legends you can use the following settings:
