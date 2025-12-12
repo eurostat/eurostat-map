@@ -6,26 +6,30 @@
     pointer-events: none;
 }
 
-.em-legend-label {
-    font-size: 15px;
-    stroke: none;
-    fill: #696969;
-    dominant-baseline: unset;
-}
-
+ /* titles */
 .em-legend-title {
-    font-size: 16px;
+    font-weight: bold;
+    font-size: 15px;
     fill: #696969;
 }
 
 .em-size-legend-title {
-    font-size: 16px;
-    fill: #696969;
+    font-size: 15px;
+    fill: #666;
 }
 
 .em-color-legend-title {
-    font-size: 16px;
+    font-size: 15px;
     fill: #696969;
+}
+
+.em-width-legend-title {
+    font-size: 15px;
+    fill: #696969;
+}
+
+.em-bivariate-axis-title {
+    font-size: 15px;
 }
 
 .em-legend-subtitle {
@@ -34,6 +38,46 @@
     opacity: 0.8;
 }
 
+/* labels */
+.em-legend-label {
+    font-size: 14px;
+    stroke: none;
+    fill: #696969;
+    dominant-baseline: unset;
+}
+
+.em-bivariate-tick-label {
+    text-anchor: middle;
+    font-size: 12px;
+}
+
+.em-legend-label-max,
+.em-legend-label-min {
+    opacity: 0.8;
+}
+.em-flow-legend-max-label {
+    text-anchor: end;
+}
+
+.em-bivariate-nodata-label {
+    font-size: 14px;
+    dominant-baseline: middle;
+}
+
+
+/* ticks */
+.em-legend-tick {
+    stroke: #696969;
+    stroke-width: 1;
+}
+
+.em-bivariate-tick {
+    stroke: #696969;
+    stroke-width: 1;
+}
+
+
+/* misc */
 .em-legend-separator {
     stroke: white;
     stroke-width: 1;
@@ -41,11 +85,6 @@
 
 .em-legend-gradient {
     cursor: pointer;
-}
-
-.em-legend-tick {
-    stroke: #696969;
-    stroke-width: 1;
 }
 
 .em-bivariate-frame {
@@ -57,25 +96,6 @@
     stroke: #696969;
     stroke-width: 0.5;
     cursor: pointer;
-}
-
-.em-bivariate-axis-title {
-    font-size: 15px;
-}
-
-.em-bivariate-nodata-label {
-    font-size: 14px;
-    dominant-baseline: middle;
-}
-
-.em-bivariate-tick {
-    stroke: #696969;
-    stroke-width: 1;
-}
-
-.em-bivariate-tick-label {
-    text-anchor: middle;
-    font-size: 12px;
 }
 
 .em-bivariate-square,
@@ -118,16 +138,4 @@
 .em-legend-background {
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
     opacity: 0.9;
-}
-
-/* Data extent labels (min/max) – slightly lighter */
-.em-legend-label-max,
-.em-legend-label-min {
-    opacity: 0.8;
-}
-.em-flow-legend-max-label {
-    text-anchor: end;
-}
-.em-flow-width-horizontal-label{
-    
 }

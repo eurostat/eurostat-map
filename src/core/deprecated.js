@@ -147,7 +147,7 @@ export const defineDeprecatedFunctions = (out) => {
     out.bordersToShow = (v) => (console.warn('map.bordersToShow() is now DEPRECATED. please use the map.filterGeometriesFunction() function if you wish to filter the default geometries.'), out);
 
     //flow maps
-    out.flownodeSizeScale = (v) => (console.warn('map.flownodeSizeScale() is now DEPRECATED. please use flowNodeSizeScale_() instead.'), out.flownodeSizeScale_ = v, out);
+    out.flowDonutSizeScale = (v) => (console.warn('map.flowDonutSizeScale() is now DEPRECATED. please use flowNodeSizeScale_() instead.'), out.flowDonutSizeScale_ = v, out);
     out.flowDonuts = (v) => (console.warn('map.flowDonuts() is now DEPRECATED. please use flowNodes(true).flowNodeType("donut") instead.'), out.flowNodeType_ = v ? 'donut' : 'circle', out);
     out.flowMapType = (v) => (console.warn('map.flowMapType() is now DEPRECATED. please use flowLineType() instead.'), out.flowLineType_ = v, out);
     out.flowGradient = (v) => (console.warn('map.flowGradient() is now DEPRECATED. please use flowColorGradient() or flowWidthGradient() instead.'), out.flowColorGradient_ = v, out);

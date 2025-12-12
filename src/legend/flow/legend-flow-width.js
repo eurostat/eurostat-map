@@ -23,7 +23,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     if (cfg.title) {
         out._flowWidthContainer
             .append('text')
-            .attr('class', 'em-size-legend-title')
+            .attr('class', 'em-width-legend-title')
             .text(cfg.title || 'Flow width')
     }
 
@@ -128,7 +128,7 @@ export function drawVerticalFlowWidthLegend(out, baseX, baseY) {
     if (cfg.title) {
         out._flowWidthContainer
             .append('text')
-            .attr('class', 'em-size-legend-title')
+            .attr('class', 'em-width-legend-title')
             .text(cfg.title || 'Flow width')
     }
 

@@ -28,7 +28,7 @@ export const map = function (config) {
 
     // flow type settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight
-    out.flowBidirectional_ = true // whether flows are bidirectional (true) or unidirectional (false)
+    out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
