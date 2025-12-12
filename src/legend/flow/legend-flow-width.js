@@ -43,7 +43,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     const sampleVals = [];
     const max = out.map.maxFlowCount;
     const min = out.map.minFlowCount;
-    for (let i = 0; i < segments; i++) {
+    for (let i = 0; i < segments +1; i++) {
         const t = segments === 1 ? 0.5 : i / (segments - 1);
         sampleVals.push(min + t * (max - min));
     }

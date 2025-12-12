@@ -6,7 +6,7 @@ import { schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import * as CoxcombLegend from '../legend/legend-coxcomb'
-import { interpolate } from 'd3'
+import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
 
 /**

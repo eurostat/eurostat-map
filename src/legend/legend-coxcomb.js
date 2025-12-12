@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import * as Legend from './legend'
 import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
-import { arc } from 'd3'
+import { arc } from 'd3-shape'
 import { drawCircleSizeLegend } from './legend-circle-size'
 
 /**

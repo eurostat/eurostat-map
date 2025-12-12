@@ -77,7 +77,7 @@
       // color
       //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
       .flowTopLocations(0) // Top N locations by flow volume
-      .flowOpacity(0.2)
+      .flowOpacity(0.1)
 
       .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
       //.position({ x: posX, y: posY, z: 300 })
@@ -89,18 +89,16 @@
       .nutsLevel(0)
       .legend({
         svgId: 'legend',
-        x: 10,
-        y: 70,
         width: 220,
-        title: 'Main legend title',
+        //title: 'Main legend title',
         boxOpacity: 0,
         flowWidthLegend: {
-          title: 'Width legend title',
-          segments: 3,
+          title: 'Passengers carried',
+          segments: 4,
           width: 150,
-          titlePadding: 50, // FIXME
+          titlePadding: 30, // FIXME
           maxMin: true,
-          //orientation:'vertical'
+          orientation:'horizontal',
         },
         nodeSizeLegend: { title: 'Node size legend title' },
         flowColorLegend: false,

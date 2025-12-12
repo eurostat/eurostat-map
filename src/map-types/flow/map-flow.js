@@ -86,6 +86,19 @@ export const map = function (config) {
         capEnd: true,       // closes the end cleanly (flat tail)
         curvatureFollow: true // keeps offset normal perpendicular to local tangent
     };
+    out.flowBundleSettings_ = {
+        iterations: 80,
+        alphaDecay: 0.15,
+        chargeStrength: 8,
+        linkStrength: 0.15,
+        linkDistanceFactor: 0.8,
+        blend: 0.25,
+        segmentDomain: [0, 800],
+        segmentRange: [1, 12],
+        widthDomain: [1, 150],
+        widthRange: [0.2, 5],
+        animate: true, 
+    };
 
     /**
      * flowmap-specific setters/getters
@@ -120,6 +133,7 @@ export const map = function (config) {
         'flowWidthGradientSettings_',
         'flowBidirectional_',
         'flowEdgeBundling_',
+        'flowBundleSettings_'
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -422,7 +436,7 @@ function addOverlayPolygons(out) {
         // Skip nodes that aren't in the geometry features
         const overlay = features.find((f) => f.properties.id === node.id)
         if (!overlay) {
-            console.warn('could not find region geometry for', node.id)
+            console.log('could not find region geometry for', node.id)
             return
         }
 
@@ -439,7 +453,7 @@ function addOverlayPolygons(out) {
     out.exporterRegionIds = exporterIds
 
     if (importerIds.length === 0 && exporterIds.length === 0) {
-        console.warn('No importer or exporter regions found in the flow graph.')
+        console.log('No importer or exporter regions found in the flow graph.')
         return
     }
 

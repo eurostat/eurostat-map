@@ -5,7 +5,7 @@ import { spaceAsThousandSeparator } from '../../core/utils'
 
 import { select } from 'd3-selection'
 import { drawCircleSizeLegend } from '../legend-circle-size'
-import { min } from 'd3'
+
 
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes

@@ -3,7 +3,7 @@ import { scaleSqrt } from 'd3-scale'
 import { arc, pie } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { select, selectAll } from 'd3-selection'
-import { format } from 'd3'
+import { format } from 'd3-format'
 
 export function drawNodeDonuts(out, container) {
     //compute composition

@@ -1,6 +1,5 @@
 import { select } from 'd3-selection'
 import { mapTemplate } from './map-template'
-import { map } from 'd3'
 
 /**
  * Build inset maps for a map template

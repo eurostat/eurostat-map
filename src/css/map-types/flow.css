@@ -3,8 +3,8 @@
 .em-flow-lines line.dimmed,
 .em-flow-container path.em-flow-link.dimmed,
 .em-flow-lines path.em-flow-link.dimmed {
-  opacity: 0.1;
-  stroke-opacity: 0.1;
+  opacity: 0;
+  stroke-opacity: 0;
 }
 
 /* emphasize the matching ones */

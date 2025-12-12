@@ -138,18 +138,24 @@ export function drawNodeCircles(out, container) {
     })
 }
 
-function highlightLines(a, b) {
-    const nodeId = typeof a === 'string' ? a : (b && b.data && b.data.parent && b.data.parent.id)
-    if (!nodeId) return
-    selectAll('g.em-flow-container line')
-        .classed('highlighted', function () {
-            return this.getAttribute('data-origin') === nodeId || this.getAttribute('data-dest') === nodeId
-        })
-        .classed('dimmed', function () {
-            return this.getAttribute('data-origin') !== nodeId && this.getAttribute('data-dest') !== nodeId
-        })
+function highlightLines(nodeId) {
+  if (!nodeId) return;
+
+  selectAll('.em-flow-link, .em-flow-link-bundled')
+    .classed('highlighted', function () {
+      const o = this.getAttribute('data-origin');
+      const d = this.getAttribute('data-dest');
+      return o === nodeId || d === nodeId;
+    })
+    .classed('dimmed', function () {
+      const o = this.getAttribute('data-origin');
+      const d = this.getAttribute('data-dest');
+      return !(o === nodeId || d === nodeId);
+    });
 }
 
-function unhighlightLines(event) {
-    selectAll('g.em-flow-container line').classed('highlighted', false).classed('dimmed', false)
+function unhighlightLines() {
+  selectAll('.em-flow-link, .em-flow-link-bundled')
+    .classed('highlighted', false)
+    .classed('dimmed', false);
 }

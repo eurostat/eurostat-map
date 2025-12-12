@@ -15,6 +15,7 @@ export const tooltip = function (config) {
         y: config.offset?.y || config.yOffset || 20, // y offset of the tooltip
     }
     config.transitionDuration = 0
+    config.opacity = config.opacity || 1
 
     let tooltip
 
@@ -37,7 +38,7 @@ export const tooltip = function (config) {
                 .interrupt() // cancel ongoing transitions
                 .transition()
                 .duration(config.transitionDuration) // fade
-                .style('opacity', 1)
+                .style('opacity', config.opacity)
         }
     }
 

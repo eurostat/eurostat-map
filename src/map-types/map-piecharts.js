@@ -7,7 +7,7 @@ import * as StatMap from '../core/stat-map'
 import * as PiechartLegend from '../legend/legend-piecharts'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
-import { interpolate } from 'd3'
+import { interpolate } from 'd3-interpolate'
 
 /**
  * Returns a proportional pie chart map.

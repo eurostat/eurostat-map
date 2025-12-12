@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
-import { formatDefaultLocale } from 'd3'
+import { formatDefaultLocale } from 'd3-format'
 import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 

@@ -3,7 +3,7 @@ import * as Legend from '../legend'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { drawSizeLegend } from './legend-symbol-size'
 import { drawDiscreteLegend } from '../legend-discrete'
-import { format } from 'd3'
+import { format } from 'd3-format'
 
 /**
  * A legend for proportional symbol map
