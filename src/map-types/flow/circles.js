@@ -1,7 +1,8 @@
 import { max } from "d3-array"
 import { scaleSqrt } from "d3-scale"
 import { spaceAsThousandSeparator } from "../../core/utils"
-import { select, selectAll } from 'd3-selection'
+import { create, select, selectAll } from 'd3-selection'
+import { createSqrtScale } from "../../core/scale"
 
 function computeCircleLocationStats(out) {
     const statsByLoc = {}
@@ -54,7 +55,7 @@ export function drawNodeCircles(out, container) {
     // size scale
     out._nodeSizeScale =
         out.flowNodeSizeScale_ ||
-        scaleSqrt().domain([0, maxValue]).range([3, 10])
+        createSqrtScale(totals, out.flowMaxNodeSize_ || 20, out.flowMinNodeSize_ || 0)
 
     const circlesContainer = container
         .append("g")

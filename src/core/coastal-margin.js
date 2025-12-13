@@ -1,13 +1,15 @@
+import { select, selectAll } from "d3-selection"
+import { executeForAllInsets } from "./utils"
 export function appendCoastalMargin(out) {
     //update existing
     if (out.svg_) {
         let margin = selectAll('#em-coast-margin')
         let filter = select('#em-coastal-blur')
         let zg = select('#em-zoom-group-' + out.svgId_) || null
-        if (margin._groups[0][0] && v == false) {
+        if (margin._groups[0][0] && out.drawCoastalMargin_ == false) {
             // remove existing
             margin.remove()
-        } else if (v == true && out._pathFunction && zg) {
+        } else if (out.drawCoastalMargin_ == true && out._pathFunction && zg) {
             //remove existing graticule
             margin.remove()
             filter.remove()
@@ -31,11 +33,11 @@ export function appendCoastalMargin(out) {
                 const cg = zoomGroup.append('g').attr('id', 'em-coast-margin')
 
                 //countries bn
-                if (map._geom.cntbn)
+                if (map.Geometries.geoJSONs.cntbn)
                     cg.append('g')
                         .attr('id', 'em-coast-margin-cnt')
                         .selectAll('path')
-                        .data(map._geom.cntbn)
+                        .data(map.Geometries.geoJSONs.cntbn)
                         .enter()
                         .filter(function (bn) {
                             return bn.properties.co === 'T'
@@ -43,11 +45,11 @@ export function appendCoastalMargin(out) {
                         .append('path')
                         .attr('d', map._pathFunction)
                 //nuts bn
-                if (map._geom.nutsbn)
+                if (map.Geometries.geoJSONs.nutsbn)
                     cg.append('g')
                         .attr('id', 'em-coast-margin-nuts')
                         .selectAll('path')
-                        .data(map._geom.nutsbn)
+                        .data(map.Geometries.geoJSONs.nutsbn)
                         .enter()
                         .filter(function (bn) {
                             return bn.properties.co === 'T'
@@ -55,7 +57,7 @@ export function appendCoastalMargin(out) {
                         .append('path')
                         .attr('d', map._pathFunction)
                 //world bn
-                if (map._geom.worldbn)
+                if (map.Geometries.geoJSONs.worldbn)
                     cg.append('g')
                         .attr('id', 'em-coast-margin-nuts')
                         .selectAll('path')

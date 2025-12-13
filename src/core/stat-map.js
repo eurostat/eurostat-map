@@ -4,6 +4,7 @@ import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
+import { hideSpinner, showSpinner } from './spinner'
 
 let _renderScheduled = false;
 
@@ -164,6 +165,16 @@ export const statMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
+    out.updateLoader = () => {
+        if (out.isInset || !out._wrapper_) return;
+
+        if (out._loadingGeo_ || out._loadingStat_) {
+            showSpinner(out._wrapper_, 'Loading…');
+        } else {
+            hideSpinner(out._wrapper_);
+        }
+    };
+
     out.buildLegend = function () {
         //create legend object
         out.legendObj(out.getLegendConstructor()(out, out.legend()))
@@ -204,16 +215,23 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * This method should be called after attributes related to the map geometries have changed, to retrieve this new data and refresh the map.
      */
     out.updateGeoData = function () {
+        out._loadingGeo_ = true;
+        out.updateLoader();
+
         out.updateGeoMapTemplate(() => {
+            out._loadingGeo_ = false;
+            out.updateLoader();
             if (!isStatDataReady()) return;
             if (_renderScheduled) return;
+
             _renderScheduled = true;
-            Promise.resolve().then(() => { // microtask to coalesce
+            Promise.resolve().then(() => {
                 _renderScheduled = false;
                 out.updateStatValues();
                 if (out.callback()) out.callback()(out);
             });
         });
+
         return out;
     };
 
@@ -222,6 +240,15 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * This method should be called after specifications on the stat data sources attached to the map have changed, to retrieve this new data and refresh the map.
      */
     out.updateStatData = function () {
+
+        const willLoadStats = hasRemoteStatData();
+
+        if (willLoadStats) {
+            out._loadingStat_ = true;
+            out.updateLoader();
+        }
+
+
         for (let statKey in out.stat_) {
             const config = out.stat(statKey)
             const manualData = out.statData(statKey).get?.()
@@ -244,6 +271,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
                     if (_renderScheduled) return;
                     _renderScheduled = true;
                     Promise.resolve().then(() => {
+                        // stats loaded
+                        out._loadingStat_ = false;
+                        out.updateLoader();
+
                         _renderScheduled = false;
                         out.updateStatValues();
                         if (out.callback()) out.callback()(out);
@@ -254,6 +285,19 @@ export const statMap = function (config, withCenterPoints, mapType) {
 
         return out
     }
+
+    const hasRemoteStatData = function () {
+        for (const key in out.stat_) {
+            const cfg = out.stat_[key];
+            if (!cfg) continue;
+
+            // remote stats if eurostat or csv
+            if (cfg.eurostatDatasetCode_ || cfg.csvURL_) {
+                return true;
+            }
+        }
+        return false;
+    };
 
     /**
      * Make/update the map with new stat data.

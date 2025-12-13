@@ -103,6 +103,9 @@ export const getFillPatternDefinitionFunction = function (opts) {
     }
 }
 
+//support deprecated name
+export const getFillPatternDefinitionFun = getFillPatternDefinitionFunction
+
 export const getDefaultLabels = function () {
     return DEFAULTLABELS
 }

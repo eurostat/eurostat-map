@@ -152,4 +152,5 @@ export const defineDeprecatedFunctions = (out) => {
     out.flowMapType = (v) => (console.warn('map.flowMapType() is now DEPRECATED. please use flowLineType() instead.'), out.flowLineType_ = v, out);
     out.flowGradient = (v) => (console.warn('map.flowGradient() is now DEPRECATED. please use flowColorGradient() or flowWidthGradient() instead.'), out.flowColorGradient_ = v, out);
     out.flowOverlayColors = (v) => (console.warn('map.flowOverlayColors() is now DEPRECATED. please use flowRegionColors() instead.'), out.flowRegionColors_ = v, out);
+    out.getFillPatternDefinitionFun = (v) => (console.warn('getFillPatternDefinitionFun is now DEPRECATED. please use fillPatternDefinitionFunction() instead.'), out.fillPatternDefinitionFunction_ = v, out);
 }

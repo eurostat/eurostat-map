@@ -5,6 +5,17 @@
 @import './map-types/pie.css';
 @import './map-types/sparkline.css';
 
+/* wrapper DOM */
+.em-map-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.em-map-wrapper > svg {
+    display: block;
+}
+
+
 /* General text settings */
 text {
     pointer-events: none;
@@ -140,7 +151,7 @@ a text {
     fill: #0a328e;
 }
 
-.em-centroid {
+.em-centroid, .em-coxcomb g {
     cursor: pointer !important;
 }
 

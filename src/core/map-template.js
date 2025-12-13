@@ -456,12 +456,39 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return svg
     }
 
+    const wrapMapSvg = function (svg) {
+        const node = svg.node();
+        if (!node) return;
+
+        const parent = node.parentNode;
+        if (!parent) return;
+
+        //  If parent is SVG (e.g. IMAGE), abandon wrapping 
+        if (parent instanceof SVGElement) return;
+
+        // already wrapped
+        if (parent.classList?.contains('em-map-wrapper')) return parent;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'em-map-wrapper';
+
+        parent.insertBefore(wrapper, node);
+        wrapper.appendChild(node);
+
+        return wrapper;
+    }
+
     /**
      * Build a map object, including container, frame, map svg, insets and d3 zoom
      */
     out.buildMapTemplateBase = function () {
         const svg = createMapSVG(out)
         out.svg_ = svg
+
+        // Wrap SVG so HTML overlays (spinner, tooltip) can sit above it
+        if (!out.isInset) {
+            out._wrapper_ = wrapMapSvg(svg);
+        }
 
         //set container for cases where container contains various maps
         if (!out.containerId_) out.containerId_ = out.svgId_

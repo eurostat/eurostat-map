@@ -57,6 +57,7 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
     if (out.nodeSizeLegend?.labelFormatter) {
         labelFormatter = out.nodeSizeLegend.labelFormatter
     }
+    let labels = out.sizeLegend?.labels || out.nodeSizeLegend?.labels
     itemContainer
         .append('text')
         .attr('class', 'em-legend-label')
@@ -67,8 +68,8 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         })
         .attr('x', maxRadius + 5)
         .text((d, i) => {
-            if (out.sizeLegend?.labels && out.sizeLegend.labels[i]) {
-                return out.sizeLegend.labels[i]
+            if (labels && labels[i]) {
+                return labels[i]
             }
             return labelFormatter(d)
         })

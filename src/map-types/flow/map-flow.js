@@ -66,6 +66,8 @@ export const map = function (config) {
     //add proportional symbols to nodes
     out.flowNodes_ = true // whether to draw proportional symbols at flow nodes
     out.flowNodeType_ = 'circle' // 'circle' || 'donut' (total count only vs inbound/outbound)
+    out.flowMinNodeSize_ = 3 // min size for node symbols
+    out.flowMaxNodeSize_ = 10 // max size for node symbols
     out.flowNodeSizeScale_ = null // custom size scale for nodes
 
     // include internal flow

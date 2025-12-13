@@ -55,13 +55,16 @@
 .em-legend-label-min {
     opacity: 0.8;
 }
-.em-flow-legend-max-label {
-    text-anchor: end;
-}
 
 .em-bivariate-nodata-label {
     font-size: 14px;
     dominant-baseline: middle;
+}
+
+.em-flow-width-horizontal-label {
+    text-anchor: middle;
+    font-size: 13px;
+    fill: #3a3a3a
 }
 
 
