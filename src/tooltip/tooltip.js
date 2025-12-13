@@ -8,7 +8,6 @@ export const tooltip = function (config) {
     config = config || {}
 
     config.containerId = config.containerId || config.svgId || 'map' // the maximum bounds of the tooltip
-    config.customElement = config.customElement // for users to specify custom tooltip elements
     config.id = config.id || `em-tooltip-${config.containerId}` // id of the tooltip div
     config.offset = {
         x: config.offset?.x || config.xOffset || 30, // x offset of the tooltip

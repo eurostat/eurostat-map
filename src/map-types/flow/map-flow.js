@@ -87,17 +87,11 @@ export const map = function (config) {
         curvatureFollow: true // keeps offset normal perpendicular to local tangent
     };
     out.flowBundleSettings_ = {
-        iterations: 80,
-        alphaDecay: 0.15,
-        chargeStrength: 8,
-        linkStrength: 0.15,
-        linkDistanceFactor: 0.8,
-        blend: 0.25,
-        segmentDomain: [0, 800],
-        segmentRange: [1, 12],
-        widthDomain: [1, 150],
-        widthRange: [0.2, 5],
-        animate: true, 
+        alphaDecay: 0.1,
+        chargeStrength: 10,
+        distanceMax: null, // if null, will default to twice the max dimension of the map
+        linkStrength: 0.7,
+        linkIterations: 1
     };
 
     /**
@@ -153,15 +147,6 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
-        // type: "Feature"
-        // properties: Object {id: "ES", na: "España"}
-        // geometry: Object {type: "MultiPolygon", coordinates: Array(7)}
-        // source: "FR"
-        // target: "ES"
-        // value: 45422327.56
-
-
-
         // if donuts are enabled, flows must have categorical colors
         if (out.flowNodes_ && out.flowNodeType_ === 'donut' && out.flowTopLocations_ == 0) {
             out.flowTopLocations_ = 4 // force top locations to enable categorical coloring

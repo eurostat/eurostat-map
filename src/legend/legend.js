@@ -69,6 +69,8 @@ export const legend = function (map) {
     out.ascending = true
     out.decimals = 0
 
+    out.maxMin = true // show max/min values in legends where applicable
+    out.maxMinLabels = ['', ''] // Labels for max and min if maxMin is true
 
     /** Build legend. */
     out.build = function () {
@@ -235,6 +237,13 @@ export const legend = function (map) {
         const mapType = map._mapType
         const colorClassifier = mapType === 'ps' ? map.classifierColor_ : map.classifier_
         return colorClassifier
+    }
+
+    out.getColorStats = function (out) {
+        const map = out.map
+        const mapType = map._mapType
+        const stats = mapType === 'ps' ? map.statData('color') : map.statData()
+        return stats
     }
 
     out.getHighlightFunction = function (map) {

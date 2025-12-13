@@ -49,10 +49,6 @@ export const legend = function (map, config) {
     out.tickLabels = undefined // Custom tick labels for continuous legend (if empty, will use tickValues)
     out.orientation = 'vertical' // or 'vertical'
 
-    // discrete legends
-    out.maxMin = false //whether to show min and max labels for discrete legends
-    out.maxMinLabels = ['', ''] // Labels for max and min if maxMin is true
-
     //override attribute values with config values
     if (config) {
         for (let key in config) {

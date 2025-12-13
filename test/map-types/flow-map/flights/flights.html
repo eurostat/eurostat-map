@@ -12,9 +12,16 @@
       height: 100%;
       margin: 0;
     }
+
     .em-cntbn {
       /* opacity:0.9; */
       stroke: white !important;
+    }
+
+    .em-node-circle {
+      fill: white;
+      opacity: 0.6;
+      stroke: #252525;
     }
   </style>
 </head>
@@ -56,8 +63,16 @@
       .flowLineType('straight')
       .flowBidirectional(false)
       .flowEdgeBundling(true)
-      .flowMaxWidth(8)
+      .flowBundleSettings({
+        alphaDecay: 0.1,
+        chargeStrength: 10,
+        distanceMax: null, // if null, will default to twice the max dimension of the map
+        linkStrength: 0.7,
+        linkIterations: 1
+      })
+      .flowMaxWidth(20)
       .flowMinWidth(0.1)
+      .flowInternal(false)
 
       // flow accessories
       .flowArrows(false)
@@ -80,6 +95,12 @@
       .flowOpacity(0.1)
 
       .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+
+
+      .tooltip({
+        xOffset:100,
+        yOffset:100,
+      })
       //.position({ x: posX, y: posY, z: 300 })
       .labels({
         values: false,
@@ -93,14 +114,14 @@
         //title: 'Main legend title',
         boxOpacity: 0,
         flowWidthLegend: {
-          title: 'Passengers carried',
+          title: 'Passengers (flights)',
           segments: 4,
           width: 150,
           titlePadding: 30, // FIXME
           maxMin: true,
-          orientation:'horizontal',
+          orientation: 'horizontal',
         },
-        nodeSizeLegend: { title: 'Node size legend title' },
+        nodeSizeLegend: { title: 'Passengers (airports)', values: [] },
         flowColorLegend: false,
         regionColorLegend: { title: 'Region colors' },
       })

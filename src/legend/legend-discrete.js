@@ -57,6 +57,7 @@ function createThresholdsLegend(out, config) {
     const unhighlightFunction = out.getUnHighlightFunction(map)
     const classifier = out.getColorClassifier(out)
     const classToFillStyle = out.getClassToFillStyle(out)
+    const stat = out.getColorStats(out)
 
     // Label formatter
     const labelFormatter = out.getLabelFormatter(out)
@@ -68,8 +69,7 @@ function createThresholdsLegend(out, config) {
     let globalMaxRegionId
     let globalMinRegion 
     let globalMaxRegion
-    if (config.maxMin && map.statData) {
-        const stat = map.statData()
+    if ((out.maxMin || config.maxMin) && stat) {
         if (stat?.getMin && stat?.getMax) {
             globalMin = stat.getMin()
             globalMax = stat.getMax()
@@ -168,15 +168,15 @@ function createThresholdsLegend(out, config) {
     }
 
     // Add MIN and MAX ticks at the ends of the scale using statData extent
-    if (config.maxMin && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
+    if ((out.maxMin ||config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
         const tickX1 = 0
         const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
         const labelX = config.maxMinTickLength ?
             Math.max(config.shapeWidth, config.sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0) :
             Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
 
-        let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : ' (max)')
-        let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : ' (min)')
+        let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : '')
+        let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
 
         if (config.maxMinRegionLabels) {
             // override with region names

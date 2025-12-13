@@ -1,8 +1,7 @@
-import { spaceAsThousandSeparator } from '../../core/utils'
 import * as Legend from '../legend'
 import { drawCircleSizeLegend } from '../legend-circle-size'
-import { select } from 'd3-selection'
 import { drawHorizontalFlowWidthLegend, drawVerticalFlowWidthLegend } from './legend-flow-width'
+import { drawFlowColorLegend } from './legend-flow-color'
 
 /**
  * A legend for proportional symbol map
@@ -174,109 +173,7 @@ export const legend = function (map, config) {
         }
     }
 
-    // explain flow line colors
-    function drawFlowColorLegend(out, x, y) {
-        const map = out.map
 
-        // Create/clear container
-        out._flowColorContainer?.remove()
-        out._flowColorContainer = out.lgg
-            .append('g')
-            .attr('class', 'em-flow-color-legend')
-            .attr('transform', `translate(${x}, ${y})`)
-
-        const title = out._flowColorContainer
-            .append('text')
-            .attr('class', 'em-color-legend-title')
-            .attr('id', 'em-color-legend-title')
-            .attr('dy', '0.35em')
-            .text(out.flowColorLegend.title || 'Destination')
-
-        let legendItems = [];
-        if (typeof map.flowColor_ === 'function') {
-            if (out.flowColorLegend.items && out.flowColorLegend.items.length > 0) {
-                // allow user-provided items; add key if provided
-                legendItems = out.flowColorLegend.items.map(d => ({ label: d.label, color: d.color, key: d.key ?? null }));
-            } else {
-                legendItems = [{ label: "please specify legend items ...", color: "#888", key: null }];
-            }
-        } else {
-            // “top destinations” case
-            const colorScale = map.topLocationColorScale;
-            const topKeys = Array.from(map.topLocationKeys || []);
-            legendItems = topKeys.map(key => ({
-                key,                                 // <<< NEW: stable key for matching
-                label: map.nodeNameMap.get(key) || key,
-                color: colorScale(key),
-            }));
-            legendItems.push({ key: 'Other', label: 'Other', color: map.flowColor_ });
-        }
-
-        // Draw each legend row
-        const titleOffset = title.node().getBBox().height + out.flowColorLegend.titlePadding
-
-        // Add hover interaction for flow lines
-        const getFlowSelector = () => {
-            // Straight: earlier code used <line>. Curved: your sankey builds <path class="em-flow-link">
-            return map.flowLineType_ === 'straight'
-                ? 'g.em-flow-container line, g.em-flow-lines line'
-                : 'g.em-flow-container path.em-flow-link, g.em-flow-lines path.em-flow-link';
-        };
-
-        // Match by stable key first; fall back to a solid paint comparison (non-gradient cases)
-        const nodeMatchesItem = function (item) {
-            // First, try our stable key
-            const keyAttr = this.getAttribute('data-color-key');
-            if (keyAttr && item.key != null) return keyAttr === String(item.key);
-
-            // Fallback for non-keyed setups: compare solid paint (only works when not gradient)
-            const dc = this.getAttribute('data-color'); // set only for non-gradient paints
-            return dc && item.color && dc === item.color;
-        };
-
-        const highlightLinesByItem = (item) => {
-            map.svg_
-                .selectAll(getFlowSelector())
-                .classed('highlighted', function () { return nodeMatchesItem.call(this, item); })
-                .classed('dimmed', function () { return !nodeMatchesItem.call(this, item); });
-        };
-
-        const clearHighlights = () => {
-            map.svg_
-                .selectAll(getFlowSelector())
-                .classed('highlighted', false)
-                .classed('dimmed', false);
-        };
-
-        // Draw legend rows with mouseover
-        const itemHeight = 22
-        const itemWidth = out.itemHeight || 18
-        legendItems.forEach((item, i) => {
-            const row = out._flowColorContainer
-                .append('g')
-                .attr('class', 'em-color-legend-item')
-                .attr('transform', `translate(0, ${i * 22 + titleOffset})`)
-                .style('cursor', 'pointer')
-                .on('mouseover', function () {
-                    highlightLinesByItem(item); // <<< was highlightLinesByColor(item.color)
-
-                    // bold text + stroke rect
-                    select(this).select('text').style('font-weight', 'bold');
-                    select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2);
-                })
-                .on('mouseout', function () {
-                    clearHighlights();
-
-                    // reset text + rect
-                    select(this).select('text').style('font-weight', 'normal');
-                    select(this).select('rect').attr('stroke', 'none');
-                });
-
-            row.append('rect').attr('width', 18).attr('height', itemHeight).attr('fill', item.color)
-
-            row.append('text').attr('x', 25).attr('y', 14).attr('class', 'em-legend-label').text(item.label)
-        })
-    }
 
     function drawRegionColorLegend(out, baseX, baseY) {
         // Create/clear container

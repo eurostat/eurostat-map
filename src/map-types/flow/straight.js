@@ -370,7 +370,7 @@ export function computeColorKey(out, originId, destId) {
 export function onFlowLineMouseOver(out, sourceId, targetId, flow, arrowIds) {
     return function (e) {
         const hoveredColor = out.hoverColor_ || 'black'
-        select(this).attr('stroke', hoveredColor)
+        select(this).attr('stroke', hoveredColor).attr('stroke-opacity', 1) // highlight with solid hover color
         if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true)
 
         if (out._tooltip) {
@@ -390,7 +390,7 @@ export function onFlowLineMouseMove(out) {
 
 export function onFlowLineMouseOut(out, baseColor, arrowIds) {
     return function () {
-        select(this).attr('stroke', baseColor)   // restore solid base color
+        select(this).attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_)   // restore solid base color
         if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false)
         if (out._tooltip) out._tooltip.mouseout()
     }

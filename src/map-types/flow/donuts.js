@@ -70,7 +70,7 @@ export function drawNodeDonuts(out, container) {
             .on('mouseover', function (event, d) {
                 if (out._tooltip) out._tooltip.mouseover(mouseoverFunction(d, out))
                 highlightDonut(event, out.svg_)
-                highlightLines(event, d)
+                highlightLines(locKey)
             })
             .on('mousemove', function (event, d) {
                 if (out._tooltip) out._tooltip.mousemove(event)
@@ -78,7 +78,7 @@ export function drawNodeDonuts(out, container) {
             .on('mouseout', function (event, d) {
                 if (out._tooltip) out._tooltip.mouseout()
                 unhighlightDonut(event, out.svg_)
-                unhighlightLines(event)
+                unhighlightLines()
             })
 
         // Inner circle
@@ -91,7 +91,7 @@ export function drawNodeDonuts(out, container) {
                 const firstArcDatum = pieData[0]
                 if (out._tooltip) out._tooltip.mouseover(mouseoverFunction(firstArcDatum, out))
                 highlightDonut(event, out.svg_)
-                highlightLines(event, firstArcDatum)
+                highlightLines(locKey)
             })
             .on('mousemove', function (event) {
                 if (out._tooltip) out._tooltip.mousemove(event)
@@ -99,26 +99,31 @@ export function drawNodeDonuts(out, container) {
             .on('mouseout', function (event) {
                 if (out._tooltip) out._tooltip.mouseout()
                 unhighlightDonut(event, out.svg_)
-                unhighlightLines(event)
+                unhighlightLines()
             })
     })
 }
 
-function highlightLines(event, d) {
-    const node = d.data.parent // donut's parent info
-    const nodeId = node.id
+function highlightLines(nodeId) {
+  if (!nodeId) return;
 
-    selectAll('g.em-flow-container line')
-        .classed('highlighted', function () {
-            return this.getAttribute('data-origin') === nodeId || this.getAttribute('data-dest') === nodeId
-        })
-        .classed('dimmed', function () {
-            return this.getAttribute('data-origin') !== nodeId && this.getAttribute('data-dest') !== nodeId
-        })
+  selectAll('.em-flow-link, .em-flow-link-bundled')
+    .classed('highlighted', function () {
+      const o = this.getAttribute('data-origin');
+      const d = this.getAttribute('data-dest');
+      return o === nodeId || d === nodeId;
+    })
+    .classed('dimmed', function () {
+      const o = this.getAttribute('data-origin');
+      const d = this.getAttribute('data-dest');
+      return !(o === nodeId || d === nodeId);
+    });
 }
 
-function unhighlightLines(event) {
-    selectAll('g.em-flow-container line').classed('highlighted', false).classed('dimmed', false)
+function unhighlightLines() {
+  selectAll('.em-flow-link, .em-flow-link-bundled')
+    .classed('highlighted', false)
+    .classed('dimmed', false);
 }
 
 function donutMouseoverFunction(d, out) {

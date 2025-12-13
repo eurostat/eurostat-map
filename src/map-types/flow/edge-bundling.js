@@ -68,37 +68,36 @@ export function drawEdgeBundleLines(out, lineGroup) {
 
 
   //mouse events
-// Mouse events — fix scope + data
-paths
-  .on("mouseover", function (event, d) {
-    const src = d[0];
-    const dst = d[d.length - 1];
-    const originId = src.id || src.code || src.iata;
-    const destId = dst.id || dst.code || dst.iata;
-    const val = (out.flowGraph_.links?.find(
-      l => (l.source.id || l.source.code) === originId &&
-           (l.target.id || l.target.code) === destId
-    )?.value) ?? 1;
+  paths
+    .on("mouseover", function (event, d) {
+      const src = d[0];
+      const dst = d[d.length - 1];
+      const originId = src.id || src.code || src.iata;
+      const destId = dst.id || dst.code || dst.iata;
+      const val = (out.flowGraph_.links?.find(
+        l => (l.source.id || l.source.code) === originId &&
+          (l.target.id || l.target.code) === destId
+      )?.value) ?? 1;
 
-    // Call imported hover handler
-    onFlowLineMouseOver(out, originId, destId, val, arrowIds).call(this, event);
-  })
-  .on("mousemove", function (event) {
-    if (out._tooltip) out._tooltip.mousemove(event);
-  })
-  .on("mouseout", function (event, d) {
-    const baseColor = select(this).attr("data-color");
-    onFlowLineMouseOut(out, baseColor, arrowIds).call(this, event);
-  });
+      // Call imported hover handler
+      onFlowLineMouseOver(out, originId, destId, val, arrowIds).call(this, event);
+    })
+    .on("mousemove", function (event) {
+      if (out._tooltip) out._tooltip.mousemove(event);
+    })
+    .on("mouseout", function (event, d) {
+      const baseColor = select(this).attr("data-color");
+      onFlowLineMouseOut(out, baseColor, arrowIds).call(this, event);
+    });
 
-  // --- Animate (optional edge bundling simulation) ---
+  // --- Animate (edge bundling simulation) ---
   const layout = forceSimulation()
-    .alphaDecay(0.1)
+    .alphaDecay(out.flowBundleSettings_.alphaDecay)
     .force(
       "charge",
-      forceManyBody().strength(10).distanceMax(scales.nodes.range()[1] * 2)
+      forceManyBody().strength(out.flowBundleSettings_.chargeStrength).distanceMax(out.flowBundleSettings_.distanceMax ? out.flowBundleSettings_.distanceMax : scales.nodes.range()[1] * 2)
     )
-    .force("link", forceLink().strength(0.7).distance(0))
+    .force("link", forceLink().strength(out.flowBundleSettings_.linkStrength).distance(0).iterations(out.flowBundleSettings_.linkIterations))
     .on("tick", () => paths.attr("d", lineFunction))
     .on("end", () => console.log("layout complete"));
 

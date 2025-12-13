@@ -1,15 +1,15 @@
-import { scaleSqrt, scaleLinear, scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
+import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
-import { forceSimulation, forceManyBody, forceCenter, forceCollide, forceX, forceY } from 'd3-force'
 import * as StatMap from '../core/stat-map'
 import * as ProportionalSymbolLegend from '../legend/proportional-symbol/legend-proportional-symbols'
 import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
-import { spaceAsThousandSeparator, getCSSPropertyFromClass, executeForAllInsets, getRegionsSelector, getTextColorForBackground, updateCSSRule } from '../core/utils'
+import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground, updateCSSRule } from '../core/utils'
 import { applyPatternFill } from '../core/pattern-fill'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
 import { color as d3color } from 'd3-color';
+import { createSqrtScale, createLinearScale } from "../core/scale.js";
 
 /**
  * Returns a proportional symbol map.
@@ -191,60 +191,37 @@ export const map = function (config) {
         }
     }
 
-    function defineSizeClassifier() {
-        // default scale choice
-        if (!out.psSizeScale_) {
-            out.psSizeScale_ = (out.psShape_ === 'spike') ? 'linear' : 'sqrt';
-        }
 
-        // raw values
-        const rawData = out.statData('size').getArray() || out.statData().getArray();
 
-        // numeric positives for max calculation
-        const positives = rawData
-            .map(d => +d)
-            .filter(d => Number.isFinite(d) && d > 0);
+function defineSizeClassifier() {
+    // raw values (size-specific first, fallback)
+    const rawData =
+        out.statData("size")?.getArray() ??
+        out.statData()?.getArray() ??
+        [];
 
-        // compute max; fallbacks
-        let maxVal = max(positives);
-        let minVal = min(positives);
-        if (!Number.isFinite(maxVal)) {
-            maxVal = out.statData().getMax();
-        }
-        if (!Number.isFinite(maxVal) || maxVal <= 0) {
-            maxVal = 1; // safe guard: avoid NaN domains
-        }
+    // choose scale type based on shape
+    const isLinear =
+        out.psShape_ === "spike" ||
+        out.psShape_ === "bar" ||
+        out.psShape_ === "line";
 
-        // allow manual override for the upper bound
-        const upper = (out.psMaxValue_ ?? maxVal);
+    const classifier = isLinear
+        ? createLinearScale(
+              rawData,
+              out.psMaxSize_,
+              out.psMinSize_ || 0
+          )
+        : createSqrtScale(
+              rawData,
+              out.psMaxSize_,
+              out.psMinSize_ || 0
+          );
 
-        // Build base scale with ZERO as lower bound
-        const Scale = (out.psSizeScale_ === 'sqrt') ? scaleSqrt : scaleLinear;
-        const base = Scale()
-            .domain([0, upper])
-            .range([0, out.psMaxSize_])
-            .clamp(true);
+    // expose on map instance (unchanged public API)
+    out.classifierSize(classifier);
+}
 
-        // Visual minimum radius for positive values (0 must stay 0)
-        const minR = Math.max(0, out.psMinSize_ || 0);
-
-        // Final classifier: 0/NaN/negatives → radius 0 (don’t draw)
-        // positives → at least minR
-        const classifier = (v) => {
-            const x = +v;
-            if (!Number.isFinite(x) || x <= 0) return 0;
-            return Math.max(minR, base(x));
-        };
-
-        // Proxy D3 scale methods so legacy code still works:
-        const nextMin = Math.min(...positives.filter(v => v > 0));
-        classifier.domain = (...args) => {
-            if (args.length) { base.domain(...args); return classifier; }
-            return [nextMin, maxVal]; // here we return actual data min/max
-        };
-
-        out.classifierSize(classifier);
-    }
 
 
     function defineColorClassifier() {

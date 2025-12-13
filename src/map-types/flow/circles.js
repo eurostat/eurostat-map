@@ -1,7 +1,7 @@
 import { max } from "d3-array"
 import { scaleSqrt } from "d3-scale"
 import { spaceAsThousandSeparator } from "../../core/utils"
-import { selectAll } from 'd3-selection'
+import { select, selectAll } from 'd3-selection'
 
 function computeCircleLocationStats(out) {
     const statsByLoc = {}
@@ -58,7 +58,7 @@ export function drawNodeCircles(out, container) {
 
     const circlesContainer = container
         .append("g")
-        .attr("class", "node-circles")
+        .attr("class", "em-node-circles")
 
     // simple tooltip
     function makeTooltip(locKey) {
@@ -110,7 +110,7 @@ export function drawNodeCircles(out, container) {
 
         const g = circlesContainer
             .append("g")
-            .attr("class", "node-circle-group")
+            .attr("class", "em-node-circle-group")
             .attr("transform", `translate(${s.x},${s.y})`)
             .attr("data-id", locKey)
 
@@ -118,16 +118,18 @@ export function drawNodeCircles(out, container) {
 
         // main circle
         g.append("circle")
-            .attr("r", r)
+            .attr("r", r).attr("class", "em-node-circle")
             .attr("fill", nodeFill(locKey))
             .attr("stroke", "white")
             .attr("stroke-width", 0.5)
             .style("cursor", "pointer")
             .on("mouseover", function (event) {
+                select(this).attr("stroke-width", 1.5)
                 if (out._tooltip) out._tooltip.mouseover(makeTooltip(locKey))
                 highlightLines(locKey)
             })
-            .on("mouseout", (event) => {
+            .on("mouseout", function(event)  {
+                select(this).attr("stroke-width", 0.5)
                 if (out._tooltip) out._tooltip.mouseout(event)
                 unhighlightLines()
             })
