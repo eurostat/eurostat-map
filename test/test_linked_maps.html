@@ -6,21 +6,14 @@
     </head>
 
     <body>
-        <div class="container">
-            <div style="padding: 50px">Test</div>
-            <div style="margin: 50px">test</div>
-            <div style="display: flex; justify-content: space-between">
-                <div style="position: absolute; top: 20vh; left: 20vh"><svg id="map"></svg></div>
-                <div style="position: absolute; top: 30vh; right: 020vh"><svg id="map2"></svg></div>
-            </div>
-        </div>
-         <script src="https://unpkg.com/eurostat-map"></script>
-         <!-- <script src="../../../build/eurostatmap.js"></script> -->
+        <svg id="map"></svg>
+        <svg id="map2"></svg>
+        <script src="../build/eurostatmap.js"></script>
 
         <script>
             const mapHeight = 500
             const mapWidth = 500
-            let syncing = false
+
             const map1 = eurostatmap
                 .map('choropleth')
                 .title('Map 1')
@@ -28,15 +21,6 @@
                 .width(mapWidth)
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .zoomExtent([1, 10])
-                .onZoom(function (event, map) {
-                    map2.position(map.position())
-                })
-                .onRegionMouseOver(function (event, feature, element, map) {
-                    map2.highlightRegion(feature.properties.id)
-                })
-                .onRegionMouseOut(function (event, feature, element, map) {
-                    map2.clearHighlight()
-                })
                 .build()
 
             const map2 = eurostatmap
@@ -48,6 +32,34 @@
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 .zoomExtent([1, 10])
                 .build()
+
+            linkMaps(map1, map2)
+
+            function linkMaps(mapA, mapB) {
+                let syncing = false
+
+                function withLock(fn) {
+                    if (syncing) return
+                    syncing = true
+                    try {
+                        fn()
+                    } finally {
+                        // Release immediately after the action finishes
+                        syncing = false
+                    }
+                }
+
+                // Sync zoom/pan
+                mapA.onZoom(() => withLock(() => mapB.position(mapA.position())))
+                mapB.onZoom(() => withLock(() => mapA.position(mapB.position())))
+
+                // Sync highlights (hover)
+                mapA.onRegionMouseOver((e, f) => withLock(() => mapB.highlightRegion(f.properties.id)))
+                mapB.onRegionMouseOver((e, f) => withLock(() => mapA.highlightRegion(f.properties.id)))
+
+                mapA.onRegionMouseOut(() => withLock(() => mapB.clearHighlight()))
+                mapB.onRegionMouseOut(() => withLock(() => mapA.clearHighlight()))
+            }
         </script>
     </body>
 </html>

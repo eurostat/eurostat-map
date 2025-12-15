@@ -1,6 +1,7 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
-import { executeForAllInsets } from '../core/utils'
+import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
+import { unhighlightRegions } from './choropleth/legend-choropleth'
 
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
 export function drawDiscreteLegend(out, x, y) {
@@ -67,7 +68,7 @@ function createThresholdsLegend(out, config) {
     let globalMax
     let globalMinRegionId
     let globalMaxRegionId
-    let globalMinRegion 
+    let globalMinRegion
     let globalMaxRegion
     if ((out.maxMin || config.maxMin) && stat) {
         if (stat?.getMin && stat?.getMax) {
@@ -168,7 +169,7 @@ function createThresholdsLegend(out, config) {
     }
 
     // Add MIN and MAX ticks at the ends of the scale using statData extent
-    if ((out.maxMin ||config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
+    if ((out.maxMin || config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
         const tickX1 = 0
         const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
         const labelX = config.maxMinTickLength ?
@@ -197,6 +198,15 @@ function createThresholdsLegend(out, config) {
 
         maxMinGroup
             .append('text')
+            .style('pointer-events', 'all')
+            .style('cursor', 'pointer')
+            .on('mouseover', function () {
+                const numberOfClasses = out.getNumberOfClasses(out)
+                highlightMaxRegion(map, numberOfClasses, globalMaxRegionId)
+            })
+            .on('mouseout', function () {
+                unhighlightRegions(map)
+            })
             .attr('class', 'em-legend-label em-legend-label-max')
             .attr('x', labelX)
             .attr('y', yTop)
@@ -215,6 +225,14 @@ function createThresholdsLegend(out, config) {
 
         maxMinGroup
             .append('text')
+            .style('pointer-events', 'all')
+            .style('cursor', 'pointer')
+            .on('mouseover', function () {
+                highlightMinRegion(map, globalMinRegionId)
+            })
+            .on('mouseout', function () {
+                unhighlightRegions(map)
+            })
             .attr('class', 'em-legend-label em-legend-label-min')
             .attr('x', labelX)
             .attr('y', yBottom)
@@ -233,6 +251,44 @@ function createThresholdsLegend(out, config) {
             }
         }
     }
+}
+
+function highlightMaxRegion(map, numberOfClasses, id) {
+    const selector = getLegendRegionsSelector(map)
+
+    const ecl = numberOfClasses - 1 // max class index
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Set all regions to white
+    allRegions.style('fill', 'white')
+
+    // Highlight only the selected regions by restoring their original color
+    const topClassRegions = allRegions.filter("[ecl='" + ecl + "']")
+    topClassRegions.each(function (d) {
+        if (d.properties.id === id) {
+            select(this).style('fill', map.hoverColor_)
+        }
+        //select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+    })
+}
+
+function highlightMinRegion(map, id) {
+    const selector = getLegendRegionsSelector(map)
+
+    const ecl = 0 // min class index
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Set all regions to white
+    allRegions.style('fill', 'white')
+
+    // Highlight only the selected regions by restoring their original color
+    const topClassRegions = allRegions.filter("[ecl='" + ecl + "']")
+    topClassRegions.each(function (d) {
+        if (d.properties.id === id) {
+            select(this).style('fill', map.hoverColor_)
+        }
+        //select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+    })
 }
 
 

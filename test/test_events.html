@@ -7,9 +7,11 @@
 
     <body>
         <svg id="map"></svg>
+        <div id="info"></div>
         <script src="../../../build/eurostatmap.js"></script>
 
         <script>
+            const infoDiv = document.getElementById('info')
             const map = eurostatmap
                 .map('choropleth')
                 .title('Test')
@@ -21,22 +23,33 @@
                 .onZoomEnd(function (event, map) {
                     console.log('Zoom ended', event)
                     console.log('Map position:', map.position())
+                    infoDiv.innerText =
+                        'Zoom level: ' +
+                        map.position().z.toFixed(2) +
+                        ', Center: (' +
+                        map.position().x.toFixed(0) +
+                        ', ' +
+                        map.position().y.toFixed(0) +
+                        ')'
                 })
                 .onRegionMouseOver(function (e, feature, element, map) {
                     console.log('Region mouse over:', feature.properties.id)
                     element.style.fill = 'orange' // Example action on mouse over
+                    infoDiv.innerText = 'Mouse over region: ' + feature.properties.id
+
                 })
                 .onRegionMouseMove(function (e, feature, element, map) {
                     console.log('Region mouse move:', feature.properties.id)
-                    // Additional actions can be added here
+                    infoDiv.innerText = 'Mouse move region: ' + feature.properties.id
                 })
                 .onRegionMouseOut(function (e, feature, element, map) {
                     console.log('Region mouse out:', feature.properties.id)
-                    //element.style.fill = '' // custom
+                    infoDiv.innerText = 'Mouse out region: ' + feature.properties.id
                 })
                 .onRegionClick(function (e, feature, element, map) {
                     console.log('Region clicked:', feature.properties.id)
-                    // Additional actions can be added here
+                    infoDiv.innerText = 'Clicked region: ' + feature.properties.id
+                    
                 })
                 .position({ x: 2200000, y: 3000000, z: 7000 })
 

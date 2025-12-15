@@ -23,7 +23,9 @@ import { addFlowValueLabels } from '../../core/labels'
 export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config, true, 'flow')
-    out.strokeWidthScale = scaleLinear()
+    out.strokeWidthScale = null // function to scale flow widths    
+
+    // override tooltip function
     out.tooltip_.textFunction = flowMapTooltipFunction
 
     // flow type settings
@@ -64,7 +66,7 @@ export const map = function (config) {
     }; //use a custom order function for the flows at nodes
 
     //add proportional symbols to nodes
-    out.flowNodes_ = true // whether to draw proportional symbols at flow nodes
+    out.flowNodes_ = false // whether to draw proportional symbols at flow nodes
     out.flowNodeType_ = 'circle' // 'circle' || 'donut' (total count only vs inbound/outbound)
     out.flowMinNodeSize_ = 3 // min size for node symbols
     out.flowMaxNodeSize_ = 10 // max size for node symbols
@@ -74,7 +76,7 @@ export const map = function (config) {
     out.flowInternal_ = true // Whether to include internal flows in donuts
 
     // top N coloring
-    out.flowTopLocations_ = 5 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
+    out.flowTopLocations_ = 0 // Number of top locations to colour categorically. currently only for flowLineType_ 'straight'. Set to 0 to disable.
     out.flowTopLocationsType_ = 'destination' // 'sum' | 'origin' | 'destination' top locations can be defined by sum of flows or by origin or destination
 
     // gradients

@@ -56,6 +56,12 @@
     opacity: 0.8;
 }
 
+.em-legend-label-max:hover,
+.em-legend-label-min:hover {
+    opacity: 1;
+    font-weight:bold;
+}
+
 .em-bivariate-nodata-label {
     font-size: 14px;
     dominant-baseline: middle;
@@ -64,7 +70,7 @@
 .em-flow-width-horizontal-label {
     text-anchor: middle;
     font-size: 13px;
-    fill: #3a3a3a
+    /* fill: #3a3a3a */
 }
 
 

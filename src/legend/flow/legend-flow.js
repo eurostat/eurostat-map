@@ -30,6 +30,7 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 25,
         values: null,
+        labels: null, // manual override for legend labels
         marginTop: 20,
         labelFormatter: undefined, // function to format legend labels
     }
