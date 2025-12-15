@@ -57,7 +57,8 @@
 }
 
 .em-legend-label-max:hover,
-.em-legend-label-min:hover {
+.em-legend-label-min:hover,
+.em-legend-label-no-data:hover {
     opacity: 1;
     font-weight:bold;
 }

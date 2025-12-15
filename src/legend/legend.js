@@ -204,10 +204,24 @@ export const legend = function (map) {
         //'no data' label
         container
             .append('text')
-            .attr('class', 'em-legend-label')
+            .attr('class', 'em-legend-label em-legend-label-no-data')
             .attr('dy', '0.35em') // ~vertical centering
             .attr('x', out.noDataShapeWidth + 5)
             .attr('y', out.noDataShapeHeight / 2 + out.noDataPadding)
+            .style('pointer-events', 'all')
+            .style('cursor', 'pointer')
+            .on('mouseover', function () {
+                highlightRegions(map, 'nd')
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
+                }
+            })
+            .on('mouseout', function () {
+                unhighlightRegions(map)
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions, 'nd')
+                }
+            })
             .text(noDataText)
     }
 
