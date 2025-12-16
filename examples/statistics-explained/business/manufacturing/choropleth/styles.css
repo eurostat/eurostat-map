@@ -42,10 +42,6 @@ body {
     margin-right: 10px;
 }
 
-.em-cntrg {
-    opacity: 0.5;
-}
-
 .em-zoom-buttons {
     transform: translate(94.5%, 79%) !important;
 }
