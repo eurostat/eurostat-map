@@ -3,7 +3,9 @@ import { csv, autoType } from 'd3-fetch'
 import { projectToMap } from './proj4'
 import { get } from 'idb-keyval'
 
-const PLACENAMESURL = 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/20/EUR.csv'
+const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
+    ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
+    : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
 
 // Load once and store all labels
 export async function loadPlacenames(out, url = PLACENAMESURL) {
@@ -55,11 +57,10 @@ export function appendPlacenameLabels(out) {
         .attr('x', (d) => d.screenX)
         .attr('y', (d) => d.screenY)
         .text((d) => d.name)
-        // 🔹 Font-size scaled immediately based on zoom
+        .attr('class', 'em-placename')
+        // Font-size scaled immediately based on zoom
         .attr('font-size', (d) => `${(13 * d.sizeFactor) / zoomFactor}px`)
         .attr('font-weight', (d) => (d.sizeFactor > 1 ? 'bold' : 'normal'))
-        .attr('fill', 'black')
-        .attr('text-anchor', 'middle')
         .attr('dy', '-0.35em')
 
     // Halo for readability, scaled with zoom
@@ -67,11 +68,8 @@ export function appendPlacenameLabels(out) {
     texts
         .clone(true)
         .lower()
-        .attr('fill', 'none')
-        .attr('stroke', 'white')
-        .attr('opacity', 0.8)
+        .attr('class', 'em-placename-halo')
         .attr('stroke-width', baseStrokeWidth / zoomFactor)
-        .attr('stroke-linejoin', 'round')
 
     out.placenameGroup_ = group
 }
