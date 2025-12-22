@@ -65,6 +65,7 @@ export const defineMapZoom = function (map) {
         .on('end', (e) => {
             svg.classed('em-dragging', false);
             map.onZoomEnd_?.(e, map);
+            window.dispatchEvent(new CustomEvent('estatmap:zoomend-' + map.svgId_, { detail: map }))
         });
 
     map.__lastTransform = previousT
