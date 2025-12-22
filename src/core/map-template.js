@@ -74,6 +74,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
     out.placenames_ = false // load placenames from placenames.js
+    out.placenamesFilter_ = undefined // function to filter placenames
 
     // pan & zoom
     out.zoomExtent_ = undefined

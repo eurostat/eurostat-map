@@ -10,8 +10,10 @@ const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
 // Load once and store all labels
 export async function loadPlacenames(out, url = PLACENAMESURL) {
     const raw = await csv(url, autoType)
-    out._placenameLabels = raw
-    return raw
+    let filtered = raw
+    if (out.placenamesFilter_) filtered = out.placenamesFilter_(raw)
+    out._placenameLabels = filtered
+    return filtered
 }
 
 export async function addPlacenameLabels(out) {
