@@ -1,6 +1,13 @@
 export function renderMap(code) {
-    const mapHeight = 550
-    const mapWidth = 700
+    const isMobile = window.innerWidth <= 768;
+
+    const mapWidth  = isMobile
+      ? window.innerWidth
+      : 700;
+    
+    const mapHeight = isMobile
+      ? Math.round(window.innerHeight - 160) // 100% of viewport height - header etc
+      : 550;
 
     const configs = {
         EMP_PLOC_NR: {
@@ -24,7 +31,7 @@ export function renderMap(code) {
         .scale('60M')
         //.title('Manufacturing sector by region, 2023')
 
-        .position({ x: 4300000, y: 3420000, z: 7400 })
+        .position({ x: 4300000, y: 3420000, z: isMobile ? 9000: 7400 })
         .insetsButton(true)
 
 
@@ -67,7 +74,7 @@ export function renderMap(code) {
         .legend({
             title: configs[code].legendTitle,
             x: 5,
-            y: 100,
+            y:  isMobile ? 10: 100,
             boxPadding: 4,
             boxOpacity: 0.9,
             tickLength:8,

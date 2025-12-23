@@ -1,5 +1,5 @@
 import * as Choropleth from './map-types/choropleth/map-choropleth'
-import * as ProportionalSymbol from './map-types/map-proportional-symbols'
+import * as ProportionalSymbol from './map-types/proportional-symbol/map-proportional-symbols'
 import * as Categorical from './map-types/map-categorical'
 import * as BivariateChoropleth from './map-types/choropleth/map-choropleth-bivariate'
 import * as TrivariateChoropleth from './map-types/choropleth/map-choropleth-trivariate'
