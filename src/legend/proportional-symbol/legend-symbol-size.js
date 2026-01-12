@@ -5,6 +5,8 @@ import { spaceAsThousandSeparator } from '../../core/utils'
 
 import { select } from 'd3-selection'
 import { drawCircleSizeLegend } from '../legend-circle-size'
+import { buildSpikeLegend } from './legend-spike'
+import { buildD3SymbolItem } from './legend-d3-shape'
 
 
 /**
@@ -101,104 +103,6 @@ function addNoDataLegend(out) {
     out.appendNoDataLegend(container, out.sizeLegend.noDataText, highlightPsRegions, unhighlightPsRegions);
 }
 
-function buildSpikeLegend(out) {
-    const map = out.map
-    const spike = (length, width = map.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
-    const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator;
-
-    const maxStat = map.classifierSize_.domain()[1]
-    const minStat = map.classifierSize_.domain()[0]
-    const maxSize = map.classifierSize_(maxStat)
-
-    // Determine values for the legend
-    const legendValues = out.sizeLegend.values || [maxStat, minStat] // Use user-defined values or default ticks
-
-    const fontSize = getFontSizeFromClass('em-legend-label') // Adjust font size
-    const labelSpacing = fontSize - 2 // Ensure labels are just below the spikes
-
-    const container = out._sizeLegendContainer
-        .append('g')
-        .attr('id', 'em-spike-legend')
-        .attr('transform', `translate(${out.boxPadding},${out.sizeLegend.titlePadding})`)
-        .attr('fill', 'black')
-        .attr('text-anchor', 'middle')
-        .style('font-size', `${fontSize}px`)
-        .selectAll()
-        .data(legendValues) // Now uses user-defined values if provided
-        .join('g')
-        .attr('transform', (d, i) => `translate(${40 * i + out.boxPadding},${maxSize + 5})`) // Increase spacing
-
-    // Append spikes
-    container
-        .append('path')
-        .attr('fill', map.psFill_)
-        .attr('fill-opacity', map.psFillOpacity_)
-        .attr('stroke', map.psStroke_)
-        .attr('stroke-width', map.psStrokeWidth_)
-        .attr('d', (d) => spike(map.classifierSize_(d))) // Correctly maps values to spike size
-
-    // Append labels directly below each spike
-    container
-        .append('text')
-        .attr('class', 'em-legend-label')
-        .attr('dy', labelSpacing) // Ensure text is right below spikes
-        .text((d) => labelFormatter(d))
-
-}
-
-/**
- * @description builds a size legend item for proportional D3 shapes (e.g. square, triangle, star)
- * @param {number} symbolSize the size of the symbol item
- */
-function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter) {
-    const map = out.map
-
-    // Initialize running Y cursor for stacking
-    if (out.sizeLegend._cursorY == null) {
-        out.sizeLegend._cursorY =
-            out.boxPadding +
-            (out.sizeLegend.title ? out.titleFontSize + out.sizeLegend.titlePadding : 0)
-    }
-
-    const maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
-    const x = maxSize
-    const y = out.sizeLegend._cursorY + out.sizeLegend.shapePadding
-
-    // Container for symbol + label
-    const itemContainer = out._sizeLegendContainer
-        .append('g')
-        .attr('transform', `translate(${x},${y})`)
-        .attr('class', 'em-size-legend-item')
-
-    // Draw D3 symbol
-    const shape = getShape(out)
-    const d = shape.size(symbolSize * symbolSize)()
-
-    itemContainer
-        .append('g')
-        .style('fill', (d) => (map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_))
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psStroke())
-        .style('stroke-width', map.psStrokeWidth())
-        .append('path')
-        .attr('d', d)
-        .attr('transform', () => `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y})`)
-
-    // Label position
-    const labelX = maxSize / 2 + out.sizeLegend.labelOffsets.x + out.boxPadding
-
-    itemContainer
-        .append('text')
-        .attr('class', 'em-legend-label')
-        .attr('dy', '0.35em') // ~vertical centering
-        .attr('x', labelX)
-        .attr('y', 0)
-        .text(labelFormatter(value))
-
-    // Measure actual height and advance the stacking cursor
-    const hb = itemContainer.node().getBBox().height
-    out.sizeLegend._cursorY += hb + out.sizeLegend.shapePadding
-}
 
 
 /**
