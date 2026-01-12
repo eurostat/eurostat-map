@@ -1,0 +1,11 @@
+.em-placename {
+    text-anchor: start;
+}
+
+.em-placename-halo {
+    text-anchor: start;
+    fill:none;
+    stroke: white;
+    opacity:0.8;
+    stroke-linejoin: round;
+}

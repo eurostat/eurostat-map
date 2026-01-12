@@ -1,3 +1,24 @@
+/* mobile */
+@media (max-width: 768px) {
+    .em-button {
+      height: 30px !important;
+      width: 30px !important;
+    }
+    ewc-singleselect#mySelect {
+        max-width: 100% !important;
+        min-width: unset !important;
+    }
+}
+
+.em-zoom-buttons {
+    transform: translate(calc(100% - 40px), calc(100% - 150px)) !important;
+}
+
+.em-insets-button {
+    transform: translate(calc(100% - 40px), 10px) !important;
+    cursor: pointer !important;
+}
+
 html,
 body {
     font-family: Arial, Helvetica, sans-serif;
@@ -40,15 +61,6 @@ body {
     padding-left: 2px;
     align-self: center;
     margin-right: 10px;
-}
-
-.em-zoom-buttons {
-    transform: translate(94.5%, 79%) !important;
-}
-
-.em-insets-button {
-    transform: translate(94.5%, 10px) !important;
-    cursor: pointer !important;
 }
 
 .em-insets {

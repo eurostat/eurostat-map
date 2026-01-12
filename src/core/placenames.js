@@ -3,13 +3,17 @@ import { csv, autoType } from 'd3-fetch'
 import { projectToMap } from './proj4'
 import { get } from 'idb-keyval'
 
-const PLACENAMESURL = 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/20/EUR.csv'
+const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
+    ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
+    : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
 
 // Load once and store all labels
 export async function loadPlacenames(out, url = PLACENAMESURL) {
     const raw = await csv(url, autoType)
-    out._placenameLabels = raw
-    return raw
+    let filtered = raw
+    if (out.placenamesFilter_) filtered = out.placenamesFilter_(raw)
+    out._placenameLabels = filtered
+    return filtered
 }
 
 export async function addPlacenameLabels(out) {
@@ -21,7 +25,7 @@ export async function addPlacenameLabels(out) {
     appendPlacenameLabels(out)
 
     // Update on zoom/pan
-    window.addEventListener('estatmap:zoomed-' + out.svgId_, (e) => {
+    window.addEventListener('estatmap:zoomend-' + out.svgId_, (e) => {
         updatePlacenameLabels(e.detail, e.detail.__lastTransform)
     })
 }
@@ -55,11 +59,10 @@ export function appendPlacenameLabels(out) {
         .attr('x', (d) => d.screenX)
         .attr('y', (d) => d.screenY)
         .text((d) => d.name)
-        // 🔹 Font-size scaled immediately based on zoom
+        .attr('class', 'em-placename')
+        // Font-size scaled immediately based on zoom
         .attr('font-size', (d) => `${(13 * d.sizeFactor) / zoomFactor}px`)
         .attr('font-weight', (d) => (d.sizeFactor > 1 ? 'bold' : 'normal'))
-        .attr('fill', 'black')
-        .attr('text-anchor', 'middle')
         .attr('dy', '-0.35em')
 
     // Halo for readability, scaled with zoom
@@ -67,51 +70,61 @@ export function appendPlacenameLabels(out) {
     texts
         .clone(true)
         .lower()
-        .attr('fill', 'none')
-        .attr('stroke', 'white')
-        .attr('opacity', 0.8)
+        .attr('class', 'em-placename-halo')
         .attr('stroke-width', baseStrokeWidth / zoomFactor)
-        .attr('stroke-linejoin', 'round')
 
     out.placenameGroup_ = group
 }
 
 const getFilteredPlacenames = function (out) {
     if (!out._placenameLabels) return []
+
     const projection = out._projection
     const width = out.width_
     const height = out.height_
     const resolution = out.position_.z
-    const padding = 30 //viewport padding
-    const maxLabels = 500 // limit to 500 labels
+    const padding = 30
+    const maxLabels = 500
 
-    // Filter based on resolution and screen position
+    const t = out.__lastTransform || { k: 1, x: 0, y: 0 }
+
+    // --- visible viewport in BASE SVG COORDS ---
+    const x0 = t.invertX(0) - padding
+    const y0 = t.invertY(0) - padding
+    const x1 = t.invertX(width) + padding
+    const y1 = t.invertY(height) + padding
 
     const filtered = []
-    for (const d of out._placenameLabels || []) {
+
+    for (const d of out._placenameLabels) {
         const rs = +d.rs
         const r1 = +d.r1
-        if (!rs || resolution > rs) continue // skip if too zoomed out
+        if (!rs || resolution > rs) continue
 
         const lon = +d.lon
         const lat = +d.lat
+
+        // 4326 → map CRS → base SVG
         const [xMap, yMap] = projectToMap(out, lon, lat)
         const [sx, sy] = projection([xMap, yMap])
 
-        if (sx < padding || sx > width - padding || sy < padding || sy > height - padding) continue
+        // viewport test in BASE coords
+        if (sx < x0 || sx > x1 || sy < y0 || sy > y1) continue
 
         filtered.push({
             ...d,
-            screenX: sx,
-            screenY: sy,
-            sizeFactor: resolution > r1 ? 1 : 1.1, //exxagerate label size using r1
+            screenX: sx,   // unchanged
+            screenY: sy,   // unchanged
+            sizeFactor: resolution > r1 ? 1 : 1.1,
         })
 
         if (filtered.length >= maxLabels) break
     }
 
+    console.log(`After filtering, ${filtered.length} placenames remain.`)
     return filtered
 }
+
 
 /**
  * Recompute label positions & size on zoom/pan

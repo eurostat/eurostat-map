@@ -1,5 +1,5 @@
 import { getFontSizeFromClass } from '../../core/utils'
-import { symbolsLibrary } from '../../map-types/map-proportional-symbols'
+import { symbolsLibrary } from '../../map-types/proportional-symbol/map-proportional-symbols.js'
 import { symbol } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 
