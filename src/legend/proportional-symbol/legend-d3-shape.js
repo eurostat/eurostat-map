@@ -1,4 +1,4 @@
-import { symbolsLibrary } from '../../map-types/map-proportional-symbols'
+import { symbolsLibrary } from '../../map-types/proportional-symbol/map-proportional-symbols'
 
 /**
  * @description returns the d3.symbol object chosen by the user
