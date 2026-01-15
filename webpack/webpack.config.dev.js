@@ -13,8 +13,16 @@ module.exports = {
         libraryTarget: 'umd',
         publicPath: '/build/', // Optional: if resources are served from this path
     },
+    resolve: {
+        extensions: ['.js', '.ts'], // allow typescript
+    },
     module: {
         rules: [
+            {
+                test: /\.ts$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
             {
                 test: /\.css$/i,
                 use: ['style-loader', 'css-loader'], // For CSS files

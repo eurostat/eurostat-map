@@ -33,22 +33,14 @@
                     unitText: '%',
                 })
                 .legend({
-                    x: 570,
-                    y: 10,
-                    width: 210,
+                    x: 500,
+                    y: 30,
                     boxOpacity: 1,
-                    topText: '45–64',
-                    leftText: '75+',
-                    rightText: '15–29',
-                    texts: {
-                        0: 'Mostly 75+ population',
-                        1: 'Mostly 45–64 population',
-                        2: 'Mostly 15–29 population',
-                        m12: '45–64 + 15–29 mix',
-                        m02: '75+ + 15–29 mix',
-                        m01: '75+ + 45–64 mix',
-                        center: 'Balanced mix of all three',
-                    },
+                    width:270,
+                    height:270,
+                    labels: ['75+', '45–64', '15–29'],
+                    labelPosition: 'corner',
+                    padding:{ top: 10, right: 30, bottom: 10, left: 30 }
                 })
 
             // map.statData('v1').setData(variable1)

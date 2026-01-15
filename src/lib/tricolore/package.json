@@ -1,0 +1,77 @@
+{
+  "name": "tricolore",
+  "version": "0.1.0",
+  "description": "Color scale for ternary compositions",
+  "type": "module",
+  "main": "dist/tricolore.cjs.js",
+  "module": "dist/tricolore.esm.js",
+  "exports": {
+    "import": "./dist/tricolore.esm.js",
+    "require": "./dist/tricolore.cjs.js",
+    "default": "./dist/tricolore.umd.js"
+  },
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "lint": "eslint --ext .ts src/",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "docs": "typedoc",
+    "prepublish": "# npm run lint && npm run test && npm run build"
+  },
+  "keywords": [
+    "visualization",
+    "ternary",
+    "choropleth",
+    "d3",
+    "maps",
+    "composition"
+  ],
+  "author": {
+    "name": "Matthieu Viry",
+    "email": "matthieu.viry@cnrs.fr"
+  },
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riatelab/tricolore.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/riatelab/tricolore.js/issues"
+  },
+  "homepage": "https://github.com/riatelab/tricolore.js#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.26.0",
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/d3": "^7.4.3",
+    "@types/jest": "^29.5.12",
+    "d3": "^7.8.5",
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "rollup": "^4.50.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-license": "^3.6.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "ts-jest": "^29.4.1",
+    "typedoc": "^0.28.12",
+    "typedoc-plugin-missing-exports": "^4.0.0",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.32.0"
+  },
+  "peerDependencies": {
+    "d3": ">=7.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

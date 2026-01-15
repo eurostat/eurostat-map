@@ -14,6 +14,9 @@ module.exports = {
         publicPath: '/build/', // Optional: if resources are served from this path
         //clean: true, // Clean the output directory before emit
     },
+    resolve: {
+        extensions: ['.js', '.ts'], // allow typescript
+    },
     devtool: false,
     plugins: [
         new webpack.BannerPlugin({
@@ -31,6 +34,11 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: /\.ts$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,

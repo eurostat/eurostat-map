@@ -2,8 +2,7 @@ import { select } from 'd3-selection'
 import * as StatMap from '../../core/stat-map'
 import * as TrivariateLegend from '../../legend/choropleth/legend-choropleth-trivariate'
 import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
-import { tricolore, CompositionUtils } from '../../lib/tricolore'
-
+import { tricolore, CompositionUtils } from '../../lib/tricolore/src'
 
 /**
  * Trivariate (ternary) choropleth map — Observable-style
@@ -15,18 +14,20 @@ export const map = function (config) {
     // Configuration
     // ===============================
 
-    out.ternaryCodes_ = config?.ternaryCodes || ['v1', 'v2', 'v3']
+    out.ternaryCodes_ = ['v1', 'v2', 'v3']
 
-    out.meanCentering_ = config?.meanCentering ?? true
-    out.noDataFillStyle_ = config?.noDataFillStyle || '#ccc'
+    out.noDataFillStyle_ = '#ccc'
 
     // tricolore parameters
-    out.hue_ = config?.hue ?? 10
-    out.chroma_ = config?.chroma ?? 120
-    out.lightness_ = config?.lightness ?? 70
-    out.contrast_ = config?.contrast ?? 0.2
-    out.spread_ = config?.spread ?? 0.8
-    out.breaks_ = config?.breaks ?? 16
+    out.ternarySettings_ = {
+        hue: 10,
+        chroma: 120,
+        lightness: 70,
+        contrast: 0.2,
+        spread: 0.8,
+        breaks: 16,
+        meanCentering: true,
+    }
 
     // internal cache (index → color)
     out._ternaryColors_ = null
@@ -37,24 +38,22 @@ export const map = function (config) {
     // ===============================
     // Getters / setters
     // ===============================
-
-    ;[
-        'ternaryCodes_',
-        'meanCentering_',
-        'noDataFillStyle_',
-        'hue_',
-        'chroma_',
-        'lightness_',
-        'contrast_',
-        'spread_',
-        'breaks_',
-    ].forEach((att) => {
+    const paramNames = ['ternaryCodes_', 'noDataFillStyle_', 'ternarySettings_']
+    paramNames.forEach((att) => {
         out[att.slice(0, -1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
             return out
         }
     })
+
+    //override attribute values with config values
+    if (config) {
+        paramNames.forEach(function (key) {
+            let k = key.slice(0, -1) // remove trailing underscore
+            if (config[k] != undefined) out[k](config[k])
+        })
+    }
 
     // ===============================
     // Classification (compute colors ONCE)
@@ -80,19 +79,17 @@ export const map = function (config) {
         })
 
         // --- Determine center ---
-        const center = out.meanCentering_
-            ?  CompositionUtils.centre(compositions)
-            : [1 / 3, 1 / 3, 1 / 3]
+        const center = out.ternarySettings_.meanCentering ? CompositionUtils.centre(compositions) : [1 / 3, 1 / 3, 1 / 3]
 
         // --- Compute colors (Observable-style) ---
         out._ternaryColors_ = tricolore(compositions, {
             center,
-            breaks: out.breaks_,
-            hue: out.hue_,
-            chroma: out.chroma_,
-            lightness: out.lightness_,
-            contrast: out.contrast_,
-            spread: out.spread_,
+            breaks: out.ternarySettings_.breaks,
+            hue: out.ternarySettings_.hue,
+            chroma: out.ternarySettings_.chroma,
+            lightness: out.ternarySettings_.lightness,
+            contrast: out.ternarySettings_.contrast,
+            spread: out.ternarySettings_.spread,
         })
 
         return out
@@ -124,7 +121,7 @@ export const map = function (config) {
             .duration(out.transitionDuration())
             .style('fill', function (rg, i) {
                 const c = colors[i]
-                return c || map.noDataFillStyle_()
+                return c || map.noDataFillStyle_
             })
             .end()
             .then(() => {

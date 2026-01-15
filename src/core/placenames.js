@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { csv, autoType } from 'd3-fetch'
+import { csv } from 'd3-fetch'
 import { projectToMap } from './proj4'
 import { get } from 'idb-keyval'
 
@@ -9,7 +9,7 @@ const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
 
 // Load once and store all labels
 export async function loadPlacenames(out, url = PLACENAMESURL) {
-    const raw = await csv(url, autoType)
+    const raw = await csv(url)
     let filtered = raw
     if (out.placenamesFilter_) filtered = out.placenamesFilter_(raw)
     out._placenameLabels = filtered

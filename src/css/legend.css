@@ -149,3 +149,9 @@
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
     opacity: 0.9;
 }
+
+.em-ternary-legend-label {
+    font-size: 14px;
+    stroke: none;
+    fill: #161616;
+}
