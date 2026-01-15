@@ -19,6 +19,9 @@
                 .map('trivariateChoropleth')
                 .title('Age Structure')
                 .nutsLevel(3)
+                .ternarySettings({
+                    spread: 0.8
+                })
                 .stat('v1', {
                     label: 'Population 15–29',
                     eurostatDatasetCode: 'demo_r_pjanind3',
@@ -39,14 +42,15 @@
                 })
                 .legend({
                     title: 'Age Structure',
-                    x: 510,
-                    y: 30,
-                    boxOpacity: 1,
+                    x: 520,
+                    y: 10,
+                    boxOpacity: 0.9,
                     width: 250,
                     height: 250,
                     labels: ['15–29', '45–64', '75+'],
                     labelPosition: 'corner',
                     padding: { top: 10, right: 30, bottom: 10, left: 30 },
+                    showLines:true
                 }).zoomButtons(true)
 
             // map.statData('v1').setData(variable1)

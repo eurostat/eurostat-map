@@ -153,14 +153,23 @@
     stroke: none;
     fill: #161616;
 }
-.em-ternary-legend-data-point {
+
+.em-ternary-grid-line {
     opacity: 0.3;
+    stroke-width: 0.5;
 }
 .em-ternary-center-line {
-    stroke: white;
-    opacity: 0.7;
+    opacity: 1;
     stroke-width: 0.5;
+    stroke-dasharray: 4 2;
 }
 .em-ternary-legend-data-point, .em-ternary-discrete-polygon {
     cursor: pointer;
 }
+
+.em-ternary-discrete-polygon {
+    transition: fill 150ms;
+}
+/* .em-ternary-legend-data-point {
+    opacity: 0.3;
+} */

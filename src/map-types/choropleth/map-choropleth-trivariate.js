@@ -44,9 +44,21 @@ export const map = function (config) {
     // ===============================
     const paramNames = ['ternaryCodes_', 'noDataFillStyle_', 'ternarySettings_']
     paramNames.forEach((att) => {
-        out[att.slice(0, -1)] = function (v) {
+        const name = att.slice(0, -1)
+
+        out[name] = function (v) {
             if (!arguments.length) return out[att]
-            out[att] = v
+
+            if (att === 'ternarySettings_') {
+                // MERGE, don’t replace
+                out.ternarySettings_ = {
+                    ...out.ternarySettings_,
+                    ...v,
+                }
+            } else {
+                out[att] = v
+            }
+
             return out
         }
     })

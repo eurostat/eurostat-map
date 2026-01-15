@@ -21,6 +21,7 @@ export const legend = function (map, config = {}) {
     out.showLines = false
     out.labels = ['Variable 1', 'Variable 2', 'Variable 3']
     out.labelPosition = 'corner'
+    out.colorTarget = 'points' // 'triangles' | 'points'
 
     // allow overrides
     Object.assign(out, config)
@@ -75,22 +76,45 @@ export const legend = function (map, config = {}) {
             showCenter: out.showCenter,
             showLines: out.showLines,
             breaks: map.ternarySettings_.breaks,
+            colorTarget: out.colorTarget,
             dataPointHandlers: {
                 mouseover: (e, d) => {
-                    select(e.currentTarget).attr('fill', 'red').attr('opacity',1).raise()
-                    map._tooltip?.mouseover(`
-                <div>
-                    <b>p₁</b>: ${d.point[0].toFixed(3)}<br/>
-                    <b>p₂</b>: ${d.point[1].toFixed(3)}<br/>
-                    <b>p₃</b>: ${d.point[2].toFixed(3)}
-                </div>
-            `)
+                    const sel = select(e.currentTarget)
+
+                    // store original styles once
+                    if (!sel.attr('fill___')) sel.attr('fill___', sel.attr('fill'))
+                    if (!sel.attr('opacity___')) sel.attr('opacity___', sel.attr('opacity'))
+
+                    sel.attr('fill', 'red').attr('opacity', 1).raise()
+
+                    //  highlight corresponding map regions
+                    highlightRegionsByClass(map, d.index)
+                    if (map.insetTemplates_) {
+                        executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionsByClass, d.index)
+                    }
+
+                    //  get region by class index
+                    const rg = getRegionByClassIndex(map, d.index)
+
+                    if (rg) {
+                        map._tooltip?.mouseover(map.tooltip_.textFunction(rg, map))
+                    }
                 },
+
                 mousemove: (e) => {
                     map._tooltip?.mousemove(e)
                 },
-                mouseout: (e) => {
-                    select(e.currentTarget).attr('fill', 'black').attr('opacity',0.3)
+
+                mouseout: (e, d) => {
+                    const sel = select(e.currentTarget)
+
+                    sel.attr('fill', sel.attr('fill___')).attr('opacity', sel.attr('opacity___')).lower()
+
+                    unhighlightRegionsByClass(map)
+                    if (map.insetTemplates_) {
+                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegionsByClass)
+                    }
+
                     map._tooltip?.mouseout()
                 },
             },
@@ -104,7 +128,7 @@ export const legend = function (map, config = {}) {
                     }
                 },
                 mouseout: (_) => {
-                    select(_.currentTarget).attr('stroke', 'none')
+                    select(_.currentTarget).attr('stroke', 'none').lower()
                     unhighlightRegions(map)
                     if (map.insetTemplates_) {
                         executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
@@ -143,6 +167,18 @@ function highlightRegionsByColor(map, color) {
     })
 }
 
+function getRegionByClassIndex(map, classIndex) {
+    const id = map._ternaryIdByClass_
+        ? map._ternaryIdByClass_.get(classIndex)
+        : [...map._ternaryClassById_.entries()].find(([, i]) => i === classIndex)?.[0]
+
+    if (!id) return null
+
+    const feature = map.Geometries.getRegionFeatures()?.find((f) => f.properties.id === id)
+
+    return feature || null
+}
+
 function normalizeColor(c) {
     if (!c) return null
     const ctx = document.createElement('canvas').getContext('2d')
@@ -159,4 +195,31 @@ function unhighlightRegions(map) {
     allRegions.each(function () {
         select(this).style('fill', select(this).attr('fill___'))
     })
+}
+
+function highlightRegionsByClass(map, classIndex) {
+    const selector = getLegendRegionsSelector(map)
+    const regions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    regions.each(function () {
+        const sel = select(this)
+        const ecl = +sel.attr('ecl')
+
+        if (ecl === classIndex) {
+            sel.style('fill', sel.attr('fill___'))
+        } else {
+            sel.style('fill', '#fff')
+        }
+    })
+}
+
+function unhighlightRegionsByClass(map) {
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll('[ecl]')
+        .each(function () {
+            const sel = select(this)
+            sel.style('fill', sel.attr('fill___'))
+        })
 }

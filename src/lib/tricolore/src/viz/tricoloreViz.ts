@@ -1,4 +1,4 @@
-import { TernaryPoint, VisualizationOptions } from '../types'
+import { TernaryPoint, TricoloreResult, VisualizationOptions } from '../types'
 import { TernaryGeometry } from '../core/ternaryGeometry'
 import { ColorMapping } from '../core/colorMapping'
 import { CompositionUtils } from '../core/compositionUtils'
@@ -83,6 +83,7 @@ export class TricoloreViz {
             showLines = true,
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
+            colorTarget = 'triangles',
         } = options
 
         const plotWidth = this.width - this.margin.left - this.margin.right
@@ -114,11 +115,12 @@ export class TricoloreViz {
         this.triangle.append('image').attr('x', 0).attr('y', 0).attr('width', size).attr('height', size).attr('href', this.canvas.toDataURL())
 
         // Add triangle border and axes using SVG
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center)
+            const colorTarget = options.colorTarget ?? 'triangles'
+            this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center, undefined, colorTarget)
         }
     }
 
@@ -161,7 +163,8 @@ export class TricoloreViz {
 
         // Calculate colors for each centroid
         const centroidPoints = centroids.map((c) => [c.p1, c.p2, c.p3] as TernaryPoint)
-        const colors = ColorMapping.colorMapTricolore(centroidPoints, center, 100, hue, chroma, lightness, contrast, spread)
+        const colors = ColorMapping.colorMapTricolore(centroidPoints, center, breaks, hue, chroma, lightness, contrast, spread)
+        const colorTarget = options.colorTarget ?? 'triangles'
 
         // Group vertices by triangle id
         const triangleGroups = group(vertices, (d: any) => d.id)
@@ -180,12 +183,17 @@ export class TricoloreViz {
             const poly = this.triangle
                 .append('polygon')
                 .attr('points', points)
-                .attr('fill', color)
                 .attr('stroke', 'none')
                 .attr('classIndex', classIndex)
                 .attr('class', 'em-ternary-discrete-polygon')
 
-            const handlers = options.legendTriangleHandlers
+            if (colorTarget === 'triangles') {
+                poly.attr('fill', color)
+            } else {
+                poly.attr('fill', '#fffefe') // or 'none'
+            }
+
+            const handlers = options.triangleHandlers
 
             if (handlers?.mouseover) {
                 poly.on('mouseover', (e) => handlers.mouseover!(e, color))
@@ -196,11 +204,21 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center)
+            const pointColors =
+                colorTarget === 'points' ? ColorMapping.colorMapTricolore(data, center, breaks, hue, chroma, lightness, contrast, spread) : undefined
+            this.addDataPoints(
+                data,
+                size,
+                options.dataPointHandlers,
+                showCenter,
+                center,
+                colorTarget === 'points' ? pointColors : undefined,
+                colorTarget
+            )
         }
     }
 
@@ -221,6 +239,7 @@ export class TricoloreViz {
             showLines = true,
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
+            colorTarget = 'triangles',
         } = options
 
         if (values.length !== 6) {
@@ -263,7 +282,7 @@ export class TricoloreViz {
                 .attr('stroke', 'none')
                 .attr('data-ecl', classIndex)
 
-            const handlers = options.legendTriangleHandlers
+            const handlers = options.triangleHandlers
 
             if (handlers?.mouseover) {
                 poly.on('mouseover', (e) => handlers.mouseover!(e, values[colorIndex]))
@@ -274,11 +293,12 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size, options.dataPointHandlers)
+            const colorTarget = options.colorTarget ?? 'triangles'
+            this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center, undefined, colorTarget)
         }
     }
 
@@ -338,7 +358,9 @@ export class TricoloreViz {
         center: TernaryPoint,
         showCenter: boolean,
         showLines: boolean,
-        labelPosition: 'corner' | 'edge' = 'corner'
+        labelPosition: 'corner' | 'edge' = 'corner',
+        colorTarget: 'triangles' | 'points' = 'triangles',
+        showData: boolean = false
     ): void {
         // Define triangle corners in ternary coordinates
         // and convert to SVG coordinates
@@ -395,107 +417,81 @@ export class TricoloreViz {
         }
 
         // Add grid lines and labels at 25%, 50%, 75% for each axis
-        const gridValues = [0.25, 0.5, 0.75]
+        // ===============================
+        // Grid lines (major + minor)
+        // ===============================
+        const majorGrid = [0.25, 0.5, 0.75]
+        const minorStep = 0.05
+
+        const minorGrid: number[] = []
+        for (let v = minorStep; v < 1; v += minorStep) {
+            if (!majorGrid.includes(+v.toFixed(2))) {
+                minorGrid.push(+v.toFixed(2))
+            }
+        }
+
+        const drawGridLine = (a: TernaryPoint, b: TernaryPoint, major: boolean) => {
+            const [x1, y1] = this.ternaryToSvgCoords(a, size)
+            const [x2, y2] = this.ternaryToSvgCoords(b, size)
+
+            this.legend
+                .append('line')
+                .attr('x1', x1)
+                .attr('y1', y1)
+                .attr('x2', x2)
+                .attr('y2', y2)
+                .attr('stroke', colorTarget === 'triangles' ? 'white' : '#555')
+                .attr('stroke-width', major ? 0.6 : 0.3)
+                .attr('opacity', major ? 0.7 : 0.25)
+                .attr('stroke-dasharray', major ? null : '2,2')
+                .attr('class', major ? 'em-ternary-grid-line' : 'em-ternary-grid-line-minor')
+        }
 
         if (showLines) {
-            // p1 grid lines
-            gridValues.forEach((val) => {
-                const line = [this.ternaryToSvgCoords([val, 0, 1 - val], size), this.ternaryToSvgCoords([val, 1 - val, 0], size)]
+            // --- minor grid first (background) ---
+            minorGrid.forEach((v) => {
+                // p1
+                drawGridLine([v, 0, 1 - v], [v, 1 - v, 0], false)
 
-                this.legend
-                    .append('line')
-                    .attr('x1', line[0][0])
-                    .attr('y1', line[0][1])
-                    .attr('x2', line[1][0])
-                    .attr('y2', line[1][1])
-                    .attr('stroke', '#aaa')
-                    .attr('stroke-width', 0.5)
-                    .attr('opacity', 0.7)
-                    .attr('class', 'em-ternary-grid-line')
+                // p2
+                drawGridLine([0, v, 1 - v], [1 - v, v, 0], false)
+
+                // p3
+                drawGridLine([1 - v, 0, v], [0, 1 - v, v], false)
             })
 
-            // p2 grid lines
-            gridValues.forEach((val) => {
-                const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
+            // --- major grid on top ---
+            majorGrid.forEach((v) => {
+                // p1
+                drawGridLine([v, 0, 1 - v], [v, 1 - v, 0], true)
 
-                this.legend
-                    .append('line')
-                    .attr('x1', line[0][0])
-                    .attr('y1', line[0][1])
-                    .attr('x2', line[1][0])
-                    .attr('y2', line[1][1])
-                    .attr('stroke', '#aaa')
-                    .attr('stroke-width', 0.5)
-                    .attr('opacity', 0.7)
-                    .attr('class', 'em-ternary-grid-line')
-            })
+                // p2
+                drawGridLine([0, v, 1 - v], [1 - v, v, 0], true)
 
-            // p3 grid lines
-            gridValues.forEach((val) => {
-                const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
-
-                this.legend
-                    .append('line')
-                    .attr('x1', line[0][0])
-                    .attr('y1', line[0][1])
-                    .attr('x2', line[1][0])
-                    .attr('y2', line[1][1])
-                    .attr('stroke', '#aaa')
-                    .attr('stroke-width', 0.5)
-                    .attr('opacity', 0.7)
-                    .attr('class', 'em-ternary-grid-line')
+                // p3
+                drawGridLine([1 - v, 0, v], [0, 1 - v, v], true)
             })
         }
 
-        // Show center point (+ extended lines from this center) if requested
-        if (showCenter) {
-            const [cx, cy] = this.ternaryToSvgCoords(center, size)
-
-            this.triangle.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 3).attr('fill', 'black').attr('stroke', 'white').attr('class', 'em-ternary-center-point')
-
-            const p1Line = [
-                this.ternaryToSvgCoords([center[0], 0, 1 - center[0]], size),
-                this.ternaryToSvgCoords([center[0], 1 - center[0], 0], size),
-            ]
-
-            const p2Line = [
-                this.ternaryToSvgCoords([0, center[1], 1 - center[1]], size),
-                this.ternaryToSvgCoords([1 - center[1], center[1], 0], size),
-            ]
-
-            const p3Line = [
-                this.ternaryToSvgCoords([0, 1 - center[2], center[2]], size),
-                this.ternaryToSvgCoords([1 - center[2], 0, center[2]], size),
-            ]
-
-            ;[p1Line, p2Line, p3Line].forEach((line) => {
-                this.triangle
-                    .append('line')
-                    .attr('x1', line[0][0])
-                    .attr('y1', line[0][1])
-                    .attr('x2', line[1][0])
-                    .attr('y2', line[1][1])
-                    .attr('stroke', 'black')
-                    .attr('stroke-width', 0.5)
-                    .attr('opacity', 0.5)
-                    .attr('class', 'em-ternary-center-line')
-            })
-        }
-
-        // Add labels along the grid lines (whether lines are shown or not)
-        gridValues.forEach((val) => {
+        // ===============================
+        // Axis labels (unchanged)
+        // ===============================
+        majorGrid.forEach((val) => {
             const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
+
             this.legend
                 .append('text')
                 .attr('x', line[0][0] - 5)
                 .attr('y', line[0][1])
                 .attr('text-anchor', 'end')
                 .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-label') 
+                .attr('class', 'em-ternary-axis-label')
                 .text(`${val * 100}%`)
         })
-        gridValues.forEach((val) => {
+
+        majorGrid.forEach((val) => {
             const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
+
             this.legend
                 .append('text')
                 .attr('x', line[0][0] + 5)
@@ -505,8 +501,10 @@ export class TricoloreViz {
                 .attr('class', 'em-ternary-axis-label')
                 .text(`${val * 100}%`)
         })
-        gridValues.forEach((val) => {
+
+        majorGrid.forEach((val) => {
             const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
+
             this.legend
                 .append('text')
                 .attr('x', line[0][0])
@@ -531,6 +529,8 @@ export class TricoloreViz {
         },
         showCenter?: boolean,
         center?: TernaryPoint,
+        colors?: TricoloreResult[],
+        colorTarget: 'triangles' | 'points' = 'triangles'
     ): void {
         const closed = CompositionUtils.close([...data])
         // Validate data (this will throw an error if invalid)
@@ -550,14 +550,20 @@ export class TricoloreViz {
         closed.forEach((p, i) => {
             if (p) {
                 const [x, y] = this.ternaryToSvgCoords(p, size)
+                const fill = colors && colors[i] && colors[i].rgb ? colors[i].rgb : 'black'
+                if (!colors[i]) {
+                    console.info(`No color found for data point at index ${i}:`, p, colors[i])
+                }
+
                 const c = this.circles
                     .append('circle')
                     .datum({ point: p, index: i })
                     .attr('cx', x)
                     .attr('cy', y)
                     .attr('r', 2)
-                    .attr('fill', 'black')
-                    .attr('opacity', 0.5).attr('class', 'em-ternary-legend-data-point')
+                    .attr('fill', fill)
+                    .attr('opacity', colorTarget === 'points' ? 1 : 0.7)
+                    .attr('class', 'em-ternary-legend-data-point')
                 if (handlers?.mouseover) {
                     c.on('mouseover', (e) => handlers.mouseover!(e, c.datum()))
                 }
@@ -571,34 +577,45 @@ export class TricoloreViz {
         })
 
         if (showCenter) {
-            const [cx, cy] = this.ternaryToSvgCoords(center, size)
+            const centerSvg = this.ternaryToSvgCoords(center, size)
+            const [cx, cy] = centerSvg
 
-            this.circles.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 3).attr('fill', 'black').attr('stroke', 'white').attr('class', 'em-ternary-center-point')
+            //LINES
+            const guides: [TernaryPoint, TernaryPoint][] = [
+                // p₁ = c1 → bottom edge (p2 = 0)
+                [[center[0], 0, 1 - center[0]], center],
 
-            const p1Line = [
-                this.ternaryToSvgCoords([center[0], 0, 1 - center[0]], size),
-                this.ternaryToSvgCoords([center[0], 1 - center[0], 0], size),
+                // p₂ = c2 → LEFT edge (p3 = 0)  ← THIS WAS WRONG BEFORE
+                [[1 - center[1], center[1], 0], center],
+
+                // p₃ = c3 → right edge (p1 = 0)
+                [[0, 1 - center[2], center[2]], center],
             ]
 
-            const p2Line = [
-                this.ternaryToSvgCoords([0, center[1], 1 - center[1]], size),
-                this.ternaryToSvgCoords([1 - center[1], center[1], 0], size),
-            ]
+            guides.forEach(([a, b]) => {
+                const [x1, y1] = this.ternaryToSvgCoords(a, size)
+                const [x2, y2] = this.ternaryToSvgCoords(b, size)
 
-            const p3Line = [
-                this.ternaryToSvgCoords([0, 1 - center[2], center[2]], size),
-                this.ternaryToSvgCoords([1 - center[2], 0, center[2]], size),
-            ]
-
-            ;[p1Line, p2Line, p3Line].forEach((line) => {
                 this.circles
                     .append('line')
-                    .attr('x1', line[0][0])
-                    .attr('y1', line[0][1])
-                    .attr('x2', line[1][0])
-                    .attr('y2', line[1][1])
+                    .attr('x1', x1)
+                    .attr('y1', y1)
+                    .attr('x2', x2)
+                    .attr('y2', y2)
+                    .attr('stroke', colorTarget === 'triangles' ? 'white' : '#000')
+                    .attr('stroke-width', 0.5)
+                    .attr('opacity', 0.6)
                     .attr('class', 'em-ternary-center-line')
             })
+
+            this.circles
+                .append('circle')
+                .attr('cx', cx)
+                .attr('cy', cy)
+                .attr('r', 3)
+                .attr('fill', 'black')
+                .attr('stroke', 'white')
+                .attr('class', 'em-ternary-center-point')
         }
     }
 
