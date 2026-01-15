@@ -25,12 +25,16 @@ export const map = function (config) {
         lightness: 70,
         contrast: 0.2,
         spread: 0.8,
-        breaks: 16,
+        breaks: 5,
         meanCentering: true,
     }
 
     // internal cache (index → color)
     out._ternaryColors_ = null
+    out._ternaryData_ = null //stats composition data
+    out._ternaryCenter_ = null
+
+    // ===============================
 
     // Tooltip renderer
     out.tooltip_.textFunction = tooltipTextFunctionTrivariate
@@ -60,30 +64,36 @@ export const map = function (config) {
     // ===============================
     //@override
     out.updateClassification = function () {
+        // ALWAYS reset to safe defaults
+        out._ternaryData_ = []
+        out._ternaryColorById_ = new Map()
+        out._ternaryCenter_ = null
+
         const features = out.Geometries.getRegionFeatures()
         if (!features || features.length === 0) return out
 
         const [c1, c2, c3] = out.ternaryCodes_
-        if (!out.statData(c1) || !out.statData(c2) || !out.statData(c3)) {
-            console.warn('Ternary map requires exactly 3 stat datasets')
-            return out
-        }
+        const filtered = []
 
-        // --- Build composition array in feature order ---
-        const compositions = features.map((f) => {
+        features.forEach((f) => {
             const id = f.properties.id
-            const v1 = +out.statData(c1).get(id)?.value || 0
-            const v2 = +out.statData(c2).get(id)?.value || 0
-            const v3 = +out.statData(c3).get(id)?.value || 0
-            return [v1, v2, v3]
+            const v1 = +out.statData(c1).get(id)?.value
+            const v2 = +out.statData(c2).get(id)?.value
+            const v3 = +out.statData(c3).get(id)?.value
+
+            if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
+                filtered.push({ id, values: [v1, v2, v3] })
+            }
         })
 
-        // --- Determine center ---
-        const center = out.ternarySettings_.meanCentering ? CompositionUtils.centre(compositions) : [1 / 3, 1 / 3, 1 / 3]
+        out._ternaryData_ = filtered.map((d) => d.values)
 
-        // --- Compute colors (Observable-style) ---
-        out._ternaryColors_ = tricolore(compositions, {
-            center,
+        // --- center ---
+        out._ternaryCenter_ = out.ternarySettings_.meanCentering ? CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
+
+        // --- colors ---
+        const colors = tricolore(out._ternaryData_, {
+            center: out._ternaryCenter_,
             breaks: out.ternarySettings_.breaks,
             hue: out.ternarySettings_.hue,
             chroma: out.ternarySettings_.chroma,
@@ -92,6 +102,17 @@ export const map = function (config) {
             spread: out.ternarySettings_.spread,
         })
 
+        out._ternaryColorById_ = new Map()
+        out._ternaryClassById_ = new Map()
+
+        filtered.forEach((d, i) => {
+            const color = colors[i]
+
+            if (color != null) {
+                out._ternaryColorById_.set(d.id, color)
+                out._ternaryClassById_.set(d.id, i) // <-- class index
+            }
+        })
         return out
     }
 
@@ -109,28 +130,54 @@ export const map = function (config) {
         return out
     }
 
+    function regionsFillFunction(rg) {
+        const id = rg.properties.id
+        const c = out._ternaryColorById_.get(id)
+        const cls = out._ternaryClassById_.get(id)
+
+        const sel = select(this)
+        sel.attr('ecl', cls ?? null)
+
+        return c ?? map.noDataFillStyle_
+    }
+
     function styleRegions(map) {
-        if (!map.svg() || !map._ternaryColors_) return
+        if (!map.svg() || !map._ternaryColorById_) return
 
         const selector = getRegionsSelector(map)
-        const colors = map._ternaryColors_
 
-        map.svg()
-            .selectAll(selector)
+        const regions = map.svg().selectAll(selector)
+
+        // Apply transition and set initial fill colors with data-driven logic
+        regions
+            .style('pointer-events', 'none') // disable interaction during transition
             .transition()
             .duration(out.transitionDuration())
-            .style('fill', function (rg, i) {
-                const c = colors[i]
-                return c || map.noDataFillStyle_
-            })
+            .style('fill', regionsFillFunction)
             .end()
             .then(() => {
-                map.svg()
-                    .selectAll(selector)
-                    .each(function () {
-                        const sel = select(this)
-                        sel.attr('fill___', sel.style('fill'))
-                    })
+                // Re-enable interaction after the transition
+                regions.style('pointer-events', null)
+                // Store the original color for each region
+                regions.each(function () {
+                    const sel = select(this)
+                    sel.attr('fill___', sel.style('fill'))
+                })
+                // Set up mouse events
+                addMouseEventsToRegions(map, regions)
+
+                // update font color for grid cartograms (contrast)
+                if (out.gridCartogram_) {
+                    map.svg()
+                        .selectAll('.em-grid-text')
+                        .each(function () {
+                            const cellColor = select(this.parentNode).style('fill')
+                            select(this).attr('fill', getTextColorForBackground(cellColor))
+                        })
+                }
+            })
+            .catch((err) => {
+                //console.error('Error applying transition to regions:', err)
             })
     }
 

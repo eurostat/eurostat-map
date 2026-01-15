@@ -238,35 +238,35 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
-        //special ones which affect also the insets
-        ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
+    //special ones which affect also the insets
+    ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
 
-                if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
-                    //override default properties
-                    for (const p in v) {
-                        out[att][p] = v[p]
-                    }
-                } else {
-                    out[att] = v
+            if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+                //override default properties
+                for (const p in v) {
+                    out[att][p] = v[p]
                 }
-
-                //recursive call to inset components
-                if (out.insetTemplates_) {
-                    executeForAllInsets(
-                        out.insetTemplates_,
-                        out.svgId_,
-                        (inset, value) => {
-                            const fnName = att.substring(0, att.length - 1)
-                            inset[fnName](value)
-                        },
-                        v
-                    )
-                }
-                return out
+            } else {
+                out[att] = v
             }
-        })
+
+            //recursive call to inset components
+            if (out.insetTemplates_) {
+                executeForAllInsets(
+                    out.insetTemplates_,
+                    out.svgId_,
+                    (inset, value) => {
+                        const fnName = att.substring(0, att.length - 1)
+                        inset[fnName](value)
+                    },
+                    v
+                )
+            }
+            return out
+        }
+    })
 
     //title getter and setter
     out.title = function (v) {
@@ -458,25 +458,25 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     const wrapMapSvg = function (svg) {
-        const node = svg.node();
-        if (!node) return;
+        const node = svg.node()
+        if (!node) return
 
-        const parent = node.parentNode;
-        if (!parent) return;
+        const parent = node.parentNode
+        if (!parent) return
 
-        //  If parent is SVG (e.g. IMAGE), abandon wrapping 
-        if (parent instanceof SVGElement) return;
+        //  If parent is SVG (e.g. IMAGE), abandon wrapping
+        if (parent instanceof SVGElement) return
 
         // already wrapped
-        if (parent.classList?.contains('em-map-wrapper')) return parent;
+        if (parent.classList?.contains('em-map-wrapper')) return parent
 
-        const wrapper = document.createElement('div');
-        wrapper.className = 'em-map-wrapper';
+        const wrapper = document.createElement('div')
+        wrapper.className = 'em-map-wrapper'
 
-        parent.insertBefore(wrapper, node);
-        wrapper.appendChild(node);
+        parent.insertBefore(wrapper, node)
+        wrapper.appendChild(node)
 
-        return wrapper;
+        return wrapper
     }
 
     /**
@@ -488,7 +488,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // Wrap SVG so HTML overlays (spinner, tooltip) can sit above it
         if (!out.isInset) {
-            out._wrapper_ = wrapMapSvg(svg);
+            out._wrapper_ = wrapMapSvg(svg)
         }
 
         //set container for cases where container contains various maps
@@ -515,7 +515,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         svg.attr('width', out.width()).attr('height', out.height())
 
         // define clipPath relative to the drawing group (map area)
-        const defs = svg.append('defs').attr('class', 'em-defs');
+        const defs = svg.append('defs').attr('class', 'em-defs')
 
         defs.append('clipPath')
             .attr('id', out.svgId_ + '-clip-path')
@@ -523,7 +523,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', out.width_)
-            .attr('height', out.height_);
+            .attr('height', out.height_)
 
         if (out.drawCoastalMargin_) {
             //define filter for coastal margin
@@ -545,12 +545,20 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             .attr('class', 'em-header')
 
         // drawing group (middle). clip-path will be updated by recalculateLayout()
-        const dg = svg.append('g')
+        const dg = svg
+            .append('g')
             .attr('id', 'em-drawing-' + out.svgId_)
-            .attr('class', 'em-drawing-group').attr('clip-path', `url(#${out.svgId_}-clip-path)`); //  apply clipPath here
+            .attr('class', 'em-drawing-group')
+            .attr('clip-path', `url(#${out.svgId_}-clip-path)`) //  apply clipPath here
+
+        //add draggable class to map svg
+        if (out.zoomExtent_ || out.zoomButtons_) {
+            dg.classed('em-draggable', true)
+        }
 
         // main zoom group inside drawing
-        const zg = dg.append('g')
+        const zg = dg
+            .append('g')
             .attr('id', 'em-zoom-group-' + out.svgId_)
             .attr('class', 'em-zoom-group')
 
@@ -570,7 +578,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', out.width_)
-            .attr('height', out.height_);
+            .attr('height', out.height_)
 
         if (out.stamp_) {
             appendStamp(out.stamp_, out)
@@ -612,9 +620,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                     out.zoomExtent_ = [1, 10]
                 }
                 defineMapZoom(out)
-
-                //add draggable class to map svg
-                out.svg().classed('em-draggable', true)
             }
 
             if (out.backgroundMap_) {
@@ -697,7 +702,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         //header/footer
-        setTimeout(() => out.recalculateLayout(), 20);
+        setTimeout(() => out.recalculateLayout(), 20)
         return out
     }
 
@@ -758,11 +763,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // Append container if not existing
         const gcp = out.getCentroidsGroup(map).empty()
             ? map
-                .svg()
-                .select('#em-zoom-group-' + map.svgId_)
-                .append('g')
-                .attr('id', `em-centroids-${map.svgId_}`)
-                .attr('class', 'em-centroids')
+                  .svg()
+                  .select('#em-zoom-group-' + map.svgId_)
+                  .append('g')
+                  .attr('id', `em-centroids-${map.svgId_}`)
+                  .attr('class', 'em-centroids')
             : out.getCentroidsGroup(map)
 
         // Join pattern for centroids
@@ -869,19 +874,19 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (out.projectionFunction_) {
             // Handle custom D3 projection (like geoAzimuthalEquidistant)
             if (typeof out.projectionFunction_.rotate === 'function') {
-                const r = out.projectionFunction_.rotate(); // [lambda, phi, gamma]
+                const r = out.projectionFunction_.rotate() // [lambda, phi, gamma]
                 if (Array.isArray(r) && r.length >= 2) {
                     // Invert signs: the map’s visual center is the opposite of its rotation
-                    const lon = -r[0];
-                    const lat = -r[1];
-                    out.position_.x = out.position_.x ?? lon;
-                    out.position_.y = out.position_.y ?? lat;
+                    const lon = -r[0]
+                    const lat = -r[1]
+                    out.position_.x = out.position_.x ?? lon
+                    out.position_.y = out.position_.y ?? lat
                 }
             } else if (typeof out.projectionFunction_.center === 'function') {
-                const c = out.projectionFunction_.center(); // [lon, lat]
+                const c = out.projectionFunction_.center() // [lon, lat]
                 if (Array.isArray(c) && c.length === 2) {
-                    out.position_.x = out.position_.x ?? c[0];
-                    out.position_.y = out.position_.y ?? c[1];
+                    out.position_.x = out.position_.x ?? c[0]
+                    out.position_.y = out.position_.y ?? c[1]
                 }
             }
         } else {
@@ -899,7 +904,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                 // out.position_.y = Geometries.userGeometries
             }
         }
-
 
         // optional: set from URL
         setViewFromURL()
@@ -954,55 +958,47 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     out.recalculateLayout = function () {
-        const svg = out.svg();
-        const header = svg.select('#em-header-' + out.svgId_);
-        const drawing = svg.select('#em-drawing-' + out.svgId_);
-        const footer = svg.select('#em-footer-' + out.svgId_);
-        const frame = drawing.select('#em-frame-' + out.geo_);
-        const clipRect = svg.select(`#${out.svgId_}-clip-path rect`);
+        const svg = out.svg()
+        const header = svg.select('#em-header-' + out.svgId_)
+        const drawing = svg.select('#em-drawing-' + out.svgId_)
+        const footer = svg.select('#em-footer-' + out.svgId_)
+        const frame = drawing.select('#em-frame-' + out.geo_)
+        const clipRect = svg.select(`#${out.svgId_}-clip-path rect`)
 
-        let headerHeight = 0;
-        let footerHeight = 0;
+        let headerHeight = 0
+        let footerHeight = 0
 
         // --- Define consistent vertical padding between header and map ---
-        const headerMapPadding = out.headerPadding_ ? out.headerPadding_ : 20; // px (tweak visually as needed)
-        const footerMapPadding = out.footerPadding_ ? out.footerPadding_ : 10; // px below map before footer
+        const headerMapPadding = out.headerPadding_ ? out.headerPadding_ : 20 // px (tweak visually as needed)
+        const footerMapPadding = out.footerPadding_ ? out.footerPadding_ : 10 // px below map before footer
 
         // --- Measure header height ---
         if (out.header_ && !header.empty()) {
-            const hb = header.node()?.getBBox?.();
-            if (hb) headerHeight = hb.height + headerMapPadding;
+            const hb = header.node()?.getBBox?.()
+            if (hb) headerHeight = hb.height + headerMapPadding
         }
 
         // --- Measure footer height ---
         if (out.footer_ && !footer.empty()) {
-            const fb = footer.node()?.getBBox?.();
-            if (fb) footerHeight = fb.height + footerMapPadding;
+            const fb = footer.node()?.getBBox?.()
+            if (fb) footerHeight = fb.height + footerMapPadding
         }
 
         // --- Move the map group below the header ---
-        drawing.attr('transform', `translate(0, ${headerHeight})`);
+        drawing.attr('transform', `translate(0, ${headerHeight})`)
 
         // --- Move footer below map ---
-        footer.attr('transform', `translate(0, ${headerHeight + out.height_ + footerMapPadding})`);
+        footer.attr('transform', `translate(0, ${headerHeight + out.height_ + footerMapPadding})`)
 
         // --- Frame bounds ---
-        frame
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('width', out.width_)
-            .attr('height', out.height_);
+        frame.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
 
         // --- Update clipRect (same dimensions as map area) ---
-        clipRect
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('width', out.width_)
-            .attr('height', out.height_);
+        clipRect.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
 
         // --- Resize entire SVG ---
-        const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding;
-        svg.attr('width', out.width_).attr('height', totalHeight);
+        const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
+        svg.attr('width', out.width_).attr('height', totalHeight)
 
         // --- Optional: Debug overlay ---
         // drawing.selectAll('.debug-clip').remove();
@@ -1016,10 +1012,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         //     .attr('stroke', 'magenta')
         //     .attr('stroke-width', 1)
         //     .attr('pointer-events', 'none');
-    };
-
-
-
+    }
 
     return out
 }

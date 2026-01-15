@@ -6,6 +6,11 @@
     </head>
 
     <body>
+        <style>
+            .em-zoom-buttons {
+                    transform: translate(1%, 15%);
+            }
+        </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script src="../../data/nuts2.js"></script>
@@ -15,9 +20,9 @@
                 .title('Age Structure')
                 .nutsLevel(3)
                 .stat('v1', {
-                    label: 'Population 75+',
+                    label: 'Population 15–29',
                     eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
+                    filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
                     unitText: '%',
                 })
                 .stat('v2', {
@@ -27,21 +32,22 @@
                     unitText: '%',
                 })
                 .stat('v3', {
-                    label: 'Population 15–29',
+                    label: 'Population 75+',
                     eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+                    filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
                     unitText: '%',
                 })
                 .legend({
-                    x: 500,
+                    title: 'Age Structure',
+                    x: 510,
                     y: 30,
                     boxOpacity: 1,
-                    width:270,
-                    height:270,
-                    labels: ['75+', '45–64', '15–29'],
+                    width: 250,
+                    height: 250,
+                    labels: ['15–29', '45–64', '75+'],
                     labelPosition: 'corner',
-                    padding:{ top: 10, right: 30, bottom: 10, left: 30 }
-                })
+                    padding: { top: 10, right: 30, bottom: 10, left: 30 },
+                }).zoomButtons(true)
 
             // map.statData('v1').setData(variable1)
             // map.statData('v2').setData(variable2)

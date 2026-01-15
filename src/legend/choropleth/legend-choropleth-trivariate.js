@@ -1,8 +1,9 @@
 // legend-choropleth-trivariate.js
 import * as Legend from '../legend'
-
+import { select } from 'd3-selection'
 // Tricolore
 import { TricoloreViz, CompositionUtils } from '../../lib/tricolore/src'
+import { executeForAllInsets, getLegendRegionsSelector } from '../../core/utils'
 
 /**
  * Legend for trivariate (ternary) choropleth maps
@@ -14,7 +15,7 @@ export const legend = function (map, config = {}) {
     // --- defaults ---
     out.width = 160
     out.height = 160
-    out.padding = { top: 10, right: 50, bottom: 10, left: 50 }
+    out.padding = { top: 50, right: 50, bottom: 10, left: 50 }
     out.type = 'continuous' // 'continuous' | 'discrete'
     out.showCenter = true
     out.showLines = false
@@ -42,13 +43,15 @@ export const legend = function (map, config = {}) {
     }
 
     function drawTricoloreLegend() {
-        const lgg = out.lgg
+        const baseY = out.getBaseY()
+        const baseX = out.getBaseX()
+        const container = out.lgg.append('g').attr('class', 'em-ternary-legend').attr('transform', `translate(${baseX},${baseY})`)
 
         // clear previous content
-        lgg.selectAll('*').remove()
+        container.selectAll('*').remove()
 
         // container div for Tricolore
-        const container = lgg
+        const tricoloreContainer = container
             .append('foreignObject')
             .attr('x', 0)
             .attr('y', 0)
@@ -58,20 +61,10 @@ export const legend = function (map, config = {}) {
             .style('width', `${out.width}px`)
             .style('height', `${out.height}px`)
 
-        // build dummy data for legend (simple barycentric grid)
-        const data = [
-            [1, 0, 0],
-            [0, 1, 0],
-            [0, 0, 1],
-            [1 / 3, 1 / 3, 1 / 3],
-        ]
-
-        const center = map.ternarySettings_.meanCentering ? CompositionUtils.centre(data) : [1 / 3, 1 / 3, 1 / 3]
-
-        const viz = new TricoloreViz(container.node(), out.width, out.height, out.padding)
+        const viz = new TricoloreViz(tricoloreContainer.node(), out.width, out.height, out.padding)
 
         const opts = {
-            center,
+            center: map._ternaryCenter_,
             hue: map.ternarySettings_.hue,
             chroma: map.ternarySettings_.chroma,
             lightness: map.ternarySettings_.lightness,
@@ -81,17 +74,84 @@ export const legend = function (map, config = {}) {
             labelPosition: out.labelPosition,
             showCenter: out.showCenter,
             showLines: out.showLines,
+            breaks: map.ternarySettings_.breaks,
+            dataPointHandlers: {
+                mouseover: (e, d) => {
+                    map._tooltip?.mouseover(`
+                <div>
+                    <b>p₁</b>: ${d.point[0].toFixed(3)}<br/>
+                    <b>p₂</b>: ${d.point[1].toFixed(3)}<br/>
+                    <b>p₃</b>: ${d.point[2].toFixed(3)}
+                </div>
+            `)
+                },
+                mousemove: (e) => {
+                    map._tooltip?.mousemove(e)
+                },
+                mouseout: () => {
+                    map._tooltip?.mouseout()
+                },
+            },
+            legendTriangleHandlers: {
+                mouseover: (_, color) => {
+                    highlightRegionsByColor(map, color)
+                    if (map.insetTemplates_) {
+                        executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionsByColor, color)
+                    }
+                },
+                mouseout: () => {
+                    unhighlightRegions(map)
+                    if (map.insetTemplates_) {
+                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+                    }
+                },
+            },
         }
 
-        if (out.type === 'discrete') {
-            viz.createDiscretePlot(data, {
-                ...opts,
-                breaks: map.ternarySettings_.breaks,
-            })
+        if (map.ternarySettings_.breaks < 30) {
+            viz.createDiscretePlot(map._ternaryData_, opts)
         } else {
-            viz.createContinuousPlot(data, opts)
+            viz.createContinuousPlot(map._ternaryData_, opts)
         }
     }
 
     return out
+}
+
+// Highlight selected regions on mouseover
+function highlightRegionsByColor(map, color) {
+    const selector = getLegendRegionsSelector(map)
+    const regions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Normalize color once (browser-safe)
+    const target = normalizeColor(color)
+
+    regions.each(function () {
+        const sel = select(this)
+        const original = normalizeColor(sel.attr('fill___'))
+
+        if (original === target) {
+            sel.style('fill', sel.attr('fill___'))
+        } else {
+            sel.style('fill', '#fff')
+        }
+    })
+}
+
+function normalizeColor(c) {
+    if (!c) return null
+    const ctx = document.createElement('canvas').getContext('2d')
+    ctx.fillStyle = c
+    return ctx.fillStyle.toLowerCase()
+}
+
+// Reset all regions to their original colors on mouseout
+function unhighlightRegions(map) {
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Restore each region's original color from the fill___ attribute
+    allRegions.each(function () {
+        select(this).style('fill', select(this).attr('fill___'))
+    })
 }

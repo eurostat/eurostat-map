@@ -4,7 +4,8 @@ import { ColorMapping } from '../core/colorMapping'
 import { CompositionUtils } from '../core/compositionUtils'
 // TODO: check if this works correctly in various environments
 //  for d3 (cf. inside TricoloreViz constructor too)
-import { select, group } from 'd3-selection'
+import { select } from 'd3-selection'
+import { group } from 'd3-array'
 
 /**
  * js visualization for Tricolore
@@ -117,7 +118,7 @@ export class TricoloreViz {
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size)
+            this.addDataPoints(data, size, options.dataPointHandlers)
         }
     }
 
@@ -175,8 +176,22 @@ export class TricoloreViz {
                 .join(' ')
 
             const color = colors[Number(id) - 1].rgb
+            const classIndex = Number(id) - 1
+            const poly = this.triangle
+                .append('polygon')
+                .attr('points', points)
+                .attr('fill', color)
+                .attr('stroke', 'none')
+                .attr('classIndex', classIndex)
 
-            this.triangle.append('polygon').attr('points', points).attr('fill', color).attr('stroke', 'none')
+            const handlers = options.legendTriangleHandlers
+
+            if (handlers?.mouseover) {
+                poly.on('mouseover', (e) => handlers.mouseover!(e, color))
+            }
+            if (handlers?.mouseout) {
+                poly.on('mouseout', (e) => handlers.mouseout!(e))
+            }
         })
 
         // Draw triangle border and axes
@@ -184,7 +199,7 @@ export class TricoloreViz {
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size)
+            this.addDataPoints(data, size, options.dataPointHandlers)
         }
     }
 
@@ -239,8 +254,22 @@ export class TricoloreViz {
                 .join(' ')
 
             const colorIndex = Number(id) - 1
+            const classIndex = Number(id) - 1
+            const poly = this.triangle
+                .append('polygon')
+                .attr('points', points)
+                .attr('fill', values[colorIndex])
+                .attr('stroke', 'none')
+                .attr('data-ecl', classIndex)
 
-            this.triangle.append('polygon').attr('points', points).attr('fill', values[colorIndex]).attr('stroke', 'none')
+            const handlers = options.legendTriangleHandlers
+
+            if (handlers?.mouseover) {
+                poly.on('mouseover', (e) => handlers.mouseover!(e, values[colorIndex]))
+            }
+            if (handlers?.mouseout) {
+                poly.on('mouseout', (e) => handlers.mouseout!(e))
+            }
         })
 
         // Draw triangle border and axes
@@ -248,7 +277,7 @@ export class TricoloreViz {
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size)
+            this.addDataPoints(data, size, options.dataPointHandlers)
         }
     }
 
@@ -339,7 +368,7 @@ export class TricoloreViz {
                     .append('text')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])
-                    .attr('class','em-axis-label')
+                    .attr('class', 'em-axis-label')
                     .attr('text-anchor', 'middle')
                     .attr('dominant-baseline', 'middle')
                     .attr('transform', `rotate(${rotateValues[i]},${labelPositions[i][0]},${labelPositions[i][1]})`)
@@ -354,7 +383,13 @@ export class TricoloreViz {
             ]
 
             labels.forEach((label, i) => {
-                this.legend.append('text').attr('class', 'em-legend-label em-ternary-legend-label').attr('x', labelPositions[i][0]).attr('y', labelPositions[i][1]).attr('text-anchor', 'middle').text(label)
+                this.legend
+                    .append('text')
+                    .attr('class', 'em-legend-label em-ternary-legend-label')
+                    .attr('x', labelPositions[i][0])
+                    .attr('y', labelPositions[i][1])
+                    .attr('text-anchor', 'middle')
+                    .text(label)
             })
         }
 
@@ -478,7 +513,15 @@ export class TricoloreViz {
     /**
      * Add data points to the visualization
      */
-    private addDataPoints(data: TernaryPoint[], size: number): void {
+    private addDataPoints(
+        data: TernaryPoint[],
+        size: number,
+        handlers?: {
+            mouseover?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
+            mousemove?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
+            mouseout?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
+        }
+    ): void {
         const closed = CompositionUtils.close([...data])
         // Validate data (this will throw an error if invalid)
         CompositionUtils.validateTernaryPoints(closed)
@@ -497,15 +540,23 @@ export class TricoloreViz {
         closed.forEach((p, i) => {
             if (p) {
                 const [x, y] = this.ternaryToSvgCoords(p, size)
-
-                this.circles
+                const c = this.circles
                     .append('circle')
-                    .datum({ point: p, id: i })
+                    .datum({ point: p, index: i })
                     .attr('cx', x)
                     .attr('cy', y)
                     .attr('r', 2)
                     .attr('fill', 'black')
                     .attr('opacity', 0.5)
+                if (handlers?.mouseover) {
+                    c.on('mouseover', (e) => handlers.mouseover!(e, c.datum()))
+                }
+                if (handlers?.mousemove) {
+                    c.on('mousemove', (e) => handlers.mousemove!(e, c.datum()))
+                }
+                if (handlers?.mouseout) {
+                    c.on('mouseout', (e) => handlers.mouseout!(e, c.datum()))
+                }
             }
         })
     }

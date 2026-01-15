@@ -53,6 +53,12 @@ export interface SextantOptions {
   values?: RGBColor[];
 }
 
+export interface DataPointHandlers {
+    mouseover?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
+    mousemove?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
+    mouseout?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
+}
+
 /**
  * Visualization options for ternary plots
  */
@@ -71,6 +77,13 @@ export interface VisualizationOptions extends TricoloreOptions {
 
   /** The position of the axis labels: 'corner' | 'edge' (default: 'corner') */
   labelPosition?: 'corner' | 'edge';
+
+  dataPointHandlers?: DataPointHandlers
+
+  legendTriangleHandlers?: {
+    mouseover?: (e: MouseEvent, color: string) => void
+    mouseout?: (e: MouseEvent) => void
+}
 }
 
 /**
