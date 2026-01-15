@@ -118,7 +118,7 @@ export class TricoloreViz {
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size, options.dataPointHandlers)
+            this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center)
         }
     }
 
@@ -183,6 +183,7 @@ export class TricoloreViz {
                 .attr('fill', color)
                 .attr('stroke', 'none')
                 .attr('classIndex', classIndex)
+                .attr('class', 'em-ternary-discrete-polygon')
 
             const handlers = options.legendTriangleHandlers
 
@@ -199,7 +200,7 @@ export class TricoloreViz {
 
         // Add data points if requested
         if (showData && data.length > 0) {
-            this.addDataPoints(data, size, options.dataPointHandlers)
+            this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center)
         }
     }
 
@@ -410,6 +411,7 @@ export class TricoloreViz {
                     .attr('stroke', '#aaa')
                     .attr('stroke-width', 0.5)
                     .attr('opacity', 0.7)
+                    .attr('class', 'em-ternary-grid-line')
             })
 
             // p2 grid lines
@@ -425,6 +427,7 @@ export class TricoloreViz {
                     .attr('stroke', '#aaa')
                     .attr('stroke-width', 0.5)
                     .attr('opacity', 0.7)
+                    .attr('class', 'em-ternary-grid-line')
             })
 
             // p3 grid lines
@@ -440,6 +443,7 @@ export class TricoloreViz {
                     .attr('stroke', '#aaa')
                     .attr('stroke-width', 0.5)
                     .attr('opacity', 0.7)
+                    .attr('class', 'em-ternary-grid-line')
             })
         }
 
@@ -447,7 +451,7 @@ export class TricoloreViz {
         if (showCenter) {
             const [cx, cy] = this.ternaryToSvgCoords(center, size)
 
-            this.triangle.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 3).attr('fill', 'black').attr('stroke', 'white')
+            this.triangle.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 3).attr('fill', 'black').attr('stroke', 'white').attr('class', 'em-ternary-center-point')
 
             const p1Line = [
                 this.ternaryToSvgCoords([center[0], 0, 1 - center[0]], size),
@@ -474,6 +478,7 @@ export class TricoloreViz {
                     .attr('stroke', 'black')
                     .attr('stroke-width', 0.5)
                     .attr('opacity', 0.5)
+                    .attr('class', 'em-ternary-center-line')
             })
         }
 
@@ -486,6 +491,7 @@ export class TricoloreViz {
                 .attr('y', line[0][1])
                 .attr('text-anchor', 'end')
                 .attr('font-size', '10px')
+                .attr('class', 'em-ternary-axis-label') 
                 .text(`${val * 100}%`)
         })
         gridValues.forEach((val) => {
@@ -496,6 +502,7 @@ export class TricoloreViz {
                 .attr('y', line[0][1])
                 .attr('text-anchor', 'start')
                 .attr('font-size', '10px')
+                .attr('class', 'em-ternary-axis-label')
                 .text(`${val * 100}%`)
         })
         gridValues.forEach((val) => {
@@ -506,6 +513,7 @@ export class TricoloreViz {
                 .attr('y', line[0][1] + 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '10px')
+                .attr('class', 'em-ternary-axis-label')
                 .text(`${val * 100}%`)
         })
     }
@@ -520,7 +528,9 @@ export class TricoloreViz {
             mouseover?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
             mousemove?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
             mouseout?: (e: MouseEvent, d: { point: TernaryPoint; index: number }) => void
-        }
+        },
+        showCenter?: boolean,
+        center?: TernaryPoint,
     ): void {
         const closed = CompositionUtils.close([...data])
         // Validate data (this will throw an error if invalid)
@@ -547,7 +557,7 @@ export class TricoloreViz {
                     .attr('cy', y)
                     .attr('r', 2)
                     .attr('fill', 'black')
-                    .attr('opacity', 0.5)
+                    .attr('opacity', 0.5).attr('class', 'em-ternary-legend-data-point')
                 if (handlers?.mouseover) {
                     c.on('mouseover', (e) => handlers.mouseover!(e, c.datum()))
                 }
@@ -559,6 +569,37 @@ export class TricoloreViz {
                 }
             }
         })
+
+        if (showCenter) {
+            const [cx, cy] = this.ternaryToSvgCoords(center, size)
+
+            this.circles.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 3).attr('fill', 'black').attr('stroke', 'white').attr('class', 'em-ternary-center-point')
+
+            const p1Line = [
+                this.ternaryToSvgCoords([center[0], 0, 1 - center[0]], size),
+                this.ternaryToSvgCoords([center[0], 1 - center[0], 0], size),
+            ]
+
+            const p2Line = [
+                this.ternaryToSvgCoords([0, center[1], 1 - center[1]], size),
+                this.ternaryToSvgCoords([1 - center[1], center[1], 0], size),
+            ]
+
+            const p3Line = [
+                this.ternaryToSvgCoords([0, 1 - center[2], center[2]], size),
+                this.ternaryToSvgCoords([1 - center[2], 0, center[2]], size),
+            ]
+
+            ;[p1Line, p2Line, p3Line].forEach((line) => {
+                this.circles
+                    .append('line')
+                    .attr('x1', line[0][0])
+                    .attr('y1', line[0][1])
+                    .attr('x2', line[1][0])
+                    .attr('y2', line[1][1])
+                    .attr('class', 'em-ternary-center-line')
+            })
+        }
     }
 
     /**

@@ -6,7 +6,7 @@
     pointer-events: none;
 }
 
- /* titles */
+/* titles */
 .em-legend-title {
     font-weight: bold;
     font-size: 15px;
@@ -60,7 +60,7 @@
 .em-legend-label-min:hover,
 .em-legend-label-no-data:hover {
     opacity: 1;
-    font-weight:bold;
+    font-weight: bold;
 }
 
 .em-bivariate-nodata-label {
@@ -74,7 +74,6 @@
     /* fill: #3a3a3a */
 }
 
-
 /* ticks */
 .em-legend-tick {
     stroke: #696969;
@@ -85,7 +84,6 @@
     stroke: #696969;
     stroke-width: 1;
 }
-
 
 /* misc */
 .em-legend-separator {
@@ -154,4 +152,15 @@
     font-size: 14px;
     stroke: none;
     fill: #161616;
+}
+.em-ternary-legend-data-point {
+    opacity: 0.3;
+}
+.em-ternary-center-line {
+    stroke: white;
+    opacity: 0.7;
+    stroke-width: 0.5;
+}
+.em-ternary-legend-data-point, .em-ternary-discrete-polygon {
+    cursor: pointer;
 }

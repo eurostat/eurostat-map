@@ -77,6 +77,7 @@ export const legend = function (map, config = {}) {
             breaks: map.ternarySettings_.breaks,
             dataPointHandlers: {
                 mouseover: (e, d) => {
+                    select(e.currentTarget).attr('fill', 'red').attr('opacity',1).raise()
                     map._tooltip?.mouseover(`
                 <div>
                     <b>p₁</b>: ${d.point[0].toFixed(3)}<br/>
@@ -88,18 +89,22 @@ export const legend = function (map, config = {}) {
                 mousemove: (e) => {
                     map._tooltip?.mousemove(e)
                 },
-                mouseout: () => {
+                mouseout: (e) => {
+                    select(e.currentTarget).attr('fill', 'black').attr('opacity',0.3)
                     map._tooltip?.mouseout()
                 },
             },
             legendTriangleHandlers: {
                 mouseover: (_, color) => {
+                    const sel = select(_.currentTarget)
+                    sel.attr('stroke-width', 2).attr('stroke', 'red').raise()
                     highlightRegionsByColor(map, color)
                     if (map.insetTemplates_) {
                         executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionsByColor, color)
                     }
                 },
-                mouseout: () => {
+                mouseout: (_) => {
+                    select(_.currentTarget).attr('stroke', 'none')
                     unhighlightRegions(map)
                     if (map.insetTemplates_) {
                         executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
