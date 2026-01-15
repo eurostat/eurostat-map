@@ -20,7 +20,7 @@ export const legend = function (map, config = {}) {
     out.showCenter = true
     out.showLines = false
     out.labels = ['Variable 1', 'Variable 2', 'Variable 3']
-    out.labelPosition = 'corner'
+    out.labelPosition = 'edge' // 'corner' | 'edge'
     out.colorTarget = 'points' // 'triangles' | 'points'
 
     // allow overrides
