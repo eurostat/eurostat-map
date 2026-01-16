@@ -191,3 +191,6 @@
     opacity: 1;
     font-size: 10px;
 }
+.em-ternary-center-point {
+    pointer-events: none;
+}
