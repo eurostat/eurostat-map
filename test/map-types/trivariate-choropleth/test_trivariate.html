@@ -10,25 +10,19 @@
             .em-zoom-buttons {
                 transform: translate(1%, 15%);
             }
+            .em-legend-subtitle {
+                font-size: 13px;
+            }
         </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script src="../../data/nuts2.js"></script>
         <script>
-        
             const map = eurostatmap
                 .map('trivariateChoropleth')
                 .title('Age Structure')
+                .subtitle('Population distribution by age groups, 2023')
                 .nutsLevel(3)
-                .ternarySettings({
-                    hue: 160,
-                    chroma: 130,
-                    lightness: 40,
-                    contrast: 0,
-                    spread: 1.5,
-                    breaks: 5,
-                    meanCentering: true,
-                })
                 .stat('v1', {
                     label: 'Population 15–29',
                     eurostatDatasetCode: 'demo_r_pjanind3',
@@ -47,21 +41,36 @@
                     filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
                     unitText: '%',
                 })
+                .ternarySettings({
+                    hue: 160,
+                    chroma: 130,
+                    lightness: 40,
+                    contrast: 0,
+                    spread: 1.5,
+                    breaks: 5,
+                    meanCentering: true,
+                })
                 .legend({
                     title: 'Age Structure',
-                    x: 520,
-                    y: 10,
-                    boxOpacity: 0.9,
+                    subtitle: `
+                        <tspan x="8" dy="0">Areas with more <tspan fill="#007b00">green</tspan> have a higher %</tspan>
+                        <tspan x="8" dy="1.2em"> of 15–29 year olds. Areas with more <tspan fill="#df0000">red</tspan> have </tspan>
+                        <tspan x="8" dy="1.2em">a higher % of 75+ year olds and areas with 
+                        <tspan x="8" dy="1.2em">more <tspan fill="#0067ff">blue</tspan> have a higher</tspan> % of 45–64 year olds.</tspan>
+                    `,
+                    x: 505,
+                    y: 3,
+                    boxOpacity: 0.99,
                     width: 250,
-                    height: 250,
+                    height: 280,
                     labels: ['← 15–29 ', '← 45–64', '75+ →'],
                     labelPosition: 'edge',
-                    padding: { top: 10, right: 30, bottom: 10, left: 30 },
+                    padding: { top: 45, right: 30, bottom: 10, left: 30 },
                     showLines: true,
                     showCenter: true,
                     centerLabel: 'Average',
                     showData: true,
-                    colorTarget: 'points',
+                    colorTarget: 'triangles', // 'points' | 'triangles'
                 })
                 .zoomButtons(true)
 

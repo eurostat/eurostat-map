@@ -208,7 +208,7 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, breaks)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -372,7 +372,7 @@ export class TricoloreViz {
         showLines: boolean,
         labelPosition: 'corner' | 'edge' = 'corner',
         colorTarget: 'triangles' | 'points' = 'triangles',
-        showData: boolean = false
+        breaks: number | null = 4
     ): void {
         // Define triangle corners in ternary coordinates
         // and convert to SVG coordinates
@@ -393,7 +393,7 @@ export class TricoloreViz {
             const labelPositions = [
                 [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14], // p1
                 [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14], // p2
-                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 30], // p3
+                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 35], // p3
             ]
 
             const rotateValues = [-60, 60, 0]
@@ -403,7 +403,7 @@ export class TricoloreViz {
                     .append('text')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])
-                    .attr('class', 'em-axis-label em-legend-label em-ternary-legend-label')
+                    .attr('class', 'em-ternary-axis-title em-legend-label em-ternary-legend-label')
                     .attr('text-anchor', 'middle')
                     .attr('dominant-baseline', 'middle')
                     .attr('transform', `rotate(${rotateValues[i]},${labelPositions[i][0]},${labelPositions[i][1]})`)
@@ -420,7 +420,7 @@ export class TricoloreViz {
             labels.forEach((label, i) => {
                 this.legend
                     .append('text')
-                    .attr('class', 'em-axis-label em-legend-label em-ternary-legend-label')
+                    .attr('class', 'em-ternary-axis-title em-legend-label em-ternary-legend-label')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])
                     .attr('text-anchor', 'middle')
@@ -428,17 +428,23 @@ export class TricoloreViz {
             })
         }
 
-        // Add grid lines and labels at 25%, 50%, 75% for each axis
+        // Add grid lines and labels for each axis
+
         // ===============================
         // Grid lines (major + minor)
         // ===============================
-        const majorGrid = [0.25, 0.5, 0.75]
-        const minorStep = 0.05
-
+        const majorGrid = typeof breaks === 'number' && breaks > 1 ? Array.from({ length: breaks - 1 }, (_, i) => (i + 1) / breaks) : []
+        const minorSubdivisions = 5 // e.g. 5 minor ticks per major
         const minorGrid: number[] = []
-        for (let v = minorStep; v < 1; v += minorStep) {
-            if (!majorGrid.includes(+v.toFixed(2))) {
-                minorGrid.push(+v.toFixed(2))
+
+        for (let i = 0; i < majorGrid.length; i++) {
+            const start = i === 0 ? 0 : majorGrid[i - 1]
+            const end = majorGrid[i]
+
+            const step = (end - start) / minorSubdivisions
+
+            for (let j = 1; j < minorSubdivisions; j++) {
+                minorGrid.push(start + j * step)
             }
         }
 
@@ -493,22 +499,23 @@ export class TricoloreViz {
         // ===============================
         // Axis labels (unchanged)
         // ===============================
-        const offset = 10
-        majorGrid.forEach((val) => {
+        const labelStride = this.computeLabelStride(majorGrid.length + 1)
+        const labelGrid = majorGrid.filter((_, i) => i % labelStride === 0)
+        labelGrid.forEach((val) => {
             // p1 axis
             const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
 
             this.legend
                 .append('text')
-                .attr('x', line[0][0] - 5)
-                .attr('y', line[0][1])
+                .attr('x', line[0][0] - 10)
+                .attr('y', line[0][1] + 3)
                 .attr('text-anchor', 'end')
                 .attr('font-size', '10px')
                 .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${val * 100}%`)
+                .text(`${(val * 100).toFixed(0)}%`)
         })
 
-        majorGrid.forEach((val) => {
+        labelGrid.forEach((val) => {
             // p2 axis
             const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
 
@@ -519,22 +526,29 @@ export class TricoloreViz {
                 .attr('text-anchor', 'start')
                 .attr('font-size', '10px')
                 .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${val * 100}%`)
+                .text(`${(val * 100).toFixed(0)}%`)
         })
 
-        majorGrid.forEach((val) => {
+        labelGrid.forEach((val) => {
             // p3 axis
             const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
 
             this.legend
                 .append('text')
-                .attr('x', line[0][0])
-                .attr('y', line[0][1] + 10)
+                .attr('x', line[0][0] + 10)
+                .attr('y', line[0][1] + 18)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '10px')
                 .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${val * 100}%`)
+                .text(`${(val * 100).toFixed(0)}%`)
         })
+    }
+
+    private computeLabelStride(breaks: number): number {
+        if (breaks <= 7) return 1 // show all
+        if (breaks <= 10) return 2 // every other
+        if (breaks <= 15) return 3
+        return Math.ceil(breaks / 4) // cap at ~4 labels per axis
     }
 
     private drawAxisTick(at: TernaryPoint, normal: TernaryPoint, size: number, length: number = 8): void {

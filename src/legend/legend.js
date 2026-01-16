@@ -143,7 +143,7 @@ export const legend = function (map) {
                 .attr('class', 'em-legend-subtitle')
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding + titleFontSize + subtitleFontSize + 3) // 3px padding after title
-                .text(out.subtitle)
+                .html(out.subtitle)
         }
     }
 

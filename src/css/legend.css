@@ -160,6 +160,9 @@
 .em-ternary-grid-line-minor {
     pointer-events: none;
 }
+.em-ternary-axis-title {
+    font-size: 13px;
+}
 .em-ternary-axis-tick {
     stroke: #3a3a3a;
     stroke-width: 1;
