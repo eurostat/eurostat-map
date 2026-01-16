@@ -13,6 +13,14 @@
             .em-legend-subtitle {
                 font-size: 13px;
             }
+            .em-ternary-annotation-line {
+                stroke: #949494;
+            }
+            
+            .em-ternary-center-annotation-label {
+                fill: #4e4e4e;
+                text-anchor: end;
+            }
         </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
@@ -57,6 +65,7 @@
                         <tspan x="8" dy="1.2em"> of 15–29 year olds. Areas with more <tspan fill="#df0000">red</tspan> have </tspan>
                         <tspan x="8" dy="1.2em">a higher % of 75+ year olds and areas with 
                         <tspan x="8" dy="1.2em">more <tspan fill="#0067ff">blue</tspan> have a higher</tspan> % of 45–64 year olds.</tspan>
+                        <tspan x="8" dy="1.2em">Hover your mouse over the legend to explore it.</tspan>
                     `,
                     x: 505,
                     y: 3,
@@ -71,6 +80,7 @@
                     centerLabel: 'Average',
                     showData: true,
                     colorTarget: 'triangles', // 'points' | 'triangles'
+                    centerAnnotationOffsets: { labelX: -70, labelY: 20, curveX: -20, curveY: 0 },
                 })
                 .zoomButtons(true)
 

@@ -88,6 +88,8 @@ export interface VisualizationOptions extends TricoloreOptions {
     colorTarget?: 'triangles' | 'points'
 
     centerLabel?: string
+
+    centerAnnotationOffsets?: { labelX: number; labelY: number; curveX: number; curveY: number }
 }
 
 /**

@@ -24,6 +24,7 @@ export const legend = function (map, config = {}) {
     out.labelPosition = 'edge' // 'corner' | 'edge'
     out.colorTarget = 'points' // 'triangles' | 'points'
     out.showData = true
+    out.centerAnnotationOffsets = { labelX: 70, labelY: 10, curveX: -20, curveY: -20 }
 
     // allow overrides
     Object.assign(out, config)
@@ -81,6 +82,7 @@ export const legend = function (map, config = {}) {
             breaks: map.ternarySettings_.breaks,
             colorTarget: out.colorTarget,
             showData: out.showData,
+            centerAnnotationOffsets: out.centerAnnotationOffsets,
             //legend event handlers
             dataPointHandlers: {
                 mouseover: (e, d) => {

@@ -176,8 +176,16 @@
 .em-ternary-discrete-polygon {
     transition: fill 150ms;
 }
-.em-ternary-center-line {
-    stroke-dasharray: 4 2;
+.em-ternary-annotation-line {
+    stroke: #161616;
+    stroke-width: 1;
+    opacity: 1;
+}
+.em-ternary-center-annotation-label {
+    font-size: 11px;
+    fill: #161616;
+    font-style: italic;
+    text-anchor: start;
 }
 .em-ternary-center-line-label {
     opacity: 1;

@@ -124,7 +124,7 @@ export class TricoloreViz {
         }
 
         if (showCenter) {
-            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value')
+            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
         }
     }
 
@@ -226,7 +226,7 @@ export class TricoloreViz {
         }
 
         if (showCenter) {
-            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value')
+            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
         }
     }
 
@@ -310,7 +310,7 @@ export class TricoloreViz {
         }
 
         if (showCenter) {
-            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value')
+            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
         }
     }
 
@@ -721,26 +721,26 @@ export class TricoloreViz {
      * Add a curved annotation from the ternary center point
      * to the top of the legend area explaining what it is.
      */
-    private addCenterAnnotation(size: number, center: TernaryPoint, text: string = 'Average value'): void {
+    private addCenterAnnotation(size: number, center: TernaryPoint, text: string = 'Average value', offsets: { labelX: number; labelY: number; curveX: number; curveY: number } = { labelX: 70, labelY: 20, curveX: 10, curveY: 0 }): void {
         const [cx, cy] = this.ternaryToSvgCoords(center, size)
 
         // Target point above the triangle (inside legend space)
-        const tx = cx + size / 5 //offset to the right
-        const ty = 35
+        const tx = cx + offsets.labelX //offset to the right
+        const ty = 35 + offsets.labelY //offset down
 
         // Control point for curvature (pulls curve upward)
-        const mx = cx
-        const my = cy - size / 3.5
+        const mx = cx + offsets.curveX
+        const my = cy - offsets.curveY
 
         const path = `
         M ${cx},${cy}
         Q ${mx},${my} ${tx},${ty}
     `
 
-        const g = this.legend.append('g').attr('class', 'em-ternary-center-annotation')
+        const g = this.circles.append('g').attr('class', 'em-ternary-center-annotation')
 
         // Curved guide line
-        g.append('path').attr('d', path).attr('fill', 'none').attr('stroke', '#2e2e2e').attr('stroke-width', 1).attr('opacity', 1)
+        g.append('path').attr('d', path).attr('fill', 'none').attr('class', 'em-ternary-annotation-line')
 
         // Small dot at the end (optional but helps)
         //g.append('circle').attr('cx', tx).attr('cy', ty).attr('r', 2).attr('fill', '#444')
@@ -749,9 +749,6 @@ export class TricoloreViz {
         g.append('text')
             .attr('x', tx)
             .attr('y', ty - 6)
-            .attr('text-anchor', 'middle')
-            .attr('font-size', '11px')
-            .attr('fill', '#444')
             .attr('class', 'em-ternary-center-annotation-label')
             .text(text)
     }
