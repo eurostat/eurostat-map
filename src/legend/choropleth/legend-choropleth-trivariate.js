@@ -18,10 +18,12 @@ export const legend = function (map, config = {}) {
     out.padding = { top: 50, right: 50, bottom: 10, left: 50 }
     out.type = 'continuous' // 'continuous' | 'discrete'
     out.showCenter = true
+    out.centerLabel = 'Average'
     out.showLines = false
     out.labels = ['Variable 1', 'Variable 2', 'Variable 3']
     out.labelPosition = 'edge' // 'corner' | 'edge'
     out.colorTarget = 'points' // 'triangles' | 'points'
+    out.showData = true
 
     // allow overrides
     Object.assign(out, config)
@@ -74,9 +76,12 @@ export const legend = function (map, config = {}) {
             labels: out.labels,
             labelPosition: out.labelPosition,
             showCenter: out.showCenter,
+            centerLabel: out.centerLabel,
             showLines: out.showLines,
             breaks: map.ternarySettings_.breaks,
             colorTarget: out.colorTarget,
+            showData: out.showData,
+            //legend event handlers
             dataPointHandlers: {
                 mouseover: (e, d) => {
                     const sel = select(e.currentTarget)

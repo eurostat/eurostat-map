@@ -149,9 +149,9 @@
 }
 
 .em-ternary-legend-label {
-    font-size: 14px;
+    font-size: 13px;
     stroke: none;
-    fill: #161616;
+    fill: #3a3a3a;
 }
 
 .em-ternary-grid-line {
@@ -159,8 +159,6 @@
     stroke-width: 0.5;
 }
 .em-ternary-center-line {
-    opacity: 1;
-    stroke-width: 0.5;
     stroke-dasharray: 4 2;
 }
 .em-ternary-legend-data-point, .em-ternary-discrete-polygon {

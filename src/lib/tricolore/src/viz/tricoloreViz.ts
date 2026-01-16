@@ -122,6 +122,10 @@ export class TricoloreViz {
             const colorTarget = options.colorTarget ?? 'triangles'
             this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center, undefined, colorTarget)
         }
+
+        if (showCenter) {
+            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value')
+        }
     }
 
     /**
@@ -146,6 +150,7 @@ export class TricoloreViz {
             showLines = true,
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
+            colorTarget = 'triangles',
         } = options
 
         const plotWidth = this.width - this.margin.left - this.margin.right
@@ -164,7 +169,6 @@ export class TricoloreViz {
         // Calculate colors for each centroid
         const centroidPoints = centroids.map((c) => [c.p1, c.p2, c.p3] as TernaryPoint)
         const colors = ColorMapping.colorMapTricolore(centroidPoints, center, breaks, hue, chroma, lightness, contrast, spread)
-        const colorTarget = options.colorTarget ?? 'triangles'
 
         // Group vertices by triangle id
         const triangleGroups = group(vertices, (d: any) => d.id)
@@ -219,6 +223,10 @@ export class TricoloreViz {
                 colorTarget === 'points' ? pointColors : undefined,
                 colorTarget
             )
+        }
+
+        if (showCenter) {
+            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value')
         }
     }
 
@@ -299,6 +307,10 @@ export class TricoloreViz {
         if (showData && data.length > 0) {
             const colorTarget = options.colorTarget ?? 'triangles'
             this.addDataPoints(data, size, options.dataPointHandlers, showCenter, center, undefined, colorTarget)
+        }
+
+        if (showCenter) {
+            this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value')
         }
     }
 
@@ -550,10 +562,7 @@ export class TricoloreViz {
         closed.forEach((p, i) => {
             if (p) {
                 const [x, y] = this.ternaryToSvgCoords(p, size)
-                const fill = colors && colors[i] && colors[i].rgb ? colors[i].rgb : 'black'
-                if (!colors[i]) {
-                    console.info(`No color found for data point at index ${i}:`, p, colors[i])
-                }
+                const fill = colorTarget === 'points' && colors && colors[i] && colors[i].rgb ? colors[i].rgb : 'black'
 
                 const c = this.circles
                     .append('circle')
@@ -603,8 +612,8 @@ export class TricoloreViz {
                     .attr('x2', x2)
                     .attr('y2', y2)
                     .attr('stroke', colorTarget === 'triangles' ? 'white' : '#000')
-                    .attr('stroke-width', 0.5)
-                    .attr('opacity', 0.6)
+                    .attr('stroke-width', colorTarget === 'triangles' ? 1 : 0.6)
+                    .attr('opacity', colorTarget === 'triangles' ? 0.9 : 0.6)
                     .attr('class', 'em-ternary-center-line')
             })
 
@@ -617,6 +626,50 @@ export class TricoloreViz {
                 .attr('stroke', 'white')
                 .attr('class', 'em-ternary-center-point')
         }
+    }
+
+    /**
+     * Add a curved annotation from the ternary center point
+     * to the top of the legend area explaining what it is.
+     */
+    private addCenterAnnotation(size: number, center: TernaryPoint, text: string = 'Average value'): void {
+        const [cx, cy] = this.ternaryToSvgCoords(center, size)
+
+        // Target point above the triangle (inside legend space)
+        const tx = cx + size/3 //offset to the right
+        const ty = 30
+
+        // Control point for curvature (pulls curve upward)
+        const mx = cx
+        const my = cy - size/3
+
+        const path = `
+        M ${cx},${cy}
+        Q ${mx},${my} ${tx},${ty}
+    `
+
+        const g = this.legend.append('g').attr('class', 'em-ternary-center-annotation')
+
+        // Curved guide line
+        g.append('path')
+            .attr('d', path)
+            .attr('fill', 'none')
+            .attr('stroke', '#444')
+            .attr('stroke-width', 0.8)
+            .attr('opacity', 0.8)
+
+        // Small dot at the end (optional but helps)
+        //g.append('circle').attr('cx', tx).attr('cy', ty).attr('r', 2).attr('fill', '#444')
+
+        // Label
+        g.append('text')
+            .attr('x', tx)
+            .attr('y', ty - 6)
+            .attr('text-anchor', 'middle')
+            .attr('font-size', '11px')
+            .attr('fill', '#444')
+            .attr('class', 'em-ternary-center-annotation-label')
+            .text(text)
     }
 
     /**

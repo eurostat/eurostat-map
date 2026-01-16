@@ -8,7 +8,7 @@
     <body>
         <style>
             .em-zoom-buttons {
-                    transform: translate(1%, 15%);
+                transform: translate(1%, 15%);
             }
         </style>
         <svg id="map"></svg>
@@ -20,7 +20,13 @@
                 .title('Age Structure')
                 .nutsLevel(3)
                 .ternarySettings({
-                    spread: 0.8
+                    hue: 20,
+                    chroma: 110,
+                    lightness: 60,
+                    contrast: 0.4,
+                    spread: 1,
+                    breaks: 5,
+                    meanCentering: true,
                 })
                 .stat('v1', {
                     label: 'Population 15–29',
@@ -48,10 +54,15 @@
                     width: 250,
                     height: 250,
                     labels: ['15–29', '45–64', '75+'],
-                    labelPosition: 'edge',
+                    labelPosition: 'corner',
                     padding: { top: 10, right: 30, bottom: 10, left: 30 },
-                    showLines:true
-                }).zoomButtons(true)
+                    showLines: true,
+                    showCenter: true,
+                    centerLabel: 'Average',
+                    showData: true,
+                    colorTarget: 'triangles',
+                })
+                .zoomButtons(true)
 
             // map.statData('v1').setData(variable1)
             // map.statData('v2').setData(variable2)

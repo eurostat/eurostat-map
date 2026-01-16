@@ -86,6 +86,8 @@ export interface VisualizationOptions extends TricoloreOptions {
     }
 
     colorTarget?: 'triangles' | 'points'
+
+    centerLabel?: string
 }
 
 /**
