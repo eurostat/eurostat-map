@@ -27,7 +27,7 @@
                     contrast: 0,
                     spread: 1.5,
                     breaks: 5,
-                    meanCentering: false,
+                    meanCentering: true,
                 })
                 .stat('v1', {
                     label: 'Population 15–29',
@@ -54,14 +54,14 @@
                     boxOpacity: 0.9,
                     width: 250,
                     height: 250,
-                    labels: ['⟵ 15–29 ', '⟵ 45–64', '75+ ⟶'],
+                    labels: ['← 15–29 ', '← 45–64', '75+ →'],
                     labelPosition: 'edge',
                     padding: { top: 10, right: 30, bottom: 10, left: 30 },
                     showLines: true,
                     showCenter: true,
                     centerLabel: 'Average',
                     showData: true,
-                    colorTarget: 'triangles',
+                    colorTarget: 'points',
                 })
                 .zoomButtons(true)
 

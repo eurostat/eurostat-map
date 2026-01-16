@@ -148,23 +148,24 @@
     opacity: 0.9;
 }
 
+/* TERNARY */
 .em-ternary-legend-label {
     font-size: 13px;
     stroke: none;
     fill: #3a3a3a;
 }
 
-.em-ternary-grid-line {
-    opacity: 0.3;
-    stroke-width: 0.5;
-}
+
 .em-ternary-grid-line,
 .em-ternary-grid-line-minor {
     pointer-events: none;
 }
-.em-ternary-center-line {
-    stroke-dasharray: 4 2;
+.em-ternary-axis-tick {
+    stroke: #3a3a3a;
+    stroke-width: 1;
+    pointer-events: none;
 }
+
 .em-ternary-legend-data-point,
 .em-ternary-discrete-polygon {
     cursor: pointer;
@@ -172,6 +173,10 @@
 .em-ternary-discrete-polygon {
     transition: fill 150ms;
 }
-/* .em-ternary-legend-data-point {
-    opacity: 0.3;
-} */
+.em-ternary-center-line {
+    stroke-dasharray: 4 2;
+}
+.em-ternary-center-line-label {
+    opacity: 1;
+    font-size: 10px;
+}

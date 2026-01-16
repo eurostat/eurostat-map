@@ -453,8 +453,8 @@ export class TricoloreViz {
                 .attr('x2', x2)
                 .attr('y2', y2)
                 .attr('stroke', colorTarget === 'triangles' ? '#555' : '#555')
-                .attr('stroke-width', major ? 0.9 : 0.2)
-                .attr('opacity', major ? 0.7 : 0.25)
+                .attr('stroke-width', major ? 1 : 0.2)
+                .attr('opacity', major ? 0.4 : 0.25)
                 .attr('class', major ? 'em-ternary-grid-line' : 'em-ternary-grid-line-minor')
         }
 
@@ -473,21 +473,29 @@ export class TricoloreViz {
 
             // --- major grid on top ---
             majorGrid.forEach((v) => {
-                // p1
-                drawGridLine([v, 0, 1 - v], [v, 1 - v, 0], true)
+                // p1 axis (edge p2 = 0)
+                const p1Edge: TernaryPoint = [v, 0, 1 - v]
+                drawGridLine(p1Edge, [v, 1 - v, 0], true)
+                this.drawAxisTick(p1Edge, [0, -1, +1], size)
 
-                // p2
-                drawGridLine([0, v, 1 - v], [1 - v, v, 0], true)
+                // p2 axis (edge p3 = 0)
+                const p2Edge: TernaryPoint = [1 - v, v, 0]
+                drawGridLine([0, v, 1 - v], p2Edge, true)
+                this.drawAxisTick(p2Edge, [+1, 0, -1], size)
 
-                // p3
-                drawGridLine([1 - v, 0, v], [0, 1 - v, v], true)
+                // p3 axis (edge p1 = 0)
+                const p3Edge: TernaryPoint = [0, 1 - v, v]
+                drawGridLine([1 - v, 0, v], p3Edge, true)
+                this.drawAxisTick(p3Edge, [-1, +1, 0], size)
             })
         }
 
         // ===============================
         // Axis labels (unchanged)
         // ===============================
+        const offset = 10
         majorGrid.forEach((val) => {
+            // p1 axis
             const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
 
             this.legend
@@ -496,24 +504,26 @@ export class TricoloreViz {
                 .attr('y', line[0][1])
                 .attr('text-anchor', 'end')
                 .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-label')
+                .attr('class', 'em-ternary-axis-tick-label')
                 .text(`${val * 100}%`)
         })
 
         majorGrid.forEach((val) => {
+            // p2 axis
             const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
 
             this.legend
                 .append('text')
                 .attr('x', line[0][0] + 5)
-                .attr('y', line[0][1])
+                .attr('y', line[0][1] - 10)
                 .attr('text-anchor', 'start')
                 .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-label')
+                .attr('class', 'em-ternary-axis-tick-label')
                 .text(`${val * 100}%`)
         })
 
         majorGrid.forEach((val) => {
+            // p3 axis
             const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
 
             this.legend
@@ -522,9 +532,27 @@ export class TricoloreViz {
                 .attr('y', line[0][1] + 10)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-label')
+                .attr('class', 'em-ternary-axis-tick-label')
                 .text(`${val * 100}%`)
         })
+    }
+
+    private drawAxisTick(at: TernaryPoint, normal: TernaryPoint, size: number, length: number = 8): void {
+        const [x1, y1] = this.ternaryToSvgCoords(at, size)
+
+        const tickEnd: TernaryPoint = [at[0] + normal[0] * (length / size), at[1] + normal[1] * (length / size), at[2] + normal[2] * (length / size)]
+
+        const [x2, y2] = this.ternaryToSvgCoords(tickEnd, size)
+
+        this.legend
+            .append('line')
+            .attr('x1', x1)
+            .attr('y1', y1)
+            .attr('x2', x2)
+            .attr('y2', y2)
+            .attr('stroke-width', 1)
+            .attr('opacity', 0.4)
+            .attr('class', 'em-ternary-axis-tick')
     }
 
     /**
@@ -600,7 +628,7 @@ export class TricoloreViz {
                 [[0, 1 - center[2], center[2]], center],
             ]
 
-            guides.forEach(([a, b]) => {
+            guides.forEach(([a, b], i) => {
                 const [x1, y1] = this.ternaryToSvgCoords(a, size)
                 const [x2, y2] = this.ternaryToSvgCoords(b, size)
 
@@ -611,9 +639,57 @@ export class TricoloreViz {
                     .attr('x2', x2)
                     .attr('y2', y2)
                     .attr('stroke', colorTarget === 'triangles' ? 'white' : '#000')
-                    .attr('stroke-width', colorTarget === 'triangles' ? 1 : 0.6)
-                    .attr('opacity', colorTarget === 'triangles' ? 0.9 : 0.6)
+                    .attr('stroke-width', colorTarget === 'triangles' ? 1 : 1)
+                    .attr('opacity', colorTarget === 'triangles' ? 0.9 : 1)
                     .attr('class', 'em-ternary-center-line')
+
+                // Add label showing the center value for this component
+                const centerValue = Math.round(center[i] * 100)
+
+                // Use the edge point (x1, y1)
+                const labelX = x1
+                const labelY = y1
+
+                // Calculate line angle
+                const lineAngle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI)
+
+                // Adjust rotation for labels 2 and 3 (flip 180 degrees)
+                let rotation = lineAngle
+                // Offset distance - make label 1 further from edge
+                const offsetDistance = i === 0 ? 25 : 15
+                let offsetX = offsetDistance * Math.cos((lineAngle * Math.PI) / 180)
+                let offsetY = offsetDistance * Math.sin((lineAngle * Math.PI) / 180)
+
+                //left
+                if (i === 1) {
+                    offsetX += -5
+                    offsetY += 8
+                }
+
+                //bottom
+                if (i === 0) {
+                    rotation = lineAngle + 180
+                    offsetX += 14
+                    offsetY += 10
+                }
+
+                //right
+                if (i === 2) {
+                    rotation = lineAngle + 180
+                    offsetX += 5
+                    offsetY += 10
+                }
+
+                this.circles
+                    .append('text')
+                    .attr('x', labelX + offsetX)
+                    .attr('y', labelY + offsetY)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'middle')
+                    .attr('fill', colorTarget === 'triangles' ? 'white' : '#000')
+                    .attr('transform', `rotate(${rotation}, ${labelX + offsetX}, ${labelY + offsetY})`)
+                    .attr('class', 'em-ternary-center-line-label')
+                    .text(`${centerValue}%`)
             })
 
             this.circles
@@ -635,12 +711,12 @@ export class TricoloreViz {
         const [cx, cy] = this.ternaryToSvgCoords(center, size)
 
         // Target point above the triangle (inside legend space)
-        const tx = cx + size/3 //offset to the right
-        const ty = 30
+        const tx = cx + size / 5 //offset to the right
+        const ty = 35
 
         // Control point for curvature (pulls curve upward)
         const mx = cx
-        const my = cy - size/3
+        const my = cy - size / 3.5
 
         const path = `
         M ${cx},${cy}
@@ -650,12 +726,7 @@ export class TricoloreViz {
         const g = this.legend.append('g').attr('class', 'em-ternary-center-annotation')
 
         // Curved guide line
-        g.append('path')
-            .attr('d', path)
-            .attr('fill', 'none')
-            .attr('stroke', '#2e2e2e')
-            .attr('stroke-width', 1)
-            .attr('opacity', 1)
+        g.append('path').attr('d', path).attr('fill', 'none').attr('stroke', '#2e2e2e').attr('stroke-width', 1).attr('opacity', 1)
 
         // Small dot at the end (optional but helps)
         //g.append('circle').attr('cx', tx).attr('cy', ty).attr('r', 2).attr('fill', '#444')
