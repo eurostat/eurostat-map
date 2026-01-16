@@ -15,47 +15,67 @@
         <script src="../../../build/eurostatmap.js"></script>
         <script src="../../data/nuts2.js"></script>
         <script>
-        
             const map = eurostatmap
                 .map('trivariateChoropleth')
-                .title('Age Structure')
-                .nutsLevel(3)
+                .title('Employment by education level')
+                .subtitle('Share of employed people, 2023')
+                .nutsLevel(0)
                 .ternarySettings({
-                    hue: 160,
-                    chroma: 130,
-                    lightness: 40,
-                    contrast: 0,
-                    spread: 1.5,
+                    hue: 20,
+                    chroma: 110,
+                    lightness: 60,
+                    contrast: 0.4,
+                    spread: 1,
                     breaks: 5,
-                    meanCentering: false,
+                    meanCentering: true,
                 })
                 .stat('v1', {
-                    label: 'Population 15–29',
-                    eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+                    label: 'Low education (ISCED 0–2)',
+                    eurostatDatasetCode: 'lfsi_educ_a',
+                    filters: {
+                        unit: 'PC_EMP',
+                        isced11: 'ED0-2',
+                        sex: 'T',
+                        age: 'Y20-64',
+                        time: 2023,
+                    },
                     unitText: '%',
                 })
+
                 .stat('v2', {
-                    label: 'Population 45–64',
-                    eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
+                    label: 'Medium education (ISCED 3–4)',
+                    eurostatDatasetCode: 'lfsi_educ_a',
+                    filters: {
+                        unit: 'PC_EMP',
+                        isced11: 'ED3_4',
+                        sex: 'T',
+                        age: 'Y20-64',
+                        time: 2023,
+                    },
                     unitText: '%',
                 })
+
                 .stat('v3', {
-                    label: 'Population 75+',
-                    eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
+                    label: 'High education (ISCED 5–8)',
+                    eurostatDatasetCode: 'lfsi_educ_a',
+                    filters: {
+                        unit: 'PC_EMP',
+                        isced11: 'ED5-8',
+                        sex: 'T',
+                        age: 'Y20-64',
+                        time: 2023,
+                    },
                     unitText: '%',
                 })
                 .legend({
-                    title: 'Age Structure',
+                    title: 'Education level',
                     x: 520,
                     y: 10,
                     boxOpacity: 0.9,
                     width: 250,
                     height: 250,
-                    labels: ['⟵ 15–29 ', '⟵ 45–64', '75+ ⟶'],
-                    labelPosition: 'edge',
+                    labels: ['Low', 'Medium', 'High'],
+                    labelPosition: 'corner',
                     padding: { top: 10, right: 30, bottom: 10, left: 30 },
                     showLines: true,
                     showCenter: true,

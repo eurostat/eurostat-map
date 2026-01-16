@@ -123,7 +123,7 @@ export const legend = function (map, config = {}) {
                     map._tooltip?.mouseout()
                 },
             },
-            legendTriangleHandlers: {
+            triangleHandlers: {
                 mouseover: (_, color) => {
                     const sel = select(_.currentTarget)
                     sel.attr('stroke-width', 2).attr('stroke', 'red').raise()

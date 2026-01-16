@@ -393,7 +393,7 @@ export class TricoloreViz {
             const labelPositions = [
                 [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14], // p1
                 [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14], // p2
-                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 25], // p3
+                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 30], // p3
             ]
 
             const rotateValues = [-60, 60, 0]
@@ -403,7 +403,7 @@ export class TricoloreViz {
                     .append('text')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])
-                    .attr('class', 'em-axis-label')
+                    .attr('class', 'em-axis-label em-legend-label em-ternary-legend-label')
                     .attr('text-anchor', 'middle')
                     .attr('dominant-baseline', 'middle')
                     .attr('transform', `rotate(${rotateValues[i]},${labelPositions[i][0]},${labelPositions[i][1]})`)
@@ -420,7 +420,7 @@ export class TricoloreViz {
             labels.forEach((label, i) => {
                 this.legend
                     .append('text')
-                    .attr('class', 'em-legend-label em-ternary-legend-label')
+                    .attr('class', 'em-axis-label em-legend-label em-ternary-legend-label')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])
                     .attr('text-anchor', 'middle')
@@ -452,10 +452,9 @@ export class TricoloreViz {
                 .attr('y1', y1)
                 .attr('x2', x2)
                 .attr('y2', y2)
-                .attr('stroke', colorTarget === 'triangles' ? 'white' : '#555')
-                .attr('stroke-width', major ? 0.6 : 0.3)
+                .attr('stroke', colorTarget === 'triangles' ? '#555' : '#555')
+                .attr('stroke-width', major ? 0.9 : 0.2)
                 .attr('opacity', major ? 0.7 : 0.25)
-                .attr('stroke-dasharray', major ? null : '2,2')
                 .attr('class', major ? 'em-ternary-grid-line' : 'em-ternary-grid-line-minor')
         }
 
@@ -654,9 +653,9 @@ export class TricoloreViz {
         g.append('path')
             .attr('d', path)
             .attr('fill', 'none')
-            .attr('stroke', '#444')
-            .attr('stroke-width', 0.8)
-            .attr('opacity', 0.8)
+            .attr('stroke', '#2e2e2e')
+            .attr('stroke-width', 1)
+            .attr('opacity', 1)
 
         // Small dot at the end (optional but helps)
         //g.append('circle').attr('cx', tx).attr('cy', ty).attr('r', 2).attr('fill', '#444')

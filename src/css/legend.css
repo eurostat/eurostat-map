@@ -158,13 +158,17 @@
     opacity: 0.3;
     stroke-width: 0.5;
 }
+.em-ternary-grid-line,
+.em-ternary-grid-line-minor {
+    pointer-events: none;
+}
 .em-ternary-center-line {
     stroke-dasharray: 4 2;
 }
-.em-ternary-legend-data-point, .em-ternary-discrete-polygon {
+.em-ternary-legend-data-point,
+.em-ternary-discrete-polygon {
     cursor: pointer;
 }
-
 .em-ternary-discrete-polygon {
     transition: fill 150ms;
 }

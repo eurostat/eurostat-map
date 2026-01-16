@@ -15,47 +15,59 @@
         <script src="../../../build/eurostatmap.js"></script>
         <script src="../../data/nuts2.js"></script>
         <script>
-        
+            //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lan_lcv_ovw?format=JSON&unit=PC&landcover=A00&lang=EN
             const map = eurostatmap
                 .map('trivariateChoropleth')
-                .title('Age Structure')
-                .nutsLevel(3)
+                .title('Land Cover')
+                .subtitle('')
+                .nutsLevel(2)
                 .ternarySettings({
-                    hue: 160,
-                    chroma: 130,
-                    lightness: 40,
-                    contrast: 0,
-                    spread: 1.5,
+                    hue: 20,
+                    chroma: 110,
+                    lightness: 60,
+                    contrast: 0.4,
+                    spread: 1,
                     breaks: 5,
-                    meanCentering: false,
+                    meanCentering: true,
                 })
                 .stat('v1', {
-                    label: 'Population 15–29',
-                    eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+                    label: 'Artificial',
+                    eurostatDatasetCode: 'lan_lcv_ovw',
+                    filters: {
+                        unit: 'PC',
+                        landcover: 'A00',
+                    },
                     unitText: '%',
                 })
+
                 .stat('v2', {
-                    label: 'Population 45–64',
-                    eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
+                    label: 'Cropland',
+                    eurostatDatasetCode: 'lan_lcv_ovw',
+                    filters: {
+                        unit: 'PC',
+                        landcover: 'B00',
+                    },
                     unitText: '%',
                 })
+
                 .stat('v3', {
-                    label: 'Population 75+',
-                    eurostatDatasetCode: 'demo_r_pjanind3',
-                    filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
+                    label: 'Woodland',
+                    eurostatDatasetCode: 'lan_lcv_ovw',
+                    filters: {
+                        unit: 'PC',
+                        landcover: 'C00',
+                    },
                     unitText: '%',
                 })
                 .legend({
-                    title: 'Age Structure',
+                    title: 'Land Cover',
                     x: 520,
                     y: 10,
                     boxOpacity: 0.9,
                     width: 250,
                     height: 250,
-                    labels: ['⟵ 15–29 ', '⟵ 45–64', '75+ ⟶'],
-                    labelPosition: 'edge',
+                    labels: ['Artificial', 'Cropland', 'Woodland'],
+                    labelPosition: 'corner',
                     padding: { top: 10, right: 30, bottom: 10, left: 30 },
                     showLines: true,
                     showCenter: true,
