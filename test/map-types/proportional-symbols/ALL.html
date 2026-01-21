@@ -88,6 +88,7 @@
             // Get the path string (HTML string for the SVG path)
             let pathString = path.toString()
 
+            // MAP 1
             eurostatmap
                 .map('proportionalSymbol')
                 .svgId('map1')
@@ -114,27 +115,26 @@
                 .psStroke('black')
                 .psStrokeWidth('1')
                 .psOffset({ x: -5, y: -10 })
-                .tooltipShowFlags('long')
-                .hoverColor('cyan')
                 .legend({
                     x: 530,
                     y: 20,
                     boxPadding: 15,
                     sizeLegend: {
                         title: 'Total organic arable land (HA)',
-                        cellNb: 3,
+                        titlePadding: 0,
+                        values: [1200000, 100000],
                         labelFormatter: d3.format(',.2r'),
                         shapeOffsets: { x: 0, y: 0 },
                         labelOffsets: { x: 40, y: 0 },
                     },
                     colorLegend: {
-                        title: '% of total utilised agricultural area',
-                        marginTop: 90,
+                        title: 'Share of total',
+                        marginTop: 30,
                     },
                 })
                 .build()
 
-            // tractors
+            // MAP 2
             eurostatmap
                 .map('proportionalSymbol')
                 .svgId('tractorMap')
@@ -153,35 +153,35 @@
                 })
                 .psShape('custom')
                 .psCustomSVG(euSVG)
-                .psMaxSize(4)
+                .psMaxSize(7)
                 .psMinSize(1)
                 .psOffset({ x: -5, y: -10 })
                 .psColorFun(d3.interpolateGreens)
                 .psClasses(6)
                 .psStroke('black')
                 .psStrokeWidth('1')
-                .tooltipShowFlags('long')
-                .hoverColor('cyan')
                 .legend({
                     x: 530,
                     y: 10,
                     boxPadding: 15,
                     sizeLegend: {
                         title: 'Total organic arable land (HA)',
-                        cellNb: 3,
+                        titlePadding: 30,
                         labelFormatter: d3.format(',.2r'),
-                        shapeOffsets: { x: 0, y: -10 },
                         labelOffsets: { x: 50, y: -30 },
+                        values: [1200000, 100000],
+                        shapeStroke: 'black',
+                        shapeStrokeWidth: '4',
                     },
                     colorLegend: {
-                        title: '% of total utilised agricultural area',
-                        marginTop: 90,
+                        title: 'Share of total',
+                        marginTop: 30,
                     },
                     legendSpacing: 80,
                 })
                 .build()
 
-            // tourism
+            // BIVARIATE
             eurostatmap
                 .map('proportionalSymbol')
                 .svgId('map2')
@@ -223,20 +223,26 @@
                         cellNb: 3,
                         labelFormatter: d3.format('.2s'),
                         shapeStroke: 'black',
+                        values: [70000000, 1000000],
                     },
                     colorLegend: {
                         title: '% change compared to 2019',
-                        marginTop: 80,
+                        marginTop: 30,
                     },
                 })
                 .build()
 
-            // vertical bars
+            // SPIKES
+            const compactNumber = new Intl.NumberFormat('en', {
+                notation: 'compact',
+                compactDisplay: 'short',
+                maximumFractionDigits: 1,
+            }).format
             eurostatmap
                 .map('proportionalSymbol')
-                .title('Population & population density, 2019')
+                .title('Population density, 2019')
                 .svgId('map3')
-                .nutsLevel(0)
+                .nutsLevel(3)
                 .stat('size', {
                     eurostatDatasetCode: 'demo_r_pjangrp3',
                     filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2019' },
@@ -245,8 +251,8 @@
                 .stat('color', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
                 .psShape('spike') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
                 .psFill('grey')
-                .psMaxSize(70)
-                .psBarWidth(20)
+                .psMinSize(1)
+                .psMaxSize(100)
                 .psFillOpacity(1)
                 .psStroke('black')
                 .psStrokeWidth('1')
@@ -257,13 +263,13 @@
                     boxPadding: 10,
                     sizeLegend: {
                         title: 'Total population',
-                        cellNb: 3,
-                        labelFormatter: d3.format(',.2r'),
+                        labelFormatter: compactNumber,
                         titlePadding: 20,
+
                     },
                     colorLegend: {
                         title: 'Inhabitants per km²',
-                        marginTop: 60,
+                        marginTop: 35,
                     },
                 })
                 .build()

@@ -1,4 +1,4 @@
-import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
+
 import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'

@@ -1,4 +1,5 @@
 import { createSqrtScale, createLinearScale } from "../../core/scale.js";
+import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 
 /**
  * @description defines classifier functions (out.classifierColor and out.classifierSize) for both symbol size and color

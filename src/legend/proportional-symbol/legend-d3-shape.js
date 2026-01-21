@@ -1,4 +1,5 @@
 import { symbolsLibrary } from '../../map-types/proportional-symbol/map-proportional-symbols'
+import { symbol } from 'd3-shape'
 
 /**
  * @description returns the d3.symbol object chosen by the user
@@ -39,9 +40,7 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
 
     // Initialize running Y cursor for stacking
     if (out.sizeLegend._cursorY == null) {
-        out.sizeLegend._cursorY =
-            out.boxPadding +
-            (out.sizeLegend.title ? out.titleFontSize + out.sizeLegend.titlePadding : 0)
+        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
     }
 
     const maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
@@ -51,35 +50,43 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
     // Container for symbol + label
     const itemContainer = out._sizeLegendContainer
         .append('g')
-        .attr('transform', `translate(${x},${y})`)
         .attr('class', 'em-size-legend-item')
+        .attr('transform', `translate(${x},${y})`)
 
-    // Draw D3 symbol
+    // --- Draw D3 symbol ---
     const shape = getShape(out)
     const d = shape.size(symbolSize * symbolSize)()
 
-    itemContainer
+    const symbolGroup = itemContainer
         .append('g')
-        .style('fill', (d) => (map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_))
+        .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
         .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psStroke())
-        .style('stroke-width', map.psStrokeWidth())
+        .style('stroke', out.sizeLegend.shapeStroke || map.psStroke())
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+
+    const symbolPath = symbolGroup
         .append('path')
         .attr('d', d)
-        .attr('transform', () => `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y})`)
 
-    // Label position
+    // hift symbol down by half its height (baseline-align it)
+    const symBBox = symbolPath.node().getBBox()
+    symbolPath.attr(
+        'transform',
+        `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y + symBBox.height / 2})`
+    )
+
+    // --- Label ---
     const labelX = maxSize / 2 + out.sizeLegend.labelOffsets.x + out.boxPadding
 
     itemContainer
         .append('text')
         .attr('class', 'em-legend-label')
-        .attr('dy', '0.35em') // ~vertical centering
+        .attr('dy', '0.35em')
         .attr('x', labelX)
-        .attr('y', 0)
+        .attr('y', symBBox.height / 2)
         .text(labelFormatter(value))
 
-    // Measure actual height and advance the stacking cursor
+    // --- Advance cursor using final rendered height ---
     const hb = itemContainer.node().getBBox().height
     out.sizeLegend._cursorY += hb + out.sizeLegend.shapePadding
 }

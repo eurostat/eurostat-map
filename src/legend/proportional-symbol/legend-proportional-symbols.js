@@ -20,10 +20,11 @@ export const legend = function (map, config) {
         titlePadding: 15, //padding between title and legend body
         values: undefined, //manually define raw data values
         cellNb: 3, //number of elements in the legend
-        shapePadding: 5, //the y distance between consecutive legend shape elements
+        shapePadding: 15, //the y distance between consecutive legend shape elements
         shapeOffsets: { x: 0, y: 0 },
         shapeFill: 'white',
         shapeStroke: null,
+        shapeStrokeWidth: null,
         labelOffsets: { x: 10, y: 0 }, //the distance between the legend box elements to the corresponding text label
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,

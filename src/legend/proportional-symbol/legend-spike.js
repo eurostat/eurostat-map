@@ -25,7 +25,7 @@ export function buildSpikeLegend(out) {
         // append title to the legend
         container
             .append('text')
-            .attr('class', 'em-size-legend-title')
+            .attr('class','em-legend-title em-spike-legend-title')
             .attr('id', 'em-size-legend-title')
             .attr('x', 0)
             .attr('y', sizeLegendTitleFontSize)
