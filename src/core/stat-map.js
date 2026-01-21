@@ -1,12 +1,19 @@
-import { applyInlineStylesFromCSS, flags, serialize, rasterize, getDownloadURL, executeForAllInsets, applyComputedStylesToSVG, ensureSvgSize } from './utils'
+import {
+    applyInlineStylesFromCSS,
+    flags,
+    serialize,
+    rasterize,
+    getDownloadURL,
+    executeForAllInsets,
+    applyComputedStylesToSVG,
+    ensureSvgSize,
+} from './utils'
 import * as MapTemplate from './map-template'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
 import { hideSpinner, showSpinner } from './spinner'
-
-let _renderScheduled = false;
 
 /**
  * An abstract statistical map: A map template with statistical data, without any particular styling rule.
@@ -17,7 +24,9 @@ export const statMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
     const out = MapTemplate.mapTemplate(config, withCenterPoints, mapType)
 
-    //statistical data
+    // render scheduling flag
+    let _renderScheduled = false
+    out._loadingStatCount_ = 0
 
     //the statistical data configuration.
     //A map can have several stat datasets. This is a dictionary of all stat configuration
@@ -78,22 +87,22 @@ export const statMap = function (config, withCenterPoints, mapType) {
     //legend object
     out.legendObj_ = undefined
 
-        /**
-         * Definition of getters/setters for all previously defined attributes.
-         * Each method follow the same pattern:
-         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-         *  - To get the attribute value, call the method without argument.
-         *  - To set the attribute value, call the same method with the new value as single argument.
-         */
-        ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'callback_'].forEach(
-            function (att) {
-                out[att.substring(0, att.length - 1)] = function (v) {
-                    if (!arguments.length) return out[att]
-                    out[att] = v
-                    return out
-                }
+    /**
+     * Definition of getters/setters for all previously defined attributes.
+     * Each method follow the same pattern:
+     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+     *  - To get the attribute value, call the method without argument.
+     *  - To set the attribute value, call the same method with the new value as single argument.
+     */
+    ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'callback_'].forEach(
+        function (att) {
+            out[att.substring(0, att.length - 1)] = function (v) {
+                if (!arguments.length) return out[att]
+                out[att] = v
+                return out
             }
-        )
+        }
+    )
 
     //override attribute values with config values
     if (config) for (let key in config) if (out[key] && config[key] != undefined) out[key](config[key])
@@ -166,14 +175,23 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     out.updateLoader = () => {
-        if (out.isInset || !out._wrapper_) return;
+        if (out.isInset) return
 
-        if (out._loadingGeo_ || out._loadingStat_) {
-            showSpinner(out._wrapper_, 'Loading…');
-        } else {
-            hideSpinner(out._wrapper_);
+        // 🛠 Ensure wrapper exists (lazy creation)
+        if (!out._wrapper_) {
+            const svg = out.svg?.()
+            if (!svg || svg.empty()) return
+            out._wrapper_ = svg.node().parentNode?.classList?.contains('em-map-wrapper') ? svg.node().parentNode : null
         }
-    };
+
+        if (!out._wrapper_) return
+
+        if (out._loadingGeo_ || out._loadingStatCount_ > 0) {
+            showSpinner(out._wrapper_, 'Loading…')
+        } else {
+            hideSpinner(out._wrapper_)
+        }
+    }
 
     out.buildLegend = function () {
         //create legend object
@@ -215,71 +233,67 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * This method should be called after attributes related to the map geometries have changed, to retrieve this new data and refresh the map.
      */
     out.updateGeoData = function () {
-        out._loadingGeo_ = true;
-        out.updateLoader();
+        out._loadingGeo_ = true
+        out.updateLoader()
 
         out.updateGeoMapTemplate(() => {
-            out._loadingGeo_ = false;
-            out.updateLoader();
-            if (!isStatDataReady()) return;
-            if (_renderScheduled) return;
+            out._loadingGeo_ = false
+            out.updateLoader()
 
-            _renderScheduled = true;
-            Promise.resolve().then(() => {
-                _renderScheduled = false;
-                out.updateStatValues();
-                if (out.callback()) out.callback()(out);
-            });
-        });
+            if (!isStatDataReady()) return
 
-        return out;
-    };
+            out.updateStatValues()
+            if (out.callback()) out.callback()(out)
+        })
+
+        return out
+    }
 
     /**
      * Launch map geo stat datasets retrieval, and make/update the map once received.
      * This method should be called after specifications on the stat data sources attached to the map have changed, to retrieve this new data and refresh the map.
      */
     out.updateStatData = function () {
-
-        const willLoadStats = hasRemoteStatData();
-
-        if (willLoadStats) {
-            out._loadingStat_ = true;
-            out.updateLoader();
-        }
-
-
         for (let statKey in out.stat_) {
             const config = out.stat(statKey)
             const manualData = out.statData(statKey).get?.()
 
-            // Skip if neither stat config nor manual data
             if (!config && !manualData) continue
 
-            // If there's a config, build the statData object (or replace existing)
             if (config) {
                 const statData = StatisticalData.statData(config)
                 out.statData(statKey, statData)
 
-                // Launch remote retrieval
+                // detect remote on statData, not config
+                const isRemote = !!statData.eurostatDatasetCode_ || !!statData.csvURL_
+
+                if (isRemote) {
+                    out._loadingStatCount_++
+                    out.updateLoader()
+                }
+
                 let nl = out.nutsLevel_
                 if (nl === 'mixed') nl = 0
 
                 statData.retrieveFromRemote(nl, out.language(), () => {
-                    if (!out.Geometries.isGeoReady()) return;
-                    if (!isStatDataReady()) return;
-                    if (_renderScheduled) return;
-                    _renderScheduled = true;
-                    Promise.resolve().then(() => {
-                        // stats loaded
-                        out._loadingStat_ = false;
-                        out.updateLoader();
+                    // bookkeeping MUST always run
+                    if (isRemote) {
+                        out._loadingStatCount_ = Math.max(0, out._loadingStatCount_ - 1)
+                        out.updateLoader()
+                    }
 
-                        _renderScheduled = false;
-                        out.updateStatValues();
-                        if (out.callback()) out.callback()(out);
-                    });
-                });
+                    if (!out.Geometries.isGeoReady()) return
+                    if (!isStatDataReady()) return
+
+                    if (_renderScheduled) return
+
+                    _renderScheduled = true
+                    Promise.resolve().then(() => {
+                        _renderScheduled = false
+                        out.updateStatValues()
+                        if (out.callback()) out.callback()(out)
+                    })
+                })
             }
         }
 
@@ -288,16 +302,16 @@ export const statMap = function (config, withCenterPoints, mapType) {
 
     const hasRemoteStatData = function () {
         for (const key in out.stat_) {
-            const cfg = out.stat_[key];
-            if (!cfg) continue;
+            const cfg = out.stat_[key]
+            if (!cfg) continue
 
             // remote stats if eurostat or csv
             if (cfg.eurostatDatasetCode_ || cfg.csvURL_) {
-                return true;
+                return true
             }
         }
-        return false;
-    };
+        return false
+    }
 
     /**
      * Make/update the map with new stat data.
@@ -405,10 +419,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
         // Temporarily append the clone to the document to compute styles
         document.body.appendChild(svgNodeClone)
 
-        // inline the actual computed styles 
-        applyComputedStylesToSVG(svgNodeClone);
+        // inline the actual computed styles
+        applyComputedStylesToSVG(svgNodeClone)
         //set explicit width / height / viewBox for reliable export
-        ensureSvgSize(svgNodeClone);
+        ensureSvgSize(svgNodeClone)
 
         // Remove the cloned SVG from the document after applying styles
         document.body.removeChild(svgNodeClone)
@@ -433,124 +447,132 @@ export const statMap = function (config, withCenterPoints, mapType) {
      */
     out.exportMapToPNG = async function (width, height) {
         // Clone original SVG
-        const svgNodeClone = out.svg_.node().cloneNode(true);
+        const svgNodeClone = out.svg_.node().cloneNode(true)
 
         // Ensure xml namespaces
-        if (!svgNodeClone.hasAttribute('xmlns')) svgNodeClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-        if (!svgNodeClone.hasAttribute('xmlns:xlink')) svgNodeClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+        if (!svgNodeClone.hasAttribute('xmlns')) svgNodeClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+        if (!svgNodeClone.hasAttribute('xmlns:xlink')) svgNodeClone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
 
         // Append clone so getComputedStyle & fonts resolve correctly
-        document.body.appendChild(svgNodeClone);
+        document.body.appendChild(svgNodeClone)
 
         // Wait for webfonts (if any) to load
         if (document.fonts && document.fonts.ready) {
-            try { await document.fonts.ready; } catch (e) { console.warn('document.fonts.ready failed', e); }
+            try {
+                await document.fonts.ready
+            } catch (e) {
+                console.warn('document.fonts.ready failed', e)
+            }
         }
 
         // Inline computed styles and set explicit size/viewBox (must run while clone is in DOM)
-        applyComputedStylesToSVG(svgNodeClone);
-        ensureSvgSize(svgNodeClone);
+        applyComputedStylesToSVG(svgNodeClone)
+        ensureSvgSize(svgNodeClone)
 
         // Insert white background rect as first child if none present
         if (!svgNodeClone.querySelector('rect[data-export-background]')) {
-            const w = svgNodeClone.getAttribute('width') || svgNodeClone.viewBox.baseVal.width || svgNodeClone.getBoundingClientRect().width;
-            const h = svgNodeClone.getAttribute('height') || svgNodeClone.viewBox.baseVal.height || svgNodeClone.getBoundingClientRect().height;
-            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            bg.setAttribute('x', 0);
-            bg.setAttribute('y', 0);
-            bg.setAttribute('width', String(w));
-            bg.setAttribute('height', String(h));
-            bg.setAttribute('fill', '#ffffff');
-            bg.setAttribute('data-export-background', 'true');
-            svgNodeClone.insertBefore(bg, svgNodeClone.firstElementChild);
+            const w = svgNodeClone.getAttribute('width') || svgNodeClone.viewBox.baseVal.width || svgNodeClone.getBoundingClientRect().width
+            const h = svgNodeClone.getAttribute('height') || svgNodeClone.viewBox.baseVal.height || svgNodeClone.getBoundingClientRect().height
+            const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+            bg.setAttribute('x', 0)
+            bg.setAttribute('y', 0)
+            bg.setAttribute('width', String(w))
+            bg.setAttribute('height', String(h))
+            bg.setAttribute('fill', '#ffffff')
+            bg.setAttribute('data-export-background', 'true')
+            svgNodeClone.insertBefore(bg, svgNodeClone.firstElementChild)
         }
 
         // Serialize while still in DOM
-        const serializer = new XMLSerializer();
-        const svgString = serializer.serializeToString(svgNodeClone);
+        const serializer = new XMLSerializer()
+        const svgString = serializer.serializeToString(svgNodeClone)
 
         // Remove clone from DOM now
-        document.body.removeChild(svgNodeClone);
+        document.body.removeChild(svgNodeClone)
 
         // Create blob URL
-        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-        const url = URL.createObjectURL(svgBlob);
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+        const url = URL.createObjectURL(svgBlob)
 
         // Determine pixel dimensions
-        const w = Math.round(width || parseFloat(svgNodeClone.getAttribute('width')) || 800);
-        const h = Math.round(height || parseFloat(svgNodeClone.getAttribute('height')) || 600);
+        const w = Math.round(width || parseFloat(svgNodeClone.getAttribute('width')) || 800)
+        const h = Math.round(height || parseFloat(svgNodeClone.getAttribute('height')) || 600)
 
         // Create image and set crossOrigin (best-effort)
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
 
         // Helper to revoke and cleanup
         const cleanup = (pngUrl) => {
-            try { URL.revokeObjectURL(url); } catch (e) { }
+            try {
+                URL.revokeObjectURL(url)
+            } catch (e) {}
             if (pngUrl) {
-                try { URL.revokeObjectURL(pngUrl); } catch (e) { }
+                try {
+                    URL.revokeObjectURL(pngUrl)
+                } catch (e) {}
             }
-        };
+        }
 
         img.onload = function () {
             try {
-                const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
+                const canvas = document.createElement('canvas')
+                canvas.width = w
+                canvas.height = h
+                const ctx = canvas.getContext('2d')
 
                 // Fill white background to avoid transparent -> black in some viewers
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = '#ffffff'
+                ctx.fillRect(0, 0, w, h)
 
-                ctx.drawImage(img, 0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h)
 
                 canvas.toBlob(function (pngBlob) {
                     if (!pngBlob) {
-                        console.error('canvas.toBlob returned null — likely CORS/taint issue.');
+                        console.error('canvas.toBlob returned null — likely CORS/taint issue.')
                         // open the serialized SVG for debugging
-                        const debugWin = window.open();
-                        debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>');
-                        cleanup();
-                        return;
+                        const debugWin = window.open()
+                        debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>')
+                        cleanup()
+                        return
                     }
 
-                    const pngUrl = URL.createObjectURL(pngBlob);
-                    const a = document.createElement('a');
-                    a.href = pngUrl;
-                    a.download = 'eurostat-map.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
+                    const pngUrl = URL.createObjectURL(pngBlob)
+                    const a = document.createElement('a')
+                    a.href = pngUrl
+                    a.download = 'eurostat-map.png'
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
 
-                    cleanup(pngUrl);
-                }, 'image/png');
+                    cleanup(pngUrl)
+                }, 'image/png')
             } catch (err) {
-                console.error('Error drawing SVG to canvas:', err);
+                console.error('Error drawing SVG to canvas:', err)
                 // open serialized SVG for debugging
-                const debugWin = window.open();
-                debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>');
-                cleanup();
+                const debugWin = window.open()
+                debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>')
+                cleanup()
             }
-        };
+        }
 
         img.onerror = function (err) {
-            console.error('Image failed to load for export. Likely CORS or invalid SVG. Error:', err);
+            console.error('Image failed to load for export. Likely CORS or invalid SVG. Error:', err)
             // open serialized SVG for debugging
-            const debugWin = window.open();
-            debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>');
-            cleanup();
-        };
+            const debugWin = window.open()
+            debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>')
+            cleanup()
+        }
 
         // start loading
-        img.src = url;
+        img.src = url
 
-        return out;
-    };
+        return out
+    }
 
     // small helper to escape HTML for debug window
     function escapeHtml(str) {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     }
 
     return out

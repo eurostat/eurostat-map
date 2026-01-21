@@ -411,6 +411,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
      * Requests geographic data and then builds the map template
      */
     out.updateGeoMapTemplate = function (callback) {
+        if (!callback) console.warn('⚠️ map.updateGeoMapTemplate called without callback function!')
         // Erase previous data
         out.Geometries.defaultGeoData = null
         out.Geometries.allNUTSGeoData = null
@@ -747,7 +748,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
         // Project and save coordinates
         // Before filtering
-        // console.log(map.geo_, centroidFeatures)
         const projectedCentroids = centroidFeatures.map((d) => {
             const coords = map._projection(d.geometry.coordinates)
             d.properties.centroid = coords

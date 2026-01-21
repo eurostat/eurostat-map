@@ -17,7 +17,10 @@
             <option value="tourism">Tourism</option>
         </select>
         <br />
-        <svg id="map"></svg>
+        <div style="display: flex">
+            <div><svg id="map"></svg></div>
+            <div style="padding-left: 10px"><svg id="legend" height="400"></svg></div>
+        </div>
 
         <svg id="inset1"></svg>
         <svg id="inset2" x="200" y="500"></svg>
@@ -40,7 +43,7 @@
                     },
                     timeParameter: 'month',
                     times: ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12'],
-                    timeLabels: ['jan', 'feb', 'march', 'apr', 'may', 'june', 'july', 'august', 'sept', 'oct', 'nov', 'dec'],
+                    timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                     categoryParameter: 'c_resid',
                     categoryCodes: ['DOM', 'FOR'],
                     categoryLabels: ['Domestic', 'Foreign'],
@@ -48,20 +51,18 @@
                     totalCode: 'TOTAL',
                 })
                 .coxcombMinRadius(5)
-                .coxcombMaxRadius(20)
+                .coxcombMaxRadius(37)
                 .transitionDuration(2000)
                 .legend({
+                    svgId: 'legend',
+                    title: 'Nights spent',
                     x: 50,
                     y: 120,
-                    boxOpacity: 1,
-                    boxPadding: 7,
-                    titleFontWeight: 'bold',
+                    colorLegend: { title: 'Type', marginTop: 50, noData: false },
+                    timeLegend: { title: 'Month', marginTop: -30 },
                 })
-                .insets([
-                    { geo: 'MT', svgId: 'inset1' },
-                    { geo: 'GP', svgId: 'inset2' },
-                ])
-                .insetBoxPosition([540, 20])
+                .insets('default')
+                .insetBoxPosition([575, 10])
                 .zoomExtent([1, 10])
             map.build()
         </script>

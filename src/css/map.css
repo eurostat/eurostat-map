@@ -19,6 +19,7 @@
 /* General text settings */
 text {
     pointer-events: none;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 a text {

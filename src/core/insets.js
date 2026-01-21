@@ -5,15 +5,20 @@ import { mapTemplate } from './map-template'
  * Build inset maps for a map template
  */
 export const buildInsets = function (out, withCenterPoints, mapType) {
+        // Early return if no insets to build
+    if (!out.insets_ || out.insets_.length === 0) {
+        return out
+    }
+
+    
     if (!out.insetBoxPosition_) {
         out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_]
     }
 
-
-    // add container to drawing group
-    // Cannot read properties of undefined (reading 'svgId')
     let svg = select('#' + out.svgId_)
     let drawingGroup = svg.select('#em-drawing-' + out.svgId_)
+    
+    
     const insetsGroup = drawingGroup
         .append('g')
         .attr('id', 'em-insets-group')
@@ -21,19 +26,19 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
         .attr('transform', 'translate(' + out.insetBoxPosition_[0] + ',' + out.insetBoxPosition_[1] + ')')
 
     if (out.insets_ === 'default') {
-        //if needed, use default inset config
         out.insets_ = defaultInsetConfig(out.insetBoxWidth_, out.insetBoxPadding_)
     }
 
-    // append each inset to map
+
     for (let i = 0; i < out.insets_.length; i++) {
         const config = out.insets_[i]
+        
         config.svgId = config.svgId || 'inset' + config.geo + Math.random().toString(36).substring(7)
 
-        //get svg element.
         let svg = select('#' + config.svgId)
+
+
         if (svg.size() == 0) {
-            // Create it as an embeded SVG if it does not exist
             const x = config.x == undefined ? out.insetBoxPadding_ : config.x
             const y = config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
             const ggeo = insetsGroup
@@ -44,10 +49,8 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
             ggeo.append('svg').attr('id', config.svgId)
         }
 
-        // build inset
-        // GISCO-2676 - PT azores inset has 2 insets with the same Geo, so second was overriding first:
+        
         if (out.insetTemplates_[config.geo]) {
-            //if inset already exists in map with same geo, then push both to an array
             let inset = buildInset(config, out, withCenterPoints, mapType)
             inset.buildMapTemplateBase()
             out.insetTemplates_[config.geo] = [out.insetTemplates_[config.geo], inset]
@@ -57,10 +60,9 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
             out.insetTemplates_[config.geo] = drawnInset
         }
     }
-
+    
     return out
 }
-
 /** Build template for inset, based on main one */
 const buildInset = function (config, out, withCenterPoints, mapType) {
     //TODO find a better way to do that
@@ -83,7 +85,7 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     config.height = config.height || out.insetBoxWidth_
     config.insets = config.insets || []
     config.insetTemplates = config.insetTemplates || {}
-    config.callback = config.callback || undefined
+    config.callback = config.callback || out.callback_
 
         //copy main map attributes
         ;[

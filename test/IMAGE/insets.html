@@ -23,30 +23,24 @@
             #subtitleLI {
                 fill: #4c4b4b !important;
             }
-            /* titleLI is actually the Liechtenstein halo. subtitleLI acts as the title */
             #titleLI {
                 fill: white !important;
                 stroke-width: 2px !important;
                 stroke: white !important;
                 opacity: 0.8 !important;
             }
-
-            /* Apply frame stroke to PT20 apart from main one (index8) */
             #em-frame-PT20 {
                 stroke-width: 0.2px;
             }
             g[index='8'] #em-frame-PT20 {
                 stroke-width: 0px !important;
             }
-
-            /* Apply frame stroke to GP apart from main one (index1) */
             #em-frame-GP {
                 stroke-width: 0.2px;
             }
             g[index='1'] #em-frame-GP {
                 stroke-width: 0px !important;
             }
-
             .em-scalebar-label {
                 font-size: 8px !important;
                 fill: #878787 !important;
@@ -54,62 +48,60 @@
             .em-scalebar-line {
                 stroke: #878787 !important;
             }
+            .em-inset-title,
+            .em-inset-subtitle,
+            #subtitleLI {
+                fill: #676767 !important;
+            }
+
+            button {
+                margin: 10px;
+                padding: 10px 20px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            #log {
+                font-family: monospace;
+                background: #f0f0f0;
+                padding: 10px;
+                margin: 10px;
+                max-height: 200px;
+                overflow-y: auto;
+                font-size: 12px;
+            }
         </style>
     </head>
 
     <body>
+        <h1>Eurostat-map Insets Callback Test</h1>
+        <div>
+            <button id="btn-build1">Build Map 1</button>
+            <button id="btn-build2">Build Map 2</button>
+            <button id="btn-clear">Clear Map</button>
+        </div>
+        <div id="log"></div>
+
         <div style="margin-left: 1%">
             <svg id="container" width="1800" height="800">
-                <svg id="mappy"></svg>
-                <!-- insets -->
-                <svg id="newInsets">
-                    <svg id="inset0" width="80" height="80" y="650" x="0"></svg>
-                    <svg id="inset1" y="650" x="80"></svg>
-                    <svg id="inset2" y="667" x="80"></svg>
-                    <svg id="inset3" y="650" x="160"></svg>
-                    <svg id="inset4" y="650" x="350"></svg>
-                    <svg id="inset5" y="650" x="440"></svg>
-                    <svg id="inset6" y="650" x="530"></svg>
-                    <svg id="inset7" y="650" x="620"></svg>
-                    <svg id="inset8" y="650" x="710"></svg>
-                    <svg id="inset9" y="650" x="800"></svg>
-                    <svg id="inset10" y="650" x="890"></svg>
-                    <svg id="inset11" y="650" x="980"></svg>
-                    <svg id="inset12" y="650" x="1070"></svg>
-                    <svg id="inset13" y="650" x="1160"></svg>
-                </svg>
+                <g id="mappy"></g>
+                <g id="newInsets"></g>
             </svg>
         </div>
 
         <script src="../../build/eurostatmap.js"></script>
-        <script src="./newInsetsLayout.js"></script>
-        <script src="../data/nuts3.js"></script>
-        <!-- <script src="../configs/insetConfig_ext.js"></script> -->
-        <script src="../data/mixed.js"></script>
+        <script src="./overseas.js"></script>
         <script>
-            let mapWidth = 767
-            let mapHeight = 700
-            const insetsCfg = createOutermostInsetsConfig()
-
-            basemap = function () {
-                return eurostatmap
-                    .map('proportionalSymbol')
-                    .svgId('mappy')
-                    .containerId('container')
-                    .pixelSize(6800)
-                    .width(mapWidth)
-                    .height(mapHeight)
-                    .nutsLevel('mixed')
-                    .insets(insetsCfg)
-                    .insetBoxPosition([500, 20])
-                    .scalebarPosition([420, 560])
-                    .hoverColor('#003E8C')
+            // Logging helper
+            function log(msg) {
+                const logDiv = document.getElementById('log')
+                const time = new Date().toLocaleTimeString()
+                logDiv.innerHTML += `[${time}] ${msg}<br>`
+                logDiv.scrollTop = logDiv.scrollHeight
+                console.log(msg)
             }
 
-            let exampleData1 = {
-                PT200: 100,
-                FRY: 120,
-                TRB: 110,
+            // Test data
+            const exampleData = {
                 AT: 130,
                 BE: 110,
                 BG: 150,
@@ -120,7 +112,6 @@
                 EE: 190,
                 EL: 180,
                 ES: 75,
-                ES30: ':',
                 FI: 150,
                 FR: 140,
                 HR: 130,
@@ -148,11 +139,257 @@
                 MK: 130,
                 AL: 120,
                 TR: 110,
+                PT200: 100,
+                FRY: 120,
+                TRB: 110,
             }
-            let exampleData2 = { ES: 10 }
-            let map = basemap()
-            map.statData().setData(exampleData1)
-            map.build()
+
+            let buildCount = 0
+
+            // Create DOM elements for insets dynamically based on config
+            function createInsetDOMElements(insetsCfg, insetBoxPosition) {
+                const insetsGroup = document.getElementById('newInsets')
+                insetsGroup.innerHTML = '' // Clear previous
+
+                const ns = 'http://www.w3.org/2000/svg'
+                const bx = insetBoxPosition[0]
+                const by = insetBoxPosition[1]
+
+                // Background rect
+                const rect = document.createElementNS(ns, 'rect')
+                rect.setAttribute('id', 'image-insets-background-rect')
+                rect.setAttribute('x', bx)
+                rect.setAttribute('y', by)
+                rect.setAttribute('width', '243')
+                rect.setAttribute('height', '265')
+                rect.setAttribute('fill', 'white')
+                insetsGroup.appendChild(rect)
+
+                // Create <g> elements for each inset
+                insetsCfg.forEach((inset, i) => {
+                    const g = document.createElementNS(ns, 'g')
+                    g.id = inset.svgId
+                    g.setAttribute('index', i)
+                    g.setAttribute('transform', `translate(${inset.x + bx}, ${inset.y + by})`)
+                    insetsGroup.appendChild(g)
+                })
+
+                // Separator lines group
+                const separatorLines = document.createElementNS(ns, 'g')
+                separatorLines.setAttribute('id', 'insets-separator-lines')
+                separatorLines.setAttribute('height', '265px')
+                separatorLines.setAttribute('width', '243px')
+                separatorLines.setAttribute('transform', `translate(${bx}, ${by})`)
+
+                // French inset separators (thin)
+                const thinLines = [
+                    [160, 18, 170, 60],
+                    [170, 60, 152, 92],
+                    [152, 92, 90, 83],
+                    [152, 92, 172, 131],
+                    [172, 131, 171, 184],
+                    [172, 131, 235, 139],
+                    [170, 60, 235, 70],
+                    [66, 213, 66, 254],
+                ]
+                thinLines.forEach(([x1, y1, x2, y2]) => {
+                    const line = document.createElementNS(ns, 'line')
+                    line.setAttribute('x1', x1)
+                    line.setAttribute('y1', y1)
+                    line.setAttribute('x2', x2)
+                    line.setAttribute('y2', y2)
+                    line.setAttribute('style', 'stroke: black; stroke-width: 0.1')
+                    separatorLines.appendChild(line)
+                })
+
+                // Thick separators
+                const thickLines = [
+                    [91, 192, 235, 192],
+                    [10, 192, 78, 192],
+                    [84, 25, 84, 185],
+                    [10, 92, 78, 92],
+                    [117, 213, 117, 254],
+                    [178, 213, 178, 254],
+                ]
+                thickLines.forEach(([x1, y1, x2, y2]) => {
+                    const line = document.createElementNS(ns, 'line')
+                    line.setAttribute('x1', x1)
+                    line.setAttribute('y1', y1)
+                    line.setAttribute('x2', x2)
+                    line.setAttribute('y2', y2)
+                    line.setAttribute('style', 'stroke: black; stroke-width: 0.3')
+                    separatorLines.appendChild(line)
+                })
+
+                insetsGroup.appendChild(separatorLines)
+
+                // Blurs group
+                const blursGroup = document.createElementNS(ns, 'g')
+                blursGroup.setAttribute('id', 'insets-blurs')
+                blursGroup.setAttribute('height', '265px')
+                blursGroup.setAttribute('width', '243px')
+                blursGroup.setAttribute('transform', `translate(${bx}, ${by})`)
+
+                const defs = document.createElementNS(ns, 'defs')
+                const gradients = [
+                    { id: 'gradL', x1: '100%', y1: '100%', x2: '0%', y2: '100%' },
+                    { id: 'gradR', x1: '0%', y1: '100%', x2: '100%', y2: '100%' },
+                    { id: 'gradB', x1: '100%', y1: '0%', x2: '100%', y2: '100%' },
+                    { id: 'gradT', x1: '100%', y1: '100%', x2: '100%', y2: '0%' },
+                ]
+
+                gradients.forEach(({ id, x1, y1, x2, y2 }) => {
+                    const gradient = document.createElementNS(ns, 'linearGradient')
+                    gradient.setAttribute('id', id)
+                    gradient.setAttribute('x1', x1)
+                    gradient.setAttribute('y1', y1)
+                    gradient.setAttribute('x2', x2)
+                    gradient.setAttribute('y2', y2)
+                    gradient.setAttribute('gradientUnits', 'objectBoundingBox')
+
+                    const stop1 = document.createElementNS(ns, 'stop')
+                    stop1.setAttribute('offset', '0')
+                    stop1.setAttribute('stop-opacity', '0.1')
+                    stop1.setAttribute('stop-color', 'rgb(255, 255, 255)')
+                    gradient.appendChild(stop1)
+
+                    const stop2 = document.createElementNS(ns, 'stop')
+                    stop2.setAttribute('offset', '1')
+                    stop2.setAttribute('stop-color', 'rgb(255, 255, 255)')
+                    gradient.appendChild(stop2)
+
+                    defs.appendChild(gradient)
+                })
+
+                blursGroup.appendChild(defs)
+
+                const blurRects = [
+                    { x: 92, y: 180, height: 10, width: 75, fill: 'url(#gradB)' },
+                    { x: 90, y: 106, height: 79, width: 10, fill: 'url(#gradL)' },
+                    { x: 123, y: 213, height: 42, width: 5, fill: 'url(#gradL)' },
+                    { x: 167, y: 213, height: 42, width: 5, fill: 'url(#gradR)' },
+                    { x: 123, y: 251, height: 5, width: 50, fill: 'url(#gradB)' },
+                    { x: 123, y: 213, height: 5, width: 50, fill: 'url(#gradT)' },
+                ]
+
+                blurRects.forEach(({ x, y, height, width, fill }) => {
+                    const blurRect = document.createElementNS(ns, 'rect')
+                    blurRect.setAttribute('x', x)
+                    blurRect.setAttribute('y', y)
+                    blurRect.setAttribute('height', height)
+                    blurRect.setAttribute('width', width)
+                    blurRect.setAttribute('fill', fill)
+                    blursGroup.appendChild(blurRect)
+                })
+
+                insetsGroup.appendChild(blursGroup)
+
+                // LI title group
+                const liTitleGroup = document.createElementNS(ns, 'g')
+                liTitleGroup.setAttribute('id', 'insets-LI-title')
+                liTitleGroup.setAttribute('height', '265px')
+                liTitleGroup.setAttribute('width', '243px')
+                liTitleGroup.setAttribute('transform', `translate(${bx}, ${by})`)
+
+                const subtitleLI = document.createElementNS(ns, 'text')
+                subtitleLI.setAttribute('id', 'subtitleLI')
+                subtitleLI.setAttribute('class', 'em-inset-title')
+                subtitleLI.setAttribute('x', '122')
+                subtitleLI.setAttribute('y', '207.85')
+                subtitleLI.textContent = 'Liechtenstein'
+                liTitleGroup.appendChild(subtitleLI)
+
+                insetsGroup.appendChild(liTitleGroup)
+
+                log(`Created ${insetsCfg.length} inset DOM elements`)
+            }
+
+            const configs = {
+                map1: {
+                    title: 'Map Build 1',
+                    colors: ['#f0f9e8', '#bae4bc', '#7bccc4', '#43a2ca', '#0868ac'],
+                    nutsLevel: 2,
+                },
+                map2: {
+                    title: 'Map Build 2',
+                    colors: ['#fff5eb', '#fcbba1', '#fc9272', '#fb6a4a', '#cb181d'],
+                    nutsLevel: 'mixed',
+                    stats: exampleData,
+                },
+            }
+
+            function buildMap(config) {
+                buildCount++
+                log(`\n========== BUILD ${buildCount} ==========`)
+
+                // Clear previous map content
+                document.getElementById('mappy').innerHTML = ''
+
+                // Generate fresh inset config with new svgIds (from overseas.js)
+                const insetsCfg = createOutermostInsetsConfig()
+                const insetBoxPosition = [500, 20]
+
+                log(`Generated ${insetsCfg.length} insets from overseas.js`)
+
+                // Create DOM elements AFTER getting config (so IDs match)
+                createInsetDOMElements(insetsCfg, insetBoxPosition)
+
+                // Verify DOM elements exist
+                insetsCfg.forEach((c, i) => {
+                    const el = document.getElementById(c.svgId)
+                    log(`  [${i}] ${c.svgId}: ${el ? '✅' : '❌'}`)
+                })
+
+                // Setup callback tracking
+                let callbackCount = 0
+                const expectedCallbacks = insetsCfg.length + 1
+                log(`Expected callbacks: ${expectedCallbacks}`)
+
+                // Build map
+                const map = eurostatmap
+                    .map('ch')
+                    .title(config.title)
+                    .colors(config.colors)
+                    .thresholds([100, 110, 150, 180])
+                    .classificationMethod('threshold')
+                    .svgId('mappy')
+                    .containerId('container')
+                    .legend({x:10,y:150})
+                    .nutsLevel(config.nutsLevel)
+                    .transitionDuration(0)
+                    .insets(insetsCfg)
+                    .insetBoxPosition(insetBoxPosition)
+                    .callback((m) => {
+                        callbackCount++
+                        // log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`);
+                        if (callbackCount === expectedCallbacks) {
+                            log(`✅ ALL CALLBACKS COMPLETE`)
+                        }
+                    })
+
+                if (config.stats) {
+                    map.statData().setData(config.stats)
+                } else {
+                    map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                }
+                //map.statData().setData(exampleData);
+
+                log(`🚀 Calling map.build()...`)
+                map.build()
+            }
+
+            function clearMap() {
+                document.getElementById('mappy').innerHTML = ''
+                document.getElementById('newInsets').innerHTML = ''
+                log('🗑️ Cleared')
+            }
+
+            // Button handlers
+            document.getElementById('btn-build1').addEventListener('click', () => buildMap(configs.map1))
+            document.getElementById('btn-build2').addEventListener('click', () => buildMap(configs.map2))
+            document.getElementById('btn-clear').addEventListener('click', clearMap)
+
+            log('Page loaded. Click "Build Map 1" to start.')
         </script>
     </body>
 </html>
