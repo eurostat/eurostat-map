@@ -59,18 +59,19 @@
 }
 
 .em-label-countries {
-    font-size: 12px;
+    fill: #3b3b3b;
+    font-size: 10px;
+    opacity: 0.7;
 }
 
 .em-label-shadow-countries {
-    font-size: 12px;
+    font-size: 10px;
     stroke-width: 3px;
 }
 
 .em-label-seas {
     font-size: 9px;
-    fill: #003399;
-    stroke: #003399;
+    fill: #6a9cff;
     letter-spacing: 3px;
 }
 

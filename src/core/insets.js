@@ -49,8 +49,9 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
             ggeo.append('svg').attr('id', config.svgId)
         }
 
-        
+         // GISCO-2676 - PT azores inset has 2 insets with the same Geo, so second was overriding first:
         if (out.insetTemplates_[config.geo]) {
+            //if inset already exists in map with same geo, then push both to an array
             let inset = buildInset(config, out, withCenterPoints, mapType)
             inset.buildMapTemplateBase()
             out.insetTemplates_[config.geo] = [out.insetTemplates_[config.geo], inset]

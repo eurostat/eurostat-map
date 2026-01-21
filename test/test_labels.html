@@ -38,6 +38,7 @@
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script> -->
         <script>
             const IMAGE = { width: 797, height: 625, position: { x: 4790000, y: 3420000, z: 6400 } }
+            const defaultLabels = eurostatmap.getDefaultLabels().EUR_3035;
             const map = eurostatmap
                 .map('choropleth')
                 .width(IMAGE.width)
@@ -62,7 +63,7 @@
                 //.projectionFunction(d3.geoAzimuthalEqualArea().rotate([-20.5, -41.5]).scale(11000))
                 .labels({
                     //labels: eurostatmap.getDefaultLabels().EUR_3035.en,
-                    //labels: eurostatmap.getDefaultLabels().EUR_3035.cc,
+                    labels: defaultLabels.en,
                     values: true,
                     shadows: true,
                     // statLabelsPositions: {

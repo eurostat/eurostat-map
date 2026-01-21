@@ -61,11 +61,11 @@
                 font-size: 16px;
             }
             #log {
+                height:100%;
                 font-family: monospace;
                 background: #f0f0f0;
                 padding: 10px;
-                margin: 10px;
-                max-height: 200px;
+                max-height: 600px;
                 overflow-y: auto;
                 font-size: 12px;
             }
@@ -79,13 +79,18 @@
             <button id="btn-build2">Build Map 2</button>
             <button id="btn-clear">Clear Map</button>
         </div>
-        <div id="log"></div>
 
-        <div style="margin-left: 1%">
-            <svg id="container" width="1800" height="800">
-                <g id="mappy"></g>
-                <g id="newInsets"></g>
-            </svg>
+        <div style="display: flex">
+            <div style="margin-left: 1%">
+                <svg id="container" width="797" height="797">
+                    <g id="mappy"></g>
+                    <g id="newInsets"></g>
+                </svg>
+            </div>
+            <div style="width: 100%; height:100%">
+                <h4>Log output</h4>
+                <div id="log"></div>
+            </div>
         </div>
 
         <script src="../../build/eurostatmap.js"></script>
@@ -327,7 +332,7 @@
 
                 // Generate fresh inset config with new svgIds (from overseas.js)
                 const insetsCfg = createOutermostInsetsConfig()
-                const insetBoxPosition = [500, 20]
+                const insetBoxPosition = [530, 20]
 
                 log(`Generated ${insetsCfg.length} insets from overseas.js`)
 
@@ -354,7 +359,7 @@
                     .classificationMethod('threshold')
                     .svgId('mappy')
                     .containerId('container')
-                    .legend({x:10,y:150})
+                    .legend({ x: 10, y: 150 })
                     .nutsLevel(config.nutsLevel)
                     .transitionDuration(0)
                     .insets(insetsCfg)
