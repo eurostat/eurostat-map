@@ -32,6 +32,7 @@
 /* all boudnaries and regions linecap/linejoin */
 #em-nutsbn,
 .em-cntbn,
+.em-cntbn-halo,
 .em-bn-0,
 .em-bn-1,
 .em-bn-2,
@@ -48,11 +49,18 @@
     stroke-linejoin: round;
 }
 
-/* national boundaries */
+/* country boundaries */
 .em-cntbn {
-    stroke: #1b1b1b;
+    stroke: #3f3f3f;
     stroke-width: 1px;
-    stroke-opacity: 0.9;
+    stroke-opacity: 0.8;
+}
+
+/* country boundary halo (not coastline) */
+.em-cntbn-halo:not(.em-bn-co) {
+    stroke: rgb(255, 255, 255, 0.5);
+    stroke-width: 3px;
+    /* filter: blur(1px); */
 }
 
 /* NUTS boundaries stroke color */
@@ -80,6 +88,7 @@
 .em-frame,
 .em-graticule,
 .em-cntbn,
+.em-cntbn-halo,
 .em-bn-0,
 .em-bn-1,
 .em-bn-2,
@@ -87,6 +96,7 @@
 .em-kosovo-bn,
 .em-bn-co {
     fill: none;
+    pointer-events: none;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */

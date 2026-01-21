@@ -8,37 +8,35 @@ import { get, set } from 'idb-keyval'
 import { hideSpinner, showSpinner } from './spinner'
 
 //helpers for when indexedDB is not supported
-const memCache = new Map();
-const TTL_MS = 24 * 60 * 60 * 1000; // 24h
+const memCache = new Map()
+const TTL_MS = 24 * 60 * 60 * 1000 // 24h
 function canUseIDB() {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === 'undefined') return false
     // Allow HTTPS or localhost only. IndexedDB can also be blocked in iframes.
-    const secure = (window.isSecureContext === true) ||
-        location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const secure = window.isSecureContext === true || location.hostname === 'localhost' || location.hostname === '127.0.0.1'
     // If you're embedding, storage may still be blocked even if secure.
-    return secure && typeof indexedDB !== 'undefined';
+    return secure && typeof indexedDB !== 'undefined'
 }
 async function safeGetIDB(key) {
-    if (!canUseIDB()) return null;
+    if (!canUseIDB()) return null
     try {
-        return await get(key);
+        return await get(key)
     } catch (e) {
         // SecurityError / "operation is insecure" shows up here; ignore it.
-        console.warn('[IDB] read skipped:', e?.name || e);
-        return null;
+        console.warn('[IDB] read skipped:', e?.name || e)
+        return null
     }
 }
 async function safeSetIDB(key, value) {
-    if (!canUseIDB()) return false;
+    if (!canUseIDB()) return false
     try {
-        await set(key, value);
-        return true;
+        await set(key, value)
+        return true
     } catch (e) {
-        console.warn('[IDB] write skipped:', e?.name || e);
-        return false;
+        console.warn('[IDB] write skipped:', e?.name || e)
+        return false
     }
 }
-
 
 // Geometries class wrapped as a function
 export const Geometries = function (map, withCenterPoints) {
@@ -90,9 +88,7 @@ export const Geometries = function (map, withCenterPoints) {
         const promises = out.getDefaultGeoDataPromise()
         return Promise.all(promises)
             .then((results) => {
-                const filtered = typeof filterGeometriesFunction === 'function'
-                    ? filterGeometriesFunction(results)
-                    : results;
+                const filtered = typeof filterGeometriesFunction === 'function' ? filterGeometriesFunction(results) : results
                 out.allNUTSGeoData = filtered
                 out.defaultGeoData = filtered[0]
 
@@ -139,35 +135,35 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         const fetchWithCache = async (url) => {
-            const cacheKey = `geojson-cache:${url}`;
+            const cacheKey = `geojson-cache:${url}`
 
             // 1) In-memory cache (fastest)
-            const mem = memCache.get(cacheKey);
-            if (mem && (Date.now() - mem.timestamp) < TTL_MS) {
-                return mem.data;
+            const mem = memCache.get(cacheKey)
+            if (mem && Date.now() - mem.timestamp < TTL_MS) {
+                return mem.data
             }
 
             // 2) IndexedDB (best-effort; never throw)
-            const cached = await safeGetIDB(cacheKey);
-            if (cached && (Date.now() - cached.timestamp) < TTL_MS) {
+            const cached = await safeGetIDB(cacheKey)
+            if (cached && Date.now() - cached.timestamp < TTL_MS) {
                 // refresh mem
-                memCache.set(cacheKey, cached);
-                return cached.data;
+                memCache.set(cacheKey, cached)
+                return cached.data
             }
 
             // 3) Network
-            const data = await json(url).catch(err => {
+            const data = await json(url).catch((err) => {
                 // If IDB had a stale record, consider using it as a last resort
-                if (cached?.data) return cached.data;
-                throw new Error(`Fetch failed for ${url}: ${err?.message || err}`);
-            });
+                if (cached?.data) return cached.data
+                throw new Error(`Fetch failed for ${url}: ${err?.message || err}`)
+            })
 
-            const record = { timestamp: Date.now(), data };
-            memCache.set(cacheKey, record);         // always keep in-memory
-            await safeSetIDB(cacheKey, record);     // best-effort; ignore failures
+            const record = { timestamp: Date.now(), data }
+            memCache.set(cacheKey, record) // always keep in-memory
+            await safeSetIDB(cacheKey, record) // best-effort; ignore failures
 
-            return data;
-        };
+            return data
+        }
 
         if (!map || !map.nuts2jsonBaseURL_) {
             throw new Error('Missing required map context or configuration')
@@ -285,23 +281,23 @@ export const Geometries = function (map, withCenterPoints) {
                 this.geoJSONs.mixed.rg2 = feature(out.allNUTSGeoData[2], out.allNUTSGeoData[2].objects.nutsrg).features
                 this.geoJSONs.mixed.rg3 = feature(out.allNUTSGeoData[3], out.allNUTSGeoData[3].objects.nutsrg).features
 
-                    //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
-                    // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
-                    ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
-                        //append each nuts level to map
-                        regions = container
-                            .append('g')
-                            .attr('id', 'em-nutsrg')
-                            .attr('class', `em-nutsrg em-nutsrg-${i}`)
-                            .selectAll('path')
-                            .data(r)
-                            .enter()
-                            .append('path')
-                            .attr('d', pathFunction)
-                            .attr('lvl', i) //to be able to distinguish nuts levels
+                //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
+                // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
+                ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
+                    //append each nuts level to map
+                    regions = container
+                        .append('g')
+                        .attr('id', 'em-nutsrg')
+                        .attr('class', `em-nutsrg em-nutsrg-${i}`)
+                        .selectAll('path')
+                        .data(r)
+                        .enter()
+                        .append('path')
+                        .attr('d', pathFunction)
+                        .attr('lvl', i) //to be able to distinguish nuts levels
 
-                        attachClickEventToRegions(regions, map)
-                    })
+                    attachClickEventToRegions(regions, map)
+                })
 
                 //add kosovo
                 if (geo == 'EUR' && (proj == '3035' || proj == '4326')) {
@@ -322,6 +318,36 @@ export const Geometries = function (map, withCenterPoints) {
 
                 attachClickEventToRegions(regions, map)
             }
+        }
+
+        // draw country boundary halo (underneath)
+        if (this.geoJSONs.cntbn) {
+            container
+                .append('g')
+                .attr('id', 'em-cntbn-halo')
+                .attr('class', 'em-cntbn-halo')
+                .selectAll('path')
+                .data(this.geoJSONs.cntbn)
+                .enter()
+                .append('path')
+                .filter(function (bn) {
+                    if (bn.properties.eu == 'T') return bn
+                    if (bn.properties.efta == 'T') return bn
+                    if (bn.properties.cc == 'T') return bn
+                    if (bn.properties.oth == 'T') return bn
+                    if (bn.properties.co == 'T') return bn
+                })
+                .attr('d', pathFunction)
+                .attr('id', (bn) => 'em-bn-' + bn.properties.id + '-halo')
+                .attr('class', function (bn) {
+                    let classList = []
+                    if (bn.properties.eu === 'T') classList.push('em-bn-eu')
+                    if (bn.properties.efta === 'T') classList.push('em-bn-efta')
+                    if (bn.properties.cc === 'T') classList.push('em-bn-cc')
+                    if (bn.properties.oth === 'T') classList.push('em-bn-oth')
+                    if (bn.properties.co === 'T') classList.push('em-bn-co')
+                    return classList.join(' ') // Use join with a space to create a valid class string
+                })
         }
 
         //draw country boundaries
@@ -345,13 +371,11 @@ export const Geometries = function (map, withCenterPoints) {
                 .attr('id', (bn) => 'em-bn-' + bn.properties.id)
                 .attr('class', function (bn) {
                     let classList = []
-
                     if (bn.properties.eu === 'T') classList.push('em-bn-eu')
                     if (bn.properties.efta === 'T') classList.push('em-bn-efta')
                     if (bn.properties.cc === 'T') classList.push('em-bn-cc')
                     if (bn.properties.oth === 'T') classList.push('em-bn-oth')
                     if (bn.properties.co === 'T') classList.push('em-bn-co')
-
                     return classList.join(' ') // Use join with a space to create a valid class string
                 })
         }
@@ -492,12 +516,9 @@ export const Geometries = function (map, withCenterPoints) {
     return out
 }
 
-
-
 function attachClickEventToRegions(regions, map) {
-    regions
-        .on('click', function (e, rg) {
-            if (map.tooltip_.omitRegions?.includes(rg.properties?.id)) return
-            if (map.onRegionClick_) map.onRegionClick_(e, rg, this, map)
-        })
+    regions.on('click', function (e, rg) {
+        if (map.tooltip_.omitRegions?.includes(rg.properties?.id)) return
+        if (map.onRegionClick_) map.onRegionClick_(e, rg, this, map)
+    })
 }

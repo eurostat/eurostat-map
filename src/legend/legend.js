@@ -102,7 +102,7 @@ export const legend = function (map) {
 
         //check if provided external svgId has changed
         const legendSVG = out.svg
-        if (legendSVG.attr('id') !== map.legend_.svgId) {
+        if (map && container && legendSVG && legendSVG?.attr('id') !== map.legend_.svgId) {
             out.build() // sets new svg and lgg
         }
     }
