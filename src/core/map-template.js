@@ -27,6 +27,7 @@ import { addEurostatLogo, addEurostatRibbon } from './logo.js'
 import { addCoastalMarginToMap, appendCoastalMargin } from './coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './texts.js'
 import { addScalebarToMap } from './scalebar.js'
+import { standardDeviation } from 'simple-statistics'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -153,7 +154,16 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     //coastal margin
     out.drawCoastalMargin_ = false
-    out.coastalMarginStdDev_ = 3
+    // for color, see .em-coastal-margin in map.css
+    out.coastalMarginSettings_ = {
+        standardDeviation: 1,
+        x: '-100%',
+        y: '-100%',
+        width: '200%',
+        height: '200%',
+        strokeWidth: 1,
+        color: 'rgb(0, 52, 107)',
+    }
 
     //graticule
     out.drawGraticule_ = false
@@ -239,7 +249,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     }
 
     //special ones which affect also the insets
-    ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_'].forEach(function (att) {
+    ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_', 'coastalMarginSettings_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
 
@@ -530,13 +540,13 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             //define filter for coastal margin
             svg.append('filter')
                 .attr('id', 'em-coastal-blur')
-                .attr('x', '-200%')
-                .attr('y', '-200%')
-                .attr('width', '400%')
-                .attr('height', '400%')
+                .attr('x', out.coastalMarginSettings_.x)
+                .attr('y', out.coastalMarginSettings_.y)
+                .attr('width', out.coastalMarginSettings_.width)
+                .attr('height', out.coastalMarginSettings_.height)
                 .append('feGaussianBlur')
                 .attr('in', 'SourceGraphic')
-                .attr('stdDeviation', out.coastalMarginStdDev_)
+                .attr('stdDeviation', out.coastalMarginSettings_.standardDeviation)
         }
 
         // create header, drawing and footer groups (stacked blocks)
@@ -628,7 +638,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             }
         }
 
-
         //prepare group for proportional symbols, with centroids
         if (withCenterPoints) {
             addCentroidsToMap(out)
@@ -701,6 +710,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         //insets buttons
         if (out.insetsButton_) {
             appendInsetsButton(out)
+        }
+
+        // after drawBackgroundMap, geometries, labels, etc.
+        if (out.drawCoastalMargin_) {
+            appendCoastalMargin(out)
         }
 
         //header/footer
@@ -847,11 +861,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         //sphere for world map
         if (out.geo_ == 'WORLD') {
             zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
-        }
-
-        // coastal margin
-        if (out.drawCoastalMargin_) {
-            addCoastalMarginToMap(out)
         }
 
         // draw polygons and borders

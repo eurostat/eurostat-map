@@ -1,8 +1,4 @@
 import {
-    applyInlineStylesFromCSS,
-    flags,
-    serialize,
-    rasterize,
     getDownloadURL,
     executeForAllInsets,
     applyComputedStylesToSVG,

@@ -45,13 +45,13 @@ a text {
 }
 
 /* Coastal margin */
-#em-coast-margin {
+.em-coastal-margin {
     filter: url(#em-coastal-blur);
     stroke-linejoin: round;
     stroke-linecap: round;
     fill: none;
-    stroke-width: 5;
-    stroke: rgb(161, 198, 237);
+    stroke-width: 1;
+    stroke: rgb(0, 52, 107);
 }
 
 /* Title and subtitle styling */

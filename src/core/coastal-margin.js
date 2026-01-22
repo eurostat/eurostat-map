@@ -1,138 +1,113 @@
-import { select, selectAll } from "d3-selection"
-import { executeForAllInsets } from "./utils"
+import { select } from 'd3-selection'
+import { executeForAllInsets } from './utils'
+
+
 export function appendCoastalMargin(out) {
-    //update existing
-    if (out.svg_) {
-        let margin = selectAll('#em-coast-margin')
-        let filter = select('#em-coastal-blur')
-        let zg = select('#em-zoom-group-' + out.svgId_) || null
-        if (margin._groups[0][0] && out.drawCoastalMargin_ == false) {
-            // remove existing
-            margin.remove()
-        } else if (out.drawCoastalMargin_ == true && out._pathFunction && zg) {
-            //remove existing graticule
-            margin.remove()
-            filter.remove()
-            //add filter
-            out.svg_
-                .append('filter')
-                .attr('id', 'em-coastal-blur')
-                .attr('x', '-200%')
-                .attr('y', '-200%')
-                .attr('width', '400%')
-                .attr('height', '400%')
-                .append('feGaussianBlur')
-                .attr('in', 'SourceGraphic')
-                .attr('stdDeviation', out.coastalMarginStdDev_)
+    if (!out.svg_ || !out._pathFunction) return
 
-            //draw for main map - geometries are still in memory so no rebuild needed
-            const drawNewCoastalMargin = (map) => {
-                // zoom group might not be inside main map (out.svg_)
-                const zoomGroup = select('#em-zoom-group-' + map.svgId_)
-                //draw new coastal margin
-                const cg = zoomGroup.append('g').attr('id', 'em-coast-margin')
+    const draw = (map) => {
+        const zg = select('#em-zoom-group-' + map.svgId_)
+        if (zg.empty()) return
 
-                //countries bn
-                if (map.Geometries.geoJSONs.cntbn)
-                    cg.append('g')
-                        .attr('id', 'em-coast-margin-cnt')
-                        .selectAll('path')
-                        .data(map.Geometries.geoJSONs.cntbn)
-                        .enter()
-                        .filter(function (bn) {
-                            return bn.properties.co === 'T'
-                        })
-                        .append('path')
-                        .attr('d', map._pathFunction)
-                //nuts bn
-                if (map.Geometries.geoJSONs.nutsbn)
-                    cg.append('g')
-                        .attr('id', 'em-coast-margin-nuts')
-                        .selectAll('path')
-                        .data(map.Geometries.geoJSONs.nutsbn)
-                        .enter()
-                        .filter(function (bn) {
-                            return bn.properties.co === 'T'
-                        })
-                        .append('path')
-                        .attr('d', map._pathFunction)
-                //world bn
-                if (map.Geometries.geoJSONs.worldbn)
-                    cg.append('g')
-                        .attr('id', 'em-coast-margin-nuts')
-                        .selectAll('path')
-                        .data(map._geom.worldbn)
-                        .enter()
-                        .filter(function (bn) {
-                            return bn.properties.COAS_FLAG === 'T'
-                        })
-                        .append('path')
-                        .attr('d', map._pathFunction)
-            }
+        // Remove only within THIS zoom group
+        zg.select('.em-coastal-margin').remove()
 
-            //draw for insets - requires geometries so we have to rebuild base template
-            if (out.insetTemplates_ && out.drawCoastalMargin_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, drawNewCoastalMargin)
-                drawNewCoastalMargin(out)
-            }
+        if (!map.drawCoastalMargin_) return
 
-            // move margin to back (in front of sea)
-            selectAll('#em-coast-margin').each(function () {
-                out.geo_ == 'WORLD'
-                    ? this.parentNode.insertBefore(this, this.parentNode.childNodes[3])
-                    : this.parentNode.insertBefore(this, this.parentNode.childNodes[1])
-            })
+        // Ensure filter once (SVG-level)
+        ensureCoastalMarginFilter(map.svg_, map.coastalMarginSettings_)
+
+        // Create margin group
+        const cg = zg.append('g')
+            .attr('class', 'em-coastal-margin')
+            .attr('filter', 'url(#em-coastal-margin-filter)')
+            .attr('fill', 'none')
+            .attr('stroke', map.coastalMarginSettings_.color)
+            .attr('stroke-width', map.coastalMarginSettings_.strokeWidth)
+            .attr('pointer-events', 'none')
+
+        // Helper
+        const drawPaths = (features, predicate, cls) => {
+            if (!features) return
+            cg.append('g')
+                .attr('class', cls)
+                .selectAll('path')
+                .data(features.filter(predicate))
+                .enter()
+                .append('path')
+                .attr('d', map._pathFunction)
+        }
+
+        drawPaths(
+            map.Geometries.geoJSONs.cntbn,
+            d => d.properties.co === 'T',
+            'em-coastal-margin-cnt'
+        )
+
+        drawPaths(
+            map.Geometries.geoJSONs.nutsbn,
+            d => d.properties.co === 'T',
+            'em-coastal-margin-nuts'
+        )
+
+        drawPaths(
+            map.Geometries.geoJSONs.worldbn,
+            d => d.properties.COAS_FLAG === 'T',
+            'em-coastal-margin-world'
+        )
+
+        // Z-order: above sea, below land
+        const parent = cg.node().parentNode
+        const refIndex = map.geo_ === 'WORLD' ? 3 : 1
+        if (parent.childNodes[refIndex]) {
+            parent.insertBefore(cg.node(), parent.childNodes[refIndex])
         }
     }
+
+    // Insets first (their own SVGs)
+    if (out.insetTemplates_) {
+        executeForAllInsets(out.insetTemplates_, out.svgId_, draw)
+    }
+
+    // Main map
+    draw(out)
 }
 
-export const addCoastalMarginToMap = function (out) {
-    const zg = out.svg().select('#em-zoom-group-' + out.svgId_)
-    //draw coastal margin
-    const cg = zg.append('g').attr('id', 'em-coast-margin').attr('class', 'em-coast-margin')
+function ensureCoastalMarginFilter(svg, settings) {
+    const defs = svg.select('defs').empty()
+        ? svg.append('defs')
+        : svg.select('defs')
 
-    //countries bn
-    if (out.Geometries.geoJSONs.cntbn) {
-        cg.append('g')
-            .attr('id', 'em-coast-margin-cnt')
-            .attr('class', 'em-coast-margin-cnt')
-            .selectAll('path')
-            .data(out.Geometries.geoJSONs.cntbn)
-            .enter()
-            .filter(function (bn) {
-                return bn.properties.co === 'T'
-            })
-            .append('path')
-            .attr('d', out._pathFunction)
-    }
+    if (!defs.select('#em-coastal-margin-filter').empty()) return
 
-    //nuts bn
-    if (out.Geometries.geoJSONs.nutsbn) {
-        cg.append('g')
-            .attr('id', 'em-coast-margin-nuts')
-            .attr('class', 'em-coast-margin-nuts')
-            .selectAll('path')
-            .data(out.Geometries.geoJSONs.nutsbn)
-            .enter()
-            .filter(function (bn) {
-                return bn.properties.co === 'T'
-            })
-            .append('path')
-            .attr('d', out._pathFunction)
-    }
+    const filter = defs
+        .append('filter')
+        .attr('id', 'em-coastal-margin-filter')
+        .attr('x', '-50%')
+        .attr('y', '-50%')
+        .attr('width', '200%')
+        .attr('height', '200%')
 
-    //world bn
-    if (out.Geometries.geoJSONs.worldbn) {
-        cg.append('g')
-            .attr('id', 'em-coast-margin-world')
-            .attr('class', 'em-coast-margin-world')
-            .selectAll('path')
-            .data(out.Geometries.geoJSONs.worldbn)
-            .enter()
-            .filter(function (bn) {
-                return bn.properties.COAS_FLAG === 'T'
-            })
-            .append('path')
-            .attr('d', out._pathFunction)
-    }
+    // Outer glow
+    filter.append('feGaussianBlur')
+        .attr('in', 'SourceGraphic')
+        .attr('stdDeviation', settings.standardDeviation)
+        .attr('result', 'blur')
+
+    // Fade it
+    filter.append('feColorMatrix')
+        .attr('in', 'blur')
+        .attr('type', 'matrix')
+        .attr('values', `
+            1 0 0 0 0
+            0 1 0 0 0
+            0 0 1 0 0
+            0 0 0 ${settings.opacity ?? 0.4} 0
+        `)
+        .attr('result', 'blurred')
+
+    // Merge sharp line back on top
+    const merge = filter.append('feMerge')
+    merge.append('feMergeNode').attr('in', 'blurred')
+    merge.append('feMergeNode').attr('in', 'SourceGraphic')
 }

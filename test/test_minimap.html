@@ -11,11 +11,83 @@
     </head>
 
     <body>
+        <svg id="spain"></svg>
         <svg id="map"></svg>
         <svg id="map2"></svg>
         <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
         <script>
+            const spainProjection = d3.geoAzimuthalEqualArea().rotate([2.3, -41.55]).scale(3500)
+            const spain = eurostatmap
+                .map('choropleth', {
+                    title: 'Productivity in Spain',
+                    projectionFunction: spainProjection,
+                    titleFontSize: 20,
+                    subtitle: 'GDP per inhabitant, 2022',
+                    subtitleFontSize: 16,
+                    subtitleFontWeight: 100,
+                    svgId: 'spain',
+                    position: { x: 3050000, y: 1990000, z: 2000 }, //see https://github.com/eurostat/eurostat-map.js/blob/master/docs/reference.md#map-geography
+                    nutsLvl: 3,
+                    scale: '10M',
+                    stat: {
+                        eurostatDatasetCode: 'nama_10r_3gdp',
+                        unitText: 'Euro per inhabitant',
+                        filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                    },
+                    titleFill: '#333',
+                    titlePosition: [15, 27],
+                    subtitlePosition: [15, 47],
+                    insetBoxPosition: [5, 550],
+                    insets: [
+                        {
+                            geo: 'IC',
+                            projectionFunction: null, //force it to use default (EPSG3035)
+                            geoCenter: [420000, 3170000],
+                            pixSize: 3100,
+                            width: 170,
+                            height: 90,
+                            title: 'Canary islands',
+                            titleFontSize: 12,
+                            titleFontWeight: '',
+                            frameStroke: 'grey',
+                            frameStrokeWidth: '0.3px',
+                        },
+                    ],
+                    legend: {
+                        labelDecNb: 0,
+                        x: 10,
+                        y: 60,
+                        boxOpacity: 0,
+                        boxPadding: 7,
+                        title: 'Euro per inhabitant',
+                        titleFontSize: 16,
+                        shapeWidth: 30,
+                        shapeHeight: 20,
+                        sepLineLength: 30,
+                        noData: true,
+                    },
+                    labelling: true,
+                    labelsToShow: ['values'],
+                    labelShadow: ['values'],
+                })
+                .labelValuesFontSize(16)
+                .fontFamily('Source serif pro')
+                .classificationMethod('threshold')
+                .thresholds([20000, 22000, 24000, 26000, 28000, 30000, 34000])
+                .minimap({
+                    x: 705,
+                    y: 570,
+                    z: 200,
+                    highlightIds: 'ES',
+                    size: 120,
+                    color: 'steelblue',
+                })
+                .colors(d3.schemeBlues[9].slice(1))
+                .build()
+
             const map = eurostatmap
                 .map('choropleth')
                 .svgId('map')
@@ -54,7 +126,7 @@
                     x: 705,
                     y: 90,
                     z: 200,
-                    highlightIds: ['DE', 'FR', 'LU','CZ','NL','BE','AT','PL'],
+                    highlightIds: ['DE', 'FR', 'LU', 'CZ', 'NL', 'BE', 'AT', 'PL'],
                     size: 120,
                     debounce: 2,
                 })

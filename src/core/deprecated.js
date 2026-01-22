@@ -98,6 +98,7 @@ export const defineDeprecatedFunctions = (out) => {
     out.worldFillStyle = (v) => (console.warn('map.worldFillStyle() is now DEPRECATED. please use the .em-worldrg CSS class'),updateCSSRule('.em-worldrg','fill',v), out); 
     out.coastalMarginWidth = (v) => (console.warn('map.coastalMarginWidth() is now DEPRECATED. please use the #em-coast-margin CSS rule'),updateCSSRule('#em-coast-margin','stroke-width',v), out);  
     out.coastalMarginColor = (v) => (console.warn('map.coastalMarginColor() is now DEPRECATED. please use the #em-coast-margin CSS rule'),updateCSSRule('#em-coast-margin','stroke',v), out);
+    out.coastalMarginStdDev = (v) => (console.warn('map.coastalMarginStdDev() is now DEPRECATED. please use map.coastalMarginSettings.standardDeviation instead.'), out.coastalMarginSettings.standardDeviation = v, out);
     out.fontFamily = (v) => (console.warn('map.fontFamily() is now DEPRECATED. please use the .em-map CSS class'),updateCSSRule('.em-map','font-family',v), out);
     out.botTxtFontSize = (v) => (console.warn('map.botTxtFontSize() is now DEPRECATED. please use the .em-footnote CSS class'),updateCSSRule('.em-footnote','font-size',v), out);
     out.botTxtFill = (v) => (console.warn('map.botTxtFill() is now DEPRECATED. please use the .em-footnote CSS class'),updateCSSRule('.em-footnote','fill',v), out);
