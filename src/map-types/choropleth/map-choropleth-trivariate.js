@@ -87,11 +87,17 @@ export const map = function (config) {
         const [c1, c2, c3] = out.ternaryCodes_
         const filtered = []
 
+        const statData1 = out.statData(c1)
+        const statData2 = out.statData(c2)
+        const statData3 = out.statData(c3)
         features.forEach((f) => {
             const id = f.properties.id
-            const v1 = +out.statData(c1).get(id)?.value
-            const v2 = +out.statData(c2).get(id)?.value
-            const v3 = +out.statData(c3).get(id)?.value
+            const id1 = statData1.get(id)
+            const id2 = statData2.get(id)
+            const id3 = statData3.get(id)
+            const v1 = +id1?.value
+            const v2 = +id2?.value
+            const v3 = +id3?.value
 
             if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
                 filtered.push({ id, values: [v1, v2, v3] })

@@ -23,8 +23,15 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
     //assign default circle radiuses if none specified by user
     let domain = sizeScale.domain()
     if (!values) {
-        // default legend values if unspecified by user
-        values = [domain[1], domain[0]]
+        let min = domain[0]
+        const max = domain[1]
+
+        // If min is 0, replace with the smallest non-zero value
+        if (min === 0 && sizeScale._values?.length) {
+            min = Math.min(...sizeScale._values.filter((v) => v > 0))
+        }
+
+        values = [max, min]
     }
 
     let maxRadius = sizeScale(max(values)) //maximum circle radius to be shown in legend

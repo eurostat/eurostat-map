@@ -146,8 +146,7 @@ export const legend = function (map, config) {
                 .attr('width', config.shapeWidth)
                 .attr('height', config.shapeHeight)
                 .style('fill', scs[code])
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
+
                 .on('mouseover', function () {
                     highlightRegions(out.map, code)
                     if (out.map.insetTemplates_) {

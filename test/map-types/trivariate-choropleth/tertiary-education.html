@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            .em-zoom-buttons {
+                transform: translate(1%, 15%);
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script type="module">
+            import { json } from 'https://cdn.jsdelivr.net/npm/d3-fetch@3/+esm'
+
+            const [bachelor_pct, masters_pct, phd_pct] = await Promise.all([
+                json('./data/bachelor_pct.json'),
+                json('./data/masters_pct.json'),
+                json('./data/phd_pct.json'),
+            ])
+
+            const map = eurostatmap.map('trivariateChoropleth').nutsLevel(2).position({ x: 4900000, y: 3620000, z: 6440 }).width(795)
+
+            map.stat('v1', { label: 'Bachelor' }).stat('v2', { label: 'Master' }).stat('v3', { label: 'PhD' })
+            map.build()
+            map.statData('v1').setData(filterNulls(bachelor_pct))
+            map.statData('v2').setData(filterNulls(masters_pct))
+            map.statData('v3').setData(filterNulls(phd_pct))
+
+            // map.updateStatValues()
+
+            function filterNulls(obj) {
+                return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))
+            }
+        </script>
+    </body>
+</html>

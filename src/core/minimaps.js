@@ -80,9 +80,7 @@ function applyMinimapScale(map) {
 
 const defineMinimapProjection = (map) => {
     const z = map.minimap_?.z || 160
-    map._minimapProjection = geoOrthographic()
-        .scale(z)
-        .translate([0, 0])
+    map._minimapProjection = geoOrthographic().scale(z).translate([0, 0])
 
     map._minimapPath = geoPath().projection(map._minimapProjection)
     map._minimapBaseScale = map._minimapProjection.scale()
@@ -103,20 +101,17 @@ const drawMinimap = (map) => {
         const geometries = map.Geometries.geoJSONs.worldrg
 
         // Container
-        map._minimapContainer = map.svg_
-            .append('g')
-            .attr('id', 'em-minimap')
-            .attr('transform', `translate(${x},${y})`)
+        map._minimapContainer = map.svg_.append('g').attr('id', 'em-minimap').attr('transform', `translate(${x},${y})`)
 
         // Inner circle (white background)
         map._minimapContainer
-            .append('circle').attr('class', 'em-minimap-inner-circle')
-            .attr('r', (size / 2))
+            .append('circle')
+            .attr('class', 'em-minimap-inner-circle')
+            .attr('r', size / 2)
             .attr('cx', 0)
             .attr('cy', 0)
             .attr('fill', 'white')
             .attr('filter', 'url(#em-minimap-inner-shadow)')
-
 
         // Projection
         defineMinimapProjection(map)
@@ -125,19 +120,10 @@ const drawMinimap = (map) => {
         addDefsToMinimap(map, size)
 
         // Globe
-        map._minimapGlobe = map._minimapContainer
-            .append('g')
-            .attr('class', 'em-minimap-globe')
-            .attr('clip-path', 'url(#minimap-clip)')
+        map._minimapGlobe = map._minimapContainer.append('g').attr('class', 'em-minimap-globe').attr('clip-path', 'url(#minimap-clip)')
 
         // Countries
-        map._minimapGlobe
-            .selectAll('path.country')
-            .data(geometries)
-            .enter()
-            .append('path')
-            .attr('d', map._minimapPath)
-            .attr('fill', '#e0e0e0')
+        map._minimapGlobe.selectAll('path.country').data(geometries).enter().append('path').attr('d', map._minimapPath).attr('fill', '#e0e0e0')
 
         // Highlight
         if (minimapConfig.highlightIds && Array.isArray(minimapConfig.highlightIds)) {
@@ -157,7 +143,8 @@ const drawMinimap = (map) => {
 
         // Outer circle
         map._minimapContainer
-            .append('circle').attr('class', 'em-minimap-outer-circle')
+            .append('circle')
+            .attr('class', 'em-minimap-outer-circle')
             .attr('r', size / 2)
             .attr('cx', 0)
             .attr('cy', 0)
@@ -179,7 +166,7 @@ function addDefsToMinimap(map, size) {
     defs.append('clipPath')
         .attr('id', 'minimap-clip')
         .append('circle')
-        .attr('r', (size / 2) - 3)
+        .attr('r', size / 2 - 3)
         .attr('cx', 0)
         .attr('cy', 0)
 }
@@ -194,40 +181,26 @@ function addInnerShadowToDefs(defs) {
         .attr('height', '200%')
         .attr('color-interpolation-filters', 'sRGB')
 
-    innerShadow.append('feGaussianBlur')
-        .attr('in', 'SourceAlpha')
-        .attr('stdDeviation', 3)
-        .attr('result', 'blur')
+    innerShadow.append('feGaussianBlur').attr('in', 'SourceAlpha').attr('stdDeviation', 3).attr('result', 'blur')
 
-    innerShadow.append('feOffset')
-        .attr('in', 'blur')
-        .attr('dx', 0)
-        .attr('dy', 0)
-        .attr('result', 'off')
+    innerShadow.append('feOffset').attr('in', 'blur').attr('dx', 0).attr('dy', 0).attr('result', 'off')
 
     // Keep only the blurred rim that lies INSIDE the circle
-    innerShadow.append('feComposite')
+    innerShadow
+        .append('feComposite')
         .attr('in', 'SourceAlpha')
         .attr('in2', 'off')
         .attr('operator', 'arithmetic')
-        .attr('k2', '1')   // + SourceAlpha
-        .attr('k3', '-1')  // - blurred offset
+        .attr('k2', '1') // + SourceAlpha
+        .attr('k3', '-1') // - blurred offset
         .attr('result', 'inner')
 
-    innerShadow.append('feFlood')
-        .attr('flood-color', '#000')
-        .attr('flood-opacity', 0.4)
+    innerShadow.append('feFlood').attr('flood-color', '#000').attr('flood-opacity', 0.4)
 
-    innerShadow.append('feComposite')
-        .attr('in2', 'inner')
-        .attr('operator', 'in')
-        .attr('result', 'shadow')
+    innerShadow.append('feComposite').attr('in2', 'inner').attr('operator', 'in').attr('result', 'shadow')
 
     // Put shadow ON TOP of the fill (multiply for natural darkening)
-    innerShadow.append('feBlend')
-        .attr('in', 'SourceGraphic')
-        .attr('in2', 'shadow')
-        .attr('mode', 'multiply')
+    innerShadow.append('feBlend').attr('in', 'SourceGraphic').attr('in2', 'shadow').attr('mode', 'multiply')
 }
 
 // ---------------------------------------------------------------------------

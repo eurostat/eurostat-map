@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="pie"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('pie')
+                .dorling(true) // to prevent overlapping
+                .svgId('pie')
+                .scale('60M')
+                .nutsLevel(1)
+                .statPie(
+                    {
+                        eurostatDatasetCode: 'hlth_cd_asdr2',
+                        filters: { sex: 'T', time: '2020', age: 'TOTAL', unit: 'RT' },
+                        unitText: 'death rate per 100 000',
+                    },
+                    'icd10', //parameter that the categories belong to
+                    ['J', 'C', 'I'], //category codes
+                    ['Respiratory', 'Cancer', 'Circulatory'], //category labels
+                    ['orange', '#A4CDF8', '#2E7AF9'], //colours
+                    'A-R_V-Y' //code for the total (all causes of death) A-R_V-Y is no longer the code???
+                )
+                .pieOtherColor('#FFCC80')
+                .pieOtherText('Other')
+                .pieMinRadius(6)
+                .title('Most common causes of death, 2021')
+                .subtitle('Standardised death rate and % share of all deaths, by NUTS 1 regions')
+                .legend({
+                    x: 560,
+                    y: 60,
+                    boxOpacity: 0,
+                    boxFill: 'white',
+                    sizeLegend: {
+                        title: 'Death rate per 100 000 inh.',
+                        titlePadding: 10,
+                    },
+                    colorLegend: {
+                        title: 'Cause of death',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>

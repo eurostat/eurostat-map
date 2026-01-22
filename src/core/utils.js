@@ -2,19 +2,16 @@ import { color, scaleLinear } from 'd3'
 
 // Ensures a <g> element with the specified class exists within the container.
 // If it exists, clears its contents; if not, creates it.
-export function ensureGroup(
-    container,
-    className
-) {
-    let g = container.select(`g.${className}`);
+export function ensureGroup(container, className) {
+    let g = container.select(`g.${className}`)
 
     if (g.empty()) {
-        g = container.append('g').attr('class', className);
+        g = container.append('g').attr('class', className)
     } else {
-        g.selectAll('*').remove();
+        g.selectAll('*').remove()
     }
 
-    return g;
+    return g
 }
 
 // e.g. to be used with deprecated .style() functions. They will now update CSS classes.
@@ -38,7 +35,7 @@ export function updateCSSRule(selector, property, value) {
             }
         } catch (e) {
             // Some stylesheets (e.g., cross-origin) may not be accessible
-            console.log(`Could not access rules in stylesheet:`, e)
+            //console.log(`Could not access rules in stylesheet:`, e)
         }
     }
 
@@ -175,75 +172,98 @@ export const applyInlineStylesFromCSS = (svgElement) => {
  * Usage: call this right before serialize(svg) or rasterize(svg)
  */
 export function applyComputedStylesToSVG(svg) {
-    if (!svg || !(svg instanceof SVGElement)) return;
+    if (!svg || !(svg instanceof SVGElement)) return
 
     const PAINT_PROPS = new Set([
-        'fill', 'fill-opacity', 'fill-rule',
-        'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'stroke-dashoffset'
-    ]);
+        'fill',
+        'fill-opacity',
+        'fill-rule',
+        'stroke',
+        'stroke-width',
+        'stroke-opacity',
+        'stroke-linecap',
+        'stroke-linejoin',
+        'stroke-dasharray',
+        'stroke-dashoffset',
+    ])
 
     const PROPS = [
         // painting (includes PAINT_PROPS)
         ...Array.from(PAINT_PROPS),
         // geometry / alignment
-        'vector-effect', 'shape-rendering', 'text-anchor', 'dominant-baseline',
+        'vector-effect',
+        'shape-rendering',
+        'text-anchor',
+        'dominant-baseline',
         // text
-        'font-family', 'font-size', 'font-style', 'font-weight', 'letter-spacing', 'word-spacing', 'line-height',
+        'font-family',
+        'font-size',
+        'font-style',
+        'font-weight',
+        'letter-spacing',
+        'word-spacing',
+        'line-height',
         // layout / visibility
-        'opacity', 'visibility', 'display', 'mix-blend-mode',
+        'opacity',
+        'visibility',
+        'display',
+        'mix-blend-mode',
         // filters, marker, etc
-        'filter', 'marker-start', 'marker-mid', 'marker-end',
+        'filter',
+        'marker-start',
+        'marker-mid',
+        'marker-end',
         // others
-        'transform'
-    ];
+        'transform',
+    ]
 
     function inlineComputedStyle(el) {
-        const cs = window.getComputedStyle(el);
+        const cs = window.getComputedStyle(el)
 
         PROPS.forEach((p) => {
             try {
-                const v = cs.getPropertyValue(p);
+                const v = cs.getPropertyValue(p)
 
                 // skip empty / trivial values
-                if (!v || v === '' || v === 'initial') return;
+                if (!v || v === '' || v === 'initial') return
 
                 // Allow 'none' for paint properties (fill/stroke) — these are meaningful
-                if (v === 'none' && !PAINT_PROPS.has(p)) return;
+                if (v === 'none' && !PAINT_PROPS.has(p)) return
 
                 // Skip '0px' for properties where that is meaningless (but keep it for stroke-width)
-                if (v === '0px' && p !== 'stroke-width') return;
+                if (v === '0px' && p !== 'stroke-width') return
 
                 // Only set if not already present as inline style
                 if (!el.style.getPropertyValue(p)) {
-                    el.style.setProperty(p, v);
+                    el.style.setProperty(p, v)
                 }
             } catch (e) {
                 // ignore properties that error for this element
             }
-        });
+        })
 
         // for text elements ensure font-size is captured if computed
         if (el.tagName && el.tagName.toLowerCase() === 'text') {
-            const fs = cs.getPropertyValue('font-size');
-            if (fs && !el.style.getPropertyValue('font-size')) el.style.setProperty('font-size', fs);
+            const fs = cs.getPropertyValue('font-size')
+            if (fs && !el.style.getPropertyValue('font-size')) el.style.setProperty('font-size', fs)
         }
     }
 
-    inlineComputedStyle(svg);
-    svg.querySelectorAll('*').forEach((el) => inlineComputedStyle(el));
+    inlineComputedStyle(svg)
+    svg.querySelectorAll('*').forEach((el) => inlineComputedStyle(el))
 }
 export function ensureSvgSize(svg) {
-    const rect = svg.getBoundingClientRect();
+    const rect = svg.getBoundingClientRect()
     // Use integer pixel width/height
-    const w = Math.round(rect.width) || parseInt(svg.getAttribute('width')) || 800;
-    const h = Math.round(rect.height) || parseInt(svg.getAttribute('height')) || 600;
+    const w = Math.round(rect.width) || parseInt(svg.getAttribute('width')) || 800
+    const h = Math.round(rect.height) || parseInt(svg.getAttribute('height')) || 600
 
     // If svg already has viewBox, preserve it; else set viewBox to current content box
     if (!svg.hasAttribute('viewBox')) {
-        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`)
     }
-    svg.setAttribute('width', w);
-    svg.setAttribute('height', h);
+    svg.setAttribute('width', w)
+    svg.setAttribute('height', h)
 }
 
 /**
@@ -449,23 +469,23 @@ export const lowerCaseAllWordsExceptFirstLetters = (string) =>
 
 export function getDownloadURL(svgNode) {
     // Create XML header to ensure the SVG is recognized properly
-    const xmlHeader = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n';
+    const xmlHeader = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
 
     // Serialize SVG (outerHTML keeps entities)
-    let svgContent = xmlHeader + svgNode.outerHTML;
+    let svgContent = xmlHeader + svgNode.outerHTML
 
     // --- 🔒 Sanitize invalid HTML entities ---
     svgContent = svgContent
-        .replace(/&nbsp;/g, '&#160;')  // non-breaking space
-        .replace(/&copy;/g, '&#169;')  // © if used anywhere
-        .replace(/&reg;/g, '&#174;')   // ® if used anywhere
+        .replace(/&nbsp;/g, '&#160;') // non-breaking space
+        .replace(/&copy;/g, '&#169;') // © if used anywhere
+        .replace(/&reg;/g, '&#174;') // ® if used anywhere
         .replace(/&times;/g, '&#215;') // × sign if used in labels
-        .replace(/&deg;/g, '&#176;');  // ° degrees symbol if used
+        .replace(/&deg;/g, '&#176;') // ° degrees symbol if used
 
     // Create blob and return URL
-    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-    const svgUrl = URL.createObjectURL(svgBlob);
-    return svgUrl;
+    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })
+    const svgUrl = URL.createObjectURL(svgBlob)
+    return svgUrl
 }
 
 // Rasterize function with additional error handling
