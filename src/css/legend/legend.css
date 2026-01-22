@@ -1,0 +1,101 @@
+@import 'bivariate-choropleth.css';
+@import 'coxcomb.css';
+@import 'flow.css';
+@import 'pie.css';
+@import 'spike.css';
+@import 'ternary.css';
+
+.em-legend-background {
+    fill: white;
+    opacity: 0.7;
+    rx: 0;
+    ry: 0;
+    pointer-events: none;
+}
+
+/* titles */
+.em-legend-title {
+    font-weight: bold;
+    font-size: 15px;
+    fill: #696969;
+}
+
+.em-size-legend-title {
+    font-size: 15px;
+    fill: #666;
+}
+
+.em-color-legend-title {
+    font-size: 15px;
+    fill: #696969;
+}
+
+.em-width-legend-title {
+    font-size: 15px;
+    fill: #696969;
+}
+
+.em-legend-subtitle {
+    font-size: 15px;
+    fill: #696969;
+    opacity: 0.8;
+}
+
+/* labels */
+.em-legend-label {
+    font-size: 14px;
+    stroke: none;
+    fill: #696969;
+    dominant-baseline: unset;
+}
+
+.em-legend-label-max,
+.em-legend-label-min {
+    opacity: 0.8;
+}
+
+.em-legend-label-max:hover,
+.em-legend-label-min:hover,
+.em-legend-label-no-data:hover {
+    opacity: 1;
+    font-weight: bold;
+}
+
+/* ticks */
+.em-legend-tick {
+    stroke: #696969;
+    stroke-width: 1;
+}
+
+/* misc */
+.em-legend-separator {
+    stroke: white;
+    stroke-width: 1;
+}
+
+/* cursor: pointer */
+.em-legend-gradient {
+    cursor: pointer;
+}
+.em-bivariate-square,
+.em-legend-rect {
+    cursor: pointer;
+}
+.em-legend-histogram-bar {
+    cursor: pointer;
+}
+
+/* hover */
+.em-bivariate-square:hover,
+.em-legend-rect:hover {
+    stroke-width: 2;
+    stroke: red;
+}
+
+.em-legend-diverging-line {
+    stroke: #696969;
+}
+.em-legend-background {
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+    opacity: 0.9;
+}

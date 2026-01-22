@@ -23,6 +23,8 @@
                 .numberOfClasses(6)
                 .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
                 .colorSchemeType('discrete')
+                .drawCoastalMargin(true)
+                .coastalMarginStdDev(1)
 
                 .legend({
                     x: 10,
@@ -37,7 +39,6 @@
                     ticks: 2,
                     tickValues: [4000, 110000],
                 })
-                .drawCoastalMargin(false)
                 .insets('default')
                 .zoomExtent([1, 10])
                 .build()

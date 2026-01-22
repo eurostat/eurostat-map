@@ -1,6 +1,6 @@
 @import 'map.css';
 @import 'tooltip.css';
-@import 'legend.css';
+@import 'legend/legend.css';
 @import 'labels.css';
 @import 'annotations.css';
 @import 'NUTS.css';

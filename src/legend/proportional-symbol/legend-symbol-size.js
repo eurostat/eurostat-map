@@ -101,7 +101,7 @@ function addNoDataLegend(out) {
     const paddings = {
         default: 20,
         bar: 35,
-        spike: 30,
+        spike: 1,
         circle: 1,
         square: 20,
     } // add some extra padding for bars and spikes
@@ -154,10 +154,10 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
         .html(map.psCustomSVG_)
         .attr('transform', `scale(${symbolSize})`)
 
-    // 🔑 Measure rendered symbol
+    //  Measure rendered symbol
     const bbox = svgGroup.node().getBBox()
 
-    // 🔑 CENTER X AND Y RELATIVE TO ROW CENTER
+    //  CENTER X AND Y RELATIVE TO ROW CENTER
     svgGroup.attr(
         'transform',
         `translate(${-bbox.x - bbox.width / 2},${-bbox.y - bbox.height / 2}) scale(${symbolSize})`
@@ -216,11 +216,7 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
         .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
         .append('path')
         .attr('d', d)
-        .attr('transform', () =>
-            map.psCustomSVG_
-                ? `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y}) scale(${symbolSize})`
-                : `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y})`
-        )
+        .attr('transform', `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y})`)
 
     // label (to the right, vertically centered)
     const labelX = x + map.psBarWidth_ + out.sizeLegend.labelOffsets.x

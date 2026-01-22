@@ -155,7 +155,7 @@ export const legend = function (map, config) {
     }
 
     /**
-     * Adds a Coxcomb month-segment legend showing how wedges represent months.
+     * Adds a Coxcomb time-segment legend showing how wedges represent periods of time.
      * Labels each segment (e.g., Jan, Feb) around the circle.
      */
     function buildCoxcombTimeLegend(out, baseX, baseY) {
@@ -202,7 +202,7 @@ export const legend = function (map, config) {
             .join('path')
             .attr('d', (d, i) => arcGen(d, i))
             .attr('fill', '#ccc')
-            .attr('class', 'em-legend-month-segment')
+            .attr('class', 'em-coxcomb-legend-time-segment')
 
         const labelRadius = radius + labelOffset
         const timeAbbr = map._coxTimeLabels
@@ -211,10 +211,10 @@ export const legend = function (map, config) {
 
         // Place horizontal labels around the circle (no flipping)
         container
-            .selectAll('text.month-label')
+            .selectAll('text.em-coxcomb-legend-time-label')
             .data(times)
             .join('text')
-            .attr('class', 'em-legend-label em-month-label')
+            .attr('class', 'em-legend-label em-coxcomb-legend-time-label')
             .attr('x', (d, i) => Math.sin(i * angleStep + angleStep / 2) * labelRadius)
             .attr('y', (d, i) => -Math.cos(i * angleStep + angleStep / 2) * labelRadius)
             .attr('text-anchor', 'middle')
@@ -223,7 +223,7 @@ export const legend = function (map, config) {
                 return timeAbbr[i] || d
             })
 
-        // Highlight behavior for month hover
+        // Highlight behavior for time hover
         container
             .selectAll('path')
             .on('mouseover', function (event, time) {

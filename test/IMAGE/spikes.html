@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-cntrg {
+                filter: drop-shadow(0 1px 1px rgba(0, 13, 29, 0.25));
+            }
+        </style>
+    </head>
+
+    <body>
+        <div style="margin-left: 1%">
+            <svg id="image-map-container" width="100%" height="797">
+                <g id="map"></g>
+                <g id="legend"></g>
+            </svg>
+        </div>
+
+        <script src="../../build/eurostatmap.js"></script>
+        <script src="../data/nuts3.js"></script>
+        <script src="../configs/insetConfig.js"></script>
+        <script src="../data/mixed.js"></script>
+        <script>
+            const compactNumber = new Intl.NumberFormat('en', {
+                notation: 'compact',
+                compactDisplay: 'short',
+                maximumFractionDigits: 1,
+            }).format
+            const legendConfig = {
+                svgId: 'eurostatmap-legend-europe-template',
+                title: '',
+                boxPadding: 5,
+                boxOpacity: 1,
+                noData: true,
+                noDataText: 'Data not available',
+                labelType: 'ranges',
+                sizeLegend: {
+                    title: 'Euro per inhabitant',
+                    values: false,
+                    noData: true,
+                    noDataText: 'Data not available',
+                    fontFill: '#000',
+                    labelFormatter: compactNumber
+                },
+            }
+
+                        
+            const map = eurostatmap
+                .map('ps')
+                .psShape('spike')
+                .svgId('map')
+                .width(795)
+                .height(625)
+                .nutsLevel('mixed')
+                .nutsYear('2024')
+                .psSpikeWidth(3)
+                .psMaxSize(100)
+                .zoomButtons(true)
+                .legend(legendConfig)
+
+            map.statData().setData({ES:1232344,DE:12234423,BE:1223432,FR:4462343})
+
+            map.build()
+
+            // setTimeout(() => {
+            //     map.exportMapToPNG(795 * 2, 625 * 2)
+            // }, 2000)
+        </script>
+    </body>
+</html>

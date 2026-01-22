@@ -1,0 +1,17 @@
+.em-coxcomb-legend-time-label {
+font-size: 13px;
+}
+.em-coxcomb-legend-time-segment {
+    stroke: #444;
+    stroke-width: 0.5;
+    opacity: 0.4;
+    fill: #ccc;
+    cursor: pointer;
+}
+.em-coxcomb-legend-time-segment {
+        stroke: #444;
+    stroke-width: 0.5;
+    opacity: 0.4;
+    fill: #ccc;
+    cursor: pointer;
+}

@@ -1,0 +1,24 @@
+.em-bivariate-nodata-label {
+    font-size: 14px;
+    dominant-baseline: middle;
+}
+.em-bivariate-tick-label {
+    text-anchor: middle;
+    font-size: 12px;
+}
+.em-bivariate-axis-title {
+    font-size: 15px;
+}
+.em-bivariate-tick {
+    stroke: #696969;
+    stroke-width: 1;
+}
+.em-bivariate-frame {
+    fill: none;
+    stroke: #696969;
+}
+.em-bivariate-nodata {
+    stroke: #696969;
+    stroke-width: 0.5;
+    cursor: pointer;
+}

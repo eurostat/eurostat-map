@@ -628,6 +628,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             }
         }
 
+
         //prepare group for proportional symbols, with centroids
         if (withCenterPoints) {
             addCentroidsToMap(out)

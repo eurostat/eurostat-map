@@ -60,7 +60,6 @@
 .em-cntbn-halo:not(.em-bn-co) {
     stroke: rgb(255, 255, 255, 0.5);
     stroke-width: 3px;
-    /* filter: blur(1px); */
 }
 
 /* NUTS boundaries stroke color */
