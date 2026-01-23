@@ -9,6 +9,7 @@ import * as Sparklines from './map-types/map-sparklines'
 import * as FlowMap from './map-types/flow/map-flow'
 import * as Coxcomb from './map-types/map-coxcomb'
 import * as ValueByAlpha from './map-types/choropleth/map-value-by-alpha'
+import * as Mushroom from './map-types/proportional-symbol/mushrooms/map-mushroom.js'
 import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/labels'
 
@@ -42,6 +43,8 @@ export const map = function (type, config) {
         if (type == 'coxcomb' || type == 'polar') return Coxcomb.map(config)
         //value by alpha maps
         if (type == 'alpha' || type == 'valueByAlpha') return ValueByAlpha.map(config)
+        //mushroom (Cheysson )
+        if (type == 'mushroom') return Mushroom.map(config)
 
         //add new map types here
         //if(type == "XX") return mapXX.map(config);
