@@ -6,6 +6,7 @@ import * as StatMap from '../../../core/stat-map.js'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../../../core/utils.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../../core/dorling/dorling.js'
 import { addMouseEvents } from './map-mushroom-interactions.js'
+import * as MushroomLegend from '../../../legend/legend-mushroom.js'
 
 /**
  * Mushroom (dual semi-circle) proportional symbol map
@@ -23,7 +24,8 @@ export const map = function (config) {
     out.mushroomMinSize_ = 4
     out.mushroomMaxSize_ = 30
     out.mushroomColors_ = ['#2c7bb6', '#d7191c']
-    out.mushroomOrientation_ = 'horizontal' // 'horizontal' | 'vertical'
+    out.mushroomOrientation_ = 'vertical' // 'horizontal' | 'vertical'
+    out.mushroomSizeScaleFunction_ = null // custom size scale function
 
     out._mushroomScale_ = null
 
@@ -33,7 +35,14 @@ export const map = function (config) {
     // Getters / setters
     // ===============================
 
-    const paramNames = ['mushroomCodes_', 'mushroomMinSize_', 'mushroomMaxSize_', 'mushroomColors_', 'mushroomOrientation_']
+    const paramNames = [
+        'mushroomCodes_',
+        'mushroomMinSize_',
+        'mushroomMaxSize_',
+        'mushroomColors_',
+        'mushroomOrientation_',
+        'mushroomSizeScaleFunction_',
+    ]
 
     paramNames.forEach((att) => {
         const name = att.slice(0, -1)
@@ -57,29 +66,38 @@ export const map = function (config) {
     // ===============================
     //@override
     out.updateClassification = function () {
-        out._mushroomScale_ = null
+        if (out.mushroomSizeScaleFunction_) {
+            //allow custom user scale function
+            out._mushroomScale_ = out.mushroomSizeScaleFunction_
+            return
+        }
 
-        const features = out.Geometries.getRegionFeatures()
-        if (!features || features.length === 0) return out
+        out._mushroomScale_ = null
 
         const [c1, c2] = out.mushroomCodes_
         const stat1 = out.statData(c1)
         const stat2 = out.statData(c2)
 
+        if (!stat1 && !stat2) return out
+
+        // Collect numeric values from BOTH stat datasets
         const values = []
 
-        features.forEach((f) => {
-            const id = f.properties.id
+        if (stat1?.getArray) {
+            stat1.getArray().forEach((v) => {
+                const n = +v
+                if (Number.isFinite(n)) values.push(n)
+            })
+        }
 
-            const sv1 = stat1.get(id)
-            const sv2 = stat2.get(id)
+        if (stat2?.getArray) {
+            stat2.getArray().forEach((v) => {
+                const n = +v
+                if (Number.isFinite(n)) values.push(n)
+            })
+        }
 
-            const v1 = +sv1?.value
-            const v2 = +sv2?.value
-
-            if (Number.isFinite(v1)) values.push(v1)
-            if (Number.isFinite(v2)) values.push(v2)
-        })
+        if (!values.length) return out
 
         const maxVal = max(values) || 0
 
@@ -114,14 +132,18 @@ export const map = function (config) {
                 const r1 = out._mushroomScale_(v1)
                 const r2 = out._mushroomScale_(v2)
 
-                // collision radius = max extent
-                return Math.max(r1, r2)
+                return Math.sqrt((r1 * r1 + r2 * r2) / 2)
             })
         } else {
             stopDorlingSimulation(out)
         }
 
         return out
+    }
+
+    //@override
+    out.getLegendConstructor = function () {
+        return MushroomLegend.legend
     }
 
     return out
@@ -151,6 +173,8 @@ function applyStyleToMap(map) {
 
         const v1 = +stat1.get(id)?.value || 0
         const v2 = +stat2.get(id)?.value || 0
+
+        if (v1 === 0 && v2 === 0) return
 
         const r1 = map._mushroomScale_(v1)
         const r2 = map._mushroomScale_(v2)

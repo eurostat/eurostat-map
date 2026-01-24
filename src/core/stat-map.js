@@ -1,9 +1,4 @@
-import {
-    getDownloadURL,
-    executeForAllInsets,
-    applyComputedStylesToSVG,
-    ensureSvgSize,
-} from './utils'
+import { getDownloadURL, executeForAllInsets, applyComputedStylesToSVG, ensureSvgSize } from './utils'
 import * as MapTemplate from './map-template'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
@@ -202,11 +197,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
             const y = legend.y == undefined ? legend.boxPadding : legend.y
 
             //build legend SVG in a new group
-            out.svg()
-                .append('g')
-                .attr('id', legend.svgId)
-                .attr('class', 'em-legend')
-                .attr('transform', 'translate(' + x + ',' + y + ')')
+            out.svg().append('g').attr('id', legend.svgId).attr('class', 'em-legend')
         }
 
         legend.build()

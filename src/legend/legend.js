@@ -105,6 +105,13 @@ export const legend = function (map) {
         if (map && container && legendSVG && legendSVG?.attr('id') !== map.legend_.svgId) {
             out.build() // sets new svg and lgg
         }
+
+        //position legend
+        if (out.x != null || out.y != null) {
+            const x = out.x ?? map.width() - out.width - out.boxPadding
+            const y = out.y ?? out.boxPadding
+            out.lgg.attr('transform', `translate(${x},${y})`)
+        }
     }
 
     out.updateConfig = function () {

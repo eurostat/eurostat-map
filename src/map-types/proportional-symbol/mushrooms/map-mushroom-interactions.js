@@ -18,6 +18,8 @@ function addMouseEventsToSymbols(map, out) {
                 const p = select(this)
                 p.attr('fill___', p.style('fill'))
                 p.style('fill', out.hoverColor_)
+                p.style('stroke', 'black')
+                p.style('stroke-width', 1)
             })
 
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
@@ -35,6 +37,7 @@ function addMouseEventsToSymbols(map, out) {
                 const p = select(this)
                 const original = p.attr('fill___')
                 if (original) p.style('fill', original)
+                p.style('stroke-width', 0)
             })
 
             if (out._tooltip) out._tooltip.mouseout()
