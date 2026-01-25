@@ -15,8 +15,13 @@ export const legend = function (map, config) {
     out.sizeLegend = {
         values: undefined, // raw data values
         labels: null, // optional labels
-        shapePadding: 24, // vertical spacing
-        labelOffsets: { x: 12, y: 0 },
+        shapePadding: 2, // vertical spacing
+        labelOffsets: { x: 5, y: 0 },
+    }
+
+    out.colorLegend = {
+        marginTop: 12,
+        labelOffsets: { x: 5, y: 5 },
     }
 
     // override via config
@@ -42,9 +47,24 @@ export const legend = function (map, config) {
         if (out.subtitle) out.addSubtitle()
 
         const baseX = out.getBaseX()
-        const baseY = out.getBaseY()
+        let cursorY = out.getBaseY()
+        const legendSpacing = 8
 
-        drawMushroomSizeLegend(out, baseX, baseY)
+        // -----------------------------
+        // SIZE LEGEND
+        // -----------------------------
+        drawMushroomSizeLegend(out, baseX, cursorY)
+
+        const sizeG = out.lgg.select('.em-mushroom-size-legend').node()
+        if (sizeG) {
+            const bbox = sizeG.getBBox()
+            cursorY += bbox.height + legendSpacing
+        }
+
+        // -----------------------------
+        // COLOR KEY
+        // -----------------------------
+        drawColorKey(out, baseX, cursorY + out.colorLegend.marginTop)
 
         out.setBoxDimension()
     }
@@ -65,89 +85,95 @@ function drawMushroomSizeLegend(out, x, y) {
     const scale = map._mushroomScale_
     if (!scale) return
 
-    const colors = map.mushroomColors()
     const orient = map.mushroomOrientation()
-
     const arcGen = arc().innerRadius(0)
-    const arcs = getMushroomArcs(orient)
+    const arcDef = getSizeLegendArc(orient)
+
+    const rowPadding = cfg.shapePadding ?? 6
+    const labelOffsetX = cfg.labelOffsets?.x ?? 5
+
+    // neutral legend style
+    const fill = cfg.shapeFill || '#d0d0d0'
+    const stroke = cfg.shapeStroke || '#666'
+    const strokeWidth = cfg.shapeStrokeWidth ?? 0.5
+
+    // prevent overlap with title
+    const maxR = Math.max(...values.map((v) => scale(v) || 0))
 
     const g = out.lgg.append('g').attr('class', 'em-mushroom-size-legend').attr('transform', `translate(${x},${y})`)
 
+    let cursorY = maxR
+
     values.forEach((v, i) => {
         const r = scale(v)
+        if (!r || r <= 0) return
 
-        const row = g.append('g').attr('transform', `translate(0, ${i * cfg.shapePadding})`)
+        const row = g
+            .append('g')
+            // shift right so left semi-circle stays inside legend
+            .attr('transform', `translate(${r}, ${cursorY})`)
 
-        // v1 half
+        // semicircle
         row.append('path')
             .attr(
                 'd',
                 arcGen({
-                    startAngle: arcs[0].start,
-                    endAngle: arcs[0].end,
+                    startAngle: arcDef.start,
+                    endAngle: arcDef.end,
                     outerRadius: r,
                 })
             )
-            .attr('fill', colors[0])
-
-        // v2 half
-        row.append('path')
-            .attr(
-                'd',
-                arcGen({
-                    startAngle: arcs[1].start,
-                    endAngle: arcs[1].end,
-                    outerRadius: r,
-                })
-            )
-            .attr('fill', colors[1])
+            .attr('fill', fill)
+            .attr('stroke', stroke)
+            .attr('stroke-width', strokeWidth)
 
         // label
         const label = cfg.labels?.[i] ?? v
         row.append('text')
-            .attr('x', r + cfg.labelOffsets.x)
+            .attr('x', r / 2 + labelOffsetX)
             .attr('y', 4)
             .attr('class', 'em-legend-label')
             .text(label)
-    })
 
-    // color key (v1 / v2)
-    drawColorKey(out, g, values.length * cfg.shapePadding + 6)
+        // spacing
+        const rowHeight = orient === 'vertical' ? 2 * r : r * 1.25
+
+        cursorY += rowHeight + rowPadding
+    })
 }
 
 /* ------------------------ Color key ---------------------------------- */
 
-function drawColorKey(out, container, y) {
+function drawColorKey(out, x, y) {
     const map = out.map
     const colors = map.mushroomColors()
     const [c1, c2] = map.mushroomCodes()
 
     const labels = [map.statData(c1)?.label_ || c1, map.statData(c2)?.label_ || c2]
 
-    const g = container.append('g').attr('class', 'em-mushroom-color-key').attr('transform', `translate(0, ${y})`)
+    const g = out.lgg.append('g').attr('class', 'em-mushroom-color-legend').attr('transform', `translate(${x}, ${y})`)
 
     labels.forEach((lab, i) => {
-        const row = g.append('g').attr('transform', `translate(0, ${i * 14})`)
+        const row = g.append('g').attr('transform', `translate(0, ${i * out.shapeHeight})`)
 
-        row.append('rect').attr('width', 10).attr('height', 10).attr('fill', colors[i])
+        row.append('rect').attr('width', out.shapeWidth).attr('height', out.shapeHeight).attr('fill', colors[i]).attr('class', 'em-legend-rect')
 
-        row.append('text').attr('x', 14).attr('y', 9).attr('class', 'em-legend-label').text(lab)
+        row.append('text')
+            .attr('x', out.shapeWidth + out.colorLegend.labelOffsets.x)
+            .attr('y', out.shapeHeight / 2 + out.colorLegend.labelOffsets.y)
+            .attr('class', 'em-legend-label')
+            .text(lab)
     })
 }
 
 /* ------------------------ Geometry ----------------------------------- */
 
-function getMushroomArcs(orientation) {
+function getSizeLegendArc(orientation) {
     if (orientation === 'vertical') {
-        return [
-            { start: Math.PI, end: 2 * Math.PI }, // top
-            { start: 0, end: Math.PI }, // bottom
-        ]
+        // top semi-circle
+        return { start: Math.PI, end: 2 * Math.PI }
     }
 
-    // horizontal (default)
-    return [
-        { start: -Math.PI / 2, end: Math.PI / 2 }, // left
-        { start: Math.PI / 2, end: (3 * Math.PI) / 2 }, // right
-    ]
+    // horizontal (default): left semi-circle
+    return { start: -Math.PI / 2, end: Math.PI / 2 }
 }
