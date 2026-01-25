@@ -6,6 +6,12 @@
     </head>
 
     <body>
+        <style>
+            .em-mushroom-segment {
+                stroke: white;
+                stroke-width: 0.5;
+            }
+        </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
@@ -61,6 +67,8 @@
                 .dorling(true)
                 .zoomButtons(true)
                 .hoverColor('#ffa500')
+                .mushroomMinSize(1)
+                .mushroomMaxSize(40)
                 .legend({
                     title: 'Million tonnes',
                     x: mapWidth - 220,

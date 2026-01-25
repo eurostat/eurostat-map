@@ -111,6 +111,8 @@ export const map = function (config) {
     // ===============================
     //@override
     out.updateStyle = function () {
+        out.updateSymbolsDrawOrder(out)
+
         applyStyleToMap(out)
 
         if (out.insetTemplates_) {
@@ -139,6 +141,49 @@ export const map = function (config) {
         }
 
         return out
+    }
+
+    out.updateSymbolsDrawOrder = function (map) {
+        const gcp = out.getCentroidsGroup(map)
+        const [c1, c2] = out.mushroomCodes()
+
+        const stat1 = out.statData(c1)
+        const stat2 = out.statData(c2)
+
+        // Ensure centroidFeatures exists
+        if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
+            map.Geometries.centroidsFeatures = map
+                .svg()
+                .selectAll('g.em-centroid')
+                .data()
+                .filter((d) => d?.properties?.centroid)
+        }
+
+        // Sort by visual size (largest first → drawn underneath)
+        const sorted = map.Geometries.centroidsFeatures
+            .map((d) => {
+                const id = d.properties.id
+                const v1 = +stat1.get(id)?.value || 0
+                const v2 = +stat2.get(id)?.value || 0
+                const r1 = out._mushroomScale_(v1)
+                const r2 = out._mushroomScale_(v2)
+                return { d, r: Math.max(r1, r2) }
+            })
+            .filter((o) => o.r > 0)
+            .sort((a, b) => b.r - a.r)
+            .map((o) => o.d)
+
+        // Clear old centroids
+        gcp.selectAll('g.em-centroid').remove()
+
+        // Recreate in sorted order
+        gcp.selectAll('g.em-centroid')
+            .data(sorted, (d) => d.properties.id)
+            .enter()
+            .append('g')
+            .attr('class', 'em-centroid')
+            .attr('id', (d) => 'mushroom-' + d.properties.id)
+            .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
     }
 
     //@override
@@ -182,7 +227,7 @@ function applyStyleToMap(map) {
         const g = select(this)
 
         if (orient === 'vertical') {
-            // top
+            // top (v1)
             g.append('path')
                 .attr(
                     'd',
@@ -193,8 +238,10 @@ function applyStyleToMap(map) {
                     })
                 )
                 .attr('fill', colors[0])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '0')
 
-            // bottom
+            // bottom (v2)
             g.append('path')
                 .attr(
                     'd',
@@ -205,8 +252,10 @@ function applyStyleToMap(map) {
                     })
                 )
                 .attr('fill', colors[1])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '1')
         } else {
-            // left
+            // left (v1)
             g.append('path')
                 .attr(
                     'd',
@@ -217,8 +266,10 @@ function applyStyleToMap(map) {
                     })
                 )
                 .attr('fill', colors[0])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '0')
 
-            // right
+            // right (v2)
             g.append('path')
                 .attr(
                     'd',
@@ -229,6 +280,8 @@ function applyStyleToMap(map) {
                     })
                 )
                 .attr('fill', colors[1])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '1')
         }
     })
 

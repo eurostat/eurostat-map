@@ -17,6 +17,9 @@ function addMouseEventsToSymbols(map, out) {
             sel.selectAll('path').each(function () {
                 const p = select(this)
                 p.attr('fill___', p.style('fill'))
+                p.attr('stroke___', p.style('stroke'))
+                p.attr('sw___', p.style('stroke-width'))
+                //set new
                 p.style('fill', out.hoverColor_)
                 p.style('stroke', 'black')
                 p.style('stroke-width', 1)
@@ -37,7 +40,10 @@ function addMouseEventsToSymbols(map, out) {
                 const p = select(this)
                 const original = p.attr('fill___')
                 if (original) p.style('fill', original)
-                p.style('stroke-width', 0)
+                const originalStrokeWidth = p.attr('sw___')
+                const originalStroke = p.attr('stroke___')
+                if (originalStroke) p.style('stroke', originalStroke)
+                if (originalStrokeWidth) p.style('stroke-width', originalStrokeWidth)
             })
 
             if (out._tooltip) out._tooltip.mouseout()

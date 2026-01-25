@@ -154,7 +154,25 @@ function drawColorKey(out, x, y) {
     const g = out.lgg.append('g').attr('class', 'em-mushroom-color-legend').attr('transform', `translate(${x}, ${y})`)
 
     labels.forEach((lab, i) => {
-        const row = g.append('g').attr('transform', `translate(0, ${i * out.shapeHeight})`)
+        const row = g
+            .append('g')
+            .attr('transform', `translate(0, ${i * out.shapeHeight})`)
+            .style('cursor', 'pointer')
+            .on('mouseover', () => {
+                highlightMushroomSide(map, i)
+
+                // apply to insets as well
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId_, highlightMushroomSide, i)
+                }
+            })
+            .on('mouseout', () => {
+                resetMushroomHighlight(map)
+
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId_, resetMushroomHighlight)
+                }
+            })
 
         row.append('rect').attr('width', out.shapeWidth).attr('height', out.shapeHeight).attr('fill', colors[i]).attr('class', 'em-legend-rect')
 
@@ -176,4 +194,16 @@ function getSizeLegendArc(orientation) {
 
     // horizontal (default): left semi-circle
     return { start: -Math.PI / 2, end: Math.PI / 2 }
+}
+
+function highlightMushroomSide(map, sideIndex) {
+    map.svg()
+        .selectAll('g.em-centroid path[data-mushroom-side]')
+        .style('opacity', function () {
+            return this.getAttribute('data-mushroom-side') === String(sideIndex) ? 1 : 0
+        })
+}
+
+function resetMushroomHighlight(map) {
+    map.svg().selectAll('g.em-centroid path[data-mushroom-side]').style('opacity', null)
 }
