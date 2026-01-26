@@ -161,7 +161,11 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
             orient === 'vertical' && sideIndex === 1
                 ? r // bottom semi-circle
                 : -r // top (or default)
-        const xLabel = maxR + labelOffsetX
+        let xLabel = maxR + labelOffsetX
+        if (orient === 'horizontal') {
+            // left side
+            xLabel = 10 + labelOffsetX
+        }
 
         row.append('line')
             .attr('x1', 0)
@@ -218,7 +222,7 @@ function getLabels(cfg, legendValues, hasIndependentScales, side) {
         labels = cfg.labels
     }
 
-    return labels && labels.length === legendValues.length ? labels : null
+    return labels && labels.length >= legendValues.length ? labels : null
 }
 
 /* ------------------------ Color key ---------------------------------- */
@@ -278,15 +282,17 @@ function getSizeLegendArc(orientation, sideIndex = null) {
         return { start: -Math.PI / 2, end: Math.PI / 2 }
     }
 
-    // horizontal
+    // HORIZONTAL — vertical flat edges
     if (sideIndex === 0) {
-        return { start: -Math.PI / 2, end: Math.PI / 2 }
+        // v1 — left
+        return { start: Math.PI, end: 2 * Math.PI }
     }
     if (sideIndex === 1) {
-        return { start: Math.PI / 2, end: (3 * Math.PI) / 2 }
+        // v2 — right
+        return { start: 0, end: Math.PI }
     }
 
-    return { start: -Math.PI / 2, end: Math.PI / 2 }
+    return { start: Math.PI, end: 2 * Math.PI }
 }
 
 function highlightMushroomSide(map, sideIndex) {

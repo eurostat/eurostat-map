@@ -7,9 +7,23 @@
 
     <body>
         <style>
+            body {
+                margin: 0;
+            }
             .em-mushroom-segment {
                 stroke: white;
                 stroke-width: 0.5;
+            }
+            .em-zoom-buttons {
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                transform: translate(95%, 90%);
+            }
+            .em-inset {
+                filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+            }
+            .em-insets .em-frame {
+                stroke: grey;
+                stroke-width: 1px !important;
             }
         </style>
         <svg id="map"></svg>
@@ -18,8 +32,8 @@
         <script src="https://unpkg.com/proj4"></script>
 
         <script type="module">
-            const mapWidth = 795
-            const mapHeight = 700
+            const mapWidth = 1080
+            const mapHeight = 900
 
             //data load
             const [freightData] = await Promise.all([d3.json('./data/maritime_freight.json')])
@@ -53,16 +67,22 @@
                 }
             }
             const getApproxCurrentGeoBbox = function () {
-                const defaultPosition = { x: 4790000, y: 3420000 }
-                const halfWidth = 0.5 * defaultPosition.z * mapWidth
-                const halfHeight = 0.5 * defaultPosition.z * mapHeight
+                const defaultPosition = { x: 4790000, y: 3420000, z: 1000 }
+                const halfWidth = 0.6 * defaultPosition.z * mapWidth
+                const halfHeight = 0.6 * defaultPosition.z * mapHeight
                 return [defaultPosition.x - halfWidth, defaultPosition.y - halfHeight, defaultPosition.x + halfWidth, defaultPosition.y + halfHeight]
             }
             const portsProjection = d3.geoIdentity().reflectY(true).fitSize([mapWidth, mapHeight], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
 
             // build map
+            const insetHeight = 90,
+                insetWidth = 90,
+                padding = 10
             const map = eurostatmap
                 .map('mushroom')
+                .width(mapWidth)
+                .height(mapHeight)
+                .position({ x: 4790000, y: 3420000, z: 4500 })
                 .nutsLevel(0)
                 .dorling(true)
                 .zoomButtons(true)
@@ -71,17 +91,73 @@
                 .mushroomMaxSize(40)
                 .mushroomOrientation('horizontal')
                 .legend({
-                    title: 'Million tonnes',
-                    x: mapWidth - 220,
-                    y: 40,
+                    title: 'Tonnes',
+                    x: 10,
+                    y: 160,
                     sizeLegend: {
                         values: [288000000, 100000000, 2000000],
-                        labels: ['288 (Rotterdam)', '100 ', '1 (Umea)'],
+                        labels: ['288 million ', '2 million'],
                     },
                 })
                 .tooltip({
                     textFunction: tooltipTextFunction,
                 })
+                .insetBoxPosition([mapWidth - insetWidth - 20, 10])
+                .insets([
+                    {
+                        x: -230,
+                        y: 0,
+                        title: 'BE,NL',
+                        geo: 'EUR',
+                        position: { x: 3900000, y: 3200000, z: 1000 },
+                    },
+                    {
+                        x: -230,
+                        y: 220,
+                        title: 'DE,DK',
+                        geo: 'EUR',
+                        position: { x: 4330000, y: 3480000, z: 1600 },
+                    },
+                    {
+                        title: 'Canarias (ES)',
+                        geo: 'IC',
+                        x: 0,
+                        y: 0,
+                        position: { z: 6400 },
+                        width: insetWidth,
+                        height: insetHeight,
+                    },
+                    {
+                        title: 'Guadeloupe (FR)',
+                        geo: 'GP',
+                        x: 0,
+                        y: insetHeight + padding,
+                        width: insetWidth,
+                        height: insetHeight,
+                        position: { x: 680000, y: 1810000, z: 2000 },
+                        // titlePosition: [0, 10],
+                        // showScalebar: true,
+                        // scalebarPosition: [48, 55],
+                    },
+                    {
+                        title: 'Martinique (FR)',
+                        geo: 'MQ',
+                        x: 0,
+                        y: insetHeight * 2 + padding * 2,
+                        position: { z: 2000 },
+                        width: insetWidth,
+                        height: insetHeight,
+                    },
+                    {
+                        title: 'Reunion (FR)',
+                        geo: 'RE',
+                        x: 0,
+                        y: insetHeight * 3 + padding * 3,
+                        position: { x: 348011, y: 7661627, z: 2600 },
+                        width: insetWidth,
+                        height: insetHeight,
+                    },
+                ])
                 .callback(() => {
                     const portKeys = freightData.map((d) => d.code)
                     //color regions
