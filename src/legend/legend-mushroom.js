@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { arc } from 'd3-shape'
 import * as Legend from './legend'
+import { spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * Legend for mushroom (dual semi-circle) proportional symbols
@@ -13,20 +14,28 @@ export const legend = function (map, config) {
     // Size legend config
     // -------------------------------
     out.sizeLegend = {
+        marginTop: 15,
         values: undefined, // raw data values
+        valuesV1: undefined, // raw data values for v1 side
+        valuesV2: undefined, // raw data values for v2 side
         labels: null, // optional labels
+        labelsV1: null, // optional labels for v1 side
+        labelsV2: null, // optional labels for v2 side
         shapePadding: 2, // vertical spacing
         labelOffsets: { x: 5, y: 0 },
     }
 
     out.colorLegend = {
-        marginTop: 12,
+        marginTop: 5,
         labelOffsets: { x: 5, y: 5 },
     }
 
     // override via config
     if (config?.sizeLegend) {
         Object.assign(out.sizeLegend, config.sizeLegend)
+    }
+    if (config?.colorLegend) {
+        Object.assign(out.colorLegend, config.colorLegend)
     }
 
     // -------------------------------
@@ -47,18 +56,19 @@ export const legend = function (map, config) {
         if (out.subtitle) out.addSubtitle()
 
         const baseX = out.getBaseX()
-        let cursorY = out.getBaseY()
+        let cursorY = out.getBaseY() + out.sizeLegend.marginTop
         const legendSpacing = 8
 
         // -----------------------------
         // SIZE LEGEND
         // -----------------------------
-        drawMushroomSizeLegend(out, baseX, cursorY)
+        const hasIndependentScales = out.map.mushroomSizeScaleFunctionV1_ && out.map.mushroomSizeScaleFunctionV2_
 
-        const sizeG = out.lgg.select('.em-mushroom-size-legend').node()
-        if (sizeG) {
-            const bbox = sizeG.getBBox()
-            cursorY += bbox.height + legendSpacing
+        if (hasIndependentScales) {
+            cursorY = drawMushroomSizeLegend(out, baseX, cursorY, 'v1') + legendSpacing
+            cursorY = drawMushroomSizeLegend(out, baseX, cursorY, 'v2')
+        } else {
+            cursorY = drawMushroomSizeLegend(out, baseX, cursorY)
         }
 
         // -----------------------------
@@ -76,44 +86,63 @@ export const legend = function (map, config) {
 /* ======================= Drawing helpers ============================== */
 /* ===================================================================== */
 
-function drawMushroomSizeLegend(out, x, y) {
+function drawMushroomSizeLegend(out, x, y, side = null) {
     const map = out.map
     const cfg = out.sizeLegend
-    const values = cfg.values
-    if (!values || !values.length) return
 
-    const scale = map._mushroomScale_
-    if (!scale) return
+    const scaleShared = map._mushroomScale_
+    const scaleV1 = map.mushroomSizeScaleFunctionV1_
+    const scaleV2 = map.mushroomSizeScaleFunctionV2_
+    const hasIndependentScales = scaleV1 && scaleV2
 
+    let scale
+    let sideIndex = null
+
+    if (side === 'v1') {
+        scale = scaleV1
+        sideIndex = 0
+    } else if (side === 'v2') {
+        scale = scaleV2
+        sideIndex = 1
+    } else {
+        scale = scaleShared
+    }
+
+    if (!scale) return y
+
+    // geometry + style
     const orient = map.mushroomOrientation()
     const arcGen = arc().innerRadius(0)
-    const arcDef = getSizeLegendArc(orient)
+    const arcDef = getSizeLegendArc(orient, sideIndex)
 
-    const rowPadding = cfg.shapePadding ?? 6
-    const labelOffsetX = cfg.labelOffsets?.x ?? 5
-
-    // neutral legend style
-    const fill = cfg.shapeFill || '#d0d0d0'
+    const labelOffsetX = cfg.labelOffsets?.x ?? 8
+    const leaderDash = '3,2'
     const stroke = cfg.shapeStroke || '#666'
     const strokeWidth = cfg.shapeStrokeWidth ?? 0.5
 
-    // prevent overlap with title
-    const maxR = Math.max(...values.map((v) => scale(v) || 0))
+    const legendValuesRaw = getValues(cfg, scale, hasIndependentScales, side)
+    if (!legendValuesRaw) return y
+
+    const legendValues = [...legendValuesRaw].sort((a, b) => scale(b) - scale(a))
+
+    const radii = legendValues.map((v) => scale(v))
+    const maxR = Math.max(...radii)
+    if (!Number.isFinite(maxR) || maxR <= 0) return y
+
+    // labels (per side)
+    const labels = getLabels(cfg, legendValues, hasIndependentScales, side)
 
     const g = out.lgg.append('g').attr('class', 'em-mushroom-size-legend').attr('transform', `translate(${x},${y})`)
 
-    let cursorY = maxR
+    const cx = maxR
+    const cy = maxR
 
-    values.forEach((v, i) => {
+    legendValues.forEach((v, i) => {
         const r = scale(v)
         if (!r || r <= 0) return
 
-        const row = g
-            .append('g')
-            // shift right so left semi-circle stays inside legend
-            .attr('transform', `translate(${r}, ${cursorY})`)
+        const row = g.append('g').attr('transform', `translate(${cx},${cy})`)
 
-        // semicircle
         row.append('path')
             .attr(
                 'd',
@@ -123,23 +152,73 @@ function drawMushroomSizeLegend(out, x, y) {
                     outerRadius: r,
                 })
             )
-            .attr('fill', fill)
+            .attr('fill', 'none')
             .attr('stroke', stroke)
             .attr('stroke-width', strokeWidth)
+            .attr('data-mushroom-side', sideIndex)
 
-        // label
-        const label = cfg.labels?.[i] ?? v
+        const yLeader =
+            orient === 'vertical' && sideIndex === 1
+                ? r // bottom semi-circle
+                : -r // top (or default)
+        const xLabel = maxR + labelOffsetX
+
+        row.append('line')
+            .attr('x1', 0)
+            .attr('x2', xLabel)
+            .attr('y1', yLeader)
+            .attr('y2', yLeader)
+            .attr('stroke', stroke)
+            .attr('stroke-width', 0.6)
+            .attr('stroke-dasharray', leaderDash)
+
         row.append('text')
-            .attr('x', r / 2 + labelOffsetX)
-            .attr('y', 4)
+            .attr('x', xLabel + 3)
+            .attr('y', yLeader)
+            .attr('dy', '0.35em')
+            .attr('dominant-baseline', 'middle')
             .attr('class', 'em-legend-label')
-            .text(label)
-
-        // spacing
-        const rowHeight = orient === 'vertical' ? 2 * r : r * 1.25
-
-        cursorY += rowHeight + rowPadding
+            .text(labels ? labels[i] : spaceAsThousandSeparator(v))
     })
+
+    const bbox = g.node()?.getBBox()
+    return bbox ? y + bbox.height : y
+}
+
+function getValues(cfg, scale, hasIndependentScales, side) {
+    let values
+
+    if (hasIndependentScales) {
+        if (side === 'v1') values = cfg.valuesV1
+        else if (side === 'v2') values = cfg.valuesV2
+    } else {
+        values = cfg.values
+    }
+
+    // auto bounds from scale
+    if (!values || !values.length) {
+        const d = scale.domain?.()
+        if (!d || d.length < 2) return null
+        return [Math.min(d[0], d[d.length - 1]), Math.max(d[0], d[d.length - 1])]
+    }
+
+    // explicit values → bounds
+    const vMin = Math.min(...values)
+    const vMax = Math.max(...values)
+    return values.length > 1 ? [vMax, vMin] : [values[0]]
+}
+
+function getLabels(cfg, legendValues, hasIndependentScales, side) {
+    let labels
+
+    if (hasIndependentScales) {
+        if (side === 'v1') labels = cfg.labelsV1
+        else if (side === 'v2') labels = cfg.labelsV2
+    } else {
+        labels = cfg.labels
+    }
+
+    return labels && labels.length === legendValues.length ? labels : null
 }
 
 /* ------------------------ Color key ---------------------------------- */
@@ -149,7 +228,7 @@ function drawColorKey(out, x, y) {
     const colors = map.mushroomColors()
     const [c1, c2] = map.mushroomCodes()
 
-    const labels = [map.statData(c1)?.label_ || c1, map.statData(c2)?.label_ || c2]
+    const labels = out.colorLegend.labels ?? [map.statData(c1)?.label_ || c1, map.statData(c2)?.label_ || c2]
 
     const g = out.lgg.append('g').attr('class', 'em-mushroom-color-legend').attr('transform', `translate(${x}, ${y})`)
 
@@ -186,13 +265,27 @@ function drawColorKey(out, x, y) {
 
 /* ------------------------ Geometry ----------------------------------- */
 
-function getSizeLegendArc(orientation) {
+function getSizeLegendArc(orientation, sideIndex = null) {
     if (orientation === 'vertical') {
-        // top semi-circle
-        return { start: Math.PI, end: 2 * Math.PI }
+        if (sideIndex === 0) {
+            // top
+            return { start: -Math.PI / 2, end: Math.PI / 2 }
+        }
+        if (sideIndex === 1) {
+            // bottom
+            return { start: Math.PI / 2, end: (3 * Math.PI) / 2 }
+        }
+        return { start: -Math.PI / 2, end: Math.PI / 2 }
     }
 
-    // horizontal (default): left semi-circle
+    // horizontal
+    if (sideIndex === 0) {
+        return { start: -Math.PI / 2, end: Math.PI / 2 }
+    }
+    if (sideIndex === 1) {
+        return { start: Math.PI / 2, end: (3 * Math.PI) / 2 }
+    }
+
     return { start: -Math.PI / 2, end: Math.PI / 2 }
 }
 

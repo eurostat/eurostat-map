@@ -26,6 +26,8 @@ Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-
     - [Stripe composition map](#stripe-composition-map)
     - [Sparkline map](#sparkline-map)
     - [Flow map](#flow-map)
+    - [Coxcomb map](#coxcomb-map)
+    - [Mushroom map](#coxcomb-map)
     - [Cartograms](#cartograms)
       - [Grid Cartograms](#grid-cartograms)
       - [Dorling Cartograms](#dorling-cartograms)
@@ -57,12 +59,16 @@ Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-
 Create a map with `let map = eurostatmap.map( mapType )`. Set the parameter `mapType` to a value corresponding with the desired map type:
 
 - `"choropleth"` for a [choropleth map](#choropleth-map),
+- `"bivariateChoropleth"` for a [bivariate choropleth map](#bivariate-choropleth-map).
+- `"trivariateChoropleth"` for a [ternary choropleth map](#trivariate-choropleth-map).
 - `"proportionalSymbol"` for a [proportional symbol map](#proportional-symbol-map),
 - `"pieChart"` for a [proportional pie chart map](#proportional-pie-chart-map),
 - `"categorical"` for a [categorical map](#categorical-map).
-- `"bivariateChoropleth"` for a [bivariate choropleth map](#bivariate-choropleth-map).
 - `"stripeComposition"` for a [stripe composition map](#stripe-composition-map).
 - `"sparkline"` for a [spark line map](#sparkline-map).
+- `"flow"` for a [flow map](#flow-map).
+- `"coxcomb"` for a [coxcomb map](#coxcomb-map).
+- `"mushroom"` for a [mushroom map](#mushroom-map).
 
 The `map` can then be customised with the methods listed in the tables below. Most of the map methods follow the pattern _map_.**myMethod**([*value*]): If a _value_ is specified, the method sets the parameter value and returns the _map_ object itself. If no _value_ is specified, the method returns the current value of the parameter.
 
@@ -553,6 +559,46 @@ eurostatmap
 | _map_.**classToFillStyle**([*value*]) | Function | _auto_        | A function returning the colors for each pair of classes i,j.                                                    |
 | _map_.**noDataFillStyle**([*value*])  | color    | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                |
 
+### Trivariate choropleth map
+
+Example:
+
+```javascript
+ const map = eurostatmap
+        .map('trivariateChoropleth')
+        .title('Age Structure')
+        .subtitle('Population distribution by age groups, 2023')
+        .nutsLevel(3)
+        .stat('v1', {
+            label: 'Population 15–29',
+            eurostatDatasetCode: 'demo_r_pjanind3',
+            filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+            unitText: '%',
+        })
+        .stat('v2', {
+            label: 'Population 45–64',
+            eurostatDatasetCode: 'demo_r_pjanind3',
+            filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
+            unitText: '%',
+        })
+        .stat('v3', {
+            label: 'Population 75+',
+            eurostatDatasetCode: 'demo_r_pjanind3',
+            filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
+            unitText: '%',
+        })
+        .ternarySettings({
+            hue: 160,
+            chroma: 130,
+            lightness: 40,
+            contrast: 0,
+            spread: 1.5,
+            breaks: 5,
+            meanCentering: true,
+        })
+        .build()
+```
+
 
 ### Stripe composition map
 
@@ -743,6 +789,71 @@ const map = eurostatmap
 | _map_.**flowCurvatureSettings**([*value*]) | object             | `{ gapX: 10, padX: 2, padY: 2, bumpY: 1, curvature: 0.5 }` | The settings for curved flows and their collision detection.                                                                                                                                         |
 | _map_.**flowBidirectional**([*value*])     | boolean            | true                                                       | Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line. |
 | _map_.**flowEdgeBundling**([*value*])      | boolean            | true                                                       | Whether to apply edge-bundling to flow lines.                                                                                                                                                        |
+
+### Coxcomb map
+
+Example:
+
+```javascript
+ const map = eurostatmap
+        .map('coxcomb')
+        .dorling(true)
+        .title('Tourism')
+        .subtitle('Total nights spent, 2022')
+        .scale('60M')
+        .nutsLevel(1)
+        .statCoxcomb({
+            stat: {
+                //data/tour_occ_nin2m?format=JSON&unit=NR&c_resid=TOTAL&nace_r2=I551-I553&month=M01&lang=EN
+                eurostatDatasetCode: 'tour_occ_nin2m',
+                filters: { unit: 'NR', nace_r2: 'I551-I553', TIME: 2022 }, // shared filters
+                unitText: 'Nights spent',
+            },
+            timeParameter: 'month',
+            times: ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12'],
+            timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            categoryParameter: 'c_resid',
+            categoryCodes: ['DOM', 'FOR'],
+            categoryLabels: ['Domestic', 'Foreign'],
+            categoryColors: ['#1b9e77', '#d95f02'],
+            totalCode: 'TOTAL',
+        })
+        .coxcombMinRadius(5)
+        .coxcombMaxRadius(37)
+        .legend({
+            svgId: 'legend',
+            title: 'Nights spent',
+            x: 50,
+            y: 120,
+            colorLegend: { title: 'Type', marginTop: 50, noData: false },
+            timeLegend: { title: 'Month', marginTop: -30 },
+        })
+        .build()
+```
+
+### Mushroom map
+
+Example:
+
+```javascript
+    const map = eurostatmap
+        .map('mushroom')
+        .nutsLevel(2)
+        .title('basic test')
+        .dorling(true)
+        .stat('v1', {
+            eurostatDatasetCode: 'demo_r_pjangrp3',
+            filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+            unitText: 'inhabitants',
+        })
+        .stat('v2', {
+            eurostatDatasetCode: 'nama_10r_3gdp',
+            unitText: 'Euro per inhabitant',
+            filters: { unit: 'EUR_HAB', time: '2022' },
+        })
+        .zoomExtent([1, 1000])
+        .build()
+```
 
 ### Cartograms
 

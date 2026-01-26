@@ -25,7 +25,9 @@ export const map = function (config) {
     out.mushroomMaxSize_ = 30
     out.mushroomColors_ = ['#2c7bb6', '#d7191c']
     out.mushroomOrientation_ = 'vertical' // 'horizontal' | 'vertical'
-    out.mushroomSizeScaleFunction_ = null // custom size scale function
+    out.mushroomSizeScaleFunction_ = null // custom size scale function for both sides
+    out.mushroomSizeScaleFunctionV1_ = null // custom size scale function for v1 side
+    out.mushroomSizeScaleFunctionV2_ = null // custom size scale function for v2 side
 
     out._mushroomScale_ = null
 
@@ -42,6 +44,8 @@ export const map = function (config) {
         'mushroomColors_',
         'mushroomOrientation_',
         'mushroomSizeScaleFunction_',
+        'mushroomSizeScaleFunctionV1_',
+        'mushroomSizeScaleFunctionV2_',
     ]
 
     paramNames.forEach((att) => {
@@ -69,6 +73,10 @@ export const map = function (config) {
         if (out.mushroomSizeScaleFunction_) {
             //allow custom user scale function
             out._mushroomScale_ = out.mushroomSizeScaleFunction_
+            return
+        }
+        if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+            //both sides have custom user scale functions
             return
         }
 
@@ -120,7 +128,7 @@ export const map = function (config) {
         }
 
         // dorling cartogram
-        if (out.dorling_ && out._mushroomScale_) {
+        if (out.dorling_ && (out._mushroomScale_ || (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_))) {
             const [c1, c2] = out.mushroomCodes()
             const stat1 = out.statData(c1)
             const stat2 = out.statData(c2)
@@ -131,8 +139,14 @@ export const map = function (config) {
                 const v1 = +stat1.get(id)?.value || 0
                 const v2 = +stat2.get(id)?.value || 0
 
-                const r1 = out._mushroomScale_(v1)
-                const r2 = out._mushroomScale_(v2)
+                let r1, r2
+                if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+                    r1 = out.mushroomSizeScaleFunctionV1_(v1)
+                    r2 = out.mushroomSizeScaleFunctionV2_(v2)
+                } else {
+                    r1 = out._mushroomScale_(v1)
+                    r2 = out._mushroomScale_(v2)
+                }
 
                 return Math.sqrt((r1 * r1 + r2 * r2) / 2)
             })
@@ -165,8 +179,14 @@ export const map = function (config) {
                 const id = d.properties.id
                 const v1 = +stat1.get(id)?.value || 0
                 const v2 = +stat2.get(id)?.value || 0
-                const r1 = out._mushroomScale_(v1)
-                const r2 = out._mushroomScale_(v2)
+                let r1, r2
+                if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+                    r1 = out.mushroomSizeScaleFunctionV1_(v1)
+                    r2 = out.mushroomSizeScaleFunctionV2_(v2)
+                } else {
+                    r1 = out._mushroomScale_(v1)
+                    r2 = out._mushroomScale_(v2)
+                }
                 return { d, r: Math.max(r1, r2) }
             })
             .filter((o) => o.r > 0)
@@ -198,11 +218,11 @@ export const map = function (config) {
  * Draw mushroom symbols
  */
 function applyStyleToMap(map) {
-    if (!map.svg() || !map._mushroomScale_) return
-
+    if (!map.svg() || (!map._mushroomScale_ && !map.mushroomSizeScaleFunctionV1_ && !map.mushroomSizeScaleFunctionV2_)) return
+    const hasIndependentScales = map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_
     const [c1, c2] = map.mushroomCodes()
     const colors = map.mushroomColors()
-    const orient = map.mushroomOrientation()
+    const orient = map.mushroomOrientation_
 
     const stat1 = map.statData(c1)
     const stat2 = map.statData(c2)
@@ -221,19 +241,25 @@ function applyStyleToMap(map) {
 
         if (v1 === 0 && v2 === 0) return
 
-        const r1 = map._mushroomScale_(v1)
-        const r2 = map._mushroomScale_(v2)
+        let r1, r2
+        if (map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_) {
+            r1 = map.mushroomSizeScaleFunctionV1_(v1)
+            r2 = map.mushroomSizeScaleFunctionV2_(v2)
+        } else {
+            r1 = map._mushroomScale_(v1)
+            r2 = map._mushroomScale_(v2)
+        }
 
         const g = select(this)
 
         if (orient === 'vertical') {
-            // top (v1)
+            // TOP (v1): upper semi-circle, flat at bottom
             g.append('path')
                 .attr(
                     'd',
                     arcGen({
-                        startAngle: Math.PI,
-                        endAngle: 2 * Math.PI,
+                        startAngle: -Math.PI / 2,
+                        endAngle: Math.PI / 2,
                         outerRadius: r1,
                     })
                 )
@@ -241,13 +267,13 @@ function applyStyleToMap(map) {
                 .attr('class', 'em-mushroom-segment')
                 .attr('data-mushroom-side', '0')
 
-            // bottom (v2)
+            // BOTTOM (v2): lower semi-circle, flat at top
             g.append('path')
                 .attr(
                     'd',
                     arcGen({
-                        startAngle: 0,
-                        endAngle: Math.PI,
+                        startAngle: Math.PI / 2,
+                        endAngle: (3 * Math.PI) / 2,
                         outerRadius: r2,
                     })
                 )
@@ -315,11 +341,11 @@ const tooltipTextFunctionMushroom = function (rg, map) {
             <table class="em-tooltip-table">
                 <tbody>
                     <tr>
-                        <td>${map.statData(c1).label_ || c1}</td>
+                        <td>${map.statData(c1).label_ || ''}</td>
                         <td>${fmt(sv1?.value, unit1)}</td>
                     </tr>
                     <tr>
-                        <td>${map.statData(c2).label_ || c2}</td>
+                        <td>${map.statData(c2).label_ || ''}</td>
                         <td>${fmt(sv2?.value, unit2)}</td>
                     </tr>
                 </tbody>

@@ -12,20 +12,36 @@
         <script>
             const map = eurostatmap
                 .map('mushroom')
-                .nutsLevel(2)
+                .nutsLevel(0)
                 .title('basic test')
                 .dorling(true)
+                .mushroomOrientation('vertical')
                 .stat('v1', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2022' },
                 })
                 .stat('v2', {
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Euro per inhabitant',
-                    filters: { unit: 'EUR_HAB', time: '2022' },
+                    eurostatDatasetCode: 'demo_r_pjangrp3',
+                    filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+                    unitText: 'inhabitants',
                 })
                 .zoomExtent([1, 1000])
+                .mushroomSizeScaleFunctionV1(function (value) {
+                    // custom size scale function for v1 side
+                    return Math.sqrt(value) * 0.01
+                })
+                .mushroomSizeScaleFunctionV2(function (value) {
+                    // custom size scale function for v2 side
+                    return Math.cbrt(value) * 0.03
+                })
+                .legend({
+                    title: 'Million tonnes',
+                    x: 500,
+                    y: 40,
+                    sizeLegend: { valuesV1: [3000000, 200000], valuesV2: [83000000] },
+                    colorLegend: { marginTop: 25, labels: ['Million Euro', 'Inhabitants'] },
+                })
                 .build()
         </script>
     </body>
