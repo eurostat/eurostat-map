@@ -13,7 +13,9 @@
             const map = eurostatmap
                 .map('mushroom')
                 .nutsLevel(0)
-                .title('basic test')
+                .title('Mushroom map')
+                .subtitle('Facing semi circles representing two different statistics')
+                .position({ x: 4710000, y: 3550000, z: 6500 })
                 .dorling(true)
                 .mushroomOrientation('vertical')
                 .stat('v1', {
@@ -36,8 +38,7 @@
                     return Math.cbrt(value) * 0.03
                 })
                 .legend({
-                    title: 'Million tonnes',
-                    x: 500,
+                    x: 610,
                     y: 40,
                     sizeLegend: { valuesV1: [3000000, 200000], valuesV2: [83000000] },
                     colorLegend: { marginTop: 25, labels: ['Million Euro', 'Inhabitants'] },
