@@ -281,13 +281,15 @@ function applyStyleToMap(map) {
                 .attr('class', 'em-mushroom-segment')
                 .attr('data-mushroom-side', '1')
         } else {
-            // left (v1)
+            // HORIZONTAL
+
+            // v1 — LEFT (curves left, flat on right)
             g.append('path')
                 .attr(
                     'd',
                     arcGen({
-                        startAngle: -Math.PI / 2,
-                        endAngle: Math.PI / 2,
+                        startAngle: Math.PI,
+                        endAngle: 2 * Math.PI,
                         outerRadius: r1,
                     })
                 )
@@ -295,13 +297,13 @@ function applyStyleToMap(map) {
                 .attr('class', 'em-mushroom-segment')
                 .attr('data-mushroom-side', '0')
 
-            // right (v2)
+            // v2 — RIGHT (curves right, flat on left)
             g.append('path')
                 .attr(
                     'd',
                     arcGen({
-                        startAngle: Math.PI / 2,
-                        endAngle: (3 * Math.PI) / 2,
+                        startAngle: 0,
+                        endAngle: Math.PI,
                         outerRadius: r2,
                     })
                 )
