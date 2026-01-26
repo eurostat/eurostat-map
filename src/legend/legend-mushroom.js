@@ -65,21 +65,57 @@ export const legend = function (map, config) {
         const hasIndependentScales = out.map.mushroomSizeScaleFunctionV1_ && out.map.mushroomSizeScaleFunctionV2_
 
         if (hasIndependentScales) {
-            cursorY = drawMushroomSizeLegend(out, baseX, cursorY, 'v1') + legendSpacing
-            cursorY = drawMushroomSizeLegend(out, baseX, cursorY, 'v2')
+            // --- v1 legend ---
+            const v1Box = drawMushroomSizeLegend(out, baseX, cursorY, 'v1')
+
+            // v1 label BELOW v1 legend
+            drawSideLabel(out, baseX, v1Box.bottom + 5, 'v1')
+
+            // move cursor directly to v1 legend bottom (NO extra spacing)
+            cursorY = v1Box.bottom
+
+            // --- v2 legend ---
+            const v2Box = drawMushroomSizeLegend(out, baseX, cursorY, 'v2')
+
+            // v2 label JUST ABOVE v2 legend
+            drawSideLabel(out, baseX, v2Box.top + 30, 'v2')
         } else {
             cursorY = drawMushroomSizeLegend(out, baseX, cursorY)
         }
 
         // -----------------------------
-        // COLOR KEY
+        // COLOR KEY (only for shared scale)
         // -----------------------------
-        drawColorKey(out, baseX, cursorY + out.colorLegend.marginTop)
+        if (!hasIndependentScales) {
+            drawColorKey(out, baseX, cursorY + out.colorLegend.marginTop)
+        }
 
         out.setBoxDimension()
     }
 
     return out
+}
+
+function drawSideLabel(out, x, y, side) {
+    const map = out.map
+    const colors = map.mushroomColors()
+    const [c1, c2] = map.mushroomCodes()
+
+    const label = side === 'v1' ? map.statData(c1)?.label_ || c1 : map.statData(c2)?.label_ || c2
+
+    const color = side === 'v1' ? colors[0] : colors[1]
+
+    const text = out.lgg
+        .append('text')
+        .attr('x', x)
+        .attr('y', y)
+        .style('fill', color)
+        .attr('font-weight', '600')
+        .attr('dominant-baseline', 'hanging') // ← IMPORTANT
+        .attr('class', 'em-legend-label')
+        .text(label)
+
+    return text.node().getBBox()
 }
 
 /* ===================================================================== */
@@ -117,8 +153,8 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
 
     const labelOffsetX = cfg.labelOffsets?.x ?? 8
     const leaderDash = '3,2'
-    const stroke = cfg.shapeStroke || '#666'
-    const strokeWidth = cfg.shapeStrokeWidth ?? 0.5
+    const stroke = cfg.shapeStroke || '#000000'
+    const strokeWidth = cfg.shapeStrokeWidth ?? 1
 
     const legendValuesRaw = getValues(cfg, scale, hasIndependentScales, side)
     if (!legendValuesRaw) return y
@@ -136,6 +172,9 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
 
     const cx = maxR
     const cy = maxR
+    const colors = map.mushroomColors()
+
+    const fillColor = hasIndependentScales && sideIndex != null ? colors[sideIndex] : 'none'
 
     legendValues.forEach((v, i) => {
         const r = scale(v)
@@ -152,7 +191,7 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
                     outerRadius: r,
                 })
             )
-            .attr('fill', 'none')
+            .style('fill', fillColor)
             .attr('stroke', stroke)
             .attr('stroke-width', strokeWidth)
             .attr('data-mushroom-side', sideIndex)
@@ -186,7 +225,7 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
     })
 
     const bbox = g.node()?.getBBox()
-    return bbox ? y + bbox.height : y
+    return bbox ? { top: y, bottom: y + bbox.height } : { top: y, bottom: y }
 }
 
 function getValues(cfg, scale, hasIndependentScales, side) {

@@ -19,11 +19,13 @@
                 .dorling(true)
                 .mushroomOrientation('vertical')
                 .stat('v1', {
+                    label: ' GDP',
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2022' },
                 })
                 .stat('v2', {
+                    label: ' Population',
                     eurostatDatasetCode: 'demo_r_pjangrp3',
                     filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
                     unitText: 'inhabitants',
@@ -31,17 +33,18 @@
                 .zoomExtent([1, 1000])
                 .mushroomSizeScaleFunctionV1(function (value) {
                     // custom size scale function for v1 side
-                    return Math.sqrt(value) * 0.01
+                    return Math.sqrt(value) * 0.02
                 })
                 .mushroomSizeScaleFunctionV2(function (value) {
                     // custom size scale function for v2 side
-                    return Math.cbrt(value) * 0.03
+                    return Math.cbrt(value) * 0.08
                 })
                 .legend({
+                    //title: 'test',
                     x: 610,
                     y: 40,
-                    sizeLegend: { valuesV1: [3000000, 200000], valuesV2: [83000000] },
-                    colorLegend: { marginTop: 25, labels: ['Million Euro', 'Inhabitants'] },
+                    sizeLegend: { valuesV1: [3000000, 200000], valuesV2: [83000000, 1000000] },
+                    colorLegend: { marginTop: 45, labels: ['Million Euro', 'Inhabitants'] },
                 })
                 .build()
         </script>
