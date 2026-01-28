@@ -161,8 +161,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         y: '-100%',
         width: '200%',
         height: '200%',
-        strokeWidth: 1,
-        color: 'rgb(0, 52, 107)',
+        strokeWidth: 2,
+        color: 'rgb(0, 0, 0)',
+        opacity: 0.8,
     }
 
     //graticule

@@ -1,7 +1,6 @@
 import { select } from 'd3-selection'
 import { executeForAllInsets } from './utils'
 
-
 export function appendCoastalMargin(out) {
     if (!out.svg_ || !out._pathFunction) return
 
@@ -18,43 +17,27 @@ export function appendCoastalMargin(out) {
         ensureCoastalMarginFilter(map.svg_, map.coastalMarginSettings_)
 
         // Create margin group
-        const cg = zg.append('g')
+        const cg = zg
+            .append('g')
             .attr('class', 'em-coastal-margin')
             .attr('filter', 'url(#em-coastal-margin-filter)')
             .attr('fill', 'none')
-            .attr('stroke', map.coastalMarginSettings_.color)
-            .attr('stroke-width', map.coastalMarginSettings_.strokeWidth)
+            .style('stroke', map.coastalMarginSettings_.color)
+            .style('stroke-width', map.coastalMarginSettings_.strokeWidth)
+            .style('opacity', map.coastalMarginSettings_.opacity)
             .attr('pointer-events', 'none')
 
         // Helper
         const drawPaths = (features, predicate, cls) => {
             if (!features) return
-            cg.append('g')
-                .attr('class', cls)
-                .selectAll('path')
-                .data(features.filter(predicate))
-                .enter()
-                .append('path')
-                .attr('d', map._pathFunction)
+            cg.append('g').attr('class', cls).selectAll('path').data(features.filter(predicate)).enter().append('path').attr('d', map._pathFunction)
         }
 
-        drawPaths(
-            map.Geometries.geoJSONs.cntbn,
-            d => d.properties.co === 'T',
-            'em-coastal-margin-cnt'
-        )
+        drawPaths(map.Geometries.geoJSONs.cntbn, (d) => d.properties.co === 'T', 'em-coastal-margin-cnt')
 
-        drawPaths(
-            map.Geometries.geoJSONs.nutsbn,
-            d => d.properties.co === 'T',
-            'em-coastal-margin-nuts'
-        )
+        drawPaths(map.Geometries.geoJSONs.nutsbn, (d) => d.properties.co === 'T', 'em-coastal-margin-nuts')
 
-        drawPaths(
-            map.Geometries.geoJSONs.worldbn,
-            d => d.properties.COAS_FLAG === 'T',
-            'em-coastal-margin-world'
-        )
+        drawPaths(map.Geometries.geoJSONs.worldbn, (d) => d.properties.COAS_FLAG === 'T', 'em-coastal-margin-world')
 
         // Z-order: above sea, below land
         const parent = cg.node().parentNode
@@ -74,9 +57,7 @@ export function appendCoastalMargin(out) {
 }
 
 function ensureCoastalMarginFilter(svg, settings) {
-    const defs = svg.select('defs').empty()
-        ? svg.append('defs')
-        : svg.select('defs')
+    const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs')
 
     if (!defs.select('#em-coastal-margin-filter').empty()) return
 
@@ -89,21 +70,22 @@ function ensureCoastalMarginFilter(svg, settings) {
         .attr('height', '200%')
 
     // Outer glow
-    filter.append('feGaussianBlur')
-        .attr('in', 'SourceGraphic')
-        .attr('stdDeviation', settings.standardDeviation)
-        .attr('result', 'blur')
+    filter.append('feGaussianBlur').attr('in', 'SourceGraphic').attr('stdDeviation', settings.standardDeviation).attr('result', 'blur')
 
     // Fade it
-    filter.append('feColorMatrix')
+    filter
+        .append('feColorMatrix')
         .attr('in', 'blur')
         .attr('type', 'matrix')
-        .attr('values', `
+        .attr(
+            'values',
+            `
             1 0 0 0 0
             0 1 0 0 0
             0 0 1 0 0
             0 0 0 ${settings.opacity ?? 0.4} 0
-        `)
+        `
+        )
         .attr('result', 'blurred')
 
     // Merge sharp line back on top
