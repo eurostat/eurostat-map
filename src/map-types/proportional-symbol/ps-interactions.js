@@ -1,20 +1,20 @@
-import { getRegionsSelector } from "../../core/utils"
-import { getSizeStatData } from "./map-proportional-symbols"
+import { getRegionsSelector } from '../../core/utils'
+import { getSizeStatData } from './map-proportional-symbols'
 import { select } from 'd3-selection'
 
-export function addMouseEvents(map,out) {
-    addMouseEventsToSymbols(map,out)
-    addMouseEventsToRegions(map,out)
+export function addMouseEvents(map, out) {
+    addMouseEventsToSymbols(map, out)
+    addMouseEventsToRegions(map, out)
 }
 
-const addMouseEventsToRegions = function (map,out) {
+const addMouseEventsToRegions = function (map, out) {
     const regions = map.svg().selectAll(getRegionsSelector(map))
     const sizeData = getSizeStatData(map)
     regions
         .on('mouseover', function (e, rg) {
             // only show tooltip for polygons of regions with values of 0
             const sv = sizeData.get(rg.properties.id)
-            if (sv?.value === 0 || sv?.value === ':') {
+            if (sv?.value === 0 || sv?.value === ':' || sv?.value === '0') {
                 select(this).style('fill', map.hoverColor_) // Apply highlight color
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
@@ -24,7 +24,7 @@ const addMouseEventsToRegions = function (map,out) {
         })
         .on('mousemove', function (e, rg) {
             const sv = sizeData.get(rg.properties.id)
-            if (sv?.value === 0 || sv?.value === ':') {
+            if (sv?.value === 0 || sv?.value === ':' || sv?.value === '0') {
                 if (out._tooltip) out._tooltip.mousemove(e)
                 if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             } else {
@@ -33,7 +33,7 @@ const addMouseEventsToRegions = function (map,out) {
         })
         .on('mouseout', function (e, rg) {
             const sv = sizeData.get(rg.properties.id)
-            if (sv?.value === 0 || sv?.value === ':') {
+            if (sv?.value === 0 || sv?.value === ':' || sv?.value === '0') {
                 const sel = select(this)
                 sel.style('fill', sel.attr('fill___')) // Revert to original color
                 if (out._tooltip) out._tooltip.mouseout()
@@ -43,7 +43,7 @@ const addMouseEventsToRegions = function (map,out) {
             }
         })
 }
-const addMouseEventsToSymbols = function (map,out) {
+const addMouseEventsToSymbols = function (map, out) {
     const symbols = map.svg().selectAll('g.em-centroid')
     //symbols
     symbols

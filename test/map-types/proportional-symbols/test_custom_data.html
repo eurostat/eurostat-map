@@ -30,8 +30,14 @@
                 .psFillOpacity(1)
                 .psStrokeOpacity(0.9)
                 .zoomExtent([1, 10])
+                .tooltip({
+                    textFunction: (d, map) => {
+                        ;`${d.properties.na}`
+                    },
+                })
 
             map.statData('size').setData({
+                NO: '0',
                 DE: 6,
                 FR: 10,
                 IT: 8,
