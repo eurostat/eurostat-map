@@ -61,7 +61,7 @@
                 font-size: 16px;
             }
             #log {
-                height:100%;
+                height: 100%;
                 font-family: monospace;
                 background: #f0f0f0;
                 padding: 10px;
@@ -87,7 +87,7 @@
                     <g id="newInsets"></g>
                 </svg>
             </div>
-            <div style="width: 100%; height:100%">
+            <div style="width: 100%; height: 100%">
                 <h4>Log output</h4>
                 <div id="log"></div>
             </div>
@@ -354,9 +354,10 @@
                 const map = eurostatmap
                     .map('ch')
                     .title(config.title)
-                    .colors(config.colors)
-                    .thresholds([100, 110, 150, 180])
-                    .classificationMethod('threshold')
+                    // .colors(config.colors)
+                    // .thresholds([100, 110, 150, 180])
+                    // .classificationMethod('threshold')
+                    //.psFill('red')
                     .svgId('mappy')
                     .containerId('container')
                     .legend({ x: 10, y: 150 })

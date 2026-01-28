@@ -186,7 +186,7 @@ export const map = function (config) {
             } else if (out.psShape_ == 'bar') {
                 symb = appendBarsToMap(map, sizeData)
             } else if (out.psShape_ == 'circle') {
-                symb = appendCirclesToMap(map, sizeData)
+                symb = appendCirclesToMap(map, sizeData, out)
             } else if (out.psShape_ == 'spike') {
                 symb = appendSpikesToMap(map, sizeData)
             } else {
