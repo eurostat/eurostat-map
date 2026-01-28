@@ -1,4 +1,4 @@
-import { symbolsLibrary } from '../../map-types/proportional-symbol/map-proportional-symbols'
+import { symbolsLibrary } from '../../map-types/proportional-symbol/symbols/d3-symbols.js'
 import { symbol } from 'd3-shape'
 
 /**
@@ -48,10 +48,7 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
     const y = out.sizeLegend._cursorY + out.sizeLegend.shapePadding
 
     // Container for symbol + label
-    const itemContainer = out._sizeLegendContainer
-        .append('g')
-        .attr('class', 'em-size-legend-item')
-        .attr('transform', `translate(${x},${y})`)
+    const itemContainer = out._sizeLegendContainer.append('g').attr('class', 'em-size-legend-item').attr('transform', `translate(${x},${y})`)
 
     // --- Draw D3 symbol ---
     const shape = getShape(out)
@@ -64,16 +61,11 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
         .style('stroke', out.sizeLegend.shapeStroke || map.psStroke())
         .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
 
-    const symbolPath = symbolGroup
-        .append('path')
-        .attr('d', d)
+    const symbolPath = symbolGroup.append('path').attr('d', d)
 
     // hift symbol down by half its height (baseline-align it)
     const symBBox = symbolPath.node().getBBox()
-    symbolPath.attr(
-        'transform',
-        `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y + symBBox.height / 2})`
-    )
+    symbolPath.attr('transform', `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y + symBBox.height / 2})`)
 
     // --- Label ---
     const labelX = maxSize / 2 + out.sizeLegend.labelOffsets.x + out.boxPadding

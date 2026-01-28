@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
-import { symbol, symbolCircle, symbolDiamond, symbolStar, symbolCross, symbolSquare, symbolTriangle, symbolWye } from 'd3-shape'
+
 import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground, updateCSSRule } from '../../core/utils.js'
 import { applyPatternFill } from '../../core/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
@@ -12,6 +12,9 @@ import { updateBackgroundColor } from './ps-background.js'
 import { addMouseEvents } from './ps-interactions.js'
 import { appendSpikesToMap } from './symbols/spikes.js'
 import { appendCirclesToMap } from './symbols/circles.js'
+import { appendBarsToMap } from './symbols/bars.js'
+import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
+import { appendCustomSymbolsToMap } from './symbols/custom.js'
 
 /**
  * Returns a proportional symbol map.
@@ -182,16 +185,16 @@ export const map = function (config) {
             // append symbols to centroids
             let symb
             if (out.psCustomSVG_) {
-                symb = appendCustomSymbolsToMap(map, sizeData)
+                symb = appendCustomSymbolsToMap(map, sizeData, out)
             } else if (out.psShape_ == 'bar') {
-                symb = appendBarsToMap(map, sizeData)
+                symb = appendBarsToMap(map, sizeData, out)
             } else if (out.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData, out)
             } else if (out.psShape_ == 'spike') {
-                symb = appendSpikesToMap(map, sizeData)
+                symb = appendSpikesToMap(map, sizeData, out)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
-                symb = appendD3SymbolsToMap(map, sizeData)
+                symb = appendD3SymbolsToMap(map, sizeData, out)
             }
 
             setRegionStyles(map, sizeData)
@@ -392,101 +395,6 @@ export const map = function (config) {
     }
 
     /**
-     * @description Appends <path> elements containing symbols for each region in the map SVG
-     * @param {*} map map instance
-     * @param {*} sizeData e.g. map.statData('size')
-     * @return {*}
-     */
-    function appendD3SymbolsToMap(map, sizeData) {
-        return map
-            .svg()
-            .selectAll('g.em-centroid')
-            .append('path')
-            .filter((rg) => {
-                const sv = sizeData.get(rg.properties.id)
-                if (sv && sv.value !== ':') return rg
-            })
-            .attr('class', 'ps')
-            .attr('d', (rg) => {
-                //calculate size
-                if (!sizeData) return
-                const sv = sizeData.get(rg.properties.id)
-                if (sv != 0 && !sv) return
-                let size = out.classifierSize_(+sv.value) || 0
-
-                //apply size to shape
-                if (out.psCustomShape_) {
-                    return out.psCustomShape_.size(size * size)()
-                } else {
-                    const symbolType = symbolsLibrary[out.psShape_] || symbolsLibrary['circle']
-                    return symbol()
-                        .type(symbolType)
-                        .size(size * size)()
-                }
-            })
-    }
-
-    /**
-     * @description Appends <rect> elements containing bars for each region in the map SVG
-     * @param {*} map map instance
-     * @param {*} sizeData e.g. map.statData('size')
-     * @return {*}
-     */
-    function appendBarsToMap(map, sizeData) {
-        return (
-            map
-                .getCentroidsGroup(map)
-                .selectAll('g.em-centroid')
-                .append('rect')
-                .filter((rg) => {
-                    const sv = sizeData.get(rg.properties.id)
-                    if (sv && sv.value !== ':') return rg
-                })
-                .attr('width', out.psBarWidth_)
-                //for vertical bars we scale the height attribute using the classifier
-                .attr('height', function (rg) {
-                    const sv = sizeData.get(rg.properties.id)
-                    if (!sv || !sv.value) {
-                        return 0
-                    }
-                    let v = out.classifierSize_(+sv.value)
-                    return v
-                })
-                .attr('transform', function () {
-                    let bRect = this.getBoundingClientRect()
-                    return `translate(${-this.getAttribute('width') / 2}` + `, -${this.getAttribute('height')})`
-                })
-        )
-    }
-
-    /**
-     * @description Appends custom SVG symbols for each region in the map
-     * @param {*} map
-     * @param {*} sizeData
-     * @return {*}
-     */
-    function appendCustomSymbolsToMap(map, sizeData) {
-        return map
-            .getCentroidsGroup(map)
-            .selectAll('g.em-centroid')
-            .append('g')
-            .filter((rg) => {
-                const sv = sizeData.get(rg.properties.id)
-                if (sv && sv.value !== ':') return rg
-            })
-            .attr('class', 'ps')
-            .html(out.psCustomSVG_)
-            .attr('transform', (rg) => {
-                //calculate size
-                const sv = sizeData.get(rg.properties.id)
-                let size = out.classifierSize_(+sv.value)
-                if (size) {
-                    return `translate(${out.psOffset_.x * size},${out.psOffset_.y * size}) scale(${size})`
-                }
-            })
-    }
-
-    /**
      * @description adds proportional symbols to each regions in a map with mixed NUTS levels (IMAGE)
      * @param {*} map
      * @param {*} sizeData
@@ -587,19 +495,6 @@ export const getColorLegend = function (colorFun, colorArray) {
     return function (ecl, numberOfClasses) {
         return colorFun(ecl / (numberOfClasses - 1))
     }
-}
-
-/**
- * @description give a d3 symbol from a shape name
- */
-export const symbolsLibrary = {
-    cross: symbolCross,
-    square: symbolSquare,
-    diamond: symbolDiamond,
-    triangle: symbolTriangle,
-    star: symbolStar,
-    wye: symbolWye,
-    circle: symbolCircle,
 }
 
 export function getSizeStatData(map) {

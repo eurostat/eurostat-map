@@ -1,5 +1,4 @@
 import { getFontSizeFromClass } from '../../core/utils'
-import { symbolsLibrary } from '../../map-types/proportional-symbol/map-proportional-symbols.js'
 import { symbol } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 
@@ -7,6 +6,7 @@ import { select } from 'd3-selection'
 import { drawCircleSizeLegend } from '../legend-circle-size'
 import { buildSpikeLegend } from './legend-spike'
 import { buildD3SymbolItem } from './legend-d3-shape'
+import { symbolsLibrary } from '../../map-types/proportional-symbol/symbols/d3-symbols'
 
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
@@ -125,8 +125,7 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
     const map = out.map
 
     if (out.sizeLegend._cursorY == null) {
-        out.sizeLegend._cursorY =
-            out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
+        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
     }
 
     const maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
@@ -137,7 +136,7 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
     const itemContainer = out._sizeLegendContainer
         .append('g')
         .attr('class', 'em-size-legend-item')
-        .attr('transform', `translate(${symbolColumnX},${y})`) 
+        .attr('transform', `translate(${symbolColumnX},${y})`)
 
     // Symbol wrapper
     const symbolGroup = itemContainer
@@ -149,35 +148,20 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
         .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
 
     // SVG content
-    const svgGroup = symbolGroup
-        .append('g')
-        .html(map.psCustomSVG_)
-        .attr('transform', `scale(${symbolSize})`)
+    const svgGroup = symbolGroup.append('g').html(map.psCustomSVG_).attr('transform', `scale(${symbolSize})`)
 
     //  Measure rendered symbol
     const bbox = svgGroup.node().getBBox()
 
     //  CENTER X AND Y RELATIVE TO ROW CENTER
-    svgGroup.attr(
-        'transform',
-        `translate(${-bbox.x - bbox.width / 2},${-bbox.y - bbox.height / 2}) scale(${symbolSize})`
-    )
+    svgGroup.attr('transform', `translate(${-bbox.x - bbox.width / 2},${-bbox.y - bbox.height / 2}) scale(${symbolSize})`)
 
     // Label aligned to same row center
-    const labelX =
-        symbolColumnX +
-        map.classifierSize_(map.classifierSize_.domain()[0]) +
-        out.sizeLegend.labelOffsets.x
+    const labelX = symbolColumnX + map.classifierSize_(map.classifierSize_.domain()[0]) + out.sizeLegend.labelOffsets.x
 
     const labelY = 0
 
-    itemContainer
-        .append('text')
-        .attr('class', 'em-legend-label')
-        .attr('dy', '0.35em')
-        .attr('x', labelX)
-        .attr('y', labelY)
-        .text(labelFormatter(value))
+    itemContainer.append('text').attr('class', 'em-legend-label').attr('dy', '0.35em').attr('x', labelX).attr('y', labelY).text(labelFormatter(value))
 
     // Advance cursor by FULL row height
     const h = itemContainer.node().getBBox().height
@@ -223,7 +207,6 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
     const labelY = symbolSize / 2 + out.sizeLegend.labelOffsets.y
 
     itemContainer.append('text').attr('class', 'em-legend-label').attr('dy', '0.35em').attr('x', labelX).attr('y', labelY).text(labelFormatter(value))
-    
 
     // advance stacking cursor by actual rendered height
     const hb = itemContainer.node().getBBox().height
