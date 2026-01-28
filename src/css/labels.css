@@ -33,14 +33,14 @@
 .em-stat-label {
     stroke: #111;
     stroke-width: 1px;
-    stroke-opacity: 0.5
+    stroke-opacity: 0.5;
 }
 
 .em-stat-label-shadow {
     stroke: white;
     stroke-width: 3px;
-    stroke-opacity: 0.9
-        /* filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) */
+    stroke-opacity: 0.9;
+    /* filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) */
 }
 
 .em-stat-label,
@@ -71,14 +71,16 @@
 
 .em-label-seas {
     font-size: 9px;
-    fill: #6a9cff;
-    letter-spacing: 3px;
+    fill: #6a9cff !important;
+    letter-spacing: 0.25em;
+    opacity: 0.5 !important;
 }
 
 .em-label-shadow-seas {
     font-size: 9px;
-    letter-spacing: 3px;
+    letter-spacing: 0.25em;
     stroke-width: 3px;
+    opacity: 0.5 !important;
 }
 
 .em-flow-labels {

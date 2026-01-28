@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-label-test {
+                font-size: 15px !important;
+            }
+            .em-label-shadow-test {
+                font-size: 15px !important;
+            }
+            /* .em-stat-label {
+                fill: white !important;
+            } */
+            .em-label-ocean {
+                font-size: 12px !important;
+                fill: #000a66;
+                font-style: italic;
+            }
+            .em-cntbn {
+                stroke: white !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"
+            integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        ></script>
+        <!-- <script src="https://d3js.org/d3-color.v2.min.js"></script>
+        <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script> -->
+        <script>
+            const IMAGE = { width: 797, height: 625, position: { x: 4790000, y: 3420000, z: 6400 } }
+            const defaultLabels = eurostatmap.getDefaultLabels().EUR_3035
+            const map = eurostatmap
+                .map('choropleth')
+                .width(IMAGE.width)
+                .height(IMAGE.height)
+                .position(IMAGE.position)
+                .svgId('map')
+                .zoomExtent([1, 20])
+                .title('Labels test')
+                .subtitle('map.labels({yourOptions})')
+                .width(900)
+                .nutsLevel('mixed')
+                .nutsYear(2024)
+                .tooltipShowFlags(false)
+                .legend({ title: 'test', decimals: 0, x: 15, y: 160 })
+                //styling
+                .language('en')
+                .seaFillStyle('aliceblue')
+                .drawCoastalMargin(false)
+                .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'lightgrey', co: 'black' })
+                .graticuleStroke('lightgrey')
+                .graticuleStrokeWidth(0.4)
+                //.projectionFunction(d3.geoAzimuthalEqualArea().rotate([-20.5, -41.5]).scale(11000))
+                .labels({
+                    //labels: eurostatmap.getDefaultLabels().EUR_3035.en,
+                    labels: defaultLabels.en,
+                    values: true,
+                    shadows: true,
+                    // statLabelsPositions: {
+                    //     AL: { x: 20.1683, y: 41.1533 },
+                    // },
+                    // processValueLabelCentroids: (centroids) => {
+
+                    // },
+                })
+                .insets([
+                    {
+                        geo: 'MT',
+                        scale: '01M',
+                        position: { z: 600 },
+                        title: 'Malta',
+                        width: 150,
+                        height: 90,
+                        x: 0,
+                        y: 0,
+                        labels: { values: true, backgrounds: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
+                    },
+                ])
+
+            map.statData().setData({
+                MD: 32,
+                AL: 23,
+                ME: 45,
+                RS: 67,
+                XK: 89,
+                BA: 100,
+                MK: 200,
+                GR: 300,
+                BG: 400,
+                RO: 500,
+                HR: 600,
+                UA: 123,
+                GE: 123,
+                BY: 123,
+                IR: 123,
+            })
+            map.build()
+            console.log(eurostatmap.getDefaultLabels())
+        </script>
+    </body>
+</html>
