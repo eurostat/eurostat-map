@@ -104,9 +104,19 @@ export const statData = function (config) {
         return out
     }
 
+    out.hasData = function () {
+        return out._data_ != undefined && Object.keys(out._data_).length > 0
+    }
+
+    out.hasNumericData = function () {
+        if (!out._data_) return false
+
+        return Object.values(out._data_).some((d) => Number.isFinite(+d.value))
+    }
+
     /** Return all stat values as an array. This can be used to classify the values. */
     out.getArray = function () {
-        if (out._data_) {
+        if (out.hasData()) {
             return Object.values(out._data_)
                 .map((s) => s.value)
                 .filter((s) => s == 0 || s)
@@ -115,14 +125,15 @@ export const statData = function (config) {
 
     /** Return stat unique values. This can be used for categorical maps. */
     out.getUniqueValues = function () {
-        return Object.values(out._data_)
-            .map((s) => s.value)
-            .filter((item, i, ar) => ar.indexOf(item) === i)
+        if (out.hasData()) {
+            return Object.values(out._data_)
+                .map((s) => s.value)
+                .filter((item, i, ar) => ar.indexOf(item) === i)
+        }
     }
-
     /** Get min value. */
     out.getMin = function () {
-        if (out._data_) {
+        if (out.hasNumericData()) {
             return Object.values(out._data_)
                 .map((s) => s.value)
                 .filter((s) => s == 0 || (s && s !== ':'))
@@ -131,7 +142,7 @@ export const statData = function (config) {
     }
     /** Get max value. */
     out.getMax = function () {
-        if (out._data_) {
+        if (out.hasNumericData()) {
             return Object.values(out._data_)
                 .map((s) => s.value)
                 .filter((s) => s == 0 || (s && s !== ':'))
@@ -140,7 +151,7 @@ export const statData = function (config) {
     }
     /** Get max value region. */
     out.getMaxRegionId = function () {
-        if (out._data_) {
+        if (out.hasNumericData()) {
             let maxVal = -Infinity
             let maxRegion = null
             for (const regionId in out._data_) {
@@ -156,7 +167,7 @@ export const statData = function (config) {
     }
     /** Get min value region. */
     out.getMinRegionId = function () {
-        if (out._data_) {
+        if (out.hasNumericData()) {
             let minVal = Infinity
             let minRegion = null
             for (const regionId in out._data_) {
@@ -173,7 +184,7 @@ export const statData = function (config) {
 
     /** Check if the stat data is ready. */
     out.isReady = function () {
-        return out._data_ != undefined
+        return out.hasData()
     }
 
     /** Some metadata */
@@ -306,20 +317,20 @@ export const statData = function (config) {
         })
     }
 
-        /**
-         * Definition of getters/setters for all previously defined attributes.
-         * Each method follow the same pattern:
-         *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-         *  - To get the attribute value, call the method without argument.
-         *  - To set the attribute value, call the same method with the new value as single argument.
-         */
-        ;['unitText_'].forEach(function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
-        })
+    /**
+     * Definition of getters/setters for all previously defined attributes.
+     * Each method follow the same pattern:
+     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
+     *  - To get the attribute value, call the method without argument.
+     *  - To set the attribute value, call the same method with the new value as single argument.
+     */
+    ;['unitText_'].forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
 
     //override attribute values with config values
     if (config) for (let key in config) out[key + '_'] = config[key]

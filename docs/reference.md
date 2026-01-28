@@ -1,58 +1,58 @@
 # API reference
+
 <div align="center">
 Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
 </div>
 
-
 ## Contents
 
 - [API reference](#api-reference)
-  - [Contents](#contents)
-  - [Map creation](#map-creation)
-    - [Map definition](#map-definition)
-    - [Map geography](#map-geography)
-      - [World maps](#world-maps)
-      - [Custom geometries](#custom-geometries)
-    - [Statistical data](#statistical-data)
-      - [Eurostat database](#eurostat-database)
-      - [CSV](#csv)
-      - [Custom JS](#custom-js)
-  - [Map types](#map-types)
-    - [Choropleth map](#choropleth-map)
-    - [Proportional symbol map](#proportional-symbol-map)
-    - [Proportional pie chart map](#proportional-pie-chart-map)
-    - [Categorical map](#categorical-map)
-    - [Bivariate choropleth map](#bivariate-choropleth-map)
-    - [Stripe composition map](#stripe-composition-map)
-    - [Sparkline map](#sparkline-map)
-    - [Flow map](#flow-map)
-    - [Coxcomb map](#coxcomb-map)
-    - [Mushroom map](#coxcomb-map)
-    - [Cartograms](#cartograms)
-      - [Grid Cartograms](#grid-cartograms)
-      - [Dorling Cartograms](#dorling-cartograms)
-  - [Map texts](#map-texts)
-    - [Map title \& subtitle](#map-title--subtitle)
-    - [Labelling](#labelling)
-    - [Annotations](#annotations)
-    - [Stamps](#stamps)
-    - [Footnotes](#footnotes)
-  - [Map legend](#map-legend)
-    - [Choropleth legends](#choropleth-legends)
-    - [Bivariate choropleth legends](#bivariate-choropleth-legends)
-    - [Proportional symbol legends](#proportional-symbol-legends)
-    - [Pie chart legends](#pie-chart-legends)
-    - [Categorical legends](#categorical-legends)
-  - [Scalebar](#scalebar)
-  - [Tooltip](#tooltip)
-  - [Styling](#styling)
-  - [Insets](#insets)
-  - [Minimap](#minimap)
-  - [Buttons](#buttons)
-  - [Export](#export)
-  - [Miscellaneous](#miscellaneous)
-  - [Build and update](#build-and-update)
-  - [Version migration](#version-migration)
+    - [Contents](#contents)
+    - [Map creation](#map-creation)
+        - [Map definition](#map-definition)
+        - [Map geography](#map-geography)
+            - [World maps](#world-maps)
+            - [Custom geometries](#custom-geometries)
+        - [Statistical data](#statistical-data)
+            - [Eurostat database](#eurostat-database)
+            - [CSV](#csv)
+            - [Custom JS](#custom-js)
+    - [Map types](#map-types)
+        - [Choropleth map](#choropleth-map)
+        - [Proportional symbol map](#proportional-symbol-map)
+        - [Proportional pie chart map](#proportional-pie-chart-map)
+        - [Categorical map](#categorical-map)
+        - [Bivariate choropleth map](#bivariate-choropleth-map)
+        - [Stripe composition map](#stripe-composition-map)
+        - [Sparkline map](#sparkline-map)
+        - [Flow map](#flow-map)
+        - [Coxcomb map](#coxcomb-map)
+        - [Mushroom map](#coxcomb-map)
+        - [Cartograms](#cartograms)
+            - [Grid Cartograms](#grid-cartograms)
+            - [Dorling Cartograms](#dorling-cartograms)
+    - [Map texts](#map-texts)
+        - [Map title \& subtitle](#map-title--subtitle)
+        - [Labelling](#labelling)
+        - [Annotations](#annotations)
+        - [Stamps](#stamps)
+        - [Footnotes](#footnotes)
+    - [Map legend](#map-legend)
+        - [Choropleth legends](#choropleth-legends)
+        - [Bivariate choropleth legends](#bivariate-choropleth-legends)
+        - [Proportional symbol legends](#proportional-symbol-legends)
+        - [Pie chart legends](#pie-chart-legends)
+        - [Categorical legends](#categorical-legends)
+    - [Scalebar](#scalebar)
+    - [Tooltip](#tooltip)
+    - [Styling](#styling)
+    - [Insets](#insets)
+    - [Minimap](#minimap)
+    - [Buttons](#buttons)
+    - [Export](#export)
+    - [Miscellaneous](#miscellaneous)
+    - [Build and update](#build-and-update)
+    - [Version migration](#version-migration)
 
 ## Map creation
 
@@ -88,16 +88,16 @@ Specify the map SVG element.
 
 Specify the NUTS geometries and the geographical extent of the map.
 
-| Method                             | Type           | Default value                 | Description                                                                                                                                                                                                                                                                                                                               |
-| ---------------------------------- | -------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**nutsLevel**([*value*])     | int/string     | _3_                           | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
-| _map_.**nutsYear**([*value*])      | int            | _2016_                        | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
-| _map_.**geo**([*value*])           | String         | _"EUR"_                       | The map geographical territory, by default the entire European territory _"EUR"_. For world maps use "WORLD" and set proj to 54030. Note that world templates are currently only available for choropleth maps. Other possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#overseas-territories---map-insets). |
-| _map_.**proj**([*value*])          | String         | _"3035"_                      | The map projection EPSG code. For world maps: use 54030. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that these values depend on the geographical territory.                                                                                                                               |
-| _map_.**scale**([*value*])         | String         | _"20M"_                       | The simplification level of the map, among _"03M"_, _"10M"_, _"20M"_, _"60M"_ (for Europe). The most simplified version is _"60M"_. The level _"01M"_ is also available for some geographical territories: For more information on possible values by geographical territory, see [Nuts2json](https://github.com/eurostat/Nuts2json/).    |
-| _map_.**position**([*value*])      | Object {x,y,z} | _auto_                        | The geographical coordinates of the position where to center the map view. These coordinates are expected to be expressed in the map projection. If not specified, a position is computed automatically.                                                                                                                                  |
-| _map_.**zoomExtent**([*value*])    | Array          | _undefined_                   | The zoom extent. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both.                                                                                            |
-| _map_.**filterGeometriesFunction** | Function       | _(geometries) =>  geometries_ | You can manipulate the default geometries using your own custom function. For example to omit certain regions.                                                                                                                                                                                                                            |
+| Method                             | Type           | Default value                | Description                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------------- | -------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**nutsLevel**([*value*])     | int/string     | _3_                          | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
+| _map_.**nutsYear**([*value*])      | int            | _2016_                       | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
+| _map_.**geo**([*value*])           | String         | _"EUR"_                      | The map geographical territory, by default the entire European territory _"EUR"_. For world maps use "WORLD" and set proj to 54030. Note that world templates are currently only available for choropleth maps. Other possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#overseas-territories---map-insets). |
+| _map_.**proj**([*value*])          | String         | _"3035"_                     | The map projection EPSG code. For world maps: use 54030. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that these values depend on the geographical territory.                                                                                                                               |
+| _map_.**scale**([*value*])         | String         | _"20M"_                      | The simplification level of the map, among _"03M"_, _"10M"_, _"20M"_, _"60M"_ (for Europe). The most simplified version is _"60M"_. The level _"01M"_ is also available for some geographical territories: For more information on possible values by geographical territory, see [Nuts2json](https://github.com/eurostat/Nuts2json/).    |
+| _map_.**position**([*value*])      | Object {x,y,z} | _auto_                       | The geographical coordinates of the position where to center the map view. These coordinates are expected to be expressed in the map projection. If not specified, a position is computed automatically.                                                                                                                                  |
+| _map_.**zoomExtent**([*value*])    | Array          | _undefined_                  | The zoom extent. The first value within [0,1] defines the maximum zoom out factor - the second value within [1,infinity] defines the maximum zoom in factor. Set to _[1,1]_ to forbid zooming and allow panning. Set to _null_ to forbid both.                                                                                            |
+| _map_.**filterGeometriesFunction** | Function       | _(geometries) => geometries_ | You can manipulate the default geometries using your own custom function. For example to omit certain regions.                                                                                                                                                                                                                            |
 
 #### World maps
 
@@ -303,6 +303,7 @@ It is also possible to prevent overlapping via the 'dorling' method:
 ```
 
 and customise it with:
+
 ```javascript
     .dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
     .dorlingIterations(1) // iterations of d3-force forceCollide
@@ -335,8 +336,6 @@ Please be aware that by using this method you will essentially be turning the ma
 | _map_.**psColors**([*value*])               | Array            | null                      | The colours to be using data-driven colour. The number of colours specified in the array should match the number of classes (specified using psClasses())                                |
 | _map_.**noDataFillStyle**([*value*])        | String           | _"lightgray"_             | The fill style to be used for regions where no data is available.                                                                                                                        |
 
-
-
 ### Proportional pie chart map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/pie_ex.png)](https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html)
@@ -364,7 +363,7 @@ eurostatmap
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { age: 'Y_GE65', sex: 'T', unit: 'NR', time: '2019' },
         unitText: 'people',
-    })  
+    })
     .catLabels({ Y_LT15: '< 15', 'Y15-64': '15 to 64', Y_GE65: '> 65' })
     .catColors({ Y_LT15: '#33a02c', 'Y15-64': '#cab2d6', Y_GE65: '#ff7f00' })
     .legend({ x: 550, y: 200, sizeLegend: { title: 'Total Population' }, colorLegend: { title: 'Population by Age' } })
@@ -490,7 +489,6 @@ map.updateStatValues()
 
 In addition to [the default legend parameters](#map-legend), proportional pie chart maps have the [these specific legend parameters](#pie-chart-legends):
 
-
 ### Categorical map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/ct_ex.png)](https://eurostat.github.io/eurostat-map/examples/categorical.html)
@@ -522,7 +520,6 @@ eurostatmap
 | _map_.**noDataFillStyle**([*value*])  | String | _"lightgray"_ | The fill style to be used for regions where no data is available.                                         |
 
 In addition to [the default legend parameters](#map-legend), categorical maps have [these specific legend parameters](#categorical-legends):
-
 
 ### Bivariate choropleth map
 
@@ -564,41 +561,40 @@ eurostatmap
 Example:
 
 ```javascript
- const map = eurostatmap
-        .map('trivariateChoropleth')
-        .title('Age Structure')
-        .subtitle('Population distribution by age groups, 2023')
-        .nutsLevel(3)
-        .stat('v1', {
-            label: 'Population 15–29',
-            eurostatDatasetCode: 'demo_r_pjanind3',
-            filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
-            unitText: '%',
-        })
-        .stat('v2', {
-            label: 'Population 45–64',
-            eurostatDatasetCode: 'demo_r_pjanind3',
-            filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
-            unitText: '%',
-        })
-        .stat('v3', {
-            label: 'Population 75+',
-            eurostatDatasetCode: 'demo_r_pjanind3',
-            filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
-            unitText: '%',
-        })
-        .ternarySettings({
-            hue: 160,
-            chroma: 130,
-            lightness: 40,
-            contrast: 0,
-            spread: 1.5,
-            breaks: 5,
-            meanCentering: true,
-        })
-        .build()
+const map = eurostatmap
+    .map('trivariateChoropleth')
+    .title('Age Structure')
+    .subtitle('Population distribution by age groups, 2023')
+    .nutsLevel(3)
+    .stat('v1', {
+        label: 'Population 15–29',
+        eurostatDatasetCode: 'demo_r_pjanind3',
+        filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+        unitText: '%',
+    })
+    .stat('v2', {
+        label: 'Population 45–64',
+        eurostatDatasetCode: 'demo_r_pjanind3',
+        filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
+        unitText: '%',
+    })
+    .stat('v3', {
+        label: 'Population 75+',
+        eurostatDatasetCode: 'demo_r_pjanind3',
+        filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
+        unitText: '%',
+    })
+    .ternarySettings({
+        hue: 160,
+        chroma: 130,
+        lightness: 40,
+        contrast: 0,
+        spread: 1.5,
+        breaks: 5,
+        meanCentering: true,
+    })
+    .build()
 ```
-
 
 ### Stripe composition map
 
@@ -795,40 +791,40 @@ const map = eurostatmap
 Example:
 
 ```javascript
- const map = eurostatmap
-        .map('coxcomb')
-        .dorling(true)
-        .title('Tourism')
-        .subtitle('Total nights spent, 2022')
-        .scale('60M')
-        .nutsLevel(1)
-        .statCoxcomb({
-            stat: {
-                //data/tour_occ_nin2m?format=JSON&unit=NR&c_resid=TOTAL&nace_r2=I551-I553&month=M01&lang=EN
-                eurostatDatasetCode: 'tour_occ_nin2m',
-                filters: { unit: 'NR', nace_r2: 'I551-I553', TIME: 2022 }, // shared filters
-                unitText: 'Nights spent',
-            },
-            timeParameter: 'month',
-            times: ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12'],
-            timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            categoryParameter: 'c_resid',
-            categoryCodes: ['DOM', 'FOR'],
-            categoryLabels: ['Domestic', 'Foreign'],
-            categoryColors: ['#1b9e77', '#d95f02'],
-            totalCode: 'TOTAL',
-        })
-        .coxcombMinRadius(5)
-        .coxcombMaxRadius(37)
-        .legend({
-            svgId: 'legend',
-            title: 'Nights spent',
-            x: 50,
-            y: 120,
-            colorLegend: { title: 'Type', marginTop: 50, noData: false },
-            timeLegend: { title: 'Month', marginTop: -30 },
-        })
-        .build()
+const map = eurostatmap
+    .map('coxcomb')
+    .dorling(true)
+    .title('Tourism')
+    .subtitle('Total nights spent, 2022')
+    .scale('60M')
+    .nutsLevel(1)
+    .statCoxcomb({
+        stat: {
+            //data/tour_occ_nin2m?format=JSON&unit=NR&c_resid=TOTAL&nace_r2=I551-I553&month=M01&lang=EN
+            eurostatDatasetCode: 'tour_occ_nin2m',
+            filters: { unit: 'NR', nace_r2: 'I551-I553', TIME: 2022 }, // shared filters
+            unitText: 'Nights spent',
+        },
+        timeParameter: 'month',
+        times: ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12'],
+        timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        categoryParameter: 'c_resid',
+        categoryCodes: ['DOM', 'FOR'],
+        categoryLabels: ['Domestic', 'Foreign'],
+        categoryColors: ['#1b9e77', '#d95f02'],
+        totalCode: 'TOTAL',
+    })
+    .coxcombMinRadius(5)
+    .coxcombMaxRadius(37)
+    .legend({
+        svgId: 'legend',
+        title: 'Nights spent',
+        x: 50,
+        y: 120,
+        colorLegend: { title: 'Type', marginTop: 50, noData: false },
+        timeLegend: { title: 'Month', marginTop: -30 },
+    })
+    .build()
 ```
 
 ### Mushroom map
@@ -836,23 +832,23 @@ Example:
 Example:
 
 ```javascript
-    const map = eurostatmap
-        .map('mushroom')
-        .nutsLevel(2)
-        .title('basic test')
-        .dorling(true)
-        .stat('v1', {
-            eurostatDatasetCode: 'demo_r_pjangrp3',
-            filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
-            unitText: 'inhabitants',
-        })
-        .stat('v2', {
-            eurostatDatasetCode: 'nama_10r_3gdp',
-            unitText: 'Euro per inhabitant',
-            filters: { unit: 'EUR_HAB', time: '2022' },
-        })
-        .zoomExtent([1, 1000])
-        .build()
+const map = eurostatmap
+    .map('mushroom')
+    .nutsLevel(2)
+    .title('basic test')
+    .dorling(true)
+    .stat('v1', {
+        eurostatDatasetCode: 'demo_r_pjangrp3',
+        filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+        unitText: 'inhabitants',
+    })
+    .stat('v2', {
+        eurostatDatasetCode: 'nama_10r_3gdp',
+        unitText: 'Euro per inhabitant',
+        filters: { unit: 'EUR_HAB', time: '2022' },
+    })
+    .zoomExtent([1, 1000])
+    .build()
 ```
 
 ### Cartograms
@@ -907,6 +903,7 @@ map.dorling(true)
 ```
 
 and customised like so:
+
 ```javascript
     .dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
     .dorlingIterations(1) // iterations of d3-force forceCollide
@@ -1184,7 +1181,6 @@ In addition to [the default legend parameters](#map-legend), bivariate choroplet
 | **arrowWidth**        | number   | _14_             | Width of axis arrows                                                                        |
 | **arrowPadding**      | number   | _10_             | Padding between arrow and axis label                                                        |
 
-
 ### Proportional symbol legends
 
 In addition to [the default legend parameters](#map-legend), proportional symbol maps have the following specific legend parameters:
@@ -1240,8 +1236,8 @@ The following parameters are properties of the colorLegend object:
 | **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
 | **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
 
-
 ### Pie chart legends
+
 | Method                             | Type   | Default value | Description                                                                                   |
 | ---------------------------------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
 | _map_.**labelFontSize**([*value*]) | int    | _12_          | Font size of the legend label.                                                                |
@@ -1286,7 +1282,6 @@ The following parameters are properties of the **colorLegend** object:
 | **noData**        | boolean | _true_        | Show 'no data' style.                                                                                                                                 |
 | **noDataText**    | Text    | _"No data"_   | 'No data' text label.                                                                                                                                 |
 | **order**         | array   | _"undefined"_ | The order in which the legend classes should be drawn. E.g. ['urb','int','rur']. If left undefined, eurostatmap will order the classes automatically. |
-
 
 ## Scalebar
 
@@ -1344,12 +1339,12 @@ use `.em-tooltip` for styling the tooltip container.
 Specify specific map styles. As of V4, styles have been moved to CSS classes. See [css.md](./css.md) for a list of CSS rules.
 See deprecated.js for deprecated style functions and their successors. (or check the developer console for warnings when using deprecated functions)
 
-| Method                                   | Type    | Default value | Description                                                                                                                                              |
-| ---------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**hoverColor**([*value*])          | String  | _"#purple"_   | The fill style of the selected NUTS regions.                                                                                                             |
-| _map_.**drawCoastalMargin**([*value*])   | boolean | _true_        | Set to true to show a coastal blurry margin. False otherwise.                                                                                            |
-| _map_.**coastalMarginStdDev**([*value*]) | number  | _2_           | The standard deviation of the coastal blurry margin.                                                                                                     |
-| _map_.**drawGraticule**([*value*])       | boolean | _false_       | Set to true to show the graticule (meridian and parallel lines). False otherwise. Calls to this method after the map is built will update the graticule. |
+| Method                                     | Type    | Default value                                                                                                                      | Description                                                                                                                                              |
+| ------------------------------------------ | ------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**hoverColor**([*value*])            | String  | _"#purple"_                                                                                                                        | The fill style of the selected NUTS regions.                                                                                                             |
+| _map_.**drawCoastalMargin**([*value*])     | boolean | _true_                                                                                                                             | Set to true to show a coastal blurry margin. False otherwise.                                                                                            |
+| _map_.**coastalMarginSettings**([*value*]) | object  | _{ standardDeviation: 1, x: '-100%',y: '-100%',width: '200%',height: '200%',strokeWidth: 3,color: 'rgb(0, 58, 99)',opacity: 0.7,}_ | The settings for the coastal margin.                                                                                                                     |
+| \_map\_.**drawGraticule**([*value*])       | boolean | _false_                                                                                                                            | Set to true to show the graticule (meridian and parallel lines). False otherwise. Calls to this method after the map is built will update the graticule. |
 
 ## Insets
 
