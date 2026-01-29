@@ -69,6 +69,9 @@
                 overflow-y: auto;
                 font-size: 12px;
             }
+            .em-zoom-buttons {
+                transform: translate(94%, 580px) !important;
+            }
         </style>
     </head>
 
@@ -347,7 +350,7 @@
 
                 // Setup callback tracking
                 let callbackCount = 0
-                const expectedCallbacks = insetsCfg.length + 1
+                const expectedCallbacks = 1
                 log(`Expected callbacks: ${expectedCallbacks}`)
 
                 // Build map
@@ -367,7 +370,7 @@
                     .insetBoxPosition(insetBoxPosition)
                     .callback((m) => {
                         callbackCount++
-                        // log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`);
+                        log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`)
                         if (callbackCount === expectedCallbacks) {
                             log(`✅ ALL CALLBACKS COMPLETE`)
                         }

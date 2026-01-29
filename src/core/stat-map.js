@@ -15,6 +15,18 @@ export const statMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
     const out = MapTemplate.mapTemplate(config, withCenterPoints, mapType)
 
+    // build-completion latch
+    out._geoDone_ = false
+    out._statDone_ = false
+    out._finalized_ = false
+
+    const tryFinalize = function () {
+        if (out._finalized_) return
+        if (!out._geoDone_ || !out._statDone_) return
+        out._finalized_ = true
+        if (out.callback()) out.callback()(out)
+    }
+
     // render scheduling flag
     let _renderScheduled = false
     out._loadingStatCount_ = 0
@@ -131,6 +143,12 @@ export const statMap = function (config, withCenterPoints, mapType) {
      * This method should be called once, preferably after the map attributes have been set to some initial values.
      */
     out.build = function () {
+        // RESET BUILD LIFECYCLE FLAGS
+        out._geoDone_ = false
+        out._statDone_ = false
+        out._finalized_ = false
+        _renderScheduled = false
+
         if (out.projectionFunction_) out.proj('4326') //when using custom d3 projection function always request NUTS2JSON in WGS84
 
         //build map template base
@@ -227,10 +245,16 @@ export const statMap = function (config, withCenterPoints, mapType) {
             out._loadingGeo_ = false
             out.updateLoader()
 
-            if (!isStatDataReady()) return
+            if (!out.Geometries.isGeoReady()) return
 
-            out.updateStatValues()
-            if (out.callback()) out.callback()(out)
+            out._geoDone_ = true
+
+            if (isStatDataReady()) {
+                out._statDone_ = true
+                out.updateStatValues()
+            }
+
+            tryFinalize()
         })
 
         return out
@@ -269,8 +293,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
                         out.updateLoader()
                     }
 
-                    if (!out.Geometries.isGeoReady()) return
                     if (!isStatDataReady()) return
+
+                    out._statDone_ = true
+                    if (!out.Geometries.isGeoReady()) return
 
                     if (_renderScheduled) return
 
@@ -278,26 +304,13 @@ export const statMap = function (config, withCenterPoints, mapType) {
                     Promise.resolve().then(() => {
                         _renderScheduled = false
                         out.updateStatValues()
-                        if (out.callback()) out.callback()(out)
+                        tryFinalize()
                     })
                 })
             }
         }
 
         return out
-    }
-
-    const hasRemoteStatData = function () {
-        for (const key in out.stat_) {
-            const cfg = out.stat_[key]
-            if (!cfg) continue
-
-            // remote stats if eurostat or csv
-            if (cfg.eurostatDatasetCode_ || cfg.csvURL_) {
-                return true
-            }
-        }
-        return false
     }
 
     /**
