@@ -26,6 +26,7 @@
     },
     "main": "build/eurostatmap.min.js",
     "unpkg": "build/eurostatmap.min.js",
+    "module": "build/eurostatmap.js",
     "files": [
         "build"
     ],
