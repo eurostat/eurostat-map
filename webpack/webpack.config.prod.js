@@ -17,7 +17,7 @@ module.exports = {
     resolve: {
         extensions: ['.js', '.ts'], // allow typescript
     },
-    devtool: false,
+    devtool: 'source-map',
     plugins: [
         new webpack.BannerPlugin({
             banner: `/*! eurostat-map v${packageJson.version} | ${new Date().getFullYear()} Eurostat | EUPL License. See https://github.com/eurostat/eurostat-map/blob/master/LICENSE */`,
