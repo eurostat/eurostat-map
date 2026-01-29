@@ -58,7 +58,7 @@
 
 /* country boundary halo (not coastline) */
 .em-cntbn-halo:not(.em-bn-co) {
-    stroke: rgb(255, 255, 255, 0.5);
+    stroke: rgba(216, 216, 216, 0.4);
     stroke-width: 3px;
 }
 
