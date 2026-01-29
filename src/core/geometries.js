@@ -416,6 +416,24 @@ export const Geometries = function (map, withCenterPoints) {
 
         //draw world boundaries
         if (this.geoJSONs.worldbn) {
+            // draw world boundary halo (underneath)
+            container
+                .append('g')
+                .attr('id', 'em-worldbn-halo')
+                .attr('class', 'em-worldbn-halo')
+                .selectAll('path')
+                .data(this.geoJSONs.worldbn)
+                .enter()
+                .append('path')
+                .attr('d', pathFunction)
+                .attr('class', function (bn) {
+                    if (bn.properties.POL_STAT > 0) {
+                        //disputed
+                        return 'em-bn-d em-worldbn-halo'
+                    }
+                    return bn.properties.COAS_FLAG === 'T' ? 'em-bn-co' : 'em-worldbn-halo'
+                })
+            //draw world boundaries
             container
                 .append('g')
                 .attr('id', 'em-worldbn')
