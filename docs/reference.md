@@ -27,7 +27,7 @@ Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
         - [Coxcomb map](#coxcomb-map)
-        - [Mushroom map](#coxcomb-map)
+        - [Mushroom map](#mushroom-map)
         - [Cartograms](#cartograms)
             - [Grid Cartograms](#grid-cartograms)
             - [Dorling Cartograms](#dorling-cartograms)
