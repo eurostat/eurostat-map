@@ -74,6 +74,7 @@ export const legend = function (map, config) {
                 .attr('class', 'em-legend-label')
                 .attr('x', out.boxPadding + out.shapeWidth + out.labelOffsets.x)
                 .attr('y', y + out.shapeHeight * 0.5)
+                .attr('dy', '0.35em') // ~vertical centering
                 .text(m.catLabels()[code] || code)
                 .on('mouseover', function () {
                     svgMap
