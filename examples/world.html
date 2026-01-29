@@ -277,18 +277,21 @@
             }
             const map = eurostatmap
                 .map('choropleth')
+                .title('World map example')
                 .geo('WORLD')
                 .width(Math.min(window.innerHeight, window.innerWidth))
                 .nutsLevel('mixed')
-                //.title('World map')
                 .drawGraticule(true)
-                .graticuleStrokeWidth(0.4)
                 .seaFillStyle('#FFFFFF')
-                .labelling(true)
-                .labelsToShow(['seas'])
                 .classificationMethod('threshold')
                 .thresholds([10, 20, 30, 40, 50, 60, 70])
                 .colors(['#e9ecf6', '#cfd6ef', '#b5bee9', '#98a6df', '#7c90d6', '#6277cd', '#4760b7', '#2c49a9'])
+                .legend({
+                    boxOpacity: 1,
+                    x: 10,
+                    y: 250,
+                })
+                .zoomButtons(true)
 
             map.statData().setData(data)
             map.build()

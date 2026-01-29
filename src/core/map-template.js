@@ -135,7 +135,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.minimap_ = undefined
 
     //buttons
-    out.zoomButtons_ = false // show zoom buttons
+    out.zoomButtons_ = true // show zoom buttons
     out.insetsButton_ = false // show insets button
 
     //tooltip
