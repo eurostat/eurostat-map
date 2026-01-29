@@ -1,10 +1,11 @@
 #em-labels {
     text-anchor: middle;
     stroke-linejoin: round;
+    stroke-linecap: round;
     font-family: Arial, Helvetica, sans-serif;
     dominant-baseline: central;
     pointer-events: none;
-    paint-order: stroke;
+    paint-order: stroke fill;
 }
 
 .em-labels {
@@ -14,7 +15,7 @@
 
 .em-label {
     font-size: 12px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .em-label-shadow,
@@ -22,7 +23,8 @@
     font-size: 12px;
     stroke-width: 2px;
     stroke: white;
-    opacity: 0.8;
+    opacity: 0.9;
+    fill: none;
 }
 
 .em-label-background {
@@ -31,22 +33,21 @@
 }
 
 .em-stat-label {
-    stroke: #111;
-    stroke-width: 1px;
-    stroke-opacity: 0.5;
+    fill: #111111;
+    stroke: #111111;
+    stroke-width: 0.5px;
 }
 
 .em-stat-label-shadow {
+    fill: none;
     stroke: white;
-    stroke-width: 3.5px;
-    /* stroke-opacity: 0.7; */
-    /* filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) */
+    stroke-width: 2.5px;
+    opacity: 0.9;
 }
 
 .em-stat-label,
 .em-stat-label-shadow {
     font-size: 13px;
-    opacity: 0.9;
 }
 
 .em-label-cc {
@@ -59,9 +60,8 @@
 }
 
 .em-label-countries {
-    fill: #3b3b3b;
+    fill: #111111;
     font-size: 10px;
-    opacity: 0.7;
 }
 
 .em-label-shadow-countries {
@@ -71,16 +71,16 @@
 
 .em-label-seas {
     font-size: 9px;
-    fill: #6a9cff !important;
+    fill: #2a58b3;
     letter-spacing: 0.25em;
-    opacity: 0.5 !important;
+    opacity: 0.7;
 }
 
 .em-label-shadow-seas {
     font-size: 9px;
     letter-spacing: 0.25em;
     stroke-width: 3px;
-    opacity: 0.5 !important;
+    opacity: 0.5;
 }
 
 .em-flow-labels {
