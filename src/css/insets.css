@@ -1,0 +1,14 @@
+.em-inset .em-zoom-buttons {
+    display: none;
+}
+.em-inset-title {
+    font-size: 11px;
+}
+.em-inset-subtitle {
+    font-size: 12px;
+}
+.em-insets .em-frame {
+    /* this will give a frame to inset maps */
+    stroke: grey;
+    stroke-width: 0.3px !important;
+}
