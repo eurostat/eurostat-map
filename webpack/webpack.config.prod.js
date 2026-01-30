@@ -25,10 +25,16 @@ module.exports = {
         }),
     ],
     optimization: {
+        runtimeChunk: false,
+        splitChunks: false,
         minimize: true,
         minimizer: [
             new TerserPlugin({
                 extractComments: false, // Disable extracting comments to a separate file
+                terserOptions: {
+                    keep_fnames: true,
+                    keep_classnames: true,
+                },
             }),
         ],
     },
@@ -48,7 +54,7 @@ module.exports = {
                         presets: ['@babel/preset-env'],
                         babelrc: false,
                         cacheDirectory: true,
-                        sourceMaps: false,
+                        sourceMaps: true,
                     },
                 },
             },

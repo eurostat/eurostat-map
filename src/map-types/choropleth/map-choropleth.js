@@ -30,18 +30,7 @@ export const map = function (config) {
     //when computed automatically, ensure the threshold are nice rounded values
     out.makeClassifNice_ = true
     //the color function [0,1] -> color
-    const paletteA = [
-        '#D4DAF0',
-        '#C1C9EB',
-        '#A8B4E6',
-        '#93A2DC',
-        '#7C90D6',
-        '#677CD2',
-        '#5169BE',
-        '#3C57B0',
-        '#2644A7',
-        '#15246B',
-    ]
+    const paletteA = ['#D4DAF0', '#C1C9EB', '#A8B4E6', '#93A2DC', '#7C90D6', '#677CD2', '#5169BE', '#3C57B0', '#2644A7', '#15246B']
     out.colorFunction_ = (t) => piecewise(interpolateLab, paletteA)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
     out.classToFillStyle_ = undefined
@@ -139,92 +128,94 @@ export const map = function (config) {
         const generateRange = (nb) => [...Array(nb).keys()]
         const dataArray = out.statData().getArray()
 
-        const setupClassifier = () => {
-            const range = generateRange(out.numberOfClasses_)
-
-            if (out.colorSchemeType_ === 'continuous') {
-                const valueTransform = out.valueTransform_ || ((d) => d)
-                const transformedValues = dataArray.map(valueTransform)
-                const minVal = min(transformedValues)
-                const maxVal = max(transformedValues)
-                const isDiverging = checkIfDiverging(out)
-                const isFullScale = typeof out.colorFunction_?.domain === 'function'
-
-                if (!isFullScale) {
-                    if (isDiverging) {
-                        const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
-                        out.domain_ = [minVal, divergence, maxVal]
-                    } else {
-                        out.domain_ = [minVal, maxVal]
-                    }
-                }
-
-                out.classifier((val) => val) // identity
-            }
-
-            const dataArrayNumeric = [...dataArray].filter(v => !isNaN(parseFloat(v)) && isFinite(v))
-
-            switch (out.classificationMethod_) {
-                case 'quantile': {
-                    out.classifier(scaleQuantile().domain(dataArray).range(range))
-                    break
-                }
-                case 'equal-interval':
-                case 'equinter': {
-                    out.classifier(
-                        scaleQuantize()
-                            .domain([min(dataArray), max(dataArray)])
-                            .range(range)
-                    )
-                    if (out.makeClassifNice_) out.classifier().nice()
-                    break
-                }
-                case 'threshold': {
-                    out.numberOfClasses(out.thresholds_.length + 1)
-                    out.classifier(scaleThreshold().domain(out.thresholds_).range(generateRange(out.numberOfClasses_)))
-                    break
-                }
-                case 'jenks': {
-                    const jenksBreaks = jenks(dataArrayNumeric, out.numberOfClasses_) //data, lowerClassLimits, nClasses
-                    const domain = jenksBreaks.slice(1, -1)
-                    out.classifier(scaleThreshold().domain(domain).range(range))
-                    break
-                }
-                case 'ckmeans': {
-                    const ckmeansBreaks = ckmeans(dataArrayNumeric, out.numberOfClasses_).map((cluster) => cluster.pop())
-                    const domain = ckmeansBreaks.slice(0, -1)
-                    out.classifier(scaleThreshold().domain(domain).range(range))
-                    break
-                }
-            }
-        }
-
-        const classifyRegions = (regions) => {
-            regions.attr('ecl', (rg) => {
-                const regionData = out.statData().get(rg.properties.id)
-                if (!regionData) return
-                const value = regionData.value
-                if (value === ':' || value === null) return 'nd'
+        if (dataArray) {
+            const setupClassifier = () => {
+                const range = generateRange(out.numberOfClasses_)
 
                 if (out.colorSchemeType_ === 'continuous') {
-                    // no class index for continuous mode
-                    return value
+                    const valueTransform = out.valueTransform_ || ((d) => d)
+                    const transformedValues = dataArray.map(valueTransform)
+                    const minVal = min(transformedValues)
+                    const maxVal = max(transformedValues)
+                    const isDiverging = checkIfDiverging(out)
+                    const isFullScale = typeof out.colorFunction_?.domain === 'function'
+
+                    if (!isFullScale) {
+                        if (isDiverging) {
+                            const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
+                            out.domain_ = [minVal, divergence, maxVal]
+                        } else {
+                            out.domain_ = [minVal, maxVal]
+                        }
+                    }
+
+                    out.classifier((val) => val) // identity
                 }
 
-                return value != null ? +out.classifier_(value) : undefined
-            })
-        }
+                const dataArrayNumeric = [...dataArray].filter((v) => !isNaN(parseFloat(v)) && isFinite(v))
 
-        // Initialize classifier and apply classification
-        setupClassifier()
+                switch (out.classificationMethod_) {
+                    case 'quantile': {
+                        out.classifier(scaleQuantile().domain(dataArray).range(range))
+                        break
+                    }
+                    case 'equal-interval':
+                    case 'equinter': {
+                        out.classifier(
+                            scaleQuantize()
+                                .domain([min(dataArray), max(dataArray)])
+                                .range(range)
+                        )
+                        if (out.makeClassifNice_) out.classifier().nice()
+                        break
+                    }
+                    case 'threshold': {
+                        out.numberOfClasses(out.thresholds_.length + 1)
+                        out.classifier(scaleThreshold().domain(out.thresholds_).range(generateRange(out.numberOfClasses_)))
+                        break
+                    }
+                    case 'jenks': {
+                        const jenksBreaks = jenks(dataArrayNumeric, out.numberOfClasses_) //data, lowerClassLimits, nClasses
+                        const domain = jenksBreaks.slice(1, -1)
+                        out.classifier(scaleThreshold().domain(domain).range(range))
+                        break
+                    }
+                    case 'ckmeans': {
+                        const ckmeansBreaks = ckmeans(dataArrayNumeric, out.numberOfClasses_).map((cluster) => cluster.pop())
+                        const domain = ckmeansBreaks.slice(0, -1)
+                        out.classifier(scaleThreshold().domain(domain).range(range))
+                        break
+                    }
+                }
+            }
 
-        if (map.svg_) {
-            const selector = getRegionsSelector(map)
-            classifyRegions(map.svg().selectAll(selector))
+            const classifyRegions = (regions) => {
+                regions.attr('ecl', (rg) => {
+                    const regionData = out.statData().get(rg.properties.id)
+                    if (!regionData) return
+                    const value = regionData.value
+                    if (value === ':' || value === null) return 'nd'
 
-            if (map.nutsLevel_ === 'mixed') {
-                const nuts0Regions = map.svg().selectAll('path.em-nutsrg0')
-                classifyRegions(nuts0Regions)
+                    if (out.colorSchemeType_ === 'continuous') {
+                        // no class index for continuous mode
+                        return value
+                    }
+
+                    return value != null ? +out.classifier_(value) : undefined
+                })
+            }
+
+            // Initialize classifier and apply classification
+            setupClassifier()
+
+            if (map.svg_) {
+                const selector = getRegionsSelector(map)
+                classifyRegions(map.svg().selectAll(selector))
+
+                if (map.nutsLevel_ === 'mixed') {
+                    const nuts0Regions = map.svg().selectAll('path.em-nutsrg0')
+                    classifyRegions(nuts0Regions)
+                }
             }
         }
     }
