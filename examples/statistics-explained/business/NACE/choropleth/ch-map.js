@@ -2,7 +2,7 @@ const configs = {
     EMP_PLOC_NR: {
         legendTitle: 'Number of persons',
         colors: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
-        thresholds: [5, 10, 15, 20, 30, 40],
+        thresholds: [5, 10, 15, 20, 30, 209],
         nbClasses: 7,
         unitText: 'people per unit',
         multiplier: 1, // no conversion needed

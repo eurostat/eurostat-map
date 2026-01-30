@@ -79,8 +79,8 @@
                     }, {})
 
                     return Promise.all([
-                        fetch('../test/geometries/spain_borders.json').then((response) => response.json()),
-                        fetch('../test/geometries/spain-municipalities.topojson.json').then((response) => response.json()),
+                        fetch('../test/data/geometries/spain_borders.json').then((response) => response.json()),
+                        fetch('../test/data/geometries/spain-municipalities.topojson.json').then((response) => response.json()),
                         statisticalData, // Pass statisticalData forward in the chain
                     ])
                 })

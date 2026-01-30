@@ -2,6 +2,35 @@ import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
 
 export const defineMapZoom = function (map) {
+    if (map.gridCartogram_) {
+        defineGridCartogramZoom(map)
+        return
+    }
+
+    // existing geographic zoom logic
+    defineGeographicZoom(map)
+}
+
+function defineGridCartogramZoom(map) {
+    const svg = map.svg()
+    const zoomGroup = svg.select('#em-zoom-group-' + map.svgId_)
+
+    map.__zoomBehavior = zoom()
+        .scaleExtent(map.zoomExtent_ || [1, 8])
+        .on('zoom', (event) => {
+            zoomGroup.attr('transform', event.transform)
+            map.__lastTransform = event.transform
+            map.onZoom_?.(event, map)
+        })
+        .on('end', (event) => {
+            map.onZoomEnd_?.(event, map)
+        })
+
+    svg.call(map.__zoomBehavior)
+    svg.call(map.__zoomBehavior.transform, zoomIdentity)
+}
+
+export const defineGeographicZoom = function (map) {
     const svg = select('#' + map.svgId())
     let previousT = zoomIdentity
     let panUnlocked = !map.lockPanUntilZoom_
@@ -18,9 +47,15 @@ export const defineMapZoom = function (map) {
 
     const translateExtent = map.translateExtent_
         ? map.translateExtent_
-        : needsPad ? [[-padX, -padY], [map.width_ + padX, map.height_ + padY]] : [[0, 0], [map.width_, map.height_]]
-
-
+        : needsPad
+          ? [
+                [-padX, -padY],
+                [map.width_ + padX, map.height_ + padY],
+            ]
+          : [
+                [0, 0],
+                [map.width_, map.height_],
+            ]
 
     map.__zoomBehavior = zoom()
         .filter((e) => !e.target.closest('.em-zoom-buttons') && !e.target.closest('.em-button'))
@@ -33,7 +68,7 @@ export const defineMapZoom = function (map) {
 
         .on('start', (e) => {
             if (e.sourceEvent && e.sourceEvent.type !== 'wheel') {
-                svg.classed('em-dragging', true);
+                svg.classed('em-dragging', true)
             }
         })
 
@@ -63,10 +98,10 @@ export const defineMapZoom = function (map) {
             }
         })
         .on('end', (e) => {
-            svg.classed('em-dragging', false);
-            map.onZoomEnd_?.(e, map);
+            svg.classed('em-dragging', false)
+            map.onZoomEnd_?.(e, map)
             window.dispatchEvent(new CustomEvent('estatmap:zoomend-' + map.svgId_, { detail: map }))
-        });
+        })
 
     map.__lastTransform = previousT
 
@@ -135,7 +170,7 @@ const zoomHandler = (event, previousT, map) => {
     }
 
     //  Store current zoom scale for later use (hover, click, etc.)
-    map._lastZoomK = t.k;
+    map._lastZoomK = t.k
 
     scaleStrokeWidths(t, map)
     if (map.labels_?.values) scaleLabelTexts(t, map)

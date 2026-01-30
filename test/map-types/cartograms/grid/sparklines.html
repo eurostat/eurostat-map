@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            .em-grid-rect {
+                opacity: 0.5;
+            }
+            .em-grid-text {
+                font-size: 12px;
+                transform: translate(0, -10px);
+                opacity: 0.8;
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+
+        <script>
+            eurostatmap
+                .map('sparkline')
+                .nutsLevel(0)
+                .gridCartogram(true)
+                .nutsYear(2016)
+                .title('Population change 2009 - 2020')
+                .subtitle('Change per thousand inhabitants')
+                .transitionDuration(1000)
+                .statSpark(
+                    {
+                        eurostatDatasetCode: 'demo_r_gind3',
+                        filters: { indic_de: 'GROWRT' },
+                        unitText: 'Population change',
+                    },
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'], //dates
+                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'] //labels
+                )
+                .sparkType('bar') //line, area, bar
+                .sparkLineWidth(30)
+                .sparkLineHeight(10)
+                .sparkLineStrokeWidth(3)
+                .sparkLineColor((d) => {
+                    // d is the full time series for the region
+                    const totalChange = d.reduce((sum, p) => sum + (p.value ?? 0), 0)
+                    //reflects cumulative population evolution
+                    if (totalChange > 0) return 'blue'
+                    if (totalChange < 0) return 'red'
+                    return '#999' // optional: neutral / no change
+                })
+                .sparkLineOpacity(0.8)
+                .sparkLineCircleRadius(0)
+                .sparkLineOffsets({ x: 0, y: 15 })
+                .tooltip({
+                    xOffset: 30,
+                    yOffset: 150,
+                    fontSize: '12px',
+                    maxWidth: Math.min(400, window.innerWidth),
+                })
+                .sparkTooltipChart({
+                    width: 150,
+                    height: 50,
+                    margin: { left: 60, right: 40, top: 40, bottom: 40 },
+                    circleRadius: 1.5,
+                })
+                .build()
+        </script>
+    </body>
+</html>

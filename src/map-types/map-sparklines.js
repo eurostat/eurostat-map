@@ -31,6 +31,7 @@ export const map = function (config) {
         margin: { left: 60, right: 40, top: 40, bottom: 40 },
         circleRadius: 1.5,
     }
+    out.sparkLineOffsets_ = { x: 0, y: 0 }
 
     //show sparklines only when data for all dates is complete.
     //Otherwise, consider the regions as being with no data at all.
@@ -59,6 +60,7 @@ export const map = function (config) {
         'sparkLineAreaColor_',
         'sparkTooltipChart_',
         'sparkLineChartFunction_',
+        'sparkLineOffsets_',
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -214,34 +216,34 @@ export const map = function (config) {
 
             return out
         } catch (e) {
-            console.error('Error in proportional symbols styling: ' + e.message)
+            console.error('Error in sparkline styling: ' + e.message)
             console.error(e)
         }
-
 
         return out
     }
 
     function applyStyleToMap(map) {
-
         //build and assign pie charts to the regions
         //collect nuts ids from g elements. TODO: find better way of getting IDs
         let nutsIds = []
-        let s = map.getCentroidsGroup(map)
-        let sym = s.selectAll('g.em-centroid').attr('id', (rg) => {
+
+        let anchors = getSparkAnchors(map)
+        anchors.attr('id', (rg) => {
             nutsIds.push(rg.properties.id)
             return 'spark_' + rg.properties.id
         })
 
-        setRegionStyles(map)
         addSparkLinesToMap(nutsIds)
         addMouseEventsToRegions(map)
         return map
-
     }
 
-    function setRegionStyles(map) {
-
+    function getSparkAnchors(map) {
+        if (map.gridCartogram_) {
+            return map.svg().selectAll('#em-grid-container .em-grid-cell')
+        }
+        return map.getCentroidsGroup(map).selectAll('g.em-centroid')
     }
 
     function addMouseEventsToRegions(map) {
@@ -277,23 +279,47 @@ export const map = function (config) {
 
     function addSparkLinesToMap(ids) {
         ids.forEach((nutsid) => {
-            //create svg for sparkline
-            // can be more than one center point for each nuts ID (e.g. Malta when included in insets)
             let node = out.svg().select('#spark_' + nutsid)
             let data = getComposition(nutsid)
 
-            if (data) {
-                createSparkLineChart(node, data, out.sparkLineWidth_, out.sparkLineHeight_)
+            if (!data) return
+
+            let g = node.append('g')
+            const offsets = out.sparkLineOffsets_ || { x: 0, y: 0 }
+            //  grid cartograms
+            if (out.gridCartogram_) {
+                const bbox = node.node().getBBox()
+                g.attr(
+                    'transform',
+                    `translate(
+            ${bbox.width / 2 + offsets.x - out.sparkLineWidth_ / 2},
+            ${bbox.height / 2 + offsets.y - out.sparkLineHeight_ / 2}
+        )`
+                )
             }
+
+            createSparkLineChart(g, data, out.sparkLineWidth_, out.sparkLineHeight_)
         })
     }
 
     function createSparkLineChart(node, data, width, height, isForTooltip = false) {
-        // call custom user function to draw the sparkline
+        // user override still wins
         if (out.sparkLineChartFunction_ && out.sparkLineChartFunction_ !== createSparkLineChart) {
             return out.sparkLineChartFunction_(node, data, width, height, isForTooltip)
         }
 
+        switch (out.sparkType_) {
+            case 'bar':
+                return createSparkBarChart(node, data, width, height, isForTooltip)
+
+            case 'area':
+            case 'line':
+            default:
+                return createSparkLineOrAreaChart(node, data, width, height, isForTooltip)
+        }
+    }
+
+    function createSparkLineOrAreaChart(node, data, width, height, isForTooltip) {
         const xScale = scaleLinear()
             .domain([0, out._statDates.length - 1])
             .range([0.5, width - 0.5])
@@ -311,8 +337,8 @@ export const map = function (config) {
 
         const zeroY = yScale(0)
 
+        // axes & zero line (tooltip only)
         if (isForTooltip) {
-            // X-axis at bottom
             node.append('g')
                 .attr('class', 'axis-x')
                 .attr('transform', `translate(0, ${height})`)
@@ -327,10 +353,8 @@ export const map = function (config) {
                 .attr('dy', '.15em')
                 .attr('transform', 'rotate(-65)')
 
-            // Y-axis with raw value labels
             node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
 
-            // Horizontal zero reference line → only if min < 0 and max > 0
             if (minValue < 0 && maxValue > 0) {
                 node.append('line')
                     .attr('x1', 0)
@@ -350,8 +374,7 @@ export const map = function (config) {
         if (out.sparkType_ === 'area') {
             node.append('path')
                 .datum(scaledData)
-                .attr('fill', typeof out.sparkAreaColor_ === 'function' ? (d, i) => out.sparkAreaColor_(d, i) : out.sparkAreaColor_)
-                .attr('stroke', 'none')
+                .attr('fill', typeof out.sparkAreaColor_ === 'function' ? out.sparkAreaColor_ : out.sparkAreaColor_)
                 .attr('opacity', out.sparkLineOpacity_)
                 .attr('fill-opacity', 0.3)
                 .attr(
@@ -363,45 +386,69 @@ export const map = function (config) {
                 )
         }
 
-        const path = node.append('path')
+        const path = node
+            .append('path')
             .datum(scaledData)
             .attr('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
-            .attr('stroke', typeof out.sparkLineColor_ === 'function'
-                ? (d, i) => out.sparkLineColor_(d, i)
-                : out.sparkLineColor_)
-            .attr('stroke-width', typeof out.sparkLineStrokeWidth_ === 'function'
-                ? (d, i) => out.sparkLineStrokeWidth_(d, i)
-                : out.sparkLineStrokeWidth_ + 'px')
-            .attr('d', lineGenerator);
+            .attr('stroke', typeof out.sparkLineColor_ === 'function' ? out.sparkLineColor_ : out.sparkLineColor_)
+            .attr('stroke-width', out.sparkLineStrokeWidth_ + 'px')
+            .attr('d', lineGenerator)
 
-        // === Progressive draw animation ===
         if (!isForTooltip) {
-            const totalLength = path.node().getTotalLength();
-            path
-                .attr('stroke-dasharray', totalLength)
+            const totalLength = path.node().getTotalLength()
+            path.attr('stroke-dasharray', totalLength)
                 .attr('stroke-dashoffset', totalLength)
                 .transition()
                 .duration(out.transitionDuration())
-                .attr('stroke-dashoffset', 0);
+                .attr('stroke-dashoffset', 0)
         }
+    }
 
-        node.selectAll('circle')
-            .data(scaledData)
+    function createSparkBarChart(node, data, width, height, isForTooltip) {
+        const minValue = min(data.map((d) => d.value)) || 0
+        const maxValue = max(data.map((d) => d.value)) || 0
+
+        const yScale = scaleLinear()
+            .domain([Math.min(minValue, 0), Math.max(maxValue, 0)])
+            .range([height, 0])
+
+        const barWidth = width / data.length
+        const zeroY = yScale(0)
+
+        // compute once per sparkline
+        const totalChange = data.reduce((sum, d) => sum + (d.value ?? 0), 0)
+
+        node.selectAll('rect.spark-bar')
+            .data(data)
             .enter()
-            .append('circle')
-            .attr('cx', (d) => d.scaledXValue)
-            .attr('cy', (d) => d.scaledYValue)
-            .attr('r', out.sparkLineCircleRadius_)
-            .attr('fill', 'red')
-            .attr('stroke', 'none')
+            .append('rect')
+            .attr('class', 'spark-bar')
+            .attr('x', (d, i) => i * barWidth)
+            .attr('width', barWidth * 0.9)
+            .attr('y', (d) => (d.value >= 0 ? yScale(d.value) : zeroY))
+            .attr('height', (d) => Math.abs(yScale(d.value) - zeroY))
+            .attr('fill', () => (typeof out.sparkLineColor_ === 'function' ? out.sparkLineColor_(data, totalChange) : out.sparkLineColor_))
+            .attr('opacity', out.sparkLineOpacity_)
+
+        // zero reference line (tooltip only)
+        if (isForTooltip && minValue < 0 && maxValue > 0) {
+            node.append('line')
+                .attr('x1', 0)
+                .attr('x2', width)
+                .attr('y1', zeroY)
+                .attr('y2', zeroY)
+                .attr('stroke', 'gray')
+                .attr('stroke-dasharray', '2,2')
+                .attr('stroke-width', 1)
+        }
     }
 
     //specific tooltip text function
     out.tooltip_.textFunction = function (region, map) {
         const buf = []
 
-        const regionName = region.properties.na
+        const regionName = region.properties.na || region.properties.name || ''
         const regionId = region.properties.id
         buf.push(`
                 <div class="em-tooltip-bar">
@@ -445,7 +492,7 @@ export const map = function (config) {
      */
     function getDatasetMaxMin() {
         const maxs = []
-        const sel = out.getCentroidsGroup(out).selectAll('g.em-centroid').data()
+        const sel = getSparkAnchors(out).data()
 
         sel.forEach((rg) => {
             const id = rg.properties.id

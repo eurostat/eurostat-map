@@ -625,22 +625,22 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             defineProjection()
             definePathFunction()
 
-            // d3 zoom
-            if (out.zoomExtent() || out.zoomButtons_) {
-                if (!out.zoomExtent_) {
-                    //console.log('Zoom buttons are enabled, but no zoom extent is defined. Setting default extent to map.zoomExtent([1,10]).')
-                    out.zoomExtent_ = [1, 10]
-                }
-                defineMapZoom(out)
-            }
-
             if (out.backgroundMap_) {
                 drawBackgroundMap(out)
             }
         }
 
+        // d3 zoom
+        if (out.zoomExtent() || out.zoomButtons_) {
+            if (!out.zoomExtent_) {
+                //console.log('Zoom buttons are enabled, but no zoom extent is defined. Setting default extent to map.zoomExtent([1,10]).')
+                out.zoomExtent_ = [1, 10]
+                defineMapZoom(out)
+            }
+        }
+
         //prepare group for proportional symbols, with centroids
-        if (withCenterPoints) {
+        if (withCenterPoints && !out.gridCartogram_) {
             addCentroidsToMap(out)
         }
 
