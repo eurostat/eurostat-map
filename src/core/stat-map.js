@@ -298,7 +298,11 @@ export const statMap = function (config, withCenterPoints, mapType) {
                     out._statDone_ = true
                     if (!out.Geometries.isGeoReady()) return
 
-                    if (_renderScheduled) return
+                    if (_renderScheduled) {
+                        // Render already scheduled, but still need to ensure callback fires
+                        tryFinalize()
+                        return
+                    }
 
                     _renderScheduled = true
                     Promise.resolve().then(() => {

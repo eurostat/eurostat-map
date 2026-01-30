@@ -15,7 +15,6 @@
     display: block;
 }
 
-
 /* General text settings */
 text {
     pointer-events: none;
@@ -66,10 +65,6 @@ a text {
     font-weight: bold;
 }
 
-.em-inset-title {
-    font-size: 11px;
-}
-
 .em-subtitle,
 .em-inset-subtitle {
     fill: #4c4b4b;
@@ -82,10 +77,6 @@ a text {
 .em-subtitle {
     font-size: 18px;
     font-weight: 100;
-}
-
-.em-inset-subtitle {
-    font-size: 12px;
 }
 
 .em-source-pretext {
@@ -111,12 +102,6 @@ a text {
 .em-frame {
     stroke-width: 0;
     stroke: grey;
-}
-
-.em-insets .em-frame {
-    /* this will give a frame to inset maps */
-    stroke: grey;
-    stroke-width: 0.3px !important;
 }
 
 .em-sea {
@@ -152,7 +137,8 @@ a text {
     fill: #0a328e;
 }
 
-.em-centroid, .em-coxcomb g {
+.em-centroid,
+.em-coxcomb g {
     cursor: pointer !important;
 }
 
