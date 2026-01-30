@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mining, electricity and water sectors map</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <div id="container">
+            <div class="map-title">Mining, electricity and water sectors by region, 2023</div>
+            <div id="dropdown-container">
+                <div id="dropdown-label">Select a variable:</div>
+                <ewc-singleselect
+                    id="mySelect"
+                    options='[
+    [
+    { "name": "Persons employed per local unit", "code": "EMP_PLOC_NR", "status": "active" },
+    { "name": "Labour costs per person employed in local unit", "code":"LC_EMP_LOC_TEUR", "status": "active" }
+
+    ]
+  ]'
+                    defaultOption="EMP_PLOC_NR"
+                    activeOption="EMP_PLOC_NR"
+                    dropdownHeight="200px"
+                    selectedLabel="Select below"
+                    invertColors="false"
+                    searchMode=""
+                ></ewc-singleselect>
+            </div>
+            <div id="map-container">
+                <svg id="map" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+        </div>
+
+        <script src="../../../../../build/eurostatmap.min.js"></script>
+        <script type="module" src="./dropdown/dropdown.js"></script>
+        <script type="module" src="./ch-map.js"></script>
+
+        <script type="module">
+            import { showSpinner, hideSpinner } from '../spinner.js'
+            // Keep original fetch
+            const originalFetch = window.fetch
+
+            // Override globally
+            let isLoading = false
+            window.fetch = async (...args) => {
+                isLoading = true
+                showSpinner()
+
+                try {
+                    const res = await originalFetch(...args)
+                    return res
+                } finally {
+                    isLoading = false
+                    hideSpinner()
+                }
+            }
+        </script>
+    </body>
+</html>

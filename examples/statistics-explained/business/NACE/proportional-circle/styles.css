@@ -1,0 +1,52 @@
+html,
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+#container {
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    max-width: 100%;
+}
+
+.map-title {
+    font-weight: bold;
+    color: #4c4b4b;
+    font-size: 21px;
+    padding: 6px;
+}
+
+#dropdown-container {
+    position: relative; /* or just remove position entirely */
+    padding: 6px;
+    padding-top: 0px;
+}
+
+#dropdown-label {
+    font-size: 14px;
+    font-weight: 100;
+    color: #333;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    padding-left: 2px;
+    align-self: center;
+    margin-right: 10px;
+}
+
+.em-zoom-buttons {
+    transform: translate(94.5%, 79%) !important;
+}
+
+.em-insets-button {
+    transform: translate(94.5%, 10px) !important;
+    cursor: pointer !important;
+}
+
+.em-insets {
+    display: none;
+}

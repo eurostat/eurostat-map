@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Mining, electricity and water sectors map</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+
+    <body>
+        <div id="container">
+            <div class="map-title">Mining, electricity and water sectors, 2023</div>
+            <div id="dropdown-container">
+                <div id="dropdown-label">Select a variable:</div>
+                <ewc-singleselect
+                    id="mySelect"
+                    options='[
+    [
+    { "name": "Local units", "code": "LOC_NR", "status": "active" },
+    { "name": "Persons employed in local units", "code": "EMP_LOC_NR", "status": "active" },
+    { "name": "Wages and salaries in local units", "code":"WAGE_LOC_MEUR", "status": "active"}
+    ]
+  ]'
+                    defaultOption="LOC_NR"
+                    activeOption="LOC_NR"
+                    dropdownHeight="200px"
+                    selectedLabel="Select below"
+                    invertColors="false"
+                    searchMode=""
+                ></ewc-singleselect>
+            </div>
+            <div id="map-container">
+                <svg id="map" viewBox="0 0 700 560"></svg>
+            </div>
+        </div>
+
+        <script src="../../../../../build/eurostatmap.min.js"></script>
+        <script type="module" src="./dropdown/dropdown.js"></script>
+        <script type="module" src="./ps-map.js"></script>
+    </body>
+</html>
