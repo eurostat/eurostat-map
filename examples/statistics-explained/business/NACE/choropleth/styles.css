@@ -1,8 +1,8 @@
 /* mobile */
 @media (max-width: 768px) {
     .em-button {
-      height: 30px !important;
-      width: 30px !important;
+        height: 30px !important;
+        width: 30px !important;
     }
     ewc-singleselect#mySelect {
         max-width: 100% !important;
@@ -32,11 +32,11 @@ body {
     width: 100%;
     height: 100vh;
     overflow: auto;
-    max-width: 100%
+    max-width: 100%;
 }
 
 #map {
-    max-width: 100%
+    max-width: 100%;
 }
 
 .map-title {
@@ -47,9 +47,9 @@ body {
 }
 
 #dropdown-container {
-    position: relative;   /* or just remove position entirely */
+    position: relative; /* or just remove position entirely */
     padding: 6px;
-    padding-top:0px;
+    padding-top: 0px;
 }
 
 #dropdown-label {
@@ -73,72 +73,4 @@ body {
 
 .em-legend-subtitle {
     font-size: 14px !important;
-}
-
-
-
-/* spinner overlay */
-#loading-overlay {
-    position: absolute;
-    inset: 0;
-    /* top:0; right:0; bottom:0; left:0 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.6);
-    /* semi-opaque so you still see map faintly */
-    z-index: 9999;
-    /* above dropdown and map */
-    pointer-events: auto;
-    /* prevents interaction while loading */
-}
-
-/* spinner overlay */
-#loading-overlay {
-    position: absolute;
-    inset: 0;
-    /* top:0; right:0; bottom:0; left:0 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.6);
-    /* semi-opaque so you still see map faintly */
-    z-index: 9999;
-    /* above dropdown and map */
-    pointer-events: auto;
-    /* prevents interaction while loading */
-}
-
-/* center spinner */
-.loading-spinner {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 4px solid rgba(0, 0, 0, 0.12);
-    border-top-color: rgba(0, 0, 0, 0.65);
-    animation: spinner-rotate 1s linear infinite;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-/* optional loading text */
-#loading-overlay .loading-label {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #222;
-    text-align: center;
-    font-weight: 500;
-}
-
-/* layout: spinner above label stacked vertically */
-#loading-overlay .spinner-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* animation */
-@keyframes spinner-rotate {
-    to {
-        transform: rotate(360deg);
-    }
 }

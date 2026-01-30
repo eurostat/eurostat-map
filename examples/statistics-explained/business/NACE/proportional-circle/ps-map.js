@@ -1,19 +1,38 @@
-const legendTitles = {
+const configs = {
     LOC_NR: {
         title: 'Number of units',
+        unitText: 'units',
+        multiplier: 1,
     },
     EMP_LOC_NR: {
         title: 'Number of persons',
-        subtitle: '',
+        unitText: 'persons',
+        multiplier: 1,
     },
     WAGE_LOC_MEUR: {
         title: 'Million EUR',
+        unitText: 'euro',
+        multiplier: 1000000, // MEUR → EUR
     },
 }
+const compactFormatter = new Intl.NumberFormat('en', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1,
+})
+const longFormatter = new Intl.NumberFormat('en', {
+    notation: 'compact',
+    compactDisplay: 'long',
+    maximumFractionDigits: 1,
+})
+const spaceAsThousandSeparator = (number) => {
+    return number.toLocaleString('en').replace(/,/g, ' ')
+}
 let map
+const isMobile = window.innerWidth <= 768
 export function initMap(code) {
-    const mapHeight = 550
-    const mapWidth = 700
+    const mapWidth = isMobile ? window.innerWidth : 700
+    const mapHeight = isMobile ? Math.round(window.innerHeight - 160) : 550
 
     map = eurostatmap
         .map('ps')
@@ -26,16 +45,13 @@ export function initMap(code) {
         .nutsLevel(2)
 
         //symbol settings
-        .psFill('#005C99')
+        .psFill('#2644A7')
         .psBrightenFactor(0.8) //background color brightening factor
         .psMaxSize(18)
         .psMinSize(3)
 
         //SE settings
-        //.header(true)
-        //.headerPadding(headerPadding)
         .footer(true)
-        .zoomButtons(false)
         .showEstatLogo(true)
         .showEstatRibbon(true)
         .logoPosition([2, mapHeight - 30])
@@ -56,7 +72,7 @@ export function initMap(code) {
         //STATS
         .stat('size', {
             eurostatDatasetCode: 'sbs_r_nuts2021',
-            unitText: '',
+            unitText: configs[code].unitText,
             filters: {
                 INDIC_SBS: code,
                 TIME: '2023',
@@ -66,11 +82,16 @@ export function initMap(code) {
 
         //legend
         .legend({
-            title: legendTitles[code].title,
-            subtitle: legendTitles[code].subtitle,
+            title: configs[code].title,
             x: 10,
             y: 110,
             boxOpacity: 0.9,
+            sizeLegend: { labelFormatter: getLegendLabelFormatter(code) },
+        })
+
+        //tooltip
+        .tooltip({
+            textFunction: getTooltipFunction(code),
         })
 
     map.build()
@@ -79,21 +100,75 @@ export function initMap(code) {
 export function updateMap(code) {
     map.stat('size', {
         eurostatDatasetCode: 'sbs_r_nuts2021',
-        unitText: '',
+        unitText: configs[code].unitText,
         filters: {
             INDIC_SBS: code,
             TIME: '2023',
-            nace_r2: ['B', 'D', 'E'], // Array for multiple values
+            nace_r2: ['B', 'D', 'E'],
         },
     })
+
     map.updateStatData()
 
     map.legend({
-        title: legendTitles[code].title,
-        subtitle: legendTitles[code].subtitle,
+        title: configs[code].title,
+        sizeLegend: { labelFormatter: getLegendLabelFormatter(code) },
+    })
+
+    map.tooltip({
+        textFunction: getTooltipFunction(code),
     })
 }
 
-// Initialize the map with a default code
+const getLegendLabelFormatter = (code) => {
+    const { multiplier } = configs[code]
+    return (value) => compactFormatter.format(value * multiplier)
+}
 
+const getTooltipFunction = (code) => {
+    const multiplier = configs[code].multiplier
+
+    return function (region, map) {
+        const html = []
+
+        const regionName = region.properties.na || region.properties.name
+        const regionId = region.properties.id
+        html.push(`
+        <div class="em-tooltip-bar">
+            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+        </div>
+        `)
+
+        const statData = map.statData('size')
+        const tooltipText = statData.unitText()
+        const sv = statData.get(regionId)
+
+        if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
+            html.push(`
+            <div class="em-tooltip-text no-data">
+                <table class="em-tooltip-table">
+                    <tbody>
+                        <tr><td>${map.noDataText_}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            `)
+            return html.join('')
+        }
+
+        const displayValue = longFormatter.format(Math.round(sv.value * multiplier))
+        html.push(`
+        <div class="em-tooltip-text">
+            <table class="em-tooltip-table">
+                <tbody>
+                    <tr><td>${displayValue} ${tooltipText}</td></tr>
+                </tbody>
+            </table>
+        </div>
+        `)
+        return html.join('')
+    }
+}
+
+// Initialize the map with a default code
 initMap('LOC_NR')

@@ -37,26 +37,5 @@
         <script src="../../../../../build/eurostatmap.min.js"></script>
         <script type="module" src="./dropdown/dropdown.js"></script>
         <script type="module" src="./ch-map.js"></script>
-
-        <script type="module">
-            import { showSpinner, hideSpinner } from '../spinner.js'
-            // Keep original fetch
-            const originalFetch = window.fetch
-
-            // Override globally
-            let isLoading = false
-            window.fetch = async (...args) => {
-                isLoading = true
-                showSpinner()
-
-                try {
-                    const res = await originalFetch(...args)
-                    return res
-                } finally {
-                    isLoading = false
-                    hideSpinner()
-                }
-            }
-        </script>
     </body>
 </html>

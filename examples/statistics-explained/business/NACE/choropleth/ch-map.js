@@ -1,27 +1,31 @@
 const configs = {
     EMP_PLOC_NR: {
         legendTitle: 'Number of persons',
-        colors: ['#FFEB99', '#D0E9B0', '#8AD6B9', '#56C2C0', '#3194B6', '#114891', '#17256B'],
-        //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
+        colors: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
         nbClasses: 7,
         unitText: 'people per unit',
+        multiplier: 1, // no conversion needed
     },
     LC_EMP_LOC_TEUR: {
-        legendTitle: 'Thousand euro',
-        colors: ['#FFEB99', '#DCEAAA', '#B0E2B6', '#77D1BA', '#56C2C0', '#3BA9BF', '#1C69A4', '#133F88', '#17256B'],
-        //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
+        legendTitle: 'Euro',
+        colors: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+        thresholds: [15, 30, 45, 60, 75, 90, 100],
         nbClasses: 9,
-        unitText: 'thousand euro per person',
+        unitText: 'euro per person',
+        multiplier: 1000, // convert thousands to actual euros
     },
 }
+
+const spaceAsThousandSeparator = (number) => {
+    return number.toLocaleString('en').replace(/,/g, ' ')
+}
+
 const isMobile = window.innerWidth <= 768
 
 let map
 export function initMap(code) {
     const mapWidth = isMobile ? window.innerWidth : 700
-    const mapHeight = isMobile
-        ? Math.round(window.innerHeight - 160) // 100% of viewport height - header etc
-        : 550
+    const mapHeight = isMobile ? Math.round(window.innerHeight - 160) : 550
 
     map = eurostatmap
         .map('ch')
@@ -29,8 +33,6 @@ export function initMap(code) {
         .height(mapHeight)
         .dorling(false)
         .scale('60M')
-        //.title('Manufacturing sector by region, 2023')
-
         .position({ x: 4300000, y: 3420000, z: isMobile ? 9000 : 7400 })
         .insetsButton(true)
 
@@ -38,11 +40,10 @@ export function initMap(code) {
         .colors(configs[code].colors)
         .thresholds(configs[code].thresholds)
         .numberOfClasses(configs[code].nbClasses)
-        .classificationMethod(configs[code].thresholds ? 'threshold' : 'jenks') //jenks, quantile, equal, threshold
+        .classificationMethod(configs[code].thresholds ? 'threshold' : 'jenks')
 
         //SE settings
         .footer(true)
-        .zoomButtons(false)
         .showEstatLogo(true)
         .showEstatRibbon(true)
         .logoPosition([2, mapHeight - 30])
@@ -57,7 +58,6 @@ export function initMap(code) {
 
         .showZoomButtons(true)
         .insets('default')
-        //end SE settings
 
         .nutsLevel(2)
         .stat({
@@ -66,7 +66,7 @@ export function initMap(code) {
             filters: {
                 INDIC_SBS: code,
                 TIME: '2023',
-                nace_r2: ['B', 'D', 'E'], // Array for multiple values
+                nace_r2: ['B', 'D', 'E'],
             },
         })
         .legend({
@@ -80,6 +80,10 @@ export function initMap(code) {
             maxMinTickLength: 15,
             maxMinRegionLabels: false,
             maxMinLabels: ['', ''],
+            labelFunction: getLegendLabelFunction(code),
+        })
+        .tooltip({
+            textFunction: getTooltipFunction(code),
         })
 
     map.build()
@@ -99,7 +103,7 @@ export function updateMap(code) {
         filters: {
             INDIC_SBS: code,
             TIME: '2023',
-            nace_r2: ['B', 'D', 'E'], // Array for multiple values
+            nace_r2: ['B', 'D', 'E'],
         },
     })
     map.updateStatData()
@@ -116,6 +120,7 @@ export function updateMap(code) {
         maxMinTickLength: 15,
         maxMinRegionLabels: false,
         maxMinLabels: ['', ''],
+        labelFormatter: getLegendLabelFunction(code),
     })
 
     //update tooltip
@@ -124,26 +129,31 @@ export function updateMap(code) {
     })
 }
 
+const getLegendLabelFunction = (code) => {
+    const multiplier = configs[code].multiplier
+    return function (value) {
+        return spaceAsThousandSeparator(Math.round(value * multiplier))
+    }
+}
+
 const getTooltipFunction = (code) => {
-    const tooltipText = configs[code].tooltipText
+    const multiplier = configs[code].multiplier
+
     return function (region, map) {
         const html = []
 
-        // Header with region name and ID
         const regionName = region.properties.na || region.properties.name
         const regionId = region.properties.id
         html.push(`
         <div class="em-tooltip-bar">
             <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
         </div>
-    `)
+        `)
 
-        // Retrieve region's data value and unit
         const statData = map.statData()
+        const tooltipText = statData.unitText()
         const sv = statData.get(regionId)
-        const unit = statData.unitText() || ''
 
-        // No data case
         if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
             html.push(`
             <div class="em-tooltip-text no-data">
@@ -153,20 +163,20 @@ const getTooltipFunction = (code) => {
                     </tbody>
                 </table>
             </div>
-        `)
+            `)
             return html.join('')
         }
 
-        // Data display
+        const displayValue = spaceAsThousandSeparator(Math.round(sv.value * multiplier))
         html.push(`
         <div class="em-tooltip-text">
             <table class="em-tooltip-table">
                 <tbody>
-                    <tr><td>${spaceAsThousandSeparator(sv.value)} ${tooltipText}</td></tr>
+                    <tr><td>${displayValue} ${tooltipText}</td></tr>
                 </tbody>
             </table>
         </div>
-    `)
+        `)
         return html.join('')
     }
 }
