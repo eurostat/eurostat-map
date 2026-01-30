@@ -279,24 +279,31 @@ export const map = function (config) {
 
     function addSparkLinesToMap(ids) {
         ids.forEach((nutsid) => {
-            let node = out.svg().select('#spark_' + nutsid)
-            let data = getComposition(nutsid)
-
+            const node = out.svg().select('#spark_' + nutsid)
+            const data = getComposition(nutsid)
             if (!data) return
+            node.selectAll('.em-sparkline-chart').remove() //clear previous
+            const g = node.append('g').attr('class', 'em-sparkline-chart')
 
-            let g = node.append('g')
             const offsets = out.sparkLineOffsets_ || { x: 0, y: 0 }
-            //  grid cartograms
+
+            let anchorX = 0
+            let anchorY = 0
+
             if (out.gridCartogram_) {
                 const bbox = node.node().getBBox()
-                g.attr(
-                    'transform',
-                    `translate(
-            ${bbox.width / 2 + offsets.x - out.sparkLineWidth_ / 2},
-            ${bbox.height / 2 + offsets.y - out.sparkLineHeight_ / 2}
-        )`
-                )
+                anchorX = bbox.width / 2
+                anchorY = bbox.height / 2
             }
+            // else: geographic map → centroid group already at (0,0)
+
+            g.attr(
+                'transform',
+                `translate(
+                ${anchorX + offsets.x - out.sparkLineWidth_ / 2},
+                ${anchorY + offsets.y - out.sparkLineHeight_ / 2}
+            )`
+            )
 
             createSparkLineChart(g, data, out.sparkLineWidth_, out.sparkLineHeight_)
         })
