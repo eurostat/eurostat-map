@@ -12,7 +12,7 @@
 }
 
 /*  regions without data input */
-.em--coxcomb [ecl="ni"] {
+.em--coxcomb [ecl='ni'] {
     fill: #e9e9e9;
 }
 
@@ -20,4 +20,8 @@
 .em--coxcomb .em-cntrg,
 .em--coxcomb .em-nutsrg {
     fill: #fafcde;
+}
+
+.em--coxcomb #em-cntbn-halo {
+    stroke: none;
 }

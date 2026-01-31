@@ -105,13 +105,19 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
         .attr('class', 'em-grid-cell')
         .attr('transform', (d) => `translate(${d.col * (cellSize + cellPadding) + margins.left}, ${d.row * (cellSize + cellPadding) + margins.top})`)
         .each(function (d) {
-            select(this).append('rect').attr('width', cellSize).attr('height', cellSize).attr('class', 'em-grid-rect')
+            select(this)
+                .append('rect')
+                .datum(d) // Explicitly bind data to shape for mouse events
+                .attr('width', cellSize)
+                .attr('height', cellSize)
+                .attr('class', 'em-grid-rect em-grid-shape')
 
             select(this)
                 .append('text')
                 .attr('class', 'em-grid-text')
                 .attr('text-anchor', 'middle')
-                .attr('font-size', 15)
+                .style('font-size', getFontSize(out._mapType))
+                .style('transform', getLabelTranslate(out._mapType))
                 .style('pointer-events', 'none')
                 .attr('fill', 'black')
                 .text(d.id)
@@ -148,18 +154,53 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
             return `translate(${x}, ${y})`
         })
         .each(function (d) {
-            select(this).append('path').attr('d', drawHexagon(hexRadius)).attr('class', 'em-grid-hexagon')
+            // Append hexagon shape as background (first child)
+            select(this)
+                .append('path')
+                .datum(d) // Explicitly bind data to shape for mouse events
+                .attr('d', drawHexagon(hexRadius))
+                .attr('class', 'em-grid-hexagon em-grid-shape')
 
+            // Append text label
             select(this)
                 .append('text')
                 .attr('class', 'em-grid-text')
                 .attr('text-anchor', 'middle')
-                .attr('font-size', 15)
+                .style('font-size', getFontSize(out._mapType))
+                .style('transform', getLabelTranslate(out._mapType))
                 .style('pointer-events', 'none')
                 .attr('fill', 'black')
                 .text(d.id)
                 .attr('y', 5)
         })
+}
+
+const getFontSize = (mapType) => {
+    switch (mapType) {
+        case 'sparkline':
+        case 'spark':
+            return 12
+        case 'proportionalSymbol':
+            return 14
+        case 'choropleth':
+            return 15
+        default:
+            return 12
+    }
+}
+
+const getLabelTranslate = (mapType) => {
+    switch (mapType) {
+        case 'sparkline':
+        case 'spark':
+            return 'translate(0, -10px)'
+        case 'proportionalSymbol':
+            return 'translate(0, -12px)'
+        case 'choropleth':
+            return 'translate(0, 0px)'
+        default:
+            return 'translate(0, 0px)'
+    }
 }
 
 /** Generates the hexagon path */

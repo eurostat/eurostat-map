@@ -22,8 +22,8 @@ export const map = function (config) {
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
     out.coxcombRings_ = true // Show outer rings by default
-
-    out.hoverColor_ = '#000'
+    out.coxcombOffsets_ = { x: 0, y: 0 }
+    out.hoverColor_ = '#ffa500'
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
@@ -38,7 +38,8 @@ export const map = function (config) {
         'coxcombStrokeFill_',
         'coxcombStrokeWidth_',
         'hoverColor_',
-        'classifierSize_'
+        'classifierSize_',
+        'coxcombOffsets_',
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -60,6 +61,7 @@ export const map = function (config) {
     out.totalCode_ = undefined
 
     // Helper for Eurostat datasets (like statSpark or statPie)
+    // For example:
     // .statCoxcomb({
     //     filters: {
     //       //data/tour_occ_nin2m?format=JSON&unit=NR&c_resid=TOTAL&nace_r2=I551-I553&month=M01&lang=EN
@@ -153,7 +155,7 @@ export const map = function (config) {
             if (index > -1) out.statCodes_.splice(index, 1)
         }
         getTotals(map)
-        computeCoxStatusMap(map);
+        computeCoxStatusMap(map)
         defineSizeScales(map)
     }
 
@@ -202,49 +204,53 @@ export const map = function (config) {
     }
 
     function computeCoxStatusMap(map) {
-        const months = out._coxTimes || [];
-        const cats = out._coxCategoryCodes || [];
-        const useTotal = !!out.totalCode_;
-        const status = new Map(); // id -> {value: ':'} for ND, {value:0} for HAS (incl. zero), null for NI
+        const months = out._coxTimes || []
+        const cats = out._coxCategoryCodes || []
+        const useTotal = !!out.totalCode_
+        const status = new Map() // id -> {value: ':'} for ND, {value:0} for HAS (incl. zero), null for NI
 
         // Collect region ids seen in any relevant series
-        const regionIds = new Set();
+        const regionIds = new Set()
         const addIdsFrom = (key) => {
-            const st = out.statData(key);
-            if (st && st._data_) Object.keys(st._data_).forEach(id => regionIds.add(id));
-        };
-        months.forEach(m => {
-            if (useTotal) addIdsFrom(`${m}:${out.totalCode_}`);
-            else cats.forEach(c => addIdsFrom(`${m}:${c}`));
-        });
+            const st = out.statData(key)
+            if (st && st._data_) Object.keys(st._data_).forEach((id) => regionIds.add(id))
+        }
+        months.forEach((m) => {
+            if (useTotal) addIdsFrom(`${m}:${out.totalCode_}`)
+            else cats.forEach((c) => addIdsFrom(`${m}:${c}`))
+        })
 
         // Determine status for each region
-        regionIds.forEach(id => {
-            let seenAny = false, seenND = false, seenNumeric = false;
-            months.forEach(m => {
+        regionIds.forEach((id) => {
+            let seenAny = false,
+                seenND = false,
+                seenNumeric = false
+            months.forEach((m) => {
                 if (useTotal) {
-                    const e = out.statData(`${m}:${out.totalCode_}`)?.get(id);
-                    if (!e) return;
-                    seenAny = true;
-                    if (e.value === ':') seenND = true;
-                    else if (typeof e.value === 'number') seenNumeric = true; // zero counts as data
+                    const e = out.statData(`${m}:${out.totalCode_}`)?.get(id)
+                    if (!e) return
+                    seenAny = true
+                    if (e.value === ':') seenND = true
+                    else if (typeof e.value === 'number') seenNumeric = true // zero counts as data
                 } else {
-                    cats.forEach(c => {
-                        const e = out.statData(`${m}:${c}`)?.get(id);
-                        if (!e) return;
-                        seenAny = true;
-                        if (e.value === ':') seenND = true;
-                        else if (typeof e.value === 'number') seenNumeric = true; // zero counts as data
-                    });
+                    cats.forEach((c) => {
+                        const e = out.statData(`${m}:${c}`)?.get(id)
+                        if (!e) return
+                        seenAny = true
+                        if (e.value === ':') seenND = true
+                        else if (typeof e.value === 'number') seenNumeric = true // zero counts as data
+                    })
                 }
-            });
+            })
 
-            if (seenND) status.set(id, { value: ':' });      // ND
-            else if (seenAny || seenNumeric) status.set(id, { value: 0 }); // HAS (incl. all-zero)
-            else status.set(id, null);                        // NI
-        });
+            if (seenND)
+                status.set(id, { value: ':' }) // ND
+            else if (seenAny || seenNumeric)
+                status.set(id, { value: 0 }) // HAS (incl. all-zero)
+            else status.set(id, null) // NI
+        })
 
-        out.coxStatus_ = status;
+        out.coxStatus_ = status
     }
 
     function getRegionTotal(id) {
@@ -292,8 +298,8 @@ export const map = function (config) {
             // apply to main map
             applyStyleToMap(out)
 
-            // dorling cartogram
-            if (out.dorling_) {
+            // dorling cartogram (not applicable for grid cartograms)
+            if (out.dorling_ && !out.gridCartogram_) {
                 runDorlingSimulation(out, (d) => {
                     const total = getRegionTotal(d.properties.id) || 0
                     return out.classifierSize_(total) || 0
@@ -311,83 +317,289 @@ export const map = function (config) {
         return out
     }
 
+    /**
+     * Get the appropriate anchor elements for coxcomb charts
+     * For grid cartograms: grid cells
+     * For geographic maps: centroid groups
+     */
+    function getCoxcombAnchors(map) {
+        if (map.gridCartogram_) {
+            return map.svg().selectAll('#em-grid-container .em-grid-cell')
+        }
+        return map.getCentroidsGroup(map).selectAll('g.em-centroid')
+    }
+
     function applyStyleToMap(map) {
         out.catLabels_ = out.catLabels_ || {}
 
         if (out.svg_) {
-            const s = map.getCentroidsGroup(map)
-            if (s) {
-                const sym = s.selectAll('g.em-centroid')
+            if (map.gridCartogram_) {
+                // Grid cartogram mode
+                applyStyleToGridCartogram(map)
+            } else {
+                // Geographic map mode
+                const s = map.getCentroidsGroup(map)
+                if (s) {
+                    const sym = s.selectAll('g.em-centroid')
 
-                // Only keep regions that actually have data
-                const regionFeatures = sym.data().filter((rg) => {
-                    const id = rg.properties.id
-                    return getRegionTotal(id) !== undefined // has non-zero or valid data
-                })
+                    // Only keep regions that actually have data
+                    const regionFeatures = sym.data().filter((rg) => {
+                        const id = rg.properties.id
+                        return getRegionTotal(id) !== undefined // has non-zero or valid data
+                    })
 
-                applyStyleToRegionPolygons(map)
+                    applyStyleToRegionPolygons(map)
 
-                // Hover behavior (skip no-data regions)
-                addMouseEventsToRegions(map)
+                    // Hover behavior (skip no-data regions)
+                    addMouseEventsToRegions(map)
 
-                // append charts to regions
-                addCoxcombChartsToMap(regionFeatures, map)
+                    // append charts to regions
+                    addCoxcombChartsToMap(regionFeatures, map)
+                }
             }
         }
     }
 
+    function applyStyleToGridCartogram(map) {
+        // Collect region IDs from grid cells
+        const regionIds = []
+        const anchors = getCoxcombAnchors(map)
+
+        anchors.attr('id', (rg) => {
+            regionIds.push(rg.properties.id)
+            return 'cox_' + rg.properties.id
+        })
+
+        // Add coxcomb charts to grid cells
+        addCoxcombChartsToGridCartogram(regionIds, map)
+
+        // Add mouse events to grid shapes
+        addMouseEventsToGridCartogram(map)
+    }
+
+    function addCoxcombChartsToGridCartogram(regionIds, map) {
+        const months = out._coxTimes
+        const causes = out._coxCategoryCodes
+        const angle = createAngleScale(months)
+        const offsets = out.coxcombOffsets_ || { x: 0, y: 0 }
+
+        regionIds.forEach((regionId) => {
+            const node = out.svg().select('#cox_' + regionId)
+            if (node.empty()) return
+
+            const monthData = buildMonthData(regionId, months, causes)
+            if (!monthData.length) return
+
+            const keys = getActiveKeys(monthData, causes)
+            const stackGen = stack().keys(keys)
+            const stacked = stackGen(monthData)
+
+            // Clear previous chart
+            node.selectAll('.em-coxcomb').remove()
+
+            // Get cell dimensions for positioning
+            const bbox = node.node().getBBox()
+            const anchorX = bbox.width / 2
+            const anchorY = bbox.height / 2
+
+            // Create chart container
+            const g = node
+                .append('g')
+                .attr('class', 'em-coxcomb')
+                .attr('transform', `translate(${anchorX + offsets.x}, ${anchorY + offsets.y})`)
+            //.style('pointer-events', 'none')
+
+            // Draw the coxcomb chart
+            drawCoxcombInContainer(g, regionId, stacked, keys, angle, map)
+
+            // Move chart after the shape element for proper z-ordering
+            const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+            if (shapeEl && shapeEl.nextSibling) {
+                node.node().insertBefore(g.node(), shapeEl.nextSibling)
+            }
+        })
+    }
+
+    function drawCoxcombInContainer(node, regionId, stackedData, keys, angle, map) {
+        // Outer ring
+        if (out.coxcombRings_) {
+            const yearlyTotal = out.yearlyTotals[regionId] || 0
+            const targetOuter = out.classifierSize_(yearlyTotal)
+            node.append('circle')
+                .attr('class', 'em-coxcomb-max-outline')
+                .attr('r', 0)
+                .attr('fill', 'none')
+                .attr('stroke', '#000')
+                .attr('stroke-width', 0.3)
+                .attr('opacity', 0.5)
+                .attr('pointer-events', 'none')
+                .transition()
+                .duration(out.transitionDuration_ / 2)
+                .attr('r', targetOuter)
+        }
+
+        // Arc generator
+        const arcGen = arc()
+            .startAngle((d) => angle(d.data.month))
+            .endAngle((d) => angle(d.data.month) + angle.bandwidth())
+            .padAngle(0.01)
+            .padRadius(0)
+
+        // Stacked wedges
+        keys.forEach((key, ki) => {
+            node.append('g')
+                .attr('class', 'em-coxcomb-chart')
+                .attr('stroke', '#ffffff')
+                .attr('stroke-width', 0.3)
+                .selectAll('path')
+                .data(stackedData[ki])
+                .join('path')
+                .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
+                .attr('code', key)
+                .attr('month', (d) => d.data.month)
+                .transition()
+                .delay((d, i) => i * 120)
+                .duration(out.transitionDuration_)
+                .attrTween('d', function (d) {
+                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId))
+                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId))
+                    return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
+                })
+        })
+    }
+
+    function addMouseEventsToGridCartogram(map) {
+        const shapes = out.svg().selectAll('#em-grid-container .em-grid-cell .em-grid-shape')
+        const charts = out.svg().selectAll('#em-grid-container .em-grid-cell .em-coxcomb')
+
+        // Helper to get region data - shapes have it directly, charts need to get it from parent cell
+        const getRegionData = (element) => {
+            const cell = select(element.closest('.em-grid-cell'))
+            return cell.datum()
+        }
+
+        // Helper to get the shape element for a cell
+        const getShapeForCell = (cell) => {
+            return cell.select('.em-grid-shape')
+        }
+
+        // Shared mouseover logic
+        const handleMouseOver = function (e) {
+            const rg = getRegionData(this)
+            if (!rg) return
+            const regionId = rg.properties.id
+            if (!getRegionTotal(regionId)) return
+
+            const cell = select(this.closest('.em-grid-cell'))
+            const shape = getShapeForCell(cell)
+
+            // Highlight shape
+            shape.attr('fill___', shape.style('fill'))
+            shape.style('fill', out.hoverColor_)
+
+            // Highlight ring or chart
+            const k = out._lastZoomK || 1
+            if (out.coxcombRings_) {
+                const outline = cell.select('circle.em-coxcomb-max-outline').node()
+                if (outline) outline.style.setProperty('stroke-width', `${2 / k}px`, 'important')
+            } else {
+                cell.selectAll('g.em-coxcomb-chart').style('stroke', out.hoverColor_)
+            }
+
+            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+        }
+
+        // Shared mousemove logic
+        const handleMouseMove = function (e) {
+            const rg = getRegionData(this)
+            if (!rg) return
+            const regionId = rg.properties.id
+            if (!getRegionTotal(regionId)) return
+            if (out._tooltip) out._tooltip.mousemove(e)
+        }
+
+        // Shared mouseout logic
+        const handleMouseOut = function (e) {
+            const rg = getRegionData(this)
+            if (!rg) return
+            const regionId = rg.properties.id
+            if (!getRegionTotal(regionId)) return
+
+            const cell = select(this.closest('.em-grid-cell'))
+            const shape = getShapeForCell(cell)
+
+            // Restore shape fill
+            shape.style('fill', shape.attr('fill___') || '')
+            shape.attr('fill___', null)
+
+            // Restore ring or chart
+            const k = out._lastZoomK || 1
+            if (out.coxcombRings_) {
+                const outline = cell.select('circle.em-coxcomb-max-outline').node()
+                if (outline) outline.style.setProperty('stroke-width', `${0.3 / k}px`, 'important')
+            } else {
+                cell.selectAll('g.em-coxcomb-chart').style('stroke', '#ffffff')
+            }
+
+            if (out._tooltip) out._tooltip.mouseout()
+        }
+
+        // Attach events to shapes
+        shapes.on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
+
+        // Attach events to charts
+        charts.style('pointer-events', 'all').on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
+    }
+
     function applyStyleToRegionPolygons(map) {
-        const selector = getRegionsSelector(map);
-        let regions = map.svg().selectAll(selector);
-        const status = out.coxStatus_; // id -> {...} or null
+        const selector = getRegionsSelector(map)
+        let regions = map.svg().selectAll(selector)
+        const status = out.coxStatus_ // id -> {...} or null
 
         if (map.geo_ !== 'WORLD') {
             if (map.nutsLevel_ == 'mixed') {
-                styleMixedNUTSRegions(map, status, regions); // pass status instead of sizeData
+                styleMixedNUTSRegions(map, status, regions) // pass status instead of sizeData
                 // (centroids build stays the same)
             }
 
             // set ecl for legend/hover
             regions.attr('ecl', (rg) => {
-                const sv = status.get(rg.properties.id);
-                if (sv == null) return 'ni';         // no input
-                if (sv?.value === ':') return 'nd';  // not available
-                return null;                         // has data
-            });
+                const sv = status.get(rg.properties.id)
+                if (sv == null) return 'ni' // no input
+                if (sv?.value === ':') return 'nd' // not available
+                return null // has data
+            })
 
             // color ND polygons
-            regions
-                .filter(rg => status.get(rg.properties.id)?.value === ':')
-                .style('fill', out.noDataFillStyle());
+            regions.filter((rg) => status.get(rg.properties.id)?.value === ':').style('fill', out.noDataFillStyle())
         }
     }
 
     function styleMixedNUTSRegions(map, status, regions) {
         regions.style('display', function (rg) {
-            if (this.parentNode.classList.contains('em-cntrg')) return;
-            const sv = status.get(rg.properties.id);
-            if (sv == null) return 'none';  // NI: hide
-            return 'block';
-        });
+            if (this.parentNode.classList.contains('em-cntrg')) return
+            const sv = status.get(rg.properties.id)
+            if (sv == null) return 'none' // NI: hide
+            return 'block'
+        })
 
         regions
             .style('stroke', function (rg) {
-                const sel = select(this);
-                const lvl = sel.attr('lvl');
-                const sv = status.get(rg.properties.id);
-                if (!sv || sv.value == null) return;
-                if (lvl !== '0') return sel.style('stroke') || '#777';
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const sv = status.get(rg.properties.id)
+                if (!sv || sv.value == null) return
+                if (lvl !== '0') return sel.style('stroke') || '#777'
             })
             .style('stroke-width', function (rg) {
-                const sel = select(this);
-                const lvl = sel.attr('lvl');
-                const sv = status.get(rg.properties.id);
-                if (!sv || sv.value == null) return;
-                if (out.geo_ == 'WORLD') return;
-                if (lvl !== '0') return sel.style('stroke-width') || 1;
-            });
+                const sel = select(this)
+                const lvl = sel.attr('lvl')
+                const sv = status.get(rg.properties.id)
+                if (!sv || sv.value == null) return
+                if (out.geo_ == 'WORLD') return
+                if (lvl !== '0') return sel.style('stroke-width') || 1
+            })
     }
-
 
     function addCoxcombChartsToMap(regionFeatures, map) {
         const months = out._coxTimes
@@ -411,28 +623,30 @@ export const map = function (config) {
 
     function drawCoxcomb(regionId, stackedData, keys, angle, map) {
         // 1) Anchor to the centroid group for this region
-        const centroid = map.svg().select('#ps' + regionId);
-        if (centroid.empty()) return;
+        const centroid = map.svg().select('#ps' + regionId)
+        if (centroid.empty()) return
 
         // 2) One container per region, keyed join
         const node = centroid
             .selectAll('g.em-coxcomb')
-            .data([regionId], d => d) // stable key
+            .data([regionId], (d) => d) // stable key
             .join(
-                enter => enter.append('g')
-                    .attr('class', 'em-coxcomb')
-                    .attr('id', 'cox_' + regionId),
-                update => update,
-                exit => exit.remove()
-            );
+                (enter) =>
+                    enter
+                        .append('g')
+                        .attr('class', 'em-coxcomb')
+                        .attr('id', 'cox_' + regionId),
+                (update) => update,
+                (exit) => exit.remove()
+            )
 
         // 3) Clear children before (re)building chart contents
-        node.selectAll('*').remove();
+        node.selectAll('*').remove()
 
         // 4) Outer ring
         if (out.coxcombRings_) {
-            const yearlyTotal = out.yearlyTotals[regionId] || 0;
-            const targetOuter = out.classifierSize_(yearlyTotal);
+            const yearlyTotal = out.yearlyTotals[regionId] || 0
+            const targetOuter = out.classifierSize_(yearlyTotal)
             node.append('circle')
                 .attr('class', 'em-coxcomb-max-outline')
                 .attr('r', 0)
@@ -443,15 +657,15 @@ export const map = function (config) {
                 .attr('pointer-events', 'none')
                 .transition()
                 .duration(out.transitionDuration_ / 2)
-                .attr('r', targetOuter);
+                .attr('r', targetOuter)
         }
 
         // 4) Arc generator (shared for tween)
         const arcGen = arc()
-            .startAngle(d => angle(d.data.month))
-            .endAngle(d => angle(d.data.month) + angle.bandwidth())
+            .startAngle((d) => angle(d.data.month))
+            .endAngle((d) => angle(d.data.month) + angle.bandwidth())
             .padAngle(0.01)
-            .padRadius(0);
+            .padRadius(0)
 
         // 5) Stacked wedges
         keys.forEach((key, ki) => {
@@ -464,16 +678,16 @@ export const map = function (config) {
                 .join('path')
                 .attr('fill', out.catColors_[key] || (key === 'other' ? '#FFCC80' : 'lightgray'))
                 .attr('code', key)
-                .attr('month', d => d.data.month)
+                .attr('month', (d) => d.data.month)
                 .transition()
                 .delay((d, i) => i * 120)
                 .duration(out.transitionDuration_)
                 .attrTween('d', function (d) {
-                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId));
-                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId));
-                    return t => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d);
-                });
-        });
+                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId))
+                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId))
+                    return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
+                })
+        })
     }
 
     function addMouseEventsToRegions(map) {
@@ -486,27 +700,27 @@ export const map = function (config) {
         //     regions,
         //     symbols,
         // ].forEach((sel) => {
-        symbols.on('mouseover', function (e, rg) {
-            if (shouldOmit(rg.properties.id)) return
-            if (!getRegionTotal(rg.properties.id)) return
-            const sel = select(this)
-            sel.attr('fill___', sel.style('fill'))
-            sel.style('fill', out.hoverColor_)
+        symbols
+            .on('mouseover', function (e, rg) {
+                if (shouldOmit(rg.properties.id)) return
+                if (!getRegionTotal(rg.properties.id)) return
+                const sel = select(this)
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
 
-            const k = out._lastZoomK || 1;
-            if (out.coxcombRings_) {
-                //highlight ring
-                sel.select('circle.em-coxcomb-max-outline')
-                    .node()
-                    .style.setProperty('stroke-width', `${2 / k}px`, 'important');
-            } else {
-                //highlight chart
-                sel.selectAll('g.em-coxcomb-chart')
-                    .style('stroke', out.hoverColor_);
-            }
+                const k = out._lastZoomK || 1
+                if (out.coxcombRings_) {
+                    //highlight ring
+                    sel.select('circle.em-coxcomb-max-outline')
+                        .node()
+                        .style.setProperty('stroke-width', `${2 / k}px`, 'important')
+                } else {
+                    //highlight chart
+                    sel.selectAll('g.em-coxcomb-chart').style('stroke', out.hoverColor_)
+                }
 
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-        })
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 if (!getRegionTotal(rg.properties.id)) return
@@ -519,16 +733,15 @@ export const map = function (config) {
                 sel.style('fill', sel.attr('fill___') || '')
                 sel.attr('fill___', null)
                 // Thicken the first circle (outline) inside the symbol group
-                const k = out._lastZoomK || 1;
+                const k = out._lastZoomK || 1
                 if (out.coxcombRings_) {
                     //highlight ring
                     sel.select('circle.em-coxcomb-max-outline')
                         .node()
-                        .style.setProperty('stroke-width', `${0.3 / k}px`, 'important'); // restore base
+                        .style.setProperty('stroke-width', `${0.3 / k}px`, 'important') // restore base
                 } else {
                     //highlight chart
-                    sel.selectAll('g.em-coxcomb-chart')
-                        .style('stroke', '#ffffff')
+                    sel.selectAll('g.em-coxcomb-chart').style('stroke', '#ffffff')
                 }
                 if (out._tooltip) out._tooltip.mouseout()
             })
@@ -565,7 +778,7 @@ export const map = function (config) {
             })
             .filter(Boolean)
 
-        // *** Remove "other" column if it’s zero for every row ***
+        // *** Remove "other" column if it's zero for every row ***
         const hasOther = rows.some((r) => (r['other'] || 0) > 0)
         if (!hasOther) {
             rows.forEach((r) => delete r['other'])

@@ -248,8 +248,16 @@ export const map = function (config) {
 
     function addMouseEventsToRegions(map) {
         // set region hover function
-        const selector = getRegionsSelector(map)
-        let regions = out.svg().selectAll(selector)
+        let regions
+
+        if (map.gridCartogram_) {
+            // For grid cartograms, attach events to the shape elements inside each cell
+            regions = out.svg().selectAll('#em-grid-container .em-grid-cell .em-grid-shape')
+        } else {
+            const selector = getRegionsSelector(map)
+            regions = out.svg().selectAll(selector)
+        }
+
         regions
             .on('mouseover', function (e, rg) {
                 const data = getComposition(rg.properties.id)
@@ -278,14 +286,23 @@ export const map = function (config) {
     }
 
     function addSparkLinesToMap(ids) {
+        let offsets = out.sparkLineOffsets_ || { x: 0, y: 0 }
+        //fine tuning for hexagon grid
+        if (out.gridCartogramShape_ === 'hexagon') {
+            offsets.x -= out.sparkLineWidth_ - 4
+            offsets.y -= out.sparkLineHeight_ + 4
+        }
+        //fine tuning for square grid
+        if (out.gridCartogramShape_ === 'square') {
+            offsets.y += 10
+        }
+
         ids.forEach((nutsid) => {
             const node = out.svg().select('#spark_' + nutsid)
             const data = getComposition(nutsid)
             if (!data) return
             node.selectAll('.em-sparkline-chart').remove() //clear previous
-            const g = node.append('g').attr('class', 'em-sparkline-chart')
-
-            const offsets = out.sparkLineOffsets_ || { x: 0, y: 0 }
+            const g = node.append('g').attr('class', 'em-sparkline-chart').style('pointer-events', 'none')
 
             let anchorX = 0
             let anchorY = 0
@@ -294,6 +311,14 @@ export const map = function (config) {
                 const bbox = node.node().getBBox()
                 anchorX = bbox.width / 2
                 anchorY = bbox.height / 2
+
+                // For grid cartograms, move the chart group to be after the shape but ensure it's visible
+                // The shape element (rect or hexagon path) should capture mouse events
+                const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+                if (shapeEl && shapeEl.nextSibling) {
+                    // Insert chart right after the shape
+                    node.node().insertBefore(g.node(), shapeEl.nextSibling)
+                }
             }
             // else: geographic map → centroid group already at (0,0)
 
@@ -402,6 +427,7 @@ export const map = function (config) {
             .attr('stroke-width', out.sparkLineStrokeWidth_ + 'px')
             .attr('d', lineGenerator)
 
+        //animation
         if (!isForTooltip) {
             const totalLength = path.node().getTotalLength()
             path.attr('stroke-dasharray', totalLength)
@@ -416,6 +442,10 @@ export const map = function (config) {
         const minValue = min(data.map((d) => d.value)) || 0
         const maxValue = max(data.map((d) => d.value)) || 0
 
+        const xScale = scaleLinear()
+            .domain([0, data.length - 1])
+            .range([0, width])
+
         const yScale = scaleLinear()
             .domain([Math.min(minValue, 0), Math.max(maxValue, 0)])
             .range([height, 0])
@@ -423,20 +453,51 @@ export const map = function (config) {
         const barWidth = width / data.length
         const zeroY = yScale(0)
 
+        // axes (tooltip only)
+        if (isForTooltip) {
+            node.append('g')
+                .attr('class', 'axis-x')
+                .attr('transform', `translate(0, ${height})`)
+                .call(
+                    axisBottom(xScale)
+                        .ticks(data.length)
+                        .tickFormat((d, i) => out._statDates[i])
+                )
+                .selectAll('text')
+                .style('text-anchor', 'end')
+                .attr('dx', '-.8em')
+                .attr('dy', '.15em')
+                .attr('transform', 'rotate(-65)')
+
+            node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
+        }
+
         // compute once per sparkline
         const totalChange = data.reduce((sum, d) => sum + (d.value ?? 0), 0)
 
-        node.selectAll('rect.spark-bar')
+        const bars = node
+            .selectAll('rect.spark-bar')
             .data(data)
             .enter()
             .append('rect')
             .attr('class', 'spark-bar')
             .attr('x', (d, i) => i * barWidth)
             .attr('width', barWidth * 0.9)
-            .attr('y', (d) => (d.value >= 0 ? yScale(d.value) : zeroY))
-            .attr('height', (d) => Math.abs(yScale(d.value) - zeroY))
             .attr('fill', () => (typeof out.sparkLineColor_ === 'function' ? out.sparkLineColor_(data, totalChange) : out.sparkLineColor_))
             .attr('opacity', out.sparkLineOpacity_)
+
+        // Animation: start from zero line, grow to full height
+        if (!isForTooltip) {
+            bars.attr('y', zeroY)
+                .attr('height', 0)
+                .transition()
+                .duration(out.transitionDuration())
+                .attr('y', (d) => (d.value >= 0 ? yScale(d.value) : zeroY))
+                .attr('height', (d) => Math.abs(yScale(d.value) - zeroY))
+        } else {
+            // No animation for tooltip
+            bars.attr('y', (d) => (d.value >= 0 ? yScale(d.value) : zeroY)).attr('height', (d) => Math.abs(yScale(d.value) - zeroY))
+        }
 
         // zero reference line (tooltip only)
         if (isForTooltip && minValue < 0 && maxValue > 0) {
