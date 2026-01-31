@@ -186,7 +186,7 @@ export const map = function (config) {
         }
 
         //define size scaling function
-        let domain = getDatasetMaxMin()
+        let domain = getDatasetMaxMin(map)
         if (!isNaN(domain[0])) {
             out.classifierSize_ = scaleSqrt().domain(domain).range([out.pieMinRadius_, out.pieMaxRadius_])
         }
@@ -221,8 +221,8 @@ export const map = function (config) {
             // apply to main map
             applyStyleToMap(out)
 
-            //dorling cartograms
-            if (out.dorling_) {
+            //dorling cartograms (not applicable for grid cartograms)
+            if (out.dorling_ && !out.gridCartogram_) {
                 runDorlingSimulation(out, (d) => {
                     const total = getRegionTotal(d.properties.id) || 0
                     return out.classifierSize_(total) || 0
@@ -238,36 +238,224 @@ export const map = function (config) {
         }
     }
 
+    /**
+     * Get the appropriate anchor elements for pie charts
+     * For grid cartograms: grid cells
+     * For geographic maps: centroid groups
+     */
+    function getPieAnchors(map) {
+        if (map.gridCartogram_) {
+            return map.svg().selectAll('#em-grid-container .em-grid-cell')
+        }
+        return map.getCentroidsGroup(map).selectAll('g.em-centroid')
+    }
+
     function applyStyleToMap(map) {
-        //build and assign pie charts to the regions
-        //collect nuts ids from g elements. TODO: find better way of sharing regions with pies
-        let regionFeatures = []
         if (out.svg_) {
-            let s = map.getCentroidsGroup(map)
-            if (s) {
-                let sym = s.selectAll('g.em-centroid')
-                sym.append('g')
-                    .attr('class', 'em-pie')
-                    .attr('id', (rg) => {
-                        regionFeatures.push(rg)
-                        return 'pie_' + rg.properties.id
-                    })
+            if (map.gridCartogram_) {
+                // Grid cartogram mode
+                applyStyleToGridCartogram(map)
+            } else {
+                // Geographic map mode
+                //build and assign pie charts to the regions
+                //collect nuts ids from g elements. TODO: find better way of sharing regions with pies
+                let regionFeatures = []
+                let s = map.getCentroidsGroup(map)
+                if (s) {
+                    let sym = s.selectAll('g.em-centroid')
+                    sym.append('g')
+                        .attr('class', 'em-pie')
+                        .attr('id', (rg) => {
+                            regionFeatures.push(rg)
+                            return 'pie_' + rg.properties.id
+                        })
 
-                // set region hover function
-                const selector = getRegionsSelector(out)
-                let regions = out.svg().selectAll(selector)
+                    // set region hover function
+                    const selector = getRegionsSelector(out)
+                    let regions = out.svg().selectAll(selector)
 
-                if (map.geo_ !== 'WORLD') {
-                    if (map.nutsLevel_ == 'mixed') {
-                        styleMixedNUTSRegions(map, regions)
+                    if (map.geo_ !== 'WORLD') {
+                        if (map.nutsLevel_ == 'mixed') {
+                            styleMixedNUTSRegions(map, regions)
+                        }
                     }
-                }
-                addPieChartsToMap(regionFeatures)
+                    addPieChartsToMap(regionFeatures)
 
-                // Set up mouse events
-                addMouseEventsToRegions(map, regions)
+                    // Set up mouse events
+                    addMouseEventsToRegions(map, regions)
+                }
             }
         }
+    }
+
+    function applyStyleToGridCartogram(map) {
+        // Collect region IDs from grid cells
+        const regionIds = []
+        const anchors = getPieAnchors(map)
+
+        anchors.attr('id', (rg) => {
+            regionIds.push(rg.properties.id)
+            return 'pie_' + rg.properties.id
+        })
+
+        // Add pie charts to grid cells
+        addPieChartsToGridCartogram(regionIds, map)
+
+        // Add mouse events to grid shapes and charts
+        addMouseEventsToGridCartogram(map)
+    }
+
+    function addPieChartsToGridCartogram(regionIds, map) {
+        regionIds.forEach((regionId) => {
+            const node = out.svg().select('#pie_' + regionId)
+            if (node.empty()) return
+
+            // Prepare data for pie chart
+            const comp = getComposition(regionId)
+            if (!comp) return
+
+            const data = []
+            for (const key in comp) data.push({ code: key, value: comp[key] })
+            if (!data || data.length === 0) return
+
+            // Clear previous chart
+            node.selectAll('.em-pie').remove()
+
+            // Get cell dimensions for positioning
+            const bbox = node.node().getBBox()
+            const anchorX = out.gridCartogramShape_ == 'hexagon' ? 0 : bbox.width / 2
+            const anchorY = out.gridCartogramShape_ == 'hexagon' ? 0 : bbox.height / 2
+
+            // Define radius
+            const r = out.classifierSize_(getRegionTotal(regionId))
+            const ir = out.pieChartInnerRadius_
+
+            // Create chart container
+            const g = node.append('g').attr('class', 'em-pie').attr('transform', `translate(${anchorX}, ${anchorY})`)
+
+            // Make pie chart
+            const pie_ = pie()
+                .sort(null)
+                .value((d) => d.value)
+            const arcFunction = arc().innerRadius(ir).outerRadius(r)
+
+            const chartNode = g
+                .append('g')
+                .attr('class', 'piechart')
+                .attr('stroke', out.pieStrokeFill_)
+                .attr('stroke-width', out.pieStrokeWidth_ + 'px')
+
+            // Draw pie segments
+            const pieData = pie_(data)
+
+            chartNode
+                .selectAll('path')
+                .data(pieData)
+                .join('path')
+                .attr('fill', (d) => out.catColors_[d.data.code] || 'lightgray')
+                .attr('code', (d) => d.data.code)
+                .each(function (d) {
+                    this._current = { startAngle: d.startAngle, endAngle: d.startAngle }
+                })
+                .transition()
+                .delay((d, i) => i * 150)
+                .duration(out.transitionDuration_)
+                .attrTween('d', function (d) {
+                    const interpolater = interpolate(this._current, d)
+                    this._current = interpolater(1)
+                    return function (t) {
+                        return arcFunction(interpolater(t))
+                    }
+                })
+
+            // Move chart after the shape element for proper z-ordering
+            const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+            if (shapeEl && shapeEl.nextSibling) {
+                node.node().insertBefore(g.node(), shapeEl.nextSibling)
+            }
+        })
+    }
+
+    function addMouseEventsToGridCartogram(map) {
+        const shapes = out.svg().selectAll('#em-grid-container .em-grid-cell .em-grid-shape')
+        const charts = out.svg().selectAll('#em-grid-container .em-grid-cell .em-pie')
+
+        // Helper to get region data from cell
+        const getRegionData = (element) => {
+            const cell = select(element.closest('.em-grid-cell'))
+            return cell.datum()
+        }
+
+        // Helper to get the shape element for a cell
+        const getShapeForCell = (cell) => {
+            return cell.select('.em-grid-shape')
+        }
+
+        // Helper to get the chart element for a cell
+        const getChartForCell = (cell) => {
+            return cell.select('.piechart')
+        }
+
+        // Shared mouseover logic
+        const handleMouseOver = function (e) {
+            const rg = getRegionData(this)
+            if (!rg) return
+            const regionId = rg.properties.id
+            if (!getRegionTotal(regionId)) return
+
+            const cell = select(this.closest('.em-grid-cell'))
+            const shape = getShapeForCell(cell)
+            const chart = getChartForCell(cell)
+
+            // Highlight shape
+            shape.attr('fill___', shape.style('fill'))
+            shape.style('fill', out.hoverColor_)
+
+            // Highlight chart
+            if (!chart.empty()) {
+                chart.style('stroke-width', out.pieStrokeWidth_ + 1).style('stroke', 'black')
+            }
+
+            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+        }
+
+        // Shared mousemove logic
+        const handleMouseMove = function (e) {
+            const rg = getRegionData(this)
+            if (!rg) return
+            const regionId = rg.properties.id
+            if (!getRegionTotal(regionId)) return
+            if (out._tooltip) out._tooltip.mousemove(e)
+        }
+
+        // Shared mouseout logic
+        const handleMouseOut = function (e) {
+            const rg = getRegionData(this)
+            if (!rg) return
+            const regionId = rg.properties.id
+            if (!getRegionTotal(regionId)) return
+
+            const cell = select(this.closest('.em-grid-cell'))
+            const shape = getShapeForCell(cell)
+            const chart = getChartForCell(cell)
+
+            // Restore shape fill
+            shape.style('fill', shape.attr('fill___') || '')
+            shape.attr('fill___', null)
+
+            // Restore chart
+            if (!chart.empty()) {
+                chart.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_)
+            }
+
+            if (out._tooltip) out._tooltip.mouseout()
+        }
+
+        // Attach events to shapes
+        shapes.on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
+
+        // Attach events to charts
+        charts.style('pointer-events', 'all').on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
     }
 
     function addMouseEventsToRegions(map, regions) {
@@ -466,9 +654,17 @@ export const map = function (config) {
      * @description gets the maximum and minimum total of all dimensions combined for each region. Used to define the domain of the pie size scaling function.
      * @returns [min,max]
      */
-    function getDatasetMaxMin() {
+    function getDatasetMaxMin(map) {
         let totals = []
-        let sel = out.getCentroidsGroup(out).selectAll('g.em-centroid').data()
+        let sel
+
+        if (map && map.gridCartogram_) {
+            // For grid cartograms, get data from grid cells
+            sel = getPieAnchors(map).data()
+        } else {
+            // For geographic maps, get data from centroids
+            sel = out.getCentroidsGroup(out).selectAll('g.em-centroid').data()
+        }
 
         sel.forEach((rg) => {
             let id = rg.properties.id

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+
+        <script>
+            const cropOptions = [
+                { value: 'C1110', text: 'Common wheat and spelt' },
+                { value: 'C1500', text: 'Grain maize and corn-cob mix' },
+                { value: 'C1300', text: 'Barley' },
+                { value: 'C1600', text: 'Triticale' },
+                { value: 'C1200', text: 'Rye and winter cereal mixtures (maslin)' },
+                { value: 'C1120', text: 'Durum wheat' },
+                { value: 'C1410', text: 'Oats' },
+                { value: 'C2000', text: 'Rice' },
+            ]
+            let map = eurostatmap
+                .map('pie')
+                .gridCartogram(true)
+                .gridCartogramMargins({ top: 130, right: 100, bottom: 50, left: 0 })
+                .gridCartogramShape('hexagon')
+                .gridCartogramCellPadding(10)
+                .pieMinRadius(10)
+                .pieMaxRadius(20)
+
+                .title('Cereal production')
+                .subtitle('')
+                .scale('60M')
+                .nutsLevel(0)
+                .statPie(
+                    {
+                        eurostatDatasetCode: 'apro_cpshr',
+                        filters: { strucpro: 'PR_HU_EU', time: '2022' },
+                        unitText: '1 000 tonnes',
+                    },
+                    'crops', //parameter that the categories belong to
+                    cropOptions.map((d) => d.value), //category codes
+                    cropOptions.map((d) => d.text), //category labels
+                    ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
+                    'C0000' //code for the total (all causes of death)
+                )
+                .pieOtherColor('#FFCC80')
+                .pieOtherText('Other')
+
+                .legend({
+                    x: 480,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: '1 000 tonnes',
+                        titlePadding: 10,
+                        values: [500, 40000],
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>

@@ -1,10 +1,27 @@
-.em-grid-cell {
+.em--coxcomb .em-grid-cell,
+.em--spark .em-grid-cell {
     /* fill: navajowhite; */
     fill: #fce8cc;
+}
+
+.em--ch .em-grid-cell,
+.em--scomp .em-grid-cell {
+    fill: #eeeeee;
 }
 .em-grid-text {
     opacity: 0.8;
 }
 .em-grid-hexagon {
     opacity: 0.7;
+}
+
+.em--coxcomb .em-grid-shape,
+.em--pie .em-grid-shape {
+    fill: none;
+    stroke: #ccc !important;
+    stroke-width: 1px;
+}
+.em--coxcomb .em-grid-text,
+.em--pie .em-grid-text {
+    transform: translate(0, -22px) !important;
 }

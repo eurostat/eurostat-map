@@ -21,8 +21,8 @@
     <body>
         <label for="dataset">Select a theme:</label>
         <select id="dataset" name="dataset">
-            <option value="tourism">Tourism</option>
-            <option value="death" selected>Causes of death</option>
+            <option value="tourism" selected>Tourism</option>
+            <option value="death">Causes of death</option>
         </select>
         <br />
         <svg id="map"></svg>
@@ -109,9 +109,9 @@
                     .width(800)
                     .height(800)
                     .gridCartogram(true)
-                    .gridCartogramMargins({ top: 130, right: 100, bottom: 50, left: 0 })
+                    .gridCartogramMargins({ top: 100, right: 120, bottom: 60, left: 10 })
                     .gridCartogramShape('hexagon')
-                    .gridCartogramCellPadding(10)
+                    .gridCartogramCellPadding(5)
                     .coxcombOffsets({ x: -30, y: -25 })
                     .title(config.title)
                     .subtitle(config.subtitle)

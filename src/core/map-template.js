@@ -61,11 +61,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.containerId_ = undefined
 
     //geographical focus
-    out.gridCartogram_ = false // draw geometries as grid cells
-    out.gridCartogramShape_ = 'square' // square or hexagon
-    out.gridCartogramMargins_ = { top: 80, right: 50, bottom: 80, left: 150 }
-    out.gridCartogramCellPadding_ = 4
-    out.gridCartogramPositions_ = undefined //user defined cartograms
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
     out.nutsYear_ = 2024
     out.geo_ = 'EUR'
@@ -76,6 +71,13 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
     out.placenames_ = false // load placenames from placenames.js
     out.placenamesFilter_ = undefined // function to filter placenames
+
+    //cartograms
+    out.gridCartogram_ = false // draw geometries as grid cells
+    out.gridCartogramShape_ = 'square' // square or hexagon
+    out.gridCartogramMargins_ = { top: 80, right: 50, bottom: 80, left: 150 }
+    out.gridCartogramCellPadding_ = 4
+    out.gridCartogramPositions_ = undefined //user defined cartograms
 
     // pan & zoom
     out.zoomExtent_ = undefined
@@ -639,13 +641,14 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             }
         }
 
-        //prepare group for proportional symbols, with centroids
+        // prepare group for proportional symbols, with centroids
+        // IMPORTANT: Skip for grid cartograms - they use grid cells as anchors instead
         if (withCenterPoints && !out.gridCartogram_) {
             addCentroidsToMap(out)
         }
 
         // add geographical labels to map
-        if (out.labels_) {
+        if (out.labels_ && !out.gridCartogram_) {
             addLabelsToMap(out, zoomGroup)
         }
 
@@ -656,7 +659,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         //placenames
-        if (out.placenames_) {
+        if (out.placenames_ && !out.gridCartogram_) {
             addPlacenameLabels(out)
         }
 
@@ -689,8 +692,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             addSourceLink(out, withCenterPoints)
         }
 
-        // scalebar
-        if (out.showScalebar_) {
+        // scalebar - not applicable for grid cartograms
+        if (out.showScalebar_ && !out.gridCartogram_) {
             if (out.scalebarPosition_.length !== 2) {
                 out.scalebarPosition_[0] = 15
                 out.scalebarPosition_[1] = out.height_ - 50
@@ -704,7 +707,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         //zoom buttons
-        if (out.zoomButtons_) {
+        if (out.zoomButtons_ && !out.gridCartogram_) {
             appendZoomButtons(out)
         }
 
@@ -714,7 +717,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         // after drawBackgroundMap, geometries, labels, etc.
-        if (out.drawCoastalMargin_) {
+        if (out.drawCoastalMargin_ && !out.gridCartogram_) {
             appendCoastalMargin(out)
         }
 
@@ -813,6 +816,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     // This will remove any centroids with no statistical data and re-add centroids for regions that just got data.
     out.refreshCentroids = function (map) {
+        // Skip for grid cartograms
+        if (map.gridCartogram_) return map
+
         const allCentroids = map.Geometries._allCentroidsFeatures
         if (!allCentroids) return
 
@@ -887,7 +893,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             if (typeof out.projectionFunction_.rotate === 'function') {
                 const r = out.projectionFunction_.rotate() // [lambda, phi, gamma]
                 if (Array.isArray(r) && r.length >= 2) {
-                    // Invert signs: the map’s visual center is the opposite of its rotation
+                    // Invert signs: the map's visual center is the opposite of its rotation
                     const lon = -r[0]
                     const lat = -r[1]
                     out.position_.x = out.position_.x ?? lon

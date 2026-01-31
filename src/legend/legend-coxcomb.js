@@ -202,6 +202,8 @@ export const legend = function (map, config) {
             .join('path')
             .attr('d', (d, i) => arcGen(d, i))
             .attr('fill', '#ccc')
+            .attr('stroke', 'white')
+            .attr('stroke-width', 0.5)
             .attr('class', 'em-coxcomb-legend-time-segment')
 
         const labelRadius = radius + labelOffset
@@ -224,22 +226,35 @@ export const legend = function (map, config) {
             })
 
         // Highlight behavior for time hover
+        // Use a mouseout on the container to ensure cleanup happens
+        container.on('mouseleave', function () {
+            const mapSvg = out.map.svg_ || out.map.svg()
+            mapSvg.selectAll('.em-coxcomb-chart path').style('opacity', 1)
+            container.selectAll('path').style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
+        })
+
         container
             .selectAll('path')
-            .on('mouseover', function (event, time) {
-                const hoveredTime = time // "YYYY-MM" format
+            .on('mouseenter', function (event, time) {
+                const hoveredTime = time
                 const mapSvg = out.map.svg_ || out.map.svg()
                 const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
 
-                allSegments.style('opacity', (d) => {
-                    return d.data.month === hoveredTime ? 1 : 0
+                // Fade non-matching segments
+                allSegments.style('opacity', function (d) {
+                    // Handle case where d might be undefined or missing data property
+                    if (!d || !d.data) return 0.1
+                    return d.data.month === hoveredTime ? 1 : 0.1
                 })
-                select(this).style('stroke-width', 3).style('opacity', 0.8).raise()
+
+                // Highlight the hovered legend wedge, dim others
+                container.selectAll('path').style('opacity', 0.3).style('stroke', 'white').style('stroke-width', 0.5)
+                select(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
             })
-            .on('mouseout', function () {
-                const mapSvg = out.map.svg_ || out.map.svg()
-                mapSvg.selectAll('.em-coxcomb-chart path').style('opacity', 1)
-                select(this).style('stroke-width', 0.5).style('opacity', 0.4).raise()
+            .on('mouseleave', function () {
+                // Individual wedge mouseout - reset just this wedge
+                // The container mouseleave will handle full reset when mouse leaves entirely
+                select(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
             })
     }
 
