@@ -184,22 +184,21 @@ export const map = function (config) {
 
     //@override
     out.updateClassification = function () {
-        //if not provided, get list of stat codes from the map stat data
         if (!out._statDates) {
-            //get list of stat codes.
             out._statDates = Object.keys(out.statData_)
-            //remove "default", if present
             const index = out._statDates.indexOf('default')
             if (index > -1) out._statDates.splice(index, 1)
         }
 
-        // define size scaling function
-        // Define the domain correctly for the log scale
-        out.domain = getDatasetMaxMin() // Avoid 0 for log scale
+        // define scales and classifiers
+        out.domain = getDatasetExtent()
 
-        // for area charts
-        out.widthClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineWidth_])
-        out.heightClassifier_ = scaleSqrt().domain(out.domain).range([0, out.sparkLineHeight_])
+        out.sparkXScale_ = scaleLinear().domain([0, out._statDates.length - 1])
+
+        const absMax = Math.max(Math.abs(out.domain[0]), Math.abs(out.domain[1]))
+
+        out.sparkYScale_ = scaleLinear().domain([-absMax, absMax])
+        //out.sparkYScale_ = scaleLinear().domain(out.domain)
 
         return out
     }
@@ -354,14 +353,11 @@ export const map = function (config) {
     }
 
     function createSparkLineOrAreaChart(node, data, width, height, isForTooltip) {
-        const xScale = scaleLinear()
-            .domain([0, out._statDates.length - 1])
-            .range([0.5, width - 0.5])
-
+        const xScale = out.sparkXScale_.range([0.5, width - 0.5])
         const minValue = min(data.map((d) => d.value)) ?? 0
         const maxValue = max(data.map((d) => d.value)) ?? 1
 
-        const yScale = scaleLinear().domain([minValue, maxValue]).range([height, 0])
+        const yScale = out.sparkYScale_.range([height, 0])
 
         const scaledData = data.map((d, i) => ({
             ...d,
@@ -489,13 +485,8 @@ export const map = function (config) {
         const minValue = min(data.map((d) => d.value)) || 0
         const maxValue = max(data.map((d) => d.value)) || 0
 
-        const xScale = scaleLinear()
-            .domain([0, data.length - 1])
-            .range([0, width])
-
-        const yScale = scaleLinear()
-            .domain([Math.min(minValue, 0), Math.max(maxValue, 0)])
-            .range([height, 0])
+        const xScale = out.sparkXScale_.range([0.5, width - 0.5])
+        const yScale = out.sparkYScale_.range([height, 0])
 
         const barWidth = width / data.length
         const zeroY = yScale(0)
@@ -607,55 +598,33 @@ export const map = function (config) {
         return buf.join('')
     }
 
-    /**
-     * @function getDatasetMaxMin
-     * @description gets the maximum and minimum values of all dates for each region. Used to define the domain of the sparkline Y axis.
-     * @returns [min,max]
-     */
-    function getDatasetMaxMin() {
-        const maxs = []
+    function getDatasetExtent() {
+        let globalMin = +Infinity
+        let globalMax = -Infinity
+
         const sel = getSparkAnchors(out).data()
 
         sel.forEach((rg) => {
             const id = rg.properties.id
-            const regionMax = getRegionMax(id)
-            if (regionMax !== undefined) {
-                maxs.push(regionMax)
+
+            for (let i = 0; i < out._statDates.length; i++) {
+                const date = out._statDates[i]
+                const statData = out.statData(date)
+                if (!statData) continue
+
+                const s = statData.get(id)
+                if (!s || isNaN(s.value)) continue
+
+                globalMin = Math.min(globalMin, s.value)
+                globalMax = Math.max(globalMax, s.value)
             }
         })
 
-        if (maxs.length === 0) {
-            return [0, 1] // fallback if no data found
+        if (!isFinite(globalMin) || !isFinite(globalMax)) {
+            return [0, 1]
         }
 
-        return extent(maxs)
-    }
-
-    /**
-     * Get absolute total value of combined statistical values for a specific region. E.g total livestock
-     * @param {*} id nuts region id
-     */
-    const getRegionMax = function (id) {
-        let max = 0
-
-        // get stat value for each date and find the max
-        for (let i = 0; i < out._statDates.length; i++) {
-            const date = out._statDates[i]
-            const statData = out.statData(date)
-
-            if (!statData || typeof statData.get !== 'function') continue
-
-            const s = statData.get(id)
-            if (!s || (s.value !== 0 && !s.value) || isNaN(s.value)) {
-                if (out.showOnlyWhenComplete()) return undefined
-                continue
-            }
-
-            if (s.value > max) max = s.value
-        }
-
-        if (max === 0) return undefined
-        return max
+        return [globalMin, globalMax]
     }
 
     //@override
