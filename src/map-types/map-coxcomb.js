@@ -344,6 +344,7 @@ export const map = function (config) {
                     map,
                     getAnchors: getCoxcombAnchors,
                     getRadius: (regionId) => getCoxcombTopRadius(regionId),
+                    margin: 2,
                 })
             } else {
                 // Geographic map mode
@@ -420,7 +421,12 @@ export const map = function (config) {
     function addCoxcombChartsToGridCartogram(regionIds, map, angle) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
-        const offsets = out.coxcombOffsets_ || { x: 0, y: 0 }
+        let offsets = out.coxcombOffsets_ || { x: 0, y: 0 }
+        //fine tuning for hexagon grid
+        if (out.gridCartogramShape_ === 'hexagon') {
+            offsets.x -= out.coxcombWidth_ - 4
+            offsets.y -= out.coxcombHeight_ + 4
+        }
 
         regionIds.forEach((regionId) => {
             const node = out.svg().select('#cox_' + regionId)

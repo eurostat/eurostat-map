@@ -9,7 +9,7 @@
     fill: #eeeeee;
 }
 .em-grid-text {
-    opacity: 0.8;
+    opacity: 0.75;
 }
 .em-grid-hexagon {
     opacity: 0.7;
@@ -19,8 +19,9 @@
 .em--pie .em-grid-shape {
     fill: none;
     stroke: #ccc !important;
-    stroke-width: 1px;
+    stroke-width: 0px;
 }
+
 /* .em--coxcomb .em-grid-text,
 .em--pie .em-grid-text {
     transform: translate(0, -22px) !important;

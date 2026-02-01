@@ -40,9 +40,9 @@
                 .sparkLineStrokeWidth(3)
                 .sparkLineOffsets({ x: -2, y: 10 })
                 // Color based on positive/negative values
-                .sparkLineColor((barValue) => {
-                    if (barValue > 0) return 'blue'
-                    if (barValue < 0) return 'red'
+                .sparkLineColor((itemValue) => {
+                    if (itemValue > 0) return 'blue'
+                    if (itemValue < 0) return 'red'
                     return '#999'
                 })
                 .sparkLineOpacity(0.8)

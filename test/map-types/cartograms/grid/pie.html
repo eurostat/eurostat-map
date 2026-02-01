@@ -36,11 +36,11 @@
             let map = eurostatmap
                 .map('pie')
                 .gridCartogram(true)
-                .gridCartogramMargins({ top: 130, right: 100, bottom: 50, left: 0 })
-                .gridCartogramShape('hexagon')
-                .gridCartogramCellPadding(10)
+                .gridCartogramMargins({ top: 60, right: 90, bottom: 40, left: 1 })
+                //.gridCartogramShape('hexagon')
+                .gridCartogramCellPadding(20)
                 .pieMinRadius(10)
-                .pieMaxRadius(20)
+                .pieMaxRadius(22)
 
                 .title('Cereal production')
                 .subtitle('')
@@ -62,7 +62,7 @@
                 .pieOtherText('Other')
 
                 .legend({
-                    x: 480,
+                    x: 550,
                     y: 10,
                     boxOpacity: 1,
                     titleFontWeight: 'bold',
