@@ -27,9 +27,9 @@ export const map = function (config) {
     out.sparkType_ = 'line'
     out.sparkLineCircleRadius_ = 0
     out.sparkTooltipChart_ = {
-        width: 100,
-        height: 50,
-        margin: { left: 60, right: 40, top: 40, bottom: 40 },
+        width: 150,
+        height: 80,
+        margin: { left: 40, right: 20, top: 20, bottom: 40 },
         circleRadius: 1.5,
     }
     out.sparkLineOffsets_ = { x: 0, y: 0 }
@@ -320,16 +320,15 @@ export const map = function (config) {
                     // Insert chart right after the shape
                     node.node().insertBefore(g.node(), shapeEl.nextSibling)
                 }
-            }
-            // else: geographic map → centroid group already at (0,0)
-
-            g.attr(
-                'transform',
-                `translate(
+                g.attr(
+                    'transform',
+                    `translate(
                 ${anchorX + offsets.x - out.sparkLineWidth_ / 2},
                 ${anchorY + offsets.y - out.sparkLineHeight_ / 2}
             )`
-            )
+                )
+            }
+            // else: geographic map → centroid group already at (0,0)
 
             createSparkLineChart(g, data, out.sparkLineWidth_, out.sparkLineHeight_)
         })
@@ -586,7 +585,7 @@ export const map = function (config) {
             const svg = container.append('svg').attr('class', 'em-tooltip-chart-svg').attr('width', totalWidth).attr('height', totalHeight)
 
             // Inner group where chart is drawn
-            const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
+            const g = svg.append('g').attr('class', 'em-tooltip-chart-group').attr('transform', `translate(${margin.left}, ${margin.top})`)
 
             // Call sparkline drawing on the inner area only
             createSparkLineChart(g, data, chartWidth, chartHeight, true)

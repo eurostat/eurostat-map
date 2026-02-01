@@ -36,9 +36,9 @@
                 )
                 .sparkType('bar') //line, area, bar
                 .sparkLineWidth(29)
-                .sparkLineHeight(20)
+                .sparkLineHeight(100)
                 .sparkLineStrokeWidth(3)
-                .sparkLineOffsets({ x: -2, y: 5 })
+                .sparkLineOffsets({ x: -2, y: 90 })
                 // Color based on positive/negative values
                 .sparkLineColor((itemValue) => {
                     if (itemValue > 0) return 'blue'
@@ -55,12 +55,12 @@
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
-                .sparkTooltipChart({
-                    width: 150,
-                    height: 50,
-                    margin: { left: 30, right: 20, top: 30, bottom: 40 },
-                    circleRadius: 1.5,
-                })
+                // .sparkTooltipChart({
+                //     width: 150,
+                //     height: 50,
+                //     margin: { left: 30, right: 20, top: 30, bottom: 40 },
+                //     circleRadius: 1.5,
+                // })
                 .hoverColor('#ffa500')
                 .build()
         </script>
