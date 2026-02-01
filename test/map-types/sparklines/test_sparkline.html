@@ -6,38 +6,14 @@
     </head>
 
     <body>
-        <style>
-            /* Region fill */
-            .em-cntrg,
-            .em-nutsrg,
-            .em-grid-cell {
-                fill: #efefef !important;
-            }
-
-            /*  borders */
-            .em-cntbn,
-            .em-worldbn,
-            g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-                stroke-width: 0.1px !important;
-                stroke: #000 !important;
-            }
-            /*  borders */
-            .em-bn-1,
-            .em-bn-2,
-            .em-bn-3,
-            .em-nutsrg [lvl='3'],
-            .em-nutsrg [lvl='2'],
-            .em-nutsrg [lvl='1'] {
-                stroke-width: 0px !important;
-                stroke: #ffffff !important;
-            }
-        </style>
+        <style></style>
         <svg id="sparklineSVG"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
             eurostatmap
                 .map('sparkline')
                 .svgId('sparklineSVG')
+                .scale('60M')
                 .nutsLevel(0)
                 .width(600)
                 .nutsYear(2016)
@@ -53,16 +29,15 @@
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'], //dates
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'] //labels
                 )
-                .sparkType('bar')
-                .sparkLineOffsets({ x: -30, y: 3 })
+                .sparkType('line')
+                //.sparkLineOffsets({ x: -30, y: 3 })
                 .sparkLineWidth(30)
                 .sparkLineHeight(10)
                 .sparkLineStrokeWidth(0.8)
-                .sparkLineColor((d, i) => {
-                    const first = d[0].value
-                    const last = d[d.length - 1].value
-
-                    return last > first ? 'blue' : 'red'
+                .sparkLineColor((itemValue, index, data) => {
+                    if (itemValue > 0) return 'blue'
+                    if (itemValue < 0) return 'red'
+                    return '#999'
                 })
 
                 .sparkLineOpacity(0.8)

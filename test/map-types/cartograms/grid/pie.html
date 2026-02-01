@@ -7,6 +7,18 @@
     </head>
 
     <body>
+        <style>
+            .em-grid-shape {
+                stroke-width: 0px !important;
+            }
+            .em--pie .em-grid-text {
+                font-weight: 100;
+                color: #ccc !important;
+                opacity: 0.7;
+                /* font-style: italic; */
+                /* filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3)); */
+            }
+        </style>
         <svg id="map"></svg>
         <script src="../../../../build/eurostatmap.js"></script>
 
@@ -16,7 +28,7 @@
                 { value: 'C1500', text: 'Grain maize and corn-cob mix' },
                 { value: 'C1300', text: 'Barley' },
                 { value: 'C1600', text: 'Triticale' },
-                { value: 'C1200', text: 'Rye and winter cereal mixtures (maslin)' },
+                { value: 'C1200', text: 'Rye and winter cereal mixtures' },
                 { value: 'C1120', text: 'Durum wheat' },
                 { value: 'C1410', text: 'Oats' },
                 { value: 'C2000', text: 'Rice' },
@@ -38,7 +50,7 @@
                     {
                         eurostatDatasetCode: 'apro_cpshr',
                         filters: { strucpro: 'PR_HU_EU', time: '2022' },
-                        unitText: '1 000 tonnes',
+                        unitText: '(1 000 tonnes)',
                     },
                     'crops', //parameter that the categories belong to
                     cropOptions.map((d) => d.value), //category codes
@@ -55,15 +67,16 @@
                     boxOpacity: 1,
                     titleFontWeight: 'bold',
                     sizeLegend: {
-                        title: '1 000 tonnes',
-                        titlePadding: 10,
+                        title: 'Tonnes',
+                        titlePadding: 15,
                         values: [500, 40000],
+                        labelFormatter: (v) => new Intl.NumberFormat('en-GB', { notation: 'compact', compactDisplay: 'short' }).format(v * 1000),
                     },
                     colorLegend: {
                         title: 'Cereal type',
                     },
                 })
-
+                .hoverColor('#ffa500')
             map.build()
         </script>
     </body>

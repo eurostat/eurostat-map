@@ -2,8 +2,12 @@
 
 /*   muted country boundaries */
 .em--spark .em-cntbn {
-    stroke: grey;
-    stroke-width: 0.2px;
+    stroke: rgb(163, 163, 163);
+    stroke-width: 0.5px;
+}
+
+.em--spark #em-cntbn-halo {
+    stroke: none;
 }
 
 /*   muted nuts boundaries */
@@ -14,7 +18,7 @@
 .em--spark .em-nutsrg [lvl='2'],
 .em--spark .em-nutsrg [lvl='1'],
 .em--spark .em-bn-co {
-    stroke-width: 0.07px;
+    stroke-width: 0.1px;
 }
 
 /*  muted country fill */
@@ -30,17 +34,17 @@
 }
 
 /*  regions without data input */
-.em--spark [ecl="ni"] {
+.em--spark [ecl='ni'] {
     fill: #e9e9e9;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
-.em--spark g#em-cntbn>.em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
+/* .em--spark g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
     stroke-width: 0px;
-}
+} */
 
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
 .em--spark .em-bn-co {
     stroke: grey;
-    stroke-width: 0.1px;
+    stroke-width: 0.2px;
 }

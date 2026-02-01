@@ -1,5 +1,6 @@
 import { select, create } from 'd3-selection'
 import { scaleLinear, scaleSqrt } from 'd3-scale'
+import { easeLinear } from 'd3-ease'
 import { line, area } from 'd3-shape'
 import { extent, min, max } from 'd3-array'
 import { axisBottom, axisLeft, axisRight } from 'd3-axis'
@@ -296,13 +297,14 @@ export const map = function (config) {
         if (out.gridCartogramShape_ === 'square') {
             offsets.y += 10
         }
-
         ids.forEach((nutsid) => {
             const node = out.svg().select('#spark_' + nutsid)
             const data = getComposition(nutsid)
             if (!data) return
             node.selectAll('.em-sparkline-chart').remove() //clear previous
             const g = node.append('g').attr('class', 'em-sparkline-chart').style('pointer-events', 'none')
+
+            const offsets = out.sparkLineOffsets_ || { x: 0, y: 0 }
 
             let anchorX = 0
             let anchorY = 0
@@ -356,8 +358,8 @@ export const map = function (config) {
             .domain([0, out._statDates.length - 1])
             .range([0.5, width - 0.5])
 
-        const minValue = min(data.map((d) => d.value)) || 0
-        const maxValue = max(data.map((d) => d.value)) || 1
+        const minValue = min(data.map((d) => d.value)) ?? 0
+        const maxValue = max(data.map((d) => d.value)) ?? 1
 
         const yScale = scaleLinear().domain([minValue, maxValue]).range([height, 0])
 
@@ -369,7 +371,9 @@ export const map = function (config) {
 
         const zeroY = yScale(0)
 
-        // axes & zero line (tooltip only)
+        // ------------------------------------
+        // Axes & zero line (tooltip only)
+        // ------------------------------------
         if (isForTooltip) {
             node.append('g')
                 .attr('class', 'axis-x')
@@ -393,22 +397,28 @@ export const map = function (config) {
                     .attr('x2', width)
                     .attr('y1', zeroY)
                     .attr('y2', zeroY)
-                    .attr('stroke', 'gray')
+                    .attr('stroke', '#999')
                     .attr('stroke-dasharray', '2,2')
                     .attr('stroke-width', 1)
             }
         }
 
-        const lineGenerator = line()
-            .x((d) => d.scaledXValue)
-            .y((d) => d.scaledYValue)
-
+        // ------------------------------------
+        // AREA (unchanged)
+        // ------------------------------------
         if (out.sparkType_ === 'area') {
+            const getAreaColor = (d, i) => {
+                if (typeof out.sparkAreaColor_ === 'function') {
+                    return out.sparkAreaColor_(d.value, i, data)
+                }
+                return out.sparkAreaColor_
+            }
+
             node.append('path')
                 .datum(scaledData)
-                .attr('fill', typeof out.sparkAreaColor_ === 'function' ? out.sparkAreaColor_ : out.sparkAreaColor_)
+                .attr('fill', getAreaColor)
                 .attr('opacity', out.sparkLineOpacity_)
-                .attr('fill-opacity', 0.3)
+                .attr('fill-opacity', 0.4)
                 .attr(
                     'd',
                     area()
@@ -418,23 +428,60 @@ export const map = function (config) {
                 )
         }
 
-        const path = node
+        // ------------------------------------
+        // LINE AS SEGMENTS (NEW)
+        // ------------------------------------
+
+        // Build one segment per adjacent pair
+        const segments = scaledData.slice(1).map((d, i) => ({
+            from: scaledData[i],
+            to: d,
+            index: i,
+            value: d.value,
+        }))
+
+        const getSegmentColor = (seg) => {
+            if (typeof out.sparkLineColor_ === 'function') {
+                return out.sparkLineColor_(seg.value, seg.index, data)
+            }
+            return out.sparkLineColor_
+        }
+
+        const segmentLine = line()
+            .x((d) => d.scaledXValue)
+            .y((d) => d.scaledYValue)
+
+        const paths = node
+            .selectAll('path.spark-line-segment')
+            .data(segments)
+            .enter()
             .append('path')
-            .datum(scaledData)
+            .attr('class', 'spark-line-segment')
             .attr('fill', 'none')
             .attr('opacity', out.sparkLineOpacity_)
-            .attr('stroke', typeof out.sparkLineColor_ === 'function' ? out.sparkLineColor_ : out.sparkLineColor_)
             .attr('stroke-width', out.sparkLineStrokeWidth_ + 'px')
-            .attr('d', lineGenerator)
+            .attr('stroke', (d) => getSegmentColor(d))
+            .attr('d', (d) => segmentLine([d.from, d.to]))
 
-        //animation
+        // ------------------------------------
+        // Animation
+        // ------------------------------------
         if (!isForTooltip) {
-            const totalLength = path.node().getTotalLength()
-            path.attr('stroke-dasharray', totalLength)
-                .attr('stroke-dashoffset', totalLength)
-                .transition()
-                .duration(out.transitionDuration())
-                .attr('stroke-dashoffset', 0)
+            const totalDuration = out.transitionDuration()
+            const perSegment = totalDuration / segments.length
+
+            paths.each(function (d, i) {
+                const p = select(this)
+                const L = this.getTotalLength()
+
+                p.attr('stroke-dasharray', L)
+                    .attr('stroke-dashoffset', L)
+                    .transition()
+                    .delay(i * perSegment)
+                    .duration(perSegment)
+                    .ease(easeLinear)
+                    .attr('stroke-dashoffset', 0)
+            })
         }
     }
 
@@ -472,8 +519,15 @@ export const map = function (config) {
             node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
         }
 
-        // compute once per sparkline
-        const totalChange = data.reduce((sum, d) => sum + (d.value ?? 0), 0)
+        // Compute color - signature: (value, index, data)
+        // For individual bar coloring, use value and index
+        // For uniform coloring based on trend, use data array
+        const getBarColor = (d, i) => {
+            if (typeof out.sparkLineColor_ === 'function') {
+                return out.sparkLineColor_(d.value, i, data)
+            }
+            return out.sparkLineColor_
+        }
 
         const bars = node
             .selectAll('rect.spark-bar')
@@ -483,7 +537,7 @@ export const map = function (config) {
             .attr('class', 'spark-bar')
             .attr('x', (d, i) => i * barWidth)
             .attr('width', barWidth * 0.9)
-            .attr('fill', () => (typeof out.sparkLineColor_ === 'function' ? out.sparkLineColor_(data, totalChange) : out.sparkLineColor_))
+            .attr('fill', (d, i) => getBarColor(d, i))
             .attr('opacity', out.sparkLineOpacity_)
 
         // Animation: start from zero line, grow to full height

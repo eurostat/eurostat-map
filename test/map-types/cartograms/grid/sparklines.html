@@ -35,16 +35,15 @@
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
                 )
                 .sparkType('bar') //line, area, bar
-                .sparkLineWidth(30)
-                .sparkLineHeight(10)
+                .sparkLineWidth(29)
+                .sparkLineHeight(20)
                 .sparkLineStrokeWidth(3)
-                .sparkLineColor((d) => {
-                    // d is the full time series for the region
-                    const totalChange = d.reduce((sum, p) => sum + (p.value ?? 0), 0)
-                    //reflects cumulative population evolution
-                    if (totalChange > 0) return 'blue'
-                    if (totalChange < 0) return 'red'
-                    return '#999' // optional: neutral / no change
+                .sparkLineOffsets({ x: -2, y: 10 })
+                // Color based on positive/negative values
+                .sparkLineColor((barValue) => {
+                    if (barValue > 0) return 'blue'
+                    if (barValue < 0) return 'red'
+                    return '#999'
                 })
                 .sparkLineOpacity(0.8)
                 .sparkLineCircleRadius(0)
@@ -59,7 +58,7 @@
                 .sparkTooltipChart({
                     width: 150,
                     height: 50,
-                    margin: { left: 60, right: 40, top: 40, bottom: 40 },
+                    margin: { left: 30, right: 20, top: 30, bottom: 40 },
                     circleRadius: 1.5,
                 })
                 .hoverColor('#ffa500')

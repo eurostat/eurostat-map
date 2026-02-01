@@ -8,6 +8,7 @@ import * as PiechartLegend from '../legend/legend-piecharts'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
 import { interpolate } from 'd3-interpolate'
+import { adjustGridCartogramTextLabels } from '../core/cartograms'
 
 /**
  * Returns a proportional pie chart map.
@@ -331,7 +332,11 @@ export const map = function (config) {
             const ir = out.pieChartInnerRadius_
 
             // Create chart container
-            const g = node.append('g').attr('class', 'em-pie').attr('transform', `translate(${anchorX}, ${anchorY})`)
+            const g = node
+                .append('g')
+                .attr('id', 'piechart_' + regionId)
+                .attr('class', 'em-pie')
+                .attr('transform', `translate(${anchorX}, ${anchorY})`)
 
             // Make pie chart
             const pie_ = pie()
@@ -373,6 +378,15 @@ export const map = function (config) {
             if (shapeEl && shapeEl.nextSibling) {
                 node.node().insertBefore(g.node(), shapeEl.nextSibling)
             }
+        })
+
+        adjustGridCartogramTextLabels({
+            map,
+            getAnchors: getPieAnchors,
+            getRadius: (regionId) => {
+                const total = getRegionTotal(regionId)
+                return total ? out.classifierSize_(total) : 0
+            },
         })
     }
 

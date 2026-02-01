@@ -114,6 +114,7 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
 
             select(this)
                 .append('text')
+                .attr('id', `em-grid-text-${d.id}`)
                 .attr('class', 'em-grid-text')
                 .attr('text-anchor', 'middle')
                 .style('font-size', getFontSize(out._mapType))
@@ -164,6 +165,7 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
             // Append text label
             select(this)
                 .append('text')
+                .attr('id', `em-grid-text-${d.id}`)
                 .attr('class', 'em-grid-text')
                 .attr('text-anchor', 'middle')
                 .style('font-size', getFontSize(out._mapType))
@@ -222,5 +224,29 @@ const centerGrid = (gridGroup, svgWidth, svgHeight, margins) => {
         const dx = (svgWidth - margins.left - margins.right - bbox.width) / 2 - bbox.x + margins.left
         const dy = (svgHeight - margins.top - margins.bottom - bbox.height) / 2 - bbox.y + margins.top
         gridGroup.attr('transform', `translate(${dx}, ${dy})`)
+    })
+}
+
+export function adjustGridCartogramTextLabels({ map, getAnchors, getRadius, margin = 2 }) {
+    const isHexagon = map.gridCartogramShape_ === 'hexagon'
+    const anchors = getAnchors(map)
+
+    anchors.each(function (d) {
+        const cell = select(this)
+        const text = cell.select('.em-grid-text')
+        if (text.empty()) return
+
+        const regionId = d.properties.id
+        const r = getRadius(regionId, d)
+        if (!r || r <= 0) return
+
+        const shapeEl = cell.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+        if (!shapeEl) return
+
+        const bbox = shapeEl.getBBox()
+        const centerY = isHexagon ? 0 : bbox.height / 2
+
+        const textY = centerY - r - margin
+        text.attr('y', textY)
     })
 }

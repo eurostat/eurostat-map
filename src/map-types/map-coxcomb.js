@@ -8,6 +8,7 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
 import * as CoxcombLegend from '../legend/legend-coxcomb'
 import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
+import { adjustGridCartogramTextLabels } from '../core/cartograms'
 
 /**
  * Returns a coxcomb (polar area) chart map.
@@ -335,7 +336,15 @@ export const map = function (config) {
         if (out.svg_) {
             if (map.gridCartogram_) {
                 // Grid cartogram mode
-                applyStyleToGridCartogram(map)
+                const angle = createAngleScale(out._coxTimes)
+
+                applyStyleToGridCartogram(map, angle)
+
+                adjustGridCartogramTextLabels({
+                    map,
+                    getAnchors: getCoxcombAnchors,
+                    getRadius: (regionId) => getCoxcombTopRadius(regionId),
+                })
             } else {
                 // Geographic map mode
                 const s = map.getCentroidsGroup(map)
@@ -360,7 +369,38 @@ export const map = function (config) {
         }
     }
 
-    function applyStyleToGridCartogram(map) {
+    function getCoxcombTopRadius(regionId) {
+        const months = out._coxTimes
+        if (!months || months.length === 0) return 0
+
+        const jan = months[0]
+        const dec = months[months.length - 1]
+
+        let maxR = 0
+
+        ;[jan, dec].forEach((month) => {
+            let stackSum = 0
+
+            // stack causes in the same order as the chart
+            out._coxCategoryCodes.forEach((cause) => {
+                const v = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                stackSum += v
+            })
+
+            // include "other" if present
+            if (out.totalCode_) {
+                const total = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                if (total > stackSum) stackSum = total
+            }
+
+            const r = out.classifierChartSize_(stackSum, regionId)
+            if (r > maxR) maxR = r
+        })
+
+        return maxR
+    }
+
+    function applyStyleToGridCartogram(map, angle) {
         // Collect region IDs from grid cells
         const regionIds = []
         const anchors = getCoxcombAnchors(map)
@@ -371,16 +411,15 @@ export const map = function (config) {
         })
 
         // Add coxcomb charts to grid cells
-        addCoxcombChartsToGridCartogram(regionIds, map)
+        addCoxcombChartsToGridCartogram(regionIds, map, angle)
 
         // Add mouse events to grid shapes
         addMouseEventsToGridCartogram(map)
     }
 
-    function addCoxcombChartsToGridCartogram(regionIds, map) {
+    function addCoxcombChartsToGridCartogram(regionIds, map, angle) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
-        const angle = createAngleScale(months)
         const offsets = out.coxcombOffsets_ || { x: 0, y: 0 }
 
         regionIds.forEach((regionId) => {
@@ -446,6 +485,7 @@ export const map = function (config) {
             .padRadius(0)
 
         // Stacked wedges
+        let lastEnded = false
         keys.forEach((key, ki) => {
             node.append('g')
                 .attr('class', 'em-coxcomb-chart')
