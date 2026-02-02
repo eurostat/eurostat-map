@@ -868,6 +868,7 @@ const map = eurostatmap
     .waffleStrokeWidth(0)
     .waffleRoundedCorners(0)
     .waffleGridSize(10) //cells per row
+    .waffleTooltipSize(100) //tooltip chart size
 
     .nutsLevel(0)
     .statWaffle({

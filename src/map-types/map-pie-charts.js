@@ -108,54 +108,118 @@ export const map = function (config) {
      * A function to define a pie chart map easily, without repetition of information.
      * Only for eurobase data sources.
      *
-     * @param {*} stat A pattern for the stat data source
-     * @param {String} dim The dimension (defined in eurostat REST API) of the composition.
-     * @param {Array} codes The category codes of the composition
-     * @param {Array} labels Optional: The labels for the category codes
-     * @param {Array} colors Optional: The colors for the category
-     * @param {string} tCode Optional: The category code of the total (used to calculate total & "other" values if codes array dont represent all possible categories)
+     * @param {Object} config Configuration object with the following properties:
+     * @param {String} config.eurostatDatasetCode - The Eurostat dataset code
+     * @param {Object} [config.filters] - Filters for the Eurostat API query
+     * @param {String} [config.unitText] - Optional unit text for display
+     * @param {String} config.categoryParameter - The dimension/parameter for the composition categories
+     * @param {Array} config.categoryCodes - The category codes of the composition
+     * @param {Array} [config.categoryLabels] - Optional labels for the category codes
+     * @param {Array} [config.categoryColors] - Optional colors for the categories
+     * @param {String} [config.totalCode] - Optional category code of the total (for calculating "other")
+     *
+     * @example
+     * .statPie({
+     *     eurostatDatasetCode: 'tour_occ_nin2',
+     *     filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+     *     unitText: 'Nights',
+     *     categoryParameter: 'c_resid',
+     *     categoryCodes: ['FOR', 'DOM'],
+     *     categoryLabels: ['Foreign', 'Domestic'],
+     *     categoryColors: ['#7fc97f', '#beaed4'],
+     *     totalCode: 'TOTAL',
+     * })
      */
-    out.statPie = function (stat, dim, codes, labels, colors, tCode) {
-        //add one dataset (stat) config for each category (code)
-        stat.filters = stat.filters || {}
-        for (let i = 0; i < codes.length; i++) {
-            //category code
-            const code = codes[i]
-            stat.filters[dim] = code
-            const sc_ = {}
-            for (let key in stat) {
-                sc_[key] = stat[key]
-            }
-            sc_.filters = {}
-            for (let key in stat.filters) {
-                sc_.filters[key] = stat.filters[key]
-            }
-            out.stat(code, sc_)
-
-            //if specified, retrieve and assign color
-            if (colors) {
-                out.catColors_ = out.catColors_ || {}
-                out.catColors_[code] = colors[i]
-            }
-            //if specified, retrieve and assign label
-            if (labels) {
-                out.catLabels_ = out.catLabels_ || {}
-                out.catLabels_[code] = labels[i]
+    out.statPie = function (config, dim, codes, labels, colors, tCode) {
+        // Backwards compatibility: handle old positional arguments API
+        // Old API: statPie(stat, dim, codes, labels, colors, tCode)
+        if (dim !== undefined && typeof dim === 'string') {
+            config = {
+                ...config,
+                categoryParameter: dim,
+                categoryCodes: codes,
+                categoryLabels: labels,
+                categoryColors: colors,
+                totalCode: tCode,
             }
         }
 
-        //set out.statCodes_
-        out.statCodes_ = codes
+        // Backwards compatibility: flatten nested stat object if present
+        if (config.stat) {
+            config = {
+                ...config.stat,
+                ...config,
+            }
+            delete config.stat
+        }
 
-        //set out.pieTotalCode_
-        if (tCode) {
-            out.pieTotalCode_ = tCode
-            stat.filters[dim] = tCode
-            const sc_ = {}
-            for (let key in stat) sc_[key] = stat[key]
-            sc_.filters = {}
-            for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
-            out.stat(tCode, sc_)
+        const { eurostatDatasetCode, filters, unitText, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode } = config
+
+        // Validate required parameters
+        if (!eurostatDatasetCode) {
+            console.error('statPie: eurostatDatasetCode is required')
+            return out
+        }
+        if (!categoryParameter) {
+            console.error('statPie: categoryParameter is required')
+            return out
+        }
+        if (!categoryCodes || !categoryCodes.length) {
+            console.error('statPie: categoryCodes array is required')
+            return out
+        }
+
+        // Base filters (clone to avoid mutation)
+        const baseFilters = filters ? { ...filters } : {}
+
+        // Add one dataset (stat) config for each category code
+        for (let i = 0; i < categoryCodes.length; i++) {
+            const code = categoryCodes[i]
+
+            // Build stat config for this category
+            const statConfig = {
+                eurostatDatasetCode,
+                unitText,
+                filters: {
+                    ...baseFilters,
+                    [categoryParameter]: code,
+                },
+            }
+
+            // Register the stat
+            out.stat(code, statConfig)
+
+            // Assign color if specified
+            if (categoryColors && categoryColors[i]) {
+                out.catColors_ = out.catColors_ || {}
+                out.catColors_[code] = categoryColors[i]
+            }
+
+            // Assign label if specified
+            if (categoryLabels && categoryLabels[i]) {
+                out.catLabels_ = out.catLabels_ || {}
+                out.catLabels_[code] = categoryLabels[i]
+            }
+        }
+
+        // Set statCodes
+        out.statCodes_ = categoryCodes
+
+        // Set total code if provided
+        if (totalCode) {
+            out.pieTotalCode_ = totalCode
+
+            // Build stat config for total
+            const totalStatConfig = {
+                eurostatDatasetCode,
+                unitText,
+                filters: {
+                    ...baseFilters,
+                    [categoryParameter]: totalCode,
+                },
+            }
+
+            out.stat(totalCode, totalStatConfig)
         } else {
             out.pieTotalCode_ = undefined
         }

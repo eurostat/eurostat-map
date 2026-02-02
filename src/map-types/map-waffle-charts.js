@@ -31,7 +31,7 @@ export const map = function (config) {
     out.waffleRoundedCorners_ = 1 // corner radius for cells
 
     // tooltip waffle chart
-    out.tooltipWaffleSize_ = 80
+    out.waffleTooltipSize_ = 80
 
     //colors - indexed by category code
     out.catColors_ = undefined
@@ -70,6 +70,7 @@ export const map = function (config) {
         'waffleStrokeFill_',
         'waffleStrokeWidth_',
         'waffleRoundedCorners_',
+        'waffleTooltipSize_',
         'dorling_',
         'animateDorling_',
         'waffleTotalCode_',
@@ -746,11 +747,10 @@ export const map = function (config) {
     }
 
     // Tooltip function for waffle charts
-    const tooltipSize = 100
-    const tooltipGridSize = 10
-    const tooltipPadding = 1
-
     const waffleChartTooltipFunction = function (rg, map) {
+        const tooltipGridSize = 10
+        const tooltipPadding = 1
+        const chartSize = out.waffleTooltipSize_ || 100
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
         const comp = getComposition(regionId)
@@ -765,7 +765,7 @@ export const map = function (config) {
 
         // Generate tooltip waffle
         const cells = generateWaffleCells(comp, tooltipGridSize)
-        const cellSize = (tooltipSize - tooltipPadding * (tooltipGridSize - 1)) / tooltipGridSize
+        const cellSize = (chartSize - tooltipPadding * (tooltipGridSize - 1)) / tooltipGridSize
 
         // Padding inside the container
         const containerPadding = 10
@@ -779,11 +779,11 @@ export const map = function (config) {
         }
 
         // Total SVG size including padding
-        const svgSize = tooltipSize + containerPadding * 2
+        const svgSize = chartSize + containerPadding * 2
 
         const svg = `
         <div class='em-tooltip-wafflechart-container'>
-            <svg viewBox="0 0 ${svgSize} ${svgSize}" width="100%" style="display:block;">
+            <svg viewBox="0 0 ${svgSize} ${svgSize}" width="${chartSize}" style="display:block;">
                 ${rects}
             </svg>
         </div>

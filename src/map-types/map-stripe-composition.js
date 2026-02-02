@@ -66,42 +66,102 @@ export const map = function (config) {
     }
 
     /**
-     * A function to define a stripe map easily, without repetition of information.
+     * A function to define a stripe composition map easily, without repetition of information.
      * Only for eurobase data sources.
      *
-     * @param {*} stat A pattern for the stat data source
-     * @param {String} dim The dimension of the composition.
-     * @param {Array} codes The category codes of the composition
-     * @param {Array} labels Optional: The labels for the category codes
-     * @param {Array} colors Optional: The colors for the category
+     * @param {Object} config Configuration object with the following properties:
+     * @param {String} config.eurostatDatasetCode - The Eurostat dataset code
+     * @param {Object} [config.filters] - Filters for the Eurostat API query
+     * @param {String} [config.unitText] - Optional unit text for display
+     * @param {String} config.categoryParameter - The dimension/parameter for the composition categories
+     * @param {Array} config.categoryCodes - The category codes of the composition
+     * @param {Array} [config.categoryLabels] - Optional labels for the category codes
+     * @param {Array} [config.categoryColors] - Optional colors for the categories
+     *
+     * @example
+     * .statComp({
+     *     eurostatDatasetCode: 'demo_pjan',
+     *     filters: { sex: 'T' },
+     *     unitText: 'Population',
+     *     categoryParameter: 'age',
+     *     categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+     *     categoryLabels: ['Under 15', '15-64', '65+'],
+     *     categoryColors: ['#4daf4a', '#377eb8', '#e41a1c'],
+     * })
      */
-    out.statComp = function (stat, dim, codes, labels, colors) {
-        //add one dataset config for each category
-        stat.filters = stat.filters || {}
-        for (let i = 0; i < codes.length; i++) {
-            //category code
-            const code = codes[i]
-            stat.filters[dim] = code
-            const sc_ = {}
-            for (let key in stat) sc_[key] = stat[key]
-            sc_.filters = {}
-            for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
-            out.stat(code, sc_)
-
-            //if specified, retrieve and assign color
-            if (colors) {
-                out.catColors_ = out.catColors_ || {}
-                out.catColors_[code] = colors[i]
-            }
-            //if specified, retrieve and assign label
-            if (labels) {
-                out.catLabels_ = out.catLabels_ || {}
-                out.catLabels_[code] = labels[i]
+    out.statComp = function (config, dim, codes, labels, colors) {
+        // Backwards compatibility: handle old positional arguments API
+        // Old API: statComp(stat, dim, codes, labels, colors)
+        if (dim !== undefined && typeof dim === 'string') {
+            config = {
+                ...config,
+                categoryParameter: dim,
+                categoryCodes: codes,
+                categoryLabels: labels,
+                categoryColors: colors,
             }
         }
 
-        //set statCodes
-        statCodes = codes
+        // Backwards compatibility: flatten nested stat object if present
+        if (config.stat) {
+            config = {
+                ...config.stat,
+                ...config,
+            }
+            delete config.stat
+        }
+
+        const { eurostatDatasetCode, filters, unitText, categoryParameter, categoryCodes, categoryLabels, categoryColors } = config
+
+        // Validate required parameters
+        if (!eurostatDatasetCode) {
+            console.error('statComp: eurostatDatasetCode is required')
+            return out
+        }
+        if (!categoryParameter) {
+            console.error('statComp: categoryParameter is required')
+            return out
+        }
+        if (!categoryCodes || !categoryCodes.length) {
+            console.error('statComp: categoryCodes array is required')
+            return out
+        }
+
+        // Base filters (clone to avoid mutation)
+        const baseFilters = filters ? { ...filters } : {}
+
+        // Add one dataset config for each category code
+        for (let i = 0; i < categoryCodes.length; i++) {
+            const code = categoryCodes[i]
+
+            // Build stat config for this category
+            const statConfig = {
+                eurostatDatasetCode,
+                unitText,
+                filters: {
+                    ...baseFilters,
+                    [categoryParameter]: code,
+                },
+            }
+
+            // Register the stat
+            out.stat(code, statConfig)
+
+            // Assign color if specified
+            if (categoryColors && categoryColors[i]) {
+                out.catColors_ = out.catColors_ || {}
+                out.catColors_[code] = categoryColors[i]
+            }
+
+            // Assign label if specified
+            if (categoryLabels && categoryLabels[i]) {
+                out.catLabels_ = out.catLabels_ || {}
+                out.catLabels_[code] = categoryLabels[i]
+            }
+        }
+
+        // Set statCodes
+        statCodes = categoryCodes
 
         return out
     }

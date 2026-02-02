@@ -14,13 +14,15 @@
                 .gridCartogram(true)
                 .nutsLevel(0)
                 .stripeWidth(12)
-                .statComp(
-                    { eurostatDatasetCode: 'agr_r_animal', filters: { unit: 'THS_HD', time: '2018' }, unitText: '1000 heads' },
-                    'animals',
-                    ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
-                    ['bovines', 'cows', 'buffalos', 'pigs', 'sheeps', 'goats'],
-                    ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f']
-                )
+                .statComp({
+                    eurostatDatasetCode: 'agr_r_animal',
+                    filters: { unit: 'THS_HD', time: '2018' },
+                    unitText: '1000 heads',
+                    categoryParameter: 'animals',
+                    categoryCodes: ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
+                    categoryLabels: ['bovines', 'cows', 'buffalos', 'pigs', 'sheeps', 'goats'],
+                    categoryColors: ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f'],
+                })
                 .title('European livestock composition (2018)')
                 .legend({ x: 10, y: 150, title: 'Animals', boxOpacity: 0.8, boxFill: 'white' })
                 .build()

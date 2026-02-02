@@ -244,7 +244,7 @@ export const legend = function (map, config) {
 
         // Draw title if provided
         if (title) {
-            container.append('text').attr('class', 'em-legend-title').attr('x', 0).attr('y', y).attr('dominant-baseline', 'hanging').text(title)
+            container.append('text').attr('class', 'em-size-legend-title').attr('x', 0).attr('y', y).attr('dominant-baseline', 'hanging').text(title)
             y += legend.titleFontSize + titlePadding
         }
 

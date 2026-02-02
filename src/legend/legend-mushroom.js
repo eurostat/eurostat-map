@@ -80,7 +80,7 @@ export const legend = function (map, config) {
             // v2 label JUST ABOVE v2 legend
             drawSideLabel(out, baseX, v2Box.top + 30, 'v2')
         } else {
-            cursorY = drawMushroomSizeLegend(out, baseX, cursorY)
+            cursorY = drawMushroomSizeLegend(out, baseX, cursorY)?.bottom || out.getBaseY() + out.sizeLegend.marginTop
         }
 
         // -----------------------------

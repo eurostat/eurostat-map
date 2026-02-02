@@ -25,6 +25,9 @@
                 stroke: grey;
                 stroke-width: 1px !important;
             }
+            .em-cntbn {
+                opacity: 0.3;
+            }
         </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
@@ -98,6 +101,7 @@
                         values: [288000000, 100000000, 2000000],
                         labels: ['288 million ', '2 million'],
                     },
+                    colorLegend: { title: '', marginTop: 10 },
                 })
                 .tooltip({
                     textFunction: tooltipTextFunction,
