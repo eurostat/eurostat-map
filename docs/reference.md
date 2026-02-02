@@ -869,14 +869,11 @@ const map = eurostatmap
     .waffleRoundedCorners(0)
     .waffleGridSize(10) //cells per row
 
-    //population by age
     .nutsLevel(0)
     .statWaffle({
-        stat: {
-            eurostatDatasetCode: 'tour_occ_nin2',
-            filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
-            unitText: 'nights spent',
-        },
+        eurostatDatasetCode: 'tour_occ_nin2',
+        filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+        unitText: 'nights spent',
         categoryParameter: 'c_resid',
         categoryCodes: ['FOR', 'DOM'],
         categoryLabels: ['Foreign', 'Domestic'],
