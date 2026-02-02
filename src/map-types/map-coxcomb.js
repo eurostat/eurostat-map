@@ -60,6 +60,7 @@ export const map = function (config) {
 
     out.statCodes_ = undefined
     out.totalCode_ = undefined
+    out._anyRegionHasOther_ = false // whether any region has "other" category data
 
     // Helper for Eurostat datasets (like statSpark or statPie)
     // For example:
@@ -283,6 +284,7 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
+        out._anyRegionHasOther_ = false // reset for this update
         if (!out.catColors_) {
             out.catColors({})
             for (let i = 0; i < out.statCodes_.length; i++) {
@@ -298,6 +300,12 @@ export const map = function (config) {
 
             // apply to main map
             applyStyleToMap(out)
+
+            // After all regions have been processed, decide if 'other' should stay
+            if (out.totalCode_ && !out._anyRegionHasOther_) {
+                delete out.catColors_?.other
+                delete out.catLabels_?.other
+            }
 
             // dorling cartogram (not applicable for grid cartograms)
             if (out.dorling_ && !out.gridCartogram_) {
@@ -824,13 +832,15 @@ export const map = function (config) {
             })
             .filter(Boolean)
 
-        // *** Remove "other" column if it's zero for every row ***
-        const hasOther = rows.some((r) => (r['other'] || 0) > 0)
-        if (!hasOther) {
-            rows.forEach((r) => delete r['other'])
-            // Also drop the color & label entry for "other" so it won't appear in legend
-            delete out.catColors_?.other
-            delete out.catLabels_?.other
+        // *** check if 'other' category is present ***
+        const hasOther = rows.some((r) => (r.other || 0) > 0)
+
+        if (hasOther) {
+            // signal globally that "other" exists somewhere
+            out._anyRegionHasOther_ = true
+        } else {
+            // local cleanup only
+            rows.forEach((r) => delete r.other)
         }
 
         return rows

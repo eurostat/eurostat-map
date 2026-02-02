@@ -104,7 +104,7 @@ export const legend = function (map, config) {
         }
 
         let i = 0
-        const scs = map.catColors()
+        const scs = map.catColors_
         for (let code in scs) {
             const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
             const col = map.catColors()[code] || 'lightgray'
@@ -136,7 +136,7 @@ export const legend = function (map, config) {
                 .attr('x', config.shapeWidth + config.labelOffsets.x)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dy', '0.35em')
-                .text(map.catLabels()[code] || code)
+                .text(map.catLabels_[code] || code)
 
             i++
         }
