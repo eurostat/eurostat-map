@@ -26,15 +26,13 @@
                 .title('Population change 2009 - 2023')
                 .subtitle('Change per thousand inhabitants')
                 .transitionDuration(1000)
-                .statSpark(
-                    {
-                        eurostatDatasetCode: 'demo_r_gind3',
-                        filters: { indic_de: 'GROWRT' },
-                        unitText: 'Population change',
-                    },
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'], //dates
-                    ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
-                )
+                .statSpark({
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT' },
+                    unitText: 'Population change',
+                    dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                })
                 .sparkType('bar') //line, area, bar
 
                 .sparkLineWidth(29)

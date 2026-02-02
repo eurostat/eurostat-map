@@ -6,32 +6,6 @@
     </head>
 
     <body>
-        <style>
-            /* Region fill */
-            .em-cntrg,
-            .em-nutsrg,
-            .em-grid-cell {
-                fill: #efefef !important;
-            }
-
-            /*  borders */
-            .em-cntbn,
-            .em-worldbn,
-            g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-                stroke-width: 0.3px !important;
-                stroke: #ffffff !important;
-            }
-            /*  borders */
-            .em-bn-1,
-            .em-bn-2,
-            .em-bn-3,
-            .em-nutsrg [lvl='3'],
-            .em-nutsrg [lvl='2'],
-            .em-nutsrg [lvl='1'] {
-                stroke-width: 0px !important;
-                stroke: #ffffff !important;
-            }
-        </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
@@ -39,22 +13,34 @@
                 .map('sparkline')
                 .gridCartogram(true)
                 //.width(800)
-                .title('Demand for energy needed to heat a building ')
-                .subtitle('Heating degree days (HDD) 2009-2021')
+                .title('GDP 2009 - 2021')
+                .subtitle('Gross Domestic Product (GDP) 2009-2021')
                 .nutsLevel(0)
                 .statSpark({
-                    eurostatDatasetCode: 'nrg_chddr2_a',
-                    filters: { indic_nrg: 'HDD' },
+                    eurostatDatasetCode: 'tec00115',
+                    filters: { unit: 'CLV_PCH_PRE' },
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                 })
                 .sparkType('bar')
-                .sparkLineWidth(25)
-                .sparkLineStrokeWidth(1)
+
+                .sparkLineWidth(30)
+                .sparkLineHeight(35)
+                .sparkLineOffsets({ x: 0, y: -10 })
+                .sparkLineStrokeWidth(3)
                 .sparkLineColor('#c44a4a')
-                .sparkLineHeight(50)
+
+                // Color based on positive/negative values
+                .sparkLineColor((itemValue) => {
+                    if (itemValue > 0) return 'blue'
+                    if (itemValue < 0) return 'red'
+                    return '#999'
+                })
+                .sparkLineOpacity(0.8)
+                .sparkLineCircleRadius(0)
+
                 .sparkLineOpacity(0.7)
-                .sparkLineCircleRadius(0.1)
+                .sparkLineCircleRadius(1)
                 .tooltip({
                     xOffset: 30,
                     yOffset: 150,

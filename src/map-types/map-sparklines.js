@@ -105,32 +105,83 @@ export const map = function (config) {
      * A function to define a sparkline map easily, without repetition of information.
      * Only for eurobase data sources.
      *
-     * @param {*} stat A pattern for the stat data source
-     * @param {Array} dates The dates of the composition (time parameter)
-     * @param {Array} labels Optional: The labels for the dates
+     * @param {Object} config Configuration object with the following properties:
+     * @param {String} config.eurostatDatasetCode - The Eurostat dataset code
+     * @param {Object} [config.filters] - Filters for the Eurostat API query
+     * @param {String} [config.unitText] - Optional unit text for display
+     * @param {Array} config.dates - The dates/times for the sparkline
+     * @param {Array} [config.labels] - Optional labels for the dates
+     *
+     * @example
+     * .statSpark({
+     *     eurostatDatasetCode: 'demo_pjan',
+     *     filters: { sex: 'T', age: 'TOTAL' },
+     *     unitText: 'Population',
+     *     dates: ['2018', '2019', '2020', '2021', '2022', '2023'],
+     *     labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+     * })
      */
-    out.statSpark = function (stat, dates, labels) {
-        //add one dataset config for each category
-        stat.filters = stat.filters || {}
-        for (let i = 0; i < dates.length; i++) {
-            //category code
-            const date = dates[i]
-            stat.filters.time = date
-            const sc_ = {}
-            for (let key in stat) sc_[key] = stat[key]
-            sc_.filters = {}
-            for (let key in stat.filters) sc_.filters[key] = stat.filters[key]
-            out.stat(date, sc_)
-
-            //if specified, retrieve and assign label
-            if (labels) {
-                out.catLabels_ = out.catLabels_ || {}
-                out.catLabels_[date] = labels[i]
+    out.statSpark = function (config, dates, labels) {
+        // Backwards compatibility: handle old positional arguments API
+        // Old API: statSpark(stat, dates, labels)
+        if (dates !== undefined && Array.isArray(dates)) {
+            config = {
+                ...config,
+                dates: dates,
+                labels: labels,
             }
         }
 
-        //set statCodes
-        out._statDates = dates
+        // Backwards compatibility: flatten nested stat object if present
+        if (config.stat) {
+            config = {
+                ...config.stat,
+                ...config,
+            }
+            delete config.stat
+        }
+
+        const { eurostatDatasetCode, filters, unitText, dates: configDates, labels: configLabels } = config
+
+        // Validate required parameters
+        if (!eurostatDatasetCode) {
+            console.error('statSpark: eurostatDatasetCode is required')
+            return out
+        }
+        if (!configDates || !configDates.length) {
+            console.error('statSpark: dates array is required')
+            return out
+        }
+
+        // Base filters (clone to avoid mutation)
+        const baseFilters = filters ? { ...filters } : {}
+
+        // Add one dataset config for each date
+        for (let i = 0; i < configDates.length; i++) {
+            const date = configDates[i]
+
+            // Build stat config for this date
+            const statConfig = {
+                eurostatDatasetCode,
+                unitText,
+                filters: {
+                    ...baseFilters,
+                    time: date,
+                },
+            }
+
+            // Register the stat
+            out.stat(date, statConfig)
+
+            // Assign label if specified
+            if (configLabels && configLabels[i]) {
+                out.catLabels_ = out.catLabels_ || {}
+                out.catLabels_[date] = configLabels[i]
+            }
+        }
+
+        // Set statDates
+        out._statDates = configDates
 
         return out
     }
@@ -195,10 +246,33 @@ export const map = function (config) {
 
         out.sparkXScale_ = scaleLinear().domain([0, out._statDates.length - 1])
 
-        const absMax = Math.max(Math.abs(out.domain[0]), Math.abs(out.domain[1]))
+        const [minVal, maxVal] = out.domain
 
-        out.sparkYScale_ = scaleLinear().domain([-absMax, absMax])
-        //out.sparkYScale_ = scaleLinear().domain(out.domain)
+        // Determine Y scale domain based on data characteristics
+        let yMin, yMax
+
+        if (minVal >= 0) {
+            // All positive values: start from 0
+            yMin = 0
+            yMax = maxVal
+        } else if (maxVal <= 0) {
+            // All negative values: end at 0
+            yMin = minVal
+            yMax = 0
+        } else {
+            // Mixed positive and negative: use symmetric range around zero
+            // for better visual comparison of positive vs negative values
+            const absMax = Math.max(Math.abs(minVal), Math.abs(maxVal))
+            yMin = -absMax
+            yMax = absMax
+        }
+
+        // Add small padding to prevent lines from touching edges
+        const padding = (yMax - yMin) * 0.05
+        yMin -= padding
+        yMax += padding
+
+        out.sparkYScale_ = scaleLinear().domain([yMin, yMax])
 
         return out
     }
@@ -386,6 +460,7 @@ export const map = function (config) {
 
             node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
 
+            // Only show zero line if data spans both positive and negative values
             if (minValue < 0 && maxValue > 0) {
                 node.append('line')
                     .attr('x1', 0)
@@ -409,6 +484,19 @@ export const map = function (config) {
                 return out.sparkAreaColor_
             }
 
+            // Determine baseline for area chart
+            // If all values positive, baseline is bottom of chart
+            // If all values negative, baseline is top of chart
+            // If mixed, baseline is zero line
+            let areaBaseline
+            if (minValue >= 0) {
+                areaBaseline = height // bottom of chart
+            } else if (maxValue <= 0) {
+                areaBaseline = 0 // top of chart
+            } else {
+                areaBaseline = zeroY // zero line
+            }
+
             node.append('path')
                 .datum(scaledData)
                 .attr('fill', getAreaColor)
@@ -418,7 +506,7 @@ export const map = function (config) {
                     'd',
                     area()
                         .x((d) => d.scaledXValue)
-                        .y0(zeroY)
+                        .y0(areaBaseline)
                         .y1((d) => d.scaledYValue)
                 )
         }
@@ -490,6 +578,10 @@ export const map = function (config) {
         const barWidth = width / data.length
         const zeroY = yScale(0)
 
+        // Calculate offset to center the bar group
+        const totalBarsWidth = data.length * barWidth
+        const offsetX = (width - totalBarsWidth) / 2
+
         // axes (tooltip only)
         if (isForTooltip) {
             node.append('g')
@@ -519,31 +611,79 @@ export const map = function (config) {
             return out.sparkLineColor_
         }
 
+        // Determine bar baseline based on data characteristics
+        let barBaseline
+        if (minValue >= 0) {
+            barBaseline = height // bottom of chart for all positive
+        } else if (maxValue <= 0) {
+            barBaseline = 0 // top of chart for all negative
+        } else {
+            barBaseline = zeroY // zero line for mixed
+        }
+
         const bars = node
             .selectAll('rect.spark-bar')
             .data(data)
             .enter()
             .append('rect')
             .attr('class', 'spark-bar')
-            .attr('x', (d, i) => i * barWidth)
+            .attr('x', (d, i) => offsetX + i * barWidth + barWidth * 0.05) // center with small padding
             .attr('width', barWidth * 0.9)
             .attr('fill', (d, i) => getBarColor(d, i))
             .attr('opacity', out.sparkLineOpacity_)
 
-        // Animation: start from zero line, grow to full height
+        // Animation: start from baseline, grow to full height
         if (!isForTooltip) {
-            bars.attr('y', zeroY)
+            bars.attr('y', barBaseline)
                 .attr('height', 0)
                 .transition()
                 .duration(out.transitionDuration())
-                .attr('y', (d) => (d.value >= 0 ? yScale(d.value) : zeroY))
-                .attr('height', (d) => Math.abs(yScale(d.value) - zeroY))
+                .attr('y', (d) => {
+                    if (minValue >= 0) {
+                        // All positive: bars grow upward from bottom
+                        return yScale(d.value)
+                    } else if (maxValue <= 0) {
+                        // All negative: bars grow downward from top
+                        return 0
+                    } else {
+                        // Mixed: bars grow from zero line
+                        return d.value >= 0 ? yScale(d.value) : zeroY
+                    }
+                })
+                .attr('height', (d) => {
+                    if (minValue >= 0) {
+                        // All positive
+                        return height - yScale(d.value)
+                    } else if (maxValue <= 0) {
+                        // All negative
+                        return yScale(d.value)
+                    } else {
+                        // Mixed
+                        return Math.abs(yScale(d.value) - zeroY)
+                    }
+                })
         } else {
             // No animation for tooltip
-            bars.attr('y', (d) => (d.value >= 0 ? yScale(d.value) : zeroY)).attr('height', (d) => Math.abs(yScale(d.value) - zeroY))
+            bars.attr('y', (d) => {
+                if (minValue >= 0) {
+                    return yScale(d.value)
+                } else if (maxValue <= 0) {
+                    return 0
+                } else {
+                    return d.value >= 0 ? yScale(d.value) : zeroY
+                }
+            }).attr('height', (d) => {
+                if (minValue >= 0) {
+                    return height - yScale(d.value)
+                } else if (maxValue <= 0) {
+                    return yScale(d.value)
+                } else {
+                    return Math.abs(yScale(d.value) - zeroY)
+                }
+            })
         }
 
-        // zero reference line (tooltip only)
+        // zero reference line (tooltip only, only if mixed values)
         if (isForTooltip && minValue < 0 && maxValue > 0) {
             node.append('line')
                 .attr('x1', 0)
