@@ -1,6 +1,5 @@
 import { scaleSqrt } from 'd3-scale'
 import { select } from 'd3-selection'
-import { sum } from 'd3-array'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as WaffleChartLegend from '../legend/legend-waffle-chart'
@@ -109,7 +108,9 @@ export const map = function (config) {
      * Only for eurobase data sources.
      *
      * @param {Object} config Configuration object with the following properties:
-     * @param {Object} config.stat - The stat data source configuration (eurostatDatasetCode, filters, unitText)
+     * @param {String} config.eurostatDatasetCode - The Eurostat dataset code
+     * @param {Object} config.filters - Filters for the Eurostat API query
+     * @param {String} [config.unitText] - Optional unit text for display
      * @param {String} config.categoryParameter - The dimension/parameter for the composition categories
      * @param {Array} config.categoryCodes - The category codes of the composition
      * @param {Array} [config.categoryLabels] - Optional labels for the category codes
@@ -118,11 +119,9 @@ export const map = function (config) {
      *
      * @example
      * .statWaffle({
-     *     stat: {
-     *         eurostatDatasetCode: 'demo_pjan',
-     *         filters: { sex: 'T' },
-     *         unitText: 'Population',
-     *     },
+     *     eurostatDatasetCode: 'demo_pjan',
+     *     filters: { sex: 'T' },
+     *     unitText: 'Population',
      *     categoryParameter: 'age',
      *     categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
      *     categoryLabels: ['Under 15', '15-64', '65+'],
@@ -131,11 +130,11 @@ export const map = function (config) {
      * })
      */
     out.statWaffle = function (config) {
-        const { stat, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode } = config
+        const { eurostatDatasetCode, filters, unitText, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode } = config
 
         // Validate required parameters
-        if (!stat) {
-            console.error('statWaffle: stat configuration is required')
+        if (!eurostatDatasetCode) {
+            console.error('statWaffle: eurostatDatasetCode is required')
             return out
         }
         if (!categoryParameter) {
@@ -147,25 +146,22 @@ export const map = function (config) {
             return out
         }
 
-        // Ensure filters object exists
-        stat.filters = stat.filters || {}
+        // Base filters (clone to avoid mutation)
+        const baseFilters = filters ? { ...filters } : {}
 
         // Add one dataset (stat) config for each category code
         for (let i = 0; i < categoryCodes.length; i++) {
             const code = categoryCodes[i]
 
-            // Clone the stat config
-            const statConfig = {}
-            for (let key in stat) {
-                statConfig[key] = stat[key]
+            // Build stat config for this category
+            const statConfig = {
+                eurostatDatasetCode,
+                unitText,
+                filters: {
+                    ...baseFilters,
+                    [categoryParameter]: code,
+                },
             }
-            statConfig.filters = {}
-            for (let key in stat.filters) {
-                statConfig.filters[key] = stat.filters[key]
-            }
-
-            // Set the category filter
-            statConfig.filters[categoryParameter] = code
 
             // Register the stat
             out.stat(code, statConfig)
@@ -190,16 +186,15 @@ export const map = function (config) {
         if (totalCode) {
             out.waffleTotalCode_ = totalCode
 
-            // Clone the stat config for total
-            const totalStatConfig = {}
-            for (let key in stat) {
-                totalStatConfig[key] = stat[key]
+            // Build stat config for total
+            const totalStatConfig = {
+                eurostatDatasetCode,
+                unitText,
+                filters: {
+                    ...baseFilters,
+                    [categoryParameter]: totalCode,
+                },
             }
-            totalStatConfig.filters = {}
-            for (let key in stat.filters) {
-                totalStatConfig.filters[key] = stat.filters[key]
-            }
-            totalStatConfig.filters[categoryParameter] = totalCode
 
             out.stat(totalCode, totalStatConfig)
         } else {

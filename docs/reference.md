@@ -23,11 +23,13 @@ Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-
         - [Proportional pie chart map](#proportional-pie-chart-map)
         - [Categorical map](#categorical-map)
         - [Bivariate choropleth map](#bivariate-choropleth-map)
+        - [Trivariate choropleth map](#trivariate-choropleth-map)
         - [Stripe composition map](#stripe-composition-map)
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
         - [Coxcomb map](#coxcomb-map)
         - [Mushroom map](#mushroom-map)
+        - [Waffle map](#waffle-map)
         - [Cartograms](#cartograms)
             - [Grid Cartograms](#grid-cartograms)
             - [Dorling Cartograms](#dorling-cartograms)
@@ -848,6 +850,49 @@ const map = eurostatmap
         filters: { unit: 'EUR_HAB', time: '2022' },
     })
     .zoomExtent([1, 1000])
+    .build()
+```
+
+### Waffle map
+
+```javascript
+const map = eurostatmap
+    .map('waffle')
+    .title('Tourism')
+    .subtitle('Nights spent in tourist accommodation, 2022')
+
+    //waffle settings
+    .waffleMinSize(10)
+    .waffleMaxSize(40)
+    .waffleCellPadding(0)
+    .waffleStrokeWidth(0)
+    .waffleRoundedCorners(0)
+    .waffleGridSize(10) //cells per row
+
+    //population by age
+    .nutsLevel(0)
+    .statWaffle({
+        stat: {
+            eurostatDatasetCode: 'tour_occ_nin2',
+            filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+            unitText: 'nights spent',
+        },
+        categoryParameter: 'c_resid',
+        categoryCodes: ['FOR', 'DOM'],
+        categoryLabels: ['Foreign', 'Domestic'],
+        categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours,
+        //totalCode: 'TOTAL',
+    })
+
+    .legend({
+        x: 10,
+        y: 150,
+        boxOpacity: 0.8,
+        boxFill: 'white',
+        sizeLegend: { title: 'Nights spent', titlePadding: 15 },
+        colorLegend: { title: 'Tourist origin', noData: false },
+    })
+
     .build()
 ```
 

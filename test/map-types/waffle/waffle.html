@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            /* .em-grid-text:not(#em-grid-text-AL, #em-grid-text-EL, #em-grid-text-UK, #em-grid-text-BA, #em-grid-text-UA) {
+                transform: translate(0, 50px) !important;
+            } */
+            .em-cntbn {
+                opacity: 0.3;
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('waffle')
+                .title('Tourism')
+                .subtitle('Nights spent in tourist accommodation, 2022')
+
+                //waffle settings
+                .waffleMinSize(10)
+                .waffleMaxSize(40)
+                .waffleCellPadding(0)
+                .waffleStrokeWidth(0)
+                .waffleRoundedCorners(0)
+                .waffleGridSize(10) //cells per row
+
+                //population by age
+                .nutsLevel(0)
+                .statWaffle({
+                    stat: {
+                        eurostatDatasetCode: 'tour_occ_nin2',
+                        filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                        unitText: 'nights spent',
+                    },
+                    categoryParameter: 'c_resid',
+                    categoryCodes: ['FOR', 'DOM'],
+                    categoryLabels: ['Foreign', 'Domestic'],
+                    categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours,
+                    //totalCode: 'TOTAL',
+                })
+
+                .legend({
+                    x: 10,
+                    y: 150,
+                    boxOpacity: 0.8,
+                    boxFill: 'white',
+                    sizeLegend: { title: 'Nights spent', titlePadding: 15 },
+                    colorLegend: { title: 'Tourist origin', noData: false },
+                })
+
+                .build()
+        </script>
+    </body>
+</html>
