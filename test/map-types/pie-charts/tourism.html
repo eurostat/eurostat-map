@@ -29,18 +29,16 @@
                 .insets('default')
                 .transitionDuration(3000)
                 .geoCenter([5000000, 3500000])
-                .statPie(
-                    {
-                        eurostatDatasetCode: 'tour_occ_nin2',
-                        filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
-                        unitText: '1 000 tonnes',
-                    },
-                    'c_resid', //parameter that the categories belong to
-                    ['FOR', 'DOM'], //category codes
-                    ['Foreign', 'Domestic'], //category labels
-                    ['#7fc97f', '#beaed4', '#666666'] //colours
+                .statPie({
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                    unitText: '1 000 tonnes',
+                    categoryParameter: 'c_resid', //parameter that the categories belong to
+                    categoryCodes: ['FOR', 'DOM'], //category codes
+                    categoryLabels: ['Foreign', 'Domestic'], //category labels
+                    categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours
                     //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
-                )
+                })
                 .pieMinRadius(6)
                 .legend({
                     x: 10,
