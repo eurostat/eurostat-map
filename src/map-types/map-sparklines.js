@@ -426,11 +426,15 @@ export const map = function (config) {
     }
 
     function createSparkLineOrAreaChart(node, data, width, height, isForTooltip) {
-        const xScale = out.sparkXScale_.range([0.5, width - 0.5])
-        const minValue = min(data.map((d) => d.value)) ?? 0
-        const maxValue = max(data.map((d) => d.value)) ?? 1
+        // Use data length for X scale, not the global _statDates length
+        const xScale = scaleLinear()
+            .domain([0, data.length - 1])
+            .range([0.5, width - 0.5])
 
         const yScale = out.sparkYScale_.range([height, 0])
+
+        // Get the global Y domain to determine baseline behavior
+        const [globalMinVal, globalMaxVal] = out.sparkYScale_.domain()
 
         const scaledData = data.map((d, i) => ({
             ...d,
@@ -449,8 +453,8 @@ export const map = function (config) {
                 .attr('transform', `translate(0, ${height})`)
                 .call(
                     axisBottom(xScale)
-                        .ticks(out._statDates.length)
-                        .tickFormat((d, i) => out._statDates[i])
+                        .tickValues(data.map((d, i) => i)) // Use actual data indices as tick values
+                        .tickFormat((d) => data[d]?.date || '')
                 )
                 .selectAll('text')
                 .style('text-anchor', 'end')
@@ -460,8 +464,8 @@ export const map = function (config) {
 
             node.append('g').attr('class', 'axis-y').call(axisLeft(yScale).ticks(5))
 
-            // Only show zero line if data spans both positive and negative values
-            if (minValue < 0 && maxValue > 0) {
+            // Only show zero line if data spans both positive and negative values globally
+            if (globalMinVal < 0 && globalMaxVal > 0) {
                 node.append('line')
                     .attr('x1', 0)
                     .attr('x2', width)
@@ -474,7 +478,7 @@ export const map = function (config) {
         }
 
         // ------------------------------------
-        // AREA (unchanged)
+        // AREA
         // ------------------------------------
         if (out.sparkType_ === 'area') {
             const getAreaColor = (d, i) => {
@@ -484,14 +488,12 @@ export const map = function (config) {
                 return out.sparkAreaColor_
             }
 
-            // Determine baseline for area chart
-            // If all values positive, baseline is bottom of chart
-            // If all values negative, baseline is top of chart
-            // If mixed, baseline is zero line
+            // Determine baseline for area chart based on GLOBAL data characteristics
+            // This ensures consistent baseline across all regions
             let areaBaseline
-            if (minValue >= 0) {
+            if (globalMinVal >= 0) {
                 areaBaseline = height // bottom of chart
-            } else if (maxValue <= 0) {
+            } else if (globalMaxVal <= 0) {
                 areaBaseline = 0 // top of chart
             } else {
                 areaBaseline = zeroY // zero line
@@ -569,11 +571,14 @@ export const map = function (config) {
     }
 
     function createSparkBarChart(node, data, width, height, isForTooltip) {
-        const minValue = min(data.map((d) => d.value)) || 0
-        const maxValue = max(data.map((d) => d.value)) || 0
-
-        const xScale = out.sparkXScale_.range([0.5, width - 0.5])
+        // Use data length for X scale, not the global _statDates length
+        const xScale = scaleLinear()
+            .domain([0, data.length - 1])
+            .range([0.5, width - 0.5])
         const yScale = out.sparkYScale_.range([height, 0])
+
+        // Get the global Y domain to determine baseline behavior
+        const [globalMinVal, globalMaxVal] = out.sparkYScale_.domain()
 
         const barWidth = width / data.length
         const zeroY = yScale(0)
@@ -589,8 +594,8 @@ export const map = function (config) {
                 .attr('transform', `translate(0, ${height})`)
                 .call(
                     axisBottom(xScale)
-                        .ticks(data.length)
-                        .tickFormat((d, i) => out._statDates[i])
+                        .tickValues(data.map((d, i) => i)) // Use actual data indices as tick values
+                        .tickFormat((d) => data[d]?.date || '')
                 )
                 .selectAll('text')
                 .style('text-anchor', 'end')
@@ -611,14 +616,18 @@ export const map = function (config) {
             return out.sparkLineColor_
         }
 
-        // Determine bar baseline based on data characteristics
+        // Determine bar baseline based on GLOBAL data characteristics
+        // This ensures consistent baseline across all regions
         let barBaseline
-        if (minValue >= 0) {
-            barBaseline = height // bottom of chart for all positive
-        } else if (maxValue <= 0) {
-            barBaseline = 0 // top of chart for all negative
+        if (globalMinVal >= 0) {
+            // All data across all regions is positive: baseline at bottom
+            barBaseline = height
+        } else if (globalMaxVal <= 0) {
+            // All data across all regions is negative: baseline at top
+            barBaseline = 0
         } else {
-            barBaseline = zeroY // zero line for mixed
+            // Mixed positive and negative across dataset: baseline at zero
+            barBaseline = zeroY
         }
 
         const bars = node
@@ -639,43 +648,43 @@ export const map = function (config) {
                 .transition()
                 .duration(out.transitionDuration())
                 .attr('y', (d) => {
-                    if (minValue >= 0) {
-                        // All positive: bars grow upward from bottom
+                    if (globalMinVal >= 0) {
+                        // All positive globally: bars grow upward from bottom
                         return yScale(d.value)
-                    } else if (maxValue <= 0) {
-                        // All negative: bars grow downward from top
+                    } else if (globalMaxVal <= 0) {
+                        // All negative globally: bars grow downward from top
                         return 0
                     } else {
-                        // Mixed: bars grow from zero line
+                        // Mixed globally: bars grow from zero line
                         return d.value >= 0 ? yScale(d.value) : zeroY
                     }
                 })
                 .attr('height', (d) => {
-                    if (minValue >= 0) {
-                        // All positive
+                    if (globalMinVal >= 0) {
+                        // All positive globally
                         return height - yScale(d.value)
-                    } else if (maxValue <= 0) {
-                        // All negative
+                    } else if (globalMaxVal <= 0) {
+                        // All negative globally
                         return yScale(d.value)
                     } else {
-                        // Mixed
+                        // Mixed globally
                         return Math.abs(yScale(d.value) - zeroY)
                     }
                 })
         } else {
             // No animation for tooltip
             bars.attr('y', (d) => {
-                if (minValue >= 0) {
+                if (globalMinVal >= 0) {
                     return yScale(d.value)
-                } else if (maxValue <= 0) {
+                } else if (globalMaxVal <= 0) {
                     return 0
                 } else {
                     return d.value >= 0 ? yScale(d.value) : zeroY
                 }
             }).attr('height', (d) => {
-                if (minValue >= 0) {
+                if (globalMinVal >= 0) {
                     return height - yScale(d.value)
-                } else if (maxValue <= 0) {
+                } else if (globalMaxVal <= 0) {
                     return yScale(d.value)
                 } else {
                     return Math.abs(yScale(d.value) - zeroY)
@@ -683,8 +692,8 @@ export const map = function (config) {
             })
         }
 
-        // zero reference line (tooltip only, only if mixed values)
-        if (isForTooltip && minValue < 0 && maxValue > 0) {
+        // zero reference line (tooltip only, only if mixed values globally)
+        if (isForTooltip && globalMinVal < 0 && globalMaxVal > 0) {
             node.append('line')
                 .attr('x1', 0)
                 .attr('x2', width)

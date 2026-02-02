@@ -13,20 +13,20 @@
                 .map('sparkline')
                 .gridCartogram(true)
                 //.width(800)
-                .title('GDP 2009 - 2021')
-                .subtitle('Gross Domestic Product (GDP) 2009-2021')
+                .title('GDP change 2009 - 2021')
+                .subtitle('Chain linked volumes, percentage change on previous period 2009-2021')
                 .nutsLevel(0)
                 .statSpark({
                     eurostatDatasetCode: 'tec00115',
-                    filters: { unit: 'CLV_PCH_PRE' },
-                    dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
-                    labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
+                    filters: { unit: 'CLV_PCH_PRE', freq: 'A' },
+                    dates: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                    labels: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
                 })
                 .sparkType('bar')
 
                 .sparkLineWidth(30)
-                .sparkLineHeight(35)
-                .sparkLineOffsets({ x: 0, y: -10 })
+                .sparkLineHeight(80)
+                .sparkLineOffsets({ x: 0, y: 5 })
                 .sparkLineStrokeWidth(3)
                 .sparkLineColor('#c44a4a')
 
