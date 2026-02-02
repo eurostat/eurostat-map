@@ -4,12 +4,13 @@ import * as Categorical from './map-types/map-categorical'
 import * as BivariateChoropleth from './map-types/choropleth/map-choropleth-bivariate'
 import * as TrivariateChoropleth from './map-types/choropleth/map-choropleth-trivariate'
 import * as StripeComposition from './map-types/map-stripe-composition'
-import * as PieCharts from './map-types/map-piecharts'
+import * as PieCharts from './map-types/map-pie-charts'
 import * as Sparklines from './map-types/map-sparklines'
 import * as FlowMap from './map-types/flow/map-flow'
 import * as Coxcomb from './map-types/map-coxcomb'
 import * as ValueByAlpha from './map-types/choropleth/map-value-by-alpha'
 import * as Mushroom from './map-types/proportional-symbol/mushrooms/map-mushroom.js'
+import * as Waffle from './map-types/map-waffle-charts.js'
 import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/labels'
 
@@ -45,6 +46,8 @@ export const map = function (type, config) {
         if (type == 'alpha' || type == 'valueByAlpha') return ValueByAlpha.map(config)
         //mushroom (Cheysson )
         if (type == 'mushroom') return Mushroom.map(config)
+        //waffle (Cheysson )
+        if (type == 'waffle') return Waffle.map(config)
 
         //add new map types here
         //if(type == "XX") return mapXX.map(config);

@@ -20,7 +20,8 @@
                 .nutsLevel(0)
                 //.width(600)
                 .gridCartogram(true)
-                .gridCartogramShape('hexagon')
+                //.gridCartogramShape('hexagon')
+                //.sparkLineOffsets({ x: -2, y: 90 }) //for hexagon grids
                 .nutsYear(2016)
                 .title('Population change 2009 - 2023')
                 .subtitle('Change per thousand inhabitants')
@@ -35,10 +36,11 @@
                     ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'] //labels
                 )
                 .sparkType('bar') //line, area, bar
+
                 .sparkLineWidth(29)
                 .sparkLineHeight(100)
                 .sparkLineStrokeWidth(3)
-                .sparkLineOffsets({ x: -2, y: 90 })
+
                 // Color based on positive/negative values
                 .sparkLineColor((itemValue) => {
                     if (itemValue > 0) return 'blue'

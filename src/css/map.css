@@ -4,6 +4,7 @@
 @import './map-types/flow.css';
 @import './map-types/pie.css';
 @import './map-types/sparkline.css';
+@import './map-types/waffle.css';
 
 /* wrapper DOM */
 .em-map-wrapper {

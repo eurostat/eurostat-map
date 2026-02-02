@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            /* .em-grid-text:not(#em-grid-text-AL, #em-grid-text-EL, #em-grid-text-UK, #em-grid-text-BA, #em-grid-text-UA) {
+                transform: translate(0, 50px) !important;
+            } */
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('waffle')
+                .gridCartogram(true)
+                .gridCartogramCellPadding(30)
+
+                //if all sizes are the same
+                .waffleMinSize(40)
+                .waffleMaxSize(40)
+
+                //population by age
+                .nutsLevel(0)
+                .statWaffle({
+                    stat: {
+                        eurostatDatasetCode: 'tps00010',
+                        filters: { time: '2024' },
+                        unitText: 'Population',
+                    },
+                    categoryParameter: 'indic_de',
+                    categoryCodes: ['PC_Y0_14', 'PC_Y15_24', 'PC_Y25_49', 'PC_Y50_64', 'PC_Y65_79', 'PC_Y80_MAX'],
+                    categoryLabels: ['0-14', '15-24', '25-49', '50-64', '65-79', '80+'],
+                    categoryColors: ['#d73027', '#fc8d59', '#fee08b', '#d9ef8b', '#91cf60', '#1a9850'].reverse(),
+                    //totalCode: 'TOTAL',
+                })
+                .title('Age composition')
+                .legend({
+                    x: 10,
+                    y: 150,
+                    boxOpacity: 0.8,
+                    boxFill: 'white',
+                    //sizeLegend: { title: 'Population', titlePadding: 15 },
+                    sizeLegend: false,
+                    colorLegend: { title: 'Age groups', noData: false },
+                })
+                .seaFillStyle('white')
+                .coastalMarginColor('lightgray')
+                .drawGraticule(false)
+
+                //population by age
+                // .statWaffle( { eurostatDatasetCode: "demo_r_pjanaggr3", filters: { sex: "T", unit: "NR", time: "2019" }, unitText: "people" },
+                //     "age",
+                //     ["Y_LT15", "Y15-64", "Y_GE65"],
+                //     ["< 15", "15 to 64", "> 65"],
+                //     ["#33a02c", "#cab2d6", "#ff7f00"]
+                // )
+
+                //.legend({ x: 550, y: 10, title: 'Population by age' })
+
+                .build()
+        </script>
+    </body>
+</html>
