@@ -1,0 +1,70 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+
+        <form id="nuts-level">
+            <label>
+                <input type="radio" name="nutsLevel" value="0" checked />
+                NUTS 0
+            </label>
+            <br />
+
+            <label>
+                <input type="radio" name="nutsLevel" value="1" />
+                NUTS 1
+            </label>
+            <br />
+
+            <label>
+                <input type="radio" name="nutsLevel" value="2" />
+                NUTS 2
+            </label>
+        </form>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // livestock
+            //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/med_ag33?format=JSON&unit=NR&animals=A4100&lang=EN
+
+            let map = eurostatmap
+                .map('ps')
+                .dorling(true)
+                .title('Livestock')
+                .subtitle('Number of animals, 2023')
+                .scale('60M')
+                .stat('size', {
+                    //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/migr_resbc1?format=json&lang=en&time=2023&unit=PER&isco08=TOTAL&citizen=TOTAL&decision=GRNT&geoLevel=country<!doctype html>
+                    eurostatDatasetCode: 'agr_r_animal',
+                    unitText: 'sheep',
+                    filters: { time: '2024', animals: 'A4100' },
+                })
+                .nutsLevel(0)
+                .psShape('circle')
+                .psMinSize(5)
+                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psStrokeWidth(1)
+                .psStroke('white')
+                .psFillOpacity(1)
+                .psStrokeOpacity(0.9)
+                .zoomExtent([1, 10])
+                .legend({ title: 'Sheep', x: 580, y: 20 })
+
+            map.build()
+        </script>
+
+        <script>
+            document.querySelectorAll('input[name="nutsLevel"]').forEach((radio) => {
+                radio.addEventListener('change', (e) => {
+                    console.log('Selected NUTS level:', e.target.value)
+                    const nutsLevel = parseInt(e.target.value, 10)
+                    map.nutsLevel(nutsLevel).build()
+                })
+            })
+        </script>
+    </body>
+</html>

@@ -633,12 +633,12 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         // d3 zoom
-        if (out.zoomExtent() || out.zoomButtons_) {
+        if (out.zoomExtent_ || out.zoomButtons_) {
             if (!out.zoomExtent_) {
                 //console.log('Zoom buttons are enabled, but no zoom extent is defined. Setting default extent to map.zoomExtent([1,10]).')
                 out.zoomExtent_ = [1, 10]
-                defineMapZoom(out)
             }
+            defineMapZoom(out)
         }
 
         // prepare group for proportional symbols, with centroids

@@ -7,6 +7,10 @@ import { select } from 'd3-selection'
  * @return {void}
  */
 export function appendCirclesToMap(map, sizeData, out) {
+    // Disable pointer events on containers during transition to prevent
+    // hover events from firing before fill___ is properly set
+    map.svg().selectAll('g.em-centroid').style('pointer-events', 'none')
+
     // Append circles to each symbol container
     const circles = map
         .svg()
@@ -20,7 +24,6 @@ export function appendCirclesToMap(map, sizeData, out) {
         .attr('stroke', out.psStroke_)
         .attr('fill-opacity', out.psFillOpacity_)
         .attr('stroke-opacity', out.psStrokeOpacity_)
-        .style('pointer-events', 'none') // disable interaction during transition
         .transition()
         .duration(out.transitionDuration_)
         .attr('r', function (d) {
@@ -31,8 +34,8 @@ export function appendCirclesToMap(map, sizeData, out) {
             return radius
         })
         .on('end', function () {
-            // Re-enable after animation completes
-            select(this).style('pointer-events', null)
+            // Re-enable pointer events on the container after animation completes
+            select(this.parentNode).style('pointer-events', null)
         })
 
     return circles

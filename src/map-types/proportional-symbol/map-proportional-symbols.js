@@ -200,7 +200,20 @@ export const map = function (config) {
             setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
             appendLabelsToSymbols(map, sizeData)
-            addMouseEvents(map, out)
+
+            // Mouse events are added after transitions complete
+            // The symbol append functions (appendCirclesToMap, etc.) handle this via .on('end')
+            // We need to wait for all transitions to complete before adding mouse events
+            const transitionDuration = out.transitionDuration_ || 0
+            if (transitionDuration > 0) {
+                // Wait for transitions to complete
+                setTimeout(() => {
+                    addMouseEvents(map, out)
+                }, transitionDuration + 100)
+            } else {
+                // No transition, add events immediately
+                addMouseEvents(map, out)
+            }
 
             // Update labels for statistical values if required
             if (out.labels_?.values) {
@@ -347,8 +360,14 @@ export const map = function (config) {
                 }
             })
             .attr('fill___', function () {
-                let fill = select(this).style('fill')
-                return fill // save for legend mouseover
+                // Set fill___ to the same value as fill (don't read back style, as it may not be applied yet during transitions)
+                if (out.classifierColor_) {
+                    const ecl = select(this.parentNode).attr('ecl')
+                    if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
+                    return out.psClassToFillStyle_(ecl, out.psClasses_)
+                } else {
+                    return out.psFill_
+                }
             })
     }
 
