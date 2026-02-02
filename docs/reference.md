@@ -836,9 +836,9 @@ Example:
 ```javascript
 const map = eurostatmap
     .map('mushroom')
+    .dorling(true) // prevents overlapping using d3-force
+    .mushroomOrientation('vertical')
     .nutsLevel(2)
-    .title('basic test')
-    .dorling(true)
     .stat('v1', {
         eurostatDatasetCode: 'demo_r_pjangrp3',
         filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
@@ -849,7 +849,15 @@ const map = eurostatmap
         unitText: 'Euro per inhabitant',
         filters: { unit: 'EUR_HAB', time: '2022' },
     })
-    .zoomExtent([1, 1000])
+    // you can define independent sizing functions for each semi-circle like so:
+    .mushroomSizeScaleFunctionV1(function (value) {
+        // custom size scale function for v1 side
+        return Math.sqrt(value) * 0.02
+    })
+    .mushroomSizeScaleFunctionV2(function (value) {
+        // custom size scale function for v2 side
+        return Math.cbrt(value) * 0.08
+    })
     .build()
 ```
 

@@ -248,7 +248,7 @@ function getValues(cfg, scale, hasIndependentScales, side) {
     // explicit values → bounds
     const vMin = Math.min(...values)
     const vMax = Math.max(...values)
-    return values.length > 1 ? [vMax, vMin] : [values[0]]
+    return values.length > 1 ? values : [vMax, vMin]
 }
 
 function getLabels(cfg, legendValues, hasIndependentScales, side) {
