@@ -6,14 +6,23 @@ import './ewc-singleselect.js'
 ;(async () => {
     await customElements.whenDefined('ewc-singleselect')
     // select the element that exists in the page
-    const sel = document.querySelector('#mySelect')
-    if (!sel) return console.warn('#mySelect not found')
+    const unitSelect = document.querySelector('#unitSelect')
+    if (!unitSelect) return console.warn('#unitSelect not found')
+    const naceSelect = document.querySelector('#NACESelect')
+    if (!naceSelect) return console.warn('#NACESelect not found')
 
     // listen for selection events
-    sel.addEventListener('option-selected', (e) => {
+    unitSelect.addEventListener('option-selected', (e) => {
         //console.log('option-selected', e.detail);
-        const code = e.detail.option.code
+        const unitCode = e.detail.option.code
         // rebuild everything for the new city
-        updateMap(code)
+        updateMap(unitCode, naceSelect.selectedOption)
+    })
+
+    naceSelect.addEventListener('option-selected', (e) => {
+        //console.log('option-selected', e.detail);
+        const naceCode = e.detail.option.code
+        // rebuild everything for the new city
+        updateMap(unitSelect.selectedOption, naceCode)
     })
 })()

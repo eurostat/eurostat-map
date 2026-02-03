@@ -30,9 +30,10 @@ const spaceAsThousandSeparator = (number) => {
 }
 let map
 const isMobile = window.innerWidth <= 768
-export function initMap(code) {
+export function initMap(unitCode, naceCode) {
     const mapWidth = isMobile ? window.innerWidth : 700
     const mapHeight = isMobile ? Math.round(window.innerHeight - 160) : 550
+    const config = configs[unitCode]
 
     map = eurostatmap
         .map('ps')
@@ -72,39 +73,39 @@ export function initMap(code) {
         //STATS
         .stat('size', {
             eurostatDatasetCode: 'sbs_r_nuts2021',
-            unitText: configs[code].unitText,
+            unitText: config.unitText,
             filters: {
-                INDIC_SBS: code,
+                INDIC_SBS: unitCode,
                 TIME: '2023',
-                nace_r2: ['B', 'D', 'E'], // Array for multiple values
+                nace_r2: naceCode, // Array for multiple values
             },
         })
 
         //legend
         .legend({
-            title: configs[code].title,
+            title: config.title,
             x: 10,
             y: 110,
             boxOpacity: 0.9,
-            sizeLegend: { labelFormatter: getLegendLabelFormatter(code) },
+            sizeLegend: { labelFormatter: getLegendLabelFormatter(unitCode) },
         })
 
         //tooltip
         .tooltip({
-            textFunction: getTooltipFunction(code),
+            textFunction: getTooltipFunction(unitCode),
         })
 
     map.build()
 }
 
-export function updateMap(code) {
+export function updateMap(unitCode, naceCode) {
     map.stat('size', {
         eurostatDatasetCode: 'sbs_r_nuts2021',
-        unitText: configs[code].unitText,
+        unitText: configs[unitCode].unitText,
         filters: {
-            INDIC_SBS: code,
+            INDIC_SBS: unitCode,
             TIME: '2023',
-            nace_r2: ['B', 'D', 'E'],
+            nace_r2: naceCode,
         },
     })
 
@@ -171,4 +172,4 @@ const getTooltipFunction = (code) => {
 }
 
 // Initialize the map with a default code
-initMap('LOC_NR')
+initMap('LOC_NR', 'B')

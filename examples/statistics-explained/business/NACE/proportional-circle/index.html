@@ -13,7 +13,7 @@
             <div id="dropdown-container">
                 <div id="dropdown-label">Select a variable:</div>
                 <ewc-singleselect
-                    id="mySelect"
+                    id="unitSelect"
                     options='[
     [
     { "name": "Local units", "code": "LOC_NR", "status": "active" },
@@ -23,6 +23,25 @@
   ]'
                     defaultOption="LOC_NR"
                     activeOption="LOC_NR"
+                    dropdownHeight="200px"
+                    selectedLabel="Select below"
+                    invertColors="false"
+                    searchMode=""
+                ></ewc-singleselect>
+            </div>
+            <div id="dropdown-container">
+                <div id="dropdown-label">Select a NACE section:</div>
+                <ewc-singleselect
+                    id="NACESelect"
+                    options='[
+    [
+    { "name": "Mining and quarrying", "code": "B", "status": "active" },
+    { "name": "Electricity, gas, steam and air conditioning supply", "code":"D", "status": "active" },
+    { "name": "Water supply; sewage, waste management and remediation activities", "code":"E", "status": "active" }
+    ]
+  ]'
+                    defaultOption="B"
+                    activeOption="B"
                     dropdownHeight="200px"
                     selectedLabel="Select below"
                     invertColors="false"
