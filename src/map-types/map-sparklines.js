@@ -39,8 +39,8 @@ export const map = function (config) {
     out.showOnlyWhenComplete_ = false
     out.sparkLineChartFunction_ = undefined
 
+    out.sparkYScale_ = undefined //custom Y scale
     out.statSpark_ = null
-    out.sparkHeightClassifier_ = null
 
     /**
      * Definition of getters/setters for all previously defined attributes.
@@ -279,7 +279,7 @@ export const map = function (config) {
         yMin -= padding
         yMax += padding
 
-        out.sparkYScale_ = scaleLinear().domain([yMin, yMax])
+        out.sparkYScale_ = out.sparkYScale_ || scaleLinear().domain([yMin, yMax])
 
         return out
     }
