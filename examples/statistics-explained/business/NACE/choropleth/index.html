@@ -3,17 +3,17 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Industry (excluding manufacturing) map</title>
+        <title>Industry (excluding manufacturing) by region</title>
         <link rel="stylesheet" href="styles.css" />
     </head>
 
     <body>
         <div id="container">
-            <div class="map-title">Industry (excluding manufacturing), 2023</div>
+            <div class="map-title">Industry, excluding manufacturing, by region, 2023</div>
             <div id="dropdown-container">
-                <div id="dropdown-label">Select a variable:</div>
+                <div id="dropdown-label">Select a unit of measurement:</div>
                 <ewc-singleselect
-                    id="mySelect"
+                    id="unitSelect"
                     options='[
     [
     { "name": "Persons employed per local unit", "code": "EMP_PLOC_NR", "status": "active" },
@@ -23,6 +23,25 @@
   ]'
                     defaultOption="EMP_PLOC_NR"
                     activeOption="EMP_PLOC_NR"
+                    dropdownHeight="200px"
+                    selectedLabel="Select below"
+                    invertColors="false"
+                    searchMode=""
+                ></ewc-singleselect>
+            </div>
+            <div id="dropdown-container">
+                <div id="dropdown-label">Select a NACE section:</div>
+                <ewc-singleselect
+                    id="NACESelect"
+                    options='[
+    [
+    { "name": "Mining and quarrying", "code": "B", "status": "active" },
+    { "name": "Electricity, gas, steam and air conditioning supply", "code":"D", "status": "active" },
+    { "name": "Water supply; sewage, waste management and remediation activities", "code":"E", "status": "active" }
+    ]
+  ]'
+                    defaultOption="B"
+                    activeOption="B"
                     dropdownHeight="200px"
                     selectedLabel="Select below"
                     invertColors="false"

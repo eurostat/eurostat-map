@@ -2,16 +2,30 @@ const configs = {
     EMP_PLOC_NR: {
         legendTitle: 'Number of persons',
         colors: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
-        thresholds: [5, 10, 15, 20, 30, 209],
-        nbClasses: 7,
+        thresholds: {
+            B: [10, 15, 30, 60, 130, 209],
+            D: [5, 10, 15, 20, 30, 55],
+            E: [5, 10, 15, 20, 30, 60],
+        },
+        legendMaxLabel: {
+            B: ' (Śląskie)',
+            D: ' (Malta)',
+            E: ' (Ceuta)',
+        },
         unitText: 'people per unit',
         multiplier: 1, // no conversion needed
     },
     LC_EMP_LOC_TEUR: {
         legendTitle: 'Euro',
         colors: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
-        thresholds: [15, 30, 45, 60, 75, 90, 100],
-        nbClasses: 9,
+        thresholds: {
+            B: [20, 30, 40, 50, 70, 95, 157],
+            D: [15, 25, 40, 50, 60, 80, 117],
+            E: [15, 20, 30, 35, 40, 45, 55],
+        },
+        legendMaxLabel: {
+            E: '',
+        },
         unitText: 'euro per person',
         multiplier: 1000, // convert thousands to actual euros
     },
@@ -24,9 +38,10 @@ const spaceAsThousandSeparator = (number) => {
 const isMobile = window.innerWidth <= 768
 
 let map
-export function initMap(code) {
+export function initMap(unitCode, naceCode) {
     const mapWidth = isMobile ? window.innerWidth : 700
     const mapHeight = isMobile ? Math.round(window.innerHeight - 160) : 550
+    const config = configs[unitCode]
 
     map = eurostatmap
         .map('ch')
@@ -38,10 +53,10 @@ export function initMap(code) {
         .insetsButton(true)
 
         //classification
-        .colors(configs[code].colors)
-        .thresholds(configs[code].thresholds)
-        .numberOfClasses(configs[code].nbClasses)
-        .classificationMethod(configs[code].thresholds ? 'threshold' : 'jenks')
+        .colors(config.colors)
+        .thresholds(config.thresholds[naceCode])
+        .numberOfClasses(config.colors.length)
+        .classificationMethod(config.thresholds ? 'threshold' : 'jenks')
 
         //SE settings
         .footer(true)
@@ -57,21 +72,22 @@ export function initMap(code) {
         )
         .footnoteTooltipText(false)
 
-        .showZoomButtons(true)
+        .zoomButtons(true)
         .insets('default')
+        .insetBoxWidth(190)
 
         .nutsLevel(2)
         .stat({
             eurostatDatasetCode: 'sbs_r_nuts2021',
-            unitText: configs[code].unitText,
+            unitText: config.unitText,
             filters: {
-                INDIC_SBS: code,
+                INDIC_SBS: unitCode,
                 TIME: '2023',
-                nace_r2: ['B', 'D', 'E'],
+                nace_r2: naceCode,
             },
         })
         .legend({
-            title: configs[code].legendTitle,
+            title: config.legendTitle,
             x: 5,
             y: isMobile ? 10 : 100,
             boxPadding: 4,
@@ -80,38 +96,39 @@ export function initMap(code) {
             maxMin: true,
             maxMinTickLength: 15,
             maxMinRegionLabels: false,
-            maxMinLabels: ['', ''],
-            labelFunction: getLegendLabelFunction(code),
+            maxMinLabels: config.legendMaxLabel[naceCode] ? ['', config.legendMaxLabel[naceCode] || ''] : ['', ''],
+            labelFunction: getLegendLabelFunction(unitCode),
         })
         .tooltip({
-            textFunction: getTooltipFunction(code),
+            textFunction: getTooltipFunction(unitCode),
         })
 
     map.build()
 }
 
-export function updateMap(code) {
+export function updateMap(unitCode, naceCode) {
+    const config = configs[unitCode]
     //classification
-    map.colors(configs[code].colors)
-        .thresholds(configs[code].thresholds)
-        .numberOfClasses(configs[code].nbClasses)
-        .classificationMethod(configs[code].thresholds ? 'threshold' : 'jenks')
+    map.colors(config.colors)
+        .thresholds(config.thresholds[naceCode])
+        .numberOfClasses(config.colors.length)
+        .classificationMethod(config.thresholds ? 'threshold' : 'jenks')
 
     //stats
     map.stat({
         eurostatDatasetCode: 'sbs_r_nuts2021',
-        unitText: configs[code].unitText,
+        unitText: config.unitText,
         filters: {
-            INDIC_SBS: code,
+            INDIC_SBS: unitCode,
             TIME: '2023',
-            nace_r2: ['B', 'D', 'E'],
+            nace_r2: naceCode,
         },
     })
     map.updateStatData()
 
     //update legend
     map.legend({
-        title: configs[code].legendTitle,
+        title: config.legendTitle,
         x: 5,
         y: isMobile ? 10 : 100,
         boxPadding: 4,
@@ -120,13 +137,13 @@ export function updateMap(code) {
         maxMin: true,
         maxMinTickLength: 15,
         maxMinRegionLabels: false,
-        maxMinLabels: ['', ''],
-        labelFormatter: getLegendLabelFunction(code),
+        maxMinLabels: config.legendMaxLabel[naceCode] ? ['', config.legendMaxLabel[naceCode] || ''] : ['', ''],
+        labelFormatter: getLegendLabelFunction(unitCode),
     })
 
     //update tooltip
     map.tooltip({
-        textFunction: getTooltipFunction(code),
+        textFunction: getTooltipFunction(unitCode),
     })
 }
 
@@ -182,4 +199,4 @@ const getTooltipFunction = (code) => {
     }
 }
 
-initMap('EMP_PLOC_NR')
+initMap('EMP_PLOC_NR', 'B')

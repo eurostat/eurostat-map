@@ -25,7 +25,7 @@
                 .sparkType('line')
                 //.sparkLineOffsets({ x: 3, y: 22 })
                 .sparkLineWidth(25)
-                .sparkLineHeight(90)
+                .sparkLineHeight(50)
                 .sparkLineStrokeWidth(3)
                 .sparkLineColor('#c44a4a')
 
@@ -40,8 +40,19 @@
                 .sparkTooltipChart({
                     width: 150,
                     height: 50,
-                    margin: { left: 60, right: 40, top: 20, bottom: 40 },
+                    margin: { left: 30, right: 10, top: 20, bottom: 40 },
                     circleRadius: 1.5,
+                })
+                .legend({
+                    title: 'Inflation rate (%)',
+                    x: 0,
+                    y: 100,
+                    width: 200,
+                    noData: false,
+                    scaleLegend: {
+                        showMaxRegion: true, // shows the region with max value (default)
+                        showExampleChart: true, // also show the average line
+                    },
                 })
                 .build()
         </script>
