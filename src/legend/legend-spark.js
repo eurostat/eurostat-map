@@ -29,6 +29,8 @@ export const legend = function (map, config) {
         xAxisRotation: -45, // Rotation angle for X axis labels
         xAxisTickStep: 1, // show every tick by default
         margin: map.sparkTooltipChart_.margin, // Margins around the cell
+        lineOpacity: 0.5,
+        lineStrokeWidth: 1,
     }
 
     // No data legend configuration
@@ -214,8 +216,8 @@ export const legend = function (map, config) {
             .attr('d', (d) => lineGen(d.series))
             .attr('fill', 'none')
             .attr('stroke', map.sparkLineColor_ || '#000')
-            .attr('stroke-width', 1.5)
-            .attr('opacity', 0.55)
+            .attr('stroke-width', config.lineStrokeWidth || 1)
+            .attr('opacity', config.lineOpacity)
             .style('cursor', 'pointer')
 
         // -----------------------------------
@@ -242,7 +244,7 @@ export const legend = function (map, config) {
             })
             .on('mouseout', function () {
                 // reset styles
-                paths.attr('opacity', 0.35).attr('stroke-width', 0.6)
+                paths.attr('opacity', config.lineOpacity).attr('stroke-width', config.lineStrokeWidth)
 
                 if (map._tooltip) {
                     map._tooltip.mouseout()
