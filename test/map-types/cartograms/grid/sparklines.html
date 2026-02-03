@@ -43,24 +43,31 @@
                 .sparkLineColor((itemValue) => {
                     if (itemValue > 0) return 'blue'
                     if (itemValue < 0) return 'red'
-                    return '#999'
+                    return '#777777'
                 })
                 .sparkLineOpacity(0.8)
                 .sparkLineCircleRadius(0)
                 //.sparkLineOffsets({ x: -26, y: -15 })
                 //.sparkLineOffsets({ x: 0, y: 10 })
-                .tooltip({
-                    xOffset: 30,
-                    yOffset: 150,
-                    fontSize: '12px',
-                    maxWidth: Math.min(400, window.innerWidth),
-                })
                 // .sparkTooltipChart({
                 //     width: 150,
                 //     height: 50,
                 //     margin: { left: 30, right: 20, top: 30, bottom: 40 },
                 //     circleRadius: 1.5,
                 // })
+                .legend({
+                    title: 'Population change',
+                    x: 0,
+                    y: 100,
+                    width: 120,
+                    noData: false,
+                    scaleLegend: {
+                        xAxisRotation: -70,
+                        xAxisTickStep: 2, // show every 2nd tick
+                        showMaxRegion: true, // shows the region with max value (default)
+                        showExampleChart: true, // also show the average line
+                    },
+                })
                 .hoverColor('#ffa500')
                 .build()
         </script>

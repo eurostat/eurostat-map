@@ -156,6 +156,13 @@ export const map = function (config) {
         // Base filters (clone to avoid mutation)
         const baseFilters = filters ? { ...filters } : {}
 
+        //store
+        out._primaryDataset_ = {
+            eurostatDatasetCode,
+            filters: baseFilters,
+            type: 'statSpark',
+        }
+
         // Add one dataset config for each date
         for (let i = 0; i < configDates.length; i++) {
             const date = configDates[i]

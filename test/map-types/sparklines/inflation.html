@@ -18,25 +18,23 @@
                 .nutsLevel(0)
                 .statSpark({
                     eurostatDatasetCode: 'prc_hicp_aind',
-                    filters: { coicop: 'CP00' },
+                    filters: { coicop: 'CP00', unit: 'RCH_A_AVG' },
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                 })
                 .sparkType('line')
-                //.sparkLineOffsets({ x: 3, y: 22 })
+                .sparkLineOffsets({ x: 3, y: 5 })
                 .sparkLineWidth(25)
                 .sparkLineHeight(50)
                 .sparkLineStrokeWidth(3)
-                .sparkLineColor('#c44a4a')
+                .sparkLineColor((itemValue) => {
+                    if (itemValue > 0) return '#2644A7' //cobalt blue
+                    if (itemValue < 0) return '#E04040' //sunset red
+                    return '#999'
+                })
 
                 .sparkLineOpacity(0.7)
                 .sparkLineCircleRadius(0.1)
-                .tooltip({
-                    xOffset: 30,
-                    yOffset: 150,
-                    fontSize: '12px',
-                    maxWidth: Math.min(400, window.innerWidth),
-                })
                 .sparkTooltipChart({
                     width: 150,
                     height: 50,
@@ -47,13 +45,16 @@
                     title: 'Inflation rate (%)',
                     x: 0,
                     y: 100,
-                    width: 200,
+                    width: 120,
                     noData: false,
                     scaleLegend: {
+                        xAxisRotation: -70,
+                        xAxisTickStep: 2, // show every 2nd tick
                         showMaxRegion: true, // shows the region with max value (default)
                         showExampleChart: true, // also show the average line
                     },
                 })
+                .showSourceLink(true)
                 .build()
         </script>
     </body>
