@@ -68,6 +68,7 @@ export function initMap(unitCode, naceCode) {
         .zoomButtons(true)
         .insets('default')
         .insetsButton(true)
+        .insetBoxWidth(190)
         //end SE settings
 
         //STATS
