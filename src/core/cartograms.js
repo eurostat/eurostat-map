@@ -1,4 +1,4 @@
-import { select, selectAll } from 'd3-selection'
+import { select } from 'd3-selection'
 import { csvParseRows } from 'd3-dsv'
 
 // draw grid cartogram geometries

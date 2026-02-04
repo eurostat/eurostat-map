@@ -1,10 +1,8 @@
-import { max, min } from 'd3-array'
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
-
-import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground, updateCSSRule } from '../../core/utils.js'
+import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
 import { applyPatternFill } from '../../core/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
 import { applyClassificationToMap, defineClassifiers } from './ps-classification.js'

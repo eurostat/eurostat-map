@@ -4,7 +4,7 @@ import { schemeCategory10 } from 'd3-scale-chromatic'
 //schemeSet3 schemeDark2 schemePastel1 schemeTableau10
 import * as StatMap from '../core/stat-map'
 import * as StripeCompositionLegend from '../legend/legend-stripe-composition'
-import { getCSSPropertyFromClass, getRegionsSelector } from '../core/utils'
+import { getRegionsSelector } from '../core/utils'
 /**
  * Return a stripe composition map.
  *

@@ -2,14 +2,7 @@ import { select, selectAll } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
-import {
-    getBBOXAsGeoJSON,
-    executeForAllInsets,
-    getFontSizeFromClass,
-    getParameterByName,
-    convertRectanglesToPaths,
-    getApproxCurrentGeoBbox,
-} from './utils'
+import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox } from './utils'
 import { appendAnnotations } from './annotations'
 import { addLabelsToMap, updateLabels, updateValuesLabels } from './labels'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -24,10 +17,9 @@ import { appendInsetsButton } from './buttons/insets-button'
 import { addPlacenameLabels } from './placenames.js'
 import { initProj4 } from './proj4.js'
 import { addEurostatLogo, addEurostatRibbon } from './logo.js'
-import { addCoastalMarginToMap, appendCoastalMargin } from './coastal-margin.js'
+import { appendCoastalMargin } from './coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './texts.js'
 import { addScalebarToMap } from './scalebar.js'
-import { standardDeviation } from 'simple-statistics'
 
 // set default d3 locale
 formatDefaultLocale({

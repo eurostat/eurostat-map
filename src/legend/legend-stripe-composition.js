@@ -1,7 +1,6 @@
 import { select } from 'd3-selection'
-import { format } from 'd3-format'
 import * as Legend from './legend'
-import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
+import { executeForAllInsets } from '../core/utils'
 
 /**
  * A legend for choropleth maps

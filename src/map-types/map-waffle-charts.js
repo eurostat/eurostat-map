@@ -5,7 +5,6 @@ import * as StatMap from '../core/stat-map'
 import * as WaffleChartLegend from '../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../core/dorling/dorling'
-import { adjustGridCartogramTextLabels } from '../core/cartograms'
 
 /**
  * Returns a proportional waffle chart map.

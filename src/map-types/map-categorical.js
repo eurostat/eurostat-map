@@ -1,4 +1,4 @@
-import { select, style } from 'd3-selection'
+import { select } from 'd3-selection'
 import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'

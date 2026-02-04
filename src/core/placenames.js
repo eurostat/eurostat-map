@@ -1,7 +1,5 @@
-import { select } from 'd3-selection'
 import { csv } from 'd3-fetch'
 import { projectToMap } from './proj4'
-import { get } from 'idb-keyval'
 
 const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
     ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
@@ -113,8 +111,8 @@ const getFilteredPlacenames = function (out) {
 
         filtered.push({
             ...d,
-            screenX: sx,   // unchanged
-            screenY: sy,   // unchanged
+            screenX: sx, // unchanged
+            screenY: sy, // unchanged
             sizeFactor: resolution > r1 ? 1 : 1.1,
         })
 
@@ -124,7 +122,6 @@ const getFilteredPlacenames = function (out) {
     console.log(`After filtering, ${filtered.length} placenames remain.`)
     return filtered
 }
-
 
 /**
  * Recompute label positions & size on zoom/pan

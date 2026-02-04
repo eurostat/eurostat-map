@@ -4,7 +4,7 @@
 // D3 diverging scales (d3.scaleDiverging(...).domain([-60, 0, 38.7]))
 import { pointer, select } from 'd3-selection'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
-import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
+import { getLegendRegionsSelector } from '../core/utils'
 
 // All of the above with or without .valueTransform / .valueUntransform
 export function createContinuousLegend(out, baseX, baseY) {

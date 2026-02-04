@@ -5,7 +5,6 @@ import { executeForAllInsets } from './utils'
 import { kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
 import { get, set } from 'idb-keyval'
-import { hideSpinner, showSpinner } from './spinner'
 
 //helpers for when indexedDB is not supported
 const memCache = new Map()

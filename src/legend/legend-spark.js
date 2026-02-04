@@ -1,7 +1,7 @@
-import { select, selectAll } from 'd3-selection'
+import { select } from 'd3-selection'
 import { scaleLinear } from 'd3-scale'
 import { axisLeft, axisBottom } from 'd3-axis'
-import { line, area } from 'd3-shape'
+import { line } from 'd3-shape'
 import * as Legend from './legend'
 
 /**

@@ -1,4 +1,4 @@
-import { create, select } from 'd3-selection'
+import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'

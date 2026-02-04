@@ -1,4 +1,3 @@
-import { select } from 'd3-selection'
 import { arc } from 'd3-shape'
 import * as Legend from './legend'
 import { spaceAsThousandSeparator } from '../core/utils'
