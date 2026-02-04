@@ -1,5 +1,5 @@
-import { color, scaleLinear } from 'd3'
-
+import { scaleLinear } from 'd3-scale'
+import { color } from 'd3-color'
 // Ensures a <g> element with the specified class exists within the container.
 // If it exists, clears its contents; if not, creates it.
 export function ensureGroup(container, className) {
