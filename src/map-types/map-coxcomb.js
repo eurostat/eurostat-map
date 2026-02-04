@@ -499,7 +499,6 @@ export const map = function (config) {
             .padRadius(0)
 
         // Stacked wedges
-        let lastEnded = false
         keys.forEach((key, ki) => {
             node.append('g')
                 .attr('class', 'em-coxcomb-chart')
