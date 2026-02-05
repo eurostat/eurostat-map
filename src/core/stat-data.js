@@ -184,9 +184,7 @@ export const statData = function (config) {
 
     /** Check if the stat data is ready. */
     out.isReady = function () {
-        //return out.hasData()
-        // Data is ready if _data_ has been explicitly set (even to empty object)
-        return out._data_ !== undefined
+        return out.hasData()
     }
 
     /** Some metadata */
