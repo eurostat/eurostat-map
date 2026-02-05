@@ -363,8 +363,8 @@
                     //.psFill('red')
                     .svgId('mappy')
                     .containerId('container')
-                    .legend({ x: 10, y: 150 })
-                    .nutsLevel(config.nutsLevel)
+                    //.legend({ x: 10, y: 150 })
+                    .nutsLevel('mixed')
                     .transitionDuration(0)
                     .insets(insetsCfg)
                     .insetBoxPosition(insetBoxPosition)
@@ -377,9 +377,12 @@
                     })
 
                 if (config.stats) {
-                    map.statData().setData(config.stats)
+                    map.nutsLevel(config.nutsLevel)
+                    map.statData().setData({ ES: 1 })
                 } else {
-                    map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                    //map.statData().setData({})
+                    map.nutsLevel(3)
+                    map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 }
                 //map.statData().setData(exampleData);
 
