@@ -28,7 +28,7 @@ export const map = function (config) {
     out.sparkTooltipChart_ = {
         width: 150,
         height: 80,
-        margin: { left: 40, right: 20, top: 20, bottom: 40 },
+        margin: { left: 40, right: 20, top: 10, bottom: 40 },
         circleRadius: 1.5,
     }
     out.sparkLineOffsets_ = { x: 0, y: 0 }

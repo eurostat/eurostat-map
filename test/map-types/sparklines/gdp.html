@@ -13,8 +13,8 @@
                 .map('sparkline')
                 .gridCartogram(true)
                 //.width(800)
-                .title('GDP change 2009 - 2021')
-                .subtitle('Chain linked volumes, percentage change on previous period 2009-2021')
+                .title('GDP change 2014 - 2024')
+                .subtitle('Chain linked volumes, percentage change on previous period 2014-2024')
                 .nutsLevel(0)
                 .statSpark({
                     eurostatDatasetCode: 'tec00115',
@@ -41,17 +41,18 @@
 
                 .sparkLineOpacity(0.7)
                 .sparkLineCircleRadius(1)
-                .tooltip({
-                    xOffset: 30,
-                    yOffset: 150,
-                    fontSize: '12px',
-                    maxWidth: Math.min(400, window.innerWidth),
-                })
-                .sparkTooltipChart({
+                .legend({
+                    title: 'GDP change (%)',
+                    x: 0,
+                    y: 100,
                     width: 150,
-                    height: 50,
-                    margin: { left: 60, right: 40, top: 20, bottom: 40 },
-                    circleRadius: 1.5,
+                    noData: false,
+                    scaleLegend: {
+                        xAxisRotation: -45,
+                        xAxisTickStep: 2, // show every 2nd tick
+                        showMaxRegion: true, // shows the region with max value (default)
+                        showExampleChart: true, // also show the average line
+                    },
                 })
                 .build()
         </script>

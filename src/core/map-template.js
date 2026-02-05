@@ -181,9 +181,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.showSourceLink_ = true
 
     //default copyright and disclaimer text
-    out.footnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap' //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
-    out.footnoteTooltipText_ =
+    out.defaultFootnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+    out.defaultFootnoteTooltipText_ =
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
+    out.footnote_ = out.defaultFootnote_ //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
+    out.footnoteTooltipText_ = out.defaultFootnoteTooltipText_
     out.footnoteWrap_ = false //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined
 
@@ -605,7 +607,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // separate logic for cartograms
         if (out.gridCartogram_ == true) {
             buildGridCartogramBase(out)
-            out.footnote_ = false //dont need copyright
+            if (out.footnote_ == out.defaultFootnote_) out.footnote_ = false //dont need copyright for grid cartograms
+            if (out.footnoteTooltipText_ == out.defaultFootnoteTooltipText_) out.footnoteTooltipText_ = false
         } else {
             // default geographic logic
 

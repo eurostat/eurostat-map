@@ -1,3 +1,10 @@
+.em-grid-cell {
+    fill: #e1e1e1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    cursor: pointer !important;
+}
+
 .em--coxcomb .em-grid-cell,
 .em--spark .em-grid-cell {
     /* fill: navajowhite; */

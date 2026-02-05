@@ -1,14 +1,10 @@
 /* STYLING OF NUTS REGIONS AND BOUNDARIES */
 /* Default region fill */
-.em-cntrg,
-.em-nutsrg,
-.em-grid-cell {
+.em-nutsrg {
     fill: #e1e1e1;
 }
 
 .em-nutsrg,
-.em-cntrg,
-.em-grid-cell,
 #em-user-regions {
     cursor: pointer !important;
 }
@@ -29,38 +25,18 @@
     stroke-opacity: 0.5;
 }
 
-/* all boudnaries and regions linecap/linejoin */
+/* all NUTS boundaries and regions */
 #em-nutsbn,
-.em-cntbn,
-.em-cntbn-halo,
 .em-bn-0,
 .em-bn-1,
 .em-bn-2,
 .em-bn-3,
-.em-kosovo-bn,
-.em-bn-co,
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'],
-.em-cntrg,
-.em-nutsrg,
-.em-grid-cell {
+.em-nutsrg {
     stroke-linecap: round;
     stroke-linejoin: round;
-}
-
-/* country boundaries */
-.em-cntbn {
-    stroke: #3f3f3f;
-    stroke-width: 1px;
-    stroke-opacity: 0.8;
-}
-
-/* country boundary halo (not coastline) */
-.em-cntbn-halo:not(.em-bn-co) {
-    stroke: white;
-    stroke-width: 3px;
-    stroke-opacity: 0.4;
 }
 
 /* NUTS boundaries stroke color */
@@ -73,33 +49,11 @@
     stroke: #474747;
 }
 
-/* coastal boundaries */
-.em-bn-co {
-    stroke: white;
-}
-
-/* kosovo */
-.em-kosovo-bn {
-    stroke: #000;
-    stroke-width: 0.15;
-}
-
-/* dont fill certain elements */
-.em-frame,
-.em-graticule,
-.em-cntbn,
-.em-cntbn-halo,
+/* dont fill border elements */
 .em-bn-0,
 .em-bn-1,
 .em-bn-2,
-.em-bn-3,
-.em-kosovo-bn,
-.em-bn-co {
+.em-bn-3 {
     fill: none;
     pointer-events: none;
 }
-
-/* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */
-/* g#em-cntbn > .em-bn-oth:not(.em-bn-co):not(.em-bn-cc):not(.em-bn-eu):not(.em-bn-efta) {
-    stroke-width: 0px;
-} */

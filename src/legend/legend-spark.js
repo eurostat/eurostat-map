@@ -3,6 +3,7 @@ import { scaleLinear } from 'd3-scale'
 import { axisLeft, axisBottom } from 'd3-axis'
 import { line } from 'd3-shape'
 import * as Legend from './legend'
+import { getRegionById } from '../core/utils'
 
 /**
  * A legend for sparkline maps.
@@ -19,7 +20,7 @@ export const legend = function (map, config) {
     // Scale legend configuration
     out.scaleLegend = {
         title: null, // Title for the scale legend section
-        titlePadding: 10, // Padding between title and chart
+        titlePadding: 5, // Padding between title and chart
         showExampleChart: false, // Whether to show an example sparkline (averaged data)
         showMaxRegion: true, // Whether to show the region with maximum value
         exampleData: null, // Custom example data, or null to use averaged data
@@ -131,13 +132,44 @@ export const legend = function (map, config) {
         const height = width * aspectRatio
 
         // -----------------------------------
+        // Collect ALL region series (WITH ID)
+        // -----------------------------------
+        const regionIds = getRegionIds(map)
+
+        const allSeries = regionIds
+            .map((id) => {
+                const series = []
+
+                for (let i = 0; i < dates.length; i++) {
+                    const statData = map.statData(dates[i])
+                    if (!statData) continue
+
+                    const s = statData.get(id)
+                    if (s && s.value != null && !isNaN(s.value)) {
+                        series.push({
+                            x: i,
+                            y: s.value,
+                        })
+                    }
+                }
+
+                return series.length ? { id, series } : null
+            })
+            .filter(Boolean)
+
+        // -----------------------------------
         // Scales
         // -----------------------------------
         const xScale = scaleLinear()
             .domain([0, dates.length - 1])
             .range([0, width])
 
-        const yScale = scaleLinear().domain(map.sparkYScale_.domain()).range([height, 0])
+        //const yScale = scaleLinear().domain(map.sparkYScale_.domain()).range([height, 0])
+        // -----------------------------------
+        // Y scale (LEGEND-SPECIFIC DOMAIN)
+        // -----------------------------------
+        const [yMin, yMax] = getLegendYDomain(allSeries)
+        const yScale = scaleLinear().domain([yMin, yMax]).range([height, 0])
 
         // -----------------------------------
         // Root group
@@ -169,32 +201,6 @@ export const legend = function (map, config) {
             .attr('dx', '-.8em')
             .attr('dy', '.15em')
             .attr('transform', `rotate(${config.xAxisRotation || -45})`)
-
-        // -----------------------------------
-        // Collect ALL region series (WITH ID)
-        // -----------------------------------
-        const regionIds = getRegionIds(map)
-
-        const allSeries = regionIds
-            .map((id) => {
-                const series = []
-
-                for (let i = 0; i < dates.length; i++) {
-                    const statData = map.statData(dates[i])
-                    if (!statData) continue
-
-                    const s = statData.get(id)
-                    if (s && s.value != null && !isNaN(s.value)) {
-                        series.push({
-                            x: i,
-                            y: s.value,
-                        })
-                    }
-                }
-
-                return series.length ? { id, series } : null
-            })
-            .filter(Boolean)
 
         // -----------------------------------
         // Line generator
@@ -232,8 +238,14 @@ export const legend = function (map, config) {
                 select(this).attr('opacity', 1).attr('stroke-width', 1.4).raise()
 
                 // tooltip
+                const region = getRegionById(map, d.id)
+                const regionName = region?.properties?.na || region?.properties?.name || d.id
                 if (map._tooltip) {
-                    map._tooltip.mouseover(`<b>${d.id}</b>`)
+                    map._tooltip.mouseover(`
+                <div class="em-tooltip-bar">
+                    <b>${regionName}</b> (${d.id})
+                </div>
+            `)
                     map._tooltip.mousemove(e)
                 }
             })
@@ -255,6 +267,41 @@ export const legend = function (map, config) {
         // Height bookkeeping
         // -----------------------------------
         legend._scaleLegendHeight = margin.top + height + margin.bottom
+    }
+
+    /**
+     * Compute a tight Y-domain for the sparkline legend,
+     * based only on the data actually drawn in the legend.
+     *
+     * @param {Array} allSeries - [{ id, series: [{ x, y }] }]
+     * @param {number} [paddingRatio=0.05] - Extra padding as ratio of range
+     * @returns {[number, number]}
+     */
+    function getLegendYDomain(allSeries, paddingRatio = 0.05) {
+        let min = +Infinity
+        let max = -Infinity
+
+        allSeries.forEach(({ series }) => {
+            series.forEach((d) => {
+                if (d.y == null || isNaN(d.y)) return
+                min = Math.min(min, d.y)
+                max = Math.max(max, d.y)
+            })
+        })
+
+        // Safety fallback
+        if (!isFinite(min) || !isFinite(max)) {
+            return [0, 1]
+        }
+
+        // Zero-span protection
+        if (min === max) {
+            const eps = min === 0 ? 1 : Math.abs(min) * 0.1
+            return [min - eps, max + eps]
+        }
+
+        const padding = (max - min) * paddingRatio
+        return [min - padding, max + padding]
     }
 
     /**

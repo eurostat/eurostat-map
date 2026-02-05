@@ -105,6 +105,17 @@ a text {
     stroke: grey;
 }
 
+/* Graticule styling */
+.em-graticule {
+    stroke: lightgray;
+    stroke-width: 1;
+}
+.em-frame,
+.em-graticule {
+    fill: none;
+    pointer-events: none;
+}
+
 .em-sea {
     fill: white;
     /* pointer-events: none; */
@@ -141,12 +152,6 @@ a text {
 .em-centroid,
 .em-coxcomb g {
     cursor: pointer !important;
-}
-
-/* Graticule styling */
-.em-graticule {
-    stroke: lightgray;
-    stroke-width: 1;
 }
 
 .em-flow-link {

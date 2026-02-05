@@ -698,31 +698,19 @@ export const getApproxCurrentGeoBbox = function (map) {
     return [map.position_.x - halfWidth, map.position_.y - halfHeight, map.position_.x + halfWidth, map.position_.y + halfHeight]
 }
 
-/**
- * Exact geographic bbox using the current projection (requires map._projection)
- * Computes bbox by inverting the screen corners to lon/lat.
- * @returns [minLon, minLat, maxLon, maxLat]
- */
-export const getExactCurrentGeoBbox = function (map) {
-    if (!map._projection) {
-        console.warn('getExactCurrentGeoBbox called before projection exists; returning approx bbox')
-        return getApproxCurrentGeoBbox(map)
+export function getRegionById(map, id) {
+    const svg = map.svg_ || map.svg()
+    let region = null
+
+    if (map.gridCartogram_) {
+        svg.selectAll('#em-grid-container .em-grid-cell').each(function (d) {
+            if (d?.properties?.id === id) region = d
+        })
+    } else {
+        svg.selectAll('path').each(function (d) {
+            if (d?.properties?.id === id) region = d
+        })
     }
 
-    const width = map.width_
-    const height = map.height_
-
-    const corners = [
-        [0, 0],
-        [width, 0],
-        [width, height],
-        [0, height],
-    ]
-
-    const projected = corners.map((pt) => map._projection.invert(pt)).filter(Boolean) // in case projection clips some corners
-
-    const lons = projected.map((p) => p[0])
-    const lats = projected.map((p) => p[1])
-
-    return [Math.min(...lons), Math.min(...lats), Math.max(...lons), Math.max(...lats)]
+    return region
 }

@@ -14,7 +14,7 @@
                 .gridCartogram(true)
                 //.width(800)
                 .title('Inflation rate 2009 - 2021')
-                .subtitle('Inflation rate (HICP) 2009-2021')
+                .subtitle('Average annual rate of change, 2009-2021')
                 .nutsLevel(0)
                 .statSpark({
                     eurostatDatasetCode: 'prc_hicp_aind',
@@ -38,11 +38,12 @@
                 .sparkTooltipChart({
                     width: 150,
                     height: 50,
-                    margin: { left: 30, right: 10, top: 20, bottom: 40 },
+                    margin: { left: 30, right: 10, top: 10, bottom: 40 },
                     circleRadius: 1.5,
                 })
+                .footnote('All-items HICP')
                 .legend({
-                    title: 'Inflation rate (%)',
+                    title: 'Percentage change (%)',
                     x: 0,
                     y: 100,
                     width: 160,
