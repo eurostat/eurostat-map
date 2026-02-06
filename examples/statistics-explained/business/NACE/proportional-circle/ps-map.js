@@ -124,7 +124,7 @@ export function updateMap(unitCode, naceCode) {
 
 const getLegendLabelFormatter = (code) => {
     const { multiplier } = configs[code]
-    return (value) => longFormatter.format(value * multiplier)
+    return (value) => compactFormatter.format(value * multiplier)
 }
 
 const getTooltipFunction = (code) => {

@@ -1,6 +1,6 @@
 const configs = {
     EMP_PLOC_NR: {
-        legendTitle: 'Number of persons',
+        legendTitle: 'Persons per unit',
         colors: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
         thresholds: {
             B: [10, 15, 30, 60, 130, 209],
