@@ -10,7 +10,7 @@ const configs = {
         multiplier: 1,
     },
     WAGE_LOC_MEUR: {
-        title: 'Million EUR',
+        title: 'Euro',
         unitText: 'euro',
         multiplier: 1000000, // MEUR → EUR
     },
