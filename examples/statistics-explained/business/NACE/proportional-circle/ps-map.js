@@ -113,12 +113,12 @@ export function updateMap(unitCode, naceCode) {
     map.updateStatData()
 
     map.legend({
-        title: configs[code].title,
-        sizeLegend: { labelFormatter: getLegendLabelFormatter(code) },
+        title: configs[unitCode].title,
+        sizeLegend: { labelFormatter: getLegendLabelFormatter(unitCode) },
     })
 
     map.tooltip({
-        textFunction: getTooltipFunction(code),
+        textFunction: getTooltipFunction(unitCode),
     })
 }
 
