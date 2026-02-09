@@ -40,7 +40,8 @@ const isMobile = window.innerWidth <= 768
 let map
 export function initMap(unitCode, naceCode) {
     const mapWidth = isMobile ? window.innerWidth : 700
-    const mapHeight = isMobile ? Math.round(window.innerHeight - 160) : 550
+    const headerHeight = 230
+    const mapHeight = isMobile ? Math.round(window.innerHeight - headerHeight) : 550
     const config = configs[unitCode]
 
     map = eurostatmap
@@ -73,6 +74,7 @@ export function initMap(unitCode, naceCode) {
         .footnoteTooltipText(false)
 
         .zoomButtons(true)
+        .zoomExtent(isMobile ? [0.7, 10] : [1, 10])
         .insets('default')
         .insetBoxWidth(190)
 

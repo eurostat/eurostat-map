@@ -15,8 +15,9 @@
 
 /* kosovo */
 .em-kosovo-bn {
-    stroke: #000;
+    stroke: #3f3f3f;
     stroke-width: 0.15;
+    stroke-opacity: 0.8;
 }
 
 /* country boundaries */

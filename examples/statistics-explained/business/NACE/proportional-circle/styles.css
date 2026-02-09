@@ -21,13 +21,13 @@ body {
     padding: 6px;
 }
 
-#dropdown-container {
+.dropdown-container {
     position: relative; /* or just remove position entirely */
     padding: 6px;
     padding-top: 0px;
 }
 
-#dropdown-label {
+.dropdown-label {
     font-size: 14px;
     font-weight: 100;
     color: #333;

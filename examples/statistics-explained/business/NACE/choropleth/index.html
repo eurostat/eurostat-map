@@ -9,45 +9,50 @@
 
     <body>
         <div id="container">
-            <div class="map-title">Businesses in non-manufacturing industries, by region, 2023</div>
-            <div id="dropdown-container">
-                <div id="dropdown-label">Select a variable:</div>
-                <ewc-singleselect
-                    id="unitSelect"
-                    options='[
+            <div class="header">
+                <div class="map-title">Businesses in non-manufacturing industries, by region, 2023</div>
+                <div class="dropdown-containers">
+                    <div class="dropdown-container">
+                        <div class="dropdown-label">Select a variable:</div>
+                        <ewc-singleselect
+                            id="unitSelect"
+                            options='[
     [
     { "name": "Persons employed per local unit", "code": "EMP_PLOC_NR", "status": "active" },
     { "name": "Labour costs per person employed in local unit", "code":"LC_EMP_LOC_TEUR", "status": "active" }
 
     ]
   ]'
-                    defaultOption="EMP_PLOC_NR"
-                    activeOption="EMP_PLOC_NR"
-                    dropdownHeight="200px"
-                    selectedLabel="Select below"
-                    invertColors="false"
-                    searchMode=""
-                ></ewc-singleselect>
-            </div>
-            <div id="dropdown-container">
-                <div id="dropdown-label">Select a NACE section:</div>
-                <ewc-singleselect
-                    id="NACESelect"
-                    options='[
+                            defaultOption="EMP_PLOC_NR"
+                            activeOption="EMP_PLOC_NR"
+                            dropdownHeight="200px"
+                            selectedLabel="Select below"
+                            invertColors="false"
+                            searchMode=""
+                        ></ewc-singleselect>
+                    </div>
+                    <div class="dropdown-container">
+                        <div class="dropdown-label">Select a NACE section:</div>
+                        <ewc-singleselect
+                            id="NACESelect"
+                            options='[
     [
     { "name": "Mining and quarrying", "code": "B", "status": "active" },
     { "name": "Electricity, gas, steam and air conditioning supply", "code":"D", "status": "active" },
     { "name": "Water supply; sewage, waste management and remediation activities", "code":"E", "status": "active" }
     ]
   ]'
-                    defaultOption="B"
-                    activeOption="B"
-                    dropdownHeight="200px"
-                    selectedLabel="Select below"
-                    invertColors="false"
-                    searchMode=""
-                ></ewc-singleselect>
+                            defaultOption="B"
+                            activeOption="B"
+                            dropdownHeight="200px"
+                            selectedLabel="Select below"
+                            invertColors="false"
+                            searchMode=""
+                        ></ewc-singleselect>
+                    </div>
+                </div>
             </div>
+
             <div id="map-container">
                 <svg id="map" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
