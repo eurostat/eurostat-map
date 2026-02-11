@@ -45,12 +45,15 @@ Based on D3 and designed for Eurostat data but compatible with custom geometries
 You can build an interactive statistical map with just a few lines of code:
 
 ```javascript
-eurostatmap
+const map = eurostatmap
     .map('choropleth') // Specify the map type
     .title('Population density in Europe') // Add a title
     .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' }) // Configure dataset
     .legend({ x: 500, y: 180, title: 'Density, people/km²' }) // Add a legend
     .build() // Build the map
+
+//you can use your own statistics like so:
+map.statData().setData({ ES: 3, FR: 2, DE: 5 })
 ```
 
 For a quick tutorial check out this notebook:
@@ -131,7 +134,7 @@ Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/euro
 
 ## Technical details
 
-Maps based on [NUTS regions](http://ec.europa.eu/eurostat/web/nuts/overview) rely on [Nuts2json API](https://github.com/eurostat/Nuts2json) and [TopoJSON](https://github.com/mbostock/topojson/wiki) format. Statistical data are accessed using [Eurostat STATISTICS API](https://wikis.ec.europa.eu/display/EUROSTATHELP/API+-+Getting+started+with+statistics+API) for [JSON-stat](https://json-stat.org/) data. The data are decoded and queried using [JSON-stat library](https://json-stat.com/). Custom data can also be used with map.statData().setData({ES:3,FR:2,DE:5}). Maps are rendered as SVG maps using [D3.js library](https://d3js.org/).
+Maps based on [NUTS regions](http://ec.europa.eu/eurostat/web/nuts/overview) rely on [Nuts2json API](https://github.com/eurostat/Nuts2json) and [TopoJSON](https://github.com/mbostock/topojson/wiki) format. Statistical data are accessed using [Eurostat STATISTICS API](https://wikis.ec.europa.eu/display/EUROSTATHELP/API+-+Getting+started+with+statistics+API) for [JSON-stat](https://json-stat.org/) data. The data are decoded and queried using [JSON-stat library](https://json-stat.com/). Custom data can also be used with `map.statData().setData({ES:3,FR:2,DE:5})`. Maps are rendered as SVG maps using [D3.js library](https://d3js.org/).
 
 ## About
 
