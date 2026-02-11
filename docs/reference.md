@@ -963,10 +963,10 @@ map.dorling(true)
 and customised like so:
 
 ```javascript
-    .dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
-    .dorlingIterations(1) // iterations of d3-force forceCollide
-    .dorlingWorker(false) // use a web worker for (non-animated) dorling cartograms to not block the main thread
-    .onDorlingProgress(undefined) // track dorling progress when using web workers
+.dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
+.dorlingIterations(1) // iterations of d3-force forceCollide
+.dorlingWorker(false) // use a web worker for (non-animated) dorling cartograms to not block the main thread
+.onDorlingProgress(undefined) // track dorling progress when using web workers
 ```
 
 removing the background map is optional but recommended:

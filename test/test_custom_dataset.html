@@ -10,7 +10,7 @@
         <script src="../build/eurostatmap.js"></script>
 
         <script>
-            const map = eurostatmap.map('ps').width(600).height(600).title('Population in Europe')
+            const map = eurostatmap.map('ch').width(600).height(600).title('Custom data test')
 
             map.nutsLevel('mixed')
 
@@ -28,10 +28,12 @@
                 FI: 1,
                 NO: 1,
                 IS: 1,
+                RS: 2,
             }
 
             map.statData('size').setData(data)
             map.statData('color').setData(data)
+            map.statData().setData(data)
             map.build()
         </script>
     </body>
