@@ -250,7 +250,7 @@ export const Geometries = function (map, withCenterPoints) {
                 .append('path')
                 .attr('d', pathFunction)
                 .attr('id', (cntrg) => {
-                    // add ids for RS and EL so that we can choose not to add statistical data to them.
+                    // add ids for RS and EL so that we can choose not to add statistical data to them (XK and Athos are in cntrg but not nutsrg so shouldnt be shown on choropleths).
                     const id = cntrg.properties.id
                     if (id == 'RS' || id == 'EL') {
                         return 'em-cntrg-' + id

@@ -674,8 +674,7 @@ export const getRegionsSelector = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions path'
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'
-    // Why not RS or EL? Because they are used for the background of the map and the legend, so we want to exclude them from region interactions.
-    //(XK and Athos are in cntrg but not nutsrg so shouldnt be shown on choropleths)
+    // Why not RS or EL? Because XK and Athos are in cntrg but not nutsrg so shouldnt be shown on choropleths
     //TODO: only exclude them for choropleths and not for interactions like tooltips and legends. This is a bit tricky because the same paths are used for both, but maybe we can add a class to them and exclude by class for choropleths?
     return '#em-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
 }
