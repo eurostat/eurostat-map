@@ -52,7 +52,7 @@ const map = eurostatmap
     .legend({ x: 500, y: 180, title: 'Density, people/km²' }) // Add a legend
     .build() // Build the map
 
-//you can use your own statistics like so:
+// Or you can use your own statistics like so:
 map.statData().setData({ ES: 3, FR: 2, DE: 5 })
 ```
 
@@ -123,12 +123,11 @@ Code examples:
 - [Stripe composition map](docs/reference.md#stripe-composition-map).
 - [Sparkline map](docs/reference.md#sparkline-map).
 - [Flow map](docs/reference.md#flow-map).
-- [Grid cartogram](docs/reference.md#grid-cartogram).
 - [Ternary choropleth](docs/reference.md#trivariate-choropleth-map).
-- [Coxcomb map](#coxcomb-map).
-- [Mushroom map](#mushroom-map).
-- [Waffle map](#waffle-map).
-- [Cartograms](#cartograms).
+- [Coxcomb map](docs/reference.md#coxcomb-map).
+- [Mushroom map](docs/reference.md#mushroom-map).
+- [Waffle map](docs/reference.md#waffle-map).
+- [Cartograms](docs/reference.md#cartograms).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
 
