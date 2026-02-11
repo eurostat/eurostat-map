@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap.map('ps').width(600).height(600).title('Population in Europe')
+
+            map.nutsLevel('mixed')
+
+            const data = {
+                DE: 12,
+                FR: 10,
+                ES: 8,
+                IT: 6,
+                PT: 9,
+                NL: 5,
+                BE: 4,
+                AT: 3,
+                SE: 2,
+                DK: 1,
+                FI: 1,
+                NO: 1,
+                IS: 1,
+            }
+
+            map.statData('size').setData(data)
+            map.statData('color').setData(data)
+            map.build()
+        </script>
+    </body>
+</html>

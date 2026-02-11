@@ -1,5 +1,3 @@
-
-
 <div align="center">
   <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
@@ -114,20 +112,26 @@ For detailed documentation see the **[API reference page](docs/reference.md)**.
 
 Code examples:
 
-- [choropleth map](docs/reference.md#choropleth-map),
-- [proportional symbol map](docs/reference.md#proportional-symbol-map),
-- [proportional pie chart map](docs/reference.md#proportional-pie-chart-map),
-- [categorical map](docs/reference.md#categorical-map).
-- [bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
-- [stripe composition map](docs/reference.md#stripe-composition-map).
-- [sparkline map](docs/reference.md#sparkline-map).
-- [flow map](docs/reference.md#flow-map).
+- [Choropleth map](docs/reference.md#choropleth-map).
+- [Proportional symbol map](docs/reference.md#proportional-symbol-map).
+- [Pie chart map](docs/reference.md#proportional-pie-chart-map).
+- [Categorical map](docs/reference.md#categorical-map).
+- [Bivariate choropleth map](docs/reference.md#bivariate-choropleth-map).
+- [Stripe composition map](docs/reference.md#stripe-composition-map).
+- [Sparkline map](docs/reference.md#sparkline-map).
+- [Flow map](docs/reference.md#flow-map).
+- [Grid cartogram](docs/reference.md#grid-cartogram).
+- [Ternary choropleth](docs/reference.md#trivariate-choropleth-map).
+- [Coxcomb map](#coxcomb-map).
+- [Mushroom map](#mushroom-map).
+- [Waffle map](#waffle-map).
+- [Cartograms](#cartograms).
 
-Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
+Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
 
 ## Technical details
 
-Maps based on [NUTS regions](http://ec.europa.eu/eurostat/web/nuts/overview) rely on [Nuts2json API](https://github.com/eurostat/Nuts2json) and [TopoJSON](https://github.com/mbostock/topojson/wiki) format. Statistical data are accessed using [Eurostat STATISTICS API](https://wikis.ec.europa.eu/display/EUROSTATHELP/API+-+Getting+started+with+statistics+API) for [JSON-stat](https://json-stat.org/) data. The data are decoded and queried using [JSON-stat library](https://json-stat.com/). Maps are rendered as SVG maps using [D3.js library](https://d3js.org/).
+Maps based on [NUTS regions](http://ec.europa.eu/eurostat/web/nuts/overview) rely on [Nuts2json API](https://github.com/eurostat/Nuts2json) and [TopoJSON](https://github.com/mbostock/topojson/wiki) format. Statistical data are accessed using [Eurostat STATISTICS API](https://wikis.ec.europa.eu/display/EUROSTATHELP/API+-+Getting+started+with+statistics+API) for [JSON-stat](https://json-stat.org/) data. The data are decoded and queried using [JSON-stat library](https://json-stat.com/). Custom data can also be used with map.statData().setData({ES:3,FR:2,DE:5}). Maps are rendered as SVG maps using [D3.js library](https://d3js.org/).
 
 ## About
 

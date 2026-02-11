@@ -298,6 +298,13 @@ Along with data-driven sizing, it is possible to colour the symbols according to
     .stat("size", { eurostatDatasetCode: "nama_10r_3gdp", unitText: "Million EUR", filters: { unit: "MIO_EUR", time: "2018" } })
 ```
 
+or with custom data:
+
+```javascript
+map.statData('size').setData({ ES: 5, FR: 2, DE: 3 })
+map.statData('color').setData({ ES: 2, FR: 7, DE: 5 })
+```
+
 It is also possible to prevent overlapping via the 'dorling' method:
 
 ```javascript
