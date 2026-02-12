@@ -8,3 +8,4 @@ Steps:
 2 open them in mapshaper
 3 export to topojson
 4 rename (find and replace all) NAME_ENGL and CNTR_ID to na and id
+5 rename CNTR_RG_20M_202X_4326 CNTR_RG_20M_2020_4326
