@@ -689,6 +689,9 @@ In addition to [the default legend parameters](#map-legend), stripe composition 
 
 ### Sparkline map
 
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/sparklines_ex.png)](https://eurostat.github.io/eurostat-map/examples/sparklines.html)
+
+
 A sparkline is a very small line chart, typically drawn without axes or coordinates. It presents the general shape of the variation (typically over time) in some measurement, such as temperature, in a simple and highly condensed way. A chart is drawn for each region showing the temporal variations of each.
 
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/sparklines.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/sparklines.html))
@@ -725,6 +728,8 @@ eurostatmap
 | _map_.**sparkLineChartFunction**([*value*]) | function          | undefined                                                                                         | you can specify your own logic for drawing the sparkline charts. Arguments passed to it are (node, data, width, height, isForTooltip) See [custom_chart_function](https://github.com/eurostat/eurostat-map/blob/master/test/map-types/sparklines/custom_chart_function.html) |
 
 ### Flow map
+
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/flow_ex.png)](https://eurostat.github.io/eurostat-map/test/map-types/flow-map/flights/flights.html)
 
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/flowmap.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/flowmap.html))
 

@@ -29,7 +29,7 @@
 <body>
   <div style="display: flex;">
     <svg id="map"></svg>
-    <svg id="legend"></svg>
+    <!-- <svg id="legend"></svg> -->
   </div>
 
 
@@ -70,7 +70,7 @@
         linkStrength: 0.7,
         linkIterations: 1
       })
-      .flowMaxWidth(20)
+      .flowMaxWidth(10)
       .flowMinWidth(0.1)
       .flowInternal(false)
 
@@ -79,6 +79,7 @@
       .flowOutlines(false)
 
       //nodes
+      .flowNodes(true)
       .flowNodeType('circle') // donut or circle
 
       // gradients
@@ -93,6 +94,7 @@
       //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
       .flowTopLocations(0) // Top N locations by flow volume
       .flowOpacity(0.1)
+      .flowColor('#000')
 
       .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
 
@@ -109,8 +111,10 @@
       })
       .nutsLevel(0)
       .legend({
-        svgId: 'legend',
+        //svgId: 'legend',
         width: 220,
+        x:20,
+        y:150,
         //title: 'Main legend title',
         boxOpacity: 0,
         flowWidthLegend: {
