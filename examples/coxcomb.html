@@ -15,8 +15,9 @@
 <body>
     <label for="dataset">Select a theme:</label>
     <select id="dataset" name="dataset">
-        <option value="death" selected>Causes of death</option>
-        <option value="tourism">Tourism</option>
+        <option value="tourism" selected>Tourism</option>
+        <option value="death" >Causes of death</option>
+
     </select>
     <br />
     <svg id="map"></svg>
@@ -139,7 +140,7 @@
         function buildMap(dataset) {
             const config = configs[dataset]
             const map = eurostatmap
-                .map('coxcomb').dorling(true)
+                .map('coxcomb').dorling(true).hoverColor('black')
                 .title(config.title)
                 .subtitle(config.subtitle)
                 .scale('60M')
@@ -163,7 +164,7 @@
         }
 
         // Initial render
-        let currentDataset = 'death'
+        let currentDataset = 'tourism'
         buildMap(currentDataset)
 
         // Rebuild on dropdown change

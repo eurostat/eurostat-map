@@ -797,6 +797,8 @@ const map = eurostatmap
 
 ### Coxcomb map
 
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/coxcomb_ex.png)](https://eurostat.github.io/eurostat-map/examples/coxcomb.html)
+
 Example:
 
 ```javascript
@@ -838,6 +840,8 @@ const map = eurostatmap
 
 ### Mushroom map
 
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/mushroom_ex.png)](https://eurostat.github.io/eurostat-map/examples/mushroom.html)
+
 Example:
 
 ```javascript
@@ -869,6 +873,8 @@ const map = eurostatmap
 ```
 
 ### Waffle map
+
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/waffle_ex.png)](https://eurostat.github.io/eurostat-map/examples/waffle.html)
 
 ```javascript
 const map = eurostatmap
@@ -1122,7 +1128,7 @@ Specify the text to be shown at the bottom of the map.
 | ----------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
 | _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                     |
-| _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatabasecode specified when using the stat() function). |
+| _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatasetcode specified when using the stat() function). |
 
 ## Map legend
 
