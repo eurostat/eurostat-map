@@ -19,7 +19,7 @@ export const legend = function (map, config) {
         marginTop: 15,
         labelFormatter: undefined, // function to format legend labels
         labels: null, // manual override for legend labels
-        color: '#333', // line color
+        color: '#616161', // line color
         orientation: 'horizontal', // 'vertical' or 'horizontal'
         segments: 3,
         width: 150,

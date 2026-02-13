@@ -43,8 +43,20 @@
                 .subtitle('flow map')
                 .flowGraph(exampleGraph)
                 .nutsLevel(0)
-                .legend({ x: 10, y: 110, title: 'Flow', boxOpacity: 0, histogram: false })
+                .legend({
+                    x: 10,
+                    y: 110,
+                    title: ' ',
+                    boxOpacity: 0,
+                    histogram: false,
+                    flowWidthLegend: { title: 'Euro', color: '#616161' },
+                    regionColorLegend: {
+                        title: ' ',
+                        marginTop:50
+                    },
+                })
                 .drawCoastalMargin(false)
+                .flowArrows(false).flowOpacity(0.8)
                 .insets(false)
                 .zoomExtent([1, 10])
                 .build()
