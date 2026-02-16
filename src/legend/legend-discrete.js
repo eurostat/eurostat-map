@@ -44,8 +44,8 @@ export function drawDiscreteLegend(out, x, y) {
 function getTitlePadding(out) {
     // Calculate the padding between the title and the first legend item
     const map = out.map
-    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : 0;
-    if (out.maxMin) p += 10; // extra padding if max/min labels are shown
+    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
+    if (out.maxMin) p += 10 // extra padding if max/min labels are shown
     return p
 }
 
@@ -80,8 +80,8 @@ function createThresholdsLegend(out, config) {
             globalMaxRegionId = stat.getMaxRegionId()
             // get region names from geometries
             const allFeatures = map.Geometries.getAllRegionFeatures()
-            const minFeature = allFeatures.find(f => f.properties.id === globalMinRegionId)
-            const maxFeature = allFeatures.find(f => f.properties.id === globalMaxRegionId)
+            const minFeature = allFeatures.find((f) => f.properties.id === globalMinRegionId)
+            const maxFeature = allFeatures.find((f) => f.properties.id === globalMaxRegionId)
             if (minFeature) globalMinRegion = minFeature.properties?.na || minFeature.properties?.na || globalMinRegionId
             if (maxFeature) globalMaxRegion = maxFeature.properties?.na || maxFeature.properties?.na || globalMaxRegionId
         }
@@ -119,13 +119,7 @@ function createThresholdsLegend(out, config) {
 
         // Append separation line
         if (i > 0) {
-            itemContainer
-                .append('line')
-                .attr('class', 'em-legend-separator')
-                .attr('x1', 0)
-                .attr('y1', y)
-                .attr('x2', out.sepLineLength)
-                .attr('y2', y)
+            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', out.sepLineLength).attr('y2', y)
         }
 
         // Append tick line at each internal boundary
@@ -145,11 +139,7 @@ function createThresholdsLegend(out, config) {
             const label = itemContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr(
-                    'x',
-                    Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) +
-                    (config.labelOffsets.x || 0)
-                )
+                .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
                 .attr('y', y + config.shapeHeight)
                 .attr('dy', '0.3em') // ~vertical centering
                 .text(() => {
@@ -163,8 +153,7 @@ function createThresholdsLegend(out, config) {
                 })
 
             // mark label so we can move it in drawDivergingLine
-            if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1)
-                label.attr('class', 'em-legend-label em-legend-label-divergence')
+            if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
         }
     }
 
@@ -172,9 +161,9 @@ function createThresholdsLegend(out, config) {
     if ((out.maxMin || config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
         const tickX1 = 0
         const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
-        const labelX = config.maxMinTickLength ?
-            Math.max(config.shapeWidth, config.sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0) :
-            Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
+        const labelX = config.maxMinTickLength
+            ? Math.max(config.shapeWidth, config.sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0)
+            : Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
 
         let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : '')
         let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
@@ -290,8 +279,6 @@ function highlightMinRegion(map, id) {
         //select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
     })
 }
-
-
 
 function createRangesLegend(out, config) {
     const map = out.map
