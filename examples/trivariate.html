@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Trivariate Choropleth Map Example</title>
+    </head>
+
+    <body>
+        <style>
+            .em-zoom-buttons {
+                transform: translate(1%, 15%);
+            }
+            .em-legend-subtitle {
+                font-size: 13px;
+            }
+            .em-ternary-annotation-line {
+                stroke: #949494;
+            }
+
+            .em-ternary-center-annotation-label {
+                fill: #4e4e4e;
+                text-anchor: end;
+            }
+            .subtitle-color {
+                font-weight: bold;
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('trivariateChoropleth')
+                .title('Age Structure')
+                .subtitle('Population distribution by age groups, 2023')
+                .nutsLevel(3)
+                .stat('v1', {
+                    label: 'Population 15–29',
+                    eurostatDatasetCode: 'demo_r_pjanind3',
+                    filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
+                    unitText: '%',
+                })
+                .stat('v2', {
+                    label: 'Population 45–64',
+                    eurostatDatasetCode: 'demo_r_pjanind3',
+                    filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
+                    unitText: '%',
+                })
+                .stat('v3', {
+                    label: 'Population 75+',
+                    eurostatDatasetCode: 'demo_r_pjanind3',
+                    filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
+                    unitText: '%',
+                })
+                .ternarySettings({
+                    hue: 160,
+                    chroma: 130,
+                    lightness: 40,
+                    contrast: 0,
+                    spread: 1.5,
+                    breaks: 5,
+                    meanCentering: true,
+                })
+                .legend({
+                    title: 'Age Structure',
+                    subtitle: `
+                        <tspan x="8" dy="0">Areas with more <tspan fill="#007b00" class='subtitle-color'>green</tspan> have a higher %</tspan>
+                        <tspan x="8" dy="1.2em"> of 15–29 year olds. Areas with more <tspan fill="#df0000" class='subtitle-color'>red</tspan> have </tspan>
+                        <tspan x="8" dy="1.2em">a higher % of 75+ year olds and areas with 
+                        <tspan x="8" dy="1.2em">more <tspan fill="#0067ff" class='subtitle-color'>blue</tspan> have a higher</tspan> % of 45–64 year olds.</tspan>
+                        <tspan x="8" dy="1.2em">Hover your mouse over the legend to explore it.</tspan>
+                    `,
+                    x: 500,
+                    y: 3,
+                    boxOpacity: 0.99,
+                    width: 250,
+                    height: 280,
+                    labels: ['← 15–29 ', '← 45–64', '75+ →'],
+                    labelPosition: 'edge',
+                    padding: { top: 45, right: 30, bottom: 10, left: 30 },
+                    showLines: true,
+                    showCenter: true,
+                    centerLabel: 'Average',
+                    showData: true,
+                    colorTarget: 'triangles', // 'points' | 'triangles'
+                    centerAnnotationOffsets: { labelX: -70, labelY: 20, curveX: -20, curveY: 0 },
+                })
+                .zoomButtons(true)
+
+            // map.statData('v1').setData(variable1)
+            // map.statData('v2').setData(variable2)
+            // map.statData('v3').setData(variable3)
+            map.build()
+        </script>
+    </body>
+</html>

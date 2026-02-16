@@ -567,6 +567,10 @@ eurostatmap
 
 ### Trivariate choropleth map
 
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/chtri_ex.png)](https://eurostat.github.io/eurostat-map/examples/trivariate.html)
+
+A trivariate choropleth map is a choropleth map showing the combination of three statistical variables. It shows how the correlation between these variables varies across space. Here is [an example](https://eurostat.github.io/eurostat-map/examples/trivariate.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/trivariate.html)).
+
 Example:
 
 ```javascript
@@ -601,6 +605,30 @@ const map = eurostatmap
         spread: 1.5,
         breaks: 5,
         meanCentering: true,
+    })
+    .legend({
+        title: 'Age Structure',
+        subtitle: `
+            <tspan x="8" dy="0">Areas with more <tspan fill="#007b00" class='subtitle-color'>green</tspan> have a higher %</tspan>
+            <tspan x="8" dy="1.2em"> of 15–29 year olds. Areas with more <tspan fill="#df0000" class='subtitle-color'>red</tspan> have </tspan>
+            <tspan x="8" dy="1.2em">a higher % of 75+ year olds and areas with 
+            <tspan x="8" dy="1.2em">more <tspan fill="#0067ff" class='subtitle-color'>blue</tspan> have a higher</tspan> % of 45–64 year olds.</tspan>
+            <tspan x="8" dy="1.2em">Hover your mouse over the legend to explore it.</tspan>
+        `,
+        x: 500,
+        y: 3,
+        boxOpacity: 0.99,
+        width: 250,
+        height: 280,
+        labels: ['← 15–29 ', '← 45–64', '75+ →'],
+        labelPosition: 'edge',
+        padding: { top: 45, right: 30, bottom: 10, left: 30 },
+        showLines: true,
+        showCenter: true,
+        centerLabel: 'Average',
+        showData: true,
+        colorTarget: 'triangles', // 'points' | 'triangles'
+        centerAnnotationOffsets: { labelX: -70, labelY: 20, curveX: -20, curveY: 0 },
     })
     .build()
 ```
@@ -690,7 +718,6 @@ In addition to [the default legend parameters](#map-legend), stripe composition 
 ### Sparkline map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/sparklines_ex.png)](https://eurostat.github.io/eurostat-map/examples/sparklines.html)
-
 
 A sparkline is a very small line chart, typically drawn without axes or coordinates. It presents the general shape of the variation (typically over time) in some measurement, such as temperature, in a simple and highly condensed way. A chart is drawn for each region showing the temporal variations of each.
 
@@ -1129,10 +1156,10 @@ const map = eurostatmap
 
 Specify the text to be shown at the bottom of the map.
 
-| Method                                    | Type    | Default value                   | Description                                                                                                                          |
-| ----------------------------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                  |
-| _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                     |
+| Method                                    | Type    | Default value                   | Description                                                                                                                         |
+| ----------------------------------------- | ------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**footnote**([*value*])             | String  | _Some default text_             | The text. Note that the default value is mandatory.                                                                                 |
+| _map_ .**footnoteTooltipText**([*value*]) | String  | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                    |
 | _map_ .**showSourceLink**([*value*])      | Boolean | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatasetcode specified when using the stat() function). |
 
 ## Map legend

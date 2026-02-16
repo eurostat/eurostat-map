@@ -1,14 +1,18 @@
 // legend-choropleth-trivariate.js
 import * as Legend from '../legend'
 import { select } from 'd3-selection'
-// Tricolore
-import { TricoloreViz, CompositionUtils } from '../../lib/tricolore/src'
+import { TricoloreViz } from '../../lib/tricolore/src'
 import { executeForAllInsets, getLegendRegionsSelector } from '../../core/utils'
 
 /**
  * Legend for trivariate (ternary) choropleth maps
  * rendered via Tricolore.
  */
+
+let activeLegendIndex = null
+let activeLegendColor = null
+let activeLegendElement = null
+
 export const legend = function (map, config = {}) {
     const out = Legend.legend(map)
 
@@ -16,17 +20,16 @@ export const legend = function (map, config = {}) {
     out.width = 160
     out.height = 160
     out.padding = { top: 50, right: 50, bottom: 10, left: 50 }
-    out.type = 'continuous' // 'continuous' | 'discrete'
+    out.type = 'continuous'
     out.showCenter = true
     out.centerLabel = 'Average'
     out.showLines = false
     out.labels = ['Variable 1', 'Variable 2', 'Variable 3']
-    out.labelPosition = 'edge' // 'corner' | 'edge'
-    out.colorTarget = 'points' // 'triangles' | 'points'
+    out.labelPosition = 'edge'
+    out.colorTarget = 'points'
     out.showData = true
     out.centerAnnotationOffsets = { labelX: 70, labelY: 10, curveX: -20, curveY: -20 }
 
-    // allow overrides
     Object.assign(out, config)
 
     out.update = function () {
@@ -35,7 +38,6 @@ export const legend = function (map, config = {}) {
 
         if (!out.lgg.node()) return out
 
-        // background + titles
         out.makeBackgroundBox()
         if (out.title) out.addTitle()
         if (out.subtitle) out.addSubtitle()
@@ -49,12 +51,11 @@ export const legend = function (map, config = {}) {
     function drawTricoloreLegend() {
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
+
         const container = out.lgg.append('g').attr('class', 'em-ternary-legend').attr('transform', `translate(${baseX},${baseY})`)
 
-        // clear previous content
         container.selectAll('*').remove()
 
-        // container div for Tricolore
         const tricoloreContainer = container
             .append('foreignObject')
             .attr('x', 0)
@@ -83,62 +84,95 @@ export const legend = function (map, config = {}) {
             colorTarget: out.colorTarget,
             showData: out.showData,
             centerAnnotationOffsets: out.centerAnnotationOffsets,
-            //legend event handlers
+
+            // ---- LEGEND INTERACTIONS (RACE SAFE) ----
             dataPointHandlers: {
                 mouseover: (e, d) => {
-                    const sel = select(e.currentTarget)
+                    const el = select(e.currentTarget)
 
-                    // store original styles once
-                    if (!sel.attr('fill___')) sel.attr('fill___', sel.attr('fill'))
-                    if (!sel.attr('opacity___')) sel.attr('opacity___', sel.attr('opacity'))
+                    // Reset previous active element safely
+                    if (activeLegendElement && activeLegendElement.node() !== el.node()) {
+                        activeLegendElement.attr('stroke', null).attr('stroke-width', null).lower()
+                    }
 
-                    sel.attr('fill', 'red').attr('opacity', 1).raise()
+                    activeLegendElement = el
+                    activeLegendIndex = d.index
+                    activeLegendColor = null
 
-                    //  highlight corresponding map regions
                     highlightRegionsByClass(map, d.index)
+
                     if (map.insetTemplates_) {
                         executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionsByClass, d.index)
                     }
 
-                    //  get region by class index
                     const rg = getRegionByClassIndex(map, d.index)
-
                     if (rg) {
                         map._tooltip?.mouseover(map.tooltip_.textFunction(rg, map))
                     }
+
+                    el.attr('stroke', 'red').attr('stroke-width', 2).raise()
                 },
 
                 mousemove: (e) => {
                     map._tooltip?.mousemove(e)
                 },
 
-                mouseout: (e, d) => {
-                    const sel = select(e.currentTarget)
+                mouseout: (e) => {
+                    const el = select(e.currentTarget)
 
-                    sel.attr('fill', sel.attr('fill___')).attr('opacity', sel.attr('opacity___')).lower()
+                    // Only reset if this is still active
+                    if (activeLegendElement && activeLegendElement.node() === el.node()) {
+                        el.attr('stroke', null).attr('stroke-width', null).lower()
 
-                    unhighlightRegionsByClass(map)
-                    if (map.insetTemplates_) {
-                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegionsByClass)
+                        activeLegendElement = null
+                        activeLegendIndex = null
+
+                        resetRegions(map)
+
+                        if (map.insetTemplates_) {
+                            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
+                        }
+
+                        map._tooltip?.mouseout()
                     }
-
-                    map._tooltip?.mouseout()
                 },
             },
+
             triangleHandlers: {
-                mouseover: (_, color) => {
-                    const sel = select(_.currentTarget)
-                    sel.attr('stroke-width', 2).attr('stroke', 'red').raise()
+                mouseover: (e, color) => {
+                    const el = select(e.currentTarget)
+
+                    if (activeLegendElement && activeLegendElement.node() !== el.node()) {
+                        activeLegendElement.attr('stroke', null).attr('stroke-width', null).lower()
+                    }
+
+                    activeLegendElement = el
+                    activeLegendColor = color
+                    activeLegendIndex = null
+
                     highlightRegionsByColor(map, color)
+
                     if (map.insetTemplates_) {
                         executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionsByColor, color)
                     }
+
+                    el.attr('stroke', 'red').attr('stroke-width', 2).raise()
                 },
-                mouseout: (_) => {
-                    select(_.currentTarget).attr('stroke', 'none').lower()
-                    unhighlightRegions(map)
-                    if (map.insetTemplates_) {
-                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+
+                mouseout: (e) => {
+                    const el = select(e.currentTarget)
+
+                    if (activeLegendElement && activeLegendElement.node() === el.node()) {
+                        el.attr('stroke', null).attr('stroke-width', null).lower()
+
+                        activeLegendElement = null
+                        activeLegendColor = null
+
+                        resetRegions(map)
+
+                        if (map.insetTemplates_) {
+                            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
+                        }
                     }
                 },
             },
@@ -154,55 +188,9 @@ export const legend = function (map, config = {}) {
     return out
 }
 
-// Highlight selected regions on mouseover
-function highlightRegionsByColor(map, color) {
-    const selector = getLegendRegionsSelector(map)
-    const regions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Normalize color once (browser-safe)
-    const target = normalizeColor(color)
-
-    regions.each(function () {
-        const sel = select(this)
-        const original = normalizeColor(sel.attr('fill___'))
-
-        if (original === target) {
-            sel.style('fill', sel.attr('fill___'))
-        } else {
-            sel.style('fill', '#fff')
-        }
-    })
-}
-
-function getRegionByClassIndex(map, classIndex) {
-    const id = map._ternaryIdByClass_
-        ? map._ternaryIdByClass_.get(classIndex)
-        : [...map._ternaryClassById_.entries()].find(([, i]) => i === classIndex)?.[0]
-
-    if (!id) return null
-
-    const feature = map.Geometries.getRegionFeatures()?.find((f) => f.properties.id === id)
-
-    return feature || null
-}
-
-function normalizeColor(c) {
-    if (!c) return null
-    const ctx = document.createElement('canvas').getContext('2d')
-    ctx.fillStyle = c
-    return ctx.fillStyle.toLowerCase()
-}
-
-// Reset all regions to their original colors on mouseout
-function unhighlightRegions(map) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Restore each region's original color from the fill___ attribute
-    allRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___'))
-    })
-}
+// --------------------------------------------------
+// Highlight Logic (Non-destructive)
+// --------------------------------------------------
 
 function highlightRegionsByClass(map, classIndex) {
     const selector = getLegendRegionsSelector(map)
@@ -212,21 +200,45 @@ function highlightRegionsByClass(map, classIndex) {
         const sel = select(this)
         const ecl = +sel.attr('ecl')
 
-        if (ecl === classIndex) {
-            sel.style('fill', sel.attr('fill___'))
-        } else {
-            sel.style('fill', '#fff')
-        }
+        sel.style('opacity', ecl === classIndex ? 1 : 0.15)
     })
 }
 
-function unhighlightRegionsByClass(map) {
+function highlightRegionsByColor(map, color) {
     const selector = getLegendRegionsSelector(map)
-    map.svg_
-        .selectAll(selector)
-        .selectAll('[ecl]')
-        .each(function () {
-            const sel = select(this)
-            sel.style('fill', sel.attr('fill___'))
-        })
+    const regions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    const target = normalizeColor(color)
+
+    regions.each(function () {
+        const sel = select(this)
+        const original = normalizeColor(sel.attr('fill___'))
+
+        sel.style('opacity', original === target ? 1 : 0.15)
+    })
+}
+
+function resetRegions(map) {
+    const selector = getLegendRegionsSelector(map)
+
+    map.svg_.selectAll(selector).selectAll('[ecl]').style('opacity', 1)
+}
+
+// --------------------------------------------------
+
+function getRegionByClassIndex(map, classIndex) {
+    const id = map._ternaryIdByClass_
+        ? map._ternaryIdByClass_.get(classIndex)
+        : [...map._ternaryClassById_.entries()].find(([, i]) => i === classIndex)?.[0]
+
+    if (!id) return null
+
+    return map.Geometries.getRegionFeatures()?.find((f) => f.properties.id === id) || null
+}
+
+function normalizeColor(c) {
+    if (!c) return null
+    const ctx = document.createElement('canvas').getContext('2d')
+    ctx.fillStyle = c
+    return ctx.fillStyle.toLowerCase()
 }
