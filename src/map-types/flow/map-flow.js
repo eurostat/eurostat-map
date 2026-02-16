@@ -14,7 +14,6 @@ import { drawNodeCircles } from './circles'
 import { scaleOrdinal } from 'd3-scale'
 import { addFlowValueLabels } from '../../core/labels'
 
-
 /**
  * Returns a flow map.
  *
@@ -23,7 +22,7 @@ import { addFlowValueLabels } from '../../core/labels'
 export const map = function (config) {
     //create map object to return, using the template
     const out = StatMap.statMap(config, true, 'flow')
-    out.strokeWidthScale = null // function to scale flow widths    
+    out.strokeWidthScale = null // function to scale flow widths
 
     // override tooltip function
     out.tooltip_.textFunction = flowMapTooltipFunction
@@ -34,12 +33,12 @@ export const map = function (config) {
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
-        gapX: 10,        // how far before/after node to begin/end curve
-        padX: 2,         // horizontal clearance near node stems
-        padY: 2,         // vertical collision detection padding
-        bumpY: 1,        // extra height for hop
-        curvature: 0.5   // 0..1; default sankey smoothness
-    };
+        gapX: 10, // how far before/after node to begin/end curve
+        padX: 2, // horizontal clearance near node stems
+        padY: 2, // vertical collision detection padding
+        bumpY: 1, // extra height for hop
+        curvature: 0.5, // 0..1; default sankey smoothness
+    }
 
     //out.flowThicknessType_ = 'linear' // gradual?
     out.flowColor_ = '#848484ff'
@@ -47,7 +46,7 @@ export const map = function (config) {
     out.flowRegionLabels_ = ['Exporter', 'Importer']
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
-    out.flowArrows_ = true
+    out.flowArrows_ = false
     out.flowArrowScale_ = 0.7 // scale of arrow markers
     out.flowOutlines_ = true
     out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
@@ -55,15 +54,14 @@ export const map = function (config) {
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
 
-
     out.flowOrder_ = (a, b) => {
-        const dy = a.otherY - b.otherY;          // primary: other end vertical position
-        if (dy) return dy;
-        if (a.at !== b.at) return a.at === "out" ? -1 : 1;  // outgoing above incoming on ties
-        const dv = (b.link.value ?? 0) - (a.link.value ?? 0); // larger value above
-        if (dv) return dv;
-        return String(a.link.id ?? '').localeCompare(String(b.link.id ?? '')); // stable
-    }; //use a custom order function for the flows at nodes
+        const dy = a.otherY - b.otherY // primary: other end vertical position
+        if (dy) return dy
+        if (a.at !== b.at) return a.at === 'out' ? -1 : 1 // outgoing above incoming on ties
+        const dv = (b.link.value ?? 0) - (a.link.value ?? 0) // larger value above
+        if (dv) return dv
+        return String(a.link.id ?? '').localeCompare(String(b.link.id ?? '')) // stable
+    } //use a custom order function for the flows at nodes
 
     //add proportional symbols to nodes
     out.flowNodes_ = false // whether to draw proportional symbols at flow nodes
@@ -84,19 +82,19 @@ export const map = function (config) {
     out.flowOpacityGradient_ = false // 0 origin to 1 at destination
     out.flowWidthGradient_ = false // thin at origin to thick at destination
     out.flowWidthGradientSettings_ = {
-        startRatio: 0.25,   // starting thickness (as a fraction of final width)
-        samples: 48,        // number of resampled points along path (smoothness)
+        startRatio: 0.25, // starting thickness (as a fraction of final width)
+        samples: 48, // number of resampled points along path (smoothness)
         minStartWidth: 1.5, // ensures very thin flows don't taper to zero
-        capEnd: true,       // closes the end cleanly (flat tail)
-        curvatureFollow: true // keeps offset normal perpendicular to local tangent
-    };
+        capEnd: true, // closes the end cleanly (flat tail)
+        curvatureFollow: true, // keeps offset normal perpendicular to local tangent
+    }
     out.flowBundleSettings_ = {
         alphaDecay: 0.1,
         chargeStrength: 10,
         distanceMax: null, // if null, will default to twice the max dimension of the map
         linkStrength: 0.7,
-        linkIterations: 1
-    };
+        linkIterations: 1,
+    }
 
     /**
      * flowmap-specific setters/getters
@@ -131,7 +129,7 @@ export const map = function (config) {
         'flowWidthGradientSettings_',
         'flowBidirectional_',
         'flowEdgeBundling_',
-        'flowBundleSettings_'
+        'flowBundleSettings_',
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -163,26 +161,23 @@ export const map = function (config) {
         defineWidthScale(out)
 
         // Define our container SVG
-        const zoomGroup = select('#em-zoom-group-' + out.svgId_);
+        const zoomGroup = select('#em-zoom-group-' + out.svgId_)
 
         // Try to select existing container
-        let flowContainer = zoomGroup.select('#em-flow-container');
+        let flowContainer = zoomGroup.select('#em-flow-container')
 
         // If it doesn't exist, create it
         if (flowContainer.empty()) {
-            flowContainer = zoomGroup
-                .append('g')
-                .attr('id', 'em-flow-container')
-                .attr('class', 'em-flow-container');
+            flowContainer = zoomGroup.append('g').attr('id', 'em-flow-container').attr('class', 'em-flow-container')
         } else {
             // If it exists, clear existing contents
-            flowContainer.selectAll('*').remove();
+            flowContainer.selectAll('*').remove()
         }
 
         //hacky: move it up one so that it is above the regions but below the labels
-        const node = flowContainer.node();
+        const node = flowContainer.node()
         if (node && node.previousSibling) {
-            node.parentNode?.insertBefore(node, node.previousSibling);
+            node.parentNode?.insertBefore(node, node.previousSibling)
         }
 
         // Show importer/exporter regions by coloring them
@@ -213,7 +208,7 @@ export const map = function (config) {
     }
 
     //@override
-    out.updateClassification = function () { }
+    out.updateClassification = function () {}
 
     //@override
     out.getLegendConstructor = function () {
@@ -227,35 +222,34 @@ export const map = function (config) {
 function defineWidthScale(out) {
     const data = out.flowGraph_.links
     // data: array of links with .value
-    const positives = data.map(d => d.value).filter(v => v > 0);
-    const upper = max(positives);
-    const smallestPositive = min(positives);
+    const positives = data.map((d) => d.value).filter((v) => v > 0)
+    const upper = max(positives)
+    const smallestPositive = min(positives)
 
     // visual params
-    const minW = Math.max(0, out.flowMinWidth_ || 0); // visible floor (px)
-    const maxW = out.flowMaxWidth_;                   // max stroke width (px)
+    const minW = Math.max(0, out.flowMinWidth_ || 0) // visible floor (px)
+    const maxW = out.flowMaxWidth_ // max stroke width (px)
 
     // Base linear scale for positives only
-    const base = scaleLinear()
-        .domain([0, upper])
-        .range([0, maxW])
-        .clamp(true);
-
+    const base = scaleLinear().domain([0, upper]).range([0, maxW]).clamp(true)
 
     // Final classifier, force min width
     const strokeWidthScale = (v) => {
-        const x = +v;
-        if (!Number.isFinite(x) || x <= 0) return 0;
-        return Math.max(minW, base(x));
-    };
+        const x = +v
+        if (!Number.isFinite(x) || x <= 0) return 0
+        return Math.max(minW, base(x))
+    }
 
     // Optional: expose domain method to be compatible with legacy code
     strokeWidthScale.domain = (...args) => {
-        if (args.length) { base.domain(...args); return strokeWidthScale; }
-        return base.domain();
-    };
+        if (args.length) {
+            base.domain(...args)
+            return strokeWidthScale
+        }
+        return base.domain()
+    }
 
-    out.strokeWidthScale = strokeWidthScale;
+    out.strokeWidthScale = strokeWidthScale
 }
 
 function prepareFlowGraph(out) {
@@ -466,37 +460,31 @@ function addOverlayPolygons(out) {
     })
 }
 
-
-
 const flowMapTooltipFunction = function (link, map) {
-    const buf = [];
-    const statData = map.statData();
-    const unit = statData.unitText() || '';
+    const buf = []
+    const statData = map.statData()
+    const unit = statData.unitText() || ''
 
     // ---- FIX: determine true origin/destination for split flows ----
-    const originId =
-        link.originId ??
-        (link.source.isMidpoint ? null : link.source.id);
+    const originId = link.originId ?? (link.source.isMidpoint ? null : link.source.id)
 
-    const destId =
-        link.destId ??
-        (link.target.isMidpoint ? null : link.target.id);
+    const destId = link.destId ?? (link.target.isMidpoint ? null : link.target.id)
 
-    const nodeById = map._nodeById || new Map();
+    const nodeById = map._nodeById || new Map()
 
-    const originNode = nodeById.get(originId) || { id: originId, name: originId };
-    const destNode = nodeById.get(destId) || { id: destId, name: destId };
+    const originNode = nodeById.get(originId) || { id: originId, name: originId }
+    const destNode = nodeById.get(destId) || { id: destId, name: destId }
 
-    const originName = originNode.name || originNode.id;
-    const destName = destNode.name || destNode.id;
+    const originName = originNode.name || originNode.id
+    const destName = destNode.name || destNode.id
 
     // Header
-    const title = `${originName} to ${destName}`;
+    const title = `${originName} to ${destName}`
     buf.push(`
         <div class="em-tooltip-bar">
             <b>${title}</b>
         </div>
-    `);
+    `)
 
     // Value
     buf.push(`
@@ -507,7 +495,7 @@ const flowMapTooltipFunction = function (link, map) {
                 </tbody>
             </table>
         </div>
-    `);
+    `)
 
-    return buf.join('');
-};
+    return buf.join('')
+}
