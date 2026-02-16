@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -46,7 +46,8 @@
                         .height(mapHeight)
                         .bottomText(null)
                         .showSourceLink(false)
-                        .nutsLevel('mixed').psMaxSize(10)
+                        .nutsLevel('mixed')
+                        .psMaxSize(10)
                         //.nutsLevel(0)
                         .drawGraticule(true)
                         .graticuleStroke('#ccc')
@@ -68,20 +69,7 @@
                             labelFontSize: 15,
                             noData: true,
                         })
-                        .drawCoastalMargin(false)
-                        .cntrgFillStyle('#E6E6E6')
-                        .nutsrgFillStyle('#E6E6E6')
-                        .nutsbnStroke({
-                            0: '#000',
-                            1: '#000',
-                            2: '#000',
-                            3: '#000',
-                            co: 'grey',
-                        })
-                        .noDataFillStyle('darkgrey')
-                        .nutsbnStrokeWidth({ 0: 2, 1: 0.4, 2: 0.4, 3: 0.4, oth: 2, co: 0 })
-                        .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 2, co: 0.2 })
-                        .bordersToShow(['eu', 'co', 'cc', 'efta'])
+
                         .insets(insetsConfig)
                         //.zoomExtent([1,10])
                         .showScalebar(true)

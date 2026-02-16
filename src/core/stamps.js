@@ -15,56 +15,99 @@ export const appendStamp = (stampConfig, map) => {
             if (!stampConfig.strokeWidth) stampConfig.strokeWidth = 1
             if (!stampConfig.lineHeight) stampConfig.lineHeight = 15
             if (!stampConfig.shape) stampConfig.shape = 'circle'
-
-            // Draw the shape
-            if (stampConfig.shape === 'square') {
-                const sideLength = stampConfig.size * 2
-                container
-                    .append('rect')
-                    .attr('width', sideLength)
-                    .attr('height', sideLength)
-                    .attr('x', stampConfig.x - stampConfig.size)
-                    .attr('y', stampConfig.y - stampConfig.size)
-                    .attr('id', 'em-stamp-shape')
-                    .attr('fill', 'none')
-                    .attr('stroke', stampConfig.stampColor)
-                    .attr('stroke-width', stampConfig.strokeWidth)
-            } else {
-                container
-                    .append('circle')
-                    .attr('r', stampConfig.size)
-                    .attr('cx', stampConfig.x)
-                    .attr('cy', stampConfig.y)
-                    .attr('id', 'em-stamp-shape')
-                    .attr('fill', 'none')
-                    .attr('stroke', stampConfig.stampColor)
-                    .attr('stroke-width', stampConfig.strokeWidth)
+            if (stampConfig.padding === undefined) {
+                stampConfig.padding = stampConfig.shape === 'rectangle' ? 5 : 0
             }
 
             // Handle text
             const text = stampConfig.text
             const targetWidth = Math.sqrt(measureWidth(text.trim()) * stampConfig.lineHeight)
             const lines = getLines(getWords(text.trim()), targetWidth)
-            const textRadius = getTextRadius(lines, stampConfig.lineHeight)
 
-            // Append inside shape
-            container
-                .append('text')
-                .attr('text-anchor', 'middle')
-                .attr('fill', stampConfig.textColor)
-                .attr('id', 'em-stamp-text')
-                .attr('transform', `translate(${stampConfig.x},${stampConfig.y}) scale(${stampConfig.size / textRadius})`)
-                .selectAll('tspan')
-                .data(lines)
-                .enter()
-                .append('tspan')
-                .attr('x', 0)
-                .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
-                .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', ''))
+            if (stampConfig.shape === 'rectangle') {
+                const maxLineWidth = Math.max(...lines.map((l) => l.width))
+                const textHeight = lines.length * stampConfig.lineHeight
+
+                // Scale based on size (use size as target height)
+                const scale = stampConfig.size / textHeight
+
+                const rectWidth = maxLineWidth * scale + stampConfig.padding * 2
+                const rectHeight = stampConfig.size + stampConfig.padding * 2
+
+                container
+                    .append('rect')
+                    .attr('width', rectWidth)
+                    .attr('height', rectHeight)
+                    .attr('x', stampConfig.x - rectWidth / 2)
+                    .attr('y', stampConfig.y - rectHeight / 2)
+                    .attr('id', 'em-stamp-shape')
+                    .attr('fill', 'none')
+                    .attr('stroke', stampConfig.stampColor)
+                    .attr('stroke-width', stampConfig.strokeWidth)
+
+                const textElement = container
+                    .append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', stampConfig.textColor)
+                    .attr('id', 'em-stamp-text')
+                    .attr('transform', `translate(${stampConfig.x},${stampConfig.y}) scale(${scale})`)
+
+                textElement
+                    .selectAll('tspan')
+                    .data(lines)
+                    .enter()
+                    .append('tspan')
+                    .attr('x', 0)
+                    .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
+                    .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', ''))
+            } else {
+                // Circle and square use the radius-based scaling
+                const textRadius = getTextRadius(lines, stampConfig.lineHeight)
+                const scale = stampConfig.size / textRadius
+
+                if (stampConfig.shape === 'square') {
+                    const sideLength = (stampConfig.size + stampConfig.padding) * 2
+                    container
+                        .append('rect')
+                        .attr('width', sideLength)
+                        .attr('height', sideLength)
+                        .attr('x', stampConfig.x - stampConfig.size - stampConfig.padding)
+                        .attr('y', stampConfig.y - stampConfig.size - stampConfig.padding)
+                        .attr('id', 'em-stamp-shape')
+                        .attr('fill', 'none')
+                        .attr('stroke', stampConfig.stampColor)
+                        .attr('stroke-width', stampConfig.strokeWidth)
+                } else {
+                    container
+                        .append('circle')
+                        .attr('r', stampConfig.size + stampConfig.padding)
+                        .attr('cx', stampConfig.x)
+                        .attr('cy', stampConfig.y)
+                        .attr('id', 'em-stamp-shape')
+                        .attr('fill', 'none')
+                        .attr('stroke', stampConfig.stampColor)
+                        .attr('stroke-width', stampConfig.strokeWidth)
+                }
+
+                const textElement = container
+                    .append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', stampConfig.textColor)
+                    .attr('id', 'em-stamp-text')
+                    .attr('transform', `translate(${stampConfig.x},${stampConfig.y}) scale(${scale})`)
+
+                textElement
+                    .selectAll('tspan')
+                    .data(lines)
+                    .enter()
+                    .append('tspan')
+                    .attr('x', 0)
+                    .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
+                    .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', ''))
+            }
         }
     }
 }
-
 // Splitting by both spaces and pilcrows
 const getWords = (text) => {
     return text
@@ -85,7 +128,7 @@ const measureWidth = (text) => {
     const width = textElement.getComputedTextLength()
     document.body.removeChild(svg)
 
-    return width + 10
+    return width
 }
 
 // Compute text radius
@@ -106,9 +149,7 @@ const getLines = (words, targetWidth) => {
 
     for (let i = 0, n = words.length; i < n; ++i) {
         if (words[i] === '¶') {
-            // Push current line (if it has text)
             if (line.text) lines.push(line)
-            // Start a new empty line
             line = { width: 0, text: '' }
             continue
         }
@@ -120,12 +161,12 @@ const getLines = (words, targetWidth) => {
             line.width = lineWidth1
             line.text = lineText1
         } else {
-            lines.push(line)
+            if (line.text) lines.push(line) // Only push if there's content
             line = { width: measureWidth(words[i]), text: words[i] }
         }
     }
 
-    if (line.text) lines.push(line) // Push last line if it exists
+    if (line.text) lines.push(line)
 
     return lines
 }

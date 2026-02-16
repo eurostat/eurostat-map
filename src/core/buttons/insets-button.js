@@ -7,6 +7,16 @@ export const appendInsetsButton = (map) => {
     const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
 
     const insetButton = svg.append('g').attr('class', 'em-insets-button em-button').attr('id', 'em-insets-button')
+
+    if (map.insetsButtonPosition_) {
+        const userPosition = map.insetsButtonPosition_
+        insetButton.attr('transform', `translate(${userPosition[0]}, ${userPosition[1]})`)
+    } else {
+        // Default position: below zoom buttons with some padding
+        const padding = 10
+        insetButton.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${buttonSize * 2 + 2 * padding})`)
+    }
+
     //tooltip
     insetButton.append('title').text('Show/hide inset maps')
     // Add rectangle for button background

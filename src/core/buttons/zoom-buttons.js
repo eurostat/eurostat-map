@@ -10,6 +10,16 @@ export const appendZoomButtons = (map) => {
         // .attr('transform', `translate(${map.width_ - 50}, 20)`)
         .style('pointer-events', 'all') // allow clicks
 
+    if (map.zoomButtonsPosition_) {
+        const userPosition = map.zoomButtonsPosition_
+        buttonGroup.attr('transform', `translate(${userPosition[0]}, ${userPosition[1]})`)
+    } else {
+        // Default position: top right corner with some padding
+        const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
+        const padding = 10
+        buttonGroup.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${padding})`)
+    }
+
     const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
 
     const zoomInBtn = buttonGroup.append('g').attr('class', 'em-zoom-in em-button').style('cursor', 'pointer')

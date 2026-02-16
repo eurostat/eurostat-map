@@ -130,7 +130,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
 
     //buttons
     out.zoomButtons_ = true // show zoom buttons
+    out.zoomButtonsPosition_ = undefined // [x,y] position of zoom buttons. If not specified, they are positioned in the top right corner
     out.insetsButton_ = false // show insets button
+    out.insetsButtonPosition_ = undefined // [x,y] position of insets button. If not specified, they are positioned in the top right corner
 
     //tooltip
     out.tooltip_ = {
@@ -150,14 +152,14 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.drawCoastalMargin_ = false
     // for color, see .em-coastal-margin in map.css
     out.coastalMarginSettings_ = {
-        standardDeviation: 1,
-        x: '-100%',
-        y: '-100%',
-        width: '200%',
-        height: '200%',
-        strokeWidth: 2,
+        standardDeviation: 0.8, // Softer blur
+        x: '-50%',
+        y: '-50%',
+        width: '150%',
+        height: '150%',
+        strokeWidth: 0.6, // Thin, subtle line
         color: 'rgb(0, 0, 0)',
-        opacity: 0.8,
+        opacity: 0.1, // Very subtle
     }
 
     //graticule

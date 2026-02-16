@@ -22,14 +22,14 @@
 }
 
 /* zoom  */
-.em-zoom-buttons {
+/* .em-zoom-buttons {
     transform: translate(94%, 10%);
-}
+} */
 
 /* insets */
-.em-insets-button {
+/* .em-insets-button {
     transform: translate(94%, 2%);
-}
+} */
 
 .em-logo-group {
     pointer-events: none;
