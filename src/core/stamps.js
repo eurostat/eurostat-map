@@ -14,17 +14,32 @@ export const appendStamp = (stampConfig, map) => {
             if (!stampConfig.stampColor) stampConfig.stampColor = '#000'
             if (!stampConfig.strokeWidth) stampConfig.strokeWidth = 1
             if (!stampConfig.lineHeight) stampConfig.lineHeight = 15
+            if (!stampConfig.shape) stampConfig.shape = 'circle'
 
-            // Draw the circle
-            container
-                .append('circle')
-                .attr('r', stampConfig.size)
-                .attr('cx', stampConfig.x)
-                .attr('cy', stampConfig.y)
-                .attr('id', 'em-stamp-circle')
-                .attr('fill', 'none')
-                .attr('stroke', stampConfig.stampColor)
-                .attr('stroke-width', stampConfig.strokeWidth)
+            // Draw the shape
+            if (stampConfig.shape === 'square') {
+                const sideLength = stampConfig.size * 2
+                container
+                    .append('rect')
+                    .attr('width', sideLength)
+                    .attr('height', sideLength)
+                    .attr('x', stampConfig.x - stampConfig.size)
+                    .attr('y', stampConfig.y - stampConfig.size)
+                    .attr('id', 'em-stamp-shape')
+                    .attr('fill', 'none')
+                    .attr('stroke', stampConfig.stampColor)
+                    .attr('stroke-width', stampConfig.strokeWidth)
+            } else {
+                container
+                    .append('circle')
+                    .attr('r', stampConfig.size)
+                    .attr('cx', stampConfig.x)
+                    .attr('cy', stampConfig.y)
+                    .attr('id', 'em-stamp-shape')
+                    .attr('fill', 'none')
+                    .attr('stroke', stampConfig.stampColor)
+                    .attr('stroke-width', stampConfig.strokeWidth)
+            }
 
             // Handle text
             const text = stampConfig.text
@@ -32,7 +47,7 @@ export const appendStamp = (stampConfig, map) => {
             const lines = getLines(getWords(text.trim()), targetWidth)
             const textRadius = getTextRadius(lines, stampConfig.lineHeight)
 
-            // Append inside circle
+            // Append inside shape
             container
                 .append('text')
                 .attr('text-anchor', 'middle')
@@ -45,72 +60,7 @@ export const appendStamp = (stampConfig, map) => {
                 .append('tspan')
                 .attr('x', 0)
                 .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
-                .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', '')) // Removes ¶ (line breaker) and ~ (non breaking space)
+                .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', ''))
         }
     }
-}
-
-// Splitting by both spaces and pilcrows
-const getWords = (text) => {
-    return text
-        .split(/(?<=¶)|\s+/g)
-        .map((word) => word.trim())
-        .filter((word) => word.length > 0)
-}
-
-// Computes text width
-const measureWidth = (text) => {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    const textElement = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-
-    textElement.textContent = text
-    svg.appendChild(textElement)
-    document.body.appendChild(svg)
-
-    const width = textElement.getComputedTextLength()
-    document.body.removeChild(svg)
-
-    return width + 10
-}
-
-// Compute text radius
-const getTextRadius = (lines, lineHeight) => {
-    let radius = 0
-    for (let i = 0, n = lines.length; i < n; ++i) {
-        const dy = (Math.abs(i - n / 2 + 0.5) + 0.5) * lineHeight
-        const dx = lines[i].width / 2
-        radius = Math.max(radius, Math.sqrt(dx ** 2 + dy ** 2))
-    }
-    return radius
-}
-
-// Handles forced line breaks
-const getLines = (words, targetWidth) => {
-    let lines = []
-    let line = { width: 0, text: '' }
-
-    for (let i = 0, n = words.length; i < n; ++i) {
-        if (words[i] === '¶') {
-            // Push current line (if it has text)
-            if (line.text) lines.push(line)
-            // Start a new empty line
-            line = { width: 0, text: '' }
-            continue
-        }
-
-        let lineText1 = (line.text ? line.text + ' ' : '') + words[i]
-        let lineWidth1 = measureWidth(lineText1)
-
-        if ((line.width + lineWidth1) / 2 < targetWidth) {
-            line.width = lineWidth1
-            line.text = lineText1
-        } else {
-            lines.push(line)
-            line = { width: measureWidth(words[i]), text: words[i] }
-        }
-    }
-
-    if (line.text) lines.push(line) // Push last line if it exists
-
-    return lines
 }
