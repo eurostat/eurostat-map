@@ -7,7 +7,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
+        <script src="../../../build/eurostatmap.min.js"></script>
 
         <script>
             const map = eurostatmap
@@ -23,6 +23,7 @@
                 .legend({
                     title: 'Inh per km2',
                     subtitle: '2020',
+                    titlePadding: -10,
                     x: 550,
                     y: 40,
                     ascending: true,

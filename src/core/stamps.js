@@ -16,7 +16,7 @@ export const appendStamp = (stampConfig, map) => {
             if (!stampConfig.lineHeight) stampConfig.lineHeight = 15
             if (!stampConfig.shape) stampConfig.shape = 'circle'
             if (stampConfig.padding === undefined) {
-                stampConfig.padding = stampConfig.shape === 'rectangle' ? 5 : 0
+                stampConfig.padding = stampConfig.shape === 'rectangle' ? 1 : 0
             }
 
             // Handle text
@@ -28,11 +28,14 @@ export const appendStamp = (stampConfig, map) => {
                 const maxLineWidth = Math.max(...lines.map((l) => l.width))
                 const textHeight = lines.length * stampConfig.lineHeight
 
-                // Scale based on size (use size as target height)
+                // Scale text to fit the target size
                 const scale = stampConfig.size / textHeight
+                const scaledTextWidth = maxLineWidth * scale
+                const scaledTextHeight = stampConfig.size
 
-                const rectWidth = maxLineWidth * scale + stampConfig.padding * 2
-                const rectHeight = stampConfig.size + stampConfig.padding * 2
+                // Apply same padding to all sides
+                const rectWidth = scaledTextWidth + stampConfig.padding * 2
+                const rectHeight = scaledTextHeight + stampConfig.padding * 2
 
                 container
                     .append('rect')
@@ -48,6 +51,7 @@ export const appendStamp = (stampConfig, map) => {
                 const textElement = container
                     .append('text')
                     .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'central')
                     .attr('fill', stampConfig.textColor)
                     .attr('id', 'em-stamp-text')
                     .attr('transform', `translate(${stampConfig.x},${stampConfig.y}) scale(${scale})`)
@@ -58,7 +62,7 @@ export const appendStamp = (stampConfig, map) => {
                     .enter()
                     .append('tspan')
                     .attr('x', 0)
-                    .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
+                    .attr('y', (d, i) => (i - lines.length / 2 + 0.5) * stampConfig.lineHeight)
                     .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', ''))
             } else {
                 // Circle and square use the radius-based scaling
