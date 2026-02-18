@@ -173,7 +173,9 @@ const zoomHandler = (event, previousT, map) => {
     map._lastZoomK = t.k
 
     scaleStrokeWidths(t, map)
-    if (map.labels_?.values) scaleLabelTexts(t, map)
+    if (map.labels_?.scaleOnZoom !== false) {
+        scaleLabelTexts(t, map)
+    }
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
 
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))

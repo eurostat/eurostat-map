@@ -401,6 +401,10 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (!arguments.length) return out.labels_
         //set
         out.labels_ = v
+        // DEFAULT: scaleOnZoom = true
+        if (out.labels_.scaleOnZoom === undefined) {
+            out.labels_.scaleOnZoom = true
+        }
         //update
         updateLabels(out)
         return out

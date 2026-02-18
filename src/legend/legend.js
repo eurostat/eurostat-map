@@ -97,20 +97,21 @@ export const legend = function (map) {
     out.updateContainer = function () {
         const map = out.map
         const container = out.lgg
+        const legendSVG = out.svg
         // Remove previous content
         container.selectAll('*').remove()
 
-        //check if provided external svgId has changed
-        const legendSVG = out.svg
-        if (map && container && legendSVG && legendSVG?.attr('id') !== map.legend_.svgId) {
-            out.build() // sets new svg and lgg
+        //check if provided external svgId has changed or if legend SVG is not yet created, then build legend
+        const needsLegendBuild = map && container && (!legendSVG || legendSVG.attr('id') !== map.legend_.svgId)
+        if (needsLegendBuild) {
+            out.build()
         }
 
         //position legend
-        if (out.x != null || out.y != null) {
+        if ((out.x != null || out.y != null) && container) {
             const x = out.x ?? map.width() - out.width - out.boxPadding
             const y = out.y ?? out.boxPadding
-            out.lgg.attr('transform', `translate(${x},${y})`)
+            container.attr('transform', `translate(${x},${y})`)
         }
     }
 

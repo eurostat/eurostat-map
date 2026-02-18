@@ -2,7 +2,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as Legend from '../legend'
-import { getLegendRegionsSelector } from '../../core/utils'
+import { getLegendRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from '../legend-continuous'
@@ -130,10 +130,10 @@ export function getThresholds(out) {
         map.thresholds_.length > 1
             ? map.thresholds_
             : Array.from({ length: map.numberOfClasses_ })
-                .map((_, index) => {
-                    return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
-                })
-                .slice(1) // Remove the first entry and return the rest as an array
+                  .map((_, index) => {
+                      return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
+                  })
+                  .slice(1) // Remove the first entry and return the rest as an array
     return thresholds
 }
 
@@ -148,9 +148,9 @@ export function getChoroplethLabelFormatter(out) {
         }
         return out.labelFormatter || defaultLabeller
     } else if (out.labelType == 'thresholds') {
-        return out.labelFormatter || format(`.${out.decimals}f`)
+        return out.labelFormatter || spaceAsThousandSeparator(Number(format(`.${out.decimals}f`)))
     } else {
-        return out.labelFormatter || format(`.${out.decimals}f`)
+        return out.labelFormatter || spaceAsThousandSeparator(Number(format(`.${out.decimals}f`)))
     }
 }
 
@@ -180,7 +180,6 @@ export function unhighlightRegions(map) {
     })
 }
 
-
 /**
  * Threshold ticks + dataset min/max at the ends.
  * Example: thresholds [10, 20, 30], data in [3, 42]
@@ -192,7 +191,6 @@ export function getThresholdTicksWithExtents(out) {
     const minVal = out.map.statData().getMin()
 
     if (!maxVal && !minVal) return thresholds
-
 
     // Build [min, ...thresholds, max] and dedupe
     const vals = [minVal, ...thresholds, maxVal]
