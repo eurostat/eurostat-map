@@ -142,15 +142,14 @@ export function getChoroplethLabelFormatter(out) {
         const thresholds = getThresholds(out)
         const defaultLabeller = (label, i) => {
             const decimalFormatter = format(`.${out.decimals}f`)
-            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}` //top
-            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
-            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
+            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}`
+            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}`
+            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  `
         }
         return out.labelFormatter || defaultLabeller
-    } else if (out.labelType == 'thresholds') {
-        return out.labelFormatter || spaceAsThousandSeparator(Number(format(`.${out.decimals}f`)))
     } else {
-        return out.labelFormatter || spaceAsThousandSeparator(Number(format(`.${out.decimals}f`)))
+        const decimalFormatter = format(`.${out.decimals}f`)
+        return out.labelFormatter || ((value) => spaceAsThousandSeparator(decimalFormatter(value)))
     }
 }
 

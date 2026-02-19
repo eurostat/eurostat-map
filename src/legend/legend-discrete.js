@@ -49,6 +49,28 @@ function getTitlePadding(out) {
     return p
 }
 
+/**
+ * Determines whether the max and/or min boundary labels should be shown.
+ * When the top or bottom class contains only a single value, it would duplicate
+ * the adjacent threshold label, so we suppress it.
+ */
+function getMaxMinVisibility(out, config, classifier, numberOfClasses, globalMin, globalMax) {
+    let showMax = true
+    let showMin = true
+
+    if (!classifier?.invertExtent) return { showMax, showMin }
+
+    const topClassEcl = out.ascending ? numberOfClasses - 1 : 0
+    const bottomClassEcl = out.ascending ? 0 : numberOfClasses - 1
+    const topExtent = classifier.invertExtent(topClassEcl)
+    const bottomExtent = classifier.invertExtent(bottomClassEcl)
+
+    if (topExtent && (topExtent[0] === topExtent[1] || topExtent[0] === globalMax)) showMax = false
+    if (bottomExtent && (bottomExtent[0] === bottomExtent[1] || bottomExtent[1] === globalMin)) showMin = false
+
+    return { showMax, showMin }
+}
+
 function createThresholdsLegend(out, config) {
     const map = out.map
     const container = out._discreteLegendContainer
@@ -159,6 +181,22 @@ function createThresholdsLegend(out, config) {
 
     // Add MIN and MAX ticks at the ends of the scale using statData extent
     if ((out.maxMin || config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
+        // Detect if the top or bottom class is a single-value class.
+        // When that happens, the threshold label already shows the same value,
+        // so we suppress the duplicate max/min boundary label.
+        let showMax = true
+        let showMin = true
+        if (classifier?.invertExtent) {
+            const topClassEcl = out.ascending ? numberOfClasses - 1 : 0
+            const bottomClassEcl = out.ascending ? 0 : numberOfClasses - 1
+            const topExtent = classifier.invertExtent(topClassEcl)
+            const bottomExtent = classifier.invertExtent(bottomClassEcl)
+            // A class with equal bounds, or whose inner boundary equals the global extreme,
+            // contains only one distinct value and would duplicate the threshold label.
+            if (topExtent && (topExtent[0] === topExtent[1] || topExtent[0] === globalMax)) showMax = false
+            if (bottomExtent && (bottomExtent[0] === bottomExtent[1] || bottomExtent[1] === globalMin)) showMin = false
+        }
+
         const tickX1 = 0
         const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
         const labelX = config.maxMinTickLength
@@ -169,64 +207,67 @@ function createThresholdsLegend(out, config) {
         let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
 
         if (config.maxMinRegionLabels) {
-            // override with region names
             maxLabel = `${labelFormatter(globalMax)} (${globalMaxRegion})`
             minLabel = `${labelFormatter(globalMin)} (${globalMinRegion})`
         }
         const maxMinGroup = container.append('g').attr('class', 'em-legend-max-min-group')
 
-        // Top boundary (MAX)
-        const yTop = titlePadding
-        maxMinGroup
-            .append('line')
-            .attr('class', 'em-legend-tick em-legend-tick-max')
-            .attr('x1', tickX1)
-            .attr('y1', yTop)
-            .attr('x2', tickX2)
-            .attr('y2', yTop)
+        if (showMax) {
+            // Top boundary (MAX)
+            const yTop = titlePadding
+            maxMinGroup
+                .append('line')
+                .attr('class', 'em-legend-tick em-legend-tick-max')
+                .attr('x1', tickX1)
+                .attr('y1', yTop)
+                .attr('x2', tickX2)
+                .attr('y2', yTop)
 
-        maxMinGroup
-            .append('text')
-            .style('pointer-events', 'all')
-            .style('cursor', 'pointer')
-            .on('mouseover', function () {
-                const numberOfClasses = out.getNumberOfClasses(out)
-                highlightMaxRegion(map, numberOfClasses, globalMaxRegionId)
-            })
-            .on('mouseout', function () {
-                unhighlightRegions(map)
-            })
-            .attr('class', 'em-legend-label em-legend-label-max')
-            .attr('x', labelX)
-            .attr('y', yTop)
-            .attr('dy', '0.3em')
-            .text(maxLabel)
+            maxMinGroup
+                .append('text')
+                .style('pointer-events', 'all')
+                .style('cursor', 'pointer')
+                .on('mouseover', function () {
+                    const numberOfClasses = out.getNumberOfClasses(out)
+                    highlightMaxRegion(map, numberOfClasses, globalMaxRegionId)
+                })
+                .on('mouseout', function () {
+                    unhighlightRegions(map)
+                })
+                .attr('class', 'em-legend-label em-legend-label-max')
+                .attr('x', labelX)
+                .attr('y', yTop)
+                .attr('dy', '0.3em')
+                .text(maxLabel)
+        }
 
-        // Bottom boundary (MIN)
-        const yBottom = numberOfClasses * config.shapeHeight + titlePadding
-        maxMinGroup
-            .append('line')
-            .attr('class', 'em-legend-tick em-legend-tick-min')
-            .attr('x1', tickX1)
-            .attr('y1', yBottom)
-            .attr('x2', tickX2)
-            .attr('y2', yBottom)
+        if (showMin) {
+            // Bottom boundary (MIN)
+            const yBottom = numberOfClasses * config.shapeHeight + titlePadding
+            maxMinGroup
+                .append('line')
+                .attr('class', 'em-legend-tick em-legend-tick-min')
+                .attr('x1', tickX1)
+                .attr('y1', yBottom)
+                .attr('x2', tickX2)
+                .attr('y2', yBottom)
 
-        maxMinGroup
-            .append('text')
-            .style('pointer-events', 'all')
-            .style('cursor', 'pointer')
-            .on('mouseover', function () {
-                highlightMinRegion(map, globalMinRegionId)
-            })
-            .on('mouseout', function () {
-                unhighlightRegions(map)
-            })
-            .attr('class', 'em-legend-label em-legend-label-min')
-            .attr('x', labelX)
-            .attr('y', yBottom)
-            .attr('dy', '0.3em')
-            .text(minLabel)
+            maxMinGroup
+                .append('text')
+                .style('pointer-events', 'all')
+                .style('cursor', 'pointer')
+                .on('mouseover', function () {
+                    highlightMinRegion(map, globalMinRegionId)
+                })
+                .on('mouseout', function () {
+                    unhighlightRegions(map)
+                })
+                .attr('class', 'em-legend-label em-legend-label-min')
+                .attr('x', labelX)
+                .attr('y', yBottom)
+                .attr('dy', '0.3em')
+                .text(minLabel)
+        }
     }
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate
