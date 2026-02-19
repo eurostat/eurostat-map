@@ -43,6 +43,7 @@ export const map = function (config) {
     out.colorSchemeType_ = 'discrete' // or 'continuous'
     out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
+    out.skipNormalization_ = false // whether to skip normalization step for continuous color schemes (e.g. for pre-normalized data like quantile)
     out.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
     // Getter/setters for exposed attributes
@@ -61,6 +62,7 @@ export const map = function (config) {
         'valueTransform_',
         'valueUntransform_',
         'pointOfDivergence_',
+        'skipNormalization_',
     ]
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
@@ -134,18 +136,25 @@ export const map = function (config) {
 
                 if (out.colorSchemeType_ === 'continuous') {
                     const valueTransform = out.valueTransform_ || ((d) => d)
-                    const transformedValues = dataArray.map(valueTransform)
-                    const minVal = min(transformedValues)
-                    const maxVal = max(transformedValues)
-                    const isDiverging = checkIfDiverging(out)
-                    const isFullScale = typeof out.colorFunction_?.domain === 'function'
 
-                    if (!isFullScale) {
-                        if (isDiverging) {
-                            const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
-                            out.domain_ = [minVal, divergence, maxVal]
-                        } else {
-                            out.domain_ = [minVal, maxVal]
+                    if (out.skipNormalization_) {
+                        // Transform already outputs 0-1 (e.g. quantile, jenks)
+                        // No domain normalisation needed
+                        out.domain_ = null
+                    } else {
+                        const transformedValues = dataArray.map(valueTransform)
+                        const minVal = min(transformedValues)
+                        const maxVal = max(transformedValues)
+                        const isDiverging = checkIfDiverging(out)
+                        const isFullScale = typeof out.colorFunction_?.domain === 'function'
+
+                        if (!isFullScale) {
+                            if (isDiverging) {
+                                const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
+                                out.domain_ = [minVal, divergence, maxVal]
+                            } else {
+                                out.domain_ = [minVal, maxVal]
+                            }
                         }
                     }
 
@@ -332,16 +341,18 @@ export const map = function (config) {
 
     function getContinuousColor(value, out) {
         const colorFn = out.colorFunction_
-        const domain = out.domain_ || [0, 1]
-        const isD3Scale = typeof colorFn?.domain === 'function'
         const transform = out.valueTransform_ || ((d) => d)
-
         const transformed = transform(value)
         if (isNaN(transformed)) return out.noDataFillStyle_ || 'gray'
 
-        if (isD3Scale) {
-            return colorFn(transformed)
+        // skipNormalization: transform already returns 0-1
+        if (out.skipNormalization_) {
+            return colorFn(Math.min(Math.max(transformed, 0), 1))
         }
+
+        const domain = out.domain_ || [0, 1]
+        const isD3Scale = typeof colorFn?.domain === 'function'
+        if (isD3Scale) return colorFn(transformed)
 
         let t
         if (domain.length === 3) {

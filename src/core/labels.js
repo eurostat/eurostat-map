@@ -494,6 +494,8 @@ export const DEFAULTLABELS = {
             { text: 'TÜRKIYE', cc: 'TR', x: 6510000, y: 2100000, class: 'countries', size: 12 },
             { text: 'U.K.', cc: 'UK', x: 3558000, y: 3250000, class: 'countries', size: 12 },
             { text: 'UKRAINE', cc: 'UA', x: 5890000, y: 3050000, class: 'countries', size: 12 },
+            { text: 'MOLDOVA', class: 'countries', cc: 'MD', x: 5740000, y: 2790000, size: 12 },
+            { text: 'GEORGIA', class: 'countries', cc: 'GE', x: 6942680, y: 2660000, size: 12 },
         ],
     },
     IC_32628: {

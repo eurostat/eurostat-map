@@ -18,11 +18,36 @@
         <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
 
         <script>
-            //SEQUENTIAL
+            const sorted = []
+
+            const valueTransform = function (v) {
+                if (!sorted.length) {
+                    const values = map1
+                        .statData()
+                        .getArray()
+                        .filter((v) => v !== ':' && !isNaN(v) && isFinite(v))
+                    sorted.push(...[...values].sort((a, b) => a - b))
+                }
+                let lo = 0,
+                    hi = sorted.length
+                while (lo < hi) {
+                    const mid = (lo + hi) >> 1
+                    if (sorted[mid] <= v) lo = mid + 1
+                    else hi = mid
+                }
+                return lo / sorted.length
+            }
+
+            const valueUntransform = function (t) {
+                if (!sorted.length) return t
+                const idx = Math.round(t * (sorted.length - 1))
+                return sorted[Math.max(0, Math.min(idx, sorted.length - 1))]
+            }
+
             const map1 = eurostatmap
                 .map('choropleth')
-                .title('Continuous (sequential)')
-                .subtitle('.valueTransform(Math.log) and .valueUntransform(Math.exp)')
+                .title('Continuous (quantile)')
+                .subtitle('.skipNormalization(true) with quantile valueTransform')
                 .stat({
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
@@ -30,30 +55,60 @@
                 })
                 .colorSchemeType('continuous')
                 .colorFunction(d3.interpolatePurples)
-                .valueTransform(Math.log) // for distribution stretching in continuous mode
-                .valueUntransform(Math.exp) // the legends need to 'untransform' the value to show the original value
+                .skipNormalization(true) // skip the default normalization to [0,1] since we will do a custom quantile-based transformation
+                .valueTransform(valueTransform) // for distribution stretching in continuous mode, using a quantile-based transformation
+                .valueUntransform(valueUntransform) // the legends need to 'untransform' the value to show the original value
                 .nutsLevel(2)
-                .placenames(true)
                 .legend({
-                    title: 'Test',
+                    title: 'GDP per inhabitant',
                     x: 10,
                     y: 135,
                     width: 200,
                     shapeWidth: 20,
                     tickLength: 7,
-                    ticks: 2, // defaults to 'low' and 'high' when unspecified
-                    tickValues: [3000, 50000, 112000],
-                    tickLabels: ['3000 (TRB2)', '3000 (TRB2)', 112000],
                     decimals: 0,
-                    lowLabel: 'Low',
-                    highLabel: 'High',
-                    orientation: 'vertical', // 'vertical' or 'horizontal'
+                    orientation: 'vertical',
                     boxOpacity: 0,
-                    highlightTolerance: 1000,
                 })
                 .zoomExtent([1, 10])
                 .insets('default')
                 .build()
+
+            // const map1 = eurostatmap
+            //     .map('choropleth')
+            //     .title('Continuous (sequential)')
+            //     .subtitle('.valueTransform(Math.log) and .valueUntransform(Math.exp)')
+            //     .stat({
+            //         eurostatDatasetCode: 'nama_10r_3gdp',
+            //         unitText: 'euro per inhabitant',
+            //         filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+            //     })
+            //     .colorSchemeType('continuous')
+            //     .colorFunction(d3.interpolatePurples)
+            //     .valueTransform(Math.log) // for distribution stretching in continuous mode
+            //     .valueUntransform(Math.exp) // the legends need to 'untransform' the value to show the original value
+            //     .nutsLevel(2)
+            //     .placenames(true)
+            //     .legend({
+            //         title: 'Test',
+            //         x: 10,
+            //         y: 135,
+            //         width: 200,
+            //         shapeWidth: 20,
+            //         tickLength: 7,
+            //         ticks: 2, // defaults to 'low' and 'high' when unspecified
+            //         tickValues: [3000, 50000, 112000],
+            //         tickLabels: ['3000 (TRB2)', '3000 (TRB2)', 112000],
+            //         decimals: 0,
+            //         lowLabel: 'Low',
+            //         highLabel: 'High',
+            //         orientation: 'vertical', // 'vertical' or 'horizontal'
+            //         boxOpacity: 0,
+            //         highlightTolerance: 1000,
+            //     })
+            //     .zoomExtent([1, 10])
+            //     .insets('default')
+            //     .build()
         </script>
     </body>
 </html>
