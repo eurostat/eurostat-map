@@ -67,7 +67,7 @@ export const legend = function (map) {
 
     //the order of the legend elements where applicable. Set to false to invert.
     out.ascending = true
-    out.decimals = 0
+    out.decimals = undefined // number of decimals for legend labels, undefined for automatically determine based on data
 
     out.maxMin = true // show max/min values in legends where applicable
     out.maxMinLabels = ['', ''] // Labels for max and min if maxMin is true

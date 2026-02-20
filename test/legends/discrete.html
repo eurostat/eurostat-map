@@ -12,18 +12,50 @@
 
         <script>
             const customColorFunction = d3.scaleDiverging().domain([-109, 0, 64]).interpolator(d3.interpolateRdBu)
+            // const map = eurostatmap
+            //     .map('choropleth')
+            //     .title('discrete color scheme legend')
+            //     .subtitle('discrete color scheme')
+            //     //.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+            //     .stat({ eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
+            //     .nutsLevel(3)
+            //     .zoomExtent([1, 1000])
+
+            //     .classificationMethod('threshold')
+            //     .threshold([3200, 30000, 40000, 50000, 193600])
+            //     .colors(['#B0DCB0', '#93CD93', '#76C076', '#5CB35C', '#3CA43C', '#177217'])
+            //     //.colorFunction(d3.interpolateBlues)
+            //     //.numberOfClasses(6)
+            //     .legend({
+            //         title: 'Population change',
+            //         subtitle: 'per 1000 inhabitants',
+            //         x: 560,
+            //         y: 10,
+            //         width: 200,
+            //         boxOpacity: 1,
+            //         noDataText: 'Data not available',
+            //         maxMin: true,
+            //         maxMinRegionLabels: true,
+            //         orientation: 'horizontal', //TODO
+            //     })
+            //     .build()
+
             const map = eurostatmap
                 .map('choropleth')
                 .title('discrete color scheme legend')
                 .subtitle('discrete color scheme')
                 //.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
-                .stat({ eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
-                .nutsLevel(3)
+                .stat({
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { sex: 'T', unit: 'PC', time: 2021 },
+                    unitText: '%',
+                })
+                .nutsLevel(2)
                 .zoomExtent([1, 1000])
 
-                .classificationMethod('threshold')
-                .threshold([3200, 30000, 40000, 50000, 193600])
-                .colors(['#B0DCB0', '#93CD93', '#76C076', '#5CB35C', '#3CA43C', '#177217'])
+                .classificationMethod('quantile')
+                //.threshold([3200, 30000, 40000, 50000, 193600])
+                //.colors(['#B0DCB0', '#93CD93', '#76C076', '#5CB35C', '#3CA43C', '#177217'])
                 //.colorFunction(d3.interpolateBlues)
                 //.numberOfClasses(6)
                 .legend({
@@ -33,6 +65,7 @@
                     y: 10,
                     width: 200,
                     boxOpacity: 1,
+                    decimals: 1,
                     noDataText: 'Data not available',
                     maxMin: true,
                     maxMinRegionLabels: true,

@@ -138,19 +138,44 @@ export function getThresholds(out) {
 }
 
 export function getChoroplethLabelFormatter(out) {
+    const stat = out.getColorStats(out)
+
+    const decimals = typeof out.decimals === 'number' ? out.decimals : detectDatasetPrecision(stat)
+
+    const decimalFormatter = format(`.${decimals}f`)
+
     if (out.labelType == 'ranges') {
         const thresholds = getThresholds(out)
+
         const defaultLabeller = (label, i) => {
-            const decimalFormatter = format(`.${out.decimals}f`)
             if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}`
             if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}`
-            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  `
+            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}`
         }
+
         return out.labelFormatter || defaultLabeller
     } else {
-        const decimalFormatter = format(`.${out.decimals}f`)
         return out.labelFormatter || ((value) => spaceAsThousandSeparator(decimalFormatter(value)))
     }
+}
+
+function detectDatasetPrecision(stat) {
+    if (!stat?.getArray) return 0
+
+    const values = stat.getArray().filter((v) => Number.isFinite(v))
+    if (!values.length) return 0
+
+    let maxDecimals = 0
+
+    for (const value of values) {
+        const str = value.toString()
+        if (str.includes('.')) {
+            const decimals = str.split('.')[1].length
+            maxDecimals = Math.max(maxDecimals, decimals)
+        }
+    }
+
+    return maxDecimals
 }
 
 // Highlight selected regions on mouseover

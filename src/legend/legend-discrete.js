@@ -94,8 +94,19 @@ function createThresholdsLegend(out, config) {
     let globalMaxRegion
     if ((out.maxMin || config.maxMin) && stat) {
         if (stat?.getMin && stat?.getMax) {
-            globalMin = stat.getMin()
-            globalMax = stat.getMax()
+            if (classifier?.invertExtent) {
+                const bottomClassEcl = out.ascending ? 0 : numberOfClasses - 1
+                const topClassEcl = out.ascending ? numberOfClasses - 1 : 0
+
+                const bottomExtent = classifier.invertExtent(bottomClassEcl)
+                const topExtent = classifier.invertExtent(topClassEcl)
+
+                globalMin = bottomExtent?.[0]
+                globalMax = topExtent?.[1]
+            } else {
+                globalMin = stat.getMin()
+                globalMax = stat.getMax()
+            }
         }
         if (stat?.getMaxRegionId && stat?.getMinRegionId) {
             globalMinRegionId = stat.getMinRegionId()
