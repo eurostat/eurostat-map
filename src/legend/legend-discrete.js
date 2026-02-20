@@ -406,6 +406,9 @@ function drawDivergingLine(out, y, config) {
     if (config.labelType == 'ranges') y = y + config.pointOfDivergencePadding / 2 // move to the middle of the space between legend item
     const maxLabelLength = out._discreteLegendContainer
         .selectAll('.em-legend-label')
+        .filter(function () {
+            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
+        })
         .nodes()
         .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
     const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffsets?.x + maxLabelLength + out.labelOffsets?.x + 15 // rect > offset > label > offset > padding > vertical line
