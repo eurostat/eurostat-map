@@ -5,6 +5,8 @@
 import { pointer, select } from 'd3-selection'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getLegendRegionsSelector } from '../core/utils'
+import { format } from 'd3-format'
+import { spaceAsThousandSeparator } from '../core/utils'
 
 // All of the above with or without .valueTransform / .valueUntransform
 export function createContinuousLegend(out, baseX, baseY) {
@@ -51,11 +53,10 @@ function getTransformedDomain(map) {
 }
 
 function getTitlePadding(out) {
-    // Calculate the padding between the title and the first legend item
     const map = out.map
-    return map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding
+    const p = map._mapType == 'ps' ? out.colorLegend?.titlePadding : out.titlePadding
+    return p || 0
 }
-
 function createLegendGradient(out, gradientId, isVertical) {
     const map = out.map
     const isD3Scale = typeof map.colorFunction_?.domain === 'function'
@@ -116,52 +117,25 @@ function drawLegendRect(gradientId, out, width, height, isVertical) {
     addMouseEvents(rect, out, width, isVertical)
 }
 
-function getMaxDecimals(values) {
-    let maxDecimals = 0
-
-    values.forEach((val) => {
-        if (val == null || isNaN(val)) return
-        const str = val.toString()
-        if (str.includes('.')) {
-            const decimals = str.split('.')[1].length
-            if (decimals > maxDecimals) maxDecimals = decimals
-        }
-    })
-
-    return maxDecimals
-}
-
-function getColorData(out) {
-    const map = out.map
-    if (map._mapType === 'ps') {
-        // For proportional symbols, use the color function directly
-        return map.statData('color')
-    } else {
-        return map.statData()
-    }
-}
-
 function addMouseEvents(rect, out, legendLength, isVertical) {
     const map = out.map
-    const domain = getUntransformedDomain(map) // untransformed for display
+    const domain = getUntransformedDomain(map)
     const untransform = map.valueUntransform_ || ((d) => d)
     const container = out._continuousLegendContainer
     const titlePadding = getTitlePadding(out)
     const highlightFunction = getHighlightFunction(map)
     const unhighlightFunction = getUnHighlightFunction(map)
+    const formatter = getChoroplethLabelFormatter(out)
 
     rect.on('mousemove', function (event) {
         const [mx, my] = pointer(event, this)
 
-        // Position along the gradient (adjust for padding if vertical)
         const along = isVertical ? my - titlePadding : mx
         const clamped = Math.max(0, Math.min(legendLength, along))
         const norm = clamped / legendLength
-
-        // Invert for vertical so bottom = min, top = max
         const t = isVertical ? 1 - norm : norm
 
-        // Map normalized t → raw domain value
+        // ---- Interpolate value ----
         let rawVal
         if (domain.length === 3) {
             const [d0, d1, d2] = domain
@@ -179,13 +153,13 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
 
         rawVal = untransform(rawVal)
 
-        // Clear old markers
+        // Clear previous hover elements
         container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label').remove()
 
         const x = isVertical ? 0 : clamped
         const y = isVertical ? clamped + titlePadding : 0
 
-        // Draw hover line
+        // Hover line
         container
             .append('line')
             .attr('class', 'em-hover-line')
@@ -197,7 +171,7 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
             .attr('stroke-width', 1)
             .attr('pointer-events', 'none')
 
-        // Draw tick
+        // Hover tick
         container
             .append('circle')
             .attr('class', 'em-hover-tick')
@@ -207,8 +181,7 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
             .attr('fill', 'black')
             .attr('pointer-events', 'none')
 
-        // Draw label
-        const labelFormatter = getChoroplethLabelFormatter(out)
+        // Hover label
         container
             .append('text')
             .attr('class', 'em-hover-label')
@@ -217,15 +190,14 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
             .attr('text-anchor', isVertical ? 'start' : 'middle')
             .attr('alignment-baseline', 'middle')
             .attr('pointer-events', 'none')
-            .text(labelFormatter(rawVal))
+            .text(formatter(rawVal))
 
-        //highlight on map
+        // Highlight on map
         highlightFunction(map, rawVal)
     })
 
     rect.on('mouseout', function () {
         container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label').remove()
-        //highlight on map
         unhighlightFunction(map)
     })
 }

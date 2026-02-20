@@ -141,8 +141,9 @@ export function getChoroplethLabelFormatter(out) {
     const stat = out.getColorStats(out)
 
     const decimals = typeof out.decimals === 'number' ? out.decimals : detectDatasetPrecision(stat)
+    out._resolvedDecimals = decimals
 
-    const decimalFormatter = format(`.${decimals}f`)
+    const decimalFormatter = format(`,.${decimals}f`)
 
     if (out.labelType == 'ranges') {
         const thresholds = getThresholds(out)
@@ -155,7 +156,8 @@ export function getChoroplethLabelFormatter(out) {
 
         return out.labelFormatter || defaultLabeller
     } else {
-        return out.labelFormatter || ((value) => spaceAsThousandSeparator(decimalFormatter(value)))
+        const round = (v) => Number(v.toFixed(decimals))
+        return out.labelFormatter || ((value) => spaceAsThousandSeparator(round(value)))
     }
 }
 
