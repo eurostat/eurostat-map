@@ -61,24 +61,23 @@ function defineSizeClassifier(out) {
  * @description assigns a color to each symbol, based on their statistical value
  * @param {*} map
  */
-export function applyClassificationToMap(map) {
-    if (map.svg_) {
-        if (map.classifierColor_) {
-            //assign color class to each symbol, based on their value
-            // at this point, the symbol path hasnt been appended. Only the parent g element (.em-centroid)
-            const colorData = map.statData('color')
-            map.svg_.selectAll('.em-centroid').attr('ecl', function (rg) {
-                const sv = colorData.get(rg.properties.id)
-                if (!sv) {
-                    return 'nd'
-                }
-                const v = sv.value
-                if ((v !== 0 && !v) || v == ':') {
-                    return 'nd'
-                }
-                let c = +map.classifierColor_(+v)
-                return c
-            })
-        }
-    }
+export function applyClassificationToMap(map, root) {
+    if (!map?.svg_) return;
+
+    const classifier = map.classifierColor_ || root?.classifierColor_;
+    if (typeof classifier !== 'function') return;
+
+    const colorData = map.statData('color');
+    if (!colorData) return;
+
+    map.svg_.selectAll('.em-centroid')
+        .attr('ecl', function (rg) {
+            const sv = colorData.get(rg.properties.id);
+            if (!sv) return 'nd';
+
+            const v = sv.value;
+            if ((v !== 0 && !v) || v === ':') return 'nd';
+
+            return +classifier(+v);
+        });
 }

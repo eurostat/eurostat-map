@@ -1,6 +1,6 @@
 {
     "name": "eurostat-map",
-    "version": "4.3.41",
+    "version": "4.3.42",
     "description": "Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.",
     "keywords": [
         "eurostat",
@@ -46,14 +46,14 @@
         "d3-force": "^3.0.0",
         "d3-format": "^3.1.0",
         "d3-geo": "^3.1.1",
+        "d3-geo-projection": "^3.0.0",
         "d3-interpolate": "^3.0.1",
         "d3-scale": "^4.0.2",
         "d3-scale-chromatic": "^3.1.0",
         "d3-selection": "^3.0.0",
         "d3-shape": "^3.2.0",
-        "d3-zoom": "^3.0.0",
-        "d3-geo-projection": "^3.0.0",
         "d3-svg-annotation": "^2.5.1",
+        "d3-zoom": "^3.0.0",
         "idb-keyval": "^6.2.2",
         "jsonstat-toolkit": "^1.0.8",
         "proj4": "^2.17.0",
@@ -80,6 +80,6 @@
         "webpack-cli": "^5.0.0",
         "webpack-dev-server": "^5.2.2",
         "webpack-livereload-plugin": "^3.0.2",
-        "worker-loader": "^3.0.8"
+        "worker-loader": "^0.8.0"
     }
 }

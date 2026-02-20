@@ -143,7 +143,7 @@ export const map = function (config) {
 
             // apply classification to all insets that are outside of the main map's SVG
             if (out.insetTemplates_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+                executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => applyClassificationToMap(inset, out))
             }
 
             // apply to main map
@@ -408,7 +408,7 @@ export const map = function (config) {
             .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
 
         // Re-apply classification to the new containers
-        applyClassificationToMap(map)
+        applyClassificationToMap(map, out)
     }
 
     /**
