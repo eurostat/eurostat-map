@@ -94,29 +94,17 @@ function createThresholdsLegend(out, config) {
     let globalMaxRegion
     if ((out.maxMin || config.maxMin) && stat) {
         if (stat?.getMin && stat?.getMax) {
-            if (classifier?.invertExtent) {
-                const bottomClassEcl = out.ascending ? 0 : numberOfClasses - 1
-                const topClassEcl = out.ascending ? numberOfClasses - 1 : 0
-
-                const bottomExtent = classifier.invertExtent(bottomClassEcl)
-                const topExtent = classifier.invertExtent(topClassEcl)
-
-                globalMin = bottomExtent?.[0]
-                globalMax = topExtent?.[1]
-            } else {
-                globalMin = stat.getMin()
-                globalMax = stat.getMax()
-            }
+            globalMin = stat.getMin()
+            globalMax = stat.getMax()
         }
         if (stat?.getMaxRegionId && stat?.getMinRegionId) {
             globalMinRegionId = stat.getMinRegionId()
             globalMaxRegionId = stat.getMaxRegionId()
-            // get region names from geometries
             const allFeatures = map.Geometries.getAllRegionFeatures()
             const minFeature = allFeatures.find((f) => f.properties.id === globalMinRegionId)
             const maxFeature = allFeatures.find((f) => f.properties.id === globalMaxRegionId)
-            if (minFeature) globalMinRegion = minFeature.properties?.na || minFeature.properties?.na || globalMinRegionId
-            if (maxFeature) globalMaxRegion = maxFeature.properties?.na || maxFeature.properties?.na || globalMaxRegionId
+            if (minFeature) globalMinRegion = minFeature.properties?.na || globalMinRegionId
+            if (maxFeature) globalMaxRegion = maxFeature.properties?.na || globalMaxRegionId
         }
     }
 

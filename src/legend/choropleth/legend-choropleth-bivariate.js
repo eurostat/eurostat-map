@@ -171,7 +171,7 @@ export const legend = function (map, config) {
 
     function addSquares() {
         const lgg = out.lgg
-        const numberOfClasses = out.map.numberOfClasses()
+        const numberOfClasses = out.map.numberOfClasses_ || 3
         const sz = out.squareSize / numberOfClasses
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
         const initialX = 0
@@ -189,7 +189,7 @@ export const legend = function (map, config) {
             for (let j = 0; j < numberOfClasses; j++) {
                 const ecl1 = numberOfClasses - i - 1
                 const ecl2 = numberOfClasses - j - 1
-                const fill = out.map.classToFillStyle()(ecl1, ecl2)
+                const fill = out.map.classToFillStyle_(ecl1, ecl2)
 
                 square
                     .append('rect')
