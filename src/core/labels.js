@@ -1,7 +1,14 @@
 import { select } from 'd3-selection'
-import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup } from './utils'
+import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColorForBackground, compactFormatter } from './utils'
 
 // handles all map labels e.g. stat values, or labels specified in map.labels({labels:[text:'myLabel', x:123, y: 123]})
+
+/** Minimum font size (px) for labels inside proportional symbols.
+ *  If the radius-derived size falls below this, the label overflows outside the circle. */
+const PS_LABEL_MIN_FONT_SIZE = 11
+const PS_LABEL_OVERFLOW_FONT_SIZE = PS_LABEL_MIN_FONT_SIZE + 2 // 8.5px when overflowing outside circle
+
+// ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
  * @function addLabelsToMap
@@ -10,67 +17,43 @@ import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup } from './ut
  * @description appends text labels to the map. Labels can be countries, country codes, ocean names or statistical values
  */
 export const addLabelsToMap = function (map, zg) {
-    // set defaults
     if (!map.labels_.config) map.labels_.config = DEFAULTLABELS
     if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
 
-    //define formatter
-    map._statLabelFormatter = map.labels_.valuesFormatter ? map.labels_.valuesFormatter : spaceAsThousandSeparator
+    map._statLabelFormatter = map.labels_.valuesFormatter ? map.labels_.valuesFormatter : compactFormatter.format
 
-    // use existing or append new container
     let existing = zg.select('#em-labels')
     let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels').attr('class', 'em-labels') : existing
 
-    //for statistical values on maps without centroids, we need to add centroids initially, then add text to them later once the stat data is loaded
     if (map.labels_?.values && map._mapType !== 'ps') appendStatLabelCentroidsToMap(map, labelsContainer)
 
-    // get labels array
     let labelsArray = map.labels_?.labels || DEFAULTLABELS[`${map.geo}_${map.proj_}.cc`]
 
-    // append other labels to map
     if (labelsArray) {
-        // create or reuse containers
         const shadowg = ensureGroup(labelsContainer, 'em-label-shadows')
         const labelg = ensureGroup(labelsContainer, 'em-labels')
 
-        //SHADOWS
         if (map.labels_?.shadows) {
-            let shadows = shadowg
+            shadowg
                 .selectAll('text')
                 .data(labelsArray)
                 .enter()
                 .append('text')
                 .attr('id', (d) => 'em-label-shadow-' + d.text.replace(/\s+/g, '-'))
                 .attr('class', (d) => 'em-label-shadow em-label-shadow-' + d.class)
-                .attr('x', function (d) {
-                    if (d.rotate) {
-                        return 0 //for rotated text, x and y positions must be specified in the transform property
-                    }
-                    return map._projection([d.x, d.y])[0]
-                })
-                .attr('y', function (d) {
-                    if (d.rotate) {
-                        return 0 //for rotated text, x and y positions must be specified in the transform property
-                    }
-                    return map._projection([d.x, d.y])[1]
-                })
-                .attr('dy', -7) // set y position of bottom of text
+                .attr('x', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[0]))
+                .attr('y', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[1]))
+                .attr('dy', -7)
                 .attr('transform', (d) => {
                     if (d.rotate) {
-                        let pos = map._projection([d.x, d.y])
-                        let x = pos[0]
-                        let y = pos[1]
+                        const [x, y] = map._projection([d.x, d.y])
                         return `translate(${x},${y}) rotate(${d.rotate})`
-                    } else {
-                        return 'rotate(0)'
                     }
+                    return 'rotate(0)'
                 })
-                .text(function (d) {
-                    return d.text
-                }) // define the text to display
+                .text((d) => d.text)
         }
 
-        //LABEL texts
         labelg
             .selectAll('text')
             .data(labelsArray)
@@ -78,35 +61,166 @@ export const addLabelsToMap = function (map, zg) {
             .append('text')
             .attr('id', (d) => 'em-label-' + d.text.replace(/\s+/g, '-'))
             .attr('class', (d) => 'em-label em-label-' + d.class)
-            //position label
-            .attr('x', function (d) {
-                if (d.rotate) {
-                    return 0 //for rotated text, x and y positions must be specified in the transform property
-                }
-                return map._projection([d.x, d.y])[0]
-            })
-            .attr('y', function (d) {
-                if (d.rotate) {
-                    return 0 //for rotated text, x and y positions must be specified in the transform property
-                }
-                return map._projection([d.x, d.y])[1]
-            })
-            .attr('dy', -7) // set y position of bottom of text
-            //transform labels which have a "rotate" property in the labels config. For rotated labels, their X,Y must also be set in the transform.
-            // note: dont apply to country code labels
+            .attr('x', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[0]))
+            .attr('y', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[1]))
+            .attr('dy', -7)
             .attr('transform', (d) => {
                 if (d.rotate) {
-                    let pos = map._projection([d.x, d.y])
-                    let x = pos[0]
-                    let y = pos[1]
+                    const [x, y] = map._projection([d.x, d.y])
                     return `translate(${x},${y}) rotate(${d.rotate})`
-                } else {
-                    return 'rotate(0)'
                 }
+                return 'rotate(0)'
             })
-            .text(function (d) {
-                return d.text
-            }) // define the text to display
+            .text((d) => d.text)
+    }
+}
+
+/**
+ * @function appendLabelsToSymbols
+ * @description Appends stat value labels and/or country-code labels to proportional symbol circles.
+ *   Labels are formatted with map._statLabelFormatter (same as choropleth stat labels).
+ *   When the radius-derived font size would fall below PS_LABEL_MIN_FONT_SIZE the label
+ *   overflows outside the circle rather than becoming illegibly tiny.
+ *   Shadows are rendered when map.labels_.shadows is truthy, consistent with choropleth behaviour.
+ */
+export const appendLabelsToSymbols = function (map, sizeData, out) {
+    // Ensure the formatter is set (mirrors the guard in addLabelsToMap / updateLabels)
+    if (!map._statLabelFormatter) {
+        map._statLabelFormatter = out.labels_?.valuesFormatter ? out.labels_?.valuesFormatter : compactFormatter.format
+    }
+
+    const symbolContainers = map.svg().selectAll('g.em-centroid')
+    const hasStatLabels = !!out.labels_?.values
+    const hasShadows = !!out.labels_?.shadows
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+
+    const getRadius = (d) => {
+        const datum = sizeData.get(d.properties.id)
+        return datum ? out.classifierSize_(+datum.value) : 0
+    }
+
+    const validRegions = (sel) =>
+        sel.filter((d) => {
+            const datum = sizeData.get(d.properties.id)
+            return datum?.value !== ':' && datum?.value != null
+        })
+
+    const STAT_FACTOR = 0.4
+    let CODE_FACTOR = out.psCodeLabels_ ? (hasStatLabels ? 0.8 : 0.9) : null
+    if (out.psCodeLabels_ && out.psShape_ === 'square') CODE_FACTOR -= 0.4
+
+    const isOverflowing = (radius, factor) => radius * factor < PS_LABEL_MIN_FONT_SIZE
+
+    // ── country-code labels ───────────────────────────────────────────────────
+
+    if (out.psCodeLabels_) {
+        let factor = hasStatLabels ? 0.8 : 0.9
+        if (out.psShape_ === 'square') factor -= 0.4
+
+        const appendCodeLabel = (container, isShadow) =>
+            validRegions(container)
+                .append('text')
+                .attr('class', (d) => {
+                    const overflow = isOverflowing(getRadius(d), CODE_FACTOR)
+                    const base = isShadow ? 'em-circle-code-label-shadow' : 'em-circle-code-label'
+                    return overflow ? `${base} em-code-overflowing` : base
+                })
+                .text((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    return datum?.value === ':' ? '' : d.properties.id
+                })
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .attr('font-family', 'sans-serif')
+                .style('font-size', (d) => {
+                    const r = getRadius(d)
+                    const computed = r * factor
+                    return `${computed < PS_LABEL_MIN_FONT_SIZE ? PS_LABEL_OVERFLOW_FONT_SIZE : computed}px`
+                })
+                .attr('fill', function (d) {
+                    if (isShadow) return 'none'
+                    const r = getRadius(d)
+                    if (isOverflowing(r, factor)) return '#333333'
+                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill
+                    return getTextColorForBackground(fill)
+                })
+                .attr('stroke', (d) => {
+                    if (!isShadow) return 'none'
+                    return isOverflowing(getRadius(d), CODE_FACTOR) ? 'white' : 'none'
+                })
+                .attr('stroke-width', (d) => {
+                    if (!isShadow) return 0
+                    return isOverflowing(getRadius(d), CODE_FACTOR) ? 3 : 0
+                })
+                .attr('paint-order', 'stroke')
+                .attr('dominant-baseline', 'auto') // override for overflowing labels so y positions top of text
+                .attr('dy', (d) => {
+                    if (isOverflowing(getRadius(d), CODE_FACTOR)) return null
+                    if (hasStatLabels && sizeData.get(d.properties.id)?.value) return '-0.3em'
+                    return '0'
+                })
+                .attr('y', (d) => {
+                    const r = getRadius(d)
+                    if (!isOverflowing(r, CODE_FACTOR)) return null
+                    return -(r + 2)
+                })
+                .style('pointer-events', 'none')
+
+        if (hasShadows) appendCodeLabel(symbolContainers, true)
+        appendCodeLabel(symbolContainers, false)
+    }
+
+    // ── stat value labels ─────────────────────────────────────────────────────
+
+    if (hasStatLabels) {
+        const appendStatLabel = (container, isShadow) =>
+            validRegions(container)
+                .append('text')
+                .attr('class', (d) => {
+                    const overflow = isOverflowing(getRadius(d), STAT_FACTOR)
+                    const base = isShadow ? 'em-circle-stat-label-shadow' : 'em-circle-stat-label'
+                    return overflow ? `${base} em-stat-overflowing` : base
+                })
+                .text((d) => {
+                    const datum = sizeData.get(d.properties.id)
+                    if (datum?.value == null || datum.value === ':') return ''
+                    return map._statLabelFormatter(datum.value)
+                })
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .attr('font-family', 'sans-serif')
+                .style('font-size', (d) => {
+                    const r = getRadius(d)
+                    return `${Math.max(r * STAT_FACTOR, PS_LABEL_MIN_FONT_SIZE)}px`
+                })
+                .attr('fill', function (d) {
+                    if (isShadow) return 'none'
+                    const r = getRadius(d)
+                    if (isOverflowing(r, STAT_FACTOR)) return '#333333'
+                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
+                    return getTextColorForBackground(fill)
+                })
+                .attr('stroke', (d) => {
+                    if (!isShadow) return 'none'
+                    // Only shadow overflowing labels — inside labels have contrast already
+                    return isOverflowing(getRadius(d), STAT_FACTOR) ? 'white' : 'none'
+                })
+                .attr('stroke-width', (d) => {
+                    if (!isShadow) return 0
+                    return isOverflowing(getRadius(d), STAT_FACTOR) ? 3 : 0
+                })
+                .attr('paint-order', 'stroke')
+                .attr('dy', () => (out.psCodeLabels_ ? '0.8em' : '0'))
+                // .attr('y', (d) => {
+                //     const r = getRadius(d)
+                //     if (!isOverflowing(r, STAT_FACTOR)) return null
+                //     return out.psCodeLabels_ ? r + PS_LABEL_OVERFLOW_FONT_SIZE : -(r + PS_LABEL_OVERFLOW_FONT_SIZE * 0.5)
+                // })
+                .style('pointer-events', 'none')
+
+        if (hasShadows) appendStatLabel(symbolContainers, true)
+        appendStatLabel(symbolContainers, false)
     }
 }
 

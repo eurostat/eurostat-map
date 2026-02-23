@@ -716,3 +716,14 @@ export function getRegionById(map, id) {
 
     return region
 }
+
+export const compactFormatter = new Intl.NumberFormat('en', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1,
+})
+export const longFormatter = new Intl.NumberFormat('en', {
+    notation: 'compact',
+    compactDisplay: 'long',
+    maximumFractionDigits: 1,
+})

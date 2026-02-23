@@ -1,100 +1,117 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .nuts-label {
+                font-family: system-ui, sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                margin-right: 8px;
+                color: #333;
+            }
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>eurostat-map.js</title>
-    <style>
-        .nuts-label {
-            font-family: system-ui, sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            margin-right: 8px;
-            color: #333;
-        }
+            .nuts-select {
+                padding: 6px 12px;
+                font-size: 14px;
+                font-family: system-ui, sans-serif;
+                font-weight: 500;
+                border: 1px solid #ccc;
+                border-radius: 6px;
+                background-color: #fff;
+                color: #333;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+                transition: all 0.2s ease;
+            }
 
-        .nuts-select {
-            padding: 6px 12px;
-            font-size: 14px;
-            font-family: system-ui, sans-serif;
-            font-weight: 500;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            background-color: #fff;
-            color: #333;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-            transition: all 0.2s ease;
-        }
+            .nuts-select:hover {
+                border-color: #0078d7;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+            }
 
-        .nuts-select:hover {
-            border-color: #0078d7;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
-        }
+            .nuts-select:focus {
+                outline: none;
+                border-color: #0078d7;
+                box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.25);
+            }
+        </style>
+    </head>
 
-        .nuts-select:focus {
-            outline: none;
-            border-color: #0078d7;
-            box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.25);
-        }
-    </style>
-</head>
+    <body>
+        <!-- dropdown to select nuts level -->
+        <div>
+            <label for="nutsLevel" class="nuts-label">NUTS level:</label>
+            <select id="nutsLevel" class="nuts-select">
+                <option value="0" selected>NUTS0</option>
+                <option value="1">NUTS1</option>
+                <option value="2">NUTS2</option>
+                <option value="3">NUTS3</option>
+            </select>
+        </div>
 
-<body>
-    <!-- dropdown to select nuts level -->
-    <div>
-        <label for="nutsLevel" class="nuts-label">NUTS level:</label>
-        <select id="nutsLevel" class="nuts-select">
-            <option value="0">NUTS0</option>
-            <option value="1">NUTS1</option>
-            <option value="2">NUTS2</option>
-            <option value="3" selected>NUTS3</option>
-        </select>
+        <svg id="map"></svg>
+        <svg id="legend"></svg>
 
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // barebones proportional circles example
+            let map = eurostatmap
+                .map('ps')
+                .title('Total GDP')
+                .scale('60M')
+                // .stat('size', {
+                //     eurostatDatasetCode: 'nama_10r_3gdp',
+                //     unitText: 'Million EUR',
+                //     filters: { unit: 'MIO_EUR', time: '2023' },
+                // })
+                .stat('size', {
+                    eurostatDatasetCode: 'demo_r_pjangrp3',
+                    filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+                    unitText: 'inhabitants',
+                })
+                .legend({
+                    title: 'Total ',
+                    subtitle: 'test',
+                    x: 5,
+                    y: 125,
+                    sizeLegend: {
+                        title: 'Total ',
+                        subtitle: 'test',
+                        //values: [100, 300000],
+                    },
+                })
+                .psShape('circle')
+                .psMinSize(2)
+                .psMaxSize(45)
+                .psStrokeWidth(0.1)
+                .psStroke('white')
+                .psFillOpacity(1)
+                .psStrokeOpacity(0.9)
+                .zoomExtent([1, 10])
+                .insets('default')
+                .psCodeLabels(true)
+                .dorling(true)
+                .labels({
+                    labels: [],
+                    values: true,
+                    backgrounds: false,
+                    shadows: true,
+                    statLabelsPositions: undefined,
+                })
+                .nutsLevel('mixed') // default
+            //.nutsLevel(0) // default
 
-    </div>
-    </div>
-    <svg id="map"></svg>
-    <svg id="legend"></svg>
-    </div>
+            map.build()
 
-    <script src="../../../build/eurostatmap.js"></script>
-    <script>
-        // barebones proportional circles example
-        let map = eurostatmap
-            .map('ps')
-            .title('Total GDP')
-            .scale("60M")
-            .stat('size', {
-                eurostatDatasetCode: 'nama_10r_3gdp',
-                unitText: 'Million EUR',
-                filters: { unit: 'MIO_EUR', time: '2023' }
-            }).legend({
-                title: 'Total GDP',
-                subtitle: 'Million EUR',
-                x:5,
-                y:125
+            // handle dropdown changes
+            const select = document.getElementById('nutsLevel')
+            select.addEventListener('change', (e) => {
+                const level = +e.target.value // number 0–3
+                map.nutsLevel(level).psMaxSize([55, 20, 20, 15][level]).build() // reapply and rebuild
             })
-            .psShape('circle')
-            .psMinSize(2)
-            .psMaxSize(15)
-            .psStrokeWidth(0.1)
-            .psStroke('white')
-            .psFillOpacity(1)
-            .psStrokeOpacity(0.9)
-            .zoomExtent([1, 10]).insets('default')
-            .nutsLevel(3); // default
-
-        map.build();
-
-        // handle dropdown changes
-        const select = document.getElementById('nutsLevel');
-        select.addEventListener('change', e => {
-            const level = +e.target.value; // number 0–3
-            map.nutsLevel(level).psMaxSize([55,20,20,15][level]).build();  // reapply and rebuild
-        });
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>

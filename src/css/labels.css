@@ -101,3 +101,31 @@
     font-size: 13px;
     stroke-width: 3px;
 }
+
+.em-circle-stat-label,
+.em-circle-stat-label-shadow {
+    text-anchor: middle;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    font-family: Arial, Helvetica, sans-serif;
+    dominant-baseline: central;
+    pointer-events: none;
+    paint-order: stroke fill;
+}
+
+.em-circle-code-label,
+.em-circle-code-label-shadow {
+    text-anchor: middle;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    font-family: Arial, Helvetica, sans-serif;
+    dominant-baseline: central;
+    pointer-events: none;
+    paint-order: stroke fill;
+}
+
+/* labels that overflow outside the proportional symbol */
+.em-stat-overflowing,
+.em-code-overflowing {
+    opacity: 0.75;
+}

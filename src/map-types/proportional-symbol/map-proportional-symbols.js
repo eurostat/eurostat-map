@@ -13,6 +13,7 @@ import { appendCirclesToMap } from './symbols/circles.js'
 import { appendBarsToMap } from './symbols/bars.js'
 import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
 import { appendCustomSymbolsToMap } from './symbols/custom.js'
+import { appendLabelsToSymbols } from '../../core/labels.js'
 
 /**
  * Returns a proportional symbol map.
@@ -197,7 +198,7 @@ export const map = function (config) {
 
             setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
-            appendLabelsToSymbols(map, sizeData)
+            appendLabelsToSymbols(map, sizeData, out)
 
             // Mouse events are added after transitions complete
             // The symbol append functions (appendCirclesToMap, etc.) handle this via .on('end')
@@ -270,70 +271,6 @@ export const map = function (config) {
                 })
                 .style('fill', out.noDataFillStyle())
                 .attr('fill___', out.noDataFillStyle()) // save for legend mouseover
-        }
-    }
-
-    const appendLabelsToSymbols = function (map, sizeData) {
-        let symbolContainers = map.svg().selectAll('g.em-centroid')
-        //country code labels
-        if (out.psCodeLabels_) {
-            const countryCodeLabel = symbolContainers
-                .filter((d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    return datum?.value !== ':' && datum?.value != null // Ignore `':'`, `null`, and `undefined`
-                })
-                .append('text')
-                .attr('class', 'em-circle-code-label')
-                .text((d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    return datum?.value === ':' ? '' : d.properties.id // Hide text if value is ':'
-                })
-                .attr('text-anchor', 'middle')
-                .attr('dominant-baseline', 'middle')
-                .attr('font-family', 'sans-serif')
-                .style('font-size', (d) => {
-                    // calculate radius
-                    const datum = sizeData.get(d.properties.id)
-                    const radius = datum ? out.classifierSize_(+datum.value) : 0
-                    // size adjustment factor depends on symbol type, and whether stat values are also added to the circles
-                    let factor = out.labels_?.values && sizeData.get(d.properties.id)?.value ? 0.8 : 0.9
-                    if (out.psShape_ === 'square') factor = factor - 0.4
-                    return `${radius * factor}px`
-                })
-                .attr('fill', function () {
-                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill
-                    return getTextColorForBackground(fill)
-                })
-                .attr('dy', (d) => (out.labels_?.values && sizeData.get(d.properties.id)?.value ? '-0.3em' : '0'))
-        }
-
-        //stat labels
-        if (out.labels_?.values) {
-            const statLabels = symbolContainers
-                .filter((d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    return datum?.value !== ':' && datum?.value != null // Ignore `':'`, `null`, and `undefined`
-                })
-                .append('text')
-                .attr('class', 'em-circle-stat-label')
-                .text((d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    if (datum?.value) return datum.value
-                })
-                .attr('text-anchor', 'middle')
-                .attr('dominant-baseline', 'middle')
-                .attr('font-family', 'sans-serif')
-                .style('font-size', (d) => {
-                    // calculate radius
-                    const datum = sizeData.get(d.properties.id)
-                    const radius = datum ? out.classifierSize_(+datum.value) : 0
-                    return `${radius * 0.4}px`
-                })
-                .attr('fill', function () {
-                    const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
-                    return getTextColorForBackground(fill)
-                })
-                .attr('dy', (d) => (out.psCodeLabels_ ? '0.8em' : '0'))
         }
     }
 

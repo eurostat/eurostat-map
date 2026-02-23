@@ -1,3 +1,5 @@
+import { compactFormatter, longFormatter } from '../../../../../src/core/utils'
+
 const configs = {
     LOC_NR: {
         title: 'Number of units',
@@ -15,16 +17,7 @@ const configs = {
         multiplier: 1000000, // MEUR → EUR
     },
 }
-const compactFormatter = new Intl.NumberFormat('en', {
-    notation: 'compact',
-    compactDisplay: 'short',
-    maximumFractionDigits: 1,
-})
-const longFormatter = new Intl.NumberFormat('en', {
-    notation: 'compact',
-    compactDisplay: 'long',
-    maximumFractionDigits: 1,
-})
+
 const spaceAsThousandSeparator = (number) => {
     return number.toLocaleString('en').replace(/,/g, ' ')
 }
