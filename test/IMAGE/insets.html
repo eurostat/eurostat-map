@@ -69,8 +69,12 @@
                 overflow-y: auto;
                 font-size: 12px;
             }
-            .em-zoom-buttons {
+            /* .em-zoom-buttons {
                 transform: translate(94%, 580px) !important;
+            } */
+
+            .em-inset .em-zoom-buttons {
+                display: none;
             }
         </style>
     </head>
@@ -368,6 +372,7 @@
                     .transitionDuration(0)
                     .insets(insetsCfg)
                     .insetBoxPosition(insetBoxPosition)
+                    //.zoomButtonsPosition([94, 580])
                     .callback((m) => {
                         callbackCount++
                         log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`)

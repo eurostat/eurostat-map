@@ -5,20 +5,18 @@ import { mapTemplate } from './map-template'
  * Build inset maps for a map template
  */
 export const buildInsets = function (out, withCenterPoints, mapType) {
-        // Early return if no insets to build
+    // Early return if no insets to build
     if (!out.insets_ || out.insets_.length === 0) {
         return out
     }
 
-    
     if (!out.insetBoxPosition_) {
         out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_]
     }
 
     let svg = select('#' + out.svgId_)
     let drawingGroup = svg.select('#em-drawing-' + out.svgId_)
-    
-    
+
     const insetsGroup = drawingGroup
         .append('g')
         .attr('id', 'em-insets-group')
@@ -29,14 +27,12 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
         out.insets_ = defaultInsetConfig(out.insetBoxWidth_, out.insetBoxPadding_)
     }
 
-
     for (let i = 0; i < out.insets_.length; i++) {
         const config = out.insets_[i]
-        
+
         config.svgId = config.svgId || 'inset' + config.geo + Math.random().toString(36).substring(7)
 
         let svg = select('#' + config.svgId)
-
 
         if (svg.size() == 0) {
             const x = config.x == undefined ? out.insetBoxPadding_ : config.x
@@ -49,7 +45,7 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
             ggeo.append('svg').attr('id', config.svgId)
         }
 
-         // GISCO-2676 - PT azores inset has 2 insets with the same Geo, so second was overriding first:
+        // GISCO-2676 - PT azores inset has 2 insets with the same Geo, so second was overriding first:
         if (out.insetTemplates_[config.geo]) {
             //if inset already exists in map with same geo, then push both to an array
             let inset = buildInset(config, out, withCenterPoints, mapType)
@@ -61,7 +57,7 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
             out.insetTemplates_[config.geo] = drawnInset
         }
     }
-    
+
     return out
 }
 /** Build template for inset, based on main one */
@@ -73,6 +69,7 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     //mt[key__] = map[key__];
     //}
 
+    config.isInset = true
     const mt = mapTemplate(config, withCenterPoints, mapType)
 
     //define default values for inset configs
@@ -88,35 +85,35 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     config.insetTemplates = config.insetTemplates || {}
     config.callback = config.callback || out.callback_
 
-        //copy main map attributes
-        ;[
-            'nutsLevel_',
-            'nutsYear_',
-            'hoverColor_',
-            //'nutsbnStroke_', // DEPRECATED
-            // 'nutsbnStrokeWidth_', // DEPRECATED
-            'cntrgFillStyle_', // DEPRECATED
-            'cntbnStroke_', // DEPRECATED
-            'cntbnStrokeWidth_', // DEPRECATED
-            'seaFillStyle_', // DEPRECATED
-            'drawCoastalMargin_',
-            'coastalMarginColor_', // DEPRECATED
-            'coastalMarginWidth_', // DEPRECATED
-            'coastalMarginStdDev_',
-            'graticuleStroke_', // DEPRECATED
-            'graticuleStrokeWidth_', // DEPRECATED
-            'lg_',
-            'projectionFunction_',
-            'filterGeometriesFunction_',
-            'processCentroids_',
-        ].forEach(function (att) {
-            mt[att] = out[att]
-        })
+    //copy main map attributes
+    ;[
+        'nutsLevel_',
+        'nutsYear_',
+        'hoverColor_',
+        //'nutsbnStroke_', // DEPRECATED
+        // 'nutsbnStrokeWidth_', // DEPRECATED
+        'cntrgFillStyle_', // DEPRECATED
+        'cntbnStroke_', // DEPRECATED
+        'cntbnStrokeWidth_', // DEPRECATED
+        'seaFillStyle_', // DEPRECATED
+        'drawCoastalMargin_',
+        'coastalMarginColor_', // DEPRECATED
+        'coastalMarginWidth_', // DEPRECATED
+        'coastalMarginStdDev_',
+        'graticuleStroke_', // DEPRECATED
+        'graticuleStrokeWidth_', // DEPRECATED
+        'lg_',
+        'projectionFunction_',
+        'filterGeometriesFunction_',
+        'processCentroids_',
+    ].forEach(function (att) {
+        mt[att] = out[att]
+    })
 
-        //copy stat map attributes/methods
-        ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', 'classToText_'].forEach(function (att) {
-            mt[att] = out[att]
-        })
+    //copy stat map attributes/methods
+    ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', 'classToText_'].forEach(function (att) {
+        mt[att] = out[att]
+    })
 
     //apply config values for inset
     for (let key in config) mt[key + '_'] = config[key]

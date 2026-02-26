@@ -14,10 +14,10 @@ export const appendZoomButtons = (map) => {
         const userPosition = map.zoomButtonsPosition_
         buttonGroup.attr('transform', `translate(${userPosition[0]}, ${userPosition[1]})`)
     } else {
-        // Default position: top right corner with some padding
+        // Default position: bottom right corner with some padding
         const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
         const padding = 10
-        buttonGroup.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${padding})`)
+        buttonGroup.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${map.height_ - buttonSize * 2 - padding * 2})`)
     }
 
     const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set

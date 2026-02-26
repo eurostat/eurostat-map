@@ -41,6 +41,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     //build map template object
     const out = {}
     out._mapType = mapType
+    out.isInset_ = false
 
     // expose imported function to other modules
     out.updateValuesLabels = updateValuesLabels
@@ -236,6 +237,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             return out
         }
     }
+
+    out.isInset = config?.isInset || false
 
     // warn existing users of functions that have been banished to the shadow realm.
     defineDeprecatedFunctions(out)
@@ -462,6 +465,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
             svg = select('body').append('svg').attr('id', out.svgId())
         }
         svg.attr('class', 'em-map')
+        if (out.isInset) svg.classed('em-inset', true)
         //add mapType css class
         svg.classed('em--' + out._mapType, true)
         // pies and coxcombs are proportional symbols, so add proportional-symbols class too
