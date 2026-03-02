@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .em-zoom-buttons {
+                transform: translate(95%, 89%) !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('pie')
+                .dorling(true) // Enable Dorling cartogram
+                .title('Tourism')
+                .subtitle('Nights spent in tourist accommodation and share of foreign tourists, 2022')
+                .scale('60M')
+                .nutsLevel(2)
+                .showZoomButtons(true)
+                .insetsButton(true)
+                .insetBoxPosition([570, 60])
+                .insetsButtonPosition([750, 10])
+                .insets('default')
+                .transitionDuration(3000)
+                .geoCenter([5000000, 3500000])
+                .statPie({
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                    unitText: 'nights spent',
+                    categoryParameter: 'c_resid', //parameter that the categories belong to
+                    categoryCodes: ['FOR', 'DOM'], //category codes
+                    categoryLabels: ['Foreign', 'Domestic'], //category labels
+                    categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours
+                    //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
+                })
+                .pieMinRadius(6)
+                .legend({
+                    x: 10,
+                    y: 120,
+                    boxOpacity: 0.5,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: 'Nights spent',
+                        titlePadding: 20,
+                    },
+                    colorLegend: {
+                        title: 'Tourist origin',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>

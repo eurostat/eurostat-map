@@ -118,7 +118,12 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     //apply config values for inset
     for (let key in config) mt[key + '_'] = config[key]
 
-    mt.isInset = true // flag for inset-specific settings e.g. CSS class for titles
+    // Only set these defaults if not explicitly provided in the inset config
+    if (config.zoomButtons === undefined) mt.zoomButtons_ = false
+    if (config.insetsButton === undefined) mt.insetsButton_ = false
+    if (config.showScalebar === undefined) mt.showScalebar_ = false
+    if (config.minimap === undefined) mt.minimap_ = undefined
+
     return mt
 }
 

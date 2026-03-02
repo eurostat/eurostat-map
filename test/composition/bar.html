@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="pie"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('bar')
+                .dorling(true) // to prevent overlapping
+                .svgId('bar')
+                .scale('60M')
+                .nutsLevel(1)
+                .statBar({
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                    unitText: '1 000 tonnes',
+                    categoryParameter: 'c_resid', //parameter that the categories belong to
+                    categoryCodes: ['FOR', 'DOM'], //category codes
+                    categoryLabels: ['Foreign', 'Domestic'], //category labels
+                    categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours
+                    //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
+                })
+                .title('Most common causes of death, 2021')
+                .subtitle('Standardised death rate and % share of all deaths, by NUTS 1 regions')
+                .legend({
+                    x: 560,
+                    y: 60,
+                    boxOpacity: 0,
+                    boxFill: 'white',
+                    sizeLegend: {
+                        title: 'Death rate per 100 000 inh.',
+                        titlePadding: 10,
+                    },
+                    colorLegend: {
+                        title: 'Cause of death',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>
