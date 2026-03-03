@@ -1,0 +1,32 @@
+/* region fill */
+.em--bar .em-cntrg,
+.em--bar .em-nutsrg {
+    fill: #f2f2f2;
+}
+/*  muted nuts boundaries */
+.em--bar .em-bn-1,
+.em--bar .em-bn-2,
+.em--bar .em-bn-3,
+.em--bar .em-nutsrg [lvl='3'],
+.em--bar .em-nutsrg [lvl='2'],
+.em--bar .em-nutsrg [lvl='1'],
+.em--bar .em-bn-co {
+    stroke-width: 0.1px;
+}
+
+/*  coastline  */
+.em--bar .em-bn-co {
+    stroke: grey;
+    stroke-width: 0.2px;
+}
+
+/*  country borders  */
+.em--bar .em-cntbn,
+.em--bar .em-cntbn-halo {
+    opacity: 0.3;
+}
+
+.em-bar-grouped-legend-label {
+    font-size: 12px !important;
+    fill: #696969;
+}

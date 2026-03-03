@@ -6,19 +6,12 @@
     </head>
 
     <body>
-        <style>
-            /* .em-grid-text:not(#em-grid-text-AL, #em-grid-text-EL, #em-grid-text-UK, #em-grid-text-BA, #em-grid-text-UA) {
-                transform: translate(0, 50px) !important;
-            } */
-            .em-cntbn {
-                opacity: 0.3;
-            }
-        </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
             const map = eurostatmap
                 .map('waffle')
+                .scale('60M')
                 .title('Tourism')
                 .subtitle('Nights spent in tourist accommodation, 2022')
 

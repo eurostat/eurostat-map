@@ -7,7 +7,6 @@
     </head>
 
     <body>
-        <svg id="pie"></svg>
         <script src="../../../../build/eurostatmap.js"></script>
 
         <script>
@@ -20,26 +19,26 @@
                 .statBar({
                     eurostatDatasetCode: 'tour_occ_nin2',
                     filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
-                    unitText: '1 000 tonnes',
+                    unitText: 'Nights',
                     categoryParameter: 'c_resid', //parameter that the categories belong to
                     categoryCodes: ['FOR', 'DOM'], //category codes
                     categoryLabels: ['Foreign', 'Domestic'], //category labels
                     categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours
                     //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
                 })
-                .title('Most common causes of death, 2021')
-                .subtitle('Standardised death rate and % share of all deaths, by NUTS 1 regions')
+                .title('Foreign and domestic tourism')
+                .subtitle('Nights spent in 2022')
                 .legend({
                     x: 560,
                     y: 60,
                     boxOpacity: 0,
                     boxFill: 'white',
                     sizeLegend: {
-                        title: 'Death rate per 100 000 inh.',
+                        title: 'Nights spent',
                         titlePadding: 10,
                     },
                     colorLegend: {
-                        title: 'Cause of death',
+                        title: 'Tourist origin',
                     },
                 })
 

@@ -5,6 +5,7 @@
 @import './map-types/pie.css';
 @import './map-types/sparkline.css';
 @import './map-types/waffle.css';
+@import './map-types/bar.css';
 
 /* wrapper DOM */
 .em-map-wrapper {

@@ -227,7 +227,9 @@ function buildOutlinePath(out, flowsGroup, dCenter, link, arrowIds) {
         .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
         .style('pointer-events', 'none')
 
-    if (out.flowArrows_) applyArrow(outline, arrowIds, 'outline')
+    if (out.flowArrows_) {
+        appendArrowAtPathEnd(flowsGroup, dCenter, baseColor, link.width, out.flowArrowScale_ || 1)
+    }
     return outline
 }
 
@@ -288,7 +290,9 @@ function buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowI
         //  again: always the solid base color
         .attr('data-color', baseColor)
 
-    if (out.flowArrows_) applyArrow(mainSel, arrowIds, 'normal')
+    if (out.flowArrows_) {
+        appendArrowAtPathEnd(flowsGroup, dCenter, baseColor, link.width, out.flowArrowScale_ || 1)
+    }
     return mainSel
 }
 

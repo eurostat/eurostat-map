@@ -1,3 +1,30 @@
+/* region fill */
+.em--waffle .em-cntrg,
+.em--waffle .em-nutsrg {
+    fill: #f2f2f2;
+}
+/*  muted nuts boundaries */
+.em--waffle .em-bn-1,
+.em--waffle .em-bn-2,
+.em--waffle .em-bn-3,
+.em--waffle .em-nutsrg [lvl='3'],
+.em--waffle .em-nutsrg [lvl='2'],
+.em--waffle .em-nutsrg [lvl='1'],
+.em--waffle .em-bn-co {
+    stroke-width: 0.1px;
+}
+
+/*  coastline  */
+.em--waffle .em-bn-co {
+    stroke: grey;
+    stroke-width: 0.2px;
+}
+
+/*  country borders  */
+.em--waffle .em-cntbn,
+.em--waffle .em-cntbn-halo {
+    opacity: 0.3;
+}
 .em-tooltip-wafflechart-container {
     max-width: 150px;
 }

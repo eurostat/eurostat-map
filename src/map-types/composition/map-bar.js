@@ -64,7 +64,7 @@ export const map = function (config) {
     out.animateDorling_ = true
 
     // Layout mode: 'stacked' (horizontal, proportional) | 'grouped' (vertical, absolute)
-    out.barType_ = 'stacked'
+    out.barType_ = 'grouped' // default to grouped for better absolute value comparison; can switch to 'stacked' for proportional view
 
     // ── Stacked mode sizing ──────────────────────────────────────────────────
     out.barMinWidth_ = 10 // minimum total bar width in pixels
@@ -73,7 +73,7 @@ export const map = function (config) {
 
     // ── Grouped mode sizing ──────────────────────────────────────────────────
     out.barGroupWidth_ = 6 // width of each individual bar in pixels
-    out.barGroupGap_ = 2 // gap between bars in pixels
+    out.barGroupGap_ = 0 // gap between bars in pixels
     out.barGroupMinHeight_ = 2 // minimum bar height (prevents invisible bars)
     out.barGroupMaxHeight_ = 40 // maximum bar height in pixels
 
