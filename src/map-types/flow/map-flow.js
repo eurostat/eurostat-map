@@ -55,13 +55,16 @@ export const map = function (config) {
     out.flowOpacity_ = 0.5 // Default opacity for flow lines
 
     out.flowOrder_ = (a, b) => {
-        const dy = a.otherY - b.otherY // primary: other end vertical position
-        if (dy) return dy
-        if (a.at !== b.at) return a.at === 'out' ? -1 : 1 // outgoing above incoming on ties
-        const dv = (b.link.value ?? 0) - (a.link.value ?? 0) // larger value above
-        if (dv) return dv
-        return String(a.link.id ?? '').localeCompare(String(b.link.id ?? '')) // stable
-    } //use a custom order function for the flows at nodes
+        const nodeAx = a.link.source?.x ?? a.link.target?.x ?? 0
+        const nodeAy = a.link.source?.y ?? a.link.target?.y ?? 0
+        const nodeBx = b.link.source?.x ?? b.link.target?.x ?? 0
+        const nodeBy = b.link.source?.y ?? b.link.target?.y ?? 0
+        const angleA = Math.atan2(a.otherY - nodeAy, a.otherX - nodeAx)
+        const angleB = Math.atan2(b.otherY - nodeBy, b.otherX - nodeBx)
+        const da = angleA - angleB
+        if (Math.abs(da) > 1e-6) return da
+        return (b.link.value ?? 0) - (a.link.value ?? 0)
+    }
 
     //add proportional symbols to nodes
     out.flowNodes_ = false // whether to draw proportional symbols at flow nodes

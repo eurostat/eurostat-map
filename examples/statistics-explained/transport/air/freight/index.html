@@ -280,7 +280,7 @@
                             const countries = d3.selectAll('#air-freight-map .em-worldrg path')
                             countries.style('fill', (d) => {
                                 for (const [regionName, codes] of Object.entries(regions)) {
-                                    if (codes.includes(d.id)) {
+                                    if (codes.includes(d.properties.id)) {
                                         return regionColors[regionName]
                                     }
                                 }

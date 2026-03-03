@@ -52,10 +52,10 @@
                 .then((graphData) => {
                     const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']
                     const fourColorTheorem = [
-                        '#388AE2', // blue
-                        '#B09120', // yellow
-                        '#33A033', // green
-                        '#E04040', // red
+                        '#C8D4DC', // dusty blue-grey
+                        '#D4CCBC', // warm greige
+                        '#C4D0C4', // sage grey
+                        '#D4C8C8', // blush grey
                     ]
                     const regionColors = {
                         'north america': fourColorTheorem[0],
@@ -70,7 +70,7 @@
                         'eastern asia': fourColorTheorem[0],
                         'South Eastern Asia': fourColorTheorem[1],
                         'Oceania and southern polar regions': fourColorTheorem[2],
-                        EU: '#003399',
+                        EU: '#8099CC',
                         'europe except eu': fourColorTheorem[2],
                     }
 
@@ -242,7 +242,7 @@
                             const countries = d3.selectAll('#air-passengers-map .em-worldrg path')
                             countries.style('fill', (d) => {
                                 for (const [regionName, codes] of Object.entries(regions)) {
-                                    if (codes.includes(d.id)) {
+                                    if (codes.includes(d.properties.id)) {
                                         return regionColors[regionName]
                                     }
                                 }

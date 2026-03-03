@@ -35,16 +35,7 @@ export function createSankeyFlowMap(out, sankeyContainer) {
     const { nodes, links } = sankey(out, sankeyInput)
 
     // shared markers (normal/hover/outline)
-    const arrowIds = out.flowArrows_
-        ? ensureArrowMarkers(svg, {
-              cacheKey: 'sankey',
-              scale: out.flowArrowScale_ || 1,
-              markerUnits: 'strokeWidth',
-              hoverColor: out.hoverColor_ || 'black',
-              outlineColor: out.flowOutlineColor_ || '#ffffff',
-              useContextStroke: true,
-          })
-        : null
+    const arrowIds = null
 
     // gradients
     const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs')
@@ -168,29 +159,62 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
     links.forEach((link, i) => {
         const dCenter = linkPath(link)
         const colorKey = computeColorKey(out, link)
-
-        //  always compute a solid base color for matching
         const baseColor = getFlowStroke(out, link)
-
-        // What we actually paint with: either gradient or solid
         const paint = usesGradient ? `url(#${gradientIds[i]})` : baseColor
 
-        // Outline behind the main symbol (only for simple stroke variant)
-        if (out.flowOutlines_ && !out.flowWidthGradient_) {
-            buildOutlinePath(out, flowsGroup, dCenter, link, arrowIds)
+        // Always use tapered polygon for sankey — either gradient-width or pointed tip
+        if (out.flowOutlines_) {
+            const dPolyOutline = taperedPolygonForLink(
+                link,
+                () => dCenter,
+                {
+                    startRatio: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.startRatio ?? 0.25) : 1,
+                    samples: out.flowWidthGradientSettings_?.samples ?? 48,
+                    minStartWidth: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.minStartWidth ?? 1.5) : link.width,
+                    pointedTip: true,
+                },
+                out.flowOutlineWidth_
+            )
+            flowsGroup
+                .append('path')
+                .attr('d', dPolyOutline)
+                .attr('fill', out.flowOutlineColor_)
+                .attr('class', 'em-flow-link-outline')
+                .attr('data-center-path', dCenter)
+                .attr('data-link-width', link.width)
+                .attr('data-is-outline', 'true')
+                .attr('data-outline-width', out.flowOutlineWidth_)
+                .style('pointer-events', 'none')
         }
 
-        // Main symbol
-        const mainSel = out.flowWidthGradient_
-            ? buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey, baseColor)
-            : buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds, baseColor)
+        const dPoly = taperedPolygonForLink(
+            link,
+            () => dCenter,
+            {
+                startRatio: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.startRatio ?? 0.25) : 1,
+                samples: out.flowWidthGradientSettings_?.samples ?? 48,
+                minStartWidth: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.minStartWidth ?? 1.5) : link.width,
+                pointedTip: true,
+            },
+            0
+        )
 
-        // Mouse/tooltip/arrow hover
+        const mainSel = flowsGroup
+            .append('path')
+            .attr('d', dPoly)
+            .attr('fill', paint)
+            .attr('class', 'em-flow-link em-flow-link-tapered')
+            .attr('data-color-key', colorKey)
+            .attr('data-color', baseColor)
+            .attr('data-link-index', i)
+            .attr('data-center-path', dCenter) // ← store center path
+            .attr('data-link-width', link.width) // ← store original width
+
         addMouseEvents(out, mainSel, {
             usesGradient,
-            paint, // paint to restore on mouseout
+            paint,
             link,
-            arrowIds,
+            arrowIds: null,
         })
     })
 }
@@ -207,124 +231,22 @@ function computeColorKey(out, link) {
     return link?.target?.id ?? link?.source?.id ?? 'Other'
 }
 
-function getBackoffAndDash(out, strokePx, dCenter) {
-    const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(strokePx, out.flowArrowScale_) : 0
-    const [dashVis, dashGap] = pathDashForBackoff(dCenter, backoff)
-    return { backoff, dashVis, dashGap }
-}
-
-function buildOutlinePath(out, flowsGroup, dCenter, link, arrowIds) {
-    const outlineW = link.width + out.flowOutlineWidth_
-    const { dashVis, dashGap } = getBackoffAndDash(out, outlineW, dCenter)
-
-    const outline = flowsGroup
-        .append('path')
-        .attr('d', dCenter)
-        .attr('fill', 'none')
-        .attr('class', 'em-flow-link-outline')
-        .attr('stroke', out.flowOutlineColor_)
-        .attr('stroke-width', outlineW)
-        .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
-        .style('pointer-events', 'none')
-
-    if (out.flowArrows_) {
-        appendArrowAtPathEnd(flowsGroup, dCenter, baseColor, link.width, out.flowArrowScale_ || 1)
-    }
-    return outline
-}
-
-function buildTaperedMain(out, flowsGroup, dCenter, link, paint, colorKey, baseColor) {
-    // Build the tapered polygon...
-    const dPoly = taperedPolygonForLink(
-        link,
-        () => dCenter,
-        {
-            startRatio: out.flowWidthGradientSettings_.startRatio,
-            samples: out.flowWidthGradientSettings_.samples,
-            minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-            capEnd: out.flowArrows_,
-        },
-        0
-    )
-
-    if (out.flowOutlines_) {
-        const dPolyOutline = taperedPolygonForLink(
-            link,
-            () => dCenter,
-            {
-                startRatio: out.flowWidthGradientSettings_.startRatio,
-                samples: out.flowWidthGradientSettings_.samples,
-                minStartWidth: out.flowWidthGradientSettings_.minStartWidth,
-                capEnd: out.flowArrows_,
-            },
-            out.flowOutlineWidth_
-        )
-        flowsGroup.append('path').attr('d', dPolyOutline).attr('fill', out.flowOutlineColor_).attr('class', 'em-flow-link-outline')
-    }
-
-    const mainSel = flowsGroup
-        .append('path')
-        .attr('d', dPoly)
-        .attr('fill', paint)
-        .attr('class', 'em-flow-link em-flow-link-tapered')
-        .attr('data-color-key', colorKey)
-        //  always the solid base color, never the gradient URL
-        .attr('data-color', baseColor)
-
-    return mainSel
-}
-
-function buildSimpleMain(out, flowsGroup, dCenter, link, paint, colorKey, arrowIds, baseColor) {
-    const { dashVis, dashGap } = getBackoffAndDash(out, link.width, dCenter)
-
-    const mainSel = flowsGroup
-        .append('path')
-        .attr('d', dCenter)
-        .attr('fill', 'none')
-        .attr('class', 'em-flow-link')
-        .attr('stroke', paint)
-        .attr('stroke-width', link.width)
-        .attr('stroke-linecap', 'butt')
-        .attr('stroke-dasharray', out.flowArrows_ ? `${dashVis} ${dashGap}` : null)
-        .attr('data-color-key', colorKey)
-        //  again: always the solid base color
-        .attr('data-color', baseColor)
-
-    if (out.flowArrows_) {
-        appendArrowAtPathEnd(flowsGroup, dCenter, baseColor, link.width, out.flowArrowScale_ || 1)
-    }
-    return mainSel
-}
-
 function addMouseEvents(out, mainSel, ctx) {
-    const { usesGradient, paint, link, arrowIds } = ctx
+    const { usesGradient, paint, link } = ctx
 
     mainSel
         .on('mouseover', function () {
-            if (out.flowWidthGradient_) {
-                // Tapered uses fill
-                select(this).attr('fill', out.hoverColor_)
-            } else {
-                // Simple uses stroke
-                select(this).attr('stroke', out.hoverColor_)
-                if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true)
-            }
+            select(this).attr('fill', out.hoverColor_)
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out))
         })
         .on('mousemove', (e) => {
             if (out._tooltip) out._tooltip.mousemove(e)
         })
         .on('mouseout', function () {
-            if (out.flowWidthGradient_) {
-                select(this).attr('fill', paint) // restore polygon fill
-            } else {
-                select(this).attr('stroke', paint) // restore stroke
-                if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false)
-            }
+            select(this).attr('fill', paint)
             if (out._tooltip) out._tooltip.mouseout()
         })
 }
-
 // Sample an SVG path string into points using DOM path length
 function samplePathByLength(d, samples = 48) {
     const tmp = document.createElementNS('http://www.w3.org/2000/svg', 'path')
@@ -340,12 +262,7 @@ function samplePathByLength(d, samples = 48) {
 
 // Build a tapered polygon by offsetting along normals of the centerline.
 // `extraPad` makes the polygon uniformly thicker (used for outlines).
-function taperedPolygonForLink(
-    link,
-    pathFn,
-    { startRatio = 0.25, samples = 48, minStartWidth = 1.5, capEnd = !out.flowArrows_ } = {},
-    extraPad = 0 // for outlines
-) {
+export function taperedPolygonForLink(link, pathFn, { startRatio = 0.25, samples = 48, minStartWidth = 1.5, pointedTip = false } = {}, extraPad = 0) {
     const center = samplePathByLength(pathFn(link), samples)
 
     // tangents → unit normals
@@ -369,7 +286,9 @@ function taperedPolygonForLink(
     for (let i = 0; i <= n; i++) {
         const t = i / n
         const width = wStart + (wEnd - wStart) * t
-        const half = width / 2 + extraPad // <<< apply pad here
+        // At the very tip, taper to zero if pointedTip
+        const tipFactor = pointedTip && i === n ? 0 : 1
+        const half = (width / 2 + extraPad) * tipFactor
         const nx = normals[i][0] * half
         const ny = normals[i][1] * half
         top.push([center[i][0] + nx, center[i][1] + ny])
@@ -377,18 +296,13 @@ function taperedPolygonForLink(
     }
     bot.reverse()
 
-    // Optional: flatten tail instead of a point
-    if (capEnd) {
-        top[n][1] = bot[0][1] = (top[n][1] + bot[0][1]) / 2
-    }
-
+    // With pointedTip, top[n] and bot[0] (after reverse) are both the tip point — close cleanly
     let d = `M${top[0][0]},${top[0][1]}`
     for (let i = 1; i < top.length; i++) d += `L${top[i][0]},${top[i][1]}`
     for (let i = 0; i < bot.length; i++) d += `L${bot[i][0]},${bot[i][1]}`
     d += 'Z'
     return d
 }
-
 function getFlowStroke(out, link) {
     const fallback = typeof out.flowColor_ === 'string' ? out.flowColor_ : '#999999'
 
@@ -560,14 +474,14 @@ function computeLinkBreadths(out, { nodes }) {
         // Outgoing links (this node is the source)
         for (const l of node.sourceLinks) {
             const other = l.target
-            const item = { link: l, width: l.width, otherY: other.y, at: 'out' }
+            const item = { link: l, width: l.width, otherY: other.y, otherX: other.x, nodeX: node.x, nodeY: node.y, at: 'out' }
             ;(other.x < node.x ? left : right).push(item)
         }
 
         // Incoming links (this node is the target)
         for (const l of node.targetLinks) {
             const other = l.source
-            const item = { link: l, width: l.width, otherY: other.y, at: 'in' }
+            const item = { link: l, width: l.width, otherY: other.y, otherX: other.x, nodeX: node.x, nodeY: node.y, at: 'in' }
             ;(other.x < node.x ? left : right).push(item)
         }
 
@@ -692,10 +606,12 @@ function sankeyLinkAvoidingNodes(
             ty = link.y1
 
         // If source and target have same x, just draw a straight segment.
+        // use a proper cubic so stacked vertical flows get curvature:
         if (sx === tx) {
-            return `M${sx},${sy}L${tx},${ty}`
+            const c = typeof curvature === 'function' ? curvature(link) : curvature
+            const midX = sx + (sy < ty ? 1 : -1) * Math.abs(ty - sy) * c * 0.5
+            return `M${sx},${sy} C${midX},${sy} ${midX},${ty} ${tx},${ty}`
         }
-
         const rev = sx > tx
         const xA = rev ? tx : sx
         const yA = rev ? ty : sy
@@ -792,24 +708,4 @@ function sankeyLinkAvoidingNodes(
         }
         return d
     }
-}
-
-function pathLength(d) {
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-    p.setAttribute('d', d)
-    return p.getTotalLength()
-}
-
-function pathDashForBackoff(d, backoffPx) {
-    const L = Math.max(0, pathLength(d))
-    const vis = Math.max(0, L - Math.min(backoffPx, L))
-    const gap = Math.min(backoffPx, L)
-    return [vis, gap]
-}
-
-// matches arrows.js defaults: markerWidth = 3 * scale (in strokeWidth units),
-// and the usable length ~ 0.9 of the marker viewBox
-function arrowBackoffPxForStroke(strokePx, arrowScale = 1) {
-    const arrowLenPx = strokePx * (3 * arrowScale) * 0.9
-    return arrowLenPx * 0.85
 }

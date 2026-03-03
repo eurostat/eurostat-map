@@ -1,5 +1,6 @@
 import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
+import { taperedPolygonForLink } from '../map-types/flow/sankey'
 
 export const defineMapZoom = function (map) {
     if (map.gridCartogram_) {
@@ -275,7 +276,7 @@ const scaleLabelTexts = function (transform, map) {
  */
 const scaleStrokeWidths = function (transform, map) {
     const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
-    const elements = zoomGroup.selectAll('*') // Select all elements in the zoom group
+    const elements = zoomGroup.selectAll('*')
     const zoomFactor = transform.k
     const updates = []
 
@@ -283,30 +284,68 @@ const scaleStrokeWidths = function (transform, map) {
         const element = select(this)
         const computedStyle = window.getComputedStyle(this)
 
-        // Get stroke-width from inline or computed style
         const inlineStrokeWidth = element.attr('stroke-width')
         const cssStrokeWidth = computedStyle.strokeWidth
         const strokeWidth = inlineStrokeWidth || cssStrokeWidth
 
-        // Only process elements that have a stroke width defined
         if (strokeWidth && parseFloat(strokeWidth) > 0) {
             const originalStrokeWidth = parseFloat(element.attr('data-sw')) || parseFloat(inlineStrokeWidth) || parseFloat(cssStrokeWidth)
 
-            // Store the original stroke width for the first time
             if (!element.attr('data-sw')) {
                 element.attr('data-sw', originalStrokeWidth)
             }
 
-            // Calculate the target stroke width
             const targetStrokeWidth = originalStrokeWidth / zoomFactor
-
-            // Add the style change to a batch array
             updates.push({ element: this, targetStrokeWidth })
         }
     })
 
-    // Apply all style changes at once
     updates.forEach(({ element, targetStrokeWidth }) => {
-        element.style.setProperty('stroke-width', `${targetStrokeWidth}px`, 'important')
+        const el = select(element)
+        if (el.classed('em-flow-link') || el.classed('em-flow-link-outline')) {
+            el.attr('stroke-width', targetStrokeWidth)
+
+            // Rescale dasharray from original stored values
+            const baseDashVis = parseFloat(el.attr('data-dash-vis'))
+            const baseDashGap = parseFloat(el.attr('data-dash-gap'))
+            if (!isNaN(baseDashVis) && !isNaN(baseDashGap)) {
+                const scaledVis = baseDashVis / zoomFactor
+                const scaledGap = baseDashGap / zoomFactor
+                el.attr('stroke-dasharray', `${scaledVis} ${scaledGap}`)
+            }
+        } else {
+            element.style.setProperty('stroke-width', `${targetStrokeWidth}px`, 'important')
+        }
+    })
+
+    // ── rescale tapered sankey polygons ─────────────────────────────────
+    zoomGroup.selectAll('.em-flow-link-tapered[data-center-path], .em-flow-link-outline[data-center-path]').each(function () {
+        const el = select(this)
+        const dCenter = el.attr('data-center-path')
+        const baseWidth = parseFloat(el.attr('data-link-width'))
+        const isOutline = el.attr('data-is-outline') === 'true'
+        const outlineWidth = parseFloat(el.attr('data-outline-width')) || 0
+
+        if (!dCenter || !baseWidth) return
+
+        const scaledWidth = baseWidth / zoomFactor
+        const extraPad = isOutline ? outlineWidth / zoomFactor : 0
+
+        // Reconstruct a fake link object with scaled width
+        const scaledLink = { width: scaledWidth }
+
+        const dPoly = taperedPolygonForLink(
+            scaledLink,
+            () => dCenter,
+            {
+                startRatio: 1, // flat start for non-gradient sankey
+                samples: 48,
+                minStartWidth: scaledWidth,
+                pointedTip: true,
+            },
+            extraPad
+        )
+
+        el.attr('d', dPoly)
     })
 }
