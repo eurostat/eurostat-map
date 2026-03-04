@@ -49,9 +49,9 @@
                     if (val > 1000000) return 1.5
                     return 1
                 })
-                .sparkLineColor((dataArray, i) => {
-                    const startPopulation = dataArray[0].value
-                    const endPopulation = dataArray[dataArray.length - 1].value
+                .sparkLineColor((value, i, data) => {
+                    const startPopulation = data[0].value
+                    const endPopulation = data[data.length - 1].value
                     return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
                 })
                 .sparkLineCircleRadius(0)

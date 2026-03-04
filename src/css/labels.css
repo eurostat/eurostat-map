@@ -125,7 +125,7 @@
 }
 
 /* labels that overflow outside the proportional symbol */
-.em-stat-overflowing,
+/* .em-stat-overflowing,
 .em-code-overflowing {
     opacity: 0.75;
-}
+} */

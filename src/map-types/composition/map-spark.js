@@ -430,7 +430,7 @@ export const map = function (config) {
         const segments = scaledData.slice(1).map((d, i) => ({ from: scaledData[i], to: d, index: i, value: d.value }))
 
         const getSegmentColor = (seg) =>
-            typeof out.sparkLineColor_ === 'function' ? out.sparkLineColor_(seg.value, seg.index, data) : out.sparkLineColor_
+            typeof out.sparkLineColor_ === 'function' && seg ? out.sparkLineColor_(seg.value, seg.index, data) : out.sparkLineColor_
 
         const segmentLine = line()
             .x((d) => d.scaledXValue)

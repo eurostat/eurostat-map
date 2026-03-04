@@ -5,8 +5,8 @@ import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColo
 
 /** Minimum font size (px) for labels inside proportional symbols.
  *  If the radius-derived size falls below this, the label overflows outside the circle. */
-const PS_LABEL_MIN_FONT_SIZE = 11
-const PS_LABEL_OVERFLOW_FONT_SIZE = PS_LABEL_MIN_FONT_SIZE + 2 // 8.5px when overflowing outside circle
+const PS_LABEL_MIN_FONT_SIZE = 9
+const PS_LABEL_OVERFLOW_FONT_SIZE = 11 //  when overflowing outside circle
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ export const addLabelsToMap = function (map, zg) {
     if (!map.labels_.config) map.labels_.config = DEFAULTLABELS
     if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
 
-    map._statLabelFormatter = map.labels_.valuesFormatter ? map.labels_.valuesFormatter : compactFormatter.format
+    map._statLabelFormatter = map.labels_.valuesFormatter ? map.labels_.valuesFormatter : spaceAsThousandSeparator
 
     let existing = zg.select('#em-labels')
     let labelsContainer = existing.empty() ? zg.append('g').attr('id', 'em-labels').attr('class', 'em-labels') : existing
@@ -85,9 +85,7 @@ export const addLabelsToMap = function (map, zg) {
  */
 export const appendLabelsToSymbols = function (map, sizeData, out) {
     // Ensure the formatter is set (mirrors the guard in addLabelsToMap / updateLabels)
-    if (!map._statLabelFormatter) {
-        map._statLabelFormatter = out.labels_?.valuesFormatter ? out.labels_?.valuesFormatter : compactFormatter.format
-    }
+    const formatter = out.labels_?.valuesFormatter ? out.labels_.valuesFormatter : compactFormatter.format
 
     const symbolContainers = map.svg().selectAll('g.em-centroid')
     const hasStatLabels = !!out.labels_?.values
@@ -115,7 +113,7 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
     // ── country-code labels ───────────────────────────────────────────────────
 
     if (out.psCodeLabels_) {
-        let factor = hasStatLabels ? 0.8 : 0.9
+        let factor = hasStatLabels ? 0.9 : 0.9
         if (out.psShape_ === 'square') factor -= 0.4
 
         const appendCodeLabel = (container, isShadow) =>
@@ -139,31 +137,15 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                     return `${computed < PS_LABEL_MIN_FONT_SIZE ? PS_LABEL_OVERFLOW_FONT_SIZE : computed}px`
                 })
                 .attr('fill', function (d) {
-                    if (isShadow) return 'none'
-                    const r = getRadius(d)
-                    if (isOverflowing(r, factor)) return '#333333'
                     const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill
                     return getTextColorForBackground(fill)
-                })
-                .attr('stroke', (d) => {
-                    if (!isShadow) return 'none'
-                    return isOverflowing(getRadius(d), CODE_FACTOR) ? 'white' : 'none'
-                })
-                .attr('stroke-width', (d) => {
-                    if (!isShadow) return 0
-                    return isOverflowing(getRadius(d), CODE_FACTOR) ? 3 : 0
                 })
                 .attr('paint-order', 'stroke')
                 .attr('dominant-baseline', 'auto') // override for overflowing labels so y positions top of text
                 .attr('dy', (d) => {
-                    if (isOverflowing(getRadius(d), CODE_FACTOR)) return null
+                    //if (isOverflowing(getRadius(d), CODE_FACTOR)) return '0.5em'
                     if (hasStatLabels && sizeData.get(d.properties.id)?.value) return '-0.3em'
                     return '0'
-                })
-                .attr('y', (d) => {
-                    const r = getRadius(d)
-                    if (!isOverflowing(r, CODE_FACTOR)) return null
-                    return -(r + 2)
                 })
                 .style('pointer-events', 'none')
 
@@ -185,7 +167,7 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 .text((d) => {
                     const datum = sizeData.get(d.properties.id)
                     if (datum?.value == null || datum.value === ':') return ''
-                    return map._statLabelFormatter(datum.value)
+                    return formatter(datum.value)
                 })
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
@@ -196,15 +178,15 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 })
                 .attr('fill', function (d) {
                     if (isShadow) return 'none'
-                    const r = getRadius(d)
-                    if (isOverflowing(r, STAT_FACTOR)) return '#333333'
+                    // const r = getRadius(d)
+                    // if (isOverflowing(r, STAT_FACTOR)) return '#333333'
                     const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
                     return getTextColorForBackground(fill)
                 })
                 .attr('stroke', (d) => {
                     if (!isShadow) return 'none'
                     // Only shadow overflowing labels — inside labels have contrast already
-                    return isOverflowing(getRadius(d), STAT_FACTOR) ? 'white' : 'none'
+                    return isOverflowing(getRadius(d), STAT_FACTOR) ? '#3333335e' : 'none'
                 })
                 .attr('stroke-width', (d) => {
                     if (!isShadow) return 0
