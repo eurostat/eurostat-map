@@ -22,7 +22,7 @@
 .em-nutsrg [lvl='1'],
 .em-bn-co {
     stroke-width: 0.3;
-    opacity: 0.5;
+    stroke-opacity: 0.5;
 }
 
 /* all NUTS boundaries and regions */
