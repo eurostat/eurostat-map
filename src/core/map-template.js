@@ -20,6 +20,7 @@ import { addEurostatLogo, addEurostatRibbon } from './logo.js'
 import { appendCoastalMargin } from './coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './texts.js'
 import { addScalebarToMap } from './scalebar.js'
+import { attachLocationsApi } from './locations.js'
 
 // set default d3 locale
 formatDefaultLocale({
@@ -423,6 +424,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     // initiate Geometries class
     out.Geometries = Geometries(out, withCenterPoints)
 
+    attachLocationsApi(out)
+
     /**
      * Requests geographic data and then builds the map template
      */
@@ -651,6 +654,9 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (withCenterPoints && !out.gridCartogram_) {
             addCentroidsToMap(out)
         }
+
+        // add user locations (points)
+        if (out._locations_?.length) updateLocations(out)
 
         // add geographical labels to map
         if (out.labels_ && !out.gridCartogram_) {

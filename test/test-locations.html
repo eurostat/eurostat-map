@@ -11,16 +11,16 @@
 
         <script>
             const capitals = [
-                { x: 2.35, y: 48.85, label: 'Paris' },
-                { x: 13.41, y: 52.52, label: 'Berlin' },
-                { x: -0.12, y: 51.5, label: 'London' },
-                { x: 12.5, y: 41.9, label: 'Rome' },
-                { x: -3.7, y: 40.42, label: 'Madrid' },
-                { x: 4.35, y: 50.85, label: 'Brussels' },
-                { x: 18.91, y: 47.49, label: 'Budapest' },
-                { x: 21.01, y: 52.23, label: 'Warsaw' },
-                { x: 14.42, y: 50.09, label: 'Prague' },
-                { x: 16.37, y: 48.21, label: 'Vienna' },
+                { lon: 2.35, lat: 48.85, label: 'Paris' },
+                { lon: 13.41, lat: 52.52, label: 'Berlin' },
+                { lon: -0.12, lat: 51.5, label: 'London' },
+                { lon: 12.5, lat: 41.9, label: 'Rome' },
+                { lon: -3.7, lat: 40.42, label: 'Madrid' },
+                { lon: 4.35, lat: 50.85, label: 'Brussels' },
+                { lon: 18.91, lat: 47.49, label: 'Budapest' },
+                { lon: 21.01, lat: 52.23, label: 'Warsaw' },
+                { lon: 14.42, lat: 50.09, label: 'Prague' },
+                { lon: 16.37, lat: 48.21, label: 'Vienna' },
             ]
 
             const map = eurostatmap
@@ -32,17 +32,11 @@
                 .build()
 
             map.callback(() => {
-                capitals.forEach((c) =>
-                    map.addLocation({
-                        ...c,
-                        shape: 'star',
-                        fill: '#FFD700',
-                        stroke: '#333',
-                        strokeWidth: 1,
-                        radius: 7,
-                    })
-                )
-            })
+                capitals.forEach(({ lon, lat, label }) => {
+                    const [x, y] = eurostatmap.projectToMap(map, lon, lat)
+                    map.addLocation({ x, y, label, shape: 'star', fill: '#FFD700', stroke: '#333', strokeWidth: 1, radius: 7, opacity: 0.5 })
+                })
+            }).build()
         </script>
     </body>
 </html>
