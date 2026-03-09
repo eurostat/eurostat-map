@@ -4,3 +4,4 @@ package-lock.json
 /node_modules/
 # Dev version
 .vscode/
+TYPESCRIPT-PLAN.md
