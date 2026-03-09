@@ -34,7 +34,31 @@
             map.callback(() => {
                 capitals.forEach(({ lon, lat, label }) => {
                     const [x, y] = eurostatmap.projectToMap(map, lon, lat)
-                    map.addLocation({ x, y, label, shape: 'star', fill: '#FFD700', stroke: '#333', strokeWidth: 1, radius: 7, opacity: 0.5 })
+                    map.addLocation({
+                        // Required
+                        x,
+                        y,
+                        // Optional core settings
+                        id: `capital-${label.toLowerCase()}`, // Auto-generated if omitted
+                        label,
+                        shape: 'star', // 'circle'|'square'|'pin'|'diamond'|'cross'|'star'
+                        radius: 7,
+                        fill: '#FFD700',
+                        opacity: 0.9,
+                        stroke: '#333',
+                        strokeWidth: 1,
+                        // Label positioning and styling
+                        labelOffset: [7, -4], // [dx, dy] from point in px
+                        labelStyle: {
+                            fontSize: '12px',
+                            fontFamily: 'inherit',
+                            fill: '#222',
+                            opacity: 1,
+                            stroke: '#fff',
+                            strokeWidth: 3,
+                            paintOrder: 'stroke',
+                        },
+                    })
                 })
             }).build()
         </script>

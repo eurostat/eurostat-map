@@ -51,11 +51,12 @@ const DEFAULT_LOCATION = {
     stroke: '#fff',
     strokeWidth: 1.5,
     label: '',
-    labelOffset: [10, 4], // [dx, dy] from projected point, px
+    labelOffset: [7, -4], // [dx, dy] from projected point, px
     labelStyle: {
         fontSize: '12px',
         fontFamily: 'inherit',
         fill: '#222',
+        opacity: 1,
         stroke: '#fff',
         strokeWidth: 3,
         paintOrder: 'stroke',
@@ -220,6 +221,7 @@ export const updateLocations = (map) => {
                 .attr('font-size', ls.fontSize)
                 .attr('font-family', ls.fontFamily)
                 .attr('fill', ls.fill)
+                .attr('opacity', ls.opacity)
                 .attr('stroke', ls.stroke)
                 .attr('stroke-width', ls.strokeWidth)
                 .attr('paint-order', ls.paintOrder)
