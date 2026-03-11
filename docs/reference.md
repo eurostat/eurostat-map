@@ -36,6 +36,7 @@ Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-
     - [Map texts](#map-texts)
         - [Map title \& subtitle](#map-title--subtitle)
         - [Labelling](#labelling)
+        - [Locations](#locations)
         - [Annotations](#annotations)
         - [Stamps](#stamps)
         - [Footnotes](#footnotes)
@@ -1092,6 +1093,66 @@ These are the default classes used to style the labels:
 .em-flow-labels
 .em-flow-label
 .em-flow-label-shadow
+```
+
+### Locations
+
+You can add locations as points with labels to your map like so:
+
+![alt text](img/locations.png)
+
+```javascript
+const capitals = [
+    { lon: 2.35, lat: 48.85, label: 'Paris' },
+    { lon: 13.41, lat: 52.52, label: 'Berlin' },
+    { lon: -0.12, lat: 51.5, label: 'London' },
+    { lon: 12.5, lat: 41.9, label: 'Rome' },
+    { lon: -3.7, lat: 40.42, label: 'Madrid' },
+    { lon: 4.35, lat: 50.85, label: 'Brussels' },
+    { lon: 18.91, lat: 47.49, label: 'Budapest' },
+    { lon: 21.01, lat: 52.23, label: 'Warsaw' },
+    { lon: 14.42, lat: 50.09, label: 'Prague' },
+    { lon: 16.37, lat: 48.21, label: 'Vienna' },
+]
+
+const map = eurostatmap
+    .map('choropleth')
+    .nutsLevel(2)
+    .title('Population density, 2023')
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+    .zoomExtent([1, 1000])
+    .build()
+
+map.callback(() => {
+    capitals.forEach(({ lon, lat, label }) => {
+        const [x, y] = eurostatmap.projectToMap(map, lon, lat)
+        map.addLocation({
+            // Required
+            x,
+            y,
+            // Optional core settings
+            id: `capital-${label.toLowerCase()}`, // Auto-generated if omitted
+            label,
+            shape: 'star', // 'circle'|'square'|'pin'|'diamond'|'cross'|'star'
+            radius: 7,
+            fill: '#FFD700',
+            opacity: 0.9,
+            stroke: '#333',
+            strokeWidth: 1,
+            // Label positioning and styling
+            labelOffset: [7, -4], // [dx, dy] from point in px
+            labelStyle: {
+                fontSize: '12px',
+                fontFamily: 'inherit',
+                fill: '#222',
+                opacity: 1,
+                stroke: '#fff',
+                strokeWidth: 3,
+                paintOrder: 'stroke',
+            },
+        })
+    })
+}).build()
 ```
 
 ### Annotations

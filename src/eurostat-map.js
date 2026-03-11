@@ -127,5 +127,4 @@ export const getDefaultLabels = function () {
 export { projectFromMap, projectToMap } from './core/proj4.js'
 
 import { version as pkgVersion } from '../package.json'
-import { projectFromMap, projectToMap } from './core/proj4.js'
 export const version = pkgVersion
