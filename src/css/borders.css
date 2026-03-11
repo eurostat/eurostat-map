@@ -22,16 +22,26 @@
 
 /* country boundaries */
 .em-cntbn {
-    stroke: #3f3f3f;
+    stroke: #000000;
     stroke-width: 1px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 /* country boundary halo (not coastline) */
 .em-cntbn-halo:not(.em-bn-co) {
     stroke: white;
-    stroke-width: 3px;
-    opacity: 0.4;
+    stroke-width: 2px;
+    opacity: 1;
+}
+
+/* NUTS boundaries stroke color */
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'] {
+    stroke: #474747;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */

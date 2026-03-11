@@ -39,16 +39,6 @@
     stroke-linejoin: round;
 }
 
-/* NUTS boundaries stroke color */
-.em-bn-1,
-.em-bn-2,
-.em-bn-3,
-.em-nutsrg [lvl='3'],
-.em-nutsrg [lvl='2'],
-.em-nutsrg [lvl='1'] {
-    stroke: #474747;
-}
-
 /* dont fill border elements */
 .em-bn-0,
 .em-bn-1,
