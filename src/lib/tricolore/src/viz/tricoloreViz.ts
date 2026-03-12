@@ -391,9 +391,12 @@ export class TricoloreViz {
         // Add axis names
         if (labelPosition === 'edge') {
             const labelPositions = [
-                [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14], // p1
-                [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14], // p2
-                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 35], // p3
+                // p1 (15-29, bottom-left) → left edge (corners[0] ↔ corners[1])
+                [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14],
+                // p2 (45-64, top) → right edge (corners[1] ↔ corners[2])
+                [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14],
+                // p3 (75+, bottom-right) → bottom edge (corners[0] ↔ corners[2])
+                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 35],
             ]
 
             const rotateValues = [-60, 60, 0]
@@ -494,54 +497,54 @@ export class TricoloreViz {
                 drawGridLine([1 - v, 0, v], p3Edge, true)
                 this.drawAxisTick(p3Edge, [-1, +1, 0], size)
             })
+
+            // ===============================
+            // Axis labels (unchanged)
+            // ===============================
+            const labelStride = this.computeLabelStride(majorGrid.length + 1)
+            const labelGrid = majorGrid.filter((_, i) => i % labelStride === 0)
+            labelGrid.forEach((val) => {
+                // p1 axis
+                const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
+
+                this.legend
+                    .append('text')
+                    .attr('x', line[0][0] - 10)
+                    .attr('y', line[0][1] + 3)
+                    .attr('text-anchor', 'end')
+                    .attr('font-size', '10px')
+                    .attr('class', 'em-ternary-axis-tick-label')
+                    .text(`${((1 - val) * 100).toFixed(0)}%`)
+            })
+
+            labelGrid.forEach((val) => {
+                // p2 axis
+                const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
+
+                this.legend
+                    .append('text')
+                    .attr('x', line[0][0] + 5)
+                    .attr('y', line[0][1] - 10)
+                    .attr('text-anchor', 'start')
+                    .attr('font-size', '10px')
+                    .attr('class', 'em-ternary-axis-tick-label')
+                    .text(`${((1 - val) * 100).toFixed(0)}%`)
+            })
+
+            labelGrid.forEach((val) => {
+                // p3 axis
+                const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
+
+                this.legend
+                    .append('text')
+                    .attr('x', line[0][0] + 10)
+                    .attr('y', line[0][1] + 18)
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', '10px')
+                    .attr('class', 'em-ternary-axis-tick-label')
+                    .text(`${((1 - val) * 100).toFixed(0)}%`)
+            })
         }
-
-        // ===============================
-        // Axis labels (unchanged)
-        // ===============================
-        const labelStride = this.computeLabelStride(majorGrid.length + 1)
-        const labelGrid = majorGrid.filter((_, i) => i % labelStride === 0)
-        labelGrid.forEach((val) => {
-            // p1 axis
-            const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
-
-            this.legend
-                .append('text')
-                .attr('x', line[0][0] - 10)
-                .attr('y', line[0][1] + 3)
-                .attr('text-anchor', 'end')
-                .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${(val * 100).toFixed(0)}%`)
-        })
-
-        labelGrid.forEach((val) => {
-            // p2 axis
-            const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
-
-            this.legend
-                .append('text')
-                .attr('x', line[0][0] + 5)
-                .attr('y', line[0][1] - 10)
-                .attr('text-anchor', 'start')
-                .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${(val * 100).toFixed(0)}%`)
-        })
-
-        labelGrid.forEach((val) => {
-            // p3 axis
-            const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
-
-            this.legend
-                .append('text')
-                .attr('x', line[0][0] + 10)
-                .attr('y', line[0][1] + 18)
-                .attr('text-anchor', 'middle')
-                .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${(val * 100).toFixed(0)}%`)
-        })
     }
 
     private computeLabelStride(breaks: number): number {
@@ -721,7 +724,12 @@ export class TricoloreViz {
      * Add a curved annotation from the ternary center point
      * to the top of the legend area explaining what it is.
      */
-    private addCenterAnnotation(size: number, center: TernaryPoint, text: string = 'Average value', offsets: { labelX: number; labelY: number; curveX: number; curveY: number } = { labelX: 70, labelY: 20, curveX: 10, curveY: 0 }): void {
+    private addCenterAnnotation(
+        size: number,
+        center: TernaryPoint,
+        text: string = 'Average value',
+        offsets: { labelX: number; labelY: number; curveX: number; curveY: number } = { labelX: 70, labelY: 20, curveX: 10, curveY: 0 }
+    ): void {
         const [cx, cy] = this.ternaryToSvgCoords(center, size)
 
         // Target point above the triangle (inside legend space)
