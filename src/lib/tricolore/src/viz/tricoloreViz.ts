@@ -84,6 +84,7 @@ export class TricoloreViz {
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
+            cornerLabelOffset,
         } = options
 
         const plotWidth = this.width - this.margin.left - this.margin.right
@@ -115,7 +116,7 @@ export class TricoloreViz {
         this.triangle.append('image').attr('x', 0).attr('y', 0).attr('width', size).attr('height', size).attr('href', this.canvas.toDataURL())
 
         // Add triangle border and axes using SVG
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, undefined, cornerLabelOffset)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -151,6 +152,7 @@ export class TricoloreViz {
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
+            cornerLabelOffset,
         } = options
 
         const plotWidth = this.width - this.margin.left - this.margin.right
@@ -208,7 +210,7 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, breaks)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, breaks, cornerLabelOffset)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -248,6 +250,11 @@ export class TricoloreViz {
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
+            cornerLabelOffset = [
+                { x: 5, y: 5 },
+                { x: 5, y: 5 },
+                { x: 5, y: 5 },
+            ],
         } = options
 
         if (values.length !== 6) {
@@ -301,7 +308,7 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, null, cornerLabelOffset)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -372,7 +379,8 @@ export class TricoloreViz {
         showLines: boolean,
         labelPosition: 'corner' | 'edge' = 'corner',
         colorTarget: 'triangles' | 'points' = 'triangles',
-        breaks: number | null = 4
+        breaks: number | null = 4,
+        cornerLabelOffset?: { x: number; y: number }[]
     ): void {
         // Define triangle corners in ternary coordinates
         // and convert to SVG coordinates
@@ -391,15 +399,15 @@ export class TricoloreViz {
         // Add axis names
         if (labelPosition === 'edge') {
             const labelPositions = [
-                // p1 (15-29, bottom-left) → left edge (corners[0] ↔ corners[1])
-                [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14],
-                // p2 (45-64, top) → right edge (corners[1] ↔ corners[2])
-                [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14],
-                // p3 (75+, bottom-right) → bottom edge (corners[0] ↔ corners[2])
+                // v1 → bottom edge, centred, offset down
                 [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 35],
+                // v2 → left edge, centred, offset left
+                [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14],
+                // v3 → right edge, centred, offset right
+                [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14],
             ]
 
-            const rotateValues = [-60, 60, 0]
+            const rotateValues = [0, -60, 60]
 
             labels.forEach((label, i) => {
                 this.legend
@@ -414,10 +422,16 @@ export class TricoloreViz {
             })
         } else {
             // 'corner'
+            const off = cornerLabelOffset ?? [
+                { x: 0, y: 30 },
+                { x: 0, y: -5 },
+                { x: 12, y: 30 },
+            ]
+
             const labelPositions = [
-                [svgCorners[0][0], svgCorners[0][1] + 25], // p1
-                [svgCorners[1][0], svgCorners[1][1] - 15], // p2
-                [svgCorners[2][0], svgCorners[2][1] + 25], // p3
+                [svgCorners[0][0] + off[0].x, svgCorners[0][1] + off[0].y], // p1 bottom-left
+                [svgCorners[1][0] + off[1].x, svgCorners[1][1] + off[1].y], // p2 top
+                [svgCorners[2][0] + off[2].x, svgCorners[2][1] + off[2].y], // p3 bottom-right
             ]
 
             labels.forEach((label, i) => {
