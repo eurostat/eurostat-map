@@ -1,7 +1,73 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
-import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
+import { format } from 'd3-format'
+import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import { unhighlightRegions } from './choropleth/legend-choropleth'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared formatting utilities
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Shared label formatter factory for discrete colour legends.
+ * Works for both choropleth and prop-symbol colour scales.
+ *
+ * @param {object} out - legend instance
+ * @param {function} getThresholdsFn - map-specific threshold getter, called lazily
+ * @param {object} statData - stat data object (may be null)
+ * @param {string} labelType - 'thresholds' | 'ranges'
+ * @param {function|null} userFormatter - user-supplied override
+ * @returns {function}
+ */
+export function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labelType, userFormatter) {
+    if (userFormatter) return userFormatter
+
+    const decimals = resolveDecimals(out, statData)
+    const decimalFormatter = format(`,.${decimals}f`)
+    const round = (v) => Number(v.toFixed(decimals))
+
+    if (labelType === 'ranges') {
+        const thresholds = getThresholdsFn()
+        return (label, i) => {
+            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}`
+            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}`
+            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}`
+        }
+    }
+
+    // thresholds (default)
+    return (value) => spaceAsThousandSeparator(round(value))
+}
+
+/**
+ * Resolve decimal places: explicit config > auto-detect from data > 0.
+ * Checks both root out.decimals and nested out.colorLegend.decimals.
+ *
+ * @param {object} out - legend instance
+ * @param {object} statData - stat data object (may be null)
+ * @returns {number}
+ */
+export function resolveDecimals(out, statData) {
+    const explicit =
+        typeof out.decimals === 'number' ? out.decimals : typeof out.colorLegend?.decimals === 'number' ? out.colorLegend.decimals : undefined
+
+    if (explicit !== undefined) return explicit
+    if (!statData?.getArray) return 0
+
+    const values = statData.getArray().filter((v) => Number.isFinite(v))
+    if (!values.length) return 0
+
+    let max = 0
+    for (const v of values) {
+        const str = v.toString()
+        if (str.includes('.')) max = Math.max(max, str.split('.')[1].length)
+    }
+    return max
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Drawing
+// ─────────────────────────────────────────────────────────────────────────────
 
 // can either be 'ranges' (e.g. 0-10, 10-20) or 'thresholds' (e.g. 0, 10, 20 with ticks)
 export function drawDiscreteLegend(out, x, y) {
@@ -47,28 +113,6 @@ function getTitlePadding(out) {
     let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
     if (out.maxMin) p += 10 // extra padding if max/min labels are shown
     return p
-}
-
-/**
- * Determines whether the max and/or min boundary labels should be shown.
- * When the top or bottom class contains only a single value, it would duplicate
- * the adjacent threshold label, so we suppress it.
- */
-function getMaxMinVisibility(out, config, classifier, numberOfClasses, globalMin, globalMax) {
-    let showMax = true
-    let showMin = true
-
-    if (!classifier?.invertExtent) return { showMax, showMin }
-
-    const topClassEcl = out.ascending ? numberOfClasses - 1 : 0
-    const bottomClassEcl = out.ascending ? 0 : numberOfClasses - 1
-    const topExtent = classifier.invertExtent(topClassEcl)
-    const bottomExtent = classifier.invertExtent(bottomClassEcl)
-
-    if (topExtent && (topExtent[0] === topExtent[1] || topExtent[0] === globalMax)) showMax = false
-    if (bottomExtent && (bottomExtent[0] === bottomExtent[1] || bottomExtent[1] === globalMin)) showMin = false
-
-    return { showMax, showMin }
 }
 
 function createThresholdsLegend(out, config) {
@@ -284,39 +328,37 @@ function createThresholdsLegend(out, config) {
 
 function highlightMaxRegion(map, numberOfClasses, id) {
     const selector = getLegendRegionsSelector(map)
-
     const ecl = numberOfClasses - 1 // max class index
     const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
-    // Set all regions to white
+    allRegions.each(function () {
+        const sel = select(this)
+        if (!sel.attr('fill___')) sel.attr('fill___', sel.style('fill'))
+    })
+
     allRegions.style('fill', 'white')
 
-    // Highlight only the selected regions by restoring their original color
     const topClassRegions = allRegions.filter("[ecl='" + ecl + "']")
     topClassRegions.each(function (d) {
-        if (d.properties.id === id) {
-            select(this).style('fill', map.hoverColor_)
-        }
-        //select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+        if (d.properties.id === id) select(this).style('fill', map.hoverColor_)
     })
 }
 
 function highlightMinRegion(map, id) {
     const selector = getLegendRegionsSelector(map)
-
     const ecl = 0 // min class index
     const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
-    // Set all regions to white
+    allRegions.each(function () {
+        const sel = select(this)
+        if (!sel.attr('fill___')) sel.attr('fill___', sel.style('fill'))
+    })
+
     allRegions.style('fill', 'white')
 
-    // Highlight only the selected regions by restoring their original color
     const topClassRegions = allRegions.filter("[ecl='" + ecl + "']")
     topClassRegions.each(function (d) {
-        if (d.properties.id === id) {
-            select(this).style('fill', map.hoverColor_)
-        }
-        //select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+        if (d.properties.id === id) select(this).style('fill', map.hoverColor_)
     })
 }
 

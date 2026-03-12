@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 import { formatDefaultLocale } from 'd3-format'
+import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 
@@ -79,10 +79,7 @@ export const legend = function (map) {
         // clear previous legend(s)
         out.svg.selectAll('*').remove()
         // append new legend group
-        out.lgg = out.svg
-            // .append('g')
-            // .attr('id', 'em-legend-' + out.svgId)
-            .attr('class', 'em-legend')
+        out.lgg = out.svg.attr('class', 'em-legend')
     }
 
     /**
@@ -178,7 +175,7 @@ export const legend = function (map) {
             out.svg
                 .select('#em-legend-background')
                 .attr('x', bb.x - p)
-                .attr('y', bb.y - p) // -2 to account for the title height
+                .attr('y', bb.y - p)
                 .attr('width', bb.width + 2 * p)
                 .attr('height', bb.height + 2 * p)
         }
@@ -213,7 +210,7 @@ export const legend = function (map) {
         container
             .append('text')
             .attr('class', 'em-legend-label em-legend-label-no-data')
-            .attr('dy', '0.35em') // ~vertical centering
+            .attr('dy', '0.35em')
             .attr('x', out.noDataShapeWidth + 5)
             .attr('y', out.noDataShapeHeight / 2 + out.noDataPadding)
             .style('pointer-events', 'all')
@@ -240,11 +237,17 @@ export const legend = function (map) {
         return numberOfClasses
     }
 
+    /**
+     * Dispatch to the correct label formatter based on map type.
+     * - Choropleth: getChoroplethLabelFormatter (legend-choropleth.js)
+     * - Prop symbols: getPropSymbolColorLabelFormatter (legend-proportional-symbols.js)
+     * Both ultimately delegate to buildDiscreteLabelFormatter (legend-discrete.js).
+     */
     out.getLabelFormatter = function (out) {
         const map = out.map
         const mapType = map._mapType
-        const labelFormatter = mapType === 'ps' ? getPropSymbolColorLabelFormatter(out) : getChoroplethLabelFormatter(out)
-        return labelFormatter
+        if (mapType === 'ps') return getPropSymbolColorLabelFormatter(out)
+        return getChoroplethLabelFormatter(out)
     }
 
     out.getClassToFillStyle = function (out) {

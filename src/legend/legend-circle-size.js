@@ -60,7 +60,7 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         .attr('r', sizeScale)
 
     //labels
-    let labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
+    let labelFormatter = out.sizeLegend?.labelFormatter || formatSizeLabel
     if (out.nodeSizeLegend?.labelFormatter) {
         labelFormatter = out.nodeSizeLegend.labelFormatter
     }
@@ -97,4 +97,17 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         })
 
     return out
+}
+
+function formatSizeLabel(value, decimals) {
+    if (!Number.isFinite(value)) return ''
+    const dec = typeof decimals === 'number' ? decimals : detectValuePrecision(value)
+    const rounded = Number(value.toFixed(dec))
+    return spaceAsThousandSeparator(rounded)
+}
+
+function detectValuePrecision(value) {
+    const str = value.toString()
+    if (!str.includes('.')) return 0
+    return str.split('.')[1].length
 }

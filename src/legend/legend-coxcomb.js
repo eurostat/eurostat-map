@@ -258,6 +258,15 @@ export const legend = function (map, config) {
 
     function highlightRegions(map, code) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
+
+        // Store original colors before changing them
+        allSegments.each(function () {
+            const sel = select(this)
+            if (!sel.attr('fill___')) {
+                sel.attr('fill___', sel.style('fill'))
+            }
+        })
+
         allSegments.style('fill', 'white')
         const selected = allSegments.filter("path[code='" + code + "']")
         selected.each(function () {
@@ -268,7 +277,22 @@ export const legend = function (map, config) {
     function unhighlightRegions(map) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
         allSegments.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
+            const sel = select(this)
+            const originalColor = sel.attr('fill___')
+
+            if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
+                sel.style('fill', originalColor)
+            } else {
+                // Fallback: try to recompute the original color if not stored properly
+                const code = sel.attr('code')
+                if (code !== null && code !== undefined && map.classToFillStyle_) {
+                    const originalFill = map.classToFillStyle_[code] || map.getColorOrFillStyle_(code)
+                    if (originalFill) {
+                        sel.style('fill', originalFill)
+                        sel.attr('fill___', originalFill)
+                    }
+                }
+            }
         })
     }
 

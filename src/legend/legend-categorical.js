@@ -115,6 +115,15 @@ export const legend = function (map, config) {
     function highlightRegions(map, ecl) {
         const selector = getLegendRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+        // Store original colors before changing them
+        allRegions.each(function () {
+            const sel = select(this)
+            if (!sel.attr('fill___')) {
+                sel.attr('fill___', sel.style('fill'))
+            }
+        })
+
         allRegions.style('fill', 'white')
         const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
         selectedRegions.each(function () {
@@ -126,8 +135,23 @@ export const legend = function (map, config) {
     function unhighlightRegions(map) {
         const selector = getLegendRegionsSelector(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
         allRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
+            const sel = select(this)
+            const originalColor = sel.attr('fill___')
+
+            if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
+                sel.style('fill', originalColor)
+            } else {
+                // Fallback: recompute the original color if not stored properly
+                const ecl = sel.attr('ecl')
+                if (ecl !== null && ecl !== undefined) {
+                    const originalFill = map.getColorOrFillStyle_(ecl)
+                    sel.style('fill', originalFill)
+                    // Store for future use
+                    sel.attr('fill___', originalFill)
+                }
+            }
         })
     }
 

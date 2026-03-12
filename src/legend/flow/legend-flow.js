@@ -14,7 +14,7 @@ export const legend = function (map, config) {
 
     out.flowWidthLegend = {
         title: null,
-        titlePadding: 17,
+        titlePadding: 20,
         values: null,
         marginTop: 15,
         labelFormatter: undefined, // function to format legend labels
@@ -40,13 +40,13 @@ export const legend = function (map, config) {
         titlePadding: 0, // Padding between title and legend body
         marginTop: 50,
         items: [], // user-defined legend items for custom flow color function,
-        ticks: false // use labels as ticks
+        ticks: false, // use labels as ticks
     }
 
     out.regionColorLegend = {
         title: null,
         titlePadding: 15,
-        marginTop: 30,
+        marginTop: 40,
         labels: ['Exporter', 'Importer'],
     }
 
@@ -129,7 +129,9 @@ export const legend = function (map, config) {
 
         // line widths
         if (out.flowWidthLegend) {
-            out.flowWidthLegend.orientation == 'vertical' ? drawVerticalFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop) : drawHorizontalFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop)
+            out.flowWidthLegend.orientation == 'vertical'
+                ? drawVerticalFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop)
+                : drawHorizontalFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop)
         }
 
         const flowWidthNode = out._flowWidthContainer.node()
@@ -161,7 +163,7 @@ export const legend = function (map, config) {
         }
 
         // flow colour legend
-        if (out.flowColorLegend && ((map.flowNodes_ && map._nodeSizeScale) || (typeof map.flowColor_ === 'function'))) {
+        if (out.flowColorLegend && ((map.flowNodes_ && map._nodeSizeScale) || typeof map.flowColor_ === 'function')) {
             // flow color legend
             let flowColorLegendYOffset = out.lgg.node().getBBox().height + out.flowColorLegend.marginTop
             drawFlowColorLegend(out, baseX, flowColorLegendYOffset)
@@ -169,12 +171,10 @@ export const legend = function (map, config) {
 
         // region fill colors
         if ((map.importerRegionIds.length > 0 || map.exporterRegionIds.length > 0) && out.regionColorLegend) {
-            let regionColorLegendYOffset = out.lgg.node().getBBox().height + out.regionColorLegend.marginTop
+            let regionColorLegendYOffset = baseY + out.lgg.node().getBBox().height + out.regionColorLegend.marginTop
             drawRegionColorLegend(out, baseX, regionColorLegendYOffset)
         }
     }
-
-
 
     function drawRegionColorLegend(out, baseX, baseY) {
         // Create/clear container
@@ -219,5 +219,3 @@ export const legend = function (map, config) {
 
     return out
 }
-
-

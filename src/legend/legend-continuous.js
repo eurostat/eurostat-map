@@ -416,13 +416,22 @@ function highlightRegions(map, rawVal) {
                 // dont whiten no data when no data is being hovered
                 return
             }
+            // Store original color before dimming
+            if (!sel.attr('fill___')) {
+                sel.attr('fill___', sel.style('fill'))
+            }
             sel.style('fill', 'white') // Dim the region
             return
         }
 
         const val = +ecl // raw stat value
+        // Store original color if not already stored
+        if (!sel.attr('fill___')) {
+            sel.attr('fill___', sel.style('fill'))
+        }
+
         if (val >= rawVal - tolerance && val <= rawVal + tolerance) {
-            sel.style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+            sel.style('fill', sel.attr('fill___')) // Restore original color for selected regions
         } else {
             sel.style('fill', 'white') // dim others
         }
@@ -436,7 +445,21 @@ function unhighlightRegions(map) {
 
     // Restore each region's original color from the fill___ attribute
     allRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___'))
+        const sel = select(this)
+        const originalColor = sel.attr('fill___')
+
+        if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
+            sel.style('fill', originalColor)
+        } else {
+            // Fallback: recompute the original color if not stored properly
+            const ecl = sel.attr('ecl')
+            if (ecl !== null && ecl !== undefined) {
+                const originalFill = map.getColorOrFillStyle_(ecl)
+                sel.style('fill', originalFill)
+                // Store for future use
+                sel.attr('fill___', originalFill)
+            }
+        }
     })
 }
 

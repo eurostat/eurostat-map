@@ -1,12 +1,11 @@
 //legend-choropleth.js
 import { select } from 'd3-selection'
-import { format } from 'd3-format'
 import * as Legend from '../legend'
-import { getLegendRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
+import { getLegendRegionsSelector } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from '../legend-continuous'
-import { drawDiscreteLegend } from '../legend-discrete'
+import { drawDiscreteLegend, buildDiscreteLabelFormatter, resolveDecimals } from '../legend-discrete'
 import { createAlphaLegend } from './legend-value-by-alpha'
 
 /**
@@ -139,71 +138,10 @@ export function getThresholds(out) {
 
 export function getChoroplethLabelFormatter(out) {
     const stat = out.getColorStats(out)
-
-    const decimals = typeof out.decimals === 'number' ? out.decimals : detectDatasetPrecision(stat)
+    const decimals = resolveDecimals(out, stat)
     out._resolvedDecimals = decimals
 
-    const decimalFormatter = format(`,.${decimals}f`)
-
-    if (out.labelType == 'ranges') {
-        const thresholds = getThresholds(out)
-
-        const defaultLabeller = (label, i) => {
-            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}`
-            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}`
-            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}`
-        }
-
-        return out.labelFormatter || defaultLabeller
-    } else {
-        const round = (v) => Number(v.toFixed(decimals))
-        return out.labelFormatter || ((value) => spaceAsThousandSeparator(round(value)))
-    }
-}
-
-function detectDatasetPrecision(stat) {
-    if (!stat?.getArray) return 0
-
-    const values = stat.getArray().filter((v) => Number.isFinite(v))
-    if (!values.length) return 0
-
-    let maxDecimals = 0
-
-    for (const value of values) {
-        const str = value.toString()
-        if (str.includes('.')) {
-            const decimals = str.split('.')[1].length
-            maxDecimals = Math.max(maxDecimals, decimals)
-        }
-    }
-
-    return maxDecimals
-}
-
-// Highlight selected regions on mouseover
-export function highlightRegions(map, ecl) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Set all regions to white
-    allRegions.style('fill', 'white')
-
-    // Highlight only the selected regions by restoring their original color
-    const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
-    selectedRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-    })
-}
-
-// Reset all regions to their original colors on mouseout
-export function unhighlightRegions(map) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Restore each region's original color from the fill___ attribute
-    allRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___'))
-    })
+    return buildDiscreteLabelFormatter(out, () => getThresholds(out), stat, out.labelType, out.labelFormatter)
 }
 
 /**
@@ -226,4 +164,52 @@ export function getThresholdTicksWithExtents(out) {
     uniq.sort((a, b) => (out.ascending ? a - b : b - a))
 
     return uniq
+}
+
+// Highlight selected regions on mouseover
+export function highlightRegions(map, ecl) {
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Store original colors before changing them
+    allRegions.each(function () {
+        const sel = select(this)
+        if (!sel.attr('fill___')) {
+            sel.attr('fill___', sel.style('fill'))
+        }
+    })
+
+    // Set all regions to white
+    allRegions.style('fill', 'white')
+
+    // Highlight only the selected regions by restoring their original color
+    const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
+    selectedRegions.each(function () {
+        select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+    })
+}
+
+// Reset all regions to their original colors on mouseout
+export function unhighlightRegions(map) {
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    // Restore each region's original color from the fill___ attribute
+    allRegions.each(function () {
+        const sel = select(this)
+        const originalColor = sel.attr('fill___')
+
+        if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
+            sel.style('fill', originalColor)
+        } else {
+            // Fallback: recompute the original color if not stored properly
+            const ecl = sel.attr('ecl')
+            if (ecl !== null && ecl !== undefined) {
+                const originalFill = map.getColorOrFillStyle_(ecl)
+                sel.style('fill', originalFill)
+                // Store for future use
+                sel.attr('fill___', originalFill)
+            }
+        }
+    })
 }

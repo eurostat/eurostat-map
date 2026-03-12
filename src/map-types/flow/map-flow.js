@@ -52,7 +52,7 @@ export const map = function (config) {
     out.flowOutlineWidth_ = 1.2 // width of outline around flow lines
     out.flowOutlineColor_ = '#ffffff' // color of outline around flow lines
     out.flowLabelOffsets_ = { x: 3, y: 0 } // Offsets for flow labels
-    out.flowOpacity_ = 0.5 // Default opacity for flow lines
+    out.flowOpacity_ = 0.9 // Default opacity for flow lines
 
     out.flowOrder_ = (a, b) => {
         const nodeAx = a.link.source?.x ?? a.link.target?.x ?? 0
