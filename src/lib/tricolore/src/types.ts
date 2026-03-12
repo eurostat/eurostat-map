@@ -92,6 +92,8 @@ export interface VisualizationOptions extends TricoloreOptions {
     centerLabel?: string
 
     centerAnnotationOffsets?: { labelX: number; labelY: number; curveX: number; curveY: number }
+
+    onLeave?: () => void
 }
 
 /**

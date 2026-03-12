@@ -12,6 +12,33 @@ import { executeForAllInsets, getLegendRegionsSelector } from '../../core/utils'
 let activeLegendIndex = null
 let activeLegendColor = null
 let activeLegendElement = null
+let resetTimer = null
+let resetGeneration = 0
+let isHighlighting = false
+
+function scheduleReset(map) {
+    const generation = ++resetGeneration
+    resetTimer = setTimeout(() => {
+        if (generation !== resetGeneration) return // a newer mouseover happened, abort
+        resetTimer = null
+        isHighlighting = false
+        activeLegendElement = null
+        activeLegendIndex = null
+        activeLegendColor = null
+        resetRegions(map)
+        if (map.insetTemplates_) {
+            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
+        }
+    }, 100)
+}
+
+function cancelReset() {
+    resetGeneration++ // invalidate any pending reset
+    if (resetTimer) {
+        clearTimeout(resetTimer)
+        resetTimer = null
+    }
+}
 
 export const legend = function (map, config = {}) {
     const out = Legend.legend(map)
@@ -49,6 +76,14 @@ export const legend = function (map, config = {}) {
     }
 
     function drawTricoloreLegend() {
+        // Force clear any lingering highlight state from previous render
+        cancelReset()
+        isHighlighting = false
+        activeLegendElement = null
+        activeLegendIndex = null
+        activeLegendColor = null
+        resetRegions(map)
+
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
 
@@ -85,14 +120,15 @@ export const legend = function (map, config = {}) {
             showData: out.showData,
             centerAnnotationOffsets: out.centerAnnotationOffsets,
 
-            // ---- LEGEND INTERACTIONS (RACE SAFE) ----
+            // ---- LEGEND INTERACTIONS ----
             dataPointHandlers: {
                 mouseover: (e, d) => {
+                    cancelReset()
+                    isHighlighting = true
                     const el = select(e.currentTarget)
 
-                    // Reset previous active element safely
-                    if (activeLegendElement && activeLegendElement.node() !== el.node()) {
-                        activeLegendElement.attr('stroke', null).attr('stroke-width', null).lower()
+                    if (activeLegendElement) {
+                        activeLegendElement.attr('stroke', null).attr('stroke-width', null)
                     }
 
                     activeLegendElement = el
@@ -118,32 +154,24 @@ export const legend = function (map, config = {}) {
                 },
 
                 mouseout: (e) => {
+                    if (!isHighlighting) return
                     const el = select(e.currentTarget)
-
-                    // Only reset if this is still active
-                    if (activeLegendElement && activeLegendElement.node() === el.node()) {
-                        el.attr('stroke', null).attr('stroke-width', null).lower()
-
-                        activeLegendElement = null
-                        activeLegendIndex = null
-
-                        resetRegions(map)
-
-                        if (map.insetTemplates_) {
-                            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
-                        }
-
-                        map._tooltip?.mouseout()
-                    }
+                    el.attr('stroke', null).attr('stroke-width', null).lower()
+                    activeLegendElement = null
+                    isHighlighting = false
+                    map._tooltip?.mouseout()
+                    scheduleReset(map)
                 },
             },
 
             triangleHandlers: {
                 mouseover: (e, color) => {
+                    cancelReset()
+                    isHighlighting = true
                     const el = select(e.currentTarget)
 
-                    if (activeLegendElement && activeLegendElement.node() !== el.node()) {
-                        activeLegendElement.attr('stroke', null).attr('stroke-width', null).lower()
+                    if (activeLegendElement) {
+                        activeLegendElement.attr('stroke', null).attr('stroke-width', null)
                     }
 
                     activeLegendElement = el
@@ -160,20 +188,12 @@ export const legend = function (map, config = {}) {
                 },
 
                 mouseout: (e) => {
+                    if (!isHighlighting) return
                     const el = select(e.currentTarget)
-
-                    if (activeLegendElement && activeLegendElement.node() === el.node()) {
-                        el.attr('stroke', null).attr('stroke-width', null).lower()
-
-                        activeLegendElement = null
-                        activeLegendColor = null
-
-                        resetRegions(map)
-
-                        if (map.insetTemplates_) {
-                            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
-                        }
-                    }
+                    el.attr('stroke', null).attr('stroke-width', null).lower()
+                    activeLegendElement = null
+                    isHighlighting = false
+                    scheduleReset(map)
                 },
             },
         }
@@ -183,6 +203,19 @@ export const legend = function (map, config = {}) {
         } else {
             viz.createContinuousPlot(map._ternaryData_, opts)
         }
+
+        // Use mouseleave on the foreignObject container as a reliable fallback
+        // This fires when the mouse leaves the entire legend area
+        container.on('mouseleave', () => {
+            if (!isHighlighting) return
+            if (activeLegendElement) {
+                activeLegendElement.attr('stroke', null).attr('stroke-width', null)
+            }
+            activeLegendElement = null
+            isHighlighting = false
+            map._tooltip?.mouseout()
+            scheduleReset(map)
+        })
     }
 
     return out
@@ -199,7 +232,6 @@ function highlightRegionsByClass(map, classIndex) {
     regions.each(function () {
         const sel = select(this)
         const ecl = +sel.attr('ecl')
-
         sel.style('opacity', ecl === classIndex ? 1 : 0.15)
     })
 }
@@ -213,14 +245,13 @@ function highlightRegionsByColor(map, color) {
     regions.each(function () {
         const sel = select(this)
         const original = normalizeColor(sel.attr('fill___'))
-
         sel.style('opacity', original === target ? 1 : 0.15)
     })
 }
 
 function resetRegions(map) {
+    if (!map.svg_) return
     const selector = getLegendRegionsSelector(map)
-
     map.svg_.selectAll(selector).selectAll('[ecl]').style('opacity', 1)
 }
 

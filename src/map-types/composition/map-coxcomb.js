@@ -79,12 +79,12 @@ export const map = function (config) {
     /**
      * Configure the coxcomb map from a single config object.
      *
-     * Supports both the new flat API and the legacy nested `stat` API for
+     * Supports both Eurostat data API, custom data, and the legacy nested `stat` API for
      * backwards compatibility.
      *
      * @param {Object} config
      *
-     * New flat API:
+     * Eurostat API:
      * @param {String} config.eurostatDatasetCode
      * @param {Object} config.filters - Shared filters (excluding time and category params)
      * @param {String} [config.unitText]
@@ -97,10 +97,20 @@ export const map = function (config) {
      * @param {Array}  [config.categoryColors]
      * @param {String} [config.totalCode] - Optional total category code for "other" wedge
      *
+     * Custom Data API (NEW):
+     * @param {Object} config.customData - Custom data in format: { regionId: { time: { category: value } } }
+     * @param {String} [config.unitText]
+     * @param {Array}  config.times - Time values (e.g. ['Jan','Feb','Mar'])
+     * @param {Array}  [config.timeLabels] - Display labels for times
+     * @param {Array}  config.categoryCodes - Category codes
+     * @param {Array}  [config.categoryLabels]
+     * @param {Array}  [config.categoryColors]
+     * @param {String} [config.totalCode] - Optional total category code for "other" wedge (auto-calculated if not provided)
+     *
      * Legacy API (still supported):
      * @param {Object} config.stat - Nested stat config: { eurostatDatasetCode, filters, unitText }
      *
-     * @example — new flat API
+     * @example — Eurostat API
      * .statCoxcomb({
      *   eurostatDatasetCode: 'tour_occ_nin2m',
      *   filters: { unit: 'NR', nace_r2: 'I551-I553' },
@@ -114,6 +124,20 @@ export const map = function (config) {
      *   categoryColors: ['#1b9e77','#d95f02'],
      *   totalCode: 'TOTAL',
      * })
+     *
+     * @example — Custom Data API
+     * .statCoxcomb({
+     *   customData: {
+     *     'FR': { 'Jan': { 'Domestic': 1500, 'Foreign': 800 }, 'Feb': { 'Domestic': 1600, 'Foreign': 900 } },
+     *     'DE': { 'Jan': { 'Domestic': 2200, 'Foreign': 1200 }, 'Feb': { 'Domestic': 2100, 'Foreign': 1300 } }
+     *   },
+     *   times: ['Jan','Feb','Mar','Apr','May','Jun'],
+     *   timeLabels: ['January','February','March','April','May','June'],
+     *   categoryCodes: ['Domestic','Foreign'],
+     *   categoryLabels: ['Domestic tourists','Foreign tourists'],
+     *   categoryColors: ['#1b9e77','#d95f02'],
+     *   unitText: 'Tourist nights'
+     * })
      */
     out.statCoxcomb = function (config) {
         // ── Backwards compat: flatten nested stat object ─────────────────────
@@ -124,6 +148,7 @@ export const map = function (config) {
 
         const {
             eurostatDatasetCode,
+            customData, // NEW: For custom data
             filters,
             unitText,
             timeParameter,
@@ -136,10 +161,142 @@ export const map = function (config) {
             totalCode,
         } = config
 
+        // Validation
+        if (!times || !times.length) {
+            throw new Error('Coxcomb maps require a "times" array. Example: times: ["Jan", "Feb", "Mar"]')
+        }
+        if (!categoryCodes || !categoryCodes.length) {
+            throw new Error('Coxcomb maps require "categoryCodes". Example: categoryCodes: ["Domestic", "Foreign"]')
+        }
+
         out._coxTimes = times
         out._coxCategoryCodes = [...categoryCodes] // clone — 'other' may be appended later
         out._coxTimeLabels = timeLabels
 
+        // Set category colors and labels
+        const assignCategoryProperties = () => {
+            categoryCodes.forEach((category, idx) => {
+                if (categoryColors?.[idx]) {
+                    out.catColors_ = out.catColors_ || {}
+                    out.catColors_[category] = categoryColors[idx]
+                }
+                if (categoryLabels?.[idx]) {
+                    out.catLabels_ = out.catLabels_ || {}
+                    out.catLabels_[category] = categoryLabels[idx]
+                }
+            })
+
+            if (totalCode) {
+                out.totalCode_ = totalCode
+                out.catColors_ = out.catColors_ || {}
+                out.catLabels_ = out.catLabels_ || {}
+                out.catColors_['other'] = '#FFCC80'
+                out.catLabels_['other'] = 'Other'
+            }
+        }
+
+        // ── Custom Data Path ─────────────────────────────────────────────────
+        if (customData && !eurostatDatasetCode) {
+            console.log('Custom data path: Setting up stat configs and storing custom data...')
+            assignCategoryProperties()
+
+            // Store custom data and config for use after build (like pie charts)
+            out._customData = customData
+            out._customTimes = times
+            out._customCategories = [...categoryCodes] // clone
+            out._customTotalCode = totalCode
+            out._customUnitText = unitText || 'Value'
+
+            // Set up stat configs for each time:category combination (no data fetching)
+            times.forEach((time) => {
+                categoryCodes.forEach((category) => {
+                    const key = `${time}:${category}`
+                    out.stat(key, {
+                        code: key,
+                        unitText: unitText || 'Value',
+                    })
+                })
+
+                if (totalCode) {
+                    const key = `${time}:${totalCode}`
+                    out.stat(key, {
+                        code: key,
+                        unitText: unitText || 'Value',
+                    })
+                }
+            })
+
+            // Store method to inject data after build (like pie charts do it manually)
+            out._injectCustomData = function () {
+                console.log('Injecting custom data...')
+
+                out._customTimes.forEach((time) => {
+                    out._customCategories.forEach((category) => {
+                        const key = `${time}:${category}`
+                        const regionData = {}
+
+                        for (const regionId in out._customData) {
+                            const value = out._customData[regionId]?.[time]?.[category]
+                            if (value !== undefined) {
+                                regionData[regionId] = value
+                            }
+                        }
+
+                        if (Object.keys(regionData).length > 0) {
+                            console.log(`Setting data for ${key}:`, regionData)
+                            out.statData(key).setData(regionData)
+                        }
+                    })
+
+                    if (out._customTotalCode) {
+                        const key = `${time}:${out._customTotalCode}`
+                        const regionData = {}
+
+                        for (const regionId in out._customData) {
+                            let total = out._customData[regionId]?.[time]?.[out._customTotalCode]
+                            if (total === undefined) {
+                                // Auto-calculate total from categories
+                                total = 0
+                                out._customCategories.forEach((cat) => {
+                                    const val = out._customData[regionId]?.[time]?.[cat]
+                                    if (val !== undefined && !isNaN(val)) total += parseFloat(val)
+                                })
+                            }
+                            if (total > 0) {
+                                regionData[regionId] = total
+                            }
+                        }
+
+                        if (Object.keys(regionData).length > 0) {
+                            console.log(`Setting total data for ${key}:`, regionData)
+                            out.statData(key).setData(regionData)
+                        }
+                    }
+                })
+
+                // After data injection, update the visualization
+                out.updateStatValues()
+                console.log('Custom data injection complete!')
+            }
+
+            // Set up build override to automatically inject data after build
+            const originalBuild = out.build
+            out.build = function () {
+                console.log('Custom build: Building map first...')
+                const result = originalBuild.call(out)
+
+                console.log('Custom build: Injecting custom data after build...')
+                // Inject custom data after build completes
+                out._injectCustomData()
+
+                return result
+            }
+
+            return out
+        }
+
+        // ── Eurostat Data Path (unchanged - maintains backward compatibility) ──
+        assignCategoryProperties()
         const baseFilters = filters ? { ...filters } : {}
 
         // Register one stat per time × category combination
@@ -151,17 +308,6 @@ export const map = function (config) {
                     unitText,
                     filters: { ...baseFilters, [timeParameter]: time, [categoryParameter]: category },
                 })
-
-                // Assign label/color once per category (same across all times)
-                const idx = categoryCodes.indexOf(category)
-                if (categoryColors?.[idx]) {
-                    out.catColors_ = out.catColors_ || {}
-                    out.catColors_[category] = categoryColors[idx]
-                }
-                if (categoryLabels?.[idx]) {
-                    out.catLabels_ = out.catLabels_ || {}
-                    out.catLabels_[category] = categoryLabels[idx]
-                }
             })
 
             // Also load total per time (used to compute "other" wedge)
@@ -173,14 +319,6 @@ export const map = function (config) {
                 })
             }
         })
-
-        if (totalCode) {
-            out.totalCode_ = totalCode
-            out.catColors_ = out.catColors_ || {}
-            out.catLabels_ = out.catLabels_ || {}
-            out.catColors_['other'] = '#FFCC80'
-            out.catLabels_['other'] = 'Other'
-        }
 
         return out
     }

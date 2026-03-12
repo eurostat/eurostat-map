@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Coxcomb Custom Data - Simplified API</title>
+        <style>
+            .em-tooltip {
+                max-width: 300px !important;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="map"></svg>
+
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // NEW: Much simpler API! Just pass customData directly to statCoxcomb()
+            // No more callbacks, manual data transformation, or complex setup required.
+
+            const customData = {
+                // Format: regionId: { month: { category: value } }
+                FR: {
+                    M01: { DOM: 1500, FOR: 800, TOTAL: 2300 },
+                    M02: { DOM: 1600, FOR: 900, TOTAL: 2500 },
+                    M03: { DOM: 1800, FOR: 1200, TOTAL: 3000 },
+                    M04: { DOM: 2200, FOR: 1500, TOTAL: 3700 },
+                    M05: { DOM: 2500, FOR: 1800, TOTAL: 4300 },
+                    M06: { DOM: 3000, FOR: 2200, TOTAL: 5200 },
+                },
+                DE: {
+                    M01: { DOM: 2200, FOR: 1200, TOTAL: 3400 },
+                    M02: { DOM: 2100, FOR: 1300, TOTAL: 3400 },
+                    M03: { DOM: 2500, FOR: 1600, TOTAL: 4100 },
+                    M04: { DOM: 2800, FOR: 1900, TOTAL: 4700 },
+                    M05: { DOM: 3200, FOR: 2300, TOTAL: 5500 },
+                    M06: { DOM: 3500, FOR: 2600, TOTAL: 6100 },
+                },
+                IT: {
+                    M01: { DOM: 1800, FOR: 1000, TOTAL: 2800 },
+                    M02: { DOM: 1900, FOR: 1100, TOTAL: 3000 },
+                    M03: { DOM: 2300, FOR: 1400, TOTAL: 3700 },
+                    M04: { DOM: 2700, FOR: 1700, TOTAL: 4400 },
+                    M05: { DOM: 3100, FOR: 2100, TOTAL: 5200 },
+                    M06: { DOM: 3400, FOR: 2400, TOTAL: 5800 },
+                },
+                ES: {
+                    M01: { DOM: 1200, FOR: 1500, TOTAL: 2700 },
+                    M02: { DOM: 1300, FOR: 1600, TOTAL: 2900 },
+                    M03: { DOM: 1600, FOR: 2000, TOTAL: 3600 },
+                    M04: { DOM: 2000, FOR: 2500, TOTAL: 4500 },
+                    M05: { DOM: 2400, FOR: 3000, TOTAL: 5400 },
+                    M06: { DOM: 2800, FOR: 3500, TOTAL: 6300 },
+                },
+            }
+
+            const map = eurostatmap
+                .map('coxcomb')
+                .width(800)
+                .nutsLevel(0)
+                .dorling(true) // Enable dorling - needed for coxcomb positioning
+                .coxcombMinRadius(5)
+                .coxcombMaxRadius(40)
+                .legend({ x: 10, y: 200 })
+
+            // Set up stat configs manually like pie charts do
+            const times = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06']
+            const categories = ['DOM', 'FOR']
+            const totalCode = 'TOTAL'
+
+            // Create stat objects for each time:category combination
+            times.forEach((time) => {
+                categories.forEach((category) => {
+                    const key = `${time}:${category}`
+                    map.stat(key, {
+                        code: key,
+                        unitText: 'Nights spent',
+                    })
+                })
+
+                // Also create total stat
+                if (totalCode) {
+                    const key = `${time}:${totalCode}`
+                    map.stat(key, {
+                        code: key,
+                        unitText: 'Nights spent',
+                    })
+                }
+            })
+
+            // Set the categories and times (needed by coxcomb)
+            map._coxTimes = times
+            map._coxCategoryCodes = [...categories]
+            map.totalCode_ = totalCode
+
+            // Set category colors
+            map.catColors_ = { DOM: '#1b9e77', FOR: '#d95f02' }
+            map.catLabels_ = { DOM: 'Domestic', FOR: 'Foreign' }
+
+            console.log('About to build map...')
+            map.build()
+            console.log('Map build completed!')
+
+            // Now inject data manually after build (like pie charts do)
+            console.log('Injecting custom data...')
+            times.forEach((time) => {
+                categories.forEach((category) => {
+                    const key = `${time}:${category}`
+                    const regionData = {}
+
+                    for (const regionId in customData) {
+                        const value = customData[regionId]?.[time]?.[category]
+                        if (value !== undefined) {
+                            regionData[regionId] = value
+                        }
+                    }
+
+                    if (Object.keys(regionData).length > 0) {
+                        console.log(`Setting data for ${key}:`, regionData)
+                        map.statData(key).setData(regionData)
+                    }
+                })
+
+                // Inject total data
+                if (totalCode) {
+                    const key = `${time}:${totalCode}`
+                    const regionData = {}
+
+                    for (const regionId in customData) {
+                        const total = customData[regionId]?.[time]?.[totalCode]
+                        if (total !== undefined) {
+                            regionData[regionId] = total
+                        }
+                    }
+
+                    if (Object.keys(regionData).length > 0) {
+                        console.log(`Setting total data for ${key}:`, regionData)
+                        map.statData(key).setData(regionData)
+                    }
+                }
+            })
+
+            // Update the map with new data (like pie charts do)
+            map.updateStatValues()
+            console.log('Custom data injection complete!')
+
+            // Test data after injection
+            setTimeout(() => {
+                console.log('Testing data after injection...')
+                const testData = map.statData('M01:DOM')
+                console.log('M01:DOM statData:', testData)
+                console.log('M01:DOM data:', testData?.get())
+                console.log('M01:DOM FR value:', testData?.getValue('FR'))
+            }, 500)
+
+            console.log('Coxcomb map created with simplified custom data API!')
+        </script>
+    </body>
+</html>

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            .em-tooltip {
+                max-width: 300px !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="display: flex">
+            <div><svg id="map"></svg></div>
+            <div style="padding-left: 10px"><svg id="legend" height="400"></svg></div>
+        </div>
+
+        <svg id="inset1"></svg>
+        <svg id="inset2" x="200" y="500"></svg>
+
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('coxcomb')
+
+                .width(800)
+                .nutsLevel(2)
+                .statCoxcomb({
+                    stat: {
+                        eurostatDatasetCode: 'tour_occ_nin2m',
+                        filters: { unit: 'NR', nace_r2: 'I551-I553', TIME: 2022 },
+                        unitText: 'Nights spent',
+                    },
+                    timeParameter: 'month',
+                    times: ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12'],
+                    timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    categoryParameter: 'c_resid',
+                    categoryCodes: ['DOM', 'FOR'],
+                    categoryLabels: ['Domestic', 'Foreign'],
+                    categoryColors: ['#1b9e77', '#d95f02'],
+                    totalCode: 'TOTAL',
+                })
+                .coxcombMinRadius(5)
+                .coxcombMaxRadius(37)
+                .transitionDuration(2000)
+                .legend({
+                    svgId: 'legend',
+                    title: 'Top 20 Regions',
+                    x: 50,
+                    y: 120,
+                    colorLegend: { title: 'Type', marginTop: 50, noData: false },
+                    timeLegend: { title: 'Month', marginTop: -30 },
+                })
+                .insets('default')
+                .insetBoxPosition([575, 10])
+                .zoomExtent([1, 10])
+                .callback((initialMap) => {
+                    console.log('API data loaded, now rebuilding with manual data injection...')
+
+                    // Step 1: Extract and filter data to top 20 regions
+                    const regionTotals = []
+
+                    if (initialMap.yearlyTotals) {
+                        for (const regionId in initialMap.yearlyTotals) {
+                            const total = initialMap.yearlyTotals[regionId]
+                            if (total > 0) {
+                                regionTotals.push({ nutsId: regionId, total })
+                            }
+                        }
+                    }
+
+                    // Sort by total and get top 20
+                    regionTotals.sort((a, b) => b.total - a.total)
+                    const top20Regions = regionTotals.slice(0, 20).map((r) => r.nutsId)
+
+                    console.log('Top 20 regions by tourist nights:', top20Regions)
+
+                    // Step 2: Extract the filtered data from API results
+                    const times = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12']
+                    const categories = ['DOM', 'FOR']
+                    const totalCode = 'TOTAL'
+                    const filteredApiData = {}
+
+                    // Extract data for top 20 regions from API results
+                    for (const statKey in initialMap.statData_) {
+                        if (statKey === 'default') continue
+
+                        const statData = initialMap.statData(statKey)
+                        if (!statData || !statData._data_) continue
+
+                        filteredApiData[statKey] = {}
+
+                        // Only include data for top 20 regions
+                        for (const regionId in statData._data_) {
+                            if (top20Regions.includes(regionId)) {
+                                filteredApiData[statKey][regionId] = statData._data_[regionId]
+                            }
+                        }
+                    }
+
+                    console.log('Filtered API data extracted:', Object.keys(filteredApiData))
+
+                    // Step 3: Clear existing map and rebuild manually (like custom-data example)
+                    initialMap.svg().selectAll('*').remove()
+
+                    // Create new map with manual setup (no API calls)
+                    const newMap = eurostatmap
+                        .map('coxcomb')
+                        .title('Tourism seasonality')
+                        .subtitle('Data for 2022, filtered to top 20 regions by total nights spent')
+                        .dorling(true)
+                        .width(800)
+                        .nutsLevel(2)
+                        .coxcombMinRadius(15)
+                        .coxcombMaxRadius(37)
+                        .transitionDuration(2000)
+                        .legend({
+                            svgId: 'legend',
+                            title: 'Nights spent',
+                            x: 50,
+                            y: 120,
+                            colorLegend: { title: 'Type (Manual)', marginTop: 50, noData: false },
+                            timeLegend: { title: 'Month', marginTop: -30 },
+                        })
+                        .insets('default')
+                        .insetBoxPosition([575, 10])
+                        .zoomExtent([1, 10])
+
+                    // Step 4: Set up stat configs manually (like custom-data example)
+                    times.forEach((time) => {
+                        categories.forEach((category) => {
+                            const key = `${time}:${category}`
+                            newMap.stat(key, {
+                                code: key,
+                                unitText: 'Nights spent',
+                            })
+                        })
+
+                        // Also create total stat
+                        if (totalCode) {
+                            const key = `${time}:${totalCode}`
+                            newMap.stat(key, {
+                                code: key,
+                                unitText: 'Nights spent',
+                            })
+                        }
+                    })
+
+                    // Set the categories and times (needed by coxcomb)
+                    newMap._coxTimes = times
+                    newMap._coxCategoryCodes = [...categories]
+                    newMap.totalCode_ = totalCode
+
+                    // Set category colors and labels
+                    newMap.catColors_ = { DOM: '#1b9e77', FOR: '#d95f02' }
+                    newMap.catLabels_ = { DOM: 'Domestic', FOR: 'Foreign' }
+
+                    console.log('Building new map with manual setup...')
+                    newMap.build()
+
+                    // Step 5: Inject the filtered API data manually (like custom-data example)
+                    console.log('Injecting filtered API data manually...')
+                    for (const statKey in filteredApiData) {
+                        if (Object.keys(filteredApiData[statKey]).length > 0) {
+                            console.log(`Setting manual data for ${statKey}:`, Object.keys(filteredApiData[statKey]).length, 'regions')
+                            newMap.statData(statKey).setData(filteredApiData[statKey])
+                        }
+                    }
+
+                    // Update the map with manually injected data
+                    newMap.updateStatValues()
+
+                    // Hide non-top-20 regions
+                    newMap
+                        .svg()
+                        .selectAll('.em-region')
+                        .style('opacity', function (d) {
+                            return top20Regions.includes(d.properties.id) ? 1 : 0.1
+                        })
+
+                    console.log('Manual data injection complete! Map rebuilt with API data applied manually.')
+                })
+                .build()
+        </script>
+    </body>
+</html>
