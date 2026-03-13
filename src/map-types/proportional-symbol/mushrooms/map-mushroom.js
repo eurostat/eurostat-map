@@ -133,23 +133,27 @@ export const map = function (config) {
             const stat1 = out.statData(c1)
             const stat2 = out.statData(c2)
 
-            runDorlingSimulation(out, (d) => {
-                const id = d.properties.id
+            runDorlingSimulation(
+                out,
+                (d) => {
+                    const id = d.properties.id
 
-                const v1 = +stat1.get(id)?.value || 0
-                const v2 = +stat2.get(id)?.value || 0
+                    const v1 = +stat1.get(id)?.value || 0
+                    const v2 = +stat2.get(id)?.value || 0
 
-                let r1, r2
-                if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
-                    r1 = out.mushroomSizeScaleFunctionV1_(v1)
-                    r2 = out.mushroomSizeScaleFunctionV2_(v2)
-                } else {
-                    r1 = out._mushroomScale_(v1)
-                    r2 = out._mushroomScale_(v2)
-                }
+                    let r1, r2
+                    if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+                        r1 = out.mushroomSizeScaleFunctionV1_(v1)
+                        r2 = out.mushroomSizeScaleFunctionV2_(v2)
+                    } else {
+                        r1 = out._mushroomScale_(v1)
+                        r2 = out._mushroomScale_(v2)
+                    }
 
-                return Math.sqrt((r1 * r1 + r2 * r2) / 2)
-            })
+                    return Math.sqrt((r1 * r1 + r2 * r2) / 2)
+                },
+                out.dorlingPadding_ || 0
+            )
         } else {
             stopDorlingSimulation(out)
         }

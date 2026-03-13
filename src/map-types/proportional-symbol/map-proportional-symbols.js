@@ -414,11 +414,15 @@ export const map = function (config) {
             // dorling cartogram
             if (out.dorling_) {
                 const sizeData = getSizeStatData(out)
-                runDorlingSimulation(out, (d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    const r = datum ? out.classifierSize_(+datum.value) : 0
-                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
-                })
+                runDorlingSimulation(
+                    out,
+                    (d) => {
+                        const datum = sizeData.get(d.properties.id)
+                        const r = datum ? out.classifierSize_(+datum.value) : 0
+                        return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                    },
+                    out.dorlingPadding_ || 0
+                )
             } else {
                 stopDorlingSimulation(out)
             }
