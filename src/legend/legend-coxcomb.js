@@ -224,34 +224,35 @@ export const legend = function (map, config) {
             })
 
         // Highlight behavior for time hover
-        // Use a mouseout on the container to ensure cleanup happens
+        // Cache and pre-group segments once
+        const mapSvg = out.map.svg_ || out.map.svg()
+        const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
+
+        const segmentsByTime = new Map()
+        allSegments.each(function (d) {
+            if (!d || !d.data) return
+            const t = d.data.month
+            if (!segmentsByTime.has(t)) segmentsByTime.set(t, [])
+            segmentsByTime.get(t).push(this)
+        })
+
         container.on('mouseleave', function () {
-            const mapSvg = out.map.svg_ || out.map.svg()
-            mapSvg.selectAll('.em-coxcomb-chart path').style('opacity', 1)
+            allSegments.style('opacity', 1)
             container.selectAll('path').style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
         })
 
         container
             .selectAll('path')
             .on('mouseenter', function (event, time) {
-                const hoveredTime = time
-                const mapSvg = out.map.svg_ || out.map.svg()
-                const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
+                // Fade all, then restore matching group
+                allSegments.style('opacity', 0.1)
+                const matching = segmentsByTime.get(time)
+                if (matching) select(matching).style('opacity', 1)
 
-                // Fade non-matching segments
-                allSegments.style('opacity', function (d) {
-                    // Handle case where d might be undefined or missing data property
-                    if (!d || !d.data) return 0.1
-                    return d.data.month === hoveredTime ? 1 : 0.1
-                })
-
-                // Highlight the hovered legend wedge, dim others
                 container.selectAll('path').style('opacity', 0.3).style('stroke', 'white').style('stroke-width', 0.5)
                 select(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
             })
             .on('mouseleave', function () {
-                // Individual wedge mouseout - reset just this wedge
-                // The container mouseleave will handle full reset when mouse leaves entirely
                 select(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
             })
     }

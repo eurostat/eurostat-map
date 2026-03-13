@@ -7,8 +7,11 @@
 
     <body>
         <div style="display: flex">
-            <div><svg id="map"></svg></div>
-            <div style="padding-left: 10px"><svg id="legend" height="400"></svg></div>
+            <div>
+                <svg id="map"></svg>
+                <svg id="legend" height="400" style="transform: translate(-250px, -200px)"></svg>
+            </div>
+            <div style="padding-left: 10px"></div>
         </div>
 
         <script src="../../../build/eurostatmap.js"></script>
@@ -105,8 +108,12 @@
                     .width(800)
                     .nutsLevel(2)
                     .dorling(true)
+                    .dorlingStrength({ x: 0.1, y: 0.1 }) // Gravity toward original position
+                    .dorlingIterations(1) // Collision detection iterations
+                    .animateDorling(false) // Skip animation for immediate result
                     .coxcombMinRadius(5)
                     .coxcombMaxRadius(20)
+                    .coxcombRings(false)
 
                     .statCoxcomb({
                         customData: allStats,
@@ -121,10 +128,10 @@
 
                     .legend({
                         svgId: 'legend',
-                        title: 'Top 20 Regions',
+                        title: 'Nights spent',
                         x: 50,
                         y: 120,
-                        colorLegend: { title: 'Type', marginTop: 50, noData: false },
+                        colorLegend: { title: 'Tourist origin', marginTop: 50, titlePadding: 10, noData: false },
                         timeLegend: { title: 'Month', marginTop: -30 },
                     })
 
