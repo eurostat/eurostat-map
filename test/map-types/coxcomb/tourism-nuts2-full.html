@@ -9,7 +9,7 @@
         <div style="display: flex">
             <div>
                 <svg id="map"></svg>
-                <svg id="legend" height="400" style="transform: translate(-250px, -200px)"></svg>
+                <!-- <svg id="legend" height="400" style="transform: translate(-250px, -200px)"></svg> -->
             </div>
             <div style="padding-left: 10px"></div>
         </div>
@@ -38,15 +38,6 @@
                     categoryLabels: ['Domestic', 'Foreign'],
                     categoryColors: ['#1b9e77', '#d95f02'],
                     totalCode: 'TOTAL',
-                })
-
-                .legend({
-                    svgId: 'legend',
-                    title: 'Top 20 Regions',
-                    x: 50,
-                    y: 120,
-                    colorLegend: { title: 'Type', marginTop: 50, noData: false },
-                    timeLegend: { title: 'Month', marginTop: -30 },
                 })
 
                 .callback(rebuildWithCustomData)
@@ -127,10 +118,9 @@
                     })
 
                     .legend({
-                        svgId: 'legend',
                         title: 'Nights spent',
-                        x: 50,
-                        y: 120,
+                        x: 570,
+                        y: 80,
                         sizeLegend: {
                             // title: 'Total nights spent',
                             marginTop: 50,

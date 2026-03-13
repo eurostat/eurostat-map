@@ -226,33 +226,44 @@ export const legend = function (map, config) {
         // Highlight behavior for time hover
         // Cache and pre-group segments once
         const mapSvg = out.map.svg_ || out.map.svg()
-        const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
 
+        // Pre-build a map of time -> NodeList once at draw time
         const segmentsByTime = new Map()
-        allSegments.each(function (d) {
-            if (!d || !d.data) return
+        mapSvg.selectAll('.em-coxcomb-chart path').each(function (d) {
+            if (!d?.data) return
             const t = d.data.month
             if (!segmentsByTime.has(t)) segmentsByTime.set(t, [])
             segmentsByTime.get(t).push(this)
         })
 
-        container.on('mouseleave', function () {
-            allSegments.style('opacity', 1)
+        let lastActive = null
+
+        container.on('mouseout', function () {
+            if (lastActive !== null) {
+                lastActive.forEach((el) => el.classList.remove('em-time-active'))
+                lastActive = null
+            }
+            mapSvg.selectAll('.em-coxcomb-chart').classed('em-time-dimmed', false)
             container.selectAll('path').style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
         })
 
         container
             .selectAll('path')
             .on('mouseenter', function (event, time) {
-                // Fade all, then restore matching group
-                allSegments.style('opacity', 0.1)
-                const matching = segmentsByTime.get(time)
-                if (matching) select(matching).style('opacity', 1)
+                // Remove previous active class
+                if (lastActive) lastActive.forEach((el) => el.classList.remove('em-time-active'))
+
+                // Add dim class to all charts (single class toggle, browser handles painting)
+                mapSvg.selectAll('.em-coxcomb-chart').classed('em-time-dimmed', true)
+
+                // Add active class only to matching segments
+                lastActive = segmentsByTime.get(time) || []
+                lastActive.forEach((el) => el.classList.add('em-time-active'))
 
                 container.selectAll('path').style('opacity', 0.3).style('stroke', 'white').style('stroke-width', 0.5)
                 select(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
             })
-            .on('mouseleave', function () {
+            .on('mouseout', function () {
                 select(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
             })
     }
