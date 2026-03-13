@@ -10,6 +10,7 @@ import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
+import { createSqrtScale } from '../../core/scale.js'
 /**
  * Returns a coxcomb (polar area) chart map.
  *
@@ -454,40 +455,24 @@ export const map = function (config) {
      *    normalised within the region so proportions are preserved
      */
     function defineSizeScales() {
-        const yearlyValues = Object.values(out.yearlyTotals)
         const minRadius = out.coxcombMinRadius_ || 0
         const maxRadius = out.coxcombMaxRadius_ || 80
 
-        // Global max across all regions and all time periods
-        let globalMonthlyMax = 0
+        const allMonthlyValues = []
         for (const regionId in out.monthlyTotals) {
             for (const month in out.monthlyTotals[regionId]) {
-                const v = out.monthlyTotals[regionId][month]
-                if (v > globalMonthlyMax) globalMonthlyMax = v
-            }
-        }
-        if (!globalMonthlyMax) globalMonthlyMax = 1
-
-        //global min
-        let globalMonthlyMin = Infinity
-        for (const regionId in out.monthlyTotals) {
-            for (const month in out.monthlyTotals[regionId]) {
-                const v = out.monthlyTotals[regionId][month]
-                if (v > 0 && v < globalMonthlyMin) globalMonthlyMin = v
+                allMonthlyValues.push(out.monthlyTotals[regionId][month])
             }
         }
 
-        // classifierChartSize_ now maps a stacked value → radius globally
-        // using sqrt so area is proportional to value
-        out.classifierChartSize_ = (v) => {
-            return Math.sqrt(v / globalMonthlyMax) * maxRadius
-        }
+        const sqrtScale = createSqrtScale(allMonthlyValues, maxRadius, minRadius)
 
-        // classifierSize_ kept for API compatibility but no longer used for rendering
-        out.classifierSize_ = scaleRadial().domain([0, globalMonthlyMax]).range([minRadius, maxRadius])
+        out.classifierChartSize_ = sqrtScale
+        out._globalMonthlyMax = sqrtScale.domain()[1]
+        out._globalMonthlyMin = sqrtScale.domain()[0]
 
-        out._globalMonthlyMax = globalMonthlyMax
-        out._globalMonthlyMin = globalMonthlyMin === Infinity ? 0 : globalMonthlyMin
+        // stub for API compatibility
+        out.classifierSize_ = sqrtScale
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
