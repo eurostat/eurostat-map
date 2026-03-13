@@ -102,8 +102,8 @@
                     .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
                     .dorlingIterations(1) // Collision detection iterations
                     .animateDorling(false) // Skip animation for immediate result
-                    .coxcombMinRadius(5)
-                    .coxcombMaxRadius(20)
+                    .coxcombMinRadius(20)
+                    .coxcombMaxRadius(30)
                     .coxcombRings(false)
 
                     .statCoxcomb({
@@ -126,7 +126,8 @@
                             marginTop: 50,
                             titlePadding: 10,
                             noData: false,
-                            values: [90000000, 25000000, 100000],
+                            // values: [90000000, 50000000, 10000000],
+                            //labels: ['90 million', '50 million', '1 million'],
                         },
                         colorLegend: { title: 'Tourist origin', marginTop: 50, titlePadding: 10, noData: false },
                         timeLegend: { title: 'Month', marginTop: -30 },

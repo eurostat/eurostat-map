@@ -457,18 +457,37 @@ export const map = function (config) {
         const yearlyValues = Object.values(out.yearlyTotals)
         const minRadius = out.coxcombMinRadius_ || 0
         const maxRadius = out.coxcombMaxRadius_ || 80
-        const globalMin = min(yearlyValues) || 0
-        const globalMax = max(yearlyValues) || 0
 
-        const outerScale = scaleRadial().domain([globalMin, globalMax]).range([minRadius, maxRadius])
+        // Global max across all regions and all time periods
+        let globalMonthlyMax = 0
+        for (const regionId in out.monthlyTotals) {
+            for (const month in out.monthlyTotals[regionId]) {
+                const v = out.monthlyTotals[regionId][month]
+                if (v > globalMonthlyMax) globalMonthlyMax = v
+            }
+        }
+        if (!globalMonthlyMax) globalMonthlyMax = 1
 
-        out.classifierChartSize_ = (v, regionId) => {
-            const targetOuter = outerScale(out.yearlyTotals[regionId] || 0)
-            const regionMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 1 }))
-            return Math.sqrt(v / regionMax) * targetOuter
+        //global min
+        let globalMonthlyMin = Infinity
+        for (const regionId in out.monthlyTotals) {
+            for (const month in out.monthlyTotals[regionId]) {
+                const v = out.monthlyTotals[regionId][month]
+                if (v > 0 && v < globalMonthlyMin) globalMonthlyMin = v
+            }
         }
 
-        out.classifierSize_ = outerScale
+        // classifierChartSize_ now maps a stacked value → radius globally
+        // using sqrt so area is proportional to value
+        out.classifierChartSize_ = (v) => {
+            return Math.sqrt(v / globalMonthlyMax) * maxRadius
+        }
+
+        // classifierSize_ kept for API compatibility but no longer used for rendering
+        out.classifierSize_ = scaleRadial().domain([0, globalMonthlyMax]).range([minRadius, maxRadius])
+
+        out._globalMonthlyMax = globalMonthlyMax
+        out._globalMonthlyMin = globalMonthlyMin === Infinity ? 0 : globalMonthlyMin
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -497,7 +516,10 @@ export const map = function (config) {
             }
 
             if (out.dorling_ && !out.gridCartogram_) {
-                runDorlingSimulation(out, (d) => out.classifierSize_(getRegionTotal(d.properties.id) || 0) || 0)
+                runDorlingSimulation(
+                    out,
+                    (d) => out.classifierChartSize_(Math.max(...Object.values(out.monthlyTotals[d.properties.id] || { 0: 0 }))) || 0
+                )
             } else {
                 stopDorlingSimulation(out)
             }
@@ -564,7 +586,8 @@ export const map = function (config) {
     function drawCoxcombChart(node, regionId, stackedData, keys, angle) {
         // Outer reference ring
         if (out.coxcombRings_) {
-            const targetOuter = out.classifierSize_(out.yearlyTotals[regionId] || 0)
+            const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
+            const targetOuter = out.classifierChartSize_(regionMonthlyMax)
             node.append('circle')
                 .attr('class', 'em-coxcomb-max-outline')
                 .attr('r', 0)
@@ -601,8 +624,8 @@ export const map = function (config) {
                 .delay((d, i) => i * 120)
                 .duration(out.transitionDuration_)
                 .attrTween('d', function (d) {
-                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId))
-                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId))
+                    const iInner = interpolate(0, out.classifierChartSize_(d[0]))
+                    const iOuter = interpolate(0, out.classifierChartSize_(d[1]))
                     return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
                 })
         })
@@ -844,7 +867,7 @@ export const map = function (config) {
                 if (total > stackSum) stackSum = total
             }
 
-            const r = out.classifierChartSize_(stackSum, regionId)
+            const r = out.classifierChartSize_(stackSum)
             if (r > maxR) maxR = r
         })
 

@@ -2,7 +2,6 @@ import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
 import { arc } from 'd3-shape'
-import { drawCircleSizeLegend } from './legend-circle-size'
 
 /**
  * Legend for Coxcomb (polar area) maps
@@ -16,6 +15,8 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 15,
         values: null,
+        labels: null,
+        labelFormatter: null,
     }
 
     out.colorLegend = {
@@ -65,17 +66,109 @@ export const legend = function (map, config) {
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
 
-        if (map.classifierSize_) {
+        // Wedge size legend replaces circle size legend
+        if (map.classifierChartSize_) {
             const container = lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             out._sizeLegendContainer = container
-            drawCircleSizeLegend(out, container, out.sizeLegend.values, out.map.classifierSize_, out.sizeLegend.title, out.sizeLegend.titlePadding)
+            drawWedgeSizeLegend(
+                out,
+                container,
+                out.sizeLegend.values,
+                out.map.classifierChartSize_,
+                out.sizeLegend.title,
+                out.sizeLegend.titlePadding
+            )
         }
 
         buildColorLegend(out, baseX, baseY)
-
         buildCoxcombTimeLegend(out, baseX, baseY)
-
         out.setBoxDimension()
+    }
+
+    function drawWedgeSizeLegend(out, container, values, sizeScale, title, titlePadding = 16) {
+        let yOffset = 0
+
+        if (title) {
+            const titleFontSize = out.titleFontSize || 12
+            yOffset += titleFontSize + (titlePadding || 0)
+            container.append('text').attr('class', 'em-size-legend-title').attr('x', 0).attr('y', titleFontSize).text(title)
+        }
+
+        // Default values if none provided
+        if (!values) {
+            const globalMax = out.map._globalMonthlyMax || 1
+            const globalMin = out.map._globalMonthlyMin || 0
+            values = [globalMax, globalMin]
+        }
+
+        const labels = out.sizeLegend?.labels
+        const labelFormatter =
+            out.sizeLegend?.labelFormatter ||
+            ((v) => {
+                if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M'
+                if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K'
+                return String(v)
+            })
+
+        // All wedges share a fixed angle — one slice wide enough to read clearly
+        const wedgeHalfAngle = Math.PI / 8
+        const startAngle = -wedgeHalfAngle
+        const endAngle = wedgeHalfAngle
+
+        const arcGen = arc().innerRadius(0).startAngle(startAngle).endAngle(endAngle)
+
+        const maxR = sizeScale(Math.max(...values))
+        // Center horizontally: wedge points up, labels extend to the right
+        const originX = maxR
+        const originY = maxR + yOffset + 10
+
+        const legendG = container.append('g').attr('class', 'em-wedge-size-legend').attr('transform', `translate(${originX}, ${originY})`)
+
+        // Draw nested wedges largest first so smaller ones render on top
+        const sorted = [...values].sort((a, b) => b - a)
+        sorted.forEach((v) => {
+            const r = sizeScale(v)
+            legendG
+                .append('path')
+                .attr('class', 'em-legend-wedge')
+                .attr('d', arcGen.outerRadius(r)())
+                .attr('fill', '#bbb')
+                .attr('stroke', 'white')
+                .attr('stroke-width', 0.5)
+                .attr('opacity', 0.85)
+        })
+
+        // Dashed lines and labels, using original values order for index alignment
+        const labelX = maxR + 8 // right of the largest wedge
+        values.forEach((v, i) => {
+            const r = sizeScale(v)
+            // tip of wedge at this radius, at the midpoint angle (pointing straight up = y:-r)
+            const tipY = -r
+
+            legendG
+                .append('line')
+                .style('stroke-dasharray', '2,2')
+                .style('stroke', 'grey')
+                .attr('x1', 2)
+                .attr('y1', tipY)
+                .attr('x2', labelX)
+                .attr('y2', tipY)
+
+            legendG
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', labelX + 3)
+                .attr('y', tipY)
+                .attr('dy', '0.35em')
+                .text(labels?.[i] !== undefined ? labels[i] : labelFormatter(v))
+        })
+
+        // Center the whole group horizontally
+        const bbox = legendG.node().getBBox()
+        const shift = -(bbox.x + bbox.width / 2)
+        legendG.attr('transform', `translate(${originX + shift}, ${originY})`)
+
+        out._sizeLegendHeight = legendG.node().getBBox().height
     }
 
     function buildColorLegend(out, baseX, baseY) {
