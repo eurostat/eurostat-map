@@ -95,6 +95,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.animateDorling_ = true
     out.dorlingStrength_ = { x: 1, y: 1 }
     out.dorlingIterations_ = 1
+    out.dorlingPadding_ = 0
     out.onDorlingProgress_ = undefined
     out.dorlingWorker_ = false // use a web worker for (non-animated) dorling cartograms to not block the main thread
     out.dorlingWorkerD3URL_ = undefined

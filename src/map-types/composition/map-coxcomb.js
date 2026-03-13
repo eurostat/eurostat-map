@@ -538,7 +538,11 @@ export const map = function (config) {
             }
         }
 
-        const radialScale = createRadialScale(allMonthlyValues, maxRadius, minRadius)
+        const radialScale = createRadialScale(allMonthlyValues, maxRadius, 0)
+        // minRadius is intentionally 0 here — the minimum chart size is enforced
+        // geometrically via a per-chart scaleFactor in drawCoxcombChart, which
+        // scales the entire chart group uniformly. Applying a floor in the scale
+        // itself corrupts stacked inner radii and distorts category proportions.
 
         out.classifierChartSize_ = radialScale
         out._globalMonthlyMax = radialScale.domain()[1]
@@ -576,7 +580,16 @@ export const map = function (config) {
             if (out.dorling_ && !out.gridCartogram_) {
                 runDorlingSimulation(
                     out,
-                    (d) => out.classifierChartSize_(Math.max(...Object.values(out.monthlyTotals[d.properties.id] || { 0: 0 }))) || 0
+                    (d) => {
+                        const regionalMax = Math.max(...Object.values(out.monthlyTotals[d.properties.id] || { 0: 0 }))
+                        const naturalMax = out.classifierChartSize_(regionalMax) || 0
+                        const minRadius = out.coxcombMinRadius_ || 0
+                        // Mirror the scaleFactor logic in drawCoxcombChart so the Dorling
+                        // simulation reserves the correct amount of space for enlarged charts.
+                        const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
+                        return naturalMax * scaleFactor
+                    },
+                    out.dorlingPadding_ || 0
                 )
             } else {
                 stopDorlingSimulation(out)
@@ -642,16 +655,30 @@ export const map = function (config) {
      * @param {Function} angle - d3 scaleBand for time → angle
      */
     function drawCoxcombChart(node, regionId, stackedData, keys, angle) {
+        const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
+        const naturalMax = out.classifierChartSize_(regionMonthlyMax)
+        const minRadius = out.coxcombMinRadius_ || 0
+
+        // If this chart's largest wedge falls below minRadius, scale the entire
+        // chart up uniformly so it remains legible. This preserves internal proportions
+        // and only affects charts smaller than the threshold.
+        const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
+        // Wrap all chart content in an inner group so scale() doesn't interfere
+        // with the parent node's translate transform or origin point
+        const chartG = node.append('g')
+        if (scaleFactor > 1) chartG.attr('transform', `scale(${scaleFactor})`)
+
         // Outer reference ring
         if (out.coxcombRings_) {
             const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
             const targetOuter = out.classifierChartSize_(regionMonthlyMax)
-            node.append('circle')
+            chartG
+                .append('circle')
                 .attr('class', 'em-coxcomb-max-outline')
                 .attr('r', 0)
                 .attr('fill', 'none')
                 .attr('stroke', '#000')
-                .attr('stroke-width', 0.3)
+                .attr('stroke-width', 0.3 / scaleFactor)
                 .attr('opacity', 0.5)
                 .attr('pointer-events', 'none')
                 .transition()
@@ -668,10 +695,11 @@ export const map = function (config) {
 
         // One group per category key, stacked
         keys.forEach((key, ki) => {
-            node.append('g')
+            chartG
+                .append('g')
                 .attr('class', 'em-coxcomb-chart')
                 .attr('stroke', '#ffffff')
-                .attr('stroke-width', 0.3)
+                .attr('stroke-width', 0.3 / scaleFactor)
                 .selectAll('path')
                 .data(stackedData[ki])
                 .join('path')
@@ -682,6 +710,10 @@ export const map = function (config) {
                 .delay((d, i) => i * 120)
                 .duration(out.transitionDuration_)
                 .attrTween('d', function (d) {
+                    // No floor correction needed here — the scale has no minRadius floor,
+                    // so d[0] correctly returns 0 for the first category and stacking
+                    // boundaries are geometrically consistent. Chart enlargement for
+                    // legibility is handled entirely by the scaleFactor transform on chartG.
                     const iInner = interpolate(0, out.classifierChartSize_(d[0]))
                     const iOuter = interpolate(0, out.classifierChartSize_(d[1]))
                     return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)

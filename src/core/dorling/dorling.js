@@ -1,7 +1,7 @@
 import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { executeForAllInsets } from '../utils'
 
-export function runDorlingSimulation(map, radiusAccessor) {
+export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
     // Common function to start a simulation on a single map (main or inset)
     const runSim = (singleMap) => {
         const nodes = singleMap.Geometries.centroidsFeatures || []
@@ -43,7 +43,7 @@ export function runDorlingSimulation(map, radiusAccessor) {
                 const sim = forceSimulation(nodes)
                     .force('x', forceX((d) => d.properties.centroid[0]).strength(strengthX))
                     .force('y', forceY((d) => d.properties.centroid[1]).strength(strengthY))
-                    .force('collide', forceCollide((d) => radiusAccessor(d)).iterations(iterations))
+                    .force('collide', forceCollide((d) => Math.max(0, radiusAccessor(d) + padding)).iterations(iterations))
                     .stop()
 
                 const nTicks = Math.ceil(Math.log(sim.alphaMin()) / Math.log(1 - sim.alphaDecay()))
@@ -60,7 +60,7 @@ export function runDorlingSimulation(map, radiusAccessor) {
                 const worker = new Worker(new URL('./dorling-worker.js', import.meta.url), { type: 'module' })
                 worker.postMessage({
                     nodes: nodes.map((n) => ({ ...n })), // shallow clone
-                    radii: nodes.map((n) => radiusAccessor(n)),
+                    radii: nodes.map((n) => Math.max(0, radiusAccessor(n) + padding)),
                     strengthX,
                     strengthY,
                     iterations,
