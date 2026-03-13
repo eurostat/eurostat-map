@@ -165,8 +165,7 @@ export const legend = function (map, config) {
 
         // Center the whole group horizontally
         const bbox = legendG.node().getBBox()
-        const shift = -(bbox.x + bbox.width / 2)
-        legendG.attr('transform', `translate(${originX + shift}, ${originY})`)
+        legendG.attr('transform', `translate(${-bbox.x}, ${originY})`)
 
         out._sizeLegendHeight = legendG.node().getBBox().height
     }
