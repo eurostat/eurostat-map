@@ -10,7 +10,7 @@ import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
-import { createSqrtScale } from '../../core/scale.js'
+import { createRadialScale, createSqrtScale } from '../../core/scale.js'
 /**
  * Returns a coxcomb (polar area) chart map.
  *
@@ -244,7 +244,6 @@ export const map = function (config) {
                         }
 
                         if (Object.keys(regionData).length > 0) {
-                            console.log(`Setting data for ${key}:`, regionData)
                             out.statData(key).setData(regionData)
                         }
                     })
@@ -269,7 +268,6 @@ export const map = function (config) {
                         }
 
                         if (Object.keys(regionData).length > 0) {
-                            console.log(`Setting total data for ${key}:`, regionData)
                             out.statData(key).setData(regionData)
                         }
                     }
@@ -346,6 +344,81 @@ export const map = function (config) {
         computeTotals()
         computeCoxStatusMap()
         defineSizeScales()
+        buildTooltipCache()
+    }
+
+    function buildTooltipCache() {
+        out._tooltipCache = new Map()
+        const months = out._coxTimes || []
+        const unit = out.statData(out.statCodes_[0])?.unitText() || ''
+
+        const allRegions = new Set()
+        months.forEach((month) => {
+            const stat = out.totalCode_ ? out.statData(`${month}:${out.totalCode_}`) : out.statData(`${month}:${out._coxCategoryCodes[0]}`)
+            if (stat?._data_) Object.keys(stat._data_).forEach((id) => allRegions.add(id))
+        })
+
+        allRegions.forEach((regionId) => {
+            const includeOther =
+                out.totalCode_ &&
+                months.some((month) => {
+                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                    const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                    return totalVal > sumCauses
+                })
+
+            const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
+            const regionYearly = out.yearlyTotals?.[regionId] || 0
+            const monthlyTotals = out.monthlyTotals?.[regionId] || {}
+
+            const headerCells = [`<th class="em-breakdown-label">Month</th>`]
+            causes.forEach((cause) => {
+                const label = out.catLabels_[cause] || cause
+                const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
+                headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
+            })
+            headerCells.push(`<th class="em-breakdown-label">Total</th>`)
+
+            const rows = months.map((month, i) => {
+                const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
+                const cells = [`<td class="em-breakdown-label">${label}</td>`]
+                const monthSum = monthlyTotals[month] || 0
+
+                causes.forEach((cause) => {
+                    let rawVal = 0
+                    if (cause === 'other') {
+                        const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                        const sumCauses = causes
+                            .filter((c) => c !== 'other')
+                            .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                        rawVal = Math.max(totalVal - sumCauses, 0)
+                    } else {
+                        rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                    }
+                    cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(rawVal)}</span></td>` : '<td></td>')
+                })
+
+                cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(monthSum)}</span></td>` : '<td></td>')
+                return `<tr>${cells.join('')}</tr>`
+            })
+
+            const yearRow =
+                regionYearly > 0
+                    ? `<tr class="em-total"><td class="em-breakdown-label">Year total</td><td colspan="${causes.length}"></td><td><span class="em-breakdown-value">${spaceAsThousandSeparator(regionYearly)} ${unit}</span></td></tr>`
+                    : ''
+
+            out._tooltipCache.set(
+                regionId,
+                `
+            <div class="em-tooltip-breakdown em-tooltip-cx">
+                <table class="em-tooltip-cx-table">
+                    <tr>${headerCells.join('')}</tr>
+                    ${rows.join('')}
+                    ${yearRow}
+                </table>
+            </div>`
+            )
+        })
     }
 
     // ── Totals computation ───────────────────────────────────────────────────
@@ -465,14 +538,14 @@ export const map = function (config) {
             }
         }
 
-        const sqrtScale = createSqrtScale(allMonthlyValues, maxRadius, minRadius)
+        const radialScale = createRadialScale(allMonthlyValues, maxRadius, minRadius)
 
-        out.classifierChartSize_ = sqrtScale
-        out._globalMonthlyMax = sqrtScale.domain()[1]
-        out._globalMonthlyMin = sqrtScale.domain()[0]
+        out.classifierChartSize_ = radialScale
+        out._globalMonthlyMax = radialScale.domain()[1]
+        out._globalMonthlyMin = radialScale.domain()[0]
 
         // stub for API compatibility
-        out.classifierSize_ = sqrtScale
+        out.classifierSize_ = radialScale
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -922,78 +995,8 @@ export const map = function (config) {
     out.tooltip_.textFunction = function (rg, map) {
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
-        const months = out._coxTimes || []
-
-        // Determine whether 'other' is needed for this specific region
-        const includeOther =
-            out.totalCode_ &&
-            months.some((month) => {
-                const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                return totalVal > sumCauses
-            })
-
-        const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
-
-        let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
-
-        // Header row
-        const headerCells = [`<th class="em-breakdown-label">Month</th>`]
-        causes.forEach((cause) => {
-            const label = out.catLabels_[cause] || cause
-            const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
-            headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
-        })
-        headerCells.push(`<th class="em-breakdown-label">Total</th>`)
-
-        const regionYearly = out.yearlyTotals?.[regionId] || 0
-        const monthlyTotals = out.monthlyTotals?.[regionId] || {}
-
-        const rows = months.map((month, i) => {
-            const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
-            const cells = [`<td class="em-breakdown-label">${label}</td>`]
-            const monthSum = monthlyTotals[month] || 0
-
-            causes.forEach((cause) => {
-                let rawVal = 0
-                if (cause === 'other') {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const sumCauses = causes
-                        .filter((c) => c !== 'other')
-                        .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                    rawVal = Math.max(totalVal - sumCauses, 0)
-                } else {
-                    rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
-                }
-                cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(rawVal)}</span></td>` : '<td></td>')
-            })
-
-            cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(monthSum)}</span></td>` : '<td></td>')
-
-            return `<tr>${cells.join('')}</tr>`
-        })
-
-        const unit = out.statData(out.statCodes_[0])?.unitText() || ''
-        const yearRow =
-            regionYearly > 0
-                ? `
-            <tr class="em-total">
-                <td class="em-breakdown-label">Year total</td>
-                <td colspan="${causes.length}"></td>
-                <td><span class="em-breakdown-value">${spaceAsThousandSeparator(regionYearly)} ${unit}</span></td>
-            </tr>`
-                : ''
-
-        html += `
-        <div class="em-tooltip-breakdown em-tooltip-cx">
-            <table class="em-tooltip-cx-table">
-                <tr>${headerCells.join('')}</tr>
-                ${rows.join('')}
-                ${yearRow}
-            </table>
-        </div>`
-
-        return html
+        const cached = out._tooltipCache?.get(regionId) || ''
+        return `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>${cached}`
     }
 
     return out
