@@ -226,38 +226,33 @@ export const legend = function (map, config) {
         // Highlight behavior for time hover
         // Cache and pre-group segments once
         const mapSvg = out.map.svg_ || out.map.svg()
-
-        // Pre-build a map of time -> NodeList once at draw time
         const segmentsByTime = new Map()
-        mapSvg.selectAll('.em-coxcomb-chart path').each(function (d) {
-            if (!d?.data) return
-            const t = d.data.month
-            if (!segmentsByTime.has(t)) segmentsByTime.set(t, [])
-            segmentsByTime.get(t).push(this)
-        })
-
         let lastActive = null
 
-        container.on('mouseout', function () {
+        function getSegments(time) {
+            if (!segmentsByTime.has(time)) {
+                segmentsByTime.set(time, mapSvg.node().querySelectorAll(`.em-coxcomb-chart path[month="${time}"]`))
+            }
+            return segmentsByTime.get(time)
+        }
+
+        container.on('mouseleave', function () {
             if (lastActive !== null) {
                 lastActive.forEach((el) => el.classList.remove('em-time-active'))
                 lastActive = null
             }
-            mapSvg.selectAll('.em-coxcomb-chart').classed('em-time-dimmed', false)
+            mapSvg.node().classList.remove('em-time-dimmed')
             container.selectAll('path').style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
         })
 
         container
             .selectAll('path')
             .on('mouseenter', function (event, time) {
-                // Remove previous active class
                 if (lastActive) lastActive.forEach((el) => el.classList.remove('em-time-active'))
 
-                // Add dim class to all charts (single class toggle, browser handles painting)
-                mapSvg.selectAll('.em-coxcomb-chart').classed('em-time-dimmed', true)
+                mapSvg.node().classList.add('em-time-dimmed')
 
-                // Add active class only to matching segments
-                lastActive = segmentsByTime.get(time) || []
+                lastActive = getSegments(time)
                 lastActive.forEach((el) => el.classList.add('em-time-active'))
 
                 container.selectAll('path').style('opacity', 0.3).style('stroke', 'white').style('stroke-width', 0.5)

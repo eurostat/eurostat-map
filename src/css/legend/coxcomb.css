@@ -1,5 +1,5 @@
 .em-coxcomb-legend-time-label {
-font-size: 13px;
+    font-size: 13px;
 }
 .em-coxcomb-legend-time-segment {
     stroke: #444;
@@ -9,9 +9,16 @@ font-size: 13px;
     cursor: pointer;
 }
 .em-coxcomb-legend-time-segment {
-        stroke: #444;
+    stroke: #444;
     stroke-width: 0.5;
     opacity: 0.4;
     fill: #ccc;
     cursor: pointer;
+}
+
+.em-time-dimmed .em-coxcomb-chart path {
+    visibility: hidden;
+}
+.em-time-dimmed .em-coxcomb-chart path.em-time-active {
+    visibility: visible;
 }
