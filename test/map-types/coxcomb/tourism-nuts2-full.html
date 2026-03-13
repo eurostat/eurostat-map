@@ -108,7 +108,7 @@
                     .width(800)
                     .nutsLevel(2)
                     .dorling(true)
-                    .dorlingStrength({ x: 0.1, y: 0.1 }) // Gravity toward original position
+                    .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
                     .dorlingIterations(1) // Collision detection iterations
                     .animateDorling(false) // Skip animation for immediate result
                     .coxcombMinRadius(5)
@@ -131,6 +131,13 @@
                         title: 'Nights spent',
                         x: 50,
                         y: 120,
+                        sizeLegend: {
+                            // title: 'Total nights spent',
+                            marginTop: 50,
+                            titlePadding: 10,
+                            noData: false,
+                            values: [90000000, 25000000, 100000],
+                        },
                         colorLegend: { title: 'Tourist origin', marginTop: 50, titlePadding: 10, noData: false },
                         timeLegend: { title: 'Month', marginTop: -30 },
                     })
