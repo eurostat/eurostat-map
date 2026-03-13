@@ -1,4 +1,4 @@
-import { scaleBand, scaleRadial } from 'd3-scale'
+import { scaleBand } from 'd3-scale'
 import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
@@ -10,7 +10,7 @@ import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
-import { createRadialScale, createSqrtScale } from '../../core/scale.js'
+import { createRadialScale } from '../../core/scale.js'
 /**
  * Returns a coxcomb (polar area) chart map.
  *
