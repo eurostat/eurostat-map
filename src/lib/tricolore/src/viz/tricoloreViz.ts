@@ -127,6 +127,11 @@ export class TricoloreViz {
         if (showCenter) {
             this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
         }
+
+        // Reliable mouseleave on the SVG root — fires when pointer exits the entire legend
+        if (options.onLeave) {
+            this.svg.on('mouseleave', () => options.onLeave!())
+        }
     }
 
     /**
@@ -230,6 +235,11 @@ export class TricoloreViz {
         if (showCenter) {
             this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
         }
+
+        // Reliable mouseleave on the SVG root — fires when pointer exits the entire legend
+        if (options.onLeave) {
+            this.svg.on('mouseleave', () => options.onLeave!())
+        }
     }
 
     /**
@@ -318,6 +328,11 @@ export class TricoloreViz {
 
         if (showCenter) {
             this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
+        }
+
+        // Reliable mouseleave on the SVG root — fires when pointer exits the entire legend
+        if (options.onLeave) {
+            this.svg.on('mouseleave', () => options.onLeave!())
         }
     }
 
@@ -513,7 +528,7 @@ export class TricoloreViz {
             })
 
             // ===============================
-            // Axis labels (unchanged)
+            // Axis labels
             // ===============================
             const labelStride = this.computeLabelStride(majorGrid.length + 1)
             const labelGrid = majorGrid.filter((_, i) => i % labelStride === 0)
@@ -605,17 +620,6 @@ export class TricoloreViz {
         const closed = CompositionUtils.close([...data])
         // Validate data (this will throw an error if invalid)
         CompositionUtils.validateTernaryPoints(closed)
-        // TODO: decide if we want
-        //  - to throw an error (current behavior)
-        //  - to silently ignore invalid points
-        //  - to filter out invalid points and warn about it
-        //  - to warn and skip plotting points
-        // try {
-        //   CompositionUtils.validateTernaryPoints(data);
-        // } catch (e) {
-        //   console.warn('Invalid ternary points:', e);
-        //   return;
-        // }
 
         closed.forEach((p, i) => {
             if (p) {
@@ -652,7 +656,7 @@ export class TricoloreViz {
                 // p₁ = c1 → bottom edge (p2 = 0)
                 [[center[0], 0, 1 - center[0]], center],
 
-                // p₂ = c2 → LEFT edge (p3 = 0)  ← THIS WAS WRONG BEFORE
+                // p₂ = c2 → LEFT edge (p3 = 0)
                 [[1 - center[1], center[1], 0], center],
 
                 // p₃ = c3 → right edge (p1 = 0)
@@ -763,9 +767,6 @@ export class TricoloreViz {
 
         // Curved guide line
         g.append('path').attr('d', path).attr('fill', 'none').attr('class', 'em-ternary-annotation-line')
-
-        // Small dot at the end (optional but helps)
-        //g.append('circle').attr('cx', tx).attr('cy', ty).attr('r', 2).attr('fill', '#444')
 
         // Label
         g.append('text')
