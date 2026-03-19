@@ -2,7 +2,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
-import { unhighlightRegions } from './choropleth/legend-choropleth'
+import { DIMMED_OPACITY, unhighlightRegions } from './choropleth/legend-choropleth'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared formatting utilities
@@ -176,7 +176,7 @@ function createThresholdsLegend(out, config) {
                 }
             })
             .on('mouseout', function () {
-                unhighlightFunction(map)
+                unhighlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
                 }
@@ -328,37 +328,23 @@ function createThresholdsLegend(out, config) {
 
 function highlightMaxRegion(map, numberOfClasses, id) {
     const selector = getLegendRegionsSelector(map)
-    const ecl = numberOfClasses - 1 // max class index
     const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+    const ecl = numberOfClasses - 1
 
-    allRegions.each(function () {
-        const sel = select(this)
-        if (!sel.attr('fill___')) sel.attr('fill___', sel.style('fill'))
-    })
-
-    allRegions.style('fill', 'white')
-
-    const topClassRegions = allRegions.filter("[ecl='" + ecl + "']")
-    topClassRegions.each(function (d) {
-        if (d.properties.id === id) select(this).style('fill', map.hoverColor_)
+    allRegions.style('opacity', DIMMED_OPACITY)
+    allRegions.filter("[ecl='" + ecl + "']").each(function (d) {
+        if (d.properties.id === id) select(this).style('opacity', 1)
     })
 }
 
 function highlightMinRegion(map, id) {
     const selector = getLegendRegionsSelector(map)
-    const ecl = 0 // min class index
     const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+    const ecl = 0
 
-    allRegions.each(function () {
-        const sel = select(this)
-        if (!sel.attr('fill___')) sel.attr('fill___', sel.style('fill'))
-    })
-
-    allRegions.style('fill', 'white')
-
-    const topClassRegions = allRegions.filter("[ecl='" + ecl + "']")
-    topClassRegions.each(function (d) {
-        if (d.properties.id === id) select(this).style('fill', map.hoverColor_)
+    allRegions.style('opacity', DIMMED_OPACITY)
+    allRegions.filter("[ecl='" + ecl + "']").each(function (d) {
+        if (d.properties.id === id) select(this).style('opacity', 1)
     })
 }
 
@@ -395,13 +381,13 @@ function createRangesLegend(out, config) {
             .style('fill', fillColor)
             .on('mouseover', function () {
                 select(this).raise()
-                highlightFunction(out.map, ecl)
+                highlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
                 }
             })
             .on('mouseout', function () {
-                unhighlightFunction(out.map)
+                unhighlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
                 }

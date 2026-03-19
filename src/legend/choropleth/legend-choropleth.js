@@ -47,6 +47,7 @@ export const legend = function (map, config) {
     out.tickValues = undefined // Custom tick values for continuous legend (if empty, will use linear interpolation based on domain)
     out.tickLabels = undefined // Custom tick labels for continuous legend (if empty, will use tickValues)
     out.orientation = 'vertical' // or 'vertical'
+    out.highlightTolerance = 10 // tolerance in pixels for highlighting nearby symbols in continuous legends
 
     //override attribute values with config values
     if (config) {
@@ -166,50 +167,39 @@ export function getThresholdTicksWithExtents(out) {
     return uniq
 }
 
-// Highlight selected regions on mouseover
-export function highlightRegions(map, ecl) {
+let currentHighlight = null
+export const DIMMED_OPACITY = 0.15
+
+export function highlightRegions(map, eclOrValue, { tolerance = 0, continuous = false } = {}) {
+    currentHighlight = eclOrValue
     const selector = getLegendRegionsSelector(map)
     const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
-    // Store original colors before changing them
     allRegions.each(function () {
         const sel = select(this)
-        if (!sel.attr('fill___')) {
-            sel.attr('fill___', sel.style('fill'))
+        const ecl = sel.attr('ecl')
+
+        if (!ecl || ecl === 'nd') {
+            sel.style('opacity', eclOrValue === 'nd' ? 1 : DIMMED_OPACITY)
+            return
         }
-    })
 
-    // Set all regions to white
-    allRegions.style('fill', 'white')
+        const match = continuous ? +ecl >= eclOrValue - tolerance && +ecl <= eclOrValue + tolerance : ecl === String(eclOrValue)
 
-    // Highlight only the selected regions by restoring their original color
-    const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
-    selectedRegions.each(function () {
-        select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+        sel.style('opacity', match ? 1 : DIMMED_OPACITY)
     })
 }
 
-// Reset all regions to their original colors on mouseout
-export function unhighlightRegions(map) {
+export function unhighlightRegions(map, eclOrValue) {
+    if (eclOrValue !== undefined && eclOrValue !== currentHighlight) return
+    currentHighlight = null
     const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+    map.svg_.selectAll(selector).selectAll('[ecl]').style('opacity', 1)
+}
 
-    // Restore each region's original color from the fill___ attribute
-    allRegions.each(function () {
-        const sel = select(this)
-        const originalColor = sel.attr('fill___')
-
-        if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
-            sel.style('fill', originalColor)
-        } else {
-            // Fallback: recompute the original color if not stored properly
-            const ecl = sel.attr('ecl')
-            if (ecl !== null && ecl !== undefined) {
-                const originalFill = map.getColorOrFillStyle_(ecl)
-                sel.style('fill', originalFill)
-                // Store for future use
-                sel.attr('fill___', originalFill)
-            }
-        }
-    })
+export function clearLegendHighlight(map) {
+    if (currentHighlight === null) return
+    currentHighlight = null
+    const selector = getLegendRegionsSelector(map)
+    map.svg_.selectAll(selector).selectAll('[ecl]').style('opacity', 1)
 }

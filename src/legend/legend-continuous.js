@@ -3,10 +3,7 @@
 // Stretched interpolators (e.g., stretchedColor using .valueTransform)
 // D3 diverging scales (d3.scaleDiverging(...).domain([-60, 0, 38.7]))
 import { pointer, select } from 'd3-selection'
-import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
-import { getLegendRegionsSelector } from '../core/utils'
-import { format } from 'd3-format'
-import { spaceAsThousandSeparator } from '../core/utils'
+import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
 
 // All of the above with or without .valueTransform / .valueUntransform
 export function createContinuousLegend(out, baseX, baseY) {
@@ -38,7 +35,9 @@ export function createContinuousLegend(out, baseX, baseY) {
         const x = 0
         if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding // shift legend items down after point of divergence
         const container = out._continuousLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        out.appendNoDataLegend(container, config.noDataText, highlightRegions, unhighlightRegions)
+        const highlightFn = getHighlightFunction(out.map)
+        const unhighlightFn = getUnHighlightFunction(out.map)
+        out.appendNoDataLegend(container, config.noDataText, highlightFn, unhighlightFn)
     }
 }
 
@@ -115,91 +114,6 @@ function drawLegendRect(gradientId, out, width, height, isVertical) {
 
     // Attach mouse events for hover highlighting
     addMouseEvents(rect, out, width, isVertical)
-}
-
-function addMouseEvents(rect, out, legendLength, isVertical) {
-    const map = out.map
-    const domain = getUntransformedDomain(map)
-    const untransform = map.valueUntransform_ || ((d) => d)
-    const container = out._continuousLegendContainer
-    const titlePadding = getTitlePadding(out)
-    const highlightFunction = getHighlightFunction(map)
-    const unhighlightFunction = getUnHighlightFunction(map)
-    const formatter = getChoroplethLabelFormatter(out)
-
-    rect.on('mousemove', function (event) {
-        const [mx, my] = pointer(event, this)
-
-        const along = isVertical ? my - titlePadding : mx
-        const clamped = Math.max(0, Math.min(legendLength, along))
-        const norm = clamped / legendLength
-        const t = isVertical ? 1 - norm : norm
-
-        // ---- Interpolate value ----
-        let rawVal
-        if (domain.length === 3) {
-            const [d0, d1, d2] = domain
-            if (t < 0.5) {
-                const tt = t / 0.5
-                rawVal = d0 + (d1 - d0) * tt
-            } else {
-                const tt = (t - 0.5) / 0.5
-                rawVal = d1 + (d2 - d1) * tt
-            }
-        } else {
-            const [d0, d1] = domain
-            rawVal = d0 + t * (d1 - d0)
-        }
-
-        rawVal = untransform(rawVal)
-
-        // Clear previous hover elements
-        container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label').remove()
-
-        const x = isVertical ? 0 : clamped
-        const y = isVertical ? clamped + titlePadding : 0
-
-        // Hover line
-        container
-            .append('line')
-            .attr('class', 'em-hover-line')
-            .attr('x1', isVertical ? x : x)
-            .attr('y1', isVertical ? y : y)
-            .attr('x2', isVertical ? x + out.shapeWidth : x)
-            .attr('y2', isVertical ? y : y + out.shapeHeight)
-            .attr('stroke', 'black')
-            .attr('stroke-width', 1)
-            .attr('pointer-events', 'none')
-
-        // Hover tick
-        container
-            .append('circle')
-            .attr('class', 'em-hover-tick')
-            .attr('cx', isVertical ? x + out.shapeWidth : x)
-            .attr('cy', isVertical ? y : y + out.shapeHeight)
-            .attr('r', 3)
-            .attr('fill', 'black')
-            .attr('pointer-events', 'none')
-
-        // Hover label
-        container
-            .append('text')
-            .attr('class', 'em-hover-label')
-            .attr('x', isVertical ? x + out.shapeWidth + 5 : x)
-            .attr('y', isVertical ? y : y + out.shapeHeight + 12)
-            .attr('text-anchor', isVertical ? 'start' : 'middle')
-            .attr('alignment-baseline', 'middle')
-            .attr('pointer-events', 'none')
-            .text(formatter(rawVal))
-
-        // Highlight on map
-        highlightFunction(map, rawVal)
-    })
-
-    rect.on('mouseout', function () {
-        container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label').remove()
-        unhighlightFunction(map)
-    })
 }
 
 function hasTicks(out) {
@@ -384,87 +298,28 @@ function drawLowHighLabels(out, width, height, isVertical) {
     }
 }
 
-function getHighlightTolerance(map) {
-    if (!map || !map.legend_) return 1 // default if map or legend is undefined
-    return map.legend_.highlightTolerance ?? map.legend_.colorLegend?.highlightTolerance ?? 1
+function getHighlightTolerance(map, out) {
+    if (out?.highlightTolerance !== undefined) return out.highlightTolerance
+    if (!map || !map.legend_) return 1
+    return map.legend_.highlightTolerance ?? 1
 }
 
 function getHighlightFunction(map) {
-    if (map._mapType == 'ps') return highlightPsSymbols
-    return highlightRegions
+    if (map._mapType === 'ps') return highlightPsSymbols
+    // tolerance read lazily at call time, not at setup time
+    return (map, val, out) => {
+        const tolerance = getHighlightTolerance(map, out)
+        return highlightRegions(map, val, { continuous: true, tolerance })
+    }
 }
 
 function getUnHighlightFunction(map) {
-    if (map._mapType == 'ps') return unhighlightPsSymbols
+    if (map._mapType === 'ps') return unhighlightPsSymbols
     return unhighlightRegions
 }
 
-// Highlight selected regions on mouseover
-//TODO: merge these with legend-choropleth.js and legend-proportional-symbols.js highlight functions
-function highlightRegions(map, rawVal) {
-    const tolerance = getHighlightTolerance(map)
-    // Select all regions
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-    if (!allRegions) return
-
-    allRegions.each(function () {
-        const sel = select(this)
-        const ecl = sel.attr('ecl')
-        if (!ecl || ecl === 'nd') {
-            if (rawVal === 'nd') {
-                // dont whiten no data when no data is being hovered
-                return
-            }
-            // Store original color before dimming
-            if (!sel.attr('fill___')) {
-                sel.attr('fill___', sel.style('fill'))
-            }
-            sel.style('fill', 'white') // Dim the region
-            return
-        }
-
-        const val = +ecl // raw stat value
-        // Store original color if not already stored
-        if (!sel.attr('fill___')) {
-            sel.attr('fill___', sel.style('fill'))
-        }
-
-        if (val >= rawVal - tolerance && val <= rawVal + tolerance) {
-            sel.style('fill', sel.attr('fill___')) // Restore original color for selected regions
-        } else {
-            sel.style('fill', 'white') // dim others
-        }
-    })
-}
-
-// Reset all regions to their original colors on mouseout
-function unhighlightRegions(map) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    // Restore each region's original color from the fill___ attribute
-    allRegions.each(function () {
-        const sel = select(this)
-        const originalColor = sel.attr('fill___')
-
-        if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
-            sel.style('fill', originalColor)
-        } else {
-            // Fallback: recompute the original color if not stored properly
-            const ecl = sel.attr('ecl')
-            if (ecl !== null && ecl !== undefined) {
-                const originalFill = map.getColorOrFillStyle_(ecl)
-                sel.style('fill', originalFill)
-                // Store for future use
-                sel.attr('fill___', originalFill)
-            }
-        }
-    })
-}
-
-function highlightPsSymbols(map, rawVal) {
-    const tolerance = getHighlightTolerance(map)
+function highlightPsSymbols(map, rawVal, out) {
+    const tolerance = getHighlightTolerance(map, out)
     const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     allSymbols.each(function () {
@@ -493,11 +348,142 @@ function highlightPsSymbols(map, rawVal) {
     })
 }
 
-function unhighlightPsSymbols(map) {
+function unhighlightPsSymbols(map, out) {
     const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore all to default opacity
     allSymbols.each(function () {
         select(this).style('opacity', map.psFillOpacity_)
+    })
+}
+
+function addMouseEvents(rect, out, legendLength, isVertical) {
+    const map = out.map
+    const domain = getUntransformedDomain(map)
+    const untransform = map.valueUntransform_ || ((d) => d)
+    const container = out._continuousLegendContainer
+    const titlePadding = getTitlePadding(out)
+    const highlightFunction = getHighlightFunction(map)
+    const unhighlightFunction = getUnHighlightFunction(map)
+    const formatter = getChoroplethLabelFormatter(out)
+    // NOTE: do NOT read tolerance here - config not yet merged at this point
+
+    function valueToPixel(rawVal) {
+        const t_val = map.valueTransform_ ? map.valueTransform_(rawVal) : rawVal
+        const uDomain = getUntransformedDomain(map)
+        let t
+        if (uDomain.length === 3) {
+            const [d0, d1, d2] = uDomain
+            t = t_val < d1 ? (0.5 * (t_val - d0)) / (d1 - d0) : 0.5 + (0.5 * (t_val - d1)) / (d2 - d1)
+        } else {
+            t = (t_val - uDomain[0]) / (uDomain[1] - uDomain[0])
+        }
+        t = Math.max(0, Math.min(1, t))
+        return isVertical ? (1 - t) * legendLength + titlePadding : t * legendLength
+    }
+
+    function drawCursorLabel(pxCursor, label) {
+        const x = isVertical ? 0 : pxCursor
+        const y = isVertical ? pxCursor + titlePadding : 0
+
+        container
+            .append('circle')
+            .attr('class', 'em-hover-tick')
+            .attr('cx', isVertical ? x + out.shapeWidth : x)
+            .attr('cy', isVertical ? y : y + out.shapeHeight)
+            .attr('r', 3)
+            .attr('fill', 'black')
+            .attr('pointer-events', 'none')
+
+        container
+            .append('text')
+            .attr('class', 'em-hover-label')
+            .attr('x', isVertical ? x + out.shapeWidth + 5 : x)
+            .attr('y', isVertical ? y : y + out.shapeHeight + 12)
+            .attr('text-anchor', isVertical ? 'start' : 'middle')
+            .attr('alignment-baseline', 'middle')
+            .attr('pointer-events', 'none')
+            .text(label)
+    }
+
+    function drawPointIndicator(pxCursor, label) {
+        const x = isVertical ? 0 : pxCursor
+        const y = isVertical ? pxCursor + titlePadding : 0
+
+        container
+            .append('line')
+            .attr('class', 'em-hover-line')
+            .attr('x1', x)
+            .attr('y1', y)
+            .attr('x2', isVertical ? x + out.shapeWidth : x)
+            .attr('y2', isVertical ? y : y + out.shapeHeight)
+            .attr('stroke', 'black')
+            .attr('stroke-width', 1)
+            .attr('pointer-events', 'none')
+
+        drawCursorLabel(pxCursor, label)
+    }
+
+    function drawBandIndicator(pxCursor, loVal, hiVal) {
+        const pxLo = valueToPixel(loVal)
+        const pxHi = valueToPixel(hiVal)
+        const MIN_BAND_PX = 6
+        const center = (pxLo + pxHi) / 2
+        const halfBand = Math.max(Math.abs(pxHi - pxLo) / 2, MIN_BAND_PX / 2)
+        const pxA = center - halfBand
+        const pxB = center + halfBand
+        const label = `${formatter(loVal)} – ${formatter(hiVal)}`
+
+        ;[pxA, pxB].forEach((px) => {
+            const x = isVertical ? 0 : px
+            const y = isVertical ? px : titlePadding
+            container
+                .append('line')
+                .attr('class', 'em-hover-line')
+                .attr('x1', x)
+                .attr('y1', y)
+                .attr('x2', isVertical ? x + out.shapeWidth : x)
+                .attr('y2', isVertical ? y : y + out.shapeHeight)
+                .attr('stroke', 'black')
+                .attr('stroke-width', 1)
+                .attr('pointer-events', 'none')
+        })
+
+        drawCursorLabel(pxCursor, label)
+    }
+
+    rect.on('mousemove', function (event) {
+        // Read tolerance lazily so it picks up the merged config value
+        const tolerance = getHighlightTolerance(map, out)
+
+        const [mx, my] = pointer(event, this)
+        const along = isVertical ? my : mx
+        const clamped = Math.max(0, Math.min(legendLength, along))
+        const t = isVertical ? 1 - clamped / legendLength : clamped / legendLength
+
+        let rawVal
+        if (domain.length === 3) {
+            const [d0, d1, d2] = domain
+            rawVal = t < 0.5 ? d0 + (d1 - d0) * (t / 0.5) : d1 + (d2 - d1) * ((t - 0.5) / 0.5)
+        } else {
+            const [d0, d1] = domain
+            rawVal = d0 + t * (d1 - d0)
+        }
+        rawVal = untransform(rawVal)
+
+        container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label, .em-hover-band').remove()
+
+        if (tolerance > 0) {
+            drawBandIndicator(clamped, rawVal - tolerance, rawVal + tolerance)
+        } else {
+            drawPointIndicator(clamped, formatter(rawVal))
+        }
+
+        highlightFunction(map, rawVal)
+    })
+
+    rect.on('mouseout', function () {
+        container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label, .em-hover-band').remove()
+        unhighlightFunction(map)
     })
 }

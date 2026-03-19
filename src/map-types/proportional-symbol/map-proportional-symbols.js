@@ -302,13 +302,6 @@ export const map = function (config) {
      * @param {*} map map instance
      */
     out.updateSymbolsDrawOrder = function (map) {
-        console.log('[drawOrder] centroidsFeatures count:', map.Geometries.centroidsFeatures?.length)
-        console.log(
-            '[drawOrder] MD in centroidsFeatures:',
-            map.Geometries.centroidsFeatures?.find((d) => d.properties.id === 'MD')
-        )
-        console.log('[drawOrder] MD centroid coords:', map.Geometries.centroidsFeatures?.find((d) => d.properties.id === 'MD')?.properties?.centroid)
-        const gcp = out.getCentroidsGroup(map)
         const sizeData = getSizeStatData(map)
 
         // Ensure centroidFeatures is populated (important for mixed)
