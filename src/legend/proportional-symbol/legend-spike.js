@@ -31,7 +31,7 @@ export function buildSpikeLegend(out) {
     if (out.sizeLegend.title) {
         container
             .append('text')
-            .attr('class', 'em-legend-title em-spike-legend-title')
+            .attr('class', 'em-spike-legend-title')
             .attr('id', 'em-size-legend-title')
             .attr('x', 0)
             .attr('y', titleFontSize)
@@ -47,7 +47,6 @@ export function buildSpikeLegend(out) {
     const maxLabelLength = Math.max(...formattedLabels.map((s) => s.length))
     const labelPixelWidth = maxLabelLength * labelFontSize * 0.45
     const spikeSpacing = labelPixelWidth + 5
-
 
     const items = container
         .append('g')
