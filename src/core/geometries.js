@@ -249,13 +249,7 @@ export const Geometries = function (map, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', pathFunction)
-                .attr('id', (cntrg) => {
-                    // add ids for RS and EL so that we can choose not to add statistical data to them (XK and Athos are in cntrg but not nutsrg so shouldnt be shown on choropleths).
-                    const id = cntrg.properties.id
-                    if (id == 'RS' || id == 'EL') {
-                        return 'em-cntrg-' + id
-                    }
-                })
+                .attr('id', (cntrg) => 'em-cntrg-' + cntrg.properties.id)
         }
 
         //draw world map
@@ -293,6 +287,7 @@ export const Geometries = function (map, withCenterPoints) {
                         .enter()
                         .append('path')
                         .attr('d', pathFunction)
+                        .attr('id', (d) => 'em-nutsrg-' + d.properties.id)
                         .attr('lvl', i) //to be able to distinguish nuts levels
 
                     attachClickEventToRegions(regions, map)
@@ -313,6 +308,7 @@ export const Geometries = function (map, withCenterPoints) {
                     .data(this.geoJSONs.nutsrg)
                     .enter()
                     .append('path')
+                    .attr('id', (d) => 'em-nutsrg-' + d.properties.id)
                     .attr('d', pathFunction)
 
                 attachClickEventToRegions(regions, map)

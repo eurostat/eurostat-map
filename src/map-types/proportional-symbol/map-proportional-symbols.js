@@ -235,15 +235,6 @@ export const map = function (config) {
         if (map.geo_ !== 'WORLD') {
             if (map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, sizeData, regions)
-                // Build centroidFeatures so Dorling has something to simulate
-                const centroids = []
-                map.svg()
-                    .selectAll('g.em-centroid')
-                    .each(function (d) {
-                        if (!d.properties?.centroid) return
-                        centroids.push(d) // d already has properties and id
-                    })
-                map.Geometries.centroidsFeatures = centroids
             }
 
             // apply 'nd' class to no data regions for legend item hover
@@ -311,6 +302,12 @@ export const map = function (config) {
      * @param {*} map map instance
      */
     out.updateSymbolsDrawOrder = function (map) {
+        console.log('[drawOrder] centroidsFeatures count:', map.Geometries.centroidsFeatures?.length)
+        console.log(
+            '[drawOrder] MD in centroidsFeatures:',
+            map.Geometries.centroidsFeatures?.find((d) => d.properties.id === 'MD')
+        )
+        console.log('[drawOrder] MD centroid coords:', map.Geometries.centroidsFeatures?.find((d) => d.properties.id === 'MD')?.properties?.centroid)
         const gcp = out.getCentroidsGroup(map)
         const sizeData = getSizeStatData(map)
 
@@ -333,10 +330,11 @@ export const map = function (config) {
             .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
 
         // Clear old symbol containers
-        gcp.selectAll('g.em-centroid').remove()
+        out.getCentroidsGroup(map).selectAll('g.em-centroid').remove()
 
-        // Recreate sorted symbol containers
-        gcp.selectAll('g.em-centroid')
+        // Re-select fresh, then recreate sorted symbol containers
+        out.getCentroidsGroup(map)
+            .selectAll('g.em-centroid')
             .data(sorted, (d) => d.properties.id)
             .enter()
             .append('g')

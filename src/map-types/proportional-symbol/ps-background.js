@@ -1,5 +1,5 @@
-import { color as d3color } from 'd3-color';
-import { updateCSSRule } from '../../core/utils';
+import { color as d3color } from 'd3-color'
+import { updateCSSRule } from '../../core/utils'
 
 //update the color of background regions of a proportional symbol map
 export function updateBackgroundColor(map, symbolFill) {
@@ -11,6 +11,7 @@ export function updateBackgroundColor(map, symbolFill) {
     const backgroundColor = getBackgroundColor(hexColor, brightenFactor)
 
     updateCSSRule(`#${mapId}.em--ps .em-nutsrg`, 'fill', backgroundColor)
+    updateCSSRule(`#${mapId}.em--ps .em-cntrg`, 'fill', backgroundColor)
 }
 
 function getBackgroundColor(fillColor, brightenFactor) {
