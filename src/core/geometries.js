@@ -274,13 +274,15 @@ export const Geometries = function (map, withCenterPoints) {
                 this.geoJSONs.mixed.rg2 = feature(out.allNUTSGeoData[2], out.allNUTSGeoData[2].objects.nutsrg).features
                 this.geoJSONs.mixed.rg3 = feature(out.allNUTSGeoData[3], out.allNUTSGeoData[3].objects.nutsrg).features
 
+                const mixedContainer = container.append('g').attr('id', 'em-mixed-nutsrg').attr('class', 'em-mixed-nutsrg')
+
                 //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
                 // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
                 ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
                     //append each nuts level to map
-                    regions = container
+                    regions = mixedContainer
                         .append('g')
-                        .attr('id', 'em-nutsrg')
+                        .attr('id', `em-nutsrg-${i}`)
                         .attr('class', `em-nutsrg em-nutsrg-${i}`)
                         .selectAll('path')
                         .data(r)
@@ -302,8 +304,8 @@ export const Geometries = function (map, withCenterPoints) {
                 // when nutsLevel is not 'mixed'
                 regions = container
                     .append('g')
-                    .attr('id', 'em-nutsrg')
-                    .attr('class', 'em-nutsrg')
+                    .attr('id', `em-nutsrg`)
+                    .attr('class', `em-nutsrg em-nuts-${nutsLevel}`)
                     .selectAll('path')
                     .data(this.geoJSONs.nutsrg)
                     .enter()

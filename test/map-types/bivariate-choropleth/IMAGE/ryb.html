@@ -9,6 +9,33 @@
         <svg id="map"></svg>
         <script src="../../../../build/eurostatmap.js"></script>
         <script>
+            const colors = [
+                '#f3e6e2',
+                '#f2caa5',
+                '#f2a96d',
+                '#f2893d',
+                '#dc530d',
+                '#c9d0d4',
+                '#c8b69b',
+                '#c89866',
+                '#c87c39',
+                '#b64a0c',
+                '#a1bfc8',
+                '#a0a892',
+                '#a08d60',
+                '#a07236',
+                '#91450c',
+                '#6da5be',
+                '#6c918b',
+                '#6c795c',
+                '#6c6233',
+                '#623b0b',
+                '#327ba8',
+                '#326c7a',
+                '#325a51',
+                '#32492d',
+                '#2d2c0a',
+            ]
             const map = eurostatmap
                 .map('bivariateChoropleth')
                 .title('Unemployment and population density')
@@ -23,29 +50,21 @@
                     unitText: '%',
                 })
                 //.insets('default')
-                //.scale('60M')
+                .scale('60M')
                 .legend({
-                    //rotation: -45,
+                    label1: 'Population',
+                    label2: 'Unemployment',
+                    x: 600,
+                    y: 100,
                     boxOpacity: 0,
-                    squareSize: 100,
-                    label1: 'Inhabitants per km²',
-                    label2: '% unemployed',
-                    // breaks1: [1, 2, 3],
-                    // breaks2: [1, 2, 3],
-                    yAxisTitleOffset: {
-                        x: 0,
-                        y: 10,
-                    },
-                    xAxisTitleOffset: {
-                        x: 0,
-                        y: -7,
-                    },
-                    showBreaks: true,
-                    x: 0,
-                    y: 150,
+                    rotation: -45,
+                    yAxisTitleOffset: { x: 5, y: 13 },
                 })
-                .drawGraticule(false)
-                .seaFillStyle('#d3dee8')
+                .numberOfClasses(5)
+                .classToFillStyle((i, j) => {
+                    if (i == null || j == null || i === ':' || j === ':') return null
+                    return colors[i * 5 + j] ?? 'gray'
+                })
                 .build()
         </script>
     </body>

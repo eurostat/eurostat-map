@@ -2,7 +2,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
-import { DIMMED_OPACITY, unhighlightRegions } from './choropleth/legend-choropleth'
+import { DIMMED_OPACITY, unhighlightRegions } from './legend.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared formatting utilities
@@ -169,7 +169,7 @@ function createThresholdsLegend(out, config) {
             .attr('height', config.shapeHeight)
             .style('fill', fillColor)
             .on('mouseover', function () {
-                select(this).raise()
+                select(this).raise().raise()
                 highlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)

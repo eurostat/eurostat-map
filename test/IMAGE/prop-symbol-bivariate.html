@@ -84,7 +84,7 @@
                 })
 
             let mapCallbacksFired = 0
-            map.callback((map) => {
+            map.onBuild((map) => {
                 mapCallbacksFired++
                 console.log(mapCallbacksFired)
             })

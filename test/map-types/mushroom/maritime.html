@@ -25,7 +25,8 @@
                 stroke: grey;
                 stroke-width: 1px !important;
             }
-            .em-cntbn, .em-kosovo-bn {
+            .em-cntbn,
+            .em-kosovo-bn {
                 opacity: 0.4;
             }
         </style>
@@ -162,7 +163,7 @@
                         height: insetHeight,
                     },
                 ])
-                .callback(() => {
+                .onBuild(() => {
                     const portKeys = freightData.map((d) => d.code)
                     //color regions
                     d3.selectAll('#ports-map .em-nutsrg path').style('fill', (d) => {

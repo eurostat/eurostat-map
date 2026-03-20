@@ -50,7 +50,7 @@
                     filters: { sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '%',
                 })
-                .nutsLevel(2)
+                .nutsLevel('mixed')
                 .zoomExtent([1, 1000])
 
                 .classificationMethod('quantile')
@@ -72,6 +72,10 @@
                     orientation: 'horizontal', //TODO
                 })
                 .build()
+
+            setTimeout(() => {
+                // map.exportMapToSVG()
+            }, 3000)
         </script>
     </body>
 </html>

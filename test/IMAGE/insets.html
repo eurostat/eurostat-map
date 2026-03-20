@@ -378,7 +378,7 @@
                     .legend({ title: 'test', x: 0, y: 130 })
                     .insetBoxPosition(insetBoxPosition)
                     //.zoomButtonsPosition([94, 580])
-                    .callback((m) => {
+                    .onBuild((m) => {
                         callbackCount++
                         log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`)
                         if (callbackCount === expectedCallbacks) {

@@ -24,7 +24,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
         if (out._finalized_) return
         if (!out._geoDone_ || !out._statDone_) return
         out._finalized_ = true
-        if (out.callback()) out.callback()(out)
+        if (out.onBuild()) out.onBuild()(out)
     }
 
     // render scheduling flag
@@ -82,8 +82,8 @@ export const statMap = function (config, withCenterPoints, mapType) {
     out.tooltip_.textFunction = undefined
     //for maps using special fill patterns, this is the function to define them in the SVG image - See functions: getFillPatternLegend and getFillPatternDefinitionFun
     out.filtersDefinitionFunction_ = undefined
-    //a callback function to execute after the map build is complete.
-    out.callback_ = undefined
+    //a function to execute after the map build is complete.
+    out.onBuild_ = undefined
 
     //legend configuration
     out.legend_ = undefined
@@ -97,7 +97,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'callback_'].forEach(
+    ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'onBuild_'].forEach(
         function (att) {
             out[att.substring(0, att.length - 1)] = function (v) {
                 if (!arguments.length) return out[att]

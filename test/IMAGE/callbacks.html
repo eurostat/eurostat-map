@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -52,7 +52,7 @@
                         //     legendSpacing: 0,
                         // })
 
-                        .callback((m) => console.log(id))
+                        .onBuild((m) => console.log(id))
                 )
             }
             let clonedConfig = JSON.parse(JSON.stringify(insetsConfig))

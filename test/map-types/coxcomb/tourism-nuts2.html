@@ -46,7 +46,7 @@
                     timeLegend: { title: 'Month', marginTop: -30 },
                 })
 
-                .callback(rebuildWithCustomData)
+                .onBuild(rebuildWithCustomData)
                 .build()
 
             function rebuildWithCustomData(initialMap) {

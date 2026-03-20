@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -23,7 +23,7 @@
                 .tooltipShowFlags(false)
                 .transitionDuration(0)
                 .legend({ decimals: 0, x: 10, y: 120, noData: false })
-                .callback(function () {
+                .onBuild(function () {
                     setTimeout(() => {
                         myMap.exportMapToPNG()
                         //myMap.exportMapToSVG();

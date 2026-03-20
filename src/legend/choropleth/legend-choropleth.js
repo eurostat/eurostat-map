@@ -1,7 +1,6 @@
 //legend-choropleth.js
 import { select } from 'd3-selection'
 import * as Legend from '../legend'
-import { getLegendRegionsSelector } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from '../legend-continuous'
@@ -165,41 +164,4 @@ export function getThresholdTicksWithExtents(out) {
     uniq.sort((a, b) => (out.ascending ? a - b : b - a))
 
     return uniq
-}
-
-let currentHighlight = null
-export const DIMMED_OPACITY = 0.15
-
-export function highlightRegions(map, eclOrValue, { tolerance = 0, continuous = false } = {}) {
-    currentHighlight = eclOrValue
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-    allRegions.each(function () {
-        const sel = select(this)
-        const ecl = sel.attr('ecl')
-
-        if (!ecl || ecl === 'nd') {
-            sel.style('opacity', eclOrValue === 'nd' ? 1 : DIMMED_OPACITY)
-            return
-        }
-
-        const match = continuous ? +ecl >= eclOrValue - tolerance && +ecl <= eclOrValue + tolerance : ecl === String(eclOrValue)
-
-        sel.style('opacity', match ? 1 : DIMMED_OPACITY)
-    })
-}
-
-export function unhighlightRegions(map, eclOrValue) {
-    if (eclOrValue !== undefined && eclOrValue !== currentHighlight) return
-    currentHighlight = null
-    const selector = getLegendRegionsSelector(map)
-    map.svg_.selectAll(selector).selectAll('[ecl]').style('opacity', 1)
-}
-
-export function clearLegendHighlight(map) {
-    if (currentHighlight === null) return
-    currentHighlight = null
-    const selector = getLegendRegionsSelector(map)
-    map.svg_.selectAll(selector).selectAll('[ecl]').style('opacity', 1)
 }

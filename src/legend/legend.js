@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
-import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
+import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
+import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 
 /**
@@ -342,4 +342,76 @@ export const legend = function (map) {
     }
 
     return out
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared region highlight / unhighlight (filter-based, works for all map types)
+// ─────────────────────────────────────────────────────────────────────────────
+
+let currentHighlight = null
+
+/**
+ * Reads the computed fill colour for a default (no-data) region from the DOM,
+ * so the dimmed highlight colour always matches the map type's CSS.
+ * Falls back to '#e1e1e1' if nothing is found.
+ */
+export function getDimmedFill(map) {
+    const selector = getLegendRegionsSelector(map)
+    // Find the first region that has no ecl (i.e. a background/no-input region)
+    const candidate = map.svg_.selectAll(selector).selectAll('[ecl="ni"], .em-cntrg, .em-nutsrg').node()
+    if (candidate) {
+        const fill = window.getComputedStyle(candidate).fill
+        if (fill && fill !== 'none') return fill
+    }
+    return '#e1e1e1'
+}
+
+export function highlightRegions(map, eclOrValue, { tolerance = 0, continuous = false } = {}) {
+    currentHighlight = eclOrValue
+    const dimmedFill = getDimmedFill(map)
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    allRegions.each(function () {
+        const sel = select(this)
+        if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
+
+        const ecl = sel.attr('ecl')
+        if (!ecl || ecl === 'nd') {
+            sel.style('fill', eclOrValue === 'nd' ? sel.attr('data-fill') : dimmedFill)
+            return
+        }
+
+        const match = continuous ? +ecl >= eclOrValue - tolerance && +ecl <= eclOrValue + tolerance : ecl === String(eclOrValue)
+
+        sel.style('fill', match ? sel.attr('data-fill') : dimmedFill)
+    })
+}
+
+export function unhighlightRegions(map, eclOrValue) {
+    if (eclOrValue !== undefined && eclOrValue !== currentHighlight) return
+    currentHighlight = null
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll('[ecl]')
+        .each(function () {
+            const sel = select(this)
+            const original = sel.attr('data-fill')
+            if (original) sel.style('fill', original)
+        })
+}
+
+export function clearLegendHighlight(map) {
+    if (currentHighlight === null) return
+    currentHighlight = null
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll('[ecl]')
+        .each(function () {
+            const sel = select(this)
+            const original = sel.attr('data-fill')
+            if (original) sel.style('fill', original)
+        })
 }

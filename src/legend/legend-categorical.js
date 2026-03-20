@@ -2,6 +2,7 @@ import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
+import { highlightRegions, unhighlightRegions } from './legend'
 
 /**
  * A legend for categorical maps
@@ -109,50 +110,6 @@ export const legend = function (map, config) {
                 .attr('dy', '0.35em') // ~vertical centering
                 .text(map.classToText() ? map.classToText()[ecl_] : ecl_)
         }
-    }
-
-    // Highlight selected regions on mouseover
-    function highlightRegions(map, ecl) {
-        const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-        // Store original colors before changing them
-        allRegions.each(function () {
-            const sel = select(this)
-            if (!sel.attr('fill___')) {
-                sel.attr('fill___', sel.style('fill'))
-            }
-        })
-
-        allRegions.style('fill', 'white')
-        const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
-        selectedRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-        })
-    }
-
-    // Reset all regions to their original colors on mouseout
-    function unhighlightRegions(map) {
-        const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-
-        allRegions.each(function () {
-            const sel = select(this)
-            const originalColor = sel.attr('fill___')
-
-            if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
-                sel.style('fill', originalColor)
-            } else {
-                // Fallback: recompute the original color if not stored properly
-                const ecl = sel.attr('ecl')
-                if (ecl !== null && ecl !== undefined) {
-                    const originalFill = map.getColorOrFillStyle_(ecl)
-                    sel.style('fill', originalFill)
-                    // Store for future use
-                    sel.attr('fill___', originalFill)
-                }
-            }
-        })
     }
 
     return out
