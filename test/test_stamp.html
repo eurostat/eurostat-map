@@ -14,49 +14,43 @@
                 .map('choropleth')
                 .title('stamp test')
                 .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                // EU stars example
                 .stamp({
-                    x: 100,
-                    y: 460,
-                    size: 32,
-                    padding: 2,
-                    //text: 'Hello~world¶New~Line¶Another~Line',
-                    text: 'EU~=~20~000 asd aasdasd',
-                    stampColor: '#3792B6',
-                    textColor: '#3792B6',
-                    strokeWidth: 1,
-                    shape: 'rectangle',
+                    text: 'EUROSTAT 2024',
+                    shape: 'eu-stars',
+                    stampColor: '#003399',
+                    textColor: '#003399',
+                    fontSize: 11,
+                    x: 80,
+                    y: 120,
                 })
                 .zoomButtons(true)
                 .zoomButtonsPosition([20, 120])
                 .build()
 
-            // setTimeout(() => {
-            //     map.stamp({
-            //         x: 230,
-            //         y: 100,
-            //         // size: 70,
-            //         text: 'EU = 20~000 test with a lot of words',
-            //         stampColor: '#3792B6',
-            //         textColor: '#3792B6',
-            //         strokeWidth: 2,
-            //     })
-            // }, 1000)
+            setTimeout(() => {
+                map.stamp({
+                    text: 'EU~=~21.4',
+                    padding: 10,
+                    x: 7, // left edge of stamp
+                    y: 380,
+                    fontSize: 11, // fixed font size — shape grows to fit
+                    textAnchor: 'start', // grows rightward from x
+                    shape: 'eu-stars',
+                    starSize: 0.6, // 30% of the default "just touching" size — leaves visible gaps between stars
+                    rx: 3,
+                    strokeWidth: 1.5,
+                })
+            }, 100)
 
-            // setTimeout(() => {
-            //     map.stamp({
-            //         x: 230,
-            //         y: 100,
-            //         size: 60,
-            //         text: 'EU = 150~inh / km',
-            //         stampColor: '#3792B6',
-            //         textColor: '#3792B6',
-            //         strokeWidth: 2,
-            //     })
-            // }, 2000)
-
-            // setTimeout(() => {
-            //     map.stamp(false)
-            // }, 3000)
+            // // Rounded rectangle example
+            // map.stamp({
+            //     text: 'PRELIMINARY',
+            //     shape: 'rectangle',
+            //     rx: 6,
+            //     fontSize: 10,
+            //     padding: 6,
+            // })
         </script>
     </body>
 </html>
