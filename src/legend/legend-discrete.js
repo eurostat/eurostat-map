@@ -54,7 +54,7 @@ export function resolveDecimals(out, statData) {
     if (!statData?.getArray) return 0
 
     const arr = statData.getArray()
-    if (!arr) return 0
+    if (!arr?.length) return 0
 
     const values = arr.filter((v) => Number.isFinite(v))
     if (!values.length) return 0
@@ -278,6 +278,9 @@ function createThresholdsLegend(out, config) {
                 })
                 .on('mouseout', function () {
                     unhighlightRegions(map)
+                    if (map.insetTemplates_) {
+                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+                    }
                 })
                 .attr('class', 'em-legend-label em-legend-label-max')
                 .attr('x', labelX)
@@ -306,6 +309,9 @@ function createThresholdsLegend(out, config) {
                 })
                 .on('mouseout', function () {
                     unhighlightRegions(map)
+                    if (map.insetTemplates_) {
+                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+                    }
                 })
                 .attr('class', 'em-legend-label em-legend-label-min')
                 .attr('x', labelX)
@@ -328,29 +334,6 @@ function createThresholdsLegend(out, config) {
     }
 }
 
-function highlightMaxRegion(map, numberOfClasses, id) {
-    const ecl = numberOfClasses - 1
-    highlightRegions(map, ecl)
-    const selector = getLegendRegionsSelector(map)
-    map.svg_
-        .selectAll(selector)
-        .selectAll(`[ecl='${ecl}']`)
-        .each(function (d) {
-            if (d.properties.id !== id) select(this).style('fill', getDimmedFill(map))
-        })
-}
-
-function highlightMinRegion(map, id) {
-    const ecl = 0
-    highlightRegions(map, ecl)
-    const selector = getLegendRegionsSelector(map)
-    map.svg_
-        .selectAll(selector)
-        .selectAll(`[ecl='${ecl}']`)
-        .each(function (d) {
-            if (d.properties.id !== id) select(this).style('fill', getDimmedFill(map))
-        })
-}
 function createRangesLegend(out, config) {
     const map = out.map
     const container = out._discreteLegendContainer
@@ -527,4 +510,36 @@ function drawDivergingLine(out, y, config) {
             out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
         }
     }
+}
+
+function highlightMaxRegion(map, numberOfClasses, id) {
+    const ecl = numberOfClasses - 1
+    applyMaxMinHighlight(map, ecl, id)
+    if (map.insetTemplates_) {
+        executeForAllInsets(map.insetTemplates_, map.svgId, (insetMap) => {
+            applyMaxMinHighlight(insetMap, ecl, id)
+        })
+    }
+}
+
+function highlightMinRegion(map, id) {
+    const ecl = 0
+    applyMaxMinHighlight(map, ecl, id)
+    if (map.insetTemplates_) {
+        executeForAllInsets(map.insetTemplates_, map.svgId, (insetMap) => {
+            applyMaxMinHighlight(insetMap, ecl, id)
+        })
+    }
+}
+
+function applyMaxMinHighlight(map, ecl, id) {
+    highlightRegions(map, ecl)
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll(`[ecl='${ecl}']`)
+        .each(function (d) {
+            if (!d?.properties?.id) return
+            if (d.properties.id !== id) select(this).style('fill', getDimmedFill(map))
+        })
 }

@@ -375,19 +375,21 @@ export function highlightRegions(map, eclOrValue, options = {}) {
 
     if (allRegions.empty()) return
 
-    // Bail out if the map hasn't finished rendering yet — fill___ is set after transition completes
+    // Bail out if the map hasn't finished rendering yet
     const isReady = allRegions.filter(function () {
         return !!this.getAttribute('fill___')
     })
     if (isReady.empty()) return
 
+    // First pass: sync data-fill from fill___ for ALL regions before any fill changes
+    allRegions.each(function () {
+        const authoritative = this.getAttribute('fill___')
+        if (authoritative) select(this).attr('data-fill', authoritative)
+    })
+
+    // Second pass: apply highlight/dim
     allRegions.each(function () {
         const sel = select(this)
-
-        // Always sync data-fill from fill___ (the authoritative post-render colour)
-        const authoritative = this.getAttribute('fill___')
-        if (authoritative) sel.attr('data-fill', authoritative)
-
         if (!sel.attr('data-fill')) return
 
         const ecl = sel.attr('ecl')
@@ -403,7 +405,6 @@ export function highlightRegions(map, eclOrValue, options = {}) {
 }
 
 export function unhighlightRegions(map, eclOrValue) {
-    if (eclOrValue !== undefined && eclOrValue !== currentHighlight) return
     currentHighlight = null
     const selector = getLegendRegionsSelector(map)
     map.svg_
@@ -411,13 +412,12 @@ export function unhighlightRegions(map, eclOrValue) {
         .selectAll('[ecl]')
         .each(function () {
             const sel = select(this)
-            const original = sel.attr('data-fill')
+            const original = sel.attr('data-fill') || this.getAttribute('fill___')
             if (original) sel.style('fill', original)
         })
 }
 
 export function clearLegendHighlight(map) {
-    if (currentHighlight === null) return
     currentHighlight = null
     const selector = getLegendRegionsSelector(map)
     map.svg_
@@ -425,7 +425,7 @@ export function clearLegendHighlight(map) {
         .selectAll('[ecl]')
         .each(function () {
             const sel = select(this)
-            const original = sel.attr('data-fill')
+            const original = sel.attr('data-fill') || this.getAttribute('fill___')
             if (original) sel.style('fill', original)
         })
 }

@@ -81,6 +81,9 @@ export const legend = function (map, config) {
             //exit early if no classifier
             if (!map.classToFillStyle()) return
 
+            //exit early if stat data not yet available
+            if (!map.statData()?.getArray()?.length) return
+
             //set default point of divergence if applicable
             if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
 
@@ -138,6 +141,10 @@ export function getThresholds(out) {
 
 export function getChoroplethLabelFormatter(out) {
     const stat = out.getColorStats(out)
+
+    // If stat data isn't ready yet, return a no-op formatter — legend will re-render when data arrives
+    if (!stat?.getArray?.()?.length) return () => ''
+
     const decimals = resolveDecimals(out, stat)
     out._resolvedDecimals = decimals
 
