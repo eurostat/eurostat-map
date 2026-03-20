@@ -208,15 +208,15 @@ export const legend = function (map, config) {
                 .attr('height', config.shapeHeight)
                 .style('fill', col)
                 .on('mouseover', function () {
-                    highlightRegions(out.map, code)
+                    highlightCoxcombWedges(out.map, code)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightCoxcombWedges, code)
                     }
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(out.map)
+                    unhighlightCoxcombWedges(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightCoxcombWedges, code)
                     }
                 })
 
@@ -240,7 +240,7 @@ export const legend = function (map, config) {
                 i * config.shapeHeight +
                 i * config.shapePadding
             const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
-            out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
+            out.appendNoDataLegend(container, out.noDataText, highlightCoxcombWedges, unhighlightCoxcombWedges)
         }
     }
 
@@ -355,7 +355,7 @@ export const legend = function (map, config) {
             })
     }
 
-    function highlightRegions(map, code) {
+    function highlightCoxcombWedges(map, code) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
 
         // Store original colors before changing them
@@ -373,7 +373,7 @@ export const legend = function (map, config) {
         })
     }
 
-    function unhighlightRegions(map) {
+    function unhighlightCoxcombWedges(map) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
         allSegments.each(function () {
             const sel = select(this)

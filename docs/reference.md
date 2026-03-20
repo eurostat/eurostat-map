@@ -1123,7 +1123,7 @@ const map = eurostatmap
     .zoomExtent([1, 1000])
     .build()
 
-map.callback(() => {
+map.onBuild(() => {
     capitals.forEach(({ lon, lat, label }) => {
         const [x, y] = eurostatmap.projectToMap(map, lon, lat)
         map.addLocation({

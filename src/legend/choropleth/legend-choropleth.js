@@ -22,7 +22,7 @@ export const legend = function (map, config) {
     //tick line length in pixels
     out.tickLength = 4
     //the number of decimal for the legend labels
-    out.decimals = 0
+    out.decimals = undefined
     //the distance between the legend box elements to the corresponding text label
     out.labelOffsets = { x: 3, y: 0 }
 

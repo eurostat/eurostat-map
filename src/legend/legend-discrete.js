@@ -2,7 +2,7 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
-import { DIMMED_OPACITY, unhighlightRegions } from './legend.js'
+import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared formatting utilities
@@ -24,7 +24,6 @@ export function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labe
 
     const decimals = resolveDecimals(out, statData)
     const decimalFormatter = format(`,.${decimals}f`)
-    const round = (v) => Number(v.toFixed(decimals))
 
     if (labelType === 'ranges') {
         const thresholds = getThresholdsFn()
@@ -36,7 +35,7 @@ export function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labe
     }
 
     // thresholds (default)
-    return (value) => spaceAsThousandSeparator(round(value))
+    return (value) => decimalFormatter(value)
 }
 
 /**
@@ -327,27 +326,28 @@ function createThresholdsLegend(out, config) {
 }
 
 function highlightMaxRegion(map, numberOfClasses, id) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
     const ecl = numberOfClasses - 1
-
-    allRegions.style('opacity', DIMMED_OPACITY)
-    allRegions.filter("[ecl='" + ecl + "']").each(function (d) {
-        if (d.properties.id === id) select(this).style('opacity', 1)
-    })
+    highlightRegions(map, ecl)
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll(`[ecl='${ecl}']`)
+        .each(function (d) {
+            if (d.properties.id !== id) select(this).style('fill', getDimmedFill(map))
+        })
 }
 
 function highlightMinRegion(map, id) {
-    const selector = getLegendRegionsSelector(map)
-    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
     const ecl = 0
-
-    allRegions.style('opacity', DIMMED_OPACITY)
-    allRegions.filter("[ecl='" + ecl + "']").each(function (d) {
-        if (d.properties.id === id) select(this).style('opacity', 1)
-    })
+    highlightRegions(map, ecl)
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll(`[ecl='${ecl}']`)
+        .each(function (d) {
+            if (d.properties.id !== id) select(this).style('fill', getDimmedFill(map))
+        })
 }
-
 function createRangesLegend(out, config) {
     const map = out.map
     const container = out._discreteLegendContainer

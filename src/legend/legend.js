@@ -182,7 +182,7 @@ export const legend = function (map) {
     }
 
     //'no data' legend box
-    out.appendNoDataLegend = function (container, noDataText, highlightRegions, unhighlightRegions) {
+    out.appendNoDataLegend = function (container, noDataText, highlightFunction, unhighlightFunction) {
         const map = out.map
 
         //append symbol & style
@@ -194,15 +194,15 @@ export const legend = function (map) {
             .attr('width', out.noDataShapeWidth)
             .attr('height', out.noDataShapeHeight)
             .on('mouseover', function () {
-                highlightRegions(map, 'nd')
+                highlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, 'nd')
                 }
             })
             .on('mouseout', function () {
-                unhighlightRegions(map)
+                unhighlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, 'nd')
                 }
             })
 
@@ -216,15 +216,15 @@ export const legend = function (map) {
             .style('pointer-events', 'all')
             .style('cursor', 'pointer')
             .on('mouseover', function () {
-                highlightRegions(map, 'nd')
+                highlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, 'nd')
                 }
             })
             .on('mouseout', function () {
-                unhighlightRegions(map)
+                unhighlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, 'nd')
                 }
             })
             .text(noDataText)
@@ -366,15 +366,29 @@ export function getDimmedFill(map) {
     return '#e1e1e1'
 }
 
-export function highlightRegions(map, eclOrValue, { tolerance = 0, continuous = false } = {}) {
+export function highlightRegions(map, eclOrValue, options = {}) {
+    const { tolerance = 0, continuous = false } = options && typeof options === 'object' && !Array.isArray(options) ? options : {}
     currentHighlight = eclOrValue
     const dimmedFill = getDimmedFill(map)
     const selector = getLegendRegionsSelector(map)
     const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
 
+    if (allRegions.empty()) return
+
+    // Bail out if the map hasn't finished rendering yet — fill___ is set after transition completes
+    const isReady = allRegions.filter(function () {
+        return !!this.getAttribute('fill___')
+    })
+    if (isReady.empty()) return
+
     allRegions.each(function () {
         const sel = select(this)
-        if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
+
+        // Always sync data-fill from fill___ (the authoritative post-render colour)
+        const authoritative = this.getAttribute('fill___')
+        if (authoritative) sel.attr('data-fill', authoritative)
+
+        if (!sel.attr('data-fill')) return
 
         const ecl = sel.attr('ecl')
         if (!ecl || ecl === 'nd') {
