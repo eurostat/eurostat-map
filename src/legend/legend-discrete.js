@@ -53,7 +53,10 @@ export function resolveDecimals(out, statData) {
     if (explicit !== undefined) return explicit
     if (!statData?.getArray) return 0
 
-    const values = statData.getArray().filter((v) => Number.isFinite(v))
+    const arr = statData.getArray()
+    if (!arr) return 0
+
+    const values = arr.filter((v) => Number.isFinite(v))
     if (!values.length) return 0
 
     let max = 0
