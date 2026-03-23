@@ -341,6 +341,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
+    out.regionCentroids = function () {
+        return out.Geometries.getRegionCentroids(out._pathFunction)
+    }
+
     /**
      * Abstract method.
      * Make/update the map after classification attributes have been changed.

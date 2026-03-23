@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>EU Economic Development — Story Map</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+    <body>
+        <!-- HEADER / TITLE SCREEN -->
+        <section class="header">
+            <div class="header-inner">
+                <p class="header-kicker">Eurostat Regional Data · 2023</p>
+                <div class="eu-flag-strip">
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                </div>
+                <h1>
+                    The
+                    <em>uneven</em>
+                    geography of European prosperity
+                </h1>
+                <p class="header-desc">
+                    GDP per capita across EU regions ranges from under 50% to over 250% of the EU average — a gap that tells a story of divergence,
+                    catch-up, and persistent inequality.
+                </p>
+                <div class="scroll-hint">
+                    <div class="scroll-arrow"></div>
+                    Scroll to explore
+                </div>
+            </div>
+        </section>
+
+        <!-- SCROLLYTELLING SECTION -->
+        <section class="story-container">
+            <!-- LEFT: text steps -->
+            <div class="text-column" id="text-column">
+                <div class="step" data-step="1" id="step-1">
+                    <div class="step-card">
+                        <p class="step-number">01 — Overview</p>
+                        <h2>A continent of contrasts</h2>
+                        <p>
+                            The EU's single market conceals vast differences in regional wealth. GDP per capita, measured as a percentage of the EU
+                            average, reveals a sharp east–west divide — with a few exceptional outliers on both ends.
+                        </p>
+                        <p>This map shows all NUTS-2 regions colour-coded by their GDP index relative to the EU-27 average (= 100).</p>
+                        <div class="stat-callout">
+                            <span class="stat-num">249</span>
+                            <span class="stat-desc">Luxembourg's GDP index — among the EU's highest values</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step" data-step="2" id="step-2">
+                    <div class="step-card">
+                        <p class="step-number">02 — The rich north</p>
+                        <h2>
+                            Northern wealth clusters around
+                            <em>capital cities</em>
+                        </h2>
+                        <p>
+                            The highest-income regions are concentrated in a band from Ireland through the Benelux, Germany, and Austria into
+                            Scandinavia. Capital city regions dominate — Île-de-France, Brussels, Hamburg, and Stockholm all exceed 150 on the index.
+                        </p>
+                        <p>Regions above 130 are highlighted.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="3" id="step-3">
+                    <div class="step-card">
+                        <p class="step-number">03 — The lagging east</p>
+                        <h2>
+                            Eastern regions remain
+                            <em>far behind</em>
+                        </h2>
+                        <p>
+                            Despite decades of convergence funding, large swathes of Romania, Bulgaria, and parts of Poland and Hungary remain below
+                            60 on the GDP index — qualifying for the highest tier of EU cohesion funding.
+                        </p>
+                        <div class="stat-callout">
+                            <span class="stat-num">29</span>
+                            <span class="stat-desc">BG31 (north-west Bulgaria) — the lowest indexed region in the dataset</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step" data-step="4" id="step-4">
+                    <div class="step-card">
+                        <p class="step-number">04 — By country</p>
+                        <h2>
+                            Within-country inequality is
+                            <em>just as stark</em>
+                        </h2>
+                        <p>
+                            The regions animate from the map into a dot chart grouped by country. Notice how France, Germany, and Ireland have
+                            enormous internal spreads, while smaller nations cluster tightly around their national average.
+                        </p>
+                        <p>Each dot is a NUTS-2 region. The square marks the country's mean.</p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="5" id="step-5">
+                    <div class="step-card">
+                        <p class="step-number">05 — The takeaway</p>
+                        <h2>
+                            Policy must address
+                            <em>regional</em>
+                            , not just national, gaps
+                        </h2>
+                        <p>
+                            National averages mask the real story. Poland's national GDP sits around 80% of the EU average — but Warsaw's region
+                            (PL91) exceeds 170, while its eastern periphery (PL84) sits at just 46.
+                        </p>
+                        <div class="stat-callout">
+                            <span class="stat-num">120+</span>
+                            <span class="stat-desc">percentage point spread between Poland's richest and poorest regions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: sticky map panel -->
+            <!--
+                .map-column is position:sticky in styles.css.
+                .map-stage is the container eurostatmap renders into.
+                main.js calls prepareMountPoint() which clears .map-stage and
+                injects a <div id="eurostatmap-mount"> for the library to use.
+            -->
+            <div class="map-column">
+                <div class="map-frame">
+                    <div class="map-header">
+                        <div class="map-title" id="map-title">Loading map…</div>
+                        <div class="map-subtitle" id="map-subtitle">GDP index · EU-27 = 100 · NUTS-2 regions</div>
+                        <div class="map-step-indicator" id="step-indicator">Step 1 of 5</div>
+                    </div>
+
+                    <!--
+                        .map-stage: eurostatmap mounts its SVG here.
+                        DO NOT put any child elements here in HTML —
+                        main.js clears and repopulates it via prepareMountPoint().
+                    -->
+                    <div class="map-stage" id="map-stage"></div>
+
+                    <!--
+                        The colour legend bar at the bottom of the panel.
+                        This mirrors the choropleth classification in main.js.
+                        For the chart view it stays visible as a reference.
+                    -->
+                    <div class="map-legend" id="map-legend">
+                        <span class="legend-label">low</span>
+                        <div class="legend-swatch" style="background: #e470a8"></div>
+                        <div class="legend-swatch" style="background: #e8b8cc"></div>
+                        <div class="legend-swatch" style="background: #d4c8e0"></div>
+                        <div class="legend-swatch" style="background: #b5e4c0"></div>
+                        <div class="legend-swatch" style="background: #6dca8a"></div>
+                        <div class="legend-swatch" style="background: #2a9455"></div>
+                        <div class="legend-swatch" style="background: #1a7a45"></div>
+                        <span class="legend-end-label">high GDP index</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div>
+                <p class="footer-brand">eurostat-map.js</p>
+                <p class="footer-meta">
+                    Data: Eurostat · GDP per capita in PPS, EU-27 = 100
+                    <br />
+                    Geography: NUTS-2, 2021 vintage · Built with D3.js
+                </p>
+            </div>
+            <div style="text-align: right">
+                <p class="footer-meta">© EuroGeographics · © OpenStreetMap</p>
+            </div>
+            <p class="footer-note">
+                Illustrative prototype. Manual data approximates Eurostat
+                <code>nama_10r_3gdp</code>
+                . Replace
+                <code>statData().setData()</code>
+                with
+                <code>stat({ eurostatDatasetCode: 'nama_10r_3gdp', ... })</code>
+                for live figures.
+            </p>
+        </footer>
+
+        <!--
+            Load order matters:
+            1. D3 UMD bundle  → window.d3  (used by tweenToChart in main.js)
+            2. eurostatmap UMD bundle → window.eurostatmap
+            3. main.js (plain script, not a module — references window globals)
+
+            If you bundle with Vite/Rollup, replace these three tags with your
+            bundler's entry point and adjust the imports in main.js accordingly.
+        -->
+        <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+        <script src="../../build/eurostatmap.min.js"></script>
+        <script src="./main.js"></script>
+    </body>
+</html>

@@ -528,6 +528,33 @@ export const Geometries = function (map, withCenterPoints) {
         return features
     }
 
+    out.getRegionCentroids = function (pathFunction) {
+        const result = new Map()
+        if (!pathFunction) return result
+
+        let features = []
+        if (map.nutsLevel_ === 'mixed') {
+            features = [
+                ...(out.geoJSONs.mixed.rg0 || []),
+                ...(out.geoJSONs.mixed.rg1 || []),
+                ...(out.geoJSONs.mixed.rg2 || []),
+                ...(out.geoJSONs.mixed.rg3 || []),
+            ]
+        } else if (out.userGeometries) {
+            features = out.statisticalRegions?.features || []
+        } else {
+            features = out.geoJSONs.nutsrg || []
+        }
+
+        features.forEach((f) => {
+            const id = f.properties?.id
+            if (!id) return
+            const c = pathFunction.centroid(f)
+            if (c && !isNaN(c[0])) result.set(id, c)
+        })
+        return result
+    }
+
     return out
 }
 
