@@ -178,6 +178,7 @@ const zoomHandler = (event, previousT, map) => {
         scaleLabelTexts(t, map)
     }
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
+    scaleLocations(t, map)
 
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
     if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
@@ -271,6 +272,20 @@ const scaleLabelTexts = function (transform, map) {
 }
 
 /**
+ * Keep custom location symbols/labels at constant screen size while map zooms.
+ * Locations are rendered inside the zoom group, so we apply an inverse scale
+ * on the location elements to compensate for the parent transform.
+ */
+const scaleLocations = function (transform, map) {
+    const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
+    const invScale = 1 / (transform.k || 1)
+    const t = invScale === 1 ? null : `scale(${invScale})`
+
+    zoomGroup.selectAll(`#em-locations-${map.svgId_} .em-loc-symbol`).attr('transform', t)
+    zoomGroup.selectAll(`#em-locations-${map.svgId_} .em-loc-label`).attr('transform', t)
+}
+
+/**
  * @description adjusts all stroke-widths dynamically according to zoom
  * @param {*} transform
  */
@@ -282,6 +297,10 @@ const scaleStrokeWidths = function (transform, map) {
 
     elements.each(function () {
         const element = select(this)
+        if (this.closest && this.closest('.em-locations')) {
+            // Let custom locations (symbols + labels) scale naturally with zoom.
+            return
+        }
         const computedStyle = window.getComputedStyle(this)
 
         const inlineStrokeWidth = element.attr('stroke-width')
