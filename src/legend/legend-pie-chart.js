@@ -146,15 +146,15 @@ export const legend = function (map, config) {
                 .style('fill', scs[code])
 
                 .on('mouseover', function () {
-                    highlightRegions(out.map, code)
+                    highlightSlices(out.map, code)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightSlices, code)
                     }
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(out.map)
+                    unhighlightSlices(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightSlices, code)
                     }
                 })
 
@@ -184,12 +184,12 @@ export const legend = function (map, config) {
                 i * (config.shapeHeight + config.shapePadding)
 
             const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
-            out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
+            out.appendNoDataLegend(container, out.noDataText, highlightSlices, unhighlightSlices)
         }
     }
 
     // Highlight selected segments on mouseover
-    function highlightRegions(map, code) {
+    function highlightSlices(map, code) {
         const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
 
         // Set all segments to transparent
@@ -203,7 +203,7 @@ export const legend = function (map, config) {
     }
 
     // Reset all segments to their original colors on mouseout
-    function unhighlightRegions(map) {
+    function unhighlightSlices(map) {
         const allSegments = map.svg_.selectAll('.piechart').selectAll('path[code]')
 
         // Restore each segments's original color from the fill___ attribute

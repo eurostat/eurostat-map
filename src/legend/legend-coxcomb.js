@@ -2,7 +2,6 @@ import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
 import { arc } from 'd3-shape'
-import { drawCircleSizeLegend } from './legend-circle-size'
 
 /**
  * Legend for Coxcomb (polar area) maps
@@ -16,6 +15,8 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 15,
         values: null,
+        labels: null,
+        labelFormatter: null,
     }
 
     out.colorLegend = {
@@ -65,17 +66,108 @@ export const legend = function (map, config) {
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
 
-        if (map.classifierSize_) {
+        // Wedge size legend replaces circle size legend
+        if (map.classifierChartSize_) {
             const container = lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             out._sizeLegendContainer = container
-            drawCircleSizeLegend(out, container, out.sizeLegend.values, out.map.classifierSize_, out.sizeLegend.title, out.sizeLegend.titlePadding)
+            drawWedgeSizeLegend(
+                out,
+                container,
+                out.sizeLegend.values,
+                out.map.classifierChartSize_,
+                out.sizeLegend.title,
+                out.sizeLegend.titlePadding
+            )
         }
 
         buildColorLegend(out, baseX, baseY)
-
         buildCoxcombTimeLegend(out, baseX, baseY)
-
         out.setBoxDimension()
+    }
+
+    function drawWedgeSizeLegend(out, container, values, sizeScale, title, titlePadding = 16) {
+        let yOffset = 0
+
+        if (title) {
+            const titleFontSize = out.titleFontSize || 12
+            yOffset += titleFontSize + (titlePadding || 0)
+            container.append('text').attr('class', 'em-size-legend-title').attr('x', 0).attr('y', titleFontSize).text(title)
+        }
+
+        // Default values if none provided
+        if (!values) {
+            const globalMax = out.map._globalMonthlyMax || 1
+            const globalMin = out.map._globalMonthlyMin || 0
+            values = [globalMax, globalMin]
+        }
+
+        const labels = out.sizeLegend?.labels
+        const labelFormatter =
+            out.sizeLegend?.labelFormatter ||
+            ((v) => {
+                if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M'
+                if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K'
+                return String(v)
+            })
+
+        // All wedges share a fixed angle — one slice wide enough to read clearly
+        const wedgeHalfAngle = Math.PI / 8
+        const startAngle = -wedgeHalfAngle
+        const endAngle = wedgeHalfAngle
+
+        const arcGen = arc().innerRadius(0).startAngle(startAngle).endAngle(endAngle)
+
+        const maxR = sizeScale(Math.max(...values))
+        // Center horizontally: wedge points up, labels extend to the right
+        const originX = maxR
+        const originY = maxR + yOffset + 10
+
+        const legendG = container.append('g').attr('class', 'em-wedge-size-legend').attr('transform', `translate(${originX}, ${originY})`)
+
+        // Draw nested wedges largest first so smaller ones render on top
+        const sorted = [...values].sort((a, b) => b - a)
+        sorted.forEach((v) => {
+            const r = sizeScale(v)
+            legendG
+                .append('path')
+                .attr('class', 'em-legend-wedge')
+                .attr('d', arcGen.outerRadius(r)())
+                .attr('fill', '#bbb')
+                .attr('stroke', 'white')
+                .attr('stroke-width', 0.5)
+                .attr('opacity', 0.85)
+        })
+
+        // Dashed lines and labels, using original values order for index alignment
+        const labelX = maxR + 8 // right of the largest wedge
+        values.forEach((v, i) => {
+            const r = sizeScale(v)
+            // tip of wedge at this radius, at the midpoint angle (pointing straight up = y:-r)
+            const tipY = -r
+
+            legendG
+                .append('line')
+                .style('stroke-dasharray', '2,2')
+                .style('stroke', 'grey')
+                .attr('x1', 2)
+                .attr('y1', tipY)
+                .attr('x2', labelX)
+                .attr('y2', tipY)
+
+            legendG
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', labelX + 3)
+                .attr('y', tipY)
+                .attr('dy', '0.35em')
+                .text(labels?.[i] !== undefined ? labels[i] : labelFormatter(v))
+        })
+
+        // Center the whole group horizontally
+        const bbox = legendG.node().getBBox()
+        legendG.attr('transform', `translate(${-bbox.x}, ${originY})`)
+
+        out._sizeLegendHeight = legendG.node().getBBox().height
     }
 
     function buildColorLegend(out, baseX, baseY) {
@@ -116,15 +208,15 @@ export const legend = function (map, config) {
                 .attr('height', config.shapeHeight)
                 .style('fill', col)
                 .on('mouseover', function () {
-                    highlightRegions(out.map, code)
+                    highlightCoxcombWedges(out.map, code)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightCoxcombWedges, code)
                     }
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(out.map)
+                    unhighlightCoxcombWedges(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightCoxcombWedges, code)
                     }
                 })
 
@@ -148,7 +240,7 @@ export const legend = function (map, config) {
                 i * config.shapeHeight +
                 i * config.shapePadding
             const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
-            out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
+            out.appendNoDataLegend(container, out.noDataText, highlightCoxcombWedges, unhighlightCoxcombWedges)
         }
     }
 
@@ -224,40 +316,56 @@ export const legend = function (map, config) {
             })
 
         // Highlight behavior for time hover
-        // Use a mouseout on the container to ensure cleanup happens
+        // Cache and pre-group segments once
+        const mapSvg = out.map.svg_ || out.map.svg()
+        const segmentsByTime = new Map()
+        let lastActive = null
+
+        function getSegments(time) {
+            if (!segmentsByTime.has(time)) {
+                segmentsByTime.set(time, mapSvg.node().querySelectorAll(`.em-coxcomb-chart path[month="${time}"]`))
+            }
+            return segmentsByTime.get(time)
+        }
+
         container.on('mouseleave', function () {
-            const mapSvg = out.map.svg_ || out.map.svg()
-            mapSvg.selectAll('.em-coxcomb-chart path').style('opacity', 1)
+            if (lastActive !== null) {
+                lastActive.forEach((el) => el.classList.remove('em-time-active'))
+                lastActive = null
+            }
+            mapSvg.node().classList.remove('em-time-dimmed')
             container.selectAll('path').style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
         })
 
         container
             .selectAll('path')
             .on('mouseenter', function (event, time) {
-                const hoveredTime = time
-                const mapSvg = out.map.svg_ || out.map.svg()
-                const allSegments = mapSvg.selectAll('.em-coxcomb-chart path')
+                if (lastActive) lastActive.forEach((el) => el.classList.remove('em-time-active'))
 
-                // Fade non-matching segments
-                allSegments.style('opacity', function (d) {
-                    // Handle case where d might be undefined or missing data property
-                    if (!d || !d.data) return 0.1
-                    return d.data.month === hoveredTime ? 1 : 0.1
-                })
+                mapSvg.node().classList.add('em-time-dimmed')
 
-                // Highlight the hovered legend wedge, dim others
+                lastActive = getSegments(time)
+                lastActive.forEach((el) => el.classList.add('em-time-active'))
+
                 container.selectAll('path').style('opacity', 0.3).style('stroke', 'white').style('stroke-width', 0.5)
                 select(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
             })
-            .on('mouseleave', function () {
-                // Individual wedge mouseout - reset just this wedge
-                // The container mouseleave will handle full reset when mouse leaves entirely
+            .on('mouseout', function () {
                 select(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
             })
     }
 
-    function highlightRegions(map, code) {
+    function highlightCoxcombWedges(map, code) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
+
+        // Store original colors before changing them
+        allSegments.each(function () {
+            const sel = select(this)
+            if (!sel.attr('fill___')) {
+                sel.attr('fill___', sel.style('fill'))
+            }
+        })
+
         allSegments.style('fill', 'white')
         const selected = allSegments.filter("path[code='" + code + "']")
         selected.each(function () {
@@ -265,10 +373,25 @@ export const legend = function (map, config) {
         })
     }
 
-    function unhighlightRegions(map) {
+    function unhighlightCoxcombWedges(map) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
         allSegments.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
+            const sel = select(this)
+            const originalColor = sel.attr('fill___')
+
+            if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
+                sel.style('fill', originalColor)
+            } else {
+                // Fallback: try to recompute the original color if not stored properly
+                const code = sel.attr('code')
+                if (code !== null && code !== undefined && map.classToFillStyle_) {
+                    const originalFill = map.classToFillStyle_[code] || map.getColorOrFillStyle_(code)
+                    if (originalFill) {
+                        sel.style('fill', originalFill)
+                        sel.attr('fill___', originalFill)
+                    }
+                }
+            }
         })
     }
 

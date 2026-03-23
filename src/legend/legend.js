@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
-import { executeForAllInsets, getFontSizeFromClass } from '../core/utils'
 import { formatDefaultLocale } from 'd3-format'
-import { getChoroplethLabelFormatter, highlightRegions, unhighlightRegions } from './choropleth/legend-choropleth'
+import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
+import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 
 /**
@@ -79,10 +79,7 @@ export const legend = function (map) {
         // clear previous legend(s)
         out.svg.selectAll('*').remove()
         // append new legend group
-        out.lgg = out.svg
-            // .append('g')
-            // .attr('id', 'em-legend-' + out.svgId)
-            .attr('class', 'em-legend')
+        out.lgg = out.svg.attr('class', 'em-legend')
     }
 
     /**
@@ -178,14 +175,14 @@ export const legend = function (map) {
             out.svg
                 .select('#em-legend-background')
                 .attr('x', bb.x - p)
-                .attr('y', bb.y - p) // -2 to account for the title height
+                .attr('y', bb.y - p)
                 .attr('width', bb.width + 2 * p)
                 .attr('height', bb.height + 2 * p)
         }
     }
 
     //'no data' legend box
-    out.appendNoDataLegend = function (container, noDataText, highlightRegions, unhighlightRegions) {
+    out.appendNoDataLegend = function (container, noDataText, highlightFunction, unhighlightFunction) {
         const map = out.map
 
         //append symbol & style
@@ -197,15 +194,15 @@ export const legend = function (map) {
             .attr('width', out.noDataShapeWidth)
             .attr('height', out.noDataShapeHeight)
             .on('mouseover', function () {
-                highlightRegions(map, 'nd')
+                highlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, 'nd')
                 }
             })
             .on('mouseout', function () {
-                unhighlightRegions(map)
+                unhighlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, 'nd')
                 }
             })
 
@@ -213,21 +210,21 @@ export const legend = function (map) {
         container
             .append('text')
             .attr('class', 'em-legend-label em-legend-label-no-data')
-            .attr('dy', '0.35em') // ~vertical centering
+            .attr('dy', '0.35em')
             .attr('x', out.noDataShapeWidth + 5)
             .attr('y', out.noDataShapeHeight / 2 + out.noDataPadding)
             .style('pointer-events', 'all')
             .style('cursor', 'pointer')
             .on('mouseover', function () {
-                highlightRegions(map, 'nd')
+                highlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, 'nd')
                 }
             })
             .on('mouseout', function () {
-                unhighlightRegions(map)
+                unhighlightFunction(map, 'nd')
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, 'nd')
                 }
             })
             .text(noDataText)
@@ -240,11 +237,17 @@ export const legend = function (map) {
         return numberOfClasses
     }
 
+    /**
+     * Dispatch to the correct label formatter based on map type.
+     * - Choropleth: getChoroplethLabelFormatter (legend-choropleth.js)
+     * - Prop symbols: getPropSymbolColorLabelFormatter (legend-proportional-symbols.js)
+     * Both ultimately delegate to buildDiscreteLabelFormatter (legend-discrete.js).
+     */
     out.getLabelFormatter = function (out) {
         const map = out.map
         const mapType = map._mapType
-        const labelFormatter = mapType === 'ps' ? getPropSymbolColorLabelFormatter(out) : getChoroplethLabelFormatter(out)
-        return labelFormatter
+        if (mapType === 'ps') return getPropSymbolColorLabelFormatter(out)
+        return getChoroplethLabelFormatter(out)
     }
 
     out.getClassToFillStyle = function (out) {
@@ -339,4 +342,90 @@ export const legend = function (map) {
     }
 
     return out
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Shared region highlight / unhighlight (filter-based, works for all map types)
+// ─────────────────────────────────────────────────────────────────────────────
+
+let currentHighlight = null
+
+/**
+ * Reads the computed fill colour for a default (no-data) region from the DOM,
+ * so the dimmed highlight colour always matches the map type's CSS.
+ * Falls back to '#e1e1e1' if nothing is found.
+ */
+export function getDimmedFill(map) {
+    const selector = getLegendRegionsSelector(map)
+    // Find the first region that has no ecl (i.e. a background/no-input region)
+    const candidate = map.svg_.selectAll(selector).selectAll('[ecl="ni"], .em-cntrg, .em-nutsrg').node()
+    if (candidate) {
+        const fill = window.getComputedStyle(candidate).fill
+        if (fill && fill !== 'none') return fill
+    }
+    return '#e1e1e1'
+}
+
+export function highlightRegions(map, eclOrValue, options = {}) {
+    const { tolerance = 0, continuous = false } = options && typeof options === 'object' && !Array.isArray(options) ? options : {}
+    currentHighlight = eclOrValue
+    const dimmedFill = getDimmedFill(map)
+    const selector = getLegendRegionsSelector(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
+
+    if (allRegions.empty()) return
+
+    // Bail out if the map hasn't finished rendering yet
+    const isReady = allRegions.filter(function () {
+        return !!this.getAttribute('fill___')
+    })
+    if (isReady.empty()) return
+
+    // First pass: sync data-fill from fill___ for ALL regions before any fill changes
+    allRegions.each(function () {
+        const authoritative = this.getAttribute('fill___')
+        if (authoritative) select(this).attr('data-fill', authoritative)
+    })
+
+    // Second pass: apply highlight/dim
+    allRegions.each(function () {
+        const sel = select(this)
+        if (!sel.attr('data-fill')) return
+
+        const ecl = sel.attr('ecl')
+        if (!ecl || ecl === 'nd') {
+            sel.style('fill', eclOrValue === 'nd' ? sel.attr('data-fill') : dimmedFill)
+            return
+        }
+
+        const match = continuous ? +ecl >= eclOrValue - tolerance && +ecl <= eclOrValue + tolerance : ecl === String(eclOrValue)
+
+        sel.style('fill', match ? sel.attr('data-fill') : dimmedFill)
+    })
+}
+
+export function unhighlightRegions(map, eclOrValue) {
+    currentHighlight = null
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll('[ecl]')
+        .each(function () {
+            const sel = select(this)
+            const original = sel.attr('data-fill') || this.getAttribute('fill___')
+            if (original) sel.style('fill', original)
+        })
+}
+
+export function clearLegendHighlight(map) {
+    currentHighlight = null
+    const selector = getLegendRegionsSelector(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll('[ecl]')
+        .each(function () {
+            const sel = select(this)
+            const original = sel.attr('data-fill') || this.getAttribute('fill___')
+            if (original) sel.style('fill', original)
+        })
 }

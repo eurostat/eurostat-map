@@ -84,6 +84,8 @@
         <div>
             <button id="btn-build1">Build Map 1</button>
             <button id="btn-build2">Build Map 2</button>
+            <button id="btn-legend">Update legend</button>
+            <button id="btn-insets">Update insets</button>
             <button id="btn-clear">Clear Map</button>
         </div>
 
@@ -157,10 +159,12 @@
             }
 
             let buildCount = 0
+            let map = null // Global map variable
 
             // Create DOM elements for insets dynamically based on config
             function createInsetDOMElements(insetsCfg, insetBoxPosition) {
                 const insetsGroup = document.getElementById('newInsets')
+                if (!insetsGroup) return
                 insetsGroup.innerHTML = '' // Clear previous
 
                 const ns = 'http://www.w3.org/2000/svg'
@@ -358,7 +362,7 @@
                 log(`Expected callbacks: ${expectedCallbacks}`)
 
                 // Build map
-                const map = eurostatmap
+                map = eurostatmap
                     .map('ch')
                     .title(config.title)
                     // .colors(config.colors)
@@ -371,9 +375,10 @@
                     .nutsLevel('mixed')
                     .transitionDuration(0)
                     .insets(insetsCfg)
+                    .legend({ title: 'test', x: 0, y: 130 })
                     .insetBoxPosition(insetBoxPosition)
                     //.zoomButtonsPosition([94, 580])
-                    .callback((m) => {
+                    .onBuild((m) => {
                         callbackCount++
                         log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`)
                         if (callbackCount === expectedCallbacks) {
@@ -383,7 +388,7 @@
 
                 if (config.stats) {
                     map.nutsLevel(config.nutsLevel)
-                    map.statData().setData({ ES: 1 })
+                    map.statData().setData({ ES: 1, LI: 2, MT: 1 })
                 } else {
                     //map.statData().setData({})
                     map.nutsLevel(3)
@@ -404,6 +409,66 @@
             // Button handlers
             document.getElementById('btn-build1').addEventListener('click', () => buildMap(configs.map1))
             document.getElementById('btn-build2').addEventListener('click', () => buildMap(configs.map2))
+            document.getElementById('btn-legend').addEventListener('click', () => {
+                if (map) {
+                    map.legend({ x: 10, y: 150, title: 'Updated Legend', sizeLegend: { values: [1, 2] } })
+                    log('📊 Legend updated with sizeLegend values [1, 2]')
+                } else {
+                    log('❌ No map built yet. Build a map first.')
+                }
+            })
+            document.getElementById('btn-insets').addEventListener('click', () => {
+                if (map) {
+                    const h = 80 // inset height
+                    const w = 75 // inset width
+                    const p = 6 // inset padding
+                    const includeLI = true // Include Liechtenstein inset
+
+                    const insetLI = {
+                        geo: 'LI',
+                        x: w + p,
+                        y: 0,
+                        width: w,
+                        height: h,
+                        title: 'Liechtenstein',
+                        subtitle: 'Liechtenstein',
+                        subtitlePosition: [2, 13],
+                        position: { x: 4285060, y: 2674000 },
+                        scale: '01M',
+                        scalebarPosition: [1, 75],
+                        titlePosition: [2, 13],
+                        labels: {
+                            values: true,
+                            shadows: true,
+                            statLabelsPositions: { LI: { x: 4287687, y: 2668253 }, CH: { x: 1, y: 1 } },
+                        },
+                        zoomButtons: false,
+                    }
+
+                    const insetMT = {
+                        geo: 'MT',
+                        x: includeLI ? 0 : w + p,
+                        y: 0,
+                        width: w,
+                        height: h,
+                        title: 'Malta',
+                        scalebarPosition: [1, 75],
+                        titlePosition: [2, 13],
+                        labels: {
+                            values: true,
+                            shadows: true,
+                            statLabelsPositions: { MT: { x: 4710000, y: 1420000 } },
+                        },
+                        zoomButtons: false,
+                    }
+
+                    const newInsets = includeLI ? [insetLI, insetMT] : [insetMT]
+                    map.insets(newInsets).insetBoxPosition([530, 20]).build()
+                    log('🗺️ Insets updated with LI and MT configurations')
+                } else {
+                    log('❌ No map built yet. Build a map first.')
+                }
+            })
             document.getElementById('btn-clear').addEventListener('click', clearMap)
 
             log('Page loaded. Click "Build Map 1" to start.')

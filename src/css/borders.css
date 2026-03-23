@@ -22,16 +22,68 @@
 
 /* country boundaries */
 .em-cntbn {
-    stroke: #3f3f3f;
-    stroke-width: 1px;
-    opacity: 0.8;
+    stroke: #353535;
+    stroke-width: 0.8px;
+    opacity: 1;
 }
 
 /* country boundary halo (not coastline) */
 .em-cntbn-halo:not(.em-bn-co) {
     stroke: white;
-    stroke-width: 3px;
-    opacity: 0.4;
+    stroke-width: 1.9px;
+    opacity: 1;
+}
+
+/* NUTS boundaries stroke color */
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'] {
+    stroke: #868686;
+}
+
+/*  boundaries stroke-width */
+.em-bn-0 {
+    stroke: none;
+}
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+/* when using MIXED NUTS levels, we add stroke to the regions, then show/hide those that have/dont have data */
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'] {
+    stroke-width: 0.3;
+    stroke-opacity: 0.5;
+}
+/* coastal boundaries must block MIXED NUTS levels polygon stroke */
+.em-bn-co {
+    stroke-width: 0.3;
+}
+
+/* all NUTS boundaries and regions */
+#em-nutsbn,
+.em-bn-0,
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-nutsrg [lvl='3'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='1'],
+.em-nutsrg {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* dont fill border elements */
+.em-bn-0,
+.em-bn-1,
+.em-bn-2,
+.em-bn-3 {
+    fill: none;
+    pointer-events: none;
 }
 
 /* Hide non-nuts borders (country boundaries > that are 'other' and not coastal, not candidates, not eu and not efta) */

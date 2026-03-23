@@ -83,7 +83,7 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     config.height = config.height || out.insetBoxWidth_
     config.insets = config.insets || []
     config.insetTemplates = config.insetTemplates || {}
-    config.callback = config.callback || out.callback_
+    config.onBuild = config.onBuild || out.onBuild_
 
     //copy main map attributes
     ;[

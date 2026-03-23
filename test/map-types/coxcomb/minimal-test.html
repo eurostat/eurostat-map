@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Minimal Coxcomb Test</title>
+    </head>
+    <body>
+        <h1>Minimal Coxcomb Custom Data Test</h1>
+        <svg id="map"></svg>
+
+        <script src="../../../build/eurostatmap.min.js"></script>
+        <script>
+            console.log('eurostatmap loaded:', typeof eurostatmap)
+
+            // Very simple custom data - just one region, two months, two categories
+            const simpleData = {
+                FR: {
+                    M01: { DOM: 100, FOR: 50, TOTAL: 150 },
+                    M02: { DOM: 120, FOR: 80, TOTAL: 200 },
+                },
+            }
+
+            console.log('Creating map...')
+
+            try {
+                const map = eurostatmap
+                    .map('coxcomb')
+                    .width(600)
+                    .nutsLevel(0)
+                    .statCoxcomb({
+                        customData: simpleData,
+                        times: ['M01', 'M02'],
+                        timeLabels: ['Jan', 'Feb'],
+                        categoryCodes: ['DOM', 'FOR'],
+                        categoryLabels: ['Domestic', 'Foreign'],
+                        categoryColors: ['#1b9e77', '#d95f02'],
+                        totalCode: 'TOTAL',
+                        unitText: 'Nights',
+                    })
+
+                console.log('Map created, calling build...')
+                map.build()
+                console.log('Build completed!')
+
+                // Test data access
+                setTimeout(() => {
+                    console.log('Testing data access...')
+                    console.log('Config:', {
+                        times: map._coxTimes,
+                        categories: map._coxCategoryCodes,
+                    })
+
+                    const testData = map.statData('M01:DOM')
+                    console.log('M01:DOM statData:', testData)
+                    if (testData) {
+                        console.log('FR value:', testData.getValue('FR'))
+                    }
+                }, 1000)
+            } catch (error) {
+                console.error('Error creating or building map:', error)
+            }
+        </script>
+    </body>
+</html>

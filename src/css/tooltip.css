@@ -143,3 +143,16 @@
 .em-total {
     font-weight: bold !important;
 }
+
+.em-tooltip-cx-table td {
+    text-align: right;
+}
+.em-tooltip-cx-table td:first-child {
+    text-align: left;
+}
+.em-tooltip-cx-table th {
+    text-align: right;
+}
+.em-tooltip-cx-table th:first-child {
+    text-align: left;
+}

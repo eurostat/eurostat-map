@@ -235,15 +235,6 @@ export const map = function (config) {
         if (map.geo_ !== 'WORLD') {
             if (map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, sizeData, regions)
-                // Build centroidFeatures so Dorling has something to simulate
-                const centroids = []
-                map.svg()
-                    .selectAll('g.em-centroid')
-                    .each(function (d) {
-                        if (!d.properties?.centroid) return
-                        centroids.push(d) // d already has properties and id
-                    })
-                map.Geometries.centroidsFeatures = centroids
             }
 
             // apply 'nd' class to no data regions for legend item hover
@@ -311,7 +302,6 @@ export const map = function (config) {
      * @param {*} map map instance
      */
     out.updateSymbolsDrawOrder = function (map) {
-        const gcp = out.getCentroidsGroup(map)
         const sizeData = getSizeStatData(map)
 
         // Ensure centroidFeatures is populated (important for mixed)
@@ -333,10 +323,11 @@ export const map = function (config) {
             .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
 
         // Clear old symbol containers
-        gcp.selectAll('g.em-centroid').remove()
+        out.getCentroidsGroup(map).selectAll('g.em-centroid').remove()
 
-        // Recreate sorted symbol containers
-        gcp.selectAll('g.em-centroid')
+        // Re-select fresh, then recreate sorted symbol containers
+        out.getCentroidsGroup(map)
+            .selectAll('g.em-centroid')
             .data(sorted, (d) => d.properties.id)
             .enter()
             .append('g')
@@ -414,11 +405,15 @@ export const map = function (config) {
             // dorling cartogram
             if (out.dorling_) {
                 const sizeData = getSizeStatData(out)
-                runDorlingSimulation(out, (d) => {
-                    const datum = sizeData.get(d.properties.id)
-                    const r = datum ? out.classifierSize_(+datum.value) : 0
-                    return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
-                })
+                runDorlingSimulation(
+                    out,
+                    (d) => {
+                        const datum = sizeData.get(d.properties.id)
+                        const r = datum ? out.classifierSize_(+datum.value) : 0
+                        return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                    },
+                    out.dorlingPadding_ || 0
+                )
             } else {
                 stopDorlingSimulation(out)
             }

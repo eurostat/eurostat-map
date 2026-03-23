@@ -18,7 +18,7 @@
 .em-legend-title {
     font-weight: bold;
     font-size: 15px;
-    fill: #696969;
+    fill: #4c4b4b;
 }
 
 .em-size-legend-title {
@@ -46,19 +46,19 @@
 .em-legend-label {
     font-size: 14px;
     stroke: none;
-    fill: #696969;
+    fill: #5e5e5e;
     dominant-baseline: unset;
 }
 
 .em-legend-label-max,
-.em-legend-label-min {
-    opacity: 0.8;
+.em-legend-label-min,
+.em-legend-label-no-data {
+    fill: #707070;
 }
 
 .em-legend-label-max:hover,
 .em-legend-label-min:hover,
 .em-legend-label-no-data:hover {
-    opacity: 1;
     font-weight: bold;
 }
 
@@ -68,7 +68,7 @@
     stroke-width: 1;
 }
 
-/* misc */
+/* swatch separator */
 .em-legend-separator {
     stroke: white;
     stroke-width: 1;

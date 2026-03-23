@@ -1,4 +1,4 @@
-import { scaleBand, scaleRadial } from 'd3-scale'
+import { scaleBand } from 'd3-scale'
 import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
@@ -10,6 +10,7 @@ import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
+import { createRadialScale } from '../../core/scale.js'
 /**
  * Returns a coxcomb (polar area) chart map.
  *
@@ -79,12 +80,12 @@ export const map = function (config) {
     /**
      * Configure the coxcomb map from a single config object.
      *
-     * Supports both the new flat API and the legacy nested `stat` API for
+     * Supports both Eurostat data API, custom data, and the legacy nested `stat` API for
      * backwards compatibility.
      *
      * @param {Object} config
      *
-     * New flat API:
+     * Eurostat API:
      * @param {String} config.eurostatDatasetCode
      * @param {Object} config.filters - Shared filters (excluding time and category params)
      * @param {String} [config.unitText]
@@ -97,10 +98,20 @@ export const map = function (config) {
      * @param {Array}  [config.categoryColors]
      * @param {String} [config.totalCode] - Optional total category code for "other" wedge
      *
+     * Custom Data API (NEW):
+     * @param {Object} config.customData - Custom data in format: { regionId: { time: { category: value } } }
+     * @param {String} [config.unitText]
+     * @param {Array}  config.times - Time values (e.g. ['Jan','Feb','Mar'])
+     * @param {Array}  [config.timeLabels] - Display labels for times
+     * @param {Array}  config.categoryCodes - Category codes
+     * @param {Array}  [config.categoryLabels]
+     * @param {Array}  [config.categoryColors]
+     * @param {String} [config.totalCode] - Optional total category code for "other" wedge (auto-calculated if not provided)
+     *
      * Legacy API (still supported):
      * @param {Object} config.stat - Nested stat config: { eurostatDatasetCode, filters, unitText }
      *
-     * @example — new flat API
+     * @example — Eurostat API
      * .statCoxcomb({
      *   eurostatDatasetCode: 'tour_occ_nin2m',
      *   filters: { unit: 'NR', nace_r2: 'I551-I553' },
@@ -114,6 +125,20 @@ export const map = function (config) {
      *   categoryColors: ['#1b9e77','#d95f02'],
      *   totalCode: 'TOTAL',
      * })
+     *
+     * @example — Custom Data API
+     * .statCoxcomb({
+     *   customData: {
+     *     'FR': { 'Jan': { 'Domestic': 1500, 'Foreign': 800 }, 'Feb': { 'Domestic': 1600, 'Foreign': 900 } },
+     *     'DE': { 'Jan': { 'Domestic': 2200, 'Foreign': 1200 }, 'Feb': { 'Domestic': 2100, 'Foreign': 1300 } }
+     *   },
+     *   times: ['Jan','Feb','Mar','Apr','May','Jun'],
+     *   timeLabels: ['January','February','March','April','May','June'],
+     *   categoryCodes: ['Domestic','Foreign'],
+     *   categoryLabels: ['Domestic tourists','Foreign tourists'],
+     *   categoryColors: ['#1b9e77','#d95f02'],
+     *   unitText: 'Tourist nights'
+     * })
      */
     out.statCoxcomb = function (config) {
         // ── Backwards compat: flatten nested stat object ─────────────────────
@@ -124,6 +149,7 @@ export const map = function (config) {
 
         const {
             eurostatDatasetCode,
+            customData, // NEW: For custom data
             filters,
             unitText,
             timeParameter,
@@ -136,10 +162,140 @@ export const map = function (config) {
             totalCode,
         } = config
 
+        // Validation
+        if (!times || !times.length) {
+            throw new Error('Coxcomb maps require a "times" array. Example: times: ["Jan", "Feb", "Mar"]')
+        }
+        if (!categoryCodes || !categoryCodes.length) {
+            throw new Error('Coxcomb maps require "categoryCodes". Example: categoryCodes: ["Domestic", "Foreign"]')
+        }
+
         out._coxTimes = times
         out._coxCategoryCodes = [...categoryCodes] // clone — 'other' may be appended later
         out._coxTimeLabels = timeLabels
 
+        // Set category colors and labels
+        const assignCategoryProperties = () => {
+            categoryCodes.forEach((category, idx) => {
+                if (categoryColors?.[idx]) {
+                    out.catColors_ = out.catColors_ || {}
+                    out.catColors_[category] = categoryColors[idx]
+                }
+                if (categoryLabels?.[idx]) {
+                    out.catLabels_ = out.catLabels_ || {}
+                    out.catLabels_[category] = categoryLabels[idx]
+                }
+            })
+
+            if (totalCode) {
+                out.totalCode_ = totalCode
+                out.catColors_ = out.catColors_ || {}
+                out.catLabels_ = out.catLabels_ || {}
+                out.catColors_['other'] = '#FFCC80'
+                out.catLabels_['other'] = 'Other'
+            }
+        }
+
+        // ── Custom Data Path ─────────────────────────────────────────────────
+        if (customData && !eurostatDatasetCode) {
+            console.log('Custom data path: Setting up stat configs and storing custom data...')
+            assignCategoryProperties()
+
+            // Store custom data and config for use after build (like pie charts)
+            out._customData = customData
+            out._customTimes = times
+            out._customCategories = [...categoryCodes] // clone
+            out._customTotalCode = totalCode
+            out._customUnitText = unitText || 'Value'
+
+            // Set up stat configs for each time:category combination (no data fetching)
+            times.forEach((time) => {
+                categoryCodes.forEach((category) => {
+                    const key = `${time}:${category}`
+                    out.stat(key, {
+                        code: key,
+                        unitText: unitText || 'Value',
+                    })
+                })
+
+                if (totalCode) {
+                    const key = `${time}:${totalCode}`
+                    out.stat(key, {
+                        code: key,
+                        unitText: unitText || 'Value',
+                    })
+                }
+            })
+
+            // Store method to inject data after build (like pie charts do it manually)
+            out._injectCustomData = function () {
+                console.log('Injecting custom data...')
+
+                out._customTimes.forEach((time) => {
+                    out._customCategories.forEach((category) => {
+                        const key = `${time}:${category}`
+                        const regionData = {}
+
+                        for (const regionId in out._customData) {
+                            const value = out._customData[regionId]?.[time]?.[category]
+                            if (value !== undefined) {
+                                regionData[regionId] = value
+                            }
+                        }
+
+                        if (Object.keys(regionData).length > 0) {
+                            out.statData(key).setData(regionData)
+                        }
+                    })
+
+                    if (out._customTotalCode) {
+                        const key = `${time}:${out._customTotalCode}`
+                        const regionData = {}
+
+                        for (const regionId in out._customData) {
+                            let total = out._customData[regionId]?.[time]?.[out._customTotalCode]
+                            if (total === undefined) {
+                                // Auto-calculate total from categories
+                                total = 0
+                                out._customCategories.forEach((cat) => {
+                                    const val = out._customData[regionId]?.[time]?.[cat]
+                                    if (val !== undefined && !isNaN(val)) total += parseFloat(val)
+                                })
+                            }
+                            if (total > 0) {
+                                regionData[regionId] = total
+                            }
+                        }
+
+                        if (Object.keys(regionData).length > 0) {
+                            out.statData(key).setData(regionData)
+                        }
+                    }
+                })
+
+                // After data injection, update the visualization
+                out.updateStatValues()
+                console.log('Custom data injection complete!')
+            }
+
+            // Set up build override to automatically inject data after build
+            const originalBuild = out.build
+            out.build = function () {
+                console.log('Custom build: Building map first...')
+                const result = originalBuild.call(out)
+
+                console.log('Custom build: Injecting custom data after build...')
+                // Inject custom data after build completes
+                out._injectCustomData()
+
+                return result
+            }
+
+            return out
+        }
+
+        // ── Eurostat Data Path (unchanged - maintains backward compatibility) ──
+        assignCategoryProperties()
         const baseFilters = filters ? { ...filters } : {}
 
         // Register one stat per time × category combination
@@ -151,17 +307,6 @@ export const map = function (config) {
                     unitText,
                     filters: { ...baseFilters, [timeParameter]: time, [categoryParameter]: category },
                 })
-
-                // Assign label/color once per category (same across all times)
-                const idx = categoryCodes.indexOf(category)
-                if (categoryColors?.[idx]) {
-                    out.catColors_ = out.catColors_ || {}
-                    out.catColors_[category] = categoryColors[idx]
-                }
-                if (categoryLabels?.[idx]) {
-                    out.catLabels_ = out.catLabels_ || {}
-                    out.catLabels_[category] = categoryLabels[idx]
-                }
             })
 
             // Also load total per time (used to compute "other" wedge)
@@ -173,14 +318,6 @@ export const map = function (config) {
                 })
             }
         })
-
-        if (totalCode) {
-            out.totalCode_ = totalCode
-            out.catColors_ = out.catColors_ || {}
-            out.catLabels_ = out.catLabels_ || {}
-            out.catColors_['other'] = '#FFCC80'
-            out.catLabels_['other'] = 'Other'
-        }
 
         return out
     }
@@ -207,6 +344,81 @@ export const map = function (config) {
         computeTotals()
         computeCoxStatusMap()
         defineSizeScales()
+        buildTooltipCache()
+    }
+
+    function buildTooltipCache() {
+        out._tooltipCache = new Map()
+        const months = out._coxTimes || []
+        const unit = out.statData(out.statCodes_[0])?.unitText() || ''
+
+        const allRegions = new Set()
+        months.forEach((month) => {
+            const stat = out.totalCode_ ? out.statData(`${month}:${out.totalCode_}`) : out.statData(`${month}:${out._coxCategoryCodes[0]}`)
+            if (stat?._data_) Object.keys(stat._data_).forEach((id) => allRegions.add(id))
+        })
+
+        allRegions.forEach((regionId) => {
+            const includeOther =
+                out.totalCode_ &&
+                months.some((month) => {
+                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                    const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                    return totalVal > sumCauses
+                })
+
+            const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
+            const regionYearly = out.yearlyTotals?.[regionId] || 0
+            const monthlyTotals = out.monthlyTotals?.[regionId] || {}
+
+            const headerCells = [`<th class="em-breakdown-label">Month</th>`]
+            causes.forEach((cause) => {
+                const label = out.catLabels_[cause] || cause
+                const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
+                headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
+            })
+            headerCells.push(`<th class="em-breakdown-label">Total</th>`)
+
+            const rows = months.map((month, i) => {
+                const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
+                const cells = [`<td class="em-breakdown-label">${label}</td>`]
+                const monthSum = monthlyTotals[month] || 0
+
+                causes.forEach((cause) => {
+                    let rawVal = 0
+                    if (cause === 'other') {
+                        const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                        const sumCauses = causes
+                            .filter((c) => c !== 'other')
+                            .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                        rawVal = Math.max(totalVal - sumCauses, 0)
+                    } else {
+                        rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                    }
+                    cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(rawVal)}</span></td>` : '<td></td>')
+                })
+
+                cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(monthSum)}</span></td>` : '<td></td>')
+                return `<tr>${cells.join('')}</tr>`
+            })
+
+            const yearRow =
+                regionYearly > 0
+                    ? `<tr class="em-total"><td class="em-breakdown-label">Year total</td><td colspan="${causes.length}"></td><td><span class="em-breakdown-value">${spaceAsThousandSeparator(regionYearly)} ${unit}</span></td></tr>`
+                    : ''
+
+            out._tooltipCache.set(
+                regionId,
+                `
+            <div class="em-tooltip-breakdown em-tooltip-cx">
+                <table class="em-tooltip-cx-table">
+                    <tr>${headerCells.join('')}</tr>
+                    ${rows.join('')}
+                    ${yearRow}
+                </table>
+            </div>`
+            )
+        })
     }
 
     // ── Totals computation ───────────────────────────────────────────────────
@@ -316,21 +528,28 @@ export const map = function (config) {
      *    normalised within the region so proportions are preserved
      */
     function defineSizeScales() {
-        const yearlyValues = Object.values(out.yearlyTotals)
         const minRadius = out.coxcombMinRadius_ || 0
         const maxRadius = out.coxcombMaxRadius_ || 80
-        const globalMin = min(yearlyValues) || 0
-        const globalMax = max(yearlyValues) || 0
 
-        const outerScale = scaleRadial().domain([globalMin, globalMax]).range([minRadius, maxRadius])
-
-        out.classifierChartSize_ = (v, regionId) => {
-            const targetOuter = outerScale(out.yearlyTotals[regionId] || 0)
-            const regionMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 1 }))
-            return Math.sqrt(v / regionMax) * targetOuter
+        const allMonthlyValues = []
+        for (const regionId in out.monthlyTotals) {
+            for (const month in out.monthlyTotals[regionId]) {
+                allMonthlyValues.push(out.monthlyTotals[regionId][month])
+            }
         }
 
-        out.classifierSize_ = outerScale
+        const radialScale = createRadialScale(allMonthlyValues, maxRadius, 0)
+        // minRadius is intentionally 0 here — the minimum chart size is enforced
+        // geometrically via a per-chart scaleFactor in drawCoxcombChart, which
+        // scales the entire chart group uniformly. Applying a floor in the scale
+        // itself corrupts stacked inner radii and distorts category proportions.
+
+        out.classifierChartSize_ = radialScale
+        out._globalMonthlyMax = radialScale.domain()[1]
+        out._globalMonthlyMin = radialScale.domain()[0]
+
+        // stub for API compatibility
+        out.classifierSize_ = radialScale
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -359,7 +578,19 @@ export const map = function (config) {
             }
 
             if (out.dorling_ && !out.gridCartogram_) {
-                runDorlingSimulation(out, (d) => out.classifierSize_(getRegionTotal(d.properties.id) || 0) || 0)
+                runDorlingSimulation(
+                    out,
+                    (d) => {
+                        const regionalMax = Math.max(...Object.values(out.monthlyTotals[d.properties.id] || { 0: 0 }))
+                        const naturalMax = out.classifierChartSize_(regionalMax) || 0
+                        const minRadius = out.coxcombMinRadius_ || 0
+                        // Mirror the scaleFactor logic in drawCoxcombChart so the Dorling
+                        // simulation reserves the correct amount of space for enlarged charts.
+                        const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
+                        return naturalMax * scaleFactor
+                    },
+                    out.dorlingPadding_ || 0
+                )
             } else {
                 stopDorlingSimulation(out)
             }
@@ -424,15 +655,30 @@ export const map = function (config) {
      * @param {Function} angle - d3 scaleBand for time → angle
      */
     function drawCoxcombChart(node, regionId, stackedData, keys, angle) {
+        const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
+        const naturalMax = out.classifierChartSize_(regionMonthlyMax)
+        const minRadius = out.coxcombMinRadius_ || 0
+
+        // If this chart's largest wedge falls below minRadius, scale the entire
+        // chart up uniformly so it remains legible. This preserves internal proportions
+        // and only affects charts smaller than the threshold.
+        const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
+        // Wrap all chart content in an inner group so scale() doesn't interfere
+        // with the parent node's translate transform or origin point
+        const chartG = node.append('g')
+        if (scaleFactor > 1) chartG.attr('transform', `scale(${scaleFactor})`)
+
         // Outer reference ring
         if (out.coxcombRings_) {
-            const targetOuter = out.classifierSize_(out.yearlyTotals[regionId] || 0)
-            node.append('circle')
+            const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
+            const targetOuter = out.classifierChartSize_(regionMonthlyMax)
+            chartG
+                .append('circle')
                 .attr('class', 'em-coxcomb-max-outline')
                 .attr('r', 0)
                 .attr('fill', 'none')
                 .attr('stroke', '#000')
-                .attr('stroke-width', 0.3)
+                .attr('stroke-width', 0.3 / scaleFactor)
                 .attr('opacity', 0.5)
                 .attr('pointer-events', 'none')
                 .transition()
@@ -449,10 +695,11 @@ export const map = function (config) {
 
         // One group per category key, stacked
         keys.forEach((key, ki) => {
-            node.append('g')
+            chartG
+                .append('g')
                 .attr('class', 'em-coxcomb-chart')
                 .attr('stroke', '#ffffff')
-                .attr('stroke-width', 0.3)
+                .attr('stroke-width', 0.3 / scaleFactor)
                 .selectAll('path')
                 .data(stackedData[ki])
                 .join('path')
@@ -463,8 +710,12 @@ export const map = function (config) {
                 .delay((d, i) => i * 120)
                 .duration(out.transitionDuration_)
                 .attrTween('d', function (d) {
-                    const iInner = interpolate(0, out.classifierChartSize_(d[0], regionId))
-                    const iOuter = interpolate(0, out.classifierChartSize_(d[1], regionId))
+                    // No floor correction needed here — the scale has no minRadius floor,
+                    // so d[0] correctly returns 0 for the first category and stacking
+                    // boundaries are geometrically consistent. Chart enlargement for
+                    // legibility is handled entirely by the scaleFactor transform on chartG.
+                    const iInner = interpolate(0, out.classifierChartSize_(d[0]))
+                    const iOuter = interpolate(0, out.classifierChartSize_(d[1]))
                     return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
                 })
         })
@@ -706,7 +957,7 @@ export const map = function (config) {
                 if (total > stackSum) stackSum = total
             }
 
-            const r = out.classifierChartSize_(stackSum, regionId)
+            const r = out.classifierChartSize_(stackSum)
             if (r > maxR) maxR = r
         })
 
@@ -776,78 +1027,8 @@ export const map = function (config) {
     out.tooltip_.textFunction = function (rg, map) {
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
-        const months = out._coxTimes || []
-
-        // Determine whether 'other' is needed for this specific region
-        const includeOther =
-            out.totalCode_ &&
-            months.some((month) => {
-                const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                return totalVal > sumCauses
-            })
-
-        const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
-
-        let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
-
-        // Header row
-        const headerCells = [`<th class="em-breakdown-label">Month</th>`]
-        causes.forEach((cause) => {
-            const label = out.catLabels_[cause] || cause
-            const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
-            headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
-        })
-        headerCells.push(`<th class="em-breakdown-label">Total</th>`)
-
-        const regionYearly = out.yearlyTotals?.[regionId] || 0
-        const monthlyTotals = out.monthlyTotals?.[regionId] || {}
-
-        const rows = months.map((month, i) => {
-            const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
-            const cells = [`<td class="em-breakdown-label">${label}</td>`]
-            const monthSum = monthlyTotals[month] || 0
-
-            causes.forEach((cause) => {
-                let rawVal = 0
-                if (cause === 'other') {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const sumCauses = causes
-                        .filter((c) => c !== 'other')
-                        .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                    rawVal = Math.max(totalVal - sumCauses, 0)
-                } else {
-                    rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
-                }
-                cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(rawVal)}</span></td>` : '<td></td>')
-            })
-
-            cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(monthSum)}</span></td>` : '<td></td>')
-
-            return `<tr>${cells.join('')}</tr>`
-        })
-
-        const unit = out.statData(out.statCodes_[0])?.unitText() || ''
-        const yearRow =
-            regionYearly > 0
-                ? `
-            <tr class="em-total">
-                <td class="em-breakdown-label">Year total</td>
-                <td colspan="${causes.length}"></td>
-                <td><span class="em-breakdown-value">${spaceAsThousandSeparator(regionYearly)} ${unit}</span></td>
-            </tr>`
-                : ''
-
-        html += `
-        <div class="em-tooltip-breakdown em-tooltip-cx">
-            <table class="em-tooltip-cx-table">
-                <tr>${headerCells.join('')}</tr>
-                ${rows.join('')}
-                ${yearRow}
-            </table>
-        </div>`
-
-        return html
+        const cached = out._tooltipCache?.get(regionId) || ''
+        return `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>${cached}`
     }
 
     return out

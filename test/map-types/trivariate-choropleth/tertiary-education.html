@@ -10,6 +10,9 @@
             .em-zoom-buttons {
                 transform: translate(1%, 15%);
             }
+            .em-legend-subtitle {
+                font-size: 13px;
+            }
         </style>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
@@ -22,7 +25,86 @@
                 json('./data/phd_pct.json'),
             ])
 
-            const map = eurostatmap.map('trivariateChoropleth').nutsLevel(2).position({ x: 4900000, y: 3620000, z: 6440 }).width(795)
+            const legendLabelPosition = 'corner' // 'corner' | 'inside'
+            const legendColorTarget = 'points' // 'points' | 'triangles'
+            const meanCentering = true
+            const map = eurostatmap
+                .map('trivariateChoropleth')
+                .position({ x: 4900000, y: 3620000, z: 6440 })
+                .width(825)
+                .title('Tertiary education students, 2021')
+                .subtitle(
+                    `<tspan x="14" dy="5"><tspan class="badge-green">Bachelor</tspan>, <tspan class="badge-blue">Masters</tspan> or <tspan class="badge-red">PHD</tspan> students.</tspan>`
+                )
+                .nutsLevel(2)
+                .ternarySettings({
+                    hue: 160,
+                    chroma: 130,
+                    lightness: 40,
+                    contrast: 0,
+                    spread: 3.5,
+                    breaks: 29,
+                    meanCentering: meanCentering,
+                })
+                .legend({
+                    title: 'Education level',
+                    subtitle: `
+                        <tspan x="8" dy="0">Areas with more <tspan fill="#007b00" class='subtitle-color'>green</tspan> have a higher %</tspan>
+                        <tspan x="8" dy="1.2em"> of bachelor students. Areas with more <tspan fill="#0067ff" class='subtitle-color'>blue</tspan> have </tspan>
+                        <tspan x="8" dy="1.2em">a higher % of masters students and areas with 
+                        <tspan x="8" dy="1.2em">more <tspan fill="#df0000" class='subtitle-color'>red</tspan> have a higher</tspan> % of PHD students.</tspan>
+                        <tspan x="8" dy="1.2em">Hover your mouse over the legend to explore it.</tspan>
+                    `,
+                    x: 520,
+                    y: 10,
+                    boxOpacity: 0.99,
+                    width: 275,
+                    height: 320,
+                    labels: legendLabelPosition == 'corner' ? ['Bachelors', 'Masters', 'PHD'] : ['← Bachelors', 'Masters →', 'PHD →'],
+                    labelPosition: legendLabelPosition,
+                    padding: { top: 75, right: 30, bottom: 10, left: 50 },
+                    showLines: true,
+                    showCenter: meanCentering,
+                    centerLabel: 'Average',
+                    showData: true,
+                    colorTarget: legendColorTarget, // 'points' | 'triangles'
+                    centerAnnotationOffsets: {
+                        labelX: -35,
+                        labelY: 15,
+                        curveX: 0,
+                        curveY: 0,
+                    },
+                })
+                .zoomButtons(true)
+                .zoomButtonsPosition([740, 590])
+
+            map.onBuild(() => {
+                const badges = [
+                    { cls: 'badge-green', color: '#007b00' },
+                    { cls: 'badge-blue', color: '#0067ff' },
+                    { cls: 'badge-red', color: '#df0000' },
+                ]
+                const svgEl = document.querySelector('#' + map.svgId_)
+                if (!svgEl) return
+                const subtitle = svgEl.querySelector('.em-subtitle')
+                if (!subtitle) return
+
+                badges.forEach(({ cls, color }) => {
+                    const tspan = subtitle.querySelector('.' + cls)
+                    if (!tspan) return
+                    const bb = tspan.getBBox()
+                    const pad = { x: 3, y: 2 }
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+                    rect.setAttribute('x', bb.x - pad.x)
+                    rect.setAttribute('y', bb.y - pad.y)
+                    rect.setAttribute('width', bb.width + pad.x * 2)
+                    rect.setAttribute('height', bb.height + pad.y * 2)
+                    rect.setAttribute('rx', 2)
+                    rect.setAttribute('fill', color)
+                    subtitle.parentNode.insertBefore(rect, subtitle)
+                    tspan.setAttribute('fill', 'white')
+                })
+            })
 
             map.stat('v1', { label: 'Bachelor' }).stat('v2', { label: 'Master' }).stat('v3', { label: 'PhD' })
             map.build()

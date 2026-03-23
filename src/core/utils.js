@@ -430,11 +430,11 @@ export const flags = {
  * @description Executes a function for all inset maps. Some insets might be external SVGs which is why this function was created.
  * @param {*} insets map.insets
  * @param {*} mainSvgId the ID of the map's svg
- * @param {*} callback the function to execute for each inset
- * @param {*} [parameter=null] the parameter to pass to the callback
- * @param {*} [parameter2=null] the parameter to pass to the callback
+ * @param {*} functionToExecute the function to execute for each inset
+ * @param {*} [parameter=null] the parameter to pass to the function
+ * @param {*} [parameter2=null] the parameter to pass to the function
  */
-export const executeForAllInsets = function (insets, mainSvgId, callback, parameter = null, parameter2 = null) {
+export const executeForAllInsets = function (insets, mainSvgId, functionToExecute, parameter = null, parameter2 = null) {
     for (const geo in insets) {
         const insetGroup = insets[geo]
 
@@ -444,19 +444,19 @@ export const executeForAllInsets = function (insets, mainSvgId, callback, parame
                 if (Array.isArray(inset)) {
                     inset.forEach((nestedInset) => {
                         if (nestedInset.svgId_ !== mainSvgId) {
-                            callback(nestedInset, parameter, parameter2)
+                            functionToExecute(nestedInset, parameter, parameter2)
                         }
                     })
                 } else {
                     if (inset.svgId_ !== mainSvgId) {
-                        callback(inset, parameter, parameter2)
+                        functionToExecute(inset, parameter, parameter2)
                     }
                 }
             })
         } else {
-            // Apply callback to unique inset
+            // Apply functionToExecute to unique inset
             if (insetGroup.svgId_ !== mainSvgId) {
-                callback(insetGroup, parameter, parameter2)
+                functionToExecute(insetGroup, parameter, parameter2)
             }
         }
     }
@@ -669,14 +669,26 @@ export const getTextColorForBackground = function (backgroundColor) {
     return luminance > 0.5 ? 'black' : 'white'
 }
 
-// get css selector. Different maps have different selectors for their regions.
+// get css selector for data-driven regions. Different maps have different selectors for their regions.
 export const getRegionsSelector = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions path'
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'
-    // Why not RS or EL? Because XK and Athos are in cntrg but not nutsrg so shouldnt be shown on choropleths
-    //TODO: only exclude them for choropleths and not for interactions like tooltips and legends. This is a bit tricky because the same paths are used for both, but maybe we can add a class to them and exclude by class for choropleths?
-    return '#em-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
+
+    const choropleths = ['ch', 'chbi', 'chtri']
+
+    if (map.nutsLevel_ === 'mixed') {
+        if (choropleths.includes(map._mapType)) {
+            return '#em-mixed-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
+        }
+        return '#em-mixed-nutsrg path, #em-cntrg path'
+    }
+
+    if (choropleths.includes(map._mapType)) {
+        return '#em-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
+    }
+
+    return '#em-nutsrg path, #em-cntrg path'
 }
 
 // get css selector for legend mouse hover. Different maps have different selectors for their regions
@@ -684,6 +696,7 @@ export const getLegendRegionsSelector = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions'
     if (map.gridCartogram_) return '#em-grid-container'
     if (map.geo_ === 'WORLD') return '#em-worldrg'
+    if (map.nutsLevel_ === 'mixed') return '#em-mixed-nutsrg, #em-cntrg'
     return '#em-nutsrg, #em-cntrg'
 }
 

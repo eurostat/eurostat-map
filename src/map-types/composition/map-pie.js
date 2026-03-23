@@ -119,8 +119,12 @@ export const map = function (config) {
             applyStyleToMap(out)
 
             if (out.dorling_ && !out.gridCartogram_) {
-                runDorlingSimulation(out, (d) =>
-                    _getRegionTotal(d.properties.id) || 0 ? out.classifierSize_(_getRegionTotal(d.properties.id)) || 0 : 0
+                runDorlingSimulation(
+                    out,
+                    (d) => {
+                        return _getRegionTotal(d.properties.id) || 0 ? out.classifierSize_(_getRegionTotal(d.properties.id)) || 0 : 0
+                    },
+                    out.dorlingPadding_ || 0
                 )
             } else {
                 stopDorlingSimulation(out)

@@ -6,6 +6,7 @@ import { updateCSSRule } from './utils.js'
 // To be removed when completely phased out.
 
 export const defineDeprecatedFunctions = (out) => {
+    out.callback = (v) => (console.warn('callback() is now DEPRECATED, please use onBuild() instead.'), out.onBuild_ = v, out);
     // buttons
     out.showZoomButtons = (v) => (console.warn('showZoomButtons() is now DEPRECATED, please use zoomButtons() instead'), out.zoomButtons_ = v, out);
     out.showInsetsButton = (v) => (console.warn('showInsetsButton() is now DEPRECATED, please use insetsButton() instead'), out.insetsButton_ = v, out);

@@ -2,6 +2,7 @@ import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
+import { highlightRegions, unhighlightRegions } from './legend'
 
 /**
  * A legend for categorical maps
@@ -109,26 +110,6 @@ export const legend = function (map, config) {
                 .attr('dy', '0.35em') // ~vertical centering
                 .text(map.classToText() ? map.classToText()[ecl_] : ecl_)
         }
-    }
-
-    // Highlight selected regions on mouseover
-    function highlightRegions(map, ecl) {
-        const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-        allRegions.style('fill', 'white')
-        const selectedRegions = allRegions.filter("[ecl='" + ecl + "']")
-        selectedRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
-        })
-    }
-
-    // Reset all regions to their original colors on mouseout
-    function unhighlightRegions(map) {
-        const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl]')
-        allRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
-        })
     }
 
     return out

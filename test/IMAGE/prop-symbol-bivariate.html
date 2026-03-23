@@ -70,20 +70,21 @@
                     //svgId: "eurostatmap-legend",
                     x: 10,
                     y: 200,
+                    title: 'legend title',
                     noDataShapeWidth: 26,
                     noDataShapeHeight: 14,
                     sizeLegend: {
-                        title: 'legend title',
+                        title: 'size legend title',
                         noData: false,
                     },
                     colorLegend: {
-                        title: 'legend title',
+                        title: 'color legend title',
                         noData: false,
                     },
                 })
 
             let mapCallbacksFired = 0
-            map.callback((map) => {
+            map.onBuild((map) => {
                 mapCallbacksFired++
                 console.log(mapCallbacksFired)
             })

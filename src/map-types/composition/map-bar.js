@@ -224,9 +224,13 @@ export const map = function (config) {
             applyStyleToMap(out)
 
             if (out.dorling_ && !out.gridCartogram_) {
-                runDorlingSimulation(out, (d) => {
-                    return _getDorlingRadius(d.properties.id)
-                })
+                runDorlingSimulation(
+                    out,
+                    (d) => {
+                        return _getDorlingRadius(d.properties.id)
+                    },
+                    out.dorlingPadding_ || 0
+                )
             } else {
                 stopDorlingSimulation(out)
             }

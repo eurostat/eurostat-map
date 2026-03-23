@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Eurostat Coxcomb Test</title>
+    </head>
+    <body>
+        <h1>Eurostat Coxcomb Test (Working Example)</h1>
+        <svg id="map"></svg>
+
+        <script src="../../../build/eurostatmap.min.js"></script>
+        <script>
+            console.log('Creating Eurostat coxcomb map...')
+
+            try {
+                const map = eurostatmap
+                    .map('coxcomb')
+                    .width(600)
+                    .nutsLevel(1)
+                    .dorling(true)
+                    .statCoxcomb({
+                        eurostatDatasetCode: 'tour_ce_omn12',
+                        filters: { unit: 'NR', indic_to: 'NGT_SP', TIME: 2023 },
+                        unitText: 'Nights spent',
+                        timeParameter: 'month',
+                        times: ['M01', 'M02', 'M03'],
+                        timeLabels: ['Jan', 'Feb', 'Mar'],
+                        categoryParameter: 'c_resid',
+                        categoryCodes: ['DOM', 'FOR'],
+                        categoryLabels: ['Domestic', 'Foreign'],
+                        categoryColors: ['#1b9e77', '#d95f02'],
+                        totalCode: 'TOTAL',
+                    })
+
+                console.log('Map created, calling build...')
+                map.build()
+                console.log('Build completed!')
+            } catch (error) {
+                console.error('Error:', error)
+            }
+        </script>
+    </body>
+</html>

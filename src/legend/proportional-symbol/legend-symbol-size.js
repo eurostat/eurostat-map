@@ -51,7 +51,7 @@ export function drawSizeLegend(out, baseX, baseY) {
             // append title to the legend
             container
                 .append('text')
-                .attr('class', 'em-legend-title em-size-legend-title')
+                .attr('class', 'em-size-legend-title')
                 .attr('id', 'em-size-legend-title')
                 .attr('x', 0)
                 .attr('y', sizeLegendTitleFontSize)

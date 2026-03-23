@@ -137,36 +137,41 @@ export const legend = function (map, config) {
         const noDataYOffset =
             out.rotation === 0 ? out.noDataYOffset + out.squareSize / out.map.numberOfClasses_ + out.arrowHeight / 2 : out.noDataYOffset
 
-        let noDataY =
+        const noDataY =
             out.rotation === 0 ? out._y + out.squareSize + noDataYOffset : out._y + 1.4142 * out.squareSize + out.boxPadding * 2 + noDataYOffset
 
-        out.lgg
-            .append('rect')
-            .attr('class', 'em-bivariate-nodata')
-            .attr('x', out.boxPadding + out.noDataShapeWidth / 2)
-            .attr('y', noDataY + (out.rotation == 0 ? 0 : -10))
-            .attr('width', out.noDataShapeWidth)
-            .attr('height', out.noDataShapeHeight)
-            .style('fill', out.map.noDataFillStyle())
-            .on('mouseover', function () {
-                const regions = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
-                const sel = regions.selectAll("[nd='nd']")
-                sel.style('fill', 'red')
+        const container = out.lgg
+            .append('g')
+            .attr('class', 'em-no-data-legend')
+            .attr('transform', `translate(${out.boxPadding}, ${noDataY + (out.rotation == 0 ? 0 : -10)})`)
+
+        const highlightNd = (map) => {
+            const selector = getLegendRegionsSelector(map)
+            const dimmedFill = Legend.getDimmedFill(map)
+            const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
+            allRegions.each(function () {
+                const sel = select(this)
+                if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
             })
-            .on('mouseout', function () {
-                const nRg = out.map.nutsLevel_ == 'mixed' ? selectAll('#em-nutsrg') : select('#em-nutsrg')
-                const sel = nRg.selectAll("[nd='nd']")
-                sel.style('fill', function () {
-                    return select(this).attr('fill___')
+            allRegions.style('fill', dimmedFill)
+            allRegions.filter("[nd='nd']").each(function () {
+                select(this).style('fill', select(this).attr('data-fill'))
+            })
+        }
+
+        const unhighlightNd = (map) => {
+            const selector = getLegendRegionsSelector(map)
+            map.svg_
+                .selectAll(selector)
+                .selectAll('[ecl1]')
+                .each(function () {
+                    const sel = select(this)
+                    const original = sel.attr('data-fill')
+                    if (original) sel.style('fill', original)
                 })
-                select(this).style('fill', out.map.noDataFillStyle())
-            })
-        out.lgg
-            .append('text')
-            .attr('class', 'em-bivariate-nodata-label')
-            .attr('x', out.boxPadding + out.noDataShapeWidth + (out.noDataShapeWidth / 2 + 5))
-            .attr('y', noDataY + out.noDataShapeHeight * 0.5 + 1 + (out.rotation == 0 ? 0 : -10))
-            .text(out.noDataText)
+        }
+
+        out.appendNoDataLegend(container, out.noDataText, highlightNd, unhighlightNd)
     }
 
     function addSquares() {
@@ -200,16 +205,16 @@ export const legend = function (map, config) {
                     .attr('height', sz)
                     .style('fill', fill)
                     .on('mouseover', function () {
-                        highlightRegions(out.map, ecl1, ecl2)
+                        highlightBivariateRegions(out.map, ecl1, ecl2)
                         if (out.map.insetTemplates_) {
-                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, ecl1, ecl2)
+                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightBivariateRegions, ecl1, ecl2)
                         }
                         select(this).raise() // raise legend square to avoid stroke issue
                     })
                     .on('mouseout', function () {
-                        unhighlightRegions(out.map)
+                        unhighlightBivariateRegions(out.map)
                         if (out.map.insetTemplates_) {
-                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, ecl1, ecl2)
+                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightBivariateRegions, ecl1, ecl2)
                         }
                     })
             }
@@ -380,29 +385,37 @@ export const legend = function (map, config) {
     }
 
     // Highlight selected regions on mouseover
-    function highlightRegions(map, ecl1, ecl2) {
+    function highlightBivariateRegions(map, ecl1, ecl2) {
         const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1],[ecl2]')
+        const dimmedFill = Legend.getDimmedFill(map)
+        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
 
-        // Set all regions to white
-        allRegions.style('fill', 'white')
-
-        // Highlight only the selected regions by restoring their original color
-        const selectedRegions = allRegions.filter(`[ecl1='${ecl1}']`).filter(`[ecl2='${ecl2}']`).filter(':not([nd])')
-        selectedRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___')) // Restore original color for selected regions
+        allRegions.each(function () {
+            const sel = select(this)
+            if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
         })
+
+        allRegions.style('fill', dimmedFill)
+
+        allRegions
+            .filter(`[ecl1='${ecl1}']`)
+            .filter(`[ecl2='${ecl2}']`)
+            .filter(':not([nd])')
+            .each(function () {
+                select(this).style('fill', select(this).attr('data-fill'))
+            })
     }
 
-    // Reset all regions to their original colors on mouseout
-    function unhighlightRegions(map) {
+    function unhighlightBivariateRegions(map) {
         const selector = getLegendRegionsSelector(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1],[ecl2]')
-
-        // Restore each region's original color from the fill___ attribute
-        allRegions.each(function () {
-            select(this).style('fill', select(this).attr('fill___'))
-        })
+        map.svg_
+            .selectAll(selector)
+            .selectAll('[ecl1],[ecl2]')
+            .each(function () {
+                const sel = select(this)
+                const original = sel.attr('data-fill')
+                if (original) sel.style('fill', original)
+            })
     }
 
     return out

@@ -7,7 +7,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script src="https://d3js.org/d3.v7.min.js"></script>
 
         <script>
@@ -60,7 +60,7 @@
                     tickLength: tickLength,
                     tickValues: [-100, 0, 60],
                     ticks: legendLabelType == 'generic' ? 0 : 3, // defaults to 'low' and 'high' when unspecified
-                    highlightTolerance: 2,
+                    highlightTolerance: 10, // tolerance in pixels for highlighting nearby symbols in continuous legends
                 })
                 .build()
         </script>

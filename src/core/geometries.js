@@ -249,13 +249,7 @@ export const Geometries = function (map, withCenterPoints) {
                 .enter()
                 .append('path')
                 .attr('d', pathFunction)
-                .attr('id', (cntrg) => {
-                    // add ids for RS and EL so that we can choose not to add statistical data to them (XK and Athos are in cntrg but not nutsrg so shouldnt be shown on choropleths).
-                    const id = cntrg.properties.id
-                    if (id == 'RS' || id == 'EL') {
-                        return 'em-cntrg-' + id
-                    }
-                })
+                .attr('id', (cntrg) => 'em-cntrg-' + cntrg.properties.id)
         }
 
         //draw world map
@@ -280,19 +274,22 @@ export const Geometries = function (map, withCenterPoints) {
                 this.geoJSONs.mixed.rg2 = feature(out.allNUTSGeoData[2], out.allNUTSGeoData[2].objects.nutsrg).features
                 this.geoJSONs.mixed.rg3 = feature(out.allNUTSGeoData[3], out.allNUTSGeoData[3].objects.nutsrg).features
 
+                const mixedContainer = container.append('g').attr('id', 'em-mixed-nutsrg').attr('class', 'em-mixed-nutsrg')
+
                 //for mixed NUTS, we add every NUTS region across all levels and hide level 1,2,3 by default, only showing them when they have stat data
                 // see updateClassification and updateStyle in map-choropleth.js for hiding/showing
                 ;[this.geoJSONs.mixed.rg0, this.geoJSONs.mixed.rg1, this.geoJSONs.mixed.rg2, this.geoJSONs.mixed.rg3].forEach((r, i) => {
                     //append each nuts level to map
-                    regions = container
+                    regions = mixedContainer
                         .append('g')
-                        .attr('id', 'em-nutsrg')
+                        .attr('id', `em-nutsrg-${i}`)
                         .attr('class', `em-nutsrg em-nutsrg-${i}`)
                         .selectAll('path')
                         .data(r)
                         .enter()
                         .append('path')
                         .attr('d', pathFunction)
+                        .attr('id', (d) => 'em-nutsrg-' + d.properties.id)
                         .attr('lvl', i) //to be able to distinguish nuts levels
 
                     attachClickEventToRegions(regions, map)
@@ -307,12 +304,13 @@ export const Geometries = function (map, withCenterPoints) {
                 // when nutsLevel is not 'mixed'
                 regions = container
                     .append('g')
-                    .attr('id', 'em-nutsrg')
-                    .attr('class', 'em-nutsrg')
+                    .attr('id', `em-nutsrg`)
+                    .attr('class', `em-nutsrg em-nuts-${nutsLevel}`)
                     .selectAll('path')
                     .data(this.geoJSONs.nutsrg)
                     .enter()
                     .append('path')
+                    .attr('id', (d) => 'em-nutsrg-' + d.properties.id)
                     .attr('d', pathFunction)
 
                 attachClickEventToRegions(regions, map)
@@ -528,6 +526,33 @@ export const Geometries = function (map, withCenterPoints) {
         }
 
         return features
+    }
+
+    out.getRegionCentroids = function (pathFunction) {
+        const result = new Map()
+        if (!pathFunction) return result
+
+        let features = []
+        if (map.nutsLevel_ === 'mixed') {
+            features = [
+                ...(out.geoJSONs.mixed.rg0 || []),
+                ...(out.geoJSONs.mixed.rg1 || []),
+                ...(out.geoJSONs.mixed.rg2 || []),
+                ...(out.geoJSONs.mixed.rg3 || []),
+            ]
+        } else if (out.userGeometries) {
+            features = out.statisticalRegions?.features || []
+        } else {
+            features = out.geoJSONs.nutsrg || []
+        }
+
+        features.forEach((f) => {
+            const id = f.properties?.id
+            if (!id) return
+            const c = pathFunction.centroid(f)
+            if (c && !isNaN(c[0])) result.set(id, c)
+        })
+        return result
     }
 
     return out

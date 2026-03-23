@@ -84,6 +84,7 @@ export class TricoloreViz {
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
+            cornerLabelOffset,
         } = options
 
         const plotWidth = this.width - this.margin.left - this.margin.right
@@ -115,7 +116,7 @@ export class TricoloreViz {
         this.triangle.append('image').attr('x', 0).attr('y', 0).attr('width', size).attr('height', size).attr('href', this.canvas.toDataURL())
 
         // Add triangle border and axes using SVG
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, undefined, cornerLabelOffset)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -125,6 +126,11 @@ export class TricoloreViz {
 
         if (showCenter) {
             this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
+        }
+
+        // Reliable mouseleave on the SVG root — fires when pointer exits the entire legend
+        if (options.onLeave) {
+            this.svg.on('mouseleave', () => options.onLeave!())
         }
     }
 
@@ -151,6 +157,7 @@ export class TricoloreViz {
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
+            cornerLabelOffset,
         } = options
 
         const plotWidth = this.width - this.margin.left - this.margin.right
@@ -208,7 +215,7 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, breaks)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, breaks, cornerLabelOffset)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -227,6 +234,11 @@ export class TricoloreViz {
 
         if (showCenter) {
             this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
+        }
+
+        // Reliable mouseleave on the SVG root — fires when pointer exits the entire legend
+        if (options.onLeave) {
+            this.svg.on('mouseleave', () => options.onLeave!())
         }
     }
 
@@ -248,6 +260,11 @@ export class TricoloreViz {
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
+            cornerLabelOffset = [
+                { x: 5, y: 5 },
+                { x: 5, y: 5 },
+                { x: 5, y: 5 },
+            ],
         } = options
 
         if (values.length !== 6) {
@@ -301,7 +318,7 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget)
+        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, null, cornerLabelOffset)
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -311,6 +328,11 @@ export class TricoloreViz {
 
         if (showCenter) {
             this.addCenterAnnotation(size, center, options.centerLabel ?? 'Average value', options.centerAnnotationOffsets)
+        }
+
+        // Reliable mouseleave on the SVG root — fires when pointer exits the entire legend
+        if (options.onLeave) {
+            this.svg.on('mouseleave', () => options.onLeave!())
         }
     }
 
@@ -372,7 +394,8 @@ export class TricoloreViz {
         showLines: boolean,
         labelPosition: 'corner' | 'edge' = 'corner',
         colorTarget: 'triangles' | 'points' = 'triangles',
-        breaks: number | null = 4
+        breaks: number | null = 4,
+        cornerLabelOffset?: { x: number; y: number }[]
     ): void {
         // Define triangle corners in ternary coordinates
         // and convert to SVG coordinates
@@ -391,12 +414,15 @@ export class TricoloreViz {
         // Add axis names
         if (labelPosition === 'edge') {
             const labelPositions = [
-                [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14], // p1
-                [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14], // p2
-                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 35], // p3
+                // v1 → bottom edge, centred, offset down
+                [(svgCorners[0][0] + svgCorners[2][0]) / 2, (svgCorners[0][1] + svgCorners[2][1]) / 2 + 35],
+                // v2 → left edge, centred, offset left
+                [(svgCorners[0][0] + svgCorners[1][0]) / 2 - 35, (svgCorners[0][1] + svgCorners[1][1]) / 2 - 14],
+                // v3 → right edge, centred, offset right
+                [(svgCorners[1][0] + svgCorners[2][0]) / 2 + 35, (svgCorners[1][1] + svgCorners[2][1]) / 2 - 14],
             ]
 
-            const rotateValues = [-60, 60, 0]
+            const rotateValues = [0, -60, 60]
 
             labels.forEach((label, i) => {
                 this.legend
@@ -411,10 +437,16 @@ export class TricoloreViz {
             })
         } else {
             // 'corner'
+            const off = cornerLabelOffset ?? [
+                { x: 0, y: 30 },
+                { x: 0, y: -5 },
+                { x: 12, y: 30 },
+            ]
+
             const labelPositions = [
-                [svgCorners[0][0], svgCorners[0][1] + 25], // p1
-                [svgCorners[1][0], svgCorners[1][1] - 15], // p2
-                [svgCorners[2][0], svgCorners[2][1] + 25], // p3
+                [svgCorners[0][0] + off[0].x, svgCorners[0][1] + off[0].y], // p1 bottom-left
+                [svgCorners[1][0] + off[1].x, svgCorners[1][1] + off[1].y], // p2 top
+                [svgCorners[2][0] + off[2].x, svgCorners[2][1] + off[2].y], // p3 bottom-right
             ]
 
             labels.forEach((label, i) => {
@@ -494,54 +526,54 @@ export class TricoloreViz {
                 drawGridLine([1 - v, 0, v], p3Edge, true)
                 this.drawAxisTick(p3Edge, [-1, +1, 0], size)
             })
+
+            // ===============================
+            // Axis labels
+            // ===============================
+            const labelStride = this.computeLabelStride(majorGrid.length + 1)
+            const labelGrid = majorGrid.filter((_, i) => i % labelStride === 0)
+            labelGrid.forEach((val) => {
+                // p1 axis
+                const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
+
+                this.legend
+                    .append('text')
+                    .attr('x', line[0][0] - 10)
+                    .attr('y', line[0][1] + 3)
+                    .attr('text-anchor', 'end')
+                    .attr('font-size', '10px')
+                    .attr('class', 'em-ternary-axis-tick-label')
+                    .text(`${((1 - val) * 100).toFixed(0)}%`)
+            })
+
+            labelGrid.forEach((val) => {
+                // p2 axis
+                const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
+
+                this.legend
+                    .append('text')
+                    .attr('x', line[0][0] + 5)
+                    .attr('y', line[0][1] - 10)
+                    .attr('text-anchor', 'start')
+                    .attr('font-size', '10px')
+                    .attr('class', 'em-ternary-axis-tick-label')
+                    .text(`${((1 - val) * 100).toFixed(0)}%`)
+            })
+
+            labelGrid.forEach((val) => {
+                // p3 axis
+                const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
+
+                this.legend
+                    .append('text')
+                    .attr('x', line[0][0] + 10)
+                    .attr('y', line[0][1] + 18)
+                    .attr('text-anchor', 'middle')
+                    .attr('font-size', '10px')
+                    .attr('class', 'em-ternary-axis-tick-label')
+                    .text(`${((1 - val) * 100).toFixed(0)}%`)
+            })
         }
-
-        // ===============================
-        // Axis labels (unchanged)
-        // ===============================
-        const labelStride = this.computeLabelStride(majorGrid.length + 1)
-        const labelGrid = majorGrid.filter((_, i) => i % labelStride === 0)
-        labelGrid.forEach((val) => {
-            // p1 axis
-            const line = [this.ternaryToSvgCoords([val, 1 - val, 0], size), this.ternaryToSvgCoords([val, 0, 1 - val], size)]
-
-            this.legend
-                .append('text')
-                .attr('x', line[0][0] - 10)
-                .attr('y', line[0][1] + 3)
-                .attr('text-anchor', 'end')
-                .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${(val * 100).toFixed(0)}%`)
-        })
-
-        labelGrid.forEach((val) => {
-            // p2 axis
-            const line = [this.ternaryToSvgCoords([0, val, 1 - val], size), this.ternaryToSvgCoords([1 - val, val, 0], size)]
-
-            this.legend
-                .append('text')
-                .attr('x', line[0][0] + 5)
-                .attr('y', line[0][1] - 10)
-                .attr('text-anchor', 'start')
-                .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${(val * 100).toFixed(0)}%`)
-        })
-
-        labelGrid.forEach((val) => {
-            // p3 axis
-            const line = [this.ternaryToSvgCoords([1 - val, 0, val], size), this.ternaryToSvgCoords([0, 1 - val, val], size)]
-
-            this.legend
-                .append('text')
-                .attr('x', line[0][0] + 10)
-                .attr('y', line[0][1] + 18)
-                .attr('text-anchor', 'middle')
-                .attr('font-size', '10px')
-                .attr('class', 'em-ternary-axis-tick-label')
-                .text(`${(val * 100).toFixed(0)}%`)
-        })
     }
 
     private computeLabelStride(breaks: number): number {
@@ -588,17 +620,6 @@ export class TricoloreViz {
         const closed = CompositionUtils.close([...data])
         // Validate data (this will throw an error if invalid)
         CompositionUtils.validateTernaryPoints(closed)
-        // TODO: decide if we want
-        //  - to throw an error (current behavior)
-        //  - to silently ignore invalid points
-        //  - to filter out invalid points and warn about it
-        //  - to warn and skip plotting points
-        // try {
-        //   CompositionUtils.validateTernaryPoints(data);
-        // } catch (e) {
-        //   console.warn('Invalid ternary points:', e);
-        //   return;
-        // }
 
         closed.forEach((p, i) => {
             if (p) {
@@ -635,7 +656,7 @@ export class TricoloreViz {
                 // p₁ = c1 → bottom edge (p2 = 0)
                 [[center[0], 0, 1 - center[0]], center],
 
-                // p₂ = c2 → LEFT edge (p3 = 0)  ← THIS WAS WRONG BEFORE
+                // p₂ = c2 → LEFT edge (p3 = 0)
                 [[1 - center[1], center[1], 0], center],
 
                 // p₃ = c3 → right edge (p1 = 0)
@@ -721,7 +742,12 @@ export class TricoloreViz {
      * Add a curved annotation from the ternary center point
      * to the top of the legend area explaining what it is.
      */
-    private addCenterAnnotation(size: number, center: TernaryPoint, text: string = 'Average value', offsets: { labelX: number; labelY: number; curveX: number; curveY: number } = { labelX: 70, labelY: 20, curveX: 10, curveY: 0 }): void {
+    private addCenterAnnotation(
+        size: number,
+        center: TernaryPoint,
+        text: string = 'Average value',
+        offsets: { labelX: number; labelY: number; curveX: number; curveY: number } = { labelX: 70, labelY: 20, curveX: 10, curveY: 0 }
+    ): void {
         const [cx, cy] = this.ternaryToSvgCoords(center, size)
 
         // Target point above the triangle (inside legend space)
@@ -741,9 +767,6 @@ export class TricoloreViz {
 
         // Curved guide line
         g.append('path').attr('d', path).attr('fill', 'none').attr('class', 'em-ternary-annotation-line')
-
-        // Small dot at the end (optional but helps)
-        //g.append('circle').attr('cx', tx).attr('cy', ty).attr('r', 2).attr('fill', '#444')
 
         // Label
         g.append('text')

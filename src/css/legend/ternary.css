@@ -24,15 +24,15 @@
     transition: fill 150ms;
 }
 .em-ternary-annotation-line {
-    stroke: #161616;
+    stroke: #949494;
     stroke-width: 1;
     opacity: 1;
 }
 .em-ternary-center-annotation-label {
     font-size: 11px;
-    fill: #161616;
+    fill: #4e4e4e;
     font-style: italic;
-    text-anchor: start;
+    text-anchor: end;
 }
 .em-ternary-center-line-label {
     opacity: 1;

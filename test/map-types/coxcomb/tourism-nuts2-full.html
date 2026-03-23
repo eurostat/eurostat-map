@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>coxcomb example</title>
+    </head>
+
+    <body>
+        <div style="display: flex">
+            <div>
+                <svg id="map"></svg>
+                <!-- <svg id="legend" height="400" style="transform: translate(-250px, -200px)"></svg> -->
+            </div>
+            <div style="padding-left: 10px"></div>
+        </div>
+
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const TIMES = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12']
+            const CATS = ['DOM', 'FOR']
+
+            eurostatmap
+                .map('coxcomb')
+
+                .width(800)
+                .nutsLevel(2)
+
+                .statCoxcomb({
+                    eurostatDatasetCode: 'tour_occ_nin2m',
+                    filters: { unit: 'NR', nace_r2: 'I551-I553', TIME: 2022 },
+                    unitText: 'Nights spent',
+                    timeParameter: 'month',
+                    times: TIMES,
+                    timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    categoryParameter: 'c_resid',
+                    categoryCodes: CATS,
+                    categoryLabels: ['Domestic', 'Foreign'],
+                    categoryColors: ['#1b9e77', '#d95f02'],
+                    totalCode: 'TOTAL',
+                })
+
+                .onBuild(rebuildWithCustomData)
+                .build()
+
+            function rebuildWithCustomData(initialMap) {
+                console.log('Eurostat data loaded → rebuilding with customData')
+
+                const allStats = {}
+                const yearlyTotals = []
+
+                // ---- build allStats from statData_ ----
+
+                TIMES.forEach((time) => {
+                    CATS.forEach((cat) => {
+                        const stat = initialMap.statData(`${time}:${cat}`)
+                        if (!stat || !stat._data_) return
+
+                        Object.entries(stat._data_).forEach(([region, obj]) => {
+                            allStats[region] = allStats[region] || {}
+                            allStats[region][time] = allStats[region][time] || {}
+
+                            const v = obj.value || 0
+                            allStats[region][time][cat] = v
+                        })
+                    })
+                })
+
+                // ---- compute totals ----
+
+                Object.entries(allStats).forEach(([region, data]) => {
+                    let total = 0
+                    TIMES.forEach((t) => {
+                        CATS.forEach((c) => {
+                            total += data?.[t]?.[c] || 0
+                        })
+                    })
+                    if (total > 0) yearlyTotals.push({ region, total })
+                })
+
+                yearlyTotals.sort((a, b) => b.total - a.total)
+
+                const top20 = yearlyTotals.slice(0, 20).map((d) => d.region)
+
+                const filtered = {}
+                top20.forEach((id) => {
+                    filtered[id] = allStats[id]
+                })
+
+                console.log('Top 20:', top20)
+
+                // ---- rebuild map using customData ----
+
+                initialMap.svg().selectAll('*').remove()
+
+                eurostatmap
+                    .map('coxcomb')
+
+                    .width(800)
+                    .nutsLevel(2)
+                    .dorling(true)
+                    .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
+                    .dorlingIterations(1) // Collision detection iterations
+                    .dorlingPadding(-1) // Minimum distance between circles
+                    .animateDorling(false) // Skip animation for immediate result
+                    .coxcombMinRadius(5)
+                    .coxcombMaxRadius(35)
+                    .coxcombRings(false)
+
+                    .statCoxcomb({
+                        customData: allStats,
+                        times: TIMES,
+                        timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        categoryCodes: CATS,
+                        categoryLabels: ['Domestic', 'Foreign'],
+                        categoryColors: ['#1b9e77', '#d95f02'],
+                        totalCode: 'TOTAL',
+                        unitText: 'Nights spent',
+                    })
+
+                    .legend({
+                        title: 'Nights spent',
+                        x: 570,
+                        y: 80,
+                        sizeLegend: {
+                            // title: 'Total nights spent',
+                            marginTop: 50,
+                            titlePadding: 10,
+                            noData: false,
+                            values: [26000000, 10000000, 1000000],
+                            labels: ['26 million', '10 million', '1 million'],
+                        },
+                        colorLegend: { title: 'Tourist origin', marginTop: 50, titlePadding: 10, noData: false },
+                        timeLegend: { title: 'Month', marginTop: -30 },
+                    })
+
+                    .build()
+            }
+        </script>
+    </body>
+</html>

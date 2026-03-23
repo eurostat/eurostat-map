@@ -37,7 +37,7 @@ export const map = function (type, config) {
         //bivariate choropleth
         if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
         //trivariate choropleth
-        if (type == 'trivariateChoropleth' || type == 'ternary') return TrivariateChoropleth.map(config)
+        if (type == 'trivariateChoropleth' || type == 'ternary' || type == 'chtri') return TrivariateChoropleth.map(config)
         //stripes composition
         if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return StripeComposition.map(config)
         //proportional pie charts
@@ -127,5 +127,4 @@ export const getDefaultLabels = function () {
 export { projectFromMap, projectToMap } from './core/proj4.js'
 
 import { version as pkgVersion } from '../package.json'
-import { projectFromMap, projectToMap } from './core/proj4.js'
 export const version = pkgVersion

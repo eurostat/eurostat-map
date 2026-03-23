@@ -2,8 +2,7 @@ import { select } from 'd3-selection'
 import * as Legend from '../legend'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { drawSizeLegend } from './legend-symbol-size'
-import { drawDiscreteLegend } from '../legend-discrete'
-import { format } from 'd3-format'
+import { drawDiscreteLegend, buildDiscreteLabelFormatter } from '../legend-discrete'
 
 /**
  * A legend for proportional symbol map
@@ -134,34 +133,25 @@ export const legend = function (map, config) {
     return out
 }
 
-function getColorThresholds(out) {
+function getPsColorThresholds(out) {
     const map = out.map
     const thresholds =
         map.psThresholds_.length > 1
             ? map.psThresholds_
             : Array.from({ length: map.psClasses_ })
-                .map((_, index) => {
-                    return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
-                })
-                .slice(1) // Remove the first entry and return the rest as an array
+                  .map((_, index) => {
+                      return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
+                  })
+                  .slice(1) // Remove the first entry and return the rest as an array
     return thresholds
 }
 
 export function getPropSymbolColorLabelFormatter(out) {
-    if (out.colorLegend.labelType == 'ranges') {
-        const thresholds = getColorThresholds(out)
-        const defaultLabeller = (label, i) => {
-            const decimalFormatter = format(`.${out.decimals}f`)
-            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}` //top
-            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}` //bottom
-            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}  ` //in-between
-        }
-        return out.colorLegend.labelFormatter || defaultLabeller
-    } else if (out.colorLegend.labelType == 'thresholds') {
-        return out.colorLegend.labelFormatter || format(`.${out.decimals}f`)
-    } else {
-        return out.colorLegend.labelFormatter || format(`.${out.decimals}f`)
-    }
+    const stat = out.getColorStats(out)
+    const labelType = out.colorLegend?.labelType || 'thresholds'
+    const userFormatter = out.colorLegend?.labelFormatter
+
+    return buildDiscreteLabelFormatter(out, () => getPsColorThresholds(out), stat, labelType, userFormatter)
 }
 
 // Highlight selected regions on mouseover

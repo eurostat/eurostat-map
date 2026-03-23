@@ -95,6 +95,7 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     out.animateDorling_ = true
     out.dorlingStrength_ = { x: 1, y: 1 }
     out.dorlingIterations_ = 1
+    out.dorlingPadding_ = 0
     out.onDorlingProgress_ = undefined
     out.dorlingWorker_ = false // use a web worker for (non-animated) dorling cartograms to not block the main thread
     out.dorlingWorkerD3URL_ = undefined
@@ -643,7 +644,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         // d3 zoom
         if (out.zoomExtent_ || out.zoomButtons_) {
             if (!out.zoomExtent_) {
-                //console.log('Zoom buttons are enabled, but no zoom extent is defined. Setting default extent to map.zoomExtent([1,10]).')
                 out.zoomExtent_ = [1, 10]
             }
             defineMapZoom(out)
@@ -760,6 +760,13 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
                     }
                     centroidFeatures.push(newFeature)
                 })
+            } else {
+                // Fallback: compute centroids from cntrg polygon geometries
+                centroidFeatures = (map.Geometries.geoJSONs.cntrg || []).map((feature) => {
+                    const newFeature = { ...feature }
+                    newFeature.geometry = { coordinates: geoCentroid(feature), type: 'Point' }
+                    return newFeature
+                })
             }
         } else {
             if (map.nutsLevel_ == 'mixed') {
@@ -777,17 +784,32 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
 
         // Project and save coordinates
-        // Before filtering
         const projectedCentroids = centroidFeatures.map((d) => {
-            const coords = map._projection(d.geometry.coordinates)
-            d.properties.centroid = coords
+            d.properties.centroid = map._projection(d.geometry.coordinates)
             return d
         })
 
-        // Keep an unfiltered copy
-        map.Geometries._allCentroidsFeatures = [...projectedCentroids]
+        // Supplement with any cntrg region not covered by the nuts centroid files.
+        // cntrg is the canonical list of all selectable country-level regions, including
+        // non-EU neighbours (MD, BY, UA, RU, etc.) absent from nutspt_N.json.
+        if (map.Geometries.geoJSONs.cntrg && map.geo_ !== 'WORLD') {
+            const existingIds = new Set(projectedCentroids.map((d) => d.properties.id))
+            for (const feature of map.Geometries.geoJSONs.cntrg) {
+                if (existingIds.has(feature.properties.id)) continue
+                // Use pathFunction.centroid() which operates in screen/pixel space,
+                // matching how the polygon was projected onto the map
+                const projected = map._pathFunction.centroid(feature)
+                if (!projected || isNaN(projected[0]) || isNaN(projected[1])) continue
+                projectedCentroids.push({
+                    ...feature,
+                    geometry: { type: 'Point', coordinates: projected },
+                    properties: { ...feature.properties, centroid: projected },
+                })
+            }
+        }
 
-        // Filter to only centroids that have statistical data
+        // Keep unfiltered master copy, then filter to regions with stat data
+        map.Geometries._allCentroidsFeatures = [...projectedCentroids]
         map.Geometries.centroidsFeatures = projectedCentroids.filter((d) => hasStatData(d.properties.id, map))
 
         // Append container if not existing

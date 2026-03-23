@@ -3,25 +3,6 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-            .em-label-test {
-                font-size: 15px !important;
-            }
-            .em-label-shadow-test {
-                font-size: 15px !important;
-            }
-            /* .em-stat-label {
-                fill: white !important;
-            } */
-            .em-label-ocean {
-                font-size: 12px !important;
-                fill: #000a66;
-                font-style: italic;
-            }
-            .em-cntbn {
-                stroke: white !important;
-            }
-        </style>
     </head>
 
     <body>
@@ -38,7 +19,7 @@
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script> -->
         <script>
             const IMAGE = { width: 797, height: 625, position: { x: 4790000, y: 3420000, z: 6400 } }
-            const defaultLabels = eurostatmap.getDefaultLabels().EUR_3035;
+            const defaultLabels = eurostatmap.getDefaultLabels().EUR_3035
             const map = eurostatmap
                 .map('choropleth')
                 .width(IMAGE.width)

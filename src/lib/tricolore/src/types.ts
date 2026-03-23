@@ -75,6 +75,8 @@ export interface VisualizationOptions extends TricoloreOptions {
     /** Show grid lines on the ternary plot */
     showLines?: boolean
 
+    cornerLabelOffset?: { x: number; y: number }[]
+
     /** The position of the axis labels: 'corner' | 'edge' (default: 'corner') */
     labelPosition?: 'corner' | 'edge'
 
@@ -90,6 +92,8 @@ export interface VisualizationOptions extends TricoloreOptions {
     centerLabel?: string
 
     centerAnnotationOffsets?: { labelX: number; labelY: number; curveX: number; curveY: number }
+
+    onLeave?: () => void
 }
 
 /**

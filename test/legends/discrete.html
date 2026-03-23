@@ -45,12 +45,12 @@
                 .title('discrete color scheme legend')
                 .subtitle('discrete color scheme')
                 //.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
-                .stat({
-                    eurostatDatasetCode: 'lfst_r_lfu3rt',
-                    filters: { sex: 'T', unit: 'PC', time: 2021 },
-                    unitText: '%',
-                })
-                .nutsLevel(2)
+                // .stat({
+                //     eurostatDatasetCode: 'lfst_r_lfu3rt',
+                //     filters: { sex: 'T', unit: 'PC', time: 2021 },
+                //     unitText: '%',
+                // })
+                .nutsLevel('mixed')
                 .zoomExtent([1, 1000])
 
                 .classificationMethod('quantile')
@@ -65,13 +65,33 @@
                     y: 10,
                     width: 200,
                     boxOpacity: 1,
-                    decimals: 1,
                     noDataText: 'Data not available',
                     maxMin: true,
                     maxMinRegionLabels: true,
                     orientation: 'horizontal', //TODO
                 })
                 .build()
+
+            map.statData().setData({
+                LB: 1.0,
+                ES: 0,
+                FR: ':',
+                DE: 3.2,
+                IT: 4.5,
+                LI: 10.5,
+                CZ: 6.0,
+                CH: 7.0,
+                UK: 8.0,
+                NO: 9.0,
+                NL: 10.0,
+                PL: 11.0,
+                RO: 7.0,
+                DE11: 16.0,
+            })
+
+            setTimeout(() => {
+                // map.exportMapToSVG()
+            }, 3000)
         </script>
     </body>
 </html>

@@ -30,7 +30,7 @@
 
             let map = eurostatmap
                 .map('ps')
-                .nutsLevel(0)
+                .nutsLevel('mixed')
                 .title('Total GDP')
                 .width(800)
                 // .stat('size', {
@@ -43,9 +43,6 @@
                 .insets(false)
                 .psMinSize(5)
                 .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
-                .tooltip({
-                    omitRegions: ['RU'],
-                })
 
             map.statData().setData({
                 ES: 1,
@@ -57,21 +54,23 @@
                 GB: 4,
                 NL: 6,
                 BE: 7,
-                AT: 8,
-                CZ: 9,
+                AT: 1,
+                CZ: 1,
                 UA: 3,
                 MD: 5,
                 GE: 6,
                 AL: 2,
                 HR: 3,
-                RS: 3,
-                MK: 4,
-                BA: 5,
-                ME: 6,
-                XK: 7,
+
+                MK: 1,
+                BA: 1,
+                ME: 1,
+                //XK: 0.1,
+                RS: 1,
                 LT: 8,
                 LV: 9,
                 EE: 10,
+                RO: ':',
             })
             map.build()
         </script>

@@ -1,6 +1,6 @@
 {
     "name": "eurostat-map",
-    "version": "4.3.48",
+    "version": "4.3.58",
     "description": "Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.",
     "keywords": [
         "eurostat",
@@ -69,7 +69,6 @@
         "@babel/preset-env": "^7.22.6",
         "@babel/runtime": "^7.12.1",
         "babel-loader": "^9.1.2",
-        "copy-webpack-plugin": "^13.0.0",
         "css-loader": "^7.1.2",
         "prettier": "^3.4.1",
         "style-loader": "^4.0.0",
