@@ -30,7 +30,7 @@ export const map = function (config) {
     // ── Config defaults ──────────────────────────────────────────────────────
 
     out.coxcombMinRadius_ = 10
-    out.coxcombMaxRadius_ = 80
+    out.coxcombMaxRadius_ = 30
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
     out.coxcombRings_ = true
