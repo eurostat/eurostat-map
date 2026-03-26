@@ -152,6 +152,7 @@ const getLocationsGroup = (map) => {
             .append('g')
             .attr('id', 'em-locations-' + map.svgId_)
             .attr('class', 'em-locations')
+            .style('pointer-events', 'none')
     }
     return g
 }
