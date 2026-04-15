@@ -33,6 +33,7 @@ export const legend = function (map, config) {
 
     out.timeLegend = {
         title: null,
+        titlePadding: 15,
         marginTop: 20,
     }
 
@@ -267,6 +268,18 @@ export const legend = function (map, config) {
 
         y += out.timeLegend?.marginTop || 0
         y += radius
+
+        // --- ADD TITLE ---
+        if (out.timeLegend?.title) {
+            out.lgg
+                .append('text')
+                .attr('class', 'em-time-legend-title')
+                .attr('x', x)
+                .attr('y', y + out.titleFontSize)
+                .text(out.timeLegend.title)
+
+            y += (out.titleFontSize || 12) + (out.timeLegend.titlePadding || 10)
+        }
 
         const labelOffset = 18 // extra spacing for labels
         const angleStep = (2 * Math.PI) / times.length

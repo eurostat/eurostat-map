@@ -33,7 +33,7 @@ export const map = function (config) {
     out.coxcombMaxRadius_ = 30
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
-    out.coxcombRings_ = true
+    out.coxcombRings_ = false
     out.coxcombOffsets_ = { x: 0, y: 0 }
     out.hoverColor_ = '#ffa500'
 

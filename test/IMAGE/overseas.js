@@ -226,7 +226,7 @@ const createOutermostInsetsConfig = () => {
             scalebarPosition: [33, 41],
             scalebarMaxWidth: 17,
         },
-    ] 
+    ]
 
     config.forEach((inset, i) => {
         if (!inset.titlePosition) inset.titlePosition = [2, 11]
@@ -251,3 +251,159 @@ const createOutermostInsetsConfig = () => {
     return deepClone(config)
 }
 
+// Create DOM elements for insets dynamically based on config
+function createInsetDOMElements(insetsCfg, insetBoxPosition) {
+    const insetsGroup = document.getElementById('newInsets')
+    if (!insetsGroup) return
+    insetsGroup.innerHTML = '' // Clear previous
+
+    const ns = 'http://www.w3.org/2000/svg'
+    const bx = insetBoxPosition[0]
+    const by = insetBoxPosition[1]
+
+    // Background rect
+    const rect = document.createElementNS(ns, 'rect')
+    rect.setAttribute('id', 'image-insets-background-rect')
+    rect.setAttribute('x', bx)
+    rect.setAttribute('y', by)
+    rect.setAttribute('width', '243')
+    rect.setAttribute('height', '265')
+    rect.setAttribute('fill', 'white')
+    insetsGroup.appendChild(rect)
+
+    // Create <g> elements for each inset
+    insetsCfg.forEach((inset, i) => {
+        const g = document.createElementNS(ns, 'g')
+        g.id = inset.svgId
+        g.setAttribute('index', i)
+        g.setAttribute('transform', `translate(${inset.x + bx}, ${inset.y + by})`)
+        insetsGroup.appendChild(g)
+    })
+
+    // Separator lines group
+    const separatorLines = document.createElementNS(ns, 'g')
+    separatorLines.setAttribute('id', 'insets-separator-lines')
+    separatorLines.setAttribute('height', '265px')
+    separatorLines.setAttribute('width', '243px')
+    separatorLines.setAttribute('transform', `translate(${bx}, ${by})`)
+
+    // French inset separators (thin)
+    const thinLines = [
+        [160, 18, 170, 60],
+        [170, 60, 152, 92],
+        [152, 92, 90, 83],
+        [152, 92, 172, 131],
+        [172, 131, 171, 184],
+        [172, 131, 235, 139],
+        [170, 60, 235, 70],
+        [66, 213, 66, 254],
+    ]
+    thinLines.forEach(([x1, y1, x2, y2]) => {
+        const line = document.createElementNS(ns, 'line')
+        line.setAttribute('x1', x1)
+        line.setAttribute('y1', y1)
+        line.setAttribute('x2', x2)
+        line.setAttribute('y2', y2)
+        line.setAttribute('style', 'stroke: black; stroke-width: 0.1')
+        separatorLines.appendChild(line)
+    })
+
+    // Thick separators
+    const thickLines = [
+        [91, 192, 235, 192],
+        [10, 192, 78, 192],
+        [84, 25, 84, 185],
+        [10, 92, 78, 92],
+        [117, 213, 117, 254],
+        [178, 213, 178, 254],
+    ]
+    thickLines.forEach(([x1, y1, x2, y2]) => {
+        const line = document.createElementNS(ns, 'line')
+        line.setAttribute('x1', x1)
+        line.setAttribute('y1', y1)
+        line.setAttribute('x2', x2)
+        line.setAttribute('y2', y2)
+        line.setAttribute('style', 'stroke: black; stroke-width: 0.3')
+        separatorLines.appendChild(line)
+    })
+
+    insetsGroup.appendChild(separatorLines)
+
+    // Blurs group
+    const blursGroup = document.createElementNS(ns, 'g')
+    blursGroup.setAttribute('id', 'insets-blurs')
+    blursGroup.setAttribute('height', '265px')
+    blursGroup.setAttribute('width', '243px')
+    blursGroup.setAttribute('transform', `translate(${bx}, ${by})`)
+
+    const defs = document.createElementNS(ns, 'defs')
+    const gradients = [
+        { id: 'gradL', x1: '100%', y1: '100%', x2: '0%', y2: '100%' },
+        { id: 'gradR', x1: '0%', y1: '100%', x2: '100%', y2: '100%' },
+        { id: 'gradB', x1: '100%', y1: '0%', x2: '100%', y2: '100%' },
+        { id: 'gradT', x1: '100%', y1: '100%', x2: '100%', y2: '0%' },
+    ]
+
+    gradients.forEach(({ id, x1, y1, x2, y2 }) => {
+        const gradient = document.createElementNS(ns, 'linearGradient')
+        gradient.setAttribute('id', id)
+        gradient.setAttribute('x1', x1)
+        gradient.setAttribute('y1', y1)
+        gradient.setAttribute('x2', x2)
+        gradient.setAttribute('y2', y2)
+        gradient.setAttribute('gradientUnits', 'objectBoundingBox')
+
+        const stop1 = document.createElementNS(ns, 'stop')
+        stop1.setAttribute('offset', '0')
+        stop1.setAttribute('stop-opacity', '0.1')
+        stop1.setAttribute('stop-color', 'rgb(255, 255, 255)')
+        gradient.appendChild(stop1)
+
+        const stop2 = document.createElementNS(ns, 'stop')
+        stop2.setAttribute('offset', '1')
+        stop2.setAttribute('stop-color', 'rgb(255, 255, 255)')
+        gradient.appendChild(stop2)
+
+        defs.appendChild(gradient)
+    })
+
+    blursGroup.appendChild(defs)
+
+    const blurRects = [
+        { x: 92, y: 180, height: 10, width: 75, fill: 'url(#gradB)' },
+        { x: 90, y: 106, height: 79, width: 10, fill: 'url(#gradL)' },
+        { x: 123, y: 213, height: 42, width: 5, fill: 'url(#gradL)' },
+        { x: 167, y: 213, height: 42, width: 5, fill: 'url(#gradR)' },
+        { x: 123, y: 251, height: 5, width: 50, fill: 'url(#gradB)' },
+        { x: 123, y: 213, height: 5, width: 50, fill: 'url(#gradT)' },
+    ]
+
+    blurRects.forEach(({ x, y, height, width, fill }) => {
+        const blurRect = document.createElementNS(ns, 'rect')
+        blurRect.setAttribute('x', x)
+        blurRect.setAttribute('y', y)
+        blurRect.setAttribute('height', height)
+        blurRect.setAttribute('width', width)
+        blurRect.setAttribute('fill', fill)
+        blursGroup.appendChild(blurRect)
+    })
+
+    insetsGroup.appendChild(blursGroup)
+
+    // LI title group
+    const liTitleGroup = document.createElementNS(ns, 'g')
+    liTitleGroup.setAttribute('id', 'insets-LI-title')
+    liTitleGroup.setAttribute('height', '265px')
+    liTitleGroup.setAttribute('width', '243px')
+    liTitleGroup.setAttribute('transform', `translate(${bx}, ${by})`)
+
+    const subtitleLI = document.createElementNS(ns, 'text')
+    subtitleLI.setAttribute('id', 'subtitleLI')
+    subtitleLI.setAttribute('class', 'em-inset-title')
+    subtitleLI.setAttribute('x', '122')
+    subtitleLI.setAttribute('y', '207.85')
+    subtitleLI.textContent = 'Liechtenstein'
+    liTitleGroup.appendChild(subtitleLI)
+
+    insetsGroup.appendChild(liTitleGroup)
+}
