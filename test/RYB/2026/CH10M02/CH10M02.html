@@ -73,11 +73,17 @@
             .em-inset .em-zoom-buttons {
                 display: none;
             }
+            .em-legend-wedge {
+                stroke: black !important;
+            }
+            .em-coxcomb-chart {
+                stroke-width: 0.1 !important;
+            }
         </style>
     </head>
     <body>
         <svg id="container" width="100%" height="97vh">
-            <g id="map"></g>
+            <svg id="map"></svg>
             <g id="newInsets"></g>
         </svg>
 
@@ -122,12 +128,27 @@
                 allNuts.forEach((nuts) => {
                     customData[nuts] = {}
                     MONTH_KEYS.forEach((month) => {
-                        const dom = domData[nuts]?.[month] ?? 0
-                        const forVal = forData[nuts]?.[month] ?? 0
-                        customData[nuts][month] = {
-                            DOM: dom,
-                            FOR: forVal,
-                            TOTAL: dom + forVal,
+                        const dom = domData[nuts]?.[month] ?? ':'
+                        const forVal = forData[nuts]?.[month] ?? ':'
+
+                        const domIsND = dom === ':'
+                        const forIsND = forVal === ':'
+
+                        // If both categories are no-data, mark the whole month as no-data
+                        if (domIsND && forIsND) {
+                            customData[nuts][month] = {
+                                DOM: ':',
+                                FOR: ':',
+                                TOTAL: ':',
+                            }
+                        } else {
+                            const domVal = domIsND ? 0 : dom
+                            const forVal2 = forIsND ? 0 : forVal
+                            customData[nuts][month] = {
+                                DOM: domIsND ? ':' : domVal,
+                                FOR: forIsND ? ':' : forVal2,
+                                TOTAL: domVal + forVal2,
+                            }
                         }
                     })
                 })
@@ -169,20 +190,20 @@
                         y: 280,
                         sizeLegend: {
                             title: 'Nights spent',
-                            marginTop: 50,
+                            marginTop: 45,
                             titlePadding: 10,
                             noData: false,
                             values: [24000000, 10000000, 1000000],
                             labels: ['24 million', '10 million', '1 million'],
                         },
-                        colorLegend: { title: 'Tourist origin', marginTop: 30, titlePadding: 10, noData: false },
-                        timeLegend: { title: 'Month', titlePadding: 33, marginTop: -40 },
+                        colorLegend: { title: 'Tourist origin', marginTop: 35, titlePadding: 10, noData: false },
+                        timeLegend: { title: 'Month', titlePadding: 33, marginTop: -33 },
                     })
                     .bottomText(false)
                     .header(true)
                     .footer(true)
-                    .showEstatLogo(true)
-                    .showEstatRibbon(true)
+                    //.showEstatLogo(true)
+                    //.showEstatRibbon(true)
                     .logoPosition([2, MAPHEIGHT - 12])
                     .ribbonPosition([MAPWIDTH - 180, MAPHEIGHT - 17])
                     .ribbonWidth(300)
@@ -190,13 +211,18 @@
                     .footnoteWrap(100)
                     .footnote('Note goes here')
                     .onBuild(() => {
-                        //add cartography footnote
+                        // move newInsets inside #map
+                        const newInsets = d3.select('#newInsets')
+                        if (!newInsets.empty()) {
+                            d3.select('#map').node().appendChild(newInsets.node())
+                        }
 
+                        //add cartography footnote
                         d3.select('#map #em-footnote-2').remove()
                         d3.selectAll('#map')
                             .append('text')
-                            .attr('x', MAPWIDTH - 315)
-                            .attr('y', MAPHEIGHT + 55)
+                            .attr('x', MAPWIDTH - 308)
+                            .attr('y', MAPHEIGHT + 40)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .append('tspan')
@@ -206,8 +232,8 @@
 
                 // Check what the map has after a short delay to allow async build to finish
                 setTimeout(() => {
-                    console.log('svg children count:', document.querySelector('#map').children.length)
-                    console.log('any coxcomb paths:', document.querySelectorAll('#map path').length)
+                    map.exportMapToSVG()
+                    map.exportMapToPNG()
                 }, 3000)
             })
 
@@ -218,6 +244,7 @@
                 let inQuotes = false
                 for (let i = 0; i < line.length; i++) {
                     const ch = line[i]
+                    if (ch === '\r') continue // ← skip carriage returns anywhere in line
                     if (ch === '"') {
                         inQuotes = !inQuotes
                     } else if (ch === ',' && !inQuotes) {
@@ -243,7 +270,8 @@
                     CSV_MONTH_COLS.forEach((month, idx) => {
                         const colIdx = headers.indexOf(month)
                         const raw = colIdx !== -1 ? cols[colIdx] : ''
-                        data[nuts][MONTH_KEYS[idx]] = raw ? parseFloat(raw) * 1_000_000 || 0 : 0
+                        const parsed = raw === ':' ? ':' : raw ? parseFloat(raw) * 1_000_000 || 0 : 0
+                        data[nuts][MONTH_KEYS[idx]] = parsed
                     })
                 }
                 return data

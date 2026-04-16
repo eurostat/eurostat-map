@@ -35,6 +35,7 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 15,
         marginTop: 20,
+        radius: 35,
     }
 
     out._sizeLegendHeight = 0
@@ -251,7 +252,7 @@ export const legend = function (map, config) {
      */
     function buildCoxcombTimeLegend(out, baseX, baseY) {
         const times = out.map._coxTimes || []
-        const radius = 40
+        const radius = out.timeLegend.radius || 40
 
         if (!times.length) return
 
