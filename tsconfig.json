@@ -1,14 +1,32 @@
 {
-  "compilerOptions": {
-    "target": "ES2018",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    "src/**/*",
-    "lib/tricolore/**/*"
-  ]
+    "compilerOptions": {
+        "target": "ES2018",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "lib": ["ES2018", "DOM"],
+
+        // Type checking
+        "strict": false,
+        "allowJs": true,
+        "checkJs": false,
+
+        // Declaration files
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": true,
+        "rootDir": "./src",
+        "outDir": "./build/types",
+
+        // Module resolution
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+
+        // Source maps
+        "sourceMap": true,
+        "inlineSources": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "build", "test", "examples"]
 }
