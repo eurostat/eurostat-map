@@ -358,31 +358,6 @@ body {
  * eurostatmap instances on the page.
  */
 
-/* Remove the hard background the library adds to the SVG frame */
-#eurostatmap-mount .em-frame {
-    fill: transparent !important;
-    stroke: none !important;
-}
-
-/* Sea background — match our page bg */
-#eurostatmap-mount .em-sea {
-    fill: #edf2f4 !important;
-}
-
-/* Default region stroke colour */
-#eurostatmap-mount .em-nutsrg,
-#eurostatmap-mount .em-cntrg {
-    stroke: #fff;
-    stroke-width: 0.25px;
-}
-
-/* Country boundary style */
-#eurostatmap-mount .em-cntbn path,
-#eurostatmap-mount .em-bn-eu {
-    stroke: #b0aca5 !important;
-    stroke-width: 0.6px !important;
-}
-
 /* Legend box — match card background */
 #eurostatmap-mount .em-legend rect.em-legend-box {
     fill: var(--card-bg) !important;

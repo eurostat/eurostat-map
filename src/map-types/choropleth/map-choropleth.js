@@ -198,19 +198,39 @@ export const map = function (config) {
                 }
             }
 
+            // add class attributes to region elements
             const classifyRegions = (regions) => {
-                regions.attr('ecl', (rg) => {
-                    const regionData = out.statData().get(rg.properties.id)
-                    if (!regionData) return
-                    const value = regionData.value
-                    if (value === ':' || value === null) return 'nd'
+                regions
+                    .attr('ni', null) // reset
+                    .attr('ecl', null)
 
-                    if (out.colorSchemeType_ === 'continuous') {
-                        // no class index for continuous mode
-                        return value
+                regions.each(function (rg) {
+                    const sel = select(this)
+
+                    const regionData = out.statData().get(rg.properties.id)
+
+                    //no input
+                    if (!regionData) {
+                        sel.attr('ni', 1)
+                        return
                     }
 
-                    return value != null ? +out.classifier_(value) : undefined
+                    const value = regionData.value
+
+                    // no data
+                    if (value === ':' || value == null || Number.isNaN(value)) {
+                        sel.attr('ecl', 'nd')
+                        return
+                    }
+
+                    //continuous (raw value as attribute for color function)
+                    if (out.colorSchemeType_ === 'continuous') {
+                        sel.attr('ecl', value)
+                        return
+                    }
+
+                    // classification into discrete classes
+                    sel.attr('ecl', +out.classifier_(value))
                 })
             }
 

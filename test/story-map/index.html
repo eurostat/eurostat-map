@@ -47,12 +47,11 @@
                 <div class="step" data-step="1" id="step-1">
                     <div class="step-card">
                         <p class="step-number">01 — Overview</p>
-                        <h2>A continent of contrasts</h2>
-                        <p>
+                        <h2 class="step-title">A continent of contrasts</h2>
+                        <p class="step-body">
                             The EU's single market conceals vast differences in regional wealth. GDP per capita, measured as a percentage of the EU
                             average, reveals a sharp east–west divide — with a few exceptional outliers on both ends.
                         </p>
-                        <p>This map shows all NUTS-2 regions colour-coded by their GDP index relative to the EU-27 average (= 100).</p>
                         <div class="stat-callout">
                             <span class="stat-num">249</span>
                             <span class="stat-desc">Luxembourg's GDP index — among the EU's highest values</span>
@@ -203,7 +202,12 @@
             If you bundle with Vite/Rollup, replace these three tags with your
             bundler's entry point and adjust the imports in main.js accordingly.
         -->
+        <!-- Shim Node's `global` for browser-bundled dependencies -->
+        <script>
+            window.global = window
+        </script>
         <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flubber@0.4.2/build/flubber.min.js"></script>
         <script src="../../build/eurostatmap.min.js"></script>
         <script src="./main.js"></script>
     </body>

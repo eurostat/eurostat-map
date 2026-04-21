@@ -6,7 +6,7 @@
         <style>
             /* country boundaries */
             #map2 .em-cntbn {
-                stroke: #000000;
+                stroke: #6d6d6d;
                 stroke-width: 0.5px;
                 opacity: 1;
             }
@@ -14,7 +14,7 @@
             /* country boundary halo (not coastline) */
             #map2 .em-cntbn-halo:not(.em-bn-co) {
                 stroke: white;
-                stroke-width: 2px;
+                stroke-width: 0px;
                 opacity: 1;
             }
 
@@ -41,6 +41,8 @@
             const nutsLevel = 'mixed' // IMAGE
             const map = eurostatmap
                 .map('choropleth')
+                .width(800)
+                .height(800)
                 .scale('20M')
                 .nutsLevel(nutsLevel)
                 .title('style 1')
@@ -57,6 +59,8 @@
 
             const map2 = eurostatmap
                 .map('choropleth')
+                .width(800)
+                .height(800)
                 .svgId('map2')
                 .scale('20M')
                 .nutsLevel(nutsLevel)
