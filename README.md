@@ -109,6 +109,27 @@ For a fixed version, use:
 
 where X.Y.Z is a [version number](https://www.npmjs.com/package/eurostat-map?activeTab=versions).
 
+## TypeScript Support
+
+eurostat-map includes full TypeScript type definitions for all APIs. TypeScript users get complete IntelliSense and type safety out of the box.
+
+```typescript
+import eurostatmap from 'eurostatmap'
+import type { ChoroplethConfig } from 'eurostatmap'
+
+const config: ChoroplethConfig = {
+    title: 'Population Density',
+    stat: { eurostatDatasetCode: 'demo_r_d3dens' },
+    numberOfClasses: 7,
+    classificationMethod: 'quantile',
+}
+
+const map = eurostatmap.map('choropleth', config)
+map.build()
+```
+
+See [TYPESCRIPT.md](TYPESCRIPT.md) for comprehensive TypeScript documentation and examples.
+
 ## Documentation
 
 For detailed documentation see the **[API reference page](docs/reference.md)**.

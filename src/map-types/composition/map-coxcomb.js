@@ -30,10 +30,10 @@ export const map = function (config) {
     // ── Config defaults ──────────────────────────────────────────────────────
 
     out.coxcombMinRadius_ = 10
-    out.coxcombMaxRadius_ = 80
+    out.coxcombMaxRadius_ = 30
     out.coxcombStrokeFill_ = 'white'
     out.coxcombStrokeWidth_ = 0.3
-    out.coxcombRings_ = true
+    out.coxcombRings_ = false
     out.coxcombOffsets_ = { x: 0, y: 0 }
     out.hoverColor_ = '#ffa500'
 
@@ -198,7 +198,6 @@ export const map = function (config) {
 
         // ── Custom Data Path ─────────────────────────────────────────────────
         if (customData && !eurostatDatasetCode) {
-            console.log('Custom data path: Setting up stat configs and storing custom data...')
             assignCategoryProperties()
 
             // Store custom data and config for use after build (like pie charts)
@@ -229,15 +228,15 @@ export const map = function (config) {
 
             // Store method to inject data after build (like pie charts do it manually)
             out._injectCustomData = function () {
-                console.log('Injecting custom data...')
-
                 out._customTimes.forEach((time) => {
                     out._customCategories.forEach((category) => {
                         const key = `${time}:${category}`
                         const regionData = {}
 
                         for (const regionId in out._customData) {
+                            if (regionId === 'UA') console.log('UA M01:DOM value:', out._customData['UA']?.['M01']?.['DOM'])
                             const value = out._customData[regionId]?.[time]?.[category]
+
                             if (value !== undefined) {
                                 regionData[regionId] = value
                             }
@@ -262,7 +261,7 @@ export const map = function (config) {
                                     if (val !== undefined && !isNaN(val)) total += parseFloat(val)
                                 })
                             }
-                            if (total > 0) {
+                            if (total === ':' || total > 0) {
                                 regionData[regionId] = total
                             }
                         }
@@ -275,16 +274,13 @@ export const map = function (config) {
 
                 // After data injection, update the visualization
                 out.updateStatValues()
-                console.log('Custom data injection complete!')
             }
 
             // Set up build override to automatically inject data after build
             const originalBuild = out.build
             out.build = function () {
-                console.log('Custom build: Building map first...')
                 const result = originalBuild.call(out)
 
-                console.log('Custom build: Injecting custom data after build...')
                 // Inject custom data after build completes
                 out._injectCustomData()
 
@@ -699,7 +695,7 @@ export const map = function (config) {
                 .append('g')
                 .attr('class', 'em-coxcomb-chart')
                 .attr('stroke', '#ffffff')
-                .attr('stroke-width', 0.3 / scaleFactor)
+                .attr('stroke-width', 0.1 / scaleFactor)
                 .selectAll('path')
                 .data(stackedData[ki])
                 .join('path')

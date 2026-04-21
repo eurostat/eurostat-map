@@ -13,7 +13,7 @@
         <script>
             const customColorFunction = d3.scaleDiverging().domain([-109, 0, 64]).interpolator(d3.interpolateRdBu)
             const legendLabelType = 'specific' // 'generic', 'specific'
-            const tickLength = 10 // Length of the ticks in the legend
+            const tickLength = 4 // Length of the ticks in the legend
             const orientation = 'vertical' // 'horizontal', 'vertical'
 
             function signedSqrtTransform(x) {
@@ -37,7 +37,7 @@
                 .nutsLevel(3)
                 .zoomExtent([1, 1000])
                 .numberOfClasses(6)
-                .colorSchemeType('continuous')
+                // .colorSchemeType('continuous')
                 .colorFunction(d3.interpolateRdBu)
                 .pointOfDivergence(0)
 

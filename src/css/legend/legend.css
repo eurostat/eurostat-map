@@ -24,16 +24,25 @@
 .em-size-legend-title {
     font-size: 15px;
     fill: #666;
+    font-weight: bold;
 }
 
 .em-color-legend-title {
     font-size: 15px;
     fill: #696969;
+    font-weight: bold;
 }
 
 .em-width-legend-title {
     font-size: 15px;
     fill: #696969;
+    font-weight: bold;
+}
+
+.em-time-legend-title {
+    font-size: 15px;
+    fill: #666;
+    font-weight: bold;
 }
 
 .em-legend-subtitle {
@@ -70,7 +79,7 @@
 
 /* swatch separator */
 .em-legend-separator {
-    stroke: white;
+    stroke: #696969;
     stroke-width: 1;
 }
 
@@ -95,6 +104,7 @@
 
 .em-legend-diverging-line {
     stroke: #696969;
+    stroke-width: 1;
 }
 .em-legend-background {
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));

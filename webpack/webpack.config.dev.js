@@ -20,8 +20,17 @@ module.exports = {
         rules: [
             {
                 test: /\.ts$/,
-                use: 'ts-loader',
-                exclude: /node_modules/,
+                use: {
+                    loader: 'ts-loader',
+                    options: {
+                        compilerOptions: {
+                            declaration: false,
+                            declarationMap: false,
+                            emitDeclarationOnly: false,
+                        },
+                    },
+                },
+                exclude: [/node_modules/, /\.d\.ts$/],
             },
             {
                 test: /\.css$/i,

@@ -154,6 +154,8 @@ function createThresholdsLegend(out, config) {
         }
     }
 
+    console.log(typeof globalMin, globalMin, labelFormatter(globalMin))
+
     for (let i = 0; i < numberOfClasses; i++) {
         const y = i * config.shapeHeight + titlePadding
         const x = 0
