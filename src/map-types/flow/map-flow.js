@@ -12,7 +12,7 @@ import { createFlowMap } from './straight'
 import { drawNodeDonuts } from './donuts'
 import { drawNodeCircles } from './circles'
 import { scaleOrdinal } from 'd3-scale'
-import { addFlowValueLabels } from '../../core/labels'
+import { addFlowValueLabels } from '../../core/decoration/labels'
 
 /**
  * Returns a flow map.

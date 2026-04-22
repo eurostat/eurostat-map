@@ -3,23 +3,23 @@ import { formatDefaultLocale } from 'd3-format'
 import { geoIdentity, geoPath, geoCentroid } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox } from './utils'
-import { appendAnnotations } from './annotations'
-import { addLabelsToMap, updateLabels, updateValuesLabels } from './labels'
+import { appendAnnotations } from './decoration/annotations'
+import { addLabelsToMap, updateLabels, updateValuesLabels } from './decoration/labels'
 import { defineDeprecatedFunctions } from './deprecated'
-import { Geometries } from './geometries'
+import { Geometries } from './geo/geometries'
 import { buildInsets, removeInsets } from './insets'
-import { appendStamp } from './stamps'
+import { appendStamp } from './decoration/stamps'
 import { buildGridCartogramBase } from './cartograms'
 import { appendMinimap } from './minimaps'
 import { defineMapZoom, setMapView } from './zoom'
 import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
-import { addPlacenameLabels } from './placenames.js'
-import { initProj4 } from './proj4.js'
-import { addEurostatLogo, addEurostatRibbon } from './logo.js'
-import { appendCoastalMargin } from './coastal-margin.js'
-import { addFootnote, addSourceLink, addSubtitle, addTitle } from './texts.js'
-import { addScalebarToMap } from './scalebar.js'
+import { addPlacenameLabels } from './decoration/placenames.js'
+import { initProj4 } from './geo/proj4.js'
+import { addEurostatLogo, addEurostatRibbon } from './decoration/logo.js'
+import { appendCoastalMargin } from './decoration/coastal-margin.js'
+import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
+import { addScalebarToMap } from './decoration/scalebar.js'
 import { attachLocationsApi } from './locations.js'
 
 // set default d3 locale
@@ -33,10 +33,18 @@ formatDefaultLocale({
 initProj4()
 
 /**
- * The map template: only the geometrical part.
- * To be used as a base map for a statistical map.
+ * The map template: the geometric and structural base for all eurostat-map
+ * map types. Handles SVG creation, projection setup, geo rendering,
+ * zoom, insets, labels, scalebar, decorations, and layout.
  *
- * @param {*} withCenterPoints Set to true (or 1) to add regions center points to the map template, to be used for proportional symbols maps for example.
+ * This is a low-level building block — end users interact with the map
+ * via statMap (stat-map.js) and the concrete map type modules on top of it.
+ *
+ * @param {object} config - Initial configuration key/value pairs.
+ * @param {boolean} withCenterPoints - When true, NUTS region centroids are
+ *   computed and stored for use by proportional symbol map types.
+ * @param {string} mapType - Internal map type string used for CSS classes.
+ * @returns {object} A mapTemplate instance.
  */
 export const mapTemplate = function (config, withCenterPoints, mapType) {
     //build map template object
@@ -57,11 +65,11 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
     out.nutsYear_ = 2024
-    out.geo_ = 'EUR'
+    out.geo_ = 'EUR' //NUTS2JSON geo (e.g. 'EUR', 'PT', 'WORLD', etc.) See
     out.proj_ = '3035'
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()
     out.filterGeometriesFunction_ = undefined // user defined filter function
-    out.scale_ = '20M' //TODO choose automatically, depending on pixelSize ?
+    out.scale_ = '20M' //TODO choose automatically?
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
     out.placenames_ = false // load placenames from placenames.js
     out.placenamesFilter_ = undefined // function to filter placenames
@@ -462,45 +470,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    const createMapSVG = function (out) {
-        //get svg element. Create it if it does not exists
-        let svg = select('#' + out.svgId())
-        if (svg.size() == 0) {
-            svg = select('body').append('svg').attr('id', out.svgId())
-        }
-        svg.attr('class', 'em-map')
-        if (out.isInset) svg.classed('em-inset', true)
-        //add mapType css class
-        svg.classed('em--' + out._mapType, true)
-        // pies and coxcombs are proportional symbols, so add proportional-symbols class too
-        if (out._mapType === 'pie' || out._mapType === 'coxcomb') {
-            svg.classed('em--ps', true)
-        }
-        return svg
-    }
-
-    const wrapMapSvg = function (svg) {
-        const node = svg.node()
-        if (!node) return
-
-        const parent = node.parentNode
-        if (!parent) return
-
-        //  If parent is SVG (e.g. IMAGE), abandon wrapping
-        if (parent instanceof SVGElement) return
-
-        // already wrapped
-        if (parent.classList?.contains('em-map-wrapper')) return parent
-
-        const wrapper = document.createElement('div')
-        wrapper.className = 'em-map-wrapper'
-
-        parent.insertBefore(wrapper, node)
-        wrapper.appendChild(node)
-
-        return wrapper
-    }
-
     /**
      * Build a map object, including container, frame, map svg, insets and d3 zoom
      */
@@ -733,156 +702,8 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
 
         //header/footer
-        setTimeout(() => out.recalculateLayout(), 20)
+        setTimeout(() => recalculateLayout(out), 20)
         return out
-    }
-
-    const addCentroidsToMap = function (map) {
-        let centroidFeatures
-
-        if (!map.Geometries.centroidsData) {
-            // if centroids data is absent (e.g. for world maps) then calculate manually
-            if (map.geo_ == 'WORLD') {
-                centroidFeatures = []
-                map.Geometries.geoJSONs.worldrg.forEach((feature) => {
-                    let newFeature = { ...feature }
-                    // exception for France (because guyane)
-                    if (feature.properties.id == 'FR') {
-                        newFeature.geometry = {
-                            coordinates: [2.2, 46.2],
-                            type: 'Point',
-                        }
-                    } else {
-                        newFeature.geometry = {
-                            coordinates: geoCentroid(feature),
-                            type: 'Point',
-                        }
-                    }
-                    centroidFeatures.push(newFeature)
-                })
-            } else {
-                // Fallback: compute centroids from cntrg polygon geometries
-                centroidFeatures = (map.Geometries.geoJSONs.cntrg || []).map((feature) => {
-                    const newFeature = { ...feature }
-                    newFeature.geometry = { coordinates: geoCentroid(feature), type: 'Point' }
-                    return newFeature
-                })
-            }
-        } else {
-            if (map.nutsLevel_ == 'mixed') {
-                centroidFeatures = [
-                    ...map.Geometries.centroidsData[0].features,
-                    ...map.Geometries.centroidsData[1].features,
-                    ...map.Geometries.centroidsData[2].features,
-                    ...map.Geometries.centroidsData[3].features,
-                ]
-            } else {
-                centroidFeatures = map.Geometries.centroidsData.features
-            }
-        }
-
-        if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
-
-        // Project and save coordinates
-        const projectedCentroids = centroidFeatures.map((d) => {
-            d.properties.centroid = map._projection(d.geometry.coordinates)
-            return d
-        })
-
-        // Supplement with any cntrg region not covered by the nuts centroid files.
-        // cntrg is the canonical list of all selectable country-level regions, including
-        // non-EU neighbours (MD, BY, UA, RU, etc.) absent from nutspt_N.json.
-        if (map.Geometries.geoJSONs.cntrg && map.geo_ !== 'WORLD') {
-            const existingIds = new Set(projectedCentroids.map((d) => d.properties.id))
-            for (const feature of map.Geometries.geoJSONs.cntrg) {
-                if (existingIds.has(feature.properties.id)) continue
-                // Use pathFunction.centroid() which operates in screen/pixel space,
-                // matching how the polygon was projected onto the map
-                const projected = map._pathFunction.centroid(feature)
-                if (!projected || isNaN(projected[0]) || isNaN(projected[1])) continue
-                projectedCentroids.push({
-                    ...feature,
-                    geometry: { type: 'Point', coordinates: projected },
-                    properties: { ...feature.properties, centroid: projected },
-                })
-            }
-        }
-
-        // Keep unfiltered master copy, then filter to regions with stat data
-        map.Geometries._allCentroidsFeatures = [...projectedCentroids]
-        map.Geometries.centroidsFeatures = projectedCentroids.filter((d) => hasStatData(d.properties.id, map))
-
-        // Append container if not existing
-        const gcp = out.getCentroidsGroup(map).empty()
-            ? map
-                  .svg()
-                  .select('#em-zoom-group-' + map.svgId_)
-                  .append('g')
-                  .attr('id', `em-centroids-${map.svgId_}`)
-                  .attr('class', 'em-centroids')
-            : out.getCentroidsGroup(map)
-
-        // Join pattern for centroids
-        gcp.selectAll('g.em-centroid')
-            .data(map.Geometries.centroidsFeatures, (d) => d.properties.id)
-            .join(
-                (enter) =>
-                    enter
-                        .append('g')
-                        .attr('class', 'em-centroid')
-                        .attr('id', (d) => 'ps' + d.properties.id)
-                        .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`),
-                (update) => update,
-                (exit) => exit.remove()
-            )
-    }
-
-    /**
-     * Returns the D3 selection for the proportional symbols container
-     * of the given map (main or inset).
-     *
-     * Always uses a map-specific ID to avoid collisions with insets.
-     */
-    out.getCentroidsGroup = function (map) {
-        return map.svg().select(`#em-centroids-${map.svgId_}`)
-    }
-
-    // This will remove any centroids with no statistical data and re-add centroids for regions that just got data.
-    out.refreshCentroids = function (map) {
-        // Skip for grid cartograms
-        if (map.gridCartogram_) return map
-
-        const allCentroids = map.Geometries._allCentroidsFeatures
-        if (!allCentroids) return
-
-        map.Geometries.centroidsFeatures = allCentroids.filter((d) => hasStatData(d.properties.id, map))
-
-        const gcp = out.getCentroidsGroup(map)
-
-        gcp.selectAll('g.em-centroid')
-            .data(map.Geometries.centroidsFeatures, (d) => d.properties.id)
-            .join(
-                (enter) =>
-                    enter
-                        .append('g')
-                        .attr('class', 'em-centroid')
-                        .attr('id', (d) => 'ps' + d.properties.id)
-                        .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`),
-                (update) => update,
-                (exit) => exit.remove()
-            )
-
-        return map
-    }
-
-    // Small helper to check if region has statistical data
-    const hasStatData = function (id, map) {
-        //TODO: statCodes_ is only for coxcomb and pie maps, ps maps should also be contemplated here
-        if (!map.statCodes_) return true // if no data yet, keep everything
-        return map.statCodes_.some((code) => {
-            const s = map.statData(code)?.get(id)
-            return s && !isNaN(s.value) && s.value !== 0
-        })
     }
 
     const drawBackgroundMap = function (out) {
@@ -920,83 +741,6 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         }
     }
 
-    const defineDefaultPosition = function () {
-        if (out.projectionFunction_) {
-            // Handle custom D3 projection (like geoAzimuthalEquidistant)
-            if (typeof out.projectionFunction_.rotate === 'function') {
-                const r = out.projectionFunction_.rotate() // [lambda, phi, gamma]
-                if (Array.isArray(r) && r.length >= 2) {
-                    // Invert signs: the map's visual center is the opposite of its rotation
-                    const lon = -r[0]
-                    const lat = -r[1]
-                    out.position_.x = out.position_.x ?? lon
-                    out.position_.y = out.position_.y ?? lat
-                }
-            } else if (typeof out.projectionFunction_.center === 'function') {
-                const c = out.projectionFunction_.center() // [lon, lat]
-                if (Array.isArray(c) && c.length === 2) {
-                    out.position_.x = out.position_.x ?? c[0]
-                    out.position_.y = out.position_.y ?? c[1]
-                }
-            }
-        } else {
-            const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-            if (defaultPosition) {
-                out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
-                out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
-            } else if (out.Geometries.defaultGeoData?.bbox) {
-                // default to center of geoData bbox
-                out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
-                out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
-            } else {
-                //TODO: auto-define user=defined geometries geoCenter
-                // out.position_.x = Geometries.userGeometries
-                // out.position_.y = Geometries.userGeometries
-            }
-        }
-
-        // optional: set from URL
-        setViewFromURL()
-    }
-
-    const getDefaultZ = function () {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
-        if (defaultPosition) {
-            return (defaultPosition.pixelSize * 800) / out.width_
-        } else if (out.Geometries.defaultGeoData?.bbox) {
-            return Math.min(
-                (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
-                (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
-            )
-        } else {
-            return 100
-        }
-    }
-
-    const defineProjection = function () {
-        // Define projection based on the geographical context
-
-        if (out.geo_ === 'WORLD') {
-            // Use Robinson projection for the world with optional custom projection function
-            out._projection =
-                out.projectionFunction_ ||
-                geoRobinson()
-                    .translate([out.width_ / 2, out.height_ / 2])
-                    .scale((out.width_ - 20) / (2 * Math.PI))
-        } else {
-            // For non-WORLD geo, use custom or default identity projection with calculated bounding box
-            out._projection =
-                out.projectionFunction_ ||
-                geoIdentity()
-                    .reflectY(true)
-                    .fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getApproxCurrentGeoBbox(out)))
-        }
-    }
-
-    const definePathFunction = function () {
-        out._pathFunction = geoPath().projection(out._projection)
-    }
-
     /** Get x,y,z elements from URL and assign them to the view. */
     const setViewFromURL = function () {
         const x = getParameterByName('x'),
@@ -1007,82 +751,5 @@ export const mapTemplate = function (config, withCenterPoints, mapType) {
         if (z != null && z != undefined && !isNaN(+z)) out.position_.z = +z
     }
 
-    out.recalculateLayout = function () {
-        const svg = out.svg()
-        const header = svg.select('#em-header-' + out.svgId_)
-        const drawing = svg.select('#em-drawing-' + out.svgId_)
-        const footer = svg.select('#em-footer-' + out.svgId_)
-        const frame = drawing.select('#em-frame-' + out.geo_)
-        const clipRect = svg.select(`#${out.svgId_}-clip-path rect`)
-
-        let headerHeight = 0
-        let footerHeight = 0
-
-        // --- Define consistent vertical padding between header and map ---
-        const headerMapPadding = out.headerPadding_ ? out.headerPadding_ : 20 // px (tweak visually as needed)
-        const footerMapPadding = out.footerPadding_ ? out.footerPadding_ : 10 // px below map before footer
-
-        // --- Measure header height ---
-        if (out.header_ && !header.empty()) {
-            const hb = header.node()?.getBBox?.()
-            if (hb) headerHeight = hb.height + headerMapPadding
-        }
-
-        // --- Measure footer height ---
-        if (out.footer_ && !footer.empty()) {
-            const fb = footer.node()?.getBBox?.()
-            if (fb) footerHeight = fb.height + footerMapPadding
-        }
-
-        // --- Move the map group below the header ---
-        drawing.attr('transform', `translate(0, ${headerHeight})`)
-
-        // --- Move footer below map ---
-        footer.attr('transform', `translate(0, ${headerHeight + out.height_ + footerMapPadding})`)
-
-        // --- Frame bounds ---
-        frame.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
-
-        // --- Update clipRect (same dimensions as map area) ---
-        clipRect.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
-
-        // --- Resize entire SVG ---
-        const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
-        svg.attr('width', out.width_).attr('height', totalHeight)
-
-        // --- Optional: Debug overlay ---
-        // drawing.selectAll('.debug-clip').remove();
-        // drawing.append('rect')
-        //     .attr('class', 'debug-clip')
-        //     .attr('x', 0)
-        //     .attr('y', 0)
-        //     .attr('width', out.width_)
-        //     .attr('height', out.height_)
-        //     .attr('fill', 'none')
-        //     .attr('stroke', 'magenta')
-        //     .attr('stroke-width', 1)
-        //     .attr('pointer-events', 'none');
-    }
-
     return out
-}
-
-/** Default geocenter positions and pixelSize (for default width = 800px) for territories and projections. */
-const _defaultPosition = {
-    EUR_3035: { geoCenter: [4790000, 3420000], pixelSize: 6400 },
-    IC_32628: { geoCenter: [443468, 3145647], pixelSize: 1000 },
-    GP_32620: { geoCenter: [669498, 1784552], pixelSize: 130 },
-    MQ_32620: { geoCenter: [716521, 1621322], pixelSize: 130 },
-    GF_32622: { geoCenter: [266852, 444074], pixelSize: 500 },
-    RE_32740: { geoCenter: [348011, 7661627], pixelSize: 130 },
-    YT_32738: { geoCenter: [516549, 8583920], pixelSize: 70 },
-    MT_3035: { geoCenter: [4719755, 1441701], pixelSize: 70 },
-    PT20_32626: { geoCenter: [397418, 4271471], pixelSize: 1500 },
-    PT30_32628: { geoCenter: [333586, 3622706], pixelSize: 150 },
-    LI_3035: { geoCenter: [4287060, 2672000], pixelSize: 40 },
-    IS_3035: { geoCenter: [3011804, 4960000], pixelSize: 700 },
-    SJ_SV_3035: { geoCenter: [4570000, 6160156], pixelSize: 800 },
-    SJ_JM_3035: { geoCenter: [3647762, 5408300], pixelSize: 100 },
-    CARIB_32620: { geoCenter: [636345, 1669439], pixelSize: 500 },
-    WORLD_54030: { geoCenter: [14, 17], pixelSize: 9000 },
 }

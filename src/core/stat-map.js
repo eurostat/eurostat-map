@@ -4,12 +4,21 @@ import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
-import { hideSpinner, showSpinner } from './spinner'
+import { hideSpinner, showSpinner } from './decoration/spinner'
 
 /**
- * An abstract statistical map: A map template with statistical data, without any particular styling rule.
+ * An abstract statistical map: a map template with statistical data,
+ * without any particular styling rule. All concrete map types (choropleth,
+ * proportional symbol, flow, etc.) are built on top of this.
  *
- * @param {*} withCenterPoints Set to true (or 1) to add regions center points to the map template, to be used for proportional symbols maps for example.
+ * @param {object} config - Initial configuration object. Any getter/setter
+ *   defined on the map can be passed here as a key/value pair.
+ *   @example { title: 'My map', nutsLevel: 2, legend: { x: 10, y: 90 } }
+ * @param {boolean} withCenterPoints - When true, NUTS region centroid points
+ *   are added to the map. Required for proportional symbol, pie, coxcomb, etc.
+ * @param {string} mapType - Internal map type identifier (e.g. 'choropleth',
+ *   'ps', 'coxcomb'). Used for CSS class assignment and inset inheritance.
+ * @returns {object} A statMap instance with builder-pattern getter/setters.
  */
 export const statMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
@@ -31,8 +40,25 @@ export const statMap = function (config, withCenterPoints, mapType) {
     let _renderScheduled = false
     out._loadingStatCount_ = 0
 
-    //the statistical data configuration.
-    //A map can have several stat datasets. This is a dictionary of all stat configuration
+    /**
+     * Statistical data configuration dictionary.
+     * Keys are stat dataset names ('default', 'color', 'size', 'v1', 'v2', 'v3', etc.).
+     * The 'default' key is used by single-stat map types (choropleth, ps, etc.).
+     *
+     * As a getter/setter it behaves as follows:
+     *   - `map.stat()` → returns the default stat config
+     *   - `map.stat('color')` → returns the stat config for key 'color'
+     *   - `map.stat({ eurostatDatasetCode: 'demo_r_d3dens', ... })` → sets default stat config
+     *   - `map.stat('color', { eurostatDatasetCode: '...', ... })` → sets stat config for key 'color'
+     *
+     * @example
+     * map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2024' } })
+     *
+     * @example
+     * // bivariate: set two independent datasets
+     * map.stat('v1', { eurostatDatasetCode: 'dataset_a' })
+     * map.stat('v2', { eurostatDatasetCode: 'dataset_b' })
+     */
     out.stat_ = { default: undefined }
     out.stat = function (k, v) {
         //no argument: getter - return the default stat
@@ -49,7 +75,21 @@ export const statMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    //the statistical data, retrieved from the config information. As a dictionary.
+    /**
+     * Retrieved statistical data, keyed by stat dataset name.
+     * Each value is a StatData instance.
+     * Lazily creates a new StatData entry if a key is accessed that doesn't yet exist.
+     *
+     * - `map.statData()` → returns the default StatData instance
+     * - `map.statData('color')` → returns the StatData instance for key 'color'
+     * - `map.statData('color', statDataInstance)` → sets StatData for key 'color'
+     *
+     * Use `.statData().setData({ regionId: value, ... })` to supply custom data
+     * directly without fetching from the Eurostat API.
+     *
+     * @example
+     * map.statData().setData({ DE: 120, FR: 95, IT: 88 })
+     */
     out.statData_ = {
         default: StatisticalData.statData(),
         color: StatisticalData.statData(),
@@ -72,22 +112,53 @@ export const statMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    //test for no data case
+    /**
+     * Text shown in the tooltip and legend for regions with no data.
+     * @type {string}
+     * @default 'No data available'
+     * @example map.noDataText('Data not available')
+     */
     out.noDataText_ = 'No data available'
-    //langage (currently used only for eurostat data API)
+    /**
+     * BCP 47 language tag used when fetching labels from the Eurostat API.
+     * @type {string}
+     * @default 'en'
+     * @example map.language('fr')
+     */
     out.language_ = 'en'
-    //transition time for rendering
+    /**
+     * Duration in milliseconds for D3 transitions when the map updates.
+     * Set to 0 to disable transitions.
+     * @type {number}
+     * @default 500
+     * @example map.transitionDuration(0)
+     */
     out.transitionDuration_ = 500
     //specific tooltip text function
     out.tooltip_.textFunction = undefined
-    //for maps using special fill patterns, this is the function to define them in the SVG image - See functions: getFillPatternLegend and getFillPatternDefinitionFun
+    /**
+     * A function that defines SVG filter/pattern definitions used for fill patterns.
+     * Receives (svg, numberOfClasses) as arguments.
+     * See also: getFillPatternDefinitionFunction() in the public API.
+     * @type {function|undefined}
+     */
     out.filtersDefinitionFunction_ = undefined
-    //a function to execute after the map build is complete.
+    /**
+     * Callback fired once after the map has fully built (geo + stat data both loaded).
+     * Receives the map instance as its only argument.
+     * @type {function(map: object): void | undefined}
+     * @example
+     * map.onBuild(m => console.log('Map ready', m))
+     */
     out.onBuild_ = undefined
-
-    //legend configuration
+    /**
+     * Legend configuration object. Passed to the legend constructor.
+     * The available properties depend on the map type's legend.
+     * @type {object|undefined}
+     * @example
+     * map.legend({ x: 10, y: 90, title: 'Density, people/km²' })
+     */
     out.legend_ = undefined
-    //legend object
     out.legendObj_ = undefined
 
     /**
@@ -139,8 +210,17 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Build the map.
-     * This method should be called once, preferably after the map attributes have been set to some initial values.
+     * Builds the map from scratch. Should be called once after initial configuration.
+     * Triggers geo data retrieval, stat data retrieval, legend build, and tooltip setup.
+     * Returns the map instance for chaining.
+     *
+     * @returns {object} The map instance (builder pattern).
+     *
+     * @example
+     * eurostatmap.map('choropleth')
+     *   .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+     *   .legend({ x: 10, y: 90 })
+     *   .build()
      */
     out.build = function () {
         // RESET BUILD LIFECYCLE FLAGS
@@ -234,8 +314,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Launch map geo data retrieval, and make/update the map once received.
-     * This method should be called after attributes related to the map geometries have changed, to retrieve this new data and refresh the map.
+     * Re-fetches geographic data and rebuilds the map geometry.
+     * Call this when any geo-related attribute changes (geo, proj, nutsLevel,
+     * nutsYear, scale, etc.) after the initial build.
+     * @returns {object} The map instance.
      */
     out.updateGeoData = function () {
         out._loadingGeo_ = true
@@ -261,8 +343,11 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Launch map geo stat datasets retrieval, and make/update the map once received.
-     * This method should be called after specifications on the stat data sources attached to the map have changed, to retrieve this new data and refresh the map.
+     * Re-fetches all configured statistical datasets and refreshes the map.
+     * Call this when stat configuration changes after the initial build
+     * (e.g. changing filters, dataset code, or CSV URL).
+     * For changes to already-loaded data values, use updateStatValues() instead.
+     * @returns {object} The map instance.
      */
     out.updateStatData = function () {
         for (let statKey in out.stat_) {
@@ -318,9 +403,10 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Make/update the map with new stat data.
-     * This method should be called after stat data attached to the map have changed, to refresh the map.
-     * If the stat data sources have changed, call *updateStatData* instead.
+     * Re-applies classification and styling using the currently loaded stat data.
+     * Call this after directly modifying statData values (e.g. via setData())
+     * without needing to re-fetch from remote.
+     * @returns {object} The map instance.
      */
     out.updateStatValues = function () {
         // filter out centroids without stat data
@@ -346,9 +432,11 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Abstract method.
-     * Make/update the map after classification attributes have been changed.
-     * For example, if the number of classes, or the classification method has changed, call this method to update the map.
+     * Abstract method — implemented by each concrete map type.
+     * Updates the map's data classification (class breaks, thresholds, etc.)
+     * without re-fetching data. Call after changing numberOfClasses,
+     * classificationMethod, thresholds, or similar attributes.
+     * @returns {object} The map instance.
      */
     out.updateClassification = function () {
         console.log('Map updateClassification function not implemented')
@@ -356,9 +444,11 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Abstract method.
-     * Make/update the map after styling attributes have been changed.
-     * For example, if the style (color?) for one legend element has changed, call this method to update the map.
+     * Abstract method — implemented by each concrete map type.
+     * Re-applies visual styling (fill colors, symbol sizes, etc.)
+     * to already-classified data. Call after changing color schemes,
+     * symbol styles, or other purely visual attributes.
+     * @returns {object} The map instance.
      */
     out.updateStyle = function () {
         console.log('Map updateStyle function not implemented')
@@ -375,9 +465,15 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * Retrieve the time stamp of the map, even if not specified in the dimension initially.
-     * This applies only for stat data retrieved from Eurostat API.
-     * This method is useful for example when the data retrieved is the freshest, and one wants to know what this date is, for example to display it in the map title.
+     * Returns the time stamp of the loaded Eurostat dataset.
+     * Useful when fetching the most recent available data and wanting to
+     * display the actual time period in the map title.
+     * Only meaningful for stat data fetched from the Eurostat API.
+     *
+     * @returns {string|undefined} The time dimension value, e.g. '2021'.
+     *
+     * @example
+     * map.onBuild(() => map.title('Population density ' + map.getTime()))
      */
     out.getTime = function () {
         return out.statData('default').getTime()
@@ -409,9 +505,9 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * @function exportMapToSVG
-     * @description Exports the current map with styling to SVG and downloads it
-     *
+     * Exports the fully rendered map (with computed CSS styles inlined) as an SVG file
+     * and triggers a browser download.
+     * @returns {object} The map instance.
      */
     out.exportMapToSVG = function () {
         // Clone the original SVG node to avoid modifying the DOM
@@ -449,9 +545,13 @@ export const statMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
-     * @function exportMapToPNG
-     * @description Exports the current map with styling to PNG and downloads it
+     * Exports the fully rendered map as a PNG file and triggers a browser download.
+     * Renders via an off-screen canvas. Fonts and external resources must be
+     * accessible without CORS restrictions for the canvas to remain untainted.
      *
+     * @param {number} [width] - Output width in pixels. Defaults to the SVG's current width.
+     * @param {number} [height] - Output height in pixels. Defaults to the SVG's current height.
+     * @returns {Promise<object>} Resolves to the map instance.
      */
     out.exportMapToPNG = async function (width, height) {
         // Clone original SVG

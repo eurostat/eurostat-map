@@ -8,7 +8,7 @@ import * as StatMap from '../../core/stat-map'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
 import { checkIfDiverging, executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
-import { applyPatternFill } from '../../core/pattern-fill'
+import { applyPatternFill } from '../../core/decoration/pattern-fill'
 
 /**
  * Returns a chroropleth map.

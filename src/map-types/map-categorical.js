@@ -4,7 +4,7 @@ import { schemeSet3 } from 'd3-scale-chromatic'
 import * as StatMap from '../core/stat-map'
 import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
-import { applyPatternFill } from '../core/pattern-fill'
+import { applyPatternFill } from '../core/decoration/pattern-fill'
 
 /**
  * Returns a categorical map.

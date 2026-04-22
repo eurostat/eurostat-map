@@ -3,7 +3,7 @@ import { interpolateOrRd } from 'd3-scale-chromatic'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
 import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
-import { applyPatternFill } from '../../core/pattern-fill.js'
+import { applyPatternFill } from '../../core/decoration/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
 import { applyClassificationToMap, defineClassifiers } from './ps-classification.js'
 import { updateBackgroundColor } from './ps-background.js'
@@ -13,7 +13,7 @@ import { appendCirclesToMap } from './symbols/circles.js'
 import { appendBarsToMap } from './symbols/bars.js'
 import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
 import { appendCustomSymbolsToMap } from './symbols/custom.js'
-import { appendLabelsToSymbols } from '../../core/labels.js'
+import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
 
 /**
  * Returns a proportional symbol map.
