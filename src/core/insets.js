@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { mapTemplate } from './map-template'
+import { createMapInstance } from './map-instance'
 
 /**
  * Build inset maps for a map template
@@ -70,7 +70,7 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     //}
 
     config.isInset = true
-    const mt = mapTemplate(config, withCenterPoints, mapType)
+    const mt = createMapInstance(config, withCenterPoints, mapType)
 
     //define default values for inset configs
     config = config || {}

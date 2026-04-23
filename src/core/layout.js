@@ -1,4 +1,6 @@
-const createMapSVG = function (out) {
+import { select, selectAll } from 'd3-selection'
+
+export const createMapSVG = function (out) {
     //get svg element. Create it if it does not exists
     let svg = select('#' + out.svgId())
     if (svg.size() == 0) {
@@ -15,7 +17,7 @@ const createMapSVG = function (out) {
     return svg
 }
 
-const wrapMapSvg = function (svg) {
+export const wrapMapSvg = function (svg) {
     const node = svg.node()
     if (!node) return
 
@@ -37,7 +39,7 @@ const wrapMapSvg = function (svg) {
     return wrapper
 }
 
-const recalculateLayout = function (out) {
+export const recalculateLayout = function (out) {
     const svg = out.svg()
     const header = svg.select('#em-header-' + out.svgId_)
     const drawing = svg.select('#em-drawing-' + out.svgId_)
@@ -79,17 +81,4 @@ const recalculateLayout = function (out) {
     // --- Resize entire SVG ---
     const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
     svg.attr('width', out.width_).attr('height', totalHeight)
-
-    // --- Optional: Debug overlay ---
-    // drawing.selectAll('.debug-clip').remove();
-    // drawing.append('rect')
-    //     .attr('class', 'debug-clip')
-    //     .attr('x', 0)
-    //     .attr('y', 0)
-    //     .attr('width', out.width_)
-    //     .attr('height', out.height_)
-    //     .attr('fill', 'none')
-    //     .attr('stroke', 'magenta')
-    //     .attr('stroke-width', 1)
-    //     .attr('pointer-events', 'none');
 }

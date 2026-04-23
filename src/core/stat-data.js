@@ -3,10 +3,13 @@ import { getEstatDataURL } from './utils'
 import JSONstat from 'jsonstat-toolkit'
 import { csvToIndex, jsonstatToIndex } from './utils'
 
+/** @typedef {import('../types/core/stat/StatData').StatData} StatData */
+/** @typedef {import('../types/core/stat/StatConfig').StatConfig} StatConfig */
+
 /**
- * A statistical dataset, to be used for a statistical map.
- *
- * @param {*} config
+ * Creates a statistical dataset for use with a eurostat-map instance.
+ * @param {StatConfig} [config]
+ * @returns {StatData}
  */
 export const statData = function (config) {
     //build stat data object

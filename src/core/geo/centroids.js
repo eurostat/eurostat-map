@@ -1,4 +1,6 @@
-const addCentroidsToMap = function (map) {
+import { geoCentroid } from 'd3-geo'
+
+export const addCentroidsToMap = function (map) {
     let centroidFeatures
 
     if (!map.Geometries.centroidsData) {
@@ -104,12 +106,12 @@ const addCentroidsToMap = function (map) {
  *
  * Always uses a map-specific ID to avoid collisions with insets.
  */
-out.getCentroidsGroup = function (map) {
+export const getCentroidsGroup = function (map) {
     return map.svg().select(`#em-centroids-${map.svgId_}`)
 }
 
 // This will remove any centroids with no statistical data and re-add centroids for regions that just got data.
-out.refreshCentroids = function (map) {
+export const refreshCentroids = function (map) {
     // Skip for grid cartograms
     if (map.gridCartogram_) return map
 
@@ -118,7 +120,7 @@ out.refreshCentroids = function (map) {
 
     map.Geometries.centroidsFeatures = allCentroids.filter((d) => centroidHasStatData(d.properties.id, map))
 
-    const gcp = out.getCentroidsGroup(map)
+    const gcp = getCentroidsGroup(map)
 
     gcp.selectAll('g.em-centroid')
         .data(map.Geometries.centroidsFeatures, (d) => d.properties.id)
@@ -137,7 +139,7 @@ out.refreshCentroids = function (map) {
 }
 
 // Small helper to check if region has statistical data
-const centroidHasStatData = function (id, map) {
+export const centroidHasStatData = function (id, map) {
     //TODO: statCodes_ is only for coxcomb and pie maps, ps maps should also be contemplated here
     if (!map.statCodes_) return true // if no data yet, keep everything
     return map.statCodes_.some((code) => {

@@ -1,59 +1,62 @@
-const defineProjection = function () {
+import { getApproxCurrentGeoBbox, getBBOXAsGeoJSON, getParameterByName } from '../utils'
+import { geoIdentity, geoPath } from 'd3-geo'
+
+export const defineProjection = function (map) {
     // Define projection based on the geographical context
 
-    if (out.geo_ === 'WORLD') {
+    if (map.geo_ === 'WORLD') {
         // Use Robinson projection for the world with optional custom projection function
-        out._projection =
-            out.projectionFunction_ ||
+        map._projection =
+            map.projectionFunction_ ||
             geoRobinson()
-                .translate([out.width_ / 2, out.height_ / 2])
-                .scale((out.width_ - 20) / (2 * Math.PI))
+                .translate([map.width_ / 2, map.height_ / 2])
+                .scale((map.width_ - 20) / (2 * Math.PI))
     } else {
         // For non-WORLD geo, use custom or default identity projection with calculated bounding box
-        out._projection =
-            out.projectionFunction_ ||
+        map._projection =
+            map.projectionFunction_ ||
             geoIdentity()
                 .reflectY(true)
-                .fitSize([out.width_, out.height_], getBBOXAsGeoJSON(getApproxCurrentGeoBbox(out)))
+                .fitSize([map.width_, map.height_], getBBOXAsGeoJSON(getApproxCurrentGeoBbox(map)))
     }
 }
 
-const definePathFunction = function () {
-    out._pathFunction = geoPath().projection(out._projection)
+export const definePathFunction = function (map) {
+    map._pathFunction = geoPath().projection(map._projection)
 }
 
-const defineDefaultPosition = function () {
-    if (out.projectionFunction_) {
+export const defineDefaultPosition = function (map) {
+    if (map.projectionFunction_) {
         // Handle custom D3 projection (like geoAzimuthalEquidistant)
-        if (typeof out.projectionFunction_.rotate === 'function') {
-            const r = out.projectionFunction_.rotate() // [lambda, phi, gamma]
+        if (typeof map.projectionFunction_.rotate === 'function') {
+            const r = map.projectionFunction_.rotate() // [lambda, phi, gamma]
             if (Array.isArray(r) && r.length >= 2) {
                 // Invert signs: the map's visual center is the opposite of its rotation
                 const lon = -r[0]
                 const lat = -r[1]
-                out.position_.x = out.position_.x ?? lon
-                out.position_.y = out.position_.y ?? lat
+                map.position_.x = map.position_.x ?? lon
+                map.position_.y = map.position_.y ?? lat
             }
-        } else if (typeof out.projectionFunction_.center === 'function') {
-            const c = out.projectionFunction_.center() // [lon, lat]
+        } else if (typeof map.projectionFunction_.center === 'function') {
+            const c = map.projectionFunction_.center() // [lon, lat]
             if (Array.isArray(c) && c.length === 2) {
-                out.position_.x = out.position_.x ?? c[0]
-                out.position_.y = out.position_.y ?? c[1]
+                map.position_.x = map.position_.x ?? c[0]
+                map.position_.y = map.position_.y ?? c[1]
             }
         }
     } else {
-        const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+        const defaultPosition = _defaultPosition[map.geo_ + '_' + map.proj_]
         if (defaultPosition) {
-            out.position_.x = out.position_.x || defaultPosition.geoCenter[0]
-            out.position_.y = out.position_.y || defaultPosition.geoCenter[1]
-        } else if (out.Geometries.defaultGeoData?.bbox) {
+            map.position_.x = map.position_.x || defaultPosition.geoCenter[0]
+            map.position_.y = map.position_.y || defaultPosition.geoCenter[1]
+        } else if (map.Geometries.defaultGeoData?.bbox) {
             // default to center of geoData bbox
-            out.position_.x = out.position_.x || 0.5 * (out.Geometries.defaultGeoData.bbox[0] + out.Geometries.defaultGeoData.bbox[2])
-            out.position_.y = out.position_.y || 0.5 * (out.Geometries.defaultGeoData.bbox[1] + out.Geometries.defaultGeoData.bbox[3])
+            map.position_.x = map.position_.x || 0.5 * (map.Geometries.defaultGeoData.bbox[0] + map.Geometries.defaultGeoData.bbox[2])
+            map.position_.y = map.position_.y || 0.5 * (map.Geometries.defaultGeoData.bbox[1] + map.Geometries.defaultGeoData.bbox[3])
         } else {
             //TODO: auto-define user=defined geometries geoCenter
-            // out.position_.x = Geometries.userGeometries
-            // out.position_.y = Geometries.userGeometries
+            // map  .position_.x = Geometries.userGeometries
+            // map.position_.y = Geometries.userGeometries
         }
     }
 
@@ -61,18 +64,28 @@ const defineDefaultPosition = function () {
     setViewFromURL()
 }
 
-const getDefaultZ = function () {
-    const defaultPosition = _defaultPosition[out.geo_ + '_' + out.proj_]
+export const getDefaultZ = function (map) {
+    const defaultPosition = _defaultPosition[map.geo_ + '_' + map.proj_]
     if (defaultPosition) {
-        return (defaultPosition.pixelSize * 800) / out.width_
-    } else if (out.Geometries.defaultGeoData?.bbox) {
+        return (defaultPosition.pixelSize * 800) / map.width_
+    } else if (map.Geometries.defaultGeoData?.bbox) {
         return Math.min(
-            (out.Geometries.defaultGeoData.bbox[2] - out.Geometries.defaultGeoData.bbox[0]) / out.width_,
-            (out.Geometries.defaultGeoData.bbox[3] - out.Geometries.defaultGeoData.bbox[1]) / out.height_
+            (map.Geometries.defaultGeoData.bbox[2] - map.Geometries.defaultGeoData.bbox[0]) / map.width_,
+            (map.Geometries.defaultGeoData.bbox[3] - map.Geometries.defaultGeoData.bbox[1]) / map.height_
         )
     } else {
         return 100
     }
+}
+
+/** Get x,y,z elements from URL and assign them to the view. */
+const setViewFromURL = function () {
+    const x = getParameterByName('x'),
+        y = getParameterByName('y'),
+        z = getParameterByName('z')
+    if (x != null && x != undefined && !isNaN(+x)) out.position_.x = +x
+    if (y != null && y != undefined && !isNaN(+y)) out.position_.y = +y
+    if (z != null && z != undefined && !isNaN(+z)) out.position_.z = +z
 }
 
 /** Default geocenter positions and pixelSize (for default width = 800px) for territories and projections. */

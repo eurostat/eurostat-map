@@ -19,11 +19,36 @@ import * as StripeComposition from './map-types/composition/map-stripe.js'
 import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/decoration/labels'
 
+// set default d3 locale
+import { formatDefaultLocale } from 'd3-format'
+formatDefaultLocale({
+    decimal: '.',
+    thousands: ' ',
+    grouping: [3],
+    currency: ['', '€'],
+})
+
+// init proj4 with common projections and aliases
+import { initProj4 } from './core/geo/proj4.js'
+initProj4()
+
+//types
+/** @typedef {import('./types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('./types/core/MapConfig').MapConfig} MapConfig */
+/** @typedef {import('./types/map-types/MapType').MapType} MapType */
+
 /**
- * Function returning a eurostat-map object.
+ * Creates and returns a eurostat-map instance of the specified type.
  *
- * @param {*} type The type of map ('ch' for choropleth, etc.)
- * @param {*} config The configuration object. Ex.: { title: "Map title", geoCenter: [233,654], ...}
+ * @param {MapType} type - The map type ('choropleth', 'ch', 'ps', 'flow', etc.)
+ * @param {MapConfig} [config] - Optional initial configuration object.
+ * @returns {MapInstance}
+ *
+ * @example
+ * eurostatmap.map('choropleth')
+ *   .width(800)
+ *   .stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } })
+ *   .build()
  */
 export const map = function (type, config) {
     try {
@@ -59,7 +84,7 @@ export const map = function (type, config) {
         //add new map types here
         //if(type == "XX") return mapXX.map(config);
 
-        console.log('Unexpected map type: ' + type)
+        console.warn(`[eurostat-map] Unknown map type: "${type}". See documentation for supported types.`)
         return mt.statMap(config, true, type)
     } catch (e) {
         console.error('Error in eurostat-map.map: ' + e.message)
@@ -67,12 +92,14 @@ export const map = function (type, config) {
     }
 }
 
+/** @typedef {import('./types/utils/FillPatternOptions').FillPatternOptions} FillPatternOptions */
+
 /**
- * Return a function which builds fill patterns style.
- * The returned function has for arguments the SVG element where to use the fill pattern, and the number of classes.
+ * Returns a function that defines SVG fill patterns for use in map legends.
+ * The returned function accepts (svg, numberOfClasses) as arguments.
  *
- * @param {*} opts Various parameters on the fill pattern.
- * @returns {function}
+ * @param {FillPatternOptions} [opts]
+ * @returns {function(svg: any, numberOfClasses: number): void}
  */
 export const getFillPatternDefinitionFunction = function (opts) {
     opts = opts || {}

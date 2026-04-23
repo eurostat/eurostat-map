@@ -1,10 +1,10 @@
 import { getDownloadURL, executeForAllInsets, applyComputedStylesToSVG, ensureSvgSize } from './utils'
-import * as MapTemplate from './map-template'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
 import { hideSpinner, showSpinner } from './decoration/spinner'
+import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 
 /**
  * An abstract statistical map: a map template with statistical data,
@@ -22,7 +22,7 @@ import { hideSpinner, showSpinner } from './decoration/spinner'
  */
 export const statMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
-    const out = MapTemplate.mapTemplate(config, withCenterPoints, mapType)
+    const out = createMapInstance(config, withCenterPoints, mapType)
 
     // build-completion latch
     out._geoDone_ = false
@@ -323,7 +323,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
         out._loadingGeo_ = true
         out.updateLoader()
 
-        out.updateGeoMapTemplate(() => {
+        updateGeoMapTemplate(() => {
             out._loadingGeo_ = false
             out.updateLoader()
 
@@ -337,7 +337,7 @@ export const statMap = function (config, withCenterPoints, mapType) {
             }
 
             tryFinalize()
-        })
+        }, out)
 
         return out
     }
