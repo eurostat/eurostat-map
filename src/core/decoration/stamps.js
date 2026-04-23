@@ -1,3 +1,11 @@
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/decoration/StampConfig').StampConfig} StampConfig */
+
+/**
+ * Appends a stamp annotation to the map SVG.
+ * @param {StampConfig} stampConfig
+ * @param {MapInstance} map
+ */
 export const appendStamp = (stampConfig, map) => {
     if (map.svg_) {
         const existing = map.svg_.select('#em-stamp')

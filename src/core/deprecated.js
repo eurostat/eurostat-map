@@ -155,4 +155,59 @@ export const defineDeprecatedFunctions = (out) => {
     out.flowGradient = (v) => (console.warn('map.flowGradient() is now DEPRECATED. please use flowColorGradient() or flowWidthGradient() instead.'), out.flowColorGradient_ = v, out);
     out.flowOverlayColors = (v) => (console.warn('map.flowOverlayColors() is now DEPRECATED. please use flowRegionColors() instead.'), out.flowRegionColors_ = v, out);
     out.getFillPatternDefinitionFun = (v) => (console.warn('getFillPatternDefinitionFun is now DEPRECATED. please use fillPatternDefinitionFunction() instead.'), out.fillPatternDefinitionFunction_ = v, out);
+
+    // scalebar is now a config object instead of separate functions (map.scalebar({}))
+    out.showScalebar = (v) => (
+        console.warn('DEPRECATED: use map.scalebar(true/false)'),
+        out.scalebar(v),
+        out
+    )
+
+    out.scalebarPosition = (v) => (
+        console.warn('map.scalebarPosition() is now DEPRECATED. Please use map.scalebar({ position: [x, y] }) instead.'),
+        out.scalebar({ position: v }),
+        out
+    )
+
+    out.scalebarUnits = (v) => (
+        console.warn('map.scalebarUnits() is now DEPRECATED. Please use map.scalebar({ units }) instead.'),
+        out.scalebar({ units: v }),
+        out
+    )
+
+    out.scalebarTextOffset = (v) => (
+        console.warn('map.scalebarTextOffset() is now DEPRECATED. Please use map.scalebar({ textOffset: [x, y] }) instead.'),
+        out.scalebar({ textOffset: v }),
+        out
+    )
+
+    out.scalebarMaxWidth = (v) => (
+        console.warn('map.scalebarMaxWidth() is now DEPRECATED. Please use map.scalebar({ maxWidth }) instead.'),
+        out.scalebar({ maxWidth: v }),
+        out
+    )
+
+    out.scalebarHeight = (v) => (
+        console.warn('map.scalebarHeight() is now DEPRECATED. Please use map.scalebar({ height }) instead.'),
+        out.scalebar({ height: v }),
+        out
+    )
+
+    out.scalebarStrokeWidth = (v) => (
+        console.warn('map.scalebarStrokeWidth() is now DEPRECATED. Please use map.scalebar({ strokeWidth }) instead.'),
+        out.scalebar({ strokeWidth: v }),
+        out
+    )
+
+    out.scalebarSegmentHeight = (v) => (
+        console.warn('map.scalebarSegmentHeight() is now DEPRECATED. Please use map.scalebar({ segmentHeight }) instead.'),
+        out.scalebar({ segmentHeight: v }),
+        out
+    )
+
+    out.scalebarTickHeight = (v) => (
+        console.warn('map.scalebarTickHeight() is now DEPRECATED. Please use map.scalebar({ tickHeight }) instead.'),
+        out.scalebar({ tickHeight: v }),
+        out
+    )
 }

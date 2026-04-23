@@ -17,7 +17,7 @@ import { initProj4 } from './geo/proj4.js'
 import { addEurostatLogo, addEurostatRibbon } from './decoration/logo.js'
 import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
-import { addScalebarToMap } from './decoration/scalebar.js'
+import { addScalebarToMap, getDefaultScalebarConfig } from './decoration/scalebar.js'
 import { attachLocationsApi } from './locations.js'
 import { createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
 import { defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
@@ -108,15 +108,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.subtitlePosition_ = undefined
 
     //scalebar
-    out.showScalebar_ = false
-    out.scalebarPosition_ = []
-    out.scalebarUnits_ = ' km' //label
-    out.scalebarTextOffset_ = [0, 12]
-    out.scalebarMaxWidth_ = 150 //px
-    out.scalebarHeight_ = 90 //px
-    out.scalebarStrokeWidth_ = 1 //px
-    out.scalebarSegmentHeight_ = 6
-    out.scalebarTickHeight_ = 8
+    out.scalebar_ = null // null = disabled
 
     // stamp annotation
     out.stamp_ = undefined //e.g {x,y,text,size}
@@ -346,6 +338,27 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
                     })
             }
         }
+        return out
+    }
+
+    out.scalebar = function (v) {
+        if (!arguments.length) return out.scalebar_
+
+        if (v === false) {
+            out.scalebar_ = null
+            return out
+        }
+
+        if (v === true) {
+            out.scalebar_ = out.scalebar_ || getDefaultScalebarConfig()
+            return out
+        }
+
+        if (typeof v === 'object' && v !== null) {
+            out.scalebar_ = Object.assign({}, getDefaultScalebarConfig(), out.scalebar_ || {}, v)
+            return out
+        }
+
         return out
     }
 
@@ -623,11 +636,13 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         }
 
         // scalebar - not applicable for grid cartograms
-        if (out.showScalebar_ && !out.gridCartogram_) {
-            if (out.scalebarPosition_.length !== 2) {
-                out.scalebarPosition_[0] = 15
-                out.scalebarPosition_[1] = out.height_ - 50
+        if (out.scalebar_ && !out.gridCartogram_) {
+            const sb = out.scalebar_
+
+            if (!sb.position || sb.position.length !== 2) {
+                sb.position = [15, out.height_ - 50]
             }
+
             addScalebarToMap(out)
         }
 
