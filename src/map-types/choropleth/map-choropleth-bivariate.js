@@ -1,7 +1,6 @@
 import { select } from 'd3-selection'
 import { scaleQuantile, scaleThreshold } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
-import * as StatMap from '../../core/stat-map'
 import * as BivariateLegend from '../../legend/choropleth/legend-choropleth-bivariate'
 import {
     getCSSPropertyFromClass,
@@ -10,6 +9,7 @@ import {
     getRegionsSelector,
     getTextColorForBackground,
 } from '../../core/utils'
+import { createStatMap } from '../../core/stat-map'
 
 /**
  * Return a bivariate choropleth map.
@@ -19,7 +19,7 @@ import {
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, false, 'chbi')
+    const out = createStatMap(config, false, 'chbi')
 
     //number of classes for the classification. Same for both variables.
     out.numberOfClasses_ = 3
@@ -75,7 +75,6 @@ export const map = function (config) {
             if (config[k] != undefined) out[key](config[k])
         })
     }
-
 
     //@override
     out.updateClassification = function () {

@@ -3,7 +3,7 @@
 
 import { min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as FlowLegend from '../../legend/flow/legend-flow'
 import { select } from 'd3-selection'
 import { createSankeyFlowMap } from './sankey'
@@ -21,7 +21,7 @@ import { addFlowValueLabels } from '../../core/decoration/labels'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, true, 'flow')
+    const out = createStatMap(config, true, 'flow')
     out.strokeWidthScale = null // function to scale flow widths
 
     // override tooltip function

@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as TrivariateLegend from '../../legend/choropleth/legend-choropleth-trivariate'
 import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
 import { tricolore, CompositionUtils } from '../../lib/tricolore/src'
@@ -8,7 +8,7 @@ import { tricolore, CompositionUtils } from '../../lib/tricolore/src'
  * Trivariate (ternary) choropleth map — Observable-style
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, false, 'chtri')
+    const out = createStatMap(config, false, 'chtri')
 
     // ===============================
     // Configuration

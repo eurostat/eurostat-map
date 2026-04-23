@@ -3,7 +3,7 @@ import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
 import { schemeCategory10 } from 'd3-scale-chromatic'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
 import { interpolate } from 'd3-interpolate'
@@ -25,7 +25,7 @@ import { createRadialScale } from '../../core/scale.js'
  * @param {*} config
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, true, 'coxcomb')
+    const out = createStatMap(config, true, 'coxcomb')
 
     // ── Config defaults ──────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { arc, pie } from 'd3-shape'
 import { schemeCategory10 } from 'd3-scale-chromatic'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as StripeCompositionLegend from '../../legend/legend-stripe-composition'
 import { getRegionsSelector } from '../../core/utils'
 import { buildGetterSetters, applyConfigValues, getComposition, addMouseEventsToRegions, buildStatCompositionMethod } from './composition-map'
@@ -17,7 +17,7 @@ import { buildGetterSetters, applyConfigValues, getComposition, addMouseEventsTo
  * @param {*} config
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, false, 'scomp')
+    const out = createStatMap(config, false, 'scomp')
 
     // ── Config defaults ──────────────────────────────────────────────────────
 

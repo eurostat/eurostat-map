@@ -1,6 +1,6 @@
 import { scaleSqrt } from 'd3-scale'
 import { select } from 'd3-selection'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
@@ -56,7 +56,7 @@ import {
  *   .build()
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, true, 'bar')
+    const out = createStatMap(config, true, 'bar')
 
     // ── Config defaults ──────────────────────────────────────────────────────
 

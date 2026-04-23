@@ -22,7 +22,7 @@ import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, true, 'ps')
+    const out = createStatMap(config, true, 'ps')
 
     //shape
     out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross

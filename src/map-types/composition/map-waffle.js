@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as WaffleChartLegend from '../../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
@@ -25,7 +25,7 @@ import {
  * @param {*} config
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, true, 'waffle')
+    const out = createStatMap(config, true, 'waffle')
 
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false

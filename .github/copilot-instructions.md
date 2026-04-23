@@ -110,7 +110,7 @@ out.numberOfClasses = function (v) {
 ### Creating New Map Types
 
 1. Create module in [src/map-types/](src/map-types/) exporting `map(config)` function
-2. Extend `StatMap.statMap()` with type-specific parameters
+2. Extend `createStatMap()` with type-specific parameters
 3. Implement required methods: `updateClassification()`, `updateStyle()`, `getLegendConstructor()`
 4. Register in [src/eurostat-map.js](src/eurostat-map.js) factory function
 5. Add example in [examples/](examples/) and update [docs/reference.md](docs/reference.md)

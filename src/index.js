@@ -16,8 +16,8 @@ import * as Waffle from './map-types/composition/map-waffle.js'
 import * as Coxcomb from './map-types/composition/map-coxcomb.js'
 import * as StripeComposition from './map-types/composition/map-stripe.js'
 
-import * as mt from './core/stat-map'
 import { DEFAULTLABELS } from './core/decoration/labels'
+import { createStatMap } from './core/stat-map'
 
 // set default d3 locale
 import { formatDefaultLocale } from 'd3-format'
@@ -85,7 +85,7 @@ export const map = function (type, config) {
         //if(type == "XX") return mapXX.map(config);
 
         console.warn(`[eurostat-map] Unknown map type: "${type}". See documentation for supported types.`)
-        return mt.statMap(config, true, type)
+        return createStatMap(config, true, type)
     } catch (e) {
         console.error('Error in eurostat-map.map: ' + e.message)
         console.error(e)
@@ -153,4 +153,5 @@ export const getDefaultLabels = function () {
 export { projectFromMap, projectToMap } from './core/geo/proj4.js'
 
 import pkg from '../package.json'
+
 export const version = pkg.version

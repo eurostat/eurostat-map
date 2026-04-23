@@ -3,7 +3,7 @@ import { scaleLinear } from 'd3-scale'
 import { easeLinear } from 'd3-ease'
 import { line, area } from 'd3-shape'
 import { axisBottom, axisLeft } from 'd3-axis'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as SparkLegend from '../../legend/legend-spark.js'
 import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
 import * as StatisticalData from '../../core/stat-data'
@@ -20,7 +20,7 @@ import { buildGetterSetters, applyConfigValues } from './composition-map'
  * @param {*} config
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, true, 'spark')
+    const out = createStatMap(config, true, 'spark')
 
     // ── Config defaults ──────────────────────────────────────────────────────
 

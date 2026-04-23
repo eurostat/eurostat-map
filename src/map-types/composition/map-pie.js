@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { arc, pie } from 'd3-shape'
 import { interpolate } from 'd3-interpolate'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as PiechartLegend from '../../legend/legend-pie-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
@@ -26,7 +26,7 @@ import {
  * @param {*} config
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, true, 'pie')
+    const out = createStatMap(config, true, 'pie')
 
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false

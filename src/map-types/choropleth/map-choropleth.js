@@ -4,7 +4,7 @@ import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
-import * as StatMap from '../../core/stat-map'
+import { createStatMap } from '../../core/stat-map'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
 import { checkIfDiverging, executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
@@ -17,7 +17,7 @@ import { applyPatternFill } from '../../core/decoration/pattern-fill'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, false, 'ch')
+    const out = createStatMap(config, false, 'ch')
 
     //the number of classes
     out.numberOfClasses_ = 7

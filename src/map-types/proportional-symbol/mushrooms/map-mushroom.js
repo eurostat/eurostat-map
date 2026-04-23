@@ -14,7 +14,7 @@ import * as MushroomLegend from '../../../legend/legend-mushroom.js'
  * v2 = right / bottom
  */
 export const map = function (config) {
-    const out = StatMap.statMap(config, true, 'mushroom')
+    const out = createStatMap(config, true, 'mushroom')
 
     // ===============================
     // Configuration

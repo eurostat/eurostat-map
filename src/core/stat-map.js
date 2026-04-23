@@ -6,21 +6,19 @@ import * as tp from '../tooltip/tooltip'
 import { hideSpinner, showSpinner } from './decoration/spinner'
 import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../types/core/MapConfig').MapConfig} MapConfig */
+/** @typedef {import('../types/core/stat/StatConfig').StatConfig} StatConfig */
+/** @typedef {import('../types/core/stat/StatData').StatData} StatData */
+/** @typedef {import('../types/legend/LegendConfig').LegendConfig} LegendConfig */
+
 /**
- * An abstract statistical map: a map template with statistical data,
- * without any particular styling rule. All concrete map types (choropleth,
- * proportional symbol, flow, etc.) are built on top of this.
- *
- * @param {object} config - Initial configuration object. Any getter/setter
- *   defined on the map can be passed here as a key/value pair.
- *   @example { title: 'My map', nutsLevel: 2, legend: { x: 10, y: 90 } }
- * @param {boolean} withCenterPoints - When true, NUTS region centroid points
- *   are added to the map. Required for proportional symbol, pie, coxcomb, etc.
- * @param {string} mapType - Internal map type identifier (e.g. 'choropleth',
- *   'ps', 'coxcomb'). Used for CSS class assignment and inset inheritance.
- * @returns {object} A statMap instance with builder-pattern getter/setters.
+ * @param {MapConfig} config
+ * @param {boolean} withCenterPoints
+ * @param {string} mapType
+ * @returns {MapInstance}
  */
-export const statMap = function (config, withCenterPoints, mapType) {
+export const createStatMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
     const out = createMapInstance(config, withCenterPoints, mapType)
 

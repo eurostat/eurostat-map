@@ -1,10 +1,11 @@
 import { select } from 'd3-selection'
 import { scaleOrdinal } from 'd3-scale'
 import { schemeSet3 } from 'd3-scale-chromatic'
-import * as StatMap from '../core/stat-map'
+
 import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/decoration/pattern-fill'
+import { createStatMap } from '../core/stat-map'
 
 /**
  * Returns a categorical map.
@@ -13,7 +14,7 @@ import { applyPatternFill } from '../core/decoration/pattern-fill'
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = StatMap.statMap(config, false, 'ct')
+    const out = createStatMap(config, false, 'ct')
 
     /** Fill style for each category/class. Ex.: { urb: "#fdb462", int: "#ffffb3", rur: "#ccebc5" } */
     out.classToFillStyle_ = undefined
