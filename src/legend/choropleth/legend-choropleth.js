@@ -6,6 +6,10 @@ import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from '../legend-continuous'
 import { drawDiscreteLegend, buildDiscreteLabelFormatter, resolveDecimals } from '../legend-discrete'
 import { createAlphaLegend } from './legend-value-by-alpha'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A legend for choropleth maps

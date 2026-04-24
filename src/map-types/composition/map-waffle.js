@@ -4,6 +4,11 @@ import * as WaffleChartLegend from '../../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import {
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
+
+
     buildGetterSetters,
     applyConfigValues,
     getComposition,

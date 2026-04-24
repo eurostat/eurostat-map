@@ -3,6 +3,10 @@ import { formatDefaultLocale } from 'd3-format'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A eurostat-map legend. This is an abstract method.

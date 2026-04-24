@@ -11,6 +11,11 @@ import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
 import { createRadialScale } from '../../core/scale.js'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
+
+
 /**
  * Returns a coxcomb (polar area) chart map.
  *

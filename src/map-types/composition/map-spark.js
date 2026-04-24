@@ -8,6 +8,11 @@ import * as SparkLegend from '../../legend/legend-spark.js'
 import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
 import * as StatisticalData from '../../core/stat-data'
 import { buildGetterSetters, applyConfigValues } from './composition-map'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
+
+
 
 /**
  * Returns a sparkline map.

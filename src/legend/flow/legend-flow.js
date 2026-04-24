@@ -2,6 +2,10 @@ import * as Legend from '../legend'
 import { drawCircleSizeLegend } from '../legend-circle-size'
 import { drawHorizontalFlowWidthLegend, drawVerticalFlowWidthLegend } from './legend-flow-width'
 import { drawFlowColorLegend } from './legend-flow-color'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A legend for proportional symbol map

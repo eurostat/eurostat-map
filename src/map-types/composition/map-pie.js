@@ -7,6 +7,11 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import {
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
+
+
     buildGetterSetters,
     applyConfigValues,
     getComposition,

@@ -3,6 +3,10 @@ import { scaleQuantile, scaleThreshold } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as BivariateLegend from '../../legend/choropleth/legend-choropleth-bivariate'
 import {
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
     getCSSPropertyFromClass,
     spaceAsThousandSeparator,
     executeForAllInsets,

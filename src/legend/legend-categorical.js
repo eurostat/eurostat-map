@@ -3,6 +3,10 @@ import * as Legend from './legend'
 import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
 import { highlightRegions, unhighlightRegions } from './legend'
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A legend for categorical maps

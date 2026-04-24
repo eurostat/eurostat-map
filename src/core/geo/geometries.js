@@ -6,6 +6,9 @@ import { kosovoBnFeatures } from './kosovo'
 import { geoGraticule } from 'd3-geo'
 import { get, set } from 'idb-keyval'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
 //helpers for when indexedDB is not supported
 const memCache = new Map()
 const TTL_MS = 24 * 60 * 60 * 1000 // 24h

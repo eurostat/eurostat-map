@@ -5,6 +5,10 @@
 import { pointer, select } from 'd3-selection'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { highlightRegions, unhighlightRegions } from './legend'
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 // All of the above with or without .valueTransform / .valueUntransform
 export function createContinuousLegend(out, baseX, baseY) {

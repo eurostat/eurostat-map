@@ -1,6 +1,12 @@
 import { getApproxCurrentGeoBbox, getBBOXAsGeoJSON, getParameterByName } from '../utils'
 import { geoIdentity, geoPath } from 'd3-geo'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+/**
+ * @param {MapInstance} map
+ */
 export const defineProjection = function (map) {
     // Define projection based on the geographical context
 

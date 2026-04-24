@@ -2,6 +2,10 @@ import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as Legend from '../legend'
 import { executeForAllInsets } from '../../core/utils'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A legend for bar chart maps.

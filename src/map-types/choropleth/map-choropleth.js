@@ -10,10 +10,14 @@ import { checkIfDiverging, executeForAllInsets, getRegionsSelector, getTextColor
 import { jenks, ckmeans } from 'simple-statistics'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/choropleth/map-choropleth').ChoroplethMapConfig} ChoroplethMapConfig */
+
 /**
- * Returns a chroropleth map.
- *
- * @param {*} config
+ * Returns a choropleth map.
+ * @param {ChoroplethMapConfig} config
+ * @returns {MapInstance}
  */
 export const map = function (config) {
     //create map object to return, using the template

@@ -3,6 +3,10 @@ import * as Legend from '../legend'
 import { select } from 'd3-selection'
 import { TricoloreViz } from '../../lib/tricolore/src'
 import { executeForAllInsets, getLegendRegionsSelector } from '../../core/utils'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * Legend for trivariate (ternary) choropleth maps

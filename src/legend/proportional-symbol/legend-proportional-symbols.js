@@ -3,6 +3,10 @@ import * as Legend from '../legend'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { drawSizeLegend } from './legend-symbol-size'
 import { drawDiscreteLegend, buildDiscreteLabelFormatter } from '../legend-discrete'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A legend for proportional symbol map

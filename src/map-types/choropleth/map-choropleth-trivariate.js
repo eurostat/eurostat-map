@@ -3,6 +3,10 @@ import { createStatMap } from '../../core/stat-map'
 import * as TrivariateLegend from '../../legend/choropleth/legend-choropleth-trivariate'
 import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
 import { tricolore, CompositionUtils } from '../../lib/tricolore/src'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * Trivariate (ternary) choropleth map — Observable-style

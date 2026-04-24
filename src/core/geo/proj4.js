@@ -1,5 +1,8 @@
 import proj4 from 'proj4'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
 export function initProj4() {
     // Load proj4 definitions for dynamic minimaps that are linked to the main map view and also for placename labels
 

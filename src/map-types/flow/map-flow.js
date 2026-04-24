@@ -13,6 +13,10 @@ import { drawNodeDonuts } from './donuts'
 import { drawNodeCircles } from './circles'
 import { scaleOrdinal } from 'd3-scale'
 import { addFlowValueLabels } from '../../core/decoration/labels'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * Returns a flow map.

@@ -6,6 +6,11 @@ import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/decoration/pattern-fill'
 import { createStatMap } from '../core/stat-map'
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../types/map-types/map-categorical').CategoricalMapConfig} CategoricalMapConfig */
+
+
 
 /**
  * Returns a categorical map.

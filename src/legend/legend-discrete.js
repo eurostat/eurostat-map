@@ -3,6 +3,10 @@ import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
 import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js'
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared formatting utilities

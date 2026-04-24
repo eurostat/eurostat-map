@@ -1,5 +1,11 @@
 import { geoCentroid } from 'd3-geo'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+/**
+ * @param {MapInstance} map
+ */
 export const addCentroidsToMap = function (map) {
     let centroidFeatures
 

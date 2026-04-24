@@ -2,6 +2,10 @@ import { select, selectAll } from 'd3-selection'
 import * as Legend from '../legend'
 import { line } from 'd3-shape'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../../core/utils'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 /**
  * A legend for choropleth-bivariate maps

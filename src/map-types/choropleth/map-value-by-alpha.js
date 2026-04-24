@@ -4,6 +4,10 @@ import * as Choropleth from './map-choropleth'
 import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
 import { select } from 'd3-selection'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
+
 
 export const map = function (config) {
     // inherits and extends choropleth map
