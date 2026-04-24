@@ -1,5 +1,11 @@
 import { select, selectAll } from 'd3-selection'
 
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+/**
+ * @param {MapInstance} out
+ */
 export const createMapSVG = function (out) {
     //get svg element. Create it if it does not exists
     let svg = select('#' + out.svgId())

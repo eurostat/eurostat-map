@@ -3,6 +3,12 @@ import { feature } from 'topojson-client'
 import { json } from 'd3-fetch'
 import proj4 from 'proj4'
 
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+/**
+ * @param {MapInstance} map
+ */
 export const appendMinimap = (map) => {
     if (!map.svg_) return
     if (!map.minimap_.size) map.minimap_.size = 150

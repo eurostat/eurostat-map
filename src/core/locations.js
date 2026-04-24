@@ -1,3 +1,7 @@
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../types/core/locations').LocationConfig} LocationConfig */
+
 /**
  * locations.js
  * Adds point locations (circles, pins, squares, diamonds, crosses) to a

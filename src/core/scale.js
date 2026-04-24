@@ -1,6 +1,9 @@
 import { scaleLinear, scaleRadial, scaleSqrt } from 'd3-scale'
 import { max, min } from 'd3-array'
 
+//types
+/** @typedef {import('../types/core/scale')} ScaleModule */
+
 /**
  * Create a proportional circle radius scale (area ∝ value)
  *

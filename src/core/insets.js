@@ -1,8 +1,14 @@
 import { select } from 'd3-selection'
 import { createMapInstance } from './map-instance'
 
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
 /**
  * Build inset maps for a map template
+ * @param {MapInstance} out
+ * @param {boolean} withCenterPoints
+ * @param {string} mapType
  */
 export const buildInsets = function (out, withCenterPoints, mapType) {
     // Early return if no insets to build

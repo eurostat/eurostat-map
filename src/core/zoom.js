@@ -2,6 +2,12 @@ import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
 import { taperedPolygonForLink } from '../map-types/flow/sankey'
 
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
+/**
+ * @param {MapInstance} map
+ */
 export const defineMapZoom = function (map) {
     if (map.gridCartogram_) {
         defineGridCartogramZoom(map)

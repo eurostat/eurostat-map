@@ -1,6 +1,10 @@
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+
 /**
  * @function addScalebarToMap
  * @description appends an SVG scalebar to the map. Uses pixelSize to calculate units in km
+ * @param {MapInstance} out
  */
 export const addScalebarToMap = function (out) {
     const sb = out.scalebar_ || getDefaultScalebarConfig()

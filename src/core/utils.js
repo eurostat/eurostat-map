@@ -1,5 +1,9 @@
 import { scaleLinear } from 'd3-scale'
 import { color } from 'd3-color'
+
+//types
+/** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
+
 // Ensures a <g> element with the specified class exists within the container.
 // If it exists, clears its contents; if not, creates it.
 export function ensureGroup(container, className) {
