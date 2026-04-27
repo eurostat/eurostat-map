@@ -9,8 +9,6 @@ import { select } from 'd3-selection'
 /** @typedef {import('../../types/map-types/choropleth/ValueByAlphaConfig').ValueByAlphaConfig} ValueByAlphaConfig */
 /** @typedef {import('../../types/map-types/choropleth/ValueByAlphaMap').ValueByAlphaMap} ValueByAlphaMap */
 
-
-
 /**
  * @param {ValueByAlphaConfig} [config]
  * @returns {ValueByAlphaMap}
