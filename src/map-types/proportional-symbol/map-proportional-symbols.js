@@ -17,17 +17,17 @@ import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/proportional-symbol/ProportionalSymbolConfig').ProportionalSymbolConfig} ProportionalSymbolConfig */
-
-
+/** @typedef {import('../../types/map-types/proportional-symbol/ProportionalSymbolMap').ProportionalSymbolMap} ProportionalSymbolMap */
 
 /**
  * Returns a proportional symbol map.
  *
  * @param {ProportionalSymbolConfig} [config]
+ * @returns {ProportionalSymbolMap}
  */
 export const map = function (config) {
     //create map object to return, using the template
-    const out = createStatMap(config, true, 'ps')
+    const out = StatMap.createStatMap(config, true, 'ps')
 
     //shape
     out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross

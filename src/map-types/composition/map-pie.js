@@ -23,11 +23,13 @@ import {
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/PieMapConfig').PieMapConfig} PieMapConfig */
+/** @typedef {import('../../types/map-types/composition/PieMap').PieMap} PieMap */
 
 /**
  * Returns a proportional pie chart map.
  *
  * @param {PieMapConfig} [config]
+ * @returns {PieMap}
  */
 export const map = function (config) {
     const out = createStatMap(config, true, 'pie')

@@ -16,11 +16,13 @@ import { addFlowValueLabels } from '../../core/decoration/labels'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/flow/FlowMapConfig').FlowMapConfig} FlowMapConfig */
+/** @typedef {import('../../types/map-types/flow/FlowMap').FlowMap} FlowMap */
 
 /**
  * Returns a flow map.
  *
  * @param {FlowMapConfig} [config]
+ * @returns {FlowMap}
  */
 export const map = function (config) {
     //create map object to return, using the template

@@ -6,9 +6,15 @@ import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
 import { select } from 'd3-selection'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/choropleth/ValueByAlphaConfig').ValueByAlphaConfig} ValueByAlphaConfig */
+/** @typedef {import('../../types/map-types/choropleth/ValueByAlphaMap').ValueByAlphaMap} ValueByAlphaMap */
 
 
 
+/**
+ * @param {ValueByAlphaConfig} [config]
+ * @returns {ValueByAlphaMap}
+ */
 export const map = function (config) {
     // inherits and extends choropleth map
     const out = Choropleth.map(config)

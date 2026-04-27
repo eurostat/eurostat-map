@@ -5,14 +5,14 @@ import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } fro
 import { tricolore, CompositionUtils } from '../../lib/tricolore/src'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/index').TrivariateChoroplethConfig} TrivariateChoroplethConfig */
-
-
+/** @typedef {import('../../types/map-types/choropleth/TrivariateChoroplethConfig').TrivariateChoroplethConfig} TrivariateChoroplethConfig */
+/** @typedef {import('../../types/map-types/choropleth/TrivariateChoroplethMap').TrivariateChoroplethMap} TrivariateChoroplethMap */
 
 /**
  * Trivariate (ternary) choropleth map — Observable-style
  *
  * @param {TrivariateChoroplethConfig} [config]
+ * @returns {TrivariateChoroplethMap}
  */
 export const map = function (config) {
     const out = createStatMap(config, false, 'chtri')

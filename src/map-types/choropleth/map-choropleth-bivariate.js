@@ -3,10 +3,6 @@ import { scaleQuantile, scaleThreshold } from 'd3-scale'
 import { interpolateRgb } from 'd3-interpolate'
 import * as BivariateLegend from '../../legend/choropleth/legend-choropleth-bivariate'
 import {
-//types
-/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-
-
     getCSSPropertyFromClass,
     spaceAsThousandSeparator,
     executeForAllInsets,
@@ -15,11 +11,17 @@ import {
 } from '../../core/utils'
 import { createStatMap } from '../../core/stat-map'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/choropleth/BivariateChoroplethConfig').BivariateChoroplethConfig} BivariateChoroplethConfig */
+/** @typedef {import('../../types/map-types/choropleth/BivariateChoroplethMap').BivariateChoroplethMap} BivariateChoroplethMap */
+
 /**
  * Return a bivariate choropleth map.
  * See: https://gistbok.ucgis.org/bok-topics/multivariate-mapping
  *
- * @param {*} config
+ * @param {BivariateChoroplethConfig} [config]
+ * @returns {BivariateChoroplethMap}
  */
 export const map = function (config) {
     //create map object to return, using the template
@@ -64,7 +66,8 @@ export const map = function (config) {
         'noDataFillStyle_',
         'classifier1_',
         'classifier2_',
-    ].forEach(function (att) {
+    ]
+    paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
@@ -76,7 +79,7 @@ export const map = function (config) {
     if (config) {
         paramNames.forEach(function (key) {
             let k = key.slice(0, -1) // remove trailing underscore
-            if (config[k] != undefined) out[key](config[k])
+            if (config[k] != undefined) out[k](config[k])
         })
     }
 

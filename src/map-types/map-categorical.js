@@ -9,11 +9,13 @@ import { createStatMap } from '../core/stat-map'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../types/map-types/CateogricalMapConfig').CategoricalMapConfig} CategoricalMapConfig */
+/** @typedef {import('../types/map-types/CategoricalMap').CategoricalMap} CategoricalMap */
 
 /**
  * Returns a categorical map.
  *
- * @param {*} config
+ * @param {CategoricalMapConfig} [config]
+ * @returns {CategoricalMap}
  */
 export const map = function (config) {
     //create map object to return, using the template

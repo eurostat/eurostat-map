@@ -1,3 +1,5 @@
+import type { MapConfig } from '../../core/MapConfig'
+
 /**
  * Configuration for proportional symbol maps
  */

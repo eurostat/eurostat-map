@@ -7,14 +7,21 @@ import { executeForAllInsets, spaceAsThousandSeparator } from '../../../core/uti
 import { runDorlingSimulation, stopDorlingSimulation } from '../../../core/dorling/dorling.js'
 import { addMouseEvents } from './map-mushroom-interactions.js'
 import * as MushroomLegend from '../../../legend/legend-mushroom.js'
+//types
+/** @typedef {import('../../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../../types/map-types/proportional-symbol/mushroom/MushroomMapConfig').MushroomMapConfig} MushroomMapConfig */
+/** @typedef {import('../../../types/map-types/proportional-symbol/mushroom/MushroomMap').MushroomMap} MushroomMap */
 
 /**
  * Mushroom (dual semi-circle) proportional symbol map
  * v1 = left / top
  * v2 = right / bottom
+ *
+ * @param {MushroomMapConfig} [config]
+ * @returns {MushroomMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, true, 'mushroom')
+    const out = StatMap.createStatMap(config, true, 'mushroom')
 
     // ===============================
     // Configuration

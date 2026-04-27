@@ -7,7 +7,8 @@ import { getRegionsSelector } from '../../core/utils'
 import { buildGetterSetters, applyConfigValues, getComposition, addMouseEventsToRegions, buildStatCompositionMethod } from './composition-map'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionMapConfig} CompositionMapConfig */
+/** @typedef {import('../../types/map-types/composition/StripeMapConfig').StripeMapConfig} StripeMapConfig */
+/** @typedef {import('../../types/map-types/composition/StripeMap').StripeMap} StripeMap */
 
 /**
  * Return a stripe composition map.
@@ -17,7 +18,8 @@ import { buildGetterSetters, applyConfigValues, getComposition, addMouseEventsTo
  * fills regions directly rather than drawing a centroid symbol, and has no
  * proportional sizing (all regions show the same total stripe width).
  *
- * @param {*} config
+ * @param {StripeMapConfig} [config]
+ * @returns {StripeMap}
  */
 export const map = function (config) {
     const out = createStatMap(config, false, 'scomp')

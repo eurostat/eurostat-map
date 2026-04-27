@@ -10,7 +10,8 @@ import * as StatisticalData from '../../core/stat-data'
 import { buildGetterSetters, applyConfigValues } from './composition-map'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionMapConfig} CompositionMapConfig */
+/** @typedef {import('../../types/map-types/composition/SparkMapConfig').SparkMapConfig} SparkMapConfig */
+/** @typedef {import('../../types/map-types/composition/SparkMap').SparkMap} SparkMap */
 
 /**
  * Returns a sparkline map.
@@ -20,7 +21,8 @@ import { buildGetterSetters, applyConfigValues } from './composition-map'
  * the data model here is temporal — a sequence of dated values per region —
  * rather than a set of simultaneously measured categories.
  *
- * @param {*} config
+ * @param {SparkMapConfig} [config]
+ * @returns {SparkMap}
  */
 export const map = function (config) {
     const out = createStatMap(config, true, 'spark')

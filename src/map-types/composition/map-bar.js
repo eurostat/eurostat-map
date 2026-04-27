@@ -22,6 +22,7 @@ import {
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/BarMapConfig').BarMapConfig} BarMapConfig */
+/** @typedef {import('../../types/map-types/composition/BarMap').BarMap} BarMap */
 
 /**
  * Returns a proportional bar chart map.
@@ -38,6 +39,7 @@ import {
  * across regions without collapsing them into proportions.
  *
  * @param {BarMapConfig} [config]
+ * @returns {BarMap}
  *
  * @example — stacked
  * eurostatmap.map('bar')

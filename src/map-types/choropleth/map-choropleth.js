@@ -12,12 +12,13 @@ import { applyPatternFill } from '../../core/decoration/pattern-fill'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/choropleth/map-choropleth').ChoroplethMapConfig} ChoroplethMapConfig */
+/** @typedef {import('../../types/map-types/choropleth/ChoroplethConfig').ChoroplethConfig} ChoroplethConfig */
+/** @typedef {import('../../types/map-types/choropleth/ChoroplethMap').ChoroplethMap} ChoroplethMap */
 
 /**
  * Returns a choropleth map.
- * @param {ChoroplethMapConfig} config
- * @returns {MapInstance}
+ * @param {ChoroplethConfig} [config]
+ * @returns {ChoroplethMap}
  */
 export const map = function (config) {
     //create map object to return, using the template

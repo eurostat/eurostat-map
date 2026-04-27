@@ -13,7 +13,8 @@ import { buildGetterSetters, applyConfigValues } from '../composition/compositio
 import { createRadialScale } from '../../core/scale.js'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionMapConfig} CompositionMapConfig */
+/** @typedef {import('../../types/map-types/composition/CoxcombMapConfig').CoxcombMapConfig} CoxcombMapConfig */
+/** @typedef {import('../../types/map-types/composition/CoxcombMap').CoxcombMap} CoxcombMap */
 
 /**
  * Returns a coxcomb (polar area) chart map.
@@ -26,7 +27,8 @@ import { createRadialScale } from '../../core/scale.js'
  * Unlike pie/waffle/bar/stripe maps, the data model here is 2-dimensional:
  * time × category. Each stat dataset is keyed as `"${time}:${category}"`.
  *
- * @param {*} config
+ * @param {CoxcombMapConfig} [config]
+ * @returns {CoxcombMap}
  */
 export const map = function (config) {
     const out = createStatMap(config, true, 'coxcomb')

@@ -19,8 +19,29 @@ export interface ChoroplethMap extends MapInstance {
     colorFunction(): (t: number) => string
     colorFunction(fn: (t: number) => string): this
 
+    makeClassifNice(): boolean
+    makeClassifNice(v: boolean): this
+
+    classToFillStyle(): any
+    classToFillStyle(v: any): this
+
+    classifier(): any
+    classifier(v: any): this
+
     colorSchemeType(): string
     colorSchemeType(type: 'discrete' | 'continuous'): this
+
+    valueTransform(): (x: number) => number
+    valueTransform(v: (x: number) => number): this
+
+    valueUntransform(): (x: number) => number
+    valueUntransform(v: (x: number) => number): this
+
+    pointOfDivergence(): number | null
+    pointOfDivergence(v: number | null): this
+
+    skipNormalization(): boolean
+    skipNormalization(v: boolean): this
 
     noDataFillStyle(): string
     noDataFillStyle(style: string): this

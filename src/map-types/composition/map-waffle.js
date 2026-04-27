@@ -20,6 +20,7 @@ import {
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/WaffleMapConfig').WaffleMapConfig} WaffleMapConfig */
+/** @typedef {import('../../types/map-types/composition/WaffleMap').WaffleMap} WaffleMap */
 
 /**
  * Returns a proportional waffle chart map.
@@ -27,6 +28,7 @@ import {
  * where each square represents a portion of the whole.
  *
  * @param {WaffleMapConfig} [config]
+ * @returns {WaffleMap}
  */
 export const map = function (config) {
     const out = createStatMap(config, true, 'waffle')
