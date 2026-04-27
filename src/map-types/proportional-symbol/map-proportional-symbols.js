@@ -16,14 +16,14 @@ import { appendCustomSymbolsToMap } from './symbols/custom.js'
 import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/proportional-symbol/map-proportional-symbols').ProportionalSymbolMapConfig} ProportionalSymbolMapConfig */
+/** @typedef {import('../../types/map-types/proportional-symbol/ProportionalSymbolConfig').ProportionalSymbolConfig} ProportionalSymbolConfig */
 
 
 
 /**
  * Returns a proportional symbol map.
  *
- * @param {*} config
+ * @param {ProportionalSymbolConfig} [config]
  */
 export const map = function (config) {
     //create map object to return, using the template

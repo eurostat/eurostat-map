@@ -6,11 +6,6 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import {
-//types
-/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
-
-
     buildGetterSetters,
     applyConfigValues,
     getComposition,
@@ -23,6 +18,10 @@ import {
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
+
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/BarMapConfig').BarMapConfig} BarMapConfig */
 
 /**
  * Returns a proportional bar chart map.
@@ -38,7 +37,7 @@ import {
  * centered on the region centroid. Good for comparing absolute category values
  * across regions without collapsing them into proportions.
  *
- * @param {*} config
+ * @param {BarMapConfig} [config]
  *
  * @example — stacked
  * eurostatmap.map('bar')

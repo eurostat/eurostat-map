@@ -15,13 +15,12 @@ import { scaleOrdinal } from 'd3-scale'
 import { addFlowValueLabels } from '../../core/decoration/labels'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-
-
+/** @typedef {import('../../types/map-types/flow/FlowMapConfig').FlowMapConfig} FlowMapConfig */
 
 /**
  * Returns a flow map.
  *
- * @param {*} config
+ * @param {FlowMapConfig} [config]
  */
 export const map = function (config) {
     //create map object to return, using the template

@@ -4,11 +4,6 @@ import * as WaffleChartLegend from '../../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import {
-//types
-/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
-
-
     buildGetterSetters,
     applyConfigValues,
     getComposition,
@@ -22,12 +17,16 @@ import {
     buildTooltipBreakdownHTML,
 } from './composition-map'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/WaffleMapConfig').WaffleMapConfig} WaffleMapConfig */
+
 /**
  * Returns a proportional waffle chart map.
  * Waffle charts display composition as a grid of small squares,
  * where each square represents a portion of the whole.
  *
- * @param {*} config
+ * @param {WaffleMapConfig} [config]
  */
 export const map = function (config) {
     const out = createStatMap(config, true, 'waffle')

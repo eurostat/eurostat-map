@@ -7,11 +7,6 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import {
-//types
-/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
-
-
     buildGetterSetters,
     applyConfigValues,
     getComposition,
@@ -25,10 +20,14 @@ import {
     buildTooltipBreakdownHTML,
 } from './composition-map'
 
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/map-types/composition/PieMapConfig').PieMapConfig} PieMapConfig */
+
 /**
  * Returns a proportional pie chart map.
  *
- * @param {*} config
+ * @param {PieMapConfig} [config]
  */
 export const map = function (config) {
     const out = createStatMap(config, true, 'pie')

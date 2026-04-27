@@ -1,5 +1,5 @@
 /**
- * Configuration for map legends
+ * Parent configuration for map legends. Each map type will extend this with its own specific properties, but these are the common ones that apply to all legend types.
  */
 export interface LegendConfig {
     x?: number

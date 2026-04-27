@@ -10,9 +10,7 @@ import * as StatisticalData from '../../core/stat-data'
 import { buildGetterSetters, applyConfigValues } from './composition-map'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/composition-map').CompositionMapConfig} CompositionMapConfig */
-
-
+/** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionMapConfig} CompositionMapConfig */
 
 /**
  * Returns a sparkline map.

@@ -1,5 +1,5 @@
 /**
- * Base configuration for all map types
+ * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
  */
 export interface MapConfig {
     // Container settings
