@@ -1,4 +1,4 @@
-import type { MapConfig } from '../../core/MapConfig'
+import type { MapConfig } from '../../../core/MapConfig'
 
 /**
  * Configuration for waffle chart composition maps.

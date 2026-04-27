@@ -10,8 +10,8 @@ import * as StatisticalData from '../../core/stat-data'
 import { buildGetterSetters, applyConfigValues } from './composition-map'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/SparkMapConfig').SparkMapConfig} SparkMapConfig */
-/** @typedef {import('../../types/map-types/composition/SparkMap').SparkMap} SparkMap */
+/** @typedef {import('../../types/map-types/composition/spark/SparkMapConfig').SparkMapConfig} SparkMapConfig */
+/** @typedef {import('../../types/map-types/composition/spark/SparkMap').SparkMap} SparkMap */
 
 /**
  * Returns a sparkline map.

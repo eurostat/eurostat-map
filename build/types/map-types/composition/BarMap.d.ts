@@ -1,4 +1,5 @@
 import type { MapInstance } from '../../core/MapInstance'
+import type { CompositionStatConfig } from './CompositionStatConfig'
 
 /**
  * Bar map type.
@@ -72,4 +73,14 @@ export interface BarMap extends MapInstance {
 
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this
+
+    statBar(config: CompositionStatConfig): this
+    statBar(
+        config: CompositionStatConfig,
+        categoryParameter?: string,
+        categoryCodes?: string[],
+        categoryLabels?: string[],
+        categoryColors?: string[],
+        totalCode?: string
+    ): this
 }

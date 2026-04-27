@@ -13,8 +13,8 @@ import { buildGetterSetters, applyConfigValues } from '../composition/compositio
 import { createRadialScale } from '../../core/scale.js'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/CoxcombMapConfig').CoxcombMapConfig} CoxcombMapConfig */
-/** @typedef {import('../../types/map-types/composition/CoxcombMap').CoxcombMap} CoxcombMap */
+/** @typedef {import('../../types/map-types/composition/coxcomb/CoxcombMapConfig').CoxcombMapConfig} CoxcombMapConfig */
+/** @typedef {import('../../types/map-types/composition/coxcomb/CoxcombMap').CoxcombMap} CoxcombMap */
 
 /**
  * Returns a coxcomb (polar area) chart map.

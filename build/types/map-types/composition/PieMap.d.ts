@@ -1,4 +1,5 @@
 import type { MapInstance } from '../../core/MapInstance'
+import type { CompositionStatConfig } from './CompositionStatConfig'
 
 /**
  * Pie map type.
@@ -48,4 +49,14 @@ export interface PieMap extends MapInstance {
 
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this
+
+    statPie(config: CompositionStatConfig): this
+    statPie(
+        config: CompositionStatConfig,
+        categoryParameter?: string,
+        categoryCodes?: string[],
+        categoryLabels?: string[],
+        categoryColors?: string[],
+        totalCode?: string
+    ): this
 }

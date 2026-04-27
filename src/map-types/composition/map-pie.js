@@ -22,8 +22,8 @@ import {
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/PieMapConfig').PieMapConfig} PieMapConfig */
-/** @typedef {import('../../types/map-types/composition/PieMap').PieMap} PieMap */
+/** @typedef {import('../../types/map-types/composition/pie/PieMapConfig').PieMapConfig} PieMapConfig */
+/** @typedef {import('../../types/map-types/composition/pie/PieMap').PieMap} PieMap */
 
 /**
  * Returns a proportional pie chart map.

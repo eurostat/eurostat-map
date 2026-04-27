@@ -1,4 +1,5 @@
 import type { MapInstance } from '../../core/MapInstance'
+import type { CompositionStatConfig } from './CompositionStatConfig'
 
 /**
  * Stripe map type.
@@ -30,4 +31,13 @@ export interface StripeMap extends MapInstance {
 
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this
+
+    statComp(config: CompositionStatConfig): this
+    statComp(
+        config: CompositionStatConfig,
+        categoryParameter?: string,
+        categoryCodes?: string[],
+        categoryLabels?: string[],
+        categoryColors?: string[]
+    ): this
 }

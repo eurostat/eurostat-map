@@ -1,4 +1,5 @@
-import type { MapInstance } from '../../core/MapInstance'
+import type { MapInstance } from '../../../core/MapInstance'
+import type { CoxcombStatConfig } from './CompositionStatConfig'
 
 /**
  * Coxcomb map type.
@@ -36,4 +37,6 @@ export interface CoxcombMap extends MapInstance {
 
     coxcombOffsets(): { x: number; y: number }
     coxcombOffsets(v: { x: number; y: number }): this
+
+    statCoxcomb(config: CoxcombStatConfig): this
 }

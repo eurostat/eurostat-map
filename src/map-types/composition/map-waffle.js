@@ -19,8 +19,8 @@ import {
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/WaffleMapConfig').WaffleMapConfig} WaffleMapConfig */
-/** @typedef {import('../../types/map-types/composition/WaffleMap').WaffleMap} WaffleMap */
+/** @typedef {import('../../types/map-types/composition/waffle/WaffleMapConfig').WaffleMapConfig} WaffleMapConfig */
+/** @typedef {import('../../types/map-types/composition/waffle/WaffleMap').WaffleMap} WaffleMap */
 
 /**
  * Returns a proportional waffle chart map.

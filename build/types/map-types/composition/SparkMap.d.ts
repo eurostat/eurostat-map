@@ -1,4 +1,5 @@
 import type { MapInstance } from '../../core/MapInstance'
+import type { SparkStatConfig } from './CompositionStatConfig'
 
 /**
  * Spark map type.
@@ -39,4 +40,7 @@ export interface SparkMap extends MapInstance {
 
     sparkLineOffsets(): { x: number; y: number }
     sparkLineOffsets(v: { x: number; y: number }): this
+
+    sparklineData(dataObject: Record<string, Record<string, number>>): this
+    statSpark(config: SparkStatConfig): this
 }

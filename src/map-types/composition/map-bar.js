@@ -21,8 +21,8 @@ import {
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/BarMapConfig').BarMapConfig} BarMapConfig */
-/** @typedef {import('../../types/map-types/composition/BarMap').BarMap} BarMap */
+/** @typedef {import('../../types/map-types/composition/bar/BarMapConfig').BarMapConfig} BarMapConfig */
+/** @typedef {import('../../types/map-types/composition/bar/BarMap').BarMap} BarMap */
 
 /**
  * Returns a proportional bar chart map.

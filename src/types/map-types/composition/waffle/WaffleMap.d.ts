@@ -1,4 +1,5 @@
-import type { MapInstance } from '../../core/MapInstance'
+import type { MapInstance } from '../../../core/MapInstance'
+import type { CompositionStatConfig } from '../CompositionStatConfig'
 
 /**
  * Waffle map type.
@@ -57,4 +58,14 @@ export interface WaffleMap extends MapInstance {
 
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this
+
+    statWaffle(config: CompositionStatConfig): this
+    statWaffle(
+        config: CompositionStatConfig,
+        categoryParameter?: string,
+        categoryCodes?: string[],
+        categoryLabels?: string[],
+        categoryColors?: string[],
+        totalCode?: string
+    ): this
 }

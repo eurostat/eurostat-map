@@ -7,8 +7,8 @@ import { getRegionsSelector } from '../../core/utils'
 import { buildGetterSetters, applyConfigValues, getComposition, addMouseEventsToRegions, buildStatCompositionMethod } from './composition-map'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/StripeMapConfig').StripeMapConfig} StripeMapConfig */
-/** @typedef {import('../../types/map-types/composition/StripeMap').StripeMap} StripeMap */
+/** @typedef {import('../../types/map-types/composition/stripe/StripeMapConfig').StripeMapConfig} StripeMapConfig */
+/** @typedef {import('../../types/map-types/composition/stripe/StripeMap').StripeMap} StripeMap */
 
 /**
  * Return a stripe composition map.

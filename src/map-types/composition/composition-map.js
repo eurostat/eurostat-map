@@ -4,7 +4,7 @@ import { select } from 'd3-selection'
 import { extent } from 'd3-array'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-/** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionMapConfig} CompositionMapConfig */
+/** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionStatConfig} CompositionStatConfig */
 
 /**
  * Shared utilities for composition-based map types (pie, waffle, bar).
