@@ -2,7 +2,7 @@ import { csv } from 'd3-fetch'
 import { projectToMap } from '../geo/proj4'
 
 const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
-    ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
+    ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
     : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
 
 // Load once and store all labels

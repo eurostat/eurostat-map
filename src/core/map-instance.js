@@ -188,7 +188,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.logoWidth_ = undefined
     out.logoHeight_ = undefined
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
-        ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/pub/nuts2json/v2'
+        ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/nuts2json/v2/'
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
 
     //style for no data regions
