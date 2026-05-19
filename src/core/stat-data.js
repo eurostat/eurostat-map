@@ -278,7 +278,17 @@ export const statData = function (config) {
                 }
             })
 
+            //e.g. PTZZ
+            removeNonGeoRegions(out._data_)
+
             if (callback) callback()
+        })
+    }
+
+    /** Filter out pseudo-regions with no geographic location (e.g. PTZZ, ESZZ). */
+    const removeNonGeoRegions = (data) => {
+        Object.keys(data).forEach((k) => {
+            if (k.toUpperCase().endsWith('ZZ')) delete data[k]
         })
     }
 
