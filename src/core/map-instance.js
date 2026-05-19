@@ -21,6 +21,7 @@ import { addScalebarToMap, getDefaultScalebarConfig } from './decoration/scaleba
 import { attachLocationsApi } from './locations.js'
 import { createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
 import { defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
+import { addCentroidsToMap } from './geo/centroids'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */

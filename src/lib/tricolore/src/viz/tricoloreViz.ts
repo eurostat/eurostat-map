@@ -81,6 +81,8 @@ export class TricoloreViz {
             showData = true,
             showCenter = true,
             showLines = true,
+            gridBreaks,
+            minorSubdivisions = 5,
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
@@ -116,7 +118,19 @@ export class TricoloreViz {
         this.triangle.append('image').attr('x', 0).attr('y', 0).attr('width', size).attr('height', size).attr('href', this.canvas.toDataURL())
 
         // Add triangle border and axes using SVG
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, undefined, cornerLabelOffset)
+        this.drawTriangleFrame(
+            size,
+            labels,
+            center,
+            showCenter,
+            showLines,
+            gridBreaks,
+            minorSubdivisions,
+            labelPosition,
+            colorTarget,
+            undefined,
+            cornerLabelOffset
+        )
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -154,6 +168,8 @@ export class TricoloreViz {
             showData = true,
             showCenter = true,
             showLines = true,
+            gridBreaks,
+            minorSubdivisions = 2,
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
@@ -215,7 +231,19 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, breaks, cornerLabelOffset)
+        this.drawTriangleFrame(
+            size,
+            labels,
+            center,
+            showCenter,
+            showLines,
+            gridBreaks,
+            minorSubdivisions,
+            labelPosition,
+            colorTarget,
+            breaks,
+            cornerLabelOffset
+        )
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -257,6 +285,8 @@ export class TricoloreViz {
             showData = true,
             showCenter = true,
             showLines = true,
+            minorSubdivisions = 5,
+            gridBreaks,
             labels = ['p₁', 'p₂', 'p₃'],
             labelPosition = 'corner',
             colorTarget = 'triangles',
@@ -318,7 +348,19 @@ export class TricoloreViz {
         })
 
         // Draw triangle border and axes
-        this.drawTriangleFrame(size, labels, center, showCenter, showLines, labelPosition, colorTarget, null, cornerLabelOffset)
+        this.drawTriangleFrame(
+            size,
+            labels,
+            center,
+            showCenter,
+            showLines,
+            gridBreaks,
+            minorSubdivisions,
+            labelPosition,
+            colorTarget,
+            null,
+            cornerLabelOffset
+        )
 
         // Add data points if requested
         if (showData && data.length > 0) {
@@ -392,6 +434,8 @@ export class TricoloreViz {
         center: TernaryPoint,
         showCenter: boolean,
         showLines: boolean,
+        gridBreaks: number,
+        minorSubdivisions: number,
         labelPosition: 'corner' | 'edge' = 'corner',
         colorTarget: 'triangles' | 'points' = 'triangles',
         breaks: number | null = 4,
@@ -465,10 +509,12 @@ export class TricoloreViz {
         // ===============================
         // Grid lines (major + minor)
         // ===============================
-        const majorGrid = typeof breaks === 'number' && breaks > 1 ? Array.from({ length: breaks - 1 }, (_, i) => (i + 1) / breaks) : []
-        const minorSubdivisions = 5 // e.g. 5 minor ticks per major
+        const gridResolution = gridBreaks ?? breaks
+        const majorGrid =
+            typeof gridResolution === 'number' && gridResolution > 1
+                ? Array.from({ length: gridResolution - 1 }, (_, i) => (i + 1) / gridResolution)
+                : []
         const minorGrid: number[] = []
-
         for (let i = 0; i < majorGrid.length; i++) {
             const start = i === 0 ? 0 : majorGrid[i - 1]
             const end = majorGrid[i]

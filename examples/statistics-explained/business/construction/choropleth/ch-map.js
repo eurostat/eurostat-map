@@ -15,10 +15,11 @@ export function renderMap(code) {
             nbClasses: 7,
         },
         LC_EMP_LOC_TEUR: {
-            legendTitle: 'Thousand euro',
+            legendTitle: 'Euro',
             colors: ['#FFEB99', '#DCEAAA', '#B0E2B6', '#77D1BA', '#56C2C0', '#3BA9BF', '#1C69A4', '#133F88', '#17256B'],
             //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
             nbClasses: 9,
+            transform: (value) => value / 1000, // convert to thousand euro
         },
     }
     let map = eurostatmap
@@ -68,6 +69,7 @@ export function renderMap(code) {
                 nace_r2: 'F',
                 TIME: '2023',
             },
+            transform: configs[code].transform, // optional function to transform values (e.g. convert to thousands)
         })
         .legend({
             title: configs[code].legendTitle,

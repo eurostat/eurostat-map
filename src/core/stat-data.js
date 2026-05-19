@@ -25,6 +25,9 @@ export const statData = function (config) {
      */
     out._data_ = undefined
 
+    // new property
+    out.transform_ = undefined // optional (value) => value function
+
     /**
      * Return the stat value {value,status} from a nuts id.
      * If no argument is specified, returns the entire index.
@@ -281,6 +284,15 @@ export const statData = function (config) {
             //e.g. PTZZ
             removeNonGeoRegions(out._data_)
 
+            //apply user transform
+            if (out.transform_) {
+                Object.values(out._data_).forEach((entry) => {
+                    if (entry && entry.value != null && entry.value !== ':') {
+                        entry.value = out.transform_(entry.value)
+                    }
+                })
+            }
+
             if (callback) callback()
         })
     }
@@ -332,6 +344,14 @@ export const statData = function (config) {
 
             //store some metadata
             out.metadata = { href: out.csvURL_ }
+
+            if (out.transform_) {
+                Object.values(out._data_).forEach((entry) => {
+                    if (entry && entry.value != null && entry.value !== ':') {
+                        entry.value = out.transform_(entry.value)
+                    }
+                })
+            }
 
             if (callback) callback()
         })

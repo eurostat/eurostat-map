@@ -5,8 +5,7 @@ import { TricoloreViz } from '../../lib/tricolore/src'
 import { executeForAllInsets, getLegendRegionsSelector } from '../../core/utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-
-
+/** @typedef {import('../../types/legend/TrivariateLegendConfig').TrivariateLegendConfig} TrivariateLegendConfig */
 
 /**
  * Legend for trivariate (ternary) choropleth maps
@@ -44,7 +43,7 @@ function cancelReset() {
     }
 }
 
-export const legend = function (map, config = {}) {
+export const legend = function (map, /** @type {TrivariateLegendConfig} */ config = {}) {
     const out = Legend.legend(map)
 
     // --- defaults ---
@@ -55,6 +54,8 @@ export const legend = function (map, config = {}) {
     out.showCenter = true
     out.centerLabel = 'Average'
     out.showLines = false
+    out.gridBreaks = 5
+    out.minorSubdivisions = 5
     out.labels = ['Variable 1', 'Variable 2', 'Variable 3']
     out.labelPosition = 'edge'
     out.colorTarget = 'points'
@@ -119,6 +120,8 @@ export const legend = function (map, config = {}) {
             showCenter: out.showCenter,
             centerLabel: out.centerLabel,
             showLines: out.showLines,
+            gridBreaks: out.gridBreaks,
+            minorSubdivisions: out.minorSubdivisions,
             breaks: map.ternarySettings_.breaks,
             colorTarget: out.colorTarget,
             showData: out.showData,

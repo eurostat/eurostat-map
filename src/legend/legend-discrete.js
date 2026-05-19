@@ -6,8 +6,6 @@ import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 
-
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared formatting utilities
 // ─────────────────────────────────────────────────────────────────────────────
@@ -177,7 +175,7 @@ function createThresholdsLegend(out, config) {
             .attr('height', config.shapeHeight)
             .style('fill', fillColor)
             .on('mouseover', function () {
-                select(this).raise().raise()
+                //select(this).raise().raise()
                 highlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
@@ -372,7 +370,7 @@ function createRangesLegend(out, config) {
             .attr('height', config.shapeHeight)
             .style('fill', fillColor)
             .on('mouseover', function () {
-                select(this).raise()
+                //select(this).raise()
                 highlightFunction(map, ecl)
                 if (out.map.insetTemplates_) {
                     executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)

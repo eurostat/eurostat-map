@@ -8,6 +8,13 @@
 .em-ternary-grid-line-minor {
     pointer-events: none;
 }
+
+.em-ternary-grid-line {
+    stroke-width: 0.8;
+}
+.em-ternary-grid-line-minor {
+    stroke-width: 0.3;
+}
 .em-ternary-axis-title {
     font-size: 13px;
 }

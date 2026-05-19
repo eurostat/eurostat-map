@@ -74,6 +74,10 @@ export interface VisualizationOptions extends TricoloreOptions {
 
     /** Show grid lines on the ternary plot */
     showLines?: boolean
+    /** Number of major grid lines. Overrides breaks for grid rendering only. @default same as breaks */
+    gridBreaks?: number
+    /** Number of minor grid subdivisions between major grid lines. @default 5 */
+    minorSubdivisions?: number
 
     cornerLabelOffset?: { x: number; y: number }[]
 
