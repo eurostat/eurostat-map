@@ -10,6 +10,9 @@
             body {
                 margin: 0;
             }
+            .em-legend-background {
+                filter: none;
+            }
             .em-mushroom-segment {
                 stroke: white;
                 stroke-width: 0.5;
@@ -17,6 +20,7 @@
             .em-zoom-buttons {
                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
                 transform: translate(95%, 89%);
+                display: none;
             }
             .em-inset {
                 filter: drop-shadow(0.7px 0.7px 0.7px rgba(0, 0, 0, 0.5));
@@ -196,7 +200,7 @@
                     d3.select('#ports-map #em-footnote-2').remove()
                     d3.selectAll('#ports-map')
                         .append('text')
-                        .attr('x', mapWidth - 350)
+                        .attr('x', mapWidth - 320)
                         .attr('y', mapHeight)
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
