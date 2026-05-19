@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Maritime freight mushroom map</title>
+        <title>Maritime passengers mushroom map</title>
     </head>
 
     <body>
@@ -51,7 +51,7 @@
             const mapHeight = 900
 
             //data load
-            const [freightData] = await Promise.all([d3.json('./data/M04/maritime-freight.json')])
+            const [freightData] = await Promise.all([d3.json('./data/M04/maritime_freight.json')])
             const inwardData = indexByCode([...freightData], 'ton_2024_inward')
             const outwardData = indexByCode([...freightData], 'ton_2024_outward')
 
@@ -108,7 +108,7 @@
                 .mushroomColors(['#33A033', '#B09120'])
                 .mushroomOrientation('horizontal')
                 .legend({
-                    title: 'Tonnes of freight',
+                    title: 'Passengers',
                     x: 10,
                     y: 160,
                     sizeLegend: {
@@ -176,8 +176,6 @@
                         height: insetHeight,
                     },
                 ])
-                .footer(true)
-                .footnote('Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined).')
                 .onBuild(() => {
                     const portKeys = freightData.map((d) => d.code)
                     //color regions
@@ -203,8 +201,8 @@
                     d3.select('#ports-map #em-footnote-2').remove()
                     d3.selectAll('#ports-map')
                         .append('text')
-                        .attr('x', mapWidth - 310)
-                        .attr('y', mapHeight + 20)
+                        .attr('x', mapWidth - 320)
+                        .attr('y', mapHeight)
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
