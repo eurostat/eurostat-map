@@ -107,8 +107,8 @@
                     x: 10,
                     y: 160,
                     sizeLegend: {
-                        values: [288000000, 100000000, 2000000],
-                        labels: ['288 million ', '10 million', '2 million'],
+                        values: [288000000, 100000000, 10000000],
+                        labels: ['288 million ', '100 million', '10 million'],
                     },
                     colorLegend: { title: '', marginTop: 10 },
                 })
@@ -189,7 +189,7 @@
                             // Check if ANY port key starts with this ISO
                             const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
 
-                            return hasPort ? 'rgba(178, 232, 215)' : '#F2F2F2'
+                            return hasPort ? '#fff4cc' : '#F2F2F2'
                         })
 
                     // --- REMOVE if it already exists ---
