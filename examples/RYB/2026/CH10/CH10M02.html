@@ -4,57 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Tourism coxcomb map</title>
+        <link rel="stylesheet" href="../../insets/insets.css" />
         <style>
-            /* Insets */
-            #titleLI,
-            #subtitleLI {
-                pointer-events: none !important;
-                stroke: none !important;
-                stroke-linejoin: round !important;
-                paint-order: stroke !important;
-            }
-            .em-inset-title,
-            .em-inset-subtitle,
-            #titleLI,
-            #subtitleLI {
-                font-size: 8.5px !important;
-            }
-            .em-inset-title,
-            .em-inset-subtitle,
-            #subtitleLI {
-                fill: #4c4b4b !important;
-            }
-            #titleLI {
-                fill: white !important;
-                stroke-width: 2px !important;
-                stroke: white !important;
-                opacity: 0.8 !important;
-            }
-            #em-frame-PT20 {
-                stroke-width: 0.2px;
-            }
-            g[index='8'] #em-frame-PT20 {
-                stroke-width: 0px !important;
-            }
-            #em-frame-GP {
-                stroke-width: 0.2px;
-            }
-            g[index='1'] #em-frame-GP {
-                stroke-width: 0px !important;
-            }
-            .em-scalebar-label {
-                font-size: 8px !important;
-                fill: #878787 !important;
-            }
-            .em-scalebar-line {
-                stroke: #878787 !important;
-            }
-            .em-inset-title,
-            .em-inset-subtitle,
-            #subtitleLI {
-                fill: #676767 !important;
-            }
-
             button {
                 margin: 10px;
                 padding: 10px 20px;
@@ -97,7 +48,7 @@
 
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
-        <script src="./overseas.js"></script>
+        <script src="../../insets/overseas.js"></script>
         <script>
             const MAPWIDTH = 797
             const MAPHEIGHT = 677

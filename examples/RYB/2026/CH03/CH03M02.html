@@ -3,22 +3,39 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="../../insets/insets.css" />
     </head>
 
     <body>
         <style>
             .em-zoom-buttons {
                 transform: translate(1%, 15%);
+                display: none;
             }
             .em-legend-subtitle {
-                font-size: 13px;
+                font-size: 12px;
+            }
+            #legend-container {
+                transform: translate(525px, 345px);
             }
         </style>
-        <svg id="map"></svg>
+        <svg id="container" width="100%" height="97vh">
+            <svg id="map"></svg>
+            <g id="newInsets"></g>
+            <svg id="legend-container"></svg>
+        </svg>
         <script src="../../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/d3@7"></script>
+        <script src="../../insets/overseas.js"></script>
         <script type="module">
             import { json } from 'https://cdn.jsdelivr.net/npm/d3-fetch@3/+esm'
 
+            // Generate fresh inset config with new svgIds (from overseas.js)
+            const insetsCfg = createOutermostInsetsConfig()
+            const insetBoxPosition = [550, 75]
+            createInsetDOMElements(insetsCfg, insetBoxPosition)
+
+            //get data
             const [bachelor_pct, masters_pct, phd_pct] = await Promise.all([
                 json('./data/bachelor_pct.json'),
                 json('./data/masters_pct.json'),
@@ -32,10 +49,19 @@
             const legendLabelPosition = 'corner' // 'corner' | 'inside'
             const legendColorTarget = 'points' // 'points' | 'triangles'
             const meanCentering = true
+
+            const MAPWIDTH = 797
+            const MAPHEIGHT = 677
+
             const map = eurostatmap
                 .map('trivariateChoropleth')
-                .position({ x: 4900000, y: 3620000, z: 6440 })
-                .width(825)
+                .insets(insetsCfg)
+                .footer(true)
+                .header(true)
+                .insetBoxPosition(insetBoxPosition)
+                .position({ x: 5200000, y: 3620000, z: 6440 })
+                .width(MAPWIDTH)
+                .height(MAPHEIGHT)
                 .title('Tertiary education students, 2021')
                 .subtitle(
                     `<tspan x="14" dy="5"><tspan class="badge-green">Bachelor</tspan> , <tspan class="badge-blue">Masters</tspan> or <tspan class="badge-red">PHD</tspan> students.</tspan>`
@@ -51,22 +77,22 @@
                     meanCentering: meanCentering,
                 })
                 .legend({
+                    svgId: 'legend-container',
                     title: 'Education level',
                     subtitle: `
-                        <tspan x="8" dy="0">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher %</tspan>
-                        <tspan x="8" dy="1.2em"> of bachelor students. Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have </tspan>
+                        <tspan x="8" dy="0">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of</tspan>
+                        <tspan x="8" dy="1.2em">  bachelor students. Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have </tspan>
                         <tspan x="8" dy="1.2em">a higher % of masters students and areas with 
                         <tspan x="8" dy="1.2em">more <tspan fill="${red}" class='subtitle-color'>red</tspan> have a higher</tspan> % of PHD students.</tspan>
                         <tspan x="8" dy="1.2em">Hover your mouse over the legend to explore it.</tspan>
                     `,
-                    x: 520,
-                    y: 10,
+
                     boxOpacity: 0.99,
-                    width: 275,
-                    height: 320,
+                    width: 250,
+                    height: 300,
                     labels: legendLabelPosition == 'corner' ? ['Bachelors', 'Masters', 'PHD'] : ['← Bachelors', 'Masters →', 'PHD →'],
                     labelPosition: legendLabelPosition,
-                    padding: { top: 75, right: 30, bottom: 10, left: 50 },
+                    padding: { top: 75, right: 30, bottom: 10, left: 47 },
                     showLines: true,
                     gridBreaks: 5,
                     minorSubdivisions: 2,
@@ -85,6 +111,12 @@
                 .zoomButtonsPosition([740, 590])
 
             map.onBuild(() => {
+                // move newInsets inside #map
+                const newInsets = d3.select('#newInsets')
+                if (!newInsets.empty()) {
+                    d3.select('#map').node().appendChild(newInsets.node())
+                }
+
                 const badges = [
                     { cls: 'badge-green', color: green },
                     { cls: 'badge-blue', color: blue },
