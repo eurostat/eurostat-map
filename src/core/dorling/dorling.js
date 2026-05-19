@@ -1,5 +1,6 @@
 import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { executeForAllInsets } from '../utils'
+import { getCentroidsGroup } from '../geo/centroids'
 
 export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
     // Common function to start a simulation on a single map (main or inset)
@@ -27,7 +28,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
             }
         }
 
-        const containers = map.getCentroidsGroup(singleMap).selectAll('g.em-centroid')
+        const containers = getCentroidsGroup(singleMap).selectAll('g.em-centroid')
 
         const tickTransform = (sel) => {
             sel.attr('transform', (d) => {

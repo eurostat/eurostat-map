@@ -8,6 +8,7 @@ import * as SparkLegend from '../../legend/legend-spark.js'
 import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
 import * as StatisticalData from '../../core/stat-data'
 import { buildGetterSetters, applyConfigValues } from './composition-map'
+import { getCentroidsGroup } from '../../core/geo/centroids'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/spark/SparkMapConfig').SparkMapConfig} SparkMapConfig */
@@ -258,7 +259,7 @@ export const map = function (config) {
         if (map.gridCartogram_) {
             return map.svg().selectAll('#em-grid-container .em-grid-cell')
         }
-        return map.getCentroidsGroup(map).selectAll('g.em-centroid')
+        return getCentroidsGroup(map).selectAll('g.em-centroid')
     }
 
     function applyStyleToMap(map) {

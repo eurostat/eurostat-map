@@ -1,6 +1,6 @@
 import { arc } from 'd3-shape'
 import * as Legend from './legend'
-import { spaceAsThousandSeparator } from '../core/utils'
+import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
 
 /**
  * Legend for mushroom (dual semi-circle) proportional symbols

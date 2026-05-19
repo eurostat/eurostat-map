@@ -7,6 +7,7 @@ import { executeForAllInsets, spaceAsThousandSeparator } from '../../../core/uti
 import { runDorlingSimulation, stopDorlingSimulation } from '../../../core/dorling/dorling.js'
 import { addMouseEvents } from './map-mushroom-interactions.js'
 import * as MushroomLegend from '../../../legend/legend-mushroom.js'
+import { getCentroidsGroup } from '../../../core/geo/centroids.js'
 //types
 /** @typedef {import('../../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../../types/map-types/proportional-symbol/mushroom/MushroomMapConfig').MushroomMapConfig} MushroomMapConfig */
@@ -169,7 +170,7 @@ export const map = function (config) {
     }
 
     out.updateSymbolsDrawOrder = function (map) {
-        const gcp = out.getCentroidsGroup(map)
+        const gcp = getCentroidsGroup(map)
         const [c1, c2] = out.mushroomCodes()
 
         const stat1 = out.statData(c1)

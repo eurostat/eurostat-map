@@ -1,3 +1,5 @@
+import { getCentroidsGroup } from '../../../core/geo/centroids'
+
 /**
  * @description Appends <rect> elements containing bars for each region in the map SVG
  * @param {*} map map instance
@@ -6,8 +8,7 @@
  */
 export function appendBarsToMap(map, sizeData, out) {
     return (
-        map
-            .getCentroidsGroup(map)
+        getCentroidsGroup(map)
             .selectAll('g.em-centroid')
             .append('rect')
             .filter((rg) => {

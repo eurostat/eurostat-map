@@ -11,6 +11,7 @@ import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/
 import { adjustGridCartogramTextLabels } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
 import { createRadialScale } from '../../core/scale.js'
+import { getCentroidsGroup } from '../../core/geo/centroids'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/coxcomb/CoxcombMapConfig').CoxcombMapConfig} CoxcombMapConfig */
@@ -609,7 +610,7 @@ export const map = function (config) {
         if (map.gridCartogram_) {
             return map.svg().selectAll('#em-grid-container .em-grid-cell')
         }
-        return map.getCentroidsGroup(map).selectAll('g.em-centroid')
+        return getCentroidsGroup(map).selectAll('g.em-centroid')
     }
 
     function applyStyleToMap(map) {
@@ -626,7 +627,7 @@ export const map = function (config) {
                 margin: 2,
             })
         } else {
-            const s = map.getCentroidsGroup(map)
+            const s = getCentroidsGroup(map)
             if (!s) return
 
             const regionFeatures = s

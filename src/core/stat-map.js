@@ -5,6 +5,7 @@ import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
 import { hideSpinner, showSpinner } from './decoration/spinner'
 import { createMapInstance, updateGeoMapTemplate } from './map-instance'
+import { refreshCentroids } from './geo/centroids'
 
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../types/core/MapConfig').MapConfig} MapConfig */
@@ -411,10 +412,10 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         if (withCenterPoints) {
             // insets
             if (out.insetTemplates_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, out.refreshCentroids)
+                executeForAllInsets(out.insetTemplates_, out.svgId_, refreshCentroids)
             }
             //main map
-            out.refreshCentroids(out)
+            refreshCentroids(out)
         }
 
         out.updateClassification()

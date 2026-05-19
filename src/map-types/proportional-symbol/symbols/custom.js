@@ -1,3 +1,5 @@
+import { getCentroidsGroup } from '../../../core/geo/centroids'
+
 /**
  * @description Appends custom SVG symbols for each region in the map
  * @param {*} map
@@ -5,8 +7,7 @@
  * @return {*}
  */
 export function appendCustomSymbolsToMap(map, sizeData, out) {
-    return map
-        .getCentroidsGroup(map)
+    return getCentroidsGroup(map)
         .selectAll('g.em-centroid')
         .append('g')
         .filter((rg) => {

@@ -16,6 +16,7 @@ import {
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
+import { getCentroidsGroup } from '../../core/geo/centroids'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -98,7 +99,7 @@ export const map = function (config) {
     const _getComposition = (id) => getComposition(id, out, 'waffleTotalCode_')
     const _getRegionTotal = (id) => getRegionTotal(id, out, 'waffleTotalCode_')
     const _getAnchors = (map) =>
-        map.gridCartogram_ ? map.svg().selectAll('#em-grid-container .em-grid-cell') : map.getCentroidsGroup(map).selectAll('g.em-centroid')
+        map.gridCartogram_ ? map.svg().selectAll('#em-grid-container .em-grid-cell') : getCentroidsGroup(map).selectAll('g.em-centroid')
 
     // ── statWaffle config method ─────────────────────────────────────────────
     out.statWaffle = buildStatCompositionMethod(out, 'waffleTotalCode_')
@@ -154,7 +155,7 @@ export const map = function (config) {
             applyStyleToGridCartogram(map)
         } else {
             let regionFeatures = []
-            const s = map.getCentroidsGroup(map)
+            const s = getCentroidsGroup(map)
             if (!s) return
 
             s.selectAll('g.em-centroid')

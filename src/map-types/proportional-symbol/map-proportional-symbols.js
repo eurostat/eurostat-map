@@ -14,6 +14,7 @@ import { appendBarsToMap } from './symbols/bars.js'
 import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
 import { appendCustomSymbolsToMap } from './symbols/custom.js'
 import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
+import { getCentroidsGroup } from '../../core/geo/centroids.js'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/proportional-symbol/ProportionalSymbolConfig').ProportionalSymbolConfig} ProportionalSymbolConfig */
@@ -328,10 +329,10 @@ export const map = function (config) {
             .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
 
         // Clear old symbol containers
-        out.getCentroidsGroup(map).selectAll('g.em-centroid').remove()
+        getCentroidsGroup(map).selectAll('g.em-centroid').remove()
 
         // Re-select fresh, then recreate sorted symbol containers
-        out.getCentroidsGroup(map)
+        getCentroidsGroup(map)
             .selectAll('g.em-centroid')
             .data(sorted, (d) => d.properties.id)
             .enter()

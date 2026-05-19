@@ -16,10 +16,10 @@
             }
             .em-zoom-buttons {
                 box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                transform: translate(95%, 90%);
+                transform: translate(95%, 89%);
             }
             .em-inset {
-                filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+                filter: drop-shadow(0.7px 0.7px 0.7px rgba(0, 0, 0, 0.5));
             }
             .em-insets .em-frame {
                 stroke: grey;
@@ -29,9 +29,15 @@
             .em-kosovo-bn {
                 opacity: 0.4;
             }
+            .em-annotations {
+                pointer-events: none;
+            }
+            g.em-annotation-be-nl .connector {
+                transform: translate(-20px, -13px);
+            }
         </style>
-        <svg id="map"></svg>
-        <script src="../../../../build/eurostatmap.min.js"></script>
+        <svg id="ports-map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
 
@@ -40,7 +46,7 @@
             const mapHeight = 900
 
             //data load
-            const [freightData] = await Promise.all([d3.json('./data/maritime_freight.json')])
+            const [freightData] = await Promise.all([d3.json('./data/M04/maritime_freight.json')])
             const inwardData = indexByCode([...freightData], 'ton_2024_inward')
             const outwardData = indexByCode([...freightData], 'ton_2024_outward')
 
@@ -80,10 +86,11 @@
 
             // build map
             const insetHeight = 90,
-                insetWidth = 90,
+                insetWidth = 94,
                 padding = 10
             const map = eurostatmap
                 .map('mushroom')
+                .svgId('ports-map')
                 .width(mapWidth)
                 .height(mapHeight)
                 .position({ x: 4790000, y: 3420000, z: 4500 })
@@ -93,6 +100,7 @@
                 .hoverColor('#ffa500')
                 .mushroomMinSize(1)
                 .mushroomMaxSize(40)
+                .mushroomColors(['#33A033', '#B09120'])
                 .mushroomOrientation('horizontal')
                 .legend({
                     title: 'Tonnes',
@@ -112,16 +120,16 @@
                     {
                         x: -230,
                         y: 0,
-                        title: 'BE,NL',
+                        title: 'Belgium / Netherlands',
                         geo: 'EUR',
                         position: { x: 3900000, y: 3200000, z: 1000 },
                     },
                     {
                         x: -230,
                         y: 220,
-                        title: 'DE,DK',
+                        title: 'Germany / Denmark',
                         geo: 'EUR',
-                        position: { x: 4330000, y: 3480000, z: 1600 },
+                        position: { x: 4300000, y: 3490000, z: 2000 },
                     },
                     {
                         title: 'Canarias (ES)',
@@ -140,7 +148,7 @@
                         width: insetWidth,
                         height: insetHeight,
                         position: { x: 680000, y: 1810000, z: 2000 },
-                        // titlePosition: [0, 10],
+                        titlePosition: [4, 14],
                         // showScalebar: true,
                         // scalebarPosition: [48, 55],
                     },
@@ -149,7 +157,7 @@
                         geo: 'MQ',
                         x: 0,
                         y: insetHeight * 2 + padding * 2,
-                        position: { z: 2000 },
+                        position: { z: 1000 },
                         width: insetWidth,
                         height: insetHeight,
                     },
@@ -158,7 +166,7 @@
                         geo: 'RE',
                         x: 0,
                         y: insetHeight * 3 + padding * 3,
-                        position: { x: 348011, y: 7661627, z: 2600 },
+                        position: { x: 348011, y: 7661627, z: 2000 },
                         width: insetWidth,
                         height: insetHeight,
                     },
@@ -166,21 +174,30 @@
                 .onBuild(() => {
                     const portKeys = freightData.map((d) => d.code)
                     //color regions
-                    d3.selectAll('#ports-map .em-nutsrg path').style('fill', (d) => {
-                        const iso = d.properties.id // e.g. "NL"
+                    d3.selectAll('#ports-map .em-nutsrg path')
+                        // .style('fill', (d) => {
+                        //     const iso = d.properties.id // e.g. "NL"
 
-                        // Check if ANY port key starts with this ISO
-                        const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+                        //     // Check if ANY port key starts with this ISO
+                        //     const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
 
-                        return hasPort ? 'rgba(178, 232, 215,0.4)' : '#F2F2F2'
-                    })
+                        //     return hasPort ? 'rgba(178, 232, 215,0.4)' : '#F2F2F2'
+                        // })
+                        .attr('fill', (d) => {
+                            const iso = d.properties.id // e.g. "NL"
+
+                            // Check if ANY port key starts with this ISO
+                            const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+
+                            return hasPort ? 'rgba(178, 232, 215)' : '#F2F2F2'
+                        })
 
                     // --- REMOVE if it already exists ---
                     d3.select('#ports-map #em-footnote-2').remove()
                     d3.selectAll('#ports-map')
                         .append('text')
-                        .attr('x', 480)
-                        .attr('y', 675)
+                        .attr('x', mapWidth - 350)
+                        .attr('y', mapHeight)
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
@@ -278,6 +295,36 @@
                     })
                     return geometries
                 })
+                .annotations({
+                    annotations: [
+                        {
+                            //de-dk
+                            dy: -65,
+                            dx: 300,
+                            x: 445,
+                            y: 430,
+                            type: 'annotationCalloutCircle',
+                            subject: {
+                                radius: 50,
+                                radiusPadding: 0,
+                            },
+                            className: 'em-annotation-de-dk',
+                        },
+                        {
+                            //be/nl
+                            dy: -390,
+                            dx: 450,
+                            x: 340,
+                            y: 480,
+                            type: 'annotationCalloutCircle',
+                            subject: {
+                                radius: 50,
+                                radiusPadding: 0,
+                            },
+                            className: 'em-annotation-be-nl',
+                        },
+                    ],
+                })
 
             map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
             map.build()
@@ -322,18 +369,18 @@
                 const row2 = `<tr><td>Outward: ${(outward / 1e6).toFixed(1)} million tonnes</td></tr>`
 
                 return `
-        <div class="em-tooltip-bar">
-            <b>${regionName}</b>
-        </div>
-        <div class="em-tooltip-text">
-            <table class="em-tooltip-table">
-                <tbody>
-                    ${row1}
-                    ${row2}
-                </tbody>
-            </table>
-        </div>
-    `.trim()
+                <div class="em-tooltip-bar">
+                    <b>${regionName}</b>
+                </div>
+                <div class="em-tooltip-text">
+                    <table class="em-tooltip-table">
+                        <tbody>
+                            ${row1}
+                            ${row2}
+                        </tbody>
+                    </table>
+                </div>
+            `.trim()
             }
         </script>
     </body>

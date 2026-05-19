@@ -5,10 +5,9 @@
 import { pointer, select } from 'd3-selection'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { highlightRegions, unhighlightRegions } from './legend'
+import { getCentroidsGroup } from '../core/geo/centroids'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
-
-
 
 // All of the above with or without .valueTransform / .valueUntransform
 export function createContinuousLegend(out, baseX, baseY) {
@@ -325,7 +324,7 @@ function getUnHighlightFunction(map) {
 
 function highlightPsSymbols(map, rawVal, out) {
     const tolerance = getHighlightTolerance(map, out)
-    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
+    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     allSymbols.each(function () {
         const symbol = select(this)
@@ -354,7 +353,7 @@ function highlightPsSymbols(map, rawVal, out) {
 }
 
 function unhighlightPsSymbols(map, out) {
-    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
+    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore all to default opacity
     allSymbols.each(function () {

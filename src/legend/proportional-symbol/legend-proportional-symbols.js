@@ -3,10 +3,9 @@ import * as Legend from '../legend'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { drawSizeLegend } from './legend-symbol-size'
 import { drawDiscreteLegend, buildDiscreteLabelFormatter } from '../legend-discrete'
+import { getCentroidsGroup } from '../../core/geo/centroids'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
-
-
 
 /**
  * A legend for proportional symbol map
@@ -160,7 +159,7 @@ export function getPropSymbolColorLabelFormatter(out) {
 
 // Highlight selected regions on mouseover
 export function highlightPsSymbols(map, ecl) {
-    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
+    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -178,7 +177,7 @@ export function highlightPsSymbols(map, ecl) {
 
 // Reset all regions to their original opacitys on mouseout
 export function unhighlightPsSymbols(map) {
-    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
+    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {

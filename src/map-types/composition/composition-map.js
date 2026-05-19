@@ -2,6 +2,7 @@ import { scaleSqrt } from 'd3-scale'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import { select } from 'd3-selection'
 import { extent } from 'd3-array'
+import { getCentroidsGroup } from '../../core/geo/centroids'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionStatConfig} CompositionStatConfig */
@@ -159,7 +160,7 @@ export const getDatasetMaxMin = function (map, out, getAnchors, totalCodeKey) {
     if (map && map.gridCartogram_) {
         sel = getAnchors(map).data()
     } else {
-        sel = out.getCentroidsGroup(out).selectAll('g.em-centroid').data()
+        sel = getCentroidsGroup(map).selectAll('g.em-centroid').data()
     }
 
     sel.forEach((rg) => {

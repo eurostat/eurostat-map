@@ -4,6 +4,7 @@ import { axisLeft, axisBottom } from 'd3-axis'
 import { line } from 'd3-shape'
 import * as Legend from './legend'
 import { getRegionById } from '../core/utils'
+import { getCentroidsGroup } from '../core/geo/centroids'
 
 /**
  * A legend for sparkline maps.
@@ -320,7 +321,7 @@ export const legend = function (map, config) {
                 }
             })
         } else {
-            const centroidsGroup = map.getCentroidsGroup ? map.getCentroidsGroup(map) : null
+            const centroidsGroup = getCentroidsGroup ? getCentroidsGroup(map) : null
             if (centroidsGroup) {
                 centroidsGroup.selectAll('g.em-centroid').each(function (d) {
                     if (d && d.properties && d.properties.id) {

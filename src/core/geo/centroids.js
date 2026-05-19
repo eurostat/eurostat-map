@@ -82,14 +82,14 @@ export const addCentroidsToMap = function (map) {
     map.Geometries.centroidsFeatures = projectedCentroids.filter((d) => centroidHasStatData(d.properties.id, map))
 
     // Append container if not existing
-    const gcp = out.getCentroidsGroup(map).empty()
+    const gcp = getCentroidsGroup(map).empty()
         ? map
               .svg()
               .select('#em-zoom-group-' + map.svgId_)
               .append('g')
               .attr('id', `em-centroids-${map.svgId_}`)
               .attr('class', 'em-centroids')
-        : out.getCentroidsGroup(map)
+        : getCentroidsGroup(map)
 
     // Join pattern for centroids
     gcp.selectAll('g.em-centroid')

@@ -7,6 +7,7 @@ import { drawCircleSizeLegend } from '../legend-circle-size'
 import { buildSpikeLegend } from './legend-spike'
 import { buildD3SymbolItem } from './legend-d3-shape'
 import { symbolsLibrary } from '../../map-types/proportional-symbol/symbols/d3-symbols'
+import { getCentroidsGroup } from '../../core/geo/centroids'
 
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
@@ -244,7 +245,7 @@ function getShape(out) {
 }
 
 function highlightPsRegions(map, ecl) {
-    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
+    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -262,7 +263,7 @@ function highlightPsRegions(map, ecl) {
 
 // Reset all regions to their original opacitys on mouseout
 function unhighlightPsRegions(map) {
-    const allSymbols = map.getCentroidsGroup(map).selectAll('[ecl]')
+    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {
