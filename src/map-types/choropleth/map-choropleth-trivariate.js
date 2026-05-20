@@ -27,10 +27,10 @@ export const map = function (config) {
 
     // tricolore parameters
     out.ternarySettings_ = {
-        hue: 10,
+        hue: 20,
         chroma: 120,
         lightness: 70,
-        contrast: 0.2,
+        contrast: 1,
         spread: 0.8,
         breaks: 5,
         meanCentering: true,
@@ -83,45 +83,51 @@ export const map = function (config) {
     // ===============================
     //@override
     out.updateClassification = function () {
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
-        }
         applyClassificationToMap(out)
         return out
     }
 
-    function applyClassificationToMap(map) {
-        // Reset on the passed map instance
-        map._ternaryData_ = []
-        map._ternaryColorById_ = new Map()
-        map._ternaryClassById_ = new Map()
-        map._ternaryCenter_ = null
+    function applyClassificationToMap(out) {
+        out._ternaryData_ = []
+        out._ternaryColorById_ = new Map()
+        out._ternaryClassById_ = new Map()
+        out._ternaryCenter_ = null
 
-        const features = map.Geometries.getRegionFeatures() // ← use map, not out
-        if (!features || features.length === 0) return map
-
-        const [c1, c2, c3] = out.ternaryCodes_ // settings from main map are fine
-        const filtered = []
-
+        const [c1, c2, c3] = out.ternaryCodes_
         const statData1 = out.statData(c1)
         const statData2 = out.statData(c2)
         const statData3 = out.statData(c3)
 
-        features.forEach((f) => {
-            const id = f.properties.id
-            const v1 = +statData1.get(id)?.value
-            const v2 = +statData2.get(id)?.value
-            const v3 = +statData3.get(id)?.value
-            if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
-                filtered.push({ id, values: [v1, v2, v3] })
-            }
+        // collect features from main map AND all insets
+        const allMaps = [out]
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => allMaps.push(inset))
+        }
+
+        const filtered = []
+        const seenIds = new Set()
+
+        allMaps.forEach((map) => {
+            const features = map.Geometries.getRegionFeatures()
+            if (!features || features.length === 0) return
+            features.forEach((f) => {
+                const id = f.properties.id
+                if (seenIds.has(id)) return
+                seenIds.add(id)
+                const v1 = +statData1.get(id)?.value
+                const v2 = +statData2.get(id)?.value
+                const v3 = +statData3.get(id)?.value
+                if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
+                    filtered.push({ id, values: [v1, v2, v3] })
+                }
+            })
         })
 
-        map._ternaryData_ = filtered.map((d) => d.values)
-        map._ternaryCenter_ = out.ternarySettings_.meanCentering ? CompositionUtils.centre(map._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
+        out._ternaryData_ = filtered.map((d) => d.values)
+        out._ternaryCenter_ = out.ternarySettings_.meanCentering ? CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
 
-        const colors = tricolore(map._ternaryData_, {
-            center: map._ternaryCenter_,
+        const colors = tricolore(out._ternaryData_, {
+            center: out._ternaryCenter_,
             breaks: out.ternarySettings_.breaks,
             hue: out.ternarySettings_.hue,
             chroma: out.ternarySettings_.chroma,
@@ -131,11 +137,22 @@ export const map = function (config) {
         })
 
         filtered.forEach((d, i) => {
-            if (colors[i] != null) {
-                map._ternaryColorById_.set(d.id, colors[i])
-                map._ternaryClassById_.set(d.id, i)
+            const color = colors[i]
+            if (color != null && !color.includes('NaN')) {
+                out._ternaryColorById_.set(d.id, color)
+                out._ternaryClassById_.set(d.id, i)
             }
         })
+
+        // share lookup with all insets
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => {
+                inset._ternaryColorById_ = out._ternaryColorById_
+                inset._ternaryClassById_ = out._ternaryClassById_
+                inset._ternaryCenter_ = out._ternaryCenter_
+                inset._ternaryData_ = out._ternaryData_
+            })
+        }
     }
 
     // ===============================
