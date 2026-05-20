@@ -63,6 +63,10 @@
                 .header(true)
                 .insetBoxPosition(insetBoxPosition)
                 .position({ x: 5050000, y: 3490000, z: 6100 })
+                .footnote(
+                    'Note: share of students enrolled in ISCED levels 6, 7 and 8. Germany: NUTS level 1. The Netherlands and Albania: national data. Iceland and Albania: 2023. Liechtenstein and Türkiye: 2022.'
+                )
+                .footnoteWrap(85)
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Tertiary education students, 2021')
@@ -114,6 +118,17 @@
                 .zoomExtent([0.1, 100])
 
             map.onBuild(() => {
+                //add footnote
+
+                d3.select('#map #em-footnote-2').remove()
+                d3.selectAll('#map')
+                    .append('text')
+                    .attr('x', MAPWIDTH - 310)
+                    .attr('y', MAPHEIGHT + 92)
+                    .attr('class', 'em-footnote')
+                    .attr('id', 'em-footnote-2')
+                    .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+
                 const newInsets = d3.select('#newInsets')
                 if (!newInsets.empty()) {
                     d3.select('#map').node().appendChild(newInsets.node())
