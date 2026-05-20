@@ -83,42 +83,45 @@ export const map = function (config) {
     // ===============================
     //@override
     out.updateClassification = function () {
-        // ALWAYS reset to safe defaults
-        out._ternaryData_ = []
-        out._ternaryColorById_ = new Map()
-        out._ternaryCenter_ = null
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+        }
+        applyClassificationToMap(out)
+        return out
+    }
 
-        const features = out.Geometries.getRegionFeatures()
-        if (!features || features.length === 0) return out
+    function applyClassificationToMap(map) {
+        // Reset on the passed map instance
+        map._ternaryData_ = []
+        map._ternaryColorById_ = new Map()
+        map._ternaryClassById_ = new Map()
+        map._ternaryCenter_ = null
 
-        const [c1, c2, c3] = out.ternaryCodes_
+        const features = map.Geometries.getRegionFeatures() // ← use map, not out
+        if (!features || features.length === 0) return map
+
+        const [c1, c2, c3] = out.ternaryCodes_ // settings from main map are fine
         const filtered = []
 
         const statData1 = out.statData(c1)
         const statData2 = out.statData(c2)
         const statData3 = out.statData(c3)
+
         features.forEach((f) => {
             const id = f.properties.id
-            const id1 = statData1.get(id)
-            const id2 = statData2.get(id)
-            const id3 = statData3.get(id)
-            const v1 = +id1?.value
-            const v2 = +id2?.value
-            const v3 = +id3?.value
-
+            const v1 = +statData1.get(id)?.value
+            const v2 = +statData2.get(id)?.value
+            const v3 = +statData3.get(id)?.value
             if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
                 filtered.push({ id, values: [v1, v2, v3] })
             }
         })
 
-        out._ternaryData_ = filtered.map((d) => d.values)
+        map._ternaryData_ = filtered.map((d) => d.values)
+        map._ternaryCenter_ = out.ternarySettings_.meanCentering ? CompositionUtils.centre(map._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
 
-        // --- center ---
-        out._ternaryCenter_ = out.ternarySettings_.meanCentering ? CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
-
-        // --- colors ---
-        const colors = tricolore(out._ternaryData_, {
-            center: out._ternaryCenter_,
+        const colors = tricolore(map._ternaryData_, {
+            center: map._ternaryCenter_,
             breaks: out.ternarySettings_.breaks,
             hue: out.ternarySettings_.hue,
             chroma: out.ternarySettings_.chroma,
@@ -127,18 +130,12 @@ export const map = function (config) {
             spread: out.ternarySettings_.spread,
         })
 
-        out._ternaryColorById_ = new Map()
-        out._ternaryClassById_ = new Map()
-
         filtered.forEach((d, i) => {
-            const color = colors[i]
-
-            if (color != null) {
-                out._ternaryColorById_.set(d.id, color)
-                out._ternaryClassById_.set(d.id, i) // <-- class index
+            if (colors[i] != null) {
+                map._ternaryColorById_.set(d.id, colors[i])
+                map._ternaryClassById_.set(d.id, i)
             }
         })
-        return out
     }
 
     // ===============================
@@ -170,12 +167,19 @@ export const map = function (config) {
         if (!map.svg() || !map._ternaryColorById_) return
 
         const selector = getRegionsSelector(map)
-
         const regions = map.svg().selectAll(selector)
 
-        // Apply transition and set initial fill colors with data-driven logic
+        // defined here so it closes over the correct map instance
+        const regionsFillFunction = function (rg) {
+            const id = rg.properties.id
+            const c = map._ternaryColorById_.get(id)
+            const cls = map._ternaryClassById_.get(id)
+            select(this).attr('ecl', cls ?? null)
+            return c ?? out.noDataFillStyle_
+        }
+
         regions
-            .style('pointer-events', 'none') // disable interaction during transition
+            .style('pointer-events', 'none')
             .transition()
             .duration(out.transitionDuration())
             .style('fill', regionsFillFunction)
