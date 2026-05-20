@@ -210,6 +210,16 @@
                         .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
 
                     //createTopCountriesOverlay("#ports-map", sums, rankingX, rankingY);
+
+                    //move annotations to below centroids
+                    const svgEl = document.querySelector('#ports-map')
+                    if (svgEl) {
+                        const centroidsGroup = svgEl.querySelector('#em-centroids-ports-map')
+                        const annotationsGroup = svgEl.querySelector('#em-annotations')
+                        if (centroidsGroup && annotationsGroup) {
+                            centroidsGroup.parentNode.insertBefore(centroidsGroup, annotationsGroup.nextSibling)
+                        }
+                    }
                 })
                 .filterGeometriesFunction((geometries) => {
                     //remove greenland to stop title overlap
