@@ -261,15 +261,17 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
     const sv2 = map.statData(c2).get(id)
     const sv3 = map.statData(c3).get(id)
 
+    const fmt = (sv) => (sv?.value != null && sv.value !== ':' ? spaceAsThousandSeparator(sv.value) + unitText : '')
+
     //we assume all three stats have the same unit
     const unitText = map.statData(c1).unitText() || map.statData(c2).unit_ || map.statData(c3).unit_ || ''
 
     buf.push(`<div class="em-tooltip-text" style="background:#fff;color:#171a22;padding:4px;font-size:15px;">
-      <table class="em-tooltip-table"><tbody>
-        <tr><td>${map.statData(c1).label_ || c1}: ${sv1?.value ? spaceAsThousandSeparator(sv1.value) + unitText : ''}</td></tr>
-        <tr><td>${map.statData(c2).label_ || c2}: ${sv2?.value ? spaceAsThousandSeparator(sv2.value) + unitText : ''}</td></tr>
-        <tr><td>${map.statData(c3).label_ || c3}: ${sv3?.value ? spaceAsThousandSeparator(sv3.value) + unitText : ''}</td></tr>
-      </tbody></table></div>`)
+  <table class="em-tooltip-table"><tbody>
+    <tr><td>${map.statData(c1).label_ || c1}: ${fmt(sv1)}</td></tr>
+    <tr><td>${map.statData(c2).label_ || c2}: ${fmt(sv2)}</td></tr>
+    <tr><td>${map.statData(c3).label_ || c3}: ${fmt(sv3)}</td></tr>
+  </tbody></table></div>`)
 
     return buf.join('')
 }

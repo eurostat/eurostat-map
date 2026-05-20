@@ -162,7 +162,9 @@
                 }
             })
 
-            map.stat('v1', { label: 'Bachelor' }).stat('v2', { label: 'Master' }).stat('v3', { label: 'PhD' })
+            map.stat('v1', { label: 'Bachelor', unitText: '%' })
+                .stat('v2', { label: 'Master', unitText: '%' })
+                .stat('v3', { label: 'PhD', unitText: '%' })
             map.build()
             map.statData('v1').setData(filterNulls(bachelor_pct))
             map.statData('v2').setData(filterNulls(masters_pct))
