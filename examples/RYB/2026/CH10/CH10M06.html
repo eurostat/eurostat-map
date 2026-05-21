@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tourism coxcomb map</title>
+        <link rel="stylesheet" href="../../insets/insets.css" />
+        <style>
+            button {
+                margin: 10px;
+                padding: 10px 20px;
+                cursor: pointer;
+                font-size: 16px;
+            }
+            #log {
+                height: 100%;
+                font-family: monospace;
+                background: #f0f0f0;
+                padding: 10px;
+                max-height: 600px;
+                overflow-y: auto;
+                font-size: 12px;
+            }
+            .em-inset .em-zoom-buttons {
+                display: none;
+            }
+            .em-legend-wedge {
+                stroke: black !important;
+            }
+            .em-coxcomb-chart {
+                stroke-width: 0.1 !important;
+            }
+            .em-legend-background {
+                filter: none !important;
+            }
+            .em-color-legend-title,
+            .em-size-legend-title,
+            .em-time-legend-title {
+                font-size: 14px !important;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="container" width="100%" height="97vh">
+            <svg id="map"></svg>
+            <g id="newInsets"></g>
+        </svg>
+
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/d3@7"></script>
+        <script src="../../insets/overseas.js"></script>
+        <script>
+            const MAPWIDTH = 797
+            const MAPHEIGHT = 677
+            const INSETBOXPOSITION = [550, 70]
+            const LEGENDX = 624
+            const LEGENDY = 330
+            // Generate fresh inset config with new svgIds (from overseas.js)
+            const insetsCfg = createOutermostInsetsConfig()
+
+            createInsetDOMElements(insetsCfg, INSETBOXPOSITION)
+
+            // data
+            const MONTH_KEYS = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12']
+            const CSV_MONTH_COLS = [
+                'January',
+                'February',
+                'March',
+                'April',
+                'May',
+                'June',
+                'July',
+                'August',
+                'September',
+                'October',
+                'November',
+                'December',
+            ]
+
+            async function loadData() {
+                const [domRes, forRes] = await Promise.all([fetch('data/M06/DOMESTIC.csv'), fetch('data/M06/INTERNATIONAL.csv')])
+                const [domText, forText] = await Promise.all([domRes.text(), forRes.text()])
+
+                const domData = parseCSV(domText)
+                const forData = parseCSV(forText)
+
+                const customData = {}
+                const allNuts = new Set([...Object.keys(domData), ...Object.keys(forData)])
+
+                allNuts.forEach((nuts) => {
+                    customData[nuts] = {}
+                    MONTH_KEYS.forEach((month) => {
+                        const dom = domData[nuts]?.[month] ?? ':'
+                        const forVal = forData[nuts]?.[month] ?? ':'
+
+                        const domIsND = dom === ':'
+                        const forIsND = forVal === ':'
+
+                        // If both categories are no-data, mark the whole month as no-data
+                        if (domIsND && forIsND) {
+                            customData[nuts][month] = {
+                                DOM: ':',
+                                FOR: ':',
+                                TOTAL: ':',
+                            }
+                        } else {
+                            const domVal = domIsND ? 0 : dom
+                            const forVal2 = forIsND ? 0 : forVal
+                            customData[nuts][month] = {
+                                DOM: domIsND ? ':' : domVal,
+                                FOR: forIsND ? ':' : forVal2,
+                                TOTAL: domVal + forVal2,
+                            }
+                        }
+                    })
+                })
+
+                return customData
+            }
+
+            loadData().then((customData) => {
+                const map = eurostatmap
+                    .map('coxcomb')
+                    .width(MAPWIDTH)
+                    .height(MAPHEIGHT)
+                    .title('Guest nights spent at short-stay accommodation')
+                    .subtitle('offered via selected online booking platforms, by month, 2024')
+                    .position({ x: 4800000, y: 3400000, z: 6000 })
+                    .dorling(true)
+                    .dorlingStrength({ x: 10, y: 10 })
+                    .dorlingIterations(1)
+                    .dorlingPadding(-1)
+                    .animateDorling(false)
+                    .nutsLevel('mixed')
+                    .statCoxcomb({
+                        customData: customData,
+                        times: MONTH_KEYS,
+                        timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        categoryCodes: ['DOM', 'FOR'],
+                        categoryLabels: ['Domestic', 'International'],
+                        categoryColors: ['#AF155C', '#2644A7'],
+                        totalCode: 'TOTAL',
+                        unitText: 'Nights',
+                    })
+                    .coxcombMaxRadius(34)
+                    .coxcombMinRadius(5)
+                    .coxcombRings(false)
+                    .zoomButtons(false)
+                    .insets(insetsCfg)
+                    .insetBoxPosition(INSETBOXPOSITION)
+                    .legend({
+                        boxOpacity: 1,
+                        x: LEGENDX,
+                        y: LEGENDY,
+                        sizeLegend: {
+                            title: 'Nights spent',
+                            marginTop: 45,
+                            titlePadding: 10,
+                            noData: false,
+                            values: [12000000, 6000000, 1000000],
+                            labels: ['12 million', '6 million', '1 million'],
+                        },
+                        colorLegend: { title: 'Residence of guest', marginTop: 35, titlePadding: 10, noData: false },
+                        timeLegend: { title: 'Month', titlePadding: 33, marginTop: -33 },
+                    })
+                    .bottomText(false)
+                    .header(true)
+                    .footer(true)
+                    // .logoPosition([2, MAPHEIGHT - 12])
+                    // .ribbonPosition([MAPWIDTH - 180, MAPHEIGHT - 17])
+                    .ribbonWidth(300)
+                    .ribbonHeight(50)
+                    .footnoteWrap(90)
+                    .footnote(
+                        "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year."
+                    )
+                    .onBuild(() => {
+                        // move newInsets inside #map
+                        const newInsets = d3.select('#newInsets')
+                        if (!newInsets.empty()) {
+                            d3.select('#map').node().appendChild(newInsets.node())
+                        }
+
+                        //add cartography footnote
+                        d3.select('#map #em-footnote-2').remove()
+                        d3.selectAll('#map')
+                            .append('text')
+                            .attr('x', MAPWIDTH - 308)
+                            .attr('y', MAPHEIGHT + 83)
+                            .attr('class', 'em-footnote')
+                            .attr('id', 'em-footnote-2')
+                            .append('tspan')
+                            .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM')
+                    })
+                    .build()
+            })
+
+            // Properly splits a CSV line respecting quoted fields
+            function splitCSVLine(line) {
+                const result = []
+                let current = ''
+                let inQuotes = false
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i]
+                    if (ch === '\r') continue
+                    if (ch === '"') {
+                        inQuotes = !inQuotes
+                    } else if (ch === ',' && !inQuotes) {
+                        result.push(current)
+                        current = ''
+                    } else {
+                        current += ch
+                    }
+                }
+                result.push(current)
+                return result
+            }
+
+            function parseCSV(text) {
+                const lines = text.trim().split('\n')
+                const headers = splitCSVLine(lines[0])
+                const data = {}
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = splitCSVLine(lines[i])
+                    const nuts = cols[0].trim()
+                    if (!nuts) continue
+                    data[nuts] = {}
+                    CSV_MONTH_COLS.forEach((month, idx) => {
+                        const colIdx = headers.indexOf(month)
+                        const raw = colIdx !== -1 ? cols[colIdx] : ''
+                        const parsed = raw === ':' ? ':' : raw ? parseFloat(raw) * 1_000_000 || 0 : 0
+                        data[nuts][MONTH_KEYS[idx]] = parsed
+                    })
+                }
+                return data
+            }
+        </script>
+    </body>
+</html>

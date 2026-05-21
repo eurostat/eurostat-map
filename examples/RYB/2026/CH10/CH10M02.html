@@ -52,10 +52,12 @@
         <script>
             const MAPWIDTH = 797
             const MAPHEIGHT = 677
+            const LEGENDX = 624
+            const LEGENDY = 330
+            const INSETBOXPOSITION = [550, 70]
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
-            const insetBoxPosition = [550, 23]
-            createInsetDOMElements(insetsCfg, insetBoxPosition)
+            createInsetDOMElements(insetsCfg, INSETBOXPOSITION)
 
             // data
             const MONTH_KEYS = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12']
@@ -120,6 +122,9 @@
                     .map('coxcomb')
                     .width(MAPWIDTH)
                     .height(MAPHEIGHT)
+                    .header(true)
+                    .title('Nights spent in tourist accommodation')
+                    .subtitle('by month, 2024')
                     .position({ x: 4800000, y: 3400000, z: 6000 })
                     .dorling(true)
                     .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
@@ -132,7 +137,7 @@
                         times: MONTH_KEYS,
                         timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         categoryCodes: ['DOM', 'FOR'],
-                        categoryLabels: ['Domestic', 'Foreign'],
+                        categoryLabels: ['Domestic', 'International'],
                         categoryColors: ['#AF155C', '#2644A7'], //R239/G209/B140
                         totalCode: 'TOTAL',
                         unitText: 'Nights',
@@ -142,11 +147,11 @@
                     .coxcombRings(false)
                     .zoomButtons(false)
                     .insets(insetsCfg)
-                    .insetBoxPosition(insetBoxPosition)
+                    .insetBoxPosition(INSETBOXPOSITION)
                     .legend({
                         boxOpacity: 1,
-                        x: 624,
-                        y: 280,
+                        x: LEGENDX,
+                        y: LEGENDY,
                         sizeLegend: {
                             title: 'Nights spent',
                             marginTop: 45,
@@ -183,7 +188,7 @@
                         d3.selectAll('#map')
                             .append('text')
                             .attr('x', MAPWIDTH - 308)
-                            .attr('y', MAPHEIGHT + 40)
+                            .attr('y', MAPHEIGHT + 83)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .append('tspan')
