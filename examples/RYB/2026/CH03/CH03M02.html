@@ -236,13 +236,13 @@
 
             const exportBtnSVG = document.getElementById('export-svg-btn')
             exportBtnSVG.addEventListener('click', function () {
-                map.exportMapToSVG()
+                map.exportMapToSVG('CH03M02-map') // filename without extension
             })
 
             const exportLegendBtn = document.getElementById('export-legend-btn')
             exportLegendBtn.addEventListener('click', function () {
                 const legendSVG = document.getElementById('legend-container')
-                exportToSVG(legendSVG, 'legend.svg')
+                exportToSVG(legendSVG, 'CH03M02-legend.svg')
             })
         </script>
     </body>
