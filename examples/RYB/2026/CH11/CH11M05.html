@@ -96,6 +96,10 @@
             const map = eurostatmap
                 .map('mushroom')
                 .svgId('ports-map')
+                .footer(true)
+                .footnote(
+                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). <br> Source: Eurostat (online data code: mar_pa_aa)'
+                )
                 .width(mapWidth)
                 .height(mapHeight)
                 .position({ x: 4790000, y: 3420000, z: 4500 })
@@ -189,35 +193,21 @@
                 .onBuild(() => {
                     const portKeys = stats.map((d) => d.code)
                     //color regions
-                    d3.selectAll('#ports-map .em-nutsrg path')
-                        // .style('fill', (d) => {
-                        //     const iso = d.properties.id // e.g. "NL"
-
-                        //     // Check if ANY port key starts with this ISO
-                        //     const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
-
-                        //     return hasPort ? 'rgba(178, 232, 215,0.4)' : '#F2F2F2'
-                        // })
-                        .attr('fill', (d) => {
-                            const iso = d.properties.id // e.g. "NL"
-
-                            // Check if ANY port key starts with this ISO
-                            const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
-
-                            return hasPort ? '#fff4cc' : '#F2F2F2'
-                        })
+                    d3.selectAll('#ports-map .em-nutsrg path').attr('fill', (d) => {
+                        const iso = d.properties.id // e.g. "NL"
+                        const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+                        return hasPort ? '#fff4cc' : '#F2F2F2'
+                    })
 
                     // --- REMOVE if it already exists ---
                     d3.select('#ports-map #em-footnote-2').remove()
                     d3.selectAll('#ports-map')
                         .append('text')
-                        .attr('x', mapWidth - 320)
-                        .attr('y', mapHeight)
+                        .attr('x', mapWidth - 310)
+                        .attr('y', mapHeight + 20)
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
-
-                    //createTopCountriesOverlay("#ports-map", sums, rankingX, rankingY);
                 })
                 .filterGeometriesFunction((geometries) => {
                     //remove greenland to stop title overlap
@@ -311,7 +301,7 @@
                     return geometries
                 })
 
-            map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
+            map.stat('v1', { label: 'Disembarked' }).stat('v2', { label: 'Embarked' })
             map.build()
             map.statData('v1').setData(filterNulls(inwardData))
             map.statData('v2').setData(filterNulls(outwardData))
