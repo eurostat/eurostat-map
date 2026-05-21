@@ -473,6 +473,7 @@ export class TricoloreViz {
                     .append('text')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])
+                    .attr('id', `em-ternary-axis-title-${i + 1}`)
                     .attr('class', 'em-ternary-axis-title em-legend-label em-ternary-legend-label')
                     .attr('text-anchor', 'middle')
                     .attr('dominant-baseline', 'middle')
@@ -496,6 +497,7 @@ export class TricoloreViz {
             labels.forEach((label, i) => {
                 this.legend
                     .append('text')
+                    .attr('id', `em-ternary-axis-title-${i + 1}`)
                     .attr('class', 'em-ternary-axis-title em-legend-label em-ternary-legend-label')
                     .attr('x', labelPositions[i][0])
                     .attr('y', labelPositions[i][1])

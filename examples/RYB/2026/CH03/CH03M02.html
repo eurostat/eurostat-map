@@ -16,10 +16,19 @@
                 font-size: 12px;
             }
             #legend-container {
-                transform: translate(526px, 73px);
+                transform: translate(826px, 73px);
+                filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
             }
             #newInsets {
                 filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
+            }
+            .em-ternary-center-line {
+                opacity: 0.7;
+                stroke: black;
+            }
+            #em-ternary-axis-title-1,
+            #em-ternary-axis-title-1-badge {
+                transform: translate(0px, 6px);
             }
         </style>
         <svg id="container" width="100%" height="900px">
@@ -35,21 +44,17 @@
 
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
-            const insetBoxPosition = [540, 415]
+            const insetBoxPosition = [545, 78]
             createInsetDOMElements(insetsCfg, insetBoxPosition)
 
             //get data
-            const [bachelor_pct, masters_pct, phd_pct] = await Promise.all([
-                json('./data/bachelor_pct.json'),
-                json('./data/masters_pct.json'),
-                json('./data/phd_pct.json'),
-            ])
+            const [bachelor, masters, phd] = await Promise.all([json('./data/bachelors.json'), json('./data/masters.json'), json('./data/phd.json')])
 
             const red = '#E04040'
             const blue = '#388AE2'
             const green = '#33A033'
 
-            const legendLabelPosition = 'corner' // 'corner' | 'inside'
+            const legendLabelPosition = 'edge' // 'corner' | 'inside'
             const legendColorTarget = 'points' // 'points' | 'triangles'
             const meanCentering = true
 
@@ -73,7 +78,7 @@
                 .height(MAPHEIGHT)
                 .title('Tertiary education students, 2021')
                 .subtitle(
-                    `<tspan x="14" dy="5"><tspan class="badge-green">Bachelor</tspan> , <tspan class="badge-blue">Masters</tspan> or <tspan class="badge-red">PHD</tspan> students.</tspan>`
+                    `<tspan x="14" dy="5"><tspan class="badge-green">Bachelor's</tspan> , <tspan class="badge-blue">Master's</tspan> or <tspan class="badge-red">PhD</tspan> students.</tspan>`
                 )
                 .nutsLevel(2)
                 .ternarySettings({
@@ -89,18 +94,17 @@
                     svgId: 'legend-container',
                     title: 'Education level',
                     subtitle: `
-                        <tspan x="8" dy="0">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of</tspan>
-                        <tspan x="8" dy="1.2em">  bachelor students. Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have </tspan>
-                        <tspan x="8" dy="1.2em">a higher % of masters students and areas with 
-                        <tspan x="8" dy="1.2em">more <tspan fill="${red}" class='subtitle-color'>red</tspan> have a higher</tspan> % of PHD students.</tspan>
+                        <tspan x="8" dy="0">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of bachelor's students.</tspan>
+                        <tspan x="8" dy="1.2em">   Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have a higher % of master's students.</tspan>
+                        <tspan x="8" dy="1.2em">Areas with more <tspan fill="${red}" class='subtitle-color'>red</tspan> have a higher % of PhD students.</tspan>
                     `,
 
                     boxOpacity: 0.99,
-                    width: 250,
-                    height: 280,
-                    labels: legendLabelPosition == 'corner' ? ['Bachelors', 'Masters', 'PHD'] : ['← Bachelors', 'Masters →', 'PHD →'],
+                    width: 310,
+                    height: 320,
+                    labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
                     labelPosition: legendLabelPosition,
-                    padding: { top: 55, right: 30, bottom: 10, left: 47 },
+                    padding: { top: 35, right: 30, bottom: 0, left: 47 },
                     showLines: true,
                     gridBreaks: 5,
                     minorSubdivisions: 2,
@@ -110,7 +114,7 @@
                     colorTarget: legendColorTarget, // 'points' | 'triangles'
                     centerAnnotationOffsets: {
                         labelX: -35,
-                        labelY: 15,
+                        labelY: 135,
                         curveX: 0,
                         curveY: 0,
                     },
@@ -161,6 +165,11 @@
                     legendSvgEl.querySelectorAll('.em-ternary-axis-title').forEach((el, i) => {
                         applyBadgeToElement(el, badges[i].color)
                     })
+
+                    //legend average indicator badges
+                    // legendSvgEl.querySelectorAll('.em-ternary-center-line-label').forEach((el, i) => {
+                    //     applyBadgeToElement(el, badges[i].color)
+                    // })
                 }
             })
 
@@ -168,9 +177,9 @@
                 .stat('v2', { label: 'Master', unitText: '%' })
                 .stat('v3', { label: 'PhD', unitText: '%' })
             map.build()
-            map.statData('v1').setData(filterNulls(bachelor_pct))
-            map.statData('v2').setData(filterNulls(masters_pct))
-            map.statData('v3').setData(filterNulls(phd_pct))
+            map.statData('v1').setData(filterNulls(bachelor))
+            map.statData('v2').setData(filterNulls(masters))
+            map.statData('v3').setData(filterNulls(phd))
 
             // map.updateStatValues()
 
@@ -179,9 +188,17 @@
             }
 
             function applyBadgeToElement(el, color) {
+                const textEl = el.closest('text')
                 const bb = el.getBBox()
                 const pad = { x: 3, y: 2 }
+
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+
+                const badgeId = el.getAttribute('id') || textEl?.getAttribute('id')
+                if (badgeId) {
+                    rect.setAttribute('id', `${badgeId}-badge`)
+                }
+
                 rect.setAttribute('x', bb.x - pad.x)
                 rect.setAttribute('y', bb.y - pad.y)
                 rect.setAttribute('width', bb.width + pad.x * 2)
@@ -189,9 +206,15 @@
                 rect.setAttribute('rx', 2)
                 rect.setAttribute('fill', color)
 
-                // find the correct parent: for tspan, walk up to the text's parent (a <g> or <svg>)
-                const insertParent = el.closest('text') ? el.closest('text').parentNode : el.parentNode
-                const insertBefore = el.closest('text') || el
+                const transforms = [textEl?.getAttribute('transform'), el !== textEl ? el.getAttribute('transform') : null].filter(Boolean)
+
+                if (transforms.length) {
+                    rect.setAttribute('transform', transforms.join(' '))
+                }
+
+                const insertParent = textEl ? textEl.parentNode : el.parentNode
+                const insertBefore = textEl || el
+
                 insertParent.insertBefore(rect, insertBefore)
 
                 el.setAttribute('fill', 'white')
