@@ -141,7 +141,7 @@ export const legend = function (map, config) {
         })
 
         // Dashed lines and labels, using original values order for index alignment
-        const labelX = maxR + 8 // right of the largest wedge
+        const labelX = maxR // right of the largest wedge
         values.forEach((v, i) => {
             const r = sizeScale(v)
             // tip of wedge at this radius, at the midpoint angle (pointing straight up = y:-r)
