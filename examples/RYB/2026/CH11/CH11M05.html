@@ -107,7 +107,7 @@
                 .dorling(true)
                 .zoomButtons(true)
                 .hoverColor('#ffa500')
-                .mushroomMinSize(1)
+                .mushroomMinSize(0.2)
                 .mushroomMaxSize(17)
                 .mushroomColors(['#33A033', '#B09120'])
                 .mushroomOrientation('horizontal')
@@ -340,8 +340,8 @@
                     }
                 }
 
-                const row1 = `<tr><td>Disembarked: ${(inward / 1e6).toFixed(1)} million tonnes</td></tr>`
-                const row2 = `<tr><td>Embarked: ${(outward / 1e6).toFixed(1)} million tonnes</td></tr>`
+                const row1 = `<tr><td>Disembarked: ${(inward / 1e6).toFixed(1)} million passengers</td></tr>`
+                const row2 = `<tr><td>Embarked: ${(outward / 1e6).toFixed(1)} million passengers</td></tr>`
 
                 return `
                 <div class="em-tooltip-bar">
