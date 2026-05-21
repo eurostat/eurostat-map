@@ -199,6 +199,17 @@
                     })
                     .zoomExtent([0.9, 100])
                     .build()
+
+                const exportBtnPNG = document.getElementById('export-png-btn')
+                exportBtnPNG.addEventListener('click', function () {
+                    const factor = 1
+                    map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+                })
+
+                const exportBtnSVG = document.getElementById('export-svg-btn')
+                exportBtnSVG.addEventListener('click', function () {
+                    map.exportMapToSVG()
+                })
             })
 
             // Properly splits a CSV line respecting quoted fields
@@ -240,16 +251,6 @@
                 }
                 return data
             }
-            const exportBtnPNG = document.getElementById('export-png-btn')
-            exportBtnPNG.addEventListener('click', function () {
-                const factor = 1
-                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
-            })
-
-            const exportBtnSVG = document.getElementById('export-svg-btn')
-            exportBtnSVG.addEventListener('click', function () {
-                map.exportMapToSVG()
-            })
         </script>
     </body>
 </html>
