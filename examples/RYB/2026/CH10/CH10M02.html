@@ -120,6 +120,7 @@
             loadData().then((customData) => {
                 const map = eurostatmap
                     .map('coxcomb')
+                    .containerId('container')
                     .width(MAPWIDTH)
                     .height(MAPHEIGHT)
                     .header(true)

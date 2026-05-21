@@ -121,6 +121,7 @@
             loadData().then((customData) => {
                 const map = eurostatmap
                     .map('coxcomb')
+                    .containerId('container')
                     .width(MAPWIDTH)
                     .height(MAPHEIGHT)
                     .title('Guest nights spent at short-stay accommodation')
@@ -142,7 +143,7 @@
                         totalCode: 'TOTAL',
                         unitText: 'Nights',
                     })
-                    .coxcombMaxRadius(34)
+                    .coxcombMaxRadius(40)
                     .coxcombMinRadius(5)
                     .coxcombRings(false)
                     .zoomButtons(false)
