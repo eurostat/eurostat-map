@@ -107,30 +107,47 @@ export const addFootnote = function (out) {
     const foot = parent.append('text').attr('id', 'em-footnote').attr('class', 'em-footnote').attr('x', position[0]).attr('y', position[1])
 
     // --- Wrapping logic ---
-    const words = text.split(/(\s+)/) // keep whitespace tokens
+    // SVG <text> does not understand <br>, so convert <br> into tspans.
+    const lineHeight = '1.2em'
     let line = ''
     let lineIndex = 0
 
-    for (const w of words) {
-        if ((line + w).length > wrap && line.length > 0) {
-            foot.append('tspan')
-                .attr('x', position[0])
-                .attr('dy', lineIndex === 0 ? 0 : '1.2em')
-                .html(line.trim())
-            line = w
-            lineIndex++
-        } else {
-            line += w
-        }
-    }
+    const appendLine = function (value, forceBlank = false) {
+        const clean = value.trim()
 
-    // last line
-    if (line.trim().length > 0) {
+        if (!clean && !forceBlank) return
+
         foot.append('tspan')
             .attr('x', position[0])
-            .attr('dy', lineIndex === 0 ? 0 : '1.2em')
-            .html(line.trim())
+            .attr('dy', lineIndex === 0 ? 0 : lineHeight)
+            .html(clean || '&nbsp;')
+
+        lineIndex++
     }
+
+    const parts = String(text).split(/<br\s*\/?>/gi)
+
+    parts.forEach((part, partIndex) => {
+        const words = part.split(/(\s+)/) // keep whitespace tokens
+
+        for (const w of words) {
+            if ((line + w).length > wrap && line.trim().length > 0) {
+                appendLine(line)
+                line = w
+            } else {
+                line += w
+            }
+        }
+
+        // Explicit <br> means force a new SVG text row
+        if (partIndex < parts.length - 1) {
+            appendLine(line, line.trim().length === 0)
+            line = ''
+        }
+    })
+
+    // last line
+    appendLine(line)
 
     // --- Tooltip logic ---
     foot.on('mouseover', function () {

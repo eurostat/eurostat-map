@@ -5,3 +5,4 @@ package-lock.json
 # Dev version
 .vscode/
 TYPESCRIPT-PLAN.md
+input/

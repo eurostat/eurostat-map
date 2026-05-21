@@ -51,9 +51,9 @@
             const mapHeight = 900
 
             //data load
-            const [freightData] = await Promise.all([d3.json('./data/M04/maritime_freight.json')])
-            const inwardData = indexByCode([...freightData], 'ton_2024_inward')
-            const outwardData = indexByCode([...freightData], 'ton_2024_outward')
+            const [stats] = await Promise.all([d3.json('./data/M05/maritime-passengers.json')])
+            const inwardData = indexByCode([...stats], 'disembarked')
+            const outwardData = indexByCode([...stats], 'embarked')
 
             //projection
             // european projection
@@ -104,7 +104,7 @@
                 .zoomButtons(true)
                 .hoverColor('#ffa500')
                 .mushroomMinSize(1)
-                .mushroomMaxSize(40)
+                .mushroomMaxSize(17)
                 .mushroomColors(['#33A033', '#B09120'])
                 .mushroomOrientation('horizontal')
                 .legend({
@@ -112,8 +112,8 @@
                     x: 10,
                     y: 160,
                     sizeLegend: {
-                        values: [288000000, 100000000, 10000000],
-                        labels: ['288 million ', '100 million', '10 million'],
+                        values: [5700000, 1000000],
+                        labels: ['5.7 million', '1 million'],
                     },
                     colorLegend: { title: '', marginTop: 10 },
                 })
@@ -122,20 +122,20 @@
                 })
                 .insetBoxPosition([mapWidth - insetWidth - 20, 10])
                 .insets([
-                    {
-                        x: -230,
-                        y: 0,
-                        title: 'Belgium / Netherlands',
-                        geo: 'EUR',
-                        position: { x: 3900000, y: 3200000, z: 1000 },
-                    },
-                    {
-                        x: -230,
-                        y: 220,
-                        title: 'Germany / Denmark',
-                        geo: 'EUR',
-                        position: { x: 4300000, y: 3490000, z: 2000 },
-                    },
+                    // {
+                    //     x: -230,
+                    //     y: 0,
+                    //     title: 'Belgium / Netherlands',
+                    //     geo: 'EUR',
+                    //     position: { x: 3900000, y: 3200000, z: 1000 },
+                    // },
+                    // {
+                    //     x: -230,
+                    //     y: 220,
+                    //     title: 'Germany / Denmark',
+                    //     geo: 'EUR',
+                    //     position: { x: 4300000, y: 3490000, z: 2000 },
+                    // },
                     {
                         title: 'Canarias (ES)',
                         geo: 'IC',
@@ -166,18 +166,28 @@
                         width: insetWidth,
                         height: insetHeight,
                     },
+                    // {
+                    //     title: 'Reunion (FR)',
+                    //     geo: 'RE',
+                    //     x: 0,
+                    //     y: insetHeight * 3 + padding * 3,
+                    //     position: { x: 348011, y: 7661627, z: 2000 },
+                    //     width: insetWidth,
+                    //     height: insetHeight,
+                    // },
                     {
-                        title: 'Reunion (FR)',
-                        geo: 'RE',
+                        geo: 'MT',
                         x: 0,
                         y: insetHeight * 3 + padding * 3,
-                        position: { x: 348011, y: 7661627, z: 2000 },
+                        scale: '01M',
+                        position: { x: 4721000, y: 1449000, z: 500 },
+                        title: 'Malta',
                         width: insetWidth,
                         height: insetHeight,
                     },
                 ])
                 .onBuild(() => {
-                    const portKeys = freightData.map((d) => d.code)
+                    const portKeys = stats.map((d) => d.code)
                     //color regions
                     d3.selectAll('#ports-map .em-nutsrg path')
                         // .style('fill', (d) => {
@@ -225,9 +235,9 @@
                     // add ports to centroids array
                     // each port location must be reprojected to the map projection
                     let centroids = geometries[1]
-                    ;[...freightData].forEach((d) => {
+                    ;[...stats].forEach((d) => {
                         let newCentroid
-                        if (d.code == 'ES02ESLPA') {
+                        if (d.code == 'ES02ESLPA' || d.code == 'ES0ESLPA') {
                             // handle canarias (inset map)
                             newCentroid = {
                                 type: 'Feature',
@@ -241,7 +251,7 @@
                                     na: d.name,
                                 },
                             }
-                        } else if (d.code == 'FR04GPPTP') {
+                        } else if (d.code == 'FR04GPPTP' || d.code == 'FR0GPPTP') {
                             newCentroid = {
                                 type: 'Feature',
                                 geometry: {
@@ -254,7 +264,7 @@
                                     na: d.name,
                                 },
                             }
-                        } else if (d.code == 'FR04MQFDF') {
+                        } else if (d.code == 'FR04MQFDF' || d.code == 'FR0MQFDF') {
                             newCentroid = {
                                 type: 'Feature',
                                 geometry: {
@@ -267,7 +277,7 @@
                                     na: d.name,
                                 },
                             }
-                        } else if (d.code == 'FR05RELPT') {
+                        } else if (d.code == 'FR05RELPT' || d.code == 'FR0RELPT') {
                             newCentroid = {
                                 type: 'Feature',
                                 geometry: {
@@ -300,36 +310,6 @@
                     })
                     return geometries
                 })
-                .annotations({
-                    annotations: [
-                        {
-                            //de-dk
-                            dy: -65,
-                            dx: 300,
-                            x: 445,
-                            y: 430,
-                            type: 'annotationCalloutCircle',
-                            subject: {
-                                radius: 50,
-                                radiusPadding: 0,
-                            },
-                            className: 'em-annotation-de-dk',
-                        },
-                        {
-                            //be/nl
-                            dy: -390,
-                            dx: 450,
-                            x: 340,
-                            y: 480,
-                            type: 'annotationCalloutCircle',
-                            subject: {
-                                radius: 50,
-                                radiusPadding: 0,
-                            },
-                            className: 'em-annotation-be-nl',
-                        },
-                    ],
-                })
 
             map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
             map.build()
@@ -355,18 +335,18 @@
 
                 if (isCountry) {
                     // 🇪🇺 Country hover → sum all ports in that country
-                    freightData.forEach((d) => {
+                    stats.forEach((d) => {
                         if (d.country === regionId) {
-                            inward += +d.ton_2024_inward || 0
-                            outward += +d.ton_2024_outward || 0
+                            inward += +d.disembarked || 0
+                            outward += +d.embarked || 0
                         }
                     })
                 } else {
                     // ⚓ Port hover → direct lookup
-                    const port = freightData.find((d) => d.code === regionId)
+                    const port = stats.find((d) => d.code === regionId)
                     if (port) {
-                        inward = +port.ton_2024_inward || 0
-                        outward = +port.ton_2024_outward || 0
+                        inward = +port.disembarked || 0
+                        outward = +port.embarked || 0
                     }
                 }
 
