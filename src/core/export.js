@@ -5,7 +5,7 @@ import { applyComputedStylesToSVG, ensureSvgSize, getDownloadURL } from './utils
  * and triggers a browser download.
  * @returns {object} The map instance.
  */
-export const exportMapToSVG = function (out) {
+export const exportMapToSVG = function (out, filename) {
     // Clone the original SVG node to avoid modifying the DOM
     const svgNodeClone = out.svg_.node().cloneNode(true)
     // Add XML namespaces if not already present
@@ -32,7 +32,7 @@ export const exportMapToSVG = function (out) {
     // Create a download link and trigger download
     const downloadLink = document.createElement('a')
     downloadLink.href = svgUrl
-    downloadLink.download = 'eurostatmap.svg'
+    downloadLink.download = filename + '.svg' || 'eurostatmap.svg'
     document.body.appendChild(downloadLink)
     downloadLink.click()
     document.body.removeChild(downloadLink)
@@ -49,7 +49,7 @@ export const exportMapToSVG = function (out) {
  * @param {number} [height] - Output height in pixels. Defaults to the SVG's current height.
  * @returns {Promise<object>} Resolves to the map instance.
  */
-export const exportMapToPNG = async function (out, width, height) {
+export const exportMapToPNG = async function (out, width, height, filename) {
     // Clone original SVG
     const svgNodeClone = out.svg_.node().cloneNode(true)
 
@@ -144,7 +144,7 @@ export const exportMapToPNG = async function (out, width, height) {
                 const pngUrl = URL.createObjectURL(pngBlob)
                 const a = document.createElement('a')
                 a.href = pngUrl
-                a.download = 'eurostat-map.png'
+                a.download = filename + '.png' || 'eurostat-map.png'
                 document.body.appendChild(a)
                 a.click()
                 document.body.removeChild(a)

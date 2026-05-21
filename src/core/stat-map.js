@@ -504,12 +504,12 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    out.exportMapToPNG = function (width, height) {
-        return exportMapToPNG(out, width, height)
+    out.exportMapToPNG = function (width, height, filename) {
+        return exportMapToPNG(out, width, height, filename)
     }
 
-    out.exportMapToSVG = function () {
-        return exportMapToSVG(out)
+    out.exportMapToSVG = function (filename) {
+        return exportMapToSVG(out, filename)
     }
 
     return out

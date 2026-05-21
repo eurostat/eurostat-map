@@ -22,22 +22,28 @@ import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js
  * @returns {function}
  */
 export function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labelType, userFormatter) {
-    if (userFormatter) return userFormatter
+    if (userFormatter) {
+        return (...args) => normalizeMinus(userFormatter(...args))
+    }
 
     const decimals = resolveDecimals(out, statData)
     const decimalFormatter = format(`,.${decimals}f`)
+    const fmt = (value) => normalizeMinus(decimalFormatter(value))
 
     if (labelType === 'ranges') {
         const thresholds = getThresholdsFn()
         return (label, i) => {
-            if (i === 0) return `> ${decimalFormatter(thresholds[thresholds.length - 1])}`
-            if (i === thresholds.length) return `< ${decimalFormatter(thresholds[0])}`
-            return `${decimalFormatter(thresholds[thresholds.length - i - 1])} - < ${decimalFormatter(thresholds[thresholds.length - i])}`
+            if (i === 0) return `> ${fmt(thresholds[thresholds.length - 1])}`
+            if (i === thresholds.length) return `< ${fmt(thresholds[0])}`
+            return `${fmt(thresholds[thresholds.length - i - 1])} − < ${fmt(thresholds[thresholds.length - i])}`
         }
     }
 
-    // thresholds (default)
-    return (value) => decimalFormatter(value)
+    // thresholds
+    return (value) => fmt(value)
+}
+function normalizeMinus(value) {
+    return String(value).replace(/-/g, '−')
 }
 
 /**
