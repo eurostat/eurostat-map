@@ -4,9 +4,6 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Maritime passengers mushroom map</title>
-    </head>
-
-    <body>
         <style>
             body {
                 margin: 0;
@@ -41,6 +38,13 @@
                 transform: translate(-20px, -13px);
             }
         </style>
+    </head>
+
+    <body>
+        <div>
+            <button id="export-png-btn" type="button">Download map as PNG</button>
+            <button id="export-svg-btn" type="button">Download map as SVG</button>
+        </div>
         <svg id="ports-map"></svg>
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
@@ -357,6 +361,17 @@
                 </div>
             `.trim()
             }
+
+            const exportBtnPNG = document.getElementById('export-png-btn')
+            exportBtnPNG.addEventListener('click', function () {
+                const factor = 1
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+            })
+
+            const exportBtnSVG = document.getElementById('export-svg-btn')
+            exportBtnSVG.addEventListener('click', function () {
+                map.exportMapToSVG()
+            })
         </script>
     </body>
 </html>

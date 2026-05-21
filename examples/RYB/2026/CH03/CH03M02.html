@@ -31,6 +31,11 @@
                 transform: translate(0px, 6px);
             }
         </style>
+        <div>
+            <button id="export-png-btn" type="button">Download map as PNG</button>
+            <button id="export-svg-btn" type="button">Download map as SVG</button>
+            <button id="export-legend-btn" type="button">Download legend as SVG</button>
+        </div>
         <svg id="container" width="100%" height="900px">
             <svg id="map"></svg>
             <g id="newInsets"></g>
@@ -39,6 +44,7 @@
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="../../insets/overseas.js"></script>
+        <script src="../../export.js"></script>
         <script type="module">
             import { json } from 'https://cdn.jsdelivr.net/npm/d3-fetch@3/+esm'
 
@@ -68,7 +74,7 @@
                 .footer(true)
                 .header(true)
                 .insetBoxPosition(insetBoxPosition)
-                .position({ x: 5050000, y: 3490000, z: 6100 })
+                .position({ x: 4950000, y: 3450000, z: 6000 })
                 .footnote(
                     'Note: share of students enrolled in ISCED levels 6, 7 and 8. Germany: NUTS level 1. The Netherlands and Albania: national data. Iceland and Albania: 2023. Liechtenstein and Türkiye: 2022. <br>Source: Eurostat (online data code: educ_uoe_enrt06)'
                 )
@@ -101,10 +107,10 @@
 
                     boxOpacity: 0.99,
                     width: 310,
-                    height: 320,
+                    height: 300,
                     labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
                     labelPosition: legendLabelPosition,
-                    padding: { top: 35, right: 30, bottom: 0, left: 47 },
+                    padding: { top: 10, right: 30, bottom: 0, left: 47 },
                     showLines: true,
                     gridBreaks: 5,
                     minorSubdivisions: 2,
@@ -114,12 +120,12 @@
                     colorTarget: legendColorTarget, // 'points' | 'triangles'
                     centerAnnotationOffsets: {
                         labelX: -35,
-                        labelY: 135,
+                        labelY: 140,
                         curveX: 0,
                         curveY: 0,
                     },
                 })
-                .zoomButtons(true)
+                .zoomButtons(false)
                 .zoomButtonsPosition([740, 590])
                 .zoomExtent([0.9, 100])
 
@@ -220,6 +226,23 @@
                 el.setAttribute('fill', 'white')
                 el.style.fill = 'white'
             }
+
+            const exportBtnPNG = document.getElementById('export-png-btn')
+            exportBtnPNG.addEventListener('click', function () {
+                const factor = 1
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+            })
+
+            const exportBtnSVG = document.getElementById('export-svg-btn')
+            exportBtnSVG.addEventListener('click', function () {
+                map.exportMapToSVG()
+            })
+
+            const exportLegendBtn = document.getElementById('export-legend-btn')
+            exportLegendBtn.addEventListener('click', function () {
+                const legendSVG = document.getElementById('legend-container')
+                exportToSVG(legendSVG, 'legend.svg')
+            })
         </script>
     </body>
 </html>

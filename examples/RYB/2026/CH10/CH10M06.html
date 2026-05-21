@@ -41,6 +41,10 @@
         </style>
     </head>
     <body>
+        <div>
+            <button id="export-png-btn" type="button">Download map as PNG</button>
+            <button id="export-svg-btn" type="button">Download map as SVG</button>
+        </div>
         <svg id="container" width="100%" height="900px">
             <svg id="map"></svg>
             <g id="newInsets"></g>
@@ -236,6 +240,16 @@
                 }
                 return data
             }
+            const exportBtnPNG = document.getElementById('export-png-btn')
+            exportBtnPNG.addEventListener('click', function () {
+                const factor = 1
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+            })
+
+            const exportBtnSVG = document.getElementById('export-svg-btn')
+            exportBtnSVG.addEventListener('click', function () {
+                map.exportMapToSVG()
+            })
         </script>
     </body>
 </html>
