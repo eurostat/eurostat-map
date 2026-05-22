@@ -5,15 +5,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>eurostat-map.js</title>
         <link rel="stylesheet" href="../../styles.css" />
+        <link rel="stylesheet" href="../../insets/insets.css" />
         <style>
             .em-cntbn {
-                opacity: 0.3 !important;
+                opacity: 0.7 !important;
             }
             #maps-wrapper {
                 display: flex;
                 width: 100%;
             }
-
             .map-container {
                 width: 50%;
                 height: 200vh;
@@ -44,9 +44,17 @@
             const MAPHEIGHT = 700
             const PIESIZE = 9
 
+            // Generate fresh inset config with new svgIds (from overseas.js)
+            const insetBoxPosition = [MAPWIDTH - 250, 70]
+            const insetsCfg1 = createOutermostInsetsConfig()
+            const insetsCfg2 = createOutermostInsetsConfig()
+            createInsetDOMElements(document.getElementById('newInsets1'), insetsCfg1, insetBoxPosition)
+            createInsetDOMElements(document.getElementById('newInsets2'), insetsCfg2, insetBoxPosition)
+
             const map1 = eurostatmap
                 .map('pie')
                 .svgId('map1')
+                .insets(insetsCfg1)
                 .containerId('container1')
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
@@ -90,6 +98,7 @@
             const map2 = eurostatmap
                 .map('pie')
                 .svgId('map2')
+                .insets(insetsCfg2)
                 .containerId('container2')
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)

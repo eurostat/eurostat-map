@@ -55,7 +55,7 @@
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
 
-            createInsetDOMElements(insetsCfg, INSETBOXPOSITION)
+            createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, INSETBOXPOSITION)
 
             // data
             const MONTH_KEYS = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12']

@@ -89,14 +89,14 @@
 
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
-        <script src="./overseas.js"></script>
+        <script src="../../overseas.js"></script>
         <script>
             const MAPWIDTH = 797
             const MAPHEIGHT = 677
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
             const insetBoxPosition = [550, 23]
-            createInsetDOMElements(insetsCfg, insetBoxPosition)
+            createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
 
             // data
             const MONTH_KEYS = ['M01', 'M02', 'M03', 'M04', 'M05', 'M06', 'M07', 'M08', 'M09', 'M10', 'M11', 'M12']

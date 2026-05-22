@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="../../insets/insets.css" />
         <link rel="stylesheet" href="../../styles.css" />
+        <link rel="stylesheet" href="../../insets/insets.css" />
     </head>
 
     <body>
@@ -52,7 +53,7 @@
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
             const insetBoxPosition = [545, 78]
-            createInsetDOMElements(insetsCfg, insetBoxPosition)
+            createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
 
             //get data
             const [bachelor, masters, phd] = await Promise.all([json('./data/bachelors.json'), json('./data/masters.json'), json('./data/phd.json')])

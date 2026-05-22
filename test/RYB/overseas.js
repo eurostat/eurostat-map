@@ -252,8 +252,7 @@ const createOutermostInsetsConfig = () => {
 }
 
 // Create DOM elements for insets dynamically based on config
-function createInsetDOMElements(insetsCfg, insetBoxPosition) {
-    const insetsGroup = document.getElementById('newInsets')
+function createInsetDOMElements(insetsGroup, insetsCfg, insetBoxPosition) {
     if (!insetsGroup) return
     insetsGroup.innerHTML = '' // Clear previous
 
