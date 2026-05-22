@@ -11,5 +11,5 @@
 }
 .em--pie .em-bn-co {
     stroke: rgb(161, 161, 161);
-    stroke-width: 0.1px;
+    stroke-width: 0.1px !important;
 }
