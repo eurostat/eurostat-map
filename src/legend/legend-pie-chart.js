@@ -154,13 +154,13 @@ export const legend = function (map, config) {
                 .on('mouseover', function () {
                     highlightSlices(out.map, code)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightSlices, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId_, highlightSlices, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightSlices(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightSlices, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId_, unhighlightSlices, code)
                     }
                 })
 

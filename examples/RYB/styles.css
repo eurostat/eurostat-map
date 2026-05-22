@@ -9,3 +9,7 @@
 .em-time-legend-title {
     font-size: 14px !important;
 }
+.em--pie .em-bn-co {
+    stroke: rgb(161, 161, 161);
+    stroke-width: 0.1px;
+}

@@ -144,7 +144,13 @@ export const map = function (config) {
     }
 
     function applyStyleToMap(map) {
-        if (!out.svg_) return
+        if (!map.svg_) return
+
+        // Insets are built from map templates and may not initialize their own tooltip instance.
+        // Reuse the main map tooltip so hover on external inset SVGs still shows tooltip content.
+        if (!map._tooltip && out._tooltip) {
+            map._tooltip = out._tooltip
+        }
 
         if (map.gridCartogram_) {
             applyStyleToGridCartogram(map)
@@ -161,15 +167,15 @@ export const map = function (config) {
                     return 'pie_' + rg.properties.id
                 })
 
-            const selector = getRegionsSelector(out)
-            const regions = out.svg().selectAll(selector)
+            const selector = getRegionsSelector(map)
+            const regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, regions, _getComposition)
             }
 
-            addPieChartsToMap(regionFeatures)
-            addMouseEventsToRegions(regions, out)
+            addPieChartsToMap(map, regionFeatures)
+            addMouseEventsToRegions(regions, map)
         }
     }
 
@@ -181,7 +187,7 @@ export const map = function (config) {
         })
         addPieChartsToGridCartogram(regionIds, map)
         addMouseEventsToGridCartogram(
-            out,
+            map,
             '.piechart',
             _getRegionTotal,
             (chart) => chart.style('stroke-width', out.pieStrokeWidth_ + 1).style('stroke', 'black'),
@@ -229,7 +235,7 @@ export const map = function (config) {
         return paths
     }
 
-    function addPieChartsToMap(regionFeatures) {
+    function addPieChartsToMap(map, regionFeatures) {
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
             const comp = _getComposition(regionId)
@@ -241,7 +247,7 @@ export const map = function (config) {
             const r = out.classifierSize_(_getRegionTotal(regionId))
             const { pie_, arcFn } = makePieArc(r)
 
-            const nodes = out.svg().selectAll('#pie_' + regionId)
+            const nodes = map.svg().selectAll('#pie_' + regionId)
             const chartNode = nodes
                 .append('g')
                 .attr('class', 'piechart')
@@ -258,21 +264,21 @@ export const map = function (config) {
                     select(this)
                         .style('stroke-width', out.pieStrokeWidth_ + 1)
                         .style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
                 .on('mousemove', function (e) {
-                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (map._tooltip) map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
                     select(this).style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_)
-                    if (out._tooltip) out._tooltip.mouseout()
+                    if (map._tooltip) map._tooltip.mouseout()
                 })
         })
     }
 
     function addPieChartsToGridCartogram(regionIds, map) {
         regionIds.forEach((regionId) => {
-            const node = out.svg().select('#pie_' + regionId)
+            const node = map.svg().select('#pie_' + regionId)
             if (node.empty()) return
 
             const comp = _getComposition(regionId)
