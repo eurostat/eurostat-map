@@ -1,5 +1,9 @@
 # RYB maps
 
+## Pie charts
+
+- [Causes of death - CH02M03](https://eurostat.github.io/eurostat-map/examples/RYB/2026/CH02/CH02M03.html)
+
 ## Coxcomb (tourism):
 
 - [Tourist nights - CH10M02](https://eurostat.github.io/eurostat-map/examples/RYB/2026/CH10/CH10M02.html)
