@@ -51,14 +51,14 @@
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Causes of death')
-                .subtitle('death rate per 100 000 inhabitants, by NUTS 2 regions, 2020')
+                .subtitle('death rate per 100 000 inhabitants, by NUTS 2 regions, 2021')
                 .dorling(true) // to prevent overlapping
                 .scale('20M')
                 .nutsLevel(2)
                 .statPie(
                     {
                         eurostatDatasetCode: 'hlth_cd_asdr2',
-                        filters: { sex: 'T', time: '2020', age: 'TOTAL', unit: 'RT' },
+                        filters: { sex: 'T', time: '2021', age: 'TOTAL', unit: 'RT' },
                         unitText: 'death rate per 100 000',
                     },
                     'icd10', //parameter that the categories belong to
@@ -94,14 +94,14 @@
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Causes of death')
-                .subtitle('death rate per 100 000 inhabitants, by NUTS 1 regions, 2020')
+                .subtitle('death rate per 100 000 inhabitants, by NUTS 1 regions, 2021')
                 .dorling(true) // to prevent overlapping
                 .scale('20M')
                 .nutsLevel(1)
                 .statPie(
                     {
                         eurostatDatasetCode: 'hlth_cd_asdr2',
-                        filters: { sex: 'T', time: '2020', age: 'TOTAL', unit: 'RT' },
+                        filters: { sex: 'T', time: '2021', age: 'TOTAL', unit: 'RT' },
                         unitText: 'death rate per 100 000',
                     },
                     'icd10', //parameter that the categories belong to
