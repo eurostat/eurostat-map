@@ -39,10 +39,10 @@
         <script src="../../insets/overseas.js"></script>
 
         <script>
-            //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_cd_asdr2?format=JSON&unit=RT&sex=T&age=TOTAL&icd10=C&lang=EN
-            const PIESIZE = 9
+            //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_cd_asdr2?format=JSON&time=2023&unit=RT&sex=T&age=TOTAL&icd10=I&lang=EN            const PIESIZE = 9
             const MAPWIDTH = 900
             const MAPHEIGHT = 700
+            const PIESIZE = 9
 
             const map1 = eurostatmap
                 .map('pie')
@@ -51,14 +51,14 @@
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Causes of death')
-                .subtitle('death rate per 100 000 inhabitants, by NUTS 2 regions, 2023')
+                .subtitle('death rate per 100 000 inhabitants, by NUTS 2 regions, 2020')
                 .dorling(true) // to prevent overlapping
                 .scale('20M')
                 .nutsLevel(2)
                 .statPie(
                     {
                         eurostatDatasetCode: 'hlth_cd_asdr2',
-                        filters: { sex: 'T', time: '2023', age: 'TOTAL', unit: 'RT' },
+                        filters: { sex: 'T', time: '2020', age: 'TOTAL', unit: 'RT' },
                         unitText: 'death rate per 100 000',
                     },
                     'icd10', //parameter that the categories belong to
@@ -94,14 +94,14 @@
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Causes of death')
-                .subtitle('death rate per 100 000 inhabitants, by NUTS 1 regions, 2023')
+                .subtitle('death rate per 100 000 inhabitants, by NUTS 1 regions, 2020')
                 .dorling(true) // to prevent overlapping
                 .scale('20M')
                 .nutsLevel(1)
                 .statPie(
                     {
                         eurostatDatasetCode: 'hlth_cd_asdr2',
-                        filters: { sex: 'T', time: '2023', age: 'TOTAL', unit: 'RT' },
+                        filters: { sex: 'T', time: '2020', age: 'TOTAL', unit: 'RT' },
                         unitText: 'death rate per 100 000',
                     },
                     'icd10', //parameter that the categories belong to
