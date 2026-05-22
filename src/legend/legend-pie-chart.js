@@ -41,13 +41,16 @@ export const legend = function (map, config) {
     if (config)
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
                         out[key][p] = config[key][p]
                     }
                 }
-                if (config.colorLegend == false) out.colorLegend = false
             } else {
                 out[key] = config[key]
             }
@@ -75,8 +78,11 @@ export const legend = function (map, config) {
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
 
+        // Reset stale references so layout is based only on legends drawn in this update.
+        out._sizeLegendContainer = null
+
         // legend for sizes
-        if (map.classifierSize_) {
+        if (map.classifierSize_ && out.sizeLegend) {
             //circle size legend
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             drawCircleSizeLegend(
@@ -90,7 +96,7 @@ export const legend = function (map, config) {
         }
 
         // legend for ps color values
-        buildColorLegend(out, baseX, baseY)
+        if (out.colorLegend) buildColorLegend(out, baseX, baseY)
 
         //set legend box dimensions
         out.setBoxDimension()
