@@ -9,26 +9,51 @@
             .em-cntbn {
                 opacity: 0.3 !important;
             }
+            #maps-wrapper {
+                display: flex;
+                width: 100%;
+            }
+
+            .map-container {
+                width: 50%;
+                height: 200vh;
+                display: block;
+            }
         </style>
     </head>
 
     <body>
-        <svg id="map"></svg>
+        <div id="maps-wrapper">
+            <svg id="container1" class="map-container" height="200vh">
+                <svg id="map1"></svg>
+                <g id="newInsets1"></g>
+            </svg>
+
+            <svg id="container2" class="map-container" height="200vh">
+                <svg id="map2"></svg>
+                <g id="newInsets2"></g>
+            </svg>
+        </div>
+
         <script src="../../../../build/eurostatmap.js"></script>
+        <script src="../../insets/overseas.js"></script>
 
         <script>
             //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/hlth_cd_asdr2?format=JSON&unit=RT&sex=T&age=TOTAL&icd10=C&lang=EN
             const PIESIZE = 9
-            const MAPWIDTH = 1000
-            const MAPHEIGHT = 800
-            const map = eurostatmap
+            const MAPWIDTH = 900
+            const MAPHEIGHT = 700
+
+            const map1 = eurostatmap
                 .map('pie')
+                .svgId('map1')
+                .containerId('container1')
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Causes of death')
                 .subtitle('% share of all deaths, by NUTS 2 regions')
                 .dorling(true) // to prevent overlapping
-                .scale('60M')
+                .scale('20M')
                 .nutsLevel(2)
                 .statPie(
                     {
@@ -37,21 +62,20 @@
                         unitText: 'death rate per 100 000',
                     },
                     'icd10', //parameter that the categories belong to
-                    ['J', 'C', 'I'], //category codes
-                    ['Respiratory', 'Cancer', 'Circulatory'], //category labels
-                    [' #33A033', '#AF155C', '#2644A7'], //colours
+                    ['I', 'C', 'J'], //category codes
+                    ['Circulatory', 'Cancer', 'Respiratory'], //category labels
+                    ['#2644A7', '#AF155C', '#33A033'], //colours
                     'A-R_V-Y' //code for the total (all causes of death) A-R_V-Y is no longer the code???
                 )
-                .pieOtherColor('#B09120')
+                .pieOtherColor('#EFD18C')
                 .pieOtherText('Other')
                 .pieMinRadius(PIESIZE)
                 .pieMaxRadius(PIESIZE)
                 .header(true)
                 .footer(true)
-
                 .legend({
-                    x: MAPWIDTH - 200,
-                    y: 90,
+                    x: 20,
+                    y: 190,
                     boxOpacity: 0,
                     boxFill: 'white',
                     sizeLegend: false,
@@ -60,8 +84,51 @@
                     },
                     noDataPadding: -10,
                 })
+                .zoomButtons(false)
+                .build()
 
-            map.build()
+            const map2 = eurostatmap
+                .map('pie')
+                .svgId('map2')
+                .containerId('container2')
+                .width(MAPWIDTH)
+                .height(MAPHEIGHT)
+                .title('Causes of death')
+                .subtitle('% share of all deaths, by NUTS 2 regions')
+                .dorling(true) // to prevent overlapping
+                .scale('20M')
+                .nutsLevel(1)
+                .statPie(
+                    {
+                        eurostatDatasetCode: 'hlth_cd_asdr2',
+                        filters: { sex: 'T', time: '2020', age: 'TOTAL', unit: 'RT' },
+                        unitText: 'death rate per 100 000',
+                    },
+                    'icd10', //parameter that the categories belong to
+                    ['I', 'C', 'J'], //category codes
+                    ['Circulatory', 'Cancer', 'Respiratory'], //category labels
+                    ['#2644A7', '#AF155C', '#33A033'], //colours
+                    'A-R_V-Y' //code for the total (all causes of death) A-R_V-Y is no longer the code???
+                )
+                .pieOtherColor('#EFD18C')
+                .pieOtherText('Other')
+                .pieMinRadius(13)
+                .pieMaxRadius(13)
+                .header(true)
+                .footer(true)
+                .zoomButtons(false)
+                .legend({
+                    x: 20,
+                    y: 190,
+                    boxOpacity: 0,
+                    boxFill: 'white',
+                    sizeLegend: false,
+                    colorLegend: {
+                        title: 'Cause of death',
+                    },
+                    noDataPadding: -10,
+                })
+                .build()
         </script>
     </body>
 </html>

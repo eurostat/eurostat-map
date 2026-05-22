@@ -355,7 +355,7 @@ export const map = function (config) {
 
         for (const d of pieData) {
             const fill = out.catColors()[d.data.code] || 'lightgray'
-            paths += `<path d="${_innerArc(d)}" fill="${fill}" stroke="white" stroke-width="1" opacity="0.7"></path>`
+            paths += `<path d="${_innerArc(d)}" fill="${fill}" stroke="white" stroke-width="1" opacity="1"></path>`
 
             if (d.data.value > 0.1) {
                 const posA = _innerArc.centroid(d)
