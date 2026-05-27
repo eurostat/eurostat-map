@@ -1,4 +1,4 @@
-# API reference
+# eurostat-map documentation
 
 Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
 

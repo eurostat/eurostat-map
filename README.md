@@ -133,9 +133,9 @@ https://observablehq.com/@joewdavies/eurostat-map-js
 
 ## Documentation
 
-For detailed documentation see the **[API reference page](docs/reference.md)**.
+For detailed documentation see the **[Documentation page](docs/reference.md)**.
 
-You can jump directly to map-type sections from the table of contents in [docs/reference.md](docs/reference.md).
+For generated, signature-accurate API docs from TypeScript/JSDoc, see [https://eurostat.github.io/eurostat-map/docs/api/index.html](https://eurostat.github.io/eurostat-map/docs/api/index.html).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
 
