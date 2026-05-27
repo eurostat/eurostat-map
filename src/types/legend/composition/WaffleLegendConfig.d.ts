@@ -1,4 +1,4 @@
-import { LegendConfig } from './LegendConfig'
+import { LegendConfig } from '../LegendConfig'
 
 /**
  * Configuration for size legend in waffle chart maps.

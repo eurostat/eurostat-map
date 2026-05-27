@@ -1,4 +1,5 @@
 import type { MapConfig } from '../../../core/MapConfig'
+import type { BarChartLegendConfig } from '../../../legend/composition/BarChartLegendConfig'
 
 /**
  * Configuration for bar chart composition maps.
@@ -27,4 +28,5 @@ export interface BarMapConfig extends MapConfig {
     animateDorling?: boolean
     barTotalCode?: string
     statCodes?: string[]
+    legend?: BarChartLegendConfig | false
 }

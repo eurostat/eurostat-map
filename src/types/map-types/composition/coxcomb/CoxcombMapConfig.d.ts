@@ -1,4 +1,5 @@
 import type { MapConfig } from '../../../core/MapConfig'
+import type { CoxcombLegendConfig } from '../../../legend/composition/CoxcombLegendConfig'
 
 /**
  * Configuration for coxcomb (polar area) chart maps.
@@ -15,4 +16,5 @@ export interface CoxcombMapConfig extends MapConfig {
     catLabels?: Record<string, string>
     noDataFillStyle?: string
     classifierSize?: any
+    legend?: CoxcombLegendConfig | false
 }

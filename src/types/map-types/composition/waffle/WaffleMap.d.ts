@@ -1,10 +1,14 @@
 import type { MapInstance } from '../../../core/MapInstance'
 import type { CompositionStatConfig } from '../CompositionStatConfig'
+import type { WaffleLegendConfig } from '../../../legend/composition/WaffleLegendConfig'
 
 /**
  * Waffle map type.
  */
 export interface WaffleMap extends MapInstance {
+    legend(): WaffleLegendConfig
+    legend(config: WaffleLegendConfig | false): this
+
     catColors(): any
     catColors(v: any): this
 

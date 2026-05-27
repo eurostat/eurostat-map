@@ -1,10 +1,14 @@
 import type { MapInstance } from '../../../core/MapInstance'
 import type { CompositionStatConfig } from '../CompositionStatConfig'
+import type { StripeCompositionLegendConfig } from '../../../legend/composition/StripeCompositionLegendConfig'
 
 /**
  * Stripe map type.
  */
 export interface StripeMap extends MapInstance {
+    legend(): StripeCompositionLegendConfig
+    legend(config: StripeCompositionLegendConfig | false): this
+
     stripeWidth(): number
     stripeWidth(v: number): this
 

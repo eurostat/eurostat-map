@@ -1,10 +1,14 @@
 import type { MapInstance } from '../../../core/MapInstance'
 import type { CompositionStatConfig } from '../CompositionStatConfig'
+import type { BarChartLegendConfig } from '../../../legend/composition/BarChartLegendConfig'
 
 /**
  * Bar map type.
  */
 export interface BarMap extends MapInstance {
+    legend(): BarChartLegendConfig
+    legend(config: BarChartLegendConfig | false): this
+
     barType(): 'stacked' | 'grouped'
     barType(v: 'stacked' | 'grouped'): this
 

@@ -5,6 +5,8 @@ import { line } from 'd3-shape'
 import * as Legend from './legend'
 import { getRegionById } from '../core/utils'
 import { getCentroidsGroup } from '../core/geo/centroids'
+//types
+/** @typedef {import('../types/legend/composition/SparklineLegendConfig').SparklineScaleLegendConfig} SparklineScaleLegendConfig */
 
 /**
  * A legend for sparkline maps.
@@ -144,6 +146,7 @@ export const legend = function (map, config) {
 
     function drawScaleLegend(legend, container) {
         const map = legend.map
+        /** @type {SparklineScaleLegendConfig} */
         const config = legend.scaleLegend
         const margin = config.margin
 
@@ -315,12 +318,7 @@ export const legend = function (map, config) {
 
         let y = 0
         if (config.title) {
-            g.append('text')
-                .attr('class', 'em-color-legend-title')
-                .attr('x', 0)
-                .attr('y', 0)
-                .attr('dy', '0.8em')
-                .text(config.title)
+            g.append('text').attr('class', 'em-color-legend-title').attr('x', 0).attr('y', 0).attr('dy', '0.8em').text(config.title)
             const titleHeight = g.select('.em-color-legend-title').node()?.getBBox()?.height || 0
             y += titleHeight + config.titlePadding
         }

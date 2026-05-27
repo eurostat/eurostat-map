@@ -5,6 +5,7 @@ export interface CompositionStatConfig {
     eurostatDatasetCode?: string
     filters?: Record<string, any>
     unitText?: string
+    transform?: (value: number) => number
 
     categoryParameter?: string
     categoryCodes?: string[]
@@ -17,5 +18,6 @@ export interface CompositionStatConfig {
         eurostatDatasetCode?: string
         filters?: Record<string, any>
         unitText?: string
+        transform?: (value: number) => number
     }
 }

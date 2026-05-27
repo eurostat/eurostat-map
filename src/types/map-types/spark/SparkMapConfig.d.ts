@@ -1,4 +1,5 @@
 import type { MapConfig } from '../../core/MapConfig'
+import type { SparklineLegendConfig } from '../../legend/composition/SparklineLegendConfig'
 
 /**
  * Configuration for sparkline maps.
@@ -22,4 +23,5 @@ export interface SparkMapConfig extends MapConfig {
     showOnlyWhenComplete?: boolean
     sparkLineChartFunction?: (node: any, data: any[], width: number, height: number, isForTooltip?: boolean) => void
     sparkYScale?: any
+    legend?: SparklineLegendConfig | false
 }

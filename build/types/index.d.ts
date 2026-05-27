@@ -64,12 +64,7 @@ export type { InsetConfig } from './core/InsetConfig'
 
 // Main legend types
 export type { CategoricalLegendConfig } from './legend/CategoricalLegendConfig'
-export type { CoxcombLegendConfig } from './legend/CoxcombLegendConfig'
 export type { MushroomLegendConfig } from './legend/MushroomLegendConfig'
-export type { PieChartLegendConfig } from './legend/PieChartLegendConfig'
-export type { SparklineLegendConfig } from './legend/SparklineLegendConfig'
-export type { WaffleLegendConfig } from './legend/WaffleLegendConfig'
-export type { StripeCompositionLegendConfig } from './legend/StripeCompositionLegendConfig'
 export type { PatternFillLegendConfig } from './legend/PatternFillLegendConfig'
 
 // Choropleth legend types
@@ -78,6 +73,16 @@ export type { HistogramLegendConfig } from './legend/choropleth/HistogramLegendC
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'
+export type { CoxcombLegendConfig } from './legend/composition/CoxcombLegendConfig'
+export type { PieChartLegendConfig } from './legend/composition/PieChartLegendConfig'
+export type { WaffleLegendConfig } from './legend/composition/WaffleLegendConfig'
+export type { StripeCompositionLegendConfig } from './legend/composition/StripeCompositionLegendConfig'
+export type {
+    SparklineLegendConfig,
+    SparklineScaleLegendConfig,
+    SparklineColorLegendConfig,
+    SparklineNoDataLegendConfig,
+} from './legend/composition/SparklineLegendConfig'
 
 // Flow legend types
 export type { FlowMapLegendConfig } from './legend/flow/FlowMapLegendConfig'

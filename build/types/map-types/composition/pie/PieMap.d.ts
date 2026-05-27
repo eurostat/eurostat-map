@@ -1,10 +1,14 @@
 import type { MapInstance } from '../../../core/MapInstance'
 import type { CompositionStatConfig } from '../CompositionStatConfig'
+import type { PieChartLegendConfig } from '../../../legend/composition/PieChartLegendConfig'
 
 /**
  * Pie map type.
  */
 export interface PieMap extends MapInstance {
+    legend(): PieChartLegendConfig
+    legend(config: PieChartLegendConfig | false): this
+
     catColors(): any
     catColors(v: any): this
 

@@ -1,10 +1,14 @@
 import type { MapInstance } from '../../core/MapInstance'
 import type { SparkStatConfig } from './SparkStatConfig'
+import type { SparklineLegendConfig } from '../../legend/composition/SparklineLegendConfig'
 
 /**
  * Spark map type.
  */
 export interface SparkMap extends MapInstance {
+    legend(): SparklineLegendConfig
+    legend(config: SparklineLegendConfig | false): this
+
     sparkLineColor(): any
     sparkLineColor(v: any): this
 

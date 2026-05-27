@@ -1,4 +1,5 @@
 import type { MapConfig } from '../../../core/MapConfig'
+import type { PieChartLegendConfig } from '../../../legend/composition/PieChartLegendConfig'
 
 /**
  * Configuration for pie chart composition maps.
@@ -21,4 +22,5 @@ export interface PieMapConfig extends MapConfig {
     animateDorling?: boolean
     pieTotalCode?: string
     statCodes?: string[]
+    legend?: PieChartLegendConfig | false
 }

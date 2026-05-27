@@ -356,14 +356,14 @@ export const styleMixedNUTSRegions = function (map, regions, getCompositionFn) {
  * Supports three call signatures for backwards compatibility:
  *
  * 1. New flat object API (preferred):
- *    .statBar({ eurostatDatasetCode, filters, categoryParameter, categoryCodes, ... })
+ *    .statBar({ eurostatDatasetCode, filters, transform, categoryParameter, categoryCodes, ... })
  *
  * 2. Legacy positional arguments API:
  *    .statBar(statConfig, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode)
  *    where statConfig is { eurostatDatasetCode, filters, unitText }
  *
  * 3. Legacy nested stat object API:
- *    .statBar({ stat: { eurostatDatasetCode, filters, unitText }, categoryParameter, categoryCodes, ... })
+ *    .statBar({ stat: { eurostatDatasetCode, filters, unitText, transform }, categoryParameter, categoryCodes, ... })
  *
  * @param {Object} out - The map object
  * @param {string|null} totalCodeKey - e.g. 'pieTotalCode_', 'waffleTotalCode_', 'barTotalCode_'.
@@ -397,6 +397,7 @@ export const buildStatCompositionMethod = function (out, totalCodeKey) {
             eurostatDatasetCode,
             filters,
             unitText,
+            transform,
             categoryParameter: cp,
             categoryCodes: cc,
             categoryLabels: cl,
@@ -423,7 +424,7 @@ export const buildStatCompositionMethod = function (out, totalCodeKey) {
 
         for (let i = 0; i < categoryCodes.length; i++) {
             const code = categoryCodes[i]
-            out.stat(code, { eurostatDatasetCode, unitText, filters: { ...baseFilters, [categoryParameter]: code } })
+            out.stat(code, { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, [categoryParameter]: code } })
 
             if (categoryColors?.[i]) {
                 out.catColors_ = out.catColors_ || {}
@@ -441,7 +442,7 @@ export const buildStatCompositionMethod = function (out, totalCodeKey) {
         if (totalCodeKey) {
             if (totalCode) {
                 out[totalCodeKey] = totalCode
-                out.stat(totalCode, { eurostatDatasetCode, unitText, filters: { ...baseFilters, [categoryParameter]: totalCode } })
+                out.stat(totalCode, { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, [categoryParameter]: totalCode } })
             } else {
                 out[totalCodeKey] = undefined
             }

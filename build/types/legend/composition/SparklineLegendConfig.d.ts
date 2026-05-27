@@ -1,4 +1,4 @@
-import { LegendConfig } from './LegendConfig'
+import { LegendConfig } from '../LegendConfig'
 
 /**
  * Configuration for scale legend in sparkline maps.
@@ -45,6 +45,21 @@ export interface SparklineScaleLegendConfig {
 }
 
 /**
+ * Configuration for sparkline color legend (explains sparkLineColor/sparkAreaColor rules).
+ */
+export interface SparklineColorLegendConfig {
+    show?: boolean
+    title?: string | null
+    titlePadding?: number
+    marginTop?: number
+    itemGap?: number
+    swatchWidth?: number
+    swatchHeight?: number
+    labelOffsetX?: number
+    items?: Array<{ color: string; label: string }>
+}
+
+/**
  * Configuration for no data legend in sparkline maps.
  */
 export interface SparklineNoDataLegendConfig {
@@ -57,11 +72,13 @@ export interface SparklineNoDataLegendConfig {
 
 /**
  * Configuration for sparkline map legends.
- * Shows the Y-axis scale and optionally an example sparkline chart.
  */
 export interface SparklineLegendConfig extends LegendConfig {
     /** Configuration for the scale legend showing Y-axis range. */
     scaleLegend?: Partial<SparklineScaleLegendConfig>
+
+    /** Optional categorical color legend for spark colors. */
+    colorLegend?: Partial<SparklineColorLegendConfig> | false
 
     /** Configuration for the no data legend. Set to false to hide. */
     noDataLegend?: Partial<SparklineNoDataLegendConfig> | false

@@ -1,10 +1,14 @@
 import type { MapInstance } from '../../../core/MapInstance'
 import type { CoxcombStatConfig } from './CoxcombStatConfig'
+import type { CoxcombLegendConfig } from '../../../legend/composition/CoxcombLegendConfig'
 
 /**
  * Coxcomb map type.
  */
 export interface CoxcombMap extends MapInstance {
+    legend(): CoxcombLegendConfig
+    legend(config: CoxcombLegendConfig | false): this
+
     catColors(): any
     catColors(v: any): this
 

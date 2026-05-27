@@ -119,6 +119,7 @@ export const map = function (config) {
      * @param {String} config.eurostatDatasetCode
      * @param {Object} [config.filters]
      * @param {String} [config.unitText]
+     * @param {Function} [config.transform] - Optional transform(value) applied after data loads
      * @param {Array}  config.dates - Time values to query (e.g. ['2018','2019',...])
      * @param {Array}  [config.labels] - Optional display labels for each date
      *
@@ -131,7 +132,7 @@ export const map = function (config) {
      * })
      */
     out.statSpark = function (config) {
-        const { eurostatDatasetCode, filters, unitText, dates, labels } = config
+        const { eurostatDatasetCode, filters, unitText, transform, dates, labels } = config
 
         if (!eurostatDatasetCode) {
             console.error('statSpark: eurostatDatasetCode is required')
@@ -146,7 +147,7 @@ export const map = function (config) {
 
         for (let i = 0; i < dates.length; i++) {
             const date = dates[i]
-            out.stat(date, { eurostatDatasetCode, unitText, filters: { ...baseFilters, time: date } })
+            out.stat(date, { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, time: date } })
 
             if (labels?.[i]) {
                 out.catLabels_ = out.catLabels_ || {}
