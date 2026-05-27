@@ -34,49 +34,18 @@
 <hr>
 <br>
 <div align="center">
-  <style>
-    .readme-mosaic {
-      width: 100%;
-      max-width: 810px;
-      border-collapse: collapse;
-      table-layout: fixed;
-    }
 
-    .readme-mosaic td {
-      padding: 6px;
-      width: 33.333%;
-    }
-
-    .readme-mosaic-frame {
-      width: 100%;
-      aspect-ratio: 16 / 10;
-      overflow: hidden;
-      border-radius: 8px;
-    }
-
-    .readme-mosaic-frame img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-  </style>
-  <table class="readme-mosaic">
+  <table>
     <tr>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/ch_ex.png" alt="Choropleth map example"/></div></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-circles.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/ps_ex.png" alt="Proportional symbols example"/></div></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/flowmap.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/flow_ex.png" alt="Flow map example"/></div></a></td>
-    </tr>
-    <tr>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/pie_ex.png" alt="Pie chart map example"/></div></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/mushroom.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/mushroom_ex.png" alt="Mushroom map example"/></div></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/sparklines.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/sparklines_ex.png" alt="Sparklines map example"/></div></a></td>
-    </tr>
-    <tr>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/categorical.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/ct_ex.png" alt="Categorical map example"/></div></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/chbi_ex.png" alt="Bivariate map example"/></div></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/trivariate.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/chtri_ex.png" alt="Trivariate map example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"><img src="examples/img/previews/population-density.png" alt="Population density example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-circles.html" target="_blank"><img src="examples/img/previews/prop-circles.png" alt="Proportional circles example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/flowmap.html" target="_blank"><img src="examples/img/previews/flowmap.png" alt="Flow map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html" target="_blank"><img src="examples/img/previews/prop-piecharts.png" alt="Pie chart map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/mushroom.html" target="_blank"><img src="examples/img/previews/mushroom.png" alt="Mushroom map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/sparklines.html" target="_blank"><img src="examples/img/previews/sparklines.png" alt="Sparklines map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/categorical.html" target="_blank"><img src="examples/img/previews/categorical.png" alt="Categorical map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html" target="_blank"><img src="examples/img/previews/pop-unemploy-bivariate.png" alt="Bivariate map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/trivariate.html" target="_blank"><img src="examples/img/previews/trivariate.png" alt="Trivariate map example"  /></a></td>
     </tr>
   </table>
 </div>
