@@ -288,6 +288,14 @@ export const map = function (config) {
             regions = out.svg().selectAll(getRegionsSelector(map))
         }
 
+        // In mixed-NUTS views, upper layers with no stat values can sit above data-bearing
+        // layers and swallow hover events. Disable pointer events on no-data regions so
+        // the cursor can reach the underlying region that has sparkline data.
+        regions.style('pointer-events', function (d) {
+            const id = d?.properties?.id
+            return id && getSparkData(id) ? null : 'none'
+        })
+
         regions
             .on('mouseover', function (e, rg) {
                 if (!getSparkData(rg.properties.id)) return
@@ -347,6 +355,10 @@ export const map = function (config) {
                     ${anchorY + offsets.y - out.sparkLineHeight_ / 2}
                 )`
                 )
+            } else {
+                // Non-grid anchors are centroid groups already translated to region centers.
+                // Place charts relative to centroid and allow x/y nudging via sparkLineOffsets.
+                g.attr('transform', `translate(${offsets.x - out.sparkLineWidth_ / 2}, ${offsets.y - out.sparkLineHeight_ / 2})`)
             }
 
             createSparkLineChart(g, data, out.sparkLineWidth_, out.sparkLineHeight_)

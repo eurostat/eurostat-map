@@ -3,7 +3,7 @@
 /*   muted country boundaries */
 .em--spark .em-cntbn {
     stroke: rgb(163, 163, 163);
-    stroke-width: 0.5px;
+    stroke-width: 0.2px;
 }
 
 .em--spark #em-cntbn-halo {
@@ -18,7 +18,7 @@
 .em--spark .em-nutsrg [lvl='2'],
 .em--spark .em-nutsrg [lvl='1'],
 .em--spark .em-bn-co {
-    stroke-width: 0.1px;
+    stroke-width: 0.05px;
 }
 
 /*  muted country fill */
@@ -28,7 +28,7 @@
 
 /*  nuts fill (regions with data) */
 .em--spark .em-nutsrg {
-    fill: #fffeef;
+    fill: #fffef3;
     /*fill: #c9ffd524;  very light green */
     /*fill: #fffee724;  very light yellow */
 }
@@ -46,5 +46,5 @@
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
 .em--spark .em-bn-co {
     stroke: grey;
-    stroke-width: 0.2px;
+    stroke-width: 0.05px;
 }
