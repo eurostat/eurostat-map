@@ -1,5 +1,4 @@
 import { select, selectAll } from 'd3-selection'
-import { geoRobinson } from 'd3-geo-projection'
 import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox } from './utils'
 import { appendAnnotations } from './decoration/annotations'
 import { addLabelsToMap, updateLabels, updateValuesLabels } from './decoration/labels'

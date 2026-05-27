@@ -19,7 +19,7 @@
                 .nutsLevel(2)
                 .nutsYear(2013)
                 .stripeWidth(10)
-                .stripeOrientation(45)
+            //.stripeOrientation(45)
             map.statComp(
                 {
                     eurostatDatasetCode: 'ef_kvaareg',
@@ -31,7 +31,7 @@
                 ['< 2 ha', '2 to 4.9 ha', '5 to 9.9 ha', '10 to 19.9 ha', '20 to 29.9 ha', '30 to 49.9 ha', '50 to 99.9 ha', '> 100 ha'].reverse(),
                 ['#FFEB99', '#D8EAAC', '#A3DDB7', '#66CABC', '#48B9C3', '#2E7AAC', '#15438C', '#17256B'].reverse()
             )
-                .legend({ x: 10, y: 65, title: 'Farm areas', boxOpacity: 0.8, boxFill: 'white' })
+                .legend({ x: 10, y: 65, title: 'Farm size', subtitle: 'hectares', boxOpacity: 0.8, boxFill: 'white' })
                 .insets('default')
                 .seaFillStyle('white')
                 .coastalMarginColor('lightgray')

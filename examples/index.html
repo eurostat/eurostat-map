@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>eurostat-map Examples</title>
+        <style>
+            :root {
+                --bg: #f6f8fb;
+                --card: #ffffff;
+                --text: #0f172a;
+                --muted: #475569;
+                --line: #dbe2ea;
+                --accent: #0a66c2;
+                --accent-dark: #084f96;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+                background: linear-gradient(180deg, #f8fafc 0%, #eef3f9 100%);
+                color: var(--text);
+            }
+
+            .wrap {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 28px 16px 48px;
+            }
+
+            .hero {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 16px;
+                padding: 20px;
+                margin-bottom: 18px;
+            }
+
+            h1 {
+                margin: 0;
+                font-size: 30px;
+                line-height: 1.2;
+            }
+
+            .sub {
+                margin-top: 8px;
+                color: var(--muted);
+            }
+
+            .actions {
+                margin-top: 12px;
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                text-decoration: none;
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                padding: 8px 12px;
+                color: var(--text);
+                font-weight: 600;
+                background: #fff;
+            }
+
+            .btn.primary {
+                background: var(--accent);
+                color: #fff;
+                border-color: var(--accent);
+            }
+
+            .btn.primary:hover {
+                background: var(--accent-dark);
+                border-color: var(--accent-dark);
+            }
+
+            .stats {
+                margin: 10px 0 16px;
+                color: var(--muted);
+                font-size: 14px;
+            }
+
+            .controls {
+                margin: 12px 0 8px;
+            }
+
+            .search {
+                width: 100%;
+                max-width: 420px;
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                padding: 10px 12px;
+                font-size: 14px;
+                color: var(--text);
+                background: #fff;
+            }
+
+            .search:focus {
+                outline: 2px solid rgba(10, 102, 194, 0.2);
+                border-color: var(--accent);
+            }
+
+            .grid {
+                display: grid;
+                gap: 14px;
+                grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
+            }
+
+            .card {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                min-height: 280px;
+            }
+
+            .thumb {
+                width: 100%;
+                aspect-ratio: 16 / 10;
+                object-fit: cover;
+                background: #eef2f7;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .content {
+                padding: 10px 12px 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                flex: 1;
+            }
+
+            .title {
+                margin: 0;
+                font-size: 16px;
+                line-height: 1.3;
+            }
+
+            .meta {
+                margin: 0;
+                color: var(--muted);
+                font-size: 13px;
+            }
+
+            .row {
+                margin-top: auto;
+                display: flex;
+                gap: 8px;
+            }
+
+            .row a {
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 700;
+                border-radius: 8px;
+                padding: 6px 8px;
+                border: 1px solid var(--line);
+                color: var(--text);
+                background: #fff;
+            }
+
+            .row a.live {
+                color: #fff;
+                background: var(--accent);
+                border-color: var(--accent);
+            }
+
+            .row a.live:hover {
+                background: var(--accent-dark);
+                border-color: var(--accent-dark);
+            }
+
+            /* ── Layout ── */
+            .layout {
+                display: flex;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            .sidebar {
+                flex-shrink: 0;
+                width: 168px;
+                position: sticky;
+                top: 20px;
+            }
+
+            .sidebar-panel {
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                padding: 14px 12px;
+            }
+
+            .sidebar-heading {
+                margin: 0 0 10px;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.07em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+
+            .sidebar-nav {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .sidebar-nav li a {
+                display: block;
+                text-decoration: none;
+                font-size: 13px;
+                color: var(--text);
+                padding: 5px 8px;
+                border-radius: 7px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar-nav li a:hover {
+                background: var(--bg);
+            }
+
+            .sidebar-nav li a.active {
+                background: var(--accent);
+                color: #fff;
+                font-weight: 600;
+            }
+
+            .main {
+                flex: 1;
+                min-width: 0;
+            }
+
+            @media (max-width: 768px) {
+                .layout {
+                    flex-direction: column;
+                }
+                .sidebar {
+                    width: 100%;
+                    position: static;
+                }
+                .sidebar-nav {
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                }
+            }
+
+            @media (max-width: 640px) {
+                h1 {
+                    font-size: 24px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <main class="wrap">
+            <section class="hero">
+                <h1>eurostat-map live examples</h1>
+                <p class="sub">See eurostat-map in action with live examples.</p>
+                <div class="actions">
+                    <a class="btn primary" href="../docs/reference.md">API Reference</a>
+                    <a class="btn" href="../README.md">Project README</a>
+                </div>
+            </section>
+
+            <div class="layout">
+                <aside class="sidebar">
+                    <div class="sidebar-panel">
+                        <p class="sidebar-heading">Map Types</p>
+                        <ul class="sidebar-nav" id="sidebar-nav"></ul>
+                    </div>
+                </aside>
+
+                <div class="main">
+                    <div class="controls">
+                        <input class="search" id="search" type="search" placeholder="Search examples by name or topic" aria-label="Search examples" />
+                    </div>
+                    <p class="stats" id="stats"></p>
+                    <section class="grid" id="grid"></section>
+                </div>
+            </div>
+        </main>
+
+        <script>
+            const fallbackPreview = '../docs/img/previews/euro.png'
+
+            const paths = [
+                'annotations.html',
+                'bar-chart.html',
+                'basic.html',
+                'cartograms/asymmetry/assymetry.html',
+                'categorical.html',
+                'CCM/index.html',
+                'coxcomb.html',
+                'custom-geometries.html',
+                'EU_only.html',
+                'farm_size.html',
+                'flowmap.html',
+                'gdp-per-inhabitant.html',
+                'grid-cartogram.html',
+                'labelling.html',
+                'linked_maps.html',
+                'livestock_composition.html',
+                'mushroom.html',
+                'population-change.html',
+                'population-density.html',
+                'population-dot-density.html',
+                'population-total.html',
+                'pop-unemploy-bivariate.html',
+                'prop-circles.html',
+                'prop-piecharts.html',
+                'prop-symbols.html',
+                'RYB/2026/CH02/CH02M03.html',
+                'RYB/2026/CH03/CH03M02.html',
+                'RYB/2026/CH10/CH10M02.html',
+                'RYB/2026/CH10/CH10M06.html',
+                'RYB/2026/CH11/CH11M04.html',
+                'RYB/2026/CH11/CH11M05.html',
+                'small_multiple.html',
+                'spain.html',
+                'sparklines.html',
+                'sparklines-custom.html',
+                'statistics-explained/business/construction/choropleth/index.html',
+                'statistics-explained/business/construction/proportional-circle/index.html',
+                'statistics-explained/business/manufacturing/choropleth/index.html',
+                'statistics-explained/business/manufacturing/proportional-circle/index.html',
+                'statistics-explained/business/NACE/choropleth/index.html',
+                'statistics-explained/business/NACE/proportional-circle/index.html',
+                'statistics-explained/transport/air/airports/index.html',
+                'statistics-explained/transport/air/freight/index.html',
+                'statistics-explained/transport/air/passengers/index.html',
+                'statistics-explained/transport/maritime/flows/index.html',
+                'statistics-explained/transport/maritime/flows/static/index.html',
+                'statistics-explained/transport/maritime/ports/index.html',
+                'statistics-explained/transport/maritime/ports/static/index.html',
+                'trivariate.html',
+                'ur/crude_rate_natural_change.html',
+                'ur/gdp_change.html',
+                'ur/land_cover_stripes.html',
+                'ur/migration.html',
+                'ur/old_dependency.html',
+                'ur/pop_change.html',
+                'ur/proj_pop_change.html',
+                'waffle.html',
+                'world.html',
+            ]
+
+            const toTitle = (path) => {
+                const name = path.replace(/\.html$/, '').replace(/\/index$/, '')
+                const tail = name.split('/').slice(-2).join(' / ')
+                return tail.replace(/[-_]/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase())
+            }
+
+            const detectDesc = (path) => {
+                if (path.includes('statistics-explained/')) return 'Statistics Explained story map'
+                if (path.includes('RYB/')) return 'RYB chapter example'
+                if (path.includes('ur/')) return 'Urban-rural chapter example'
+                if (path.includes('CCM/')) return 'Country comparison map'
+                return 'Interactive map example'
+            }
+
+            const previewPathFor = (path) => {
+                const filename = path.split('/').pop() || ''
+                const basename = filename.replace(/\.html$/, '')
+                return './img/previews/' + basename + '.png'
+            }
+
+            // Map type assignments: [file, type]
+            const mapTypes = {
+                'EU_only.html': 'Choropleth',
+                'annotations.html': 'Choropleth',
+                'bar-chart.html': 'Bar Chart',
+                'basic.html': 'Choropleth',
+                'categorical.html': 'Categorical',
+                'coxcomb.html': 'Coxcomb',
+                'custom-geometries.html': 'Choropleth',
+                'farm_size.html': 'Stripe',
+                'flowmap.html': 'Flow Map',
+                'gdp-per-inhabitant.html': 'Choropleth',
+                'grid-cartogram.html': 'Cartogram',
+                'labelling.html': 'Choropleth',
+                'linked_maps.html': 'Choropleth',
+                'livestock_composition.html': 'Stripe',
+                'mushroom.html': 'Mushroom',
+                'pop-unemploy-bivariate.html': 'Bivariate',
+                'population-change.html': 'Choropleth',
+                'population-density.html': 'Choropleth',
+                'population-dot-density.html': 'Dot Density',
+                'population-total.html': 'Proportional',
+                'prop-circles.html': 'Proportional',
+                'prop-piecharts.html': 'Pie Charts',
+                'prop-symbols.html': 'Proportional',
+                'small_multiple.html': 'Choropleth',
+                'spain.html': 'Choropleth',
+                'sparklines.html': 'Sparklines',
+                'sparklines-custom.html': 'Sparklines',
+                'trivariate.html': 'Trivariate',
+                'waffle.html': 'Waffle',
+                'world.html': 'Choropleth',
+            }
+
+            const rootPaths = paths.filter((path) => !path.includes('/'))
+            const examples = rootPaths.map((path) => [path, toTitle(path), detectDesc(path), previewPathFor(path), mapTypes[path] || 'Other'])
+
+            // Build sidebar nav
+            const allTypes = ['All', ...Array.from(new Set(rootPaths.map((p) => mapTypes[p] || 'Other'))).sort()]
+            let activeType = 'All'
+
+            const sidebarNav = document.getElementById('sidebar-nav')
+            allTypes.forEach((type) => {
+                const li = document.createElement('li')
+                const a = document.createElement('a')
+                a.textContent = type
+                a.href = '#'
+                if (type === 'All') a.className = 'active'
+                a.addEventListener('click', (e) => {
+                    e.preventDefault()
+                    activeType = type
+                    sidebarNav.querySelectorAll('a').forEach((el) => el.classList.remove('active'))
+                    a.classList.add('active')
+                    renderExamples(search.value)
+                })
+                li.appendChild(a)
+                sidebarNav.appendChild(li)
+            })
+
+            const grid = document.getElementById('grid')
+            const stats = document.getElementById('stats')
+            const search = document.getElementById('search')
+
+            const renderExamples = (query) => {
+                const q = (query || '').trim().toLowerCase()
+                const filtered = examples.filter(([file, title, desc, , type]) => {
+                    const matchesType = activeType === 'All' || type === activeType
+                    if (!matchesType) return false
+                    if (!q) return true
+                    return file.toLowerCase().includes(q) || title.toLowerCase().includes(q) || desc.toLowerCase().includes(q)
+                })
+
+                stats.textContent = filtered.length + ' of ' + examples.length + ' examples'
+                grid.textContent = ''
+
+                for (const [file, title, desc, previewPath] of filtered) {
+                    const card = document.createElement('article')
+                    card.className = 'card'
+
+                    const img = document.createElement('img')
+                    img.className = 'thumb'
+                    img.loading = 'lazy'
+                    img.src = previewPath
+                    img.onerror = () => {
+                        img.onerror = null
+                        img.src = fallbackPreview
+                    }
+                    img.alt = title + ' preview'
+                    card.appendChild(img)
+
+                    const content = document.createElement('div')
+                    content.className = 'content'
+
+                    const h = document.createElement('h2')
+                    h.className = 'title'
+                    h.textContent = title
+                    content.appendChild(h)
+
+                    const p = document.createElement('p')
+                    p.className = 'meta'
+                    p.textContent = desc
+                    content.appendChild(p)
+
+                    const row = document.createElement('div')
+                    row.className = 'row'
+
+                    const live = document.createElement('a')
+                    live.className = 'live'
+                    live.href = './' + file
+                    live.textContent = 'Live'
+                    row.appendChild(live)
+
+                    const src = document.createElement('a')
+                    src.href = 'https://github.com/eurostat/eurostat-map/blob/master/examples/' + file
+                    src.textContent = 'Source'
+                    row.appendChild(src)
+
+                    content.appendChild(row)
+                    card.appendChild(content)
+                    grid.appendChild(card)
+                }
+            }
+
+            renderExamples('')
+            search.addEventListener('input', () => renderExamples(search.value))
+        </script>
+    </body>
+</html>

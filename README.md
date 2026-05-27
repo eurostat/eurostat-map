@@ -16,12 +16,12 @@
 </div>
 
 <div align="center">
-  <strong>D3-based mapping library for Eurostat and custom data, with built-in map types for analytical storytelling.</strong>
+  D3-based mapping library for Eurostat and custom data, with built-in map types for analytical storytelling.
 </div>
 
 <div align="center">
   <a href="docs/reference.md"><strong>API docs</strong></a> ·
-  <a href="https://eurostat.github.io/eurostat-map/examples/population-density.html"><strong>Live examples</strong></a> ·
+  <a href="https://eurostat.github.io/eurostat-map/examples/index.html"><strong>Live examples</strong></a> ·
   <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js"><strong>Quickstart notebook</strong></a>
 </div>
 <hr>
@@ -162,41 +162,6 @@ For detailed documentation see the **[API reference page](docs/reference.md)**.
 You can jump directly to map-type sections from the table of contents in [docs/reference.md](docs/reference.md).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
-
-## Developer Path
-
-### Local setup
-
-```bash
-npm install
-npm run server
-```
-
-### Build and quality checks
-
-```bash
-npm run build-prod
-npm run format
-```
-
-### Where to start in the codebase
-
-- Factory and map creation: [src/eurostat-map.js](src/eurostat-map.js)
-- Core map scaffolding: [src/core/map-instance.js](src/core/map-instance.js), [src/core/stat-map.js](src/core/stat-map.js)
-- Map types: [src/map-types](src/map-types)
-- Legend system: [src/legend](src/legend)
-- Type declarations: [src/types](src/types)
-
-### Contribution flow
-
-1. Pick an issue or propose one in Discussions/Issues.
-2. Add or update an example in [examples](examples) when changing behavior.
-3. Run build and formatting before opening a PR.
-4. Link relevant docs updates in [docs/reference.md](docs/reference.md) when APIs change.
-
-## Technical details
-
-Maps based on [NUTS regions](http://ec.europa.eu/eurostat/web/nuts/overview) rely on [Nuts2json API](https://github.com/eurostat/Nuts2json) and [TopoJSON](https://github.com/mbostock/topojson/wiki) format. Statistical data are accessed using [Eurostat STATISTICS API](https://wikis.ec.europa.eu/display/EUROSTATHELP/API+-+Getting+started+with+statistics+API) for [JSON-stat](https://json-stat.org/) data. The data are decoded and queried using [JSON-stat library](https://json-stat.com/). Custom data can also be used with `map.statData().setData({ES:3,FR:2,DE:5})`. Maps are rendered as SVG maps using [D3.js library](https://d3js.org/).
 
 ## About
 

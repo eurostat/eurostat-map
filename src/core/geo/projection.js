@@ -1,5 +1,6 @@
 import { getApproxCurrentGeoBbox, getBBOXAsGeoJSON, getParameterByName } from '../utils'
 import { geoIdentity, geoPath } from 'd3-geo'
+import { geoRobinson } from 'd3-geo-projection'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */

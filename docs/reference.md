@@ -1,8 +1,6 @@
 # API reference
 
-<div align="center">
 Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
-</div>
 
 This document is the narrative usage guide. For generated, signature-accurate API docs from TypeScript/JSDoc, see [https://eurostat.github.io/eurostat-map/docs/api/index.html](https://eurostat.github.io/eurostat-map/docs/api/index.html).
 

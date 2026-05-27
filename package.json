@@ -41,7 +41,8 @@
         "copy-types": "copyfiles -u 2 \"src/types/**/*.d.ts\" build/types",
         "type-check": "tsc --noEmit && tsc --noEmit test/typescript-test.ts",
         "docs:api": "typedoc --options typedoc.json",
-        "docs": "npm run docs:api"
+        "docs": "npm run docs:api",
+        "generate-previews": "node examples/scripts/generate-previews.js"
     },
     "dependencies": {
         "d3-array": "^3.2.4",
@@ -75,6 +76,7 @@
         "babel-loader": "^9.1.2",
         "copyfiles": "^2.4.1",
         "css-loader": "^7.1.2",
+        "playwright": "^1.60.0",
         "prettier": "^3.4.1",
         "style-loader": "^4.0.0",
         "ts-loader": "^9.5.4",

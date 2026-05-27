@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bar Chart Map – eurostat-map.js</title>
+    </head>
+    <body>
+        <label for="bartype">Bar type:</label>
+        <select id="bartype">
+            <option value="grouped" selected>Grouped (vertical)</option>
+            <option value="stacked">Stacked (horizontal)</option>
+        </select>
+        <br />
+        <svg id="map"></svg>
+
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            let map
+
+            function buildMap(barType) {
+                if (map) map.svg().selectAll('*').remove()
+
+                map = eurostatmap
+                    .map('bar')
+                    .svgId('map')
+                    .title('Tourism nights spent by residence of guest')
+                    .subtitle('NUTS 1, 2022')
+                    .nutsLevel(1)
+                    .scale('20M')
+                    .barType(barType)
+                    // Stacked sizing
+                    .barMinWidth(6)
+                    .barMaxWidth(50)
+                    .barHeight(10)
+                    // Grouped sizing
+                    .barGroupWidth(6)
+                    .barGroupGap(1)
+                    .barGroupMaxHeight(45)
+                    .statBar({
+                        eurostatDatasetCode: 'tour_occ_nin2',
+                        filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                        unitText: 'Nights',
+                        categoryParameter: 'c_resid',
+                        categoryCodes: ['FOR', 'DOM'],
+                        categoryLabels: ['Foreign', 'Domestic'],
+                        categoryColors: ['#7fc97f', '#beaed4'],
+                        totalCode: 'TOTAL',
+                    })
+                    .legend({
+                        x: 570,
+                        y: 0,
+                        boxOpacity: 1,
+                        boxPadding: 20,
+                        titleFontWeight: 'bold',
+                        sizeLegend: {
+                            title: 'Total nights spent',
+                            titlePadding: 15,
+                            values: [10000000, 1000000],
+                        },
+                        colorLegend: {
+                            title: 'Residence of guest',
+                            marginTop: 30,
+                            noData: false,
+                        },
+                    })
+
+                map.build()
+            }
+
+            buildMap('grouped')
+
+            document.getElementById('bartype').addEventListener('change', function (e) {
+                buildMap(e.target.value)
+            })
+        </script>
+    </body>
+</html>
