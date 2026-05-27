@@ -5,12 +5,10 @@ import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } f
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
-
-
 /**
  * A legend for choropleth-bivariate maps
  *
- * @param {*} map
+ * @param {MapInstance} map
  */
 export const legend = function (map, config) {
     //build generic legend object for the map
