@@ -5,6 +5,7 @@ import type { InsetConfig } from './InsetConfig'
 import type { MapInstance as EurostatMap } from './MapInstance'
 import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
 import type { GridCartogramSettings } from './GridCartogramSettings'
+import type { DorlingSettings } from './DorlingSettings'
 
 /**
  * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
@@ -71,6 +72,9 @@ export interface MapConfig {
 
     /** Grid cartogram layout settings. */
     gridCartogramSettings?: Partial<GridCartogramSettings>
+
+    /** Dorling simulation settings. */
+    dorlingSettings?: Partial<DorlingSettings>
 
     /** Show or hide the coastal margin effect. */
     drawCoastalMargin?: boolean

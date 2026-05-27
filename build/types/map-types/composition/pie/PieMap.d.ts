@@ -45,9 +45,6 @@ export interface PieMap extends MapInstance {
     dorling(): boolean
     dorling(v: boolean): this
 
-    animateDorling(): boolean
-    animateDorling(v: boolean): this
-
     pieTotalCode(): string | undefined
     pieTotalCode(v: string | undefined): this
 

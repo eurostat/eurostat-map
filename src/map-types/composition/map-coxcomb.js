@@ -592,7 +592,7 @@ export const map = function (config) {
                         const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
                         return naturalMax * scaleFactor
                     },
-                    out.dorlingPadding_ || 0
+                    out.dorlingSettings_.padding || 0
                 )
             } else {
                 stopDorlingSimulation(out)

@@ -69,9 +69,6 @@ export interface BarMap extends MapInstance {
     dorling(): boolean
     dorling(v: boolean): this
 
-    animateDorling(): boolean
-    animateDorling(v: boolean): this
-
     barTotalCode(): string | undefined
     barTotalCode(v: string | undefined): this
 

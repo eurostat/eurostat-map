@@ -37,7 +37,6 @@ export const map = function (config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
-    out.animateDorling_ = true
 
     out.pieMinRadius_ = 5
     out.pieMaxRadius_ = 15
@@ -71,7 +70,6 @@ export const map = function (config) {
         'pieStrokeFill_',
         'pieStrokeWidth_',
         'dorling_',
-        'animateDorling_',
         'pieTotalCode_',
         'statCodes_',
     ])
@@ -131,7 +129,7 @@ export const map = function (config) {
                     (d) => {
                         return _getRegionTotal(d.properties.id) || 0 ? out.classifierSize_(_getRegionTotal(d.properties.id)) || 0 : 0
                     },
-                    out.dorlingPadding_ || 0
+                    out.dorlingSettings_.padding || 0
                 )
             } else {
                 stopDorlingSimulation(out)

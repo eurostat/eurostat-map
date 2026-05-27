@@ -45,8 +45,6 @@ export interface BarMapConfig extends MapConfig {
     barTooltipHeight?: number
     /** Dorling. */
     dorling?: boolean
-    /** Animate dorling. */
-    animateDorling?: boolean
     /** Bar total code. */
     barTotalCode?: string
     /** Stat codes. */

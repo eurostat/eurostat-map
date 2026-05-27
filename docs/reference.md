@@ -317,10 +317,12 @@ It is also possible to prevent overlapping via the 'dorling' method:
 and customise it with:
 
 ```javascript
-    .dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
-    .dorlingIterations(1) // iterations of d3-force forceCollide
-    .dorlingWorker(false) // use a web worker for (non-animated) dorling cartograms to not block the main thread
-    .onDorlingProgress(undefined) // track dorling progress when using web workers
+    .dorlingSettings({
+        strength: { x: 1, y: 1 }, // forces applied during dorling simulation
+        iterations: 1, // iterations of d3-force forceCollide
+        worker: false, // use a web worker for (non-animated) dorling cartograms to not block the main thread
+        onProgress: undefined, // track dorling progress when using web workers
+    })
 ```
 
 Please be aware that by using this method you will essentially be turning the map into a Cartogram. If deformation is high, please consider hiding the background elements/basemap.
@@ -1016,10 +1018,12 @@ map.dorling(true)
 and customised like so:
 
 ```javascript
-.dorlingStrength({ x: 1, y: 1 }) // forces applied during dorling simulation
-.dorlingIterations(1) // iterations of d3-force forceCollide
-.dorlingWorker(false) // use a web worker for (non-animated) dorling cartograms to not block the main thread
-.onDorlingProgress(undefined) // track dorling progress when using web workers
+.dorlingSettings({
+    strength: { x: 1, y: 1 }, // forces applied during dorling simulation
+    iterations: 1, // iterations of d3-force forceCollide
+    worker: false, // use a web worker for (non-animated) dorling cartograms to not block the main thread
+    onProgress: undefined, // track dorling progress when using web workers
+})
 ```
 
 removing the background map is optional but recommended:

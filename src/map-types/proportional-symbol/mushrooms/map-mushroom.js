@@ -160,7 +160,7 @@ export const map = function (config) {
 
                     return Math.sqrt((r1 * r1 + r2 * r2) / 2)
                 },
-                out.dorlingPadding_ || 0
+                out.dorlingSettings_.padding || 0
             )
         } else {
             stopDorlingSimulation(out)

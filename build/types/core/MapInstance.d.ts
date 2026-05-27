@@ -5,6 +5,7 @@ import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
 import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
 import type { GridCartogramSettings } from './GridCartogramSettings'
+import type { DorlingSettings } from './DorlingSettings'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -242,21 +243,9 @@ export interface MapInstance {
     dorling(): boolean
     dorling(enable: boolean): this
 
-    /** Animate the Dorling simulation. @default true */
-    animateDorling(): boolean
-    animateDorling(animate: boolean): this
-
-    /** Dorling simulation gravity strength. @default { x: 1, y: 1 } */
-    dorlingStrength(): { x: number; y: number }
-    dorlingStrength(strength: { x: number; y: number }): this
-
-    /** Number of Dorling collision detection iterations. @default 1 */
-    dorlingIterations(): number
-    dorlingIterations(n: number): this
-
-    /** Minimum distance between Dorling circles. Negative allows overlap. @default 0 */
-    dorlingPadding(): number
-    dorlingPadding(padding: number): this
+    /** Dorling simulation settings. */
+    dorlingSettings(): DorlingSettings
+    dorlingSettings(settings: Partial<DorlingSettings>): this
 
     /** Events. */
 

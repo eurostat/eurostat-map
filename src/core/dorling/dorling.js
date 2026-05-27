@@ -10,11 +10,12 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
 
         stopDorlingSimulation(singleMap)
 
-        const strengthX = singleMap.dorlingStrength_?.x ?? 1
-        const strengthY = singleMap.dorlingStrength_?.y ?? 1
-        const iterations = singleMap.dorlingIterations_ ?? 1
-        const useWorker = singleMap.dorlingWorker_ !== false
-        const d3URL = singleMap.dorlingWorkerD3URL_ || 'https://unpkg.com/d3@7/dist/d3.min.js'
+        const settings = singleMap.dorlingSettings_ || {}
+        const strengthX = settings.strength?.x ?? 1
+        const strengthY = settings.strength?.y ?? 1
+        const iterations = settings.iterations ?? 1
+        const useWorker = settings.worker !== false
+        const d3URL = settings.workerD3URL || 'https://unpkg.com/d3@7/dist/d3.min.js'
 
         // Compute initial projected coordinates
         for (const n of nodes) {
@@ -38,7 +39,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
         }
 
         // === Non-animated branch ===
-        if (singleMap.animateDorling_ === false) {
+        if (settings.animate === false) {
             if (!useWorker) {
                 // Run synchronously on main thread
                 const sim = forceSimulation(nodes)
@@ -110,8 +111,8 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
 }
 
 function updateDorlingProgress(progress, map) {
-    if (map.onDorlingProgress_) {
-        map.onDorlingProgress_(progress, map)
+    if (map.dorlingSettings_?.onProgress) {
+        map.dorlingSettings_.onProgress(progress, map)
     }
 }
 
@@ -124,11 +125,11 @@ export function stopDorlingSimulation(map) {
 
 // Optional API setters
 export function dorlingWorker(flag) {
-    this.dorlingWorker_ = flag
+    this.dorlingSettings(Object.assign({}, this.dorlingSettings(), { worker: flag }))
     return this
 }
 
 export function dorlingWorkerD3URL(url) {
-    this.dorlingWorkerD3URL_ = url
+    this.dorlingSettings(Object.assign({}, this.dorlingSettings(), { workerD3URL: url }))
     return this
 }

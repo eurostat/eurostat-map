@@ -11,8 +11,6 @@ export interface ProportionalSymbolConfig extends MapConfig {
 
     /** Dorling cartogram. */
     dorling?: boolean
-    /** Number of Dorling simulation iterations. */
-    dorlingIterations?: number
 
     /** Size function. */
     psCustomSize?: (value: number) => number

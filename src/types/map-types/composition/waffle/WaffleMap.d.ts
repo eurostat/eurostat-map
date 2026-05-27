@@ -54,9 +54,6 @@ export interface WaffleMap extends MapInstance {
     dorling(): boolean
     dorling(v: boolean): this
 
-    animateDorling(): boolean
-    animateDorling(v: boolean): this
-
     waffleTotalCode(): string | undefined
     waffleTotalCode(v: string | undefined): this
 

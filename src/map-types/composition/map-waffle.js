@@ -36,7 +36,6 @@ export const map = function (config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
-    out.animateDorling_ = true
 
     out.waffleMinSize_ = 10
     out.waffleMaxSize_ = 30
@@ -73,7 +72,6 @@ export const map = function (config) {
         'waffleRoundedCorners_',
         'waffleTooltipSize_',
         'dorling_',
-        'animateDorling_',
         'waffleTotalCode_',
         'statCodes_',
     ])
@@ -136,7 +134,7 @@ export const map = function (config) {
                         const total = _getRegionTotal(d.properties.id) || 0
                         return total ? out.classifierSize_(total) / 2 : 0
                     },
-                    out.dorlingPadding_ || 0
+                    out.dorlingSettings_.padding || 0
                 )
             } else {
                 stopDorlingSimulation(out)

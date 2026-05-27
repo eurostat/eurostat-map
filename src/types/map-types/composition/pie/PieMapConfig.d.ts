@@ -33,8 +33,6 @@ export interface PieMapConfig extends MapConfig {
     noDataFillStyle?: string
     /** Dorling. */
     dorling?: boolean
-    /** Animate dorling. */
-    animateDorling?: boolean
     /** Pie total code. */
     pieTotalCode?: string
     /** Stat codes. */

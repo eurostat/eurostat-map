@@ -113,6 +113,48 @@ export const defineDeprecatedFunctions = (out) => {
     out.pixelSize = (v) => (console.warn('map.pixelSize() is now DEPRECATED. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.pixSize = (v) => (console.warn('map.pixelSize() is now DEPRECATED. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.tooltipText = (v) => (console.warn('map.tooltipText() is now DEPRECATED. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
+    out.animateDorling = function (v) {
+        if (!arguments.length) return out.dorlingSettings().animate
+        console.warn('map.animateDorling() is now DEPRECATED. Please use map.dorlingSettings({ animate }) instead.')
+        out.dorlingSettings({ animate: v })
+        return out
+    };
+    out.dorlingStrength = function (v) {
+        if (!arguments.length) return out.dorlingSettings().strength
+        console.warn('map.dorlingStrength() is now DEPRECATED. Please use map.dorlingSettings({ strength }) instead.')
+        out.dorlingSettings({ strength: v })
+        return out
+    };
+    out.dorlingIterations = function (v) {
+        if (!arguments.length) return out.dorlingSettings().iterations
+        console.warn('map.dorlingIterations() is now DEPRECATED. Please use map.dorlingSettings({ iterations }) instead.')
+        out.dorlingSettings({ iterations: v })
+        return out
+    };
+    out.dorlingPadding = function (v) {
+        if (!arguments.length) return out.dorlingSettings().padding
+        console.warn('map.dorlingPadding() is now DEPRECATED. Please use map.dorlingSettings({ padding }) instead.')
+        out.dorlingSettings({ padding: v })
+        return out
+    };
+    out.onDorlingProgress = function (v) {
+        if (!arguments.length) return out.dorlingSettings().onProgress
+        console.warn('map.onDorlingProgress() is now DEPRECATED. Please use map.dorlingSettings({ onProgress }) instead.')
+        out.dorlingSettings({ onProgress: v })
+        return out
+    };
+    out.dorlingWorker = function (v) {
+        if (!arguments.length) return out.dorlingSettings().worker
+        console.warn('map.dorlingWorker() is now DEPRECATED. Please use map.dorlingSettings({ worker }) instead.')
+        out.dorlingSettings({ worker: v })
+        return out
+    };
+    out.dorlingWorkerD3URL = function (v) {
+        if (!arguments.length) return out.dorlingSettings().workerD3URL
+        console.warn('map.dorlingWorkerD3URL() is now DEPRECATED. Please use map.dorlingSettings({ workerD3URL }) instead.')
+        out.dorlingSettings({ workerD3URL: v })
+        return out
+    };
     out.gridCartogramShape = function (v) {
         if (!arguments.length) return out.gridCartogramSettings().shape
         console.warn('map.gridCartogramShape() is now DEPRECATED. Please use map.gridCartogramSettings({ shape }) instead.')

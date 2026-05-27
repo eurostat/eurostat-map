@@ -105,9 +105,6 @@ export const map = function (config) {
         'psClassificationMethod_',
         'psClasses_',
         'dorling_',
-        'dorlingStrength_',
-        'dorlingIterations_',
-        'animateDorling_',
         'psSpikeWidth_',
         'psCodeLabels_',
         'psBrightenFactor_',
@@ -418,7 +415,7 @@ export const map = function (config) {
                         const r = datum ? out.classifierSize_(+datum.value) : 0
                         return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                     },
-                    out.dorlingPadding_ || 0
+                    out.dorlingSettings_.padding || 0
                 )
             } else {
                 stopDorlingSimulation(out)

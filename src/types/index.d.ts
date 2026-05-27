@@ -61,6 +61,7 @@ export type { StatConfig } from './core/stat/StatConfig'
 export type { InsetConfig } from './core/InsetConfig'
 export type { CoastalMarginSettings } from './core/decoration/CoastalMarginSettings'
 export type { GridCartogramSettings, GridCartogramMargins } from './core/GridCartogramSettings'
+export type { DorlingSettings, DorlingStrength } from './core/DorlingSettings'
 
 // ==================== Legend Configuration Type Exports ====================
 

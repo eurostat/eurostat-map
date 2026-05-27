@@ -79,15 +79,6 @@ export interface ProportionalSymbolMap extends MapInstance {
     dorling(): boolean
     dorling(v: boolean): this
 
-    dorlingStrength(): any
-    dorlingStrength(v: any): this
-
-    dorlingIterations(): number
-    dorlingIterations(v: number): this
-
-    animateDorling(): boolean
-    animateDorling(v: boolean): this
-
     psSpikeWidth(): number
     psSpikeWidth(v: number): this
 

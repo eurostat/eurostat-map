@@ -68,7 +68,6 @@ export const map = function (config) {
     // ── Config defaults ──────────────────────────────────────────────────────
 
     out.dorling_ = config?.dorling || false
-    out.animateDorling_ = true
 
     // Layout mode: 'stacked' (horizontal, proportional) | 'grouped' (vertical, absolute)
     out.barType_ = 'grouped' // default to grouped for better absolute value comparison; can switch to 'stacked' for proportional view
@@ -128,7 +127,6 @@ export const map = function (config) {
         'barTooltipWidth_',
         'barTooltipHeight_',
         'dorling_',
-        'animateDorling_',
         'barTotalCode_',
         'statCodes_',
     ])
@@ -236,7 +234,7 @@ export const map = function (config) {
                     (d) => {
                         return _getDorlingRadius(d.properties.id)
                     },
-                    out.dorlingPadding_ || 0
+                    out.dorlingSettings_.padding || 0
                 )
             } else {
                 stopDorlingSimulation(out)

@@ -35,8 +35,6 @@ export interface WaffleMapConfig extends MapConfig {
     noDataFillStyle?: string
     /** Dorling. */
     dorling?: boolean
-    /** Animate dorling. */
-    animateDorling?: boolean
     /** Waffle total code. */
     waffleTotalCode?: string
     /** Stat codes. */

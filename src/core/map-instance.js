@@ -88,13 +88,15 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
 
     //dorling cartograms (used for ps and pie maps)
     out.dorling_ = false
-    out.animateDorling_ = true
-    out.dorlingStrength_ = { x: 1, y: 1 }
-    out.dorlingIterations_ = 1
-    out.dorlingPadding_ = 0
-    out.onDorlingProgress_ = undefined
-    out.dorlingWorker_ = false // use a web worker for (non-animated) dorling cartograms to not block the main thread
-    out.dorlingWorkerD3URL_ = undefined
+    out.dorlingSettings_ = {
+        animate: true,
+        strength: { x: 1, y: 1 },
+        iterations: 1,
+        padding: 0,
+        onProgress: undefined,
+        worker: false, // use a web worker for (non-animated) dorling cartograms to not block the main thread
+        workerD3URL: undefined,
+    }
 
     //header/footer
     out.header_ = false // add titles to separate header section
@@ -282,6 +284,22 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             out.gridCartogramSettings_ = next
         } else {
             out.gridCartogramSettings_ = v
+        }
+        return out
+    }
+
+    // dorling settings getter/setter
+    out.dorlingSettings = function (v) {
+        if (!arguments.length) return out.dorlingSettings_
+
+        if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+            const next = Object.assign({}, out.dorlingSettings_, v)
+            if (v.strength && typeof v.strength === 'object') {
+                next.strength = Object.assign({}, out.dorlingSettings_.strength, v.strength)
+            }
+            out.dorlingSettings_ = next
+        } else {
+            out.dorlingSettings_ = v
         }
         return out
     }
