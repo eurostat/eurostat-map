@@ -39,7 +39,9 @@
         "build-prod-debug": "webpack --config webpack/webpack.config.debug-size.js",
         "format": "prettier --write .",
         "copy-types": "copyfiles -u 2 \"src/types/**/*.d.ts\" build/types",
-        "type-check": "tsc --noEmit && tsc --noEmit test/typescript-test.ts"
+        "type-check": "tsc --noEmit && tsc --noEmit test/typescript-test.ts",
+        "docs:api": "typedoc --options typedoc.json",
+        "docs": "npm run docs:api"
     },
     "dependencies": {
         "d3-array": "^3.2.4",
@@ -76,6 +78,8 @@
         "prettier": "^3.4.1",
         "style-loader": "^4.0.0",
         "ts-loader": "^9.5.4",
+        "typedoc": "^0.28.12",
+        "typedoc-plugin-missing-exports": "^4.0.0",
         "typescript": "^5.9.3",
         "webpack": "^5.88.1",
         "webpack-bundle-analyzer": "^4.10.2",

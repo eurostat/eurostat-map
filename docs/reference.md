@@ -4,6 +4,8 @@
 Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
 </div>
 
+This document is the narrative usage guide. For generated, signature-accurate API docs from TypeScript/JSDoc, run `npm run docs:api` and open `docs/api/index.html`.
+
 ## Contents
 
 - [API reference](#api-reference)
@@ -390,7 +392,12 @@ eurostatmap
     .stripeWidth(10)
     .stripeOrientation(45)
     .statPie(
-        { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR', time: '2019' }, unitText: 'people' },
+        {
+            eurostatDatasetCode: 'demo_r_pjanaggr3',
+            filters: { sex: 'T', unit: 'NR', time: '2019' },
+            unitText: 'people',
+            transform: (v) => v / 1000, // optional: transform values after load
+        },
         'age', //parameter that the categories belong to
         ['Y_LT15', 'Y15-64', 'Y_GE65'], //category codes
         ['< 15', '15 to 64', '> 65'], //labels
@@ -400,6 +407,8 @@ eurostatmap
 ```
 
 If the sum of the chosen categories do not represent the complete total for that variable, then an optional code can be included as the last parameter passed to the statPie() method. For example, when making a proportional pie chart map for different causes of death, the chosen categories "Respiratory", "Cancer", "Circulatory" do not represent all causes of death. In this case, the code for "all causes of death" is specified ("A-R_V-Y"). The shares of each categories are then calculated according to this total and not just the total of the specified categories. The remaining share is then given the label "other", which can be changed using the pieOtherText() method and the colour of its pie slices can be changed using the pieOtherColor() method.
+
+The same `transform` option available in `map.stat({...})` is also available in composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`) and is applied to each generated category dataset (and total dataset when `totalCode` is used).
 
 ```javascript
          .statPie(
@@ -730,17 +739,22 @@ Example:
 eurostatmap
     .map('sparkline')
     .nutsLevel(1)
-    .statSpark(
-        { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR' }, unitText: 'people' },
-        ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'], //dates
-        ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'] //labels
-    )
+    .statSpark({
+        eurostatDatasetCode: 'demo_r_pjanaggr3',
+        filters: { sex: 'T', unit: 'NR' },
+        unitText: 'people',
+        transform: (v) => v / 1000, // optional: transform values after load
+        dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
+        labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
+    })
     .sparkType('area')
     .sparkLineWidth(70)
     .sparkLineHeight(20)
     .sparkLineOpacity(0.9)
     .build()
 ```
+
+`statSpark({...})` also supports `transform`, identical to `map.stat({...})`.
 
 | Method                                      | Type              | Default                                                                                           | Description                                                                                                                                                                                                                                                                  |
 | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -1,0 +1,14 @@
+{
+    "entryPoints": ["src/types/index.d.ts"],
+    "out": "docs/api",
+    "entryPointStrategy": "resolve",
+    "plugin": ["typedoc-plugin-missing-exports"],
+    "readme": "none",
+    "excludePrivate": true,
+    "excludeProtected": false,
+    "excludeInternal": true,
+    "cleanOutputDir": true,
+    "hideGenerator": true,
+    "categorizeByGroup": true,
+    "sort": ["source-order", "alphabetical"]
+}
