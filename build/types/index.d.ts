@@ -10,6 +10,31 @@ export { StatConfig } from './core/stat/StatConfig'
 export { InsetConfig } from './core/InsetConfig'
 export { MapInstance } from './core/MapInstance'
 
+// ==================== Legend Configuration Types ====================
+
+// Main legend types
+export { CategoricalLegendConfig } from './legend/CategoricalLegendConfig'
+export { CoxcombLegendConfig } from './legend/CoxcombLegendConfig'
+export { MushroomLegendConfig } from './legend/MushroomLegendConfig'
+export { PieChartLegendConfig } from './legend/PieChartLegendConfig'
+export { SparklineLegendConfig } from './legend/SparklineLegendConfig'
+export { WaffleLegendConfig } from './legend/WaffleLegendConfig'
+export { StripeCompositionLegendConfig } from './legend/StripeCompositionLegendConfig'
+export { PatternFillLegendConfig } from './legend/PatternFillLegendConfig'
+
+// Choropleth legend types
+export { BivariateLegendConfig } from './legend/choropleth/BivariateLegendConfig'
+export { HistogramLegendConfig } from './legend/choropleth/HistogramLegendConfig'
+
+// Composition legend types
+export { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'
+
+// Flow legend types
+export { FlowMapLegendConfig } from './legend/flow/FlowMapLegendConfig'
+
+// Proportional symbol legend types
+export { ProportionalSymbolsLegendConfig } from './legend/proportional-symbol/ProportionalSymbolsLegendConfig'
+
 // ==================== Categorical Map Types ====================
 
 /**
