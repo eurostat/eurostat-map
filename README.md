@@ -34,7 +34,51 @@
 <hr>
 <br>
 <div align="center">
-<a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"> <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/examples.gif" alt="examples" width="600"/> </a>
+  <style>
+    .readme-mosaic {
+      width: 100%;
+      max-width: 810px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .readme-mosaic td {
+      padding: 6px;
+      width: 33.333%;
+    }
+
+    .readme-mosaic-frame {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .readme-mosaic-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+  </style>
+  <table class="readme-mosaic">
+    <tr>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/ch_ex.png" alt="Choropleth map example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-circles.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/ps_ex.png" alt="Proportional symbols example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/flowmap.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/flow_ex.png" alt="Flow map example"/></div></a></td>
+    </tr>
+    <tr>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/pie_ex.png" alt="Pie chart map example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/mushroom.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/mushroom_ex.png" alt="Mushroom map example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/sparklines.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/sparklines_ex.png" alt="Sparklines map example"/></div></a></td>
+    </tr>
+    <tr>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/categorical.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/ct_ex.png" alt="Categorical map example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/chbi_ex.png" alt="Bivariate map example"/></div></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/trivariate.html" target="_blank"><div class="readme-mosaic-frame"><img src="docs/img/chtri_ex.png" alt="Trivariate map example"/></div></a></td>
+    </tr>
+  </table>
 </div>
 
 ---
@@ -42,12 +86,8 @@
 ## Resources
 
 - [Quick Start](#quick-start)
-- [What You Can Build](#what-you-can-build)
-- [Examples by Use Case](#examples-by-use-case)
-- [Installation](#installation)
+- [Examples](https://eurostat.github.io/eurostat-map/examples/index.html)
 - [Documentation](#documentation)
-- [Developer Path](#developer-path)
-- [Technical details](#technical-details)
 - [About](#about)
 - [Contribute](#contribute)
 - [Copyright](#copyright)
@@ -63,7 +103,23 @@ npm install eurostat-map
 
 ```javascript
 import eurostatmap from 'eurostat-map'
+```
 
+or
+
+```javascript
+const eurostatmap = require('eurostat-map')
+```
+
+or
+
+```html
+<script src="https://unpkg.com/eurostat-map"></script>
+```
+
+then
+
+```javascript
 eurostatmap
     .map('choropleth')
     .title('Population density in Europe')
@@ -74,86 +130,6 @@ eurostatmap
 
 Want a guided setup? Try the notebook:
 https://observablehq.com/@joewdavies/eurostat-map-js
-
-## What You Can Build
-
-- [Choropleth](https://eurostat.github.io/eurostat-map/examples/population-density.html): classed or continuous regional shading.
-- [Value-by-alpha](docs/reference.md): dual encoding with color and opacity.
-- [Bivariate choropleth](https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html): two variables in one map.
-- [Trivariate choropleth](https://eurostat.github.io/eurostat-map/examples/trivariate.html): three-variable ternary coloring.
-- [Categorical](https://eurostat.github.io/eurostat-map/examples/categorical.html): discrete class-based mapping.
-- [Proportional symbols](https://eurostat.github.io/eurostat-map/examples/prop-circles.html): size-based symbol encoding.
-- [Mushroom](https://eurostat.github.io/eurostat-map/examples/mushroom.html): bilateral symbol comparison per region.
-- [Pie composition](https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html): proportional category shares.
-- [Bar composition](docs/reference.md): grouped/stacked regional breakdowns.
-- [Stripe composition](https://eurostat.github.io/eurostat-map/examples/livestock_composition.html): compact stripe-based composition.
-- [Waffle composition](https://eurostat.github.io/eurostat-map/examples/waffle.html): grid-cell composition breakdowns.
-- [Coxcomb composition](https://eurostat.github.io/eurostat-map/examples/coxcomb.html): radial composition profiles.
-- [Sparkline](https://eurostat.github.io/eurostat-map/examples/sparklines.html): in-map time series microcharts.
-- [Flow map](https://eurostat.github.io/eurostat-map/examples/flowmap.html): directional links between territories.
-
-## Examples by Use Case
-
-### Core analytical maps
-
-- [Population density choropleth](https://eurostat.github.io/eurostat-map/examples/population-density.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-density.html))
-- [Proportional circles](https://eurostat.github.io/eurostat-map/examples/prop-circles.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-circles.html))
-- [Categorical NUTS typology](https://eurostat.github.io/eurostat-map/examples/categorical.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/categorical.html))
-- [World map](https://eurostat.github.io/eurostat-map/examples/world.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/world.html))
-
-### Composition and structure
-
-- [Proportional pie charts](https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/prop-piecharts.html))
-- [Farm size composition](https://eurostat.github.io/eurostat-map/examples/farm_size.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/farm_size.html))
-- [Livestock composition](https://eurostat.github.io/eurostat-map/examples/livestock_composition.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/livestock_composition.html))
-
-### Time and change
-
-- [Population change](https://eurostat.github.io/eurostat-map/examples/population-change.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/population-change.html))
-- [Sparklines since 2012](https://eurostat.github.io/eurostat-map/examples/sparklines.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/sparklines.html))
-- [20 years of GDP change](https://eurostat.github.io/eurostat-map/examples/small_multiple.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/small_multiple.html))
-
-### Relationships and advanced views
-
-- [Bivariate unemployment/population](https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/pop-unemploy-bivariate.html))
-- [Flow map](https://eurostat.github.io/eurostat-map/examples/flowmap.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/flowmap.html))
-- [Country focus: Spain](https://eurostat.github.io/eurostat-map/examples/spain.html) (see [code](https://github.com/eurostat/eurostat-map/blob/master/examples/spain.html))
-
-## Installation
-
-### Node.js
-
-```npm
-npm install eurostat-map
-```
-
-then
-
-```javascript
-import eurostatmap from 'eurostat-map'
-```
-
-or
-
-```javascript
-const eurostatmap = require('eurostat-map')
-```
-
-### Standalone
-
-For the latest version, use:
-
-```html
-<script src="https://unpkg.com/eurostat-map"></script>
-```
-
-For a fixed version, use:
-
-```html
-<script src="https://unpkg.com/eurostat-map@X.Y.Z"></script>
-```
-
-where X.Y.Z is a [version number](https://www.npmjs.com/package/eurostat-map?activeTab=versions).
 
 ## Documentation
 
