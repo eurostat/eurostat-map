@@ -1,11 +1,11 @@
+# eurostat-map: Data-Driven Maps
+
 <div align="center">
   <img src="https://img.shields.io/bundlephobia/min/eurostat-map" alt="npm bundle size">
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
   <img src="https://img.shields.io/badge/license-EUPL-success" alt="license">
   <a href="http://www.awesomeofficialstatistics.org"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Official Statistics"></a>
 </div>
-
-# eurostat-map: Mapping Library for Eurostat Data
 
 <br>
 <div align="center">
@@ -24,8 +24,7 @@
   <a href="https://eurostat.github.io/eurostat-map/examples/population-density.html"><strong>Live examples</strong></a> ·
   <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js"><strong>Quickstart notebook</strong></a>
 </div>
-
-## At a Glance
+<hr>
 
 - **Interactive SVG maps** rendered using **D3.js**.
 - **TypeScript support** with built-in definition typings.
