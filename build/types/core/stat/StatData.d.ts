@@ -83,11 +83,17 @@ export interface StatData {
 
     /** Metadata from the Eurostat API response or CSV source. */
     metadata?: {
+        /** Label. */
         label?: string
+        /** Href. */
         href?: string
+        /** Source. */
         source?: string
+        /** Updated. */
         updated?: string
+        /** Time. */
         time?: string
+        /** Extension. */
         extension?: any
     }
 

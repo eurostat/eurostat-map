@@ -56,11 +56,17 @@ export interface PieMap extends MapInstance {
 
     statPie(config: CompositionStatConfig): this
     statPie(
+        /** Config. */
         config: CompositionStatConfig,
+        /** Category parameter. */
         categoryParameter?: string,
+        /** Category codes. */
         categoryCodes?: string[],
+        /** Category labels. */
         categoryLabels?: string[],
+        /** Category colors. */
         categoryColors?: string[],
+        /** Total code. */
         totalCode?: string
     ): this
 }

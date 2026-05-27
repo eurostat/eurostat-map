@@ -101,10 +101,14 @@ export const flags: Record<string, string>
  * Executes a function for all insets recursively.
  */
 export function executeForAllInsets(
+    /** Insets. */
     insets: any,
+    /** Main svg id. */
     mainSvgId: string,
     functionToExecute: (inset: MapInstance, ...args: any[]) => void,
+    /** Parameter. */
     parameter?: any,
+    /** Parameter2. */
     parameter2?: any
 ): void
 

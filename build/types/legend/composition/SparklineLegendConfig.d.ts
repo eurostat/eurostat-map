@@ -48,14 +48,23 @@ export interface SparklineScaleLegendConfig {
  * Configuration for sparkline color legend (explains sparkLineColor/sparkAreaColor rules).
  */
 export interface SparklineColorLegendConfig {
+    /** Show. */
     show?: boolean
+    /** Title. */
     title?: string | null
+    /** Title padding. */
     titlePadding?: number
+    /** Margin top. */
     marginTop?: number
+    /** Item gap. */
     itemGap?: number
+    /** Swatch width. */
     swatchWidth?: number
+    /** Swatch height. */
     swatchHeight?: number
+    /** Label offset x. */
     labelOffsetX?: number
+    /** Items. */
     items?: Array<{ color: string; label: string }>
 }
 

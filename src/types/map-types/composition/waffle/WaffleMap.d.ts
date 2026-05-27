@@ -65,11 +65,17 @@ export interface WaffleMap extends MapInstance {
 
     statWaffle(config: CompositionStatConfig): this
     statWaffle(
+        /** Config. */
         config: CompositionStatConfig,
+        /** Category parameter. */
         categoryParameter?: string,
+        /** Category codes. */
         categoryCodes?: string[],
+        /** Category labels. */
         categoryLabels?: string[],
+        /** Category colors. */
         categoryColors?: string[],
+        /** Total code. */
         totalCode?: string
     ): this
 }

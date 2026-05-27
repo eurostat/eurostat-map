@@ -8,78 +8,77 @@ import type { MapInstance as EurostatMap } from './MapInstance'
  * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
  */
 export interface MapConfig {
-    // Container settings
+    /** Container settings. */
     svgId?: string
+    /** ID of the container element used to host the map. */
     containerId?: string
 
-    // Geographic settings
-    proj?: string // NUTS2json geometries projection: '3035', '3857', '4326'. For custom projections use 4326, then set the desired projection with projectionFunction()
-    projectionFunction?: () => any // Function to set a custom projection. See d3-geo projections for examples.
-    scale?: '60M' | '20M' | '10M' | '03M' | '01M' // Scale of the map, for NUTSjson geometries
-    nutsLevel?: number // 0, 1, 2, 3
+    /** Geographic settings. */
+    /**
+     * NUTS2json geometries projection: '3035', '3857', '4326'.
+     * For custom projections, use 4326 and then set projectionFunction().
+     */
+    proj?: string
+    /** Function to set a custom projection. See d3-geo projections for examples. */
+    projectionFunction?: () => any
+    /** Scale of the map, for NUTSjson geometries. */
+    scale?: '60M' | '20M' | '10M' | '03M' | '01M'
+    /** NUTS level (0, 1, 2, 3). */
+    nutsLevel?: number
+    /** NUTS boundary year. */
     nutsYear?: number | string
+    /** Geographic center as [longitude, latitude]. */
     geoCenter?: [number, number]
-    pixSize?: number
 
-    // Geometry settings
-    geo?: string // NUTS2JSON Geographic focus (e.g., 'EUR', 'WORLD', 'IC', 'GF') see https://github.com/eurostat/Nuts2json#overseas-territories---map-insets
+    /** Geometry settings. */
+    /**
+     * NUTS2JSON geographic focus (e.g., 'EUR', 'WORLD', 'IC', 'GF').
+     * See https://github.com/eurostat/Nuts2json#overseas-territories---map-insets
+     */
+    geo?: string
 
-    // Map dimensions
+    /** Map dimensions. */
     width?: number
+    /** Map height in pixels. */
     height?: number
 
-    // map texts
+    /** Map texts. */
+    /** Map title. */
     title?: string
+    /** Map subtitle. */
     subtitle?: string
-    bottomText?: string
-    botTxtFontSize?: number
-    botTxtPadding?: number
-    botTxtTooltipMessage?: string
+    /** Footnote text shown below the map. */
     footnote?: string
+    /** Data source text. */
     source?: string
 
-    // Statistical data configuration
+    /** Statistical data configuration. */
     stat?: StatConfig
 
-    // Legend configuration
+    /** Legend configuration. */
     legend?: LegendConfig
 
-    // Tooltip configuration
+    /** Tooltip configuration. */
     tooltip?: TooltipConfig
 
-    // Insets (small additional maps)
+    /** Insets (small additional maps). */
     insets?: InsetConfig[]
 
-    // Zoom and pan settings
+    /** Zoom and pan settings. */
     zoomExtent?: [number, number]
 
-    // UI Controls
-    showBtns?: boolean // Show zoom buttons
-
-    // Coastal margin
+    /** Coastal margin. */
     coastal?: boolean
-    coastalMarginWidth?: number
-    coastalMarginColor?: string
 
-    // Graticule
+    /** Graticule. */
     drawGraticule?: boolean
-    graticuleStyle?: any
 
-    // Borders
-    borderWidth?: number
-    borderColor?: string
-
-    // Labels
+    /** Labels. */
     labelling?: boolean
-    labelSizeThreshold?: number
-    labelOpacity?: number
 
-    // Logo
-    logoURL?: string
-
-    // Callbacks
+    /** Fires once the map is built. */
     onBuild?: (map: EurostatMap) => void
 
-    // Allow additional properties for extensibility
+    /** Allow additional properties for extensibility. */
     [key: string]: any
 }

@@ -6,6 +6,6 @@ import { LegendConfig } from '../LegendConfig'
  * in stripe composition maps (regions divided into colored stripes showing composition).
  */
 export interface StripeCompositionLegendConfig extends LegendConfig {
-	// Inherits all properties from LegendConfig
-	// No additional specific properties beyond the base legend configuration
+    // Inherits all properties from LegendConfig
+    // No additional specific properties beyond the base legend configuration
 }

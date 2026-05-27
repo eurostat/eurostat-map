@@ -45,8 +45,8 @@ export interface SparkMap extends MapInstance {
     sparkLineOffsets(): { x: number; y: number }
     sparkLineOffsets(v: { x: number; y: number }): this
 
-    //manually set the data for the sparkline, instead of fetching it from Eurostat
+    /** Manually set sparkline data instead of fetching it from Eurostat. */
     sparklineData(dataObject: Record<string, Record<string, number>>): this
-    //configuration for fetching the data from Eurostat and generating the sparkline
+    /** Configure fetching data from Eurostat and generating spark lines. */
     statSpark(config: SparkStatConfig): this
 }

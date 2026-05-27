@@ -38,10 +38,15 @@ export interface StripeMap extends MapInstance {
 
     statComp(config: CompositionStatConfig): this
     statComp(
+        /** Config. */
         config: CompositionStatConfig,
+        /** Category parameter. */
         categoryParameter?: string,
+        /** Category codes. */
         categoryCodes?: string[],
+        /** Category labels. */
         categoryLabels?: string[],
+        /** Category colors. */
         categoryColors?: string[]
     ): this
 }

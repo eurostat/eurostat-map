@@ -13,12 +13,19 @@ export interface GeometriesClass {
     centroidsData: any
     /** Processed GeoJSON features organized by type */
     geoJSONs: {
+        /** Nutsrg. */
         nutsrg?: any[]
+        /** Nutsbn. */
         nutsbn?: any[]
+        /** Cntrg. */
         cntrg?: any[]
+        /** Cntbn. */
         cntbn?: any[]
+        /** Worldrg. */
         worldrg?: any[]
+        /** Graticule. */
         graticule?: any[]
+        /** Mixed. */
         mixed?: any
     }
     /** User-provided custom geometries */
@@ -34,13 +41,21 @@ export interface GeometriesClass {
     setUserGeometries(geometries: any[]): void
     /** Adds default NUTS geometries to the map */
     addDefaultGeometriesToMap(
+        /** Zoom group. */
         zoomGroup: any,
+        /** Draw graticule. */
         drawGraticule: boolean,
+        /** Path function. */
         pathFunction: any,
+        /** Nuts level. */
         nutsLevel: number | string,
+        /** Nuts year. */
         nutsYear: number,
+        /** Geo. */
         geo: string,
+        /** Proj. */
         proj: string,
+        /** Scale. */
         scale: string
     ): void
     /** Adds user-defined geometries to the map */

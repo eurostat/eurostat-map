@@ -4,7 +4,9 @@
  */
 export const kosovoBnFeatures: {
     [year: number]: {
+        /** Type. */
         type: 'FeatureCollection'
+        /** Features. */
         features: any[]
     }
 }

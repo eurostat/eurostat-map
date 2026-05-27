@@ -11,7 +11,7 @@ import type { InsetConfig } from './InsetConfig'
  * return the instance for chaining.
  */
 export interface MapInstance {
-    // ==================== Container ====================
+    /** Container. */
 
     /** ID of the target SVG element. @default 'map' */
     svgId(): string
@@ -21,7 +21,7 @@ export interface MapInstance {
     containerId(): string
     containerId(id: string): this
 
-    // ==================== Dimensions ====================
+    /** Dimensions. */
 
     /** Map width in pixels. @default min(795, window.innerWidth) */
     width(): number
@@ -31,7 +31,7 @@ export interface MapInstance {
     height(): number
     height(h: number): this
 
-    // ==================== Geography ====================
+    /** Geography. */
 
     /**
      * NUTS2JSON geographic focus area.
@@ -78,7 +78,7 @@ export interface MapInstance {
     projectionFunction(): any
     projectionFunction(fn: any): this
 
-    // ==================== Text & Labels ====================
+    /** Text and labels. */
 
     /** Map title. */
     title(): string
@@ -103,7 +103,7 @@ export interface MapInstance {
     footnoteWrap(): number | false
     footnoteWrap(chars: number | false): this
 
-    // ==================== Statistical Data ====================
+    /** Statistical data. */
 
     /**
      * Get or set statistical data configuration.
@@ -142,7 +142,7 @@ export interface MapInstance {
     language(): string
     language(lang: string): this
 
-    // ==================== Legend ====================
+    /** Legend. */
 
     /**
      * Get or set legend configuration. Pass false to remove the legend.
@@ -154,13 +154,13 @@ export interface MapInstance {
     /** Force-update the legend after data or style changes. */
     updateLegend(): this
 
-    // ==================== Tooltip ====================
+    /** Tooltip. */
 
     /** Get or set tooltip configuration. */
     tooltip(): TooltipConfig
     tooltip(config: TooltipConfig): this
 
-    // ==================== Zoom & Pan ====================
+    /** Zoom and pan. */
 
     /**
      * D3 zoom scale extent [min, max].
@@ -173,7 +173,7 @@ export interface MapInstance {
     zoomButtons(): boolean
     zoomButtons(show: boolean): this
 
-    // ==================== Insets ====================
+    /** Insets. */
 
     /**
      * Inset map configurations. Pass 'default' for the standard
@@ -184,7 +184,7 @@ export interface MapInstance {
     insets(): InsetConfig[] | 'default' | false
     insets(config: InsetConfig[] | 'default' | false): this
 
-    // ==================== Decoration ====================
+    /** Decoration. */
 
     /** Show/hide the graticule (coordinate grid lines). */
     drawGraticule(): boolean
@@ -230,7 +230,7 @@ export interface MapInstance {
     showEstatRibbon(): boolean
     showEstatRibbon(show: boolean): this
 
-    // ==================== Dorling ====================
+    /** Dorling. */
 
     /** Enable Dorling cartogram layout for proportional symbol maps. */
     dorling(): boolean
@@ -252,7 +252,7 @@ export interface MapInstance {
     dorlingPadding(): number
     dorlingPadding(padding: number): this
 
-    // ==================== Events ====================
+    /** Events. */
 
     /** Called when the user finishes a zoom gesture. */
     onZoomEnd(): ((event: any) => void) | undefined
@@ -286,7 +286,7 @@ export interface MapInstance {
     onBuild(): ((map: MapInstance) => void) | undefined
     onBuild(callback: (map: MapInstance) => void): this
 
-    // ==================== Build & Update ====================
+    /** Build and update. */
 
     /**
      * Builds the map from scratch. Call once after initial configuration.
@@ -315,7 +315,7 @@ export interface MapInstance {
     /** Recalculates header/footer layout and resizes the SVG. */
     recalculateLayout(): void
 
-    // ==================== Export ====================
+    /** Export. */
 
     /**
      * Exports the map as an SVG file and triggers a browser download.
@@ -330,7 +330,7 @@ export interface MapInstance {
      */
     exportMapToPNG(width?: number, height?: number): Promise<this>
 
-    // ==================== Misc ====================
+    /** Misc. */
 
     /**
      * Sets map attributes from URL parameters.

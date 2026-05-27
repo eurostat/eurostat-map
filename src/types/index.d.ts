@@ -138,11 +138,17 @@ export type { FlowMapConfig, FlowMap }
  * Options for fill pattern definitions
  */
 export interface FillPatternOptions {
+    /** Shape. */
     shape?: 'circle' | 'square'
+    /** Pattern size. */
     patternSize?: number
+    /** Min size. */
     minSize?: number
+    /** Max size. */
     maxSize?: number
+    /** Bck color. */
     bckColor?: string
+    /** Symb color. */
     symbColor?: string
 }
 
@@ -230,12 +236,19 @@ export const version: string
 // ==================== Default Export ====================
 
 declare const eurostatmap: {
+    /** Map. */
     map: typeof map
+    /** Get fill pattern definition function. */
     getFillPatternDefinitionFunction: typeof getFillPatternDefinitionFunction
+    /** Get fill pattern definition fun. */
     getFillPatternDefinitionFun: typeof getFillPatternDefinitionFun
+    /** Get default labels. */
     getDefaultLabels: typeof getDefaultLabels
+    /** Project from map. */
     projectFromMap: typeof projectFromMap
+    /** Project to map. */
     projectToMap: typeof projectToMap
+    /** Version. */
     version: typeof version
 }
 
