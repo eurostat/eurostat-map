@@ -464,6 +464,7 @@ export const map = function (config) {
             .attr('opacity', out.sparkLineOpacity_)
             .attr('stroke-width', out.sparkLineStrokeWidth_ + 'px')
             .attr('stroke', (d) => getSegmentColor(d))
+            .attr('data-spark-color', (d) => getSegmentColor(d))
             .attr('d', (d) => segmentLine([d.from, d.to]))
 
         // Animate on map (not in tooltip)
@@ -538,6 +539,7 @@ export const map = function (config) {
             .attr('x', (d, i) => offsetX + i * barWidth + barWidth * 0.05)
             .attr('width', barWidth * 0.9)
             .attr('fill', (d, i) => getBarColor(d, i))
+            .attr('data-spark-color', (d, i) => getBarColor(d, i))
             .attr('opacity', out.sparkLineOpacity_)
 
         if (!isForTooltip) {

@@ -1,4 +1,4 @@
-import { select } from 'd3-selection'
+import { select, selectAll } from 'd3-selection'
 import { scaleLinear } from 'd3-scale'
 import { axisLeft, axisBottom } from 'd3-axis'
 import { line } from 'd3-shape'
@@ -39,12 +39,12 @@ export const legend = function (map, config) {
     out.colorLegend = {
         show: false,
         title: null,
-        titlePadding: 8,
+        titlePadding: 10,
         marginTop: 8,
-        itemGap: 5,
-        swatchWidth: 14,
-        swatchHeight: 10,
-        labelOffsetX: 6,
+        itemGap: 2,
+        swatchWidth: undefined,
+        swatchHeight: undefined,
+        labelOffsetX: undefined,
         items: [], // [{ color: '#hex', label: '>= 12%' }, ...]
     }
 
@@ -308,34 +308,68 @@ export const legend = function (map, config) {
 
         const g = container.append('g').attr('class', 'em-spark-color-legend').attr('transform', `translate(0, ${offsetY})`)
 
+        const shapeWidth = config.swatchWidth ?? legend.shapeWidth ?? 18
+        const shapeHeight = config.swatchHeight ?? legend.shapeHeight ?? 18
+        const labelOffsetX = config.labelOffsetX ?? legend.labelOffsets?.x ?? 5
+        const rowGap = config.itemGap ?? legend.shapePadding ?? 2
+
         let y = 0
         if (config.title) {
             g.append('text')
-                .attr('class', 'em-spark-color-legend-title em-spark-legend-label')
+                .attr('class', 'em-color-legend-title')
                 .attr('x', 0)
                 .attr('y', 0)
                 .attr('dy', '0.8em')
                 .text(config.title)
-            y += config.titlePadding
+            const titleHeight = g.select('.em-color-legend-title').node()?.getBBox()?.height || 0
+            y += titleHeight + config.titlePadding
         }
 
         items.forEach((item, i) => {
-            const rowY = y + i * (config.swatchHeight + config.itemGap)
-            g.append('rect')
-                .attr('class', 'em-spark-color-legend-swatch')
+            const rowY = y + i * (shapeHeight + rowGap)
+            const row = g
+                .append('g')
+                .attr('class', 'em-color-legend-item em-legend-item')
+                .attr('transform', `translate(0, ${rowY})`)
+                .style('cursor', 'pointer')
+                .on('mouseover', function () {
+                    highlightSparkByColor(item.color)
+                    select(this).select('text').style('font-weight', 'bold')
+                    select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2)
+                })
+                .on('mouseout', function () {
+                    unhighlightSparkColors()
+                    select(this).select('text').style('font-weight', 'normal')
+                    select(this).select('rect').attr('stroke', 'none')
+                })
+
+            row.append('rect')
+                .attr('class', 'em-legend-rect')
                 .attr('x', 0)
-                .attr('y', rowY)
-                .attr('width', config.swatchWidth)
-                .attr('height', config.swatchHeight)
+                .attr('y', 0)
+                .attr('width', shapeWidth)
+                .attr('height', shapeHeight)
                 .attr('fill', item.color || '#999')
 
-            g.append('text')
-                .attr('class', 'em-spark-legend-label')
-                .attr('x', config.swatchWidth + config.labelOffsetX)
-                .attr('y', rowY + config.swatchHeight / 2)
-                .attr('dy', '0.3em')
+            row.append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', shapeWidth + labelOffsetX)
+                .attr('y', shapeHeight * 0.5)
+                .attr('dy', '0.35em')
                 .text(item.label || '')
         })
+    }
+
+    function highlightSparkByColor(color) {
+        if (!color) return
+        selectAll('.spark-line-segment, .spark-bar').style('opacity', function () {
+            const c = this.getAttribute('data-spark-color')
+            return c === color ? 1 : 0.15
+        })
+    }
+
+    function unhighlightSparkColors() {
+        selectAll('.spark-line-segment, .spark-bar').style('opacity', null)
     }
 
     /**
