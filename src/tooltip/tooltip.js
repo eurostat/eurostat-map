@@ -17,6 +17,9 @@ export const tooltip = function (config) {
     config.opacity = config.opacity || 1
 
     let tooltip
+    let rafId = null // requestAnimationFrame ID for throttling
+    let lastX = 0
+    let lastY = 0
 
     function my() {
         tooltip = select('#' + config.id)
@@ -31,6 +34,8 @@ export const tooltip = function (config) {
         if (html) {
             let x = event.pageX
             let y = event.pageY
+            lastX = x
+            lastY = y
             my.ensureTooltipOnScreen(x, y)
             // Fade in
             tooltip
@@ -44,10 +49,25 @@ export const tooltip = function (config) {
     my.mousemove = function (event) {
         let x = event.pageX
         let y = event.pageY
-        this.ensureTooltipOnScreen(x, y)
+        lastX = x
+        lastY = y
+
+        // Throttle position updates using requestAnimationFrame
+        // This limits updates to ~60fps instead of firing on every mouse pixel movement
+        if (!rafId) {
+            rafId = requestAnimationFrame(() => {
+                this.ensureTooltipOnScreen(lastX, lastY)
+                rafId = null
+            })
+        }
     }
 
     my.mouseout = function () {
+        // Cancel any pending position update
+        if (rafId) {
+            cancelAnimationFrame(rafId)
+            rafId = null
+        }
         // Fade out
         tooltip.interrupt().transition().duration(config.transitionDuration).style('opacity', 0)
     }
