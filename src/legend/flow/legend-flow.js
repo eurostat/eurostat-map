@@ -5,8 +5,6 @@ import { drawFlowColorLegend } from './legend-flow-color'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
-
-
 /**
  * A legend for proportional symbol map
  *
@@ -41,7 +39,7 @@ export const legend = function (map, config) {
 
     out.flowColorLegend = {
         title: null,
-        titlePadding: 0, // Padding between title and legend body
+        titlePadding: 10, // Padding between title and legend body
         marginTop: 50,
         items: [], // user-defined legend items for custom flow color function,
         ticks: false, // use labels as ticks

@@ -35,6 +35,19 @@ export const legend = function (map, config) {
         lineStrokeWidth: 1,
     }
 
+    // Optional categorical color legend for spark line/bar color rules
+    out.colorLegend = {
+        show: false,
+        title: null,
+        titlePadding: 8,
+        marginTop: 8,
+        itemGap: 5,
+        swatchWidth: 14,
+        swatchHeight: 10,
+        labelOffsetX: 6,
+        items: [], // [{ color: '#hex', label: '>= 12%' }, ...]
+    }
+
     // No data legend configuration
     out.noDataLegend = {
         show: true,
@@ -52,6 +65,20 @@ export const legend = function (map, config) {
                     if (config.scaleLegend[p] !== undefined) {
                         out.scaleLegend[p] = config.scaleLegend[p]
                     }
+                }
+            } else if (key === 'colorLegend') {
+                if (config.colorLegend === false) {
+                    out.colorLegend.show = false
+                } else if (typeof config.colorLegend === 'object') {
+                    for (let p in out.colorLegend) {
+                        if (config.colorLegend[p] !== undefined) {
+                            out.colorLegend[p] = config.colorLegend[p]
+                        }
+                    }
+                    if (!Array.isArray(config.colorLegend.items)) {
+                        out.colorLegend.items = out.colorLegend.items || []
+                    }
+                    out.colorLegend.show = config.colorLegend.show !== undefined ? config.colorLegend.show : true
                 }
             } else if (key === 'noDataLegend') {
                 if (config.noDataLegend === false) {
@@ -105,6 +132,10 @@ export const legend = function (map, config) {
                 .attr('transform', `translate(${baseX}, ${baseY})`)
 
             drawScaleLegend(out, out._scaleLegendContainer)
+
+            if ((out.colorLegend.show || out.colorLegend.items?.length) && out.colorLegend.items?.length) {
+                drawColorLegend(out, out._scaleLegendContainer, out._scaleLegendHeight + out.colorLegend.marginTop)
+            }
         }
 
         // Set legend box dimensions
@@ -268,6 +299,43 @@ export const legend = function (map, config) {
         // Height bookkeeping
         // -----------------------------------
         legend._scaleLegendHeight = margin.top + height + margin.bottom
+    }
+
+    function drawColorLegend(legend, container, offsetY) {
+        const config = legend.colorLegend
+        const items = config.items || []
+        if (!items.length) return
+
+        const g = container.append('g').attr('class', 'em-spark-color-legend').attr('transform', `translate(0, ${offsetY})`)
+
+        let y = 0
+        if (config.title) {
+            g.append('text')
+                .attr('class', 'em-spark-color-legend-title em-spark-legend-label')
+                .attr('x', 0)
+                .attr('y', 0)
+                .attr('dy', '0.8em')
+                .text(config.title)
+            y += config.titlePadding
+        }
+
+        items.forEach((item, i) => {
+            const rowY = y + i * (config.swatchHeight + config.itemGap)
+            g.append('rect')
+                .attr('class', 'em-spark-color-legend-swatch')
+                .attr('x', 0)
+                .attr('y', rowY)
+                .attr('width', config.swatchWidth)
+                .attr('height', config.swatchHeight)
+                .attr('fill', item.color || '#999')
+
+            g.append('text')
+                .attr('class', 'em-spark-legend-label')
+                .attr('x', config.swatchWidth + config.labelOffsetX)
+                .attr('y', rowY + config.swatchHeight / 2)
+                .attr('dy', '0.3em')
+                .text(item.label || '')
+        })
     }
 
     /**

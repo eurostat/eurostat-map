@@ -6,90 +6,101 @@ export function drawFlowColorLegend(out, x, y) {
 
     // Create/clear container
     out._flowColorContainer?.remove()
-    out._flowColorContainer = out.lgg
-        .append('g')
-        .attr('class', 'em-flow-color-legend')
-        .attr('transform', `translate(${x}, ${y})`)
+    out._flowColorContainer = out.lgg.append('g').attr('class', 'em-flow-color-legend').attr('transform', `translate(${x}, ${y})`)
 
     const title = out._flowColorContainer
         .append('text')
         .attr('class', 'em-color-legend-title')
         .attr('id', 'em-color-legend-title')
-        .attr('dy', '0.35em')
+        .attr('y', 0)
+        .attr('dy', '0.8em')
         .text(out.flowColorLegend.title || 'Destination')
 
-    let legendItems = [];
+    let legendItems = []
     if (typeof map.flowColor_ === 'function') {
         if (out.flowColorLegend.items && out.flowColorLegend.items.length > 0) {
             // allow user-provided items; add key if provided
-            legendItems = out.flowColorLegend.items.map(d => ({ label: d.label, color: d.color, key: d.key ?? null }));
+            legendItems = out.flowColorLegend.items.map((d) => ({ label: d.label, color: d.color, key: d.key ?? null }))
         } else {
-            legendItems = [{ label: "please specify legend items ...", color: "#888", key: null }];
+            legendItems = [{ label: 'please specify legend items ...', color: '#888', key: null }]
         }
     } else {
         // “top destinations” case
-        const colorScale = map.topLocationColorScale;
-        const topKeys = Array.from(map.topLocationKeys || []);
-        legendItems = topKeys.map(key => ({
-            key,                                 // <<< NEW: stable key for matching
+        const colorScale = map.topLocationColorScale
+        const topKeys = Array.from(map.topLocationKeys || [])
+        legendItems = topKeys.map((key) => ({
+            key, // <<< NEW: stable key for matching
             label: map.nodeNameMap.get(key) || key,
             color: colorScale(key),
-        }));
-        legendItems.push({ key: 'Other', label: 'Other', color: map.flowColor_ });
+        }))
+        legendItems.push({ key: 'Other', label: 'Other', color: map.flowColor_ })
     }
 
-    // Draw each legend row
-    const titleOffset = title.node().getBBox().height + out.flowColorLegend.titlePadding
+    // Draw each legend row. Keep layout consistent with other swatch legends.
+    const titleBoxHeight = title.node()?.getBBox()?.height || 0
+    const titlePadding = out.flowColorLegend.titlePadding ?? 10
+    const shapeWidth = out.shapeWidth || 18
+    const shapeHeight = out.shapeHeight || 18
+    const rowGap = out.shapePadding ?? 2
+    const labelOffsetX = out.labelOffsets?.x ?? 5
+    const titleOffset = titleBoxHeight + titlePadding
 
-    // Draw legend rows with mouseover
-    const itemHeight = 22
-    const itemWidth = out.itemHeight || 18
     legendItems.forEach((item, i) => {
+        const rowY = titleOffset + i * (shapeHeight + rowGap)
+
         const row = out._flowColorContainer
             .append('g')
-            .attr('class', 'em-color-legend-item')
-            .attr('transform', `translate(0, ${i * 22 + titleOffset})`)
+            .attr('class', 'em-color-legend-item em-legend-item')
+            .attr('transform', `translate(0, ${rowY})`)
             .style('cursor', 'pointer')
             .on('mouseover', function () {
-                highlightLines(item.key);
+                highlightLines(item.key)
 
                 // bold text + stroke rect
-                select(this).select('text').style('font-weight', 'bold');
-                select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2);
+                select(this).select('text').style('font-weight', 'bold')
+                select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2)
             })
             .on('mouseout', function () {
-                unhighlightLines();
+                unhighlightLines()
 
                 // reset text + rect
-                select(this).select('text').style('font-weight', 'normal');
-                select(this).select('rect').attr('stroke', 'none');
-            });
+                select(this).select('text').style('font-weight', 'normal')
+                select(this).select('rect').attr('stroke', 'none')
+            })
 
-        row.append('rect').attr('width', 18).attr('height', itemHeight).attr('fill', item.color)
+        row.append('rect')
+            .attr('class', 'em-legend-rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('width', shapeWidth)
+            .attr('height', shapeHeight)
+            .attr('fill', item.color)
 
-        row.append('text').attr('x', 25).attr('y', 14).attr('class', 'em-legend-label').text(item.label)
+        row.append('text')
+            .attr('x', shapeWidth + labelOffsetX)
+            .attr('y', shapeHeight * 0.5)
+            .attr('dy', '0.35em')
+            .attr('class', 'em-legend-label')
+            .text(item.label)
     })
 }
 
-
 function highlightLines(nodeId) {
-    if (!nodeId) return;
+    if (!nodeId) return
 
     selectAll('.em-flow-link, .em-flow-link-bundled')
         .classed('highlighted', function () {
-            //const o = this.getAttribute('data-origin'); 
-            const d = this.getAttribute('data-dest');
-            return  d === nodeId; // destination only here
+            //const o = this.getAttribute('data-origin')
+            const d = this.getAttribute('data-dest')
+            return d === nodeId // destination only here
         })
         .classed('dimmed', function () {
-            //const o = this.getAttribute('data-origin');
-            const d = this.getAttribute('data-dest');
-            return !( d === nodeId);
-        });
+            //const o = this.getAttribute('data-origin')
+            const d = this.getAttribute('data-dest')
+            return !(d === nodeId)
+        })
 }
 
 function unhighlightLines() {
-    selectAll('.em-flow-link, .em-flow-link-bundled')
-        .classed('highlighted', false)
-        .classed('dimmed', false);
+    selectAll('.em-flow-link, .em-flow-link-bundled').classed('highlighted', false).classed('dimmed', false)
 }

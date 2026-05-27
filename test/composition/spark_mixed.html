@@ -17,7 +17,7 @@
                 .height(760)
                 .title('Regional unemployment trend (mixed NUTS)')
                 .subtitle("Regression test: nutsLevel('mixed') for sparklines")
-                .nutsLevel('mixed')
+                .nutsLevel(2)
                 .statSpark({
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { isced11: 'TOTAL', sex: 'T', age: 'Y15-74', unit: 'PC' },
@@ -47,6 +47,16 @@
                     x: 10,
                     y: 90,
                     noData: true,
+                    colorLegend: {
+                        show: true,
+                        title: 'Line color bands',
+                        items: [
+                            { color: '#b91c1c', label: '>= 12%' },
+                            { color: '#c2410c', label: '8% to < 12%' },
+                            { color: '#0369a1', label: '5% to < 8%' },
+                            { color: '#0f766e', label: '< 5%' },
+                        ],
+                    },
                     scaleLegend: {
                         xAxisRotation: -60,
                         xAxisTickStep: 1,
