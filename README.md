@@ -5,7 +5,7 @@
   <a href="http://www.awesomeofficialstatistics.org"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Official Statistics"></a>
 </div>
 
-# eurostat-map: JavaScript & TypeScript Mapping Library for Eurostat Data
+# eurostat-map: Mapping Library for Eurostat Data
 
 <br>
 <div align="center">
