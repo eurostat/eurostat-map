@@ -369,7 +369,9 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                 }
 
                 let nl = out.nutsLevel_
-                if (nl === 'mixed') nl = 0
+                // Keep mixed level for sparkline maps so remote data includes all NUTS levels.
+                // Other map types keep historical behavior (country-level fallback).
+                if (nl === 'mixed' && out._mapType !== 'spark') nl = 0
 
                 statData.retrieveFromRemote(nl, out.language(), () => {
                     // bookkeeping MUST always run

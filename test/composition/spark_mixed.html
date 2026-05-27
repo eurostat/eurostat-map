@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script>
+            // Mixed-level sparkline regression test:
+            // nutsLevel('mixed') must fetch and render non-country NUTS data too.
+            eurostatmap
+                .map('sparkline')
+                .width(900)
+                .height(760)
+                .title('Regional population density trend (mixed NUTS)')
+                .subtitle("Regression test: nutsLevel('mixed') for sparklines")
+                .nutsLevel('mixed')
+                .statSpark({
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    filters: {},
+                    dates: ['2019', '2020', '2021', '2022', '2023'],
+                    labels: ['2019', '2020', '2021', '2022', '2023'],
+                })
+                .sparkType('line')
+                .sparkLineWidth(24)
+                .sparkLineHeight(16)
+                .sparkLineStrokeWidth(1.2)
+                .sparkLineOpacity(0.85)
+                .sparkLineColor((itemValue) => {
+                    if (itemValue > 200) return '#0f766e'
+                    if (itemValue > 100) return '#0369a1'
+                    return '#7c3aed'
+                })
+                .sparkTooltipChart({
+                    width: 220,
+                    height: 120,
+                    margin: { left: 35, right: 10, top: 8, bottom: 45 },
+                    circleRadius: 1.5,
+                })
+                .legend({
+                    title: 'Population density',
+                    x: 10,
+                    y: 90,
+                    noData: true,
+                    scaleLegend: {
+                        xAxisRotation: -60,
+                        xAxisTickStep: 1,
+                        showMaxRegion: true,
+                        showExampleChart: true,
+                    },
+                })
+                .showSourceLink(true)
+                .build()
+        </script>
+    </body>
+</html>

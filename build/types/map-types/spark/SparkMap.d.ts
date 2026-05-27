@@ -1,5 +1,5 @@
-import type { MapInstance } from '../../../core/MapInstance'
-import type { SparkStatConfig } from '../CompositionStatConfig'
+import type { MapInstance } from '../../core/MapInstance'
+import type { SparkStatConfig } from './SparkStatConfig'
 
 /**
  * Spark map type.

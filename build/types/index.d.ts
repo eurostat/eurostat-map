@@ -19,7 +19,7 @@ import type { TrivariateChoroplethConfig } from './map-types/choropleth/Trivaria
 import type { TrivariateChoroplethMap } from './map-types/choropleth/TrivariateChoroplethMap'
 
 // Categorical map types
-import type { CategoricalMapConfig } from './map-types/CateogricalMapConfig'
+import type { CategoricalMapConfig } from './map-types/CategoricalMapConfig'
 import type { CategoricalMap } from './map-types/CategoricalMap'
 
 // Proportional symbol map types
@@ -54,6 +54,7 @@ import type { FlowMap } from './map-types/flow/FlowMap'
 // ==================== Core Type Exports ====================
 
 export type { MapConfig, MapType, MapInstance }
+export type EurostatMap = MapInstance
 export type { TooltipConfig } from './core/TooltipConfig'
 export type { LegendConfig } from './legend/LegendConfig'
 export type { StatConfig } from './core/stat/StatConfig'

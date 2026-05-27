@@ -235,7 +235,12 @@ export const statData = function (config) {
         //out.filters_["precision"] = out.precision_;
         //select only required geo groups, depending on the specified nuts level
         if (!out.filters_.geo) {
-            out.filters_['geoLevel'] = nutsLevel + '' === '0' ? 'country' : 'nuts' + nutsLevel
+            if (nutsLevel === 'mixed') {
+                // Mixed-level maps need all available NUTS levels from the dataset.
+                delete out.filters_.geoLevel
+            } else {
+                out.filters_['geoLevel'] = nutsLevel + '' === '0' ? 'country' : 'nuts' + nutsLevel
+            }
         }
 
         //force filtering of euro-geo-aggregates
