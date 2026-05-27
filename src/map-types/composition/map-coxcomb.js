@@ -818,26 +818,40 @@ export const map = function (config) {
         const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
         const symbols = map.svg().selectAll('g.em-centroid')
 
+        // Cache to avoid repeated function calls on mousemove
+        let cachedRegion = null
+        let cachedSelection = null
+
         symbols
             .on('mouseover', function (e, rg) {
                 if (shouldOmit(rg.properties.id) || !getRegionTotal(rg.properties.id)) return
-                const sel = select(this)
-                sel.attr('fill___', sel.style('fill'))
-                sel.style('fill', out.hoverColor_)
-                highlightCoxcombChart(sel, true)
+
+                // Cache for mousemove performance
+                cachedRegion = rg
+                cachedSelection = select(this)
+
+                cachedSelection.attr('fill___', cachedSelection.style('fill'))
+                cachedSelection.style('fill', out.hoverColor_)
+                highlightCoxcombChart(cachedSelection, true)
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e, rg) {
-                if (shouldOmit(rg.properties.id) || !getRegionTotal(rg.properties.id)) return
-                if (out._tooltip) out._tooltip.mousemove(e) // ← was incorrectly calling .mouseover
+                // Use cached data to avoid expensive checks on every mousemove
+                if (!cachedRegion) return
+                if (out._tooltip) out._tooltip.mousemove(e)
             })
             .on('mouseout', function (e, rg) {
-                if (shouldOmit(rg.properties.id) || !getRegionTotal(rg.properties.id)) return
-                const sel = select(this)
-                sel.style('fill', sel.attr('fill___') || '')
-                sel.attr('fill___', null)
-                highlightCoxcombChart(sel, false)
+                // Use cached data for consistent behavior
+                if (!cachedRegion || !cachedSelection) return
+
+                cachedSelection.style('fill', cachedSelection.attr('fill___') || '')
+                cachedSelection.attr('fill___', null)
+                highlightCoxcombChart(cachedSelection, false)
                 if (out._tooltip) out._tooltip.mouseout()
+
+                // Clear cache
+                cachedRegion = null
+                cachedSelection = null
             })
     }
 
@@ -847,32 +861,42 @@ export const map = function (config) {
 
         const getRegionData = (el) => select(el.closest('.em-grid-cell')).datum()
 
+        // Cache to avoid repeated DOM lookups on mousemove
+        let cachedRegion = null
+        let cachedCell = null
+
         const handleMouseOver = function (e) {
             const rg = getRegionData(this)
             if (!rg || !getRegionTotal(rg.properties.id)) return
 
-            const cell = select(this.closest('.em-grid-cell'))
-            const shape = cell.select('.em-grid-shape')
+            // Cache for mousemove performance
+            cachedRegion = rg
+            cachedCell = select(this.closest('.em-grid-cell'))
+
+            const shape = cachedCell.select('.em-grid-shape')
             shape.attr('fill___', shape.style('fill')).style('fill', out.hoverColor_)
-            highlightCoxcombChart(cell, true)
+            highlightCoxcombChart(cachedCell, true)
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
         }
 
         const handleMouseMove = function (e) {
-            const rg = getRegionData(this)
-            if (!rg || !getRegionTotal(rg.properties.id)) return
+            // Use cached data to avoid expensive DOM lookups on every mousemove
+            if (!cachedRegion) return
             if (out._tooltip) out._tooltip.mousemove(e)
         }
 
         const handleMouseOut = function (e) {
-            const rg = getRegionData(this)
-            if (!rg || !getRegionTotal(rg.properties.id)) return
+            // Use cached data for consistent behavior
+            if (!cachedRegion || !cachedCell) return
 
-            const cell = select(this.closest('.em-grid-cell'))
-            const shape = cell.select('.em-grid-shape')
+            const shape = cachedCell.select('.em-grid-shape')
             shape.style('fill', shape.attr('fill___') || '').attr('fill___', null)
-            highlightCoxcombChart(cell, false)
+            highlightCoxcombChart(cachedCell, false)
             if (out._tooltip) out._tooltip.mouseout()
+
+            // Clear cache
+            cachedRegion = null
+            cachedCell = null
         }
 
         shapes.on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
