@@ -1,5 +1,5 @@
 import type { MapInstance } from '../../../core/MapInstance'
-import type { CoxcombStatConfig } from './CompositionStatConfig'
+import type { CoxcombStatConfig } from './CoxcombStatConfig'
 
 /**
  * Coxcomb map type.
