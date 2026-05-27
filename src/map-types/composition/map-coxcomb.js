@@ -636,6 +636,7 @@ export const map = function (config) {
                 .filter((rg) => getRegionTotal(rg.properties.id) !== undefined)
 
             applyStyleToRegionPolygons(map)
+            addMouseEventsToRegionPolygons(map)
             addMouseEventsToRegions(map)
             addCoxcombChartsToMap(regionFeatures, map)
         }
@@ -808,6 +809,36 @@ export const map = function (config) {
     }
 
     // ── Mouse events ─────────────────────────────────────────────────────────
+
+    /**
+     * Add tooltip mouse events to region polygons (like pie charts do).
+     * This allows users to hover over the region fill, not just the coxcomb chart.
+     */
+    function addMouseEventsToRegionPolygons(map) {
+        const selector = getRegionsSelector(map)
+        const regions = map.svg().selectAll(selector)
+
+        regions
+            .on('mouseover', function (e, rg) {
+                if (!getRegionTotal(rg.properties.id)) return
+                const sel = select(this)
+                sel.attr('fill___', sel.style('fill'))
+                sel.style('fill', out.hoverColor_)
+                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            })
+            .on('mousemove', function (e) {
+                if (out._tooltip) out._tooltip.mousemove(e)
+            })
+            .on('mouseout', function () {
+                const sel = select(this)
+                const newFill = sel.attr('fill___')
+                if (newFill) {
+                    sel.style('fill', newFill)
+                    sel.attr('fill___', null)
+                    if (out._tooltip) out._tooltip.mouseout()
+                }
+            })
+    }
 
     /**
      * Coxcomb mouse events are attached to the centroid symbol groups (not region
