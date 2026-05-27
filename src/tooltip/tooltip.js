@@ -20,6 +20,7 @@ export const tooltip = function (config) {
     let rafId = null // requestAnimationFrame ID for throttling
     let lastX = 0
     let lastY = 0
+    let currentHtml = '' // Cache current HTML to avoid unnecessary DOM updates
 
     function my() {
         tooltip = select('#' + config.id)
@@ -30,7 +31,11 @@ export const tooltip = function (config) {
     }
 
     my.mouseover = function (html) {
-        tooltip.html(html)
+        // Only update HTML if it actually changed - avoids expensive DOM operations
+        if (html !== currentHtml) {
+            tooltip.html(html)
+            currentHtml = html
+        }
         if (html) {
             let x = event.pageX
             let y = event.pageY
@@ -68,6 +73,8 @@ export const tooltip = function (config) {
             cancelAnimationFrame(rafId)
             rafId = null
         }
+        // Clear HTML cache for next hover
+        currentHtml = ''
         // Fade out
         tooltip.interrupt().transition().duration(config.transitionDuration).style('opacity', 0)
     }
