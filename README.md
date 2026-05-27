@@ -20,7 +20,7 @@
 </div>
 
 <div align="center">
-  <a href="docs/reference.md"><strong>API docs</strong></a> ·
+  <a href="docs/reference.md"><strong>Documentation</strong></a> ·
   <a href="https://eurostat.github.io/eurostat-map/examples/index.html"><strong>Live examples</strong></a> ·
   <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js"><strong>Quickstart notebook</strong></a>
 </div>
