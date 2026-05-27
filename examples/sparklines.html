@@ -7,12 +7,10 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/eurostat-map"></script>
         <script>
             eurostatmap
                 .map('sparkline')
-                .width(900)
-                .height(760)
                 .title('Regional unemployment trend (mixed NUTS)')
                 .subtitle("Regression test: nutsLevel('mixed') for sparklines")
                 .nutsLevel(2)

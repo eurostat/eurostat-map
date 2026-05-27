@@ -40,10 +40,8 @@
       <td><a href="https://eurostat.github.io/eurostat-map/examples/population-density.html" target="_blank"><img src="examples/img/previews/population-density.png" alt="Population density example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-circles.html" target="_blank"><img src="examples/img/previews/prop-circles.png" alt="Proportional circles example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/flowmap.html" target="_blank"><img src="examples/img/previews/flowmap.png" alt="Flow map example"  /></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/prop-piecharts.html" target="_blank"><img src="examples/img/previews/prop-piecharts.png" alt="Pie chart map example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/mushroom.html" target="_blank"><img src="examples/img/previews/mushroom.png" alt="Mushroom map example"  /></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/sparklines.html" target="_blank"><img src="examples/img/previews/sparklines.png" alt="Sparklines map example"  /></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/categorical.html" target="_blank"><img src="examples/img/previews/categorical.png" alt="Categorical map example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/sparklines-grid-cartogram.html" target="_blank"><img src="examples/img/previews/sparklines-grid-cartogram.png" alt="Sparklines map example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/pop-unemploy-bivariate.html" target="_blank"><img src="examples/img/previews/pop-unemploy-bivariate.png" alt="Bivariate map example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/trivariate.html" target="_blank"><img src="examples/img/previews/trivariate.png" alt="Trivariate map example"  /></a></td>
     </tr>
@@ -102,9 +100,9 @@ https://observablehq.com/@joewdavies/eurostat-map-js
 
 ## Documentation
 
-For detailed documentation see the **[Documentation page](docs/reference.md)**.
+For detailed documentation on what eurostat-map can do, see the **[documentation page](docs/reference.md)**.
 
-For generated, signature-accurate API docs from TypeScript/JSDoc, see [https://eurostat.github.io/eurostat-map/docs/api/index.html](https://eurostat.github.io/eurostat-map/docs/api/index.html).
+For generated, signature-accurate API docs from TypeScript/JSDoc, see [the API docs](https://eurostat.github.io/eurostat-map/docs/api/index.html).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
 
