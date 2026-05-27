@@ -9,8 +9,6 @@ import { createAlphaLegend } from './legend-value-by-alpha'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
-
-
 /**
  * A legend for choropleth maps
  *
@@ -152,7 +150,7 @@ export function getChoroplethLabelFormatter(out) {
     const decimals = resolveDecimals(out, stat)
     out._resolvedDecimals = decimals
 
-    return buildDiscreteLabelFormatter(out, () => getThresholds(out), stat, out.labelType, out.labelFormatter)
+    return buildDiscreteLabelFormatter(out, () => getThresholds(out), stat, out.labelType, userFormatter)
 }
 
 /**
