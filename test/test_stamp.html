@@ -25,15 +25,16 @@
                     y: 120,
                 })
                 .zoomButtons(true)
-                .zoomButtonsPosition([20, 120])
+                .zoomButtonsPosition([750, 10])
+                .legend({ x: 20, y: 150, title: 'Population density' })
                 .build()
 
             setTimeout(() => {
                 map.stamp({
                     text: 'EU~=~21.4',
-                    padding: 10,
+                    padding: 5,
                     x: 7, // left edge of stamp
-                    y: 380,
+                    y: 440,
                     fontSize: 12, // fixed font size — shape grows to fit
                     textAnchor: 'start', // grows rightward from x
                     shape: 'eu-stars',

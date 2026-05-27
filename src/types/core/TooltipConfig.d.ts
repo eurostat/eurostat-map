@@ -1,3 +1,5 @@
+import type { MapInstance as EurostatMap } from './MapInstance'
+
 /**
  * Configuration for tooltips
  */

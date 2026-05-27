@@ -162,8 +162,6 @@ function createThresholdsLegend(out, config) {
         }
     }
 
-    console.log(typeof globalMin, globalMin, labelFormatter(globalMin))
-
     for (let i = 0; i < numberOfClasses; i++) {
         const y = i * config.shapeHeight + titlePadding
         const x = 0
@@ -434,7 +432,7 @@ function drawDivergingLine(out, y, config) {
         })
         .nodes()
         .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
-    const lineLength = out.divergingLineLength || out.shapeWidth + out.labelOffsets?.x + maxLabelLength + out.labelOffsets?.x + 15 // rect > offset > label > offset > padding > vertical line
+    const lineLength = config.divergingLineLength || config.shapeWidth + config.labelOffsets?.x + maxLabelLength + config.labelOffsets?.x + 15 // rect > offset > label > offset > padding > vertical line
 
     // Draw the horizontal divergence line
     container
@@ -445,10 +443,20 @@ function drawDivergingLine(out, y, config) {
         .attr('y2', y)
         .attr('class', 'em-legend-diverging-line')
 
-    const labels = out.pointOfDivergenceLabel.split('|')
+    // Small vertical tick at the end of the line, matching other threshold ticks
+    const tickLen = config.tickLength || 5
+    container
+        .append('line')
+        .attr('class', 'em-legend-tick')
+        .attr('x1', x + lineLength)
+        .attr('y1', y - tickLen / 2)
+        .attr('x2', x + lineLength)
+        .attr('y2', y + tickLen / 2)
+
+    const labels = config.pointOfDivergenceLabel.split('|')
     if (labels.length > 1) {
         // divergence line with up and down arrows
-        const directionLineLength = out.divergingArrowLength || 30
+        const directionLineLength = config.divergingArrowLength || 30
         const directionLineX = x + lineLength
         // Add arrowhead marker definition
         const defs = container.append('defs')
@@ -507,18 +515,21 @@ function drawDivergingLine(out, y, config) {
             .attr('x', x + lineLength + 5)
             .attr('y', y)
             .attr('dy', '0.3em')
-            .text(out.pointOfDivergenceLabel)
+            .text(config.pointOfDivergenceLabel)
     }
 
-    //move threshold label out of the way of the line
-    if (out.labelType == 'thresholds' || out.colorLegend?.labelType == 'thresholds') {
-        if (labels.length > 1) {
-            // move it to end of line
-            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').attr('x', x + lineLength + 10)
-        } else {
-            // remove it so it doesnt clash with pointOfDivergenceLabel
-            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
-        }
+    // Move the threshold value label at the divergence point so it never overlaps the line
+    if (labels.length > 1) {
+        // Move it to the right of the line end and reparent into container
+        out._discreteLegendContainer
+            .selectAll('.em-legend-label-divergence')
+            .each(function () {
+                container.node().appendChild(this)
+            })
+            .attr('x', x + lineLength + 10)
+    } else {
+        // Single pointOfDivergenceLabel — remove the threshold value label to avoid clashing
+        out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
     }
 }
 

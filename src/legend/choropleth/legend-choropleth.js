@@ -150,7 +150,7 @@ export function getChoroplethLabelFormatter(out) {
     const decimals = resolveDecimals(out, stat)
     out._resolvedDecimals = decimals
 
-    return buildDiscreteLabelFormatter(out, () => getThresholds(out), stat, out.labelType, userFormatter)
+    return buildDiscreteLabelFormatter(out, () => getThresholds(out), stat, out.labelType, out.labelFormatter)
 }
 
 /**

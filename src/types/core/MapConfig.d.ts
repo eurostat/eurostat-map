@@ -1,3 +1,9 @@
+import type { StatConfig } from './stat/StatConfig'
+import type { LegendConfig } from '../legend/LegendConfig'
+import type { TooltipConfig } from './TooltipConfig'
+import type { InsetConfig } from './InsetConfig'
+import type { MapInstance as EurostatMap } from './MapInstance'
+
 /**
  * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
  */

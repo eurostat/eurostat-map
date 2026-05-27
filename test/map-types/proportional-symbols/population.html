@@ -4,6 +4,11 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>eurostat-map.js</title>
+        <style>
+            .em--ps .em-nutsrg {
+                fill: rgb(255, 255, 255) !important;
+            }
+        </style>
     </head>
 
     <body>
@@ -169,9 +174,8 @@
                 .psStrokeWidth('0.1')
                 .psStrokeOpacity(0.5)
                 .legend({
-                    x: 580,
-                    pointOfDivergence: 3,
-                    pointOfDivergenceLabel: 'Increase|Decrease',
+                    x: 20,
+                    y: 150,
                     sizeLegend: {
                         title: 'Total population',
                         titlePadding: 20,
@@ -181,14 +185,15 @@
                         //labelFormatter: (label) => label + '‰',
                         tickLength: 3,
                         marginTop: 50,
-                        labelType: 'ranges',
+                        labelType: 'threshold',
                         pointOfDivergence: 3,
                         pointOfDivergenceLabel: 'Increase|Decrease',
                     },
                 })
                 .insets(insets)
-                .insetBoxPosition([500, 40])
+                .insetBoxPosition([650, 40])
                 .insetsButton(true)
+                .insetsButtonPosition([750, 10])
                 .zoomButtons(true)
                 .zoomExtent([1, 10])
                 .build()

@@ -39,7 +39,7 @@
         "build-prod-debug": "webpack --config webpack/webpack.config.debug-size.js",
         "format": "prettier --write .",
         "copy-types": "copyfiles -u 2 \"src/types/**/*.d.ts\" build/types",
-        "type-check": "tsc --noEmit"
+        "type-check": "tsc --noEmit && tsc --noEmit test/typescript-test.ts"
     },
     "dependencies": {
         "d3-array": "^3.2.4",

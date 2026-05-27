@@ -3,12 +3,13 @@
  * This file tests that all TypeScript definitions work correctly
  */
 
-import * as eurostatmap from '../src/eurostat-map'
-import type { MapConfig, ChoroplethConfig, ProportionalSymbolConfig, CategoricalConfig } from '../src/types'
+import * as eurostatmap from '../src/index'
+import type { MapConfig, ChoroplethConfig, ProportionalSymbolConfig, CategoricalMapConfig } from '../src/types'
 
 // Test 1: Basic choropleth map
 const choroplethConfig: ChoroplethConfig = {
     svgId: 'map1',
+
     title: 'Population Density Test',
     width: 800,
     height: 600,
@@ -49,7 +50,7 @@ const map2 = eurostatmap.map('ps', psConfig)
 map2.symbol('square').size(60).build()
 
 // Test 3: Categorical map
-const catConfig: CategoricalConfig = {
+const catConfig: CategoricalMapConfig = {
     svgId: 'map3',
     title: 'Urban Rural Typology',
     stat: {

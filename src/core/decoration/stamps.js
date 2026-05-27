@@ -86,7 +86,6 @@ export const appendStamp = (stampConfig, map) => {
                 const textElement = container
                     .append('text')
                     .attr('text-anchor', 'middle') // always centre within its own translated group
-                    .attr('dominant-baseline', 'central')
                     .attr('fill', stampConfig.textColor)
                     .attr('id', 'em-stamp-text')
                     .attr('transform', `translate(${textTranslateX},${stampConfig.y}) scale(${scale})`)
@@ -97,7 +96,7 @@ export const appendStamp = (stampConfig, map) => {
                     .enter()
                     .append('tspan')
                     .attr('x', 0)
-                    .attr('y', (d, i) => (i - lines.length / 2 + 0.5) * stampConfig.lineHeight)
+                    .attr('y', (d, i) => (i - lines.length / 2 + 0.8) * stampConfig.lineHeight)
                     .text((d) => d.text.replaceAll('~', ' ').replaceAll('¶', ''))
             } else {
                 // ── Circle / Square / EU-stars ────────────────────────────────
