@@ -7,7 +7,8 @@ export const buildGridCartogramBase = function (out) {
     const gridGroup = zoomGroup.append('g').attr('id', 'em-grid-container')
 
     // Ensure margins exist with default values
-    out.gridCartogramMargins_ = out.gridCartogramMargins_ || { top: 80, right: 80, bottom: 80, left: 80 }
+    out.gridCartogramSettings_ = out.gridCartogramSettings_ || {}
+    out.gridCartogramSettings_.margins = out.gridCartogramSettings_.margins || { top: 80, right: 80, bottom: 80, left: 80 }
 
     // Get grid layout
     const gridLayout = getGridLayout(out)
@@ -15,14 +16,14 @@ export const buildGridCartogramBase = function (out) {
     const gridData = getGridData(position, out)
 
     // Draw the appropriate grid
-    if (out.gridCartogramShape_ === 'hexagon') {
+    if (out.gridCartogramSettings_.shape === 'hexagon') {
         drawHexagonGrid(gridGroup, gridData, out)
     } else {
         drawSquareGrid(gridGroup, gridData, out)
     }
 
     // Center the grid
-    centerGrid(gridGroup, out.width_, out.height_, out.gridCartogramMargins_)
+    centerGrid(gridGroup, out.width_, out.height_, out.gridCartogramSettings_.margins)
 }
 
 /** Determines the grid layout based on settings */
@@ -53,7 +54,7 @@ const getGridLayout = (out) => {
         ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,  
         ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `
 
-    return out.gridCartogramPositions_ || (out.gridCartogramShape_ === 'hexagon' ? hexagonGrid : squareGrid)
+    return out.gridCartogramSettings_.positions || (out.gridCartogramSettings_.shape === 'hexagon' ? hexagonGrid : squareGrid)
 }
 
 /** Parses the grid layout and maps each ID to its position */
@@ -90,8 +91,8 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
     const numCols = Math.max(...gridData.map((d) => d.col)) + 1
     const numRows = Math.max(...gridData.map((d) => d.row)) + 1
 
-    const margins = out.gridCartogramMargins_
-    const cellPadding = out.gridCartogramCellPadding_ || 0 // Keep cell padding
+    const margins = out.gridCartogramSettings_.margins
+    const cellPadding = out.gridCartogramSettings_.cellPadding || 0 // Keep cell padding
 
     const cellWidth = (out.width_ - margins.left - margins.right) / numCols - cellPadding
     const cellHeight = (out.height_ - margins.top - margins.bottom) / numRows - cellPadding
@@ -132,8 +133,8 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
     const numCols = Math.max(...gridData.map((d) => d.col)) + 1
     const numRows = Math.max(...gridData.map((d) => d.row)) + 1
 
-    const margins = out.gridCartogramMargins_
-    const cellPadding = out.gridCartogramCellPadding_ || 0 // Keep cell padding
+    const margins = out.gridCartogramSettings_.margins
+    const cellPadding = out.gridCartogramSettings_.cellPadding || 0 // Keep cell padding
 
     const baseHexRadius = Math.min(
         (out.width_ - margins.left - margins.right) / (numCols * 1.5),
@@ -228,7 +229,7 @@ const centerGrid = (gridGroup, svgWidth, svgHeight, margins) => {
 }
 
 export function adjustGridCartogramTextLabels({ map, getAnchors, getRadius, margin = 2 }) {
-    const isHexagon = map.gridCartogramShape_ === 'hexagon'
+    const isHexagon = map.gridCartogramSettings_.shape === 'hexagon'
     const anchors = getAnchors(map)
 
     anchors.each(function (d) {

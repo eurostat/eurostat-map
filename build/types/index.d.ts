@@ -59,6 +59,8 @@ export type { TooltipConfig } from './core/TooltipConfig'
 export type { LegendConfig } from './legend/LegendConfig'
 export type { StatConfig } from './core/stat/StatConfig'
 export type { InsetConfig } from './core/InsetConfig'
+export type { CoastalMarginSettings } from './core/decoration/CoastalMarginSettings'
+export type { GridCartogramSettings, GridCartogramMargins } from './core/GridCartogramSettings'
 
 // ==================== Legend Configuration Type Exports ====================
 
@@ -197,11 +199,6 @@ export function map(type: MapType, config?: MapConfig): MapInstance
  * @returns Function that creates pattern definitions
  */
 export function getFillPatternDefinitionFunction(opts?: FillPatternOptions): (svg: any, numberOfClasses: number) => void
-
-/**
- * @deprecated Use getFillPatternDefinitionFunction instead
- */
-export function getFillPatternDefinitionFun(opts?: FillPatternOptions): (svg: any, numberOfClasses: number) => void
 
 /**
  * Get default labels for the map

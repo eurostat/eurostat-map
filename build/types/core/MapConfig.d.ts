@@ -3,6 +3,8 @@ import type { LegendConfig } from '../legend/LegendConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
 import type { MapInstance as EurostatMap } from './MapInstance'
+import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
+import type { GridCartogramSettings } from './GridCartogramSettings'
 
 /**
  * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
@@ -67,8 +69,13 @@ export interface MapConfig {
     /** Zoom and pan settings. */
     zoomExtent?: [number, number]
 
-    /** Coastal margin. */
-    coastal?: boolean
+    /** Grid cartogram layout settings. */
+    gridCartogramSettings?: Partial<GridCartogramSettings>
+
+    /** Show or hide the coastal margin effect. */
+    drawCoastalMargin?: boolean
+    /** Coastal margin settings to override defaults. */
+    coastalMarginSettings?: Partial<CoastalMarginSettings>
 
     /** Graticule. */
     drawGraticule?: boolean
@@ -76,7 +83,7 @@ export interface MapConfig {
     /** Labels. */
     labelling?: boolean
 
-    /** Callbacks. */
+    /** Fires once the map is built. */
     onBuild?: (map: EurostatMap) => void
 
     /** Allow additional properties for extensibility. */

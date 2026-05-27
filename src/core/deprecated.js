@@ -113,6 +113,30 @@ export const defineDeprecatedFunctions = (out) => {
     out.pixelSize = (v) => (console.warn('map.pixelSize() is now DEPRECATED. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.pixSize = (v) => (console.warn('map.pixelSize() is now DEPRECATED. Please use the z property in map.position({x,y,z}) instead.'), out.position_.z = v, out);
     out.tooltipText = (v) => (console.warn('map.tooltipText() is now DEPRECATED. Please use map.tooltip(config.textFunction) instead. See API reference for details.'), out.tooltip_.textFunction = v, out);
+    out.gridCartogramShape = function (v) {
+        if (!arguments.length) return out.gridCartogramSettings().shape
+        console.warn('map.gridCartogramShape() is now DEPRECATED. Please use map.gridCartogramSettings({ shape }) instead.')
+        out.gridCartogramSettings({ shape: v })
+        return out
+    };
+    out.gridCartogramMargins = function (v) {
+        if (!arguments.length) return out.gridCartogramSettings().margins
+        console.warn('map.gridCartogramMargins() is now DEPRECATED. Please use map.gridCartogramSettings({ margins }) instead.')
+        out.gridCartogramSettings({ margins: v })
+        return out
+    };
+    out.gridCartogramCellPadding = function (v) {
+        if (!arguments.length) return out.gridCartogramSettings().cellPadding
+        console.warn('map.gridCartogramCellPadding() is now DEPRECATED. Please use map.gridCartogramSettings({ cellPadding }) instead.')
+        out.gridCartogramSettings({ cellPadding: v })
+        return out
+    };
+    out.gridCartogramPositions = function (v) {
+        if (!arguments.length) return out.gridCartogramSettings().positions
+        console.warn('map.gridCartogramPositions() is now DEPRECATED. Please use map.gridCartogramSettings({ positions }) instead.')
+        out.gridCartogramSettings({ positions: v })
+        return out
+    };
     out.classifMethod = (v) => (console.warn('map.classifMethod() is now DEPRECATED. please use map.classificationMethod() instead.'), out.classificationMethod_ = v,out);
     out.threshold = (v) => (console.warn('map.threshold() is now DEPRECATED. please use map.thresholds() instead.'), out.thresholds_ = v,out);
     out.psThreshold = (v) => (console.warn('map.psThreshold() is now DEPRECATED. please use map.psThresholds() instead.'), out.psThresholds_ = v,out);

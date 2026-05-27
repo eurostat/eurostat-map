@@ -775,7 +775,7 @@ export const map = function (config) {
         const causes = out._coxCategoryCodes
         const offsets = { ...(out.coxcombOffsets_ || { x: 0, y: 0 }) }
 
-        if (out.gridCartogramShape_ === 'hexagon') {
+        if (out.gridCartogramSettings_.shape === 'hexagon') {
             offsets.x -= (out.coxcombWidth_ || 0) - 4
             offsets.y -= (out.coxcombHeight_ || 0) + 4
         }

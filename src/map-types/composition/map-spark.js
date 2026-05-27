@@ -324,11 +324,11 @@ export const map = function (config) {
     function addSparkLinesToMap(ids) {
         const offsets = { ...(out.sparkLineOffsets_ || { x: 0, y: 0 }) }
 
-        if (out.gridCartogramShape_ === 'hexagon') {
+        if (out.gridCartogramSettings_.shape === 'hexagon') {
             offsets.x -= out.sparkLineWidth_ - 4
             offsets.y -= out.sparkLineHeight_ + 4
         }
-        if (out.gridCartogramShape_ === 'square') {
+        if (out.gridCartogramSettings_.shape === 'square') {
             offsets.y += 10
         }
 

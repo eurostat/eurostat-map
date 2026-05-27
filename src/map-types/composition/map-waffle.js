@@ -308,8 +308,8 @@ export const map = function (config) {
             node.selectAll('.em-waffle').remove()
 
             const bbox = node.node().getBBox()
-            const anchorX = out.gridCartogramShape_ == 'hexagon' ? 0 : bbox.width / 2
-            const anchorY = out.gridCartogramShape_ == 'hexagon' ? 0 : bbox.height / 2
+            const anchorX = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.width / 2
+            const anchorY = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.height / 2
 
             const total = _getRegionTotal(regionId)
             const waffleSize = out.classifierSize_(total)

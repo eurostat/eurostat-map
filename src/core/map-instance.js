@@ -62,10 +62,12 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
 
     //cartograms
     out.gridCartogram_ = false // draw geometries as grid cells
-    out.gridCartogramShape_ = 'square' // square or hexagon
-    out.gridCartogramMargins_ = { top: 80, right: 50, bottom: 80, left: 150 }
-    out.gridCartogramCellPadding_ = 4
-    out.gridCartogramPositions_ = undefined //user defined cartograms
+    out.gridCartogramSettings_ = {
+        shape: 'square', // square or hexagon
+        margins: { top: 80, right: 50, bottom: 80, left: 150 },
+        cellPadding: 4,
+        positions: undefined, // user defined cartograms
+    }
 
     // pan & zoom
     out.zoomExtent_ = undefined
@@ -267,6 +269,22 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             return out
         }
     })
+
+    // grid cartogram settings getter/setter
+    out.gridCartogramSettings = function (v) {
+        if (!arguments.length) return out.gridCartogramSettings_
+
+        if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
+            const next = Object.assign({}, out.gridCartogramSettings_, v)
+            if (v.margins && typeof v.margins === 'object') {
+                next.margins = Object.assign({}, out.gridCartogramSettings_.margins, v.margins)
+            }
+            out.gridCartogramSettings_ = next
+        } else {
+            out.gridCartogramSettings_ = v
+        }
+        return out
+    }
 
     //title getter and setter
     out.title = function (v) {

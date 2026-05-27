@@ -290,8 +290,8 @@ export const map = function (config) {
             node.selectAll('.em-pie').remove()
 
             const bbox = node.node().getBBox()
-            const anchorX = out.gridCartogramShape_ == 'hexagon' ? 0 : bbox.width / 2
-            const anchorY = out.gridCartogramShape_ == 'hexagon' ? 0 : bbox.height / 2
+            const anchorX = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.width / 2
+            const anchorY = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.height / 2
 
             const r = out.classifierSize_(_getRegionTotal(regionId))
             const { pie_, arcFn } = makePieArc(r)

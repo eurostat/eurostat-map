@@ -3,6 +3,8 @@ import type { StatData } from './stat/StatData'
 import type { LegendConfig } from '../legend/LegendConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
+import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
+import type { GridCartogramSettings } from './GridCartogramSettings'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -173,6 +175,10 @@ export interface MapInstance {
     zoomButtons(): boolean
     zoomButtons(show: boolean): this
 
+    /** Grid cartogram settings (shape, margins, cell padding, layout positions). */
+    gridCartogramSettings(): GridCartogramSettings
+    gridCartogramSettings(settings: Partial<GridCartogramSettings>): this
+
     /** Insets. */
 
     /**
@@ -195,8 +201,8 @@ export interface MapInstance {
     drawCoastalMargin(show: boolean): this
 
     /** Coastal margin appearance settings. */
-    coastalMarginSettings(): object
-    coastalMarginSettings(settings: object): this
+    coastalMarginSettings(): CoastalMarginSettings
+    coastalMarginSettings(settings: Partial<CoastalMarginSettings>): this
 
     /** Show/hide placename labels loaded from the placenames layer. */
     placenames(): boolean
