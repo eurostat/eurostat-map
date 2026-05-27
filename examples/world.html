@@ -16,7 +16,7 @@
         <script src="../build/eurostatmap.js"></script>
         <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
         <script>
-            let data = {
+            const data = {
                 JM: 70,
                 JO: 24,
                 JP: 35,
@@ -277,9 +277,10 @@
             }
             const map = eurostatmap
                 .map('choropleth')
+                .height(700)
+                .width(700)
                 .title('World map example')
                 .geo('WORLD')
-                .width(Math.min(window.innerHeight, window.innerWidth))
                 .nutsLevel('mixed')
                 .drawGraticule(true)
                 .seaFillStyle('#FFFFFF')
