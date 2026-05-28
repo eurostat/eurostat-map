@@ -1,8 +1,6 @@
 export function renderMap(code) {
     const isMobile = window.innerWidth <= 768
-
     const mapWidth = isMobile ? window.innerWidth : 700
-
     const mapHeight = isMobile
         ? Math.round(window.innerHeight - 160) // 100% of viewport height - header etc
         : 550
@@ -19,10 +17,10 @@ export function renderMap(code) {
             colors: ['#FFEB99', '#DCEAAA', '#B0E2B6', '#77D1BA', '#56C2C0', '#3BA9BF', '#1C69A4', '#133F88', '#17256B'],
             //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
             nbClasses: 9,
-            transform: (value) => value / 1000, // convert to thousand euro
+            //transform: (value) => value / 1000, // convert to thousand euro
         },
     }
-    let map = eurostatmap
+    const map = eurostatmap
         .map('ch')
         .width(mapWidth)
         .height(mapHeight)

@@ -30,33 +30,12 @@
                 ></ewc-singleselect>
             </div>
             <div id="map-container">
-                <svg id="map" viewBox="0 0 700 560"></svg>
+                <svg id="map" width="100%" height="100%" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
         </div>
 
         <script src="../../../eurostatmap.min.js"></script>
         <script type="module" src="./dropdown/dropdown.js"></script>
         <script type="module" src="./ps-map.js"></script>
-
-        <script type="module">
-            import { showSpinner, hideSpinner } from '../spinner.js'
-            // Keep original fetch
-            const originalFetch = window.fetch
-
-            // Override globally
-            let isLoading = false
-            window.fetch = async (...args) => {
-                isLoading = true
-                showSpinner()
-
-                try {
-                    const res = await originalFetch(...args)
-                    return res
-                } finally {
-                    isLoading = false
-                    hideSpinner()
-                }
-            }
-        </script>
     </body>
 </html>

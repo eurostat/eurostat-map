@@ -1,6 +1,9 @@
 export function renderMap(code) {
-    const mapHeight = 550
-    const mapWidth = 700
+    const isMobile = window.innerWidth <= 768
+    const mapWidth = isMobile ? window.innerWidth : 700
+    const mapHeight = isMobile
+        ? Math.round(window.innerHeight - 160) // 100% of viewport height - header etc
+        : 550
 
     const legendTitles = {
         LOC_NR: {
@@ -22,7 +25,7 @@ export function renderMap(code) {
         .height(mapHeight)
         .scale('60M')
         //.title('Manufacturing sector by region, 2023')
-        .position({ x: 4300000, y: 3420000, z: 7400 })
+        .position({ x: 4300000, y: 3420000, z: isMobile ? 9000 : 7400 })
         .nutsLevel(2)
 
         //symbol settings
