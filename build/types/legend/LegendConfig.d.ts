@@ -46,6 +46,4 @@ export interface LegendConfig {
     noData?: boolean
     /** Label used for no-data legend item. */
     noDataText?: string
-
-    [key: string]: any
 }
