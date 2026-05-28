@@ -8,14 +8,14 @@ export function renderMap(code) {
         },
         EMP_LOC_NR: {
             title: 'Number of persons',
-            subtitle: ''
+            subtitle: '',
         },
         WAGE_LOC_MEUR: {
             title: 'Million EUR',
-        }
+        },
     }
 
-    let map = eurostatmap
+    const map = eurostatmap
         .map('ps')
         .dorling(true)
         .width(mapWidth)
@@ -38,19 +38,20 @@ export function renderMap(code) {
         .zoomButtons(false)
         .showEstatLogo(true)
         .showEstatRibbon(true)
-        .logoPosition([2, mapHeight -30])
-        .ribbonPosition([mapWidth - 180, mapHeight -30])
+        .logoPosition([2, mapHeight - 30])
+        .ribbonPosition([mapWidth - 180, mapHeight - 30])
         .ribbonWidth(300)
         .ribbonHeight(50)
         .showSourceLink(false)
-        .footnote(' <tspan style="font-style: italic;">Source</tspan>: Eurostat <a href="https://ec.europa.eu/eurostat" target="_blank">(sbs_r_nuts2021)</a>')
+        .footnote(
+            ' <tspan style="font-style: italic;">Source</tspan>: Eurostat <a href="https://ec.europa.eu/eurostat" target="_blank">(sbs_r_nuts2021)</a>'
+        )
         .footnoteTooltipText(false)
 
         .showZoomButtons(true)
         .insets('default')
         .insetsButton(true)
         //end SE settings
-
 
         //STATS
         .stat('size', {
@@ -59,7 +60,7 @@ export function renderMap(code) {
             filters: {
                 INDIC_SBS: code,
                 TIME: '2023',
-                nace_r2: 'C',
+                nace_r2: 'F',
             },
         })
 
@@ -69,9 +70,8 @@ export function renderMap(code) {
             subtitle: legendTitles[code].subtitle,
             x: 10,
             y: 110,
-            boxOpacity: 0.9
+            boxOpacity: 0.9,
         })
-
 
     map.build()
 }
