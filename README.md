@@ -16,7 +16,7 @@
 </div>
 
 <div align="center">
-  D3-based mapping library for Eurostat and custom data, with built-in map types for analytical storytelling.
+  D3-based mapping library for Eurostat and custom data - the engine that powers [IMAGE](https://gisco-services.ec.europa.eu/image/).
 </div>
 
 <div align="center">
