@@ -135,6 +135,7 @@ function createThresholdsLegend(out, config) {
     const classifier = out.getColorClassifier(out)
     const classToFillStyle = out.getClassToFillStyle(out)
     const stat = out.getColorStats(out)
+    const sepLineLength = config.sepLineLength ?? config.shapeWidth
 
     // Label formatter
     const labelFormatter = out.getLabelFormatter(out)
@@ -194,7 +195,7 @@ function createThresholdsLegend(out, config) {
 
         // Append separation line
         if (i > 0) {
-            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', out.sepLineLength).attr('y2', y)
+            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', sepLineLength).attr('y2', y)
         }
 
         // Append tick line at each internal boundary
@@ -202,9 +203,9 @@ function createThresholdsLegend(out, config) {
             itemContainer
                 .append('line')
                 .attr('class', 'em-legend-tick')
-                .attr('x1', config.sepLineLength)
+                .attr('x1', sepLineLength)
                 .attr('y1', y)
-                .attr('x2', config.sepLineLength + config.tickLength)
+                .attr('x2', sepLineLength + config.tickLength)
                 .attr('y2', y)
         }
 
@@ -214,7 +215,7 @@ function createThresholdsLegend(out, config) {
             const label = itemContainer
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
+                .attr('x', Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
                 .attr('y', y + config.shapeHeight)
                 .attr('dy', '0.3em') // ~vertical centering
                 .text(() => {
@@ -251,10 +252,10 @@ function createThresholdsLegend(out, config) {
         }
 
         const tickX1 = 0
-        const tickX2 = config.maxMinTickLength ? config.sepLineLength + config.maxMinTickLength : config.sepLineLength + config.tickLength
+        const tickX2 = config.maxMinTickLength ? sepLineLength + config.maxMinTickLength : sepLineLength + config.tickLength
         const labelX = config.maxMinTickLength
-            ? Math.max(config.shapeWidth, config.sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0)
-            : Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
+            ? Math.max(config.shapeWidth, sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0)
+            : Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
 
         let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : '')
         let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
@@ -352,6 +353,7 @@ function createRangesLegend(out, config) {
     const classToFillStyle = out.getClassToFillStyle(out)
     const colorClassifier = out.getColorClassifier(out)
     const titlePadding = getTitlePadding(out)
+    const sepLineLength = config.sepLineLength ?? config.shapeWidth
 
     // for each class
     for (let i = 0; i < numberOfClasses; i++) {
@@ -389,20 +391,14 @@ function createRangesLegend(out, config) {
 
         // Append separation line
         if (i > 0) {
-            itemContainer
-                .append('line')
-                .attr('class', 'em-legend-separator')
-                .attr('x1', 0)
-                .attr('y1', y)
-                .attr('x2', config.sepLineLength)
-                .attr('y2', y)
+            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', sepLineLength).attr('y2', y)
         }
 
         // Append labels
         itemContainer
             .append('text')
             .attr('class', 'em-legend-label')
-            .attr('x', Math.max(config.shapeWidth, config.sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
+            .attr('x', Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
             .attr('y', y + config.shapeHeight / 2)
             .attr('dy', '0.3em')
             .text(config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i))

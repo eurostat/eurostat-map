@@ -135,6 +135,7 @@ export const map = function (config) {
     out.psThresholds = function (v) {
         if (!arguments.length) return out.psThresholds_
         out.psThresholds_ = v
+        out.psClassificationMethod_ = 'threshold'
         out.psClasses(v.length + 1)
         return out
     }

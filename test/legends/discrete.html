@@ -56,31 +56,36 @@
                 .svgId('ps-map')
                 .nutsLevel(2)
                 .scale('60M')
-                .title('Total GDP and GDP per inhabitant')
+                .title('Total population and popualtion change')
                 .subtitle('2022')
                 .width(800)
                 .stat('size', {
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Million EUR',
-                    filters: { unit: 'MIO_EUR', time: '2022' },
+                    eurostatDatasetCode: 'demo_r_pjanaggr3',
+                    unitText: 'people',
+                    filters: {
+                        TIME: '2021',
+                        SEX: 'T', // Total
+                        AGE: 'TOTAL', // All ages
+                    },
                 })
                 .stat('color', {
-                    eurostatDatasetCode: 'nama_10r_3gdp',
-                    unitText: 'Euro per inhabitant',
-                    filters: { unit: 'EUR_HAB', time: '2022' },
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT', time: 2022 },
+                    unitText: '‰',
                 })
                 .legend({
                     x: 590,
                     y: 20,
                     boxOpacity: 1,
-                    sizeLegend: { title: 'Million EUR', values: [800000, 10000] },
+                    sizeLegend: { title: 'Population', values: [10000000, 1000000] },
                     colorLegend: {
-                        title: 'EUR per inhabitant',
-                        labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
+                        title: 'Population change',
+                        //labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
                     },
                 })
-                .psThresholds([10000, 20000, 30000, 40000])
-                .psColors(['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'])
+                .psClassificationMethod('threshold')
+                .psThresholds([-10, -5, 0, 5, 10])
+                .psColors(['#d73027', '#fc8d59', '#fee08b', '#d9ef8b', '#91cf60', '#1a9850'])
                 .psShape('circle')
                 .psMaxSize(15)
                 .transitionDuration(900)

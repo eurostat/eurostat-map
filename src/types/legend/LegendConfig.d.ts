@@ -33,6 +33,8 @@ export interface LegendConfig {
     shapeHeight?: number
     /** Horizontal gap between shape and label. */
     shapePadding?: number
+    /** Length of separator lines in discrete legends. */
+    sepLineLength?: number
 
     /** Label styling. */
     /** Label font size in pixels. */

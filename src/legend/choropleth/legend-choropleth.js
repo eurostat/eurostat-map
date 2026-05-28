@@ -22,7 +22,7 @@ export const legend = function (map, config = {}) {
 
     out.labelType = 'thresholds' // thresholds || ranges
     //the separation line length
-    out.sepLineLength = out.shapeWidth
+    out.sepLineLength = out.sepLineLength ?? out.shapeWidth
     //tick line length in pixels
     out.tickLength = 4
     //the number of decimal for the legend labels

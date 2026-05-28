@@ -52,7 +52,7 @@ export const legend = function (map, config) {
         labels: null, // user-defined labels for each class
         noData: true, //show no data
         noDataText: 'No data', //no data text label
-        sepLineLength: out.shapeWidth, // //the separation line length
+        sepLineLength: out.sepLineLength, // //the separation line length
         sepLineStroke: 'black', //the separation line color
         sepLineStrokeWidth: 1, //the separation line width
         tickLength: 4, // threshold ticks length in px

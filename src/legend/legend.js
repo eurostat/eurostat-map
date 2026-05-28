@@ -6,8 +6,6 @@ import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymb
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 
-
-
 /**
  * A eurostat-map legend. This is an abstract method.
  */
@@ -45,6 +43,8 @@ export const legend = function (map) {
     out.shapeHeight = 20
     //the distance between consecutive legend shape elements
     out.shapePadding = 5
+    //the separator line length for discrete legend swatches
+    out.sepLineLength = out.shapeWidth
 
     // we now use CSS instead of inline styles
     out.labelFontSize = getFontSizeFromClass('em-legend-label')
