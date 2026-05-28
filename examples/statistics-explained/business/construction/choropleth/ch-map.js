@@ -8,8 +8,8 @@ export function renderMap(code) {
     const configs = {
         EMP_PLOC_NR: {
             legendTitle: 'Persons per unit',
-            colors: ['#FFEB99', '#D0E9B0', '#8AD6B9', '#56C2C0', '#3194B6', '#114891', '#17256B'],
-            //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
+            colors: ['#FFEB99', '#E0EAA8', '#BDE6B5', '#8AD6B9', '#62C8BD', '#4ABBC2', '#3194B6', '#155A9E', '#133C85', '#17256B'],
+            thresholds: [2, 3, 4, 5, 6, 7, 8, 9, 10],
             nbClasses: 7,
         },
         LC_EMP_LOC_TEUR: {
