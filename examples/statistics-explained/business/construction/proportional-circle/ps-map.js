@@ -70,6 +70,7 @@ export function renderMap(code) {
         //legend
         .legend({
             title: legendTitles[code].title,
+            titlePadding: -10,
             subtitle: legendTitles[code].subtitle,
             x: 10,
             y: 110,

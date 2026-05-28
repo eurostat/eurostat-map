@@ -14,10 +14,10 @@ export function renderMap(code) {
         },
         LC_EMP_LOC_TEUR: {
             legendTitle: 'Euro',
-            colors: ['#FFEB99', '#DCEAAA', '#B0E2B6', '#77D1BA', '#56C2C0', '#3BA9BF', '#1C69A4', '#133F88', '#17256B'],
-            //thresholds: [10, 20, 30, 40, 50, 60, 70, 80],
+            colors: ['#FFEB99', '#D7EAAC', '#A0DDB7', '#65CABC', '#47B9C3', '#257BAB', '#12438C', '#17256B'],
+            thresholds: [8000, 16000, 24000, 32000, 40000, 48000, 56000],
             nbClasses: 9,
-            //transform: (value) => value / 1000, // convert to thousand euro
+            transform: (value) => Number((value * 1000).toFixed(0)), // convert from thousand euro to euro
         },
     }
     const map = eurostatmap
@@ -71,6 +71,7 @@ export function renderMap(code) {
         })
         .legend({
             title: configs[code].legendTitle,
+            titlePadding: -10,
             x: 5,
             y: isMobile ? 10 : 100,
             boxPadding: 4,
