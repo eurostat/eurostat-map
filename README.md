@@ -111,6 +111,8 @@ Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/euro
 
 ## About
 
+eurostat-map is an open-source JavaScript library for building interactive, publication-ready statistical maps focused on Europe. It combines D3-based SVG rendering with direct support for Eurostat datasets (JSON-stat), NUTS geographies from Nuts2json, and custom data workflows, and includes map types such as choropleth, proportional symbols, cartograms, flow maps, and composition charts. The project is designed for analysts, journalists, and institutions that need reproducible, configurable map visualizations for both exploratory analysis and official communication.
+
 |                |                                                                                                                                                                                       |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _contributors_ | [<img src="https://github.com/jgaffuri.png" height="40" />](https://github.com/jgaffuri) [<img src="https://github.com/JoeWDavies.png" height="40" />](https://github.com/JoeWDavies) |
