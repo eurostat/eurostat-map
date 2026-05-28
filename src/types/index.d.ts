@@ -71,8 +71,10 @@ export type { MushroomLegendConfig } from './legend/MushroomLegendConfig'
 export type { PatternFillLegendConfig } from './legend/PatternFillLegendConfig'
 
 // Choropleth legend types
+export type { ChoroplethLegendConfig } from './legend/choropleth/ChoroplethLegendConfig'
 export type { BivariateLegendConfig } from './legend/choropleth/BivariateLegendConfig'
 export type { HistogramLegendConfig } from './legend/choropleth/HistogramLegendConfig'
+export type { TrivariateLegendConfig } from './legend/choropleth/TrivariateLegendConfig'
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'

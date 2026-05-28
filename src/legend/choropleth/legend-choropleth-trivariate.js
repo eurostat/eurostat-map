@@ -19,30 +19,6 @@ let resetTimer = null
 let resetGeneration = 0
 let isHighlighting = false
 
-function scheduleReset(map) {
-    const generation = ++resetGeneration
-    resetTimer = setTimeout(() => {
-        if (generation !== resetGeneration) return // a newer mouseover happened, abort
-        resetTimer = null
-        isHighlighting = false
-        activeLegendElement = null
-        activeLegendIndex = null
-        activeLegendColor = null
-        resetRegions(map)
-        if (map.insetTemplates_) {
-            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
-        }
-    }, 100)
-}
-
-function cancelReset() {
-    resetGeneration++ // invalidate any pending reset
-    if (resetTimer) {
-        clearTimeout(resetTimer)
-        resetTimer = null
-    }
-}
-
 export const legend = function (map, /** @type {TrivariateLegendConfig} */ config = {}) {
     const out = Legend.legend(map)
 
@@ -279,4 +255,28 @@ function normalizeColor(c) {
     const ctx = document.createElement('canvas').getContext('2d')
     ctx.fillStyle = c
     return ctx.fillStyle.toLowerCase()
+}
+
+function scheduleReset(map) {
+    const generation = ++resetGeneration
+    resetTimer = setTimeout(() => {
+        if (generation !== resetGeneration) return // a newer mouseover happened, abort
+        resetTimer = null
+        isHighlighting = false
+        activeLegendElement = null
+        activeLegendIndex = null
+        activeLegendColor = null
+        resetRegions(map)
+        if (map.insetTemplates_) {
+            executeForAllInsets(map.insetTemplates_, map.svgId, resetRegions)
+        }
+    }, 100)
+}
+
+function cancelReset() {
+    resetGeneration++ // invalidate any pending reset
+    if (resetTimer) {
+        clearTimeout(resetTimer)
+        resetTimer = null
+    }
 }

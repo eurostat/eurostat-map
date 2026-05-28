@@ -39,7 +39,8 @@
         "build-prod-debug": "webpack --config webpack/webpack.config.debug-size.js",
         "format": "prettier --write .",
         "copy-types": "copyfiles -u 2 \"src/types/**/*.d.ts\" build/types",
-        "type-check": "tsc --noEmit && tsc --noEmit test/typescript-test.ts",
+        "check:types:legend-config-sync": "node test/scripts/check-legend-config-sync.js",
+        "type-check": "npm run check:types:legend-config-sync && tsc --noEmit && tsc --noEmit test/typescript-test.ts",
         "docs:api": "typedoc --options typedoc.json",
         "docs": "npm run docs:api",
         "generate-previews": "node examples/scripts/generate-previews.js"

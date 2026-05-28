@@ -42,20 +42,20 @@ export const legend = function (map, config) {
         title: null,
         titlePadding: 10, //padding between title and legend body
         marginTop: 30, // margin top (distance between color and size legend)
-        shapeWidth: 25, //the width of the legend box elements
-        shapeHeight: 20, //the height of the legend box elements
+        shapeWidth: out.shapeWidth, //the width of the legend box elements
+        shapeHeight: out.shapeHeight, //the height of the legend box elements
         shapePadding: 1, //the distance between consecutive legend shape elements in the color legend
-        labelOffsets: { x: 5, y: 0 }, //distance (x) between label text and its corresponding shape element
-        decimals: 0, //the number of decimal for the legend labels
+        labelOffsets: { x: 3, y: 0 }, //distance (x) between label text and its corresponding shape element
+        decimals: undefined, //the number of decimal for the legend labels (undefined for auto-detect based on data)
         labelFormatter: undefined, // user-defined d3 format function
         labelType: 'thresholds', // type of labels to show: thresholds or ranges
         labels: null, // user-defined labels for each class
         noData: true, //show no data
         noDataText: 'No data', //no data text label
-        sepLineLength: 24, // //the separation line length
+        sepLineLength: out.shapeWidth, // //the separation line length
         sepLineStroke: 'black', //the separation line color
         sepLineStrokeWidth: 1, //the separation line width
-        tickLength: 5, // threshold ticks length in px
+        tickLength: 4, // threshold ticks length in px
         //diverging line for diverging color legends
         pointOfDivergenceLabel: undefined,
         pointOfDivergence: undefined,

@@ -13,12 +13,18 @@ export interface LegendConfig {
 
     /** Legend title text. */
     title?: string
+    /** Legend subtitle text. */
+    subtitle?: string
     /** Legend title font size in pixels. */
     titleFontSize?: number
 
     /** Box styling. */
     /** Inner spacing around legend content. */
     boxPadding?: number
+    /** Background opacity of the legend box. */
+    boxOpacity?: number
+    /** Padding between the title block and legend body. */
+    titlePadding?: number
 
     /** Shape styling (for proportional symbol legends). */
     /** Symbol swatch width in pixels. */
@@ -31,19 +37,30 @@ export interface LegendConfig {
     /** Label styling. */
     /** Label font size in pixels. */
     labelFontSize?: number
-    /** Pixel offset applied to labels. */
-    labelOffset?: number
+    /** Pixel offsets applied to labels. */
+    labelOffsets?: { x: number; y: number }
+    /** Custom formatter for legend labels. */
+    labelFormatter?: ((value: number, index?: number) => string) | null
+    /** Number of decimal places for auto-formatted labels. */
+    decimals?: number
 
     /** Legend layout direction. */
     orientation?: 'vertical' | 'horizontal'
     /** Sort legend entries in ascending order when true. */
     ascending?: boolean
-
-    /** Manual legend cell definitions. */
-    cells?: any[]
-
     /** Whether to display the no-data legend item. */
     noData?: boolean
     /** Label used for no-data legend item. */
     noDataText?: string
+    /** Vertical gap before the no-data swatch in pixels. */
+    noDataPadding?: number
+    /** Width of the no-data swatch in pixels. */
+    noDataShapeWidth?: number
+    /** Height of the no-data swatch in pixels. */
+    noDataShapeHeight?: number
+
+    /** Whether to show dataset min/max labels when supported. */
+    maxMin?: boolean
+    /** Text affixes for min/max labels as [minSuffix, maxSuffix]. */
+    maxMinLabels?: [string, string]
 }

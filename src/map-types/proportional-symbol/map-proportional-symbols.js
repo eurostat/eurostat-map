@@ -167,11 +167,12 @@ export const map = function (config) {
      * @returns
      */
     function applyStyleToMap(map) {
-        // update region color according to symbol color
-        updateBackgroundColor(map, out.psFill_)
-
         //define style per class
         if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
+
+        // update region color according to symbol color
+        const backgroundSymbolFill = out.classifierColor_ ? out.psClassToFillStyle_(out.psClasses_ - 1, out.psClasses_) : out.psFill_
+        updateBackgroundColor(map, backgroundSymbolFill)
 
         // if size dataset not defined then use default
         const sizeData = getSizeStatData(map)

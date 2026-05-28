@@ -8,13 +8,15 @@ import { drawDiscreteLegend, buildDiscreteLabelFormatter, resolveDecimals } from
 import { createAlphaLegend } from './legend-value-by-alpha'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/legend/choropleth/ChoroplethLegendConfig').ChoroplethLegendConfig} ChoroplethLegendConfig */
 
 /**
  * A legend for choropleth maps
  *
- * @param {*} map
+ * @param {MapInstance} map
+ * @param {ChoroplethLegendConfig} [config]
  */
-export const legend = function (map, config) {
+export const legend = function (map, config = {}) {
     //build generic legend object (inherit)
     const out = Legend.legend(map)
 
@@ -51,19 +53,17 @@ export const legend = function (map, config) {
     out.highlightTolerance = 10 // tolerance in pixels for highlighting nearby symbols in continuous legends
 
     //override attribute values with config values
-    if (config) {
-        for (let key in config) {
-            if (key === 'histogram' && typeof config[key] === 'object') {
-                out.histogram = {
-                    orientation: 'horizontal',
-                    showCounts: false,
-                    showPercentages: false,
-                    labelRotation: 0,
-                    ...config.histogram,
-                }
-            } else {
-                out[key] = config[key]
+    for (let key in config) {
+        if (key === 'histogram' && typeof config[key] === 'object') {
+            out.histogram = {
+                orientation: 'horizontal',
+                showCounts: false,
+                showPercentages: false,
+                labelRotation: 0,
+                ...config.histogram,
             }
+        } else {
+            out[key] = config[key]
         }
     }
 
