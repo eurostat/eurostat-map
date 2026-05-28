@@ -129,6 +129,12 @@
                 border-bottom: 1px solid var(--line);
             }
 
+            .thumb-link {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+            }
+
             .content {
                 padding: 10px 12px 12px;
                 display: flex;
@@ -456,6 +462,10 @@
                     const card = document.createElement('article')
                     card.className = 'card'
 
+                    const thumbLink = document.createElement('a')
+                    thumbLink.className = 'thumb-link'
+                    thumbLink.href = './' + file
+
                     const img = document.createElement('img')
                     img.className = 'thumb'
                     img.loading = 'lazy'
@@ -465,7 +475,8 @@
                         img.src = fallbackPreview
                     }
                     img.alt = title + ' preview'
-                    card.appendChild(img)
+                    thumbLink.appendChild(img)
+                    card.appendChild(thumbLink)
 
                     const content = document.createElement('div')
                     content.className = 'content'
