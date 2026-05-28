@@ -6,6 +6,7 @@ import type { InsetConfig } from './InsetConfig'
 import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
 import type { GridCartogramSettings } from './GridCartogramSettings'
 import type { DorlingSettings } from './DorlingSettings'
+import type { ScalebarConfig } from './decoration/ScalebarConfig'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -221,6 +222,10 @@ export interface MapInstance {
     stamp(): object | undefined
     stamp(config: { x: number; y: number; text: string; size?: number }): this
 
+    /** Scalebar configuration. */
+    scalebar(): ScalebarConfig | null
+    scalebar(config: ScalebarConfig | boolean): this
+
     /** Scalebar visibility. */
     showScalebar(): boolean
     showScalebar(show: boolean): this
@@ -236,6 +241,94 @@ export interface MapInstance {
     /** Show the Eurostat ribbon banner. */
     showEstatRibbon(): boolean
     showEstatRibbon(show: boolean): this
+
+    /** Returns the D3 selection of the SVG element. */
+    svg(): any
+    svg(s: any): this
+
+    /** Custom geometry filtering function. */
+    filterGeometriesFunction(): ((geometry: any) => boolean) | undefined
+    filterGeometriesFunction(fn: (geometry: any) => boolean): this
+
+    /** Grid cartogram enabled or disabled. */
+    gridCartogram(): boolean
+    gridCartogram(enable: boolean): this
+
+    /** Toggle background map rendering (sea, country boundaries, etc.). */
+    backgroundMap(): boolean
+    backgroundMap(show: boolean): this
+
+    /** Minimap configuration. */
+    minimap(): any
+    minimap(config: any): this
+
+    /** Show/hide inset map toggle button. */
+    insetsButton(): boolean
+    insetsButton(show: boolean): this
+
+    /** Filter function for placename labels. */
+    placenamesFilter(): ((name: any) => boolean) | undefined
+    placenamesFilter(fn: (name: any) => boolean): this
+
+    /** Use a separate header section for titles. */
+    header(): boolean
+    header(show: boolean): this
+
+    /** Use a separate footer section for footnotes. */
+    footer(): boolean
+    footer(show: boolean): this
+
+    /** Padding between the map and footer in pixels. */
+    footerPadding(): number | undefined
+    footerPadding(padding: number): this
+
+    /** Padding between the header and map in pixels. */
+    headerPadding(): number | undefined
+    headerPadding(padding: number): this
+
+    /** Position adjustment for map title: [x, y] */
+    titlePosition(): [number, number] | undefined
+    titlePosition(pos: [number, number]): this
+
+    /** Position adjustment for map subtitle: [x, y] */
+    subtitlePosition(): [number, number] | undefined
+    subtitlePosition(pos: [number, number]): this
+
+    /** Position adjustment for footnote text: [x, y] */
+    footnotePosition(): [number, number] | undefined
+    footnotePosition(pos: [number, number]): this
+
+    /** Position adjustment for Eurostat logo: [x, y] */
+    logoPosition(): [number, number] | undefined
+    logoPosition(pos: [number, number]): this
+
+    /** Position adjustment for ribbon banner: [x, y] */
+    ribbonPosition(): [number, number] | undefined
+    ribbonPosition(pos: [number, number]): this
+
+    /** Position adjustment for zoom buttons: [x, y] */
+    zoomButtonsPosition(): [number, number] | undefined
+    zoomButtonsPosition(pos: [number, number]): this
+
+    /** Position adjustment for insets button: [x, y] */
+    insetsButtonPosition(): [number, number] | undefined
+    insetsButtonPosition(pos: [number, number]): this
+
+    /** Pointer hover color for NUTS regions. */
+    hoverColor(): string
+    hoverColor(color: string): this
+
+    /** Base fill color for regions with no statistical data. */
+    noDataFillStyle(): string
+    noDataFillStyle(style: string): this
+
+    /** Show the link to the remote Eurostat statistical dataset. */
+    showSourceLink(): boolean
+    showSourceLink(show: boolean): this
+
+    /** Pattern fill configurations. */
+    patternFill(): any
+    patternFill(config: any): this
 
     /** Dorling. */
 

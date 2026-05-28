@@ -204,7 +204,7 @@ export function getFillPatternDefinitionFunction(opts?: FillPatternOptions): (sv
 /**
  * Get default labels for the map
  */
-export function getDefaultLabels(): { [key: string]: string }
+export function getDefaultLabels(): { [key: string]: any }
 
 /**
  * Project coordinates from map pixel space to geographic coordinates
@@ -238,8 +238,6 @@ declare const eurostatmap: {
     map: typeof map
     /** Get fill pattern definition function. */
     getFillPatternDefinitionFunction: typeof getFillPatternDefinitionFunction
-    /** Get fill pattern definition fun. */
-    getFillPatternDefinitionFun: typeof getFillPatternDefinitionFun
     /** Get default labels. */
     getDefaultLabels: typeof getDefaultLabels
     /** Project from map. */
