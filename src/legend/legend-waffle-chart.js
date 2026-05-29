@@ -284,7 +284,7 @@ export const legend = function (map, config) {
                 .attr('x', labelX)
                 .attr('y', y + labelY)
                 .attr('dominant-baseline', 'middle')
-                .text(legend.sizeLegend?.labelFormatter ? legend.sizeLegend.labelFormatter(val) : formatSizeLabel(val))
+                .text(formatValue(val, legend.sizeLegend?.labelFormatter))
 
             y += waffleSize + 8
         }
