@@ -326,7 +326,7 @@ const STEPS = [
         subtitle: 'Index: EU-27 = 100 · Purchasing power standard',
         enter: (l, s) => {
             tweenToMap(l, s)
-            resetHighlights(l)
+            resetHighlights(l, s)
         },
         card: {
             num: '01',
@@ -335,50 +335,28 @@ const STEPS = [
         },
     },
     {
-        title: 'Above-average regions highlighted',
-        subtitle: 'Index > 130',
+        title: 'Highlighting Regions on the Map',
+        subtitle: 'Regions with GDP index above 130 highlighted in red',
         enter: (l, s) => {
             tweenToMap(l, s)
-            highlight(l, (id) => (GDP_DATA[id] || 0) > 130, '#ffd700')
+            highlight(l, s, (id) => (GDP_DATA[id] || 0) > 130, '#e84040')
         },
         card: {
             num: '02',
-            h2: 'High-GDP cluster',
-            body: 'Regions above 130 are concentrated in north-west Europe. Capital city regions dominate.',
+            h2: 'Highlighting Regions',
+            body: 'As the user scrolls, we highlight specific regions (e.g. high-GDP regions above 130) in red while dimming background regions to focus attention.',
         },
     },
     {
-        title: 'Below-average regions highlighted',
-        subtitle: 'Index < 60',
+        title: 'Transitioning the Map into a Chart',
+        subtitle: 'Each NUTS-2 region polygon morphs into a dot grouped by country',
         enter: (l, s) => {
-            tweenToMap(l, s)
-            highlight(l, (id) => (GDP_DATA[id] || 999) < 60, '#e84040')
+            tweenToChart(l, s)
         },
         card: {
             num: '03',
-            h2: 'Low-GDP cluster',
-            body: 'Regions below 60 are concentrated in south-east Europe. Many qualify for EU cohesion funding.',
-        },
-    },
-    {
-        title: 'Regions by country',
-        subtitle: 'Each dot = one NUTS-2 region · Square = country average',
-        enter: (l, s) => tweenToChart(l, s),
-        card: {
-            num: '04',
-            h2: 'Chart view',
-            body: 'Each polygon morphs into a dot on the chart. The square shows the national average. Notice within-country spread.',
-        },
-    },
-    {
-        title: 'Poland — wide internal spread',
-        subtitle: 'PL91 (Warsaw) vs PL84 (east) — 120+ pt gap',
-        enter: (l, s) => tweenToChart(l, s, 'PL'),
-        card: {
-            num: '05',
-            h2: 'Example: Poland',
-            body: "Warsaw's region (PL91) scores 171. Its eastern periphery (PL84) scores 46 — a 125-point gap within one country.",
-            stat: { num: '125', desc: 'point spread, Warsaw vs eastern periphery' },
+            h2: 'Map to Chart Morph',
+            body: 'Finally, we morph the complex geographic boundaries of each NUTS-2 region into a standard chart. Each polygon smoothly transitions into a dot on a horizontal dot plot.',
         },
     },
 ]
@@ -544,7 +522,7 @@ function init(svg) {
     const subEl = document.getElementById('map-subtitle')
     const cntEl = document.getElementById('step-indicator')
 
-    const state = { chartVisible: false, focusCountry: null }
+    const state = { chartVisible: false, focusCountry: null, highlightPredicate: null, highlightColor: null }
 
     function applyStep(i) {
         const step = STEPS[i]
@@ -574,31 +552,74 @@ function init(svg) {
 
 // ─── Map helpers ──────────────────────────────────────────────────────────────
 
-function resetHighlights({ svg, regionData }) {
+function resetHighlights(layout, state) {
+    state.highlightPredicate = null
+    state.highlightColor = null
+
+    if (state.chartVisible) return
+
+    const { svg, regionData } = layout
     svg.selectAll('#em-nutsrg path').each(function (d) {
         const r = regionData.get(d?.properties?.id)
         if (!r) return
-        window.d3.select(this).transition().duration(300).style('stroke', r.origStroke).style('stroke-width', r.origStrokeWidth).style('filter', null)
+        window.d3
+            .select(this)
+            .transition('highlight')
+            .duration(300)
+            .style('stroke', r.origStroke)
+            .style('stroke-width', r.origStrokeWidth)
+            .style('filter', null)
+            .style('opacity', 1)
     })
+
+    svg.selectAll('#em-cntrg path').each(function () {
+        window.d3
+            .select(this)
+            .transition('highlight')
+            .duration(300)
+            .style('opacity', 1)
+    })
+
+    svg.select('#em-cntbn').transition('highlight').duration(300).style('opacity', 1)
+    svg.select('#em-nutsbn').transition('highlight').duration(300).style('opacity', 1)
 }
 
-function highlight({ svg, regionData }, predicate, color) {
+function highlight(layout, state, predicate, color) {
+    state.highlightPredicate = predicate
+    state.highlightColor = color
+
+    if (state.chartVisible) return
+
+    const { svg, regionData } = layout
     svg.selectAll('#em-nutsrg path').each(function (d) {
         const id = d?.properties?.id
         const r = regionData.get(id)
         if (!r) return
 
         const on = predicate(id)
+        const selection = window.d3.select(this)
+        if (on) selection.raise()
 
-        window.d3
-            .select(this)
-            .raise()
-            .transition()
+        selection
+            .transition('highlight')
             .duration(400)
             .style('stroke', on ? color : r.origStroke)
-            .style('stroke-width', on ? '1.6px' : r.origStrokeWidth)
+            .style('style-width', on ? '2.5px' : r.origStrokeWidth)
+            .style('stroke-width', on ? '2.5px' : r.origStrokeWidth)
             .style('filter', on ? null : 'grayscale(70%) brightness(1.05)')
+            .style('opacity', on ? 1.0 : 0.08)
     })
+
+    svg.selectAll('#em-cntrg path').each(function () {
+        window.d3
+            .select(this)
+            .transition('highlight')
+            .duration(400)
+            .style('opacity', 0.08)
+    })
+
+    svg.select('#em-cntbn').transition('highlight').duration(400).style('opacity', 0.3)
+    svg.select('#em-nutsbn').transition('highlight').duration(400).style('opacity', 0.08)
 }
 
 // ─── Morph constants ──────────────────────────────────────────────────────────
@@ -684,36 +705,49 @@ function tweenToChart(layout, state, focusCountry = null) {
             .style('stroke', on ? dotColor(r.value) : '#d8d3cc')
             .style('stroke-width', on ? '0.5px' : '0.35px')
             .style('filter', on ? null : 'grayscale(80%) brightness(1.1)')
+            .style('opacity', on ? 1.0 : 0.2)
     })
 
-    // COUNTRY SQUARES
-    countryPathData.forEach((cp, cc) => {
-        const node = svg.select(`#em-cntrg-${cc}`).node()
-        if (!node) return
+    // COUNTRY BORDERS AND SHAPES (#em-cntrg)
+    svg.selectAll('#em-cntrg path').each(function () {
+        const id = this.getAttribute('id')
+        if (!id) return
+        const cc = id.replace('em-cntrg-', '')
 
-        const on = !focusCountry || cc === focusCountry
+        const cp = countryPathData.get(cc)
+        if (cp) {
+            // Morph active country to square
+            const on = !focusCountry || cc === focusCountry
+            const local = rootToLocal(svg.node(), cp.chartX, cp.chartY)
+            const targetD = squarePath(local.x, local.y)
 
-        const local = rootToLocal(svg.node(), cp.chartX, cp.chartY)
+            let interp
+            try {
+                interp = flubberInterpolate(this.getAttribute('d'), targetD)
+            } catch {
+                return
+            }
 
-        const targetD = squarePath(local.x, local.y)
-
-        let interp
-        try {
-            interp = flubberInterpolate(node.getAttribute('d'), targetD)
-        } catch {
-            return
+            window.d3
+                .select(this)
+                .raise()
+                .transition('morph')
+                .duration(MORPH_DURATION)
+                .ease(EASE)
+                .attrTween('d', () => interp)
+                .style('fill', 'none')
+                .style('stroke', on ? '#1a7a45' : '#bbb')
+                .style('stroke-width', on ? '1.8px' : '1px')
+        } else {
+            // Fade out non-active country geometries (like UK, RS, etc.)
+            window.d3
+                .select(this)
+                .transition('morph')
+                .duration(MORPH_DURATION)
+                .ease(EASE)
+                .style('opacity', 0)
+                .style('pointer-events', 'none')
         }
-
-        window.d3
-            .select(node)
-            .raise()
-            .transition('morph')
-            .duration(MORPH_DURATION)
-            .ease(EASE)
-            .attrTween('d', () => interp)
-            .style('fill', 'none')
-            .style('stroke', on ? '#1a7a45' : '#bbb')
-            .style('stroke-width', on ? '1.8px' : '1px')
     })
 
     // AXES OVERLAY INSIDE ZOOM GROUP
@@ -734,8 +768,6 @@ function tweenToChart(layout, state, focusCountry = null) {
         .style('opacity', 1)
 }
 
-// ─── tweenToMap ───────────────────────────────────────────────────────────────
-
 function tweenToMap(layout, state) {
     const { svg, svgW, regionData, countryPathData } = layout
 
@@ -748,7 +780,8 @@ function tweenToMap(layout, state) {
 
     // DOTS → REGIONS
     svg.selectAll('#em-nutsrg path').each(function (d) {
-        const r = regionData.get(d?.properties?.id)
+        const id = d?.properties?.id
+        const r = regionData.get(id)
         if (!r) return
 
         let interp
@@ -758,6 +791,24 @@ function tweenToMap(layout, state) {
             return
         }
 
+        // Determine target stroke and filter based on active highlight predicate
+        let targetStroke = r.origStroke
+        let targetStrokeWidth = r.origStrokeWidth
+        let targetFilter = null
+        let targetOpacity = 1
+
+        if (state.highlightPredicate) {
+            const on = state.highlightPredicate(id)
+            if (on) {
+                targetStroke = state.highlightColor
+                targetStrokeWidth = '2.5px'
+                window.d3.select(this).raise()
+            } else {
+                targetFilter = 'grayscale(70%) brightness(1.05)'
+                targetOpacity = 0.08
+            }
+        }
+
         window.d3
             .select(this)
             .transition('morph')
@@ -765,44 +816,73 @@ function tweenToMap(layout, state) {
             .ease(EASE)
             .attrTween('d', () => interp)
             .style('fill', r.origFill)
-            .style('stroke', r.origStroke)
-            .style('stroke-width', r.origStrokeWidth)
-            .style('filter', null)
+            .style('stroke', targetStroke)
+            .style('stroke-width', targetStrokeWidth)
+            .style('filter', targetFilter)
+            .style('opacity', targetOpacity)
     })
 
-    // SQUARES → COUNTRIES
-    countryPathData.forEach((cp, cc) => {
-        const node = svg.select(`#em-cntrg-${cc}`).node()
-        if (!node) return
+    // Restore all country geometries (#em-cntrg paths)
+    svg.selectAll('#em-cntrg path').each(function () {
+        const id = this.getAttribute('id')
+        if (!id) return
+        const cc = id.replace('em-cntrg-', '')
 
-        let interp
-        try {
-            interp = flubberInterpolate(node.getAttribute('d'), cp.mapD)
-        } catch {
-            return
+        const cp = countryPathData.get(cc)
+        if (cp) {
+            // Morph active country back to geographic shape
+            let interp
+            try {
+                interp = flubberInterpolate(this.getAttribute('d'), cp.mapD)
+            } catch {
+                return
+            }
+
+            // Since active country geometries sit under NUTS regions,
+            // we dim them to match the active highlight predicate state
+            const targetOpacity = state.highlightPredicate ? 0.08 : 1
+
+            window.d3
+                .select(this)
+                .transition('morph')
+                .duration(MORPH_DURATION)
+                .ease(EASE)
+                .attrTween('d', () => interp)
+                .style('fill', cp.origFill)
+                .style('stroke', cp.origStroke)
+                .style('stroke-width', cp.origStrokeWidth)
+                .style('opacity', targetOpacity)
+                .style('pointer-events', null)
+        } else {
+            // Restore non-active country geometries (like UK, RS, etc.) back to opacity 1 (or 0.08 if highlighted)
+            const targetOpacity = state.highlightPredicate ? 0.08 : 1
+            window.d3
+                .select(this)
+                .transition('morph')
+                .duration(MORPH_DURATION)
+                .ease(EASE)
+                .style('opacity', targetOpacity)
+                .style('pointer-events', null)
         }
-
-        window.d3
-            .select(node)
-            .transition('morph')
-            .duration(MORPH_DURATION)
-            .ease(EASE)
-            .attrTween('d', () => interp)
-            .style('fill', cp.origFill)
-            .style('stroke', cp.origStroke)
-            .style('stroke-width', cp.origStrokeWidth)
-            .style('pointer-events', null)
     })
 
     // restore furniture
-    FURNITURE.forEach((sel) =>
+    FURNITURE.forEach((sel) => {
+        let opacity = 1
+        if (state.highlightPredicate) {
+            if (sel === '#em-cntbn') {
+                opacity = 0.3
+            } else if (sel === '#em-nutsbn') {
+                opacity = 0.08
+            }
+        }
         svg
             .select(sel)
             .transition()
             .delay(MORPH_DURATION - 200)
             .duration(500)
-            .style('opacity', 1)
-    )
+            .style('opacity', opacity)
+    })
 }
 
 // ─── Axes overlay (horizontal chart) ─────────────────────────────────────────
