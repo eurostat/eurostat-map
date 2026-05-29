@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>eurostat-map.js</title>
+        <title>Proportional Symbols</title>
     </head>
 
     <body>
@@ -14,12 +14,10 @@
         <script src="https://d3js.org/d3-format.v2.min.js"></script>
 
         <script>
-            let euSVG = `<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+            const euSVG = `<svg width="20" height="20" xmlns="http://www.w3.org/2000/svg">
   <circle cx="10" cy="10" r="8" stroke="black" stroke-width="1"  />
   <text x="50%" y="50%" text-anchor="middle" stroke="black" stroke-width="0px" dy=".3em" font-size="8" font-family="Arial" fill="black">€</text>
 </svg>
-
-
 `
 
             //set legend labels locale
@@ -30,7 +28,8 @@
                 currency: ['', '€'],
             })
             eurostatmap
-                .map('ps').scale('60M')
+                .map('ps')
+                .scale('60M')
                 .nutsLevel(0)
                 .width(800)
                 .title('Gross domestic product (GDP) across Europe')

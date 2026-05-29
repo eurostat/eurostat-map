@@ -393,15 +393,17 @@ export const map = function (config) {
     }
 
     const regionsFillFunction = function (rg) {
-        const ecl = select(this).attr('ecl') // may be a class index or a raw value
+        const sel = select(this)
+        const ecl = sel.attr('ecl') // may be a class index or a raw value
+        const isNoInput = sel.attr('ni') === '1'
         const colorSchemeType = out.colorSchemeType_ || 'discrete'
 
         if (!ecl && ecl !== '0') {
             return // input not added
         }
 
-        // Data not available
-        if (ecl === 'nd') {
+        // Data not available or region missing in input data
+        if (ecl === 'nd' || isNoInput) {
             return out.noDataFillStyle_ || 'gray'
         }
 

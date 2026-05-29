@@ -454,3 +454,71 @@ body {
     padding: 1px 4px;
     border-radius: 2px;
 }
+
+/* ── MOBILE RESPONSIVENESS ───────────────────────────── */
+@media (max-width: 800px) {
+    .header {
+        padding: 0 6vw;
+    }
+
+    .story-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        padding: 0;
+    }
+
+    .map-column {
+        grid-column: 1;
+        grid-row: 1;
+        position: sticky;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        margin-left: 0;
+        z-index: 1;
+    }
+
+    .map-frame {
+        height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .text-column {
+        grid-column: 1;
+        grid-row: 1;
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        padding: 12vh 16px 50vh 16px;
+        pointer-events: none;
+    }
+
+    .step {
+        margin-bottom: 65vh;
+        pointer-events: auto;
+    }
+
+    .step:last-child {
+        margin-bottom: 25vh;
+    }
+
+    .step-card {
+        background: rgba(255, 254, 251, 0.95);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 6px;
+        padding: 22px 26px;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    .footer {
+        padding: 4rem 6vw 3rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+}

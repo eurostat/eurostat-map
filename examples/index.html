@@ -139,8 +139,8 @@
                 color: inherit;
             }
 
-            .card:hover .thumb,
-            .card:focus-within .thumb {
+            .thumb-link:hover .thumb,
+            .thumb-link:focus .thumb {
                 filter: saturate(1.08) brightness(1.02);
                 box-shadow:
                     0 0 0 1px rgba(10, 102, 194, 0.25),
@@ -289,8 +289,8 @@
                 <h1>eurostat-map live examples</h1>
                 <p class="sub">See eurostat-map in action with live examples.</p>
                 <div class="actions">
-                    <a class="btn primary" href="https://eurostat.github.io/eurostat-map/docs/reference.html">See documentation</a>
-                    <a class="btn" href="https://eurostat.github.io/eurostat-map/">Project README</a>
+                    <a class="btn primary" href="https://eurostat.github.io/eurostat-map/docs/reference.html" target="_blank" rel="noopener noreferrer">See documentation</a>
+                    <a class="btn" href="https://eurostat.github.io/eurostat-map/" target="_blank" rel="noopener noreferrer">Project README</a>
                 </div>
             </section>
 
@@ -418,6 +418,8 @@
                     const thumbLink = document.createElement('a')
                     thumbLink.className = 'thumb-link'
                     thumbLink.href = './' + file
+                    thumbLink.target = '_blank'
+                    thumbLink.rel = 'noopener noreferrer'
 
                     const img = document.createElement('img')
                     img.className = 'thumb'
@@ -455,11 +457,15 @@
                     const live = document.createElement('a')
                     live.className = 'live'
                     live.href = './' + file
+                    live.target = '_blank'
+                    live.rel = 'noopener noreferrer'
                     live.textContent = 'Live'
                     row.appendChild(live)
 
                     const src = document.createElement('a')
                     src.href = 'https://github.com/eurostat/eurostat-map/blob/master/examples/' + file
+                    src.target = '_blank'
+                    src.rel = 'noopener noreferrer'
                     src.textContent = 'Source'
                     row.appendChild(src)
 

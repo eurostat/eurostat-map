@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>eurostat-map.js</title>
+        <title>Population Change</title>
     </head>
 
     <body>
@@ -19,12 +19,12 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('Population change')
-                .subtitle('Crude rate of total population change, 2021')
+                .subtitle('Crude rate of total population change, 2024')
                 .nutsLevel(2)
                 .nutsYear(2024)
                 .stat({
                     eurostatDatasetCode: 'demo_r_gind3',
-                    filters: { indic_de: 'GROWRT', time: 2021 },
+                    filters: { indic_de: 'GROWRT', time: 2024 },
                     unitText: '‰',
                 })
                 .colors(['#B2182B', '#D6604D', '#F4A582', '#FDDBC7', '#D1E5F0', '#92C5DE', '#4393C3', '#2166AC'])

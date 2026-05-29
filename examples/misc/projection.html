@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>Map Projection</title><meta charset="UTF-8" />
+        <title>Custom Map Projection</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
             .em-label-TÜRKİYE,
@@ -20,13 +20,15 @@
         <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
         <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
         <script>
-            let projectionFunction = d3.geoAzimuthalEqualArea().rotate([-5, -45.55]).scale(2000)
+            const projectionFunction = d3.geoAzimuthalEqualArea().rotate([-5, -45.55]).scale(2000)
             //.geoRobinson()
             //.geoMercator()
 
             const map = eurostatmap
                 .map('choropleth')
+                .header(true)
                 .title('Custom projection test')
+                .subtitle('Azimuthal Equal Area projection centered on Spain')
                 .nutsLevel('mixed')
                 .nutsYear(2021)
                 .width(600)

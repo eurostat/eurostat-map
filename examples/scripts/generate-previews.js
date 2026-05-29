@@ -152,13 +152,21 @@ async function run() {
             // Extra wait for D3 async rendering after network idle
             await page.waitForTimeout(EXTRA_WAIT)
 
-            // Clip to the first SVG element (the map); fall back to full viewport
+            // Clip to the first SVG element (the map); fall back to full viewport.
+            // Only use the SVG box if it is actually visible within the current viewport.
             let clip = { x: 0, y: 0, width: WIDTH, height: HEIGHT }
             const svgEl = await page.$('svg')
             if (svgEl) {
                 const box = await svgEl.boundingBox()
                 if (box && box.width > 10 && box.height > 10) {
-                    clip = { x: Math.max(0, box.x), y: Math.max(0, box.y), width: box.width, height: box.height }
+                    const cx = Math.max(0, box.x)
+                    const cy = Math.max(0, box.y)
+                    const cw = Math.min(box.width, WIDTH - cx)
+                    const ch = Math.min(box.height, HEIGHT - cy)
+                    // Only clip if the intersection with the viewport is meaningful
+                    if (cw > 10 && ch > 10 && cy < HEIGHT) {
+                        clip = { x: cx, y: cy, width: cw, height: ch }
+                    }
                 }
             }
 

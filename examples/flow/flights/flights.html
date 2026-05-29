@@ -1,139 +1,136 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Passenger Flights</title>
+        <style>
+            /* make sure the svg is visible — adjust as needed */
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+            }
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flow map test</title>
-  <style>
-    /* make sure the svg is visible — adjust as needed */
-    html,
-    body {
-      height: 100%;
-      margin: 0;
-    }
+            .em-cntbn {
+                /* opacity:0.9; */
+                stroke: white !important;
+            }
 
-    .em-cntbn {
-      /* opacity:0.9; */
-      stroke: white !important;
-    }
+            .em-node-circle {
+                fill: white;
+                opacity: 0.6;
+                stroke: #252525;
+            }
+        </style>
+    </head>
 
-    .em-node-circle {
-      fill: white;
-      opacity: 0.6;
-      stroke: #252525;
-    }
-  </style>
-</head>
+    <body>
+        <div style="display: flex">
+            <svg id="map"></svg>
+            <!-- <svg id="legend"></svg> -->
+        </div>
 
-<body>
-  <div style="display: flex;">
-    <svg id="map"></svg>
-    <!-- <svg id="legend"></svg> -->
-  </div>
+        <!-- your built bundle (must expose global `eurostatmap`) -->
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/proj4@2.19.10/dist/proj4.js"></script>
 
+        <!-- use a module so `await` works at top level -->
+        <script type="module">
+            import { toFlowGraph } from './parse.js'
 
-  <!-- your built bundle (must expose global `eurostatmap`) -->
-  <script src="../../../../build/eurostatmap.js"></script>
-  <script src="https://unpkg.com/proj4@2.19.10/dist/proj4.js"></script>
+            // load JSON (parse the response)
+            const data = await fetch('eurostat-flight-data.json').then((r) => r.json())
+            const graph = toFlowGraph(data)
 
-  <!-- use a module so `await` works at top level -->
-  <script type="module">
-    import { toFlowGraph } from './parse.js';
+            // guard: get first node coords if present
+            const firstNode = graph?.nodes?.[0] ?? null
+            const posX = firstNode ? firstNode.x : 0
+            const posY = firstNode ? firstNode.y : 0
 
-    // load JSON (parse the response)
-    const data = await fetch('eurostat-flight-data.json').then(r => r.json());
-    const graph = toFlowGraph(data);
+            // Build the map (assumes eurostatmap is available globally from your bundle)
+            const map = eurostatmap
+                .map('flow')
+                .title('Passenger flights, 2024')
+                .header(true)
+                .footer(true)
+                .position({ x: 3900000, y: 2900000, z: 6400 })
 
-    // guard: get first node coords if present
-    const firstNode = graph?.nodes?.[0] ?? null;
-    const posX = firstNode ? firstNode.x : 0;
-    const posY = firstNode ? firstNode.y : 0;
+                .flowGraph(graph)
 
-    // Build the map (assumes eurostatmap is available globally from your bundle)
-    const map = eurostatmap
-      .map('flow')
-      .title('Passenger flights, 2024')
-      .header(true).footer(true)
-      .position({ x: 3900000, y: 2900000, z: 6400 })
+                // line type
+                .flowLineType('straight')
+                .flowBidirectional(false)
+                .flowEdgeBundling(true)
+                .flowBundleSettings({
+                    alphaDecay: 0.1,
+                    chargeStrength: 10,
+                    distanceMax: null, // if null, will default to twice the max dimension of the map
+                    linkStrength: 0.7,
+                    linkIterations: 1,
+                })
+                .flowMaxWidth(10)
+                .flowMinWidth(0.1)
+                .flowInternal(false)
 
-      .flowGraph(graph)
+                // flow accessories
+                .flowArrows(false)
+                .flowOutlines(false)
 
-      // line type
-      .flowLineType('straight')
-      .flowBidirectional(false)
-      .flowEdgeBundling(true)
-      .flowBundleSettings({
-        alphaDecay: 0.1,
-        chargeStrength: 10,
-        distanceMax: null, // if null, will default to twice the max dimension of the map
-        linkStrength: 0.7,
-        linkIterations: 1
-      })
-      .flowMaxWidth(10)
-      .flowMinWidth(0.1)
-      .flowInternal(false)
+                //nodes
+                .flowNodes(true)
+                .flowNodeType('circle') // donut or circle
 
-      // flow accessories
-      .flowArrows(false)
-      .flowOutlines(false)
+                // gradients
+                .flowColorGradient(false)
+                .flowWidthGradient(false)
+                .flowOpacityGradient(false)
 
-      //nodes
-      .flowNodes(true)
-      .flowNodeType('circle') // donut or circle
+                // sankey-only
+                // .flowStack(false)
 
-      // gradients
-      .flowColorGradient(false)
-      .flowWidthGradient(false)
-      .flowOpacityGradient(false)
+                // color
+                //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
+                .flowTopLocations(0) // Top N locations by flow volume
+                .flowOpacity(0.1)
+                .flowColor('#000')
 
-      // sankey-only
-      // .flowStack(false)
+                .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
 
-      // color
-      //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
-      .flowTopLocations(0) // Top N locations by flow volume
-      .flowOpacity(0.1)
-      .flowColor('#000')
-
-      .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
-
-
-      .tooltip({
-        xOffset:100,
-        yOffset:100,
-      })
-      //.position({ x: posX, y: posY, z: 300 })
-      .labels({
-        values: false,
-        backgrounds: true,
-        shadows: true,
-      })
-      .nutsLevel(0)
-      .legend({
-        //svgId: 'legend',
-        width: 220,
-        x:20,
-        y:150,
-        //title: 'Main legend title',
-        boxOpacity: 0,
-        flowWidthLegend: {
-          title: 'Passengers (flights)',
-          segments: 4,
-          width: 150,
-          titlePadding: 30, // FIXME
-          maxMin: true,
-          orientation: 'horizontal',
-        },
-        nodeSizeLegend: { title: 'Passengers (airports)', values: [60000000,1000000], labels: ['60M','1M'] },
-        flowColorLegend: false,
-        regionColorLegend: { title: 'Region colors' },
-      })
-      .drawCoastalMargin(false)
-      .insets(false)
-      .zoomExtent([0.03, 1000])
-      .build();
-  </script>
-</body>
-
+                .tooltip({
+                    xOffset: 100,
+                    yOffset: 100,
+                })
+                //.position({ x: posX, y: posY, z: 300 })
+                .labels({
+                    values: false,
+                    backgrounds: true,
+                    shadows: true,
+                })
+                .nutsLevel(0)
+                .legend({
+                    //svgId: 'legend',
+                    width: 220,
+                    x: 20,
+                    y: 150,
+                    //title: 'Main legend title',
+                    boxOpacity: 0,
+                    flowWidthLegend: {
+                        title: 'Passengers (flights)',
+                        segments: 4,
+                        width: 150,
+                        titlePadding: 30, // FIXME
+                        maxMin: true,
+                        orientation: 'horizontal',
+                    },
+                    nodeSizeLegend: { title: 'Passengers (airports)', values: [60000000, 1000000], labels: ['60M', '1M'] },
+                    flowColorLegend: false,
+                    regionColorLegend: { title: 'Region colors' },
+                })
+                .drawCoastalMargin(false)
+                .insets(false)
+                .zoomExtent([0.03, 1000])
+                .build()
+        </script>
+    </body>
 </html>
