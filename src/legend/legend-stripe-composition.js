@@ -122,10 +122,14 @@ export const legend = function (map, config) {
         }
 
         if (config.noData) {
-            const y = out.boxPadding + (config.title ? out.titleFontSize + out.boxPadding : 0) + i * (config.shapeHeight + config.shapePadding)
+            const y =
+                out.colorLegend.marginTop +
+                out.boxPadding +
+                (config.title ? out.titleFontSize + out.boxPadding : 0) +
+                i * (config.shapeHeight + config.shapePadding)
 
             const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
-            out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
+            out.appendNoDataLegend(container, config.noDataText || out.noDataText, highlightRegions, unhighlightRegions)
         }
     }
 
