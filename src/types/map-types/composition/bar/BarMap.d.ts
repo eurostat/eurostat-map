@@ -6,7 +6,7 @@ import type { BarChartLegendConfig } from '../../../legend/composition/BarChartL
  * Bar map type.
  */
 export interface BarMap extends MapInstance {
-    legend(): BarChartLegendConfig
+    legend(): BarChartLegendConfig | false
     legend(config: BarChartLegendConfig | false): this
 
     barType(): 'stacked' | 'grouped'

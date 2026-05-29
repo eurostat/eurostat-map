@@ -6,7 +6,7 @@ import type { StripeCompositionLegendConfig } from '../../../legend/composition/
  * Stripe map type.
  */
 export interface StripeMap extends MapInstance {
-    legend(): StripeCompositionLegendConfig
+    legend(): StripeCompositionLegendConfig | false
     legend(config: StripeCompositionLegendConfig | false): this
 
     stripeWidth(): number

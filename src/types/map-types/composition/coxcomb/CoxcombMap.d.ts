@@ -6,7 +6,7 @@ import type { CoxcombLegendConfig } from '../../../legend/composition/CoxcombLeg
  * Coxcomb map type.
  */
 export interface CoxcombMap extends MapInstance {
-    legend(): CoxcombLegendConfig
+    legend(): CoxcombLegendConfig | false
     legend(config: CoxcombLegendConfig | false): this
 
     catColors(): any

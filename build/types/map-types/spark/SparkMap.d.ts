@@ -6,7 +6,7 @@ import type { SparklineLegendConfig } from '../../legend/composition/SparklineLe
  * Spark map type.
  */
 export interface SparkMap extends MapInstance {
-    legend(): SparklineLegendConfig
+    legend(): SparklineLegendConfig | false
     legend(config: SparklineLegendConfig | false): this
 
     sparkLineColor(): any

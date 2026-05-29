@@ -152,7 +152,7 @@ export interface MapInstance {
      * Get or set legend configuration. Pass false to remove the legend.
      * @example map.legend({ x: 10, y: 90, title: 'Density, people/km²' })
      */
-    legend(): LegendConfig
+    legend(): LegendConfig | false
     legend(config: LegendConfig | false): this
 
     /** Force-update the legend after data or style changes. */

@@ -6,7 +6,7 @@ import type { PieChartLegendConfig } from '../../../legend/composition/PieChartL
  * Pie map type.
  */
 export interface PieMap extends MapInstance {
-    legend(): PieChartLegendConfig
+    legend(): PieChartLegendConfig | false
     legend(config: PieChartLegendConfig | false): this
 
     catColors(): any
