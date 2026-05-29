@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>Urban-Rural Projected Population Change</title><meta charset="UTF-8" />
+        <title>Urban-Rural Projected Population Change</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
 
     <body style="font-family: sans-serif">
         <svg id="map75"></svg>
 
-        <script src="../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/eurostat-map"></script>
         <script>
             const url = 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/examples/ur/proj_pop_change.csv'
             const n2jURL = 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/'
@@ -96,11 +96,7 @@
                         if (!sv2 || (sv2.value != 0 && !sv2.value) || sv2.value == ':') buf.push(map.noDataText_)
                         else {
                             buf.push(
-                                sv2.value == 1
-                                    ? 'Predominantly urban region'
-                                    : sv2.value == 2
-                                      ? 'Intermediate region'
-                                      : 'Predominantly rural region'
+                                sv2.value == 1 ? 'Predominantly urban region' : sv2.value == 2 ? 'Intermediate region' : 'Predominantly rural region'
                             )
                         }
 

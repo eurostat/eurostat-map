@@ -4,6 +4,14 @@ import { getCSSPropertyFromClass } from '../utils'
 export const appendZoomButtons = (map) => {
     const svg = select('#' + map.svgId())
 
+    let headerOffset = 0
+    if (map.header_ && !map.isInset) {
+        const header = svg.select('#em-header-' + map.svgId_)
+        const hb = header.empty() ? null : header.node()?.getBBox?.()
+        const headerPadding = map.headerPadding_ ? map.headerPadding_ : 20
+        if (hb) headerOffset = hb.height + headerPadding
+    }
+
     const buttonGroup = svg
         .append('g')
         .attr('class', 'em-zoom-buttons')
@@ -12,12 +20,12 @@ export const appendZoomButtons = (map) => {
 
     if (map.zoomButtonsPosition_) {
         const userPosition = map.zoomButtonsPosition_
-        buttonGroup.attr('transform', `translate(${userPosition[0]}, ${userPosition[1]})`)
+        buttonGroup.attr('transform', `translate(${userPosition[0]}, ${userPosition[1] + headerOffset})`)
     } else {
         // Default position: bottom right corner with some padding
         const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
         const padding = 10
-        buttonGroup.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${map.height_ - buttonSize * 2 - padding * 2})`)
+        buttonGroup.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${map.height_ - buttonSize * 2 - padding * 2 + headerOffset})`)
     }
 
     const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set

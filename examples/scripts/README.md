@@ -5,6 +5,7 @@ This folder contains scripts used to keep the examples gallery and preview image
 ## Scripts Overview
 
 ### `update-examples-manifest.js`
+
 Scans the `examples/` tree for `.html` files and regenerates:
 
 - `examples/scripts/example-manifest.js`
@@ -24,6 +25,7 @@ npm run update-examples-manifest
 ```
 
 ### `generate-previews.js`
+
 Uses Playwright to open examples and generate PNG preview images under:
 
 - `examples/img/previews/`
@@ -37,6 +39,7 @@ npm run generate-previews
 ```
 
 ### `example-manifest.js`
+
 Auto-generated file consumed by:
 
 - `examples/index.html` (browser gallery)
@@ -51,6 +54,7 @@ npm run update-examples-manifest
 ## Main Workflows
 
 ### Update everything (recommended)
+
 Regenerates manifest and all previews:
 
 ```bash
@@ -58,6 +62,7 @@ npm run update-examples
 ```
 
 ### Update only manifest
+
 Useful after adding/moving example files, without generating screenshots:
 
 ```bash
@@ -65,6 +70,7 @@ npm run update-examples-manifest
 ```
 
 ### Update only previews
+
 Uses current manifest as input:
 
 ```bash

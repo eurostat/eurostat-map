@@ -74,6 +74,15 @@ export const addFootnote = function (out) {
     const wrap = out.footnoteWrap_ || Infinity // e.g. user sets map.footnoteWrap(500)
     const text = out.footnote_ || ''
 
+    // In header mode, root-level elements must be shifted down by header height.
+    let headerOffset = 0
+    if (out.header_ && !out.isInset) {
+        const header = out.svg().select('#em-header-' + out.svgId_)
+        const hb = header.empty() ? null : header.node()?.getBBox?.()
+        const headerPadding = out.headerPadding_ ? out.headerPadding_ : 20
+        if (hb) headerOffset = hb.height + headerPadding
+    }
+
     // --- Determine base position depending on footer mode ---
     let position
     if (out.footer_ && !out.isInset) {
@@ -81,7 +90,8 @@ export const addFootnote = function (out) {
         position = out.footnotePosition_ ? [out.footnotePosition_[0], out.footnotePosition_[1]] : [5, 10]
     } else {
         // Legacy mode: footnote drawn directly on SVG, use bottom of map area
-        position = out.footnotePosition_ ? out.footnotePosition_ : [10, out.height_]
+        const basePosition = out.footnotePosition_ ? out.footnotePosition_ : [10, out.height_]
+        position = [basePosition[0], basePosition[1] + headerOffset]
     }
 
     const svg = out.svg()

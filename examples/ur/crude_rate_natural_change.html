@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>Urban-Rural Crude Rate of Natural Change</title><meta charset="UTF-8" />
+        <title>Urban-Rural Crude Rate of Natural Change</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
 
     <body style="font-family: sans-serif">
         <svg id="map73"></svg>
 
-        <script src="../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/eurostat-map"></script>
         <script>
             const url = './crude_rate_natural_change.csv'
             const n2jURL = 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2/'
@@ -69,10 +69,10 @@
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '%',
                 })
-                 .numberOfClasses(3)
-                 .classifier1((v) => (v >= 0.0 ? 2 : v >= -4.0 ? 1 : 0))
-                 .classifier2((v) => 3 - v)
-                 .classToFillStyle((i, j) => {
+                .numberOfClasses(3)
+                .classifier1((v) => (v >= 0.0 ? 2 : v >= -4.0 ? 1 : 0))
+                .classifier2((v) => 3 - v)
+                .classToFillStyle((i, j) => {
                     if (i == 0 && j == 2) return '#71a8df'
                     if (i == 1 && j == 2) return '#286eb4'
                     if (i == 2 && j == 2) return '#1e5388'

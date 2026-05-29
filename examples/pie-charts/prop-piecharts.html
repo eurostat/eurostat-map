@@ -13,59 +13,44 @@
         <script>
             const ourMap = eurostatmap
                 .map('pie')
+                .dorling(true)
+                .header(true)
+                .footer(true)
+                .title('Livestock in the EU, 2024')
+                .subtitle('Number of animals (pie size) and type of animal (color), 2024')
                 .scale('60M')
-                .nutsLevel(1)
                 .pieOtherColor('#FFCC80')
                 .pieOtherText('Other')
                 .pieMinRadius(6)
+                .pieMaxRadius(20)
+                .nutsLevel(1)
                 .statPie({
                     eurostatDatasetCode: 'agr_r_animal',
-                    filters: { unit: 'THS_HD', time: '2018' },
-                    unitText: '1000 heads',
+                    filters: { unit: 'THS_HD', time: '2024' },
+                    unitText: 'heads',
                     categoryParameter: 'animals',
                     categoryCodes: ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
-                    categoryLabels: ['bovines', 'cows', 'buffalos', 'pigs', 'sheeps', 'goats'],
-                    categoryColors: ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f'],
+                    categoryLabels: ['Bovines', 'Cows', 'Buffalos', 'Pigs', 'Sheep', 'Goats'],
+                    categoryColors: ['#E04040', '#208486', '#2644A7', '#AF155C', '#672DC4', '#33A033'],
+                    transform: (value) => value * 1000, // convert from 1000 heads to heads
                 })
-                .title('Most common causes of death')
-                .subtitle('Death rate (pie size) and cause of death (color), 2022')
+
                 .legend({
-                    x: 530,
+                    x: 600,
                     y: 70,
                     boxOpacity: 0,
                     boxFill: 'white',
                     titleFontWeight: 'bold',
                     sizeLegend: {
-                        title: 'Death rate per 100 000 inh.',
+                        title: 'Number of animals',
                         titlePadding: 10,
-                        values: [400, 1600],
+                        values: [13000000, 500000],
                     },
                     colorLegend: {
-                        title: 'Cause of death',
+                        title: 'Type of animal',
                     },
                 })
-
-            //add our own stat data objects
-            for (let k in stats) {
-                let statObject = {
-                    code: k,
-                    unitText: 'death rate per 100 000',
-                }
-
-                ourMap.stat(k, statObject) // adds 'stat' object to map.statData_ during build
-            }
-            ourMap.statCodes_ = ['cancer', 'circulatory', 'respiratory'] //set stat codes to show on map
-            ourMap.build()
-
-            // update our stat data after build
-            for (let key in ourMap.statData_) {
-                if (stats[key]) {
-                    // fix this
-                    ourMap.statData_[key].setData({ ...stats[key] })
-                }
-            }
-
-            ourMap.updateStatValues()
+                .build()
         </script>
     </body>
 </html>

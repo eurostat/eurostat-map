@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Stats</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="https://unpkg.com/eurostat-map"></script>
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .header(true)
+                .footer(true)
+                .title('Custom statistical data')
+                .subtitle('Data is not from Eurostat, but set manually with map.statData().setData( {DE:12, FR:10, ...} )')
+
+            map.nutsLevel('mixed') // can show different NUTS levels at once, e.g. to show a few countries with NUTS 0 and the rest with NUTS 2
+
+            const data = {
+                DE1: '12',
+                FR: 10,
+                IT: 8,
+                ES: 6,
+                RO: 4,
+                PL: 2,
+                NL: 1,
+                BE: 3,
+                DK: 5,
+                IE: 7,
+                PT: 9,
+                FR1: 11,
+                EL: 14,
+                BG: 13,
+                CZ: 15,
+            }
+
+            map.statData().setData(data)
+            map.build()
+        </script>
+    </body>
+</html>

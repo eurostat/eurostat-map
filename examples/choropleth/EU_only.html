@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>EU Only Choropleth</title><meta charset="UTF-8" />
+        <title>EU Only Choropleth</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
             /* hide non cc/eu/efta borders */
@@ -18,7 +18,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/eurostat-map"></script>
 
         <script>
             const map = eurostatmap.map('choropleth').nutsLevel(0).title('EU only example').zoomExtent([1, 1000])
