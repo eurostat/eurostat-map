@@ -1,9 +1,13 @@
 import { MapConfig } from '../../core/MapConfig'
+import type { ChoroplethLegendConfig } from '../../legend/choropleth/ChoroplethLegendConfig'
 
 /**
  * Configuration specific to choropleth maps
  */
 export interface ChoroplethConfig extends MapConfig {
+    /** Choropleth legend configuration. */
+    legend?: ChoroplethLegendConfig | false
+
     /** Classification. */
     numberOfClasses?: number
     /** Classification method. */

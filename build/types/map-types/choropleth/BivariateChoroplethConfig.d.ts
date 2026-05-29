@@ -1,9 +1,13 @@
 import type { MapConfig } from '../../core/MapConfig'
+import type { BivariateLegendConfig } from '../../legend/choropleth/BivariateLegendConfig'
 
 /**
  * Configuration for bivariate choropleth maps.
  */
 export interface BivariateChoroplethConfig extends MapConfig {
+    /** Bivariate choropleth legend configuration. */
+    legend?: BivariateLegendConfig | false
+
     /** Number of classes. */
     numberOfClasses?: number
     /** Breaks1. */
