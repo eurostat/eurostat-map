@@ -645,7 +645,7 @@ export const map = function (config) {
 
         const comp = _getComposition(regionId)
         if (!comp) {
-            html += `<div>${out.noDataText()}</div>`
+            html += `<div class="em-tooltip-text">${out.noDataText()}</div>`
             return html
         }
 
@@ -679,7 +679,7 @@ export const map = function (config) {
      */
     function buildGroupedTooltipHTML(regionId) {
         const codes = out.statCodes_
-        if (!codes?.length) return `<div>${out.noDataText()}</div>`
+        if (!codes?.length) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
         const bw = 16 // slightly wider bars in tooltip for readability
         const gap = 4
@@ -696,7 +696,7 @@ export const map = function (config) {
             const s = out.statData(code)?.get(regionId)
             if (s?.value != null && !isNaN(s.value)) maxVal = Math.max(maxVal, s.value)
         })
-        if (maxVal === 0) return `<div>${out.noDataText()}</div>`
+        if (maxVal === 0) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
         let bars = ''
         codes.forEach((code, i) => {

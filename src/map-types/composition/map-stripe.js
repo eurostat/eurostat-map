@@ -1,10 +1,16 @@
 import { select } from 'd3-selection'
 import { arc, pie } from 'd3-shape'
-import { schemeCategory10 } from 'd3-scale-chromatic'
 import { createStatMap } from '../../core/stat-map'
 import * as StripeCompositionLegend from '../../legend/legend-stripe-composition'
-import { getRegionsSelector } from '../../core/utils'
-import { buildGetterSetters, applyConfigValues, getComposition, addMouseEventsToRegions, buildStatCompositionMethod } from './composition-map'
+import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
+import {
+    buildGetterSetters,
+    applyConfigValues,
+    getComposition,
+    addMouseEventsToRegions,
+    buildStatCompositionMethod,
+    ensureCategoryColors,
+} from './composition-map'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/stripe/StripeMapConfig').StripeMapConfig} StripeMapConfig */
@@ -31,13 +37,16 @@ export const map = function (config) {
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
+    out.stripeOtherColor_ = '#FFCC80'
+    out.stripeOtherText_ = 'Other'
     out.showOnlyWhenComplete_ = false
 
     // Tooltip pie chart dimensions
     out.pieChartRadius_ = 40
     out.pieChartInnerRadius_ = 15
 
-    // Internal — stripe maps don't use a totalCode
+    // Internal
+    out.stripeTotalCode_ = undefined
     out.statCodes_ = undefined
 
     // ── Getters/setters ──────────────────────────────────────────────────────
@@ -46,10 +55,13 @@ export const map = function (config) {
         'stripeOrientation_',
         'catColors_',
         'catLabels_',
+        'stripeOtherColor_',
+        'stripeOtherText_',
         'showOnlyWhenComplete_',
         'noDataFillStyle_',
         'pieChartRadius_',
         'pieChartInnerRadius_',
+        'stripeTotalCode_',
         'statCodes_',
     ])
 
@@ -58,16 +70,18 @@ export const map = function (config) {
         'stripeOrientation',
         'catColors',
         'catLabels',
+        'stripeOtherColor',
+        'stripeOtherText',
         'showOnlyWhenComplete',
         'noDataFillStyle',
         'pieChartRadius',
         'pieChartInnerRadius',
+        'stripeTotalCode',
         'statCodes',
     ])
 
     // ── Convenience wrapper ──────────────────────────────────────────────────
-    // Stripe maps have no totalCode — pass null so getComposition skips that logic
-    const _getComposition = (id) => getComposition(id, out, null)
+    const _getComposition = (id) => getComposition(id, out, 'stripeTotalCode_')
 
     // ── statComp config method ───────────────────────────────────────────────
 
@@ -82,6 +96,7 @@ export const map = function (config) {
      * @param {Array}  config.categoryCodes
      * @param {Array}  [config.categoryLabels]
      * @param {Array}  [config.categoryColors]
+     * @param {String} [config.totalCode]
      *
      * @example
      * .statComp({
@@ -94,7 +109,7 @@ export const map = function (config) {
      *   categoryColors: ['#4daf4a', '#377eb8', '#e41a1c'],
      * })
      */
-    out.statComp = buildStatCompositionMethod(out, null)
+    out.statComp = buildStatCompositionMethod(out, 'stripeTotalCode_')
 
     // ── Classification ───────────────────────────────────────────────────────
 
@@ -113,19 +128,34 @@ export const map = function (config) {
 
     //@override
     out.updateStyle = function () {
-        // Assign default colors if not specified
-        if (!out.catColors()) {
-            out.catColors({})
-            for (let i = 0; i < out.statCodes_.length; i++) {
-                out.catColors()[out.statCodes_[i]] = schemeCategory10[i % 10]
-            }
-        }
+        // Assign defaults, including optional "other" bucket when totalCode is used
+        ensureCategoryColors(out, 'stripeTotalCode_', out.stripeOtherColor_, out.stripeOtherText_)
 
         out.catLabels_ = out.catLabels_ || {}
 
+        // Apply style to insets first
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+        }
+
+        // Apply style to main map
+        applyStyleToMap(out)
+
+        return out
+    }
+
+    function applyStyleToMap(map) {
+        if (!map.svg_) return
+
+        // Insets can be external SVGs and may not initialize their own tooltip instance.
+        // Reuse the main map tooltip so hover still works.
+        if (!map._tooltip && out._tooltip) {
+            map._tooltip = out._tooltip
+        }
+
         // Apply stripe fill patterns directly to region paths
-        out.svg()
-            .selectAll(getRegionsSelector(out))
+        map.svg()
+            .selectAll(getRegionsSelector(map))
             .style('fill', function (d) {
                 if (this.parentNode.classList.contains('em-cntrg')) return
 
@@ -135,7 +165,7 @@ export const map = function (config) {
                 if (!composition) return out.noDataFillStyle() || 'gray'
 
                 // Build an SVG <pattern> for this region
-                const patt = out
+                const patt = map
                     .svg()
                     .append('pattern')
                     .attr('id', 'pattern_' + id)
@@ -190,10 +220,8 @@ export const map = function (config) {
             })
 
         // Region hover/tooltip events
-        const regions = out.svg().selectAll(getRegionsSelector(out))
-        addMouseEventsToRegions(regions, out)
-
-        return out
+        const regions = map.svg().selectAll(getRegionsSelector(map))
+        addMouseEventsToRegions(regions, map)
     }
 
     // ── Legend ───────────────────────────────────────────────────────────────
@@ -217,7 +245,7 @@ export const map = function (config) {
         let html = `<div class="em-tooltip-bar"><b>${regionName}</b>${regionId ? ` (${regionId})` : ''}</div>`
 
         if (!data.length) {
-            html += `<div>${out.noDataText()}</div>`
+            html += `<div class="em-tooltip-text">${out.noDataText()}</div>`
             return html
         }
 

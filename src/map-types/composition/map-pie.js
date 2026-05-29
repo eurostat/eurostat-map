@@ -144,6 +144,22 @@ export const map = function (config) {
     function applyStyleToMap(map) {
         if (!map.svg_) return
 
+        function hasExplicitNoData(regionId) {
+            const codes = out.statCodes_ || []
+
+            for (let i = 0; i < codes.length; i++) {
+                const entry = map.statData(codes[i])?.get(regionId)
+                if (entry && entry.value === ':') return true
+            }
+
+            if (out.pieTotalCode_) {
+                const totalEntry = map.statData(out.pieTotalCode_)?.get(regionId)
+                if (totalEntry && totalEntry.value === ':') return true
+            }
+
+            return false
+        }
+
         // Insets are built from map templates and may not initialize their own tooltip instance.
         // Reuse the main map tooltip so hover on external inset SVGs still shows tooltip content.
         if (!map._tooltip && out._tooltip) {
@@ -167,6 +183,19 @@ export const map = function (config) {
 
             const selector = getRegionsSelector(map)
             const regions = map.svg().selectAll(selector)
+
+            // Keep no-data region polygons visually consistent with other composition maps.
+            regions
+                .attr('nd', function (d) {
+                    const regionId = d.properties.id
+                    const hasComposition = !!_getComposition(regionId)
+                    return !hasComposition && hasExplicitNoData(regionId) ? 'nd' : ''
+                })
+                .style('fill', function (d) {
+                    const regionId = d.properties.id
+                    const hasComposition = !!_getComposition(regionId)
+                    return !hasComposition && hasExplicitNoData(regionId) ? out.noDataFillStyle() || 'gray' : null
+                })
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, regions, _getComposition)
@@ -348,7 +377,7 @@ export const map = function (config) {
         let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
         if (!data.length) {
-            html += `<div>${out.noDataText()}</div>`
+            html += `<div class="em-tooltip-text">${out.noDataText()}</div>`
             return html
         }
 

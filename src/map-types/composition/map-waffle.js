@@ -345,7 +345,7 @@ export const map = function (config) {
         let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
         if (!comp) {
-            html += `<div>${out.noDataText()}</div>`
+            html += `<div class="em-tooltip-text">${out.noDataText()}</div>`
             return html
         }
 

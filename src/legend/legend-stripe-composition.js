@@ -11,16 +11,42 @@ export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
 
+    //colour legend config (aligned with pie chart color legend)
+    out.colorLegend = {
+        title: null,
+        titlePadding: 10,
+        marginTop: 33,
+        labelOffsets: { x: 5, y: 5 },
+        shapeWidth: 25,
+        shapeHeight: 20,
+        shapePadding: 1,
+        noData: true,
+        noDataText: 'No data',
+    }
+
     //override attribute values with config values
-    if (config) for (let key in config) out[key] = config[key]
+    if (config)
+        for (let key in config) {
+            if (key == 'colorLegend') {
+                if (config.colorLegend === false) {
+                    out.colorLegend = false
+                    continue
+                }
+                for (let p in out.colorLegend) {
+                    if (config.colorLegend[p] !== undefined) {
+                        out.colorLegend[p] = config.colorLegend[p]
+                    }
+                }
+            } else {
+                out[key] = config[key]
+            }
+        }
 
     //@override
     out.update = function () {
         out.updateConfig()
         out.updateContainer()
 
-        const m = out.map
-        const svgMap = m.svg()
         const lgg = out.lgg
 
         //remove previous content
@@ -33,112 +59,74 @@ export const legend = function (map, config) {
         if (out.title) out.addTitle()
         if (out.subtitle) out.addSubtitle()
 
-        //draw legend elements for classes: rectangle + label
+        const baseY = out.getBaseY()
+        const baseX = out.getBaseX()
+
+        if (out.colorLegend) buildColorLegend(out, baseX, baseY)
+
+        //set legend box dimensions
+        out.setBoxDimension()
+    }
+
+    function buildColorLegend(out, baseX, baseY) {
+        const map = out.map
+        const config = out.colorLegend
+
+        out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend').attr('transform', `translate(${baseX},${baseY})`)
+
+        if (config.title) {
+            out._colorLegendContainer
+                .append('text')
+                .attr('id', 'em-color-legend-title')
+                .attr('class', 'em-color-legend-title')
+                .attr('x', 0)
+                .attr('y', out.titleFontSize)
+                .text(config.title)
+        }
+
         let i = 0
-        const scs = m.catColors()
+        const scs = map.catColors()
         for (let code in scs) {
-            //the vertical position of the legend element
-            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
+            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
 
-            //the color
-            const col = m.catColors()[code] || 'lightgray'
-
-            //rectangle
-            lgg.append('rect')
+            out._colorLegendContainer
+                .append('rect')
                 .attr('class', 'em-legend-rect')
-                .attr('x', out.boxPadding)
+                .attr('x', 0)
                 .attr('y', y)
-                .attr('width', out.shapeWidth)
-                .attr('height', out.shapeHeight)
+                .attr('width', config.shapeWidth)
+                .attr('height', config.shapeHeight)
                 .style('fill', scs[code])
-                .attr('stroke', 'black')
-                .attr('stroke-width', 0.5)
                 .on('mouseover', function () {
-                    const sel = select(this)
-                    sel.raise()
                     highlightRegions(out.map, code)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId_, highlightRegions, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightRegions(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId_, unhighlightRegions)
                     }
                 })
 
-            //label
-            lgg.append('text')
+            out._colorLegendContainer
+                .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + out.shapeWidth + out.labelOffsets.x)
-                .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dy', '0.35em') // ~vertical centering
-                .text(m.catLabels()[code] || code)
-                .on('mouseover', function () {
-                    svgMap
-                        .selectAll('pattern')
-                        .selectAll("rect[code='" + code + "']")
-                        .style('fill', m.hoverColor())
-                })
-                .on('mouseout', function () {
-                    const col = m.catColors()[code] || 'lightgray'
-                    svgMap
-                        .selectAll('pattern')
-                        .selectAll("rect[code='" + code + "']")
-                        .style('fill', col)
-                })
+                .attr('x', config.shapeWidth + config.labelOffsets.x)
+                .attr('y', y + config.shapeHeight * 0.5)
+                .attr('dy', '0.35em')
+                .text(map.catLabels()[code] || code)
 
             i++
         }
 
-        //'no data' legend box
-        if (out.noData) {
-            const y = out.boxPadding + (out.title ? out.titleFontSize + out.boxPadding : 0) + i * (out.shapeHeight + out.shapePadding)
+        if (config.noData) {
+            const y = out.boxPadding + (config.title ? out.titleFontSize + out.boxPadding : 0) + i * (config.shapeHeight + config.shapePadding)
 
-            //rectangle
-            lgg.append('rect')
-                .attr('class', 'em-legend-rect')
-                .attr('x', out.boxPadding)
-                .attr('y', y)
-                .attr('width', out.shapeWidth)
-                .attr('height', out.shapeHeight)
-                .style('fill', m.noDataFillStyle())
-                .on('mouseover', function () {
-                    svgMap.select('#em-nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
-                    select(this).style('fill', m.hoverColor())
-                })
-                .on('mouseout', function () {
-                    const sel = svgMap
-                        .select('#em-nutsrg')
-                        .selectAll("[nd='nd']")
-                        .style('fill', function (d) {
-                            m.noDataFillStyle()
-                        })
-                    select(this).style('fill', m.noDataFillStyle())
-                })
-
-            //'no data' label
-            lgg.append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', out.boxPadding + out.shapeWidth + out.labelOffsets.x)
-                .attr('y', y + out.shapeHeight * 0.5)
-                .text(out.noDataText)
-                .on('mouseover', function () {
-                    svgMap.select('#em-nutsrg').selectAll("[nd='nd']").style('fill', m.hoverColor())
-                })
-                .on('mouseout', function () {
-                    const sel = svgMap
-                        .select('#em-nutsrg')
-                        .selectAll("[nd='nd']")
-                        .style('fill', function (d) {
-                            m.noDataFillStyle()
-                        })
-                })
+            const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
+            out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
         }
-
-        //set legend box dimensions
-        out.setBoxDimension()
     }
 
     function highlightRegions(map, code) {

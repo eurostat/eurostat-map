@@ -13,6 +13,10 @@ export interface StripeMapConfig extends MapConfig {
     catColors?: Record<string, string>
     /** Cat labels. */
     catLabels?: Record<string, string>
+    /** Stripe other color. */
+    stripeOtherColor?: string
+    /** Stripe other text. */
+    stripeOtherText?: string
     /** Show only when complete. */
     showOnlyWhenComplete?: boolean
     /** No data fill style. */
@@ -21,6 +25,8 @@ export interface StripeMapConfig extends MapConfig {
     pieChartRadius?: number
     /** Pie chart inner radius. */
     pieChartInnerRadius?: number
+    /** Stripe total code. */
+    stripeTotalCode?: string
     /** Stat codes. */
     statCodes?: string[]
     /** Legend. */

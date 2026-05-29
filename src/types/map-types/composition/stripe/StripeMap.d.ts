@@ -21,6 +21,12 @@ export interface StripeMap extends MapInstance {
     catLabels(): any
     catLabels(v: any): this
 
+    stripeOtherColor(): string
+    stripeOtherColor(v: string): this
+
+    stripeOtherText(): string
+    stripeOtherText(v: string): this
+
     showOnlyWhenComplete(): boolean
     showOnlyWhenComplete(v: boolean): this
 
@@ -32,6 +38,9 @@ export interface StripeMap extends MapInstance {
 
     pieChartInnerRadius(): number
     pieChartInnerRadius(v: number): this
+
+    stripeTotalCode(): string | undefined
+    stripeTotalCode(v: string | undefined): this
 
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this
@@ -47,6 +56,8 @@ export interface StripeMap extends MapInstance {
         /** Category labels. */
         categoryLabels?: string[],
         /** Category colors. */
-        categoryColors?: string[]
+        categoryColors?: string[],
+        /** Total code. */
+        totalCode?: string
     ): this
 }
