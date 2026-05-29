@@ -159,7 +159,6 @@
                 .zoomButtons(false)
                 .zoomExtent([0.5, 20])
                 .legend({
-                    title: 'Cause of death',
                     x: 20,
                     y: 190,
                     boxOpacity: 0,
@@ -168,7 +167,7 @@
                     colorLegend: {
                         title: 'Cause of death',
                     },
-                    noDataPadding: 5,
+                    noDataPadding: -10,
                 })
                 .onBuild(() => {
                     //add cartography text
