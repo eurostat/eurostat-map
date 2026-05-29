@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Population Change</title>
+        <style>
+            .em--ps .em-nutsrg {
+                fill: rgb(255, 255, 255) !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+
+        <script>
+            const nutsLevel = 3
+            const map = eurostatmap
+                .map('proportionalSymbol')
+                .dorling(true)
+                //.animateDorling(false)
+                .dorlingWorker(true) // use web worker to not block the main thread during the dorling algorithm
+                .title('Total population & population change')
+                .subtitle('2023')
+                .nutsLevel(nutsLevel)
+                .scale('60M')
+                .stat('size', {
+                    eurostatDatasetCode: 'demo_r_pjangrp3',
+                    filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+                    unitText: 'inhabitants',
+                })
+                .stat('color', {
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT', time: 2023 },
+                    unitText: '‰',
+                    time: '2023',
+                })
+                .psShape('circle')
+                .psMinSize([10, 3, 2, 2][nutsLevel])
+                .psMaxSize([60, 20, 20, 21][nutsLevel])
+                .psFill('yellow')
+                .psFillOpacity(1)
+                .psColors(['#b2182b', '#ef8a62', '#fddbc7', '#d1e5f0', '#67a9cf', '#2166ac'])
+                .psClassificationMethod('threshold')
+                .psThresholds([-10, -5, 0, 5, 10])
+                .psStroke('white')
+                .psStrokeWidth('0.1')
+                .psStrokeOpacity(0.5)
+                .legend({
+                    x: 570,
+                    y: 0,
+                    sizeLegend: {
+                        title: 'Total population',
+                        titlePadding: 20,
+                    },
+                    colorLegend: {
+                        title: 'Population change',
+                        //labelFormatter: (label) => label + '‰',
+                        tickLength: 3,
+                        marginTop: 50,
+                        labelType: 'threshold',
+                        pointOfDivergence: 3,
+                        pointOfDivergenceLabel: 'Increase|Decrease',
+                    },
+                })
+                .zoomButtons(true)
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>

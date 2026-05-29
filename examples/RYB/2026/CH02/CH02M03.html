@@ -15,7 +15,7 @@
                 width: 100%;
             }
             .map-container {
-                width: 50%;
+                width: 100%;
                 height: 200vh;
                 display: block;
             }
@@ -23,15 +23,14 @@
     </head>
 
     <body>
+        <div>
+            <button id="export-png-btn" type="button">Download map as PNG</button>
+            <button id="export-svg-btn" type="button">Download map as SVG</button>
+        </div>
         <div id="maps-wrapper">
-            <!-- <svg id="container1" class="map-container" height="200vh">
-                <svg id="map1"></svg>
-                <g id="newInsets1"></g>
-            </svg> -->
-
-            <svg id="container2" class="map-container" height="200vh">
-                <svg id="map2"></svg>
-                <g id="newInsets2"></g>
+            <svg id="container" class="map-container" height="200vh">
+                <svg id="map"></svg>
+                <g id="newInsets"></g>
             </svg>
         </div>
 
@@ -47,80 +46,14 @@
 
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetBoxPosition = [MAPWIDTH - 250, 70]
-            const insetsCfg1 = createOutermostInsetsConfig()
-            const insetsCfg2 = createOutermostInsetsConfig()
-            createInsetDOMElements(document.getElementById('newInsets1'), insetsCfg1, insetBoxPosition)
-            createInsetDOMElements(document.getElementById('newInsets2'), insetsCfg2, insetBoxPosition)
+            const insetsCfg = createOutermostInsetsConfig()
+            createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
 
-            const map1 = eurostatmap
+            const map = eurostatmap
                 .map('pie')
-                .svgId('map1')
-                .insets(insetsCfg1)
-                .containerId('container1')
-                .width(MAPWIDTH)
-                .height(MAPHEIGHT)
-                .title('Causes of death')
-                .subtitle('% of all deaths, by NUTS 2 regions, 2021')
-                .dorling(true) // to prevent overlapping
-                .scale('20M')
-                .nutsLevel(2)
-                .statPie({
-                    eurostatDatasetCode: 'hlth_cd_asdr2',
-                    filters: {
-                        sex: 'T',
-                        time: '2021',
-                        age: 'TOTAL',
-                        unit: 'RT',
-                    },
-                    unitText: 'death rate per 100 000',
-
-                    categoryParameter: 'icd10',
-                    categoryCodes: ['I', 'C', 'J'],
-                    categoryLabels: ['Circulatory', 'Cancer', 'Respiratory'],
-                    categoryColors: ['#2644A7', '#AF155C', '#33A033'],
-
-                    totalCode: 'A-R_V-Y',
-                })
-                .pieOtherColor('#EFD18C')
-                .pieOtherText('Other')
-                .pieMinRadius(PIESIZE)
-                .pieMaxRadius(PIESIZE)
-                .header(true)
-                .footer(true)
-                .footnote(
-                    'Note: the most common causes of death in the EU were – diseases of the circulatory system (32.5%), cancer (malignant neoplasms; 24.2%), diseases of the respiratory system (7.8%). EU standardised death rate = 963.4 per 100 000 inhabitants. <br>Source: Eurostat (online data code: hlth_cd_asdr2)'
-                )
-                .footnoteWrap(100)
-                .legend({
-                    x: 20,
-                    y: 190,
-                    boxOpacity: 0,
-                    boxFill: 'white',
-                    sizeLegend: false,
-                    colorLegend: {
-                        title: 'Cause of death',
-                    },
-                    noDataPadding: -10,
-                })
-                .zoomButtons(false)
-                .onBuild(() => {
-                    //add cartography text
-                    d3.select('#map1 #em-footnote-2').remove()
-                    d3.selectAll('#map1')
-                        .append('text')
-                        .attr('x', MAPWIDTH - 310)
-                        .attr('y', MAPHEIGHT + 83)
-                        .attr('class', 'em-footnote')
-                        .attr('id', 'em-footnote-2')
-                        .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
-                })
-                .build()
-
-            const map2 = eurostatmap
-                .map('pie')
-                .svgId('map2')
-                .insets(insetsCfg2)
-                .containerId('container2')
+                .svgId('map')
+                .insets(insetsCfg)
+                .containerId('container')
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
                 .title('Main causes of death')
@@ -179,6 +112,17 @@
                         .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
                 })
                 .build()
+
+            const exportBtnPNG = document.getElementById('export-png-btn')
+            exportBtnPNG.addEventListener('click', function () {
+                const factor = 1
+                map2.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+            })
+
+            const exportBtnSVG = document.getElementById('export-svg-btn')
+            exportBtnSVG.addEventListener('click', function () {
+                map2.exportMapToSVG('CH02M03') // filename without extension
+            })
         </script>
     </body>
 </html>
