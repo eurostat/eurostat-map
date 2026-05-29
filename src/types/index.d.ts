@@ -58,16 +58,23 @@ export type EurostatMap = MapInstance
 export type { TooltipConfig } from './core/TooltipConfig'
 export type { LegendConfig } from './legend/LegendConfig'
 export type { StatConfig } from './core/stat/StatConfig'
+export type { StatData } from './core/stat/StatData'
 export type { InsetConfig } from './core/InsetConfig'
 export type { CoastalMarginSettings } from './core/decoration/CoastalMarginSettings'
+export type { ScalebarConfig } from './core/decoration/ScalebarConfig'
+export type { StampConfig } from './core/decoration/StampConfig'
 export type { GridCartogramSettings, GridCartogramMargins } from './core/GridCartogramSettings'
 export type { DorlingSettings, DorlingStrength } from './core/DorlingSettings'
+export type { MinimapConfig } from './core/minimaps'
+export type { LocationConfig } from './core/locations'
+export type { GeometriesClass } from './core/geo/geometries'
 
 // ==================== Legend Configuration Type Exports ====================
 
 // Main legend types
 export type { CategoricalLegendConfig } from './legend/CategoricalLegendConfig'
 export type { MushroomLegendConfig } from './legend/MushroomLegendConfig'
+export type { MushroomSizeLegendConfig, MushroomColorLegendConfig } from './legend/MushroomLegendConfig'
 export type { PatternFillLegendConfig } from './legend/PatternFillLegendConfig'
 
 // Choropleth legend types
@@ -78,9 +85,13 @@ export type { TrivariateLegendConfig } from './legend/choropleth/TrivariateLegen
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'
+export type { BarChartSizeLegendConfig, BarChartColorLegendConfig } from './legend/composition/BarChartLegendConfig'
 export type { CoxcombLegendConfig } from './legend/composition/CoxcombLegendConfig'
+export type { CoxcombSizeLegendConfig, CoxcombColorLegendConfig, CoxcombTimeLegendConfig } from './legend/composition/CoxcombLegendConfig'
 export type { PieChartLegendConfig } from './legend/composition/PieChartLegendConfig'
+export type { PieChartSizeLegendConfig, PieChartColorLegendConfig } from './legend/composition/PieChartLegendConfig'
 export type { WaffleLegendConfig } from './legend/composition/WaffleLegendConfig'
+export type { WaffleSizeLegendConfig, WaffleColorLegendConfig } from './legend/composition/WaffleLegendConfig'
 export type { StripeCompositionLegendConfig } from './legend/composition/StripeCompositionLegendConfig'
 export type {
     SparklineLegendConfig,
@@ -91,9 +102,14 @@ export type {
 
 // Flow legend types
 export type { FlowMapLegendConfig } from './legend/flow/FlowMapLegendConfig'
+export type { FlowWidthLegendConfig, NodeSizeLegendConfig, FlowColorLegendConfig, RegionColorLegendConfig } from './legend/flow/FlowMapLegendConfig'
 
 // Proportional symbol legend types
 export type { ProportionalSymbolsLegendConfig } from './legend/proportional-symbol/ProportionalSymbolsLegendConfig'
+export type {
+    ProportionalSymbolSizeLegendConfig,
+    ProportionalSymbolColorLegendConfig,
+} from './legend/proportional-symbol/ProportionalSymbolsLegendConfig'
 
 // ==================== Map Type Exports ====================
 
@@ -136,6 +152,14 @@ export type { SparkMapConfig, SparkMap, SparkStatConfig }
 
 // Flow map types
 export type { FlowMapConfig, FlowMap }
+export type {
+    FlowNode,
+    FlowLink,
+    FlowGraph,
+    FlowCurvatureSettings,
+    FlowWidthGradientSettings,
+    FlowBundleSettings,
+} from './map-types/flow/FlowMapConfig'
 
 // ==================== Pattern Fill Options ====================
 

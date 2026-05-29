@@ -38,7 +38,20 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
     // render scheduling flag
     let _renderScheduled = false
+    out._loadingGeoCount_ = 0
     out._loadingStatCount_ = 0
+
+    const countGeoUpdateTargets = function (map) {
+        let count = 1
+
+        if (!map?.insetTemplates_) return count
+
+        executeForAllInsets(map.insetTemplates_, map.svgId_, (inset) => {
+            count += countGeoUpdateTargets(inset)
+        })
+
+        return count
+    }
 
     /**
      * Statistical data configuration dictionary.
@@ -275,7 +288,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
         if (!out._wrapper_) return
 
-        if (out._loadingGeo_ || out._loadingStatCount_ > 0) {
+        if (out._loadingGeoCount_ > 0 || out._loadingStatCount_ > 0) {
             showSpinner(out._wrapper_, 'Loading…')
         } else {
             hideSpinner(out._wrapper_)
@@ -320,11 +333,11 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * @returns {object} The map instance.
      */
     out.updateGeoData = function () {
-        out._loadingGeo_ = true
+        out._loadingGeoCount_ += countGeoUpdateTargets(out)
         out.updateLoader()
 
         updateGeoMapTemplate(() => {
-            out._loadingGeo_ = false
+            out._loadingGeoCount_ = Math.max(0, out._loadingGeoCount_ - 1)
             out.updateLoader()
 
             if (!out.Geometries.isGeoReady()) return

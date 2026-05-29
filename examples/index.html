@@ -127,12 +127,25 @@
                 object-fit: cover;
                 background: #eef2f7;
                 border-bottom: 1px solid var(--line);
+                transition:
+                    filter 160ms ease,
+                    box-shadow 160ms ease,
+                    transform 160ms ease;
             }
 
             .thumb-link {
                 display: block;
                 text-decoration: none;
                 color: inherit;
+            }
+
+            .card:hover .thumb,
+            .card:focus-within .thumb {
+                filter: saturate(1.08) brightness(1.02);
+                box-shadow:
+                    0 0 0 1px rgba(10, 102, 194, 0.25),
+                    0 6px 18px rgba(10, 102, 194, 0.18);
+                transform: scale(1.01);
             }
 
             .content {
