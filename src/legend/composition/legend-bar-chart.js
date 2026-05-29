@@ -5,8 +5,6 @@ import { executeForAllInsets } from '../../core/utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
-
-
 /**
  * A legend for bar chart maps.
  *
@@ -30,6 +28,7 @@ export const legend = function (map, config) {
     out.sizeLegend = {
         title: null,
         titlePadding: 10,
+        offsetX: 10,
         values: null, // custom values; null → auto [min, mid, max]
         labelFormatter: undefined,
         noData: false,
@@ -137,6 +136,7 @@ export const legend = function (map, config) {
         const domain = classifierSize.domain()
         const legendValues = values || [domain[0], Math.round((domain[0] + domain[1]) / 2), domain[1]]
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
+        const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         let y = 0
 
@@ -158,7 +158,7 @@ export const legend = function (map, config) {
             for (let i = 0; i < segCount; i++) {
                 container
                     .append('rect')
-                    .attr('x', i * segWidth)
+                    .attr('x', offsetX + i * segWidth)
                     .attr('y', y)
                     .attr('width', segWidth)
                     .attr('height', h)
@@ -172,7 +172,7 @@ export const legend = function (map, config) {
             container
                 .append('text')
                 .attr('class', 'em-legend-label')
-                .attr('x', maxBarWidth + 8)
+                .attr('x', offsetX + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
                 .text(formatValue(val, legend.sizeLegend?.labelFormatter))
@@ -212,6 +212,7 @@ export const legend = function (map, config) {
         const domain = classifierSize.domain()
         const legendValues = values || [domain[1], Math.round((domain[0] + domain[1]) / 2), Math.max(domain[0], domain[1] * 0.1)]
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
+        const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         const bw = 16
         const gap = 30
@@ -234,8 +235,8 @@ export const legend = function (map, config) {
         const totalRuleWidth = sortedValues.length * bw + (sortedValues.length - 1) * gap
         container
             .append('line')
-            .attr('x1', 0)
-            .attr('x2', totalRuleWidth)
+            .attr('x1', offsetX)
+            .attr('x2', offsetX + totalRuleWidth)
             .attr('y1', baseline)
             .attr('y2', baseline)
             .attr('stroke', '#aaa')
@@ -243,7 +244,7 @@ export const legend = function (map, config) {
 
         sortedValues.forEach((val, i) => {
             const barH = classifierSize(val)
-            const x = i * (bw + gap)
+            const x = offsetX + i * (bw + gap)
 
             // Bar growing upward from baseline
             container

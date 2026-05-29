@@ -312,73 +312,15 @@
             </div>
         </main>
 
+        <script src="./scripts/example-manifest.js"></script>
         <script>
+            const { paths, previewPathFor, legacyPreviewPathFor, isShowcasePath, typeForPath } = window.eurostatMapExamples
             const fallbackPreview = '../docs/img/previews/euro.png'
 
-            const paths = [
-                'annotations.html',
-                'bar-chart.html',
-                'basic.html',
-                'cartograms/asymmetry/assymetry.html',
-                'categorical.html',
-                'CCM/index.html',
-                'coxcomb.html',
-                'custom-geometries.html',
-                'EU_only.html',
-                'farm_size.html',
-                'flowmap.html',
-                'gdp-per-inhabitant.html',
-                'grid-cartogram.html',
-                'labelling.html',
-                'linked_maps.html',
-                'livestock_composition.html',
-                'mushroom.html',
-                'population-change.html',
-                'population-density.html',
-                'population-dot-density.html',
-                'population-total.html',
-                'pop-unemploy-bivariate.html',
-                'prop-circles.html',
-                'prop-piecharts.html',
-                'prop-symbols.html',
-                'RYB/2026/CH02/CH02M03.html',
-                'RYB/2026/CH03/CH03M02.html',
-                'RYB/2026/CH10/CH10M02.html',
-                'RYB/2026/CH10/CH10M06.html',
-                'RYB/2026/CH11/CH11M04.html',
-                'RYB/2026/CH11/CH11M05.html',
-                'small_multiple.html',
-                'spain.html',
-                'sparklines.html',
-                'sparklines-grid-cartogram.html',
-                'statistics-explained/business/construction/choropleth/index.html',
-                'statistics-explained/business/construction/proportional-circle/index.html',
-                'statistics-explained/business/manufacturing/choropleth/index.html',
-                'statistics-explained/business/manufacturing/proportional-circle/index.html',
-                'statistics-explained/business/NACE/choropleth/index.html',
-                'statistics-explained/business/NACE/proportional-circle/index.html',
-                'statistics-explained/transport/air/airports/index.html',
-                'statistics-explained/transport/air/freight/index.html',
-                'statistics-explained/transport/air/passengers/index.html',
-                'statistics-explained/transport/maritime/flows/index.html',
-                'statistics-explained/transport/maritime/flows/static/index.html',
-                'statistics-explained/transport/maritime/ports/index.html',
-                'statistics-explained/transport/maritime/ports/static/index.html',
-                'trivariate.html',
-                'ur/crude_rate_natural_change.html',
-                'ur/gdp_change.html',
-                'ur/land_cover_stripes.html',
-                'ur/migration.html',
-                'ur/old_dependency.html',
-                'ur/pop_change.html',
-                'ur/proj_pop_change.html',
-                'waffle.html',
-                'world.html',
-            ]
-
             const toTitle = (path) => {
-                const name = path.replace(/\.html$/, '').replace(/\/index$/, '')
-                const tail = name.split('/').slice(-2).join(' / ')
+                const name = path.replace(/\.html$/, '')
+                const parts = name.split('/')
+                const tail = parts[parts.length - 1] === 'index' && parts.length > 1 ? parts[parts.length - 2] : parts[parts.length - 1]
                 return tail.replace(/[-_]/g, ' ').replace(/\b\w/g, (m) => m.toUpperCase())
             }
 
@@ -390,51 +332,41 @@
                 return 'Interactive map example'
             }
 
-            const previewPathFor = (path) => {
-                const filename = path.split('/').pop() || ''
-                const basename = filename.replace(/\.html$/, '')
-                return './img/previews/' + basename + '.png'
+            const titleCache = new Map()
+
+            const readHeadTitle = (html) => {
+                try {
+                    const doc = new DOMParser().parseFromString(html, 'text/html')
+                    const title = doc.querySelector('head title')?.textContent?.trim()
+                    return title || ''
+                } catch {
+                    return ''
+                }
             }
 
-            // Map type assignments: [file, type]
-            const mapTypes = {
-                'EU_only.html': 'Choropleth',
-                'annotations.html': 'Choropleth',
-                'bar-chart.html': 'Bar Chart',
-                'basic.html': 'Choropleth',
-                'categorical.html': 'Categorical',
-                'coxcomb.html': 'Coxcomb',
-                'custom-geometries.html': 'Choropleth',
-                'farm_size.html': 'Stripe',
-                'flowmap.html': 'Flow Map',
-                'gdp-per-inhabitant.html': 'Choropleth',
-                'grid-cartogram.html': 'Cartogram',
-                'labelling.html': 'Choropleth',
-                'linked_maps.html': 'Choropleth',
-                'livestock_composition.html': 'Stripe',
-                'mushroom.html': 'Mushroom',
-                'pop-unemploy-bivariate.html': 'Bivariate',
-                'population-change.html': 'Choropleth',
-                'population-density.html': 'Choropleth',
-                'population-dot-density.html': 'Dot Density',
-                'population-total.html': 'Proportional',
-                'prop-circles.html': 'Proportional',
-                'prop-piecharts.html': 'Pie Charts',
-                'prop-symbols.html': 'Proportional',
-                'small_multiple.html': 'Choropleth',
-                'spain.html': 'Choropleth',
-                'sparklines.html': 'Sparklines',
-                'sparklines-grid-cartogram.html': 'Sparklines',
-                'trivariate.html': 'Trivariate',
-                'waffle.html': 'Waffle',
-                'world.html': 'Choropleth',
+            const resolveTitle = async (path) => {
+                if (titleCache.has(path)) return titleCache.get(path)
+
+                let title = ''
+                try {
+                    const response = await fetch('./' + path)
+                    if (response.ok) {
+                        title = readHeadTitle(await response.text())
+                    }
+                } catch {
+                    title = ''
+                }
+
+                if (!title) title = toTitle(path)
+                titleCache.set(path, title)
+                return title
             }
 
-            const rootPaths = paths.filter((path) => !path.includes('/'))
-            const examples = rootPaths.map((path) => [path, toTitle(path), detectDesc(path), previewPathFor(path), mapTypes[path] || 'Other'])
+            const showcasePaths = paths.filter(isShowcasePath)
+            let examples = []
 
             // Build sidebar nav
-            const allTypes = ['All', ...Array.from(new Set(rootPaths.map((p) => mapTypes[p] || 'Other'))).sort()]
+            const allTypes = ['All', ...Array.from(new Set(showcasePaths.map((p) => typeForPath(p) || 'Other'))).sort()]
             let activeType = 'All'
 
             const sidebarNav = document.getElementById('sidebar-nav')
@@ -458,6 +390,14 @@
             const grid = document.getElementById('grid')
             const stats = document.getElementById('stats')
             const search = document.getElementById('search')
+
+            const loadExamples = async () => {
+                const loaded = await Promise.all(
+                    showcasePaths.map(async (path) => [path, await resolveTitle(path), detectDesc(path), previewPathFor(path), typeForPath(path)])
+                )
+                examples = loaded
+                renderExamples(search.value)
+            }
 
             const renderExamples = (query) => {
                 const q = (query || '').trim().toLowerCase()
@@ -484,8 +424,13 @@
                     img.loading = 'lazy'
                     img.src = previewPath
                     img.onerror = () => {
-                        img.onerror = null
-                        img.src = fallbackPreview
+                        if (img.src.endsWith(legacyPreviewPathFor(file).replace(/^\.\//, ''))) {
+                            img.onerror = null
+                            img.src = fallbackPreview
+                            return
+                        }
+
+                        img.src = legacyPreviewPathFor(file)
                     }
                     img.alt = title + ' preview'
                     thumbLink.appendChild(img)
@@ -524,7 +469,8 @@
                 }
             }
 
-            renderExamples('')
+            stats.textContent = 'Loading examples...'
+            loadExamples()
             search.addEventListener('input', () => renderExamples(search.value))
         </script>
     </body>

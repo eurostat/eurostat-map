@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Map Projection</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-label-TÜRKİYE,
+            .em-label-shadow-TÜRKİYE {
+                font-size: 17px !important;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
+        <script>
+            let projectionFunction = d3.geoAzimuthalEqualArea().rotate([-5, -45.55]).scale(2000)
+            //.geoRobinson()
+            //.geoMercator()
+
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Custom projection test')
+                .nutsLevel('mixed')
+                .nutsYear(2021)
+                .width(600)
+                .height(600)
+                .scale('03M')
+                .projectionFunction(projectionFunction)
+                .labels({
+                    labels: [
+                        {
+                            text: 'SPAIN',
+                            x: -2,
+                            y: 41,
+                            class: 'countries',
+                        },
+                        {
+                            text: 'FRANCE',
+                            x: 2,
+                            y: 44,
+                            class: 'countries',
+                        },
+                    ],
+                    shadows: true,
+                    backgrounds: true,
+                })
+                // .classificationMethod('threshold')
+                // .threshold([50, 75, 100, 150, 300, 850])
+                .zoomExtent([1, 10])
+
+            map.statData().setData({
+                ES: 1,
+                //RS: ':',
+                //XK: ':'
+            })
+            map.build()
+        </script>
+    </body>
+</html>

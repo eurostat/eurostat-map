@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Map Scalebar</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .position({
+                    x: 4790000,
+                    y: 3420000,
+                    z: 1000,
+                })
+                .scalebar({
+                    position: [15, 200], // bottom-left corner
+                    maxWidth: 200, // px
+                    units: ' km', // label suffix
+                    textOffset: [0, 12], // label offset from ticks
+                    height: 90, // total group height
+                    strokeWidth: 1, // line thickness
+                    segmentHeight: 6, // midline height
+                    tickHeight: 10, // tick height
+                })
+                .zoomExtent([0.1, 10])
+                .translateExtent([
+                    [-900, -900], // north / west
+                    [2 * 900, 3 * 900], // east / much further south
+                ])
+                .lockPanUntilZoom(false)
+            map.build()
+        </script>
+    </body>
+</html>

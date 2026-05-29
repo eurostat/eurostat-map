@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <style>
+            .em-grid-shape {
+                stroke-width: 0px !important;
+            }
+            .em--pie .em-grid-text {
+                font-weight: 100;
+                color: #ccc !important;
+                opacity: 0.7;
+                /* font-style: italic; */
+                /* filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3)); */
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+
+        <script>
+            const cropOptions = [
+                { value: 'C1110', text: 'Common wheat and spelt' },
+                { value: 'C1500', text: 'Grain maize and corn-cob mix' },
+                { value: 'C1300', text: 'Barley' },
+                { value: 'C1600', text: 'Triticale' },
+                { value: 'C1200', text: 'Rye and winter cereal mixtures' },
+                { value: 'C1120', text: 'Durum wheat' },
+                { value: 'C1410', text: 'Oats' },
+                { value: 'C2000', text: 'Rice' },
+            ]
+            let map = eurostatmap
+                .map('pie')
+                .gridCartogram(true)
+                .gridCartogramMargins({ top: 60, right: 90, bottom: 40, left: 1 })
+                //.gridCartogramShape('hexagon')
+                .gridCartogramCellPadding(20)
+                .pieMinRadius(10)
+                .pieMaxRadius(22)
+
+                .title('Cereal production')
+                .subtitle('2024')
+                .scale('60M')
+                .nutsLevel(0)
+                .statPie(
+                    {
+                        eurostatDatasetCode: 'apro_cpshr',
+                        filters: { strucpro: 'HPRD_HUMD_EU_THS_T', time: '2024' },
+                        unitText: '(1 000 tonnes)',
+                    },
+                    'crops', //parameter that the categories belong to
+                    cropOptions.map((d) => d.value), //category codes
+                    cropOptions.map((d) => d.text), //category labels
+                    ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
+                    'C0000' //code for the total (all causes of death)
+                )
+                .pieOtherColor('#FFCC80')
+                .pieOtherText('Other')
+
+                .legend({
+                    x: 550,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: 'Tonnes',
+                        titlePadding: 15,
+                        values: [500, 40000],
+                        labelFormatter: (v) => new Intl.NumberFormat('en-GB', { notation: 'compact', compactDisplay: 'short' }).format(v * 1000),
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                        noData: false,
+                    },
+                })
+                .hoverColor('#ffa500')
+            map.build()
+        </script>
+    </body>
+</html>

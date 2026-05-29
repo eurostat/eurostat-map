@@ -1,8 +1,8 @@
 /**
  * generate-previews.js
  *
- * Generates preview screenshots for every root-level HTML example in /examples/
- * and saves them as PNG files to /examples/img/previews/<basename>.png.
+ * Generates preview screenshots for every HTML example in /examples/
+ * and saves them as PNG files mirroring the example tree under /examples/img/previews/.
  *
  * Usage:
  *   node scripts/generate-previews.js
@@ -16,13 +16,14 @@
  *   PREVIEW_HEIGHT - viewport height (default: 750)
  *   PREVIEW_WAIT   - extra ms to wait after network idle for D3 to finish rendering (default: 4000)
  *   PREVIEW_PORT   - local server port (default: 8765)
- *   PREVIEW_ONLY   - comma-separated basenames to process (e.g. basic,flowmap)
+ *   PREVIEW_ONLY   - comma-separated example paths or basenames to process (e.g. basic,flow/flowmap)
  */
 
 const http = require('http')
 const fs = require('fs')
 const path = require('path')
 const { execSync } = require('child_process')
+const { paths, previewPathFor } = require('./example-manifest')
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const ROOT = path.resolve(__dirname, '..', '..')
@@ -61,12 +62,15 @@ try {
     process.exit(1)
 }
 
-// ── Collect root-level example files ─────────────────────────────────────────
-const examples = fs
-    .readdirSync(EXAMPLES_DIR)
-    .filter((f) => f.endsWith('.html') && f !== 'index.html')
-    .filter((f) => !ONLY || ONLY.includes(f.replace('.html', '')))
-    .sort()
+// ── Collect example files from the shared manifest ───────────────────────────
+const examples = paths.filter((examplePath) => {
+    if (examplePath === 'index.html') return false
+    if (!ONLY) return true
+
+    const withoutExtension = examplePath.replace(/\.html$/, '')
+    const basename = path.basename(examplePath, '.html')
+    return ONLY.includes(examplePath) || ONLY.includes(withoutExtension) || ONLY.includes(basename)
+})
 
 if (examples.length === 0) {
     console.error('No example HTML files found in', EXAMPLES_DIR)
@@ -126,9 +130,14 @@ async function run() {
     let failed = 0
 
     for (const file of examples) {
-        const basename = file.replace('.html', '')
         const url = `http://127.0.0.1:${PORT}/examples/${file}`
-        const outFile = path.join(OUT_DIR, basename + '.png')
+        const outFile = path.join(
+            OUT_DIR,
+            previewPathFor(file)
+                .replace(/^\.\/img\/previews\//, '')
+                .split('/')
+                .join(path.sep)
+        )
 
         process.stdout.write(`  [${String(passed + failed + 1).padStart(2)}/${examples.length}] ${file} ... `)
 
@@ -136,6 +145,7 @@ async function run() {
         page.on('pageerror', () => {}) // suppress console noise for failed fetches
 
         try {
+            fs.mkdirSync(path.dirname(outFile), { recursive: true })
             await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 })
             // Strip body margin/padding so the SVG sits flush against the viewport
             await page.addStyleTag({ content: 'body { margin: 0 !important; padding: 0 !important; }' })

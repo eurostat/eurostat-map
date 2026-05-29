@@ -25,7 +25,7 @@
                 .map('pie')
                 .dorling(true) // Enable Dorling cartogram
                 .title('Cereal production')
-                .subtitle('')
+                .subtitle('2024')
                 .scale('60M')
                 .nutsLvl(2)
                 //.dorling(true)
@@ -33,7 +33,7 @@
                 .statPie(
                     {
                         eurostatDatasetCode: 'apro_cpshr',
-                        filters: { strucpro: 'PR_HU_EU', time: '2022' },
+                        filters: { strucpro: 'HPRD_HUMD_EU_THS_T', time: '2024' },
                         unitText: '1 000 tonnes',
                     },
                     'crops', //parameter that the categories belong to

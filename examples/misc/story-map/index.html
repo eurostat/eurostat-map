@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>An example of a scrollytelling-map using eurostat-map</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+    <body>
+        <!-- HEADER / TITLE SCREEN -->
+        <section class="header">
+            <div class="header-inner">
+                <p class="header-kicker">eurostat-map.js · interactive storymap</p>
+                <div class="eu-flag-strip">
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                    <div class="flag-dot"></div>
+                </div>
+                <h1>
+                    An example of a scrollytelling-map using eurostat-map
+                </h1>
+                <p class="header-desc">
+                    This example demonstrates how to integrate eurostat-map with scroll-based transitions to create engaging, narrative-driven data visualizations.
+                </p>
+                <div class="scroll-hint">
+                    <div class="scroll-arrow"></div>
+                    Scroll to explore
+                </div>
+            </div>
+        </section>
+
+        <!-- SCROLLYTELLING SECTION -->
+        <section class="story-container">
+            <!-- LEFT: text steps -->
+            <div class="text-column" id="text-column">
+                <div class="step" data-step="1" id="step-1">
+                    <div class="step-card">
+                        <p class="step-number">01 — Initial map</p>
+                        <h2 class="step-title">Choropleth view</h2>
+                        <p class="step-body">
+                            Here we render a standard map generated using eurostat-map. It shows NUTS-2 regions colored by their GDP per capita index relative to the EU-27 average (= 100).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="2" id="step-2">
+                    <div class="step-card">
+                        <p class="step-number">02 — Highlighting regions</p>
+                        <h2>Highlighting regions on the map</h2>
+                        <p>
+                            As the user scrolls, we highlight specific regions (e.g. high-income regions above 130) in gold while dimming the background regions to guide focus.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="3" id="step-3">
+                    <div class="step-card">
+                        <p class="step-number">03 — Transition to chart</p>
+                        <h2>Transitioning the map into a chart</h2>
+                        <p>
+                            Finally, we morph the complex geographic boundaries of each NUTS-2 region into a standard chart. Each polygon smoothly transitions into a dot on a horizontal dot plot grouped by country, illustrating within-country spread.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: sticky map panel -->
+            <!--
+                .map-column is position:sticky in styles.css.
+                .map-stage is the container eurostatmap renders into.
+                main.js calls prepareMountPoint() which clears .map-stage and
+                injects a <div id="eurostatmap-mount"> for the library to use.
+            -->
+            <div class="map-column">
+                <div class="map-frame">
+                    <div class="map-header">
+                        <div class="map-title" id="map-title">Loading map…</div>
+                        <div class="map-subtitle" id="map-subtitle">GDP index · EU-27 = 100 · NUTS-2 regions</div>
+                        <div class="map-step-indicator" id="step-indicator">Step 1 of 3</div>
+                    </div>
+
+                    <!--
+                        .map-stage: eurostatmap mounts its SVG here.
+                        DO NOT put any child elements here in HTML —
+                        main.js clears and repopulates it via prepareMountPoint().
+                    -->
+                    <div class="map-stage" id="map-stage"></div>
+
+                    <!--
+                        The colour legend bar at the bottom of the panel.
+                        This mirrors the choropleth classification in main.js.
+                        For the chart view it stays visible as a reference.
+                    -->
+                    <div class="map-legend" id="map-legend">
+                        <span class="legend-label">low</span>
+                        <div class="legend-swatch" style="background: #e470a8"></div>
+                        <div class="legend-swatch" style="background: #e8b8cc"></div>
+                        <div class="legend-swatch" style="background: #d4c8e0"></div>
+                        <div class="legend-swatch" style="background: #b5e4c0"></div>
+                        <div class="legend-swatch" style="background: #6dca8a"></div>
+                        <div class="legend-swatch" style="background: #2a9455"></div>
+                        <div class="legend-swatch" style="background: #1a7a45"></div>
+                        <span class="legend-end-label">high GDP index</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <div>
+                <p class="footer-brand">eurostat-map.js</p>
+                <p class="footer-meta">
+                    Data: Eurostat · GDP per capita in PPS, EU-27 = 100
+                    <br />
+                    Geography: NUTS-2, 2021 vintage · Built with D3.js
+                </p>
+            </div>
+            <div style="text-align: right">
+                <p class="footer-meta">© EuroGeographics · © OpenStreetMap</p>
+            </div>
+            <p class="footer-note">
+                Illustrative prototype. Manual data approximates Eurostat
+                <code>nama_10r_3gdp</code>
+                . Replace
+                <code>statData().setData()</code>
+                with
+                <code>stat({ eurostatDatasetCode: 'nama_10r_3gdp', ... })</code>
+                for live figures.
+            </p>
+        </footer>
+
+        <!--
+            Load order matters:
+            1. D3 UMD bundle  → window.d3  (used by tweenToChart in main.js)
+            2. eurostatmap UMD bundle → window.eurostatmap
+            3. main.js (plain script, not a module — references window globals)
+
+            If you bundle with Vite/Rollup, replace these three tags with your
+            bundler's entry point and adjust the imports in main.js accordingly.
+        -->
+        <!-- Shim Node's `global` for browser-bundled dependencies -->
+        <script>
+            window.global = window
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flubber@0.4.2/build/flubber.min.js"></script>
+        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="./main.js"></script>
+    </body>
+</html>

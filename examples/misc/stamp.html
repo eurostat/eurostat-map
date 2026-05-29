@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Map Stamp</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('stamp test')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                // EU stars example
+                .stamp({
+                    text: 'EUROSTAT 2024',
+                    shape: 'eu-stars',
+                    stampColor: '#003399',
+                    textColor: '#003399',
+                    fontSize: 11,
+                    x: 80,
+                    y: 120,
+                })
+                .zoomButtons(true)
+                .zoomButtonsPosition([750, 10])
+                .legend({ x: 20, y: 150, title: 'Population density' })
+                .build()
+
+            setTimeout(() => {
+                map.stamp({
+                    text: 'EU~=~21.4',
+                    padding: 5,
+                    x: 7, // left edge of stamp
+                    y: 440,
+                    fontSize: 12, // fixed font size — shape grows to fit
+                    textAnchor: 'start', // grows rightward from x
+                    shape: 'eu-stars',
+                    starSize: 0.6, // 30% of the default "just touching" size — leaves visible gaps between stars
+                    rx: 3,
+                    strokeWidth: 1.5,
+                })
+            }, 100)
+
+            // // Rounded rectangle example
+            // map.stamp({
+            //     text: 'PRELIMINARY',
+            //     shape: 'rectangle',
+            //     rx: 6,
+            //     fontSize: 10,
+            //     padding: 6,
+            // })
+        </script>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Population density in Europe')
+                .width(800)
+                .subtitle('2021')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
+                .legend({ x: 10, y: 130, title: 'Density, people/km²', boxOpacity: 0 })
+                .numberOfClasses(6)
+                .nutsLevel(2)
+                .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .build()
+        </script>
+    </body>
+</html>

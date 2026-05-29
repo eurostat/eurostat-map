@@ -1,0 +1,456 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --map-width: 55vw;
+    --text-width: 38vw;
+    --col-gap: 7vw;
+    --bg: #f5f2ec;
+    --ink: #1a1814;
+    --ink-muted: #6b6760;
+    --ink-faint: #b0aca5;
+    --accent: #2a6e3f;
+    --accent-light: #e8f0eb;
+    --rule: #d4cfc8;
+    --card-bg: #fffefb;
+    --card-shadow: 0 2px 24px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+/* ── HEADER ──────────────────────────────────────────── */
+.header {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 10vw;
+    position: relative;
+    overflow: hidden;
+}
+.header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #e8f0eb 0%, #f5f2ec 60%);
+    z-index: 0;
+}
+.header-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+}
+.header-kicker {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+}
+.header h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+}
+.header h1 em {
+    font-style: italic;
+    color: var(--accent);
+}
+.header-desc {
+    font-size: 17px;
+    color: var(--ink-muted);
+    max-width: 480px;
+    margin-bottom: 3rem;
+    font-weight: 300;
+}
+.scroll-hint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink-faint);
+}
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 1.5px solid var(--ink-faint);
+    border-bottom: 1.5px solid var(--ink-faint);
+    transform: rotate(45deg);
+    animation: bob 1.8s ease-in-out infinite;
+}
+@keyframes bob {
+    0%,
+    100% {
+        transform: rotate(45deg) translateY(0);
+    }
+    50% {
+        transform: rotate(45deg) translateY(4px);
+    }
+}
+.eu-flag-strip {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 2rem;
+}
+.flag-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffd700;
+}
+
+/* ── SCROLLYTELLING LAYOUT ───────────────────────────── */
+.story-container {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    padding: 0 5vw;
+}
+
+/* Left: scrolling text column */
+.text-column {
+    width: var(--text-width);
+    padding: 10vh 0 30vh;
+    flex-shrink: 0;
+}
+
+/* Right: sticky map column */
+.map-column {
+    width: var(--map-width);
+    margin-left: var(--col-gap);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-frame {
+    width: 100%;
+    height: 88vh;
+    background: var(--card-bg);
+    border-radius: 4px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--rule);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.map-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid var(--rule);
+    flex-shrink: 0;
+    position: relative;
+}
+.map-title {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--ink);
+    transition: opacity 0.3s;
+}
+.map-subtitle {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 2px;
+    transition: opacity 0.3s;
+}
+.map-step-indicator {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    font-size: 10px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/*
+ * .map-stage is the flex-growing area where eurostatmap renders its SVG.
+ *
+ * eurostatmap appends an SVG to #eurostatmap-mount (created by main.js).
+ * We size the mount div to fill .map-stage, then let the library measure
+ * its container width via offsetWidth to set map.width_.
+ *
+ * overflow:hidden prevents the legend/footnote inside the eurostatmap SVG
+ * from spilling outside the frame.
+ */
+.map-stage {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0; /* required for flex children to shrink */
+}
+
+/* The div that main.js inserts as eurostatmap's mount point */
+#eurostatmap-mount {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+/*
+ * eurostatmap renders an SVG with class .em-map.
+ * We want it to fill the mount div exactly.
+ * The library sets explicit width/height attrs on the SVG —
+ * we override with 100% so it scales with the container.
+ */
+#eurostatmap-mount .em-map {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+/*
+ * .em-map-wrapper is the div eurostatmap wraps around its SVG
+ * (for spinner + tooltip positioning). It must fill the mount div.
+ */
+#eurostatmap-mount .em-map-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+/* Colour legend strip at the bottom of the map frame */
+.map-legend {
+    padding: 12px 20px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+.legend-label {
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-right: 6px;
+}
+.legend-swatch {
+    height: 8px;
+    border-radius: 2px;
+    flex: 1;
+    max-width: 28px;
+}
+.legend-end-label {
+    font-size: 10px;
+    color: var(--ink-faint);
+    margin-left: 6px;
+}
+
+/* ── TEXT CARDS ──────────────────────────────────────── */
+.step {
+    margin-bottom: 40vh;
+    opacity: 0.35;
+    transform: translateY(20px);
+    transition:
+        opacity 0.4s ease,
+        transform 0.4s ease;
+}
+.step.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+.step:last-child {
+    margin-bottom: 10vh;
+}
+
+.step-card {
+    background: var(--card-bg);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 28px 32px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+}
+.step-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 24px;
+    bottom: 24px;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+}
+
+.step-number {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+}
+.step-card h2 {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 14px;
+    color: var(--ink);
+}
+.step-card h2 em {
+    font-style: italic;
+    color: var(--accent);
+}
+.step-card p {
+    font-size: 15px;
+    color: var(--ink-muted);
+    line-height: 1.7;
+    font-weight: 300;
+}
+.step-card p + p {
+    margin-top: 0.85em;
+}
+
+.stat-callout {
+    margin-top: 18px;
+    padding: 14px 16px;
+    background: var(--accent-light);
+    border-radius: 2px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+.stat-num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+}
+.stat-desc {
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.4;
+    max-width: 200px;
+}
+
+/* ── EUROSTATMAP OVERRIDES ───────────────────────────── */
+/*
+ * These rules adjust eurostatmap's default styles to fit
+ * the story map aesthetic. They are namespaced under
+ * #eurostatmap-mount to avoid interfering with other
+ * eurostatmap instances on the page.
+ */
+
+/* Legend box — match card background */
+#eurostatmap-mount .em-legend rect.em-legend-box {
+    fill: var(--card-bg) !important;
+    stroke: var(--rule) !important;
+}
+#eurostatmap-mount .em-legend text {
+    font-family: var(--sans) !important;
+    font-size: 10px !important;
+    fill: var(--ink-muted) !important;
+}
+
+/* Footnote — keep it subtle */
+#eurostatmap-mount .em-footnote {
+    font-family: var(--sans) !important;
+    font-size: 9px !important;
+    fill: var(--ink-faint) !important;
+}
+
+/* Tooltip — inherit our card style */
+.em-tooltip {
+    font-family: var(--sans) !important;
+    font-size: 13px !important;
+    background: var(--card-bg) !important;
+    border: 1px solid var(--rule) !important;
+    border-radius: 3px !important;
+    box-shadow: var(--card-shadow) !important;
+}
+.em-tooltip-bar {
+    background: var(--accent) !important;
+    color: #fff !important;
+    padding: 6px 10px !important;
+    font-weight: 500 !important;
+}
+.em-tooltip-text {
+    padding: 6px 10px !important;
+    color: var(--ink) !important;
+}
+
+/* Zoom buttons — subtle */
+#eurostatmap-mount .em-zoom-btn {
+    fill: var(--card-bg) !important;
+    stroke: var(--rule) !important;
+}
+#eurostatmap-mount .em-zoom-btn text {
+    fill: var(--ink-muted) !important;
+}
+
+/* ── CHART OVERLAY (injected by tweenToChart in main.js) ── */
+/*
+ * The chart overlay is an SVG <g> appended directly to the eurostatmap SVG.
+ * These rules style the axes and dots via CSS classes set in main.js.
+ */
+.em-chart-dot {
+    transition: opacity 0.3s;
+    cursor: default;
+}
+.em-chart-avg {
+    transition: opacity 0.3s;
+}
+
+/* ── FOOTER ──────────────────────────────────────────── */
+.footer {
+    padding: 6rem 10vw 4rem;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+.footer-brand {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--ink);
+}
+.footer-meta {
+    font-size: 12px;
+    color: var(--ink-faint);
+    line-height: 1.8;
+}
+.footer-note {
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-style: italic;
+    border-top: 1px solid var(--rule);
+    padding-top: 2rem;
+    margin-top: 3rem;
+    width: 100%;
+}
+.footer-note code {
+    font-style: normal;
+    font-size: 10px;
+    background: #eee;
+    padding: 1px 4px;
+    border-radius: 2px;
+}

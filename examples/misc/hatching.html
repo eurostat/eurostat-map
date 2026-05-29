@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Map Hatching</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .nutsLevel(0)
+                .title('basic test')
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .patternFill([
+                    { pattern: 'dots', regionIds: ['DE', 'IT'], legendLabel: 'EU Founding Members', color: 'orange', strokeWidth: 1 },
+                    { pattern: 'hatching', regionIds: ['ES', 'FR'], legendLabel: 'High Inflation', color: 'grey', strokeWidth: 1 },
+                    { pattern: 'crosshatch', regionIds: ['PL'], legendLabel: 'Transition Economy' },
+                ])
+                .legend({ x: 580 })
+                .zoomExtent([1, 1000])
+                .build()
+        </script>
+    </body>
+</html>

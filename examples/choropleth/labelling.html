@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Choropleth Labelling</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            .em-label-test {
+                font-size: 15px !important;
+            }
+            .em-label-shadow-test {
+                font-size: 15px !important;
+            }
+            .em-label-ocean {
+                font-size: 12px !important;
+                fill: #000a66;
+                font-style: italic;
+            }
+            .em-cntbn {
+                stroke: white !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script src="https://d3js.org/d3-color.v2.min.js"></script>
+        <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
+        <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
+        <script>
+            const labels = eurostatmap.getDefaultLabels()
+            const map = eurostatmap
+                .map('choropleth')
+                .width(800)
+                .svgId('map')
+                .zoomExtent([1, 20])
+                .title('GDP per capita')
+                .subtitle('at current market prices, 2024')
+                .stat({
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { TIME: '2024', UNIT: 'EUR_HAB' },
+                })
+                .nutsLevel(0)
+                .nutsYear(2024)
+                .legend({ title: 'Euro per inhabitant', decimals: 0, x: 640, y: 100 })
+                .classificationMethod('threshold')
+                .thresholds([10000, 20000, 30000, 40000, 50000, 60000])
+
+                .labels({
+                    //values: true,
+                    backgrounds: false,
+                    shadows: true,
+                    labels: labels.EUR_3035.en.filter((d) => d.class == 'seas' || d.class == 'countries'),
+                    processValueLabelCentroids: (region, centroid) => {
+                        // (optional) adjust NUTS1 label positions manually to avoid overlapping
+                        if (region.properties.id == 'ES4') {
+                            return [centroid[0] - 10, centroid[1] + 19]
+                        } else if (region.properties.id == 'DE4') {
+                            return [centroid[0] + 4, centroid[1] + 8]
+                        }
+                        return centroid
+                    },
+                })
+                .insets([
+                    {
+                        geo: 'MT',
+                        scale: '01M',
+                        position: { z: 600 },
+                        title: 'Malta',
+                        width: 150,
+                        height: 90,
+                        x: 0,
+                        y: 0,
+                        labels: { values: true, shadows: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
+                    },
+                ])
+                .insetBoxPosition([640, 5])
+
+                .build()
+        </script>
+    </body>
+</html>

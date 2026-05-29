@@ -43,7 +43,9 @@
         "type-check": "npm run check:types:legend-config-sync && tsc --noEmit && tsc --noEmit test/typescript-test.ts",
         "docs:api": "typedoc --options typedoc.json",
         "docs": "npm run docs:api",
-        "generate-previews": "node examples/scripts/generate-previews.js"
+        "generate-previews": "node examples/scripts/generate-previews.js",
+        "update-examples-manifest": "node examples/scripts/update-examples-manifest.js",
+        "update-examples": "npm run update-examples-manifest && npm run generate-previews"
     },
     "dependencies": {
         "d3-array": "^3.2.4",

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Grid Cartogram Sparklines</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            .em-grid-rect {
+                opacity: 0.5;
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+
+        <script>
+            eurostatmap
+                .map('sparkline')
+                .nutsLevel(0)
+                //.width(600)
+                .gridCartogram(true)
+                //.gridCartogramShape('hexagon')
+                //.sparkLineOffsets({ x: -2, y: 90 }) //for hexagon grids
+                .nutsYear(2016)
+                .title('Population change 2009 - 2023')
+                .subtitle('Change per thousand inhabitants')
+                .transitionDuration(1000)
+                .statSpark({
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: { indic_de: 'GROWRT' },
+                    unitText: 'Population change',
+                    dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                    labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
+                })
+                .sparkType('bar') //line, area, bar
+
+                .sparkLineWidth(29)
+                .sparkLineHeight(100)
+                .sparkLineStrokeWidth(3)
+
+                // Color based on positive/negative values
+                .sparkLineColor((itemValue) => {
+                    if (itemValue > 0) return 'blue'
+                    if (itemValue < 0) return 'red'
+                    return '#777777'
+                })
+                .sparkLineOpacity(0.8)
+                .sparkLineCircleRadius(0)
+                //.sparkLineOffsets({ x: -26, y: -15 })
+                //.sparkLineOffsets({ x: 0, y: 10 })
+                // .sparkTooltipChart({
+                //     width: 150,
+                //     height: 50,
+                //     margin: { left: 30, right: 20, top: 30, bottom: 40 },
+                //     circleRadius: 1.5,
+                // })
+                .legend({
+                    //title: 'Population change',
+                    x: 0,
+                    y: 100,
+                    width: 160,
+                    noData: false,
+                    scaleLegend: {
+                        xAxisRotation: -70,
+                        xAxisTickStep: 2, // show every 2nd tick
+                        showMaxRegion: true, // shows the region with max value (default)
+                        showExampleChart: true, // also show the average line
+                    },
+                })
+                .hoverColor('#ffa500')
+                .build()
+        </script>
+    </body>
+</html>

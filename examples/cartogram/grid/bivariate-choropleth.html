@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Grid Cartogram Bivariate Choropleth</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('bivariateChoropleth')
+                .gridCartogram(true)
+                .title('Unemployment and population density')
+                .subtitle('Inhabitants per km and % unemployed, 2021')
+                .nutsLevel(0)
+                .width(Math.min(1000, window.innerHeight))
+                .nutsYear(2016)
+                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .stat('v2', {
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                    unitText: '%',
+                })
+                .legend({
+                    squareSize: 100,
+                    label1: 'Inhabitants per km²',
+                    label2: '% unemployed',
+                    showBreaks: true,
+                    x: 0,
+                    y: 140,
+                })
+                .seaFillStyle('#d3dee8')
+                .build()
+        </script>
+    </body>
+</html>

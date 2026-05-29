@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        
+        <title>Flow Map</title><meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="flow"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+        <script>
+            const fmtCompact = new Intl.NumberFormat('en', {
+                notation: 'compact',
+                compactDisplay: 'short', // "short" → 1.2K,
+                maximumFractionDigits: 1,
+            })
+            const flowmap = eurostatmap
+                .map('flow')
+                .svgId('flow')
+                .width(800)
+                .scale('60M')
+                .title('French Exports')
+                .subtitle('Top 10 European importers of goods from France in 2022')
+                .flowGraph({
+                    nodes: [
+                        { id: 'FR' },
+                        { id: 'DE' },
+                        { id: 'IT' },
+                        { id: 'ES' },
+                        { id: 'BE' },
+                        { id: 'NL' },
+                        { id: 'CH' },
+                        { id: 'PL' },
+                        { id: 'PT' },
+                        { id: 'AT' },
+                        { id: 'CZ' },
+                    ],
+                    links: [
+                        { source: 'FR', target: 'DE', value: 82018369.72 },
+                        { source: 'FR', target: 'IT', value: 49697198.92 },
+                        { source: 'FR', target: 'ES', value: 45422327.56 },
+                        { source: 'FR', target: 'NL', value: 34453478.99 },
+                        { source: 'FR', target: 'CH', value: 16164188.98 },
+                        { source: 'FR', target: 'PL', value: 12673336.04 },
+                        { source: 'FR', target: 'PT', value: 7178656.08 },
+                        { source: 'FR', target: 'AT', value: 6305366.1 },
+                        { source: 'FR', target: 'CZ', value: 5883790.49 },
+                        { source: 'FR', target: 'BE', value: 43038180.93 },
+                    ],
+                })
+                .flowArrows(false)
+                .flowOpacity(1)
+                .flowColor('#65a061')
+                .flowCurvatureSettings({
+                    gapX: 10, // how far before/after node to begin/end curve
+                    padX: 2, // horizontal clearance near node stems
+                    padY: 2, // vertical collision detection padding
+                    bumpY: 1, // extra height for hop
+                    curvature: 0.5, // 0..1; default sankey smoothness
+                })
+                .nutsLevel(0)
+                .legend({
+                    x: 10,
+                    y: 120,
+                    boxOpacity: 0,
+                    barChart: false,
+                    flowWidthLegend: {
+                        title: 'Trade (€)',
+                        titlePadding: 25,
+                        values: [25000000, 80000000],
+                    },
+                    regionColorLegend: { title: ' ' },
+                })
+                .drawCoastalMargin(false)
+                .insets(false)
+                .labels({
+                    values: true,
+                    backgrounds: false,
+                    shadows: true,
+                    valuesFormatter: (value) => fmtCompact.format(value),
+                })
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>
