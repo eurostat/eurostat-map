@@ -58,6 +58,7 @@
 - [Quick Start](#quick-start)
 - [Examples](https://eurostat.github.io/eurostat-map/examples/index.html)
 - [Documentation](#documentation)
+- [Made with eurostat-map](#made-with-eurostat-map)
 - [About](#about)
 - [Contribute](#contribute)
 - [Copyright](#copyright)
@@ -108,6 +109,19 @@ For detailed documentation on what eurostat-map can do, see the **[documentation
 For generated, signature-accurate API docs from TypeScript/JSDoc, see [the API docs](https://eurostat.github.io/eurostat-map/docs/api/index.html).
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
+
+## Made with eurostat-map
+
+Here are some public projects and publications built with eurostat-map:
+
+- [IMAGE](https://gisco-services.ec.europa.eu/image/) - Eurostat's interactive map generator.
+- [Regions in Europe 2025](https://ec.europa.eu/eurostat/web/interactive-publications/regions-2025) - interactive publication.
+- [Eurostat Regional Yearbook](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Eurostat_regional_yearbook) - interactive publication.
+- [Women make up 53% of science & technology ranks](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260529-2)
+- [Average work week nearly 36 hours in the EU in 2025](https://ec.europa.eu/eurostat/en/web/products-eurostat-news/w/ddn-20260527-1)
+- [Tourism nights booked via platforms hit nearly 1 billion](https://ec.europa.eu/eurostat/en/web/products-eurostat-news/w/ddn-20260401-1)
+- [EU rail passengers made 8.7 billion trips in 2024](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260514-1)
+- [EU life expectancy increases again and hits 81.5 years](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260313-3)
 
 ## About
 
