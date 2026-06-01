@@ -819,17 +819,19 @@ export const map = function (config) {
         const regions = map.svg().selectAll(selector)
 
         regions
-            .on('mouseover', function (e, rg) {
+            .on('mouseenter', function (e, rg) {
+                console.log('mouseenter', rg.properties.id)
                 if (!getRegionTotal(rg.properties.id)) return
                 const sel = select(this)
                 sel.attr('fill___', sel.style('fill'))
                 sel.style('fill', out.hoverColor_)
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
-            .on('mousemove', function (e) {
-                if (out._tooltip) out._tooltip.mousemove(e)
-            })
-            .on('mouseout', function () {
+            // .on('mousemove', function (e) {
+            //     if (out._tooltip) out._tooltip.mousemove(e)
+            // })
+            .on('mouseleave', function (e, rg) {
+                console.log('mouseleave', rg.properties.id)
                 const sel = select(this)
                 const newFill = sel.attr('fill___')
                 if (newFill) {
@@ -854,7 +856,7 @@ export const map = function (config) {
         let cachedSelection = null
 
         symbols
-            .on('mouseover', function (e, rg) {
+            .on('mouseenter', function (e, rg) {
                 if (shouldOmit(rg.properties.id) || !getRegionTotal(rg.properties.id)) return
 
                 // Cache for mousemove performance
@@ -866,12 +868,12 @@ export const map = function (config) {
                 highlightCoxcombChart(cachedSelection, true)
                 if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
-            .on('mousemove', function (e, rg) {
-                // Use cached data to avoid expensive checks on every mousemove
-                if (!cachedRegion) return
-                if (out._tooltip) out._tooltip.mousemove(e)
-            })
-            .on('mouseout', function (e, rg) {
+            // .on('mousemove', function (e, rg) {
+            //     // Use cached data to avoid expensive checks on every mousemove
+            //     if (!cachedRegion) return
+            //     if (out._tooltip) out._tooltip.mousemove(e)
+            // })
+            .on('mouseleave', function (e, rg) {
                 // Use cached data for consistent behavior
                 if (!cachedRegion || !cachedSelection) return
 
@@ -930,8 +932,8 @@ export const map = function (config) {
             cachedCell = null
         }
 
-        shapes.on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
-        charts.style('pointer-events', 'all').on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)
+        shapes.on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
+        charts.style('pointer-events', 'all').on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
     }
 
     /**

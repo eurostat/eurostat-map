@@ -21,6 +21,29 @@ export const tooltip = function (config) {
     let lastX = 0
     let lastY = 0
     let currentHtml = '' // Cache current HTML to avoid unnecessary DOM updates
+    let parentRect = null
+    let cachedParentWidth = 0
+    let cachedParentHeight = 0
+    let cachedTooltipWidth = 0
+    let cachedTooltipHeight = 0
+    let lastWindowWidth = window.innerWidth
+    let lastWindowHeight = window.innerHeight
+
+    function refreshBoundsAndSize() {
+        const parent = document.getElementById(config.containerId)
+        if (!parent) return
+
+        parentRect = parent.getBoundingClientRect()
+        cachedParentWidth = parentRect.width
+        cachedParentHeight = parentRect.height
+
+        const node = tooltip.node()
+        cachedTooltipWidth = node.clientWidth
+        cachedTooltipHeight = node.clientHeight
+
+        lastWindowWidth = window.innerWidth
+        lastWindowHeight = window.innerHeight
+    }
 
     function my() {
         tooltip = select('#' + config.id)
@@ -35,12 +58,15 @@ export const tooltip = function (config) {
         if (html !== currentHtml) {
             tooltip.html(html)
             currentHtml = html
+            // Tooltip dimensions can change after HTML updates.
+            refreshBoundsAndSize()
         }
         if (html) {
             let x = event.pageX
             let y = event.pageY
             lastX = x
             lastY = y
+            if (!parentRect) refreshBoundsAndSize()
             my.ensureTooltipOnScreen(x, y)
             // Fade in
             tooltip
@@ -75,6 +101,7 @@ export const tooltip = function (config) {
         }
         // Clear HTML cache for next hover
         currentHtml = ''
+        parentRect = null
         // Fade out
         tooltip.interrupt().transition().duration(config.transitionDuration).style('opacity', 0)
     }
@@ -98,31 +125,31 @@ export const tooltip = function (config) {
     my.ensureTooltipOnScreen = function (eventX, eventY) {
         let node = tooltip.node()
 
+        // Refresh cached layout info only when viewport changes or cache is empty.
+        if (!parentRect || window.innerWidth !== lastWindowWidth || window.innerHeight !== lastWindowHeight) {
+            refreshBoundsAndSize()
+        }
+
         node.style.left = eventX + config.offset.x + 'px'
         node.style.top = eventY - config.offset.y + 'px'
 
-        let parent = document.getElementById(config.containerId)
-        let rect = parent.getBoundingClientRect() // get the bounding rectangle
-        let parentWidth = rect.width
-        let parentHeight = rect.height
-
         //too far right
         //taking into account off screen space but shouldnt be
-        if (node.offsetLeft > rect.left + parentWidth - node.clientWidth) {
-            let left = eventX - node.clientWidth - config.offset.x
+        if (node.offsetLeft > parentRect.left + cachedParentWidth - cachedTooltipWidth) {
+            let left = eventX - cachedTooltipWidth - config.offset.x
             node.style.left = left + 'px'
             // check if mouse covers tooltip
-            if (node.offsetLeft + node.clientWidth > eventX) {
+            if (node.offsetLeft + cachedTooltipWidth > eventX) {
                 //move tooltip left so it doesnt cover mouse
-                let left2 = eventX - node.clientWidth - config.offset.x
+                let left2 = eventX - cachedTooltipWidth - config.offset.x
                 node.style.left = left2 + 'px'
             }
             // node.style.top = node.offsetTop + config.offset.y + "px";
         }
 
         //too far down
-        if (node.offsetTop + node.clientHeight > rect.top + parentHeight) {
-            node.style.top = node.offsetTop - node.clientHeight + 'px'
+        if (node.offsetTop + cachedTooltipHeight > parentRect.top + cachedParentHeight) {
+            node.style.top = node.offsetTop - cachedTooltipHeight + 'px'
         }
     }
 
