@@ -133,6 +133,12 @@
                 const map2 = eurostatmap
                     .map('waffle')
                     .dorling(true)
+                    .dorlingSettings({
+                        animate: true,
+                        strength: { x: 1, y: 1 },
+                        iterations: 1,
+                        padding: -10,
+                    })
                     .svgId('map2')
                     .insets(insetsCfg2)
                     .containerId('container2')

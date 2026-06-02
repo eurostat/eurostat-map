@@ -15,6 +15,8 @@ import {
     addMouseEventsToRegions,
     addMouseEventsToGridCartogram,
     styleMixedNUTSRegions,
+    hasExplicitNoDataForComposition,
+    applyCompositionRegionDataFill,
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
@@ -285,6 +287,13 @@ export const map = function (config) {
 
             const selector = getRegionsSelector(out)
             const regions = out.svg().selectAll(selector)
+
+            applyCompositionRegionDataFill(
+                regions,
+                _getComposition,
+                (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'barTotalCode_'),
+                out.noDataFillStyle()
+            )
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, regions, _getComposition)

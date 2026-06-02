@@ -1,8 +1,13 @@
-/* region fill */
-.em--waffle .em-cntrg,
-.em--waffle .em-nutsrg {
+/* muted country fill */
+.em--waffle .em-cntrg {
     fill: #f2f2f2;
 }
+
+/* nuts fill (regions with data) */
+.em--waffle .em-nutsrg {
+    fill: #fffeef;
+}
+
 /*  muted nuts boundaries */
 .em--waffle .em-bn-1,
 .em--waffle .em-bn-2,

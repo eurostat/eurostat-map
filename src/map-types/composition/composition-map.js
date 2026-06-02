@@ -354,6 +354,56 @@ export const styleMixedNUTSRegions = function (map, regions, getCompositionFn) {
     })
 }
 
+/**
+ * Return true when at least one composition stat entry for the region is
+ * explicit no-data (':').
+ *
+ * @param {Object} map - The map instance
+ * @param {Object} out - The map object
+ * @param {string} regionId - NUTS/region ID
+ * @param {string|null} totalCodeKey - Name of total code key on out (e.g. 'pieTotalCode_')
+ * @returns {boolean}
+ */
+export const hasExplicitNoDataForComposition = function (map, out, regionId, totalCodeKey) {
+    const codes = out.statCodes_ || []
+
+    for (let i = 0; i < codes.length; i++) {
+        const entry = map.statData(codes[i])?.get(regionId)
+        if (entry && entry.value === ':') return true
+    }
+
+    if (totalCodeKey && out[totalCodeKey]) {
+        const totalEntry = map.statData(out[totalCodeKey])?.get(regionId)
+        if (totalEntry && totalEntry.value === ':') return true
+    }
+
+    return false
+}
+
+/**
+ * Apply polygon background fill for composition maps:
+ * - explicit no-data (':') regions get noDataFillStyle
+ * - regions with composition data clear inline fill so in-scope CSS applies
+ *
+ * @param {Object} regions - d3 selection of region elements
+ * @param {Function} getCompositionFn - Function(regionId) => composition|undefined
+ * @param {Function} hasExplicitNoDataFn - Function(regionId) => boolean
+ * @param {string} noDataFillStyle - Fill for explicit no-data regions
+ */
+export const applyCompositionRegionDataFill = function (regions, getCompositionFn, hasExplicitNoDataFn, noDataFillStyle) {
+    regions
+        .attr('nd', function (d) {
+            const regionId = d.properties.id
+            const hasComposition = !!getCompositionFn(regionId)
+            return !hasComposition && hasExplicitNoDataFn(regionId) ? 'nd' : ''
+        })
+        .style('fill', function (d) {
+            const regionId = d.properties.id
+            const hasComposition = !!getCompositionFn(regionId)
+            return !hasComposition && hasExplicitNoDataFn(regionId) ? noDataFillStyle || 'gray' : null
+        })
+}
+
 // ─── Stat composition config builder ─────────────────────────────────────────
 
 /**

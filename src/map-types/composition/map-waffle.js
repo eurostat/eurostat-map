@@ -13,6 +13,8 @@ import {
     addMouseEventsToRegions,
     addMouseEventsToGridCartogram,
     styleMixedNUTSRegions,
+    hasExplicitNoDataForComposition,
+    applyCompositionRegionDataFill,
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
@@ -43,7 +45,7 @@ export const map = function (config) {
     out.waffleCellPadding_ = 0
     out.waffleStrokeFill_ = 'white'
     out.waffleStrokeWidth_ = 0
-    out.waffleRoundedCorners_ = 1
+    out.waffleRoundedCorners_ = 0
     out.waffleTooltipSize_ = 80
 
     out.catColors_ = undefined
@@ -176,6 +178,13 @@ export const map = function (config) {
 
             const selector = getRegionsSelector(map)
             const regions = map.svg().selectAll(selector)
+
+            applyCompositionRegionDataFill(
+                regions,
+                _getComposition,
+                (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'waffleTotalCode_'),
+                out.noDataFillStyle()
+            )
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, regions, _getComposition)
