@@ -136,9 +136,12 @@ export const legend = function (map, config) {
         let i = 0
         const scs = map.catColors() // get the category colors
 
-        Object.keys(scs)
-            .reverse()
-            .forEach((code) => {
+        // Preserve configured category order and always place "other" last.
+        const codes = Object.keys(scs)
+        const orderedCodes = codes.filter((c) => c !== 'other')
+        if (codes.includes('other')) orderedCodes.push('other')
+
+        orderedCodes.forEach((code) => {
                 const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
 
                 // rectangle
