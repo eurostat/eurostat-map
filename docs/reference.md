@@ -408,7 +408,23 @@ eurostatmap
 
 If the sum of the chosen categories do not represent the complete total for that variable, then an optional code can be included as the last parameter passed to the statPie() method. For example, when making a proportional pie chart map for different causes of death, the chosen categories "Respiratory", "Cancer", "Circulatory" do not represent all causes of death. In this case, the code for "all causes of death" is specified ("A-R_V-Y"). The shares of each categories are then calculated according to this total and not just the total of the specified categories. The remaining share is then given the label "other", which can be changed using the pieOtherText() method and the colour of its pie slices can be changed using the pieOtherColor() method.
 
-The same `transform` option available in `map.stat({...})` is also available in composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`) and is applied to each generated category dataset (and total dataset when `totalCode` is used).
+The same `transform` option available in `map.stat({...})` is also available in composition helpers (`statPie`, `statWaffle`, `statBar`, `statComp`) and is applied to each generated category dataset (and total dataset when `totalCode` is used).
+
+All composition helpers (`statPie`, `statWaffle`, `statBar`, `statComp`) also accept a `customData` option as an alternative to `eurostatDatasetCode`:
+
+````javascript
+// Works the same for statBar, statWaffle, statComp
+.statPie({
+    customData: {
+        DE: { cat1: 45, cat2: 30, cat3: 25 },
+        FR: { cat1: 60, cat2: 20, cat3: 20 },
+        // etc.
+    },
+    categoryCodes:  ['cat1', 'cat2', 'cat3'],
+    categoryLabels: ['Category A', 'Category B', 'Category C'],
+    categoryColors: ['#e41a1c', '#377eb8', '#4daf4a'],
+    unitText: 'units',
+})
 
 ```javascript
          .statPie(
@@ -419,78 +435,30 @@ The same `transform` option available in `map.stat({...})` is also available in 
             ["orange", "#A4CDF8", "#2E7AF9", "blue"], //colours
             "A-R_V-Y" //code for the total (all causes of death)
           )
-```
+````
 
-To add data manually you can use the following methods:
+To supply custom data directly without fetching from the Eurostat API, use the `customData` option in `statPie`:
 
 ```javascript
-const cropStats = {
-    C1600: {
-        name: 'Triticale',
-        data: {
-            DE1: 2,
-            //etc
+eurostatmap
+    .map('pieChart')
+    .nutsLevel(0)
+    .statPie({
+        customData: {
+            DE: { cereals: 45, oilseeds: 20, roots: 12, other: 23 },
+            FR: { cereals: 60, oilseeds: 15, roots: 8, other: 17 },
+            ES: { cereals: 38, oilseeds: 22, roots: 18, other: 22 },
+            // etc.
         },
-    },
-    C1200: {
-        name: 'Rye and maslin',
-        data: {
-            DE1: 2,
-            //etc
-        },
-    },
-    C1110: {
-        name: 'Common wheat and spelt',
-        data: {
-            DE1: 2,
-            //etc
-        },
-    },
-    C1300: {
-        name: 'Barley',
-        data: {
-            DE1: 2,
-            //etc
-        },
-    },
-    //etc
-}
-const totalStats = {
-    DE1: 10,
-    //etc
-}
-
-//add our own stat data objects
-for (let k in cropStats) {
-    map.stat(k, {
-        code: k,
+        categoryCodes: ['cereals', 'oilseeds', 'roots', 'other'],
+        categoryLabels: ['Cereals', 'Oilseeds', 'Root crops', 'Other'],
+        categoryColors: ['#e6c619', '#8DB600', '#a05d2b', '#aaaaaa'],
         unitText: '1 000 tonnes',
     })
-}
-// all crops
-map.stat('C0000', {
-    code: 'C0000',
-    unitText: '1 000 tonnes',
-}) // add 'all crops'
-map.pieTotalCode('C0000') //set total code to show on map
-
-//set stat codes to show on map
-map.statCodes(Object.keys(cropStats))
-
-map.build()
-
-// update our stat data after build
-for (let key in map.statData_) {
-    if (cropStats[key]) {
-        map.statData(key).setData({ ...cropStats[key].data })
-    }
-}
-
-// add totals dataset, to calculate 'other' category
-map.statData(['C0000']).setData({ ...totalStats })
-
-map.updateStatValues()
+    .build()
 ```
+
+When `customData` is supplied, `eurostatDatasetCode` and `categoryParameter` are not required. An optional `totalCode` key inside each region object can be provided for the "other" wedge calculation; if omitted the total is auto-computed from the sum of `categoryCodes`.
 
 | Method                                    | Type    | Default value | Description                                                                                                                                                                 |
 | ----------------------------------------- | ------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -756,6 +724,19 @@ eurostatmap
 
 `statSpark({...})` also supports `transform`, identical to `map.stat({...})`.
 
+`statSpark` also accepts a `customData` option as an alternative to `eurostatDatasetCode`. The dates are inferred from the key order of the first region's entries when no explicit `dates` array is provided:
+
+````javascript
+.statSpark({
+    customData: {
+        DE: { '2020': 200, '2021': 190, '2022': 210, '2023': 205 },
+        FR: { '2020': 150, '2021': 160, '2022': 155, '2023': 170 },
+        // etc.
+    },
+    labels: ['2020', '2021', '2022', '2023'], // optional display labels
+    unitText: 'people',
+})
+
 | Method                                      | Type              | Default                                                                                           | Description                                                                                                                                                                                                                                                                  |
 | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**sparkType**([*value*])              | string            | "area"                                                                                            | Type of chart to use. Can be 'line' or 'area'                                                                                                                                                                                                                                |
@@ -812,7 +793,7 @@ const map = eurostatmap
     .flowMinWidth(1)
 
     .build()
-```
+````
 
 | Method                                     | Type               | Default                                                    | Description                                                                                                                                                                                          |
 | ------------------------------------------ | ------------------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

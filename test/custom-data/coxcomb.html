@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Coxcomb Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up monthly tourist overnight stays (thousands) per country
+            // Split into domestic (DOM) and foreign (FOR) tourists
+            const touristData = {
+                DE: {
+                    Jan: { DOM: 28000, FOR: 8000 },
+                    Feb: { DOM: 30000, FOR: 9000 },
+                    Mar: { DOM: 38000, FOR: 13000 },
+                    Apr: { DOM: 42000, FOR: 16000 },
+                    May: { DOM: 52000, FOR: 20000 },
+                    Jun: { DOM: 62000, FOR: 28000 },
+                    Jul: { DOM: 78000, FOR: 38000 },
+                    Aug: { DOM: 82000, FOR: 42000 },
+                    Sep: { DOM: 58000, FOR: 28000 },
+                    Oct: { DOM: 44000, FOR: 18000 },
+                    Nov: { DOM: 32000, FOR: 11000 },
+                    Dec: { DOM: 34000, FOR: 12000 },
+                },
+                FR: {
+                    Jan: { DOM: 18000, FOR: 11000 },
+                    Feb: { DOM: 20000, FOR: 12000 },
+                    Mar: { DOM: 24000, FOR: 16000 },
+                    Apr: { DOM: 28000, FOR: 18000 },
+                    May: { DOM: 34000, FOR: 22000 },
+                    Jun: { DOM: 44000, FOR: 32000 },
+                    Jul: { DOM: 58000, FOR: 48000 },
+                    Aug: { DOM: 62000, FOR: 52000 },
+                    Sep: { DOM: 40000, FOR: 32000 },
+                    Oct: { DOM: 28000, FOR: 18000 },
+                    Nov: { DOM: 20000, FOR: 12000 },
+                    Dec: { DOM: 22000, FOR: 14000 },
+                },
+                ES: {
+                    Jan: { DOM: 12000, FOR: 14000 },
+                    Feb: { DOM: 13000, FOR: 14000 },
+                    Mar: { DOM: 16000, FOR: 18000 },
+                    Apr: { DOM: 20000, FOR: 22000 },
+                    May: { DOM: 22000, FOR: 24000 },
+                    Jun: { DOM: 28000, FOR: 32000 },
+                    Jul: { DOM: 36000, FOR: 52000 },
+                    Aug: { DOM: 38000, FOR: 58000 },
+                    Sep: { DOM: 28000, FOR: 38000 },
+                    Oct: { DOM: 20000, FOR: 24000 },
+                    Nov: { DOM: 14000, FOR: 14000 },
+                    Dec: { DOM: 14000, FOR: 16000 },
+                },
+                IT: {
+                    Jan: { DOM: 15000, FOR: 10000 },
+                    Feb: { DOM: 16000, FOR: 11000 },
+                    Mar: { DOM: 20000, FOR: 15000 },
+                    Apr: { DOM: 28000, FOR: 22000 },
+                    May: { DOM: 30000, FOR: 24000 },
+                    Jun: { DOM: 38000, FOR: 32000 },
+                    Jul: { DOM: 52000, FOR: 44000 },
+                    Aug: { DOM: 58000, FOR: 48000 },
+                    Sep: { DOM: 38000, FOR: 30000 },
+                    Oct: { DOM: 26000, FOR: 20000 },
+                    Nov: { DOM: 17000, FOR: 11000 },
+                    Dec: { DOM: 18000, FOR: 14000 },
+                },
+                PL: {
+                    Jan: { DOM: 8000, FOR: 2800 },
+                    Feb: { DOM: 9000, FOR: 3000 },
+                    Mar: { DOM: 11000, FOR: 4200 },
+                    Apr: { DOM: 14000, FOR: 5600 },
+                    May: { DOM: 18000, FOR: 7200 },
+                    Jun: { DOM: 22000, FOR: 9400 },
+                    Jul: { DOM: 28000, FOR: 12000 },
+                    Aug: { DOM: 30000, FOR: 13000 },
+                    Sep: { DOM: 20000, FOR: 8400 },
+                    Oct: { DOM: 14000, FOR: 5600 },
+                    Nov: { DOM: 9000, FOR: 3000 },
+                    Dec: { DOM: 10000, FOR: 3600 },
+                },
+                NL: {
+                    Jan: { DOM: 5200, FOR: 4800 },
+                    Feb: { DOM: 5600, FOR: 5000 },
+                    Mar: { DOM: 6400, FOR: 6400 },
+                    Apr: { DOM: 8200, FOR: 8600 },
+                    May: { DOM: 9800, FOR: 10200 },
+                    Jun: { DOM: 12000, FOR: 13000 },
+                    Jul: { DOM: 16000, FOR: 18000 },
+                    Aug: { DOM: 17000, FOR: 19000 },
+                    Sep: { DOM: 11000, FOR: 12000 },
+                    Oct: { DOM: 7800, FOR: 8200 },
+                    Nov: { DOM: 5400, FOR: 5000 },
+                    Dec: { DOM: 6200, FOR: 6400 },
+                },
+                SE: {
+                    Jan: { DOM: 6400, FOR: 2200 },
+                    Feb: { DOM: 7000, FOR: 2400 },
+                    Mar: { DOM: 8000, FOR: 3000 },
+                    Apr: { DOM: 9800, FOR: 3800 },
+                    May: { DOM: 12000, FOR: 5000 },
+                    Jun: { DOM: 16000, FOR: 7200 },
+                    Jul: { DOM: 22000, FOR: 9800 },
+                    Aug: { DOM: 23000, FOR: 10000 },
+                    Sep: { DOM: 14000, FOR: 6000 },
+                    Oct: { DOM: 9400, FOR: 3800 },
+                    Nov: { DOM: 6600, FOR: 2400 },
+                    Dec: { DOM: 7200, FOR: 2800 },
+                },
+                AT: {
+                    Jan: { DOM: 5800, FOR: 11000 },
+                    Feb: { DOM: 5600, FOR: 10000 },
+                    Mar: { DOM: 4800, FOR: 7200 },
+                    Apr: { DOM: 5200, FOR: 6800 },
+                    May: { DOM: 6200, FOR: 8400 },
+                    Jun: { DOM: 7400, FOR: 9800 },
+                    Jul: { DOM: 9200, FOR: 14000 },
+                    Aug: { DOM: 10000, FOR: 16000 },
+                    Sep: { DOM: 7200, FOR: 10000 },
+                    Oct: { DOM: 5800, FOR: 7800 },
+                    Nov: { DOM: 4200, FOR: 5600 },
+                    Dec: { DOM: 6200, FOR: 12000 },
+                },
+            }
+
+            const map = eurostatmap
+                .map('coxcomb')
+                .nutsLevel(0)
+                .title('Monthly Tourist Overnights')
+                .subtitle('Made-up thousands of overnight stays')
+                .scale('60M')
+                .coxcombMaxRadius(30)
+                .coxcombMinRadius(4)
+                .insets(false)
+                .statCoxcomb({
+                    customData: touristData,
+                    times: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    timeLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    categoryCodes: ['DOM', 'FOR'],
+                    categoryLabels: ['Domestic', 'Foreign'],
+                    categoryColors: ['#1b9e77', '#d95f02'],
+                    unitText: 'thousand overnights',
+                })
+                .legend({
+                    x: 10,
+                    y: 150,
+                    sizeLegend: { title: 'Total overnights (thousands)' },
+                    colorLegend: { title: 'Tourist origin', noData: false },
+                })
+                .build()
+        </script>
+    </body>
+</html>

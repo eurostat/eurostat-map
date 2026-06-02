@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>Regional Yearbook 2026 CH03M02</title><meta charset="UTF-8" />
+        <title>Regional Yearbook 2026 CH03M02</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="../../insets/insets.css" />
         <link rel="stylesheet" href="../../styles.css" />
@@ -103,7 +103,8 @@
                     svgId: 'legend-container',
                     title: 'Education level',
                     subtitle: `
-                        <tspan x="8" dy="0">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of bachelor's students.</tspan>
+                    <tspan x="8" dy="0">Compared to the average...</tspan> 
+                        <tspan x="8" dy="1.2em">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of bachelor's students.</tspan>
                         <tspan x="8" dy="1.2em">   Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have a higher % of master's students.</tspan>
                         <tspan x="8" dy="1.2em">Areas with more <tspan fill="${red}" class='subtitle-color'>red</tspan> have a higher % of PhD students.</tspan>
                     `,
@@ -113,7 +114,7 @@
                     height: 300,
                     labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
                     labelPosition: legendLabelPosition,
-                    padding: { top: 10, right: 30, bottom: 0, left: 47 },
+                    padding: { top: 15, right: 30, bottom: 0, left: 47 },
                     showLines: true,
                     gridBreaks: 5,
                     minorSubdivisions: 2,

@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data Tests — eurostat-map.js</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 900px;
+                margin: 40px auto;
+                padding: 0 20px;
+                color: #333;
+            }
+            h1 {
+                color: #1a5276;
+            }
+            h2 {
+                color: #2874a6;
+                margin-top: 32px;
+                border-bottom: 1px solid #aed6f1;
+                padding-bottom: 6px;
+            }
+            ul {
+                list-style: none;
+                padding: 0;
+            }
+            li {
+                margin: 8px 0;
+            }
+            a {
+                color: #1a5276;
+                text-decoration: none;
+                padding: 6px 12px;
+                border: 1px solid #aed6f1;
+                border-radius: 4px;
+                display: inline-block;
+                min-width: 220px;
+            }
+            a:hover {
+                background: #eaf4fb;
+            }
+            .desc {
+                color: #777;
+                font-size: 0.85em;
+                margin-left: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>eurostat-map.js — Custom Data Tests</h1>
+        <p>
+            Each page below demonstrates a different map type using
+            <strong>entirely made-up data</strong>
+            injected via the custom data APIs, without any network calls to Eurostat.
+        </p>
+
+        <h2>Single-variable maps</h2>
+        <ul>
+            <li>
+                <a href="choropleth.html">Choropleth</a>
+                <span class="desc">
+                    Happiness index (0–100) —
+                    <code>statData().setData()</code>
+                </span>
+            </li>
+            <li>
+                <a href="categorical.html">Categorical</a>
+                <span class="desc">
+                    Climate zones —
+                    <code>statData().setData()</code>
+                    with string values
+                </span>
+            </li>
+            <li>
+                <a href="proportional-symbols.html">Proportional Symbols</a>
+                <span class="desc">
+                    Urban population —
+                    <code>statData('size').setData()</code>
+                </span>
+            </li>
+            <li>
+                <a href="value-by-alpha.html">Value by Alpha</a>
+                <span class="desc">Renewables share (colour) + green investment (opacity)</span>
+            </li>
+        </ul>
+
+        <h2>Multi-variable maps</h2>
+        <ul>
+            <li>
+                <a href="bivariate.html">Bivariate Choropleth</a>
+                <span class="desc">GDP per capita × life expectancy</span>
+            </li>
+            <li>
+                <a href="trivariate.html">Trivariate (Ternary) Choropleth</a>
+                <span class="desc">Age structure — youth / working-age / elderly</span>
+            </li>
+            <li>
+                <a href="mushroom.html">Mushroom Map</a>
+                <span class="desc">Exports (left) vs imports (right)</span>
+            </li>
+        </ul>
+
+        <h2>Composition maps</h2>
+        <ul>
+            <li>
+                <a href="pie.html">Pie Chart Map</a>
+                <span class="desc">
+                    Electricity generation mix —
+                    <code>statPie({ customData })</code>
+                </span>
+            </li>
+            <li>
+                <a href="bar.html">Bar Chart Map</a>
+                <span class="desc">
+                    Employment by sector —
+                    <code>statBar({ customData })</code>
+                </span>
+            </li>
+            <li>
+                <a href="waffle.html">Waffle Map</a>
+                <span class="desc">
+                    Land use —
+                    <code>statWaffle({ customData })</code>
+                </span>
+            </li>
+            <li>
+                <a href="stripe.html">Stripe Composition Map</a>
+                <span class="desc">
+                    Transport modal split —
+                    <code>statComp({ customData })</code>
+                </span>
+            </li>
+            <li>
+                <a href="coxcomb.html">Coxcomb Map</a>
+                <span class="desc">
+                    Monthly tourist overnights —
+                    <code>statCoxcomb({ customData })</code>
+                </span>
+            </li>
+        </ul>
+
+        <h2>Time-series &amp; flow maps</h2>
+        <ul>
+            <li>
+                <a href="sparkline.html">Sparkline Map</a>
+                <span class="desc">
+                    Annual temperature trend 2018–2024 —
+                    <code>statSpark({ customData })</code>
+                </span>
+            </li>
+            <li>
+                <a href="flow.html">Flow Map</a>
+                <span class="desc">
+                    Trade flows from Germany —
+                    <code>flowGraph({ nodes, links })</code>
+                </span>
+            </li>
+        </ul>
+    </body>
+</html>

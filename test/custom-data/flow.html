@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Flow Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up bilateral trade flows (€ millions) from DE to its main EU partners
+            const map = eurostatmap
+                .map('flow')
+                .nutsLevel(0)
+                .title('Trade Flows from Germany')
+                .subtitle('Made-up export values to top EU partners, € millions')
+                .scale('60M')
+                .flowGraph({
+                    nodes: [
+                        { id: 'DE' },
+                        { id: 'FR' },
+                        { id: 'NL' },
+                        { id: 'IT' },
+                        { id: 'PL' },
+                        { id: 'ES' },
+                        { id: 'AT' },
+                        { id: 'BE' },
+                        { id: 'CZ' },
+                        { id: 'SE' },
+                    ],
+                    links: [
+                        { source: 'DE', target: 'FR', value: 112000 },
+                        { source: 'DE', target: 'NL', value: 98000 },
+                        { source: 'DE', target: 'IT', value: 86000 },
+                        { source: 'DE', target: 'PL', value: 74000 },
+                        { source: 'DE', target: 'ES', value: 58000 },
+                        { source: 'DE', target: 'AT', value: 52000 },
+                        { source: 'DE', target: 'BE', value: 49000 },
+                        { source: 'DE', target: 'CZ', value: 43000 },
+                        { source: 'DE', target: 'SE', value: 31000 },
+                    ],
+                })
+                .flowArrows(false)
+                .flowOpacity(0.8)
+                .flowColor('#2980b9')
+                .insets(false)
+                .legend({
+                    x: 10,
+                    y: 160,
+                    boxOpacity: 0,
+                    flowWidthLegend: {
+                        title: 'Exports (€ million)',
+                        titlePadding: 25,
+                        values: [100000, 50000, 10000],
+                    },
+                })
+                .build()
+        </script>
+    </body>
+</html>

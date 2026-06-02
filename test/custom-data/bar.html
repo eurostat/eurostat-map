@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Bar Chart Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up employment by sector (thousands of persons) per country
+            const employmentData = {
+                BE: { services: 4120, industry: 1050, agriculture: 65 },
+                BG: { services: 1840, industry: 830, agriculture: 200 },
+                CZ: { services: 2920, industry: 1780, agriculture: 110 },
+                DK: { services: 2640, industry: 540, agriculture: 84 },
+                DE: { services: 29800, industry: 10200, agriculture: 620 },
+                EE: { services: 520, industry: 200, agriculture: 22 },
+                IE: { services: 2140, industry: 540, agriculture: 110 },
+                EL: { services: 2580, industry: 560, agriculture: 420 },
+                ES: { services: 14200, industry: 3200, agriculture: 740 },
+                FR: { services: 23400, industry: 4800, agriculture: 780 },
+                HR: { services: 1020, industry: 380, agriculture: 120 },
+                IT: { services: 17800, industry: 6200, agriculture: 980 },
+                LV: { services: 720, industry: 220, agriculture: 62 },
+                LT: { services: 1020, industry: 300, agriculture: 98 },
+                LU: { services: 340, industry: 42, agriculture: 4 },
+                HU: { services: 2640, industry: 1340, agriculture: 220 },
+                NL: { services: 8400, industry: 1560, agriculture: 280 },
+                AT: { services: 3520, industry: 1020, agriculture: 120 },
+                PL: { services: 11200, industry: 5600, agriculture: 1540 },
+                PT: { services: 4820, industry: 1180, agriculture: 340 },
+                RO: { services: 4200, industry: 2200, agriculture: 1600 },
+                SI: { services: 680, industry: 300, agriculture: 82 },
+                SK: { services: 1500, industry: 840, agriculture: 78 },
+                FI: { services: 2380, industry: 660, agriculture: 98 },
+                SE: { services: 5200, industry: 1340, agriculture: 165 },
+            }
+
+            const map = eurostatmap
+                .map('bar')
+                .nutsLevel(0)
+                .title('Employment by Sector')
+                .subtitle('Made-up figures, thousands of persons')
+                .scale('60M')
+                .barType('stacked')
+                .barGroupMaxHeight(35)
+                .insets(false)
+                .statBar({
+                    customData: employmentData,
+                    categoryCodes: ['services', 'industry', 'agriculture'],
+                    categoryLabels: ['Services', 'Industry', 'Agriculture'],
+                    categoryColors: ['#3498db', '#e67e22', '#2ecc71'],
+                    unitText: 'thousands',
+                })
+                .legend({
+                    x: 10,
+                    y: 150,
+                    sizeLegend: { title: 'Total employed (thousands)' },
+                    colorLegend: { title: 'Sector', noData: false },
+                })
+                .build()
+        </script>
+    </body>
+</html>

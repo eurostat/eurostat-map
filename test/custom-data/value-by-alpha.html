@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Value by Alpha</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // color stat: Made-up renewable energy share (%)
+            const renewableShare = {
+                BE: 18,
+                BG: 22,
+                CZ: 17,
+                DK: 65,
+                DE: 46,
+                EE: 38,
+                IE: 43,
+                EL: 30,
+                ES: 44,
+                FR: 22,
+                HR: 48,
+                IT: 38,
+                CY: 20,
+                LV: 54,
+                LT: 45,
+                LU: 14,
+                HU: 18,
+                MT: 12,
+                NL: 27,
+                AT: 80,
+                PL: 16,
+                PT: 60,
+                RO: 40,
+                SI: 35,
+                SK: 22,
+                FI: 52,
+                SE: 67,
+                NO: 98,
+                CH: 75,
+            }
+
+            // alpha stat: Made-up green investment (€ billions) — higher = more opaque
+            const greenInvestment = {
+                BE: 4.2,
+                BG: 0.8,
+                CZ: 2.1,
+                DK: 5.6,
+                DE: 28.4,
+                EE: 0.7,
+                IE: 3.1,
+                EL: 1.9,
+                ES: 12.3,
+                FR: 18.7,
+                HR: 0.9,
+                IT: 14.2,
+                CY: 0.4,
+                LV: 0.6,
+                LT: 0.8,
+                LU: 1.2,
+                HU: 1.6,
+                MT: 0.3,
+                NL: 9.8,
+                AT: 5.1,
+                PL: 5.4,
+                PT: 4.7,
+                RO: 2.3,
+                SI: 0.8,
+                SK: 1.1,
+                FI: 3.9,
+                SE: 7.6,
+                NO: 8.2,
+                CH: 6.5,
+            }
+
+            const map = eurostatmap
+                .map('valueByAlpha')
+                .nutsLevel(0)
+                .title('Renewables & Green Investment')
+                .subtitle('Colour = renewable share (%), Opacity = investment (€ bn) — made-up data')
+                .scale('60M')
+                .numberOfClasses(5)
+                .insets('default')
+                .legend({ x: 10, y: 160, title: 'Renewable energy (%)' })
+
+            map.stat({ code: 'color', unitText: '%' })
+            map.stat('alpha', { code: 'alpha', unitText: '€ bn' })
+            map.statData().setData(renewableShare)
+            map.statData('alpha').setData(greenInvestment)
+            map.build()
+        </script>
+    </body>
+</html>

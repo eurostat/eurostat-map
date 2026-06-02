@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Stripe Composition Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up transport modal split (% of passenger-km) per country
+            const transportData = {
+                BE: { car: 67, rail: 10, bus: 13, cycling: 8, walking: 2 },
+                BG: { car: 72, rail: 7, bus: 15, cycling: 3, walking: 3 },
+                CZ: { car: 68, rail: 12, bus: 11, cycling: 6, walking: 3 },
+                DK: { car: 60, rail: 11, bus: 9, cycling: 16, walking: 4 },
+                DE: { car: 64, rail: 14, bus: 9, cycling: 10, walking: 3 },
+                EE: { car: 68, rail: 5, bus: 18, cycling: 6, walking: 3 },
+                IE: { car: 73, rail: 9, bus: 11, cycling: 4, walking: 3 },
+                EL: { car: 72, rail: 5, bus: 16, cycling: 2, walking: 5 },
+                ES: { car: 70, rail: 10, bus: 12, cycling: 5, walking: 3 },
+                FR: { car: 66, rail: 13, bus: 10, cycling: 7, walking: 4 },
+                HR: { car: 70, rail: 6, bus: 16, cycling: 5, walking: 3 },
+                IT: { car: 69, rail: 11, bus: 13, cycling: 4, walking: 3 },
+                LV: { car: 65, rail: 6, bus: 20, cycling: 6, walking: 3 },
+                LT: { car: 66, rail: 4, bus: 20, cycling: 7, walking: 3 },
+                LU: { car: 68, rail: 10, bus: 10, cycling: 8, walking: 4 },
+                HU: { car: 63, rail: 12, bus: 16, cycling: 6, walking: 3 },
+                NL: { car: 56, rail: 11, bus: 7, cycling: 22, walking: 4 },
+                AT: { car: 65, rail: 14, bus: 10, cycling: 8, walking: 3 },
+                PL: { car: 67, rail: 10, bus: 15, cycling: 5, walking: 3 },
+                PT: { car: 71, rail: 9, bus: 12, cycling: 4, walking: 4 },
+                RO: { car: 64, rail: 8, bus: 20, cycling: 5, walking: 3 },
+                SI: { car: 69, rail: 8, bus: 13, cycling: 7, walking: 3 },
+                SK: { car: 66, rail: 10, bus: 16, cycling: 5, walking: 3 },
+                FI: { car: 67, rail: 8, bus: 12, cycling: 10, walking: 3 },
+                SE: { car: 62, rail: 12, bus: 10, cycling: 12, walking: 4 },
+                NO: { car: 61, rail: 11, bus: 11, cycling: 13, walking: 4 },
+                CH: { car: 57, rail: 20, bus: 10, cycling: 9, walking: 4 },
+            }
+
+            const map = eurostatmap
+                .map('stripeComposition')
+                .nutsLevel(0)
+                .title('Transport Modal Split')
+                .subtitle('Made-up % of passenger-km')
+                .scale('60M')
+                .stripeWidth(10)
+                .insets('default')
+                .statComp({
+                    customData: transportData,
+                    categoryCodes: ['car', 'rail', 'bus', 'cycling', 'walking'],
+                    categoryLabels: ['Car', 'Rail', 'Bus', 'Cycling', 'Walking'],
+                    categoryColors: ['#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6'],
+                    unitText: '% of passenger-km',
+                })
+                .legend({ x: 10, y: 160, title: 'Mode of transport', boxOpacity: 0.8, boxFill: 'white' })
+                .build()
+        </script>
+    </body>
+</html>

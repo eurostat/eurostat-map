@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Categorical</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up climate zone classification per EU country
+            const climateData = {
+                BE: 'atlantic',
+                BG: 'continental',
+                CZ: 'continental',
+                DK: 'atlantic',
+                DE: 'continental',
+                EE: 'continental',
+                IE: 'atlantic',
+                EL: 'mediterranean',
+                ES: 'mediterranean',
+                FR: 'atlantic',
+                HR: 'mediterranean',
+                IT: 'mediterranean',
+                CY: 'mediterranean',
+                LV: 'continental',
+                LT: 'continental',
+                LU: 'atlantic',
+                HU: 'continental',
+                MT: 'mediterranean',
+                NL: 'atlantic',
+                AT: 'continental',
+                PL: 'continental',
+                PT: 'atlantic',
+                RO: 'continental',
+                SI: 'continental',
+                SK: 'continental',
+                FI: 'nordic',
+                SE: 'nordic',
+                NO: 'nordic',
+                IS: 'arctic',
+                CH: 'alpine',
+            }
+
+            const map = eurostatmap
+                .map('categorical')
+                .nutsLevel(0)
+                .title('Climate Zones')
+                .subtitle('Made-up classification')
+                .scale('60M')
+                .classToFillStyle({
+                    atlantic: '#4e9af1',
+                    continental: '#f5a623',
+                    mediterranean: '#e84545',
+                    nordic: '#4ecdc4',
+                    arctic: '#a8d8ea',
+                    alpine: '#a29bfe',
+                })
+                .classToText({
+                    atlantic: 'Atlantic',
+                    continental: 'Continental',
+                    mediterranean: 'Mediterranean',
+                    nordic: 'Nordic',
+                    arctic: 'Arctic',
+                    alpine: 'Alpine',
+                })
+                .insets('default')
+                .legend({ x: 10, y: 160 })
+
+            map.statData().setData(climateData)
+            map.build()
+        </script>
+    </body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Waffle Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up land use composition (km²) per country
+            const landUseData = {
+                BE: { forest: 7300, cropland: 13500, pasture: 4800, urban: 5200, water: 800 },
+                BG: { forest: 38000, cropland: 38000, pasture: 15000, urban: 5200, water: 3200 },
+                CZ: { forest: 26000, cropland: 32000, pasture: 8400, urban: 6800, water: 1600 },
+                DK: { forest: 6200, cropland: 25000, pasture: 9200, urban: 3400, water: 700 },
+                DE: { forest: 113000, cropland: 118000, pasture: 48000, urban: 45000, water: 8400 },
+                EE: { forest: 23000, cropland: 7200, pasture: 3800, urban: 1600, water: 4200 },
+                IE: { forest: 7700, cropland: 14000, pasture: 34000, urban: 3200, water: 1400 },
+                EL: { forest: 52000, cropland: 48000, pasture: 25000, urban: 8200, water: 1800 },
+                ES: { forest: 186000, cropland: 172000, pasture: 84000, urban: 24000, water: 6200 },
+                FR: { forest: 172000, cropland: 182000, pasture: 98000, urban: 42000, water: 6800 },
+                HR: { forest: 26000, cropland: 14000, pasture: 9200, urban: 4200, water: 1800 },
+                IT: { forest: 102000, cropland: 132000, pasture: 52000, urban: 38000, water: 7200 },
+                LV: { forest: 34000, cropland: 15000, pasture: 5800, urban: 2200, water: 7400 },
+                LT: { forest: 22000, cropland: 28000, pasture: 7200, urban: 2800, water: 2600 },
+                LU: { forest: 900, cropland: 1400, pasture: 420, urban: 380, water: 40 },
+                HU: { forest: 19000, cropland: 55000, pasture: 9200, urban: 6800, water: 3400 },
+                NL: { forest: 3800, cropland: 18000, pasture: 10000, urban: 8600, water: 7200 },
+                AT: { forest: 39000, cropland: 14000, pasture: 19000, urban: 8400, water: 1600 },
+                PL: { forest: 93000, cropland: 148000, pasture: 32000, urban: 18000, water: 8200 },
+                PT: { forest: 36000, cropland: 22000, pasture: 18000, urban: 8200, water: 1800 },
+                RO: { forest: 68000, cropland: 92000, pasture: 48000, urban: 12000, water: 7600 },
+                SI: { forest: 12000, cropland: 4400, pasture: 3200, urban: 1600, water: 600 },
+                SK: { forest: 19000, cropland: 15000, pasture: 5200, urban: 3800, water: 600 },
+                FI: { forest: 222000, cropland: 22000, pasture: 2600, urban: 4200, water: 33000 },
+                SE: { forest: 280000, cropland: 26000, pasture: 5400, urban: 6800, water: 39000 },
+            }
+
+            const map = eurostatmap
+                .map('waffle')
+                .nutsLevel(0)
+                .title('Land Use Composition')
+                .subtitle('Made-up km² by type')
+                .scale('60M')
+                .waffleMaxSize(40)
+                .waffleMinSize(10)
+                .waffleGridSize(10)
+                .insets(false)
+                .statWaffle({
+                    customData: landUseData,
+                    categoryCodes: ['forest', 'cropland', 'pasture', 'urban', 'water'],
+                    categoryLabels: ['Forest', 'Cropland', 'Pasture', 'Urban', 'Water'],
+                    categoryColors: ['#27ae60', '#f39c12', '#a8e063', '#e74c3c', '#3498db'],
+                    unitText: 'km²',
+                })
+                .legend({
+                    x: 10,
+                    y: 140,
+                    sizeLegend: { title: 'Total area (km²)' },
+                    colorLegend: { title: 'Land use', noData: false },
+                })
+                .build()
+        </script>
+    </body>
+</html>

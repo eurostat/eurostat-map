@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Choropleth</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up happiness index (0–100) per EU country (NUTS 0)
+            const happinessData = {
+                BE: 72,
+                BG: 48,
+                CZ: 65,
+                DK: 88,
+                DE: 75,
+                EE: 62,
+                IE: 80,
+                EL: 53,
+                ES: 69,
+                FR: 71,
+                HR: 58,
+                IT: 61,
+                CY: 64,
+                LV: 57,
+                LT: 59,
+                LU: 85,
+                HU: 55,
+                MT: 74,
+                NL: 84,
+                AT: 78,
+                PL: 63,
+                PT: 70,
+                RO: 51,
+                SI: 67,
+                SK: 60,
+                FI: 90,
+                SE: 87,
+                NO: 91,
+                CH: 86,
+                IS: 89,
+            }
+
+            const map = eurostatmap
+                .map('choropleth')
+                .nutsLevel(0)
+                .title('Happiness Index')
+                .subtitle('Made-up scores, 0–100')
+                .scale('60M')
+                .insets('default')
+                .legend({ x: 10, y: 160, title: 'Score' })
+
+            map.statData().setData(happinessData)
+            map.build()
+        </script>
+    </body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Mushroom Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // v1: Made-up goods exports (€ billions)
+            const exports = {
+                BE: 342,
+                BG: 31,
+                CZ: 182,
+                DK: 112,
+                DE: 1567,
+                EE: 18,
+                IE: 188,
+                EL: 37,
+                ES: 315,
+                FR: 592,
+                HR: 18,
+                IT: 608,
+                CY: 3,
+                LV: 15,
+                LT: 32,
+                LU: 20,
+                HU: 118,
+                MT: 4,
+                NL: 712,
+                AT: 168,
+                PL: 285,
+                PT: 74,
+                RO: 79,
+                SI: 41,
+                SK: 91,
+                FI: 75,
+                SE: 164,
+                NO: 145,
+                CH: 312,
+            }
+
+            // v2: Made-up goods imports (€ billions)
+            const imports = {
+                BE: 356,
+                BG: 34,
+                CZ: 175,
+                DK: 98,
+                DE: 1342,
+                EE: 20,
+                IE: 112,
+                EL: 56,
+                ES: 358,
+                FR: 654,
+                HR: 26,
+                IT: 572,
+                CY: 9,
+                LV: 17,
+                LT: 38,
+                LU: 24,
+                HU: 124,
+                MT: 6,
+                NL: 668,
+                AT: 182,
+                PL: 298,
+                PT: 89,
+                RO: 104,
+                SI: 38,
+                SK: 97,
+                FI: 68,
+                SE: 172,
+                NO: 92,
+                CH: 278,
+            }
+
+            const map = eurostatmap
+                .map('mushroom')
+                .nutsLevel(0)
+                .title('Trade Balance')
+                .subtitle('Made-up exports (left) vs imports (right), € bn')
+                .scale('60M')
+                .mushroomOrientation('vertical')
+                .mushroomSizeScaleFunctionV1((v) => Math.sqrt(v) * 0.6)
+                .mushroomSizeScaleFunctionV2((v) => Math.sqrt(v) * 0.6)
+                .insets(false)
+                .legend({
+                    x: 10,
+                    y: 160,
+                    sizeLegend: { valuesV1: [1500, 200, 10], valuesV2: [1500, 200, 10] },
+                    colorLegend: { marginTop: 30, labels: ['Exports (€ bn)', 'Imports (€ bn)'] },
+                })
+
+            map.stat('v1', { code: 'v1', label: 'Exports', unitText: '€ bn' })
+            map.stat('v2', { code: 'v2', label: 'Imports', unitText: '€ bn' })
+            map.statData('v1').setData(exports)
+            map.statData('v2').setData(imports)
+            map.build()
+        </script>
+    </body>
+</html>

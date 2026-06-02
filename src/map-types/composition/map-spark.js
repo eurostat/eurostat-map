@@ -132,8 +132,28 @@ export const map = function (config) {
      * })
      */
     out.statSpark = function (config) {
-        const { eurostatDatasetCode, filters, unitText, transform, dates, labels } = config
+        const { eurostatDatasetCode, customData, filters, unitText, transform, dates, labels } = config
 
+        // ── Custom Data Path ─────────────────────────────────────────────────
+        if (customData && !eurostatDatasetCode) {
+            const resolvedDates = dates?.length ? dates : Object.keys(customData[Object.keys(customData)[0]] || {})
+
+            if (!resolvedDates.length) {
+                console.error('statSpark: dates array or customData with date keys is required')
+                return out
+            }
+
+            resolvedDates.forEach((date, i) => {
+                if (labels?.[i]) {
+                    out.catLabels_ = out.catLabels_ || {}
+                    out.catLabels_[date] = labels[i]
+                }
+            })
+
+            return out.sparklineData(customData)
+        }
+
+        // ── Eurostat Data Path ────────────────────────────────────────────────
         if (!eurostatDatasetCode) {
             console.error('statSpark: eurostatDatasetCode is required')
             return out

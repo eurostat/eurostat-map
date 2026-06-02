@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Pie Chart Map</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up electricity generation mix (GWh) by source per country
+            const energyData = {
+                BE: { solar: 8200, wind: 9100, hydro: 1400, nuclear: 32000, fossil: 18000 },
+                BG: { solar: 2100, wind: 1800, hydro: 3200, nuclear: 15000, fossil: 22000 },
+                CZ: { solar: 3100, wind: 700, hydro: 1100, nuclear: 28000, fossil: 36000 },
+                DK: { solar: 4200, wind: 21000, hydro: 50, nuclear: 0, fossil: 5200 },
+                DE: { solar: 62000, wind: 122000, hydro: 19000, nuclear: 0, fossil: 145000 },
+                EE: { solar: 700, wind: 2100, hydro: 20, nuclear: 0, fossil: 6200 },
+                IE: { solar: 1200, wind: 14000, hydro: 850, nuclear: 0, fossil: 11000 },
+                EL: { solar: 7200, wind: 8100, hydro: 4200, nuclear: 0, fossil: 24000 },
+                ES: { solar: 42000, wind: 68000, hydro: 22000, nuclear: 22000, fossil: 62000 },
+                FR: { solar: 22000, wind: 38000, hydro: 62000, nuclear: 355000, fossil: 45000 },
+                HR: { solar: 1800, wind: 1900, hydro: 8200, nuclear: 0, fossil: 5100 },
+                IT: { solar: 30000, wind: 22000, hydro: 41000, nuclear: 0, fossil: 118000 },
+                LV: { solar: 500, wind: 350, hydro: 2800, nuclear: 0, fossil: 2400 },
+                LT: { solar: 900, wind: 2200, hydro: 450, nuclear: 0, fossil: 5100 },
+                LU: { solar: 600, wind: 180, hydro: 420, nuclear: 0, fossil: 1800 },
+                HU: { solar: 6200, wind: 620, hydro: 220, nuclear: 15000, fossil: 13000 },
+                NL: { solar: 18000, wind: 32000, hydro: 100, nuclear: 3800, fossil: 55000 },
+                AT: { solar: 5500, wind: 7200, hydro: 40000, nuclear: 0, fossil: 12000 },
+                PL: { solar: 12000, wind: 21000, hydro: 2200, nuclear: 0, fossil: 118000 },
+                PT: { solar: 9800, wind: 14000, hydro: 12000, nuclear: 0, fossil: 12000 },
+                RO: { solar: 3200, wind: 7200, hydro: 18000, nuclear: 10000, fossil: 28000 },
+                SI: { solar: 1200, wind: 12, hydro: 5800, nuclear: 5400, fossil: 2800 },
+                SK: { solar: 900, wind: 4, hydro: 4200, nuclear: 14000, fossil: 8200 },
+                FI: { solar: 1800, wind: 11000, hydro: 14000, nuclear: 22000, fossil: 9200 },
+                SE: { solar: 4200, wind: 32000, hydro: 65000, nuclear: 50000, fossil: 8200 },
+            }
+
+            const map = eurostatmap
+                .map('pieChart')
+                .nutsLevel(0)
+                .title('Electricity Generation Mix')
+                .subtitle('Made-up GWh by source')
+                .scale('60M')
+                .pieMaxRadius(20)
+                .pieMinRadius(5)
+                .insets(false)
+                .statPie({
+                    customData: energyData,
+                    categoryCodes: ['solar', 'wind', 'hydro', 'nuclear', 'fossil'],
+                    categoryLabels: ['Solar', 'Wind', 'Hydro', 'Nuclear', 'Fossil fuels'],
+                    categoryColors: ['#f9ca24', '#6ab04c', '#22a6b3', '#e84393', '#636e72'],
+                    unitText: 'GWh',
+                })
+                .legend({
+                    x: 10,
+                    y: 150,
+                    sizeLegend: { title: 'Total generation (GWh)' },
+                    colorLegend: { title: 'Energy source', noData: false },
+                })
+                .build()
+        </script>
+    </body>
+</html>

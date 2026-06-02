@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Proportional Symbols</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up urban population (thousands) per EU country
+            const urbanPop = {
+                BE: 10200,
+                BG: 5800,
+                CZ: 6900,
+                DK: 4700,
+                DE: 65400,
+                EE: 940,
+                IE: 3800,
+                EL: 7500,
+                ES: 35600,
+                FR: 55200,
+                HR: 2600,
+                IT: 45800,
+                CY: 780,
+                LV: 1300,
+                LT: 1900,
+                LU: 560,
+                HU: 6600,
+                MT: 480,
+                NL: 14900,
+                AT: 7200,
+                PL: 23100,
+                PT: 8400,
+                RO: 11300,
+                SI: 1300,
+                SK: 3100,
+                FI: 4500,
+                SE: 8800,
+                NO: 4300,
+                CH: 7100,
+            }
+
+            const map = eurostatmap
+                .map('proportionalSymbol')
+                .nutsLevel(0)
+                .title('Urban Population')
+                .subtitle('Made-up figures, thousands')
+                .scale('60M')
+                .psShape('circle')
+                .psMaxSize(40)
+                .psMinSize(3)
+                .insets('default')
+                .legend({
+                    x: 10,
+                    y: 160,
+                    sizeLegend: { title: 'Urban population (thousands)', values: [60000, 20000, 5000] },
+                })
+
+            map.statData('size').setData(urbanPop)
+            map.build()
+        </script>
+    </body>
+</html>

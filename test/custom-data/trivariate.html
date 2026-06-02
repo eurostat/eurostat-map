@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Custom Data — Trivariate (Ternary) Choropleth</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Made-up population share by age group (should sum to ~100 per country)
+            // v1: Youth (0–24), v2: Working-age (25–64), v3: Elderly (65+)
+            const youth = {
+                BE: 27,
+                BG: 22,
+                CZ: 24,
+                DK: 26,
+                DE: 22,
+                EE: 24,
+                IE: 31,
+                EL: 21,
+                ES: 22,
+                FR: 28,
+                HR: 22,
+                IT: 20,
+                CY: 28,
+                LV: 22,
+                LT: 23,
+                LU: 28,
+                HU: 22,
+                MT: 25,
+                NL: 26,
+                AT: 24,
+                PL: 23,
+                PT: 21,
+                RO: 24,
+                SI: 22,
+                SK: 24,
+                FI: 23,
+                SE: 26,
+                NO: 27,
+                CH: 24,
+            }
+            const workingAge = {
+                BE: 52,
+                BG: 54,
+                CZ: 56,
+                DK: 52,
+                DE: 54,
+                EE: 55,
+                IE: 55,
+                EL: 55,
+                ES: 57,
+                FR: 52,
+                HR: 56,
+                IT: 57,
+                CY: 57,
+                LV: 54,
+                LT: 54,
+                LU: 57,
+                HU: 56,
+                MT: 58,
+                NL: 54,
+                AT: 55,
+                PL: 57,
+                PT: 57,
+                RO: 56,
+                SI: 57,
+                SK: 58,
+                FI: 54,
+                SE: 53,
+                NO: 54,
+                CH: 56,
+            }
+            const elderly = {
+                BE: 21,
+                BG: 24,
+                CZ: 20,
+                DK: 22,
+                DE: 24,
+                EE: 21,
+                IE: 14,
+                EL: 24,
+                ES: 21,
+                FR: 20,
+                HR: 22,
+                IT: 23,
+                CY: 15,
+                LV: 24,
+                LT: 23,
+                LU: 15,
+                HU: 22,
+                MT: 17,
+                NL: 20,
+                AT: 21,
+                PL: 20,
+                PT: 22,
+                RO: 20,
+                SI: 21,
+                SK: 18,
+                FI: 23,
+                SE: 21,
+                NO: 19,
+                CH: 20,
+            }
+
+            const map = eurostatmap
+                .map('trivariateChoropleth')
+                .nutsLevel(0)
+                .title('Population by Age Group')
+                .subtitle('Made-up shares (%) — Youth / Working-age / Elderly')
+                .scale('60M')
+                .ternarySettings({ hue: 160, chroma: 130, lightness: 40, spread: 1.5, breaks: 5 })
+                .insets('default')
+                .legend({
+                    x: 10,
+                    y: 100,
+                    title: 'Age structure',
+                })
+
+            map.stat('v1', { code: 'v1', label: 'Youth (0–24)', unitText: '%' })
+            map.stat('v2', { code: 'v2', label: 'Working-age (25–64)', unitText: '%' })
+            map.stat('v3', { code: 'v3', label: 'Elderly (65+)', unitText: '%' })
+            map.statData('v1').setData(youth)
+            map.statData('v2').setData(workingAge)
+            map.statData('v3').setData(elderly)
+            map.build()
+        </script>
+    </body>
+</html>
