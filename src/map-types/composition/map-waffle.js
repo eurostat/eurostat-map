@@ -40,9 +40,9 @@ export const map = function (config) {
     out.waffleMinSize_ = 10
     out.waffleMaxSize_ = 30
     out.waffleGridSize_ = 10
-    out.waffleCellPadding_ = 0.5
+    out.waffleCellPadding_ = 0
     out.waffleStrokeFill_ = 'white'
-    out.waffleStrokeWidth_ = 0.2
+    out.waffleStrokeWidth_ = 0
     out.waffleRoundedCorners_ = 1
     out.waffleTooltipSize_ = 80
 
@@ -131,8 +131,7 @@ export const map = function (config) {
                 runDorlingSimulation(
                     out,
                     (d) => {
-                        const total = _getRegionTotal(d.properties.id) || 0
-                        return total ? out.classifierSize_(total) / 2 : 0
+                        return _getDorlingRadius(d.properties.id)
                     },
                     out.dorlingSettings_.padding || 0
                 )
@@ -144,6 +143,17 @@ export const map = function (config) {
         } catch (e) {
             console.error('Error in waffle chart styling: ' + e.message, e)
         }
+    }
+
+    /**
+     * Collision radius for Dorling force layout.
+     * Waffle symbols are square, so use half the diagonal to avoid corner overlap.
+     */
+    function _getDorlingRadius(regionId) {
+        const total = _getRegionTotal(regionId) || 0
+        if (!total) return 0
+        const size = out.classifierSize_(total)
+        return size ? (Math.SQRT2 * size) / 2 : 0
     }
 
     function applyStyleToMap(map) {
@@ -164,15 +174,15 @@ export const map = function (config) {
                     return 'waffle_' + rg.properties.id
                 })
 
-            const selector = getRegionsSelector(out)
-            const regions = out.svg().selectAll(selector)
+            const selector = getRegionsSelector(map)
+            const regions = map.svg().selectAll(selector)
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, regions, _getComposition)
             }
 
-            addWaffleChartsToMap(regionFeatures)
-            addMouseEventsToRegions(regions, out)
+            addWaffleChartsToMap(map, regionFeatures)
+            addMouseEventsToRegions(regions, map)
         }
     }
 
@@ -184,7 +194,7 @@ export const map = function (config) {
         })
         addWaffleChartsToGridCartogram(regionIds, map)
         addMouseEventsToGridCartogram(
-            out,
+            map,
             '.wafflechart',
             _getRegionTotal,
             (chart) => chart.style('stroke-width', out.waffleStrokeWidth_ + 0.5).style('stroke', 'black'),
@@ -250,7 +260,7 @@ export const map = function (config) {
         return rects
     }
 
-    function addWaffleChartsToMap(regionFeatures) {
+    function addWaffleChartsToMap(map, regionFeatures) {
         const gridSize = out.waffleGridSize_
 
         regionFeatures.forEach((region) => {
@@ -263,7 +273,7 @@ export const map = function (config) {
             const cellSize = (waffleSize - out.waffleCellPadding_ * (gridSize - 1)) / gridSize
             const cells = generateWaffleCells(comp, gridSize)
 
-            const nodes = out.svg().selectAll('#waffle_' + regionId)
+            const nodes = map.svg().selectAll('#waffle_' + regionId)
             const chartNode = nodes
                 .append('g')
                 .attr('class', 'wafflechart')
@@ -281,14 +291,14 @@ export const map = function (config) {
                     select(this)
                         .style('stroke-width', out.waffleStrokeWidth_ + 0.5)
                         .style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
                 .on('mousemove', function (e) {
-                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (map._tooltip) map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
                     select(this).style('stroke-width', out.waffleStrokeWidth_).style('stroke', out.waffleStrokeFill_)
-                    if (out._tooltip) out._tooltip.mouseout()
+                    if (map._tooltip) map._tooltip.mouseout()
                 })
         })
     }
@@ -297,7 +307,7 @@ export const map = function (config) {
         const gridSize = out.waffleGridSize_
 
         regionIds.forEach((regionId) => {
-            const node = out.svg().select('#waffle_' + regionId)
+            const node = map.svg().select('#waffle_' + regionId)
             if (node.empty()) return
 
             const comp = _getComposition(regionId)

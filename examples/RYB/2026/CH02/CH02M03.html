@@ -131,7 +131,8 @@
                     .build()
 
                 const map2 = eurostatmap
-                    .map('stripe')
+                    .map('waffle')
+                    .dorling(true)
                     .svgId('map2')
                     .insets(insetsCfg2)
                     .containerId('container2')
@@ -141,14 +142,22 @@
                     .subtitle('% of all deaths, by NUTS 1 regions, 2021')
                     .dorling(true)
                     .scale('20M')
-                    .nutsLevel(1)
-                    .statComp({
+                    .nutsLevel('mixed')
+
+                    .waffleStrokeWidth(0)
+                    .waffleStrokeFill('none')
+
+                    //if all sizes are the same
+                    .waffleMinSize(20)
+                    .waffleMaxSize(20)
+
+                    .statWaffle({
                         customData: myData,
                         categoryCodes: ['I', 'C', 'J', 'Other'],
                         categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
                         categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
                     })
-                    .stripeWidth(12)
+
                     .header(true)
                     .footer(true)
                     .footnote(
