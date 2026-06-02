@@ -326,15 +326,22 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
  * @param {Function} getCompositionFn - Function(id) → composition or undefined
  */
 export const styleMixedNUTSRegions = function (map, regions, getCompositionFn) {
+    const inScopeFill = map.svg().select('#em-mixed-nutsrg path').style('fill') || map.svg().select('#em-nutsrg path').style('fill') || '#fffeef'
+
     regions.each(function (rg) {
         const sel = select(this)
-        if (this.parentNode.classList.contains('em-cntrg')) return
+        const isCntrg = this.parentNode?.classList?.contains('em-cntrg')
 
         const lvl = sel.attr('lvl')
         const comp = getCompositionFn(rg.properties.id)
         const hasData = !!comp
 
+        // Keep existing behavior for cntrg regions without data,
+        // but style cntrg regions when composition data exists (e.g. MD, GE).
+        if (isCntrg && !hasData) return
+
         let display = hasData ? (map.geo_ === 'WORLD' ? 'block' : null) : 'none'
+        let fill = hasData ? inScopeFill : null
         let stroke = null
         let strokeWidth = null
 
@@ -343,7 +350,7 @@ export const styleMixedNUTSRegions = function (map, regions, getCompositionFn) {
             if (map.geo_ === 'WORLD') strokeWidth = sel.style('stroke-width') || '#777'
         }
 
-        sel.style('display', display).style('stroke', stroke).style('stroke-width', strokeWidth)
+        sel.style('display', display).style('fill', fill).style('stroke', stroke).style('stroke-width', strokeWidth)
     })
 }
 
