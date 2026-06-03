@@ -22,19 +22,22 @@
         <div>
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
+            <label for="composition-type-select">Type:</label>
+            <select id="composition-type-select">
+                <option value="pie" selected>pie</option>
+                <option value="flag">flag</option>
+                <option value="ring">ring</option>
+                <option value="segment">segment</option>
+                <option value="radar">radar</option>
+                <option value="agepyramid">agepyramid</option>
+                <option value="halftone">halftone</option>
+                <option value="stripe">stripe</option>
+            </select>
         </div>
         <div id="maps-wrapper">
             <svg id="container" class="map-container" height="900px">
                 <svg id="map"></svg>
                 <g id="newInsets"></g>
-            </svg>
-            <svg id="container2" class="map-container" height="900px">
-                <svg id="map2"></svg>
-                <g id="newInsets2"></g>
-            </svg>
-            <svg id="container3" class="map-container" height="900px">
-                <svg id="map3"></svg>
-                <g id="newInsets3"></g>
             </svg>
         </div>
 
@@ -46,6 +49,24 @@
             const PIESIZE = 9
             const MAPWIDTH = 900
             const MAPHEIGHT = 700
+            const minSizeByType = {
+                pie: 13,
+                flag: 11,
+                ring: 13,
+                segment: 12,
+                radar: 13,
+                agepyramid: 13,
+                halftone: 12,
+            }
+            const maxSizeByType = {
+                pie: 13,
+                flag: 11,
+                ring: 13,
+                segment: 12,
+                radar: 13,
+                agepyramid: 13,
+                halftone: 12,
+            }
 
             async function loadCustomPieData() {
                 const [circulatory, cancer, respiratory, other] = await Promise.all([
@@ -73,189 +94,178 @@
 
             async function initMaps() {
                 const myData = await loadCustomPieData()
+                const categoryCodes = ['I', 'C', 'J', 'Other']
+                const categoryLabels = ['Circulatory', 'Cancer', 'Respiratory', 'Other']
+                const categoryColors = ['#2644A7', '#AF155C', '#33A033', '#EFD18C']
 
-                const insetBoxPosition = [MAPWIDTH - 250, 70]
-                const insetsCfg = createOutermostInsetsConfig()
-                const insetsCfg2 = createOutermostInsetsConfig()
-                const insetsCfg3 = createOutermostInsetsConfig()
+                let currentMap = null
+                let currentMapKind = 'pie'
 
-                createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
-                createInsetDOMElements(document.getElementById('newInsets2'), insetsCfg2, insetBoxPosition)
-                createInsetDOMElements(document.getElementById('newInsets3'), insetsCfg3, insetBoxPosition)
+                function resetMapDom() {
+                    d3.select('#map').selectAll('*').remove()
+                    d3.select('#newInsets').selectAll('*').remove()
+                }
 
-                const map = eurostatmap
-                    .map('pie')
-                    .svgId('map')
-                    .insets(insetsCfg)
-                    .containerId('container')
-                    .width(MAPWIDTH)
-                    .height(MAPHEIGHT)
-                    .title('Main causes of death')
-                    .subtitle('% of all deaths, by NUTS 1 regions, 2021')
-                    .dorling(true)
-                    .scale('20M')
-                    .nutsLevel('mixed')
-                    .nutsYear(2024)
-                    .statPie({
-                        customData: myData,
-                        categoryCodes: ['I', 'C', 'J', 'Other'],
-                        categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
-                        categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
-                    })
-                    .compositionSettings({
-                        type: 'pie',
+                function applyCommonLayout(m) {
+                    return m
+                        .width(MAPWIDTH)
+                        .height(MAPHEIGHT)
+                        .title('Main causes of death')
+                        .subtitle('% of all deaths, by NUTS 1 regions, 2021')
+                        .header(true)
+                        .footer(true)
+                        .footnote(
+                            'Note: the most common causes of death in the EU were – diseases of the circulatory system, cancer, diseases of the respiratory system. <br>Source: Custom JSON files'
+                        )
+                        .footnoteWrap(100)
+                        .zoomButtons(false)
+                        .legend({
+                            x: 20,
+                            y: 190,
+                            boxOpacity: 0,
+                            boxFill: 'white',
+                            sizeLegend: false,
+                            colorLegend: {
+                                title: 'Cause of death',
+                            },
+                            noDataPadding: -10,
+                        })
+                        .onBuild(() => {
+                            d3.select('#map #em-footnote-2').remove()
+                            d3.select('#map')
+                                .append('text')
+                                .attr('x', MAPWIDTH - 310)
+                                .attr('y', MAPHEIGHT + 83)
+                                .attr('class', 'em-footnote')
+                                .attr('id', 'em-footnote-2')
+                                .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+                        })
+                }
+
+                function buildPieMap(type = 'pie') {
+                    resetMapDom()
+                    const insetBoxPosition = [MAPWIDTH - 250, 70]
+                    const insetsCfg = createOutermostInsetsConfig()
+                    createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
+
+                    const patch = {
+                        type,
+                        minSize: minSizeByType[type] ?? minSizeByType.pie,
+                        maxSize: maxSizeByType[type] ?? maxSizeByType.pie,
                         otherColor: '#EFD18C',
                         otherText: 'Other',
-                        minSize: 13,
-                        maxSize: 13,
-                    })
-                    .header(true)
-                    .footer(true)
-                    .footnote(
-                        'Note: the most common causes of death in the EU were – diseases of the circulatory system, cancer, diseases of the respiratory system. <br>Source: Custom JSON files'
-                    )
-                    .footnoteWrap(100)
-                    .zoomButtons(false)
-                    .legend({
-                        x: 20,
-                        y: 190,
-                        boxOpacity: 0,
-                        boxFill: 'white',
-                        sizeLegend: false,
-                        colorLegend: {
-                            title: 'Cause of death',
-                        },
-                        noDataPadding: -10,
-                    })
-                    .onBuild(() => {
-                        d3.select('#map #em-footnote-2').remove()
-                        d3.select('#map')
-                            .append('text')
-                            .attr('x', MAPWIDTH - 310)
-                            .attr('y', MAPHEIGHT + 83)
-                            .attr('class', 'em-footnote')
-                            .attr('id', 'em-footnote-2')
-                            .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
-                    })
-                    .build()
+                    }
 
-                const map2 = eurostatmap
-                    .map('pie')
-                    .dorling(true)
-                    .dorlingSettings({
-                        padding: -1.5,
-                    })
-                    .svgId('map2')
-                    .insets(insetsCfg2)
-                    .containerId('container2')
-                    .compositionSettings({
-                        type: 'flag',
-                        minSize: 11,
-                        maxSize: 11,
-                        reverseOrder: true,
-                        offsetAngle: 90,
-                        otherColor: '#EFD18C',
-                        stripesOrientation: 1,
-                        // offsetAngle: 30, //radar/halftone
-                    })
-                    .width(MAPWIDTH)
-                    .height(MAPHEIGHT)
-                    .title('Main causes of death')
-                    .subtitle('% of all deaths, by NUTS 1 regions, 2021')
-                    .dorling(true)
-                    .scale('20M')
-                    .nutsLevel('mixed')
-                    .nutsYear(2024)
-                    .statPie({
-                        customData: myData,
-                        categoryCodes: ['I', 'C', 'J', 'Other'],
-                        categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
-                        categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
-                    })
-                    .header(true)
-                    .footer(true)
-                    .footnote(
-                        'Note: the most common causes of death in the EU were – diseases of the circulatory system, cancer, diseases of the respiratory system. <br>Source: Custom JSON files'
-                    )
-                    .footnoteWrap(100)
-                    .zoomButtons(false)
-                    .legend({
-                        x: 20,
-                        y: 190,
-                        boxOpacity: 0,
-                        boxFill: 'white',
-                        sizeLegend: false,
-                        colorLegend: {
-                            title: 'Cause of death',
-                        },
-                        noDataPadding: -10,
-                    })
-                    .onBuild(() => {
-                        d3.select('#map #em-footnote-2').remove()
-                        d3.select('#map')
-                            .append('text')
-                            .attr('x', MAPWIDTH - 310)
-                            .attr('y', MAPHEIGHT + 83)
-                            .attr('class', 'em-footnote')
-                            .attr('id', 'em-footnote-2')
-                            .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
-                    })
-                    .build()
+                    if (type === 'flag') {
+                        patch.reverseOrder = true
+                        patch.stripesOrientation = 1
+                    } else {
+                        patch.reverseOrder = false
+                        patch.stripesOrientation = 0
+                    }
 
-                const map3 = eurostatmap
-                    .map('stripe')
-                    .svgId('map3')
-                    .insets(insetsCfg3)
-                    .containerId('container3')
-                    .width(MAPWIDTH)
-                    .height(MAPHEIGHT)
-                    .title('Main causes of death')
-                    .subtitle('% of all deaths, by NUTS 1 regions, 2021')
-                    .scale('20M')
-                    .nutsLevel(1)
-                    .nutsYear(2024)
-                    .statComp({
-                        customData: myData,
-                        categoryCodes: ['I', 'C', 'J', 'Other'],
-                        categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
-                        categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
-                    })
-                    .header(true)
-                    .footer(true)
-                    .footnote(
-                        'Note: the most common causes of death in the EU were – diseases of the circulatory system, cancer, diseases of the respiratory system. <br>Source: Custom JSON files'
+                    const pieMap = applyCommonLayout(
+                        eurostatmap
+                            .map('pie')
+                            .dorling(true)
+                            .svgId('map')
+                            .insets(insetsCfg)
+                            .containerId('container')
+                            .scale('20M')
+                            .nutsLevel('mixed')
+                            .nutsYear(2024)
+                            .statPie({
+                                customData: myData,
+                                categoryCodes,
+                                categoryLabels,
+                                categoryColors,
+                            })
+                            .compositionSettings(patch)
                     )
-                    .footnoteWrap(100)
-                    .zoomButtons(false)
-                    .legend({
-                        x: 20,
-                        y: 190,
-                        boxOpacity: 0,
-                        boxFill: 'white',
-                        sizeLegend: false,
-                        colorLegend: {
-                            title: 'Cause of death',
-                        },
-                        noDataPadding: -10,
-                    })
-                    .onBuild(() => {
-                        d3.select('#map #em-footnote-2').remove()
-                        d3.select('#map')
-                            .append('text')
-                            .attr('x', MAPWIDTH - 310)
-                            .attr('y', MAPHEIGHT + 83)
-                            .attr('class', 'em-footnote')
-                            .attr('id', 'em-footnote-2')
-                            .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
-                    })
-                    .build()
+
+                    if (type === 'flag') {
+                        pieMap.dorlingSettings({ padding: -1.7 })
+                    } else {
+                        pieMap.dorlingSettings({ padding: 0 })
+                    }
+
+                    pieMap.build()
+                    currentMap = pieMap
+                    currentMapKind = 'pie'
+                }
+
+                function buildStripeMap() {
+                    resetMapDom()
+                    const insetBoxPosition = [MAPWIDTH - 250, 70]
+                    const insetsCfg = createOutermostInsetsConfig()
+                    createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
+
+                    const stripeMap = applyCommonLayout(
+                        eurostatmap
+                            .map('stripe')
+                            .svgId('map')
+                            .insets(insetsCfg)
+                            .containerId('container')
+                            .scale('20M')
+                            .nutsLevel(1)
+                            .nutsYear(2024)
+                            .statComp({
+                                customData: myData,
+                                categoryCodes,
+                                categoryLabels,
+                                categoryColors,
+                            })
+                    )
+
+                    stripeMap.build()
+                    currentMap = stripeMap
+                    currentMapKind = 'stripe'
+                }
+
+                buildPieMap('pie')
+
+                const typeSelect = document.getElementById('composition-type-select')
+                typeSelect.addEventListener('change', (event) => {
+                    const type = event.target.value
+
+                    if (type === 'stripe') {
+                        buildStripeMap()
+                        return
+                    }
+
+                    if (currentMapKind === 'stripe') {
+                        buildPieMap(type)
+                        return
+                    }
+
+                    const patch = {
+                        type,
+                        minSize: minSizeByType[type] ?? minSizeByType.pie,
+                        maxSize: maxSizeByType[type] ?? maxSizeByType.pie,
+                    }
+
+                    // Keep previous showcase behavior for flag layout.
+                    if (type === 'flag') {
+                        patch.reverseOrder = true
+                        patch.stripesOrientation = 1
+                        currentMap.dorlingSettings({ padding: -1.7 })
+                    } else {
+                        patch.reverseOrder = false
+                        patch.stripesOrientation = 0
+                        currentMap.dorlingSettings({ padding: 0 })
+                    }
+
+                    currentMap.compositionSettings(patch)
+                    currentMap.updateClassification()
+                    currentMap.updateStyle()
+                })
 
                 document.getElementById('export-png-btn').addEventListener('click', () => {
-                    map2.exportMapToPNG(MAPWIDTH, MAPHEIGHT + 120)
+                    if (currentMap) currentMap.exportMapToPNG(MAPWIDTH, MAPHEIGHT + 120)
                 })
 
                 document.getElementById('export-svg-btn').addEventListener('click', () => {
-                    map2.exportMapToSVG('CH02M03')
+                    if (currentMap) currentMap.exportMapToSVG('CH02M03')
                 })
             }
 

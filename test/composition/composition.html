@@ -12,6 +12,18 @@
     </head>
 
     <body>
+        <div style="margin-bottom: 8px">
+            <label for="composition-type-select">Composition type:</label>
+            <select id="composition-type-select">
+                <option value="flag" selected>flag</option>
+                <option value="pie">pie</option>
+                <option value="ring">ring</option>
+                <option value="segment">segment</option>
+                <option value="radar">radar</option>
+                <option value="agepyramid">agepyramid</option>
+                <option value="halftone">halftone</option>
+            </select>
+        </div>
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
 
@@ -23,9 +35,8 @@
                 .subtitle('Nights spent in tourist accommodation and share of foreign tourists, 2022')
                 .scale('60M')
                 .compositionSettings({
-                    type: 'flag',
+                    type: 'pie',
                     minSize: 6,
-
                     offsetAngle: 90,
                 })
                 .nutsLevel(2)
@@ -62,6 +73,13 @@
                 })
 
             map.build()
+
+            const typeSelect = document.getElementById('composition-type-select')
+            typeSelect.addEventListener('change', (event) => {
+                const selectedType = event.target.value
+                map.compositionSettings({ type: selectedType })
+                map.updateStyle()
+            })
         </script>
     </body>
 </html>

@@ -128,14 +128,7 @@ export const map = function (config) {
                 )
             )
         }
-        applyClassificationToMap(
-            out,
-            out,
-            _getAnchors,
-            'compositionTotalCode_',
-            out.compositionSettings_.minSize,
-            out.compositionSettings_.maxSize
-        )
+        applyClassificationToMap(out, out, _getAnchors, 'compositionTotalCode_', out.compositionSettings_.minSize, out.compositionSettings_.maxSize)
         return out
     }
 
@@ -201,6 +194,10 @@ export const map = function (config) {
             let regionFeatures = []
             const s = getCentroidsGroup(map)
             if (!s) return
+
+            // Re-rendering (e.g. switching composition type) should replace existing
+            // symbol containers instead of appending duplicates on each updateStyle call.
+            s.selectAll('g.em-centroid > g.em-pie').remove()
 
             s.selectAll('g.em-centroid')
                 .append('g')
