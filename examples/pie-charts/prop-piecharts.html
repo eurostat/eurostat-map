@@ -19,10 +19,13 @@
                 .title('Livestock in the EU, 2024')
                 .subtitle('Number of animals (pie size) and type of animal (color), 2024')
                 .scale('60M')
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
-                .pieMinRadius(6)
-                .pieMaxRadius(20)
+                .compositionSettings({
+                    type: 'pie',
+                    otherColor: '#FFCC80',
+                    otherText: 'Other',
+                    minSize: 6,
+                    maxSize: 20,
+                })
                 .nutsLevel(1)
                 .statPie({
                     eurostatDatasetCode: 'agr_r_animal',

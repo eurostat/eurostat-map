@@ -1,5 +1,14 @@
 # Release notes
 
+## Unreleased
+
+- Composition maps: pie chart API refactored to use `compositionSettings({...})` for shared composition options and `pieSettings({...})` for pie-specific options.
+- Composition sizing renamed from radius-oriented naming to generic sizing (`minSize`/`maxSize`) for non-circular composition symbols.
+- Pie composition rendering now supports multiple composition symbol types through `compositionSettings.type` (including `flag`, `segment`, `ring`, `radar`, `agepyramid`, `halftone`, `pie`).
+- Backward compatibility aliases for removed pie-prefixed methods added in deprecated API shims with migration warnings.
+- Dorling collision behavior improved for non-circular composition symbols (especially flag-like shapes) with shape-aware collision radius inflation.
+- Dorling padding now applies consistently across animated, synchronous, and worker-based simulation paths.
+
 ## v4.0.0
 
 - Almost all **inline styles moved to CSS** (see ./css.md and deprecated.js)

@@ -96,10 +96,13 @@
                         categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
                         categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
                     })
-                    .pieOtherColor('#EFD18C')
-                    .pieOtherText('Other')
-                    .pieMinRadius(13)
-                    .pieMaxRadius(13)
+                    .compositionSettings({
+                        type: 'pie',
+                        otherColor: '#EFD18C',
+                        otherText: 'Other',
+                        minSize: 13,
+                        maxSize: 13,
+                    })
                     .header(true)
                     .footer(true)
                     .footnote(
@@ -131,17 +134,21 @@
                     .build()
 
                 const map2 = eurostatmap
-                    .map('waffle')
+                    .map('pie')
                     .dorling(true)
                     .dorlingSettings({
-                        animate: true,
-                        strength: { x: 1, y: 1 },
-                        iterations: 1,
-                        padding: -10,
+                        padding: -1,
                     })
                     .svgId('map2')
                     .insets(insetsCfg2)
                     .containerId('container2')
+                    .compositionSettings({
+                        type: 'flag',
+                        minSize: 13,
+                        maxSize: 13,
+                        offsetAngle: 90,
+                        otherColor: '#EFD18C',
+                    })
                     .width(MAPWIDTH)
                     .height(MAPHEIGHT)
                     .title('Main causes of death')
@@ -149,21 +156,13 @@
                     .dorling(true)
                     .scale('20M')
                     .nutsLevel('mixed')
-
-                    .waffleStrokeWidth(0)
-                    .waffleStrokeFill('none')
-
-                    //if all sizes are the same
-                    .waffleMinSize(20)
-                    .waffleMaxSize(20)
-
-                    .statWaffle({
+                    .nutsYear(2024)
+                    .statPie({
                         customData: myData,
                         categoryCodes: ['I', 'C', 'J', 'Other'],
                         categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
                         categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
                     })
-
                     .header(true)
                     .footer(true)
                     .footnote(
@@ -171,7 +170,6 @@
                     )
                     .footnoteWrap(100)
                     .zoomButtons(false)
-                    .zoomExtent([0.5, 20])
                     .legend({
                         x: 20,
                         y: 190,
@@ -184,8 +182,8 @@
                         noDataPadding: -10,
                     })
                     .onBuild(() => {
-                        d3.select('#map2 #em-footnote-2').remove()
-                        d3.select('#map2')
+                        d3.select('#map #em-footnote-2').remove()
+                        d3.select('#map')
                             .append('text')
                             .attr('x', MAPWIDTH - 310)
                             .attr('y', MAPHEIGHT + 83)

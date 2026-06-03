@@ -155,6 +155,55 @@ export const defineDeprecatedFunctions = (out) => {
         out.dorlingSettings({ workerD3URL: v })
         return out
     };
+    // composition/pie legacy aliases
+    out.pieMinRadius = function (v) {
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().minSize : undefined
+        console.warn('map.pieMinRadius() is now DEPRECATED. Please use map.compositionSettings({ minSize }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ minSize: v })
+        return out
+    };
+    out.pieMaxRadius = function (v) {
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().maxSize : undefined
+        console.warn('map.pieMaxRadius() is now DEPRECATED. Please use map.compositionSettings({ maxSize }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ maxSize: v })
+        return out
+    };
+    out.pieChartInnerRadius = function (v) {
+        if (!arguments.length) return out.pieSettings ? out.pieSettings().innerRadius : undefined
+        console.warn('map.pieChartInnerRadius() is now DEPRECATED. Please use map.pieSettings({ innerRadius }) instead.')
+        if (out.pieSettings) out.pieSettings({ innerRadius: v })
+        return out
+    };
+    out.pieStrokeFill = function (v) {
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().strokeFill : undefined
+        console.warn('map.pieStrokeFill() is now DEPRECATED. Please use map.compositionSettings({ strokeFill }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ strokeFill: v })
+        return out
+    };
+    out.pieStrokeWidth = function (v) {
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().strokeWidth : undefined
+        console.warn('map.pieStrokeWidth() is now DEPRECATED. Please use map.compositionSettings({ strokeWidth }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ strokeWidth: v })
+        return out
+    };
+    out.pieOtherColor = function (v) {
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().otherColor : undefined
+        console.warn('map.pieOtherColor() is now DEPRECATED. Please use map.compositionSettings({ otherColor }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ otherColor: v })
+        return out
+    };
+    out.pieOtherText = function (v) {
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().otherText : undefined
+        console.warn('map.pieOtherText() is now DEPRECATED. Please use map.compositionSettings({ otherText }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ otherText: v })
+        return out
+    };
+    out.pieTotalCode = function (v) {
+        if (!arguments.length) return out.compositionTotalCode ? out.compositionTotalCode() : undefined
+        console.warn('map.pieTotalCode() is now DEPRECATED. Please use map.compositionTotalCode() instead.')
+        if (out.compositionTotalCode) out.compositionTotalCode(v)
+        return out
+    };
     out.gridCartogramShape = function (v) {
         if (!arguments.length) return out.gridCartogramSettings().shape
         console.warn('map.gridCartogramShape() is now DEPRECATED. Please use map.gridCartogramSettings({ shape }) instead.')

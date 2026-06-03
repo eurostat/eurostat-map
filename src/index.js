@@ -10,7 +10,7 @@ import * as Mushroom from './map-types/proportional-symbol/mushrooms/map-mushroo
 
 //composition maps
 import * as PieCharts from './map-types/composition/map-pie'
-import * as Sparklines from './map-types/composition/map-spark'
+import * as Sparklines from './map-types/map-spark'
 import * as Bar from './map-types/composition/map-bar.js'
 import * as Waffle from './map-types/composition/map-waffle.js'
 import * as Coxcomb from './map-types/composition/map-coxcomb.js'

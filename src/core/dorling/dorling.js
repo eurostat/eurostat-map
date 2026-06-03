@@ -11,6 +11,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
         stopDorlingSimulation(singleMap)
 
         const settings = singleMap.dorlingSettings_ || {}
+        const effectivePadding = settings.padding ?? padding
         const strengthX = settings.strength?.x ?? 1
         const strengthY = settings.strength?.y ?? 1
         const iterations = settings.iterations ?? 1
@@ -45,7 +46,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
                 const sim = forceSimulation(nodes)
                     .force('x', forceX((d) => d.properties.centroid[0]).strength(strengthX))
                     .force('y', forceY((d) => d.properties.centroid[1]).strength(strengthY))
-                    .force('collide', forceCollide((d) => Math.max(0, radiusAccessor(d) + padding)).iterations(iterations))
+                    .force('collide', forceCollide((d) => Math.max(0, radiusAccessor(d) + effectivePadding)).iterations(iterations))
                     .stop()
 
                 const nTicks = Math.ceil(Math.log(sim.alphaMin()) / Math.log(1 - sim.alphaDecay()))
@@ -62,7 +63,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
                 const worker = new Worker(new URL('./dorling-worker.js', import.meta.url), { type: 'module' })
                 worker.postMessage({
                     nodes: nodes.map((n) => ({ ...n })), // shallow clone
-                    radii: nodes.map((n) => Math.max(0, radiusAccessor(n) + padding)),
+                    radii: nodes.map((n) => Math.max(0, radiusAccessor(n) + effectivePadding)),
                     strengthX,
                     strengthY,
                     iterations,
@@ -93,7 +94,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
         singleMap.simulation = forceSimulation(nodes)
             .force('x', forceX((d) => d.properties.centroid[0]).strength(strengthX))
             .force('y', forceY((d) => d.properties.centroid[1]).strength(strengthY))
-            .force('collide', forceCollide((d) => radiusAccessor(d)).iterations(iterations))
+            .force('collide', forceCollide((d) => Math.max(0, radiusAccessor(d) + effectivePadding)).iterations(iterations))
             .on('tick', () => tickTransform(containers))
 
         return singleMap.simulation

@@ -40,22 +40,27 @@ export const map = function (config) {
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
 
-    out.pieMinRadius_ = 5
-    out.pieMaxRadius_ = 15
-    out.pieChartInnerRadius_ = 0
-    out.pieStrokeFill_ = 'white'
-    out.pieStrokeWidth_ = 0.3
-
-    out.tooltipPieRadius_ = 40
-    out.tooltipPieInnerRadius_ = 0
+    out.pieSettings_ = {
+        innerRadius: 0,
+    }
+    out.compositionSettings_ = {
+        type: 'pie',
+        minSize: 5,
+        maxSize: 15,
+        strokeFill: 'white',
+        strokeWidth: 0.3,
+        stripesOrientation: 0,
+        offsetAngle: 0,
+        agePyramidHeightFactor: 1,
+        otherColor: '#FFCC80',
+        otherText: 'Other',
+    }
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
-    out.pieOtherColor_ = '#FFCC80'
-    out.pieOtherText_ = 'Other'
     out.showOnlyWhenComplete_ = false
     out.classifierSize_ = null
-    out.pieTotalCode_ = undefined
+    out.compositionTotalCode_ = undefined
     out.statCodes_ = undefined
 
     // ── Getters/setters ──────────────────────────────────────────────────────
@@ -64,51 +69,72 @@ export const map = function (config) {
         'catLabels_',
         'showOnlyWhenComplete_',
         'noDataFillStyle_',
-        'pieMaxRadius_',
-        'pieMinRadius_',
-        'pieChartInnerRadius_',
-        'pieOtherColor_',
-        'pieOtherText_',
-        'pieStrokeFill_',
-        'pieStrokeWidth_',
         'dorling_',
-        'pieTotalCode_',
+        'compositionTotalCode_',
         'statCodes_',
     ])
+
+    out.pieSettings = function (v) {
+        if (!arguments.length) return { ...out.pieSettings_ }
+        out.pieSettings_ = {
+            ...out.pieSettings_,
+            ...v,
+        }
+        return out
+    }
+
+    out.compositionSettings = function (v) {
+        if (!arguments.length) return { ...out.compositionSettings_ }
+        out.compositionSettings_ = {
+            ...out.compositionSettings_,
+            ...v,
+        }
+        return out
+    }
 
     applyConfigValues(out, config, [
         'catColors',
         'catLabels',
         'showOnlyWhenComplete',
         'noDataFillStyle',
-        'pieMaxRadius',
-        'pieMinRadius',
-        'pieChartInnerRadius',
-        'pieOtherColor',
-        'pieOtherText',
-        'pieStrokeFill',
-        'pieStrokeWidth',
+        'pieSettings',
+        'compositionSettings',
+        'compositionTotalCode',
         'statCodes',
     ])
 
     // ── Convenience wrappers (bind totalCodeKey) ─────────────────────────────
-    const _getComposition = (id) => getComposition(id, out, 'pieTotalCode_')
-    const _getRegionTotal = (id) => getRegionTotal(id, out, 'pieTotalCode_')
+    const _getComposition = (id) => getComposition(id, out, 'compositionTotalCode_')
+    const _getRegionTotal = (id) => getRegionTotal(id, out, 'compositionTotalCode_')
     const _getAnchors = (map) =>
         map.gridCartogram_ ? map.svg().selectAll('#em-grid-container .em-grid-cell') : getCentroidsGroup(map).selectAll('g.em-centroid')
 
     // ── statPie config method ────────────────────────────────────────────────
-    out.statPie = buildStatCompositionMethod(out, 'pieTotalCode_')
+    out.statPie = buildStatCompositionMethod(out, 'compositionTotalCode_')
 
     // ── Classification ───────────────────────────────────────────────────────
     //@override
     out.updateClassification = function () {
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
-                applyClassificationToMap(map, out, _getAnchors, 'pieTotalCode_', out.pieMinRadius_, out.pieMaxRadius_)
+                applyClassificationToMap(
+                    map,
+                    out,
+                    _getAnchors,
+                    'compositionTotalCode_',
+                    out.compositionSettings_.minSize,
+                    out.compositionSettings_.maxSize
+                )
             )
         }
-        applyClassificationToMap(out, out, _getAnchors, 'pieTotalCode_', out.pieMinRadius_, out.pieMaxRadius_)
+        applyClassificationToMap(
+            out,
+            out,
+            _getAnchors,
+            'compositionTotalCode_',
+            out.compositionSettings_.minSize,
+            out.compositionSettings_.maxSize
+        )
         return out
     }
 
@@ -118,7 +144,7 @@ export const map = function (config) {
         try {
             if (!out.classifierSize_) return
 
-            ensureCategoryColors(out, 'pieTotalCode_', out.pieOtherColor_, out.pieOtherText_)
+            ensureCategoryColors(out, 'compositionTotalCode_', out.compositionSettings_.otherColor, out.compositionSettings_.otherText)
 
             if (out.insetTemplates_) {
                 executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
@@ -129,7 +155,23 @@ export const map = function (config) {
                 runDorlingSimulation(
                     out,
                     (d) => {
-                        return _getRegionTotal(d.properties.id) || 0 ? out.classifierSize_(_getRegionTotal(d.properties.id)) || 0 : 0
+                        const total = _getRegionTotal(d.properties.id)
+                        if (!total) return 0
+
+                        const baseSize = out.classifierSize_(total) || 0
+                        const type = out.compositionSettings_?.type || 'pie'
+
+                        // Dorling collide expects a circle radius. For non-circular symbols,
+                        // inflate radius to circumscribed-circle size to reduce overlap.
+                        if (type === 'flag') return Math.SQRT2 * baseSize
+                        if (type === 'segment') return Math.sqrt(1 + 0.35 * 0.35) * baseSize
+                        if (type === 'agepyramid') {
+                            const h = out.compositionSettings_?.agePyramidHeightFactor || 1
+                            return Math.sqrt(1 + h * h) * baseSize
+                        }
+                        if (type === 'halftone') return 1.2 * baseSize
+
+                        return baseSize
                     },
                     out.dorlingSettings_.padding || 0
                 )
@@ -173,7 +215,7 @@ export const map = function (config) {
             applyCompositionRegionDataFill(
                 regions,
                 _getComposition,
-                (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'pieTotalCode_'),
+                (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'compositionTotalCode_'),
                 out.noDataFillStyle()
             )
 
@@ -181,7 +223,7 @@ export const map = function (config) {
                 styleMixedNUTSRegions(map, regions, _getComposition)
             }
 
-            addPieChartsToMap(map, regionFeatures)
+            addChartsToMap(map, regionFeatures)
             addMouseEventsToRegions(regions, map)
         }
     }
@@ -192,13 +234,13 @@ export const map = function (config) {
             regionIds.push(rg.properties.id)
             return 'pie_' + rg.properties.id
         })
-        addPieChartsToGridCartogram(regionIds, map)
+        addChartsToGridCartogram(regionIds, map)
         addMouseEventsToGridCartogram(
             map,
             '.piechart',
             _getRegionTotal,
-            (chart) => chart.style('stroke-width', out.pieStrokeWidth_ + 1).style('stroke', 'black'),
-            (chart) => chart.style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_)
+            (chart) => chart.style('stroke-width', out.compositionSettings_.strokeWidth + 1).style('stroke', 'black'),
+            (chart) => chart.style('stroke-width', out.compositionSettings_.strokeWidth).style('stroke', out.compositionSettings_.strokeFill)
         )
     }
 
@@ -208,7 +250,7 @@ export const map = function (config) {
         const pie_ = pie()
             .sort(null)
             .value((d) => d.value)
-        const arcFn = arc().innerRadius(out.pieChartInnerRadius_).outerRadius(r)
+        const arcFn = arc().innerRadius(out.pieSettings_.innerRadius).outerRadius(r)
         return { pie_, arcFn }
     }
 
@@ -242,7 +284,164 @@ export const map = function (config) {
         return paths
     }
 
-    function addPieChartsToMap(map, regionFeatures) {
+    function drawCompositionSymbol(container, data, r, animated) {
+        const settings = out.compositionSettings_ || {}
+        const type = settings.type || 'pie'
+        const s = 2 * r
+        const half = s / 2
+
+        if (type === 'pie') {
+            const { pie_, arcFn } = makePieArc(r)
+            return drawPieSegments(container, data, arcFn, pie_, animated)
+        }
+
+        container.selectAll('*').remove()
+
+        const offAng = ((settings.offsetAngle || 0) * Math.PI) / 180
+        const orientation = settings.stripesOrientation || 0
+        const maxVal = data.reduce((m, d) => Math.max(m, +d.value || 0), 0) || 1
+        const nbCat = data.length || 1
+
+        if (type === 'flag' || type === 'segment') {
+            let cumul = 0
+            const segmentThickness = s * 0.35
+            data.forEach((d) => {
+                const share = +d.value || 0
+                if (!share) return
+
+                if (type === 'flag') {
+                    if (orientation === 0) {
+                        container
+                            .append('rect')
+                            .attr('x', -half)
+                            .attr('y', -half + cumul * s)
+                            .attr('width', s)
+                            .attr('height', share * s)
+                            .attr('fill', out.catColors_[d.code] || 'lightgray')
+                    } else {
+                        container
+                            .append('rect')
+                            .attr('x', -half + cumul * s)
+                            .attr('y', -half)
+                            .attr('width', share * s)
+                            .attr('height', s)
+                            .attr('fill', out.catColors_[d.code] || 'lightgray')
+                    }
+                } else {
+                    if (orientation === 0) {
+                        container
+                            .append('rect')
+                            .attr('x', -half)
+                            .attr('y', -segmentThickness / 2 + cumul * segmentThickness)
+                            .attr('width', s)
+                            .attr('height', share * segmentThickness)
+                            .attr('fill', out.catColors_[d.code] || 'lightgray')
+                    } else {
+                        container
+                            .append('rect')
+                            .attr('x', -segmentThickness / 2 + cumul * segmentThickness)
+                            .attr('y', -half)
+                            .attr('width', share * segmentThickness)
+                            .attr('height', s)
+                            .attr('fill', out.catColors_[d.code] || 'lightgray')
+                    }
+                }
+
+                cumul += share
+            })
+        } else if (type === 'ring') {
+            let cumul = 0
+            data.forEach((d) => {
+                const share = +d.value || 0
+                if (!share) return
+
+                const outerR = Math.sqrt(Math.max(0, 1 - cumul)) * r
+                const innerR = Math.sqrt(Math.max(0, 1 - (cumul + share))) * r
+
+                container
+                    .append('path')
+                    .attr('d', arc()({ startAngle: 0, endAngle: 2 * Math.PI, innerRadius: innerR, outerRadius: outerR }))
+                    .attr('fill', out.catColors_[d.code] || 'lightgray')
+
+                cumul += share
+            })
+        } else if (type === 'radar') {
+            let cumul = Math.PI / 2 + offAng
+            const incr = (2 * Math.PI) / nbCat
+
+            data.forEach((d) => {
+                const val = +d.value || 0
+                const rr = r * Math.sqrt(val / maxVal)
+
+                container
+                    .append('path')
+                    .attr(
+                        'd',
+                        arc()({
+                            startAngle: cumul - incr,
+                            endAngle: cumul,
+                            innerRadius: 0,
+                            outerRadius: rr,
+                        })
+                    )
+                    .attr('fill', out.catColors_[d.code] || 'lightgray')
+
+                cumul += incr
+            })
+        } else if (type === 'halftone') {
+            let cumul = Math.PI / 2 + offAng
+            const incr = (2 * Math.PI) / nbCat
+
+            data.forEach((d) => {
+                const val = +d.value || 0
+                const rr = s * 0.333 * Math.sqrt(val / maxVal)
+                const orbit = s * 0.25
+
+                container
+                    .append('circle')
+                    .attr('cx', orbit * Math.cos(cumul))
+                    .attr('cy', orbit * Math.sin(cumul))
+                    .attr('r', rr)
+                    .attr('fill', out.catColors_[d.code] || 'lightgray')
+
+                cumul += incr
+            })
+        } else if (type === 'agepyramid') {
+            const heightFactor = settings.agePyramidHeightFactor || 1
+            let cumul = -(s * heightFactor) / 2
+            const pyramidHeight = s * heightFactor
+            const dy = pyramidHeight / nbCat
+
+            data.forEach((d) => {
+                const val = +d.value || 0
+                const w = (s * val) / maxVal
+
+                container
+                    .append('rect')
+                    .attr('x', -w / 2)
+                    .attr('y', cumul)
+                    .attr('width', w)
+                    .attr('height', dy)
+                    .attr('fill', out.catColors_[d.code] || 'lightgray')
+
+                cumul += dy
+            })
+        }
+
+        if (animated) {
+            const nodes = container.selectAll('path, rect, circle').style('opacity', 0)
+            nodes
+                .transition()
+                .delay((d, i) => i * 100)
+                .duration(out.transitionDuration_)
+                .style('opacity', 1)
+            return nodes
+        }
+
+        return container.selectAll('path, rect, circle')
+    }
+
+    function addChartsToMap(map, regionFeatures) {
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
             const comp = _getComposition(regionId)
@@ -252,24 +451,23 @@ export const map = function (config) {
             if (!data.length) return
 
             const r = out.classifierSize_(_getRegionTotal(regionId))
-            const { pie_, arcFn } = makePieArc(r)
 
             const nodes = map.svg().selectAll('#pie_' + regionId)
             const chartNode = nodes
                 .append('g')
                 .attr('class', 'piechart')
-                .attr('stroke', out.pieStrokeFill_)
-                .attr('stroke-width', out.pieStrokeWidth_ + 'px')
+                .attr('stroke', out.compositionSettings_.strokeFill)
+                .attr('stroke-width', out.compositionSettings_.strokeWidth + 'px')
                 .style('pointer-events', 'none')
 
-            drawPieSegments(chartNode, data, arcFn, pie_, true).on('end', function () {
+            drawCompositionSymbol(chartNode, data, r, true).on('end', function () {
                 select(chartNode.node()).style('pointer-events', null)
             })
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.pieStrokeWidth_ + 1)
+                        .style('stroke-width', out.compositionSettings_.strokeWidth + 1)
                         .style('stroke', 'black')
                     if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
@@ -277,13 +475,13 @@ export const map = function (config) {
                     if (map._tooltip) map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.pieStrokeWidth_).style('stroke', out.pieStrokeFill_)
+                    select(this).style('stroke-width', out.compositionSettings_.strokeWidth).style('stroke', out.compositionSettings_.strokeFill)
                     if (map._tooltip) map._tooltip.mouseout()
                 })
         })
     }
 
-    function addPieChartsToGridCartogram(regionIds, map) {
+    function addChartsToGridCartogram(regionIds, map) {
         regionIds.forEach((regionId) => {
             const node = map.svg().select('#pie_' + regionId)
             if (node.empty()) return
@@ -301,7 +499,6 @@ export const map = function (config) {
             const anchorY = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.height / 2
 
             const r = out.classifierSize_(_getRegionTotal(regionId))
-            const { pie_, arcFn } = makePieArc(r)
 
             const g = node
                 .append('g')
@@ -312,10 +509,10 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'piechart')
-                .attr('stroke', out.pieStrokeFill_)
-                .attr('stroke-width', out.pieStrokeWidth_ + 'px')
+                .attr('stroke', out.compositionSettings_.strokeFill)
+                .attr('stroke-width', out.compositionSettings_.strokeWidth + 'px')
 
-            drawPieSegments(chartNode, data, arcFn, pie_, true)
+            drawCompositionSymbol(chartNode, data, r, true)
 
             const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
             if (shapeEl?.nextSibling) node.node().insertBefore(g.node(), shapeEl.nextSibling)
