@@ -49,6 +49,7 @@ export const map = function (config) {
         maxSize: 15,
         strokeFill: 'white',
         strokeWidth: 0.3,
+        reverseOrder: false,
         stripesOrientation: 0,
         offsetAngle: 0,
         agePyramidHeightFactor: 1,
@@ -287,25 +288,26 @@ export const map = function (config) {
     function drawCompositionSymbol(container, data, r, animated) {
         const settings = out.compositionSettings_ || {}
         const type = settings.type || 'pie'
+        const orderedData = settings.reverseOrder ? [...data].reverse() : data
         const s = 2 * r
         const half = s / 2
 
         if (type === 'pie') {
             const { pie_, arcFn } = makePieArc(r)
-            return drawPieSegments(container, data, arcFn, pie_, animated)
+            return drawPieSegments(container, orderedData, arcFn, pie_, animated)
         }
 
         container.selectAll('*').remove()
 
         const offAng = ((settings.offsetAngle || 0) * Math.PI) / 180
         const orientation = settings.stripesOrientation || 0
-        const maxVal = data.reduce((m, d) => Math.max(m, +d.value || 0), 0) || 1
-        const nbCat = data.length || 1
+        const maxVal = orderedData.reduce((m, d) => Math.max(m, +d.value || 0), 0) || 1
+        const nbCat = orderedData.length || 1
 
         if (type === 'flag' || type === 'segment') {
             let cumul = 0
             const segmentThickness = s * 0.35
-            data.forEach((d) => {
+            orderedData.forEach((d) => {
                 const share = +d.value || 0
                 if (!share) return
 
@@ -351,7 +353,7 @@ export const map = function (config) {
             })
         } else if (type === 'ring') {
             let cumul = 0
-            data.forEach((d) => {
+            orderedData.forEach((d) => {
                 const share = +d.value || 0
                 if (!share) return
 
@@ -369,7 +371,7 @@ export const map = function (config) {
             let cumul = Math.PI / 2 + offAng
             const incr = (2 * Math.PI) / nbCat
 
-            data.forEach((d) => {
+            orderedData.forEach((d) => {
                 const val = +d.value || 0
                 const rr = r * Math.sqrt(val / maxVal)
 
@@ -392,7 +394,7 @@ export const map = function (config) {
             let cumul = Math.PI / 2 + offAng
             const incr = (2 * Math.PI) / nbCat
 
-            data.forEach((d) => {
+            orderedData.forEach((d) => {
                 const val = +d.value || 0
                 const rr = s * 0.333 * Math.sqrt(val / maxVal)
                 const orbit = s * 0.25
@@ -412,7 +414,7 @@ export const map = function (config) {
             const pyramidHeight = s * heightFactor
             const dy = pyramidHeight / nbCat
 
-            data.forEach((d) => {
+            orderedData.forEach((d) => {
                 const val = +d.value || 0
                 const w = (s * val) / maxVal
 

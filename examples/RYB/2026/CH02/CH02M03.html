@@ -137,17 +137,20 @@
                     .map('pie')
                     .dorling(true)
                     .dorlingSettings({
-                        padding: -1,
+                        padding: -1.5,
                     })
                     .svgId('map2')
                     .insets(insetsCfg2)
                     .containerId('container2')
                     .compositionSettings({
                         type: 'flag',
-                        minSize: 13,
-                        maxSize: 13,
+                        minSize: 11,
+                        maxSize: 11,
+                        reverseOrder: true,
                         offsetAngle: 90,
                         otherColor: '#EFD18C',
+                        stripesOrientation: 1,
+                        // offsetAngle: 30, //radar/halftone
                     })
                     .width(MAPWIDTH)
                     .height(MAPHEIGHT)

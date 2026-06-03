@@ -32,6 +32,7 @@ export interface PieMap extends MapInstance {
         maxSize?: number
         strokeFill?: string
         strokeWidth?: number
+        reverseOrder?: boolean
         stripesOrientation?: number
         offsetAngle?: number
         agePyramidHeightFactor?: number
@@ -44,6 +45,7 @@ export interface PieMap extends MapInstance {
         maxSize?: number
         strokeFill?: string
         strokeWidth?: number
+        reverseOrder?: boolean
         stripesOrientation?: number
         offsetAngle?: number
         agePyramidHeightFactor?: number

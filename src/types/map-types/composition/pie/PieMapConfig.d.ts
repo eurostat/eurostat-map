@@ -16,6 +16,7 @@ export interface PieMapConfig extends MapConfig {
         maxSize?: number
         strokeFill?: string
         strokeWidth?: number
+        reverseOrder?: boolean
         stripesOrientation?: number
         offsetAngle?: number
         agePyramidHeightFactor?: number
