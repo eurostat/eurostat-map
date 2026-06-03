@@ -32,6 +32,10 @@
                 <svg id="map2"></svg>
                 <g id="newInsets2"></g>
             </svg>
+            <svg id="container3" class="map-container" height="900px">
+                <svg id="map3"></svg>
+                <g id="newInsets3"></g>
+            </svg>
         </div>
 
         <script src="../../../../build/eurostatmap.js"></script>
@@ -73,9 +77,11 @@
                 const insetBoxPosition = [MAPWIDTH - 250, 70]
                 const insetsCfg = createOutermostInsetsConfig()
                 const insetsCfg2 = createOutermostInsetsConfig()
+                const insetsCfg3 = createOutermostInsetsConfig()
 
                 createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
                 createInsetDOMElements(document.getElementById('newInsets2'), insetsCfg2, insetBoxPosition)
+                createInsetDOMElements(document.getElementById('newInsets3'), insetsCfg3, insetBoxPosition)
 
                 const map = eurostatmap
                     .map('pie')
@@ -161,6 +167,54 @@
                     .nutsLevel('mixed')
                     .nutsYear(2024)
                     .statPie({
+                        customData: myData,
+                        categoryCodes: ['I', 'C', 'J', 'Other'],
+                        categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
+                        categoryColors: ['#2644A7', '#AF155C', '#33A033', '#EFD18C'],
+                    })
+                    .header(true)
+                    .footer(true)
+                    .footnote(
+                        'Note: the most common causes of death in the EU were – diseases of the circulatory system, cancer, diseases of the respiratory system. <br>Source: Custom JSON files'
+                    )
+                    .footnoteWrap(100)
+                    .zoomButtons(false)
+                    .legend({
+                        x: 20,
+                        y: 190,
+                        boxOpacity: 0,
+                        boxFill: 'white',
+                        sizeLegend: false,
+                        colorLegend: {
+                            title: 'Cause of death',
+                        },
+                        noDataPadding: -10,
+                    })
+                    .onBuild(() => {
+                        d3.select('#map #em-footnote-2').remove()
+                        d3.select('#map')
+                            .append('text')
+                            .attr('x', MAPWIDTH - 310)
+                            .attr('y', MAPHEIGHT + 83)
+                            .attr('class', 'em-footnote')
+                            .attr('id', 'em-footnote-2')
+                            .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+                    })
+                    .build()
+
+                const map3 = eurostatmap
+                    .map('stripe')
+                    .svgId('map3')
+                    .insets(insetsCfg3)
+                    .containerId('container3')
+                    .width(MAPWIDTH)
+                    .height(MAPHEIGHT)
+                    .title('Main causes of death')
+                    .subtitle('% of all deaths, by NUTS 1 regions, 2021')
+                    .scale('20M')
+                    .nutsLevel(1)
+                    .nutsYear(2024)
+                    .statComp({
                         customData: myData,
                         categoryCodes: ['I', 'C', 'J', 'Other'],
                         categoryLabels: ['Circulatory', 'Cancer', 'Respiratory', 'Other'],
