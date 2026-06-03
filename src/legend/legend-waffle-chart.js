@@ -142,43 +142,43 @@ export const legend = function (map, config) {
         if (codes.includes('other')) orderedCodes.push('other')
 
         orderedCodes.forEach((code) => {
-                const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
 
-                // rectangle
-                out._colorLegendContainer
-                    .append('rect')
-                    .attr('class', 'em-legend-rect')
-                    .attr('x', 0)
-                    .attr('y', y)
-                    .attr('width', config.shapeWidth)
-                    .attr('height', config.shapeHeight)
-                    .attr('rx', 2)
-                    .attr('ry', 2)
-                    .style('fill', scs[code])
-                    .on('mouseover', function () {
-                        highlightRegions(out.map, code)
-                        if (out.map.insetTemplates_) {
-                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
-                        }
-                    })
-                    .on('mouseout', function () {
-                        unhighlightRegions(out.map)
-                        if (out.map.insetTemplates_) {
-                            executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
-                        }
-                    })
+            // rectangle
+            out._colorLegendContainer
+                .append('rect')
+                .attr('class', 'em-legend-rect')
+                .attr('x', 0)
+                .attr('y', y)
+                .attr('width', config.shapeWidth)
+                .attr('height', config.shapeHeight)
+                .attr('rx', 2)
+                .attr('ry', 2)
+                .style('fill', scs[code])
+                .on('mouseover', function () {
+                    highlightRegions(out.map, code)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                    }
+                })
+                .on('mouseout', function () {
+                    unhighlightRegions(out.map)
+                    if (out.map.insetTemplates_) {
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
+                    }
+                })
 
-                // label
-                out._colorLegendContainer
-                    .append('text')
-                    .attr('class', 'em-legend-label')
-                    .attr('x', config.shapeWidth + config.labelOffsets.x)
-                    .attr('y', y + config.shapeHeight * 0.5)
-                    .attr('dy', '0.35em')
-                    .text(map.catLabels()[code] || code)
+            // label
+            out._colorLegendContainer
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', config.shapeWidth + config.labelOffsets.x)
+                .attr('y', y + config.shapeHeight * 0.5)
+                .attr('dy', '0.35em')
+                .text(map.catLabels()[code] || code)
 
-                i++
-            })
+            i++
+        })
 
         //'no data' legend box
         if (config.noData) {
