@@ -40,11 +40,10 @@
         "copy-types": "copyfiles -u 2 \"src/types/**/*.d.ts\" build/types",
         "check:types:legend-config-sync": "node test/scripts/check-legend-config-sync.js",
         "type-check": "npm run check:types:legend-config-sync && tsc --noEmit && tsc --noEmit test/typescript-test.ts",
-        "docs:api": "typedoc --options typedoc.json",
-        "docs": "npm run docs:api",
-        "generate-previews": "node examples/scripts/generate-previews.js",
+        "update-docs": "typedoc --options typedoc.json",
+        "update-examples": "npm run update-examples-manifest && npm run generate-previews",
         "update-examples-manifest": "node examples/scripts/update-examples-manifest.js",
-        "update-examples": "npm run update-examples-manifest && npm run generate-previews"
+        "generate-previews": "node examples/scripts/generate-previews.js"
     },
     "dependencies": {
         "d3-array": "^3.2.4",
