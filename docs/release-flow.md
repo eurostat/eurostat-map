@@ -9,6 +9,7 @@ Use this flow when you want to:
 - build and publish a new npm version
 - push a matching git tag
 - prepare GitHub release notes from that tag
+- keep an in-repo release history in `docs/release-notes.md`
 
 This flow assumes:
 
@@ -74,6 +75,14 @@ This flow assumes:
     - `git status --short`
 - note: unpkg may take a short time to refresh cache
 
+7. Update release notes file
+
+- append a new section for the released version in `docs/release-notes.md`
+- use the release notes structure from this document
+- include one code snippet for each meaningful change
+- keep notes concise and copy-pasteable for GitHub Releases
+- commit and push this documentation update if it was not already included
+
 ## Agent Output Requirements
 
 After completing the flow, the agent should report:
@@ -84,6 +93,18 @@ After completing the flow, the agent should report:
 - any blockers encountered
 - explicit confirmation that tag format used was `X.Y.Z` (no `v` prefix)
 
+When preparing release notes for users:
+
+- include a code snippet for each meaningful change listed in the notes
+- snippets should be practical, copy-pasteable, and reflect the shipped API/behavior
+- for type additions/changes, include a concise TypeScript interface/property snippet
+- for map behavior changes, include a minimal builder-chain example
+- for UI/example changes, include a focused JS/CSS snippet that demonstrates usage
+- ensure the same notes are written to `docs/release-notes.md`
+- document only library-facing changes from `src/**` by default
+- exclude changes limited to `examples/**`, `docs/**`, or generated `build/**` artifacts from user release notes
+- include non-`src/**` changes only when they reflect a real library/API/runtime behavior change that users of the package consume
+
 ## GitHub Release (No gh CLI)
 
 When `gh` CLI is not available, do not attempt automated GitHub release creation.
@@ -91,6 +112,7 @@ When `gh` CLI is not available, do not attempt automated GitHub release creation
 Instead, the agent must provide this exact deliverable to the user:
 
 - Give me a concise summary of meaningful changes made, as bullet points, in order to inform our users of new functionalities, improvements, and breaking changes. give it to me as markdown that i can simply copy and paste to my release notes when i create release from tag on github
+- Include one code snippet per meaningful change in that markdown.
 
 ## Suggested Release Notes Structure
 
@@ -102,6 +124,12 @@ Use this markdown structure for release notes output:
 - `### Fixes`
 - `### Breaking Changes` (only if applicable)
 - `### Notes` (optional: unpkg cache propagation, migration hints)
+
+Snippet conventions:
+
+- after each meaningful bullet, add a short `Example` label and a fenced code block
+- keep snippets short (roughly 5-20 lines) and focused on a single change
+- prefer real API names and options exactly as released
 
 ## Operational Notes
 
