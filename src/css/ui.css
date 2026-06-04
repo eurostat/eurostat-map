@@ -20,6 +20,10 @@
     font-size: 20px;
     fill: #333333;
 }
+.em-legend-button-rect {
+    fill: black;
+    stroke: #000;
+}
 
 /* zoom  */
 /* .em-zoom-buttons {

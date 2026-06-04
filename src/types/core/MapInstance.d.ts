@@ -266,6 +266,10 @@ export interface MapInstance {
     insetsButton(): boolean
     insetsButton(show: boolean): this
 
+    /** Show/hide legend toggle button. */
+    legendButton(): boolean
+    legendButton(show: boolean): this
+
     /** Filter function for placename labels. */
     placenamesFilter(): ((name: any) => boolean) | undefined
     placenamesFilter(fn: (name: any) => boolean): this
@@ -313,6 +317,10 @@ export interface MapInstance {
     /** Position adjustment for insets button: [x, y] */
     insetsButtonPosition(): [number, number] | undefined
     insetsButtonPosition(pos: [number, number]): this
+
+    /** Position adjustment for legend button: [x, y] */
+    legendButtonPosition(): [number, number] | undefined
+    legendButtonPosition(pos: [number, number]): this
 
     /** Pointer hover color for NUTS regions. */
     hoverColor(): string

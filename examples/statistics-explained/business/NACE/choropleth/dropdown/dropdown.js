@@ -11,6 +11,26 @@ import './ewc-singleselect.js'
     const naceSelect = document.querySelector('#NACESelect')
     if (!naceSelect) return console.warn('#NACESelect not found')
 
+    const closeDropdown = (dropdown) => {
+        if (typeof dropdown.closeDropdownWithoutFocus === 'function') {
+            dropdown.closeDropdownWithoutFocus()
+        }
+    }
+
+    // Capture interactions before bubbling quirks in Shadow DOM so only one dropdown stays open.
+    document.addEventListener(
+        'click',
+        (event) => {
+            const path = event.composedPath ? event.composedPath() : []
+            if (path.includes(unitSelect)) {
+                requestAnimationFrame(() => closeDropdown(naceSelect))
+            } else if (path.includes(naceSelect)) {
+                requestAnimationFrame(() => closeDropdown(unitSelect))
+            }
+        },
+        true
+    )
+
     // listen for selection events
     unitSelect.addEventListener('option-selected', (e) => {
         //console.log('option-selected', e.detail);

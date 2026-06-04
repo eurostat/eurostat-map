@@ -1,4 +1,24 @@
-import { compactFormatter, longFormatter } from '../../../../../src/core/utils'
+const compactIntlFormatter = new Intl.NumberFormat('en', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1,
+})
+
+const longIntlFormatter = new Intl.NumberFormat('en', {
+    maximumFractionDigits: 0,
+})
+
+const compactFormatter = {
+    format(value) {
+        return compactIntlFormatter.format(value).replace(/,/g, ' ')
+    },
+}
+
+const longFormatter = {
+    format(value) {
+        return longIntlFormatter.format(value).replace(/,/g, ' ')
+    },
+}
 
 const configs = {
     LOC_NR: {

@@ -11,6 +11,7 @@ import { appendMinimap } from './minimaps'
 import { defineMapZoom, setMapView } from './zoom'
 import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
+import { appendLegendButton } from './buttons/legend-button'
 import { addPlacenameLabels } from './decoration/placenames.js'
 import { initProj4 } from './geo/proj4.js'
 import { addEurostatLogo, addEurostatRibbon } from './decoration/logo.js'
@@ -125,6 +126,9 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.zoomButtonsPosition_ = undefined // [x,y] position of zoom buttons. If not specified, they are positioned in the top right corner
     out.insetsButton_ = false // show insets button
     out.insetsButtonPosition_ = undefined // [x,y] position of insets button. If not specified, they are positioned in the top right corner
+    out.legendButton_ = false // show legend toggle button
+    out.legendButtonPosition_ = undefined // [x,y] position of legend button. If not specified, they are positioned in the top left corner
+    out.legendVisible_ = undefined // legend visibility state (initialized in stat-map when legendButton is enabled)
 
     //tooltip
     out.tooltip_ = {
@@ -695,6 +699,11 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         //insets buttons
         if (out.insetsButton_) {
             appendInsetsButton(out)
+        }
+
+        // legend button
+        if (out.legendButton_ && typeof out.legendObj_ !== 'undefined' && out.legendObj_) {
+            appendLegendButton(out)
         }
 
         // after drawBackgroundMap, geometries, labels, etc.

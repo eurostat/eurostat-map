@@ -21,32 +21,47 @@ export interface PieMap extends MapInstance {
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
 
-    pieMaxRadius(): number
-    pieMaxRadius(v: number): this
+    pieSettings(): {
+        innerRadius?: number
+    }
+    pieSettings(v: { innerRadius?: number }): this
 
-    pieMinRadius(): number
-    pieMinRadius(v: number): this
-
-    pieChartInnerRadius(): number
-    pieChartInnerRadius(v: number): this
-
-    pieOtherColor(): string
-    pieOtherColor(v: string): this
-
-    pieOtherText(): string
-    pieOtherText(v: string): this
-
-    pieStrokeFill(): string
-    pieStrokeFill(v: string): this
-
-    pieStrokeWidth(): number
-    pieStrokeWidth(v: number): this
+    compositionSettings(): {
+        type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'
+        minSize?: number
+        maxSize?: number
+        strokeFill?: string
+        strokeWidth?: number
+        reverseOrder?: boolean
+        /** Category code order for composition rendering. */
+        order?: string[]
+        stripesOrientation?: number
+        offsetAngle?: number
+        agePyramidHeightFactor?: number
+        otherColor?: string
+        otherText?: string
+    }
+    compositionSettings(v: {
+        type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'
+        minSize?: number
+        maxSize?: number
+        strokeFill?: string
+        strokeWidth?: number
+        reverseOrder?: boolean
+        /** Category code order for composition rendering. */
+        order?: string[]
+        stripesOrientation?: number
+        offsetAngle?: number
+        agePyramidHeightFactor?: number
+        otherColor?: string
+        otherText?: string
+    }): this
 
     dorling(): boolean
     dorling(v: boolean): this
 
-    pieTotalCode(): string | undefined
-    pieTotalCode(v: string | undefined): this
+    compositionTotalCode(): string | undefined
+    compositionTotalCode(v: string | undefined): this
 
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this

@@ -174,6 +174,38 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.legend_ = undefined
     out.legendObj_ = undefined
 
+    const applyLegendVisibility = function () {
+        const legend = out.legendObj()
+        if (!legend) return
+
+        if (out.legendButton_) {
+            if (out.legendVisible_ === undefined) {
+                // Auto-hide on mobile by default when legend button is enabled.
+                out.legendVisible_ = window.innerWidth > 768
+            }
+        } else {
+            out.legendVisible_ = true
+        }
+
+        const legendSvg = select('#' + legend.svgId)
+        if (!legendSvg.empty()) {
+            legendSvg.style('display', out.legendVisible_ ? null : 'none')
+        }
+    }
+
+    out.setLegendVisibility = function (visible) {
+        out.legendVisible_ = !!visible
+        applyLegendVisibility()
+        return out
+    }
+
+    out.toggleLegendVisibility = function () {
+        const current = out.legendVisible_ === undefined ? true : !!out.legendVisible_
+        out.legendVisible_ = !current
+        applyLegendVisibility()
+        return out
+    }
+
     /**
      * Definition of getters/setters for all previously defined attributes.
      * Each method follow the same pattern:
@@ -207,6 +239,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                     legendSvg.selectAll('*').remove()
                 }
             }
+            out.svg()?.select('#em-legend-button').remove()
             out.legend_ = v
             return out
         }
@@ -218,7 +251,10 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out.updateLegend = function (v) {
-        if (out.legendObj_) out.legendObj().update()
+        if (out.legendObj_) {
+            out.legendObj().update()
+            applyLegendVisibility()
+        }
         return out
     }
 
@@ -312,6 +348,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         legend.build()
+        applyLegendVisibility()
     }
 
     /** Check if all stat datasets have been loaded. */

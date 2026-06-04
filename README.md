@@ -122,6 +122,7 @@ Here are some public projects and publications built with eurostat-map:
 - [Tourism nights booked via platforms hit nearly 1 billion](https://ec.europa.eu/eurostat/en/web/products-eurostat-news/w/ddn-20260401-1)
 - [EU rail passengers made 8.7 billion trips in 2024](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260514-1)
 - [EU life expectancy increases again and hits 81.5 years](https://ec.europa.eu/eurostat/web/products-eurostat-news/w/ddn-20260313-3)
+- [Statistics Explained - Businesses in Manufacturing](https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Businesses_in_the_manufacturing_sector#Regional_data:_Manufacturing)
 
 ## About
 

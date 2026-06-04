@@ -10,6 +10,7 @@ export const defineDeprecatedFunctions = (out) => {
     // buttons
     out.showZoomButtons = (v) => (console.warn('showZoomButtons() is now DEPRECATED, please use zoomButtons() instead'), out.zoomButtons_ = v, out);
     out.showInsetsButton = (v) => (console.warn('showInsetsButton() is now DEPRECATED, please use insetsButton() instead'), out.insetsButton_ = v, out);
+    out.showLegendButton = (v) => (console.warn('showLegendButton() is now DEPRECATED, please use legendButton() instead'), out.legendButton_ = v, out);
     // styles
     out.seaFillStyle = (v) => (console.warn('seaFillStyle() is now DEPRECATED, please use the .em-sea CSS class'), updateCSSRule('.em-sea','fill',v), out);
     out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'),updateCSSRule('.em-cntrg','fill',v), out);

@@ -112,6 +112,9 @@ export interface MapConfig {
     /** Show/hide inset map toggle button. */
     insetsButton?: boolean
 
+    /** Show/hide legend toggle button. */
+    legendButton?: boolean
+
     /** Show/hide placename labels. */
     placenames?: boolean
 
@@ -150,6 +153,9 @@ export interface MapConfig {
 
     /** Position adjustment for insets button: [x, y] */
     insetsButtonPosition?: [number, number]
+
+    /** Position adjustment for legend button: [x, y] */
+    legendButtonPosition?: [number, number]
 
     /** Pointer hover color for NUTS regions. */
     hoverColor?: string

@@ -4,7 +4,7 @@
  * Either `eurostatDatasetCode` + `categoryParameter` (Eurostat API path)
  * or `customData` (custom data path) must be provided.
  */
-export interface CompositionStatConfig {
+export interface CompositionStatConfig<TCustomData = Record<string, Record<string, number>>> {
     /**
      * Custom data keyed by region ID then category code.
      * Use instead of `eurostatDatasetCode` when supplying data directly.
@@ -16,7 +16,7 @@ export interface CompositionStatConfig {
      *   DE: { cat1: 4, cat2: 1, cat3: 6 },
      * }
      */
-    customData?: Record<string, Record<string, number>>
+    customData?: TCustomData
 
     /** Eurostat dataset code. Required when not using `customData`. */
     eurostatDatasetCode?: string

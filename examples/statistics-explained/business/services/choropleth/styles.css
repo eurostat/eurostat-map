@@ -1,0 +1,78 @@
+/* mobile */
+@media (max-width: 768px) {
+    .em-button {
+        height: 30px !important;
+        width: 30px !important;
+    }
+    ewc-singleselect {
+        max-width: 100% !important;
+        min-width: unset !important;
+    }
+    .em-legend {
+        transform: translate(10px, 10px) !important;
+    }
+}
+
+html,
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+#container {
+    width: 100%;
+    overflow: auto;
+    max-width: 100%;
+}
+
+#map {
+    max-width: 100%;
+}
+
+.map-title {
+    font-weight: bold;
+    color: #4c4b4b;
+    font-size: 21px;
+    padding: 6px;
+}
+
+.dropdown-container {
+    position: relative; /* or just remove position entirely */
+    padding: 6px;
+    padding-top: 0px;
+}
+
+.dropdown-label {
+    font-size: 14px;
+    font-weight: 100;
+    color: #333;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    padding-left: 2px;
+    align-self: center;
+    margin-right: 10px;
+}
+
+.em-zoom-buttons {
+    transform: translate(calc(100% - 40px), calc(100% - 140px)) !important;
+}
+
+.em-insets-button {
+    transform: translate(calc(100% - 40px), 10px) !important;
+    cursor: pointer !important;
+}
+
+.em-insets {
+    display: none;
+}
+
+.em-legend-title {
+    font-size: 1rem !important;
+}
+
+.em-legend-subtitle {
+    font-size: 14px !important;
+}
