@@ -39,19 +39,21 @@ export const map = function (config) {
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
 
-    out.waffleMinSize_ = 10
-    out.waffleMaxSize_ = 30
-    out.waffleGridSize_ = 10
-    out.waffleCellPadding_ = 0
-    out.waffleStrokeFill_ = 'white'
-    out.waffleStrokeWidth_ = 0
-    out.waffleRoundedCorners_ = 0
-    out.waffleTooltipSize_ = 80
+    out.waffleSettings_ = {
+        minSize: 10,
+        maxSize: 30,
+        gridSize: 10,
+        cellPadding: 0,
+        strokeFill: 'white',
+        strokeWidth: 0,
+        roundedCorners: 0,
+        tooltipSize: 80,
+        otherColor: '#FFCC80',
+        otherText: 'Other',
+    }
 
     out.catColors_ = undefined
     out.catLabels_ = undefined
-    out.waffleOtherColor_ = '#FFCC80'
-    out.waffleOtherText_ = 'Other'
     out.showOnlyWhenComplete_ = false
     out.classifierSize_ = null
     out.waffleTotalCode_ = undefined
@@ -63,26 +65,28 @@ export const map = function (config) {
         'catLabels_',
         'showOnlyWhenComplete_',
         'noDataFillStyle_',
-        'waffleMaxSize_',
-        'waffleMinSize_',
-        'waffleGridSize_',
-        'waffleCellPadding_',
-        'waffleOtherColor_',
-        'waffleOtherText_',
-        'waffleStrokeFill_',
-        'waffleStrokeWidth_',
-        'waffleRoundedCorners_',
-        'waffleTooltipSize_',
+        'waffleSettings_',
         'dorling_',
         'waffleTotalCode_',
         'statCodes_',
     ])
+
+    out.waffleSettings = function (v) {
+        if (!arguments.length) return { ...out.waffleSettings_ }
+        out.waffleSettings_ = {
+            ...out.waffleSettings_,
+            ...v,
+        }
+        return out
+    }
 
     applyConfigValues(out, config, [
         'catColors',
         'catLabels',
         'showOnlyWhenComplete',
         'noDataFillStyle',
+        'waffleSettings',
+        // legacy keys (deprecated) — still accepted for backwards compatibility
         'waffleMaxSize',
         'waffleMinSize',
         'waffleGridSize',
@@ -92,6 +96,7 @@ export const map = function (config) {
         'waffleStrokeFill',
         'waffleStrokeWidth',
         'waffleRoundedCorners',
+        'waffleTooltipSize',
         'statCodes',
     ])
 
@@ -109,10 +114,10 @@ export const map = function (config) {
     out.updateClassification = function () {
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
-                applyClassificationToMap(map, out, _getAnchors, 'waffleTotalCode_', out.waffleMinSize_, out.waffleMaxSize_)
+                applyClassificationToMap(map, out, _getAnchors, 'waffleTotalCode_', out.waffleSettings_.minSize, out.waffleSettings_.maxSize)
             )
         }
-        applyClassificationToMap(out, out, _getAnchors, 'waffleTotalCode_', out.waffleMinSize_, out.waffleMaxSize_)
+        applyClassificationToMap(out, out, _getAnchors, 'waffleTotalCode_', out.waffleSettings_.minSize, out.waffleSettings_.maxSize)
         return out
     }
 
@@ -122,7 +127,7 @@ export const map = function (config) {
         try {
             if (!out.classifierSize_) return
 
-            ensureCategoryColors(out, 'waffleTotalCode_', out.waffleOtherColor_, out.waffleOtherText_)
+            ensureCategoryColors(out, 'waffleTotalCode_', out.waffleSettings_.otherColor, out.waffleSettings_.otherText)
 
             if (out.insetTemplates_) {
                 executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
@@ -206,8 +211,8 @@ export const map = function (config) {
             map,
             '.wafflechart',
             _getRegionTotal,
-            (chart) => chart.style('stroke-width', out.waffleStrokeWidth_ + 0.5).style('stroke', 'black'),
-            (chart) => chart.style('stroke-width', out.waffleStrokeWidth_).style('stroke', out.waffleStrokeFill_)
+            (chart) => chart.style('stroke-width', out.waffleSettings_.strokeWidth + 0.5).style('stroke', 'black'),
+            (chart) => chart.style('stroke-width', out.waffleSettings_.strokeWidth).style('stroke', out.waffleSettings_.strokeFill)
         )
     }
 
@@ -249,12 +254,12 @@ export const map = function (config) {
             .selectAll('rect')
             .data(cells)
             .join('rect')
-            .attr('x', (d) => d.col * (cellSize + out.waffleCellPadding_))
-            .attr('y', (d) => d.row * (cellSize + out.waffleCellPadding_))
+            .attr('x', (d) => d.col * (cellSize + out.waffleSettings_.cellPadding))
+            .attr('y', (d) => d.row * (cellSize + out.waffleSettings_.cellPadding))
             .attr('width', cellSize)
             .attr('height', cellSize)
-            .attr('rx', out.waffleRoundedCorners_)
-            .attr('ry', out.waffleRoundedCorners_)
+            .attr('rx', out.waffleSettings_.roundedCorners)
+            .attr('ry', out.waffleSettings_.roundedCorners)
             .attr('fill', (d) => d.color)
             .attr('code', (d) => d.code)
 
@@ -270,7 +275,7 @@ export const map = function (config) {
     }
 
     function addWaffleChartsToMap(map, regionFeatures) {
-        const gridSize = out.waffleGridSize_
+        const gridSize = out.waffleSettings_.gridSize
 
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
@@ -279,7 +284,7 @@ export const map = function (config) {
 
             const total = _getRegionTotal(regionId)
             const waffleSize = out.classifierSize_(total)
-            const cellSize = (waffleSize - out.waffleCellPadding_ * (gridSize - 1)) / gridSize
+            const cellSize = (waffleSize - out.waffleSettings_.cellPadding * (gridSize - 1)) / gridSize
             const cells = generateWaffleCells(comp, gridSize)
 
             const nodes = map.svg().selectAll('#waffle_' + regionId)
@@ -287,18 +292,15 @@ export const map = function (config) {
                 .append('g')
                 .attr('class', 'wafflechart')
                 .attr('transform', `translate(${-waffleSize / 2}, ${-waffleSize / 2})`)
-                .attr('stroke', out.waffleStrokeFill_)
-                .attr('stroke-width', out.waffleStrokeWidth_ + 'px')
-                .style('pointer-events', 'none')
+                .attr('stroke', out.waffleSettings_.strokeFill)
+                .attr('stroke-width', out.waffleSettings_.strokeWidth + 'px')
 
-            renderWaffleRects(chartNode, cells, cellSize, true).on('end', function () {
-                select(chartNode.node()).style('pointer-events', null)
-            })
+            renderWaffleRects(chartNode, cells, cellSize, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.waffleStrokeWidth_ + 0.5)
+                        .style('stroke-width', out.waffleSettings_.strokeWidth + 0.5)
                         .style('stroke', 'black')
                     if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
@@ -306,14 +308,14 @@ export const map = function (config) {
                     if (map._tooltip) map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.waffleStrokeWidth_).style('stroke', out.waffleStrokeFill_)
+                    select(this).style('stroke-width', out.waffleSettings_.strokeWidth).style('stroke', out.waffleSettings_.strokeFill)
                     if (map._tooltip) map._tooltip.mouseout()
                 })
         })
     }
 
     function addWaffleChartsToGridCartogram(regionIds, map) {
-        const gridSize = out.waffleGridSize_
+        const gridSize = out.waffleSettings_.gridSize
 
         regionIds.forEach((regionId) => {
             const node = map.svg().select('#waffle_' + regionId)
@@ -330,7 +332,7 @@ export const map = function (config) {
 
             const total = _getRegionTotal(regionId)
             const waffleSize = out.classifierSize_(total)
-            const cellSize = (waffleSize - out.waffleCellPadding_ * (gridSize - 1)) / gridSize
+            const cellSize = (waffleSize - out.waffleSettings_.cellPadding * (gridSize - 1)) / gridSize
             const cells = generateWaffleCells(comp, gridSize)
 
             const g = node
@@ -342,8 +344,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'wafflechart')
-                .attr('stroke', out.waffleStrokeFill_)
-                .attr('stroke-width', out.waffleStrokeWidth_ + 'px')
+                .attr('stroke', out.waffleSettings_.strokeFill)
+                .attr('stroke-width', out.waffleSettings_.strokeWidth + 'px')
 
             renderWaffleRects(chartNode, cells, cellSize, true)
 
@@ -356,7 +358,7 @@ export const map = function (config) {
 
     const waffleChartTooltipFunction = function (rg, map) {
         const tooltipGridSize = 10
-        const chartSize = out.waffleTooltipSize_ || 100
+        const chartSize = out.waffleSettings_.tooltipSize || 100
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
         const comp = _getComposition(regionId)

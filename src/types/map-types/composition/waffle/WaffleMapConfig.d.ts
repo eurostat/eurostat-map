@@ -5,29 +5,43 @@ import type { WaffleLegendConfig } from '../../../legend/composition/WaffleLegen
  * Configuration for waffle chart composition maps.
  */
 export interface WaffleMapConfig extends MapConfig {
-    /** Waffle min size. */
+    /** Consolidated waffle chart settings. */
+    waffleSettings?: {
+        minSize?: number
+        maxSize?: number
+        gridSize?: number
+        cellPadding?: number
+        strokeFill?: string
+        strokeWidth?: number
+        roundedCorners?: number
+        tooltipSize?: number
+        otherColor?: string
+        otherText?: string
+    }
+
+    /** @deprecated Use waffleSettings.minSize */
     waffleMinSize?: number
-    /** Waffle max size. */
+    /** @deprecated Use waffleSettings.maxSize */
     waffleMaxSize?: number
-    /** Waffle grid size. */
+    /** @deprecated Use waffleSettings.gridSize */
     waffleGridSize?: number
-    /** Waffle cell padding. */
+    /** @deprecated Use waffleSettings.cellPadding */
     waffleCellPadding?: number
-    /** Waffle stroke fill. */
+    /** @deprecated Use waffleSettings.strokeFill */
     waffleStrokeFill?: string
-    /** Waffle stroke width. */
+    /** @deprecated Use waffleSettings.strokeWidth */
     waffleStrokeWidth?: number
-    /** Waffle rounded corners. */
+    /** @deprecated Use waffleSettings.roundedCorners */
     waffleRoundedCorners?: number
-    /** Waffle tooltip size. */
+    /** @deprecated Use waffleSettings.tooltipSize */
     waffleTooltipSize?: number
     /** Cat colors. */
     catColors?: Record<string, string>
     /** Cat labels. */
     catLabels?: Record<string, string>
-    /** Waffle other color. */
+    /** @deprecated Use waffleSettings.otherColor */
     waffleOtherColor?: string
-    /** Waffle other text. */
+    /** @deprecated Use waffleSettings.otherText */
     waffleOtherText?: string
     /** Show only when complete. */
     showOnlyWhenComplete?: boolean

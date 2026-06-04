@@ -205,6 +205,67 @@ export const defineDeprecatedFunctions = (out) => {
         if (out.compositionTotalCode) out.compositionTotalCode(v)
         return out
     };
+    // composition/waffle legacy aliases
+    out.waffleMinSize = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().minSize : undefined
+        console.warn('map.waffleMinSize() is now DEPRECATED. Please use map.waffleSettings({ minSize }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ minSize: v })
+        return out
+    };
+    out.waffleMaxSize = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().maxSize : undefined
+        console.warn('map.waffleMaxSize() is now DEPRECATED. Please use map.waffleSettings({ maxSize }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ maxSize: v })
+        return out
+    };
+    out.waffleGridSize = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().gridSize : undefined
+        console.warn('map.waffleGridSize() is now DEPRECATED. Please use map.waffleSettings({ gridSize }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ gridSize: v })
+        return out
+    };
+    out.waffleCellPadding = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().cellPadding : undefined
+        console.warn('map.waffleCellPadding() is now DEPRECATED. Please use map.waffleSettings({ cellPadding }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ cellPadding: v })
+        return out
+    };
+    out.waffleStrokeFill = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().strokeFill : undefined
+        console.warn('map.waffleStrokeFill() is now DEPRECATED. Please use map.waffleSettings({ strokeFill }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ strokeFill: v })
+        return out
+    };
+    out.waffleStrokeWidth = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().strokeWidth : undefined
+        console.warn('map.waffleStrokeWidth() is now DEPRECATED. Please use map.waffleSettings({ strokeWidth }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ strokeWidth: v })
+        return out
+    };
+    out.waffleRoundedCorners = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().roundedCorners : undefined
+        console.warn('map.waffleRoundedCorners() is now DEPRECATED. Please use map.waffleSettings({ roundedCorners }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ roundedCorners: v })
+        return out
+    };
+    out.waffleTooltipSize = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().tooltipSize : undefined
+        console.warn('map.waffleTooltipSize() is now DEPRECATED. Please use map.waffleSettings({ tooltipSize }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ tooltipSize: v })
+        return out
+    };
+    out.waffleOtherColor = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().otherColor : undefined
+        console.warn('map.waffleOtherColor() is now DEPRECATED. Please use map.waffleSettings({ otherColor }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ otherColor: v })
+        return out
+    };
+    out.waffleOtherText = function (v) {
+        if (!arguments.length) return out.waffleSettings ? out.waffleSettings().otherText : undefined
+        console.warn('map.waffleOtherText() is now DEPRECATED. Please use map.waffleSettings({ otherText }) instead.')
+        if (out.waffleSettings) out.waffleSettings({ otherText: v })
+        return out
+    };
     out.gridCartogramShape = function (v) {
         if (!arguments.length) return out.gridCartogramSettings().shape
         console.warn('map.gridCartogramShape() is now DEPRECATED. Please use map.gridCartogramSettings({ shape }) instead.')

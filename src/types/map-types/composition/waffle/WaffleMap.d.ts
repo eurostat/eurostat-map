@@ -21,34 +21,79 @@ export interface WaffleMap extends MapInstance {
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
 
+    waffleSettings(): {
+        minSize?: number
+        maxSize?: number
+        gridSize?: number
+        cellPadding?: number
+        strokeFill?: string
+        strokeWidth?: number
+        roundedCorners?: number
+        tooltipSize?: number
+        otherColor?: string
+        otherText?: string
+    }
+    waffleSettings(v: {
+        minSize?: number
+        maxSize?: number
+        gridSize?: number
+        cellPadding?: number
+        strokeFill?: string
+        strokeWidth?: number
+        roundedCorners?: number
+        tooltipSize?: number
+        otherColor?: string
+        otherText?: string
+    }): this
+
+    /** @deprecated Use waffleSettings({ maxSize }) */
     waffleMaxSize(): number
+    /** @deprecated Use waffleSettings({ maxSize }) */
     waffleMaxSize(v: number): this
 
+    /** @deprecated Use waffleSettings({ minSize }) */
     waffleMinSize(): number
+    /** @deprecated Use waffleSettings({ minSize }) */
     waffleMinSize(v: number): this
 
+    /** @deprecated Use waffleSettings({ gridSize }) */
     waffleGridSize(): number
+    /** @deprecated Use waffleSettings({ gridSize }) */
     waffleGridSize(v: number): this
 
+    /** @deprecated Use waffleSettings({ cellPadding }) */
     waffleCellPadding(): number
+    /** @deprecated Use waffleSettings({ cellPadding }) */
     waffleCellPadding(v: number): this
 
+    /** @deprecated Use waffleSettings({ otherColor }) */
     waffleOtherColor(): string
+    /** @deprecated Use waffleSettings({ otherColor }) */
     waffleOtherColor(v: string): this
 
+    /** @deprecated Use waffleSettings({ otherText }) */
     waffleOtherText(): string
+    /** @deprecated Use waffleSettings({ otherText }) */
     waffleOtherText(v: string): this
 
+    /** @deprecated Use waffleSettings({ strokeFill }) */
     waffleStrokeFill(): string
+    /** @deprecated Use waffleSettings({ strokeFill }) */
     waffleStrokeFill(v: string): this
 
+    /** @deprecated Use waffleSettings({ strokeWidth }) */
     waffleStrokeWidth(): number
+    /** @deprecated Use waffleSettings({ strokeWidth }) */
     waffleStrokeWidth(v: number): this
 
+    /** @deprecated Use waffleSettings({ roundedCorners }) */
     waffleRoundedCorners(): number
+    /** @deprecated Use waffleSettings({ roundedCorners }) */
     waffleRoundedCorners(v: number): this
 
+    /** @deprecated Use waffleSettings({ tooltipSize }) */
     waffleTooltipSize(): number
+    /** @deprecated Use waffleSettings({ tooltipSize }) */
     waffleTooltipSize(v: number): this
 
     dorling(): boolean

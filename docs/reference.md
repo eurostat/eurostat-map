@@ -905,14 +905,19 @@ const map = eurostatmap
     .title('Tourism')
     .subtitle('Nights spent in tourist accommodation, 2022')
 
-    //waffle settings
-    .waffleMinSize(10)
-    .waffleMaxSize(40)
-    .waffleCellPadding(0)
-    .waffleStrokeWidth(0)
-    .waffleRoundedCorners(0)
-    .waffleGridSize(10) //cells per row
-    .waffleTooltipSize(100) //tooltip chart size
+    // waffle settings
+    .waffleSettings({
+        minSize: 10,
+        maxSize: 40,
+        gridSize: 10, // cells per row
+        cellPadding: 0,
+        strokeFill: 'white',
+        strokeWidth: 0,
+        roundedCorners: 0,
+        tooltipSize: 100, // tooltip chart size
+        otherColor: '#FFCC80',
+        otherText: 'Other',
+    })
 
     .nutsLevel(0)
     .statWaffle({
@@ -937,6 +942,8 @@ const map = eurostatmap
 
     .build()
 ```
+
+Legacy waffle-prefixed setters (for example, `.waffleMinSize()` and `.waffleGridSize()`) are still supported for backward compatibility but are deprecated. Use `.waffleSettings({...})` instead.
 
 ### Cartograms
 
