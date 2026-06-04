@@ -91,6 +91,7 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
             lightness: map.ternarySettings_.lightness,
             contrast: map.ternarySettings_.contrast,
             spread: map.ternarySettings_.spread,
+            values: map.ternarySettings_.sextantColors,
             labels: out.labels,
             labelPosition: out.labelPosition,
             showCenter: out.showCenter,
@@ -181,7 +182,9 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
             },
         }
 
-        if (map.ternarySettings_.breaks < 30) {
+        if (map.ternarySettings_.sextant) {
+            viz.createSextantPlot(map._ternaryData_, opts)
+        } else if (map.ternarySettings_.breaks < 30) {
             viz.createDiscretePlot(map._ternaryData_, opts)
         } else {
             viz.createContinuousPlot(map._ternaryData_, opts)

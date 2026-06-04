@@ -15,7 +15,7 @@ import type { ValueByAlphaConfig } from './map-types/choropleth/ValueByAlphaConf
 import type { ValueByAlphaMap } from './map-types/choropleth/ValueByAlphaMap'
 import type { BivariateChoroplethConfig } from './map-types/choropleth/BivariateChoroplethConfig'
 import type { BivariateChoroplethMap } from './map-types/choropleth/BivariateChoroplethMap'
-import type { TrivariateChoroplethConfig } from './map-types/choropleth/TrivariateChoroplethConfig'
+import type { TrivariateChoroplethConfig, TrivariateTernarySettings } from './map-types/choropleth/TrivariateChoroplethConfig'
 import type { TrivariateChoroplethMap } from './map-types/choropleth/TrivariateChoroplethMap'
 
 // Categorical map types
@@ -122,6 +122,7 @@ export type {
     BivariateChoroplethConfig,
     BivariateChoroplethMap,
     TrivariateChoroplethConfig,
+    TrivariateTernarySettings,
     TrivariateChoroplethMap,
 }
 

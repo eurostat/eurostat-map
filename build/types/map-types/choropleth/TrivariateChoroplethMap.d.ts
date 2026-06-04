@@ -1,4 +1,7 @@
 import type { MapInstance } from '../../core/MapInstance'
+import type { TrivariateChoroplethConfig, TrivariateTernarySettings } from './TrivariateChoroplethConfig'
+
+type TernarySettings = TrivariateTernarySettings
 
 /**
  * Trivariate choropleth map type.
@@ -10,6 +13,6 @@ export interface TrivariateChoroplethMap extends MapInstance {
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
 
-    ternarySettings(): any
-    ternarySettings(v: any): this
+    ternarySettings(): TernarySettings
+    ternarySettings(v: Partial<TernarySettings>): this
 }

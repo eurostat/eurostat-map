@@ -402,7 +402,7 @@ function createMap(config: ChoroplethConfig): EurostatMap {
 - `ProportionalSymbolConfig` - Proportional symbol map configuration
 - `CategoricalConfig` - Categorical map configuration
 - `BivariateChoroplethConfig` - Bivariate choropleth configuration
-- `TrivariateChoroplethConfig` - Trivariate (ternary) choropleth configuration
+- `TrivariateChoroplethConfig` - Trivariate (ternary) choropleth configuration, including continuous and sextant ternary settings
 - `PieChartConfig` - Pie chart map configuration
 - `SparklineConfig` - Sparkline map configuration
 - `WaffleConfig` - Waffle map configuration

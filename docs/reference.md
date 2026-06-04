@@ -606,6 +606,29 @@ const map = eurostatmap
     .build()
 ```
 
+`ternarySettings(...)` supports two colour modes:
+
+- Continuous/discrete `tricolore` mode (default), using `hue`, `chroma`, `lightness`, `contrast`, `spread` and `breaks`.
+- `tricoloreSextant` mode, enabled with `sextant: true`, which classifies each region into one of six sextants around the ternary centre.
+
+Example using sextant mode:
+
+```javascript
+eurostatmap
+    .map('trivariateChoropleth')
+    .stat('v1', { label: 'Bachelor', unitText: '%' })
+    .stat('v2', { label: 'Master', unitText: '%' })
+    .stat('v3', { label: 'PhD', unitText: '%' })
+    .ternarySettings({
+        sextant: true,
+        meanCentering: true,
+        sextantColors: ['#FFFF00', '#B3DCC3', '#01A0C6', '#B8B3D8', '#F11D8C', '#FFB3B3'],
+    })
+    .build()
+```
+
+When `sextant: true` is enabled, `hue`, `chroma`, `lightness`, `contrast`, `spread` and `breaks` are ignored for polygon colouring, but the legend still uses the current ternary centre.
+
 ### Stripe composition map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/comp1.png)](https://eurostat.github.io/eurostat-map/examples/stripe/livestock_composition.html)

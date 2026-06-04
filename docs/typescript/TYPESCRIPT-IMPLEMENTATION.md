@@ -19,6 +19,7 @@ This document summarizes the comprehensive TypeScript support added to the euros
 ### New Files Created
 
 1. **`src/types/index.d.ts`** (654 lines)
+
     - Comprehensive type definitions for all map types
     - Configuration interfaces for all features
     - Builder pattern method signatures
@@ -26,6 +27,7 @@ This document summarizes the comprehensive TypeScript support added to the euros
     - Full JSDoc documentation
 
 2. **`TYPESCRIPT.md`** (530+ lines)
+
     - Complete TypeScript usage guide
     - Code examples for all map types
     - Common patterns and best practices
@@ -40,18 +42,21 @@ This document summarizes the comprehensive TypeScript support added to the euros
 ### Files Modified
 
 1. **`tsconfig.json`**
+
     - Enhanced with declaration generation settings
     - Configured for proper module resolution
     - Set up source maps and declaration maps
     - Optimized for library distribution
 
 2. **`package.json`**
+
     - Added `types` and `typings` entry points
     - Added `build-types` script
     - Updated `build-prod` to include type generation
     - Added `type-check` script for CI/CD
 
 3. **`src/index.js`**
+
     - Added re-export of type definitions
     - Enables type-only imports
 
@@ -69,7 +74,7 @@ This document summarizes the comprehensive TypeScript support added to the euros
 - `ProportionalSymbolConfig` - Proportional symbols settings
 - `CategoricalConfig` - Categorical map settings
 - `BivariateChoroplethConfig` - Bivariate settings
-- `TrivariateChoroplethConfig` - Trivariate/ternary settings
+- `TrivariateChoroplethConfig` - Trivariate/ternary settings, including optional sextant mode and sextant color palette
 - `PieChartConfig` - Pie chart settings
 - `SparklineConfig` - Sparkline settings
 - `WaffleConfig` - Waffle map settings
@@ -220,6 +225,7 @@ npm run type-check  # Validates types without building
 ### User Documentation
 
 1. **TYPESCRIPT.md** (530+ lines)
+
     - Installation guide
     - Usage examples for all map types
     - Advanced patterns
@@ -271,16 +277,19 @@ When adding new features:
 ### Potential Future Enhancements
 
 1. **Stricter Types**
+
     - Enable strict mode in tsconfig.json
     - Add more specific type constraints
     - Reduce use of `any` types
 
 2. **Additional Type Files**
+
     - Separate files for complex types
     - Legend-specific types in dedicated file
     - Utility types file
 
 3. **Full Migration**
+
     - Convert JavaScript files to TypeScript
     - Enables even better type inference
     - Catch more errors at compile time

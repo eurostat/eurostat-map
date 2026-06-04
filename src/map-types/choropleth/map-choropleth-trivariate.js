@@ -2,7 +2,7 @@ import { select } from 'd3-selection'
 import { createStatMap } from '../../core/stat-map'
 import * as TrivariateLegend from '../../legend/choropleth/legend-choropleth-trivariate'
 import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
-import { tricolore, CompositionUtils } from '../../lib/tricolore/src'
+import { tricolore, tricoloreSextant, CompositionUtils } from '../../lib/tricolore/src'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/choropleth/TrivariateChoroplethConfig').TrivariateChoroplethConfig} TrivariateChoroplethConfig */
@@ -34,6 +34,8 @@ export const map = function (config) {
         spread: 0.8,
         breaks: 5,
         meanCentering: true,
+        sextant: false,
+        sextantColors: ['#FFFF00', '#B3DCC3', '#01A0C6', '#B8B3D8', '#F11D8C', '#FFB3B3'],
     }
 
     // internal cache (index → color)
@@ -126,15 +128,20 @@ export const map = function (config) {
         out._ternaryData_ = filtered.map((d) => d.values)
         out._ternaryCenter_ = out.ternarySettings_.meanCentering ? CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
 
-        const colors = tricolore(out._ternaryData_, {
-            center: out._ternaryCenter_,
-            breaks: out.ternarySettings_.breaks,
-            hue: out.ternarySettings_.hue,
-            chroma: out.ternarySettings_.chroma,
-            lightness: out.ternarySettings_.lightness,
-            contrast: out.ternarySettings_.contrast,
-            spread: out.ternarySettings_.spread,
-        })
+        const colors = out.ternarySettings_.sextant
+            ? tricoloreSextant(out._ternaryData_, {
+                  center: out._ternaryCenter_,
+                  values: out.ternarySettings_.sextantColors,
+              })
+            : tricolore(out._ternaryData_, {
+                  center: out._ternaryCenter_,
+                  breaks: out.ternarySettings_.breaks,
+                  hue: out.ternarySettings_.hue,
+                  chroma: out.ternarySettings_.chroma,
+                  lightness: out.ternarySettings_.lightness,
+                  contrast: out.ternarySettings_.contrast,
+                  spread: out.ternarySettings_.spread,
+              })
 
         filtered.forEach((d, i) => {
             const color = colors[i]
