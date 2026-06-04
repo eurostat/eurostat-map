@@ -17,6 +17,8 @@ export interface PieMapConfig extends MapConfig {
         strokeFill?: string
         strokeWidth?: number
         reverseOrder?: boolean
+        /** Category code order for composition rendering. */
+        order?: string[]
         stripesOrientation?: number
         offsetAngle?: number
         agePyramidHeightFactor?: number

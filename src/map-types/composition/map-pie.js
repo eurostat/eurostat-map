@@ -285,7 +285,33 @@ export const map = function (config) {
     function drawCompositionSymbol(container, data, r, animated) {
         const settings = out.compositionSettings_ || {}
         const type = settings.type || 'pie'
-        const orderedData = settings.reverseOrder ? [...data].reverse() : data
+        const hasManualOrder = Array.isArray(settings.order) && settings.order.length
+        let orderedData = data
+
+        if (hasManualOrder) {
+            const byCode = new Map(data.map((d) => [d.code, d]))
+            const orderSet = new Set()
+            const explicitOrder = []
+
+            settings.order.forEach((code) => {
+                const match = byCode.get(code)
+                if (match && !orderSet.has(code)) {
+                    explicitOrder.push(match)
+                    orderSet.add(code)
+                }
+            })
+
+            // Keep unspecified categories in their natural order after explicitly ordered ones.
+            const remaining = data.filter((d) => !orderSet.has(d.code))
+            orderedData = [...explicitOrder, ...remaining]
+        } else {
+            if (type === 'ring') {
+                // Default ring order keeps smaller shares near the center.
+                orderedData = [...data].sort((a, b) => (+b.value || 0) - (+a.value || 0))
+            }
+        }
+
+        if (settings.reverseOrder) orderedData = [...orderedData].reverse()
         const s = 2 * r
         const half = s / 2
 

@@ -33,6 +33,8 @@ export interface PieMap extends MapInstance {
         strokeFill?: string
         strokeWidth?: number
         reverseOrder?: boolean
+        /** Category code order for composition rendering. */
+        order?: string[]
         stripesOrientation?: number
         offsetAngle?: number
         agePyramidHeightFactor?: number
@@ -46,6 +48,8 @@ export interface PieMap extends MapInstance {
         strokeFill?: string
         strokeWidth?: number
         reverseOrder?: boolean
+        /** Category code order for composition rendering. */
+        order?: string[]
         stripesOrientation?: number
         offsetAngle?: number
         agePyramidHeightFactor?: number
