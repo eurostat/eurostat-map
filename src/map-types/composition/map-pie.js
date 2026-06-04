@@ -49,6 +49,7 @@ export const map = function (config) {
         maxSize: 15,
         strokeFill: 'white',
         strokeWidth: 0.3,
+        radarValueMode: 'share',
         reverseOrder: false,
         stripesOrientation: 0,
         offsetAngle: 0,
@@ -129,7 +130,30 @@ export const map = function (config) {
             )
         }
         applyClassificationToMap(out, out, _getAnchors, 'compositionTotalCode_', out.compositionSettings_.minSize, out.compositionSettings_.maxSize)
+        out.radarAbsoluteMax_ = computeRadarAbsoluteMax(out)
         return out
+    }
+
+    function computeRadarAbsoluteMax(map) {
+        const anchors = _getAnchors(map)
+        if (!anchors || anchors.empty()) return 1
+
+        let maxRaw = 0
+        anchors.each((rg) => {
+            const regionId = rg?.properties?.id
+            if (!regionId) return
+
+            const comp = _getComposition(regionId)
+            const total = _getRegionTotal(regionId)
+            if (!comp || !total || isNaN(total)) return
+
+            Object.values(comp).forEach((share) => {
+                const raw = (+share || 0) * total
+                if (raw > maxRaw) maxRaw = raw
+            })
+        })
+
+        return maxRaw || 1
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -393,10 +417,12 @@ export const map = function (config) {
         } else if (type === 'radar') {
             let cumul = Math.PI / 2 + offAng
             const incr = (2 * Math.PI) / nbCat
+            const radarValueMode = settings.radarValueMode || 'share'
+            const radarScaleMax = radarValueMode === 'absolute' ? out.radarAbsoluteMax_ || 1 : maxVal
 
             orderedData.forEach((d) => {
-                const val = +d.value || 0
-                const rr = r * Math.sqrt(val / maxVal)
+                const val = radarValueMode === 'absolute' ? +d.rawValue || 0 : +d.value || 0
+                const rr = r * Math.sqrt(val / radarScaleMax)
 
                 container
                     .append('path')
@@ -472,10 +498,17 @@ export const map = function (config) {
             const comp = _getComposition(regionId)
             if (!comp) return
 
-            const data = Object.entries(comp).map(([code, value]) => ({ code, value }))
+            const total = _getRegionTotal(regionId)
+            if (!total) return
+
+            const data = Object.entries(comp).map(([code, value]) => ({
+                code,
+                value,
+                rawValue: (+value || 0) * total,
+            }))
             if (!data.length) return
 
-            const r = out.classifierSize_(_getRegionTotal(regionId))
+            const r = out.classifierSize_(total)
 
             const nodes = map.svg().selectAll('#pie_' + regionId)
             const chartNode = nodes
@@ -483,11 +516,8 @@ export const map = function (config) {
                 .attr('class', 'piechart')
                 .attr('stroke', out.compositionSettings_.strokeFill)
                 .attr('stroke-width', out.compositionSettings_.strokeWidth + 'px')
-                .style('pointer-events', 'none')
 
-            drawCompositionSymbol(chartNode, data, r, true).on('end', function () {
-                select(chartNode.node()).style('pointer-events', null)
-            })
+            drawCompositionSymbol(chartNode, data, r, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
@@ -514,7 +544,14 @@ export const map = function (config) {
             const comp = _getComposition(regionId)
             if (!comp) return
 
-            const data = Object.entries(comp).map(([code, value]) => ({ code, value }))
+            const total = _getRegionTotal(regionId)
+            if (!total) return
+
+            const data = Object.entries(comp).map(([code, value]) => ({
+                code,
+                value,
+                rawValue: (+value || 0) * total,
+            }))
             if (!data.length) return
 
             node.selectAll('.em-pie').remove()
@@ -523,7 +560,7 @@ export const map = function (config) {
             const anchorX = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.width / 2
             const anchorY = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.height / 2
 
-            const r = out.classifierSize_(_getRegionTotal(regionId))
+            const r = out.classifierSize_(total)
 
             const g = node
                 .append('g')

@@ -28,6 +28,8 @@ export interface PieMap extends MapInstance {
 
     compositionSettings(): {
         type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'
+        /** Radar wedge radius mode: share within symbol (default) or absolute values across map. */
+        radarValueMode?: 'share' | 'absolute'
         minSize?: number
         maxSize?: number
         strokeFill?: string
@@ -43,6 +45,8 @@ export interface PieMap extends MapInstance {
     }
     compositionSettings(v: {
         type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'
+        /** Radar wedge radius mode: share within symbol (default) or absolute values across map. */
+        radarValueMode?: 'share' | 'absolute'
         minSize?: number
         maxSize?: number
         strokeFill?: string

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Proportional Pie Charts</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+
+        <script>
+            const ourMap = eurostatmap
+                .map('waffle')
+                .dorling(true)
+                .header(true)
+                .footer(true)
+                .title('Livestock in the EU, 2024')
+                .subtitle('Number of animals (pie size) and type of animal (color), 2024')
+                .scale('60M')
+                .compositionSettings({
+                    type: 'pie',
+                    otherColor: '#FFCC80',
+                    otherText: 'Other',
+                    minSize: 6,
+                    maxSize: 20,
+                })
+                .nutsLevel(1)
+                .statPie({
+                    eurostatDatasetCode: 'agr_r_animal',
+                    filters: { unit: 'THS_HD', time: '2024' },
+                    unitText: 'heads',
+                    categoryParameter: 'animals',
+                    categoryCodes: ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
+                    categoryLabels: ['Bovines', 'Cows', 'Buffalos', 'Pigs', 'Sheep', 'Goats'],
+                    categoryColors: ['#E04040', '#208486', '#2644A7', '#AF155C', '#672DC4', '#33A033'],
+                    transform: (value) => value * 1000, // convert from 1000 heads to heads
+                })
+
+                .legend({
+                    x: 600,
+                    y: 70,
+                    boxOpacity: 0,
+                    boxFill: 'white',
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: 'Number of animals',
+                        titlePadding: 10,
+                        values: [13000000, 500000],
+                    },
+                    colorLegend: {
+                        title: 'Type of animal',
+                        noData: false,
+                    },
+                })
+                .build()
+        </script>
+    </body>
+</html>

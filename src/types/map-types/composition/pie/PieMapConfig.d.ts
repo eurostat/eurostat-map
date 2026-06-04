@@ -12,6 +12,8 @@ export interface PieMapConfig extends MapConfig {
     /** Consolidated composition symbol settings. */
     compositionSettings?: {
         type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'
+        /** Radar wedge radius mode: share within symbol (default) or absolute values across map. */
+        radarValueMode?: 'share' | 'absolute'
         minSize?: number
         maxSize?: number
         strokeFill?: string

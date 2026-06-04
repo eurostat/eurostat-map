@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Proportional Pie Charts</title>
+    </head>
+
+    <body>
+        <div style="margin-bottom: 10px; font-family: Arial, sans-serif">
+            <label for="composition-type-select">Composition type:</label>
+            <select id="composition-type-select">
+                <option value="pie" selected>pie</option>
+                <option value="flag">flag</option>
+                <option value="ring">ring</option>
+                <option value="segment">segment</option>
+                <option value="radar">radar</option>
+                <option value="agepyramid">agepyramid</option>
+                <option value="halftone">halftone</option>
+            </select>
+        </div>
+        <div style="margin-bottom: 10px; font-family: Arial, sans-serif">
+            <label for="radar-value-mode-select">Radar wedge sizing:</label>
+            <select id="radar-value-mode-select">
+                <option value="share" selected>share within each chart</option>
+                <option value="absolute">absolute category count (global scale)</option>
+            </select>
+        </div>
+        <svg id="map"></svg>
+        <script src="https://unpkg.com/eurostat-map"></script>
+
+        <script>
+            const minSizeByType = {
+                pie: 13,
+                flag: 11,
+                ring: 13,
+                segment: 12,
+                radar: 13,
+                agepyramid: 13,
+                halftone: 12,
+            }
+            const maxSizeByType = {
+                pie: 13,
+                flag: 11,
+                ring: 13,
+                segment: 12,
+                radar: 13,
+                agepyramid: 13,
+                halftone: 12,
+            }
+
+            const ourMap = eurostatmap
+                .map('pie')
+                .dorling(true)
+                .header(true)
+                .footer(true)
+                .title('Livestock in the EU, 2024')
+                .subtitle('Number of animals (pie size) and type of animal (color), 2024')
+                .scale('60M')
+                .compositionSettings({
+                    type: 'pie',
+                    radarValueMode: 'share',
+                    otherColor: '#FFCC80',
+                    otherText: 'Other',
+                    minSize: minSizeByType.pie,
+                    maxSize: maxSizeByType.pie,
+                })
+                .nutsLevel(1)
+                .statPie({
+                    eurostatDatasetCode: 'agr_r_animal',
+                    filters: { unit: 'THS_HD', time: '2024' },
+                    unitText: 'heads',
+                    categoryParameter: 'animals',
+                    categoryCodes: ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
+                    categoryLabels: ['Bovines', 'Cows', 'Buffalos', 'Pigs', 'Sheep', 'Goats'],
+                    categoryColors: ['#E04040', '#208486', '#2644A7', '#AF155C', '#672DC4', '#33A033'],
+                    transform: (value) => value * 1000, // convert from 1000 heads to heads
+                })
+
+                .legend({
+                    x: 600,
+                    y: 70,
+                    boxOpacity: 0,
+                    boxFill: 'white',
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: 'Number of animals',
+                        titlePadding: 10,
+                        values: [13000000, 500000],
+                    },
+                    colorLegend: {
+                        title: 'Type of animal',
+                        noData: false,
+                    },
+                })
+                .build()
+
+            const typeSelect = document.getElementById('composition-type-select')
+            const radarValueModeSelect = document.getElementById('radar-value-mode-select')
+
+            const applyCompositionSettings = () => {
+                const type = typeSelect.value
+                const radarValueMode = radarValueModeSelect.value
+
+                radarValueModeSelect.disabled = type !== 'radar'
+
+                const patch = {
+                    type,
+                    radarValueMode,
+                    minSize: minSizeByType[type] ?? minSizeByType.pie,
+                    maxSize: maxSizeByType[type] ?? maxSizeByType.pie,
+                }
+
+                // Keep the flag layout readable in this demo.
+                if (type === 'flag') {
+                    patch.reverseOrder = true
+                    patch.stripesOrientation = 1
+                    ourMap.dorlingSettings({ padding: -1.7 })
+                } else {
+                    patch.reverseOrder = false
+                    patch.stripesOrientation = 0
+                    ourMap.dorlingSettings({ padding: 0 })
+                }
+
+                ourMap.compositionSettings(patch)
+                ourMap.updateClassification()
+                ourMap.updateStyle()
+            }
+
+            typeSelect.addEventListener('change', (event) => {
+                applyCompositionSettings()
+            })
+
+            radarValueModeSelect.addEventListener('change', () => {
+                if (typeSelect.value === 'radar') applyCompositionSettings()
+            })
+
+            applyCompositionSettings()
+        </script>
+    </body>
+</html>

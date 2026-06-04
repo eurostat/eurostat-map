@@ -408,11 +408,8 @@ export const map = function (config) {
                 .attr('class', 'barchart')
                 .attr('stroke', out.barStrokeFill_)
                 .attr('stroke-width', out.barStrokeWidth_ + 'px')
-                .style('pointer-events', 'none')
 
-            renderBar(chartNode, comp, totalWidth, true).on('end', function () {
-                select(chartNode.node()).style('pointer-events', null)
-            })
+            renderBar(chartNode, comp, totalWidth, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
@@ -574,11 +571,8 @@ export const map = function (config) {
                 .attr('class', 'barchart')
                 .attr('stroke', out.barStrokeFill_)
                 .attr('stroke-width', out.barStrokeWidth_ + 'px')
-                .style('pointer-events', 'none')
 
-            renderGroupedBars(chartNode, segments, true).on('end', function () {
-                select(chartNode.node()).style('pointer-events', null)
-            })
+            renderGroupedBars(chartNode, segments, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
