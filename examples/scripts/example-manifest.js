@@ -33,6 +33,7 @@
         'choropleth/small_multiple.html',
         'choropleth/spain.html',
         'choropleth/world.html',
+        'composition/composition.html',
         'coxcomb/coxcomb.html',
         'dot-density/population-dot-density.html',
         'flow/flights/flights.html',
@@ -69,6 +70,8 @@
         'statistics-explained/business/manufacturing/proportional-circle/index.html',
         'statistics-explained/business/NACE/choropleth/index.html',
         'statistics-explained/business/NACE/proportional-circle/index.html',
+        'statistics-explained/business/services/choropleth/index.html',
+        'statistics-explained/business/services/proportional-circle/index.html',
         'statistics-explained/transport/air/airports/index.html',
         'statistics-explained/transport/air/freight/index.html',
         'statistics-explained/transport/air/passengers/index.html',
@@ -86,6 +89,7 @@
         'ur/old_dependency.html',
         'ur/pop_change.html',
         'ur/proj_pop_change.html',
+        'waffle/livestock.html',
         'waffle/waffle.html',
     ]
 
