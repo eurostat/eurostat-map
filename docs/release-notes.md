@@ -1,5 +1,36 @@
 # Release notes
 
+## 4.4.5
+
+### Fixes
+
+- Fixed inset scalebar rendering when using partial `scalebar` objects in inset configuration by merging with default scalebar settings. This prevents invalid line coordinates (for example `NaN`) and preserves expected label spacing.
+
+Example:
+
+```js
+const map = eurostatmap
+    .map('choropleth')
+    .insets([
+        {
+            id: 'iceland',
+            bbox: [0, 0, 120, 80],
+            scalebar: {
+                // Partial config now safely merges with defaults
+                maxWidth: 18,
+                textOffset: [0, 8],
+            },
+        },
+    ])
+    .build()
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.4.5`
+- Dist-tag `latest` points to `4.4.5`
+- Release tag format used: `4.4.5` (no `v` prefix)
+
 ## 4.4.4
 
 ### New
