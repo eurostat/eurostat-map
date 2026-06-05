@@ -1,16 +1,39 @@
 const configs = {
     EMP_PLOC_NR: {
         legendTitle: 'Persons per unit',
-        colors: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
+        colors: {
+            H: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
+            I: ['#e4e6ff', '#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d'],
+            J: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
+            L: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
+            M: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
+            N: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
+        },
+        thresholds: {},
         unitText: 'people per unit',
         multiplier: 1, // no conversion needed
     },
     LC_EMP_LOC_TEUR: {
         legendTitle: 'Euro',
-        colors: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+        colors: {
+            H: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+            I: ['#e4e6ff', '#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d'],
+            J: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+            L: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+            M: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+            N: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
+        },
+        thresholds: {},
         unitText: 'euro per person',
         multiplier: 1000, // convert thousands to actual euros
     },
+}
+
+const getClassificationConfig = (config, naceCode) => {
+    const fallbackColors = Object.values(config.colors)[0] || []
+    const colors = config.colors[naceCode] || fallbackColors
+    const thresholds = config.thresholds?.[naceCode]
+    return { colors, thresholds }
 }
 
 const spaceAsThousandSeparator = (number) => {
@@ -26,6 +49,8 @@ export function initMap(unitCode, naceCode) {
     const containerHeight = mapContainer ? mapContainer.clientHeight : (isMobile ? Math.round(window.innerHeight - 230) : 550)
     const mapHeight = Math.max(containerHeight - 24, 240)
     const config = configs[unitCode]
+    const { colors, thresholds } = getClassificationConfig(config, naceCode)
+    const classificationMethod = thresholds?.length ? 'threshold' : 'jenks'
 
     map = eurostatmap
         .map('ch')
@@ -37,9 +62,9 @@ export function initMap(unitCode, naceCode) {
         .insetsButton(true)
 
         //classification
-        .colors(config.colors)
-        .numberOfClasses(config.colors.length)
-        .classificationMethod('quantile')
+    .colors(colors)
+    .numberOfClasses(colors.length)
+    .classificationMethod(classificationMethod)
 
         //SE settings
         .footer(true)
@@ -88,13 +113,22 @@ export function initMap(unitCode, naceCode) {
             textFunction: getTooltipFunction(unitCode),
         })
 
+    if (thresholds?.length) {
+        map.thresholds(thresholds)
+    }
+
     map.build()
 }
 
 export function updateMap(unitCode, naceCode) {
     const config = configs[unitCode]
+    const { colors, thresholds } = getClassificationConfig(config, naceCode)
+    const classificationMethod = thresholds?.length ? 'threshold' : 'quantile'
     //classification
-    map.colors(config.colors).numberOfClasses(config.colors.length).classificationMethod('quantile')
+    map.colors(colors).numberOfClasses(colors.length).classificationMethod(classificationMethod)
+    if (thresholds?.length) {
+        map.thresholds(thresholds)
+    }
 
     //stats
     map.stat({
