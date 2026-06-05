@@ -21,8 +21,8 @@
     fill: #333333;
 }
 .em-legend-button-rect {
-    fill: #333;
-    stroke: #000;
+    fill: #333 !important;
+    stroke: #000 !important;
 }
 
 /* zoom  */

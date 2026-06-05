@@ -21,9 +21,10 @@ const isMobile = window.innerWidth <= 768
 
 let map
 export function initMap(unitCode, naceCode) {
-    const mapWidth = isMobile ? window.innerWidth : 700
-    const headerHeight = 230
-    const mapHeight = isMobile ? Math.round(window.innerHeight - headerHeight) : 550
+    const mapContainer = document.getElementById('map-container')
+    const mapWidth = mapContainer ? mapContainer.clientWidth : (isMobile ? window.innerWidth : 700)
+    const containerHeight = mapContainer ? mapContainer.clientHeight : (isMobile ? Math.round(window.innerHeight - 230) : 550)
+    const mapHeight = Math.max(containerHeight - 24, 240)
     const config = configs[unitCode]
 
     map = eurostatmap
@@ -179,4 +180,5 @@ const getTooltipFunction = (code) => {
     }
 }
 
-initMap('EMP_PLOC_NR', 'H')
+// Initialize the map with defaults - defer until after flex layout is computed
+requestAnimationFrame(() => initMap('EMP_PLOC_NR', 'H'))

@@ -44,9 +44,10 @@ const spaceAsThousandSeparator = (number) => {
 let map
 const isMobile = window.innerWidth <= 768
 export function initMap(unitCode, naceCode) {
-    const mapWidth = isMobile ? window.innerWidth : 700
-    const headerHeight = 250
-    const mapHeight = isMobile ? Math.round(window.innerHeight - headerHeight) : 700
+    const mapContainer = document.getElementById('map-container')
+    const mapWidth = mapContainer ? mapContainer.clientWidth : (isMobile ? window.innerWidth : 700)
+    const containerHeight = mapContainer ? mapContainer.clientHeight : (isMobile ? Math.round(window.innerHeight - 250) : 700)
+    const mapHeight = Math.max(containerHeight - 24, 240)
     const config = configs[unitCode]
 
     map = eurostatmap
@@ -70,7 +71,7 @@ export function initMap(unitCode, naceCode) {
         .showEstatLogo(true)
         .showEstatRibbon(true)
         .logoPosition([2, mapHeight - 30])
-        .ribbonPosition([mapWidth - 180, mapHeight - 30])
+        .ribbonPosition([mapWidth - 180, mapHeight - 50])
         .ribbonWidth(300)
         .ribbonHeight(50)
         .showSourceLink(false)
@@ -187,5 +188,5 @@ const getTooltipFunction = (code) => {
     }
 }
 
-// Initialize the map with a default code
-initMap('LOC_NR', 'H')
+// Initialize the map with a default code - defer until after flex layout is computed
+requestAnimationFrame(() => initMap('LOC_NR', 'H'))
