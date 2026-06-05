@@ -231,13 +231,13 @@ const createOutermostInsetsConfig = () => {
     config.forEach((inset, i) => {
         if (!inset.titlePosition) inset.titlePosition = [2, 11]
         if (inset.showScalebar) {
-            inset.scalebarTickHeight = 6
-            inset.scalebarSegmentHeight = 6
-            inset.scalebarFontSize = 7
-            inset.scalebarUnits = ''
-            inset.scalebarTextOffset = [0, 8]
-            if (!inset.scalebarMaxWidth) {
-                inset.scalebarMaxWidth = 15
+            inset.scalebar = {
+                tickHeight: 6,
+                segmentHeight: 6,
+                units: inset.scalebarUnits || '',
+                textOffset: [0, 8],
+                maxWidth: inset.scalebarMaxWidth || 15,
+                position: inset.scalebarPosition,
             }
         }
 

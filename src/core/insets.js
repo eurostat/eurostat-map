@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
 import { createMapInstance } from './map-instance'
+import { getDefaultScalebarConfig } from './decoration/scalebar'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -90,6 +91,14 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     config.insets = config.insets || []
     config.insetTemplates = config.insetTemplates || {}
     config.onBuild = config.onBuild || out.onBuild_
+
+    // Inset configs often pass partial scalebar objects (e.g., just position/maxWidth).
+    // Merge with defaults to avoid undefined numeric fields producing NaN SVG coordinates.
+    if (config.scalebar === true) {
+        config.scalebar = getDefaultScalebarConfig()
+    } else if (config.scalebar && typeof config.scalebar === 'object') {
+        config.scalebar = Object.assign({}, getDefaultScalebarConfig(), config.scalebar)
+    }
 
     //copy main map attributes
     ;[
