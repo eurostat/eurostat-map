@@ -123,7 +123,6 @@ Use this markdown structure for release notes output:
 - `### Improvements`
 - `### Fixes`
 - `### Breaking Changes` (only if applicable)
-- `### Notes` (optional: unpkg cache propagation, migration hints)
 
 Snippet conventions:
 

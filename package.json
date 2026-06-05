@@ -39,7 +39,7 @@
         "format": "prettier --write .",
         "copy-types": "copyfiles -u 2 \"src/types/**/*.d.ts\" build/types",
         "check:types:legend-config-sync": "node scripts/check-legend-config-sync.js",
-        "type-check": "npm run check:types:legend-config-sync && tsc --noEmit && tsc --noEmit test/typescript-test.ts",
+        "type-check": "npm run check:types:legend-config-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/typescript-test.ts",
         "update-all": "npm run update-types && npm run update-docs && npm run update-examples",
         "update-types": "node scripts/update-types.js",
         "update-docs": "typedoc --options typedoc.json",

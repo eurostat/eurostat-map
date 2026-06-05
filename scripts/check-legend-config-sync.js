@@ -1,7 +1,26 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const repoRoot = path.resolve(__dirname, '..', '..')
+function findRepoRoot(startDir) {
+    let current = path.resolve(startDir)
+
+    while (true) {
+        const packageJsonPath = path.join(current, 'package.json')
+        const srcDirPath = path.join(current, 'src')
+
+        if (fs.existsSync(packageJsonPath) && fs.existsSync(srcDirPath)) {
+            return current
+        }
+
+        const parent = path.dirname(current)
+        if (parent === current) {
+            throw new Error('Could not locate repository root from scripts/check-legend-config-sync.js')
+        }
+        current = parent
+    }
+}
+
+const repoRoot = findRepoRoot(__dirname)
 const legendImplPath = path.join(repoRoot, 'src', 'legend', 'legend.js')
 const legendTypePath = path.join(repoRoot, 'src', 'types', 'legend', 'LegendConfig.d.ts')
 const choroplethLegendImplPath = path.join(repoRoot, 'src', 'legend', 'choropleth', 'legend-choropleth.js')
