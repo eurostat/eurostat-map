@@ -6,7 +6,7 @@ import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
 import { createStatMap } from '../../core/stat-map'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
-import { checkIfDiverging, executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../../core/utils'
+import { applyNiceNumbers, checkIfDiverging, executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 
@@ -180,7 +180,6 @@ export const map = function (config) {
                                 .domain([min(dataArray), max(dataArray)])
                                 .range(range)
                         )
-                        if (out.makeClassifNice_) out.classifier().nice()
                         break
                     }
                     case 'threshold': {
@@ -200,6 +199,12 @@ export const map = function (config) {
                         out.classifier(scaleThreshold().domain(domain).range(range))
                         break
                     }
+                }
+
+                if (out.makeClassifNice_) {
+                    const rawThresholds = out.classifier_.domain()
+                    const niceThresholds = applyNiceNumbers(rawThresholds, dataArrayNumeric)
+                    out.classifier_.domain(niceThresholds)
                 }
             }
 

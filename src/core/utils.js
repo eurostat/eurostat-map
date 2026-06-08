@@ -744,3 +744,120 @@ export const longFormatter = new Intl.NumberFormat('en', {
     compactDisplay: 'long',
     maximumFractionDigits: 1,
 })
+
+/**
+ * Rounds a threshold value to the nearest "nice" number (1, 1.5, 2, 2.5, 3, 4, 5 … × 10^n).
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+export function roundToNiceNumber(value, min, max) {
+    if (value === 0) return 0
+
+    const sign = value < 0 ? -1 : 1
+    const absValue = Math.abs(value)
+    const exponent = Math.floor(Math.log10(absValue))
+    const magnitude = Math.pow(10, exponent)
+    const fraction = absValue / magnitude
+
+    const niceFractions = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10]
+    let closestFraction = niceFractions[0]
+    let minDiff = Math.abs(fraction - niceFractions[0])
+    for (const nf of niceFractions) {
+        const diff = Math.abs(fraction - nf)
+        if (diff < minDiff) {
+            minDiff = diff
+            closestFraction = nf
+        }
+    }
+
+    const niceValue = sign * closestFraction * magnitude
+    const margin = (max - min) * 0.01
+    if (niceValue < min - margin) return min
+    if (niceValue > max + margin) return max
+    return niceValue
+}
+
+/**
+ * Adjusts thresholds when rounding caused duplicates by splitting the largest gap.
+ * @param {number[]} uniqueThresholds
+ * @param {number} targetCount
+ * @param {number} min
+ * @param {number} max
+ * @returns {number[]}
+ */
+export function adjustDuplicateThresholds(uniqueThresholds, targetCount, min, max) {
+    if (uniqueThresholds.length >= targetCount) return uniqueThresholds.slice(0, targetCount)
+
+    const result = [...uniqueThresholds]
+
+    while (result.length < targetCount) {
+        let maxGap = 0
+        let maxGapIndex = -1
+
+        for (let i = 0; i < result.length - 1; i++) {
+            const gap = result[i + 1] - result[i]
+            if (gap > maxGap) {
+                maxGap = gap
+                maxGapIndex = i
+            }
+        }
+
+        const startGap = result[0] - min
+        const endGap = max - result[result.length - 1]
+
+        if (startGap > maxGap && startGap > endGap) {
+            const newValue = roundToNiceNumber((min + result[0]) / 2, min, max)
+            if (!result.includes(newValue) && newValue > min) {
+                result.unshift(newValue)
+                result.sort((a, b) => a - b)
+                continue
+            }
+        }
+
+        if (endGap > maxGap) {
+            const newValue = roundToNiceNumber((result[result.length - 1] + max) / 2, min, max)
+            if (!result.includes(newValue) && newValue < max) {
+                result.push(newValue)
+                result.sort((a, b) => a - b)
+                continue
+            }
+        }
+
+        if (maxGapIndex >= 0) {
+            const midpoint = (result[maxGapIndex] + result[maxGapIndex + 1]) / 2
+            const newValue = roundToNiceNumber(midpoint, min, max)
+            result.push(!result.includes(newValue) ? newValue : midpoint)
+        } else {
+            const step = (max - min) / (targetCount + 1)
+            result.push(min + step * (result.length + 1))
+        }
+
+        result.sort((a, b) => a - b)
+    }
+
+    return result.slice(0, targetCount)
+}
+
+/**
+ * Rounds classification thresholds to nice, legible values.
+ * @param {number[]} thresholds - raw threshold values from the classifier
+ * @param {number[]} values - full data array (used to derive min/max bounds)
+ * @returns {number[]}
+ */
+export function applyNiceNumbers(thresholds, values) {
+    if (!thresholds || thresholds.length === 0) return []
+
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+
+    const niceThresholds = thresholds.map((t) => roundToNiceNumber(t, min, max))
+    const uniqueSorted = [...new Set(niceThresholds)].sort((a, b) => a - b)
+
+    if (uniqueSorted.length < thresholds.length) {
+        return adjustDuplicateThresholds(uniqueSorted, thresholds.length, min, max)
+    }
+
+    return uniqueSorted
+}
