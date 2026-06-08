@@ -5,11 +5,19 @@ const configs = {
             H: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
             I:['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
             J: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
-            L:  ['#e4e6ff', '#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d'],
+            L: ["#d1d4ff","#9ca0f3","#6771d3","#3545a7","#001d75"],
             M: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
             N: ['#cacdff', '#a4a8f9', '#7e86e7', '#5966cb', '#3648aa', '#162b87', '#000d60'],
         },
-        thresholds: {},
+        classificationMethod: {
+            H: 'jenks',
+            I: 'jenks',
+            J: 'jenks',
+            L: 'threshold',
+            M: 'threshold',
+            N: 'jenks',
+        },
+        thresholds: {L:[1, 2, 3,4 ],M:[1,2,3,4,5,7]},
         unitText: 'people per unit',
         multiplier: 1, // no conversion needed
     },
@@ -23,6 +31,14 @@ const configs = {
             M: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
             N: ['#d9dbff', '#b8bafd', '#969bf3', '#747de0', '#5462c7', '#3447aa', '#152e8b', '#001469'],
         },
+        classificationMethod: {
+            H: 'jenks',
+            I: 'jenks',
+            J: 'jenks',
+            L: 'jenks',
+            M: 'jenks',
+            N: 'jenks',
+        },
         thresholds: {},
         unitText: 'euro per person',
         multiplier: 1000, // convert thousands to actual euros
@@ -33,7 +49,9 @@ const getClassificationConfig = (config, naceCode) => {
     const fallbackColors = Object.values(config.colors)[0] || []
     const colors = config.colors[naceCode] || fallbackColors
     const thresholds = config.thresholds?.[naceCode]
-    return { colors, thresholds }
+    const methodFromConfig = config.classificationMethod?.[naceCode]
+    const classificationMethod = methodFromConfig || (thresholds?.length ? 'threshold' : 'jenks')
+    return { colors, thresholds, classificationMethod }
 }
 
 const spaceAsThousandSeparator = (number) => {
@@ -49,8 +67,7 @@ export function initMap(unitCode, naceCode) {
     const containerHeight = mapContainer ? mapContainer.clientHeight : (isMobile ? Math.round(window.innerHeight - 230) : 550)
     const mapHeight = Math.max(containerHeight - 24, 240)
     const config = configs[unitCode]
-    const { colors, thresholds } = getClassificationConfig(config, naceCode)
-    const classificationMethod = thresholds?.length ? 'threshold' : 'jenks'
+    const { colors, thresholds, classificationMethod } = getClassificationConfig(config, naceCode)
 
     map = eurostatmap
         .map('ch')
@@ -122,8 +139,7 @@ export function initMap(unitCode, naceCode) {
 
 export function updateMap(unitCode, naceCode) {
     const config = configs[unitCode]
-    const { colors, thresholds } = getClassificationConfig(config, naceCode)
-    const classificationMethod = thresholds?.length ? 'threshold' : 'quantile'
+    const { colors, thresholds, classificationMethod } = getClassificationConfig(config, naceCode)
     //classification
     map.colors(colors).numberOfClasses(colors.length).classificationMethod(classificationMethod)
     if (thresholds?.length) {
