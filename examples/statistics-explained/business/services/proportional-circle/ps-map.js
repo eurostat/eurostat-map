@@ -1,6 +1,6 @@
 const compactIntlFormatter = new Intl.NumberFormat('en', {
     notation: 'compact',
-    compactDisplay: 'short',
+    compactDisplay: 'long',
     maximumFractionDigits: 1,
 })
 
@@ -63,8 +63,8 @@ export function initMap(unitCode, naceCode) {
         //symbol settings
         .psFill('#2644A7')
         .psBrightenFactor(0.8) //background color brightening factor
-        .psMaxSize(18)
-        .psMinSize(3)
+        .psMaxSize(20)
+        .psMinSize(2)
 
         //SE settings
         .footer(true)
@@ -81,7 +81,7 @@ export function initMap(unitCode, naceCode) {
         .footnoteTooltipText(false)
 
         .zoomButtons(true)
-        .zoomExtent(isMobile ? [0.7, 10] : [1, 10])
+        .zoomExtent(isMobile ? [0.7, 10] : [0.9, 10])
         .insets('default')
         .insetsButton(true)
         .insetBoxWidth(190)
