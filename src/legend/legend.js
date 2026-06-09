@@ -31,6 +31,8 @@ export const legend = function (map) {
 
     //legend title
     out.title = ''
+    //legend subtitle
+    out.subtitle = ''
     // we now use CSS instead of inline styles
     out.titleFontSize = getFontSizeFromClass('em-legend-title')
     // width

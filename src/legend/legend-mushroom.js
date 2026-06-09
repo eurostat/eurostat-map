@@ -13,6 +13,8 @@ export const legend = function (map, config) {
     // Size legend config
     // -------------------------------
     out.sizeLegend = {
+        title: '',
+        titlePadding: 5,
         marginTop: 15,
         values: undefined, // raw data values
         valuesV1: undefined, // raw data values for v1 side
@@ -25,7 +27,9 @@ export const legend = function (map, config) {
     }
 
     out.colorLegend = {
+        title: '',
         marginTop: 5,
+        titlePadding: 5,
         labelOffsets: { x: 5, y: 5 },
     }
 
@@ -57,6 +61,18 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
         let cursorY = out.getBaseY() + out.sizeLegend.marginTop
         const legendSpacing = 8
+
+        if (out.sizeLegend.title) {
+            const sizeTitle = out.lgg
+                .append('text')
+                .attr('class', 'em-size-legend-title')
+                .attr('x', baseX)
+                .attr('y', cursorY)
+                .text(out.sizeLegend.title)
+
+            const titleHeight = sizeTitle.node()?.getBBox()?.height || 0
+            cursorY += titleHeight + (out.sizeLegend.titlePadding ?? 5)
+        }
 
         // -----------------------------
         // SIZE LEGEND
@@ -274,10 +290,24 @@ function drawColorKey(out, x, y) {
 
     const g = out.lgg.append('g').attr('class', 'em-mushroom-color-legend').attr('transform', `translate(${x}, ${y})`)
 
+    let rowsOffsetY = 0
+    if (out.colorLegend.title) {
+        const title = g
+            .append('text')
+            .attr('class', 'em-color-legend-title')
+            .attr('id', 'em-color-legend-title')
+            .attr('x', 0)
+            .attr('y', 0)
+            .text(out.colorLegend.title)
+
+        const titleHeight = title.node()?.getBBox()?.height || 0
+        rowsOffsetY = titleHeight + (out.colorLegend.titlePadding ?? 5)
+    }
+
     labels.forEach((lab, i) => {
         const row = g
             .append('g')
-            .attr('transform', `translate(0, ${i * out.shapeHeight})`)
+            .attr('transform', `translate(0, ${rowsOffsetY + i * out.shapeHeight})`)
             .style('cursor', 'pointer')
             .on('mouseover', () => {
                 highlightMushroomSide(map, i)

@@ -31,7 +31,7 @@ export function appendAnnotations(map) {
                 const annotationType = annotationTypeMap[d.type] || annotationLabel // Default to annotationLabel
                 return { ...d, type: annotationType } // Update 'type' with the function reference
             })
-            const makeAnnotations = annotation().type(annotationLabel).annotations(annotationsWithTypes).editMode(annotationsConfig.editMode)
+            const makeAnnotations = annotation().annotations(annotationsWithTypes).editMode(annotationsConfig.editMode)
 
             // append new
             zoomGroup.append('g').attr('id', 'em-annotations').attr('class', 'em-annotations').call(makeAnnotations)
