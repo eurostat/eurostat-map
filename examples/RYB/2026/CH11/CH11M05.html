@@ -32,17 +32,26 @@
             .em-kosovo-bn {
                 opacity: 0.4;
             }
-            .em-annotations {
-                pointer-events: none;
-            }
             g.em-annotation-be-nl .connector {
                 transform: translate(-20px, -13px);
+            }
+            .em-cntrg {
+                fill: #f2f2f2 !important;
+            }
+            .em-cntbn {
+                opacity: 0.4 !important;
+            }
+            .a-napoli .annotation-note-title {
+                transform: translate(0px, 10px);
             }
         </style>
     </head>
 
     <body>
         <div>
+            <button id="toggle-edit-mode-btn" type="button">Toggle annotation edit mode</button>
+            <button id="export-annotations-btn" type="button">Export annotations JSON</button>
+            |
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
         </div>
@@ -50,10 +59,16 @@
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
+        <script src="./exportAnnotations.js"></script>
 
         <script type="module">
             const mapWidth = 1080
             const mapHeight = 900
+            const annotationsFileName = 'maritime-passengers-annotations.json'
+            const annotationsFilePath = `./data/M05/${annotationsFileName}`
+            const loadedAnnotations = await (await fetch(annotationsFilePath)).json()
+            window.ch11M05Annotations = loadedAnnotations
+            let annotationsEditMode = false
 
             //data load
             const [stats] = await Promise.all([d3.json('./data/M05/maritime-passengers.json')])
@@ -103,7 +118,7 @@
                 .svgId('ports-map')
                 .footer(true)
                 .footnote(
-                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). <br> Source: Eurostat (online data code: mar_pa_aa)'
+                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). Top 10 labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
                 )
                 .width(mapWidth)
                 .height(mapHeight)
@@ -305,11 +320,31 @@
                     })
                     return geometries
                 })
+                .annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M05Annotations,
+                })
 
             map.stat('v1', { label: 'Disembarked' }).stat('v2', { label: 'Embarked' })
             map.build()
             map.statData('v1').setData(filterNulls(inwardData))
             map.statData('v2').setData(filterNulls(outwardData))
+
+            const editModeBtn = document.getElementById('toggle-edit-mode-btn')
+            editModeBtn.addEventListener('click', function () {
+                annotationsEditMode = !annotationsEditMode
+                map.annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M05Annotations,
+                })
+            })
+
+            const exportAnnotationsBtn = document.getElementById('export-annotations-btn')
+            exportAnnotationsBtn.addEventListener('click', function () {
+                const result = generateMapAnnotations(window.ch11M05Annotations)
+                downloadAnnotationsJSON(result, annotationsFileName)
+                console.log('Exported annotations:', result)
+            })
 
             function filterNulls(obj) {
                 return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))
@@ -366,7 +401,7 @@
             const exportBtnPNG = document.getElementById('export-png-btn')
             exportBtnPNG.addEventListener('click', function () {
                 const factor = 1
-                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+                map.exportMapToPNG(mapWidth * factor, mapHeight + 120 * factor) // width, height, scale (for better quality)
             })
 
             const exportBtnSVG = document.getElementById('export-svg-btn')

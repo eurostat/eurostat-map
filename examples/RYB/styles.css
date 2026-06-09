@@ -18,3 +18,11 @@
     font-size: 11px !important;
     opacity: 0.9 !important;
 }
+
+.a-left .annotation-note-title {
+    transform: translate(0px, -10px);
+}
+.annotation-note-title {
+    font-size: 12px;
+    font-weight: bold;
+}
