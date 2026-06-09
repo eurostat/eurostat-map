@@ -39,7 +39,7 @@ export const map = function (config) {
     out.coxcombMinRadius_ = 10
     out.coxcombMaxRadius_ = 30
     out.coxcombStrokeFill_ = 'white'
-    out.coxcombStrokeWidth_ = 0.3
+    out.coxcombStrokeWidth_ = 0.1
     out.coxcombRings_ = false
     out.coxcombOffsets_ = { x: 0, y: 0 }
     out.hoverColor_ = '#ffa500'
@@ -702,8 +702,8 @@ export const map = function (config) {
             chartG
                 .append('g')
                 .attr('class', 'em-coxcomb-chart')
-                .attr('stroke', '#ffffff')
-                .attr('stroke-width', 0.1 / scaleFactor)
+                .attr('stroke', out.coxcombStrokeFill_)
+                .attr('stroke-width', out.coxcombStrokeWidth_ / scaleFactor)
                 .selectAll('path')
                 .data(stackedData[ki])
                 .join('path')
