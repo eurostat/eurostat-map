@@ -95,6 +95,11 @@ export const map = function (config) {
         out._ternaryClassById_ = new Map()
         out._ternaryCenter_ = null
 
+        const flattenRegionFeatures = (features) => {
+            if (!Array.isArray(features) || features.length === 0) return []
+            return Array.isArray(features[0]) ? features.flat() : features
+        }
+
         const [c1, c2, c3] = out.ternaryCodes_
         const statData1 = out.statData(c1)
         const statData2 = out.statData(c2)
@@ -110,10 +115,11 @@ export const map = function (config) {
         const seenIds = new Set()
 
         allMaps.forEach((map) => {
-            const features = map.Geometries.getRegionFeatures()
+            const features = flattenRegionFeatures(map.Geometries.getRegionFeatures())
             if (!features || features.length === 0) return
             features.forEach((f) => {
-                const id = f.properties.id
+                const id = f?.properties?.id
+                if (!id) return
                 if (seenIds.has(id)) return
                 seenIds.add(id)
                 const v1 = +statData1.get(id)?.value
@@ -231,6 +237,33 @@ export const map = function (config) {
             })
             .catch((err) => {
                 //console.error('Error applying transition to regions:', err)
+            })
+
+        if (map.nutsLevel_ === 'mixed') {
+            styleMixedNUTS(map)
+        }
+    }
+
+    // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)
+    const styleMixedNUTS = function (map) {
+        map.svg()
+            .selectAll(getRegionsSelector(map))
+            .each(function () {
+                if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
+                const sel = select(this)
+                const ecl = sel.attr('ecl')
+                const lvl = sel.attr('lvl')
+
+                // Show level 0 as base layer and display upper levels only where data exists.
+                const isVisible = ecl || lvl === '0'
+
+                sel.style('display', isVisible ? 'block' : 'none')
+
+                if (ecl && lvl !== '0') {
+                    const stroke = sel.style('stroke') || '#777'
+                    const strokeWidth = sel.style('stroke-width') || 0.2
+                    sel.style('stroke', stroke).style('stroke-width', strokeWidth)
+                }
             })
     }
 

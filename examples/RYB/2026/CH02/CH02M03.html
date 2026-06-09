@@ -10,8 +10,6 @@
             .em-cntbn {
                 opacity: 0.7 !important;
             }
-            #maps-wrapper {
-            }
             .map-container {
                 width: 100%;
             }
@@ -96,7 +94,7 @@
                 const myData = await loadCustomPieData()
                 const categoryCodes = ['I', 'C', 'J', 'Other']
                 const categoryLabels = ['Circulatory', 'Cancer', 'Respiratory', 'Other']
-                const categoryColors = ['#2644A7', '#AF155C', '#33A033', '#EFD18C']
+                const categoryColors = ['#33A033', '#2644A7', '#C05F03', '#B09120']
 
                 let currentMap = null
                 let currentMapKind = 'pie'
@@ -110,14 +108,15 @@
                     return m
                         .width(MAPWIDTH)
                         .height(MAPHEIGHT)
+
                         .title('Main causes of death')
-                        .subtitle('% of all deaths, by NUTS 1 regions, 2021')
+                        .subtitle('(% of all deaths, by NUTS 1 regions, 2023)')
                         .header(true)
                         .footer(true)
                         .footnote(
-                            'Note: the most common causes of death in the EU were – diseases of the circulatory system, cancer, diseases of the respiratory system. <br>Source: Custom JSON files'
+                            'Note: the most common causes of death in the EU were – diseases of the circulatory system (32.5%), cancer (malignant neoplasms; 24.2%), diseases of the respiratory system (7.8%). Source: Eurostat (online data code: hlth_cd_asdr2)'
                         )
-                        .footnoteWrap(100)
+                        .footnoteWrap(90)
                         .zoomButtons(false)
                         .legend({
                             x: 20,
@@ -129,16 +128,25 @@
                                 title: 'Cause of death',
                             },
                             noDataPadding: -10,
+                            noDataText: 'Data not available',
                         })
                         .onBuild(() => {
                             d3.select('#map #em-footnote-2').remove()
                             d3.select('#map')
                                 .append('text')
-                                .attr('x', MAPWIDTH - 310)
+                                .attr('x', MAPWIDTH - 272)
                                 .attr('y', MAPHEIGHT + 83)
                                 .attr('class', 'em-footnote')
                                 .attr('id', 'em-footnote-2')
-                                .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+                                .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+
+                            d3.select('#map')
+                                .append('text')
+                                .attr('x', MAPWIDTH - 209)
+                                .attr('y', MAPHEIGHT + 96)
+                                .attr('class', 'em-footnote')
+                                .attr('id', 'em-footnote-2')
+                                .html('Cartography: Eurostat – GISCO, 06/2026')
                         })
                 }
 
