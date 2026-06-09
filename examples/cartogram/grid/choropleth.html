@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Grid Cartogram Choropleth</title>
+        <title>Choropleth Grid Cartogram</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
@@ -13,8 +13,8 @@
         <script>
             const map = eurostatmap
                 .map('choropleth')
-                .title('GDP per inhabitant')
-                .subtitle('2024')
+                .title('GDP per inhabitant 2024')
+                .subtitle('Ensures that each region is assigned equal visual importance')
                 .stat({
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
@@ -26,7 +26,7 @@
                 //.gridCartogramContainerPadding(110)
                 .numberOfClasses(6)
                 .nutsLevel(0)
-                .legend({ x: 10, y: 120, title: 'Euro', titlePadding: 0, boxOpacity: 0, histogram: false })
+                .legend({ x: 10, y: 120, title: 'Euro per inhabitant', titlePadding: 0, boxOpacity: 0, histogram: false })
                 .build()
         </script>
     </body>
