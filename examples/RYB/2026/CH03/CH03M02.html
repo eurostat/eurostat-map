@@ -95,7 +95,7 @@
             }
             .small-multiples .em-cntbn path,
             .small-multiples .em-cntbn-halo path {
-                stroke-width: 0.2px !important;
+                stroke-width: 0.1px !important;
             }
             .small-multiples .em-nutsbn path {
                 opacity: 0.1 !important;
@@ -109,6 +109,7 @@
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
             <button id="export-legend-btn" type="button">Download legend as SVG</button>
+            <button id="export-small-multiples-btn" type="button">Download small multiples</button>
         </div>
         <div class="map-layout">
             <svg id="container" width="100%" height="820px">
@@ -455,7 +456,7 @@
                         .zoomButtons(false)
                         .hoverColor('#FFCC00')
                         .classificationMethod('quantile')
-                        .makeClassifNice(true)
+                        //.makeClassifNice(true)
                         .numberOfClasses(config.colorRamp.length)
                         .colors(config.colorRamp)
                         .legend({
@@ -471,6 +472,40 @@
                     smallMap.build()
                     smallMap.statData().setData(filterNulls(config.data))
                 })
+            }
+
+            function buildSmallMultiplesExportSVG() {
+                const container = document.querySelector('.small-multiples')
+                if (!container) return null
+
+                const sourceSvgs = Array.from(container.querySelectorAll('svg'))
+                if (!sourceSvgs.length) return null
+
+                const SVG_NS = 'http://www.w3.org/2000/svg'
+                const containerRect = container.getBoundingClientRect()
+                const width = Math.ceil(containerRect.width)
+                const height = Math.ceil(containerRect.height)
+
+                const exportSvg = document.createElementNS(SVG_NS, 'svg')
+                exportSvg.setAttribute('width', width)
+                exportSvg.setAttribute('height', height)
+                exportSvg.setAttribute('viewBox', `0 0 ${width} ${height}`)
+
+                sourceSvgs.forEach((sourceSvg) => {
+                    const rect = sourceSvg.getBoundingClientRect()
+                    const x = rect.left - containerRect.left
+                    const y = rect.top - containerRect.top
+
+                    const clonedSvg = sourceSvg.cloneNode(true)
+                    clonedSvg.setAttribute('x', `${x}`)
+                    clonedSvg.setAttribute('y', `${y}`)
+                    clonedSvg.setAttribute('width', `${Math.ceil(rect.width)}`)
+                    clonedSvg.setAttribute('height', `${Math.ceil(rect.height)}`)
+
+                    exportSvg.appendChild(clonedSvg)
+                })
+
+                return exportSvg
             }
 
             function applyBadgeToElement(el, color, pad = { x: 3, y: 2 }) {
@@ -523,6 +558,13 @@
             exportLegendBtn.addEventListener('click', function () {
                 const legendSVG = document.getElementById('legend-container')
                 exportToSVG(legendSVG, 'CH03M02-legend.svg')
+            })
+
+            const exportSmallMultiplesBtn = document.getElementById('export-small-multiples-btn')
+            exportSmallMultiplesBtn.addEventListener('click', function () {
+                const smallMultiplesSVG = buildSmallMultiplesExportSVG()
+                if (!smallMultiplesSVG) return
+                exportToSVG(smallMultiplesSVG, 'CH03M02-small-multiples.svg')
             })
 
             const hueSlider = document.getElementById('hue-slider')

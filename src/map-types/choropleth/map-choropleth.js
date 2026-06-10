@@ -6,7 +6,14 @@ import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
 import { createStatMap } from '../../core/stat-map'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
-import { applyNiceNumbers, checkIfDiverging, executeForAllInsets, getRegionsSelector, getTextColorForBackground, spaceAsThousandSeparator } from '../../core/utils'
+import {
+    applyNiceNumbers,
+    checkIfDiverging,
+    executeForAllInsets,
+    getRegionsSelector,
+    getTextColorForBackground,
+    spaceAsThousandSeparator,
+} from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 
@@ -134,6 +141,7 @@ export const map = function (config) {
     function applyClassificationToMap(map) {
         const generateRange = (nb) => [...Array(nb).keys()]
         const dataArray = out.statData().getArray()
+        const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
 
         if (dataArray) {
             const setupClassifier = () => {
@@ -147,7 +155,7 @@ export const map = function (config) {
                         // No domain normalisation needed
                         out.domain_ = null
                     } else {
-                        const transformedValues = dataArray.map(valueTransform)
+                        const transformedValues = dataArrayNumeric.map(valueTransform)
                         const minVal = min(transformedValues)
                         const maxVal = max(transformedValues)
                         const isDiverging = checkIfDiverging(out)
@@ -166,18 +174,16 @@ export const map = function (config) {
                     out.classifier((val) => val) // identity
                 }
 
-                const dataArrayNumeric = [...dataArray].filter((v) => !isNaN(parseFloat(v)) && isFinite(v))
-
                 switch (out.classificationMethod_) {
                     case 'quantile': {
-                        out.classifier(scaleQuantile().domain(dataArray).range(range))
+                        out.classifier(scaleQuantile().domain(dataArrayNumeric).range(range))
                         break
                     }
                     case 'equal-interval':
                     case 'equinter': {
                         out.classifier(
                             scaleQuantize()
-                                .domain([min(dataArray), max(dataArray)])
+                                .domain([min(dataArrayNumeric), max(dataArrayNumeric)])
                                 .range(range)
                         )
                         break
