@@ -51,17 +51,78 @@
                 min-width: 54px;
                 font-variant-numeric: tabular-nums;
             }
+            .map-layout {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+            #container {
+                width: 860px;
+                max-width: 100%;
+                flex: 1 1 860px;
+            }
+            .small-multiples {
+                width: 320px;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                flex: 0 0 320px;
+            }
+            .small-multiples svg {
+                width: 100%;
+                height: 248px;
+                border: 1px solid #d6d6d6;
+                border-radius: 4px;
+                background: white;
+            }
+            .small-multiples .em-source-link,
+            .small-multiples .em-footer,
+            .small-multiples .em-zoom-buttons {
+                display: none;
+            }
+            @media (max-width: 1260px) {
+                .small-multiples {
+                    width: 100%;
+                    grid-template-columns: repeat(3, minmax(210px, 1fr));
+                    flex: 1 1 100%;
+                }
+            }
+            @media (max-width: 900px) {
+                .small-multiples {
+                    grid-template-columns: 1fr;
+                }
+            }
+            .small-multiples .em-cntbn path,
+            .small-multiples .em-cntbn-halo path {
+                stroke-width: 0.2px !important;
+            }
+            .small-multiples .em-nutsbn path {
+                opacity: 0.1 !important;
+                stroke-width: 0.1px !important;
+            }
+            .small-multiples .em-nutsrg path {
+                stroke-width: 0px !important;
+            }
         </style>
         <div>
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
             <button id="export-legend-btn" type="button">Download legend as SVG</button>
         </div>
-        <svg id="container" width="100%" height="820px">
-            <svg id="map"></svg>
-            <g id="newInsets"></g>
-            <svg id="legend-container"></svg>
-        </svg>
+        <div class="map-layout">
+            <svg id="container" width="100%" height="820px">
+                <svg id="map"></svg>
+                <g id="newInsets"></g>
+                <svg id="legend-container"></svg>
+            </svg>
+
+            <div class="small-multiples">
+                <svg id="small-map-v1"></svg>
+                <svg id="small-map-v2"></svg>
+                <svg id="small-map-v3"></svg>
+            </div>
+        </div>
         <div class="map-controls">
             <label for="hue-slider">Hue</label>
             <input id="hue-slider" type="range" min="0" max="360" step="1" value="160" />
@@ -116,6 +177,32 @@
 
             const MAPWIDTH = 797
             const MAPHEIGHT = 677
+            const SMALL_MAP_WIDTH = 320
+            const SMALL_MAP_HEIGHT = 278
+
+            const smallMultipleDefinitions = [
+                {
+                    svgId: 'small-map-v1',
+                    title: "Bachelor's",
+                    subtitle: '% share, 2024',
+                    colorRamp: ['#eff8ef', '#d6ecd7', '#a7d8a8', '#72c374', '#33a033'],
+                    data: bachelor,
+                },
+                {
+                    svgId: 'small-map-v2',
+                    title: "Master's",
+                    subtitle: '% share, 2024',
+                    colorRamp: ['#eef4fc', '#d0e1f7', '#a7c9f0', '#6ea6e6', '#388ae2'],
+                    data: masters,
+                },
+                {
+                    svgId: 'small-map-v3',
+                    title: 'PhD',
+                    subtitle: '% share, 2024',
+                    colorRamp: ['#fdeeee', '#f8d3d3', '#efa8a8', '#e97575', '#e04040'],
+                    data: phd,
+                },
+            ]
 
             const map = eurostatmap
                 .map('trivariateChoropleth')
@@ -125,7 +212,7 @@
                 .footer(true)
                 .header(true)
                 .insetBoxPosition(insetBoxPosition)
-                .position({ x: 4950000, y: 3450000, z: 6000 })
+                .position({ x: 4950000, y: 3440000, z: 5950 })
                 .footnote(
                     'Note: share of students enrolled in ISCED levels 6, 7 and 8. Germany: NUTS level 1. The Netherlands and Albania: national data. Iceland and Albania: 2023. Liechtenstein and Türkiye: 2022. <br>Source: Eurostat (online data code: educ_uoe_enrt06)'
                 )
@@ -213,6 +300,8 @@
             map.statData('v1').setData(filterNulls(bachelor))
             map.statData('v2').setData(filterNulls(masters))
             map.statData('v3').setData(filterNulls(phd))
+
+            buildSmallMultipleMaps()
 
             // map.updateStatValues()
 
@@ -345,6 +434,43 @@
 
             function filterNulls(obj) {
                 return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))
+            }
+
+            function buildSmallMultipleMaps() {
+                smallMultipleDefinitions.forEach((config) => {
+                    const smallMap = eurostatmap
+                        .map('choropleth')
+                        .svgId(config.svgId)
+                        .width(SMALL_MAP_WIDTH)
+                        .height(SMALL_MAP_HEIGHT)
+                        .nutsLevel('mixed')
+                        .nutsYear(2024)
+                        .position({ x: 4950000, y: 3200000, z: 16500 })
+                        .title(config.title)
+                        .titlePosition([5, 20])
+                        //.subtitle(config.subtitle)
+                        .header(false)
+                        .footer(false)
+                        .showSourceLink(false)
+                        .zoomButtons(false)
+                        .hoverColor('#FFCC00')
+                        .classificationMethod('quantile')
+                        .makeClassifNice(true)
+                        .numberOfClasses(config.colorRamp.length)
+                        .colors(config.colorRamp)
+                        .legend({
+                            x: SMALL_MAP_WIDTH - 80,
+                            y: 6,
+                            title: '%',
+                            titlePadding: -10,
+                            noData: false,
+                            noDataText: 'No data',
+                            boxOpacity: 0.94,
+                        })
+
+                    smallMap.build()
+                    smallMap.statData().setData(filterNulls(config.data))
+                })
             }
 
             function applyBadgeToElement(el, color, pad = { x: 3, y: 2 }) {
