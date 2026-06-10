@@ -40,7 +40,7 @@ export const map = function (config) {
     //colors to use for classes
     out.colors_ = null
     //when computed automatically, ensure the threshold are nice rounded values
-    out.makeClassifNice_ = true
+    out.makeClassifNice_ = false
     //the color function [0,1] -> color
     const paletteA = ['#D4DAF0', '#C1C9EB', '#A8B4E6', '#93A2DC', '#7C90D6', '#677CD2', '#5169BE', '#3C57B0', '#2644A7', '#15246B']
     out.colorFunction_ = (t) => piecewise(interpolateLab, paletteA)(Math.min(Math.max(0, t), 1)) // default
@@ -207,6 +207,7 @@ export const map = function (config) {
                     }
                 }
 
+                // For quantile, keep exact quantile thresholds so class counts stay balanced.
                 if (out.makeClassifNice_) {
                     const rawThresholds = out.classifier_.domain()
                     const niceThresholds = applyNiceNumbers(rawThresholds, dataArrayNumeric)
