@@ -12,21 +12,41 @@
             <option value="stacked">Stacked (horizontal)</option>
         </select>
         <br />
+        <fieldset style="display: inline-block; margin-top: 8px">
+            <legend>NUTS level</legend>
+            <label>
+                <input type="radio" name="nuts-level" value="0" checked />
+                0
+            </label>
+            <label>
+                <input type="radio" name="nuts-level" value="1" />
+                1
+            </label>
+            <label>
+                <input type="radio" name="nuts-level" value="2" />
+                2
+            </label>
+            <label>
+                <input type="radio" name="nuts-level" value="3" />
+                3
+            </label>
+        </fieldset>
+        <br />
         <svg id="map"></svg>
 
         <script src="https://unpkg.com/eurostat-map"></script>
         <script>
             let map
 
-            function buildMap(barType) {
+            function buildMap(barType, nutsLevel) {
                 if (map) map.svg().selectAll('*').remove()
 
                 map = eurostatmap
                     .map('bar')
                     .svgId('map')
                     .title('Tourism nights spent by residence of guest')
-                    .subtitle('NUTS 1, 2022')
-                    .nutsLevel(1)
+                    .subtitle(`NUTS ${nutsLevel}, 2022`)
+                    .nutsLevel(nutsLevel)
                     .scale('20M')
                     .barType(barType)
                     // Stacked sizing
@@ -65,10 +85,25 @@
                 map.build()
             }
 
-            buildMap('grouped')
+            function getSelectedNutsLevel() {
+                const selected = document.querySelector('input[name="nuts-level"]:checked')
+                return Number(selected.value)
+            }
+
+            function getSelectedBarType() {
+                return document.getElementById('bartype').value
+            }
+
+            buildMap(getSelectedBarType(), getSelectedNutsLevel())
 
             document.getElementById('bartype').addEventListener('change', function (e) {
-                buildMap(e.target.value)
+                buildMap(e.target.value, getSelectedNutsLevel())
+            })
+
+            document.querySelectorAll('input[name="nuts-level"]').forEach((radio) => {
+                radio.addEventListener('change', function () {
+                    buildMap(getSelectedBarType(), Number(this.value))
+                })
             })
         </script>
     </body>
