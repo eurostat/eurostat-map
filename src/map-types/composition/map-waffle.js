@@ -3,6 +3,7 @@ import { createStatMap } from '../../core/stat-map'
 import * as WaffleChartLegend from '../../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
+import { getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
     buildGetterSetters,
     applyConfigValues,
@@ -327,8 +328,7 @@ export const map = function (config) {
             node.selectAll('.em-waffle').remove()
 
             const bbox = node.node().getBBox()
-            const anchorX = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.width / 2
-            const anchorY = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.height / 2
+            const anchor = getGridCartogramChartAnchor(out, bbox)
 
             const total = _getRegionTotal(regionId)
             const waffleSize = out.classifierSize_(total)
@@ -339,7 +339,7 @@ export const map = function (config) {
                 .append('g')
                 .attr('id', 'wafflechart_' + regionId)
                 .attr('class', 'em-waffle')
-                .attr('transform', `translate(${anchorX - waffleSize / 2}, ${anchorY - waffleSize / 2})`)
+                .attr('transform', `translate(${anchor.x - waffleSize / 2}, ${anchor.y - waffleSize / 2})`)
 
             const chartNode = g
                 .append('g')

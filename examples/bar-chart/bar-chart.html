@@ -4,6 +4,13 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Bar Chart Map</title>
+        <style>
+            .em-grid-rect,
+            .em-grid-hexagon {
+                fill: white;
+                stroke: #dfdfdf !important;
+            }
+        </style>
     </head>
     <body>
         <label for="bartype">Bar type:</label>
@@ -32,16 +39,24 @@
             </label>
         </fieldset>
         <br />
+        <label>
+            <input type="checkbox" id="grid-cartogram-toggle" />
+            Grid cartogram (NUTS 0 only)
+        </label>
+        <br />
         <svg id="map"></svg>
 
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="/build/eurostatmap.js"></script>
         <script>
             let map
 
-            function buildMap(barType, nutsLevel) {
+            function buildMap(barType, nutsLevel, useGridCartogram) {
                 if (map) map.svg().selectAll('*').remove()
 
-                map = eurostatmap
+                const shouldUseGridCartogram = useGridCartogram && nutsLevel === 0
+
+                let mapBuilder = eurostatmap
                     .map('bar')
                     .svgId('map')
                     .title('Tourism nights spent by residence of guest')
@@ -72,8 +87,8 @@
                         sizeLegend: {
                             title: 'Total nights spent',
                             titlePadding: 15,
-                            values: [10000000, 1000000],
                             offsetX: 14,
+                            cells: 2,
                         },
                         colorLegend: {
                             title: 'Residence of guest',
@@ -81,6 +96,12 @@
                             noData: false,
                         },
                     })
+
+                if (shouldUseGridCartogram) {
+                    mapBuilder = mapBuilder.gridCartogram(true).gridCartogramSettings({ chartOffset: { x: 0, y: 20 } })
+                }
+
+                map = mapBuilder
 
                 map.build()
             }
@@ -94,16 +115,32 @@
                 return document.getElementById('bartype').value
             }
 
-            buildMap(getSelectedBarType(), getSelectedNutsLevel())
+            function isGridCartogramEnabled() {
+                return document.getElementById('grid-cartogram-toggle').checked
+            }
+
+            function updateGridCartogramToggleState() {
+                const toggle = document.getElementById('grid-cartogram-toggle')
+                const isNuts0 = getSelectedNutsLevel() === 0
+                toggle.disabled = !isNuts0
+            }
+
+            updateGridCartogramToggleState()
+            buildMap(getSelectedBarType(), getSelectedNutsLevel(), isGridCartogramEnabled())
 
             document.getElementById('bartype').addEventListener('change', function (e) {
-                buildMap(e.target.value, getSelectedNutsLevel())
+                buildMap(e.target.value, getSelectedNutsLevel(), isGridCartogramEnabled())
             })
 
             document.querySelectorAll('input[name="nuts-level"]').forEach((radio) => {
                 radio.addEventListener('change', function () {
-                    buildMap(getSelectedBarType(), Number(this.value))
+                    updateGridCartogramToggleState()
+                    buildMap(getSelectedBarType(), Number(this.value), isGridCartogramEnabled())
                 })
+            })
+
+            document.getElementById('grid-cartogram-toggle').addEventListener('change', function () {
+                buildMap(getSelectedBarType(), getSelectedNutsLevel(), this.checked)
             })
         </script>
     </body>

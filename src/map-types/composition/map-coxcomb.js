@@ -8,7 +8,7 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
 import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
 import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
-import { adjustGridCartogramTextLabels } from '../../core/cartograms'
+import { adjustGridCartogramTextLabels, getGridCartogramChartOffset } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
 import { createRadialScale } from '../../core/scale.js'
 import { getCentroidsGroup } from '../../core/geo/centroids'
@@ -774,6 +774,9 @@ export const map = function (config) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
         const offsets = { ...(out.coxcombOffsets_ || { x: 0, y: 0 }) }
+        const sharedOffset = getGridCartogramChartOffset(out)
+        offsets.x += sharedOffset.x
+        offsets.y += sharedOffset.y
 
         if (out.gridCartogramSettings_.shape === 'hexagon') {
             offsets.x -= (out.coxcombWidth_ || 0) - 4

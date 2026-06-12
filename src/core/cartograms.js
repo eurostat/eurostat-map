@@ -9,6 +9,7 @@ export const buildGridCartogramBase = function (out) {
     // Ensure margins exist with default values
     out.gridCartogramSettings_ = out.gridCartogramSettings_ || {}
     out.gridCartogramSettings_.margins = out.gridCartogramSettings_.margins || { top: 80, right: 80, bottom: 80, left: 80 }
+    out.gridCartogramSettings_.chartOffset = out.gridCartogramSettings_.chartOffset || { x: 0, y: 0 }
 
     // Get grid layout
     const gridLayout = getGridLayout(out)
@@ -24,6 +25,22 @@ export const buildGridCartogramBase = function (out) {
 
     // Center the grid
     centerGrid(gridGroup, out.width_, out.height_, out.gridCartogramSettings_.margins)
+}
+
+export function getGridCartogramChartOffset(map) {
+    const offset = map?.gridCartogramSettings_?.chartOffset || {}
+    return {
+        x: Number.isFinite(+offset.x) ? +offset.x : 0,
+        y: Number.isFinite(+offset.y) ? +offset.y : 0,
+    }
+}
+
+export function getGridCartogramChartAnchor(map, bbox) {
+    const isHexagon = map.gridCartogramSettings_?.shape === 'hexagon'
+    const offset = getGridCartogramChartOffset(map)
+    const x = (isHexagon ? 0 : bbox.width / 2) + offset.x
+    const y = (isHexagon ? 0 : bbox.height / 2) + offset.y
+    return { x, y }
 }
 
 /** Determines the grid layout based on settings */

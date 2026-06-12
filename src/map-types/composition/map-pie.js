@@ -5,7 +5,7 @@ import { createStatMap } from '../../core/stat-map'
 import * as PiechartLegend from '../../legend/legend-pie-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
-import { adjustGridCartogramTextLabels } from '../../core/cartograms'
+import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
     buildGetterSetters,
     applyConfigValues,
@@ -557,8 +557,7 @@ export const map = function (config) {
             node.selectAll('.em-pie').remove()
 
             const bbox = node.node().getBBox()
-            const anchorX = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.width / 2
-            const anchorY = out.gridCartogramSettings_.shape == 'hexagon' ? 0 : bbox.height / 2
+            const anchor = getGridCartogramChartAnchor(out, bbox)
 
             const r = out.classifierSize_(total)
 
@@ -566,7 +565,7 @@ export const map = function (config) {
                 .append('g')
                 .attr('id', 'piechart_' + regionId)
                 .attr('class', 'em-pie')
-                .attr('transform', `translate(${anchorX}, ${anchorY})`)
+                .attr('transform', `translate(${anchor.x}, ${anchor.y})`)
 
             const chartNode = g
                 .append('g')
