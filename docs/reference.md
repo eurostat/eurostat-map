@@ -245,8 +245,8 @@ eurostatmap
     .map('choropleth')
     .title('Population in Europe')
     .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inhab./km²' })
-    .classifMethod('threshold')
-    .threshold([50, 75, 100, 150, 300, 850])
+    .classificationMethod('threshold')
+    .thresholds([50, 75, 100, 150, 300, 850])
     .tooltipShowFlags(false)
     .legend({ noData: false, decimals: 0, x: 15, y: 160 })
     .build()
@@ -257,8 +257,8 @@ eurostatmap
 | _map_.**numberOfClasses**([*value*])      | int       | _7_                    | The number of classes. When _classificationMethod == "threshold"_, this parameter is inferred from the number of breaks specified.                                                        |
 | _map_.**classificationMethod**([*value*]) | String    | _"quantile"_           | The classification method. Possible values are _"ckmeans"\_\_"jenks"_,_"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshol (see threshold method). |
 | _map_.**colors**([*value*])               | Array     | _null_                 | The colours to use for the classes. if unspecified, default colorFun is used.                                                                                                             |
-| _map_.**thresholds**([*value*])           | Array     | _[0]_                  | If _classifMethod = "threshold"_, the breaks of the classification.                                                                                                                       |
-| _map_.**makeClassifNice**([*value*])      | _boolean_ | true                   | Make nice break values. Works only for _classifMethod = "equinter"_.                                                                                                                      |
+| _map_.**thresholds**([*value*])           | Array     | _[0]_                  | If _classificationMethod = "threshold"_, the breaks of the classification.                                                                                                                |
+| _map_.**makeClassifNice**([*value*])      | _boolean_ | true                   | Make nice break values. Works only for _classificationMethod = "equinter"_.                                                                                                               |
 | _map_.**colorFunction**([*value*])        | Function  | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                         |
 | _map_.**classToFillStyle**([*value*])     | Function  | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorFunction(colorFun())`.                                       |
 | _map_.**noDataFillStyle**([*value*])      | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                                         |
@@ -460,14 +460,14 @@ eurostatmap
 
 When `customData` is supplied, `eurostatDatasetCode` and `categoryParameter` are not required. An optional `totalCode` key inside each region object can be provided for the "other" wedge calculation; if omitted the total is auto-computed from the sum of `categoryCodes`.
 
-| Method                                    | Type    | Default value | Description                                                                                                                                                                                        |
-| ----------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Method                                    | Type    | Default value | Description                                                                                                                                                                                                                                  |
+| ----------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**compositionSettings**([*value*])  | object  | _auto_        | Composition-level settings for chart symbols: `type`, `radarValueMode` (`share` or `absolute`), `minSize`, `maxSize`, `strokeFill`, `strokeWidth`, `stripesOrientation`, `offsetAngle`, `agePyramidHeightFactor`, `otherColor`, `otherText`. |
-| _map_.**pieSettings**([*value*])          | object  | _auto_        | Pie-specific settings. Currently supports `innerRadius` to render donut charts.                                                                                                                    |
-| _map_.**catColors**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code. If not specified, different colors are proposed.                                                                                               |
-| _map_.**catLabels**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code.                                                                                                                                                |
-| _map_.**showOnlyWhenComplete**([*value*]) | boolean | _false_       | Draw a region only when data is available for all categories. If one is missing, the region is considered as with 'no data'. If not, the value of missing data is set to 0.                        |
-| _map_.**noDataFillStyle**([*value*])      | string  | _"darkgray"_  | The fill style to be used for regions where no data is available.                                                                                                                                  |
+| _map_.**pieSettings**([*value*])          | object  | _auto_        | Pie-specific settings. Currently supports `innerRadius` to render donut charts.                                                                                                                                                              |
+| _map_.**catColors**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code. If not specified, different colors are proposed.                                                                                                                                         |
+| _map_.**catLabels**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code.                                                                                                                                                                                          |
+| _map_.**showOnlyWhenComplete**([*value*]) | boolean | _false_       | Draw a region only when data is available for all categories. If one is missing, the region is considered as with 'no data'. If not, the value of missing data is set to 0.                                                                  |
+| _map_.**noDataFillStyle**([*value*])      | string  | _"darkgray"_  | The fill style to be used for regions where no data is available.                                                                                                                                                                            |
 
 In addition to [the default legend parameters](#map-legend), proportional pie chart maps have the [these specific legend parameters](#pie-chart-legends):
 
@@ -759,12 +759,12 @@ eurostatmap
 | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**sparkType**([*value*])              | string            | "area"                                                                                            | Type of chart to use. Can be 'line' or 'area'                                                                                                                                                                                                                                |
 | _map_.**sparkLineColor**([*value*])         | string / Function | "black"                                                                                           | colour of the sparklines. Also accepts an acessor function e.g: `.sparkLineColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                                                                  |
-| _map_.**sparkAreaColor**([*value*])         | string / Function | "#41afaa"                                                                                         | colour of the area chart fill (when sparkType set to area) Also accepts an acessor function e.g: `.sparkAreaColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                                 |
+| _map_.**sparkLineAreaColor**([*value*])     | string / Function | "#41afaa"                                                                                         | colour of the area chart fill (when sparkType set to area) Also accepts an acessor function e.g: `.sparkLineAreaColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                             |
 | _map_.**sparkLineWidth**([*value*])         | number            | 30                                                                                                | width of the spark charts                                                                                                                                                                                                                                                    |
 | _map_.**sparkLineHeight**([*value*])        | number            | 20                                                                                                | height of the spark charts                                                                                                                                                                                                                                                   |
 | _map_.**sparkLineStrokeWidth**([*value*])   | number            | 0.4                                                                                               | stroke width of the spark lines                                                                                                                                                                                                                                              |
 | _map_.**sparkLineOpacity**([*value*])       | number            | 0.6                                                                                               | opacity of the spark lines                                                                                                                                                                                                                                                   |
-| _map_.**sparkChartCircleRadius**([*value*]) | number            | 0.5                                                                                               | Radius of the circles at each record                                                                                                                                                                                                                                         |
+| _map_.**sparkLineCircleRadius**([*value*])  | number            | 0.5                                                                                               | Radius of the circles at each record                                                                                                                                                                                                                                         |
 | _map_.**sparkTooltipChart**([*value*])      | object            | {width: 100, height: 80, margin: { left: 60, right: 40, top: 40, bottom: 40 }, circleRadius: 1.5} | config for the chart shown in the tooltip                                                                                                                                                                                                                                    |
 | _map_.**sparkLineChartFunction**([*value*]) | function          | undefined                                                                                         | you can specify your own logic for drawing the sparkline charts. Arguments passed to it are (node, data, width, height, isForTooltip) See [custom_chart_function](https://github.com/eurostat/eurostat-map/blob/master/test/map-types/sparklines/custom_chart_function.html) |
 
@@ -978,23 +978,22 @@ As of version 4.1.0 you can now create grid cartograms and dorling cartograms by
 map.gridCartogram(true)
 ```
 
-You can switch between squares and hexagons using
+Configure shape, margins, cell spacing and optional custom positions with a single settings object:
 
 ```javascript
-map.gridCartogramShape('hexagon')
+map.gridCartogramSettings({
+    shape: 'hexagon', // or 'square'
+    margins: { top: 100, right: 10, bottom: 10, left: 10 },
+    cellPadding: 5,
+    chartOffset: { x: 0, y: 0 }, // optional offset for chart-based cartograms in each cell
+})
 ```
 
-and define container or cell padding using:
+If you wish, you can define custom grid positions using `positions`:
 
 ```javascript
-map.gridCartogramMargins({ bottom: 10, top: 100, left: 10, right: 10 }).gridCartogramCellPadding(5)
-```
-
-If you wish, you can even define custom grid positions using:
-
-```javascript
-map.gridCartogramPositions(
-    `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
+map.gridCartogramSettings({
+    positions: `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
     ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
     ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
     ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
@@ -1004,10 +1003,11 @@ map.gridCartogramPositions(
     ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
     ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,
     ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,
-    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  
-   `
-)
+    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,`,
+})
 ```
+
+Legacy setters such as `gridCartogramShape`, `gridCartogramMargins`, `gridCartogramCellPadding` and `gridCartogramPositions` are still available for backward compatibility but are deprecated.
 
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/cartogram/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/cartogram/grid-cartogram.html))
 

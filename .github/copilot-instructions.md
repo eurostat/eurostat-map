@@ -115,6 +115,10 @@ out.numberOfClasses = function (v) {
 4. Register in [src/eurostat-map.js](src/eurostat-map.js) factory function
 5. Add example in [examples/](examples/) and update [docs/reference.md](docs/reference.md)
 
+### API Change Policy
+
+- If a change affects user-facing API (method names, option names, config object shape, defaults, deprecations), update relevant documentation in [docs/reference.md](docs/reference.md) in the same work.
+
 ## Code Style & Conventions
 
 - **ES6 modules**: Use `import/export`, no CommonJS
@@ -173,9 +177,13 @@ map.tooltip({ textFunction: myCustomFunction })
 Grid cartograms ([src/core/cartograms.js](src/core/cartograms.js)) replace geographic shapes with regular grids:
 
 ```javascript
-map.gridCartogramShape('hexagon') // or 'square'
-    .gridCartogramPositions(customLayout) // Optional: custom CSV layout
-    .gridCartogramMargins({ top: 80, right: 80, bottom: 80, left: 80 })
+map.gridCartogramSettings({
+    shape: 'hexagon', // or 'square'
+    positions: customLayout, // Optional: custom CSV layout
+    margins: { top: 80, right: 80, bottom: 80, left: 80 },
+    cellPadding: 0,
+    chartOffset: { x: 0, y: 0 },
+})
 ```
 
 **Layout format**: CSV string where each cell contains NUTS ID (e.g., `ES,FR,DE`). Default layouts for Europe provided.
@@ -186,10 +194,12 @@ Dorling cartograms ([src/core/dorling/](src/core/dorling/)) use D3 force simulat
 
 ```javascript
 map.dorling(true)
-    .dorlingStrength({ x: 1, y: 1 }) // Gravity toward original position
-    .dorlingIterations(1) // Collision detection iterations
+    .dorlingSettings({
+        strength: { x: 1, y: 1 },
+        iterations: 1,
+        worker: true,
+    })
     .animateDorling(false) // Skip animation for immediate result
-    .dorlingWorker(true) // Use Web Worker for performance
 ```
 
 **Implementation notes**:
