@@ -284,6 +284,19 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             if (v.margins && typeof v.margins === 'object') {
                 next.margins = Object.assign({}, out.gridCartogramSettings_.margins, v.margins)
             }
+            const labelSettings = Object.assign(
+                {},
+                out.gridCartogramSettings_?.countryLabelSettings || {},
+                v.countryLabelSettings || {}
+            )
+            ;['countryLabels', 'countryLabelFontSize', 'countryLabelMinFontSize', 'countryLabelPadding', 'countryLabelAvoidOverlap'].forEach(
+                (key) => {
+                    if (v[key] !== undefined) labelSettings[key] = v[key]
+                }
+            )
+            if (Object.keys(labelSettings).length) {
+                next.countryLabelSettings = labelSettings
+            }
             out.gridCartogramSettings_ = next
         } else {
             out.gridCartogramSettings_ = v

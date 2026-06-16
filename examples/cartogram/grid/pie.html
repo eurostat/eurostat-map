@@ -20,7 +20,8 @@
             }
         </style>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="../../../build/eurostatmap.js"></script>
 
         <script>
             const cropOptions = [
@@ -34,15 +35,31 @@
                 { value: 'C2000', text: 'Rice' },
             ]
             let map = eurostatmap
-                .map('pie')
+                .map('pie').header(true)
                 .gridCartogram(true)
-                .gridCartogramMargins({ top: 60, right: 90, bottom: 40, left: 1 })
-                //.gridCartogramShape('hexagon')
-                .gridCartogramCellPadding(20)
-                .pieMinRadius(10)
-                .pieMaxRadius(22)
 
-                .title('Cereal production')
+                .gridCartogramSettings({
+                    margins: { top: 60, right: 90, bottom: 40, left: 1 },
+                    cellPadding: 13,
+                    shape: 'square',
+                    countryLabelSettings: {
+                        countryLabels: 'name',
+                        countryLabelFontSize: 12,
+                        countryLabelMinFontSize: 12,
+                        countryLabelAvoidOverlap: false,
+                    },
+                })
+
+                .compositionSettings({
+                    minSize: 10,
+                    maxSize: 25,
+                })
+                .pieSettings({
+                    otherColor: '#FFCC80',
+                    otherText: 'Other',
+                })
+
+                .title('Cereal production across Europe')
                 .subtitle('2024')
                 .scale('60M')
                 .nutsLevel(0)
@@ -58,8 +75,6 @@
                     ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
                     'C0000' //code for the total (all causes of death)
                 )
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
 
                 .legend({
                     x: 550,

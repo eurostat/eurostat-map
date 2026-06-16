@@ -1,6 +1,21 @@
 import { select } from 'd3-selection'
 import { csvParseRows } from 'd3-dsv'
 
+const COUNTRY_CODE_ALIASES = {
+    EL: 'GR',
+    UK: 'GB',
+}
+
+const COUNTRY_NAME_OVERRIDES = {
+    BA: 'Bosnia & H.',
+    MK: 'N. Macedonia',
+}
+
+const englishRegionNames =
+    typeof Intl !== 'undefined' && Intl.DisplayNames
+        ? new Intl.DisplayNames(['en'], { type: 'region' })
+        : null
+
 // draw grid cartogram geometries
 export const buildGridCartogramBase = function (out) {
     const zoomGroup = select(`#em-zoom-group-${out.svgId_}`)
@@ -24,6 +39,9 @@ export const buildGridCartogramBase = function (out) {
 
     // Center the grid
     centerGrid(gridGroup, out.width_, out.height_, out.gridCartogramSettings_.margins)
+
+    // Fit labels after centering so country names do not overlap their neighbors.
+    fitGridCartogramLabels(gridGroup, out)
 }
 
 /** Determines the grid layout based on settings */
@@ -97,6 +115,7 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
     const cellWidth = (out.width_ - margins.left - margins.right) / numCols - cellPadding
     const cellHeight = (out.height_ - margins.top - margins.bottom) / numRows - cellPadding
     const cellSize = Math.min(cellWidth, cellHeight)
+    const labelFontSize = getGridCountryLabelFontSize(out, cellSize)
 
     gridGroup
         .selectAll('.em-grid-cell')
@@ -118,11 +137,11 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
                 .attr('id', `em-grid-text-${d.id}`)
                 .attr('class', 'em-grid-text')
                 .attr('text-anchor', 'middle')
-                .style('font-size', getFontSize(out._mapType))
+                .style('font-size', `${labelFontSize}px`)
                 .style('transform', getLabelTranslate(out._mapType))
                 .style('pointer-events', 'none')
                 .attr('fill', 'black')
-                .text(d.id)
+                .text(getGridCountryLabelText(out, d))
                 .attr('x', cellSize / 2)
                 .attr('y', cellSize / 2 + 5)
         })
@@ -143,6 +162,7 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
 
     const hexRadius = baseHexRadius
     const hexHeight = Math.sqrt(3) * hexRadius
+    const labelFontSize = getGridCountryLabelFontSize(out, hexRadius * 2)
 
     gridGroup
         .selectAll('.em-grid-cell')
@@ -169,13 +189,113 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
                 .attr('id', `em-grid-text-${d.id}`)
                 .attr('class', 'em-grid-text')
                 .attr('text-anchor', 'middle')
-                .style('font-size', getFontSize(out._mapType))
+                .style('font-size', `${labelFontSize}px`)
                 .style('transform', getLabelTranslate(out._mapType))
                 .style('pointer-events', 'none')
                 .attr('fill', 'black')
-                .text(d.id)
+                .text(getGridCountryLabelText(out, d))
                 .attr('y', 5)
         })
+}
+
+const getGridCountryLabelText = (out, d) => {
+    const labelSettings = getGridCountryLabelSettings(out)
+    const labelMode = labelSettings.countryLabels || 'code'
+
+    if (typeof labelMode === 'function') {
+        return labelMode(d.id, d.properties?.name, d)
+    }
+
+    if (labelMode === 'name') {
+        return getEnglishCountryName(d.id, d.properties?.name)
+    }
+
+    return d.id
+}
+
+const getEnglishCountryName = (id, fallbackName) => {
+    if (!englishRegionNames || !id) return fallbackName || id
+
+    const canonicalCode = COUNTRY_CODE_ALIASES[id] || id
+    if (COUNTRY_NAME_OVERRIDES[canonicalCode]) return COUNTRY_NAME_OVERRIDES[canonicalCode]
+
+    const englishName = englishRegionNames.of(canonicalCode)
+
+    // Intl may return the original code if unknown (e.g. some non-ISO identifiers).
+    if (!englishName || englishName === canonicalCode) return fallbackName || id
+    return englishName
+}
+
+const getGridCountryLabelFontSize = (out, maxWidth) => {
+    const settings = getGridCountryLabelSettings(out)
+    const baseFontSize = settings.countryLabelFontSize || getFontSize(out._mapType)
+    const mode = settings.countryLabels || 'code'
+
+    if (mode === 'name') {
+        const minFontSize = settings.countryLabelMinFontSize || 8
+        const fitFontSize = Math.max(minFontSize, Math.min(baseFontSize, Math.floor(maxWidth / 4.8)))
+        return fitFontSize
+    }
+
+    return baseFontSize
+}
+
+const fitGridCartogramLabels = (gridGroup, out) => {
+    const settings = getGridCountryLabelSettings(out)
+    const mode = settings.countryLabels || 'code'
+    const shouldFit = settings.countryLabelAvoidOverlap !== false && mode === 'name'
+    if (!shouldFit) return
+
+    const minFontSize = settings.countryLabelMinFontSize || 8
+    const padding = settings.countryLabelPadding ?? 4
+    const labels = gridGroup.selectAll('.em-grid-cell .em-grid-text')
+
+    labels.each(function () {
+        const text = select(this)
+        const cell = select(this.parentNode)
+        const shape = cell.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+        if (!shape) return
+
+        const shapeBBox = shape.getBBox()
+        const availableWidth = Math.max(shapeBBox.width - padding * 2, 1)
+        const currentFontSize = parseFloat(text.style('font-size')) || getFontSize(out._mapType)
+        const currentLength = this.getComputedTextLength?.() || 0
+        if (!currentLength) return
+
+        let nextFontSize = currentFontSize
+
+        if (currentLength > availableWidth) {
+            nextFontSize = Math.max(minFontSize, Math.floor(currentFontSize * (availableWidth / currentLength)))
+            text.style('font-size', `${nextFontSize}px`)
+        }
+
+        // Guarantee the name stays inside the cell even when the font cannot be reduced further.
+        const appliedFontSize = parseFloat(text.style('font-size')) || nextFontSize
+        const updatedLength = this.getComputedTextLength?.() || 0
+        if (updatedFontNeedsStretch(updatedLength, availableWidth, appliedFontSize, minFontSize)) {
+            text
+                .attr('textLength', availableWidth)
+                .attr('lengthAdjust', 'spacingAndGlyphs')
+        }
+    })
+}
+
+const getGridCountryLabelSettings = (out) => {
+    const gridSettings = out.gridCartogramSettings_ || {}
+    const legacyLabelSettings = {
+        countryLabels: gridSettings.countryLabels,
+        countryLabelFontSize: gridSettings.countryLabelFontSize,
+        countryLabelMinFontSize: gridSettings.countryLabelMinFontSize,
+        countryLabelPadding: gridSettings.countryLabelPadding,
+        countryLabelAvoidOverlap: gridSettings.countryLabelAvoidOverlap,
+    }
+
+    return Object.assign({}, legacyLabelSettings, gridSettings.countryLabelSettings || {})
+}
+
+const updatedFontNeedsStretch = (textLength, availableWidth, fontSize, minFontSize) => {
+    if (!textLength) return false
+    return textLength > availableWidth && fontSize <= minFontSize
 }
 
 const getFontSize = (mapType) => {
@@ -239,7 +359,12 @@ export function adjustGridCartogramTextLabels({ map, getAnchors, getRadius, marg
 
         const regionId = d.properties.id
         const r = getRadius(regionId, d)
-        if (!r || r <= 0) return
+        if (!r || r <= 0) {
+            text.style('display', 'none')
+            return
+        }
+
+        text.style('display', null)
 
         const shapeEl = cell.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
         if (!shapeEl) return
