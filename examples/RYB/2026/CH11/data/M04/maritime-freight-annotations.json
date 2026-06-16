@@ -1,0 +1,157 @@
+[
+  {
+    "dy": -390,
+    "dx": 400,
+    "x": 445,
+    "y": 430,
+    "type": "annotationCalloutCircle",
+    "subject": {
+      "radius": 48.58578643762691,
+      "radiusPadding": 0
+    },
+    "connector": {
+      "type": "curve",
+      "points": [
+        [
+          100,
+          -100
+        ]
+      ]
+    },
+    "className": "em-annotation-de-dk",
+    "note": {}
+  },
+  {
+    "dy": -180,
+    "dx": 420,
+    "x": 373,
+    "y": 518,
+    "type": "annotationCalloutCircle",
+    "subject": {
+      "radius": 50,
+      "radiusPadding": 15
+    },
+    "connector": {
+      "type": "curve",
+      "points": [
+        [
+          210,
+          -40
+        ]
+      ]
+    },
+    "className": "em-annotation-be-nl",
+    "note": {}
+  },
+  {
+    "x": 305,
+    "y": 456,
+    "dx": -20,
+    "dy": -11,
+    "note": {
+      "title": "Rotterdam",
+      "align": "middle"
+    },
+    "className": "em-annotation-top-port em-annotation-nl00nlrtm"
+  },
+  {
+    "x": 353,
+    "y": 558,
+    "dx": 0,
+    "dy": 18,
+    "note": {
+      "title": "Antwerp-Bruges",
+      "align": "middle"
+    },
+    "className": "em-annotation-top-port em-annotation-be00be003"
+  },
+  {
+    "x": 448,
+    "y": 472,
+    "dx": 15,
+    "dy": 11,
+    "note": {
+      "title": "Hamburg",
+      "align": "left"
+    },
+    "className": "em-annotation-top-port em-annotation-de01deham a-left"
+  },
+  {
+    "x": 775,
+    "y": 784,
+    "dx": 23,
+    "dy": 0,
+    "note": {
+      "title": "Aliaga",
+      "align": "left"
+    },
+    "className": "em-annotation-top-port em-annotation-tr02trali a-left"
+  },
+  {
+    "x": 820,
+    "y": 727,
+    "dx": 19,
+    "dy": 0,
+    "note": {
+      "title": "Izmit",
+      "align": "left"
+    },
+    "className": "em-annotation-top-port em-annotation-tr02trizt a-left"
+  },
+  {
+    "x": 140,
+    "y": 861,
+    "dx": 12,
+    "dy": 5,
+    "note": {
+      "title": "Algeciras",
+      "align": "left"
+    },
+    "className": "em-annotation-top-port em-annotation-es02esalg a-left"
+  },
+  {
+    "x": 395,
+    "y": 498,
+    "dx": 13,
+    "dy": 4,
+    "note": {
+      "title": "Amsterdam",
+      "align": "left"
+    },
+    "className": "em-annotation-top-port em-annotation-nl00nlams a-left"
+  },
+  {
+    "x": 272,
+    "y": 547,
+    "dx": -19,
+    "dy": -7,
+    "note": {
+      "title": "HAROPA",
+      "align": "middle"
+    },
+    "className": "em-annotation-top-port em-annotation-fr01fr001"
+  },
+  {
+    "x": 549,
+    "y": 443,
+    "dx": 0,
+    "dy": 14,
+    "note": {
+      "title": "Gdansk",
+      "align": "middle"
+    },
+    "className": "em-annotation-top-port em-annotation-pl00plgdn"
+  },
+  {
+    "x": 967,
+    "y": 795,
+    "dx": 17,
+    "dy": 0,
+    "note": {
+      "title": "Iskenderun- Hatay",
+      "align": "left",
+      "wrap": 10
+    },
+    "className": "em-annotation-top-port em-annotation-tr02trisk a-left"
+  }
+]

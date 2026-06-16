@@ -66,6 +66,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         shape: 'square', // square or hexagon
         margins: { top: 80, right: 50, bottom: 80, left: 150 },
         cellPadding: 4,
+        chartOffset: { x: 0, y: 0 },
         positions: undefined, // user defined cartograms
     }
 
@@ -296,6 +297,9 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             )
             if (Object.keys(labelSettings).length) {
                 next.countryLabelSettings = labelSettings
+            }
+            if (v.chartOffset && typeof v.chartOffset === 'object') {
+                next.chartOffset = Object.assign({}, out.gridCartogramSettings_.chartOffset, v.chartOffset)
             }
             out.gridCartogramSettings_ = next
         } else {

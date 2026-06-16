@@ -12,6 +12,14 @@ export interface GridCartogramMargins {
     left: number
 }
 
+/** Shared chart offset for symbols drawn inside each grid cell. */
+export interface GridCartogramChartOffset {
+    /** Horizontal offset in pixels. Positive moves right. */
+    x: number
+    /** Vertical offset in pixels. Positive moves down. */
+    y: number
+}
+
 /**
  * Settings for grid cartogram layout and geometry.
  */
@@ -45,6 +53,8 @@ export interface GridCartogramSettings {
     countryLabelPadding?: number
     /** @deprecated Use countryLabelSettings.countryLabelAvoidOverlap instead. */
     countryLabelAvoidOverlap?: boolean
+    /** Shared chart offset in grid cells for chart-based map types. */
+    chartOffset: GridCartogramChartOffset
     /**
      * Custom grid layout CSV string.
      * If undefined, the built-in layout for the selected shape is used.

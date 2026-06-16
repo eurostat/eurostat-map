@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tourism coxcomb map</title>
+        <title>Tourism coxcomb map - CH10M06</title>
         <link rel="stylesheet" href="../../insets/insets.css" />
         <link rel="stylesheet" href="../../styles.css" />
         <style>
@@ -27,9 +27,6 @@
             }
             .em-legend-wedge {
                 stroke: black !important;
-            }
-            .em-coxcomb-chart {
-                stroke-width: 0.1 !important;
             }
         </style>
     </head>
@@ -121,8 +118,8 @@
                     .containerId('container')
                     .width(MAPWIDTH)
                     .height(MAPHEIGHT)
-                    .title('Guest nights spent at short-stay accommodation')
-                    .subtitle('offered via selected online booking platforms, by month, 2024')
+                    .title('Guest nights spent at short-stay accommodation ')
+                    .subtitle('(offered via selected online booking platforms, by NUTS 2 regions, 2025)')
                     .position({ x: 4800000, y: 3400000, z: 6000 })
                     .dorling(true)
                     .dorlingStrength({ x: 10, y: 10 })
@@ -140,7 +137,7 @@
                         totalCode: 'TOTAL',
                         unitText: 'Nights',
                     })
-                    .coxcombMaxRadius(42)
+                    .coxcombMaxRadius(35)
                     .coxcombMinRadius(5)
                     .coxcombRings(false)
                     .zoomButtons(false)
@@ -155,8 +152,8 @@
                             marginTop: 45,
                             titlePadding: 10,
                             noData: false,
-                            values: [12000000, 6000000, 1000000],
-                            labels: ['12 million', '6 million', '1 million'],
+                            values: [12000000, 5000000, 1000000],
+                            labels: ['12 million', '5 million', '1 million'],
                         },
                         colorLegend: { title: 'Residence of guest', marginTop: 35, titlePadding: 10, noData: false },
                         timeLegend: { title: 'Month', titlePadding: 33, marginTop: -33 },
@@ -170,7 +167,7 @@
                     .ribbonHeight(50)
                     .footnoteWrap(90)
                     .footnote(
-                        "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year."
+                        "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year. <br>Source: Eurostat (online data code: tour_ce_omn12)"
                     )
                     .onBuild(() => {
                         // move newInsets inside #map
@@ -181,14 +178,21 @@
 
                         //add cartography footnote
                         d3.select('#map #em-footnote-2').remove()
-                        d3.selectAll('#map')
+                        d3.select('#map')
                             .append('text')
-                            .attr('x', MAPWIDTH - 308)
+                            .attr('x', MAPWIDTH - 272)
                             .attr('y', MAPHEIGHT + 83)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
-                            .append('tspan')
-                            .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM')
+                            .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+
+                        d3.select('#map')
+                            .append('text')
+                            .attr('x', MAPWIDTH - 209)
+                            .attr('y', MAPHEIGHT + 96)
+                            .attr('class', 'em-footnote')
+                            .attr('id', 'em-footnote-2')
+                            .html('Cartography: Eurostat – GISCO, 06/2026')
                     })
                     .zoomExtent([0.9, 100])
                     .build()

@@ -4,7 +4,7 @@ import { createStatMap } from '../../core/stat-map'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
-import { adjustGridCartogramTextLabels } from '../../core/cartograms'
+import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
     buildGetterSetters,
     applyConfigValues,
@@ -439,8 +439,7 @@ export const map = function (config) {
             node.selectAll('.em-bar-chart').remove()
 
             const bbox = node.node().getBBox()
-            const anchorX = out.gridCartogramSettings_.shape === 'hexagon' ? 0 : bbox.width / 2
-            const anchorY = out.gridCartogramSettings_.shape === 'hexagon' ? 0 : bbox.height / 2
+            const anchor = getGridCartogramChartAnchor(out, bbox)
 
             const total = _getRegionTotal(regionId)
             const totalWidth = out.classifierSize_(total)
@@ -449,7 +448,7 @@ export const map = function (config) {
                 .append('g')
                 .attr('id', 'barchart_' + regionId)
                 .attr('class', 'em-bar-chart')
-                .attr('transform', `translate(${anchorX}, ${anchorY})`)
+                .attr('transform', `translate(${anchor.x}, ${anchor.y})`)
 
             const chartNode = g
                 .append('g')
@@ -602,15 +601,13 @@ export const map = function (config) {
             node.selectAll('.em-bar-chart').remove()
 
             const bbox = node.node().getBBox()
-            const anchorX = out.gridCartogramSettings_.shape === 'hexagon' ? 0 : bbox.width / 2
-            // Anchor at center-bottom of cell so bars grow upward into the cell
-            const anchorY = out.gridCartogramSettings_.shape === 'hexagon' ? 0 : bbox.height / 2
+            const anchor = getGridCartogramChartAnchor(out, bbox)
 
             const g = node
                 .append('g')
                 .attr('id', 'barchart_' + regionId)
                 .attr('class', 'em-bar-chart')
-                .attr('transform', `translate(${anchorX}, ${anchorY})`)
+                .attr('transform', `translate(${anchor.x}, ${anchor.y})`)
 
             const chartNode = g
                 .append('g')
@@ -687,7 +684,11 @@ export const map = function (config) {
         const bw = 16 // slightly wider bars in tooltip for readability
         const gap = 4
         const maxH = out.barTooltipWidth_ * 0.5 // tooltip bar height proportional to width
-        const bottomPad = 14 // space below baseline for value labels
+        const valueLabelFontSize = 8
+        const valueLabelGap = 2
+        const valueLabelRows = 2
+        const valueLabelRowHeight = valueLabelFontSize + 2
+        const bottomPad = valueLabelRows * valueLabelRowHeight + 4 // reserve space for two non-overlapping label rows
         const totalW = codes.length * bw + (codes.length - 1) * gap
         const svgW = Math.max(out.barTooltipWidth_, totalW + 8)
         const svgH = maxH + bottomPad + 4
@@ -702,6 +703,7 @@ export const map = function (config) {
         if (maxVal === 0) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
         let bars = ''
+        const lastLabelRightByRow = Array(valueLabelRows).fill(-Infinity)
         codes.forEach((code, i) => {
             const s = out.statData(code)?.get(regionId)
             const rawVal = s?.value != null && !isNaN(s.value) ? s.value : 0
@@ -709,14 +711,36 @@ export const map = function (config) {
             const x = offsetX + i * (bw + gap)
             const color = out.catColors_?.[code] || 'lightgray'
             const label = out.catLabels_?.[code] || code
-            const valStr = spaceAsThousandSeparator(rawVal)
+            const fullValStr = spaceAsThousandSeparator(rawVal)
+            const valStr = compactValue(rawVal)
+            const centerX = x + bw / 2
+            const estimatedLabelWidth = valStr.length * valueLabelFontSize * 0.62
+            const labelLeft = centerX - estimatedLabelWidth / 2
+            const labelRight = centerX + estimatedLabelWidth / 2
+
+            let rowIndex = -1
+            for (let r = 0; r < valueLabelRows; r++) {
+                if (labelLeft > lastLabelRightByRow[r] + valueLabelGap) {
+                    rowIndex = r
+                    break
+                }
+            }
+
+            if (rowIndex >= 0) lastLabelRightByRow[rowIndex] = labelRight
+            const showValueLabel = rowIndex >= 0
+            const labelY = maxH + valueLabelRowHeight * (rowIndex + 1) - 1
 
             bars += `
             <rect x="${x}" y="${maxH - barH}" width="${bw}" height="${barH}"
                   fill="${color}" rx="1" ry="1"/>
-            <text x="${x + bw / 2}" y="${maxH + bottomPad - 2}"
-                  text-anchor="middle" font-size="7" fill="#555"
-                  title="${label}">${valStr}</text>`
+            ${
+                showValueLabel
+                    ? `<text x="${centerX}" y="${labelY}"
+                  text-anchor="middle" font-size="${valueLabelFontSize}" fill="#555"
+                  style="font-family: monospace;"
+                  title="${label}: ${fullValStr}">${valStr}</text>`
+                    : ''
+            }`
         })
 
         // Category color swatches + labels below chart
@@ -740,6 +764,18 @@ export const map = function (config) {
             </svg>
         </div>
         <div style="padding: 2px 0 4px; line-height: 1.6;">${legend}</div>`
+    }
+
+    function compactValue(value) {
+        const abs = Math.abs(value)
+        if (abs >= 1e9) return `${trimTrailingZero((value / 1e9).toFixed(1))}B`
+        if (abs >= 1e6) return `${trimTrailingZero((value / 1e6).toFixed(1))}M`
+        if (abs >= 1e3) return `${trimTrailingZero((value / 1e3).toFixed(1))}K`
+        return String(Math.round(value))
+    }
+
+    function trimTrailingZero(v) {
+        return v.endsWith('.0') ? v.slice(0, -2) : v
     }
 
     // ── Legend ───────────────────────────────────────────────────────────────

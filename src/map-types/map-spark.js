@@ -6,6 +6,7 @@ import { axisBottom, axisLeft } from 'd3-axis'
 import { createStatMap } from '../core/stat-map'
 import * as SparkLegend from '../legend/legend-spark.js'
 import { executeForAllInsets, getRegionsSelector } from '../core/utils'
+import { getGridCartogramChartOffset } from '../core/cartograms'
 import * as StatisticalData from '../core/stat-data'
 import { buildGetterSetters, applyConfigValues } from './composition/composition-map'
 import { getCentroidsGroup } from '../core/geo/centroids'
@@ -343,6 +344,9 @@ export const map = function (config) {
 
     function addSparkLinesToMap(ids) {
         const offsets = { ...(out.sparkLineOffsets_ || { x: 0, y: 0 }) }
+        const sharedOffset = getGridCartogramChartOffset(out)
+        offsets.x += sharedOffset.x
+        offsets.y += sharedOffset.y
 
         if (out.gridCartogramSettings_.shape === 'hexagon') {
             offsets.x -= out.sparkLineWidth_ - 4

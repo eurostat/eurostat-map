@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <title>Regional Yearbook 2026 CH03M02</title>
+        <title>Ternary Choropleth - CH03M02</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="../../insets/insets.css" />
@@ -51,21 +51,91 @@
                 min-width: 54px;
                 font-variant-numeric: tabular-nums;
             }
+            .map-layout {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+            #container {
+                width: 860px;
+                max-width: 100%;
+                flex: 1 1 860px;
+            }
+            .small-multiples {
+                width: 320px;
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                flex: 0 0 320px;
+            }
+            .small-multiples svg {
+                width: 100%;
+                height: 248px;
+                border: 1px solid #d6d6d6;
+                border-radius: 4px;
+                background: white;
+            }
+            .small-multiples .em-source-link,
+            .small-multiples .em-footer,
+            .small-multiples .em-zoom-buttons {
+                display: none;
+            }
+            @media (max-width: 1260px) {
+                .small-multiples {
+                    width: 100%;
+                    grid-template-columns: repeat(3, minmax(210px, 1fr));
+                    flex: 1 1 100%;
+                }
+            }
+            @media (max-width: 900px) {
+                .small-multiples {
+                    grid-template-columns: 1fr;
+                }
+            }
+            .small-multiples .em-cntbn path,
+            .small-multiples .em-cntbn-halo path {
+                stroke-width: 0.1px !important;
+            }
+            .small-multiples .em-nutsbn path {
+                opacity: 0.1 !important;
+                stroke-width: 0.1px !important;
+            }
+            .small-multiples .em-nutsrg path {
+                stroke-width: 0px !important;
+            }
         </style>
         <div>
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
             <button id="export-legend-btn" type="button">Download legend as SVG</button>
+            <button id="export-small-multiples-btn" type="button">Download small multiples</button>
         </div>
-        <svg id="container" width="100%" height="820px">
-            <svg id="map"></svg>
-            <g id="newInsets"></g>
-            <svg id="legend-container"></svg>
-        </svg>
+        <div class="map-layout">
+            <svg id="container" width="100%" height="820px">
+                <svg id="map"></svg>
+                <g id="newInsets"></g>
+                <svg id="legend-container"></svg>
+            </svg>
+
+            <div class="small-multiples">
+                <svg id="small-map-v1"></svg>
+                <svg id="small-map-v2"></svg>
+                <svg id="small-map-v3"></svg>
+            </div>
+        </div>
         <div class="map-controls">
             <label for="hue-slider">Hue</label>
             <input id="hue-slider" type="range" min="0" max="360" step="1" value="160" />
             <output id="hue-slider-value" class="map-controls-output" for="hue-slider">160</output>
+
+            <label for="chroma-slider">Chroma</label>
+            <input id="chroma-slider" type="range" min="0" max="360" step="1" value="130" />
+            <output id="chroma-slider-value" class="map-controls-output" for="chroma-slider">130</output>
+
+            <label for="lightness-slider">Lightness</label>
+            <input id="lightness-slider" type="range" min="0" max="100" step="1" value="50" />
+            <output id="lightness-slider-value" class="map-controls-output" for="lightness-slider">50</output>
 
             <label for="breaks-slider">Breaks</label>
             <input id="breaks-slider" type="range" min="3" max="60" step="1" value="29" />
@@ -77,10 +147,13 @@
         </div>
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
+        <script src="../../../../src/lib/tricolore/dist/tricolore.umd.js"></script>
         <script src="../../insets/overseas.js"></script>
         <script src="../../export.js"></script>
         <script type="module">
             import { json } from 'https://cdn.jsdelivr.net/npm/d3-fetch@3/+esm'
+
+            const { tricolore, tricoloreSextant, CompositionUtils } = window.tricolore
 
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
@@ -90,28 +163,57 @@
             //get data
             const [bachelor, masters, phd] = await Promise.all([json('./data/bachelors.json'), json('./data/masters.json'), json('./data/phd.json')])
 
-            const red = '#E04040'
-            const blue = '#388AE2'
-            const green = '#33A033'
+            let var1Color = '#33A033'
+            let var2Color = '#388AE2'
+            let var3Color = '#E04040'
 
             const legendLabelPosition = 'edge' // 'corner' | 'inside'
             const legendColorTarget = 'points' // 'points' | 'triangles'
             const meanCentering = true
             const initialHue = 160
+            const initialLightness = 50
+            const initialChroma = 130
             const initialBreaks = 29
             const initialSpread = 3.5
 
             const MAPWIDTH = 797
             const MAPHEIGHT = 677
+            const SMALL_MAP_WIDTH = 320
+            const SMALL_MAP_HEIGHT = 278
+
+            const smallMultipleDefinitions = [
+                {
+                    svgId: 'small-map-v1',
+                    title: "Bachelor's",
+                    subtitle: '% share, 2024',
+                    colorRamp: ['#eff8ef', '#d6ecd7', '#a7d8a8', '#72c374', '#33a033'],
+                    data: bachelor,
+                },
+                {
+                    svgId: 'small-map-v2',
+                    title: "Master's",
+                    subtitle: '% share, 2024',
+                    colorRamp: ['#eef4fc', '#d0e1f7', '#a7c9f0', '#6ea6e6', '#388ae2'],
+                    data: masters,
+                },
+                {
+                    svgId: 'small-map-v3',
+                    title: 'PhD',
+                    subtitle: '% share, 2024',
+                    colorRamp: ['#fdeeee', '#f8d3d3', '#efa8a8', '#e97575', '#e04040'],
+                    data: phd,
+                },
+            ]
 
             const map = eurostatmap
                 .map('trivariateChoropleth')
+                .hoverColor('#FFCC00')
                 .insets(insetsCfg)
                 .containerId('container')
                 .footer(true)
                 .header(true)
                 .insetBoxPosition(insetBoxPosition)
-                .position({ x: 4950000, y: 3450000, z: 6000 })
+                .position({ x: 4950000, y: 3440000, z: 5950 })
                 .footnote(
                     'Note: share of students enrolled in ISCED levels 6, 7 and 8. Germany: NUTS level 1. The Netherlands and Albania: national data. Iceland and Albania: 2023. Liechtenstein and Türkiye: 2022. <br>Source: Eurostat (online data code: educ_uoe_enrt06)'
                 )
@@ -119,15 +221,16 @@
 
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
-                .title('Tertiary education students, 2021')
-                .subtitle(
-                    `<tspan x="14" dy="5"><tspan class="badge-green">Bachelor's</tspan> , <tspan class="badge-blue">Master's</tspan> or <tspan class="badge-red">PhD</tspan> students.</tspan>`
-                )
-                .nutsLevel(2)
+                .title('Students enrolled in tertiary education')
+                .subtitle('(% of all tertiary students excluding short-cycle tertiary education, by NUTS 2 regions, 2024)')
+                // .subtitle(
+                //     `<tspan x="14" dy="5"><tspan class="badge-var1">Bachelor's</tspan> , <tspan class="badge-var2">Master's</tspan> or <tspan class="badge-var3">PhD</tspan> students.</tspan>`
+                // )
+                .nutsLevel('mixed')
                 .ternarySettings({
                     hue: initialHue,
-                    chroma: 130,
-                    lightness: 50,
+                    chroma: initialChroma,
+                    lightness: initialLightness,
                     contrast: 0.3,
                     spread: initialSpread,
                     breaks: initialBreaks,
@@ -137,12 +240,7 @@
                 .legend({
                     svgId: 'legend-container',
                     title: 'Education level',
-                    subtitle: `
-                    <tspan x="8" dy="0">Compared to the average...</tspan> 
-                        <tspan x="8" dy="1.2em">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of bachelor's students.</tspan>
-                        <tspan x="8" dy="1.2em">   Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have a higher % of master's students.</tspan>
-                        <tspan x="8" dy="1.2em">Areas with more <tspan fill="${red}" class='subtitle-color'>red</tspan> have a higher % of PhD students.</tspan>
-                    `,
+                    subtitle: getLegendSubtitle(),
 
                     boxOpacity: 0.99,
                     width: 310,
@@ -172,26 +270,139 @@
                 //add footnote
 
                 d3.select('#map #em-footnote-2').remove()
-                d3.selectAll('#map')
+                d3.select('#map')
                     .append('text')
-                    .attr('x', MAPWIDTH - 310)
-                    .attr('y', MAPHEIGHT + 92)
+                    .attr('x', MAPWIDTH - 272)
+                    .attr('y', MAPHEIGHT + 90)
                     .attr('class', 'em-footnote')
                     .attr('id', 'em-footnote-2')
-                    .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+                    .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+
+                d3.select('#map')
+                    .append('text')
+                    .attr('x', MAPWIDTH - 209)
+                    .attr('y', MAPHEIGHT + 103)
+                    .attr('class', 'em-footnote')
+                    .attr('id', 'em-footnote-2')
+                    .html('Cartography: Eurostat – GISCO, 06/2026')
 
                 const newInsets = d3.select('#newInsets')
                 if (!newInsets.empty()) {
                     d3.select('#map').node().appendChild(newInsets.node())
                 }
 
-                const badges = [
-                    { cls: 'badge-green', color: green },
-                    { cls: 'badge-blue', color: blue },
-                    { cls: 'badge-red', color: red },
+                refreshBadgeColors()
+            })
+
+            map.stat('v1', { label: 'Bachelor', unitText: '%' })
+                .stat('v2', { label: 'Master', unitText: '%' })
+                .stat('v3', { label: 'PhD', unitText: '%' })
+            map.build()
+            map.statData('v1').setData(filterNulls(bachelor))
+            map.statData('v2').setData(filterNulls(masters))
+            map.statData('v3').setData(filterNulls(phd))
+
+            buildSmallMultipleMaps()
+
+            // map.updateStatValues()
+
+            function getTernaryCenter() {
+                const stat1 = map.statData('v1').get() || {}
+                const stat2 = map.statData('v2').get() || {}
+                const stat3 = map.statData('v3').get() || {}
+                const compositions = []
+
+                Object.keys(stat1).forEach((id) => {
+                    const v1 = +stat1[id]?.value
+                    const v2 = +stat2[id]?.value
+                    const v3 = +stat3[id]?.value
+
+                    if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
+                        compositions.push([v1, v2, v3])
+                    }
+                })
+
+                if (!meanCentering || compositions.length === 0) {
+                    return [1 / 3, 1 / 3, 1 / 3]
+                }
+
+                return CompositionUtils.centre(compositions)
+            }
+
+            function updateExtremeColors() {
+                const ternarySettings = map.ternarySettings()
+                const center = getTernaryCenter()
+                const extremePoints = [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                    [0, 0, 1],
                 ]
 
-                // subtitle badges (inside #map SVG)
+                const colors = ternarySettings.sextant
+                    ? tricoloreSextant(extremePoints, {
+                          center,
+                          values: ternarySettings.sextantColors,
+                      })
+                    : tricolore(extremePoints, {
+                          center,
+                          breaks: ternarySettings.breaks,
+                          hue: ternarySettings.hue,
+                          chroma: ternarySettings.chroma,
+                          lightness: ternarySettings.lightness,
+                          contrast: ternarySettings.contrast,
+                          spread: ternarySettings.spread,
+                      })
+
+                ;[var1Color, var2Color, var3Color] = colors.map((color, index) => color || [var1Color, var2Color, var3Color][index])
+            }
+
+            function getLegendSubtitle() {
+                return `
+                    <tspan x="8" dy="0">Compared to the average...</tspan> 
+                        <tspan x="8" dy="1.2em">Areas with more   <tspan class="badge-legend-var1">green</tspan>  have a higher % of bachelor's students.</tspan>
+                        <tspan x="8" dy="1.2em">Areas with more   <tspan class="badge-legend-var2">blue</tspan>  have a higher % of master's students.</tspan>
+                        <tspan x="8" dy="1.2em">Areas with more   <tspan class="badge-legend-var3">red</tspan>  have a higher % of PhD students.</tspan>
+                    `
+            }
+
+            function getLegendConfig() {
+                return {
+                    svgId: 'legend-container',
+                    title: 'Education level',
+                    subtitle: getLegendSubtitle(),
+                    boxOpacity: 0.99,
+                    width: 310,
+                    height: 300,
+                    labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
+                    labelPosition: legendLabelPosition,
+                    padding: { top: 15, right: 30, bottom: 0, left: 47 },
+                    showLines: true,
+                    gridBreaks: 5,
+                    minorSubdivisions: 2,
+                    showCenter: meanCentering,
+                    centerLabel: 'Average',
+                    showData: true,
+                    colorTarget: legendColorTarget,
+                    centerAnnotationOffsets: {
+                        labelX: -35,
+                        labelY: 140,
+                        curveX: 0,
+                        curveY: 0,
+                    },
+                }
+            }
+
+            function refreshBadgeColors() {
+                updateExtremeColors()
+
+                document.querySelectorAll('.em-generated-badge').forEach((el) => el.remove())
+
+                const badges = [
+                    { cls: 'badge-var1', color: var1Color },
+                    { cls: 'badge-var2', color: var2Color },
+                    { cls: 'badge-var3', color: var3Color },
+                ]
+
                 const svgEl = document.querySelector('#' + map.svgId_)
                 if (svgEl) {
                     const subtitle = svgEl.querySelector('.em-subtitle')
@@ -204,38 +415,102 @@
                     }
                 }
 
-                // axis title badges (inside #legend-container SVG)
                 const legendSvgEl = document.querySelector('#legend-container')
                 if (legendSvgEl) {
+                    const legendSubtitle = legendSvgEl.querySelector('.em-legend-subtitle')
+                    if (legendSubtitle) {
+                        badges.forEach(({ cls, color }) => {
+                            const legendBadgeClass = cls.replace('badge-', 'badge-legend-')
+                            const tspan = legendSubtitle.querySelector('.' + legendBadgeClass)
+                            if (!tspan) return
+                            applyBadgeToElement(tspan, color, { x: 2, y: 1 })
+                        })
+                    }
+
                     legendSvgEl.querySelectorAll('.em-ternary-axis-title').forEach((el, i) => {
                         applyBadgeToElement(el, badges[i].color)
                     })
-
-                    //legend average indicator badges
-                    // legendSvgEl.querySelectorAll('.em-ternary-center-line-label').forEach((el, i) => {
-                    //     applyBadgeToElement(el, badges[i].color)
-                    // })
                 }
-            })
-
-            map.stat('v1', { label: 'Bachelor', unitText: '%' })
-                .stat('v2', { label: 'Master', unitText: '%' })
-                .stat('v3', { label: 'PhD', unitText: '%' })
-            map.build()
-            map.statData('v1').setData(filterNulls(bachelor))
-            map.statData('v2').setData(filterNulls(masters))
-            map.statData('v3').setData(filterNulls(phd))
-
-            // map.updateStatValues()
+            }
 
             function filterNulls(obj) {
                 return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))
             }
 
-            function applyBadgeToElement(el, color) {
+            function buildSmallMultipleMaps() {
+                smallMultipleDefinitions.forEach((config) => {
+                    const smallMap = eurostatmap
+                        .map('choropleth')
+                        .svgId(config.svgId)
+                        .width(SMALL_MAP_WIDTH)
+                        .height(SMALL_MAP_HEIGHT)
+                        .nutsLevel('mixed')
+                        .nutsYear(2024)
+                        .position({ x: 4950000, y: 3200000, z: 16500 })
+                        .title(config.title)
+                        .titlePosition([5, 20])
+                        //.subtitle(config.subtitle)
+                        .header(false)
+                        .footer(false)
+                        .showSourceLink(false)
+                        .zoomButtons(false)
+                        .hoverColor('#FFCC00')
+                        .classificationMethod('quantile')
+                        .makeClassifNice(false)
+                        .numberOfClasses(config.colorRamp.length)
+                        .colors(config.colorRamp)
+                        .legend({
+                            x: SMALL_MAP_WIDTH - 80,
+                            y: 6,
+                            title: '%',
+                            titlePadding: -10,
+                            noData: false,
+                            noDataText: 'No data',
+                            boxOpacity: 0.94,
+                        })
+
+                    smallMap.build()
+                    smallMap.statData().setData(filterNulls(config.data))
+                })
+            }
+
+            function buildSmallMultiplesExportSVG() {
+                const container = document.querySelector('.small-multiples')
+                if (!container) return null
+
+                const sourceSvgs = Array.from(container.querySelectorAll('svg'))
+                if (!sourceSvgs.length) return null
+
+                const SVG_NS = 'http://www.w3.org/2000/svg'
+                const containerRect = container.getBoundingClientRect()
+                const width = Math.ceil(containerRect.width)
+                const height = Math.ceil(containerRect.height)
+
+                const exportSvg = document.createElementNS(SVG_NS, 'svg')
+                exportSvg.setAttribute('width', width)
+                exportSvg.setAttribute('height', height)
+                exportSvg.setAttribute('viewBox', `0 0 ${width} ${height}`)
+
+                sourceSvgs.forEach((sourceSvg) => {
+                    const rect = sourceSvg.getBoundingClientRect()
+                    const x = rect.left - containerRect.left
+                    const y = rect.top - containerRect.top
+
+                    const clonedSvg = sourceSvg.cloneNode(true)
+                    clonedSvg.setAttribute('x', `${x}`)
+                    clonedSvg.setAttribute('y', `${y}`)
+                    clonedSvg.setAttribute('width', `${Math.ceil(rect.width)}`)
+                    clonedSvg.setAttribute('height', `${Math.ceil(rect.height)}`)
+
+                    exportSvg.appendChild(clonedSvg)
+                })
+
+                return exportSvg
+            }
+
+            function applyBadgeToElement(el, color, pad = { x: 3, y: 2 }) {
                 const textEl = el.closest('text')
                 const bb = el.getBBox()
-                const pad = { x: 3, y: 2 }
 
                 const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
 
@@ -243,6 +518,8 @@
                 if (badgeId) {
                     rect.setAttribute('id', `${badgeId}-badge`)
                 }
+
+                rect.setAttribute('class', 'em-generated-badge')
 
                 rect.setAttribute('x', bb.x - pad.x)
                 rect.setAttribute('y', bb.y - pad.y)
@@ -283,60 +560,54 @@
                 exportToSVG(legendSVG, 'CH03M02-legend.svg')
             })
 
+            const exportSmallMultiplesBtn = document.getElementById('export-small-multiples-btn')
+            exportSmallMultiplesBtn.addEventListener('click', function () {
+                const smallMultiplesSVG = buildSmallMultiplesExportSVG()
+                if (!smallMultiplesSVG) return
+                exportToSVG(smallMultiplesSVG, 'CH03M02-small-multiples.svg')
+            })
+
             const hueSlider = document.getElementById('hue-slider')
             const hueSliderValue = document.getElementById('hue-slider-value')
+            const chromaSlider = document.getElementById('chroma-slider')
+            const chromaSliderValue = document.getElementById('chroma-slider-value')
             const breaksSlider = document.getElementById('breaks-slider')
             const breaksSliderValue = document.getElementById('breaks-slider-value')
             const spreadSlider = document.getElementById('spread-slider')
             const spreadSliderValue = document.getElementById('spread-slider-value')
+            const lightnessSlider = document.getElementById('lightness-slider')
+            const lightnessSliderValue = document.getElementById('lightness-slider-value')
+
+            updateTernaryControls()
 
             function updateTernaryControls() {
                 const hue = Number(hueSlider.value)
+                const chroma = Number(chromaSlider.value)
                 const breaks = Number(breaksSlider.value)
                 const spread = Number(spreadSlider.value)
+                const lightness = Number(lightnessSlider.value)
 
                 hueSliderValue.textContent = String(hue)
+                chromaSliderValue.textContent = String(chroma)
                 breaksSliderValue.textContent = String(breaks)
                 spreadSliderValue.textContent = spread.toFixed(1)
+                lightnessSliderValue.textContent = String(lightness)
 
-                map.ternarySettings({ hue, breaks, spread })
-                map.legend({
-                    svgId: 'legend-container',
-                    title: 'Education level',
-                    subtitle: `
-                    <tspan x="8" dy="0">Compared to the average...</tspan> 
-                        <tspan x="8" dy="1.2em">Areas with more <tspan fill="${green}" class='subtitle-color'>green</tspan> have a higher % of bachelor's students.</tspan>
-                        <tspan x="8" dy="1.2em">   Areas with more <tspan fill="${blue}" class='subtitle-color'>blue</tspan> have a higher % of master's students.</tspan>
-                        <tspan x="8" dy="1.2em">Areas with more <tspan fill="${red}" class='subtitle-color'>red</tspan> have a higher % of PhD students.</tspan>
-                    `,
-
-                    boxOpacity: 0.99,
-                    width: 310,
-                    height: 300,
-                    labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
-                    labelPosition: legendLabelPosition,
-                    padding: { top: 15, right: 30, bottom: 0, left: 47 },
-                    showLines: true,
-                    gridBreaks: breaks,
-                    minorSubdivisions: 2,
-                    showCenter: meanCentering,
-                    centerLabel: 'Average',
-                    showData: true,
-                    colorTarget: legendColorTarget, // 'points' | 'triangles'
-                    centerAnnotationOffsets: {
-                        labelX: -35,
-                        labelY: 140,
-                        curveX: 0,
-                        curveY: 0,
-                    },
-                })
+                map.ternarySettings({ hue, chroma, breaks, spread, lightness })
+                updateExtremeColors()
                 map.updateClassification()
                 map.updateStyle()
+                map.legend(getLegendConfig())
                 map.updateLegend()
+                refreshBadgeColors()
                 //if (map.legendObj()) map.legendObj().update()
             }
 
             hueSlider.addEventListener('input', function () {
+                updateTernaryControls()
+            })
+
+            chromaSlider.addEventListener('input', function () {
                 updateTernaryControls()
             })
 
@@ -345,6 +616,10 @@
             })
 
             spreadSlider.addEventListener('input', function () {
+                updateTernaryControls()
+            })
+
+            lightnessSlider.addEventListener('input', function () {
                 updateTernaryControls()
             })
         </script>

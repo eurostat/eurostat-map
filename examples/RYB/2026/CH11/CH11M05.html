@@ -32,28 +32,43 @@
             .em-kosovo-bn {
                 opacity: 0.4;
             }
-            .em-annotations {
-                pointer-events: none;
-            }
             g.em-annotation-be-nl .connector {
                 transform: translate(-20px, -13px);
+            }
+            .em-cntrg {
+                fill: #f2f2f2 !important;
+            }
+            .em-cntbn {
+                opacity: 0.4 !important;
+            }
+            .a-napoli .annotation-note-title {
+                transform: translate(0px, 10px);
             }
         </style>
     </head>
 
     <body>
         <div>
+            <button id="toggle-edit-mode-btn" type="button">Toggle annotation edit mode</button>
+            <button id="export-annotations-btn" type="button">Export annotations JSON</button>
+            |
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
         </div>
-        <svg id="ports-map"></svg>
+        <svg id="map"></svg>
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
+        <script src="./exportAnnotations.js"></script>
 
         <script type="module">
-            const mapWidth = 1080
-            const mapHeight = 900
+            const MAPWIDTH = 1080
+            const MAPHEIGHT = 900
+            const annotationsFileName = 'maritime-passengers-annotations.json'
+            const annotationsFilePath = `./data/M05/${annotationsFileName}`
+            const loadedAnnotations = await (await fetch(annotationsFilePath)).json()
+            window.ch11M05Annotations = loadedAnnotations
+            let annotationsEditMode = false
 
             //data load
             const [stats] = await Promise.all([d3.json('./data/M05/maritime-passengers.json')])
@@ -88,11 +103,11 @@
             }
             const getApproxCurrentGeoBbox = function () {
                 const defaultPosition = { x: 4790000, y: 3420000, z: 1000 }
-                const halfWidth = 0.6 * defaultPosition.z * mapWidth
-                const halfHeight = 0.6 * defaultPosition.z * mapHeight
+                const halfWidth = 0.6 * defaultPosition.z * MAPWIDTH
+                const halfHeight = 0.6 * defaultPosition.z * MAPHEIGHT
                 return [defaultPosition.x - halfWidth, defaultPosition.y - halfHeight, defaultPosition.x + halfWidth, defaultPosition.y + halfHeight]
             }
-            const portsProjection = d3.geoIdentity().reflectY(true).fitSize([mapWidth, mapHeight], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
+            const portsProjection = d3.geoIdentity().reflectY(true).fitSize([MAPWIDTH, MAPHEIGHT], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
 
             // build map
             const insetHeight = 90,
@@ -100,13 +115,16 @@
                 padding = 10
             const map = eurostatmap
                 .map('mushroom')
-                .svgId('ports-map')
+                .svgId('map')
+                .title('Maritime passengers carried')
+                .subtitle('(by main ports, 2024)')
                 .footer(true)
+                .header(true)
                 .footnote(
-                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). <br> Source: Eurostat (online data code: mar_pa_aa)'
+                    'Note: the map shows data for ports with at least 100 000 passengers carried (total of embarked and disembarked). Top 10 labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
                 )
-                .width(mapWidth)
-                .height(mapHeight)
+                .width(MAPWIDTH)
+                .height(MAPHEIGHT)
                 .position({ x: 4790000, y: 3420000, z: 4500 })
                 .nutsLevel(0)
                 .dorling(true)
@@ -119,7 +137,7 @@
                 .legend({
                     title: 'Passengers',
                     x: 10,
-                    y: 160,
+                    y: 250,
                     sizeLegend: {
                         values: [5700000, 1000000],
                         labels: ['5.7 million', '1 million'],
@@ -129,7 +147,7 @@
                 .tooltip({
                     textFunction: tooltipTextFunction,
                 })
-                .insetBoxPosition([mapWidth - insetWidth - 20, 10])
+                .insetBoxPosition([MAPWIDTH - insetWidth - 20, 10])
                 .insets([
                     // {
                     //     x: -230,
@@ -198,21 +216,29 @@
                 .onBuild(() => {
                     const portKeys = stats.map((d) => d.code)
                     //color regions
-                    d3.selectAll('#ports-map .em-nutsrg path').attr('fill', (d) => {
+                    d3.selectAll('#map .em-nutsrg path').attr('fill', (d) => {
                         const iso = d.properties.id // e.g. "NL"
                         const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
                         return hasPort ? '#fff4cc' : '#F2F2F2'
                     })
 
                     // --- REMOVE if it already exists ---
-                    d3.select('#ports-map #em-footnote-2').remove()
-                    d3.selectAll('#ports-map')
+                    d3.select('#map #em-footnote-2').remove()
+                    d3.select('#map')
                         .append('text')
-                        .attr('x', mapWidth - 310)
-                        .attr('y', mapHeight + 20)
+                        .attr('x', MAPWIDTH - 272)
+                        .attr('y', MAPHEIGHT + 83)
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
-                        .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+                        .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+
+                    d3.select('#map')
+                        .append('text')
+                        .attr('x', MAPWIDTH - 209)
+                        .attr('y', MAPHEIGHT + 96)
+                        .attr('class', 'em-footnote')
+                        .attr('id', 'em-footnote-2')
+                        .html('Cartography: Eurostat – GISCO, 06/2026')
                 })
                 .filterGeometriesFunction((geometries) => {
                     //remove greenland to stop title overlap
@@ -305,11 +331,31 @@
                     })
                     return geometries
                 })
+                .annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M05Annotations,
+                })
 
             map.stat('v1', { label: 'Disembarked' }).stat('v2', { label: 'Embarked' })
             map.build()
             map.statData('v1').setData(filterNulls(inwardData))
             map.statData('v2').setData(filterNulls(outwardData))
+
+            const editModeBtn = document.getElementById('toggle-edit-mode-btn')
+            editModeBtn.addEventListener('click', function () {
+                annotationsEditMode = !annotationsEditMode
+                map.annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M05Annotations,
+                })
+            })
+
+            const exportAnnotationsBtn = document.getElementById('export-annotations-btn')
+            exportAnnotationsBtn.addEventListener('click', function () {
+                const result = generateMapAnnotations(window.ch11M05Annotations)
+                downloadAnnotationsJSON(result, annotationsFileName)
+                console.log('Exported annotations:', result)
+            })
 
             function filterNulls(obj) {
                 return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))

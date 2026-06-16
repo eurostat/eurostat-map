@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Tourism coxcomb map</title>
+        <title>Tourism Coxcomb Map - CH10M02</title>
         <link rel="stylesheet" href="../../insets/insets.css" />
         <link rel="stylesheet" href="../../styles.css" />
         <style>
@@ -27,9 +27,6 @@
             }
             .em-legend-wedge {
                 stroke: black !important;
-            }
-            .em-coxcomb-chart {
-                stroke-width: 0.1 !important;
             }
         </style>
     </head>
@@ -122,7 +119,7 @@
                     .height(MAPHEIGHT)
                     .header(true)
                     .title('Nights spent in tourist accommodation')
-                    .subtitle('by month, 2024')
+                    .subtitle('(by NUTS 2 regions, 2024)')
                     .position({ x: 4800000, y: 3400000, z: 6000 })
                     .dorling(true)
                     .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
@@ -142,6 +139,8 @@
                     })
                     .coxcombMaxRadius(34)
                     .coxcombMinRadius(5)
+                    .coxcombStrokeWidth(0)
+                    .coxcombStrokeFill('none')
                     .coxcombRings(false)
                     .zoomButtons(false)
                     .insets(insetsCfg)
@@ -172,7 +171,7 @@
                     .ribbonHeight(50)
                     .footnoteWrap(90)
                     .footnote(
-                        "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year."
+                        "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year. <br>Source: Eurostat (online data codes: tour_occ_nin2m and tour_occ_nim)"
                     )
                     .onBuild(() => {
                         // move newInsets inside #map
@@ -183,14 +182,21 @@
 
                         //add cartography footnote
                         d3.select('#map #em-footnote-2').remove()
-                        d3.selectAll('#map')
+                        d3.select('#map')
                             .append('text')
-                            .attr('x', MAPWIDTH - 308)
+                            .attr('x', MAPWIDTH - 272)
                             .attr('y', MAPHEIGHT + 83)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
-                            .append('tspan')
-                            .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM')
+                            .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+
+                        d3.select('#map')
+                            .append('text')
+                            .attr('x', MAPWIDTH - 209)
+                            .attr('y', MAPHEIGHT + 96)
+                            .attr('class', 'em-footnote')
+                            .attr('id', 'em-footnote-2')
+                            .html('Cartography: Eurostat – GISCO, 06/2026')
                     })
                     .zoomExtent([0.9, 100])
                     .build()

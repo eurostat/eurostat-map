@@ -8,7 +8,7 @@ import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } fro
 import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
 import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
-import { adjustGridCartogramTextLabels } from '../../core/cartograms'
+import { adjustGridCartogramTextLabels, getGridCartogramChartOffset } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
 import { createRadialScale } from '../../core/scale.js'
 import { getCentroidsGroup } from '../../core/geo/centroids'
@@ -39,7 +39,7 @@ export const map = function (config) {
     out.coxcombMinRadius_ = 10
     out.coxcombMaxRadius_ = 30
     out.coxcombStrokeFill_ = 'white'
-    out.coxcombStrokeWidth_ = 0.3
+    out.coxcombStrokeWidth_ = 0.1
     out.coxcombRings_ = false
     out.coxcombOffsets_ = { x: 0, y: 0 }
     out.hoverColor_ = '#ffa500'
@@ -702,8 +702,8 @@ export const map = function (config) {
             chartG
                 .append('g')
                 .attr('class', 'em-coxcomb-chart')
-                .attr('stroke', '#ffffff')
-                .attr('stroke-width', 0.1 / scaleFactor)
+                .attr('stroke', out.coxcombStrokeFill_)
+                .attr('stroke-width', out.coxcombStrokeWidth_ / scaleFactor)
                 .selectAll('path')
                 .data(stackedData[ki])
                 .join('path')
@@ -774,6 +774,9 @@ export const map = function (config) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
         const offsets = { ...(out.coxcombOffsets_ || { x: 0, y: 0 }) }
+        const sharedOffset = getGridCartogramChartOffset(out)
+        offsets.x += sharedOffset.x
+        offsets.y += sharedOffset.y
 
         if (out.gridCartogramSettings_.shape === 'hexagon') {
             offsets.x -= (out.coxcombWidth_ || 0) - 4

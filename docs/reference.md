@@ -72,6 +72,7 @@ Create a map with `let map = eurostatmap.map( mapType )`. Set the parameter `map
 - `"flow"` for a [flow map](#flow-map).
 - `"coxcomb"` for a [coxcomb map](#coxcomb-map).
 - `"mushroom"` for a [mushroom map](#mushroom-map).
+- `"waffle"` for a [waffle map](#waffle-map).
 
 The `map` can then be customised with the methods listed in the tables below. Most of the map methods follow the pattern _map_.**myMethod**([*value*]): If a _value_ is specified, the method sets the parameter value and returns the _map_ object itself. If no _value_ is specified, the method returns the current value of the parameter.
 
@@ -94,7 +95,7 @@ Specify the NUTS geometries and the geographical extent of the map.
 | Method                             | Type           | Default value                | Description                                                                                                                                                                                                                                                                                                                               |
 | ---------------------------------- | -------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**nutsLevel**([*value*])     | int/string     | _3_                          | The nuts level to show on the map, from 0 (national level) to 3 (more local level). Note that not all NUTS levels are always available for Eurostat databases. When using custom data sources and mixing different NUTS levels, set this option to "mixed" to show the different levels at once.                                          |
-| _map_.**nutsYear**([*value*])      | int            | _2016_                       | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
+| _map_.**nutsYear**([*value*])      | int            | _2024_                       | The version of the NUTS dataset to use. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that the default value will be adjusted in the future depending on the [NUTS legislation in force](https://ec.europa.eu/eurostat/web/nuts/legislation).                                                |
 | _map_.**geo**([*value*])           | String         | _"EUR"_                      | The map geographical territory, by default the entire European territory _"EUR"_. For world maps use "WORLD" and set proj to 54030. Note that world templates are currently only available for choropleth maps. Other possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#overseas-territories---map-insets). |
 | _map_.**proj**([*value*])          | String         | _"3035"_                     | The map projection EPSG code. For world maps: use 54030. Possible values are given in [Nuts2json](https://github.com/eurostat/Nuts2json/#api). Note that these values depend on the geographical territory.                                                                                                                               |
 | _map_.**scale**([*value*])         | String         | _"20M"_                      | The simplification level of the map, among _"03M"_, _"10M"_, _"20M"_, _"60M"_ (for Europe). The most simplified version is _"60M"_. The level _"01M"_ is also available for some geographical territories: For more information on possible values by geographical territory, see [Nuts2json](https://github.com/eurostat/Nuts2json/).    |
@@ -106,9 +107,9 @@ Specify the NUTS geometries and the geographical extent of the map.
 
 It is also possible to build thematic world maps using eurostat-map. Simply pass "WORLD" to the map.geo() method. See [this example](https://github.com/eurostat/eurostat-map/blob/master/examples/choropleth/world.html) for how to configure a world map.
 
-| Method                                  | Type          | Default value       | Description                                                            |
-| --------------------------------------- | ------------- | ------------------- | ---------------------------------------------------------------------- |
-| _map_.**projectionFunction**([*value*]) | d3 projection | _d3.geoRobninson()_ | Here you can define your own custom projection function for world maps |
+| Method                                  | Type          | Default value      | Description                                                            |
+| --------------------------------------- | ------------- | ------------------ | ---------------------------------------------------------------------- |
+| _map_.**projectionFunction**([*value*]) | d3 projection | _d3.geoRobinson()_ | Here you can define your own custom projection function for world maps |
 
 #### Custom geometries
 
@@ -245,27 +246,28 @@ eurostatmap
     .map('choropleth')
     .title('Population in Europe')
     .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inhab./km²' })
-    .classifMethod('threshold')
-    .threshold([50, 75, 100, 150, 300, 850])
+    .classificationMethod('threshold')
+    .thresholds([50, 75, 100, 150, 300, 850])
     .tooltipShowFlags(false)
     .legend({ noData: false, decimals: 0, x: 15, y: 160 })
     .build()
 ```
 
-| Method                                    | Type      | Default value          | Description                                                                                                                                                                               |
-| ----------------------------------------- | --------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**numberOfClasses**([*value*])      | int       | _7_                    | The number of classes. When _classificationMethod == "threshold"_, this parameter is inferred from the number of breaks specified.                                                        |
-| _map_.**classificationMethod**([*value*]) | String    | _"quantile"_           | The classification method. Possible values are _"ckmeans"\_\_"jenks"_,_"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshol (see threshold method). |
-| _map_.**colors**([*value*])               | Array     | _null_                 | The colours to use for the classes. if unspecified, default colorFun is used.                                                                                                             |
-| _map_.**thresholds**([*value*])           | Array     | _[0]_                  | If _classifMethod = "threshold"_, the breaks of the classification.                                                                                                                       |
-| _map_.**makeClassifNice**([*value*])      | _boolean_ | true                   | Make nice break values. Works only for _classifMethod = "equinter"_.                                                                                                                      |
-| _map_.**colorFunction**([*value*])        | Function  | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                         |
-| _map_.**classToFillStyle**([*value*])     | Function  | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorFunction(colorFun())`.                                       |
-| _map_.**noDataFillStyle**([*value*])      | String    | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                                         |
-| _map_.**colorSchemeType**([*value*])      | String    | _"discrete"_           | Discrete or continuous                                                                                                                                                                    |
-| _map_.**valueTransform**([*value*])       | Function  | _"(val)=>val"_         | Transform your data for distribution stretching when using continuous colour schemes.                                                                                                     |
-| _map_.**valueUntransform**([*value*])     | Function  | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in .                                                                           |
-| _map_.**pointOfDivergence**([*value*])    | Function  | _"undefined"_          | Set point of divergence for diverging continuous color schemes.                                                                                                                           |
+| Method                                    | Type        | Default value          | Description                                                                                                                                                                               |
+| ----------------------------------------- | ----------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**numberOfClasses**([*value*])      | int         | _7_                    | The number of classes. When _classificationMethod == "threshold"_, this parameter is inferred from the number of breaks specified.                                                        |
+| _map_.**classificationMethod**([*value*]) | String      | _"quantile"_           | The classification method. Possible values are _"ckmeans"\_\_"jenks"_,_"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshol (see threshold method). |
+| _map_.**colors**([*value*])               | Array       | _null_                 | The colours to use for the classes. if unspecified, default colorFun is used.                                                                                                             |
+| _map_.**thresholds**([*value*])           | Array       | _[0]_                  | If _classificationMethod = "threshold"_, the breaks of the classification.                                                                                                                |
+| _map_.**makeClassifNice**([*value*])      | _boolean_   | false                  | Make nice break values. Works only for _classificationMethod = "equinter"_.                                                                                                               |
+| _map_.**colorFunction**([*value*])        | Function    | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                         |
+| _map_.**classToFillStyle**([*value*])     | Function    | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorFunction(colorFun())`.                                       |
+| _map_.**noDataFillStyle**([*value*])      | String      | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                                         |
+| _map_.**colorSchemeType**([*value*])      | String      | _"discrete"_           | Discrete or continuous                                                                                                                                                                    |
+| _map_.**valueTransform**([*value*])       | Function    | _"(val)=>val"_         | Transform your data for distribution stretching when using continuous colour schemes.                                                                                                     |
+| _map_.**valueUntransform**([*value*])     | Function    | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in .                                                                           |
+| _map_.**pointOfDivergence**([*value*])    | number/null | _null_                 | Set point of divergence for diverging continuous color schemes.                                                                                                                           |
+| _map_.**skipNormalization**([*value*])    | boolean     | _false_                | Skip normalization in continuous colour mode (useful when values are already normalized).                                                                                                 |
 
 ### Proportional symbol map
 
@@ -332,20 +334,24 @@ Please be aware that by using this method you will essentially be turning the ma
 | _map_.**psCustomSVG**([*value*])            | Template Literal | null                      | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psCustomSVG(`<svg width="100" height="100"><rect width="100" height="100" /></svg>`). |
 | _map_.**psOffset**([*value*])               | Object           | {x:0,y:0}                 | Defines the offsets to apply to the symbols on the map. Only applicable to symbols where custom svgs are specified ( through psCustomSVG)                                                |
 | _map_.**psMaxSize**([*value*])              | number           | _30_                      | The maximum size of the symbol. For shapes and vertical bars, this value is in pixels, but for psCustomSVG() it represents the scale factor of the transform applied to it.              |
-| _map_.**psMinSize**([*value*])              | number           | _0.8_                     | The minimum size / scale of the symbol.                                                                                                                                                  |
+| _map_.**psMinSize**([*value*])              | number           | _5_                       | The minimum size / scale of the symbol.                                                                                                                                                  |
 | _map_.**psMaxValue**([*value*])             | number           | _dataset's maximum value_ | Manually set the maximum value of the data, for example to ensure different maps use the same size scale.                                                                                |
 | _map_.**psMinValue**([*value*])             | number           | _dataset's minimum value_ | Manually set the minimum value of the data, for example to ensure different maps use the same size scale.                                                                                |
-| _map_.**psBarWidth**([*value*])             | number           | _5_                       | Width in pixels of the vertical bars. Only to be used with a psShape of type "bar"                                                                                                       |
-| _map_.**psFill**([*value*])                 | String           | _"#B45F04"_               | The fill color or pattern of the symbol, for when a colour scheme is not defined.                                                                                                        |
-| _map_.**psFillOpacity**([*value*])          | number           | _0.7_                     | The opacity of the symbol, from 0 to 1.                                                                                                                                                  |
+| _map_.**psBarWidth**([*value*])             | number           | _10_                      | Width in pixels of the vertical bars. Only to be used with a psShape of type "bar"                                                                                                       |
+| _map_.**psFill**([*value*])                 | String           | _"#009569"_               | The fill color or pattern of the symbol, for when a colour scheme is not defined.                                                                                                        |
+| _map_.**psFillOpacity**([*value*])          | number           | _1_                       | The opacity of the symbol, from 0 to 1.                                                                                                                                                  |
+| _map_.**psStrokeOpacity**([*value*])        | number           | _1_                       | The opacity of the symbol stroke, from 0 to 1.                                                                                                                                           |
 | _map_.**psStroke**([*value*])               | String           | _"#fff"_                  | The stroke color of the symbol.                                                                                                                                                          |
-| _map_.**psStrokeWidth**([*value*])          | number           | _0.3_                     | The width of the stroke.                                                                                                                                                                 |
+| _map_.**psStrokeWidth**([*value*])          | number           | _0.2_                     | The width of the stroke.                                                                                                                                                                 |
 | _map_.**psClasses**([*value*])              | number           | _5_                       | The number of classes to use when applying data-driven colour for the symbols. Similar to numberOfClasses() for choropleth maps.                                                         |
 | _map_.**psColorFun**([*value*])             | function         | _d3.interpolateOrRd_      | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                        |
 | _map_.**psSizeScale**([*value*])            | string           | 'sqrt' or 'linear'        | The D3 scale function used to define the sizes of the symbols. The following methods are then called internally: psSizeScale().domain(sizeDomain).range([psMinSize, psMaxSize])          |
 | _map_.**psClassificationMethod**([*value*]) | String           | _"quantile"_              | The classification method. Possible values are _"quantile"_, _"equinter"_ for equal intervals, and _"threshold"_ for user defined threshold (see threshold method).                      |
 | _map_.**psThresholds**([*value*])           | Array            | _[0]_                     | If _psClassificationMethod = "threshold"_, the breaks of the classification.                                                                                                             |
 | _map_.**psColors**([*value*])               | Array            | null                      | The colours to be using data-driven colour. The number of colours specified in the array should match the number of classes (specified using psClasses())                                |
+| _map_.**psSpikeWidth**([*value*])           | number           | _7_                       | Width of spike symbols when `psShape("spike")` is used.                                                                                                                                  |
+| _map_.**psCodeLabels**([*value*])           | boolean          | _false_                   | Show region codes inside proportional symbols.                                                                                                                                           |
+| _map_.**psBrightenFactor**([*value*])       | number           | _0.9_                     | Brightening factor used for region background color beneath symbols.                                                                                                                     |
 | _map_.**noDataFillStyle**([*value*])        | String           | _"lightgray"_             | The fill style to be used for regions where no data is available.                                                                                                                        |
 
 ### Proportional pie chart map
@@ -460,14 +466,14 @@ eurostatmap
 
 When `customData` is supplied, `eurostatDatasetCode` and `categoryParameter` are not required. An optional `totalCode` key inside each region object can be provided for the "other" wedge calculation; if omitted the total is auto-computed from the sum of `categoryCodes`.
 
-| Method                                    | Type    | Default value | Description                                                                                                                                                                                        |
-| ----------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Method                                    | Type    | Default value | Description                                                                                                                                                                                                                                  |
+| ----------------------------------------- | ------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**compositionSettings**([*value*])  | object  | _auto_        | Composition-level settings for chart symbols: `type`, `radarValueMode` (`share` or `absolute`), `minSize`, `maxSize`, `strokeFill`, `strokeWidth`, `stripesOrientation`, `offsetAngle`, `agePyramidHeightFactor`, `otherColor`, `otherText`. |
-| _map_.**pieSettings**([*value*])          | object  | _auto_        | Pie-specific settings. Currently supports `innerRadius` to render donut charts.                                                                                                                    |
-| _map_.**catColors**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code. If not specified, different colors are proposed.                                                                                               |
-| _map_.**catLabels**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code.                                                                                                                                                |
-| _map_.**showOnlyWhenComplete**([*value*]) | boolean | _false_       | Draw a region only when data is available for all categories. If one is missing, the region is considered as with 'no data'. If not, the value of missing data is set to 0.                        |
-| _map_.**noDataFillStyle**([*value*])      | string  | _"darkgray"_  | The fill style to be used for regions where no data is available.                                                                                                                                  |
+| _map_.**pieSettings**([*value*])          | object  | _auto_        | Pie-specific settings. Currently supports `innerRadius` to render donut charts.                                                                                                                                                              |
+| _map_.**catColors**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code. If not specified, different colors are proposed.                                                                                                                                         |
+| _map_.**catLabels**([*value*])            | object  | _auto_        | The colors of the slices, indexed by category code.                                                                                                                                                                                          |
+| _map_.**showOnlyWhenComplete**([*value*]) | boolean | _false_       | Draw a region only when data is available for all categories. If one is missing, the region is considered as with 'no data'. If not, the value of missing data is set to 0.                                                                  |
+| _map_.**noDataFillStyle**([*value*])      | string  | _"darkgray"_  | The fill style to be used for regions where no data is available.                                                                                                                                                                            |
 
 In addition to [the default legend parameters](#map-legend), proportional pie chart maps have the [these specific legend parameters](#pie-chart-legends):
 
@@ -535,6 +541,8 @@ eurostatmap
 | _map_.**endColor**([*value*])         | color    | _"#2a5a5b"_   | The color for highest values of both variables.                                                                  |
 | _map_.**classifier1**([*value*])      | Function | _auto_        | A function which returns a class number from a stat value. This allows you to set the class thresholds manually. |
 | _map_.**classifier2**([*value*])      | Function | _auto_        | A function which returns a class number from a stat value. This allows you to set the class thresholds manually. |
+| _map_.**breaks1**([*value*])          | Array    | _undefined_   | Manual class breaks for variable 1 (used instead of quantiles).                                                  |
+| _map_.**breaks2**([*value*])          | Array    | _undefined_   | Manual class breaks for variable 2 (used instead of quantiles).                                                  |
 | _map_.**classToFillStyle**([*value*]) | Function | _auto_        | A function returning the colors for each pair of classes i,j.                                                    |
 | _map_.**noDataFillStyle**([*value*])  | color    | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                |
 
@@ -629,6 +637,14 @@ eurostatmap
 
 When `sextant: true` is enabled, `hue`, `chroma`, `lightness`, `contrast`, `spread` and `breaks` are ignored for polygon colouring, but the legend still uses the current ternary centre.
 
+| Method                               | Type     | Default value                  | Description                                          |
+| ------------------------------------ | -------- | ------------------------------ | ---------------------------------------------------- |
+| _map_.**ternaryCodes**([*value*])    | string[] | _['v1', 'v2', 'v3']_           | Dataset keys used for ternary composition.           |
+| _map_.**noDataFillStyle**([*value*]) | string   | _"#ccc"_                       | Fill style for regions with missing trivariate data. |
+| _map_.**ternarySettings**([*value*]) | object   | _see defaults in example/code_ | Ternary colour settings object.                      |
+
+`ternarySettings` keys: `sextant`, `sextantColors`, `hue`, `chroma`, `lightness`, `contrast`, `spread`, `breaks`, `meanCentering`.
+
 ### Stripe composition map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/comp1.png)](https://eurostat.github.io/eurostat-map/examples/stripe/livestock_composition.html)
@@ -688,16 +704,20 @@ eurostatmap
     .legend({ x: 550, y: 10, title: 'Population by age' })
 ```
 
-| Method                                    | Type    | Default value | Description                                                                                                                                                                 |
-| ----------------------------------------- | ------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**stripeWidth**([*value*])          | number  | _50_          | Width of the stripes series.                                                                                                                                                |
-| _map_.**stripeOrientation**([*value*])    | number  | _0_           | Orientation of the stripes, in degree. Set to 0 for vertical and 90 for horizontal.                                                                                         |
-| _map_.**catColors**([*value*])            | object  | _auto_        | The colors of the stripes, indexed by category code. If not specified, different colors are proposed.                                                                       |
-| _map_.**catLabels**([*value*])            | object  | _auto_        | The colors of the stripes, indexed by category code.                                                                                                                        |
-| _map_.**showOnlyWhenComplete**([*value*]) | boolean | _false_       | Draw a region only when data is available for all categories. If one is missing, the region is considered as with 'no data'. If not, the value of missing data is set to 0. |
-| _map_.**noDataFillStyle**([*value*])      |         | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                                                                           |
-| _map_.**pieChartRadius**([*value*])       |         | _40_          | Radius of the pie chart to show in the tooltip.                                                                                                                             |
-| _map_.**pieChartInnerRadius**([*value*])  |         | _15_          | Inner radius of the pie chart to show in the tooltip.                                                                                                                       |
+| Method                                    | Type     | Default value | Description                                                                                                                                                                 |
+| ----------------------------------------- | -------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**stripeWidth**([*value*])          | number   | _50_          | Width of the stripes series.                                                                                                                                                |
+| _map_.**stripeOrientation**([*value*])    | number   | _0_           | Orientation of the stripes, in degree. Set to 0 for vertical and 90 for horizontal.                                                                                         |
+| _map_.**catColors**([*value*])            | object   | _auto_        | The colors of the stripes, indexed by category code. If not specified, different colors are proposed.                                                                       |
+| _map_.**catLabels**([*value*])            | object   | _auto_        | The colors of the stripes, indexed by category code.                                                                                                                        |
+| _map_.**showOnlyWhenComplete**([*value*]) | boolean  | _false_       | Draw a region only when data is available for all categories. If one is missing, the region is considered as with 'no data'. If not, the value of missing data is set to 0. |
+| _map_.**noDataFillStyle**([*value*])      |          | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                                                                           |
+| _map_.**pieChartRadius**([*value*])       |          | _40_          | Radius of the pie chart to show in the tooltip.                                                                                                                             |
+| _map_.**pieChartInnerRadius**([*value*])  |          | _15_          | Inner radius of the pie chart to show in the tooltip.                                                                                                                       |
+| _map_.**stripeOtherColor**([*value*])     | string   | _auto_        | Colour used for the optional "other" stripe category.                                                                                                                       |
+| _map_.**stripeOtherText**([*value*])      | string   | _"other"_     | Label used for the optional "other" stripe category.                                                                                                                        |
+| _map_.**stripeTotalCode**([*value*])      | string   | _undefined_   | Category code used as the total reference when computing shares/other.                                                                                                      |
+| _map_.**statCodes**([*value*])            | string[] | _undefined_   | Explicit stat code order used by composition rendering/legends.                                                                                                             |
 
 In addition to [the default legend parameters](#map-legend), stripe composition maps have the following specific legend parameters:
 
@@ -744,7 +764,7 @@ eurostatmap
 
 `statSpark` also accepts a `customData` option as an alternative to `eurostatDatasetCode`. The dates are inferred from the key order of the first region's entries when no explicit `dates` array is provided:
 
-````javascript
+```javascript
 .statSpark({
     customData: {
         DE: { '2020': 200, '2021': 190, '2022': 210, '2023': 205 },
@@ -754,19 +774,23 @@ eurostatmap
     labels: ['2020', '2021', '2022', '2023'], // optional display labels
     unitText: 'people',
 })
+```
 
 | Method                                      | Type              | Default                                                                                           | Description                                                                                                                                                                                                                                                                  |
 | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**sparkType**([*value*])              | string            | "area"                                                                                            | Type of chart to use. Can be 'line' or 'area'                                                                                                                                                                                                                                |
+| _map_.**sparkType**([*value*])              | string            | "area"                                                                                            | Type of chart to use. Can be 'line', 'area' or 'bar'                                                                                                                                                                                                                         |
 | _map_.**sparkLineColor**([*value*])         | string / Function | "black"                                                                                           | colour of the sparklines. Also accepts an acessor function e.g: `.sparkLineColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                                                                  |
-| _map_.**sparkAreaColor**([*value*])         | string / Function | "#41afaa"                                                                                         | colour of the area chart fill (when sparkType set to area) Also accepts an acessor function e.g: `.sparkAreaColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                                 |
+| _map_.**sparkLineAreaColor**([*value*])     | string / Function | "#41afaa"                                                                                         | colour of the area chart fill (when sparkType set to area) Also accepts an acessor function e.g: `.sparkLineAreaColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                             |
 | _map_.**sparkLineWidth**([*value*])         | number            | 30                                                                                                | width of the spark charts                                                                                                                                                                                                                                                    |
 | _map_.**sparkLineHeight**([*value*])        | number            | 20                                                                                                | height of the spark charts                                                                                                                                                                                                                                                   |
 | _map_.**sparkLineStrokeWidth**([*value*])   | number            | 0.4                                                                                               | stroke width of the spark lines                                                                                                                                                                                                                                              |
 | _map_.**sparkLineOpacity**([*value*])       | number            | 0.6                                                                                               | opacity of the spark lines                                                                                                                                                                                                                                                   |
-| _map_.**sparkChartCircleRadius**([*value*]) | number            | 0.5                                                                                               | Radius of the circles at each record                                                                                                                                                                                                                                         |
+| _map_.**sparkLineCircleRadius**([*value*])  | number            | 0.5                                                                                               | Radius of the circles at each record                                                                                                                                                                                                                                         |
 | _map_.**sparkTooltipChart**([*value*])      | object            | {width: 100, height: 80, margin: { left: 60, right: 40, top: 40, bottom: 40 }, circleRadius: 1.5} | config for the chart shown in the tooltip                                                                                                                                                                                                                                    |
 | _map_.**sparkLineChartFunction**([*value*]) | function          | undefined                                                                                         | you can specify your own logic for drawing the sparkline charts. Arguments passed to it are (node, data, width, height, isForTooltip) See [custom_chart_function](https://github.com/eurostat/eurostat-map/blob/master/test/map-types/sparklines/custom_chart_function.html) |
+| _map_.**sparkLineOffsets**([*value*])       | object {x,y}      | _{x:0,y:0}_                                                                                       | Offsets applied to sparkline chart position within each region.                                                                                                                                                                                                              |
+| _map_.**showOnlyWhenComplete**([*value*])   | boolean           | _false_                                                                                           | Draw region charts only when data is complete for all expected records.                                                                                                                                                                                                      |
+| _map_.**sparklineData**([*value*])          | object            | _undefined_                                                                                       | Provide sparkline data directly instead of fetching via Eurostat.                                                                                                                                                                                                            |
 
 ### Flow map
 
@@ -783,7 +807,7 @@ const exampleGraph = {
         { id: 'IT' },
         { id: 'ES' },
         { id: 'BE' },
-`       // alternatively, specify custom nodes with their own x/y
+        // alternatively, specify custom nodes with their own x/y
         { id: 'Custom', x: 420000, y: 320000 },
     ],
     links: [
@@ -801,7 +825,7 @@ const map = eurostatmap
     .nutsLevel(0)
     .flowColor('#72bb6f') // can be a function
     .flowRegionColors(['#bbd7ee', '#c7e3c6']) // origins, destinations
-    .flowRegionLabels(['importer','exporter'])
+    .flowRegionLabels(['importer', 'exporter'])
     .flowArrows(false)
     .flowOutlines(true)
     .flowOutlineWidth(1)
@@ -811,35 +835,42 @@ const map = eurostatmap
     .flowMinWidth(1)
 
     .build()
-````
+```
 
-| Method                                     | Type               | Default                                                    | Description                                                                                                                                                                                          |
-| ------------------------------------------ | ------------------ | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**flowGraph**([*value*])             | Object             | undefined                                                  | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey.                                                                           |
-| _map_.**flowColor**([*value*])             | String or Function | '#72bb6f'                                                  | The color of the flows and arrows.                                                                                                                                                                   |
-| _map_.**flowArrows**([*value*])            | boolean            | true                                                       | Whether to show arrow tips or not.                                                                                                                                                                   |
-| _map_.**flowOutlines**([*value*])          | boolean            | true                                                       | Whether to show flow outlines or not.                                                                                                                                                                |
-| _map_.**flowOutlineWidth**([*value*])      | number             | 1.2                                                        | Width of flow outlines.                                                                                                                                                                              |
-| _map_.**flowOutlineColor**([*value*])      | string             | '#ffffff'                                                  | Color of flow outlines.                                                                                                                                                                              |
-| _map_.**flowColorGradient**([*value*])     | boolean            | true                                                       | Whether to show gradients along the flow line (from origin color to destination color) or not.                                                                                                       |
-| _map_.**flowOpacityGradient**([*value*])   | boolean            | true                                                       | Whether to apply an opacity gradient from origin to destination. not.                                                                                                                                |
-| _map_.**flowWidthGradient**([*value*])     | boolean            | true                                                       | Whether to gradually scale flow thickness (from origin to destination) or not.                                                                                                                       |
-| _map_.**flowMaxWidth**([*value*])          | number             | 30                                                         | Maximum width of flow lines in px                                                                                                                                                                    |
-| _map_.**flowMinWidth**([*value*])          | number             | 1                                                          | Minimum width of flow lines in px                                                                                                                                                                    |
-| _map_.**flowLineType**([*value*])          | string             | 'curved'                                                   | 'curved' (sankey) or 'straight'                                                                                                                                                                      |
-| _map_.**flowStack**([*value*])             | boolean            | true                                                       | when flowLineType is curved, this option will stack flows at origin/destination (or not)                                                                                                             |
-| _map_.**flowLabelOffsets**([*value*])      | object {x,y}       | { x: 3, y: 0 }                                             | x and y offsets for flow value labels ( when map.labels({values:true}) )                                                                                                                             |
-| _map_.**flowRegionColors**([*value*])      | array              | ['#bbd7ee', '#c7e3c6']                                     | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).                                                                              |
-| _map_.**flowRegionLabels**([*value*])      | array              | ['importer', 'exporter']                                   | The labels that are shown in the legend to explain the flowRegionColors.                                                                                                                             |
-| _map_.**flowOpacity**([*value*])           | number             | 0.6                                                        | The opacity of the flows                                                                                                                                                                             |
-| _map_.**flowDonuts**([*value*])            | boolean            | false                                                      | Create donut charts at each node showing the composition of incoming/outgoing flows                                                                                                                  |
-| _map_.**flowNodeSizeScale**([*value*])     | function           | null                                                       | Custom size scale for donut charts                                                                                                                                                                   |
-| _map_.**flowInternal**([*value*])          | boolean            | true                                                       | Include internal flows/routes in the donut chart (routes that start and end at the same node).                                                                                                       |
-| _map_.**flowTopLocations**([*value*])      | number             | 5                                                          | Number of top locations to colour categorically when using flowDonuts and flowLineType == 'straight'. Set to 0 to disable.                                                                           |
-| _map_.**flowOrder**([*value*])             | function           | `(a,b) => a.otherY - b.otherY`                             | The sort function that defines the vertical order of flows at each node.                                                                                                                             |
-| _map_.**flowCurvatureSettings**([*value*]) | object             | `{ gapX: 10, padX: 2, padY: 2, bumpY: 1, curvature: 0.5 }` | The settings for curved flows and their collision detection.                                                                                                                                         |
-| _map_.**flowBidirectional**([*value*])     | boolean            | true                                                       | Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line. |
-| _map_.**flowEdgeBundling**([*value*])      | boolean            | true                                                       | Whether to apply edge-bundling to flow lines.                                                                                                                                                        |
+| Method                                         | Type               | Default                                                                                            | Description                                                                                                                                                                                          |
+| ---------------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**flowGraph**([*value*])                 | Object             | undefined                                                                                          | The graph object with the links and nodes to be used to define the flow map's data. Same format that is used by d3 sankey.                                                                           |
+| _map_.**flowColor**([*value*])                 | String or Function | '#72bb6f'                                                                                          | The color of the flows and arrows.                                                                                                                                                                   |
+| _map_.**flowArrows**([*value*])                | boolean            | true                                                                                               | Whether to show arrow tips or not.                                                                                                                                                                   |
+| _map_.**flowOutlines**([*value*])              | boolean            | true                                                                                               | Whether to show flow outlines or not.                                                                                                                                                                |
+| _map_.**flowOutlineWidth**([*value*])          | number             | 1.2                                                                                                | Width of flow outlines.                                                                                                                                                                              |
+| _map_.**flowOutlineColor**([*value*])          | string             | '#ffffff'                                                                                          | Color of flow outlines.                                                                                                                                                                              |
+| _map_.**flowColorGradient**([*value*])         | boolean            | true                                                                                               | Whether to show gradients along the flow line (from origin color to destination color) or not.                                                                                                       |
+| _map_.**flowOpacityGradient**([*value*])       | boolean            | true                                                                                               | Whether to apply an opacity gradient from origin to destination. not.                                                                                                                                |
+| _map_.**flowWidthGradient**([*value*])         | boolean            | true                                                                                               | Whether to gradually scale flow thickness (from origin to destination) or not.                                                                                                                       |
+| _map_.**flowMaxWidth**([*value*])              | number             | 30                                                                                                 | Maximum width of flow lines in px                                                                                                                                                                    |
+| _map_.**flowMinWidth**([*value*])              | number             | 1                                                                                                  | Minimum width of flow lines in px                                                                                                                                                                    |
+| _map_.**flowLineType**([*value*])              | string             | 'curved'                                                                                           | 'curved' (sankey) or 'straight'                                                                                                                                                                      |
+| _map_.**flowStack**([*value*])                 | boolean            | true                                                                                               | when flowLineType is curved, this option will stack flows at origin/destination (or not)                                                                                                             |
+| _map_.**flowLabelOffsets**([*value*])          | object {x,y}       | { x: 3, y: 0 }                                                                                     | x and y offsets for flow value labels ( when map.labels({values:true}) )                                                                                                                             |
+| _map_.**flowRegionColors**([*value*])          | array              | ['#bbd7ee', '#c7e3c6']                                                                             | The colors of the 'exporters' and 'importers' polygons (the colours of the region of origin and region of destination).                                                                              |
+| _map_.**flowRegionLabels**([*value*])          | array              | ['importer', 'exporter']                                                                           | The labels that are shown in the legend to explain the flowRegionColors.                                                                                                                             |
+| _map_.**flowOpacity**([*value*])               | number             | 0.6                                                                                                | The opacity of the flows                                                                                                                                                                             |
+| _map_.**flowArrowScale**([*value*])            | number             | 0.7                                                                                                | Scale factor for arrowhead marker size.                                                                                                                                                              |
+| _map_.**flowNodes**([*value*])                 | boolean            | false                                                                                              | Draw node symbols at origins/destinations.                                                                                                                                                           |
+| _map_.**flowNodeType**([*value*])              | string             | 'circle'                                                                                           | Node symbol type: 'circle' or 'donut'.                                                                                                                                                               |
+| _map_.**flowNodeSizeScale**([*value*])         | function           | null                                                                                               | Custom size scale for donut charts                                                                                                                                                                   |
+| _map_.**flowInternal**([*value*])              | boolean            | true                                                                                               | Include internal flows/routes in the donut chart (routes that start and end at the same node).                                                                                                       |
+| _map_.**flowTopLocations**([*value*])          | number             | 0                                                                                                  | Number of top locations to colour categorically (mainly for straight flow mode). Set to 0 to disable.                                                                                                |
+| _map_.**flowTopLocationsType**([*value*])      | string             | 'destination'                                                                                      | Strategy for top location ranking: 'sum', 'origin', or 'destination'.                                                                                                                                |
+| _map_.**flowOrder**([*value*])                 | function           | `(a,b) => a.otherY - b.otherY`                                                                     | The sort function that defines the vertical order of flows at each node.                                                                                                                             |
+| _map_.**flowCurvatureSettings**([*value*])     | object             | `{ gapX: 10, padX: 2, padY: 2, bumpY: 1, curvature: 0.5 }`                                         | The settings for curved flows and their collision detection.                                                                                                                                         |
+| _map_.**flowWidthGradientSettings**([*value*]) | object             | `{ startRatio: 0.25, samples: 48, minStartWidth: 1.5, capEnd: true, curvatureFollow: true }`       | Settings controlling tapered width gradients along flows.                                                                                                                                            |
+| _map_.**flowBidirectional**([*value*])         | boolean            | true                                                                                               | Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line. |
+| _map_.**flowEdgeBundling**([*value*])          | boolean            | true                                                                                               | Whether to apply edge-bundling to flow lines.                                                                                                                                                        |
+| _map_.**flowBundleSettings**([*value*])        | object             | `{ alphaDecay: 0.1, chargeStrength: 10, distanceMax: null, linkStrength: 0.7, linkIterations: 1 }` | Force settings used when `flowEdgeBundling(true)`.                                                                                                                                                   |
+
+`flowDonuts()` remains available as a deprecated alias. Prefer `flowNodes(true).flowNodeType('donut')`.
 
 ### Coxcomb map
 
@@ -884,6 +915,20 @@ const map = eurostatmap
     .build()
 ```
 
+| Method                                  | Type         | Default value | Description                                          |
+| --------------------------------------- | ------------ | ------------- | ---------------------------------------------------- |
+| _map_.**coxcombMinRadius**([*value*])   | number       | _auto_        | Minimum coxcomb radius.                              |
+| _map_.**coxcombMaxRadius**([*value*])   | number       | _auto_        | Maximum coxcomb radius.                              |
+| _map_.**coxcombStrokeFill**([*value*])  | string       | _auto_        | Stroke color for coxcomb wedges.                     |
+| _map_.**coxcombStrokeWidth**([*value*]) | number       | _auto_        | Stroke width for coxcomb wedges.                     |
+| _map_.**coxcombRings**([*value*])       | boolean      | _auto_        | Show/hide concentric reference rings.                |
+| _map_.**coxcombOffsets**([*value*])     | object {x,y} | _{x:0,y:0}_   | X/Y offset applied to coxcomb symbols.               |
+| _map_.**hoverColor**([*value*])         | string       | _auto_        | Hover fill color for highlighted regions/symbols.    |
+| _map_.**classifierSize**([*value*])     | function     | _auto_        | Override size classifier function for symbol sizing. |
+| _map_.**catColors**([*value*])          | object       | _auto_        | Category colors used in the coxcomb chart wedges.    |
+| _map_.**catLabels**([*value*])          | object       | _auto_        | Category labels used in legends/tooltips.            |
+| _map_.**noDataFillStyle**([*value*])    | string       | _"lightgray"_ | Fill style for regions with no data.                 |
+
 ### Mushroom map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/mushroom_ex.png)](https://eurostat.github.io/eurostat-map/examples/mushroom/mushroom.html)
@@ -917,6 +962,17 @@ const map = eurostatmap
     })
     .build()
 ```
+
+| Method                                           | Type            | Default value | Description                                              |
+| ------------------------------------------------ | --------------- | ------------- | -------------------------------------------------------- | ----------------------------------- |
+| _map_.**mushroomCodes**([*value*])               | [string,string] | _['v1','v2']_ | Dataset keys used for left/right mushroom halves.        |
+| _map_.**mushroomMinSize**([*value*])             | number          | _auto_        | Minimum mushroom size.                                   |
+| _map_.**mushroomMaxSize**([*value*])             | number          | _auto_        | Maximum mushroom size.                                   |
+| _map_.**mushroomColors**([*value*])              | [string,string] | _auto_        | Colors for the two mushroom halves.                      |
+| _map_.**mushroomOrientation**([*value*])         | 'horizontal'    | 'vertical'    | _"horizontal"_                                           | Orientation of the mushroom symbol. |
+| _map_.**mushroomSizeScaleFunction**([*value*])   | function        | _auto_        | Shared custom size scaling function for both halves.     |
+| _map_.**mushroomSizeScaleFunctionV1**([*value*]) | function        | _auto_        | Custom size scaling function for the first half (`v1`).  |
+| _map_.**mushroomSizeScaleFunctionV2**([*value*]) | function        | _auto_        | Custom size scaling function for the second half (`v2`). |
 
 ### Waffle map
 
@@ -968,6 +1024,17 @@ const map = eurostatmap
 
 Legacy waffle-prefixed setters (for example, `.waffleMinSize()` and `.waffleGridSize()`) are still supported for backward compatibility but are deprecated. Use `.waffleSettings({...})` instead.
 
+| Method                                    | Type     | Default value | Description                                                                                                                                                                 |
+| ----------------------------------------- | -------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| _map_.**waffleSettings**([*value*])       | object   | _auto_        | Waffle settings object with keys: `minSize`, `maxSize`, `gridSize`, `cellPadding`, `strokeFill`, `strokeWidth`, `roundedCorners`, `tooltipSize`, `otherColor`, `otherText`. |
+| _map_.**catColors**([*value*])            | object   | _auto_        | Category colors for waffle cells.                                                                                                                                           |
+| _map_.**catLabels**([*value*])            | object   | _auto_        | Category labels for legends/tooltips.                                                                                                                                       |
+| _map_.**showOnlyWhenComplete**([*value*]) | boolean  | _false_       | Draw region only when all category values are available.                                                                                                                    |
+| _map_.**noDataFillStyle**([*value*])      | string   | _"darkgray"_  | Fill style for regions where no data is available.                                                                                                                          |
+| _map_.**dorling**([*value*])              | boolean  | _false_       | Apply dorling collision handling to waffle symbols.                                                                                                                         |
+| _map_.**waffleTotalCode**([*value*])      | string   | _undefined_   | Total code used to compute optional "other" share.                                                                                                                          |
+| _map_.**statCodes**([*value*])            | string[] | _undefined_   | Explicit stat code order used by composition rendering/legends.                                                                                                             |
+
 ### Cartograms
 
 As of version 4.1.0 you can now create grid cartograms and dorling cartograms by using the following functions:
@@ -978,23 +1045,22 @@ As of version 4.1.0 you can now create grid cartograms and dorling cartograms by
 map.gridCartogram(true)
 ```
 
-You can switch between squares and hexagons using
+Configure shape, margins, cell spacing and optional custom positions with a single settings object:
 
 ```javascript
-map.gridCartogramShape('hexagon')
+map.gridCartogramSettings({
+    shape: 'hexagon', // or 'square'
+    margins: { top: 100, right: 10, bottom: 10, left: 10 },
+    cellPadding: 5,
+    chartOffset: { x: 0, y: 0 }, // optional offset for chart-based cartograms in each cell
+})
 ```
 
-and define container or cell padding using:
+If you wish, you can define custom grid positions using `positions`:
 
 ```javascript
-map.gridCartogramMargins({ bottom: 10, top: 100, left: 10, right: 10 }).gridCartogramCellPadding(5)
-```
-
-If you wish, you can even define custom grid positions using:
-
-```javascript
-map.gridCartogramPositions(
-    `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
+map.gridCartogramSettings({
+    positions: `,IS,  ,  ,  ,NO,SE,FI,  ,  ,  ,  ,
     ,  ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,
     ,  ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,
     ,IE,UK,  ,  ,DK,  ,LT,  ,  ,  ,  ,
@@ -1004,10 +1070,11 @@ map.gridCartogramPositions(
     ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
     ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,
     ,  ,  ,  ,  ,  ,  ,AL,EL,TR,  ,  ,
-    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  
-   `
-)
+    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,`,
+})
 ```
+
+Legacy setters such as `gridCartogramShape`, `gridCartogramMargins`, `gridCartogramCellPadding` and `gridCartogramPositions` are still available for backward compatibility but are deprecated.
 
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/cartogram/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/cartogram/grid-cartogram.html))
 
@@ -1464,18 +1531,21 @@ The following parameters are properties of the **colorLegend** object:
 
 ## Scalebar
 
-| Method                                    | Type    | Default value              | Description                                          |
-| ----------------------------------------- | ------- | -------------------------- | ---------------------------------------------------- |
-| _map_.**showScalebar**([*value*])         | Boolean | _false_                    | Adds a scalebar to the map                           |
-| _map_.**scaleBarPosition**([*value*])     | array   | _calculated (bottom left)_ | The X/Y position of the scalebar.                    |
-| _map_.**scalebarFontSize**([*value*])     | int     | _8_                        | The font size in pixels of the scalebar text.        |
-| _map_.**scalebarTicks**([*value*])        | int     | _5_                        | The number of ticks in the scalebar.                 |
-| _map_.**scalebarTickHeight**([*value*])   | int     | _13_                       | The height of each tick in pixels.                   |
-| _map_.**scalebarSegmenHeight**([*value*]) | int     | _30_                       | The width in pixels of each segment in the scalebar. |
-| _map_.**scalebarTextOffset**([*value*])   | array   | _[4,8]_                    | The offset in pixels for the scalebar text ([x,y]).  |
-| _map_.**scalebarUnits**([*value*])        | string  | _' km'_                    | The suffix text for the last scalebar label          |
-| _map_.**scalebarMaxWidth**([*value*])     | string  | _px_                       | The maximum width of the scalebar                    |
-| _map_.**scalebarHeight**([*value*])       | string  | _px_                       | The height of the scalebar                           |
+Scalebar is configured via `map.scalebar({...})`.
+
+| Property          | Type            | Default value | Description                                   |
+| ----------------- | --------------- | ------------- | --------------------------------------------- |
+| **show**          | boolean         | _false_       | Show/hide scalebar.                           |
+| **position**      | [number,number] | _auto_        | Scalebar anchor position in SVG pixels.       |
+| **units**         | string          | _" km"_       | Unit suffix displayed on the scalebar labels. |
+| **textOffset**    | [number,number] | _[4,8]_       | Label offset from tick position.              |
+| **maxWidth**      | number          | _auto_        | Maximum scalebar width in pixels.             |
+| **height**        | number          | _auto_        | Total height reserved for the scalebar group. |
+| **strokeWidth**   | number          | _auto_        | Stroke width used by scalebar lines.          |
+| **segmentHeight** | number          | _auto_        | Height of the horizontal middle segment line. |
+| **tickHeight**    | number          | _auto_        | Height of vertical tick marks.                |
+
+Legacy setters such as `showScalebar`, `scalebarPosition`, `scalebarUnits`, `scalebarTextOffset` and `scalebarMaxWidth` are deprecated.
 
 ## Tooltip
 
@@ -1577,7 +1647,7 @@ map.minimap({
 
 ## Buttons
 
-You can add zoom buttons with map.zoomButtons(true) and an inset toggle with map.showInsetButton(true). See ui.css for their styling.
+You can add zoom buttons with `map.zoomButtons(true)` and an inset toggle with `map.insetsButton(true)`. See ui.css for their styling.
 
 ## Export
 
@@ -1594,9 +1664,9 @@ Export the map as a PNG image or a SVG file.
 | ---------------------------------------------- | -------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | _map_.**noDataText**([*value*])                | String   | _"No data available"_ | The text to show for regions where no data is available.                                                                                                                                                                                                                                                                                                                       |
 | _map_.**language**([*value*])                  | String   | _"en"_                | The language code, for multilingual maps.                                                                                                                                                                                                                                                                                                                                      |
-| _map_.**transitionDuration**([*value*])        | int      | _800_                 | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms.                                                                                                                                                                                                                                            |
+| _map_.**transitionDuration**([*value*])        | int      | _500_                 | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms.                                                                                                                                                                                                                                            |
 | _map_.**filtersDefinitionFunction**([*value*]) | Function | _function() {}_       | A function defining SVG filter elements. To be used to defined fill patterns.                                                                                                                                                                                                                                                                                                  |
-| _map_.**callback**([*value*])                  | Function | _undefined_           | A function to execute after the map build is complete.                                                                                                                                                                                                                                                                                                                         |
+| _map_.**onBuild**([*value*])                   | Function | _undefined_           | A function to execute after the map build is complete.                                                                                                                                                                                                                                                                                                                         |
 | _map_.**getTime**()                            | String   | -                     | Return the _time_ parameter of the statistical data. When a filter such as _{ lastTimePeriod : 1 }_ is used, this method allows a retrieval of the map timestamp.                                                                                                                                                                                                              |
 | _map_.**setFromURL**()                         | _this_   | -                     | Set some map parameters based on URL parameters: "w" for width, "h" for height, "x" for xGeoCenter, "y" for yGeoCenter, "z" for pixGeoSize, "s" for scale, "lvl" for nuts level, "time" for time, "proj" for the CRS, "geo" for the geographical territory, "ny" for the NUTS version, "lg" for the langage, "sl" to show legend, "numberOfClasses" for the number of classes. |
 
@@ -1608,11 +1678,11 @@ After changing some parameters, one of the following methods need to be executed
 | -------------------------------- | ------ | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | _map_.**build**()                | _this_ | Build (or rebuild) the entire map.                                                                                                      |
 | _map_.**updateGeoData**()        | _this_ | Get new geometrical data. It should be used to update the map when parameters on the map geometries have changed.                       |
-| _map_.**buildMapTemplate**()     | _this_ | Update the map when parameters on the map template have changed.                                                                        |
 | _map_.**updateStatData**()       | _this_ | Get new statistical data. It should be used to update the map when parameters on the statistical data sources have changed.             |
 | _map_.**updateStatValues**()     | _this_ | Update client side information related to statistical values. It should be used to update the map when statistical values have changed. |
 | _map_.**updateClassification**() | _this_ | Update the map when parameters on the classification have changed.                                                                      |
 | _map_.**updateStyle**()          | _this_ | Update the map when parameters on the styling have changed.                                                                             |
+| _map_.**recalculateLayout**()    | void   | Recalculate map/header/footer layout after structural changes.                                                                          |
 
 Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
 

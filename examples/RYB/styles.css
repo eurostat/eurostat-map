@@ -13,3 +13,16 @@
     stroke: rgb(161, 161, 161);
     stroke-width: 0.1px !important;
 }
+.em-footnote {
+    fill: rgb(26, 26, 46) !important;
+    font-size: 11px !important;
+    opacity: 0.9 !important;
+}
+
+.a-left .annotation-note-title {
+    transform: translate(0px, -10px);
+}
+.annotation-note-title {
+    font-size: 12px;
+    font-weight: bold;
+}
