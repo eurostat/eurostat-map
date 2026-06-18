@@ -679,16 +679,17 @@ export const getRegionsSelector = (map) => {
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'
 
-    const choropleths = ['ch', 'chbi', 'chtri']
+    // Map types that need to exclude RS and EL cntrg regions (because they include Kosovo and Athos, which are not part of the NUTS regions)
+    const mapsExcludingRSEL = ['ch', 'chbi', 'chtri', 'coxcomb', 'ps', 'pie']
 
     if (map.nutsLevel_ === 'mixed') {
-        if (choropleths.includes(map._mapType)) {
+        if (mapsExcludingRSEL.includes(map._mapType)) {
             return '#em-mixed-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
         }
         return '#em-mixed-nutsrg path, #em-cntrg path'
     }
 
-    if (choropleths.includes(map._mapType)) {
+    if (mapsExcludingRSEL.includes(map._mapType)) {
         return '#em-nutsrg path:not(#em-cntrg-RS):not(#em-cntrg-EL), #em-cntrg path:not(#em-cntrg-RS):not(#em-cntrg-EL)'
     }
 

@@ -964,17 +964,24 @@ export const map = function (config) {
         const regions = map.svg().selectAll(selector)
         const status = out.coxStatus_
 
-        if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
-            styleMixedNUTSRegions(map, status, regions)
-        }
+        // For cntrg regions (RS, EL), we need to apply ecl to ALL paths inside, including Kosovo/XK
+        // even though the cntrg container itself is excluded from the main selector
+        const allRegionsSelector = map.nutsLevel_ === 'mixed' ? '#em-mixed-nutsrg path, #em-cntrg path' : '#em-nutsrg path, #em-cntrg path'
+        const allRegions = map.svg().selectAll(allRegionsSelector)
 
-        regions.attr('ecl', (rg) => {
+        // Apply ecl attribute to ALL regions (including those in excluded cntrg groups)
+        allRegions.attr('ecl', (rg) => {
             const sv = status.get(rg.properties.id)
             if (sv == null) return 'ni'
             if (sv?.value === ':') return 'nd'
             return null
         })
 
+        if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
+            styleMixedNUTSRegions(map, status, regions)
+        }
+
+        // Apply no-data fill style only to regions in the filtered selector
         regions.filter((rg) => status.get(rg.properties.id)?.value === ':').style('fill', out.noDataFillStyle())
     }
 
