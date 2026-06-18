@@ -1,2 +1,8 @@
-/* .em--ch {
-} */
+/* Choropleth maps (including bivariate and trivariate) */
+
+/*  regions without data input */
+.em--ch [ecl='ni'],
+.em--chbi [ecl='ni'],
+.em--chtri [ecl='ni'] {
+    fill: #e9e9e9;
+}
