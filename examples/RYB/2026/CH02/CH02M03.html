@@ -147,6 +147,11 @@
                                 .attr('class', 'em-footnote')
                                 .attr('id', 'em-footnote-2')
                                 .html('Cartography: Eurostat – GISCO, 06/2026')
+
+                            const newInsets = d3.select('#newInsets')
+                            if (!newInsets.empty()) {
+                                d3.select('#map').node().appendChild(newInsets.node())
+                            }
                         })
                 }
 
