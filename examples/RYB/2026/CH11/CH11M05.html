@@ -44,6 +44,12 @@
             .a-napoli .annotation-note-title {
                 transform: translate(0px, 10px);
             }
+            .paloukia .annotation-note-title {
+                transform: translate(14px, -3px);
+            }
+            .calabria .annotation-note-title {
+                transform: translate(-3px, -1px);
+            }
         </style>
     </head>
 
@@ -135,14 +141,15 @@
                 .mushroomColors(['#33A033', '#B09120'])
                 .mushroomOrientation('horizontal')
                 .legend({
-                    title: 'Passengers',
+                    //title: 'Passengers',
                     x: 10,
-                    y: 250,
+                    y: 220,
                     sizeLegend: {
+                        title: 'Passengers carried',
                         values: [5700000, 1000000],
                         labels: ['5.7 million', '1 million'],
                     },
-                    colorLegend: { title: '', marginTop: 10 },
+                    colorLegend: { title: 'Passenger movements', marginTop: 20, titlePadding: -5 },
                 })
                 .tooltip({
                     textFunction: tooltipTextFunction,

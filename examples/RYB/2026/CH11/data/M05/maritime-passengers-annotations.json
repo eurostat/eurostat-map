@@ -1,113 +1,113 @@
 [
-  {
-    "note": {
-      "title": "Messina",
-      "align": "left"
+    {
+        "note": {
+            "title": "Messina",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger a-left",
+        "x": 554,
+        "y": 809,
+        "dy": 1,
+        "dx": 17
     },
-    "className": "em-annotation-top-passenger a-left",
-    "x": 554,
-    "y": 809,
-    "dy": 1,
-    "dx": 17
-  },
-  {
-    "note": {
-      "title": "Reggio di Calabria",
-      "align": "left"
+    {
+        "note": {
+            "title": "Reggio di Calabria",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger a-left calabria",
+        "x": 551,
+        "y": 863,
+        "dy": 16,
+        "dx": 10
     },
-    "className": "em-annotation-top-passenger a-left",
-    "x": 551,
-    "y": 863,
-    "dy": 26,
-    "dx": 0
-  },
-  {
-    "note": {
-      "title": "Napoli",
-      "align": "left"
+    {
+        "note": {
+            "title": "Napoli",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger a-napoli",
+        "x": 527,
+        "y": 750,
+        "dy": -9,
+        "dx": 16
     },
-    "className": "em-annotation-top-passenger a-napoli",
-    "x": 527,
-    "y": 750,
-    "dy": -9,
-    "dx": 16
-  },
-  {
-    "note": {
-      "title": "Peiraias",
-      "align": "left"
+    {
+        "note": {
+            "title": "Peiraias",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger a-left",
+        "x": 713,
+        "y": 837,
+        "dy": 20,
+        "dx": 48
     },
-    "className": "em-annotation-top-passenger a-left",
-    "x": 713,
-    "y": 837,
-    "dy": 20,
-    "dx": 48
-  },
-  {
-    "note": {
-      "title": "Helsinki",
-      "align": "left"
+    {
+        "note": {
+            "title": "Helsinki",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger a-left",
+        "x": 632,
+        "y": 275,
+        "dy": 0,
+        "dx": 11
     },
-    "className": "em-annotation-top-passenger a-left",
-    "x": 632,
-    "y": 275,
-    "dy": 0,
-    "dx": 11
-  },
-  {
-    "note": {
-      "title": "Palma Mallorca",
-      "align": "middle"
+    {
+        "note": {
+            "title": "Palma Mallorca",
+            "align": "middle"
+        },
+        "className": "em-annotation-top-passenger",
+        "x": 295,
+        "y": 810,
+        "dy": 13,
+        "dx": 0
     },
-    "className": "em-annotation-top-passenger",
-    "x": 295,
-    "y": 810,
-    "dy": 13,
-    "dx": 0
-  },
-  {
-    "note": {
-      "title": "Paloukia Salaminas",
-      "align": "right",
-      "wrap": 10
+    {
+        "note": {
+            "title": "Paloukia Salaminas",
+            "align": "right",
+            "wrap": 10
+        },
+        "className": "em-annotation-top-passenger a-right paloukia",
+        "x": 679,
+        "y": 827,
+        "dy": 19,
+        "dx": -14
     },
-    "className": "em-annotation-top-passenger a-right",
-    "x": 679,
-    "y": 827,
-    "dy": 19,
-    "dx": -14
-  },
-  {
-    "note": {
-      "title": "Perama",
-      "align": "left"
+    {
+        "note": {
+            "title": "Perama",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger",
+        "x": 711,
+        "y": 788,
+        "dy": -11,
+        "dx": 18
     },
-    "className": "em-annotation-top-passenger",
-    "x": 711,
-    "y": 788,
-    "dy": -11,
-    "dx": 18
-  },
-  {
-    "note": {
-      "title": "Calais",
-      "align": "right"
+    {
+        "note": {
+            "title": "Calais",
+            "align": "right"
+        },
+        "className": "em-annotation-top-passenger a-right",
+        "x": 295,
+        "y": 509,
+        "dy": -8,
+        "dx": -7
     },
-    "className": "em-annotation-top-passenger a-right",
-    "x": 295,
-    "y": 509,
-    "dy": -8,
-    "dx": -7
-  },
-  {
-    "note": {
-      "title": "Stockholm",
-      "align": "left"
-    },
-    "className": "em-annotation-top-passenger a-left",
-    "x": 550,
-    "y": 312,
-    "dy": 0,
-    "dx": 13
-  }
+    {
+        "note": {
+            "title": "Stockholm",
+            "align": "left"
+        },
+        "className": "em-annotation-top-passenger a-left",
+        "x": 550,
+        "y": 312,
+        "dy": 0,
+        "dx": 13
+    }
 ]

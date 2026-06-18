@@ -613,19 +613,33 @@ export const buildTooltipBreakdownHTML = function (regionId, out, getRegionTotal
 
     const total = getRegionTotalFn(regionId) || breakdownData.reduce((sum, d) => sum + d.value, 0)
 
+    // Detect if values are already percentages by checking if total is close to 100
+    const isPercentageData = total >= 99 && total <= 101
+
     let html = `<div class="em-tooltip-breakdown">`
 
     for (const item of breakdownData) {
-        const percent = total ? ((item.value / total) * 100).toFixed(0) : 0
-        html += `
+        // For percentage data, don't calculate percentages again - just show the values
+        if (isPercentageData) {
+            html += `
+        <div class="em-breakdown-item">
+            <span class="em-breakdown-color" style="background:${item.color}"></span>
+            <span class="em-breakdown-label">${item.label || item.code}</span>
+            <span class="em-breakdown-value">${item.value?.toFixed ? item.value.toFixed(1) : 0}%</span>
+        </div>`
+        } else {
+            const percent = total ? ((item.value / total) * 100).toFixed(0) : 0
+            html += `
         <div class="em-breakdown-item">
             <span class="em-breakdown-color" style="background:${item.color}"></span>
             <span class="em-breakdown-label">${item.label || item.code}</span>
             <span class="em-breakdown-value">${item.value?.toFixed ? spaceAsThousandSeparator(item.value) : 0} (${isNaN(percent) ? 0 : percent}%)</span>
         </div>`
+        }
     }
 
-    if (total !== undefined && total !== null) {
+    // Only show total for non-percentage data
+    if (!isPercentageData && total !== undefined && total !== null) {
         const unit = out.statData(out.statCodes_[0]).unitText() || ''
         html += `
         <div class="em-breakdown-item em-total">
