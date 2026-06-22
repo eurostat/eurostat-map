@@ -128,7 +128,7 @@
                     unitText: '%',
                     legendTitle: 'Degree of urbanisation',
                     sizeLegendTitle: '% people aged 18-64',
-                    noDataRegions: ['IS', 'CH', 'UK', 'LI', 'BA', 'ME', 'AL', 'TR'],
+                    noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'TR'],
                 },
                 social: {
                     data: 'data/degurba/social.json',
@@ -168,12 +168,12 @@
                 map = eurostatmap
                     .map('bar')
                     .dorling(true)
-                    .hoverColor('#f0f0f0')
+                    .hoverColor('#ffffbf')
                     .dorling(!useCartogram) // use dorling when NOT in cartogram mode
                     .gridCartogram(useCartogram) // enable grid cartogram when toggled
                     .gridCartogramSettings({
                         spacing: 0,
-                        cellPadding: 2,
+                        cellPadding: 5,
                         margins: { top: 2, right: 100, bottom: 0, left: 0 },
                         positions: `
                                     ,IS,  ,  ,NO,SE,FI,  ,  ,  ,  ,  ,
@@ -203,7 +203,7 @@
                     })
                     .barSettings({
                         //type: 'grouped',
-                        groupWidth: useCartogram ? 17 : 9,
+                        //groupWidth: useCartogram ? 17 : 9,
                         groupMaxHeight: GROUP_MAX_HEIGHT,
                         groupMaxValue: 100, // optional override for grouped mode max value - for sharing scales across maps
                     })

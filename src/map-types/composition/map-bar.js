@@ -78,7 +78,7 @@ export const map = function (config) {
         minWidth: 10,
         maxWidth: 40,
         height: 8,
-        groupWidth: 6,
+        groupWidth: undefined, // defaults to cell width ÷ number of categories at render time
         groupGap: 0,
         groupMinHeight: 2,
         groupMaxHeight: 40,
@@ -89,7 +89,7 @@ export const map = function (config) {
         otherColor: '#FFCC80',
         otherText: 'Other',
         tooltipWidth: 150,
-        tooltipHeight: 20,
+        tooltipHeight: 10,
     }
 
     out.barSettings_ = { ...defaultBarSettings, ...(config?.barSettings || {}) }
@@ -101,6 +101,7 @@ export const map = function (config) {
 
     // ── Internal ──────────────────────────────────────────────────────────────
     out.classifierSize_ = null
+    out._groupedMaxCatValue = 1
     out.barTotalCode_ = undefined
     out.statCodes_ = undefined
 
@@ -151,6 +152,46 @@ export const map = function (config) {
         }
         return out
     }
+    /**
+     * Resolve the pixel width of each bar in grouped mode.
+     * If groupWidth_ is explicitly set, use that.
+     * Otherwise divide the container width (bbox) by the number of categories.
+     * @param {number} n - number of categories
+     * @param {DOMRect|null} bbox - bounding box of the container cell, or null
+     */
+    function _resolvedGroupWidth(n, bbox) {
+        if (out.barSettings_.groupWidth != null) return out.barSettings_.groupWidth
+        if (!bbox || !n) return 9 // safe fallback
+        const gap = out.barSettings_.groupGap
+        // total available width = bbox.width; solve for bw: n*bw + (n-1)*gap = bbox.width
+        return Math.max(1, (bbox.width - Math.max(0, n - 1) * gap) / n)
+    }
+
+    function _effectiveGroupMaxHeight(bbox) {
+        const configuredMaxHeight = out.barSettings_.groupMaxHeight
+        if (!out.gridCartogram_ || !bbox) return configuredMaxHeight
+        return Math.max(0, Math.min(configuredMaxHeight, bbox.height))
+    }
+
+    function _resolvedGroupHeight(rawValue, bbox) {
+        if (rawValue <= 0) return 0
+
+        const maxHeight = _effectiveGroupMaxHeight(bbox)
+        if (maxHeight <= 0) return 0
+
+        const minHeight = Math.min(out.barSettings_.groupMinHeight, maxHeight)
+        if (!out.gridCartogram_ || !bbox) {
+            return Math.min(maxHeight, Math.max(minHeight, out.classifierSize_(rawValue)))
+        }
+
+        const height = scaleLinear().domain([0, out._groupedMaxCatValue || 1]).range([0, maxHeight]).clamp(true)(rawValue)
+        return Math.min(maxHeight, Math.max(minHeight, height))
+    }
+
+    function _getGridCellShapeBBox(cellSelection) {
+        const shapeEl = cellSelection.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+        return shapeEl?.getBBox() || cellSelection.node().getBBox()
+    }
 
     /**
      * For grouped mode: find the maximum individual category value across all
@@ -183,6 +224,7 @@ export const map = function (config) {
 
         if (maxCatValue === 0) maxCatValue = 1 // guard against empty data
 
+        out._groupedMaxCatValue = maxCatValue
         out.classifierSize_ = scaleLinear().domain([0, maxCatValue]).range([0, out.barSettings_.groupMaxHeight]).clamp(true)
     }
 
@@ -226,15 +268,16 @@ export const map = function (config) {
     function _getDorlingRadius(regionId) {
         if (out.barSettings_.type === 'grouped') {
             const n = out.statCodes_?.length || 1
-            return _groupFootprintWidth(n) / 2
+            return _groupFootprintWidth(n, null) / 2
         }
         const total = _getRegionTotal(regionId) || 0
         return total ? out.classifierSize_(total) / 2 : 0
     }
 
     /** Total pixel width of a grouped bar cluster for n categories. */
-    function _groupFootprintWidth(n) {
-        return n * out.barSettings_.groupWidth + Math.max(0, n - 1) * out.barSettings_.groupGap
+    function _groupFootprintWidth(n, bbox = null) {
+        const bw = _resolvedGroupWidth(n, bbox)
+        return n * bw + Math.max(0, n - 1) * out.barSettings_.groupGap
     }
 
     function applyStyleToMap(map) {
@@ -460,23 +503,22 @@ export const map = function (config) {
      * @param {string} regionId
      * @returns {Array|null}
      */
-    function buildGroupedSegments(regionId) {
+    function buildGroupedSegments(regionId, bbox) {
         const codes = out.statCodes_
         if (!codes?.length) return null
 
         const segments = []
         const n = codes.length
-        const bw = out.barSettings_.groupWidth
+        const bw = _resolvedGroupWidth(n, bbox) // ← was: out.barSettings_.groupWidth
         const gap = out.barSettings_.groupGap
-        const totalGroupWidth = _groupFootprintWidth(n)
+        const totalGroupWidth = n * bw + Math.max(0, n - 1) * gap
         const startX = -totalGroupWidth / 2
 
         for (let i = 0; i < n; i++) {
             const code = codes[i]
             const s = out.statData(code)?.get(regionId)
             const rawValue = s?.value != null && !isNaN(s.value) ? s.value : 0
-
-            const barHeight = Math.max(rawValue > 0 ? out.barSettings_.groupMinHeight : 0, out.classifierSize_(rawValue))
+            const barHeight = _resolvedGroupHeight(rawValue, bbox)
 
             segments.push({
                 x: startX + i * (bw + gap),
@@ -488,7 +530,6 @@ export const map = function (config) {
             })
         }
 
-        // Return null if the region has no data at all
         return segments.some((s) => s.rawValue > 0) ? segments : null
     }
 
@@ -534,7 +575,7 @@ export const map = function (config) {
     function addGroupedBarChartsToMap(regionFeatures) {
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
-            const segments = buildGroupedSegments(regionId)
+            const segments = buildGroupedSegments(regionId, null) // ← null: no bbox in centroid mode
             if (!segments) return
 
             const chartNode = out
@@ -569,12 +610,12 @@ export const map = function (config) {
             const node = out.svg().select('#bar_' + regionId)
             if (node.empty()) return
 
-            const segments = buildGroupedSegments(regionId)
+            const bbox = _getGridCellShapeBBox(node)
+            const segments = buildGroupedSegments(regionId, bbox) // ← pass it in
             if (!segments) return
 
             node.selectAll('.em-bar-chart').remove()
 
-            const bbox = node.node().getBBox()
             const anchor = getGridCartogramChartAnchor(out, bbox)
 
             const g = node
@@ -602,10 +643,12 @@ export const map = function (config) {
                 const codes = out.statCodes_
                 if (!codes?.length) return 0
                 let maxH = 0
+                const node = out.svg().select('#bar_' + regionId)
+                const bbox = node.empty() ? null : _getGridCellShapeBBox(node)
                 for (const code of codes) {
                     const s = out.statData(code)?.get(regionId)
                     const rawValue = s?.value != null && !isNaN(s.value) ? s.value : 0
-                    const barHeight = Math.max(rawValue > 0 ? out.barSettings_.groupMinHeight : 0, out.classifierSize_(rawValue))
+                    const barHeight = _resolvedGroupHeight(rawValue, bbox)
                     maxH = Math.max(maxH, barHeight)
                 }
                 return maxH
@@ -645,7 +688,7 @@ export const map = function (config) {
         }
 
         html += `
-        <div class="em-tooltip-barchart-container" style="padding: 6px 0;">
+        <div class="em-tooltip-barchart-container">
             <svg width="${tw}" height="${th}" viewBox="0 0 ${tw} ${th}" style="display:block;">
                 ${rects}
             </svg>
@@ -663,19 +706,6 @@ export const map = function (config) {
         const codes = out.statCodes_
         if (!codes?.length) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
-        const bw = out.barSettings_.groupWidth
-        const gap = out.barSettings_.groupGap
-        const maxH = out.barSettings_.groupMaxHeight
-        const valueLabelFontSize = 8
-        const valueLabelGap = 2
-        const valueLabelRows = 2
-        const valueLabelRowHeight = valueLabelFontSize + 2
-        const bottomPad = valueLabelRows * valueLabelRowHeight + 4 // reserve space for two non-overlapping label rows
-        const totalW = codes.length * bw + (codes.length - 1) * gap
-        const svgW = Math.max(out.barSettings_.tooltipWidth, totalW + 8)
-        const svgH = maxH + bottomPad + 4
-        const offsetX = (svgW - totalW) / 2
-
         // Find if we have any valid data for this region
         let hasData = false
         codes.forEach((code) => {
@@ -683,6 +713,21 @@ export const map = function (config) {
             if (s?.value != null && !isNaN(s.value) && s.value !== ':') hasData = true
         })
         if (!hasData) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
+
+        const gap = out.barSettings_.groupGap
+        const maxH = out.barSettings_.groupMaxHeight
+        const svgW = out.barSettings_.tooltipWidth
+        const valueLabelFontSize = 8
+        const valueLabelRowHeight = valueLabelFontSize + 2
+        const valueLabelRows = 2
+        const bottomPad = valueLabelRows * valueLabelRowHeight + 4
+        const svgH = maxH + bottomPad + 4
+
+        // Derive bar width from the fixed svg width, same logic as _resolvedGroupWidth
+        const n = codes.length
+        const bw = Math.max(1, (svgW - Math.max(0, n - 1) * gap) / n)
+        const totalW = n * bw + Math.max(0, n - 1) * gap
+        const offsetX = (svgW - totalW) / 2
 
         let bars = ''
         const lastLabelRightByRow = Array(valueLabelRows).fill(-Infinity)
@@ -702,37 +747,33 @@ export const map = function (config) {
 
             let rowIndex = -1
             for (let r = 0; r < valueLabelRows; r++) {
-                if (labelLeft > lastLabelRightByRow[r] + valueLabelGap) {
+                if (labelLeft > lastLabelRightByRow[r] + 2) {
                     rowIndex = r
                     break
                 }
             }
-
             if (rowIndex >= 0) lastLabelRightByRow[rowIndex] = labelRight
-            const showValueLabel = rowIndex >= 0
             const labelY = maxH + valueLabelRowHeight * (rowIndex + 1) - 1
 
             bars += `
-            <rect x="${x}" y="${maxH - barH}" width="${bw}" height="${barH}"
-                  fill="${color}" rx="1" ry="1"/>
-            ${
-                showValueLabel
-                    ? `<text x="${centerX}" y="${labelY}"
-                  text-anchor="middle" font-size="${valueLabelFontSize}" fill="#555"
-                  style="font-family: monospace;"
-                  title="${label}: ${fullValStr}">${valStr}</text>`
-                    : ''
-            }`
+        <rect x="${x}" y="${maxH - barH}" width="${bw}" height="${barH}"
+              fill="${color}" rx="1" ry="1"/>
+        ${
+            rowIndex >= 0
+                ? `<text x="${centerX}" y="${labelY}" text-anchor="middle"
+               font-size="${valueLabelFontSize}" fill="#555"
+               style="font-family:monospace;"
+               title="${label}: ${fullValStr}">${valStr}</text>`
+                : ''
+        }`
         })
 
         return `
-        <div style="padding: 4px 0 2px;">
-            <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;overflow:visible;">
-                <line x1="0" y1="${maxH}" x2="${svgW}" y2="${maxH}"
-                      stroke="#ccc" stroke-width="0.5"/>
-                ${bars}
-            </svg>
-        </div>`
+    <div class="em-tooltip-barchart-container">
+        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;">
+            ${bars}
+        </svg>
+    </div>`
     }
 
     function compactValue(value) {

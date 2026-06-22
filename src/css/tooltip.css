@@ -1,8 +1,9 @@
 .em-tooltip {
     font-family: Arial;
     color: #383838;
-    max-width: 300px;
-    overflow: hidden;
+    max-width: min(300px, calc(100vw - 24px));
+    max-height: min(70vh, calc(100vh - 24px));
+    overflow: auto;
     background: white;
     padding: 0px;
     border: 0px;
@@ -14,6 +15,7 @@
     font-family: Helvetica, Arial, sans-serif;
     pointer-events: none;
     z-index: 99999999;
+    box-sizing: border-box;
 }
 .em-tooltip-text {
     background: #ffffff;
@@ -34,6 +36,7 @@
 }
 .em-tooltip-table {
     margin: 0px;
+    max-width: 100%;
 }
 .em-tooltip-piechart-container {
     text-align: center;
@@ -155,4 +158,8 @@
 }
 .em-tooltip-cx-table th:first-child {
     text-align: left;
+}
+.em-tooltip-barchart-container {
+    width: 100%;
+    box-sizing: border-box;
 }

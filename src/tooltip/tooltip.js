@@ -130,27 +130,25 @@ export const tooltip = function (config) {
             refreshBoundsAndSize()
         }
 
-        node.style.left = eventX + config.offset.x + 'px'
-        node.style.top = eventY - config.offset.y + 'px'
+        const scrollX = window.pageXOffset || document.documentElement.scrollLeft
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop
+        const minLeft = parentRect.left + scrollX
+        const maxLeft = minLeft + cachedParentWidth - cachedTooltipWidth
+        const minTop = parentRect.top + scrollY
+        const maxTop = minTop + cachedParentHeight - cachedTooltipHeight
 
-        //too far right
-        //taking into account off screen space but shouldnt be
-        if (node.offsetLeft > parentRect.left + cachedParentWidth - cachedTooltipWidth) {
-            let left = eventX - cachedTooltipWidth - config.offset.x
-            node.style.left = left + 'px'
-            // check if mouse covers tooltip
-            if (node.offsetLeft + cachedTooltipWidth > eventX) {
-                //move tooltip left so it doesnt cover mouse
-                let left2 = eventX - cachedTooltipWidth - config.offset.x
-                node.style.left = left2 + 'px'
-            }
-            // node.style.top = node.offsetTop + config.offset.y + "px";
+        let left = eventX + config.offset.x
+        if (left > maxLeft) {
+            left = eventX - cachedTooltipWidth - config.offset.x
         }
 
-        //too far down
-        if (node.offsetTop + cachedTooltipHeight > parentRect.top + cachedParentHeight) {
-            node.style.top = node.offsetTop - cachedTooltipHeight + 'px'
+        let top = eventY - config.offset.y
+        if (top + cachedTooltipHeight > minTop + cachedParentHeight) {
+            top = eventY - cachedTooltipHeight - config.offset.y
         }
+
+        node.style.left = Math.max(minLeft, Math.min(left, Math.max(minLeft, maxLeft))) + 'px'
+        node.style.top = Math.max(minTop, Math.min(top, Math.max(minTop, maxTop))) + 'px'
     }
 
     my()
