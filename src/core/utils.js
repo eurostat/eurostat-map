@@ -337,6 +337,21 @@ export const spaceAsThousandSeparator = function (number) {
     return number.toLocaleString('en').replace(/,/gi, ' ')
 }
 
+/**
+ * Formats a raw number with space as a thousand separator without any rounding.
+ * @function formatRawValue
+ * @param {number} value
+ * @returns {string}
+ */
+export const formatRawValue = function (value) {
+    if (value === null || value === undefined || isNaN(value)) {
+        return '0'
+    }
+    const parts = String(value).split('.')
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+    return parts.join('.')
+}
+
 //REST API
 export const getEstatRestDataURLBase = 'https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/' //the different dataswag endpoints are appended to this base URL
 

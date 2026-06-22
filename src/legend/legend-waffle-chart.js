@@ -2,6 +2,7 @@ import { format } from 'd3-format'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
+import { appendPatternFillLegend } from './legend-pattern-fill'
 
 /**
  * A legend for waffle chart maps.
@@ -97,6 +98,15 @@ export const legend = function (map, config) {
 
         // legend for waffle color values
         buildColorLegend(out, baseX, baseY)
+
+        if (map.patternFill_) {
+            const legendHeight = out.lgg.node().getBBox().height
+            const patternContainer = out.lgg
+                .append('g')
+                .attr('class', 'pattern-fill-legend')
+                .attr('transform', `translate(${baseX}, ${legendHeight + 15})`)
+            appendPatternFillLegend(out, patternContainer)
+        }
 
         //set legend box dimensions
         out.setBoxDimension()

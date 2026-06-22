@@ -2,6 +2,7 @@ import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as Legend from '../legend'
 import { executeForAllInsets } from '../../core/utils'
+import { appendPatternFillLegend } from '../legend-pattern-fill'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -86,7 +87,7 @@ export const legend = function (map, config) {
         if (map.classifierSize_) {
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-bar-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
-            if (map.barType_ === 'grouped') {
+            if (map.barSettings_.type === 'grouped') {
                 drawGroupedSizeLegend(
                     out,
                     out._sizeLegendContainer,
@@ -94,8 +95,8 @@ export const legend = function (map, config) {
                     map.classifierSize_,
                     out.sizeLegend.title,
                     out.sizeLegend.titlePadding,
-                    map.barGroupWidth_,
-                    map.barGroupGap_,
+                    map.barSettings_.groupWidth,
+                    map.barSettings_.groupGap,
                     map.catColors_
                 )
             } else {
@@ -106,13 +107,23 @@ export const legend = function (map, config) {
                     map.classifierSize_,
                     out.sizeLegend.title,
                     out.sizeLegend.titlePadding,
-                    map.barHeight_,
+                    map.barSettings_.height,
                     map.catColors_
                 )
             }
         }
 
         buildColorLegend(out, baseX, baseY)
+
+        if (map.patternFill_) {
+            const legendHeight = out.lgg.node().getBBox().height
+            const patternContainer = out.lgg
+                .append('g')
+                .attr('class', 'pattern-fill-legend')
+                .attr('transform', `translate(${baseX}, ${legendHeight + 15})`)
+            appendPatternFillLegend(out, patternContainer)
+        }
+
         out.setBoxDimension()
     }
 
@@ -214,12 +225,10 @@ export const legend = function (map, config) {
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
         const offsetX = legend.sizeLegend?.offsetX ?? 0
 
-        const bw = 16
-        const gap = 30
+        const bw = barGroupWidth ?? 16
+        const gap = barGroupGap ?? 0
         const maxBarHeight = classifierSize(sortedValues[0])
-        const labelHeight = 16 // space below baseline for value labels
         const colors = catColors ? Object.values(catColors) : ['#7f7f7f']
-        const barColor = '#7f7f7f'
 
         let y = 0
 
@@ -243,8 +252,10 @@ export const legend = function (map, config) {
             .attr('stroke-width', 0.8)
 
         sortedValues.forEach((val, i) => {
-            const barH = classifierSize(val)
+            const minHeight = legend.map?.barSettings_?.groupMinHeight ?? 0
+            const barH = Math.max(val > 0 ? minHeight : 0, classifierSize(val))
             const x = offsetX + i * (bw + gap)
+            const barColor = '#7f7f7f'
 
             // Bar growing upward from baseline
             container
@@ -253,16 +264,31 @@ export const legend = function (map, config) {
                 .attr('y', baseline - barH)
                 .attr('width', bw)
                 .attr('height', barH)
-                .attr('rx', 1)
-                .attr('ry', 1)
+                .attr('rx', legend.map?.barSettings_?.cornerRadius ?? 1)
+                .attr('ry', legend.map?.barSettings_?.cornerRadius ?? 1)
                 .attr('fill', barColor)
+                .attr('stroke', legend.map?.barSettings_?.strokeFill || 'white')
+                .attr('stroke-width', (legend.map?.barSettings_?.strokeWidth ?? 0.3) + 'px')
 
-            // Value label centered below baseline
+            // Staggered value label centered below baseline to prevent overlap
+            const labelSpacing = 14
+            const labelY = baseline + 12 + i * labelSpacing
+
+            // Vertical tick line from baseline to label
+            container
+                .append('line')
+                .attr('x1', x + bw / 2)
+                .attr('x2', x + bw / 2)
+                .attr('y1', baseline)
+                .attr('y2', labelY - 5)
+                .attr('stroke', '#ccc')
+                .attr('stroke-width', 0.5)
+
             container
                 .append('text')
                 .attr('class', 'em-legend-label em-bar-grouped-legend-label')
                 .attr('x', x + bw / 2)
-                .attr('y', baseline + labelHeight - 2)
+                .attr('y', labelY)
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
                 .text(formatValue(val, legend.sizeLegend?.labelFormatter))

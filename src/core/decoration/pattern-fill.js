@@ -2,9 +2,9 @@ import { getRegionsSelector } from '../utils'
 import { select } from 'd3-selection'
 
 export function applyPatternFill(map, configs = []) {
+    if (!configs) return
     if (!Array.isArray(configs)) {
-        console.warn('patternFill expects an array of configs')
-        return
+        configs = [configs]
     }
 
     let defs = map.svg().select('defs')
@@ -52,21 +52,28 @@ export function applyPatternFill(map, configs = []) {
     map.svg()
         .selectAll(getRegionsSelector(map))
         .each(function (d) {
-            const id = d?.properties?.id
+            const id = d?.properties?.id || d?.id
             const patternIds = regionToPatternIds[id]
 
             if (patternIds && patternIds.length) {
                 const original = select(this)
+                let target = original
+                if (map.gridCartogram_) {
+                    target = original.select('.em-grid-shape')
+                    if (target.empty()) target = original
+                }
 
                 patternIds.forEach((patternId) => {
-                    const clone = original.node().cloneNode(true)
+                    const clone = target.node().cloneNode(true)
 
                     select(clone)
+                        .style('fill', null) // clear any inline fill style (e.g. from transitions or no data)
                         .attr('fill', `url(#${patternId})`)
                         .attr('pointer-events', 'none')
-                        .attr('class', (original.attr('class') || '') + 'pattern-fill-overlay')
+                        .attr('class', (select(clone).attr('class') || '') + ' pattern-fill-overlay')
 
-                    select(this.parentNode).append(() => clone)
+                    const targetNode = target.node()
+                    targetNode.parentNode.insertBefore(clone, targetNode.nextSibling)
                 })
             }
         })

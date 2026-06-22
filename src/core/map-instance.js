@@ -68,6 +68,13 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         cellPadding: 4,
         chartOffset: { x: 0, y: 0 },
         positions: undefined, // user defined cartograms
+
+        // labelling settings for grid cartograms
+        countryLabels: undefined,
+        countryLabelFontSize: undefined,
+        countryLabelMinFontSize: undefined,
+        countryLabelPadding: { x: 0, y: 0 },
+        countryLabelAvoidOverlap: undefined,
     }
 
     // pan & zoom
@@ -285,11 +292,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             if (v.margins && typeof v.margins === 'object') {
                 next.margins = Object.assign({}, out.gridCartogramSettings_.margins, v.margins)
             }
-            const labelSettings = Object.assign(
-                {},
-                out.gridCartogramSettings_?.countryLabelSettings || {},
-                v.countryLabelSettings || {}
-            )
+            const labelSettings = Object.assign({}, out.gridCartogramSettings_?.countryLabelSettings || {}, v.countryLabelSettings || {})
             ;['countryLabels', 'countryLabelFontSize', 'countryLabelMinFontSize', 'countryLabelPadding', 'countryLabelAvoidOverlap'].forEach(
                 (key) => {
                     if (v[key] !== undefined) labelSettings[key] = v[key]
@@ -513,16 +516,26 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         selectAll('#' + out.svgId() + ' > *').remove()
 
         //set SVG dimensions
-        if (out.geo_.toUpperCase() == 'WORLD') {
-            //if no height was specified, use 45% of the width.
-            if (!out.height()) out.height(0.55 * out.width())
-            svg.attr('width', out.width()).attr('height', out.height())
+        if (!out.height()) {
+            let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
 
+            // Get available height constrained to 99% of screen/container height
+            const availableHeight = getAvailableHeight(out)
+            const maxTotalHeight = 0.99 * availableHeight
+
+            // Estimate header/footer/padding overhead to find maximum allowed map height
+            const overhead = (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
+
+            if (defaultHeight + overhead > maxTotalHeight) {
+                defaultHeight = Math.max(150, maxTotalHeight - overhead)
+            }
+            out.height(defaultHeight)
+        }
+
+        if (out.geo_.toUpperCase() == 'WORLD') {
             //WORLD geo only accepts proj 54030 (robinson) at the moment
             out.proj_ = 54030
         }
-        //if no height was specified, use 85% of the width.
-        if (!out.height()) out.height(0.85 * out.width())
         svg.attr('width', out.width()).attr('height', out.height())
 
         // define clipPath relative to the drawing group (map area)
@@ -804,4 +817,45 @@ export const updateGeoMapTemplate = function (callback, map) {
     })
 
     return map
+}
+
+const getAvailableHeight = function (out) {
+    let availableHeight = typeof window !== 'undefined' ? window.innerHeight : 800
+
+    if (typeof document !== 'undefined') {
+        const svgId = out.svgId()
+        const containerId = out.containerId_
+
+        let container = null
+        // Only use containerId_ if it is explicitly set and is DIFFERENT from the SVG ID
+        if (containerId && containerId !== svgId) {
+            container = document.getElementById(containerId)
+        }
+
+        // If no explicit container was found, try to find the parent container in the DOM
+        if (!container) {
+            const svgEl = document.getElementById(svgId)
+            if (svgEl) {
+                let parent = svgEl.parentNode
+                if (parent && parent.classList?.contains('em-map-wrapper')) {
+                    parent = parent.parentNode
+                }
+                container = parent
+            }
+        }
+
+        if (container && container !== document.body && container !== document.documentElement) {
+            // Ensure the container is not the SVG element or wrapper itself
+            const tagName = container.tagName?.toLowerCase()
+            const isMapElement = tagName === 'svg' || container.classList?.contains('em-map-wrapper') || container.classList?.contains('em-map')
+
+            if (!isMapElement) {
+                const containerHeight = container.clientHeight
+                if (containerHeight > 0) {
+                    availableHeight = Math.min(availableHeight, containerHeight)
+                }
+            }
+        }
+    }
+    return availableHeight
 }

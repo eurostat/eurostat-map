@@ -4,6 +4,7 @@ import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import { createStatMap } from '../../core/stat-map'
+import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
 import { interpolate } from 'd3-interpolate'
@@ -541,6 +542,12 @@ export const map = function (config) {
             }
         }
 
+        // Also check custom size legend values
+        const legendConfig = out.legend()
+        if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
+            allMonthlyValues.push(...legendConfig.sizeLegend.values)
+        }
+
         const radialScale = createRadialScale(allMonthlyValues, maxRadius, 0)
         // minRadius is intentionally 0 here — the minimum chart size is enforced
         // geometrically via a per-chart scaleFactor in drawCoxcombChart, which
@@ -639,6 +646,10 @@ export const map = function (config) {
             addMouseEventsToRegionPolygons(map)
             addMouseEventsToRegions(map)
             addCoxcombChartsToMap(regionFeatures, map)
+        }
+
+        if (out.patternFill_) {
+            applyPatternFill(map, out.patternFill_)
         }
     }
 

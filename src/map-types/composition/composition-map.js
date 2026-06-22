@@ -1,8 +1,9 @@
-import { scaleSqrt } from 'd3-scale'
+import { scaleSqrt, scaleLinear } from 'd3-scale'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 import { select } from 'd3-selection'
 import { extent } from 'd3-array'
 import { getCentroidsGroup } from '../../core/geo/centroids'
+import { formatRawValue } from '../../core/utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionStatConfig} CompositionStatConfig */
@@ -193,7 +194,19 @@ export const applyClassificationToMap = function (map, out, getAnchors, totalCod
 
     const domain = getDatasetMaxMin(map, out, getAnchors, totalCodeKey)
     if (!isNaN(domain[0])) {
-        out.classifierSize_ = scaleSqrt().domain(domain).range([minSize, maxSize])
+        // Check if there are custom size legend values that exceed the observed max
+        const legendConfig = out.legend()
+        if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
+            const maxLegendValue = Math.max(...legendConfig.sizeLegend.values)
+            if (maxLegendValue > domain[1]) {
+                domain[1] = maxLegendValue
+            }
+        }
+        if (out._mapType === 'bar') {
+            out.classifierSize_ = scaleLinear().domain([0, domain[1]]).range([minSize, maxSize])
+        } else {
+            out.classifierSize_ = scaleSqrt().domain(domain).range([minSize, maxSize])
+        }
     }
 }
 
@@ -625,7 +638,7 @@ export const buildTooltipBreakdownHTML = function (regionId, out, getRegionTotal
         <div class="em-breakdown-item">
             <span class="em-breakdown-color" style="background:${item.color}"></span>
             <span class="em-breakdown-label">${item.label || item.code}</span>
-            <span class="em-breakdown-value">${item.value?.toFixed ? item.value.toFixed(1) : 0}%</span>
+            <span class="em-breakdown-value">${item.value?.toFixed ? formatRawValue(item.value) : 0}%</span>
         </div>`
         } else {
             const percent = total ? ((item.value / total) * 100).toFixed(0) : 0
@@ -633,7 +646,7 @@ export const buildTooltipBreakdownHTML = function (regionId, out, getRegionTotal
         <div class="em-breakdown-item">
             <span class="em-breakdown-color" style="background:${item.color}"></span>
             <span class="em-breakdown-label">${item.label || item.code}</span>
-            <span class="em-breakdown-value">${item.value?.toFixed ? spaceAsThousandSeparator(item.value) : 0} (${isNaN(percent) ? 0 : percent}%)</span>
+            <span class="em-breakdown-value">${item.value?.toFixed ? formatRawValue(item.value) : 0} (${isNaN(percent) ? 0 : percent}%)</span>
         </div>`
         }
     }
@@ -644,7 +657,7 @@ export const buildTooltipBreakdownHTML = function (regionId, out, getRegionTotal
         html += `
         <div class="em-breakdown-item em-total">
             <span class="em-breakdown-label">Total</span>
-            <span class="em-breakdown-value">${spaceAsThousandSeparator(total)} ${unit}</span>
+            <span class="em-breakdown-value">${formatRawValue(total)} ${unit}</span>
         </div>`
     }
 

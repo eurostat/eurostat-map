@@ -7,7 +7,12 @@ export function appendPatternFillLegend(out, container) {
 
     if (!map.patternFill_) return
 
-    map.patternFill_.forEach((cfg, index) => {
+    let configs = map.patternFill_
+    if (!Array.isArray(configs)) {
+        configs = [configs]
+    }
+
+    configs.forEach((cfg, index) => {
         if (!cfg.legendLabel) return // skip if no label
 
         const y = index * out.shapeHeight + index * out.shapePadding + offsetY

@@ -387,4 +387,80 @@ export const defineDeprecatedFunctions = (out) => {
         out.scalebar({ tickHeight: v }),
         out
     )
+    // Legacy individual setters (deprecated but kept for backward compatibility)
+    out.barType = function (v) {
+        if (!arguments.length) return out.barSettings_.type
+        out.barSettings_.type = v
+        return out
+    }
+    out.barMaxWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.maxWidth
+        out.barSettings_.maxWidth = v
+        return out
+    }
+    out.barMinWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.minWidth
+        out.barSettings_.minWidth = v
+        return out
+    }
+    out.barHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.height
+        out.barSettings_.height = v
+        return out
+    }
+    out.barGroupWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.groupWidth
+        out.barSettings_.groupWidth = v
+        return out
+    }
+    out.barGroupGap = function (v) {
+        if (!arguments.length) return out.barSettings_.groupGap
+        out.barSettings_.groupGap = v
+        return out
+    }
+    out.barGroupMinHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.groupMinHeight
+        out.barSettings_.groupMinHeight = v
+        return out
+    }
+    out.barGroupMaxHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.groupMaxHeight
+        out.barSettings_.groupMaxHeight = v
+        return out
+    }
+    out.barStrokeFill = function (v) {
+        if (!arguments.length) return out.barSettings_.strokeFill
+        out.barSettings_.strokeFill = v
+        return out
+    }
+    out.barStrokeWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.strokeWidth
+        out.barSettings_.strokeWidth = v
+        return out
+    }
+    out.barCornerRadius = function (v) {
+        if (!arguments.length) return out.barSettings_.cornerRadius
+        out.barSettings_.cornerRadius = v
+        return out
+    }
+    out.barOtherColor = function (v) {
+        if (!arguments.length) return out.barSettings_.otherColor
+        out.barSettings_.otherColor = v
+        return out
+    }
+    out.barOtherText = function (v) {
+        if (!arguments.length) return out.barSettings_.otherText
+        out.barSettings_.otherText = v
+        return out
+    }
+    out.barTooltipWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.tooltipWidth
+        out.barSettings_.tooltipWidth = v
+        return out
+    }
+    out.barTooltipHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.tooltipHeight
+        out.barSettings_.tooltipHeight = v
+        return out
+    }
 }

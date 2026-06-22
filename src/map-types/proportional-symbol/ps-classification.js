@@ -44,7 +44,13 @@ function defineColorClassifier(out) {
 
 function defineSizeClassifier(out) {
     // raw values (size-specific first, fallback)
-    const rawData = out.statData('size')?.getArray() ?? out.statData()?.getArray() ?? []
+    let rawData = out.statData('size')?.getArray() ?? out.statData()?.getArray() ?? []
+
+    // Also check custom size legend values
+    const legendConfig = out.legend()
+    if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
+        rawData = [...rawData, ...legendConfig.sizeLegend.values]
+    }
 
     // choose scale type based on shape
     const isLinear = out.psShape_ === 'spike' || out.psShape_ === 'bar' || out.psShape_ === 'line'

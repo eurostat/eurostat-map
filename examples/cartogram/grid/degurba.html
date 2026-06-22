@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>DEGURBA</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0px;
+                font-family: Arial, sans-serif;
+            }
+            .controls {
+                padding: 15px;
+
+                display: flex;
+                gap: 20px;
+                align-items: center;
+            }
+            .control-group {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            label {
+                font-weight: bold;
+            }
+            select {
+                padding: 5px 10px;
+                font-size: 14px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+            }
+            .toggle-switch {
+                position: relative;
+                display: inline-block;
+                width: 50px;
+                height: 24px;
+            }
+            .toggle-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: 0.4s;
+                border-radius: 24px;
+            }
+            .slider:before {
+                position: absolute;
+                content: '';
+                height: 18px;
+                width: 18px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+            }
+            input:checked + .slider {
+                background-color: #2196f3;
+            }
+            input:checked + .slider:before {
+                transform: translateX(26px);
+            }
+            .em-grid-cell rect {
+                stroke: #999 !important;
+                stroke-width: 0px !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="controls">
+            <div class="control-group">
+                <label for="dataset-select">Select Dataset:</label>
+                <select id="dataset-select">
+                    <option value="unemployment">Unemployment rate</option>
+                    <option value="flat">Population living in flats</option>
+                    <option value="education">Education level</option>
+                    <option value="social">Social network use</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="cartogram-toggle">Grid Cartogram:</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="cartogram-toggle" checked />
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            // Configuration for each dataset
+
+            const configs = {
+                unemployment: {
+                    data: 'data/degurba/unemployment.json',
+                    title: 'Unemployment rate',
+                    subtitle: 'Share of people aged 15-74, by degree of urbanisation, 2025',
+                    legendTitle: 'Degree of urbanisation',
+                    sizeLegendTitle: '% people aged 15-74',
+                    noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'LI'],
+                },
+                flat: {
+                    data: 'data/degurba/flat.json',
+                    title: 'Population living in flats',
+                    subtitle: 'Share of people currently living in flats, by degree of urbanisation, 2025',
+                    unitText: '%',
+                    legendTitle: 'Degree of urbanisation',
+                    sizeLegendTitle: '% of people',
+                    noDataRegions: ['IS', 'CH', 'UK', 'LI', 'RS', 'ME', 'AL', 'BA', 'MK', 'TR'],
+                },
+
+                education: {
+                    data: 'data/degurba/education.json',
+                    title: 'Participation rate in education and training',
+                    subtitle: 'Share of people aged 18-64, by degree of urbanisation, 2025',
+                    unitText: '%',
+                    legendTitle: 'Degree of urbanisation',
+                    sizeLegendTitle: '% people aged 18-64',
+                    noDataRegions: ['IS', 'CH', 'UK', 'LI', 'BA', 'ME', 'AL', 'TR'],
+                },
+                social: {
+                    data: 'data/degurba/social.json',
+                    title: 'Participation in social networks',
+                    subtitle: 'Share of all people, by degree of urbanisation, 2025',
+                    footnote: 'Includes creating user profile, posting messages or other contributions to facebook, twitter, etc.',
+                    unitText: '%',
+                    legendTitle: 'Degree of urbanisation',
+                    sizeLegendTitle: '% of people',
+                    noDataRegions: ['RS', 'ME', 'LI', 'UK', 'IS'],
+                },
+            }
+
+            let map = null
+            let currentDataset = 'flat'
+            let isCartogram = true
+
+            async function buildMap(configKey, useCartogram) {
+                const config = configs[configKey]
+                currentDataset = configKey
+                isCartogram = useCartogram
+
+                // Fetch the data
+                const response = await fetch(config.data)
+                const data = await response.json()
+
+                // Remove existing map if it exists
+                if (map) {
+                    const svg = document.getElementById('bar')
+                    if (svg) {
+                        svg.innerHTML = ''
+                    }
+                }
+
+                // Build new map with selected configuration
+                const GROUP_MAX_HEIGHT = useCartogram ? 48 : 45
+                map = eurostatmap
+                    .map('bar')
+                    .dorling(true)
+                    .hoverColor('#f0f0f0')
+                    .dorling(!useCartogram) // use dorling when NOT in cartogram mode
+                    .gridCartogram(useCartogram) // enable grid cartogram when toggled
+                    .gridCartogramSettings({
+                        spacing: 0,
+                        cellPadding: 2,
+                        margins: { top: 2, right: 100, bottom: 0, left: 0 },
+                        positions: `
+                                    ,IS,  ,  ,NO,SE,FI,  ,  ,  ,  ,  ,
+                                    ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,  ,
+                                    ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,  ,
+                                    ,IE, UK ,  ,  ,DK,  ,LT,  ,  ,  ,  ,
+                                    ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
+                                    ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
+                                    ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
+                                    ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
+                                    ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
+                                    ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,  
+                                    ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `,
+                        countryLabels: 'name',
+                        countryLabelPadding: { x: 2, y: -4 },
+                        countryLabelFontSize: 11,
+                    })
+                    .svgId('bar')
+                    .scale('60M')
+                    .nutsLevel(0)
+                    .statBar({
+                        customData: data,
+                        categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
+                        categoryLabels: ['Cities', 'Towns and suburbs', 'Rural areas'],
+                        categoryColors: ['#33A033', '#8F741A', '#E04040'],
+                        unitText: config.unitText,
+                    })
+                    .barSettings({
+                        //type: 'grouped',
+                        groupWidth: useCartogram ? 17 : 9,
+                        groupMaxHeight: GROUP_MAX_HEIGHT,
+                        groupMaxValue: 100, // optional override for grouped mode max value - for sharing scales across maps
+                    })
+                    .title(config.title)
+                    .header(true)
+                    .footer(true)
+                    .subtitle(config.subtitle)
+                    .legend({
+                        x: 560,
+                        y: 60,
+                        boxOpacity: 0.8,
+                        boxFill: 'white',
+                        sizeLegend: {
+                            title: config.sizeLegendTitle,
+                            titlePadding: 10,
+                        },
+                        colorLegend: {
+                            title: config.legendTitle,
+                            noData: false,
+                        },
+                    })
+                    .patternFill({
+                        pattern: 'hatching',
+                        color: '#000000',
+                        strokeWidth: 0.2,
+                        spacing: 15,
+                        regionIds: config.noDataRegions,
+                        legendLabel: 'Data unavailable',
+                    })
+                    .noDataFillStyle('#ffffff')
+                    .zoomButtons(false)
+
+                map.build()
+            }
+
+            // Initialize with first dataset
+            buildMap('unemployment', true)
+
+            // Add event listener for dropdown
+            document.getElementById('dataset-select').addEventListener('change', function (e) {
+                buildMap(e.target.value, isCartogram)
+            })
+
+            // Add event listener for cartogram toggle
+            document.getElementById('cartogram-toggle').addEventListener('change', function (e) {
+                buildMap(currentDataset, e.target.checked)
+            })
+        </script>
+    </body>
+</html>

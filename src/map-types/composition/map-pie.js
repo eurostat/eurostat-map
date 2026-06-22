@@ -2,6 +2,7 @@ import { select } from 'd3-selection'
 import { arc, pie } from 'd3-shape'
 import { interpolate } from 'd3-interpolate'
 import { createStatMap } from '../../core/stat-map'
+import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as PiechartLegend from '../../legend/legend-pie-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
@@ -247,6 +248,10 @@ export const map = function (config) {
 
             addChartsToMap(map, regionFeatures)
             addMouseEventsToRegions(regions, map)
+        }
+
+        if (out.patternFill_) {
+            applyPatternFill(map, out.patternFill_)
         }
     }
 

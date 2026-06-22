@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
 import { createStatMap } from '../../core/stat-map'
+import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as WaffleChartLegend from '../../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
@@ -198,6 +199,10 @@ export const map = function (config) {
 
             addWaffleChartsToMap(map, regionFeatures)
             addMouseEventsToRegions(regions, map)
+        }
+
+        if (out.patternFill_) {
+            applyPatternFill(map, out.patternFill_)
         }
     }
 

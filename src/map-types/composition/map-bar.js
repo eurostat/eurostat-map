@@ -1,8 +1,9 @@
-import { scaleSqrt } from 'd3-scale'
+import { scaleSqrt, scaleLinear } from 'd3-scale'
 import { select } from 'd3-selection'
 import { createStatMap } from '../../core/stat-map'
+import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
-import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
+import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator, formatRawValue } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
@@ -81,6 +82,7 @@ export const map = function (config) {
         groupGap: 0,
         groupMinHeight: 2,
         groupMaxHeight: 40,
+        groupMaxValue: undefined, // optional override for grouped mode max value - for sharing scales across maps
         strokeFill: 'white',
         strokeWidth: 0.3,
         cornerRadius: 1,
@@ -112,83 +114,6 @@ export const map = function (config) {
     }
 
     buildGetterSetters(out, ['catColors_', 'catLabels_', 'showOnlyWhenComplete_', 'noDataFillStyle_', 'dorling_', 'barTotalCode_', 'statCodes_'])
-
-    // Legacy individual setters (deprecated but kept for backward compatibility)
-    out.barType = function (v) {
-        if (!arguments.length) return out.barSettings_.type
-        out.barSettings_.type = v
-        return out
-    }
-    out.barMaxWidth = function (v) {
-        if (!arguments.length) return out.barSettings_.maxWidth
-        out.barSettings_.maxWidth = v
-        return out
-    }
-    out.barMinWidth = function (v) {
-        if (!arguments.length) return out.barSettings_.minWidth
-        out.barSettings_.minWidth = v
-        return out
-    }
-    out.barHeight = function (v) {
-        if (!arguments.length) return out.barSettings_.height
-        out.barSettings_.height = v
-        return out
-    }
-    out.barGroupWidth = function (v) {
-        if (!arguments.length) return out.barSettings_.groupWidth
-        out.barSettings_.groupWidth = v
-        return out
-    }
-    out.barGroupGap = function (v) {
-        if (!arguments.length) return out.barSettings_.groupGap
-        out.barSettings_.groupGap = v
-        return out
-    }
-    out.barGroupMinHeight = function (v) {
-        if (!arguments.length) return out.barSettings_.groupMinHeight
-        out.barSettings_.groupMinHeight = v
-        return out
-    }
-    out.barGroupMaxHeight = function (v) {
-        if (!arguments.length) return out.barSettings_.groupMaxHeight
-        out.barSettings_.groupMaxHeight = v
-        return out
-    }
-    out.barStrokeFill = function (v) {
-        if (!arguments.length) return out.barSettings_.strokeFill
-        out.barSettings_.strokeFill = v
-        return out
-    }
-    out.barStrokeWidth = function (v) {
-        if (!arguments.length) return out.barSettings_.strokeWidth
-        out.barSettings_.strokeWidth = v
-        return out
-    }
-    out.barCornerRadius = function (v) {
-        if (!arguments.length) return out.barSettings_.cornerRadius
-        out.barSettings_.cornerRadius = v
-        return out
-    }
-    out.barOtherColor = function (v) {
-        if (!arguments.length) return out.barSettings_.otherColor
-        out.barSettings_.otherColor = v
-        return out
-    }
-    out.barOtherText = function (v) {
-        if (!arguments.length) return out.barSettings_.otherText
-        out.barSettings_.otherText = v
-        return out
-    }
-    out.barTooltipWidth = function (v) {
-        if (!arguments.length) return out.barSettings_.tooltipWidth
-        out.barSettings_.tooltipWidth = v
-        return out
-    }
-    out.barTooltipHeight = function (v) {
-        if (!arguments.length) return out.barSettings_.tooltipHeight
-        out.barSettings_.tooltipHeight = v
-        return out
-    }
 
     applyConfigValues(out, config, ['catColors', 'catLabels', 'showOnlyWhenComplete', 'noDataFillStyle', 'statCodes'])
 
@@ -235,7 +160,7 @@ export const map = function (config) {
     function computeGroupedClassifier() {
         if (!out.statCodes_) return
 
-        let maxCatValue = 0
+        let maxCatValue = out.barSettings_.groupMaxValue || 0
 
         _getAnchors(out).each(function (rg) {
             const id = rg.properties.id
@@ -247,9 +172,18 @@ export const map = function (config) {
             }
         })
 
+        // Check if there are custom size legend values that exceed the observed max
+        const legendConfig = out.legend()
+        if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
+            const maxLegendValue = Math.max(...legendConfig.sizeLegend.values)
+            if (maxLegendValue > maxCatValue) {
+                maxCatValue = maxLegendValue
+            }
+        }
+
         if (maxCatValue === 0) maxCatValue = 1 // guard against empty data
 
-        out.classifierSize_ = scaleSqrt().domain([0, maxCatValue]).range([0, out.barSettings_.groupMaxHeight]).clamp(true)
+        out.classifierSize_ = scaleLinear().domain([0, maxCatValue]).range([0, out.barSettings_.groupMaxHeight]).clamp(true)
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -342,6 +276,10 @@ export const map = function (config) {
             }
 
             addMouseEventsToRegions(regions, out)
+        }
+
+        if (out.patternFill_) {
+            applyPatternFill(map, out.patternFill_)
         }
     }
 
@@ -492,7 +430,7 @@ export const map = function (config) {
                 .attr('stroke', out.barSettings_.strokeFill)
                 .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
 
-            renderBar(chartNode, comp, totalWidth, false)
+            renderBar(chartNode, comp, totalWidth, true)
 
             const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
             if (shapeEl?.nextSibling) node.node().insertBefore(g.node(), shapeEl.nextSibling)
@@ -651,7 +589,7 @@ export const map = function (config) {
                 .attr('stroke', out.barSettings_.strokeFill)
                 .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
 
-            renderGroupedBars(chartNode, segments, false)
+            renderGroupedBars(chartNode, segments, true)
 
             const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
             if (shapeEl?.nextSibling) node.node().insertBefore(g.node(), shapeEl.nextSibling)
@@ -661,8 +599,16 @@ export const map = function (config) {
             map,
             getAnchors: _getAnchors,
             getRadius: (regionId) => {
-                const n = out.statCodes_?.length || 1
-                return _groupFootprintWidth(n) / 2
+                const codes = out.statCodes_
+                if (!codes?.length) return 0
+                let maxH = 0
+                for (const code of codes) {
+                    const s = out.statData(code)?.get(regionId)
+                    const rawValue = s?.value != null && !isNaN(s.value) ? s.value : 0
+                    const barHeight = Math.max(rawValue > 0 ? out.barSettings_.groupMinHeight : 0, out.classifierSize_(rawValue))
+                    maxH = Math.max(maxH, barHeight)
+                }
+                return maxH
             },
         })
     }
@@ -717,9 +663,9 @@ export const map = function (config) {
         const codes = out.statCodes_
         if (!codes?.length) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
-        const bw = 16 // slightly wider bars in tooltip for readability
-        const gap = 4
-        const maxH = out.barSettings_.tooltipWidth * 0.5 // tooltip bar height proportional to width
+        const bw = out.barSettings_.groupWidth
+        const gap = out.barSettings_.groupGap
+        const maxH = out.barSettings_.groupMaxHeight
         const valueLabelFontSize = 8
         const valueLabelGap = 2
         const valueLabelRows = 2
@@ -730,25 +676,25 @@ export const map = function (config) {
         const svgH = maxH + bottomPad + 4
         const offsetX = (svgW - totalW) / 2
 
-        // Find max value for this region's tooltip scale
-        let maxVal = 0
+        // Find if we have any valid data for this region
+        let hasData = false
         codes.forEach((code) => {
             const s = out.statData(code)?.get(regionId)
-            if (s?.value != null && !isNaN(s.value)) maxVal = Math.max(maxVal, s.value)
+            if (s?.value != null && !isNaN(s.value) && s.value !== ':') hasData = true
         })
-        if (maxVal === 0) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
+        if (!hasData) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
         let bars = ''
         const lastLabelRightByRow = Array(valueLabelRows).fill(-Infinity)
         codes.forEach((code, i) => {
             const s = out.statData(code)?.get(regionId)
-            const rawVal = s?.value != null && !isNaN(s.value) ? s.value : 0
-            const barH = (rawVal / maxVal) * maxH
+            const rawVal = s?.value != null && !isNaN(s.value) && s.value !== ':' ? s.value : 0
+            const barH = Math.max(rawVal > 0 ? out.barSettings_.groupMinHeight : 0, out.classifierSize_(rawVal))
             const x = offsetX + i * (bw + gap)
             const color = out.catColors_?.[code] || 'lightgray'
             const label = out.catLabels_?.[code] || code
-            const fullValStr = spaceAsThousandSeparator(rawVal)
-            const valStr = compactValue(rawVal)
+            const fullValStr = formatRawValue(rawVal)
+            const valStr = formatRawValue(rawVal)
             const centerX = x + bw / 2
             const estimatedLabelWidth = valStr.length * valueLabelFontSize * 0.62
             const labelLeft = centerX - estimatedLabelWidth / 2
@@ -779,18 +725,6 @@ export const map = function (config) {
             }`
         })
 
-        // Category color swatches + labels below chart
-        let legend = ''
-        codes.forEach((code, i) => {
-            const color = out.catColors_?.[code] || 'lightgray'
-            const label = out.catLabels_?.[code] || code
-            legend += `
-            <span style="display:inline-flex;align-items:center;gap:3px;margin-right:8px;font-size:11px;">
-                <span style="width:8px;height:8px;background:${color};border-radius:1px;display:inline-block;"></span>
-                ${label}
-            </span>`
-        })
-
         return `
         <div style="padding: 4px 0 2px;">
             <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;overflow:visible;">
@@ -798,8 +732,7 @@ export const map = function (config) {
                       stroke="#ccc" stroke-width="0.5"/>
                 ${bars}
             </svg>
-        </div>
-        <div style="padding: 2px 0 4px; line-height: 1.6;">${legend}</div>`
+        </div>`
     }
 
     function compactValue(value) {

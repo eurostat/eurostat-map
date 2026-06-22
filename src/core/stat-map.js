@@ -252,6 +252,8 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
     out.updateLegend = function (v) {
         if (out.legendObj_) {
+            if (out.updateClassification) out.updateClassification()
+            if (out.updateStyle) out.updateStyle()
             out.legendObj().update()
             applyLegendVisibility()
         }

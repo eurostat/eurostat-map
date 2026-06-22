@@ -39,7 +39,7 @@ export interface GridCartogramSettings {
         /** Minimum font size allowed when shrinking labels to avoid overlap. */
         countryLabelMinFontSize?: number
         /** Extra padding subtracted from the available label width before fitting. */
-        countryLabelPadding?: number
+        countryLabelPadding?: { x: number; y: number }
         /** Disable automatic label shrinking/stretching to avoid overlap. @default true */
         countryLabelAvoidOverlap?: boolean
     }
@@ -50,7 +50,7 @@ export interface GridCartogramSettings {
     /** @deprecated Use countryLabelSettings.countryLabelMinFontSize instead. */
     countryLabelMinFontSize?: number
     /** @deprecated Use countryLabelSettings.countryLabelPadding instead. */
-    countryLabelPadding?: number
+    countryLabelPadding?: { x: number; y: number }
     /** @deprecated Use countryLabelSettings.countryLabelAvoidOverlap instead. */
     countryLabelAvoidOverlap?: boolean
     /** Shared chart offset in grid cells for chart-based map types. */
