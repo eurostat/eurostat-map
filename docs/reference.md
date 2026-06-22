@@ -30,6 +30,7 @@ This document is the narrative usage guide. For generated, signature-accurate AP
         - [Coxcomb map](#coxcomb-map)
         - [Mushroom map](#mushroom-map)
         - [Waffle map](#waffle-map)
+        - [Bar chart map](#bar-chart-map)
         - [Cartograms](#cartograms)
             - [Grid Cartograms](#grid-cartograms)
             - [Dorling Cartograms](#dorling-cartograms)
@@ -1034,6 +1035,101 @@ Legacy waffle-prefixed setters (for example, `.waffleMinSize()` and `.waffleGrid
 | _map_.**dorling**([*value*])              | boolean  | _false_       | Apply dorling collision handling to waffle symbols.                                                                                                                         |
 | _map_.**waffleTotalCode**([*value*])      | string   | _undefined_   | Total code used to compute optional "other" share.                                                                                                                          |
 | _map_.**statCodes**([*value*])            | string[] | _undefined_   | Explicit stat code order used by composition rendering/legends.                                                                                                             |
+
+### Bar chart map
+
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/waffle_ex.png)](https://eurostat.github.io/eurostat-map/examples/composition/bar.html)
+
+A bar chart map shows proportional bar charts positioned at region centroids. The library supports two layout modes:
+
+- **Stacked bars** (horizontal): Bar width scales with the region total; colored segments represent category shares left-to-right. Good for comparing totals and composition simultaneously.
+- **Grouped bars** (vertical): Each category gets its own vertical bar; bar height scales with the individual category value. Good for comparing absolute category values across regions.
+
+Here is [an example](https://eurostat.github.io/eurostat-map/examples/composition/bar.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/composition/bar.html)).
+
+Example (stacked horizontal bars):
+
+```javascript
+const map = eurostatmap
+    .map('bar')
+    .title('Tourism')
+    .subtitle('Nights spent in tourist accommodation, 2022')
+    .nutsLevel(0)
+    .statBar({
+        eurostatDatasetCode: 'tour_occ_nin2',
+        filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+        unitText: 'nights spent',
+        categoryParameter: 'c_resid',
+        categoryCodes: ['FOR', 'DOM'],
+        categoryLabels: ['Foreign', 'Domestic'],
+        categoryColors: ['#7fc97f', '#beaed4'],
+        totalCode: 'TOTAL',
+    })
+    .barSettings({
+        type: 'stacked',
+        maxWidth: 40,
+        minWidth: 10,
+        height: 8,
+    })
+    .legend({
+        x: 10,
+        y: 150,
+        colorLegend: { title: 'Tourist origin', noData: false },
+    })
+    .build()
+```
+
+Example (grouped vertical bars):
+
+```javascript
+const map = eurostatmap
+    .map('bar')
+    .barSettings({
+        type: 'grouped',
+        groupWidth: 6,
+        groupMaxHeight: 40,
+    })
+    .statBar({
+        eurostatDatasetCode: 'demo_r_pjanaggr3',
+        filters: { sex: 'T', unit: 'NR', time: '2019' },
+        unitText: 'people',
+        categoryParameter: 'age',
+        categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+        categoryLabels: ['< 15', '15 to 64', '> 65'],
+        categoryColors: ['#33a02c', '#cab2d6', '#ff7f00'],
+    })
+    .build()
+```
+
+The `statBar` helper also supports `customData` and `transform` options, identical to `statPie` and `statWaffle`:
+
+```javascript
+.statBar({
+    customData: {
+        DE: { cat1: 45, cat2: 30, cat3: 25 },
+        FR: { cat1: 60, cat2: 20, cat3: 20 },
+        // etc.
+    },
+    categoryCodes: ['cat1', 'cat2', 'cat3'],
+    categoryLabels: ['Category A', 'Category B', 'Category C'],
+    categoryColors: ['#e41a1c', '#377eb8', '#4daf4a'],
+    unitText: 'units',
+    transform: (v) => v / 1000, // optional: transform values after load
+})
+```
+
+| Method                                    | Type     | Default value                                                                                                                                                                                                                                           | Description                                                                                      |
+| ----------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| _map_.**barSettings**([*value*])          | object   | `{type:'grouped', minWidth:10, maxWidth:40, height:8, groupWidth:6, groupGap:0, groupMinHeight:2, groupMaxHeight:40, strokeFill:'white', strokeWidth:0.3, cornerRadius:1, otherColor:'#FFCC80', otherText:'Other', tooltipWidth:150, tooltipHeight:20}` | Bar chart settings object. Use this to configure all bar-related visual properties in one place. |
+| _map_.**catColors**([*value*])            | object   | _auto_                                                                                                                                                                                                                                                  | Category colors indexed by category code.                                                        |
+| _map_.**catLabels**([*value*])            | object   | _auto_                                                                                                                                                                                                                                                  | Category labels indexed by category code.                                                        |
+| _map_.**showOnlyWhenComplete**([*value*]) | boolean  | _false_                                                                                                                                                                                                                                                 | Draw region only when all category values are available.                                         |
+| _map_.**noDataFillStyle**([*value*])      | string   | _"lightgray"_                                                                                                                                                                                                                                           | Fill style for regions where no data is available.                                               |
+| _map_.**dorling**([*value*])              | boolean  | _false_                                                                                                                                                                                                                                                 | Apply dorling collision handling to bar chart symbols.                                           |
+| _map_.**barTotalCode**([*value*])         | string   | _undefined_                                                                                                                                                                                                                                             | Total code used to compute optional "other" share (similar to waffle/pie totalCode).             |
+| _map_.**statCodes**([*value*])            | string[] | _undefined_                                                                                                                                                                                                                                             | Explicit stat code order used by composition rendering/legends.                                  |
+
+Legacy individual setters (e.g., `barType()`, `barMaxWidth()`, etc.) are still supported for backward compatibility but deprecated. Use `barSettings({...})` instead.
 
 ### Cartograms
 

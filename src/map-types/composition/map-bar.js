@@ -71,30 +71,30 @@ export const map = function (config) {
 
     out.dorling_ = config?.dorling || false
 
-    // Layout mode: 'stacked' (horizontal, proportional) | 'grouped' (vertical, absolute)
-    out.barType_ = 'grouped' // default to grouped for better absolute value comparison; can switch to 'stacked' for proportional view
+    // Bar settings with defaults
+    const defaultBarSettings = {
+        type: 'grouped', // 'stacked' | 'grouped'
+        minWidth: 10,
+        maxWidth: 40,
+        height: 8,
+        groupWidth: 6,
+        groupGap: 0,
+        groupMinHeight: 2,
+        groupMaxHeight: 40,
+        strokeFill: 'white',
+        strokeWidth: 0.3,
+        cornerRadius: 1,
+        otherColor: '#FFCC80',
+        otherText: 'Other',
+        tooltipWidth: 150,
+        tooltipHeight: 20,
+    }
 
-    // ── Stacked mode sizing ──────────────────────────────────────────────────
-    out.barMinWidth_ = 10 // minimum total bar width in pixels
-    out.barMaxWidth_ = 40 // maximum total bar width in pixels
-    out.barHeight_ = 8 // fixed bar height in pixels
-
-    // ── Grouped mode sizing ──────────────────────────────────────────────────
-    out.barGroupWidth_ = 6 // width of each individual bar in pixels
-    out.barGroupGap_ = 0 // gap between bars in pixels
-    out.barGroupMinHeight_ = 2 // minimum bar height (prevents invisible bars)
-    out.barGroupMaxHeight_ = 40 // maximum bar height in pixels
-
-    // ── Visual style (shared) ─────────────────────────────────────────────────
-    out.barStrokeFill_ = 'white'
-    out.barStrokeWidth_ = 0.3
-    out.barCornerRadius_ = 1
+    out.barSettings_ = { ...defaultBarSettings, ...(config?.barSettings || {}) }
 
     // ── Category data ─────────────────────────────────────────────────────────
     out.catColors_ = undefined
     out.catLabels_ = undefined
-    out.barOtherColor_ = '#FFCC80'
-    out.barOtherText_ = 'Other'
     out.showOnlyWhenComplete_ = false
 
     // ── Internal ──────────────────────────────────────────────────────────────
@@ -102,59 +102,95 @@ export const map = function (config) {
     out.barTotalCode_ = undefined
     out.statCodes_ = undefined
 
-    // ── Tooltip ───────────────────────────────────────────────────────────────
-    out.barTooltipWidth_ = 150
-    out.barTooltipHeight_ = 20
-
     // ── Getters/setters ──────────────────────────────────────────────────────
 
-    buildGetterSetters(out, [
-        'barType_',
-        'catColors_',
-        'catLabels_',
-        'showOnlyWhenComplete_',
-        'noDataFillStyle_',
-        'barMaxWidth_',
-        'barMinWidth_',
-        'barHeight_',
-        'barGroupWidth_',
-        'barGroupGap_',
-        'barGroupMinHeight_',
-        'barGroupMaxHeight_',
-        'barStrokeFill_',
-        'barStrokeWidth_',
-        'barCornerRadius_',
-        'barOtherColor_',
-        'barOtherText_',
-        'barTooltipWidth_',
-        'barTooltipHeight_',
-        'dorling_',
-        'barTotalCode_',
-        'statCodes_',
-    ])
+    // Primary barSettings getter/setter
+    out.barSettings = function (v) {
+        if (!arguments.length) return out.barSettings_
+        out.barSettings_ = { ...out.barSettings_, ...v }
+        return out
+    }
 
-    applyConfigValues(out, config, [
-        'barType',
-        'catColors',
-        'catLabels',
-        'showOnlyWhenComplete',
-        'noDataFillStyle',
-        'barMaxWidth',
-        'barMinWidth',
-        'barHeight',
-        'barGroupWidth',
-        'barGroupGap',
-        'barGroupMinHeight',
-        'barGroupMaxHeight',
-        'barStrokeFill',
-        'barStrokeWidth',
-        'barCornerRadius',
-        'barOtherColor',
-        'barOtherText',
-        'barTooltipWidth',
-        'barTooltipHeight',
-        'statCodes',
-    ])
+    buildGetterSetters(out, ['catColors_', 'catLabels_', 'showOnlyWhenComplete_', 'noDataFillStyle_', 'dorling_', 'barTotalCode_', 'statCodes_'])
+
+    // Legacy individual setters (deprecated but kept for backward compatibility)
+    out.barType = function (v) {
+        if (!arguments.length) return out.barSettings_.type
+        out.barSettings_.type = v
+        return out
+    }
+    out.barMaxWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.maxWidth
+        out.barSettings_.maxWidth = v
+        return out
+    }
+    out.barMinWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.minWidth
+        out.barSettings_.minWidth = v
+        return out
+    }
+    out.barHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.height
+        out.barSettings_.height = v
+        return out
+    }
+    out.barGroupWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.groupWidth
+        out.barSettings_.groupWidth = v
+        return out
+    }
+    out.barGroupGap = function (v) {
+        if (!arguments.length) return out.barSettings_.groupGap
+        out.barSettings_.groupGap = v
+        return out
+    }
+    out.barGroupMinHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.groupMinHeight
+        out.barSettings_.groupMinHeight = v
+        return out
+    }
+    out.barGroupMaxHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.groupMaxHeight
+        out.barSettings_.groupMaxHeight = v
+        return out
+    }
+    out.barStrokeFill = function (v) {
+        if (!arguments.length) return out.barSettings_.strokeFill
+        out.barSettings_.strokeFill = v
+        return out
+    }
+    out.barStrokeWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.strokeWidth
+        out.barSettings_.strokeWidth = v
+        return out
+    }
+    out.barCornerRadius = function (v) {
+        if (!arguments.length) return out.barSettings_.cornerRadius
+        out.barSettings_.cornerRadius = v
+        return out
+    }
+    out.barOtherColor = function (v) {
+        if (!arguments.length) return out.barSettings_.otherColor
+        out.barSettings_.otherColor = v
+        return out
+    }
+    out.barOtherText = function (v) {
+        if (!arguments.length) return out.barSettings_.otherText
+        out.barSettings_.otherText = v
+        return out
+    }
+    out.barTooltipWidth = function (v) {
+        if (!arguments.length) return out.barSettings_.tooltipWidth
+        out.barSettings_.tooltipWidth = v
+        return out
+    }
+    out.barTooltipHeight = function (v) {
+        if (!arguments.length) return out.barSettings_.tooltipHeight
+        out.barSettings_.tooltipHeight = v
+        return out
+    }
+
+    applyConfigValues(out, config, ['catColors', 'catLabels', 'showOnlyWhenComplete', 'noDataFillStyle', 'statCodes'])
 
     // ── Convenience wrappers ─────────────────────────────────────────────────
 
@@ -171,7 +207,7 @@ export const map = function (config) {
 
     //@override
     out.updateClassification = function () {
-        if (out.barType_ === 'grouped') {
+        if (out.barSettings_.type === 'grouped') {
             // Grouped mode: classifier maps individual category value → bar height.
             // The shared applyClassificationToMap works on region totals, which is
             // wrong here — we need the max per-category value across all regions.
@@ -183,10 +219,10 @@ export const map = function (config) {
             // Stacked mode: classifier maps region total → total bar width (unchanged).
             if (out.insetTemplates_) {
                 executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
-                    applyClassificationToMap(map, out, _getAnchors, 'barTotalCode_', out.barMinWidth_, out.barMaxWidth_)
+                    applyClassificationToMap(map, out, _getAnchors, 'barTotalCode_', out.barSettings_.minWidth, out.barSettings_.maxWidth)
                 )
             }
-            applyClassificationToMap(out, out, _getAnchors, 'barTotalCode_', out.barMinWidth_, out.barMaxWidth_)
+            applyClassificationToMap(out, out, _getAnchors, 'barTotalCode_', out.barSettings_.minWidth, out.barSettings_.maxWidth)
         }
         return out
     }
@@ -194,7 +230,7 @@ export const map = function (config) {
     /**
      * For grouped mode: find the maximum individual category value across all
      * regions and all categories, then build a scaleSqrt mapping that value to
-     * barGroupMaxHeight_. This ensures bars are comparable across regions.
+     * barGroupMaxHeight. This ensures bars are comparable across regions.
      */
     function computeGroupedClassifier() {
         if (!out.statCodes_) return
@@ -213,7 +249,7 @@ export const map = function (config) {
 
         if (maxCatValue === 0) maxCatValue = 1 // guard against empty data
 
-        out.classifierSize_ = scaleSqrt().domain([0, maxCatValue]).range([0, out.barGroupMaxHeight_]).clamp(true)
+        out.classifierSize_ = scaleSqrt().domain([0, maxCatValue]).range([0, out.barSettings_.groupMaxHeight]).clamp(true)
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -223,7 +259,7 @@ export const map = function (config) {
         try {
             if (!out.classifierSize_) return
 
-            ensureCategoryColors(out, 'barTotalCode_', out.barOtherColor_, out.barOtherText_)
+            ensureCategoryColors(out, 'barTotalCode_', out.barSettings_.otherColor, out.barSettings_.otherText)
 
             if (out.insetTemplates_) {
                 executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
@@ -254,7 +290,7 @@ export const map = function (config) {
      * Grouped: half the total group footprint width.
      */
     function _getDorlingRadius(regionId) {
-        if (out.barType_ === 'grouped') {
+        if (out.barSettings_.type === 'grouped') {
             const n = out.statCodes_?.length || 1
             return _groupFootprintWidth(n) / 2
         }
@@ -264,7 +300,7 @@ export const map = function (config) {
 
     /** Total pixel width of a grouped bar cluster for n categories. */
     function _groupFootprintWidth(n) {
-        return n * out.barGroupWidth_ + Math.max(0, n - 1) * out.barGroupGap_
+        return n * out.barSettings_.groupWidth + Math.max(0, n - 1) * out.barSettings_.groupGap
     }
 
     function applyStyleToMap(map) {
@@ -299,7 +335,7 @@ export const map = function (config) {
                 styleMixedNUTSRegions(map, regions, _getComposition)
             }
 
-            if (out.barType_ === 'grouped') {
+            if (out.barSettings_.type === 'grouped') {
                 addGroupedBarChartsToMap(regionFeatures)
             } else {
                 addBarChartsToMap(regionFeatures)
@@ -316,7 +352,7 @@ export const map = function (config) {
             return 'bar_' + rg.properties.id
         })
 
-        if (out.barType_ === 'grouped') {
+        if (out.barSettings_.type === 'grouped') {
             addGroupedBarChartsToGridCartogram(regionIds, map)
         } else {
             addBarChartsToGridCartogram(regionIds, map)
@@ -326,8 +362,8 @@ export const map = function (config) {
             out,
             '.barchart',
             _getRegionTotal,
-            (chart) => chart.style('stroke-width', out.barStrokeWidth_ + 1).style('stroke', 'black'),
-            (chart) => chart.style('stroke-width', out.barStrokeWidth_).style('stroke', out.barStrokeFill_)
+            (chart) => chart.style('stroke-width', out.barSettings_.strokeWidth + 1).style('stroke', 'black'),
+            (chart) => chart.style('stroke-width', out.barSettings_.strokeWidth).style('stroke', out.barSettings_.strokeFill)
         )
     }
 
@@ -362,8 +398,8 @@ export const map = function (config) {
      */
     function renderBar(container, comp, totalWidth, animated) {
         const segments = buildBarSegments(comp, totalWidth)
-        const h = out.barHeight_
-        const r = out.barCornerRadius_
+        const h = out.barSettings_.height
+        const r = out.barSettings_.cornerRadius
         const halfW = totalWidth / 2
         const halfH = h / 2
 
@@ -406,15 +442,15 @@ export const map = function (config) {
                 .select('#bar_' + regionId)
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barStrokeFill_)
-                .attr('stroke-width', out.barStrokeWidth_ + 'px')
+                .attr('stroke', out.barSettings_.strokeFill)
+                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
 
             renderBar(chartNode, comp, totalWidth, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.barStrokeWidth_ + 1)
+                        .style('stroke-width', out.barSettings_.strokeWidth + 1)
                         .style('stroke', 'black')
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 })
@@ -422,7 +458,7 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.barStrokeWidth_).style('stroke', out.barStrokeFill_)
+                    select(this).style('stroke-width', out.barSettings_.strokeWidth).style('stroke', out.barSettings_.strokeFill)
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })
@@ -453,8 +489,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barStrokeFill_)
-                .attr('stroke-width', out.barStrokeWidth_ + 'px')
+                .attr('stroke', out.barSettings_.strokeFill)
+                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
 
             renderBar(chartNode, comp, totalWidth, false)
 
@@ -492,8 +528,8 @@ export const map = function (config) {
 
         const segments = []
         const n = codes.length
-        const bw = out.barGroupWidth_
-        const gap = out.barGroupGap_
+        const bw = out.barSettings_.groupWidth
+        const gap = out.barSettings_.groupGap
         const totalGroupWidth = _groupFootprintWidth(n)
         const startX = -totalGroupWidth / 2
 
@@ -502,7 +538,7 @@ export const map = function (config) {
             const s = out.statData(code)?.get(regionId)
             const rawValue = s?.value != null && !isNaN(s.value) ? s.value : 0
 
-            const barHeight = Math.max(rawValue > 0 ? out.barGroupMinHeight_ : 0, out.classifierSize_(rawValue))
+            const barHeight = Math.max(rawValue > 0 ? out.barSettings_.groupMinHeight : 0, out.classifierSize_(rawValue))
 
             segments.push({
                 x: startX + i * (bw + gap),
@@ -527,7 +563,7 @@ export const map = function (config) {
      * @param {boolean} animated
      */
     function renderGroupedBars(container, segments, animated) {
-        const r = out.barCornerRadius_
+        const r = out.barSettings_.cornerRadius
 
         const rects = container
             .selectAll('rect')
@@ -568,15 +604,15 @@ export const map = function (config) {
                 .select('#bar_' + regionId)
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barStrokeFill_)
-                .attr('stroke-width', out.barStrokeWidth_ + 'px')
+                .attr('stroke', out.barSettings_.strokeFill)
+                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
 
             renderGroupedBars(chartNode, segments, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.barStrokeWidth_ + 1)
+                        .style('stroke-width', out.barSettings_.strokeWidth + 1)
                         .style('stroke', 'black')
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 })
@@ -584,7 +620,7 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.barStrokeWidth_).style('stroke', out.barStrokeFill_)
+                    select(this).style('stroke-width', out.barSettings_.strokeWidth).style('stroke', out.barSettings_.strokeFill)
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })
@@ -612,8 +648,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barStrokeFill_)
-                .attr('stroke-width', out.barStrokeWidth_ + 'px')
+                .attr('stroke', out.barSettings_.strokeFill)
+                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
 
             renderGroupedBars(chartNode, segments, false)
 
@@ -639,7 +675,7 @@ export const map = function (config) {
 
         let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
 
-        if (out.barType_ === 'grouped') {
+        if (out.barSettings_.type === 'grouped') {
             return html + buildGroupedTooltipHTML(regionId)
         }
 
@@ -650,10 +686,10 @@ export const map = function (config) {
         }
 
         // Stacked: show proportional bar SVG + breakdown table
-        const tw = out.barTooltipWidth_
-        const th = out.barTooltipHeight_
+        const tw = out.barSettings_.tooltipWidth
+        const th = out.barSettings_.tooltipHeight
         const segments = buildBarSegments(comp, tw)
-        const r = out.barCornerRadius_
+        const r = out.barSettings_.cornerRadius
 
         let rects = ''
         for (const seg of segments) {
@@ -683,14 +719,14 @@ export const map = function (config) {
 
         const bw = 16 // slightly wider bars in tooltip for readability
         const gap = 4
-        const maxH = out.barTooltipWidth_ * 0.5 // tooltip bar height proportional to width
+        const maxH = out.barSettings_.tooltipWidth * 0.5 // tooltip bar height proportional to width
         const valueLabelFontSize = 8
         const valueLabelGap = 2
         const valueLabelRows = 2
         const valueLabelRowHeight = valueLabelFontSize + 2
         const bottomPad = valueLabelRows * valueLabelRowHeight + 4 // reserve space for two non-overlapping label rows
         const totalW = codes.length * bw + (codes.length - 1) * gap
-        const svgW = Math.max(out.barTooltipWidth_, totalW + 8)
+        const svgW = Math.max(out.barSettings_.tooltipWidth, totalW + 8)
         const svgH = maxH + bottomPad + 4
         const offsetX = (svgW - totalW) / 2
 
