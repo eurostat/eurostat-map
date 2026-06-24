@@ -184,7 +184,10 @@ export const map = function (config) {
             return Math.min(maxHeight, Math.max(minHeight, out.classifierSize_(rawValue)))
         }
 
-        const height = scaleLinear().domain([0, out._groupedMaxCatValue || 1]).range([0, maxHeight]).clamp(true)(rawValue)
+        const height = scaleLinear()
+            .domain([0, out._groupedMaxCatValue || 1])
+            .range([0, maxHeight])
+            .clamp(true)(rawValue)
         return Math.min(maxHeight, Math.max(minHeight, height))
     }
 
@@ -717,7 +720,7 @@ export const map = function (config) {
         const gap = out.barSettings_.groupGap
         const maxH = out.barSettings_.groupMaxHeight
         const svgW = out.barSettings_.tooltipWidth
-        const valueLabelFontSize = 8
+        const valueLabelFontSize = 12
         const valueLabelRowHeight = valueLabelFontSize + 2
         const valueLabelRows = 2
         const bottomPad = valueLabelRows * valueLabelRowHeight + 4
@@ -762,7 +765,6 @@ export const map = function (config) {
             rowIndex >= 0
                 ? `<text x="${centerX}" y="${labelY}" text-anchor="middle"
                font-size="${valueLabelFontSize}" fill="#555"
-               style="font-family:monospace;"
                title="${label}: ${fullValStr}">${valStr}</text>`
                 : ''
         }`
