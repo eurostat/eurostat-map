@@ -23,6 +23,7 @@ import {
     buildTooltipBreakdownHTML,
 } from './composition-map'
 import { getCentroidsGroup } from '../../core/geo/centroids'
+import { getMobileSymbolScale, getResponsiveSymbolSize } from '../../core/responsive'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -118,6 +119,7 @@ export const map = function (config) {
     // ── Classification ───────────────────────────────────────────────────────
     //@override
     out.updateClassification = function () {
+        const settings = getResponsiveCompositionSettings()
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
                 applyClassificationToMap(
@@ -125,12 +127,12 @@ export const map = function (config) {
                     out,
                     _getAnchors,
                     'compositionTotalCode_',
-                    out.compositionSettings_.minSize,
-                    out.compositionSettings_.maxSize
+                    settings.minSize,
+                    settings.maxSize
                 )
             )
         }
-        applyClassificationToMap(out, out, _getAnchors, 'compositionTotalCode_', out.compositionSettings_.minSize, out.compositionSettings_.maxSize)
+        applyClassificationToMap(out, out, _getAnchors, 'compositionTotalCode_', settings.minSize, settings.maxSize)
         out.radarAbsoluteMax_ = computeRadarAbsoluteMax(out)
         return out
     }
@@ -312,7 +314,7 @@ export const map = function (config) {
     }
 
     function drawCompositionSymbol(container, data, r, animated) {
-        const settings = out.compositionSettings_ || {}
+        const settings = getResponsiveCompositionSettings()
         const type = settings.type || 'pie'
         const hasManualOrder = Array.isArray(settings.order) && settings.order.length
         let orderedData = data
@@ -498,6 +500,7 @@ export const map = function (config) {
     }
 
     function addChartsToMap(map, regionFeatures) {
+        const settings = getResponsiveCompositionSettings()
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
             const comp = _getComposition(regionId)
@@ -519,15 +522,15 @@ export const map = function (config) {
             const chartNode = nodes
                 .append('g')
                 .attr('class', 'piechart')
-                .attr('stroke', out.compositionSettings_.strokeFill)
-                .attr('stroke-width', out.compositionSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             drawCompositionSymbol(chartNode, data, r, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.compositionSettings_.strokeWidth + 1)
+                        .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
                     if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
@@ -535,13 +538,14 @@ export const map = function (config) {
                     if (map._tooltip) map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.compositionSettings_.strokeWidth).style('stroke', out.compositionSettings_.strokeFill)
+                    select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
                     if (map._tooltip) map._tooltip.mouseout()
                 })
         })
     }
 
     function addChartsToGridCartogram(regionIds, map) {
+        const settings = getResponsiveCompositionSettings()
         regionIds.forEach((regionId) => {
             const node = map.svg().select('#pie_' + regionId)
             if (node.empty()) return
@@ -575,8 +579,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'piechart')
-                .attr('stroke', out.compositionSettings_.strokeFill)
-                .attr('stroke-width', out.compositionSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             drawCompositionSymbol(chartNode, data, r, true)
 
@@ -597,6 +601,18 @@ export const map = function (config) {
     function _getGridCellShapeBBox(cellSelection) {
         const shapeEl = cellSelection.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
         return shapeEl?.getBBox() || cellSelection.node().getBBox()
+    }
+
+    function getResponsiveCompositionSettings() {
+        const scale = getMobileSymbolScale()
+        if (scale === 1) return out.compositionSettings_
+
+        return {
+            ...out.compositionSettings_,
+            minSize: getResponsiveSymbolSize(out.compositionSettings_.minSize, 3),
+            maxSize: getResponsiveSymbolSize(out.compositionSettings_.maxSize, 5),
+            strokeWidth: getResponsiveSymbolSize(out.compositionSettings_.strokeWidth, 0),
+        }
     }
 
     // ── Tooltip ──────────────────────────────────────────────────────────────

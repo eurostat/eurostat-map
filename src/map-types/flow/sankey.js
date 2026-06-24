@@ -3,6 +3,7 @@ import { sum } from 'd3-array'
 import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
 import { expandRoutesToSankeyMidpointGraph } from './flow-bidirectional.js'
+import { getResponsiveSymbolSize } from '../../core/responsive'
 
 // spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
 // See https://observablehq.com/@joewdavies/flow-map-of-europe
@@ -161,6 +162,8 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
         const colorKey = computeColorKey(out, link)
         const baseColor = getFlowStroke(out, link)
         const paint = usesGradient ? `url(#${gradientIds[i]})` : baseColor
+        const outlineWidth = getResponsiveSymbolSize(out.flowOutlineWidth_, 0)
+        const minStartWidth = getResponsiveSymbolSize(out.flowWidthGradientSettings_.minStartWidth ?? 1.5, 0)
 
         // Always use tapered polygon for sankey — either gradient-width or pointed tip
         if (out.flowOutlines_) {
@@ -170,10 +173,10 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                 {
                     startRatio: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.startRatio ?? 0.25) : 1,
                     samples: out.flowWidthGradientSettings_?.samples ?? 48,
-                    minStartWidth: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.minStartWidth ?? 1.5) : link.width,
+                    minStartWidth: out.flowWidthGradient_ ? minStartWidth : link.width,
                     pointedTip: true,
                 },
-                out.flowOutlineWidth_
+                outlineWidth
             )
             flowsGroup
                 .append('path')
@@ -183,7 +186,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                 .attr('data-center-path', dCenter)
                 .attr('data-link-width', link.width)
                 .attr('data-is-outline', 'true')
-                .attr('data-outline-width', out.flowOutlineWidth_)
+                .attr('data-outline-width', outlineWidth)
                 .style('pointer-events', 'none')
         }
 
@@ -193,7 +196,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
             {
                 startRatio: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.startRatio ?? 0.25) : 1,
                 samples: out.flowWidthGradientSettings_?.samples ?? 48,
-                minStartWidth: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.minStartWidth ?? 1.5) : link.width,
+                minStartWidth: out.flowWidthGradient_ ? minStartWidth : link.width,
                 pointedTip: true,
             },
             0

@@ -3,6 +3,7 @@ import { scaleSqrt } from "d3-scale"
 import { spaceAsThousandSeparator } from "../../core/utils"
 import { create, select, selectAll } from 'd3-selection'
 import { createSqrtScale } from "../../core/scale"
+import { getResponsiveSymbolSize } from "../../core/responsive"
 
 function computeCircleLocationStats(out) {
     const statsByLoc = {}
@@ -55,7 +56,11 @@ export function drawNodeCircles(out, container) {
     // size scale
     out._nodeSizeScale =
         out.flowNodeSizeScale_ ||
-        createSqrtScale(totals, out.flowMaxNodeSize_ || 20, out.flowMinNodeSize_ || 0)
+        createSqrtScale(
+            totals,
+            getResponsiveSymbolSize(out.flowMaxNodeSize_ || 20, 3),
+            getResponsiveSymbolSize(out.flowMinNodeSize_ || 0, 0)
+        )
 
     const circlesContainer = container
         .append("g")

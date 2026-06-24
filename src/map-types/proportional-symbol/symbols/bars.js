@@ -1,4 +1,5 @@
 import { getCentroidsGroup } from '../../../core/geo/centroids'
+import { getResponsiveSymbolSize } from '../../../core/responsive'
 
 /**
  * @description Appends <rect> elements containing bars for each region in the map SVG
@@ -7,6 +8,7 @@ import { getCentroidsGroup } from '../../../core/geo/centroids'
  * @return {*}
  */
 export function appendBarsToMap(map, sizeData, out) {
+    const barWidth = getResponsiveSymbolSize(out.psBarWidth_, 1)
     return (
         getCentroidsGroup(map)
             .selectAll('g.em-centroid')
@@ -15,7 +17,7 @@ export function appendBarsToMap(map, sizeData, out) {
                 const sv = sizeData.get(rg.properties.id)
                 if (sv && sv.value !== ':') return rg
             })
-            .attr('width', out.psBarWidth_)
+            .attr('width', barWidth)
             //for vertical bars we scale the height attribute using the classifier
             .attr('height', function (rg) {
                 const sv = sizeData.get(rg.properties.id)

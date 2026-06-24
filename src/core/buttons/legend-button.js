@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { getCSSPropertyFromClass } from '../utils'
+import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
 
 export const appendLegendButton = (map) => {
     const legendObj = map.legendObj_ || (typeof map.legendObj === 'function' ? map.legendObj() : undefined)
@@ -8,36 +8,12 @@ export const appendLegendButton = (map) => {
     const svg = select('#' + map.svgId())
     if (svg.empty()) return
 
-    const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30
-    const padding = 10
-
-    let headerOffset = 0
-    if (map.header_ && !map.isInset) {
-        const header = svg.select('#em-header-' + map.svgId_)
-        const hb = header.empty() ? null : header.node()?.getBBox?.()
-        const headerPadding = map.headerPadding_ ? map.headerPadding_ : 20
-        if (hb) headerOffset = hb.height + headerPadding
-    }
+    const buttonSize = getButtonSize()
+    const padding = getButtonPadding()
 
     const legendButton = svg.append('g').attr('class', 'em-legend-button em-button').attr('id', 'em-legend-button')
 
-    if (map.legendButtonPosition_) {
-        const userPosition = map.legendButtonPosition_
-        legendButton.attr('transform', `translate(${userPosition[0]}, ${userPosition[1] + headerOffset})`)
-    } else {
-        let y = padding + headerOffset
-
-        if (!map.header_ && !map.isInset) {
-            const titleY = map.title_ && map.titlePosition_ ? map.titlePosition_[1] : 0
-            const subtitleY = map.subtitle_ && map.subtitlePosition_ ? map.subtitlePosition_[1] : 0
-            const maxTitleY = Math.max(titleY, subtitleY)
-            if (maxTitleY > 0) {
-                y = maxTitleY + padding + 6
-            }
-        }
-
-        legendButton.attr('transform', `translate(${padding}, ${y})`)
-    }
+    positionLegendButton(map, legendButton, buttonSize, padding)
 
     legendButton.append('title').text('Show/hide legend')
     legendButton.append('rect').attr('width', buttonSize).attr('height', buttonSize).attr('class', 'em-button-rect')
@@ -90,4 +66,39 @@ export const appendLegendButton = (map) => {
         const isHidden = legendSvg.style('display') === 'none'
         legendSvg.style('display', isHidden ? null : 'none')
     })
+}
+
+export const updateLegendButtonPosition = (map) => {
+    const svg = select('#' + map.svgId())
+    if (svg.empty()) return
+
+    const legendButton = svg.select('#em-legend-button')
+    if (legendButton.empty()) return
+
+    const buttonSize = getButtonSize()
+    positionLegendButton(map, legendButton, buttonSize, getButtonPadding())
+}
+
+function positionLegendButton(map, legendButton, buttonSize, padding) {
+    if (map.legendButtonPosition_) {
+        const userPosition = map.legendButtonPosition_
+        legendButton.attr('transform', `translate(${userPosition[0]}, ${userPosition[1]})`)
+        return
+    }
+
+    const extent = getMapDrawingExtent(map)
+    const position = getCornerPosition(map.legendObj_?.position) || 'top left'
+    const [vertical, horizontal] = position.split(' ')
+
+    const x = horizontal === 'right' ? extent.x + extent.width - buttonSize - padding : extent.x + padding
+    const y = vertical === 'bottom' ? extent.y + extent.height - buttonSize - padding : extent.y + padding
+
+    legendButton.attr('transform', `translate(${x}, ${y})`)
+}
+
+function getCornerPosition(position) {
+    if (typeof position !== 'string') return null
+    const normalized = position.trim().toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
+    const supported = ['top right', 'bottom right', 'top left', 'bottom left']
+    return supported.includes(normalized) ? normalized : null
 }

@@ -8,6 +8,7 @@ import { runDorlingSimulation, stopDorlingSimulation } from '../../../core/dorli
 import { addMouseEvents } from './map-mushroom-interactions.js'
 import * as MushroomLegend from '../../../legend/legend-mushroom.js'
 import { getCentroidsGroup } from '../../../core/geo/centroids.js'
+import { getResponsiveSymbolSize } from '../../../core/responsive.js'
 //types
 /** @typedef {import('../../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../../types/map-types/proportional-symbol/mushroom/MushroomMapConfig').MushroomMapConfig} MushroomMapConfig */
@@ -117,7 +118,9 @@ export const map = function (config) {
 
         const maxVal = max(values) || 0
 
-        out._mushroomScale_ = scaleSqrt().domain([0, maxVal]).range([out.mushroomMinSize_, out.mushroomMaxSize_])
+        out._mushroomScale_ = scaleSqrt()
+            .domain([0, maxVal])
+            .range([getResponsiveSymbolSize(out.mushroomMinSize_, 2), getResponsiveSymbolSize(out.mushroomMaxSize_, 5)])
 
         return out
     }

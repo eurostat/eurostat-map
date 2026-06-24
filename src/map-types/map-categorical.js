@@ -1,11 +1,11 @@
 import { select } from 'd3-selection'
 import { scaleOrdinal } from 'd3-scale'
-import { schemeSet3 } from 'd3-scale-chromatic'
 
 import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/decoration/pattern-fill'
 import { createStatMap } from '../core/stat-map'
+import { DEFAULT_CATEGORICAL_COLORS } from '../core/color-palettes'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../types/map-types/CateogricalMapConfig').CategoricalMapConfig} CategoricalMapConfig */
@@ -125,7 +125,7 @@ export const map = function (config) {
         if (!out.classToFillStyle()) {
             const ctfs = {}
             const dom = out.classifier().domain()
-            for (let i = 0; i < dom.length; i++) ctfs[dom[i]] = schemeSet3[i % 12]
+            for (let i = 0; i < dom.length; i++) ctfs[dom[i]] = DEFAULT_CATEGORICAL_COLORS[i % DEFAULT_CATEGORICAL_COLORS.length]
             out.classToFillStyle(ctfs)
         }
 

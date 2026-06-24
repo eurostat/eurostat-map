@@ -13,6 +13,7 @@ import { drawNodeDonuts } from './donuts'
 import { drawNodeCircles } from './circles'
 import { scaleOrdinal } from 'd3-scale'
 import { addFlowValueLabels } from '../../core/decoration/labels'
+import { getResponsiveSymbolSize } from '../../core/responsive'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/flow/FlowMapConfig').FlowMapConfig} FlowMapConfig */
@@ -235,8 +236,8 @@ function defineWidthScale(out) {
     const smallestPositive = min(positives)
 
     // visual params
-    const minW = Math.max(0, out.flowMinWidth_ || 0) // visible floor (px)
-    const maxW = out.flowMaxWidth_ // max stroke width (px)
+    const minW = getResponsiveSymbolSize(Math.max(0, out.flowMinWidth_ || 0), 0) // visible floor (px)
+    const maxW = getResponsiveSymbolSize(out.flowMaxWidth_, 2) // max stroke width (px)
 
     // Base linear scale for positives only
     const base = scaleLinear().domain([0, upper]).range([0, maxW]).clamp(true)

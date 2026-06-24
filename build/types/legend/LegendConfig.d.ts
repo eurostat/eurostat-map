@@ -6,6 +6,8 @@ export interface LegendConfig {
     x?: number
     /** Legend origin y-coordinate in pixels. */
     y?: number
+    /** Automatically position the legend in a map corner. Manual x/y coordinates take precedence. */
+    position?: 'top right' | 'bottom right' | 'top left' | 'bottom left'
     /** Legend width in pixels. */
     width?: number
     /** Legend height in pixels. */

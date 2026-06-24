@@ -22,6 +22,7 @@ import {
     buildTooltipBreakdownHTML,
 } from './composition-map'
 import { getCentroidsGroup } from '../../core/geo/centroids'
+import { getMobileSymbolScale, getResponsiveSymbolSize } from '../../core/responsive'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -133,6 +134,7 @@ export const map = function (config) {
 
     //@override
     out.updateClassification = function () {
+        const settings = getResponsiveBarSettings()
         if (out.barSettings_.type === 'grouped') {
             // Grouped mode: classifier maps individual category value → bar height.
             // The shared applyClassificationToMap works on region totals, which is
@@ -145,10 +147,10 @@ export const map = function (config) {
             // Stacked mode: classifier maps region total → total bar width (unchanged).
             if (out.insetTemplates_) {
                 executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
-                    applyClassificationToMap(map, out, _getAnchors, 'barTotalCode_', out.barSettings_.minWidth, out.barSettings_.maxWidth)
+                    applyClassificationToMap(map, out, _getAnchors, 'barTotalCode_', settings.minWidth, settings.maxWidth)
                 )
             }
-            applyClassificationToMap(out, out, _getAnchors, 'barTotalCode_', out.barSettings_.minWidth, out.barSettings_.maxWidth)
+            applyClassificationToMap(out, out, _getAnchors, 'barTotalCode_', settings.minWidth, settings.maxWidth)
         }
         return out
     }
@@ -160,15 +162,16 @@ export const map = function (config) {
      * @param {DOMRect|null} bbox - bounding box of the container cell, or null
      */
     function _resolvedGroupWidth(n, bbox) {
-        if (out.barSettings_.groupWidth != null) return out.barSettings_.groupWidth
+        const settings = getResponsiveBarSettings()
+        if (settings.groupWidth != null) return settings.groupWidth
         if (!bbox || !n) return 9 // safe fallback
-        const gap = out.barSettings_.groupGap
+        const gap = settings.groupGap
         // total available width = bbox.width; solve for bw: n*bw + (n-1)*gap = bbox.width
         return Math.max(1, (bbox.width - Math.max(0, n - 1) * gap) / n)
     }
 
     function _effectiveGroupMaxHeight(bbox) {
-        const configuredMaxHeight = out.barSettings_.groupMaxHeight
+        const configuredMaxHeight = getResponsiveBarSettings().groupMaxHeight
         if (!out.gridCartogram_ || !bbox) return configuredMaxHeight
         return Math.max(0, Math.min(configuredMaxHeight, bbox.height))
     }
@@ -179,7 +182,7 @@ export const map = function (config) {
         const maxHeight = _effectiveGroupMaxHeight(bbox)
         if (maxHeight <= 0) return 0
 
-        const minHeight = Math.min(out.barSettings_.groupMinHeight, maxHeight)
+        const minHeight = Math.min(getResponsiveBarSettings().groupMinHeight, maxHeight)
         if (!out.gridCartogram_ || !bbox) {
             return Math.min(maxHeight, Math.max(minHeight, out.classifierSize_(rawValue)))
         }
@@ -228,7 +231,7 @@ export const map = function (config) {
         if (maxCatValue === 0) maxCatValue = 1 // guard against empty data
 
         out._groupedMaxCatValue = maxCatValue
-        out.classifierSize_ = scaleLinear().domain([0, maxCatValue]).range([0, out.barSettings_.groupMaxHeight]).clamp(true)
+        out.classifierSize_ = scaleLinear().domain([0, maxCatValue]).range([0, getResponsiveBarSettings().groupMaxHeight]).clamp(true)
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -279,8 +282,9 @@ export const map = function (config) {
 
     /** Total pixel width of a grouped bar cluster for n categories. */
     function _groupFootprintWidth(n, bbox = null) {
+        const settings = getResponsiveBarSettings()
         const bw = _resolvedGroupWidth(n, bbox)
-        return n * bw + Math.max(0, n - 1) * out.barSettings_.groupGap
+        return n * bw + Math.max(0, n - 1) * settings.groupGap
     }
 
     function applyStyleToMap(map) {
@@ -330,6 +334,7 @@ export const map = function (config) {
     }
 
     function applyStyleToGridCartogram(map) {
+        const settings = getResponsiveBarSettings()
         const regionIds = []
         _getAnchors(map).attr('id', (rg) => {
             regionIds.push(rg.properties.id)
@@ -346,8 +351,8 @@ export const map = function (config) {
             out,
             '.barchart',
             _getRegionTotal,
-            (chart) => chart.style('stroke-width', out.barSettings_.strokeWidth + 1).style('stroke', 'black'),
-            (chart) => chart.style('stroke-width', out.barSettings_.strokeWidth).style('stroke', out.barSettings_.strokeFill)
+            (chart) => chart.style('stroke-width', settings.strokeWidth + 1).style('stroke', 'black'),
+            (chart) => chart.style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
         )
     }
 
@@ -381,9 +386,10 @@ export const map = function (config) {
      * Centered at (0, 0): x offset by -totalWidth/2, y offset by -barHeight/2.
      */
     function renderBar(container, comp, totalWidth, animated) {
+        const settings = getResponsiveBarSettings()
         const segments = buildBarSegments(comp, totalWidth)
-        const h = out.barSettings_.height
-        const r = out.barSettings_.cornerRadius
+        const h = settings.height
+        const r = settings.cornerRadius
         const halfW = totalWidth / 2
         const halfH = h / 2
 
@@ -413,6 +419,7 @@ export const map = function (config) {
     }
 
     function addBarChartsToMap(regionFeatures) {
+        const settings = getResponsiveBarSettings()
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
             const comp = _getComposition(regionId)
@@ -426,15 +433,15 @@ export const map = function (config) {
                 .select('#bar_' + regionId)
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barSettings_.strokeFill)
-                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             renderBar(chartNode, comp, totalWidth, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.barSettings_.strokeWidth + 1)
+                        .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 })
@@ -442,13 +449,14 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.barSettings_.strokeWidth).style('stroke', out.barSettings_.strokeFill)
+                    select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })
     }
 
     function addBarChartsToGridCartogram(regionIds, map) {
+        const settings = getResponsiveBarSettings()
         regionIds.forEach((regionId) => {
             const node = out.svg().select('#bar_' + regionId)
             if (node.empty()) return
@@ -473,8 +481,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barSettings_.strokeFill)
-                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             renderBar(chartNode, comp, totalWidth, true)
 
@@ -507,13 +515,14 @@ export const map = function (config) {
      * @returns {Array|null}
      */
     function buildGroupedSegments(regionId, bbox) {
+        const settings = getResponsiveBarSettings()
         const codes = out.statCodes_
         if (!codes?.length) return null
 
         const segments = []
         const n = codes.length
         const bw = _resolvedGroupWidth(n, bbox) // ← was: out.barSettings_.groupWidth
-        const gap = out.barSettings_.groupGap
+        const gap = settings.groupGap
         const totalGroupWidth = n * bw + Math.max(0, n - 1) * gap
         const startX = -totalGroupWidth / 2
 
@@ -545,7 +554,7 @@ export const map = function (config) {
      * @param {boolean} animated
      */
     function renderGroupedBars(container, segments, animated) {
-        const r = out.barSettings_.cornerRadius
+        const r = getResponsiveBarSettings().cornerRadius
 
         const rects = container
             .selectAll('rect')
@@ -576,6 +585,7 @@ export const map = function (config) {
     }
 
     function addGroupedBarChartsToMap(regionFeatures) {
+        const settings = getResponsiveBarSettings()
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
             const segments = buildGroupedSegments(regionId, null) // ← null: no bbox in centroid mode
@@ -586,15 +596,15 @@ export const map = function (config) {
                 .select('#bar_' + regionId)
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barSettings_.strokeFill)
-                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             renderGroupedBars(chartNode, segments, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.barSettings_.strokeWidth + 1)
+                        .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
                     if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
                 })
@@ -602,13 +612,14 @@ export const map = function (config) {
                     if (out._tooltip) out._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.barSettings_.strokeWidth).style('stroke', out.barSettings_.strokeFill)
+                    select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
                     if (out._tooltip) out._tooltip.mouseout()
                 })
         })
     }
 
     function addGroupedBarChartsToGridCartogram(regionIds, map) {
+        const settings = getResponsiveBarSettings()
         regionIds.forEach((regionId) => {
             const node = out.svg().select('#bar_' + regionId)
             if (node.empty()) return
@@ -630,8 +641,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'barchart')
-                .attr('stroke', out.barSettings_.strokeFill)
-                .attr('stroke-width', out.barSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             renderGroupedBars(chartNode, segments, true)
 
@@ -661,7 +672,28 @@ export const map = function (config) {
 
     // ── Tooltip ──────────────────────────────────────────────────────────────
 
+    function getResponsiveBarSettings() {
+        const scale = getMobileSymbolScale()
+        if (scale === 1) return out.barSettings_
+
+        return {
+            ...out.barSettings_,
+            minWidth: getResponsiveSymbolSize(out.barSettings_.minWidth, 4),
+            maxWidth: getResponsiveSymbolSize(out.barSettings_.maxWidth, 6),
+            height: getResponsiveSymbolSize(out.barSettings_.height, 2),
+            groupWidth: out.barSettings_.groupWidth == null ? out.barSettings_.groupWidth : getResponsiveSymbolSize(out.barSettings_.groupWidth, 1),
+            groupGap: getResponsiveSymbolSize(out.barSettings_.groupGap, 0),
+            groupMinHeight: getResponsiveSymbolSize(out.barSettings_.groupMinHeight, 1),
+            groupMaxHeight: getResponsiveSymbolSize(out.barSettings_.groupMaxHeight, 6),
+            strokeWidth: getResponsiveSymbolSize(out.barSettings_.strokeWidth, 0),
+            cornerRadius: getResponsiveSymbolSize(out.barSettings_.cornerRadius, 0),
+            tooltipWidth: getResponsiveSymbolSize(out.barSettings_.tooltipWidth, 60),
+            tooltipHeight: getResponsiveSymbolSize(out.barSettings_.tooltipHeight, 4),
+        }
+    }
+
     out.tooltip_.textFunction = function (rg, map) {
+        const settings = getResponsiveBarSettings()
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
 
@@ -678,10 +710,10 @@ export const map = function (config) {
         }
 
         // Stacked: show proportional bar SVG + breakdown table
-        const tw = out.barSettings_.tooltipWidth
-        const th = out.barSettings_.tooltipHeight
+        const tw = settings.tooltipWidth
+        const th = settings.tooltipHeight
         const segments = buildBarSegments(comp, tw)
-        const r = out.barSettings_.cornerRadius
+        const r = settings.cornerRadius
 
         let rects = ''
         for (const seg of segments) {
@@ -706,6 +738,7 @@ export const map = function (config) {
      * Shows the same vertical layout as the map, with value labels below each bar.
      */
     function buildGroupedTooltipHTML(regionId) {
+        const settings = getResponsiveBarSettings()
         const codes = out.statCodes_
         if (!codes?.length) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
@@ -717,9 +750,9 @@ export const map = function (config) {
         })
         if (!hasData) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
-        const gap = out.barSettings_.groupGap
-        const maxH = out.barSettings_.groupMaxHeight
-        const svgW = out.barSettings_.tooltipWidth
+        const gap = settings.groupGap
+        const maxH = settings.groupMaxHeight
+        const svgW = settings.tooltipWidth
         const valueLabelFontSize = 12
         const valueLabelRowHeight = valueLabelFontSize + 2
         const valueLabelRows = 2
@@ -737,7 +770,7 @@ export const map = function (config) {
         codes.forEach((code, i) => {
             const s = out.statData(code)?.get(regionId)
             const rawVal = s?.value != null && !isNaN(s.value) && s.value !== ':' ? s.value : 0
-            const barH = Math.max(rawVal > 0 ? out.barSettings_.groupMinHeight : 0, out.classifierSize_(rawVal))
+            const barH = Math.max(rawVal > 0 ? settings.groupMinHeight : 0, out.classifierSize_(rawVal))
             const x = offsetX + i * (bw + gap)
             const color = out.catColors_?.[code] || 'lightgray'
             const label = out.catLabels_?.[code] || code

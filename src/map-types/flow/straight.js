@@ -3,6 +3,7 @@ import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
 import { buildBidirectionalRouteMap } from './flow-bidirectional.js'
 import { generateUniqueId } from '../../core/utils.js'
 import { drawEdgeBundleLines } from './edge-bundling.js'
+import { getResponsiveSymbolSize } from '../../core/responsive'
 
 /**
  * Function to create a flow map with straight lines.
@@ -25,7 +26,7 @@ function drawStraightLinesByFlow(out, container) {
     const arrowIds = out.flowArrows_
         ? ensureArrowMarkers(svgRoot, {
               cacheKey: 'straight',
-              scale: out.flowArrowScale_ || 1,
+              scale: getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35),
               markerUnits: 'strokeWidth',
               hoverColor: out.hoverColor_ || 'black',
               outlineColor: out.flowOutlineColor_ || '#ffffff',
@@ -261,7 +262,7 @@ function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
         ny = dx / L
 
     const startRatio = out.flowWidthGradientSettings_?.startRatio ?? 0.25
-    const minStartWidth = out.flowWidthGradientSettings_?.minStartWidth ?? s.width * 0.25
+    const minStartWidth = getResponsiveSymbolSize(out.flowWidthGradientSettings_?.minStartWidth ?? s.width * 0.25, 0)
     const wStart = Math.max(minStartWidth, s.width * startRatio)
     const wEnd = s.width
 
@@ -324,7 +325,7 @@ function drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor) {
 // estimate arrow length (px) for a given stroke width (px), matched to arrows.js createMarker()
 function arrowBackoffPxForStroke(strokePx, out) {
     // match arrows.js createMarker(): markerWidth = 3 * scale, tip at ~90% of viewBox
-    const arrowLenPx = strokePx * (3 * (out.flowArrowScale_ || 1)) * 0.9
+    const arrowLenPx = strokePx * (3 * getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35)) * 0.9
     return arrowLenPx * 0.7 // slightly less so the base tucks under cleanly
 }
 

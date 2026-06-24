@@ -24,6 +24,7 @@ export const legend = function (map) {
     //the legend element position, in case it is embeded within the map SVG
     out.x = undefined
     out.y = undefined
+    out.position = undefined
 
     //the legend box
     out.boxPadding = 7
@@ -110,12 +111,26 @@ export const legend = function (map) {
             out.build()
         }
 
-        //position legend
-        if ((out.x != null || out.y != null) && container) {
-            const x = out.x ?? map.width() - out.width - out.boxPadding
-            const y = out.y ?? out.boxPadding
-            container.attr('transform', `translate(${x},${y})`)
-        }
+        out.applyPosition()
+    }
+
+    out.applyPosition = function () {
+        const map = out.map
+        const container = out.lgg
+        if (!map || !container || !container.node()) return
+
+        const hasManualX = out.x != null
+        const hasManualY = out.y != null
+        const cornerPosition = getCornerPosition(out.position)
+        if (!hasManualX && !hasManualY && !cornerPosition) return
+
+        const bbox = getLegendBBox(container, out)
+        const cornerCoords = cornerPosition ? getCornerCoords(cornerPosition, bbox, map, out.boxPadding) : null
+
+        const x = hasManualX ? out.x : cornerCoords ? cornerCoords.x : map.width() - out.width - out.boxPadding
+        const y = hasManualY ? out.y : cornerCoords ? cornerCoords.y : out.boxPadding
+
+        container.attr('transform', `translate(${x},${y})`)
     }
 
     out.updateConfig = function () {
@@ -184,6 +199,7 @@ export const legend = function (map) {
                 .attr('y', bb.y - p)
                 .attr('width', bb.width + 2 * p)
                 .attr('height', bb.height + 2 * p)
+            out.applyPosition()
         }
     }
 
@@ -345,6 +361,79 @@ export const legend = function (map) {
     // Helper to check for plain objects
     function isPlainObject(value) {
         return Object.prototype.toString.call(value) === '[object Object]'
+    }
+
+    function getCornerPosition(position) {
+        if (typeof position !== 'string') return null
+        const normalized = position.trim().toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
+        const supported = ['top right', 'bottom right', 'top left', 'bottom left']
+        return supported.includes(normalized) ? normalized : null
+    }
+
+    function getLegendBBox(container, legend) {
+        const node = container.node()
+        try {
+            const bbox = node.getBBox({ stroke: true })
+            if (Number.isFinite(bbox.width) && Number.isFinite(bbox.height) && (bbox.width || bbox.height)) return bbox
+        } catch (e) {
+            // Fall back below when the browser cannot provide a rendered bbox yet.
+        }
+        return { x: 0, y: 0, width: legend.width || 0, height: legend.height || 0 }
+    }
+
+    function getCornerCoords(position, bbox, map, padding) {
+        const [vertical, horizontal] = position.split(' ')
+        const extent = getMapDrawingExtent(map)
+        const buttonReserve = getLegendButtonReserve(map, position)
+        const maxX = Math.max(extent.x + padding, extent.x + extent.width - bbox.width - padding)
+        const minY = extent.y + padding
+        const maxY = Math.max(minY, extent.y + extent.height - bbox.height - padding)
+        const left = horizontal === 'right' ? maxX : extent.x + padding
+        const top =
+            vertical === 'bottom'
+                ? Math.max(minY, Math.min(maxY, maxY - buttonReserve))
+                : Math.max(minY, Math.min(maxY, minY + buttonReserve))
+
+        return {
+            x: left - bbox.x,
+            y: top - bbox.y,
+        }
+    }
+
+    function getLegendButtonReserve(map, position) {
+        if (!map.legendButton_ || map.legendButtonPosition_) return 0
+
+        const buttonPosition = getCornerPosition(map.legendObj_?.position) || 'top left'
+        if (buttonPosition !== position) return 0
+
+        const svg = map.svg?.()
+        const button = svg?.select?.('#em-legend-button')
+        if (!button || button.empty()) return 0
+
+        try {
+            const bbox = button.node().getBBox({ stroke: true })
+            return bbox.height + 8
+        } catch (e) {
+            return 38
+        }
+    }
+
+    function getMapDrawingExtent(map) {
+        const fallback = { x: 0, y: 0, width: map.width(), height: map.height() }
+        const svg = map.svg?.()
+        if (!svg) return fallback
+
+        const drawing = svg.select?.('#em-drawing-' + map.svgId_)
+        if (!drawing || drawing.empty()) return fallback
+
+        const transform = drawing.attr('transform') || ''
+        const match = transform.match(/translate\(\s*([-\d.]+)(?:[,\s]+([-\d.]+))?\s*\)/)
+        return {
+            x: match ? Number(match[1]) || 0 : 0,
+            y: match ? Number(match[2]) || 0 : 0,
+            width: map.width(),
+            height: map.height(),
+        }
     }
 
     return out

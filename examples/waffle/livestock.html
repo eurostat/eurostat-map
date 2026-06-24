@@ -4,11 +4,17 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Livestock Waffle Charts</title>
+        <style>
+            body {
+                margin: 0;
+            }
+        </style>
     </head>
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <script src="../../build/eurostatmap.js"></script>
 
         <script>
             const ourMap = eurostatmap
@@ -19,15 +25,18 @@
                 .title('Livestock in the EU, 2024')
                 .subtitle('Number of animals (pie size) and type of animal (color), 2024')
                 .scale('60M')
-                // .compositionSettings({
-                //     type: 'pie',
-                //     otherColor: '#FFCC80',
-                //     otherText: 'Other',
-                //     minSize: 6,
-                //     maxSize: 20,
-                // })
+                .waffleSettings({
+                    minSize: 10,
+                    maxSize: 30,
+                    gridSize: 10,
+                    cellPadding: 0,
+                    strokeFill: 'white',
+                    strokeWidth: 0,
+                    roundedCorners: 0,
+                    tooltipSize: 80,
+                })
                 .nutsLevel(1)
-                .statPie({
+                .statWaffle({
                     eurostatDatasetCode: 'agr_r_animal',
                     filters: { unit: 'THS_HD', time: '2024' },
                     unitText: 'heads',
@@ -39,9 +48,8 @@
                 })
 
                 .legend({
-                    x: 600,
-                    y: 70,
-                    boxOpacity: 0,
+                    position: 'top right',
+                    boxOpacity: 1,
                     boxFill: 'white',
                     titleFontWeight: 'bold',
                     sizeLegend: {
@@ -54,6 +62,7 @@
                         noData: false,
                     },
                 })
+                .legendButton(true)
                 .build()
         </script>
     </body>

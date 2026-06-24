@@ -1,4 +1,7 @@
 import { select, selectAll } from 'd3-selection'
+import { updateLegendButtonPosition } from './buttons/legend-button'
+import { updateInsetsButtonPosition } from './buttons/insets-button'
+import { updateZoomButtonsPosition } from './buttons/zoom-buttons'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -87,4 +90,9 @@ export const recalculateLayout = function (out) {
     // --- Resize entire SVG ---
     const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
     svg.attr('width', out.width_).attr('height', totalHeight)
+
+    if (out.zoomButtons_ && !out.gridCartogram_) updateZoomButtonsPosition(out)
+    if (out.insetsButton_) updateInsetsButtonPosition(out)
+    if (out.legendButton_) updateLegendButtonPosition(out)
+    if (out.legendObj_?.applyPosition) out.legendObj_.applyPosition()
 }

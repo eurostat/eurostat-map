@@ -517,18 +517,17 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
 
         //set SVG dimensions
         if (!out.height()) {
-            let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
-
             // Get available height constrained to 99% of screen/container height
             const availableHeight = getAvailableHeight(out)
             const maxTotalHeight = 0.99 * availableHeight
 
             // Estimate header/footer/padding overhead to find maximum allowed map height
-            const overhead = (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
+            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+            const overhead = isMobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
+            const maxMapHeight = Math.max(150, maxTotalHeight - overhead)
+            let defaultHeight = isMobile ? maxMapHeight : (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
 
-            if (defaultHeight + overhead > maxTotalHeight) {
-                defaultHeight = Math.max(150, maxTotalHeight - overhead)
-            }
+            if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height(defaultHeight)
         }
 

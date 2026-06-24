@@ -1,9 +1,9 @@
 import { scaleSqrt, scaleLinear } from 'd3-scale'
-import { schemeCategory10 } from 'd3-scale-chromatic'
 import { select } from 'd3-selection'
 import { extent } from 'd3-array'
 import { getCentroidsGroup } from '../../core/geo/centroids'
 import { formatRawValue } from '../../core/utils'
+import { DEFAULT_CATEGORICAL_COLORS } from '../../core/color-palettes'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/CompositionStatConfig').CompositionStatConfig} CompositionStatConfig */
@@ -213,7 +213,7 @@ export const applyClassificationToMap = function (map, out, getAnchors, totalCod
 // ─── Default colors ───────────────────────────────────────────────────────────
 
 /**
- * Assign default category colors from schemeCategory10 if not already set.
+ * Assign default category colors if not already set.
  * Also handles the 'other' category when a totalCode is used.
  *
  * @param {Object} out - The map object
@@ -225,7 +225,7 @@ export const ensureCategoryColors = function (out, totalCodeKey, otherColor, oth
     if (!out.catColors_) {
         out.catColors({})
         for (let i = 0; i < out.statCodes_.length; i++) {
-            out.catColors_[out.statCodes_[i]] = schemeCategory10[i % 10]
+            out.catColors_[out.statCodes_[i]] = DEFAULT_CATEGORICAL_COLORS[i % DEFAULT_CATEGORICAL_COLORS.length]
         }
     }
     if (out[totalCodeKey]) {

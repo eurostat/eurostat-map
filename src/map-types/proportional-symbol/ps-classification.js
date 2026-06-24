@@ -1,5 +1,6 @@
 import { createSqrtScale, createLinearScale } from "../../core/scale.js";
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
+import { getResponsiveSymbolSize } from '../../core/responsive.js'
 
 /**
  * @description defines classifier functions (out.classifierColor and out.classifierSize) for both symbol size and color
@@ -54,10 +55,12 @@ function defineSizeClassifier(out) {
 
     // choose scale type based on shape
     const isLinear = out.psShape_ === 'spike' || out.psShape_ === 'bar' || out.psShape_ === 'line'
+    const maxSize = getResponsiveSymbolSize(out.psMaxSize_, 2)
+    const minSize = getResponsiveSymbolSize(out.psMinSize_ || 0, 0)
 
     const classifier = isLinear
-        ? createLinearScale(rawData, out.psMaxSize_, out.psMinSize_ || 0)
-        : createSqrtScale(rawData, out.psMaxSize_, out.psMinSize_ || 0)
+        ? createLinearScale(rawData, maxSize, minSize)
+        : createSqrtScale(rawData, maxSize, minSize)
 
     // expose on map instance (unchanged public API)
     out.classifierSize(classifier)

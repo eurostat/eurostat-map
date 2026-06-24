@@ -21,6 +21,7 @@ import {
     buildTooltipBreakdownHTML,
 } from './composition-map'
 import { getCentroidsGroup } from '../../core/geo/centroids'
+import { getMobileSymbolScale, getResponsiveSymbolSize } from '../../core/responsive'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -114,12 +115,13 @@ export const map = function (config) {
     // ── Classification ───────────────────────────────────────────────────────
     //@override
     out.updateClassification = function () {
+        const settings = getResponsiveWaffleSettings()
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
-                applyClassificationToMap(map, out, _getAnchors, 'waffleTotalCode_', out.waffleSettings_.minSize, out.waffleSettings_.maxSize)
+                applyClassificationToMap(map, out, _getAnchors, 'waffleTotalCode_', settings.minSize, settings.maxSize)
             )
         }
-        applyClassificationToMap(out, out, _getAnchors, 'waffleTotalCode_', out.waffleSettings_.minSize, out.waffleSettings_.maxSize)
+        applyClassificationToMap(out, out, _getAnchors, 'waffleTotalCode_', settings.minSize, settings.maxSize)
         return out
     }
 
@@ -207,6 +209,7 @@ export const map = function (config) {
     }
 
     function applyStyleToGridCartogram(map) {
+        const settings = getResponsiveWaffleSettings()
         const regionIds = []
         _getAnchors(map).attr('id', (rg) => {
             regionIds.push(rg.properties.id)
@@ -217,8 +220,8 @@ export const map = function (config) {
             map,
             '.wafflechart',
             _getRegionTotal,
-            (chart) => chart.style('stroke-width', out.waffleSettings_.strokeWidth + 0.5).style('stroke', 'black'),
-            (chart) => chart.style('stroke-width', out.waffleSettings_.strokeWidth).style('stroke', out.waffleSettings_.strokeFill)
+            (chart) => chart.style('stroke-width', settings.strokeWidth + 0.5).style('stroke', 'black'),
+            (chart) => chart.style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
         )
     }
 
@@ -256,16 +259,17 @@ export const map = function (config) {
     }
 
     function renderWaffleRects(container, cells, cellSize, animated) {
+        const settings = getResponsiveWaffleSettings()
         const rects = container
             .selectAll('rect')
             .data(cells)
             .join('rect')
-            .attr('x', (d) => d.col * (cellSize + out.waffleSettings_.cellPadding))
-            .attr('y', (d) => d.row * (cellSize + out.waffleSettings_.cellPadding))
+            .attr('x', (d) => d.col * (cellSize + settings.cellPadding))
+            .attr('y', (d) => d.row * (cellSize + settings.cellPadding))
             .attr('width', cellSize)
             .attr('height', cellSize)
-            .attr('rx', out.waffleSettings_.roundedCorners)
-            .attr('ry', out.waffleSettings_.roundedCorners)
+            .attr('rx', settings.roundedCorners)
+            .attr('ry', settings.roundedCorners)
             .attr('fill', (d) => d.color)
             .attr('code', (d) => d.code)
 
@@ -281,7 +285,8 @@ export const map = function (config) {
     }
 
     function addWaffleChartsToMap(map, regionFeatures) {
-        const gridSize = out.waffleSettings_.gridSize
+        const settings = getResponsiveWaffleSettings()
+        const gridSize = settings.gridSize
 
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
@@ -290,7 +295,7 @@ export const map = function (config) {
 
             const total = _getRegionTotal(regionId)
             const waffleSize = out.classifierSize_(total)
-            const cellSize = (waffleSize - out.waffleSettings_.cellPadding * (gridSize - 1)) / gridSize
+            const cellSize = (waffleSize - settings.cellPadding * (gridSize - 1)) / gridSize
             const cells = generateWaffleCells(comp, gridSize)
 
             const nodes = map.svg().selectAll('#waffle_' + regionId)
@@ -298,15 +303,15 @@ export const map = function (config) {
                 .append('g')
                 .attr('class', 'wafflechart')
                 .attr('transform', `translate(${-waffleSize / 2}, ${-waffleSize / 2})`)
-                .attr('stroke', out.waffleSettings_.strokeFill)
-                .attr('stroke-width', out.waffleSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             renderWaffleRects(chartNode, cells, cellSize, true)
 
             chartNode
                 .on('mouseover', function (e, rg) {
                     select(this)
-                        .style('stroke-width', out.waffleSettings_.strokeWidth + 0.5)
+                        .style('stroke-width', settings.strokeWidth + 0.5)
                         .style('stroke', 'black')
                     if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
@@ -314,14 +319,15 @@ export const map = function (config) {
                     if (map._tooltip) map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function () {
-                    select(this).style('stroke-width', out.waffleSettings_.strokeWidth).style('stroke', out.waffleSettings_.strokeFill)
+                    select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
                     if (map._tooltip) map._tooltip.mouseout()
                 })
         })
     }
 
     function addWaffleChartsToGridCartogram(regionIds, map) {
-        const gridSize = out.waffleSettings_.gridSize
+        const settings = getResponsiveWaffleSettings()
+        const gridSize = settings.gridSize
 
         regionIds.forEach((regionId) => {
             const node = map.svg().select('#waffle_' + regionId)
@@ -337,7 +343,7 @@ export const map = function (config) {
 
             const total = _getRegionTotal(regionId)
             const waffleSize = out.classifierSize_(total)
-            const cellSize = (waffleSize - out.waffleSettings_.cellPadding * (gridSize - 1)) / gridSize
+            const cellSize = (waffleSize - settings.cellPadding * (gridSize - 1)) / gridSize
             const cells = generateWaffleCells(comp, gridSize)
 
             const g = node
@@ -349,8 +355,8 @@ export const map = function (config) {
             const chartNode = g
                 .append('g')
                 .attr('class', 'wafflechart')
-                .attr('stroke', out.waffleSettings_.strokeFill)
-                .attr('stroke-width', out.waffleSettings_.strokeWidth + 'px')
+                .attr('stroke', settings.strokeFill)
+                .attr('stroke-width', settings.strokeWidth + 'px')
 
             renderWaffleRects(chartNode, cells, cellSize, true)
 
@@ -362,8 +368,9 @@ export const map = function (config) {
     // ── Tooltip ──────────────────────────────────────────────────────────────
 
     const waffleChartTooltipFunction = function (rg, map) {
+        const settings = getResponsiveWaffleSettings()
         const tooltipGridSize = 10
-        const chartSize = out.waffleSettings_.tooltipSize || 100
+        const chartSize = settings.tooltipSize || 100
         const regionName = rg.properties.na || rg.properties.name
         const regionId = rg.properties.id
         const comp = _getComposition(regionId)
@@ -400,6 +407,21 @@ export const map = function (config) {
     }
 
     out.tooltip_.textFunction = waffleChartTooltipFunction
+
+    function getResponsiveWaffleSettings() {
+        const scale = getMobileSymbolScale()
+        if (scale === 1) return out.waffleSettings_
+
+        return {
+            ...out.waffleSettings_,
+            minSize: getResponsiveSymbolSize(out.waffleSettings_.minSize, 4),
+            maxSize: getResponsiveSymbolSize(out.waffleSettings_.maxSize, 6),
+            cellPadding: getResponsiveSymbolSize(out.waffleSettings_.cellPadding, 0),
+            strokeWidth: getResponsiveSymbolSize(out.waffleSettings_.strokeWidth, 0),
+            roundedCorners: getResponsiveSymbolSize(out.waffleSettings_.roundedCorners, 0),
+            tooltipSize: getResponsiveSymbolSize(out.waffleSettings_.tooltipSize || 100, 48),
+        }
+    }
 
     // ── Legend ───────────────────────────────────────────────────────────────
     out.getLegendConstructor = function () {

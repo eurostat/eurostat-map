@@ -1,10 +1,10 @@
 import { select } from 'd3-selection'
-import { getCSSPropertyFromClass } from '../utils'
+import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
 
 export const appendInsetsButton = (map) => {
     const svg = select('#' + map.svgId())
 
-    const buttonSize = parseInt(getCSSPropertyFromClass('em-button', 'width')) || 30 // Default to 30px if not set
+    const buttonSize = getButtonSize()
 
     const insetButton = svg.append('g').attr('class', 'em-insets-button em-button').attr('id', 'em-insets-button')
 
@@ -12,9 +12,7 @@ export const appendInsetsButton = (map) => {
         const userPosition = map.insetsButtonPosition_
         insetButton.attr('transform', `translate(${userPosition[0]}, ${userPosition[1]})`)
     } else {
-        // Default position: below zoom buttons with some padding
-        const padding = 10
-        insetButton.attr('transform', `translate(${map.width_ - buttonSize - padding}, ${buttonSize * 2 + 2 * padding})`)
+        positionInsetsButton(map, insetButton, buttonSize)
     }
 
     //tooltip
@@ -50,4 +48,30 @@ export const appendInsetsButton = (map) => {
             container.style('display', 'none')
         }
     })
+}
+
+export function updateInsetsButtonPosition(map) {
+    const svg = select('#' + map.svgId())
+    if (svg.empty() || map.insetsButtonPosition_) return
+
+    const insetButton = svg.select('#em-insets-button')
+    if (insetButton.empty()) return
+
+    positionInsetsButton(map, insetButton, getButtonSize())
+}
+
+function positionInsetsButton(map, insetButton, buttonSize) {
+    const padding = getButtonPadding()
+    const extent = getMapDrawingExtent(map)
+    const legendButtonPosition = getCornerPosition(map.legendObj_?.position) || 'top left'
+    const reserveLegendButton = map.legendButton_ && !map.legendButtonPosition_ && legendButtonPosition === 'top right'
+    const y = extent.y + padding + (reserveLegendButton ? buttonSize + padding : 0)
+    insetButton.attr('transform', `translate(${extent.x + extent.width - buttonSize - padding}, ${y})`)
+}
+
+function getCornerPosition(position) {
+    if (typeof position !== 'string') return null
+    const normalized = position.trim().toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
+    const supported = ['top right', 'bottom right', 'top left', 'bottom left']
+    return supported.includes(normalized) ? normalized : null
 }

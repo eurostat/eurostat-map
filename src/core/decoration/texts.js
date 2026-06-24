@@ -3,7 +3,7 @@ import { getFontSizeFromClass } from '../utils'
 export function addTitle(out) {
     // define default position
     const cssClass = out.isInset ? 'em-inset-title' : 'em-title'
-    if (!out.titlePosition()) out.titlePosition([10, getFontSizeFromClass(cssClass) + (out.isInset ? 0 : 10)])
+    if (!out.titlePosition()) out.titlePosition([5, getFontSizeFromClass(cssClass) + (out.isInset ? 5 : 10)])
 
     // ensure header group exists (create if missing)
     if (out.header_ && !out.isInset) {
@@ -26,13 +26,15 @@ export function addTitle(out) {
     parent.select('#title' + out.geo_).remove()
 
     // append new title (keep .html if you rely on markup)
-    parent
+    const title = parent
         .append('text')
         .attr('id', 'title' + out.geo_)
         .attr('class', cssClass)
         .attr('x', out.titlePosition()[0])
         .attr('y', out.titlePosition()[1])
         .html(out.title())
+
+    wrapTextForMobile(title, out, out.titlePosition()[0])
 }
 
 export function addSubtitle(out) {
@@ -40,7 +42,8 @@ export function addSubtitle(out) {
 
     const cssSubtitleClass = out.isInset ? 'em-inset-subtitle' : 'em-subtitle'
     const cssTitleClass = out.isInset ? 'em-inset-title' : 'em-title'
-    if (!out.subtitlePosition()) out.subtitlePosition([10, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
+    const hasCustomSubtitlePosition = !!out.subtitlePosition()
+    if (!hasCustomSubtitlePosition) out.subtitlePosition([5, getFontSizeFromClass(cssTitleClass) + getFontSizeFromClass(cssSubtitleClass) + 15])
 
     // ensure header group exists if needed
     if (
@@ -61,13 +64,73 @@ export function addSubtitle(out) {
 
     parent.select('#subtitle' + out.geo_).remove()
 
-    parent
+    let subtitleY = out.subtitlePosition()[1]
+    if (!hasCustomSubtitlePosition) {
+        const title = parent.select('#title' + out.geo_)
+        const titleBox = title.empty() ? null : title.node()?.getBBox?.()
+        if (titleBox) subtitleY = titleBox.y + titleBox.height + getFontSizeFromClass(cssSubtitleClass) + 5
+    }
+
+    const subtitle = parent
         .append('text')
         .attr('id', 'subtitle' + out.geo_)
         .attr('class', cssSubtitleClass)
         .attr('x', out.subtitlePosition()[0])
-        .attr('y', out.subtitlePosition()[1])
+        .attr('y', subtitleY)
         .html(out.subtitle())
+
+    wrapTextForMobile(subtitle, out, out.subtitlePosition()[0])
+}
+
+function wrapTextForMobile(textSelection, out, x) {
+    if (typeof window === 'undefined' || window.innerWidth > 768) return
+
+    const node = textSelection.node()
+    if (!node) return
+
+    const rawLines = String(node.textContent || '')
+        .split(/\n|<br\s*\/?>/i)
+        .map((line) => line.trim())
+        .filter(Boolean)
+    if (!rawLines.length) return
+
+    const maxWidth = Math.max(80, out.width_ - x - 8)
+    const y = textSelection.attr('y')
+    const dy = textSelection.attr('dy') || 0
+    const lineHeightEm = 1.15
+
+    textSelection.text(null)
+
+    let lineNumber = 0
+    rawLines.forEach((rawLine) => {
+        const words = rawLine.split(/\s+/).filter(Boolean)
+        let line = []
+        let tspan = textSelection
+            .append('tspan')
+            .attr('x', x)
+            .attr('y', y)
+            .attr('dy', lineNumber === 0 ? dy : `${lineHeightEm}em`)
+
+        words.forEach((word) => {
+            line.push(word)
+            tspan.text(line.join(' '))
+
+            if (tspan.node().getComputedTextLength() > maxWidth && line.length > 1) {
+                line.pop()
+                tspan.text(line.join(' '))
+                line = [word]
+                lineNumber++
+                tspan = textSelection
+                    .append('tspan')
+                    .attr('x', x)
+                    .attr('y', y)
+                    .attr('dy', `${lineHeightEm}em`)
+                    .text(word)
+            }
+        })
+
+        lineNumber++
+    })
 }
 
 export const addFootnote = function (out) {

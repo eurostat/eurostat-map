@@ -2,7 +2,6 @@ import { scaleBand } from 'd3-scale'
 import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
-import { schemeCategory10 } from 'd3-scale-chromatic'
 import { createStatMap } from '../../core/stat-map'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
@@ -13,6 +12,8 @@ import { adjustGridCartogramTextLabels, getGridCartogramChartOffset } from '../.
 import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
 import { createRadialScale } from '../../core/scale.js'
 import { getCentroidsGroup } from '../../core/geo/centroids'
+import { DEFAULT_CATEGORICAL_COLORS } from '../../core/color-palettes'
+import { getResponsiveSymbolSize } from '../../core/responsive'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/map-types/composition/coxcomb/CoxcombMapConfig').CoxcombMapConfig} CoxcombMapConfig */
@@ -532,8 +533,8 @@ export const map = function (config) {
      *    normalised within the region so proportions are preserved
      */
     function defineSizeScales() {
-        const minRadius = out.coxcombMinRadius_ || 0
-        const maxRadius = out.coxcombMaxRadius_ || 80
+        const minRadius = getResponsiveSymbolSize(out.coxcombMinRadius_ || 0, 0)
+        const maxRadius = getResponsiveSymbolSize(out.coxcombMaxRadius_ || 80, 8)
 
         const allMonthlyValues = []
         for (const regionId in out.monthlyTotals) {
@@ -571,7 +572,7 @@ export const map = function (config) {
         if (!out.catColors_) {
             out.catColors({})
             for (let i = 0; i < out.statCodes_.length; i++) {
-                out.catColors_[out.statCodes_[i]] = schemeCategory10[i % 10]
+                out.catColors_[out.statCodes_[i]] = DEFAULT_CATEGORICAL_COLORS[i % DEFAULT_CATEGORICAL_COLORS.length]
             }
         }
 
@@ -593,7 +594,7 @@ export const map = function (config) {
                     (d) => {
                         const regionalMax = Math.max(...Object.values(out.monthlyTotals[d.properties.id] || { 0: 0 }))
                         const naturalMax = out.classifierChartSize_(regionalMax) || 0
-                        const minRadius = out.coxcombMinRadius_ || 0
+                        const minRadius = getResponsiveSymbolSize(out.coxcombMinRadius_ || 0, 0)
                         // Mirror the scaleFactor logic in drawCoxcombChart so the Dorling
                         // simulation reserves the correct amount of space for enlarged charts.
                         const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
@@ -672,7 +673,7 @@ export const map = function (config) {
     function drawCoxcombChart(node, regionId, stackedData, keys, angle) {
         const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
         const naturalMax = out.classifierChartSize_(regionMonthlyMax)
-        const minRadius = out.coxcombMinRadius_ || 0
+        const minRadius = getResponsiveSymbolSize(out.coxcombMinRadius_ || 0, 0)
 
         // If this chart's largest wedge falls below minRadius, scale the entire
         // chart up uniformly so it remains legible. This preserves internal proportions

@@ -4,6 +4,7 @@ import { scaleLinear, scaleSqrt } from 'd3-scale'
 import { applyArrow } from './arrows.js'
 import { select } from 'd3-selection'
 import { getFlowStroke, computeColorKey, onFlowLineMouseOver, onFlowLineMouseOut } from './straight.js' // reuse your helpers
+import { getResponsiveSymbolSize } from '../../core/responsive'
 
 export function drawEdgeBundleLines(out, lineGroup) {
     const width = out.width_ || out.innerWidth_ || 1000
@@ -12,7 +13,7 @@ export function drawEdgeBundleLines(out, lineGroup) {
 
     const scales = {
         segments: scaleLinear().domain([0, hypotenuse]).range([1, 10]),
-        nodes: out._nodeSizeScale || scaleSqrt().range([4, 18]),
+        nodes: out._nodeSizeScale || scaleSqrt().range([getResponsiveSymbolSize(4, 2), getResponsiveSymbolSize(18, 4)]),
     }
 
     // Build the bundled network

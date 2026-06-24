@@ -4,6 +4,7 @@ import { arc, pie } from 'd3-shape'
 import { spaceAsThousandSeparator } from '../../core/utils'
 import { select, selectAll } from 'd3-selection'
 import { format } from 'd3-format'
+import { getResponsiveSymbolSize } from '../../core/responsive'
 
 export function drawNodeDonuts(out, container) {
     //compute composition
@@ -13,7 +14,11 @@ export function drawNodeDonuts(out, container) {
     const donutContainer = container.append('g').attr('class', 'donuts').attr('id', 'donuts')
     const nodes = out.flowGraph_.nodes
     const maxValue = max(nodes, (d) => sum(d.donutValues, (v) => v.value))
-    out._nodeSizeScale = out.flowNodeSizeScale_ || scaleSqrt().domain([0, maxValue]).range([3, 10])
+    out._nodeSizeScale =
+        out.flowNodeSizeScale_ ||
+        scaleSqrt()
+            .domain([0, maxValue])
+            .range([getResponsiveSymbolSize(out.flowMinNodeSize_ || 3, 2), getResponsiveSymbolSize(out.flowMaxNodeSize_ || 10, 3)])
     const arcGen = arc().innerRadius(5)
     const pieGen = pie()
         .value((d) => d.value)

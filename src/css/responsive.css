@@ -1,6 +1,32 @@
 /* ── Mobile/Tablet ─────────────────────────────────── */
 
 @media (max-width: 768px) {
+    .em-title {
+        font-size: 17px;
+    }
+
+    .em-subtitle,
+    .em-legend-subtitle {
+        font-size: 13px;
+    }
+
+    .em-inset-title {
+        font-size: 14px;
+    }
+
+    .em-inset-subtitle {
+        font-size: 12px;
+    }
+
+    .em-button {
+        width: 28px;
+        height: 28px;
+    }
+
+    .em-button text {
+        font-size: 16px;
+    }
+
     /* Prevent the tooltip from being taller than half the screen,
        and ensure it never bleeds past either edge */
     .em-tooltip {
@@ -27,15 +53,10 @@
     }
 
     .em-tooltip-breakdown {
-        gap: 4px; /* More breathing room between rows on touch */
+        gap: 0px; /* More breathing room between rows on touch */
         padding: 8px 10px;
         padding-top: 4px;
         font-size: 12px;
-    }
-
-    /* Make the hit-area of each row taller so mistouch is less likely */
-    .em-breakdown-item {
-        min-height: 24px;
     }
 
     .em-breakdown-color {
