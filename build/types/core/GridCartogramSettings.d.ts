@@ -40,7 +40,7 @@ export interface GridCartogramSettings {
         countryLabelMinFontSize?: number
         /** Extra padding subtracted from the available label width before fitting. */
         countryLabelPadding?: { x: number; y: number }
-        /** Disable automatic label shrinking/stretching to avoid overlap. @default true */
+        /** Disable automatic label shrinking/stretching to avoid overlap. @default false */
         countryLabelAvoidOverlap?: boolean
     }
     /** @deprecated Use countryLabelSettings.countryLabels instead. */

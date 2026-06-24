@@ -185,15 +185,15 @@ export function getGridCartogramChartOffset(map) {
 export function getGridCartogramChartAnchor(map, bbox) {
     const isHexagon = map.gridCartogramSettings_?.shape === 'hexagon'
     const offset = getGridCartogramChartOffset(map)
-    const x = (isHexagon ? 0 : bbox.width / 2) + offset.x
-    let y = isHexagon ? 0 : bbox.height / 2
+    const x = (bbox.x || 0) + bbox.width / 2 + offset.x
+    let y = (bbox.y || 0) + bbox.height / 2
 
     if (map._mapType === 'bar' && !isHexagon) {
         if (map.barSettings_?.type === 'grouped') {
-            y = bbox.height
+            y = (bbox.y || 0) + bbox.height
         } else {
             const h = map.barSettings_?.height ?? 8
-            y = bbox.height - h / 2
+            y = (bbox.y || 0) + bbox.height - h / 2
         }
     }
 

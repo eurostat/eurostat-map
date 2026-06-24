@@ -561,7 +561,7 @@ export const map = function (config) {
 
             node.selectAll('.em-pie').remove()
 
-            const bbox = node.node().getBBox()
+            const bbox = _getGridCellShapeBBox(node)
             const anchor = getGridCartogramChartAnchor(out, bbox)
 
             const r = out.classifierSize_(total)
@@ -592,6 +592,11 @@ export const map = function (config) {
                 return total ? out.classifierSize_(total) : 0
             },
         })
+    }
+
+    function _getGridCellShapeBBox(cellSelection) {
+        const shapeEl = cellSelection.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
+        return shapeEl?.getBBox() || cellSelection.node().getBBox()
     }
 
     // ── Tooltip ──────────────────────────────────────────────────────────────

@@ -74,7 +74,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         countryLabelFontSize: undefined,
         countryLabelMinFontSize: undefined,
         countryLabelPadding: { x: 0, y: 0 },
-        countryLabelAvoidOverlap: undefined,
+        countryLabelAvoidOverlap: false,
     }
 
     // pan & zoom

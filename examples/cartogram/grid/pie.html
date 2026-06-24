@@ -35,17 +35,18 @@
                 { value: 'C2000', text: 'Rice' },
             ]
             let map = eurostatmap
-                .map('pie').header(true)
+                .map('pie')
+                .header(true)
                 .gridCartogram(true)
 
                 .gridCartogramSettings({
                     margins: { top: 60, right: 90, bottom: 40, left: 1 },
-                    cellPadding: 13,
+                    cellPadding: 35,
                     shape: 'square',
                     countryLabelSettings: {
                         countryLabels: 'name',
-                        countryLabelFontSize: 12,
-                        countryLabelMinFontSize: 12,
+                        countryLabelFontSize: 15,
+                        countryLabelMinFontSize: 10,
                         countryLabelAvoidOverlap: false,
                     },
                 })
@@ -89,7 +90,7 @@
                     },
                     colorLegend: {
                         title: 'Cereal type',
-                        noData: false,
+                        noData: true,
                     },
                 })
                 .hoverColor('#ffa500')
