@@ -7,6 +7,7 @@ import { hideSpinner, showSpinner } from './decoration/spinner'
 import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 import { refreshCentroids } from './geo/centroids'
 import { exportMapToPNG, exportMapToSVG } from './export'
+import { buildGridCartogramBase } from './cartograms'
 
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../types/core/MapConfig').MapConfig} MapConfig */
@@ -463,6 +464,12 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * @returns {object} The map instance.
      */
     out.updateStatValues = function () {
+        if (out.gridCartogram_ && out._gridCartogramNeedsStatFilterRefresh_) {
+            out._gridCartogramNeedsStatFilterRefresh_ = false
+            out.svg().select('#em-zoom-group-' + out.svgId_).selectAll('*').remove()
+            buildGridCartogramBase(out)
+        }
+
         // filter out centroids without stat data
         if (withCenterPoints) {
             // insets

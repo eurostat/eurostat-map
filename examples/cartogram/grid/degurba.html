@@ -108,7 +108,7 @@
                     title: 'Unemployment rate',
                     subtitle: 'Share of people aged 15-74, by degree of urbanisation, 2025',
                     legendTitle: 'Degree of urbanisation',
-                    sizeLegendTitle: '% people aged 15-74',
+                    sizeLegendTitle: '% of people aged 15-74',
                     noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'LI'],
                 },
                 flat: {
@@ -127,7 +127,7 @@
                     subtitle: 'Share of people aged 18-64, by degree of urbanisation, 2025',
                     unitText: '%',
                     legendTitle: 'Degree of urbanisation',
-                    sizeLegendTitle: '% people aged 18-64',
+                    sizeLegendTitle: '% of people aged 18-64',
                     noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'TR'],
                 },
                 social: {
@@ -173,8 +173,8 @@
                     .gridCartogram(useCartogram) // enable grid cartogram when toggled
                     .gridCartogramSettings({
                         spacing: 0,
-                        cellPadding: 5,
-                        margins: { top: 2, right: 100, bottom: 0, left: 0 },
+                        cellPadding: 8,
+                        margins: { top: 10, right: 100, bottom: 0, left: 0 },
                         positions: `
                                     ,IS,  ,  ,NO,SE,FI,  ,  ,  ,  ,  ,
                                     ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,  ,
@@ -188,7 +188,7 @@
                                     ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,  
                                     ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `,
                         countryLabels: 'name',
-                        countryLabelPadding: { x: 2, y: -4 },
+                        countryLabelPadding: { x: 2, y: -3 },
                         countryLabelFontSize: 11,
                     })
                     .svgId('bar')

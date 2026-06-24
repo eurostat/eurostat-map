@@ -26,7 +26,9 @@ export const buildGridCartogramBase = function (out) {
     // Get grid layout
     const gridLayout = getGridLayout(out)
     const position = parseGridLayout(gridLayout)
-    const gridData = getGridData(position, out, shouldShowCell)
+    const filterCellsByData = isGridCellStatDataReady(out)
+    out._gridCartogramNeedsStatFilterRefresh_ = !filterCellsByData
+    const gridData = getGridData(position, out, filterCellsByData ? shouldShowCell : undefined)
 
     // Draw the appropriate grid
     if (out.gridCartogramSettings_.shape === 'hexagon') {
@@ -40,6 +42,20 @@ export const buildGridCartogramBase = function (out) {
 
     // Fit labels after centering so country names do not overlap their neighbors.
     fitGridCartogramLabels(gridGroup, out)
+}
+
+export const isGridCellStatDataReady = function (map) {
+    if (!map.statCodes_ || map.statCodes_.length === 0) return true
+
+    const codes = [...map.statCodes_]
+    const totalCode =
+        map.pieTotalCode_ || map.barTotalCode_ || map.waffleTotalCode_ || map.compositionTotalCode_ || map.stripeTotalCode_ || map.totalCode_
+    if (totalCode) codes.push(totalCode)
+
+    return codes.some((code) => {
+        const statData = map.statData(code)
+        return statData?.isReady?.() && !!statData.get?.()
+    })
 }
 
 /**
