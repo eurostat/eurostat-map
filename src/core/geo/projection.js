@@ -2,6 +2,8 @@ import { getApproxCurrentGeoBbox, getBBOXAsGeoJSON, getParameterByName } from '.
 import { geoIdentity, geoPath } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 
+const DEFAULT_FIT_ZOOM = 1.03
+
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -68,31 +70,41 @@ export const defineDefaultPosition = function (map) {
     }
 
     // optional: set from URL
-    setViewFromURL()
+    setViewFromURL(map)
 }
 
 export const getDefaultZ = function (map) {
     const defaultPosition = _defaultPosition[map.geo_ + '_' + map.proj_]
     if (defaultPosition) {
-        return (defaultPosition.pixelSize * 800) / map.width_
+        return getPixelSizeToFitBbox(map, [map.position_.x ?? defaultPosition.geoCenter[0], map.position_.y ?? defaultPosition.geoCenter[1]])
     } else if (map.Geometries.defaultGeoData?.bbox) {
-        return Math.min(
-            (map.Geometries.defaultGeoData.bbox[2] - map.Geometries.defaultGeoData.bbox[0]) / map.width_,
-            (map.Geometries.defaultGeoData.bbox[3] - map.Geometries.defaultGeoData.bbox[1]) / map.height_
-        )
+        return getPixelSizeToFitBbox(map)
     } else {
         return 100
     }
 }
 
+const getPixelSizeToFitBbox = function (map, center) {
+    const bbox = map.Geometries.defaultGeoData?.bbox
+    if (!bbox || !map.width_ || !map.height_) return undefined
+
+    const [minX, minY, maxX, maxY] = bbox
+    const cx = center?.[0] ?? 0.5 * (minX + maxX)
+    const cy = center?.[1] ?? 0.5 * (minY + maxY)
+    const requiredWidth = 2 * Math.max(Math.abs(cx - minX), Math.abs(maxX - cx))
+    const requiredHeight = 2 * Math.max(Math.abs(cy - minY), Math.abs(maxY - cy))
+
+    return Math.max(requiredWidth / map.width_, requiredHeight / map.height_) / DEFAULT_FIT_ZOOM
+}
+
 /** Get x,y,z elements from URL and assign them to the view. */
-const setViewFromURL = function () {
+const setViewFromURL = function (map) {
     const x = getParameterByName('x'),
         y = getParameterByName('y'),
         z = getParameterByName('z')
-    if (x != null && x != undefined && !isNaN(+x)) out.position_.x = +x
-    if (y != null && y != undefined && !isNaN(+y)) out.position_.y = +y
-    if (z != null && z != undefined && !isNaN(+z)) out.position_.z = +z
+    if (x != null && x != undefined && !isNaN(+x)) map.position_.x = +x
+    if (y != null && y != undefined && !isNaN(+y)) map.position_.y = +y
+    if (z != null && z != undefined && !isNaN(+z)) map.position_.z = +z
 }
 
 /** Default geocenter positions and pixelSize (for default width = 800px) for territories and projections. */
