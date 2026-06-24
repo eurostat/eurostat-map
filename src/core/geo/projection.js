@@ -2,7 +2,7 @@ import { getApproxCurrentGeoBbox, getBBOXAsGeoJSON, getParameterByName } from '.
 import { geoIdentity, geoPath } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 
-const DEFAULT_FIT_ZOOM = 1.03
+const DEFAULT_FIT_ZOOM = 1.27
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
