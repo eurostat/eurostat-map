@@ -110,11 +110,7 @@
                     .scale('60M')
                     .nutsLevel(config.nutsLevel)
                     .statCoxcomb(config.data)
-                    .coxcombMinRadius(5)
-                    .coxcombMaxRadius(40)
-                    .coxcombStrokeFill('white')
-                    .coxcombStrokeWidth(0.1)
-                    .coxcombRings(false)
+                    .coxcombSettings({ minRadius: 5, maxRadius: 40, strokeFill: 'white', strokeWidth: 0.1, rings: false })
                     .legend({
                         x: 570,
                         y: 0,

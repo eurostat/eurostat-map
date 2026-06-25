@@ -119,6 +119,65 @@ export const map = function (config) {
         return out
     }
 
+    const legacyBarConfigToSettings = {
+        barType: 'type',
+        barMinWidth: 'minWidth',
+        barMaxWidth: 'maxWidth',
+        barHeight: 'height',
+        barGroupWidth: 'groupWidth',
+        barGroupMinWidth: 'groupMinWidth',
+        barGroupMaxWidth: 'groupMaxWidth',
+        barGroupGap: 'groupGap',
+        barGroupMinHeight: 'groupMinHeight',
+        barGroupMaxHeight: 'groupMaxHeight',
+        barGroupMaxValue: 'groupMaxValue',
+        barStrokeFill: 'strokeFill',
+        barStrokeWidth: 'strokeWidth',
+        barCornerRadius: 'cornerRadius',
+        barOtherColor: 'otherColor',
+        barOtherText: 'otherText',
+        barTooltipWidth: 'tooltipWidth',
+        barTooltipHeight: 'tooltipHeight',
+    }
+
+    const legacyBarSettingsWrappers = {
+        barType: 'type',
+        barMinWidth: 'minWidth',
+        barMaxWidth: 'maxWidth',
+        barHeight: 'height',
+        barGroupWidth: 'groupWidth',
+        barGroupMinWidth: 'groupMinWidth',
+        barGroupMaxWidth: 'groupMaxWidth',
+        barGroupGap: 'groupGap',
+        barGroupMinHeight: 'groupMinHeight',
+        barGroupMaxHeight: 'groupMaxHeight',
+        barGroupMaxValue: 'groupMaxValue',
+        barStrokeFill: 'strokeFill',
+        barStrokeWidth: 'strokeWidth',
+        barCornerRadius: 'cornerRadius',
+        barOtherColor: 'otherColor',
+        barOtherText: 'otherText',
+        barTooltipWidth: 'tooltipWidth',
+        barTooltipHeight: 'tooltipHeight',
+    }
+
+    Object.entries(legacyBarSettingsWrappers).forEach(([legacyMethod, settingsKey]) => {
+        out[legacyMethod] = function (v) {
+            if (!arguments.length) return out.barSettings()[settingsKey]
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.barSettings({ ${settingsKey} }) instead.`)
+            out.barSettings({ [settingsKey]: v })
+            return out
+        }
+    })
+
+    if (config) {
+        const legacySettingsPatch = {}
+        Object.entries(legacyBarConfigToSettings).forEach(([legacyKey, settingsKey]) => {
+            if (config[legacyKey] !== undefined) legacySettingsPatch[settingsKey] = config[legacyKey]
+        })
+        if (Object.keys(legacySettingsPatch).length) out.barSettings(legacySettingsPatch)
+    }
+
     buildGetterSetters(out, ['catColors_', 'catLabels_', 'showOnlyWhenComplete_', 'noDataFillStyle_', 'dorling_', 'barTotalCode_', 'statCodes_'])
 
     applyConfigValues(out, config, ['catColors', 'catLabels', 'showOnlyWhenComplete', 'noDataFillStyle', 'statCodes'])

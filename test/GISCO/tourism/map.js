@@ -393,10 +393,9 @@ function buildCoxcomb() {
       categoryColors: ['#1b9e77', '#d95f02'],
       totalCode: 'TOTAL',
     })
-    .coxcombMinRadius(8)
-    .coxcombMaxRadius(30)
+    .coxcombSettings({ minRadius: 8, maxRadius: 30 })
     .transitionDuration(2000)
-    .coxcombRings(true)
+    .coxcombSettings({ rings: true })
     .insets(mapConfig.insets)
     .legend({
       svgId: "eurostatmap-legend-europe-template",

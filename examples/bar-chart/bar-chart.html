@@ -63,15 +63,13 @@
                     .subtitle(`NUTS ${nutsLevel}, 2022`)
                     .nutsLevel(nutsLevel)
                     .scale('20M')
-                    .barType(barType)
+                    .barSettings({ type: barType })
                     // Stacked sizing
                     // .barMinWidth(6)
                     // .barMaxWidth(70)
-                    .barHeight(10)
+                    .barSettings({ height: 10 })
                     // Grouped sizing
-                    .barGroupWidth(8)
-                    .barGroupGap(0)
-                    .barGroupMaxHeight(40)
+                    .barSettings({ groupWidth: 8, groupGap: 0, groupMaxHeight: 40 })
                     .stat('composition', {
                         eurostatDatasetCode: 'tour_occ_nin2',
                         filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },

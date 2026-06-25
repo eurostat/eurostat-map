@@ -81,9 +81,7 @@
                 .title('Trade Balance')
                 .subtitle('Made-up exports (left) vs imports (right), € bn')
                 .scale('60M')
-                .mushroomOrientation('horizontal')
-                .mushroomSizeScaleFunctionV1((v) => Math.sqrt(v) * 0.6)
-                .mushroomSizeScaleFunctionV2((v) => Math.sqrt(v) * 0.6)
+                .mushroomSettings({ orientation: 'horizontal', sizeScaleFunctionV1: (v) => Math.sqrt(v) * 0.6, sizeScaleFunctionV2: (v) => Math.sqrt(v) * 0.6 })
                 .insets(false)
                 .legend({
                     position: 'top right',

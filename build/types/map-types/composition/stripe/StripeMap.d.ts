@@ -9,10 +9,27 @@ export interface StripeMap extends MapInstance {
     legend(): StripeCompositionLegendConfig | false
     legend(config: StripeCompositionLegendConfig | false): this
 
+    stripeSettings(): {
+        width: number
+        orientation: number
+        otherColor: string
+        otherText: string
+    }
+    stripeSettings(v: {
+        width?: number
+        orientation?: number
+        otherColor?: string
+        otherText?: string
+    }): this
+
+    /** @deprecated Use stripeSettings({ width }) */
     stripeWidth(): number
+    /** @deprecated Use stripeSettings({ width }) */
     stripeWidth(v: number): this
 
+    /** @deprecated Use stripeSettings({ orientation }) */
     stripeOrientation(): number
+    /** @deprecated Use stripeSettings({ orientation }) */
     stripeOrientation(v: number): this
 
     catColors(): any
@@ -21,10 +38,14 @@ export interface StripeMap extends MapInstance {
     catLabels(): any
     catLabels(v: any): this
 
+    /** @deprecated Use stripeSettings({ otherColor }) */
     stripeOtherColor(): string
+    /** @deprecated Use stripeSettings({ otherColor }) */
     stripeOtherColor(v: string): this
 
+    /** @deprecated Use stripeSettings({ otherText }) */
     stripeOtherText(): string
+    /** @deprecated Use stripeSettings({ otherText }) */
     stripeOtherText(v: string): this
 
     showOnlyWhenComplete(): boolean

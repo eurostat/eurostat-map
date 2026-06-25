@@ -49,6 +49,19 @@ export const map = function (config) {
     out.stripeTotalCode_ = undefined
     out.statCodes_ = undefined
 
+    const defaultStripeSettings = {
+        width: out.stripeWidth_,
+        orientation: out.stripeOrientation_,
+        otherColor: out.stripeOtherColor_,
+        otherText: out.stripeOtherText_,
+    }
+
+    out.stripeSettings_ = { ...defaultStripeSettings, ...(config?.stripeSettings || {}) }
+    out.stripeWidth_ = out.stripeSettings_.width
+    out.stripeOrientation_ = out.stripeSettings_.orientation
+    out.stripeOtherColor_ = out.stripeSettings_.otherColor
+    out.stripeOtherText_ = out.stripeSettings_.otherText
+
     // ── Getters/setters ──────────────────────────────────────────────────────
     buildGetterSetters(out, [
         'stripeWidth_',
@@ -65,7 +78,42 @@ export const map = function (config) {
         'statCodes_',
     ])
 
+    out.stripeSettings = function (v) {
+        if (!arguments.length) {
+            return {
+                width: out.stripeWidth_,
+                orientation: out.stripeOrientation_,
+                otherColor: out.stripeOtherColor_,
+                otherText: out.stripeOtherText_,
+            }
+        }
+
+        out.stripeSettings_ = { ...out.stripeSettings_, ...v }
+        if (v.width !== undefined) out.stripeWidth_ = v.width
+        if (v.orientation !== undefined) out.stripeOrientation_ = v.orientation
+        if (v.otherColor !== undefined) out.stripeOtherColor_ = v.otherColor
+        if (v.otherText !== undefined) out.stripeOtherText_ = v.otherText
+        return out
+    }
+
+    const legacyStripeSettingsWrappers = {
+        stripeWidth: 'width',
+        stripeOrientation: 'orientation',
+        stripeOtherColor: 'otherColor',
+        stripeOtherText: 'otherText',
+    }
+
+    Object.entries(legacyStripeSettingsWrappers).forEach(([legacyMethod, settingsKey]) => {
+        out[legacyMethod] = function (v) {
+            if (!arguments.length) return out.stripeSettings()[settingsKey]
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.stripeSettings({ ${settingsKey} }) instead.`)
+            out.stripeSettings({ [settingsKey]: v })
+            return out
+        }
+    })
+
     applyConfigValues(out, config, [
+        'stripeSettings',
         'stripeWidth',
         'stripeOrientation',
         'catColors',

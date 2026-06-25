@@ -9,7 +9,7 @@
         <svg id="map"></svg>
         <script src="../../../build/eurostatmap.js"></script>
         <script>
-            const map = eurostatmap.map('scomp').scale('60M').zoomExtent([1, 2]).nutsLevel(2).nutsYear(2013).stripeWidth(10).stripeOrientation(45)
+            const map = eurostatmap.map('scomp').scale('60M').zoomExtent([1, 2]).nutsLevel(2).nutsYear(2013).stripeSettings({ width: 10, orientation: 45 })
             map.stat('composition', {
                 eurostatDatasetCode: 'ef_kvaareg',
                 filters: { indic_ef: 'TOTAREA_HA', legtype: 'TOTAL', time: '2013' },

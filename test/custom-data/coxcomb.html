@@ -132,8 +132,7 @@
                 .title('Monthly Tourist Overnights')
                 .subtitle('Made-up thousands of overnight stays')
                 .scale('60M')
-                .coxcombMaxRadius(30)
-                .coxcombMinRadius(4)
+                .coxcombSettings({ maxRadius: 30, minRadius: 4 })
                 .insets(false)
                 .statCoxcomb({
                     customData: touristData,

@@ -54,6 +54,23 @@ export const map = function (config) {
     out.totalCode_ = undefined
     out._anyRegionHasOther_ = false
 
+    const defaultCoxcombSettings = {
+        minRadius: out.coxcombMinRadius_,
+        maxRadius: out.coxcombMaxRadius_,
+        strokeFill: out.coxcombStrokeFill_,
+        strokeWidth: out.coxcombStrokeWidth_,
+        rings: out.coxcombRings_,
+        offsets: out.coxcombOffsets_,
+    }
+
+    out.coxcombSettings_ = { ...defaultCoxcombSettings, ...(config?.coxcombSettings || {}) }
+    out.coxcombMinRadius_ = out.coxcombSettings_.minRadius
+    out.coxcombMaxRadius_ = out.coxcombSettings_.maxRadius
+    out.coxcombStrokeFill_ = out.coxcombSettings_.strokeFill
+    out.coxcombStrokeWidth_ = out.coxcombSettings_.strokeWidth
+    out.coxcombRings_ = out.coxcombSettings_.rings
+    out.coxcombOffsets_ = out.coxcombSettings_.offsets
+
     // ── Getters/setters ──────────────────────────────────────────────────────
 
     buildGetterSetters(out, [
@@ -70,7 +87,48 @@ export const map = function (config) {
         'coxcombOffsets_',
     ])
 
+    out.coxcombSettings = function (v) {
+        if (!arguments.length) {
+            return {
+                minRadius: out.coxcombMinRadius_,
+                maxRadius: out.coxcombMaxRadius_,
+                strokeFill: out.coxcombStrokeFill_,
+                strokeWidth: out.coxcombStrokeWidth_,
+                rings: out.coxcombRings_,
+                offsets: out.coxcombOffsets_,
+            }
+        }
+
+        out.coxcombSettings_ = { ...out.coxcombSettings_, ...v }
+        if (v.minRadius !== undefined) out.coxcombMinRadius_ = v.minRadius
+        if (v.maxRadius !== undefined) out.coxcombMaxRadius_ = v.maxRadius
+        if (v.strokeFill !== undefined) out.coxcombStrokeFill_ = v.strokeFill
+        if (v.strokeWidth !== undefined) out.coxcombStrokeWidth_ = v.strokeWidth
+        if (v.rings !== undefined) out.coxcombRings_ = v.rings
+        if (v.offsets !== undefined) out.coxcombOffsets_ = v.offsets
+        return out
+    }
+
+    const legacyCoxcombSettingsWrappers = {
+        coxcombMaxRadius: 'maxRadius',
+        coxcombMinRadius: 'minRadius',
+        coxcombRings: 'rings',
+        coxcombStrokeFill: 'strokeFill',
+        coxcombStrokeWidth: 'strokeWidth',
+        coxcombOffsets: 'offsets',
+    }
+
+    Object.entries(legacyCoxcombSettingsWrappers).forEach(([legacyMethod, settingsKey]) => {
+        out[legacyMethod] = function (v) {
+            if (!arguments.length) return out.coxcombSettings()[settingsKey]
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.coxcombSettings({ ${settingsKey} }) instead.`)
+            out.coxcombSettings({ [settingsKey]: v })
+            return out
+        }
+    })
+
     applyConfigValues(out, config, [
+        'coxcombSettings',
         'catColors',
         'catLabels',
         'noDataFillStyle',

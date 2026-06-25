@@ -17,7 +17,7 @@
                 //livestock
                 .nutsLevel(1)
                 .nutsYear(2016)
-                .stripeWidth(12)
+                .stripeSettings({ width: 12 })
             //.stripeOrientation(45)
             map.stat('composition', {
                 eurostatDatasetCode: 'agr_r_animal',
@@ -39,8 +39,7 @@
                 /*/size of exploitations agri
             .nutsLevel(2)
             .nutsYear(2013)
-            .stripeWidth(10)
-            .stripeOrientation(45)
+            .stripeSettings({ width: 10, orientation: 45 })
             map.stat('composition',  { eurostatDatasetCode: "ef_kvaareg", filters: { indic_ef: "TOTAREA_HA", legtype: "TOTAL", time: "2013" }, unitText: "" },
                 "agrarea",
                 ["HA_LT2", "HA2-4", "HA5-9", "HA10-19", "HA20-29", "HA30-49", "HA50-99", "HA_GE100"],
@@ -55,7 +54,7 @@
                 /*/cod
             .nutsLevel(2)
             .nutsYear(2016)
-            .stripeWidth(20)
+            .stripeSettings({ width: 20 })
             //.stripeOrientation(45)
             map.stat('composition',  { eurostatDatasetCode: "hlth_cd_acdr2", filters: { age: "TOTAL", sex: "T", time: "2016" }, unitText: "%" },
                 "icd10",
@@ -98,7 +97,7 @@ ACC: "Accidents",
                 /*/Governement expenditure by COFOG
             .nutsLevel(0)
             .nutsYear(2016)
-            .stripeWidth(60)
+            .stripeSettings({ width: 60 })
             //.stripeOrientation(45)
             map.stat('composition',  { eurostatDatasetCode: "gov_10a_exp", filters: { na_item: "TE", sector: "S13", unit: "MIO_EUR", time: "2018" }, unitText: "M€" },
                 "cofog99",
@@ -114,7 +113,7 @@ ACC: "Accidents",
                 /*/COICOP
             .nutsLevel(0)
             .nutsYear(2016)
-            .stripeWidth(60)
+            .stripeSettings({ width: 60 })
             //.stripeOrientation(45)
             map.stat('composition',  { eurostatDatasetCode: "prc_hicp_inw", filters: { time: "2020" }, unitText: "" },
                 "coicop",
@@ -142,8 +141,7 @@ ACC: "Accidents",
                 /*/population by age
             .nutsLevel(3)
             .nutsYear(2016)
-            .stripeWidth(10)
-            .stripeOrientation(45)
+            .stripeSettings({ width: 10, orientation: 45 })
             .stat('composition',  { eurostatDatasetCode: "demo_r_pjanaggr3", filters: { sex: "T", unit: "NR", time: "2019" }, unitText: "people" },
                 "age",
                 ["Y_LT15", "Y15-64", "Y_GE65"],
@@ -164,7 +162,7 @@ ACC: "Accidents",
                 /*/GDP by sector
             .nutsLevel(0)
             .nutsYear(2016)
-            .stripeWidth(70)
+            .stripeSettings({ width: 70 })
             //.stripeOrientation(45)
             .stat("A", { eurostatDatasetCode: "nama_10_a10", filters: { nace_r2: "A", na_item: "B1G", unit: "CP_MEUR", time: "2019" }, unitText: "M€" })
             .stat("B-E", { eurostatDatasetCode: "nama_10_a10", filters: { nace_r2: "B-E", na_item: "B1G", unit: "CP_MEUR", time: "2019" }, unitText: "M€" })
@@ -194,7 +192,7 @@ ACC: "Accidents",
                 /*/internet utilisation
             .nutsLevel(2)
             .nutsYear(2016)
-            .stripeWidth(15)
+            .stripeSettings({ width: 15 })
             //.stripeOrientation(45)
             map.stat('composition',  { eurostatDatasetCode: "isoc_r_iuse_i", filters: { unit: "PC_IND", time: "2019" }, unitText: "" },
                 "indic_is",
@@ -206,7 +204,7 @@ ACC: "Accidents",
                 /*/business demography
             .nutsLevel(2)
             .nutsYear(2016)
-            .stripeWidth(15)
+            .stripeSettings({ width: 15 })
             //.stripeOrientation(45)
             map.stat('composition',  { eurostatDatasetCode: "bd_hgnace2_r3", filters: { indic_sb: "V11920", time: "2017" }, unitText: "" },
                 "nace_r2",

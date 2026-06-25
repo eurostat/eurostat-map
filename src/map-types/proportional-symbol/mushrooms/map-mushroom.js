@@ -38,6 +38,27 @@ export const map = function (config) {
     out.mushroomSizeScaleFunctionV1_ = null // custom size scale function for v1 side
     out.mushroomSizeScaleFunctionV2_ = null // custom size scale function for v2 side
 
+    const defaultMushroomSettings = {
+        codes: out.mushroomCodes_,
+        minSize: out.mushroomMinSize_,
+        maxSize: out.mushroomMaxSize_,
+        colors: out.mushroomColors_,
+        orientation: out.mushroomOrientation_,
+        sizeScaleFunction: out.mushroomSizeScaleFunction_,
+        sizeScaleFunctionV1: out.mushroomSizeScaleFunctionV1_,
+        sizeScaleFunctionV2: out.mushroomSizeScaleFunctionV2_,
+    }
+
+    out.mushroomSettings_ = { ...defaultMushroomSettings, ...(config?.mushroomSettings || {}) }
+    out.mushroomCodes_ = out.mushroomSettings_.codes
+    out.mushroomMinSize_ = out.mushroomSettings_.minSize
+    out.mushroomMaxSize_ = out.mushroomSettings_.maxSize
+    out.mushroomColors_ = out.mushroomSettings_.colors
+    out.mushroomOrientation_ = out.mushroomSettings_.orientation
+    out.mushroomSizeScaleFunction_ = out.mushroomSettings_.sizeScaleFunction
+    out.mushroomSizeScaleFunctionV1_ = out.mushroomSettings_.sizeScaleFunctionV1
+    out.mushroomSizeScaleFunctionV2_ = out.mushroomSettings_.sizeScaleFunctionV2
+
     out._mushroomScale_ = null
 
     out.tooltip_.textFunction = tooltipTextFunctionMushroom
@@ -69,6 +90,52 @@ export const map = function (config) {
         out[name] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = v
+            return out
+        }
+    })
+
+    out.mushroomSettings = function (v) {
+        if (!arguments.length) {
+            return {
+                codes: out.mushroomCodes_,
+                minSize: out.mushroomMinSize_,
+                maxSize: out.mushroomMaxSize_,
+                colors: out.mushroomColors_,
+                orientation: out.mushroomOrientation_,
+                sizeScaleFunction: out.mushroomSizeScaleFunction_,
+                sizeScaleFunctionV1: out.mushroomSizeScaleFunctionV1_,
+                sizeScaleFunctionV2: out.mushroomSizeScaleFunctionV2_,
+            }
+        }
+
+        out.mushroomSettings_ = { ...out.mushroomSettings_, ...v }
+        if (v.codes !== undefined) out.mushroomCodes_ = v.codes
+        if (v.minSize !== undefined) out.mushroomMinSize_ = v.minSize
+        if (v.maxSize !== undefined) out.mushroomMaxSize_ = v.maxSize
+        if (v.colors !== undefined) out.mushroomColors_ = v.colors
+        if (v.orientation !== undefined) out.mushroomOrientation_ = v.orientation
+        if (v.sizeScaleFunction !== undefined) out.mushroomSizeScaleFunction_ = v.sizeScaleFunction
+        if (v.sizeScaleFunctionV1 !== undefined) out.mushroomSizeScaleFunctionV1_ = v.sizeScaleFunctionV1
+        if (v.sizeScaleFunctionV2 !== undefined) out.mushroomSizeScaleFunctionV2_ = v.sizeScaleFunctionV2
+        return out
+    }
+
+    const legacyMushroomSettingsWrappers = {
+        mushroomCodes: 'codes',
+        mushroomMinSize: 'minSize',
+        mushroomMaxSize: 'maxSize',
+        mushroomColors: 'colors',
+        mushroomOrientation: 'orientation',
+        mushroomSizeScaleFunction: 'sizeScaleFunction',
+        mushroomSizeScaleFunctionV1: 'sizeScaleFunctionV1',
+        mushroomSizeScaleFunctionV2: 'sizeScaleFunctionV2',
+    }
+
+    Object.entries(legacyMushroomSettingsWrappers).forEach(([legacyMethod, settingsKey]) => {
+        out[legacyMethod] = function (v) {
+            if (!arguments.length) return out.mushroomSettings()[settingsKey]
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.mushroomSettings({ ${settingsKey} }) instead.`)
+            out.mushroomSettings({ [settingsKey]: v })
             return out
         }
     })

@@ -121,7 +121,8 @@ export const legend = function (map) {
 
         const hasManualX = out.x != null
         const hasManualY = out.y != null
-        const cornerPosition = getCornerPosition(out.position)
+        const userCornerPosition = getCornerPosition(out.position)
+        const cornerPosition = userCornerPosition || (!hasManualX && !hasManualY ? 'top right' : null)
         if (!hasManualX && !hasManualY && !cornerPosition) return
 
         const bbox = getLegendBBox(container, out)

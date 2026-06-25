@@ -451,8 +451,7 @@ eurostatmap
     .map('pie')
     .nutsLevel(3)
     .nutsYear(2016)
-    .stripeWidth(10)
-    .stripeOrientation(45)
+    .stripeSettings({ width: 10, orientation: 45 })
     .statPie({
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { sex: 'T', unit: 'NR', time: '2019' },
@@ -724,8 +723,7 @@ eurostatmap
     .map('stripe')
     .nutsLevel(3)
     .nutsYear(2016)
-    .stripeWidth(10)
-    .stripeOrientation(45)
+    .stripeSettings({ width: 10, orientation: 45 })
     .stat('composition', {
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { sex: 'T', unit: 'NR', time: '2019' },
@@ -748,8 +746,7 @@ eurostatmap
     .map('stripe')
     .nutsLevel(3)
     .nutsYear(2016)
-    .stripeWidth(10)
-    .stripeOrientation(45)
+    .stripeSettings({ width: 10, orientation: 45 })
     .statStripe({
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { sex: 'T', unit: 'NR', time: '2019' },
@@ -963,8 +960,7 @@ const map = eurostatmap
         categoryColors: ['#1b9e77', '#d95f02'],
         totalCode: 'TOTAL',
     })
-    .coxcombMinRadius(5)
-    .coxcombMaxRadius(37)
+    .coxcombSettings({ minRadius: 5, maxRadius: 37 })
     .legend({
         svgId: 'legend',
         title: 'Nights spent',
@@ -1000,7 +996,7 @@ Example:
 const map = eurostatmap
     .map('mushroom')
     .dorling(true) // prevents overlapping using d3-force
-    .mushroomOrientation('vertical')
+    .mushroomSettings({ orientation: 'vertical' })
     .nutsLevel(2)
     .stat('v1', {
         eurostatDatasetCode: 'demo_r_pjangrp3',
@@ -1013,13 +1009,15 @@ const map = eurostatmap
         filters: { unit: 'EUR_HAB', time: '2022' },
     })
     // you can define independent sizing functions for each semi-circle like so:
-    .mushroomSizeScaleFunctionV1(function (value) {
-        // custom size scale function for v1 side
-        return Math.sqrt(value) * 0.02
-    })
-    .mushroomSizeScaleFunctionV2(function (value) {
-        // custom size scale function for v2 side
-        return Math.cbrt(value) * 0.08
+    .mushroomSettings({
+        sizeScaleFunctionV1: function (value) {
+            // custom size scale function for v1 side
+            return Math.sqrt(value) * 0.02
+        },
+        sizeScaleFunctionV2: function (value) {
+            // custom size scale function for v2 side
+            return Math.cbrt(value) * 0.08
+        },
     })
     .build()
 ```

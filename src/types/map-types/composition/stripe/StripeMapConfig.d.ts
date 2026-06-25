@@ -5,16 +5,27 @@ import type { StripeCompositionLegendConfig } from '../../../legend/composition/
  * Configuration for stripe composition maps.
  */
 export interface StripeMapConfig extends MapConfig {
+    /** Grouped stripe settings. */
+    stripeSettings?: {
+        width?: number
+        orientation?: number
+        otherColor?: string
+        otherText?: string
+    }
+    /** @deprecated Use stripeSettings.width */
     /** Stripe width. */
     stripeWidth?: number
+    /** @deprecated Use stripeSettings.orientation */
     /** Stripe orientation. */
     stripeOrientation?: number
     /** Cat colors. */
     catColors?: Record<string, string>
     /** Cat labels. */
     catLabels?: Record<string, string>
+    /** @deprecated Use stripeSettings.otherColor */
     /** Stripe other color. */
     stripeOtherColor?: string
+    /** @deprecated Use stripeSettings.otherText */
     /** Stripe other text. */
     stripeOtherText?: string
     /** Show only when complete. */

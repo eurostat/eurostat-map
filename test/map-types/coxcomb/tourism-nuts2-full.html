@@ -103,9 +103,7 @@
                     .dorlingIterations(1) // Collision detection iterations
                     .dorlingPadding(-1) // Minimum distance between circles
                     .animateDorling(false) // Skip animation for immediate result
-                    .coxcombMinRadius(5)
-                    .coxcombMaxRadius(35)
-                    .coxcombRings(false)
+                    .coxcombSettings({ minRadius: 5, maxRadius: 35, rings: false })
 
                     .statCoxcomb({
                         customData: allStats,

@@ -18,7 +18,7 @@
                 .subtitle('Facing semi circles representing two different statistics')
                 .position({ x: 4710000, y: 3550000, z: 6500 })
                 .dorling(true)
-                .mushroomOrientation('vertical')
+                .mushroomSettings({ orientation: 'vertical' })
                 .stat('statV1', {
                     label: ' GDP',
                     eurostatDatasetCode: 'nama_10r_3gdp',
@@ -34,13 +34,15 @@
                 })
                 .encoding('right', { stat: 'statV2' })
                 .zoomExtent([1, 1000])
-                .mushroomSizeScaleFunctionV1(function (value) {
-                    // custom size scale function for v1 side
-                    return Math.sqrt(value) * 0.02
-                })
-                .mushroomSizeScaleFunctionV2(function (value) {
-                    // custom size scale function for v2 side
-                    return Math.cbrt(value) * 0.08
+                .mushroomSettings({
+                    sizeScaleFunctionV1: function (value) {
+                        // custom size scale function for v1 side
+                        return Math.sqrt(value) * 0.02
+                    },
+                    sizeScaleFunctionV2: function (value) {
+                        // custom size scale function for v2 side
+                        return Math.cbrt(value) * 0.08
+                    },
                 })
                 .legend({
                     //title: 'test',

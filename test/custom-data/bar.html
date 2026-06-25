@@ -44,8 +44,7 @@
                 .title('Employment by Sector')
                 .subtitle('Made-up figures, thousands of persons')
                 .scale('60M')
-                .barType('stacked')
-                .barGroupMaxHeight(35)
+                .barSettings({ type: 'stacked', groupMaxHeight: 35 })
                 .insets(false)
                 .stat('composition', {
                     customData: employmentData,
@@ -56,8 +55,6 @@
                 })
                 .encoding('composition', { stat: 'composition' })
                 .legend({
-                    x: 10,
-                    y: 150,
                     sizeLegend: { title: 'Total employed (thousands)' },
                     colorLegend: { title: 'Sector', noData: false },
                 })
