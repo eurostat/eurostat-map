@@ -58,6 +58,7 @@ export type EurostatMap = MapInstance
 export type { TooltipConfig } from './core/TooltipConfig'
 export type { LegendConfig } from './legend/LegendConfig'
 export type { StatConfig } from './core/stat/StatConfig'
+export type { EncodingConfig } from './core/encoding/EncodingConfig'
 export type { StatData } from './core/stat/StatData'
 export type { InsetConfig } from './core/InsetConfig'
 export type { CoastalMarginSettings } from './core/decoration/CoastalMarginSettings'

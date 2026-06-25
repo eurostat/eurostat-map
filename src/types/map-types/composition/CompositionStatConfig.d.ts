@@ -1,8 +1,15 @@
 /**
  * Statistical configuration for composition maps (pie, bar, waffle, stripe).
  *
+ * Preferred API:
+ * - `map.stat('composition', { ... })`
+ * - `map.encoding('composition', { stat: 'composition' })`
+ *
  * Either `eurostatDatasetCode` + `categoryParameter` (Eurostat API path)
  * or `customData` (custom data path) must be provided.
+ *
+ * Legacy positional signatures in `statPie/statWaffle/statBar/statStripe` and
+ * `map.stat('composition', config, categoryParameter, ...)` remain supported.
  */
 export interface CompositionStatConfig<TCustomData = Record<string, Record<string, number>>> {
     /**

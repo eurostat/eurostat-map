@@ -14,6 +14,7 @@ This document is the narrative usage guide. For generated, signature-accurate AP
             - [World maps](#world-maps)
             - [Custom geometries](#custom-geometries)
         - [Statistical data](#statistical-data)
+            - [Stat and encoding model](#stat-and-encoding-model)
             - [Eurostat database](#eurostat-database)
             - [CSV](#csv)
             - [Custom JS](#custom-js)
@@ -65,15 +66,16 @@ Create a map with `let map = eurostatmap.map( mapType )`. Set the parameter `map
 - `"choropleth"` for a [choropleth map](#choropleth-map),
 - `"bivariateChoropleth"` for a [bivariate choropleth map](#bivariate-choropleth-map).
 - `"trivariateChoropleth"` for a [ternary choropleth map](#trivariate-choropleth-map).
-- `"proportionalSymbol"` for a [proportional symbol map](#proportional-symbol-map),
-- `"pieChart"` for a [proportional pie chart map](#proportional-pie-chart-map),
+- "proportionalSymbol" (or `ps`) for a [proportional symbol map](#proportional-symbol-map),
+- "pie" (or `pieChart`) for a [proportional pie chart map](#proportional-pie-chart-map),
 - `"categorical"` for a [categorical map](#categorical-map).
-- `"stripeComposition"` for a [stripe composition map](#stripe-composition-map).
+- "stripe" (or `stripeComposition`) for a [stripe composition map](#stripe-composition-map).
 - `"sparkline"` for a [spark line map](#sparkline-map).
 - `"flow"` for a [flow map](#flow-map).
 - `"coxcomb"` for a [coxcomb map](#coxcomb-map).
 - `"mushroom"` for a [mushroom map](#mushroom-map).
 - `"waffle"` for a [waffle map](#waffle-map).
+- "bar" for a [bar chart map](#bar-chart-map).
 
 The `map` can then be customised with the methods listed in the tables below. Most of the map methods follow the pattern _map_.**myMethod**([*value*]): If a _value_ is specified, the method sets the parameter value and returns the _map_ object itself. If no _value_ is specified, the method returns the current value of the parameter.
 
@@ -159,6 +161,34 @@ The map statistical data can be accessed with the _map_.**statData**() method, w
 | **unitText**([*value*])  | The text of the unit of measurement, to show in the tooltip. _undefined_ by default.                                                                                         |
 
 The map statistical data source can be accessed with the _map_.**stat**([*value*]) method. Several types of data sources are supported (see sections below).
+
+#### Stat and encoding model
+
+The preferred API separates dataset registration from visual mapping:
+
+- Use `stat(...)` to define named datasets.
+- Use `encoding(...)` to bind those datasets to channels (`fill`, `color`, `size`, `composition`, `x`, `y`, `opacity`, etc.).
+
+Example:
+
+```javascript
+eurostatmap
+    .map('proportionalSymbol')
+    .stat('population', {
+        eurostatDatasetCode: 'demo_r_pjangrp3',
+        filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+        unitText: 'inhabitants',
+    })
+    .stat('gdpPerCapita', {
+        eurostatDatasetCode: 'nama_10r_3gdp',
+        filters: { unit: 'EUR_HAB', time: '2023' },
+        unitText: 'EUR/inhabitant',
+    })
+    .encoding('size', { stat: 'population', scale: 'sqrt', range: [5, 30] })
+    .encoding('color', { stat: 'gdpPerCapita', scale: 'quantile', classes: 5 })
+```
+
+Backward-compatible forms are still supported, including channel-named stats such as `.stat('size', ...)` and legacy positional composition signatures.
 
 #### Eurostat database
 
@@ -293,7 +323,16 @@ eurostatmap
     .build()
 ```
 
-Along with data-driven sizing, it is possible to colour the symbols according to a statistical variable as well. This is achieved by adding the "size" and "color" strings to their corresponding stat methods. For example:
+Along with data-driven sizing, it is possible to colour symbols according to another variable. The preferred approach is to define named datasets and connect them through `encoding(...)`:
+
+```javascript
+    .stat('gdpPerInhabitant', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2018' } })
+    .stat('totalGdp', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'Million EUR', filters: { unit: 'MIO_EUR', time: '2018' } })
+    .encoding('color', { stat: 'gdpPerInhabitant' })
+    .encoding('size', { stat: 'totalGdp' })
+```
+
+Legacy channel-named datasets are still supported for backward compatibility:
 
 ```javascript
     //GDP per inhabitant (colour of symbol)
@@ -364,91 +403,76 @@ A proportional pie chart map shows pie charts **sized** in proportion to a stati
 Example:
 
 ```javascript
-//population composition by age
+// Population composition by age
 eurostatmap
-    .map('pieChart')
-    .nutsLevel(1)
-    .stat('Y_LT15', {
+    .map('pie')
+    .nutsLevel(3)
+    .nutsYear(2016)
+    .stat('composition', {
         eurostatDatasetCode: 'demo_r_pjanaggr3',
-        filters: { age: 'Y_LT15', sex: 'T', unit: 'NR', time: '2019' },
+        filters: { sex: 'T', unit: 'NR', time: '2019' },
         unitText: 'people',
+        categoryParameter: 'age',
+        categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+        categoryLabels: ['< 15', '15 to 64', '> 65'],
+        categoryColors: ['#33a02c', '#cab2d6', '#ff7f00'],
     })
-    .stat('Y15-64', {
-        eurostatDatasetCode: 'demo_r_pjanaggr3',
-        filters: { age: 'Y15-64', sex: 'T', unit: 'NR', time: '2019' },
-        unitText: 'people',
-    })
-    .stat('Y_GE65', {
-        eurostatDatasetCode: 'demo_r_pjanaggr3',
-        filters: { age: 'Y_GE65', sex: 'T', unit: 'NR', time: '2019' },
-        unitText: 'people',
-    })
-    .catLabels({ Y_LT15: '< 15', 'Y15-64': '15 to 64', Y_GE65: '> 65' })
-    .catColors({ Y_LT15: '#33a02c', 'Y15-64': '#cab2d6', Y_GE65: '#ff7f00' })
+    .encoding('composition', { stat: 'composition' })
     .legend({ x: 550, y: 200, sizeLegend: { title: 'Total Population' }, colorLegend: { title: 'Population by Age' } })
+    .build()
 ```
 
-Or simpler:
+Equivalent helper API:
 
 ```javascript
 //population composition by age
 eurostatmap
-    .map('pieChart')
+    .map('pie')
     .nutsLevel(3)
     .nutsYear(2016)
     .stripeWidth(10)
     .stripeOrientation(45)
-    .statPie(
-        {
-            eurostatDatasetCode: 'demo_r_pjanaggr3',
-            filters: { sex: 'T', unit: 'NR', time: '2019' },
-            unitText: 'people',
-            transform: (v) => v / 1000, // optional: transform values after load
-        },
-        'age', //parameter that the categories belong to
-        ['Y_LT15', 'Y15-64', 'Y_GE65'], //category codes
-        ['< 15', '15 to 64', '> 65'], //labels
-        ['#33a02c', '#cab2d6', '#ff7f00'] //colours
-    )
+    .statPie({
+        eurostatDatasetCode: 'demo_r_pjanaggr3',
+        filters: { sex: 'T', unit: 'NR', time: '2019' },
+        unitText: 'people',
+        categoryParameter: 'age',
+        categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+        categoryLabels: ['< 15', '15 to 64', '> 65'],
+        categoryColors: ['#33a02c', '#cab2d6', '#ff7f00'],
+        transform: (v) => v / 1000, // optional: transform values after load
+    })
     .legend({ x: 550, y: 200, sizeLegend: { title: 'Total Population' }, colorLegend: { title: 'Population by Age' } })
 ```
 
-If the sum of the chosen categories do not represent the complete total for that variable, then an optional code can be included as the last parameter passed to the statPie() method. For example, when making a proportional pie chart map for different causes of death, the chosen categories "Respiratory", "Cancer", "Circulatory" do not represent all causes of death. In this case, the code for "all causes of death" is specified ("A-R_V-Y"). The shares of each categories are then calculated according to this total and not just the total of the specified categories. The remaining share is then given the label "other", which can be changed using `compositionSettings({ otherText })`, and the colour of its slices can be changed using `compositionSettings({ otherColor })`.
+If the sum of the chosen categories does not represent the complete total, set `totalCode` in the same config object. For example, for causes of death, selected categories such as "Respiratory", "Cancer", and "Circulatory" do not cover all causes. In this case, set `totalCode: 'A-R_V-Y'`. The remaining share is then shown as "other" (configurable via `compositionSettings({ otherText, otherColor })`).
 
-The same `transform` option available in `map.stat({...})` is also available in composition helpers (`statPie`, `statWaffle`, `statBar`, `statComp`) and is applied to each generated category dataset (and total dataset when `totalCode` is used).
+The same `transform` option available in `map.stat({...})` is also available in composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`) and is applied to each generated category dataset (and total dataset when `totalCode` is used).
 
-All composition helpers (`statPie`, `statWaffle`, `statBar`, `statComp`) also accept a `customData` option as an alternative to `eurostatDatasetCode`:
+All composition helpers also accept a `customData` option as an alternative to `eurostatDatasetCode`:
 
-````javascript
-// Works the same for statBar, statWaffle, statComp
+```javascript
+// Works the same for statBar, statWaffle and statStripe
 .statPie({
     customData: {
         DE: { cat1: 45, cat2: 30, cat3: 25 },
         FR: { cat1: 60, cat2: 20, cat3: 20 },
         // etc.
     },
-    categoryCodes:  ['cat1', 'cat2', 'cat3'],
+    categoryCodes: ['cat1', 'cat2', 'cat3'],
     categoryLabels: ['Category A', 'Category B', 'Category C'],
     categoryColors: ['#e41a1c', '#377eb8', '#4daf4a'],
     unitText: 'units',
 })
+```
 
-```javascript
-         .statPie(
-            { eurostatDatasetCode: "hlth_cd_asdr2", filters: { sex: "T", time: "2016", age: "TOTAL", unit: "RT" }, unitText: "death rate per 100 000" },
-            "icd10", //parameter that the categories belong to
-            ["J", "C", "I"], //category codes
-            ["Respiratory", "Cancer", "Circulatory"], //category labels
-            ["orange", "#A4CDF8", "#2E7AF9", "blue"], //colours
-            "A-R_V-Y" //code for the total (all causes of death)
-          )
-````
+Legacy positional helper signatures remain supported for backward compatibility.
 
 To supply custom data directly without fetching from the Eurostat API, use the `customData` option in `statPie`:
 
 ```javascript
 eurostatmap
-    .map('pieChart')
+    .map('pie')
     .nutsLevel(0)
     .statPie({
         customData: {
@@ -523,12 +547,14 @@ eurostatmap
     .map('bivariateChoropleth')
     .nutsLevel(2)
     .nutsYear(2016)
-    .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
-    .stat('v2', {
+    .stat('populationDensity', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²' })
+    .stat('unemploymentRate', {
         eurostatDatasetCode: 'lfst_r_lfu3rt',
         filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2017 },
         unitText: '%',
     })
+    .encoding('x', { stat: 'populationDensity' })
+    .encoding('y', { stat: 'unemploymentRate' })
     .numberOfClasses(4)
     .build()
 ```
@@ -546,6 +572,13 @@ eurostatmap
 | _map_.**breaks2**([*value*])          | Array    | _undefined_   | Manual class breaks for variable 2 (used instead of quantiles).                                                  |
 | _map_.**classToFillStyle**([*value*]) | Function | _auto_        | A function returning the colors for each pair of classes i,j.                                                    |
 | _map_.**noDataFillStyle**([*value*])  | color    | _"lightgray"_ | The fill style to be used for regions where no data is available.                                                |
+
+By default, bivariate maps read datasets `v1` and `v2`. You can override this through encodings:
+
+```javascript
+.encoding('x', { stat: 'myFirstDataset' })
+.encoding('y', { stat: 'mySecondDataset' })
+```
 
 ### Trivariate choropleth map
 
@@ -625,9 +658,10 @@ Example using sextant mode:
 ```javascript
 eurostatmap
     .map('trivariateChoropleth')
-    .stat('v1', { label: 'Bachelor', unitText: '%' })
-    .stat('v2', { label: 'Master', unitText: '%' })
-    .stat('v3', { label: 'PhD', unitText: '%' })
+    .stat('bachelor', { label: 'Bachelor', unitText: '%' })
+    .stat('master', { label: 'Master', unitText: '%' })
+    .stat('phd', { label: 'PhD', unitText: '%' })
+    .encoding('color', { type: 'trivariate', stats: ['bachelor', 'master', 'phd'] })
     .ternarySettings({
         sextant: true,
         meanCentering: true,
@@ -646,6 +680,12 @@ When `sextant: true` is enabled, `hue`, `chroma`, `lightness`, `contrast`, `spre
 
 `ternarySettings` keys: `sextant`, `sextantColors`, `hue`, `chroma`, `lightness`, `contrast`, `spread`, `breaks`, `meanCentering`.
 
+By default, trivariate maps read datasets from `ternaryCodes` (`['v1','v2','v3']`). You can also bind them through:
+
+```javascript
+.encoding('color', { type: 'trivariate', stats: ['datasetA', 'datasetB', 'datasetC'] })
+```
+
 ### Stripe composition map
 
 [![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/comp1.png)](https://eurostat.github.io/eurostat-map/examples/stripe/livestock_composition.html)
@@ -658,50 +698,46 @@ Here is [an example](https://eurostat.github.io/eurostat-map/examples/stripe/liv
 Example:
 
 ```javascript
-//population composition by age
+// Population composition by age
 eurostatmap
-    .map('stripeComposition')
+    .map('stripe')
     .nutsLevel(3)
     .nutsYear(2016)
     .stripeWidth(10)
     .stripeOrientation(45)
-    .stat('Y_LT15', {
+    .stat('composition', {
         eurostatDatasetCode: 'demo_r_pjanaggr3',
-        filters: { age: 'Y_LT15', sex: 'T', unit: 'NR', time: '2019' },
+        filters: { sex: 'T', unit: 'NR', time: '2019' },
         unitText: 'people',
+        categoryParameter: 'age',
+        categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+        categoryLabels: ['< 15', '15 to 64', '> 65'],
+        categoryColors: ['#33a02c', '#cab2d6', '#ff7f00'],
     })
-    .stat('Y15-64', {
-        eurostatDatasetCode: 'demo_r_pjanaggr3',
-        filters: { age: 'Y15-64', sex: 'T', unit: 'NR', time: '2019' },
-        unitText: 'people',
-    })
-    .stat('Y_GE65', {
-        eurostatDatasetCode: 'demo_r_pjanaggr3',
-        filters: { age: 'Y_GE65', sex: 'T', unit: 'NR', time: '2019' },
-        unitText: 'people',
-    })
-    .catLabels({ Y_LT15: '< 15', 'Y15-64': '15 to 64', Y_GE65: '> 65' })
-    .catColors({ Y_LT15: '#33a02c', 'Y15-64': '#cab2d6', Y_GE65: '#ff7f00' })
+    .encoding('composition', { stat: 'composition' })
     .legend({ x: 550, y: 10, title: 'Population by age' })
+    .build()
 ```
 
 Or simply:
 
 ```javascript
-//population composition by age
+// Population composition by age
 eurostatmap
-    .map('stripeComposition')
+    .map('stripe')
     .nutsLevel(3)
     .nutsYear(2016)
     .stripeWidth(10)
     .stripeOrientation(45)
-    .statComp(
-        { eurostatDatasetCode: 'demo_r_pjanaggr3', filters: { sex: 'T', unit: 'NR', time: '2019' }, unitText: 'people' },
-        'age',
-        ['Y_LT15', 'Y15-64', 'Y_GE65'],
-        ['< 15', '15 to 64', '> 65'],
-        ['#33a02c', '#cab2d6', '#ff7f00']
-    )
+    .statStripe({
+        eurostatDatasetCode: 'demo_r_pjanaggr3',
+        filters: { sex: 'T', unit: 'NR', time: '2019' },
+        unitText: 'people',
+        categoryParameter: 'age',
+        categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+        categoryLabels: ['< 15', '15 to 64', '> 65'],
+        categoryColors: ['#33a02c', '#cab2d6', '#ff7f00'],
+    })
     .legend({ x: 550, y: 10, title: 'Population by age' })
 ```
 
@@ -1785,3 +1821,38 @@ Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/euro
 ## Version migration
 
 See https://github.com/eurostat/eurostat-map/blob/master/docs/release-notes.md for any major changes.
+
+### Encoding API migration notes
+
+The library is migrating toward a clearer split between dataset definition and visual mapping:
+
+- Define datasets with `stat(name, config)`.
+- Connect datasets to channels with `encoding(channel, config)`.
+
+Recommended pattern:
+
+```javascript
+map
+    .stat('population', { ... })
+    .stat('growthRate', { ... })
+    .encoding('size', { stat: 'population' })
+    .encoding('color', { stat: 'growthRate' })
+```
+
+Composition maps follow the same model:
+
+```javascript
+map
+    .stat('composition', {
+        categoryParameter: 'age',
+        categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
+        ...
+    })
+    .encoding('composition', { stat: 'composition' })
+```
+
+Backward compatibility remains in place for existing code:
+
+- Channel-named stats such as `.stat('size', ...)` and `.stat('color', ...)`.
+- Legacy composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`).
+- Legacy positional composition signatures (for example `.stat('composition', config, categoryParameter, categoryCodes, ...)`).

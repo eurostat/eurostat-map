@@ -1,6 +1,9 @@
 /**
  * Configuration for a statistical data source.
  * Pass this to map.stat() or as the config argument to statData().
+ *
+ * Preferred for multi-channel maps: register named datasets with
+ * `map.stat('datasetName', config)` and map them with `map.encoding(...)`.
  */
 export interface StatConfig {
     /** Custom data keyed by region ID. Use instead of a remote data source. */

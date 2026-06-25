@@ -106,6 +106,7 @@ export interface WaffleMap extends MapInstance {
     statCodes(v: string[] | undefined): this
 
     statWaffle(config: CompositionStatConfig): this
+    /** @deprecated Legacy positional signature. Prefer statWaffle({ categoryParameter, categoryCodes, ... }). */
     statWaffle(
         /** Config. */
         config: CompositionStatConfig,

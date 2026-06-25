@@ -1,4 +1,5 @@
 import type { StatConfig } from './stat/StatConfig'
+import type { CompositionStatConfig } from '../map-types/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
@@ -7,6 +8,7 @@ import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
 import type { GridCartogramSettings } from './GridCartogramSettings'
 import type { DorlingSettings } from './DorlingSettings'
 import type { ScalebarConfig } from './decoration/ScalebarConfig'
+import type { EncodingConfig } from './encoding/EncodingConfig'
 
 /**
  * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
@@ -56,8 +58,17 @@ export interface MapConfig {
     /** Data source text. */
     source?: string
 
-    /** Statistical data configuration. */
-    stat?: StatConfig
+    /**
+     * Statistical data configuration.
+     *
+     * Preferred for multi-dataset maps:
+     *  - set named datasets via `stat` dictionary
+     *  - bind channels via `encoding`
+     */
+    stat?: StatConfig | CompositionStatConfig | Record<string, StatConfig | CompositionStatConfig>
+
+    /** Optional visual encoding configuration by channel (size, color, fill, composition, etc.). */
+    encoding?: Record<string, EncodingConfig>
 
     /** Legend configuration. */
     legend?: LegendConfig | false

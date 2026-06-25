@@ -46,6 +46,7 @@ export interface StripeMap extends MapInstance {
     statCodes(v: string[] | undefined): this
 
     statStripe(config: CompositionStatConfig): this
+    /** @deprecated Legacy positional signature. Prefer statStripe({ categoryParameter, categoryCodes, ... }). */
     statStripe(
         /** Config. */
         config: CompositionStatConfig,

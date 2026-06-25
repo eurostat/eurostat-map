@@ -71,6 +71,7 @@ export interface PieMap extends MapInstance {
     statCodes(v: string[] | undefined): this
 
     statPie(config: CompositionStatConfig): this
+    /** @deprecated Legacy positional signature. Prefer statPie({ categoryParameter, categoryCodes, ... }). */
     statPie(
         /** Config. */
         config: CompositionStatConfig,

@@ -1,5 +1,30 @@
 # Release notes
 
+## Unreleased
+
+### New
+
+- Expanded encoding-first API support across map types:
+    - `stat(name, config)` defines named datasets.
+    - `encoding(channel, config)` maps those datasets to visual channels.
+    - Added/standardized helpers such as `getEncodingStat*` for channel-aware data lookup.
+
+### Compatibility
+
+- Preserved legacy API paths:
+    - Channel-named stats (`stat('size', ...)`, `stat('color', ...)`, etc.).
+    - Composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`).
+    - Legacy positional composition signatures (including `stat('composition', config, categoryParameter, ...)`).
+
+### Documentation and Typings
+
+- Updated `docs/reference.md` to document the preferred stat/encoding model and migration guidance.
+- Updated TypeScript definitions for:
+    - encoding helpers on map instances,
+    - `MapConfig.encoding`,
+    - broader `MapConfig.stat` composition support,
+    - composition helper overload parity.
+
 ## 4.4.5
 
 ### Fixes

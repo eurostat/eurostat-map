@@ -79,4 +79,19 @@ export interface BarMap extends MapInstance {
     statCodes(v: string[] | undefined): this
 
     statBar(config: CompositionStatConfig): this
+    /** @deprecated Legacy positional signature. Prefer statBar({ categoryParameter, categoryCodes, ... }). */
+    statBar(
+        /** Config. */
+        config: CompositionStatConfig,
+        /** Category parameter. */
+        categoryParameter?: string,
+        /** Category codes. */
+        categoryCodes?: string[],
+        /** Category labels. */
+        categoryLabels?: string[],
+        /** Category colors. */
+        categoryColors?: string[],
+        /** Total code. */
+        totalCode?: string
+    ): this
 }

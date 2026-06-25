@@ -119,10 +119,23 @@ export interface MapInstance {
      * - `map.stat('v1', config)` → sets the stat config for key 'v1'
      * @example map.stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } })
      */
-    stat(): StatConfig
+    stat(): StatConfig | CompositionStatConfig | undefined
     stat(config: StatConfig | CompositionStatConfig): this
-    stat(key: string): StatConfig
+    stat(key: string): StatConfig | CompositionStatConfig | undefined
     stat(key: string, config: StatConfig | CompositionStatConfig): this
+    /**
+     * Legacy compatibility overload for composition channels.
+     * Preferred: pass category fields directly inside config.
+     */
+    stat(
+        key: string,
+        config: StatConfig | CompositionStatConfig,
+        categoryParameter: string,
+        categoryCodes?: string[],
+        categoryLabels?: string[],
+        categoryColors?: string[],
+        totalCode?: string
+    ): this
 
     /**
      * Get or set visual encodings that map named stats to visual variables.
@@ -132,6 +145,24 @@ export interface MapInstance {
     encoding(channel: string): EncodingConfig | undefined
     encoding(channel: string, config: EncodingConfig): this
     encoding(configs: Record<string, EncodingConfig>): this
+
+    /** Returns the stat name for an encoding channel, or fallback when unset. */
+    getEncodingStat(channel: string, fallback?: string): string | undefined
+
+    /** Returns stat names for an encoding channel (`stats` or single `stat`). */
+    getEncodingStats(channel: string, fallback?: string[]): string[] | undefined
+
+    /** Returns the concrete statData key for a channel/category combination. */
+    getEncodingStatKey(channel: string, categoryCode?: string, fallbackStat?: string): string | undefined
+
+    /** Returns the StatData source bound to a channel/category. */
+    getEncodingStatData(channel: string, categoryCode?: string, fallbackStat?: string): StatData | undefined
+
+    /** Returns a region value through encoding lookup. */
+    getEncodingValue(channel: string, regionId: string, categoryCode?: string, fallbackStat?: string): number | string | undefined
+
+    /** Returns unit text through encoding lookup. */
+    getEncodingUnitText(channel: string, categoryCode?: string, fallbackStat?: string): string
 
     /**
      * Get or set the StatData instance for a given key.
