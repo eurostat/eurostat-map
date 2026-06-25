@@ -108,13 +108,11 @@
                     label1: 'GDP per capita →',
                     label2: 'Life expectancy →',
                 })
+                .stat('gdpPerCapita', { customData: gdpPerCapita, unitText: '€ thousands' })
+                .encoding('x', { stat: 'gdpPerCapita' })
+                .stat('lifeExpectancy', { customData: lifeExpectancy, unitText: 'years' })
+                .encoding('y', { stat: 'lifeExpectancy' })
 
-            map.stat('statV1', { code: 'v1', unitText: '€ thousands' })
-            map.encoding('x', { stat: 'statV1' })
-            map.stat('statV2', { code: 'v2', unitText: 'years' })
-            map.encoding('y', { stat: 'statV2' })
-            map.statData('statV1').setData(gdpPerCapita)
-            map.statData('statV2').setData(lifeExpectancy)
             map.build()
         </script>
     </body>

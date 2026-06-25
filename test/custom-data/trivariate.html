@@ -114,18 +114,14 @@
                 .ternarySettings({ hue: 160, chroma: 130, lightness: 40, spread: 1.5, breaks: 5 })
                 .insets('default')
                 .legend({
-                    x: 10,
-                    y: 100,
+                    position: 'top left',
                     title: 'Age structure',
                 })
 
-            map.stat('statV1', { code: 'v1', label: 'Youth (0–24)', unitText: '%' })
-            map.stat('statV2', { code: 'v2', label: 'Working-age (25–64)', unitText: '%' })
-            map.stat('statV3', { code: 'v3', label: 'Elderly (65+)', unitText: '%' })
-            map.encoding('color', { stats: ['statV1', 'statV2', 'statV3'] })
-            map.statData('statV1').setData(youth)
-            map.statData('statV2').setData(workingAge)
-            map.statData('statV3').setData(elderly)
+            map.stat('youth', { customData: youth, unitText: '%', label: 'Youth (0–24)' })
+            map.stat('workingAge', { customData: workingAge, unitText: '%', label: 'Working-age (25–64)' })
+            map.stat('elderly', { customData: elderly, unitText: '%', label: 'Elderly (65+)' })
+            map.encoding('color', { stats: ['youth', 'workingAge', 'elderly'] })
             map.build()
         </script>
     </body>

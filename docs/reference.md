@@ -1488,6 +1488,7 @@ map = eurostatmap.map(...)
 | -------------- | ------ | ------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | **svgId**      | String | _auto_        | The SVG element where to draw the legend. If not specified, an element is automatically built within the map.          |
 | **title**      | Text   | _""_          | The legend title.                                                                                                      |
+| **position**   | String | _auto_        | Corner-based auto-placement. Supported values: `top right`, `top left`, `bottom right`, `bottom left`. When set for top corners and `header(false)` is used, the legend moves down only if it would overlap title/subtitle text. |
 | **x**          | number | _auto_        | The legend element X position, in case it is embeded within the map. If not specified, an automatic value is computed. |
 | **y**          | number | _auto_        | The legend element Y position, in case it is embeded within the map. If not specified, an automatic value is computed. |
 | **boxOpacity** | number | _0.7_         | The legend box opacity, from 0 to 1. Sets opacity of em-legend-background                                              |

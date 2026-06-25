@@ -81,23 +81,18 @@
                 .title('Trade Balance')
                 .subtitle('Made-up exports (left) vs imports (right), € bn')
                 .scale('60M')
-                .mushroomOrientation('vertical')
+                .mushroomOrientation('horizontal')
                 .mushroomSizeScaleFunctionV1((v) => Math.sqrt(v) * 0.6)
                 .mushroomSizeScaleFunctionV2((v) => Math.sqrt(v) * 0.6)
                 .insets(false)
                 .legend({
-                    x: 10,
-                    y: 160,
-                    sizeLegend: { valuesV1: [1500, 200, 10], valuesV2: [1500, 200, 10] },
+                    position: 'top right',
+                    sizeLegend: { valuesV1: [1500, 500, 10], valuesV2: [1500, 500, 10] },
                     colorLegend: { marginTop: 30, labels: ['Exports (€ bn)', 'Imports (€ bn)'] },
                 })
 
-            map.stat('statV1', { code: 'v1', label: 'Exports', unitText: '€ bn' })
-                .encoding('left', { stat: 'statV1' })
-            map.stat('statV2', { code: 'v2', label: 'Imports', unitText: '€ bn' })
-                .encoding('right', { stat: 'statV2' })
-            map.statData('statV1').setData(exports)
-            map.statData('statV2').setData(imports)
+            map.stat('exports', { customData: exports, unitText: '€ bn', label: 'Exports' }).encoding('left', { stat: 'exports' })
+            map.stat('imports', { customData: imports, unitText: '€ bn', label: 'Imports' }).encoding('right', { stat: 'imports' })
             map.build()
         </script>
     </body>

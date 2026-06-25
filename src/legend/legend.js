@@ -392,15 +392,56 @@ export const legend = function (map) {
         const minY = extent.y + padding
         const maxY = Math.max(minY, extent.y + extent.height - bbox.height - padding)
         const left = horizontal === 'right' ? maxX : extent.x + padding
-        const top =
-            vertical === 'bottom'
-                ? Math.max(minY, Math.min(maxY, maxY - buttonReserve))
-                : Math.max(minY, Math.min(maxY, minY + buttonReserve))
+        const baseTop = vertical === 'bottom' ? maxY - buttonReserve : minY + buttonReserve
+        let top = Math.max(minY, Math.min(maxY, baseTop))
+
+        if (vertical === 'top') {
+            const overlapOffset = getTopTextOverlapOffset(map, padding, bbox, left, top)
+            if (overlapOffset > 0) {
+                top = Math.max(minY, Math.min(maxY, top + overlapOffset))
+            }
+        }
 
         return {
             x: left - bbox.x,
             y: top - bbox.y,
         }
+    }
+
+    function getTopTextOverlapOffset(map, padding, legendBBox, legendLeft, legendTop) {
+        // When header is disabled, title/subtitle are drawn in the root SVG and can overlap top legends.
+        if (map.header_ || map.isInset) return 0
+        if (!map.title_ && !map.subtitle_) return 0
+
+        const svg = map.svg?.()
+        if (!svg) return 0
+
+        const title = svg.select?.('#title' + map.geo_)
+        const subtitle = svg.select?.('#subtitle' + map.geo_)
+
+        let textBottom = 0
+        let textLeft = Infinity
+        let textRight = -Infinity
+        ;[title, subtitle].forEach((textSel) => {
+            if (!textSel || textSel.empty()) return
+            try {
+                const bb = textSel.node().getBBox({ stroke: true })
+                textBottom = Math.max(textBottom, bb.y + bb.height)
+                textLeft = Math.min(textLeft, bb.x)
+                textRight = Math.max(textRight, bb.x + bb.width)
+            } catch (e) {
+                // Ignore bbox errors and keep fallback offset.
+            }
+        })
+
+        if (!textBottom || textLeft === Infinity || textRight === -Infinity) return 0
+
+        const legendRight = legendLeft + (legendBBox?.width || 0)
+        const overlapsHorizontally = legendLeft < textRight && legendRight > textLeft
+        if (!overlapsHorizontally) return 0
+
+        const requiredTop = textBottom + padding
+        return Math.max(0, requiredTop - legendTop)
     }
 
     function getLegendButtonReserve(map, position) {
