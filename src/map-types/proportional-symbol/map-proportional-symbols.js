@@ -72,6 +72,17 @@ export const map = function (config) {
 
     out.psCodeLabels_ = false // show country codes in symbols
 
+    const getPsSettingsSnapshot = function () {
+        return {
+            stroke: out.psStroke_,
+            strokeWidth: out.psStrokeWidth_,
+            sizeScale: out.psSizeScale_,
+            minSize: out.psMinSize_,
+            maxSize: out.psMaxSize_,
+            codeLabels: out.psCodeLabels_,
+        }
+    }
+
     /**
      * Definition of getters/setters for all previously defined attributes.
      * Each method follow the same pattern:
@@ -117,13 +128,47 @@ export const map = function (config) {
         }
     })
 
+    out.psSettings = function (v) {
+        if (!arguments.length) return getPsSettingsSnapshot()
+        if (!v || typeof v !== 'object' || Array.isArray(v)) return out
+
+        if (v.stroke !== undefined) out.psStroke_ = v.stroke
+        if (v.strokeWidth !== undefined) out.psStrokeWidth_ = v.strokeWidth
+        if (v.sizeScale !== undefined) out.psSizeScale_ = v.sizeScale
+        if (v.minSize !== undefined) out.psMinSize_ = v.minSize
+        if (v.maxSize !== undefined) out.psMaxSize_ = v.maxSize
+        if (v.codeLabels !== undefined) out.psCodeLabels_ = v.codeLabels
+
+        return out
+    }
+
     //override attribute values with config values
     if (config) {
+        if (config.psSettings !== undefined) out.psSettings(config.psSettings)
+
         paramNames.forEach(function (key) {
             let k = key.slice(0, -1) // remove trailing underscore
             if (config[k] != undefined) out[k](config[k])
         })
     }
+
+    const deprecatedPsSettingsWrappers = [
+        ['psStroke', 'stroke'],
+        ['psStrokeWidth', 'strokeWidth'],
+        ['psSizeScale', 'sizeScale'],
+        ['psMinSize', 'minSize'],
+        ['psMaxSize', 'maxSize'],
+        ['psCodeLabels', 'codeLabels'],
+    ]
+
+    deprecatedPsSettingsWrappers.forEach(function ([legacyMethod, settingsKey]) {
+        out[legacyMethod] = function (v) {
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.psSettings({ ${settingsKey} }) instead.`)
+            if (!arguments.length) return out.psSettings()[settingsKey]
+            out.psSettings({ [settingsKey]: v })
+            return out
+        }
+    })
 
     //override of some special getters/setters
     out.psColorFun = function (v) {
@@ -471,7 +516,7 @@ const tooltipTextFunPs = function (region, map) {
     const regionId = region.properties.id
 
     const formatValue = (val, unit, noDataText) => {
-        if (val === ':') {
+        if (val === ':' || val === undefined || val === null || (typeof val === 'number' && Number.isNaN(val))) {
             return noDataText || 'Data not available'
         }
         return spaceAsThousandSeparator(val) + (unit ? ' ' + unit : '')
@@ -485,7 +530,16 @@ const tooltipTextFunPs = function (region, map) {
 
     // Stat 2 (optional)
     let row2 = ''
-    const v2 = map.getEncodingStatData?.('color', undefined, 'color') || (map.statData('color')?.getArray() ? map.statData('color') : null)
+    let v2 = null
+    const encodedColorStat = map.getEncodingStat?.('color')
+    if (encodedColorStat) {
+        const encodedColorData = map.getEncodingStatData?.('color')
+        if (encodedColorData?.getArray()?.length) v2 = encodedColorData
+    } else {
+        const legacyColorData = map.statData('color')
+        if (legacyColorData?.getArray()?.length) v2 = legacyColorData
+    }
+
     if (v2) {
         const sv2 = v2.get(region.properties.id)
         const unit2 = v2.unitText?.() || ''

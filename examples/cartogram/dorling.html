@@ -29,14 +29,17 @@
                 .encoding('size', { stat: 'symbolSize' })
                 .legend({ title: 'Euro', x: 550, y: 90, boxOpacity: 0, sizeLegend: { noData: true } })
                 .labels({ values: true, shadows: true })
-                .psCodeLabels(true)
                 .insets(false)
-                .psStroke('white')
-                .psStrokeWidth(0.5)
-                .psSizeScale('linear')
-                .psMinSize(10)
+                .psSettings({
+                    codeLabels: true,
+                    stroke: 'white',
+                    strokeWidth: 0.5,
+                    sizeScale: 'linear',
+                    minSize: 10,
+                    maxSize: 60,
+                })
                 .dorling(true)
-                .psMaxSize(60) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+            // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
             map.build()
         </script>

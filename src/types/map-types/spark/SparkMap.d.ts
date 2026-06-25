@@ -1,11 +1,15 @@
 import type { MapInstance } from '../../core/MapInstance'
 import type { SparkStatConfig } from './SparkStatConfig'
 import type { SparklineLegendConfig } from '../../legend/composition/SparklineLegendConfig'
+import type { SparkSettings } from './SparkMapConfig'
 
 /**
  * Spark map type.
  */
 export interface SparkMap extends MapInstance {
+    sparkSettings(): SparkSettings
+    sparkSettings(v: SparkSettings): this
+
     legend(): SparklineLegendConfig | false
     legend(config: SparklineLegendConfig | false): this
 

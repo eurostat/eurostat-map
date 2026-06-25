@@ -54,6 +54,17 @@ export const map = function (config) {
     // Internal — dates replace "categories" for this map type
     out._statDates = undefined
 
+    const getSparkSettingsSnapshot = function () {
+        return {
+            type: out.sparkType_,
+            lineOffsets: out.sparkLineOffsets_,
+            lineWidth: out.sparkLineWidth_,
+            lineHeight: out.sparkLineHeight_,
+            lineStrokeWidth: out.sparkLineStrokeWidth_,
+            lineOpacity: out.sparkLineOpacity_,
+        }
+    }
+
     // ── Getters/setters ──────────────────────────────────────────────────────
 
     buildGetterSetters(out, [
@@ -65,11 +76,32 @@ export const map = function (config) {
         'sparkLineStrokeWidth_',
         'sparkLineOpacity_',
         'sparkLineCircleRadius_',
-        'sparkLineAreaColor_',
+        'sparkAreaColor_',
         'sparkTooltipChart_',
         'sparkLineChartFunction_',
         'sparkLineOffsets_',
     ])
+
+    // Backward-compatible alias for previous method name used in docs and examples.
+    out.sparkLineAreaColor = function (v) {
+        if (!arguments.length) return out.sparkAreaColor_
+        out.sparkAreaColor_ = v
+        return out
+    }
+
+    out.sparkSettings = function (v) {
+        if (!arguments.length) return getSparkSettingsSnapshot()
+        if (!v || typeof v !== 'object' || Array.isArray(v)) return out
+
+        if (v.type !== undefined) out.sparkType_ = v.type
+        if (v.lineOffsets !== undefined) out.sparkLineOffsets_ = v.lineOffsets
+        if (v.lineWidth !== undefined) out.sparkLineWidth_ = v.lineWidth
+        if (v.lineHeight !== undefined) out.sparkLineHeight_ = v.lineHeight
+        if (v.lineStrokeWidth !== undefined) out.sparkLineStrokeWidth_ = v.lineStrokeWidth
+        if (v.lineOpacity !== undefined) out.sparkLineOpacity_ = v.lineOpacity
+
+        return out
+    }
 
     applyConfigValues(out, config, [
         'sparkLineColor',
@@ -80,11 +112,32 @@ export const map = function (config) {
         'sparkLineStrokeWidth',
         'sparkLineOpacity',
         'sparkLineCircleRadius',
+        'sparkAreaColor',
         'sparkLineAreaColor',
         'sparkTooltipChart',
         'sparkLineChartFunction',
         'sparkLineOffsets',
     ])
+
+    if (config?.sparkSettings !== undefined) out.sparkSettings(config.sparkSettings)
+
+    const deprecatedSparkSettingsWrappers = [
+        ['sparkType', 'type'],
+        ['sparkLineOffsets', 'lineOffsets'],
+        ['sparkLineWidth', 'lineWidth'],
+        ['sparkLineHeight', 'lineHeight'],
+        ['sparkLineStrokeWidth', 'lineStrokeWidth'],
+        ['sparkLineOpacity', 'lineOpacity'],
+    ]
+
+    deprecatedSparkSettingsWrappers.forEach(function ([legacyMethod, settingsKey]) {
+        out[legacyMethod] = function (v) {
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.sparkSettings({ ${settingsKey} }) instead.`)
+            if (!arguments.length) return out.sparkSettings()[settingsKey]
+            out.sparkSettings({ [settingsKey]: v })
+            return out
+        }
+    })
 
     // ── Manual data loader ───────────────────────────────────────────────────
 

@@ -1,9 +1,13 @@
 import { MapInstance } from '../../core/MapInstance'
+import type { ProportionalSymbolSettings } from './ProportionalSymbolConfig'
 
 /**
  * Proportional symbol map object
  */
 export interface ProportionalSymbolMap extends MapInstance {
+    psSettings(): ProportionalSymbolSettings
+    psSettings(v: ProportionalSymbolSettings): this
+
     psMaxSize(): number
     psMaxSize(v: number): this
 

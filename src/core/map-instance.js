@@ -826,21 +826,11 @@ const getAvailableHeight = function (out) {
         const containerId = out.containerId_
 
         let container = null
-        // Only use containerId_ if it is explicitly set and is DIFFERENT from the SVG ID
+        // Only use containerId_ when explicitly set and different from the SVG ID.
+        // This avoids constraining height to a parent wrapper with auto height
+        // (often just the browser's default intrinsic SVG height).
         if (containerId && containerId !== svgId) {
             container = document.getElementById(containerId)
-        }
-
-        // If no explicit container was found, try to find the parent container in the DOM
-        if (!container) {
-            const svgEl = document.getElementById(svgId)
-            if (svgEl) {
-                let parent = svgEl.parentNode
-                if (parent && parent.classList?.contains('em-map-wrapper')) {
-                    parent = parent.parentNode
-                }
-                container = parent
-            }
         }
 
         if (container && container !== document.body && container !== document.documentElement) {

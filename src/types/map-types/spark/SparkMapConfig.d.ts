@@ -1,10 +1,22 @@
 import type { MapConfig } from '../../core/MapConfig'
 import type { SparklineLegendConfig } from '../../legend/composition/SparklineLegendConfig'
 
+export interface SparkSettings {
+    type?: 'line' | 'area' | 'bar'
+    lineOffsets?: { x: number; y: number }
+    lineWidth?: number
+    lineHeight?: number
+    lineStrokeWidth?: number
+    lineOpacity?: number
+}
+
 /**
  * Configuration for sparkline maps.
  */
 export interface SparkMapConfig extends MapConfig {
+    /** Grouped sparkline rendering settings. */
+    sparkSettings?: SparkSettings
+
     /** Spark type. */
     sparkType?: 'line' | 'area' | 'bar'
     sparkLineColor?: string | ((value: number, index: number, data: any[]) => string)
