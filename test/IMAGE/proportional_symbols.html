@@ -347,11 +347,11 @@
                 // .insetBoxPosition([400, 10])
                 .width(mapWidth)
                 .height(mapHeight)
-                .psShape('circle')
+                .psSettings({ shape: 'circle' })
                 .nutsLevel('mixed')
-                .psMinSize(1)
-                .psMaxSize(10)
-                //.psFillOpacity(0.8)
+                .psSettings({ minSize: 1 })
+                .psSettings({ maxSize: 10 })
+                //.psSettings({ fillOpacity: 0.8 })
                 .legend({
                     //svgId: "eurostatmap-legend",
                     x: 0,

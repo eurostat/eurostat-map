@@ -20,22 +20,22 @@
                 .nutsYear(2016)
                 .title('Custom chart function - log scale')
                 //.zoomExtent([1, 2]) //pan & zoom
-                .statSpark({
+                .stat({
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT' },
                     unitText: 'Population change',
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                 })
-                .sparkType('line')
-                .sparkLineWidth(30)
-                .sparkLineStrokeWidth(0.8)
-                .sparkLineColor((d, i) => {
+                .sparkSettings({ type: 'line' })
+                .sparkSettings({ lineWidth: 30 })
+                .sparkSettings({ lineStrokeWidth: 0.8 })
+                .sparkSettings({ lineColor: (d, i) => {
                     return d[d.length - 1].value <= 0 ? 'red' : 'blue'
-                })
-                .sparkLineHeight(20)
-                .sparkLineOpacity(0.8)
-                .sparkLineCircleRadius(0)
+                } })
+                .sparkSettings({ lineHeight: 20 })
+                .sparkSettings({ lineOpacity: 0.8 })
+                .sparkSettings({ lineCircleRadius: 0 })
 
                 .tooltip({
                     xOffset: 30,
@@ -43,7 +43,7 @@
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
-                .sparkLineChartFunction((node, data, width, height, isForTooltip) => {
+                .sparkSettings({ lineChartFunction: (node, data, width, height, isForTooltip) => {
                     const xScale = d3
                         .scaleLinear()
                         .domain([0, data.length - 1])
@@ -88,13 +88,13 @@
                             .attr('stroke-dasharray', '2,2')
                             .attr('stroke-width', 1)
                     }
-                })
-                .sparkTooltipChart({
+                } })
+                .sparkSettings({ tooltipChart: {
                     width: 150,
                     height: 50,
                     margin: { left: 60, right: 40, top: 40, bottom: 40 },
                     circleRadius: 1.5,
-                })
+                } })
                 .build()
         </script>
     </body>

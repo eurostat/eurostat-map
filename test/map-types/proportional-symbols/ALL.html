@@ -107,16 +107,16 @@
                     unitText: '% of total agricultural area',
                 })
                 .encoding('color', { stat: 'symbolColor' })
-                .psShape('shape')
-                .psCustomShape(customCircle)
-                .psMaxSize(50)
-                .psMinSize(1)
-                .psFillOpacity(1)
-                .psColorFun(d3.interpolateGreens)
-                .psClasses(6)
-                .psStroke('black')
-                .psStrokeWidth('1')
-                .psOffset({ x: -5, y: -10 })
+                .psSettings({ shape: 'shape' })
+                .psSettings({ customShape: customCircle })
+                .psSettings({ maxSize: 50 })
+                .psSettings({ minSize: 1 })
+                .psSettings({ fillOpacity: 1 })
+                .psSettings({ colorFun: d3.interpolateGreens })
+                .psSettings({ classes: 6 })
+                .psSettings({ stroke: 'black' })
+                .psSettings({ strokeWidth: '1' })
+                .psSettings({ offset: { x: -5, y: -10 } })
                 .legend({
                     x: 530,
                     y: 20,
@@ -155,15 +155,15 @@
                     unitText: '% of total agricultural area',
                 })
                 .encoding('color', { stat: 'symbolColor' })
-                .psShape('custom')
-                .psCustomSVG(euSVG)
-                .psMaxSize(7)
-                .psMinSize(1)
-                .psOffset({ x: -5, y: -10 })
-                .psColorFun(d3.interpolateGreens)
-                .psClasses(6)
-                .psStroke('black')
-                .psStrokeWidth('1')
+                .psSettings({ shape: 'custom' })
+                .psSettings({ customSVG: euSVG })
+                .psSettings({ maxSize: 7 })
+                .psSettings({ minSize: 1 })
+                .psSettings({ offset: { x: -5, y: -10 } })
+                .psSettings({ colorFun: d3.interpolateGreens })
+                .psSettings({ classes: 6 })
+                .psSettings({ stroke: 'black' })
+                .psSettings({ strokeWidth: '1' })
                 .legend({
                     x: 530,
                     y: 10,
@@ -213,13 +213,13 @@
                     unitText: '% change compared to previous year',
                 })
                 .encoding('color', { stat: 'symbolColor' })
-                .psShape('square') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
-                .psFill('#fa8dfc')
-                .psStroke('white')
-                .psStrokeWidth('1')
-                .psMaxSize(70)
+                .psSettings({ shape: 'square' }) // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
+                .psSettings({ fill: '#fa8dfc' })
+                .psSettings({ stroke: 'white' })
+                .psSettings({ strokeWidth: '1' })
+                .psSettings({ maxSize: 70 })
                 .tooltipShowFlags('long')
-                .psColors(['#fee5d9', '#fcbba1', '#fc9272', '#fb6a4a', '#de2d26', '#a50f15'].reverse())
+                .psSettings({ colors: ['#fee5d9', '#fcbba1', '#fc9272', '#fb6a4a', '#de2d26', '#a50f15'].reverse( }))
                 .legend({
                     x: 550,
                     y: 20,
@@ -257,15 +257,15 @@
                 .encoding('size', { stat: 'symbolSize' })
                 .stat('symbolColor', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
                 .encoding('color', { stat: 'symbolColor' })
-                .psShape('spike') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
-                .psFill('grey')
-                .psMinSize(1)
-                .psMaxSize(100)
-                .psFillOpacity(1)
-                .psStroke('black')
-                .psStrokeWidth('1')
+                .psSettings({ shape: 'spike' }) // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
+                .psSettings({ fill: 'grey' })
+                .psSettings({ minSize: 1 })
+                .psSettings({ maxSize: 100 })
+                .psSettings({ fillOpacity: 1 })
+                .psSettings({ stroke: 'black' })
+                .psSettings({ strokeWidth: '1' })
                 .tooltipShowFlags('long')
-                .psColorFun(d3.interpolateReds)
+                .psSettings({ colorFun: d3.interpolateReds })
                 .legend({
                     x: 610,
                     boxPadding: 10,

@@ -23,12 +23,12 @@
                 //.width(600)
                 .gridCartogram(true)
                 //.gridCartogramShape('hexagon')
-                //.sparkLineOffsets({ x: -2, y: 90 }) //for hexagon grids
+                //.sparkSettings({ lineOffsets: { x: -2, y: 90 } }) //for hexagon grids
                 .nutsYear(2016)
                 .title('Population change 2009 - 2023')
                 .subtitle('Change per thousand inhabitants')
                 .transitionDuration(1000)
-                .statSpark({
+                .stat({
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT' },
                     unitText: 'Population change',
@@ -69,28 +69,28 @@
                         '2024',
                     ],
                 })
-                .sparkType('bar') //line, area, bar
+                .sparkSettings({ type: 'bar' }) //line, area, bar
 
-                .sparkLineWidth(29)
-                .sparkLineHeight(100)
-                .sparkLineStrokeWidth(3)
+                .sparkSettings({ lineWidth: 29 })
+                .sparkSettings({ lineHeight: 100 })
+                .sparkSettings({ lineStrokeWidth: 3 })
 
                 // Color based on positive/negative values
-                .sparkLineColor((itemValue) => {
+                .sparkSettings({ lineColor: (itemValue) => {
                     if (itemValue > 0) return 'blue'
                     if (itemValue < 0) return 'red'
                     return '#777777'
-                })
-                .sparkLineOpacity(0.8)
-                .sparkLineCircleRadius(0)
-                //.sparkLineOffsets({ x: -26, y: -15 })
-                //.sparkLineOffsets({ x: 0, y: 10 })
-                // .sparkTooltipChart({
+                } })
+                .sparkSettings({ lineOpacity: 0.8 })
+                .sparkSettings({ lineCircleRadius: 0 })
+                //.sparkSettings({ lineOffsets: { x: -26, y: -15 } })
+                //.sparkSettings({ lineOffsets: { x: 0, y: 10 } })
+                // .sparkSettings({ tooltipChart: {
                 //     width: 150,
                 //     height: 50,
                 //     margin: { left: 30, right: 20, top: 30, bottom: 40 },
                 //     circleRadius: 1.5,
-                // })
+                // } })
                 .legend({
                     //title: 'Population change',
                     x: 0,

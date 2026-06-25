@@ -23,10 +23,10 @@
                         noData: false,
                     },
                 })
-                .psShape('circle')
+                .psSettings({ shape: 'circle' })
                 .insets(false)
-                .psMinSize(1)
-                .psMaxSize(30)
+                .psSettings({ minSize: 1 })
+                .psSettings({ maxSize: 30 })
                 .patternFill([
                     {
                         pattern: 'hatching',

@@ -62,6 +62,11 @@ export const map = function (config) {
             lineHeight: out.sparkLineHeight_,
             lineStrokeWidth: out.sparkLineStrokeWidth_,
             lineOpacity: out.sparkLineOpacity_,
+            lineColor: out.sparkLineColor_,
+            areaColor: out.sparkAreaColor_,
+            lineCircleRadius: out.sparkLineCircleRadius_,
+            tooltipChart: out.sparkTooltipChart_,
+            lineChartFunction: out.sparkLineChartFunction_,
         }
     }
 
@@ -99,6 +104,11 @@ export const map = function (config) {
         if (v.lineHeight !== undefined) out.sparkLineHeight_ = v.lineHeight
         if (v.lineStrokeWidth !== undefined) out.sparkLineStrokeWidth_ = v.lineStrokeWidth
         if (v.lineOpacity !== undefined) out.sparkLineOpacity_ = v.lineOpacity
+        if (v.lineColor !== undefined) out.sparkLineColor_ = v.lineColor
+        if (v.areaColor !== undefined) out.sparkAreaColor_ = v.areaColor
+        if (v.lineCircleRadius !== undefined) out.sparkLineCircleRadius_ = v.lineCircleRadius
+        if (v.tooltipChart !== undefined) out.sparkTooltipChart_ = v.tooltipChart
+        if (v.lineChartFunction !== undefined) out.sparkLineChartFunction_ = v.lineChartFunction
 
         return out
     }
@@ -128,6 +138,12 @@ export const map = function (config) {
         ['sparkLineHeight', 'lineHeight'],
         ['sparkLineStrokeWidth', 'lineStrokeWidth'],
         ['sparkLineOpacity', 'lineOpacity'],
+        ['sparkLineColor', 'lineColor'],
+        ['sparkLineAreaColor', 'areaColor'],
+        ['sparkAreaColor', 'areaColor'],
+        ['sparkLineCircleRadius', 'lineCircleRadius'],
+        ['sparkTooltipChart', 'tooltipChart'],
+        ['sparkLineChartFunction', 'lineChartFunction'],
     ]
 
     deprecatedSparkSettingsWrappers.forEach(function ([legacyMethod, settingsKey]) {
@@ -231,6 +247,58 @@ export const map = function (config) {
 
         out._statDates = dates
         return out
+    }
+
+    const superStat = out.stat
+    out.stat = function (...args) {
+        if (args.length === 1 && args[0] && typeof args[0] === 'object' && !Array.isArray(args[0])) {
+            const cfg = args[0]
+            if (cfg.dates && (cfg.eurostatDatasetCode || cfg.customData)) {
+                const { eurostatDatasetCode, customData, filters, unitText, transform, dates, labels } = cfg
+
+                if (customData && !eurostatDatasetCode) {
+                    const resolvedDates = dates?.length ? dates : Object.keys(customData[Object.keys(customData)[0]] || {})
+                    if (!resolvedDates.length) {
+                        console.error('stat({...}): dates array or customData with date keys is required for sparkline maps')
+                        return out
+                    }
+                    resolvedDates.forEach((date, i) => {
+                        if (labels?.[i]) {
+                            out.catLabels_ = out.catLabels_ || {}
+                            out.catLabels_[date] = labels[i]
+                        }
+                    })
+                    return out.sparklineData(customData)
+                }
+
+                if (!eurostatDatasetCode) {
+                    console.error('stat({...}): eurostatDatasetCode is required for sparkline maps when dates are provided')
+                    return out
+                }
+                if (!dates?.length) {
+                    console.error('stat({...}): dates array is required for sparkline maps')
+                    return out
+                }
+
+                const baseFilters = filters ? { ...filters } : {}
+                for (let i = 0; i < dates.length; i++) {
+                    const date = dates[i]
+                    superStat.call(out, date, {
+                        eurostatDatasetCode,
+                        unitText,
+                        transform,
+                        filters: { ...baseFilters, time: date },
+                    })
+                    if (labels?.[i]) {
+                        out.catLabels_ = out.catLabels_ || {}
+                        out.catLabels_[date] = labels[i]
+                    }
+                }
+                out._statDates = dates
+                return out
+            }
+        }
+        return superStat.apply(out, args)
     }
 
     // ── Data helpers ─────────────────────────────────────────────────────────

@@ -85,69 +85,69 @@ Use `stat` inside encoding configs, not `field`, because it directly links the v
 
 1. Add `map.encoding(channel, config)` to `createStatMap`.
 
-   Supported forms:
+    Supported forms:
 
-   ```js
-   map.encoding('color')
-   map.encoding('color', config)
-   map.encoding({ color: config, size: config })
-   ```
+    ```js
+    map.encoding('color')
+    map.encoding('color', config)
+    map.encoding({ color: config, size: config })
+    ```
 
-   Internally store:
+    Internally store:
 
-   ```js
-   out.encodings_ = {
-       color: { ... },
-       size: { ... },
-       height: { ... },
-       width: { ... },
-   }
-   ```
+    ```js
+    out.encodings_ = {
+        color: { ... },
+        size: { ... },
+        height: { ... },
+        width: { ... },
+    }
+    ```
 
 2. Add shared encoding helpers on map instances:
 
-   ```js
-   out.encoding(channel, config?)
-   out.getEncodingStat(channel)
-   out.getEncodingStatData(channel, categoryCode?)
-   out.getEncodingValue(channel, regionId, categoryCode?)
-   out.getEncodingUnitText(channel)
-   ```
+    ```js
+    out.encoding(channel, config?)
+    out.getEncodingStat(channel)
+    out.getEncodingStatData(channel, categoryCode?)
+    out.getEncodingValue(channel, regionId, categoryCode?)
+    out.getEncodingUnitText(channel)
+    ```
 
 3. Make named categorical stats pure data definitions.
 
-   Categorical stat metadata should live on the stat, for example:
+    Categorical stat metadata should live on the stat, for example:
 
-   ```js
-   out.statMeta_ = {
-       degurbaRate: {
-           categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
-           unitText: '%',
-           statKeys: {
-               DEG1: 'degurbaRate:DEG1',
-               DEG2: 'degurbaRate:DEG2',
-               DEG3: 'degurbaRate:DEG3',
-           },
-       },
-   }
-   ```
+    ```js
+    out.statMeta_ = {
+        degurbaRate: {
+            categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
+            unitText: '%',
+            statKeys: {
+                DEG1: 'degurbaRate:DEG1',
+                DEG2: 'degurbaRate:DEG2',
+                DEG3: 'degurbaRate:DEG3',
+            },
+        },
+    }
+    ```
 
-   Internally, `statData('degurbaRate:DEG1')` can still store the category-specific values, but users should interact with `degurbaRate`.
+    Internally, `statData('degurbaRate:DEG1')` can still store the category-specific values, but users should interact with `degurbaRate`.
 
 4. Keep existing API forms as compatibility sugar.
 
-   Existing calls such as:
+    Existing calls such as:
 
-   ```js
-   .stat('size', config)
-   .stat('color', config)
-   .statBar({ categoryCodes, categoryColors, categoryLabels, ... })
-   .statPie(...)
-   .statWaffle(...)
-   .statStripe(...)
-   ```
+    ```js
+    .stat('size', config)
+    .stat('color', config)
+    .statBar({ categoryCodes, categoryColors, categoryLabels, ... })
+    .statPie(...)
+    .statWaffle(...)
+    .statStripe(...)
+    ```
 
-   should translate internally into named stats plus encodings.
+    should translate internally into named stats plus encodings.
 
 ## Map-Type Migration Plan
 
@@ -202,7 +202,7 @@ Preferred API:
 .encoding('color', { stat: 'growth', scale: 'quantile', scheme: 'OrRd', classes: 5 })
 ```
 
-Existing settings such as `psMinSize`, `psMaxSize`, `psSizeScale`, `psColorFun`, `psClasses`, and `psThresholds` can be compatibility wrappers around encoding configs.
+Existing settings such as `psSettings` can be compatibility wrappers around encoding configs.
 
 ### Choropleths
 

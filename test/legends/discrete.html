@@ -85,11 +85,11 @@
                         //labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
                     },
                 })
-                .psClassificationMethod('threshold')
-                .psThresholds([-10, -5, 0, 5, 10])
-                .psColors(['#d73027', '#fc8d59', '#fee08b', '#d9ef8b', '#91cf60', '#1a9850'])
-                .psShape('circle')
-                .psMaxSize(15)
+                .psSettings({ classificationMethod: 'threshold' })
+                .psSettings({ thresholds: [-10, -5, 0, 5, 10] })
+                .psSettings({ colors: ['#d73027', '#fc8d59', '#fee08b', '#d9ef8b', '#91cf60', '#1a9850'] })
+                .psSettings({ shape: 'circle' })
+                .psSettings({ maxSize: 15 })
                 .transitionDuration(900)
                 .dorling(true)
                 .dorlingStrength({ x: 0.1, y: 0.1 })

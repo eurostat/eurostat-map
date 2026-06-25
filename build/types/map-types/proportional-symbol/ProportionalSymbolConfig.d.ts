@@ -1,11 +1,29 @@
 import type { MapConfig } from '../../core/MapConfig'
 
 export interface ProportionalSymbolSettings {
+    shape?: string
+    customShape?: any
+    customSVG?: any
+    spikeWidth?: number
+    offset?: { x: number; y: number }
+    barWidth?: number
+    minValue?: number | undefined
+    maxValue?: number | undefined
+    fill?: string
+    fillOpacity?: number
     stroke?: string
     strokeWidth?: number
+    strokeOpacity?: number
     sizeScale?: 'sqrt' | 'linear' | any
     minSize?: number
     maxSize?: number
+    classes?: number
+    colors?: string[] | null
+    colorFun?: any
+    classToFillStyle?: any
+    thresholds?: number[]
+    classificationMethod?: string
+    brightenFactor?: number
     codeLabels?: boolean
 }
 

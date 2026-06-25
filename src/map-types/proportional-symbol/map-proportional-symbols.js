@@ -74,11 +74,29 @@ export const map = function (config) {
 
     const getPsSettingsSnapshot = function () {
         return {
+            shape: out.psShape_,
+            customShape: out.psCustomShape_,
+            customSVG: out.psCustomSVG_,
+            spikeWidth: out.psSpikeWidth_,
+            offset: out.psOffset_,
+            barWidth: out.psBarWidth_,
+            minValue: out.psMinValue_,
+            maxValue: out.psMaxValue_,
+            fill: out.psFill_,
+            fillOpacity: out.psFillOpacity_,
             stroke: out.psStroke_,
             strokeWidth: out.psStrokeWidth_,
+            strokeOpacity: out.psStrokeOpacity_,
             sizeScale: out.psSizeScale_,
             minSize: out.psMinSize_,
             maxSize: out.psMaxSize_,
+            classes: out.psClasses_,
+            colors: out.psColors_,
+            colorFun: out.psColorFun_,
+            classToFillStyle: out.psClassToFillStyle_,
+            thresholds: out.psThresholds_,
+            classificationMethod: out.psClassificationMethod_,
+            brightenFactor: out.psBrightenFactor_,
             codeLabels: out.psCodeLabels_,
         }
     }
@@ -132,12 +150,38 @@ export const map = function (config) {
         if (!arguments.length) return getPsSettingsSnapshot()
         if (!v || typeof v !== 'object' || Array.isArray(v)) return out
 
+        if (v.shape !== undefined) out.psShape_ = v.shape
+        if (v.customShape !== undefined) out.psCustomShape_ = v.customShape
+        if (v.customSVG !== undefined) out.psCustomSVG_ = v.customSVG
+        if (v.spikeWidth !== undefined) out.psSpikeWidth_ = v.spikeWidth
+        if (v.offset !== undefined) out.psOffset_ = v.offset
+        if (v.barWidth !== undefined) out.psBarWidth_ = v.barWidth
+        if (v.minValue !== undefined) out.psMinValue_ = v.minValue
+        if (v.maxValue !== undefined) out.psMaxValue_ = v.maxValue
+        if (v.fill !== undefined) out.psFill_ = v.fill
+        if (v.fillOpacity !== undefined) out.psFillOpacity_ = v.fillOpacity
         if (v.stroke !== undefined) out.psStroke_ = v.stroke
         if (v.strokeWidth !== undefined) out.psStrokeWidth_ = v.strokeWidth
+        if (v.strokeOpacity !== undefined) out.psStrokeOpacity_ = v.strokeOpacity
         if (v.sizeScale !== undefined) out.psSizeScale_ = v.sizeScale
         if (v.minSize !== undefined) out.psMinSize_ = v.minSize
         if (v.maxSize !== undefined) out.psMaxSize_ = v.maxSize
+        if (v.classes !== undefined) out.psClasses_ = v.classes
+        if (v.colors !== undefined) out.psColors_ = v.colors
+        if (v.colorFun !== undefined) out.psColorFun_ = v.colorFun
+        if (v.classToFillStyle !== undefined) out.psClassToFillStyle_ = v.classToFillStyle
+        if (v.classificationMethod !== undefined) out.psClassificationMethod_ = v.classificationMethod
+        if (v.thresholds !== undefined) {
+            out.psThresholds_ = v.thresholds
+            out.psClassificationMethod_ = 'threshold'
+            out.psClasses_ = v.thresholds.length + 1
+        }
+        if (v.brightenFactor !== undefined) out.psBrightenFactor_ = v.brightenFactor
         if (v.codeLabels !== undefined) out.psCodeLabels_ = v.codeLabels
+
+        if (v.colorFun !== undefined || v.colors !== undefined) {
+            out.psClassToFillStyle_ = getColorLegend(out.psColorFun_, out.psColors_)
+        }
 
         return out
     }
@@ -153,11 +197,29 @@ export const map = function (config) {
     }
 
     const deprecatedPsSettingsWrappers = [
+        ['psShape', 'shape'],
+        ['psCustomShape', 'customShape'],
+        ['psCustomSVG', 'customSVG'],
+        ['psSpikeWidth', 'spikeWidth'],
+        ['psOffset', 'offset'],
+        ['psBarWidth', 'barWidth'],
+        ['psMinValue', 'minValue'],
+        ['psMaxValue', 'maxValue'],
+        ['psFill', 'fill'],
+        ['psFillOpacity', 'fillOpacity'],
         ['psStroke', 'stroke'],
         ['psStrokeWidth', 'strokeWidth'],
+        ['psStrokeOpacity', 'strokeOpacity'],
         ['psSizeScale', 'sizeScale'],
         ['psMinSize', 'minSize'],
         ['psMaxSize', 'maxSize'],
+        ['psClasses', 'classes'],
+        ['psColors', 'colors'],
+        ['psColorFun', 'colorFun'],
+        ['psClassToFillStyle', 'classToFillStyle'],
+        ['psThresholds', 'thresholds'],
+        ['psClassificationMethod', 'classificationMethod'],
+        ['psBrightenFactor', 'brightenFactor'],
         ['psCodeLabels', 'codeLabels'],
     ]
 
@@ -169,21 +231,6 @@ export const map = function (config) {
             return out
         }
     })
-
-    //override of some special getters/setters
-    out.psColorFun = function (v) {
-        if (!arguments.length) return out.psColorFun_
-        out.psColorFun_ = v
-        out.psClassToFillStyle_ = getColorLegend(out.psColorFun_, out.psColors_)
-        return out
-    }
-    out.psThresholds = function (v) {
-        if (!arguments.length) return out.psThresholds_
-        out.psThresholds_ = v
-        out.psClassificationMethod_ = 'threshold'
-        out.psClasses(v.length + 1)
-        return out
-    }
 
     //@override
     out.updateClassification = function () {

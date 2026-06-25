@@ -20,9 +20,9 @@
             .legend({ x: 500, y: 100, title: 'Test' })
             .nutsLevel('mixed')
             .dorling(true)
-            .psFill('#4ac499')
-            .psMaxSize(30)
-            .psMinSize(5)
+            .psSettings({ fill: '#4ac499' })
+            .psSettings({ maxSize: 30 })
+            .psSettings({ minSize: 5 })
             .nutsYear(2016)
 
         map.statData('size').setData({
@@ -64,7 +64,7 @@
                 DE12: 5,
                 PL: 23,
             })
-            map.psFill('#ff0000')
+            map.psSettings({ fill: '#ff0000' })
             map.updateStatValues()
         }, 1000)
 
@@ -88,7 +88,7 @@
                 DE12: 5,
                 PT: 23,
             })
-            map.psFill('#ff9900')
+            map.psSettings({ fill: '#ff9900' })
             map.updateStatValues()
         }, 2000)
 
@@ -112,7 +112,7 @@
                 DE12: '5',
                 PL: '23',
             })
-            map.psFill('#0000ff')
+            map.psSettings({ fill: '#0000ff' })
             map.updateStatValues()
         }, 3000)
 

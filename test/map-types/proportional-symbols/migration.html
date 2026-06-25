@@ -24,13 +24,13 @@
                 //     filters: { unit: 'PER', time: '2023', isco08: 'TOTAL', citizen: 'TOTAL', decision: 'GRNT' },
                 // })
                 .nutsLevel(0)
-                .psShape('circle')
-                .psMinSize(5)
-                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
-                .psStrokeWidth(1)
-                .psStroke('white')
-                .psFillOpacity(1)
-                .psStrokeOpacity(0.9)
+                .psSettings({ shape: 'circle' })
+                .psSettings({ minSize: 5 })
+                .psSettings({ maxSize: 30 }) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psSettings({ strokeWidth: 1 })
+                .psSettings({ stroke: 'white' })
+                .psSettings({ fillOpacity: 1 })
+                .psSettings({ strokeOpacity: 0.9 })
                 .zoomExtent([1, 10])
                 .legend({ title: 'EU blue cards issued', x: 580, y: 20 })
 

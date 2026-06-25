@@ -16,11 +16,11 @@
                 .map('proportionalSymbol')
                 .svgId('basic')
                 .nutsLevel('mixed')
-                .psOffset({ x: -5, y: -10 })
-                .psMaxSize(5)
-                .psMinSize(0.1)
-                .psShape('custom')
-                .psCustomSVG(
+                .psSettings({ offset: { x: -5, y: -10 } })
+                .psSettings({ maxSize: 5 })
+                .psSettings({ minSize: 0.1 })
+                .psSettings({ shape: 'custom' })
+                .psSettings({ customSVG: 
                     `<svg
                         width="10px"
                         height="10px"
@@ -81,7 +81,7 @@
                             fill=""
                         />
                     </svg>`
-                )
+                 })
                 .legend({
                     svgId: 'legend',
                     height: 600,

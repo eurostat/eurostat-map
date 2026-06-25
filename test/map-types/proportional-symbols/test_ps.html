@@ -39,10 +39,10 @@
                 //     filters: { unit: 'MIO_EUR', time: '2018' },
                 // })
                 .legend(legendConfig)
-                .psShape('circle')
+                .psSettings({ shape: 'circle' })
                 .insets(false)
-                .psMinSize(5)
-                .psMaxSize(30) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psSettings({ minSize: 5 })
+                .psSettings({ maxSize: 30 }) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
             map.statData().setData({
                 ES: 1,

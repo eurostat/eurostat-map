@@ -29,18 +29,18 @@
                 //.position({ x: 4900000, y: 3500000, z: zoom })
                 .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
 
-                .statSpark({
+                .stat({
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT' },
                     unitText: 'Population change',
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                 })
-                .sparkType('line')
-                .sparkLineWidth(30)
-                .sparkLineHeight(10)
+                .sparkSettings({ type: 'line' })
+                .sparkSettings({ lineWidth: 30 })
+                .sparkSettings({ lineHeight: 10 })
                 .transitionDuration(2000)
-                .sparkLineStrokeWidth((data, index) => {
+                .sparkSettings({ lineStrokeWidth: (data, index) => {
                     // console.log(data, index)
                     let val = data[data.length - 1]?.value
                     if (val > 10000000) return 3
@@ -48,25 +48,25 @@
                     if (val > 2000000) return 2
                     if (val > 1000000) return 1.5
                     return 1
-                })
-                .sparkLineColor((value, i, data) => {
+                } })
+                .sparkSettings({ lineColor: (value, i, data) => {
                     const startPopulation = data[0].value
                     const endPopulation = data[data.length - 1].value
                     return endPopulation > startPopulation ? '#1f77b4' : '#d62728'
-                })
-                .sparkLineCircleRadius(0)
+                } })
+                .sparkSettings({ lineCircleRadius: 0 })
                 .tooltip({
                     xOffset: 30,
                     yOffset: 10,
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
-                .sparkTooltipChart({
+                .sparkSettings({ tooltipChart: {
                     width: 150,
                     height: 150,
                     margin: { left: 60, right: 40, top: 20, bottom: 40 },
                     circleRadius: 1.5,
-                })
+                } })
                 .hoverColor('yellow')
                 .build()
 
@@ -85,15 +85,15 @@
                 .position({ x: 4900000, y: 3500000, z: zoom })
                 .bottomText('Line thickness determined by latest population figure. By NUTS1 regions. Source: Eurostat (demo_r_pjanaggr3)')
                 .nutsLevel(1)
-                .statSpark({
+                .stat({
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT' },
                     unitText: 'Population change',
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                 })
-                .sparkType('line')
-                .sparkLineChartFunction((node, data, width, height, isForTooltip) => {
+                .sparkSettings({ type: 'line' })
+                .sparkSettings({ lineChartFunction: (node, data, width, height, isForTooltip) => {
                     // 1) Convert % changes to multiplicative factors (1 + r)
                     //    Handle null/NaN gracefully: treat as missing (break the line).
                     const factors = data.map((d) => {
@@ -208,7 +208,7 @@
                             .attr('stroke-dasharray', '2,2')
                             .attr('stroke-width', 1)
                     }
-                })
+                } })
 
                 .tooltip({
                     xOffset: 30,

@@ -46,13 +46,13 @@
                 .title('Average Annual Temperature')
                 .subtitle('Made-up °C values, 2018–2024')
                 .scale('60M')
-                .sparkType('area')
-                .sparkLineWidth(50)
-                .sparkLineHeight(20)
-                .sparkLineOpacity(0.85)
+                .sparkSettings({ type: 'area' })
+                .sparkSettings({ lineWidth: 50 })
+                .sparkSettings({ lineHeight: 20 })
+                .sparkSettings({ lineOpacity: 0.85 })
                 .insets('default')
                 .legend({ x: 10, y: 160, title: 'Temperature trend (°C)' })
-                .statSpark({
+                .stat({
                     customData: tempData,
                     unitText: '°C',
                     labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],

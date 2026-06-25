@@ -84,16 +84,16 @@
                         //values: [100, 300000],
                     },
                 })
-                .psShape('circle')
-                .psMinSize(2)
-                .psMaxSize(45)
-                .psStrokeWidth(0.1)
-                .psStroke('white')
-                .psFillOpacity(1)
-                .psStrokeOpacity(0.9)
+                .psSettings({ shape: 'circle' })
+                .psSettings({ minSize: 2 })
+                .psSettings({ maxSize: 45 })
+                .psSettings({ strokeWidth: 0.1 })
+                .psSettings({ stroke: 'white' })
+                .psSettings({ fillOpacity: 1 })
+                .psSettings({ strokeOpacity: 0.9 })
                 .zoomExtent([1, 10])
                 .insets('default')
-                .psCodeLabels(false)
+                .psSettings({ codeLabels: false })
                 .dorling(true)
                 .labels({
                     labels: [],
@@ -111,7 +111,7 @@
             const select = document.getElementById('nutsLevel')
             select.addEventListener('change', (e) => {
                 const level = +e.target.value // number 0–3
-                map.nutsLevel(level).psMaxSize([55, 20, 20, 15][level]).build() // reapply and rebuild
+                map.nutsLevel(level).psSettings({ maxSize: [55, 20, 20, 15][level] }).build() // reapply and rebuild
             })
         </script>
     </body>

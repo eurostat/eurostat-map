@@ -41,10 +41,10 @@
                         labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
                     },
                 })
-                .psThresholds([10000, 20000, 30000, 40000])
-                .psColors(['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'])
-                .psShape('circle')
-                .psMaxSize(15)
+                .psSettings({ thresholds: [10000, 20000, 30000, 40000] })
+                .psSettings({ colors: ['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'] })
+                .psSettings({ shape: 'circle' })
+                .psSettings({ maxSize: 15 })
                 .transitionDuration(900)
                 .dorling(true)
                 .dorlingStrength({ x: 0.1, y: 0.1 })

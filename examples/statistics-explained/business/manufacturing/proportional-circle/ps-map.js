@@ -26,10 +26,10 @@ export function renderMap(code) {
         .nutsLevel(2)
 
         //symbol settings
-        .psFill('#005C99')
-        .psBrightenFactor(0.8) //background color brightening factor
-        .psMaxSize(18)
-        .psMinSize(3)
+        .psSettings({ fill: '#005C99' })
+        .psSettings({ brightenFactor: 0.8 }) //background color brightening factor
+        .psSettings({ maxSize: 18 })
+        .psSettings({ minSize: 3 })
 
         //SE settings
         //.header(true)

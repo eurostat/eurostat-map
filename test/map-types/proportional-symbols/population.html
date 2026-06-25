@@ -164,17 +164,17 @@
                     time: '2023',
                 })
                 .encoding('color', { stat: 'symbolColor' })
-                .psShape('circle')
-                .psMinSize([10, 3, 2, 2][nutsLevel])
-                .psMaxSize([60, 20, 20, 15][nutsLevel])
-                .psFill('yellow')
-                .psFillOpacity(1)
-                .psColors(['rgb(153,122,0)', 'rgb(226,200,34)', 'rgb(254,234,152)', 'rgb(190,235,190)', 'rgb(127,204,187)', 'rgb(32,132,134)'])
-                .psClassificationMethod('threshold')
-                .psThresholds([-10, -5, 0, 5, 10])
-                .psStroke('white')
-                .psStrokeWidth('0.1')
-                .psStrokeOpacity(0.5)
+                .psSettings({ shape: 'circle' })
+                .psSettings({ minSize: [10, 3, 2, 2][nutsLevel] })
+                .psSettings({ maxSize: [60, 20, 20, 15][nutsLevel] })
+                .psSettings({ fill: 'yellow' })
+                .psSettings({ fillOpacity: 1 })
+                .psSettings({ colors: ['rgb(153,122,0 })', 'rgb(226,200,34)', 'rgb(254,234,152)', 'rgb(190,235,190)', 'rgb(127,204,187)', 'rgb(32,132,134)'])
+                .psSettings({ classificationMethod: 'threshold' })
+                .psSettings({ thresholds: [-10, -5, 0, 5, 10] })
+                .psSettings({ stroke: 'white' })
+                .psSettings({ strokeWidth: '0.1' })
+                .psSettings({ strokeOpacity: 0.5 })
                 .legend({
                     x: 20,
                     y: 150,

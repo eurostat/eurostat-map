@@ -49,14 +49,14 @@
                         
             const map = eurostatmap
                 .map('ps')
-                .psShape('spike')
+                .psSettings({ shape: 'spike' })
                 .svgId('map')
                 .width(795)
                 .height(625)
                 .nutsLevel('mixed')
                 .nutsYear('2024')
-                .psSpikeWidth(3)
-                .psMaxSize(100)
+                .psSettings({ spikeWidth: 3 })
+                .psSettings({ maxSize: 100 })
                 .zoomButtons(true)
                 .legend(legendConfig)
 

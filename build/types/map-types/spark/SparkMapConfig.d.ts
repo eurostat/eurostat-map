@@ -8,6 +8,16 @@ export interface SparkSettings {
     lineHeight?: number
     lineStrokeWidth?: number
     lineOpacity?: number
+    lineColor?: string | ((value: number, index: number, data: any[]) => string)
+    areaColor?: string | ((value: number, index: number, data: any[]) => string)
+    lineCircleRadius?: number
+    tooltipChart?: {
+        width: number
+        height: number
+        margin: { left: number; right: number; top: number; bottom: number }
+        circleRadius: number
+    }
+    lineChartFunction?: (node: any, data: any[], width: number, height: number, isForTooltip?: boolean) => void
 }
 
 /**
@@ -19,6 +29,16 @@ export interface SparkMapConfig extends MapConfig {
 
     /** Spark type. */
     sparkType?: 'line' | 'area' | 'bar'
+
+    /** Object-form stat configuration for temporal sparkline datasets. */
+    dates?: string[]
+    labels?: string[]
+    eurostatDatasetCode?: string
+    customData?: Record<string, Record<string, number>>
+    filters?: Record<string, any>
+    unitText?: string
+    transform?: (value: any) => any
+
     sparkLineColor?: string | ((value: number, index: number, data: any[]) => string)
     sparkAreaColor?: string | ((value: number, index: number, data: any[]) => string)
     /** Spark line width. */

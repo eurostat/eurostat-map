@@ -109,7 +109,7 @@
                     subtitle: 'Share of people aged 15-74, by degree of urbanisation, 2025',
                     legendTitle: 'Degree of urbanisation',
                     sizeLegendTitle: '% of people aged 15-74',
-                    noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'LI'],
+                    noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'LI', 'RS', 'ME', 'MK', 'AL', 'GE'],
                 },
                 flat: {
                     data: 'data/degurba/flat.json',
@@ -210,11 +210,11 @@
                         scale: 'linear',
                         range: [2, GROUP_MAX_HEIGHT],
                     })
-                    .encoding('width', {
-                        stat: 'degurbaPop',
-                        scale: 'linear',
-                        range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
-                    })
+                    // .encoding('width', {
+                    //     stat: 'degurbaPop',
+                    //     scale: 'linear',
+                    //     range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
+                    // })
                     .encoding('color', {
                         stat: 'degurbaRate',
                         by: 'category',

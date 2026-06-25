@@ -27,11 +27,11 @@
                 .encoding('size', { stat: 'symbolSize' })
                 .stat('symbolColor', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
                 .encoding('color', { stat: 'symbolColor' })
-                .psCodeLabels(true)
-                .psFill('#e04a28')
-                .psMaxSize(50)
+                .psSettings({ codeLabels: true })
+                .psSettings({ fill: '#e04a28' })
+                .psSettings({ maxSize: 50 })
                 .dorling(true)
-                .psMinSize(12)
+                .psSettings({ minSize: 12 })
                 // .processCentroids((centroidFeatures) => {
                 //     return centroidFeatures.map((feature) => {
                 //         if (feature.properties.id == 'TR') {
@@ -44,9 +44,9 @@
                 // })
                 //.labels({ values: true })
                 .nutsLevel('mixed')
-                .psClassificationMethod('threshold')
-                .psThreshold([10000, 30000, 40000, 50000, 70000])
-                .psColors(['#B0DCB0', '#93CD93', '#76C076', '#5CB35C', '#3CA43C', '#177217'])
+                .psSettings({ classificationMethod: 'threshold' })
+                .psSettings({ thresholds: [10000, 30000, 40000, 50000, 70000] })
+                .psSettings({ colors: ['#B0DCB0', '#93CD93', '#76C076', '#5CB35C', '#3CA43C', '#177217'] })
                 .legend({
                     x: 580,
                     y: 10,

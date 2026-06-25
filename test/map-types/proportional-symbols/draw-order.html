@@ -24,8 +24,8 @@
                     .title('Draw order. Smaller circle on top')
                     .width(800)
                     .insets(false)
-                    .psMinSize(1)
-                    .psMaxSize(10)
+                    .psSettings({ minSize: 1 })
+                    .psSettings({ maxSize: 10 })
                     .zoomExtent([1, 10])
 
                 map.statData('size').setData(result)

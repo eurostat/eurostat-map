@@ -48,9 +48,9 @@
                 .title('Urban Population')
                 .subtitle('Made-up figures, thousands')
                 .scale('60M')
-                .psShape('circle')
-                .psMaxSize(40)
-                .psMinSize(3)
+                .psSettings({ shape: 'circle' })
+                .psSettings({ maxSize: 40 })
+                .psSettings({ minSize: 3 })
                 .insets('default')
                 .legend({
                     x: 10,

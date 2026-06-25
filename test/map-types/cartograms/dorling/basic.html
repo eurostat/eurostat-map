@@ -25,12 +25,12 @@
                 // })
                 .position({ x: 3900000, y: 3085423, z: 6000 })
                 .dorling(true)
-                //.psShape('square')
+                //.psSettings({ shape: 'square' })
                 .backgroundMap(false)
-                .psCodeLabels(true)
-                .psFill('#e04a28')
-                .psMaxSize(100)
-                .psMinSize(8)
+                .psSettings({ codeLabels: true })
+                .psSettings({ fill: '#e04a28' })
+                .psSettings({ maxSize: 100 })
+                .psSettings({ minSize: 8 })
                 .processCentroids((centroidFeatures) => {
                     return centroidFeatures.map((feature) => {
                         if (feature.properties.id == 'TR') {
@@ -80,8 +80,8 @@
                     MT: 45,
                     TR: 46,
                 })
-                map.psCodeLabels(false).labels({ values: false })
-                map.psMaxSize(60)
+                map.psSettings({ codeLabels: false }).labels({ values: false })
+                map.psSettings({ maxSize: 60 })
                 //.dorlingStrength({ x: 3, y: 3 })
                 map.stamp({
                     x: 230,

@@ -15,7 +15,7 @@
                 .title('Regional unemployment trend (mixed NUTS)')
                 .subtitle("Regression test: nutsLevel('mixed') for sparklines")
                 .nutsLevel(2)
-                .statSpark({
+                .stat({
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { isced11: 'TOTAL', sex: 'T', age: 'Y15-74', unit: 'PC' },
                     dates: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
@@ -29,18 +29,18 @@
                     lineStrokeWidth: 1.2,
                     lineOpacity: 0.85,
                 })
-                .sparkLineColor((itemValue) => {
+                .sparkSettings({ lineColor: (itemValue) => {
                     if (itemValue >= 12) return '#b91c1c'
                     if (itemValue >= 8) return '#c2410c'
                     if (itemValue >= 5) return '#0369a1'
                     return '#0f766e'
-                })
-                .sparkTooltipChart({
+                } })
+                .sparkSettings({ tooltipChart: {
                     width: 220,
                     height: 120,
                     margin: { left: 35, right: 10, top: 8, bottom: 45 },
                     circleRadius: 1.5,
-                })
+                } })
                 .legend({
                     title: 'Unemployment rate (%)',
                     position: 'top right',

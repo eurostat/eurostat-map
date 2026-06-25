@@ -326,7 +326,7 @@ eurostatmap
         unitText: 'inhabitants',
     })
     .psSettings({ maxSize: 25, stroke: '#fff', strokeWidth: 0.2, sizeScale: 'linear' })
-    .psFill('red')
+    .psSettings({ fill: 'red' })
     .build()
 ```
 
@@ -392,7 +392,7 @@ Please be aware that by using this method you will essentially be turning the ma
 | _map_.**psSettings**([*value*])             | object           | _{ stroke, strokeWidth, sizeScale, minSize, maxSize, codeLabels }_ | Grouped proportional-symbol settings. Supported keys: `stroke`, `strokeWidth`, `sizeScale`, `minSize`, `maxSize`, `codeLabels`.                                                                                            |
 | _map_.**psShape**([*value*])                | string           | _circle_                                                           | The shape of the symbol. Accepted values: circle, spike, bar, square, star, cross, diamond, triangle, wye or custom                                                                                                        |
 | _map_.**psCustomShape**([*value*])          | Object           | null                                                               | A custom symbol to be used with d3.symbol when psShape is set to "custom". See http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT                                                                                       |
-| _map_.**psCustomSVG**([*value*])            | Template Literal | null                                                               | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psCustomSVG(`<svg width="100" height="100"><rect width="100" height="100" /></svg>`).                                   |
+| _map_.**psCustomSVG**([*value*])            | Template Literal | null                                                               | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psSettings({ customSVG: `<svg width="100" height="100"><rect width="100" height="100" /></svg>` }).                                   |
 | _map_.**psOffset**([*value*])               | Object           | {x:0,y:0}                                                          | Defines the offsets to apply to the symbols on the map. Only applicable to symbols where custom svgs are specified ( through psCustomSVG)                                                                                  |
 | _map_.**psMaxSize**([*value*])              | number           | _30_                                                               | Deprecated alias of `psSettings({ maxSize })`. The maximum size of the symbol. For shapes and vertical bars, this value is in pixels, but for psCustomSVG() it represents the scale factor of the transform applied to it. |
 | _map_.**psMinSize**([*value*])              | number           | _5_                                                                | Deprecated alias of `psSettings({ minSize })`. The minimum size / scale of the symbol.                                                                                                                                     |
@@ -803,7 +803,7 @@ Example:
 eurostatmap
     .map('sparkline')
     .nutsLevel(1)
-    .statSpark({
+    .stat({
         eurostatDatasetCode: 'demo_r_pjanaggr3',
         filters: { sex: 'T', unit: 'NR' },
         unitText: 'people',
@@ -825,7 +825,7 @@ eurostatmap
 `statSpark` also accepts a `customData` option as an alternative to `eurostatDatasetCode`. The dates are inferred from the key order of the first region's entries when no explicit `dates` array is provided:
 
 ```javascript
-.statSpark({
+.stat({
     customData: {
         DE: { '2020': 200, '2021': 190, '2022': 210, '2023': 205 },
         FR: { '2020': 150, '2021': 160, '2022': 155, '2023': 170 },
@@ -840,8 +840,8 @@ eurostatmap
 | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**sparkSettings**([*value*])          | object            | _{ type, lineOffsets, lineWidth, lineHeight, lineStrokeWidth, lineOpacity }_                      | Grouped sparkline settings. Supported keys: `type`, `lineOffsets`, `lineWidth`, `lineHeight`, `lineStrokeWidth`, `lineOpacity`.                                                                                                                                              |
 | _map_.**sparkType**([*value*])              | string            | "area"                                                                                            | Deprecated alias of `sparkSettings({ type })`. Type of chart to use. Can be 'line', 'area' or 'bar'.                                                                                                                                                                         |
-| _map_.**sparkLineColor**([*value*])         | string / Function | "black"                                                                                           | colour of the sparklines. Also accepts an acessor function e.g: `.sparkLineColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                                                                  |
-| _map_.**sparkLineAreaColor**([*value*])     | string / Function | "#41afaa"                                                                                         | colour of the area chart fill (when sparkType set to area) Also accepts an acessor function e.g: `.sparkLineAreaColor((d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue'))`                                                                                             |
+| _map_.**sparkLineColor**([*value*])         | string / Function | "black"                                                                                           | colour of the sparklines. Also accepts an acessor function e.g: `.sparkSettings({ lineColor: (d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue') })`                                                                                                                                  |
+| _map_.**sparkLineAreaColor**([*value*])     | string / Function | "#41afaa"                                                                                         | colour of the area chart fill (when sparkType set to area) Also accepts an acessor function e.g: `.sparkSettings({ areaColor: (d, i) => (d[d.length - 1].value > 100 ? 'red' : 'blue') })`                                                                                             |
 | _map_.**sparkLineWidth**([*value*])         | number            | 30                                                                                                | Deprecated alias of `sparkSettings({ lineWidth })`. Width of the spark charts.                                                                                                                                                                                               |
 | _map_.**sparkLineHeight**([*value*])        | number            | 20                                                                                                | Deprecated alias of `sparkSettings({ lineHeight })`. Height of the spark charts.                                                                                                                                                                                             |
 | _map_.**sparkLineStrokeWidth**([*value*])   | number            | 0.4                                                                                               | Deprecated alias of `sparkSettings({ lineStrokeWidth })`. Stroke width of the spark lines.                                                                                                                                                                                   |
@@ -1262,7 +1262,7 @@ map.backgroundMap(false)
 you can toggle the region code being shown inside the proportional symbols with:
 
 ```javascript
-map.psCodeLabels(true)
+map.psSettings({ codeLabels: true })
 ```
 
 ## Map texts

@@ -36,11 +36,11 @@
                         .width(mapWidth)
                         .height(mapHeight)
                         .nutsLevel('mixed')
-                        .psFill('#4ac499')
-                        .psShape('square')
-                        .psFillOpacity(0.8)
-                        .psMaxSize(100)
-                        .psMinSize(5)
+                        .psSettings({ fill: '#4ac499' })
+                        .psSettings({ shape: 'square' })
+                        .psSettings({ fillOpacity: 0.8 })
+                        .psSettings({ maxSize: 100 })
+                        .psSettings({ minSize: 5 })
                         // .legend({
                         //     ascending: false,
                         //     boxPadding: 5,
@@ -85,41 +85,41 @@
 
             // setTimeout(() => {
             //   map.statData('size').setData({ ES: 0, DE: 10000, FR: 5000, PL:':' })
-            //     map.psShape('square')
-            //     .psFillOpacity(0.8)
-            //     .psMaxSize(30)
-            //     .psMinSize(2)
-            //     .psFill("blue")
+            //     map.psSettings({ shape: 'square' })
+            //     .psSettings({ fillOpacity: 0.8 })
+            //     .psSettings({ maxSize: 30 })
+            //     .psSettings({ minSize: 2 })
+            //     .psSettings({ fill: "blue" })
             //   map.updateStatValues();
             // }, 2000);
 
             // setTimeout(() => {
             //   map.statData('size').setData({ ES: 10000, DE: 10000, FR: 5000 });
-            //   map.psMaxSize(80)
+            //   map.psSettings({ maxSize: 80 })
             //   map.updateStatValues();
             // }, 4000);
 
             // setTimeout(() => {
             //   map.statData('size').setData({ ES: 20000, DE: 100000, FR: 50000 });
-            //   map.psMaxSize(30)
+            //   map.psSettings({ maxSize: 30 })
             //   map.updateStatValues();
             // }, 6000);
 
             // setTimeout(() => {
             //   map.statData('size').setData({ ES: 30000, DE: 10000, FR: 5000 });
-            //   map.psMaxSize(50)
+            //   map.psSettings({ maxSize: 50 })
             //   map.updateStatValues();
             // }, 8000);
 
             // setTimeout(() => {
             //   map.statData('size').setData({ ES: 40000, DE: 10000, FR: 50000});
-            //   map.psMaxSize(100)
+            //   map.psSettings({ maxSize: 100 })
             //   map.updateStatValues();
             // }, 10000);
 
             // setTimeout(() => {
             //    map.statData('size').setData({ "HU": 10, "NO": 20, "FI": 30 });
-            //   map.psFill("yellow")
+            //   map.psSettings({ fill: "yellow" })
             //   map.updateStatValues();
             //   // map.updateClassification();
             //   // map.updateStyle();

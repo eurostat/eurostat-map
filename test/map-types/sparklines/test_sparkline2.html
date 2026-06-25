@@ -42,31 +42,31 @@
                 .title('Demand for energy needed to heat a building ')
                 .subtitle('Heating degree days (HDD) 2009-2021')
                 .nutsLevel(0)
-                .statSpark({
+                .stat({
                     eurostatDatasetCode: 'nrg_chddr2_a',
                     filters: { indic_nrg: 'HDD' },
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                 })
-                .sparkType('bar')
-                .sparkLineWidth(25)
-                .sparkLineStrokeWidth(1)
-                .sparkLineColor('#c44a4a')
-                .sparkLineHeight(50)
-                .sparkLineOpacity(0.7)
-                .sparkLineCircleRadius(0.1)
+                .sparkSettings({ type: 'bar' })
+                .sparkSettings({ lineWidth: 25 })
+                .sparkSettings({ lineStrokeWidth: 1 })
+                .sparkSettings({ lineColor: '#c44a4a' })
+                .sparkSettings({ lineHeight: 50 })
+                .sparkSettings({ lineOpacity: 0.7 })
+                .sparkSettings({ lineCircleRadius: 0.1 })
                 .tooltip({
                     xOffset: 30,
                     yOffset: 150,
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
-                .sparkTooltipChart({
+                .sparkSettings({ tooltipChart: {
                     width: 150,
                     height: 50,
                     margin: { left: 60, right: 40, top: 20, bottom: 40 },
                     circleRadius: 1.5,
-                })
+                } })
                 .build()
         </script>
     </body>
