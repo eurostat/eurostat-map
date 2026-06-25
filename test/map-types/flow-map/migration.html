@@ -126,14 +126,9 @@
             .title('First-time asylum applicants')
             .subtitle('number of applicants in EU countries, 2024')
             .flowGraph(JSON.parse(JSON.stringify(graphData)))
-            .flowColor('#72bb6f')
-            .flowMaxWidth(10)
-            .flowMinWidth(2)
-            .flowLineType('sankey')
-            .flowOutlines(false)
-            .flowGradient(false)
-            .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-            .flowArrows(true)
+            .flowSettings({ color: '#72bb6f', maxWidth: 10, minWidth: 2, lineType: 'sankey', outlines: false, colorGradient: false })
+            .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+            .flowSettings({ arrows: true })
             .legend({
                 title: '',
                 x: 830,

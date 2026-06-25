@@ -118,17 +118,12 @@
                 .projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -30]).scale(460).translate([730, 290]))
                 .title('First-time asylum applicants')
                 .subtitle('number of applicants in EU countries, 2024')
-                .flowLineType('straight')
-                .flowTopLocations(5)
-                .flowTopLocationsType('origin') // 'origin' or 'destination'
+                .flowSettings({ lineType: 'straight', topLocations: 5 })
+                .flowSettings({ topLocationsType: 'origin' }) // 'origin' or 'destination'
                 .flowGraph(JSON.parse(JSON.stringify(graphData)))
-                .flowMaxWidth(10)
-                .flowMinWidth(2)
-                .flowOutlines(true)
-                .flowGradient(false)
-                .flowDonuts(true)
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowArrows(true)
+                .flowSettings({ maxWidth: 10, minWidth: 2, outlines: true, colorGradient: false, nodeType: true ? 'donut' : 'circle' })
+                .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+                .flowSettings({ arrows: true })
                 .legend({
                     title: '',
                     x: width - 210,

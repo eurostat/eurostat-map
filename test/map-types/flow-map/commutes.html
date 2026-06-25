@@ -72,17 +72,13 @@
 
             //flow settings
             .flowGraph(exampleGraph)
-            .flowLineType('straight')
-            .flowBidirectional(true)
-            .flowTopLocations(topLocations) // Top N locations by flow volume
-            .flowTopLocationsType(type)
-            .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-            .flowArrows(false)
-            .flowOutlines(false)
-            .flowNodes(true)
-            .flowNodeType('circle')
-            .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
-            .flowEdgeBundling(true)
+            .flowSettings({ lineType: 'straight', bidirectional: true })
+            .flowSettings({ topLocations: topLocations }) // Top N locations by flow volume
+            .flowSettings({ topLocationsType: type })
+            .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+            .flowSettings({ arrows: false, outlines: false, nodes: true, nodeType: 'circle' })
+            .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
+            .flowSettings({ edgeBundling: true })
 
             .position({ x: nodes[0].x, y: nodes[0].y, z: 100 })
             .labels({

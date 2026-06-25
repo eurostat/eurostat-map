@@ -270,7 +270,7 @@ export const map = function (config) {
         const pie_ = pie()
             .sort(null)
             .value((d) => d.value)
-        const arcFn = arc().innerRadius(out.pieSettings_.innerRadius).outerRadius(r)
+        const arcFn = arc().innerRadius(out.compositionSettings_.innerRadius).outerRadius(r)
         return { pie_, arcFn }
     }
 

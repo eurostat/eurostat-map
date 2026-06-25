@@ -46,19 +46,20 @@
                 .title('Average Annual Temperature')
                 .subtitle('Made-up °C values, 2018–2024')
                 .scale('60M')
+                .stat({
+                    customData: tempData,
+                    unitText: '°C',
+                    dates: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                    labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                })
                 .sparkSettings({
                     type: 'area',
                     lineWidth: 50,
                     lineHeight: 20,
-                    lineOpacity: 0.85
+                    lineOpacity: 0.85,
                 })
                 .insets('default')
                 .legend({ x: 10, y: 160, title: 'Temperature trend (°C)' })
-                .stat({
-                    customData: tempData,
-                    unitText: '°C',
-                    labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024'],
-                })
                 .build()
         </script>
     </body>

@@ -174,29 +174,18 @@
 
                         // flow settings
                         .flowGraph(graphData)
-                        .flowMinWidth(4)
-                        .flowMaxWidth(70)
-                        .flowMapType('curved')
-                        .flowDonuts(false)
+                        .flowSettings({ minWidth: 4, maxWidth: 70, lineType: 'curved', nodeType: false ? 'donut' : 'circle' })
                         // .flowColor("#72bb6f")
-                        .flowColor((d) => {
-                            if (!d.target || !d.target.change) {
-                                console.log(d)
-                                return '#999999'
-                            }
-                            return colorFunction(parseChangeToPct(d.target.change))
+                        .flowSettings({
+                            color: (d) => {
+                                if (!d.target || !d.target.change) {
+                                    console.log(d)
+                                    return '#999999'
+                                }
+                                return colorFunction(parseChangeToPct(d.target.change))
+                            },
                         })
-                        .flowOpacity(0.9)
-                        .flowArrows(true)
-                        .flowArrowScale(0.7)
-                        .flowOutlines(true)
-                        .flowOutlineWidth(2)
-                        .flowOutlineColor('white')
-                        .flowColorGradient(false)
-                        .flowWidthGradient(false)
-                        .flowTopLocations(0)
-                        .flowStack(false)
-                        .flowNodes(false)
+                        .flowSettings({ opacity: 0.9, arrows: true, arrowScale: 0.7, outlines: true, outlineWidth: 2, outlineColor: 'white', colorGradient: false, widthGradient: false, topLocations: 0, stack: false, nodes: false })
 
                         // legend
                         .legend({

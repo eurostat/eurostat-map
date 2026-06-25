@@ -48,12 +48,10 @@
                 .title('Flow map')
                 .subtitle('with share of incoming/outgoing')
                 .flowGraph(exampleGraph)
-                .flowLineType('straight')
-                .flowDonuts(true)
-                .flowColor('#72bb6f')
-                .flowTopLocations(0) // Disable top locations coloring
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowArrows(false)
+                .flowSettings({ lineType: 'straight', nodeType: true ? 'donut' : 'circle', color: '#72bb6f' })
+                .flowSettings({ topLocations: 0 }) // Disable top locations coloring
+                .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+                .flowSettings({ arrows: false })
                 .nutsLevel(0)
                 .legend({
                     x: 10,

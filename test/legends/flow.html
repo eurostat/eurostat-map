@@ -78,12 +78,10 @@
                 .title('Test')
                 .subtitle('test')
                 .flowGraph(exampleGraph)
-                .flowColor('#72bb6f')
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowArrows(false)
-                .flowOutlines(false)
-                .flowDonuts(true)
-                .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+                .flowSettings({ color: '#72bb6f' })
+                .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+                .flowSettings({ arrows: false, outlines: false, nodeType: true ? 'donut' : 'circle' })
+                .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
                 .labels({
                     values: false,
                     backgrounds: true,

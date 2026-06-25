@@ -59,39 +59,36 @@
             .subtitle('')
             .flowGraph(exampleGraph)
 
-            .flowLineType('sankey')
-            .flowMinWidth(6)
-            .flowMaxWidth(20)
-            .flowColor('#72bb6f')
-            .flowOutlines(true)
-            .flowArrows(false)
-            .flowOpacity(0.8)
-            .flowDonuts(false)
-            .flowCurvatureSettings({
-                gapX: 10,        // how far before/after node to begin/end curve
-                padX: -10,         // horizontal clearance near node stems
-                padY: 1,         // vertical collision detection padding
-                bumpY: 10,        // extra height for hop
-                curvature: 0.1   // 0..1; default sankey smoothness 
+            .flowSettings({ lineType: 'sankey', minWidth: 6, maxWidth: 20, color: '#72bb6f', outlines: true, arrows: false, opacity: 0.8, nodeType: false ? 'donut' : 'circle' })
+            .flowSettings({
+                curvatureSettings: {
+                    gapX: 10,        // how far before/after node to begin/end curve
+                    padX: -10,         // horizontal clearance near node stems
+                    padY: 1,         // vertical collision detection padding
+                    bumpY: 10,        // extra height for hop
+                    curvature: 0.1   // 0..1; default sankey smoothness 
+                },
             })
-            .flowOrder((a, b) => {
-                //edge case: put FR>BE link on top of FR>DE
-                if (a.link.target.id == 'BE' && b.link.target.id == 'DE') {
-                    return a.link.target.id == 'BE' ? -1 : 1
-                }
-                // put FR>PL on top of the following links
-                if (b.link.target.id == 'PL' && ['DE', 'ES', 'BE', 'NL'].includes(a.link.target.id)) {
-                    return -1
-                }
+            .flowSettings({
+                order: (a, b) => {
+                    //edge case: put FR>BE link on top of FR>DE
+                    if (a.link.target.id == 'BE' && b.link.target.id == 'DE') {
+                        return a.link.target.id == 'BE' ? -1 : 1
+                    }
+                    // put FR>PL on top of the following links
+                    if (b.link.target.id == 'PL' && ['DE', 'ES', 'BE', 'NL'].includes(a.link.target.id)) {
+                        return -1
+                    }
 
-                // move CH up
-                if (a.link.target.id == 'CH' && b.link.target.id == 'AT') {
-                    return -1
-                }
-                // otherwise sort by otherY
-                return a.otherY - b.otherY
+                    // move CH up
+                    if (a.link.target.id == 'CH' && b.link.target.id == 'AT') {
+                        return -1
+                    }
+                    // otherwise sort by otherY
+                    return a.otherY - b.otherY
+                },
             })
-            .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
+            .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
 
             .labels({
                 shadows: true,

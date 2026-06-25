@@ -64,8 +64,8 @@ export const map = function (type, config) {
         if (type == 'trivariateChoropleth' || type == 'ternary' || type == 'chtri') return TrivariateChoropleth.map(config)
         //stripes composition
         if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return StripeComposition.map(config)
-        //proportional pie charts
-        if (type == 'pieChart' || type == 'pie') return PieCharts.map(config)
+        //composition (e.g. pie) charts
+        if (type == 'pieChart' || type == 'pie' || type == 'composition') return PieCharts.map(config)
         //sparkline maps
         if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return Sparklines.map(config)
         //flow maps

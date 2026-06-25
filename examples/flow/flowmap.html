@@ -49,15 +49,15 @@
                         { source: 'FR', target: 'BE', value: 43038180.93 },
                     ],
                 })
-                .flowArrows(false)
-                .flowOpacity(1)
-                .flowColor('#65a061')
-                .flowCurvatureSettings({
-                    gapX: 10, // how far before/after node to begin/end curve
-                    padX: 2, // horizontal clearance near node stems
-                    padY: 2, // vertical collision detection padding
-                    bumpY: 1, // extra height for hop
-                    curvature: 0.5, // 0..1; default sankey smoothness
+                .flowSettings({ arrows: false, opacity: 1, color: '#65a061' })
+                .flowSettings({
+                    curvatureSettings: {
+                        gapX: 10, // how far before/after node to begin/end curve
+                        padX: 2, // horizontal clearance near node stems
+                        padY: 2, // vertical collision detection padding
+                        bumpY: 1, // extra height for hop
+                        curvature: 0.5, // 0..1; default sankey smoothness
+                    },
                 })
                 .nutsLevel(0)
                 .legend({

@@ -137,31 +137,29 @@
 
                         // flow settings
                         .flowGraph(graphData)
-                        .flowMinWidth(3)
-                        .flowMaxWidth(15)
-                        .flowMapType('curved')
-                        .flowStack(true)
-                        .flowColor((d) => {
-                            if (!d || !d.changePct) {
-                                console.log(d)
-                                return '#999999'
-                            }
-                            return airportChangeColorFunction(d.changePct)
+                        .flowSettings({ minWidth: 3, maxWidth: 15, lineType: 'curved', stack: true })
+                        .flowSettings({
+                            color: (d) => {
+                                if (!d || !d.changePct) {
+                                    console.log(d)
+                                    return '#999999'
+                                }
+                                return airportChangeColorFunction(d.changePct)
+                            },
                         })
-                        .flowOpacity(0.99)
+                        .flowSettings({ opacity: 0.99 })
                         //.flowNodes(false)
-                        .flowArrows(false)
-                        .flowOutlines(true)
-                        .flowWidthGradient(true)
-                        .flowColorGradient(false)
-                        .flowCurvatureSettings({
-                            gapX: 0, // how far before/after node to begin/end curve
-                            padX: 0, // horizontal clearance near node stems
-                            padY: 2, // vertical collision detection padding
-                            bumpY: 10, // extra height for hop
-                            curvature: 0.3, // 0..1; default sankey smoothness
+                        .flowSettings({ arrows: false, outlines: true, widthGradient: true, colorGradient: false })
+                        .flowSettings({
+                            curvatureSettings: {
+                                gapX: 0, // how far before/after node to begin/end curve
+                                padX: 0, // horizontal clearance near node stems
+                                padY: 2, // vertical collision detection padding
+                                bumpY: 10, // extra height for hop
+                                curvature: 0.3, // 0..1; default sankey smoothness
+                            },
                         })
-                        .flowOrder(mapConfigs[year].flowOrder)
+                        .flowSettings({ order: mapConfigs[year].flowOrder })
 
                         // legend
                         .legend({

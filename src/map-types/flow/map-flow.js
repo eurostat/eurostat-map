@@ -148,6 +148,72 @@ export const map = function (config) {
         }
     })
 
+    const getFlowSettingsSnapshot = function () {
+        return {
+            color: out.flowColor_,
+            regionColors: out.flowRegionColors_,
+            regionLabels: out.flowRegionLabels_,
+            arrows: out.flowArrows_,
+            arrowScale: out.flowArrowScale_,
+            maxWidth: out.flowMaxWidth_,
+            minWidth: out.flowMinWidth_,
+            outlines: out.flowOutlines_,
+            outlineWidth: out.flowOutlineWidth_,
+            outlineColor: out.flowOutlineColor_,
+            colorGradient: out.flowColorGradient_,
+            stack: out.flowStack_,
+            nodes: out.flowNodes_,
+            nodeType: out.flowNodeType_,
+            labelOffsets: out.flowLabelOffsets_,
+            lineType: out.flowLineType_,
+            nodeSizeScale: out.flowNodeSizeScale_,
+            opacity: out.flowOpacity_,
+            internal: out.flowInternal_,
+            topLocations: out.flowTopLocations_,
+            topLocationsType: out.flowTopLocationsType_,
+            curvatureSettings: out.flowCurvatureSettings_,
+            order: out.flowOrder_,
+            widthGradient: out.flowWidthGradient_,
+            opacityGradient: out.flowOpacityGradient_,
+            widthGradientSettings: out.flowWidthGradientSettings_,
+            bidirectional: out.flowBidirectional_,
+            edgeBundling: out.flowEdgeBundling_,
+            bundleSettings: out.flowBundleSettings_,
+        }
+    }
+
+    const applyFlowSettings = function (v) {
+        if (v.color !== undefined) out.flowColor_ = v.color
+        if (v.regionColors !== undefined) out.flowRegionColors_ = v.regionColors
+        if (v.regionLabels !== undefined) out.flowRegionLabels_ = v.regionLabels
+        if (v.arrows !== undefined) out.flowArrows_ = v.arrows
+        if (v.arrowScale !== undefined) out.flowArrowScale_ = v.arrowScale
+        if (v.maxWidth !== undefined) out.flowMaxWidth_ = v.maxWidth
+        if (v.minWidth !== undefined) out.flowMinWidth_ = v.minWidth
+        if (v.outlines !== undefined) out.flowOutlines_ = v.outlines
+        if (v.outlineWidth !== undefined) out.flowOutlineWidth_ = v.outlineWidth
+        if (v.outlineColor !== undefined) out.flowOutlineColor_ = v.outlineColor
+        if (v.colorGradient !== undefined) out.flowColorGradient_ = v.colorGradient
+        if (v.stack !== undefined) out.flowStack_ = v.stack
+        if (v.nodes !== undefined) out.flowNodes_ = v.nodes
+        if (v.nodeType !== undefined) out.flowNodeType_ = v.nodeType
+        if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
+        if (v.lineType !== undefined) out.flowLineType_ = v.lineType
+        if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
+        if (v.opacity !== undefined) out.flowOpacity_ = v.opacity
+        if (v.internal !== undefined) out.flowInternal_ = v.internal
+        if (v.topLocations !== undefined) out.flowTopLocations_ = v.topLocations
+        if (v.topLocationsType !== undefined) out.flowTopLocationsType_ = v.topLocationsType
+        if (v.curvatureSettings !== undefined) out.flowCurvatureSettings_ = v.curvatureSettings
+        if (v.order !== undefined) out.flowOrder_ = v.order
+        if (v.widthGradient !== undefined) out.flowWidthGradient_ = v.widthGradient
+        if (v.opacityGradient !== undefined) out.flowOpacityGradient_ = v.opacityGradient
+        if (v.widthGradientSettings !== undefined) out.flowWidthGradientSettings_ = v.widthGradientSettings
+        if (v.bidirectional !== undefined) out.flowBidirectional_ = v.bidirectional
+        if (v.edgeBundling !== undefined) out.flowEdgeBundling_ = v.edgeBundling
+        if (v.bundleSettings !== undefined) out.flowBundleSettings_ = v.bundleSettings
+    }
+
     //override attribute values with config values
     if (config) {
         paramNames.forEach(function (key) {
@@ -155,6 +221,61 @@ export const map = function (config) {
             if (config[k] != undefined) out[k](config[k])
         })
     }
+
+    out.flowSettings_ = getFlowSettingsSnapshot()
+    if (config?.flowSettings !== undefined) {
+        out.flowSettings_ = { ...out.flowSettings_, ...config.flowSettings }
+        applyFlowSettings(config.flowSettings)
+    }
+
+    out.flowSettings = function (v) {
+        if (!arguments.length) return getFlowSettingsSnapshot()
+        if (!v || typeof v !== 'object' || Array.isArray(v)) return out
+        out.flowSettings_ = { ...out.flowSettings_, ...v }
+        applyFlowSettings(v)
+        return out
+    }
+
+    const deprecatedFlowSettingsWrappers = [
+        ['flowColor', 'color'],
+        ['flowRegionColors', 'regionColors'],
+        ['flowRegionLabels', 'regionLabels'],
+        ['flowArrows', 'arrows'],
+        ['flowArrowScale', 'arrowScale'],
+        ['flowMaxWidth', 'maxWidth'],
+        ['flowMinWidth', 'minWidth'],
+        ['flowOutlines', 'outlines'],
+        ['flowOutlineWidth', 'outlineWidth'],
+        ['flowOutlineColor', 'outlineColor'],
+        ['flowColorGradient', 'colorGradient'],
+        ['flowStack', 'stack'],
+        ['flowNodes', 'nodes'],
+        ['flowNodeType', 'nodeType'],
+        ['flowLabelOffsets', 'labelOffsets'],
+        ['flowLineType', 'lineType'],
+        ['flowNodeSizeScale', 'nodeSizeScale'],
+        ['flowOpacity', 'opacity'],
+        ['flowInternal', 'internal'],
+        ['flowTopLocations', 'topLocations'],
+        ['flowTopLocationsType', 'topLocationsType'],
+        ['flowCurvatureSettings', 'curvatureSettings'],
+        ['flowOrder', 'order'],
+        ['flowWidthGradient', 'widthGradient'],
+        ['flowOpacityGradient', 'opacityGradient'],
+        ['flowWidthGradientSettings', 'widthGradientSettings'],
+        ['flowBidirectional', 'bidirectional'],
+        ['flowEdgeBundling', 'edgeBundling'],
+        ['flowBundleSettings', 'bundleSettings'],
+    ]
+
+    deprecatedFlowSettingsWrappers.forEach(function ([legacyMethod, settingsKey]) {
+        out[legacyMethod] = function (v) {
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.flowSettings({ ${settingsKey} }) instead.`)
+            if (!arguments.length) return out.flowSettings()[settingsKey]
+            out.flowSettings({ [settingsKey]: v })
+            return out
+        }
+    })
 
     //@override
     out.updateStyle = function () {

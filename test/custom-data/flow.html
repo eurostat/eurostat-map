@@ -41,13 +41,9 @@
                         { source: 'DE', target: 'SE', value: 31000 },
                     ],
                 })
-                .flowArrows(false)
-                .flowOpacity(0.8)
-                .flowColor('#2980b9')
+                .flowSettings({ arrows: false, opacity: 0.8, color: '#2980b9' })
                 .insets(false)
                 .legend({
-                    x: 10,
-                    y: 160,
                     boxOpacity: 0,
                     flowWidthLegend: {
                         title: 'Exports (€ million)',

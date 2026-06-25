@@ -78,11 +78,9 @@
                 .title('Flow map with geoAzimuthalEquidistant projection')
                 .subtitle('test')
                 .flowGraph(JSON.parse(JSON.stringify(exampleGraph)))
-                .flowColor('#72bb6f')
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowOutlines(true)
-                .flowArrows(true)
-                .flowMaxWidth(20)
+                .flowSettings({ color: '#72bb6f' })
+                .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+                .flowSettings({ outlines: true, arrows: true, maxWidth: 20 })
                 .nutsLevel(0)
                 .zoomExtent([0.5, 10])
 

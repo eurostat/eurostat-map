@@ -53,13 +53,10 @@
                 .title('Test')
                 .subtitle('test')
                 .flowGraph(exampleGraph)
-                .flowColor('green')
-                .flowRegionColors(['#bbd7ee', '#c7e3c6']) // exporter, importers
-                .flowArrows(false)
-                .flowOpacity(0.7)
-                .flowOutlines(true)
-                .flowDonuts(false)
-                .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+                .flowSettings({ color: 'green' })
+                .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+                .flowSettings({ arrows: false, opacity: 0.7, outlines: true, nodeType: false ? 'donut' : 'circle' })
+                .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
                 .labels({
                     values: true,
                     backgrounds: true,

@@ -15,12 +15,7 @@ export interface StripeMap extends MapInstance {
         otherColor: string
         otherText: string
     }
-    stripeSettings(v: {
-        width?: number
-        orientation?: number
-        otherColor?: string
-        otherText?: string
-    }): this
+    stripeSettings(v: { width?: number; orientation?: number; otherColor?: string; otherText?: string }): this
 
     /** @deprecated Use stripeSettings({ width }) */
     stripeWidth(): number

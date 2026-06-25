@@ -51,28 +51,26 @@
             .title('Node proportional circles test')
             .subtitle(':)')
             .flowGraph(exampleGraph)
-            .flowLineType('straight')
+            .flowSettings({ lineType: 'straight' })
 
 
-            .flowArrows(false)
-            .flowOutlines(false)
-            .flowNodeType('circle') // donut or circle
+            .flowSettings({ arrows: false, outlines: false })
+            .flowSettings({ nodeType: 'circle' }) // donut or circle
 
             //gradients
             //.flowColorGradient(false)
-            .flowWidthGradient(false)
+            .flowSettings({ widthGradient: false })
             //.flowOpacityGradient(true)
-            .flowStack(true)
-            .flowOpacity(0.5)
+            .flowSettings({ stack: true, opacity: 0.5 })
 
             //color
             //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
-            .flowTopLocations(false) // Top N locations by flow volume
+            .flowSettings({ topLocations: false }) // Top N locations by flow volume
             //.flowTopLocationsType(type)
 
 
 
-            .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+            .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
             .position({ x: nodes[0].x, y: nodes[0].y, z: 300 })
             .labels({
                 values: false,

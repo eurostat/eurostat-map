@@ -58,43 +58,37 @@
                 .flowGraph(graph)
 
                 // line type
-                .flowLineType('straight')
-                .flowBidirectional(false)
-                .flowEdgeBundling(true)
-                .flowBundleSettings({
-                    alphaDecay: 0.1,
-                    chargeStrength: 10,
-                    distanceMax: null, // if null, will default to twice the max dimension of the map
-                    linkStrength: 0.7,
-                    linkIterations: 1,
+                .flowSettings({ lineType: 'straight', bidirectional: false, edgeBundling: true })
+                .flowSettings({
+                    bundleSettings: {
+                        alphaDecay: 0.1,
+                        chargeStrength: 10,
+                        distanceMax: null, // if null, will default to twice the max dimension of the map
+                        linkStrength: 0.7,
+                        linkIterations: 1,
+                    },
                 })
-                .flowMaxWidth(10)
-                .flowMinWidth(0.1)
-                .flowInternal(false)
+                .flowSettings({ maxWidth: 10, minWidth: 0.1, internal: false })
 
                 // flow accessories
-                .flowArrows(false)
-                .flowOutlines(false)
+                .flowSettings({ arrows: false, outlines: false })
 
                 //nodes
-                .flowNodes(true)
-                .flowNodeType('circle') // donut or circle
+                .flowSettings({ nodes: true })
+                .flowSettings({ nodeType: 'circle' }) // donut or circle
 
                 // gradients
-                .flowColorGradient(false)
-                .flowWidthGradient(false)
-                .flowOpacityGradient(false)
+                .flowSettings({ colorGradient: false, widthGradient: false, opacityGradient: false })
 
                 // sankey-only
                 // .flowStack(false)
 
                 // color
                 //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
-                .flowTopLocations(0) // Top N locations by flow volume
-                .flowOpacity(0.1)
-                .flowColor('#000')
+                .flowSettings({ topLocations: 0 }) // Top N locations by flow volume
+                .flowSettings({ opacity: 0.1, color: '#000' })
 
-                .flowLabelOffsets({ x: 9, y: 0 }) // Offsets for flow labels
+                .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
 
                 .tooltip({
                     xOffset: 100,

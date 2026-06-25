@@ -70,34 +70,29 @@
 
             // flow settings
             .flowGraph(maritimeFlowGraph)
-            .flowColor((d) => {
-                if (d.meta.direction == 'Outwards') {
-                    return map.flowRegionColors_[1];
-                }
-                return map.flowRegionColors_[0];
+            .flowSettings({
+                color: (d) => {
+                    if (d.meta.direction == 'Outwards') {
+                        return map.flowRegionColors_[1];
+                    }
+                    return map.flowRegionColors_[0];
+                },
             })
-            .flowMinWidth(5)
-            .flowMaxWidth(30)
+            .flowSettings({ minWidth: 5, maxWidth: 30 })
             //.flowLineType("straight")
-            .flowLineType("curved")
-            .flowDonuts(false)
-            .flowOpacity(0.9)
-            .flowArrows(false)
-            .flowOutlines(true)
-            .flowOutlineColor('white')
-            .flowOutlineWidth(1)
-            .flowColorGradient(false)
-            .flowWidthGradient(false)
+            .flowSettings({ lineType: "curved", nodeType: false ? 'donut' : 'circle', opacity: 0.9, arrows: false, outlines: true, outlineColor: 'white', outlineWidth: 1, colorGradient: false, widthGradient: false })
             //.flowTopLocations(0)
             //.flowWidthGradient(true)
-            .flowStack(true)
-            .flowCurvatureSettings({
-                gapX: 1,        // how far before/after node to begin/end curve
-                padX: 0,         // horizontal clearance near node stems
-                padY: 1,         // vertical collision detection padding
-                bumpY: 5,        // extra height for hop
-                curvature: 0.3   // 0..1; default sankey smoothness
-            }).flowOrder(flowOrderFunction)
+            .flowSettings({ stack: true })
+            .flowSettings({
+                curvatureSettings: {
+                    gapX: 1,        // how far before/after node to begin/end curve
+                    padX: 0,         // horizontal clearance near node stems
+                    padY: 1,         // vertical collision detection padding
+                    bumpY: 5,        // extra height for hop
+                    curvature: 0.3   // 0..1; default sankey smoothness
+                },
+            }).flowSettings({ order: flowOrderFunction })
 
 
             .labels({
@@ -128,7 +123,7 @@
             .zoomExtent([0.6, 10])
             .zoomButtons(true)
             .lockPanUntilZoom(false)
-            .flowRegionColors(["#2171b5", "#51824f"])
+            .flowSettings({ regionColors: ["#2171b5", "#51824f"] })
             .footnote(
                 "<tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_go)"
             )
