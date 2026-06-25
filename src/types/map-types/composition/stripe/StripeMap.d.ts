@@ -45,8 +45,8 @@ export interface StripeMap extends MapInstance {
     statCodes(): string[] | undefined
     statCodes(v: string[] | undefined): this
 
-    statComp(config: CompositionStatConfig): this
-    statComp(
+    statStripe(config: CompositionStatConfig): this
+    statStripe(
         /** Config. */
         config: CompositionStatConfig,
         /** Category parameter. */

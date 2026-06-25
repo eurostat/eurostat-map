@@ -83,7 +83,7 @@ export const map = function (config) {
     // ── Convenience wrapper ──────────────────────────────────────────────────
     const _getComposition = (id) => getComposition(id, out, 'stripeTotalCode_')
 
-    // ── statComp config method ───────────────────────────────────────────────
+    // ── statStripe config method ───────────────────────────────────────────────
 
     /**
      * Configure the stripe composition map using a single config object.
@@ -99,7 +99,7 @@ export const map = function (config) {
      * @param {String} [config.totalCode]
      *
      * @example
-     * .statComp({
+     * .statStripe({
      *   eurostatDatasetCode: 'demo_pjan',
      *   filters: { sex: 'T' },
      *   unitText: 'Population',
@@ -109,7 +109,7 @@ export const map = function (config) {
      *   categoryColors: ['#4daf4a', '#377eb8', '#e41a1c'],
      * })
      */
-    out.statComp = buildStatCompositionMethod(out, 'stripeTotalCode_')
+    out.statStripe = buildStatCompositionMethod(out, 'stripeTotalCode_')
 
     // ── Classification ───────────────────────────────────────────────────────
 
