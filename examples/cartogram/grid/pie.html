@@ -20,7 +20,7 @@
             }
         </style>
         <svg id="map"></svg>
-        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <!-- <script src="../../../build/eurostatmap.js"></script> -->
         <script src="../../../build/eurostatmap.js"></script>
 
         <script>
@@ -64,7 +64,8 @@
                 .subtitle('2024')
                 .scale('60M')
                 .nutsLevel(0)
-                .statPie(
+                .stat(
+                    'composition',
                     {
                         eurostatDatasetCode: 'apro_cpshr',
                         filters: { strucpro: 'HPRD_HUMD_EU_THS_T', time: '2024' },
@@ -76,6 +77,7 @@
                     ['#388AE2', '#33A033', '#672DC4', '#B09120', '#B656BD', '#AF155C', '#2644A7', '#AA5F18', '#208486', '#E04040'], //estat colours
                     'C0000' //code for the total (all causes of death)
                 )
+                .encoding('composition', { stat: 'composition' })
 
                 .legend({
                     x: 550,

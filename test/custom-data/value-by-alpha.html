@@ -85,10 +85,10 @@
                 .insets('default')
                 .legend({ x: 10, y: 160, title: 'Renewable energy (%)' })
 
-            map.stat({ code: 'color', unitText: '%' })
-            map.stat('alpha', { code: 'alpha', unitText: '€ bn' })
-            map.statData().setData(renewableShare)
-            map.statData('alpha').setData(greenInvestment)
+            map.stat('value', { code: 'color', customData: renewableShare, unitText: '%' })
+            map.encoding('fill', { stat: 'value' })
+            map.stat('opacityValue', { code: 'alpha', customData: greenInvestment, unitText: 'EUR bn' })
+            map.encoding('opacity', { stat: 'opacityValue' })
             map.build()
         </script>
     </body>

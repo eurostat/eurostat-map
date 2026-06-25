@@ -18,8 +18,9 @@
             .map('choropleth')
             .title('discrete color scheme legend')
             .subtitle('discrete color scheme')
-            //.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
-            .stat({ eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
+            //.stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+            .stat('value', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
+            .encoding('fill', { stat: 'value' })
             .nutsLevel(3)
             .zoomExtent([1, 1000])
 

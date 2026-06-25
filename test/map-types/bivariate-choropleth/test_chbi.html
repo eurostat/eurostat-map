@@ -16,12 +16,14 @@
                 .nutsLevel(2)
                 .width(Math.min(1000, window.innerHeight))
                 .nutsYear(2021)
-                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
-                .stat('v2', {
+                .stat('statV1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .encoding('x', { stat: 'statV1' })
+                .stat('statV2', {
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '%',
                 })
+                .encoding('y', { stat: 'statV2' })
                 //.insets('default')
                 //.scale('60M')
 

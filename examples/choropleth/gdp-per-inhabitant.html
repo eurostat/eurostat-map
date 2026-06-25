@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>GDP per Inhabitant Choropleth</title><meta charset="UTF-8" />
+        <title>GDP per Inhabitant Choropleth</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
 
     <body>
         <svg id="map"></svg>
         <svg id="legend" width="200" height="350"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script src="https://d3js.org/d3.v7.min.js"></script>
 
         <script>
@@ -19,8 +19,9 @@
                 //.header(true).footer(true)
                 .title('GDP per inhabitant')
                 .subtitle('2022')
-                //.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
-                .stat({ eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
+                //.stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .stat('value', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
+                .encoding('fill', { stat: 'value' })
                 .nutsLevel(0)
                 .zoomExtent([1, 1000])
 

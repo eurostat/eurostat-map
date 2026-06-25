@@ -8,7 +8,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
 
         <script>
             const capitals = [
@@ -28,7 +28,8 @@
                 .map('choropleth')
                 .nutsLevel(2)
                 .title('Population density, 2023')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .encoding('fill', { stat: 'value' })
                 .zoomExtent([1, 1000])
                 .build()
 

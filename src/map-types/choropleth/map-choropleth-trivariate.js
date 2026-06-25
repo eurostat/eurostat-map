@@ -48,6 +48,10 @@ export const map = function (config) {
     // Tooltip renderer
     out.tooltip_.textFunction = tooltipTextFunctionTrivariate
 
+    out.getTernaryStatCodes = function () {
+        return out.getEncodingStats?.('color', out.ternaryCodes_) || out.ternaryCodes_
+    }
+
     // ===============================
     // Getters / setters
     // ===============================
@@ -100,7 +104,7 @@ export const map = function (config) {
             return Array.isArray(features[0]) ? features.flat() : features
         }
 
-        const [c1, c2, c3] = out.ternaryCodes_
+        const [c1, c2, c3] = out.getTernaryStatCodes()
         const statData1 = out.statData(c1)
         const statData2 = out.statData(c2)
         const statData3 = out.statData(c3)
@@ -312,7 +316,7 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
     const id = rg.properties.id || ''
     buf.push(`<div class="em-tooltip-bar">${name}${id ? ` (${id})` : ''}</div>`)
 
-    const [c1, c2, c3] = map.ternaryCodes_
+    const [c1, c2, c3] = map.getTernaryStatCodes?.() || map.ternaryCodes_
 
     const sv1 = map.statData(c1).get(id)
     const sv2 = map.statData(c2).get(id)

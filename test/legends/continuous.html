@@ -29,11 +29,12 @@
                 .map('choropleth')
                 .title('continuous color scheme legend')
                 .subtitle('diverges at 0')
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT', time: 2022 },
                     unitText: '‰',
                 })
+                .encoding('fill', { stat: 'value' })
                 .nutsLevel(3)
                 .zoomExtent([1, 1000])
                 .numberOfClasses(6)

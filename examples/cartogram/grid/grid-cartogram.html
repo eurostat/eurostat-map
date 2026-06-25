@@ -13,18 +13,19 @@
             }
         </style>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../../build/eurostatmap.js"></script>
 
         <script>
             const map = eurostatmap
                 .map('choropleth')
                 .title('Choropleth Grid Cartogram')
                 .subtitle('ensures that each region is assigned equal visual importance')
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
+                .encoding('fill', { stat: 'value' })
                 .gridCartogram(true)
                 .classificationMethod('threshold')
                 .thresholds([10000, 20000, 30200, 40000, 50000, 60000])

@@ -84,7 +84,7 @@ export const legend = function (map, config = {}) {
             if (!map.classToFillStyle()) return
 
             //exit early if stat data not yet available
-            if (!map.statData()?.getArray()?.length) return
+            if (!out.getColorStats(out)?.getArray()?.length) return
 
             //set default point of divergence if applicable
             if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
@@ -160,8 +160,9 @@ export function getChoroplethLabelFormatter(out) {
  */
 export function getThresholdTicksWithExtents(out) {
     const thresholds = getThresholds(out)
-    const maxVal = out.map.statData().getMax()
-    const minVal = out.map.statData().getMin()
+    const statData = out.getColorStats(out)
+    const maxVal = statData.getMax()
+    const minVal = statData.getMin()
 
     if (!maxVal && !minVal) return thresholds
 

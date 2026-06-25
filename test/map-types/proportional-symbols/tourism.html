@@ -19,16 +19,18 @@
                 .title('Tourism')
                 .subtitle('Nights spent in tourist accommodation and share of foreign tourists in total nights spent, 2022')
                 .width(800)
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'tour_occ_nin2',
                     unitText: 'Nights spent',
                     filters: { c_resid: 'TOTAL', unit: 'NR', time: '2023', nace_r2: 'I551-I553' },
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'tour_occ_nin2',
                     unitText: 'share of foreign tourists',
                     filters: { c_resid: 'FOR', unit: 'PC_TOT', time: '2023', nace_r2: 'I551-I553' },
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .legend({
                     x: 590,
                     y: 20,

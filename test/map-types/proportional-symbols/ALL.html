@@ -94,17 +94,19 @@
                 .svgId('map1')
                 .title('MAP 1')
                 .nutsLevel(0)
-                //.stat({ eurostatDatasetCode: "demo_r_pjangrp3", filters: { age: "TOTAL", sex: "T", unit: "NR", time: 2016 }, unitText: "inhabitants" })
-                .stat('size', {
+                //.stat('value', { eurostatDatasetCode: "demo_r_pjangrp3", filters: { age: "TOTAL", sex: "T", unit: "NR", time: 2016 }, unitText: "inhabitants" })
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'org_cropar',
                     filters: { crops: 'ARA', time: 2018, unit: 'HA', agprdmet: 'TOTAL' },
                     unitText: 'HA of organic arable land',
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'org_cropar',
                     filters: { crops: 'ARA', time: 2018, unit: 'PC_UAA', agprdmet: 'TOTAL' },
                     unitText: '% of total agricultural area',
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .psShape('shape')
                 .psCustomShape(customCircle)
                 .psMaxSize(50)
@@ -140,17 +142,19 @@
                 .svgId('tractorMap')
                 .title('MAP 2')
                 .nutsLevel(0)
-                //.stat({ eurostatDatasetCode: "demo_r_pjangrp3", filters: { age: "TOTAL", sex: "T", unit: "NR", time: 2016 }, unitText: "inhabitants" })
-                .stat('size', {
+                //.stat('value', { eurostatDatasetCode: "demo_r_pjangrp3", filters: { age: "TOTAL", sex: "T", unit: "NR", time: 2016 }, unitText: "inhabitants" })
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'org_cropar',
                     filters: { crops: 'ARA', time: 2018, unit: 'HA', agprdmet: 'TOTAL' },
                     unitText: 'HA of organic arable land',
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'org_cropar',
                     filters: { crops: 'ARA', time: 2018, unit: 'PC_UAA', agprdmet: 'TOTAL' },
                     unitText: '% of total agricultural area',
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .psShape('custom')
                 .psCustomSVG(euSVG)
                 .psMaxSize(7)
@@ -187,7 +191,7 @@
                 .svgId('map2')
                 .nutsLevel(0)
                 .title('MAP 3')
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'tour_occ_nim',
                     filters: {
                         c_resid: 'TOTAL',
@@ -197,7 +201,8 @@
                     },
                     unitText: 'total nights spent',
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'tour_occ_nim',
                     filters: {
                         c_resid: 'TOTAL',
@@ -207,6 +212,7 @@
                     },
                     unitText: '% change compared to previous year',
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .psShape('square') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
                 .psFill('#fa8dfc')
                 .psStroke('white')
@@ -243,12 +249,14 @@
                 .title('Population density, 2019')
                 .svgId('map3')
                 .nutsLevel(3)
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'demo_r_pjangrp3',
                     filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2019' },
                     unitText: 'inhabitants',
                 })
-                .stat('color', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
+                .encoding('color', { stat: 'symbolColor' })
                 .psShape('spike') // cross, diamond, star, square, wye, circle, triangle, bar https://github.com/d3/d3-shape#symbols
                 .psFill('grey')
                 .psMinSize(1)

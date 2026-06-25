@@ -8,7 +8,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../../build/eurostatmap.js"></script>
         <script>
             const map = eurostatmap
                 .map('bivariateChoropleth')
@@ -18,12 +18,14 @@
                 .nutsLevel(0)
                 .width(Math.min(1000, window.innerHeight))
                 .nutsYear(2016)
-                .stat('v1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
-                .stat('v2', {
+                .stat('statV1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .encoding('x', { stat: 'statV1' })
+                .stat('statV2', {
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '%',
                 })
+                .encoding('y', { stat: 'statV2' })
                 .legend({
                     squareSize: 100,
                     label1: 'Inhabitants per km²',

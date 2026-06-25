@@ -122,7 +122,7 @@
                 })
                 .onBuild(function () {})
 
-            map.stat({
+            map.stat('value', {
                 eurostatDatasetCode: 'demo_r_d3dens',
                 unitText: 'people/km²',
                 filters: {
@@ -131,6 +131,7 @@
                     UNIT: 'PER_KM2',
                 },
             })
+            .encoding('fill', { stat: 'value' })
 
             // Build the map
             map.build()

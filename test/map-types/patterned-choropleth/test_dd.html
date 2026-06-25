@@ -13,11 +13,12 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('Dot density')
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
+                .encoding('fill', { stat: 'value' })
                 // define dot density pattern
                 .filtersDefinitionFunction((svg, numberOfClasses) => {
                     svg.selectAll('.em-fill-pattern').remove()

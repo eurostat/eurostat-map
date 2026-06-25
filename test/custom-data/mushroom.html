@@ -92,10 +92,12 @@
                     colorLegend: { marginTop: 30, labels: ['Exports (€ bn)', 'Imports (€ bn)'] },
                 })
 
-            map.stat('v1', { code: 'v1', label: 'Exports', unitText: '€ bn' })
-            map.stat('v2', { code: 'v2', label: 'Imports', unitText: '€ bn' })
-            map.statData('v1').setData(exports)
-            map.statData('v2').setData(imports)
+            map.stat('statV1', { code: 'v1', label: 'Exports', unitText: '€ bn' })
+                .encoding('left', { stat: 'statV1' })
+            map.stat('statV2', { code: 'v2', label: 'Imports', unitText: '€ bn' })
+                .encoding('right', { stat: 'statV2' })
+            map.statData('statV1').setData(exports)
+            map.statData('statV2').setData(imports)
             map.build()
         </script>
     </body>

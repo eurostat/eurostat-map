@@ -115,11 +115,12 @@
                 .width(mapWidth)
                 .height(mapHeight)
                 .proj('4326')
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'demo_r_d3dens',
                     unitText: 'people/km²',
                     filters: { time: 2016 },
                 })
+                .encoding('fill', { stat: 'value' })
                 .proj('4326')
                 .nutsLevel(2)
                 .scale('03M')

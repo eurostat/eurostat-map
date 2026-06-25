@@ -48,13 +48,14 @@
                 .scale('60M')
                 .stripeWidth(10)
                 .insets('default')
-                .statStripe({
+                .stat('composition', {
                     customData: transportData,
                     categoryCodes: ['car', 'rail', 'bus', 'cycling', 'walking'],
                     categoryLabels: ['Car', 'Rail', 'Bus', 'Cycling', 'Walking'],
                     categoryColors: ['#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6'],
                     unitText: '% of passenger-km',
                 })
+                .encoding('composition', { stat: 'composition' })
                 .legend({ x: 10, y: 160, title: 'Mode of transport', boxOpacity: 0.8, boxFill: 'white' })
                 .build()
         </script>

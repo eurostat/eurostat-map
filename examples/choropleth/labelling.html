@@ -24,7 +24,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script src="https://d3js.org/d3-color.v2.min.js"></script>
         <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
@@ -37,11 +37,12 @@
                 .zoomExtent([1, 20])
                 .title('GDP per capita')
                 .subtitle('at current market prices, 2024')
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Euro per inhabitant',
                     filters: { TIME: '2024', UNIT: 'EUR_HAB' },
                 })
+                .encoding('fill', { stat: 'value' })
                 .nutsLevel(0)
                 .nutsYear(2024)
                 .legend({ title: 'Euro per inhabitant', decimals: 0, x: 640, y: 100 })

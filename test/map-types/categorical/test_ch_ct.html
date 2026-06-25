@@ -16,7 +16,8 @@
                 .title('Population in Europe')
                 .width(400)
                 .scale('20M')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
+                .encoding('fill', { stat: 'value' })
                 .classificationMethod('threshold')
                 .threshold([50, 75, 100, 150, 300, 850])
                 .tooltipShowFlags(false)
@@ -31,11 +32,12 @@
                 .scale('60M')
                 .nutsYear(2013)
                 .nutsLevel(3)
-                .stat({
+                .stat('value', {
                     csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                     geoCol: 'NUTS_ID_2013',
                     valueCol: 'urban_rural',
                 })
+                .encoding('fill', { stat: 'value' })
                 .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
                 .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
                 .legend({ x: 270, y: 50, boxFill: 'none' })

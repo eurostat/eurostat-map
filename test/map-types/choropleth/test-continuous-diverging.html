@@ -60,11 +60,12 @@
                 .subtitle('Population change per 1 000 persons, 2023')
                 .subtitleFontSize(15)
                 .nutsLevel(2)
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT', time: 2023 },
                     unitText: '‰',
                 })
+                .encoding('fill', { stat: 'value' })
                 .colorSchemeType('continuous')
                 .colorFunction(stretchedColor)
                 .valueTransform(valueTransform)

@@ -17,11 +17,12 @@
                 .title('NUTS urban/rural typology')
                 .nutsLevel('mixed')
                 // .stat('default', { ES: 'a' })
-                // .stat({
+                // .stat('value', {
                 //     csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                 //     geoCol: 'NUTS_ID_2013',
                 //     valueCol: 'urban_rural',
                 // })
+                .encoding('fill', { stat: 'value' })
                 .classToFillStyle({ a: '#fdb462', b: '#ffffb3', c: '#ccebc5' })
                 .classToText({ a: '1', b: '2', c: '3' })
                 .legend({
@@ -31,7 +32,7 @@
                     shapeHeight: 18,
                 })
 
-            map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'c', IT: 'c', SI: 'c', RO: 'c', PL: 'b', PT: 'b', RU:'c' })
+            map.statData('value').setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'c', IT: 'c', SI: 'c', RO: 'c', PL: 'b', PT: 'b', RU:'c' })
             map.build()
 
             // second
@@ -43,7 +44,7 @@
             //         shapeHeight: 18,
             //     })
 
-            //     map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.statData('value').setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
             //     map.updateStatValues()
             //     map.updateClassification().updateStyle()
             //     map.updateLegend()
@@ -51,7 +52,7 @@
 
             // third
             // setTimeout(() => {
-            //     map.statData().setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.statData('value').setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
             //     map.updateStatValues()
             //     map.legend({
             //         svgId: 'legend',
@@ -76,7 +77,7 @@
             //         shapeWidth: 10,
             //         shapeHeight: 10,
             //     })
-            //     map.statData().setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.statData('value').setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
             //     map.updateStatValues()
             //     map.updateClassification().updateStyle()
             //     map.updateLegend()

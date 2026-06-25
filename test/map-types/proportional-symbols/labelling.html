@@ -18,11 +18,12 @@
                 .psShape('circle')
                 .psSpikeWidth(7)
                 .nutsLevel(0)
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
+                .encoding('size', { stat: 'symbolSize' })
                 .legend({ title: 'Million EUR', x: 550, y: 90, boxOpacity: 0, sizeLegend: { noData: true } })
                 .labels({ values: true, shadows: true })
                 .psCodeLabels(true)

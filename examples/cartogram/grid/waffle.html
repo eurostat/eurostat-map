@@ -13,7 +13,7 @@
             } */
         </style>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../../build/eurostatmap.js"></script>
         <script>
             const map = eurostatmap
                 .map('waffle')
@@ -26,7 +26,7 @@
 
                 //population by age
                 .nutsLevel(0)
-                .statWaffle({
+                .stat('composition', {
                     eurostatDatasetCode: 'tps00010',
                     filters: { time: '2024' },
                     unitText: 'Population',
@@ -36,6 +36,7 @@
                     categoryColors: ['#d73027', '#fc8d59', '#fee08b', '#d9ef8b', '#91cf60', '#1a9850'].reverse(),
                     //totalCode: 'TOTAL',
                 })
+                .encoding('composition', { stat: 'composition' })
                 .title('Age composition')
                 .legend({
                     x: 10,
@@ -51,7 +52,7 @@
                 .drawGraticule(false)
 
                 //population by age
-                // .statWaffle( { eurostatDatasetCode: "demo_r_pjanaggr3", filters: { sex: "T", unit: "NR", time: "2019" }, unitText: "people" },
+                // .stat('composition',  { eurostatDatasetCode: "demo_r_pjanaggr3", filters: { sex: "T", unit: "NR", time: "2019" }, unitText: "people" },
                 //     "age",
                 //     ["Y_LT15", "Y15-64", "Y_GE65"],
                 //     ["< 15", "15 to 64", "> 65"],

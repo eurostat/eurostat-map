@@ -119,6 +119,15 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
             return out
         }
 
+        if (!options.totalCodeKey && channel === 'composition') {
+            const totalCodeKeysByMapType = {
+                pie: 'compositionTotalCode_',
+                waffle: 'waffleTotalCode_',
+                bar: 'barTotalCode_',
+            }
+            options.totalCodeKey = totalCodeKeysByMapType[out._mapType]
+        }
+
         const isPrimaryCategoricalChannel = channel === 'default' || channel === 'composition' || channel === 'height'
         const statKeyPrefix = options.statKeyPrefix === undefined ? (isPrimaryCategoricalChannel ? '' : channel) : options.statKeyPrefix
         const statKeys = {}
@@ -263,6 +272,13 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         return out.encodings_[channel]?.stat || fallback
     }
 
+    out.getEncodingStats = function (channel, fallback) {
+        const encoding = out.encodings_[channel]
+        if (encoding?.stats) return encoding.stats
+        if (encoding?.stat) return [encoding.stat]
+        return fallback
+    }
+
     out.getEncodingStatKey = function (channel, categoryCode, fallbackStat) {
         const statName = out.getEncodingStat(channel, fallbackStat || channel)
         if (!categoryCode) return statName
@@ -286,8 +302,27 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.stat = function (k, v) {
         //no argument: getter - return the default stat
         if (!arguments.length) return out.stat_['default']
-        //two arguments: setter - set the config k with value v
-        if (arguments.length == 2) {
+        //legacy multi-argument API for categorical composition stats:
+        // .stat('composition', statConfig, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode)
+        if (
+            arguments.length > 2 &&
+            (typeof k === 'string' || k instanceof String) &&
+            v &&
+            typeof v === 'object' &&
+            typeof arguments[2] === 'string'
+        ) {
+            return out._registerCategoricalStatChannel(k, {
+                ...v,
+                categoryParameter: arguments[2],
+                categoryCodes: arguments[3],
+                categoryLabels: arguments[4],
+                categoryColors: arguments[5],
+                totalCode: arguments[6],
+            })
+        }
+
+        //two-or-more arguments: setter - set the config k with value v
+        if (arguments.length >= 2) {
             if (isCategoricalStatConfig(v)) return out._registerCategoricalStatChannel(k, v)
             if (v?.customData) return out._registerScalarCustomStat(k, v)
             out.stat_[k] = v

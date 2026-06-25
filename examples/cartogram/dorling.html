@@ -11,7 +11,7 @@
             <svg id="map"></svg>
         </div>
 
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
 
         <script>
             const map = eurostatmap
@@ -21,11 +21,12 @@
                 .psShape('circle')
                 .psSpikeWidth(7)
                 .nutsLevel(0)
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2024' },
                 })
+                .encoding('size', { stat: 'symbolSize' })
                 .legend({ title: 'Euro', x: 550, y: 90, boxOpacity: 0, sizeLegend: { noData: true } })
                 .labels({ values: true, shadows: true })
                 .psCodeLabels(true)

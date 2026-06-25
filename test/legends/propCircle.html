@@ -19,12 +19,14 @@
                 .map('ps')
                 .title('Proportional circles')
                 .subtitle('test')
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2023' },
                 })
-                .stat('color', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2023' } })
+                .encoding('color', { stat: 'symbolColor' })
                 .psCodeLabels(true)
                 .psFill('#e04a28')
                 .psMaxSize(50)
@@ -67,7 +69,7 @@
                     },
                 })
 
-            map.statData('size').setData({
+            map.statData('symbolSize').setData({
                 DED2C: 20,
                 ES: 22,
                 FR: 23,
@@ -98,7 +100,7 @@
                 MT: 45,
                 TR: 46,
             })
-            map.statData('color').setData({
+            map.statData('symbolColor').setData({
                 DED2C: ':',
                 ES: 22,
                 FR: 23,

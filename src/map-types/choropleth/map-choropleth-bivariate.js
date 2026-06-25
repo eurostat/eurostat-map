@@ -47,6 +47,11 @@ export const map = function (config) {
     //specific tooltip text function
     out.tooltip_.textFunction = tooltipTextFunBiv
 
+    const getBivariateCodes = () => [
+        out.getEncodingStat?.('x', out.getEncodingStat?.('v1', 'v1')) || 'v1',
+        out.getEncodingStat?.('y', out.getEncodingStat?.('v2', 'v2')) || 'v2',
+    ]
+
     /**
      * Definition of getters/setters for all previously defined attributes.
      * Each method follow the same pattern:
@@ -99,8 +104,9 @@ export const map = function (config) {
     function applyClassificationToMap(map) {
         //set classifiers
         const setupClassifiers = () => {
-            let stat1 = out.statData('v1').getArray()
-            let stat2 = out.statData('v2').getArray()
+            const [c1, c2] = getBivariateCodes()
+            let stat1 = out.statData(c1).getArray()
+            let stat2 = out.statData(c2).getArray()
 
             const range = [...Array(out.numberOfClasses()).keys()]
 
@@ -132,7 +138,8 @@ export const map = function (config) {
         const classifyRegions = (regions) => {
             regions
                 .attr('ecl1', function (rg) {
-                    const sv = out.statData('v1').get(rg.properties.id)
+                    const [c1] = getBivariateCodes()
+                    const sv = out.statData(c1).get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
@@ -140,15 +147,17 @@ export const map = function (config) {
                     return +out.classifier1_(+v)
                 })
                 .attr('ecl2', function (rg) {
-                    const sv = out.statData('v2').get(rg.properties.id)
+                    const [, c2] = getBivariateCodes()
+                    const sv = out.statData(c2).get(rg.properties.id)
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
                     return +out.classifier2_(+v)
                 })
                 .attr('nd', function (rg) {
-                    const sv1 = out.statData('v1').get(rg.properties.id)
-                    const sv2 = out.statData('v2').get(rg.properties.id)
+                    const [c1, c2] = getBivariateCodes()
+                    const sv1 = out.statData(c1).get(rg.properties.id)
+                    const sv2 = out.statData(c2).get(rg.properties.id)
                     if (sv1 || sv2) {
                         let v = sv1?.value
                         if ((v != 0 && !v) || v == ':') return 'nd'
@@ -346,11 +355,13 @@ const tooltipTextFunBiv = function (rg, map) {
     }
 
     //stat 1 value
-    const sv1 = map.statData('v1').get(rg.properties.id)
-    const unit1 = map.statData('v1').unitText()
+    const c1 = map.getEncodingStat?.('x', map.getEncodingStat?.('v1', 'v1')) || 'v1'
+    const c2 = map.getEncodingStat?.('y', map.getEncodingStat?.('v2', 'v2')) || 'v2'
+    const sv1 = map.statData(c1).get(rg.properties.id)
+    const unit1 = map.statData(c1).unitText()
     //stat 2 value
-    const sv2 = map.statData('v2').get(rg.properties.id)
-    const unit2 = map.statData('v2').unitText()
+    const sv2 = map.statData(c2).get(rg.properties.id)
+    const unit2 = map.statData(c2).unitText()
 
     buf.push(`
         <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">

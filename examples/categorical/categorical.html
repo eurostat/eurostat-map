@@ -8,7 +8,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script>
             eurostatmap
                 .map('ct')
@@ -17,11 +17,12 @@
                 .scale('60M')
                 .nutsYear(2013)
                 .nutsLevel(3)
-                .stat({
+                .stat('value', {
                     csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
                     geoCol: 'NUTS_ID_2013',
                     valueCol: 'urban_rural',
                 })
+                .encoding('fill', { stat: 'value' })
                 .classToFillStyle({ urb: '#fdb462', int: '#ffffb3', rur: '#ccebc5' })
                 .classToText({ urb: 'Urban', int: 'Intermediate', rur: 'Rural' })
                 .insets('default')

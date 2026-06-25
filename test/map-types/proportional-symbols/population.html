@@ -151,17 +151,19 @@
                 .subtitle('2023')
                 .nutsLevel(nutsLevel)
                 .scale('60M')
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'demo_r_pjangrp3',
                     filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
                     unitText: 'inhabitants',
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT', time: 2023 },
                     unitText: '‰',
                     time: '2023',
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .psShape('circle')
                 .psMinSize([10, 3, 2, 2][nutsLevel])
                 .psMaxSize([60, 20, 20, 15][nutsLevel])

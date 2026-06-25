@@ -106,11 +106,12 @@
                 })
             })
 
-            map.stat('v1', { label: 'Bachelor' }).stat('v2', { label: 'Master' }).stat('v3', { label: 'PhD' })
+            map.stat('statV1', { label: 'Bachelor' }).stat('statV2', { label: 'Master' }).stat('statV3', { label: 'PhD' })
+                .encoding('color', { stats: ['statV1', 'statV2', 'statV3'] })
             map.build()
-            map.statData('v1').setData(filterNulls(bachelor_pct))
-            map.statData('v2').setData(filterNulls(masters_pct))
-            map.statData('v3').setData(filterNulls(phd_pct))
+            map.statData('statV1').setData(filterNulls(bachelor_pct))
+            map.statData('statV2').setData(filterNulls(masters_pct))
+            map.statData('statV3').setData(filterNulls(phd_pct))
 
             // map.updateStatValues()
 

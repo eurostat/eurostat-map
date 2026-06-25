@@ -8,7 +8,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script>
             const map = eurostatmap
                 .map('stripeComposition')
@@ -20,13 +20,15 @@
                 .nutsLevel(1)
                 .nutsYear(2016)
                 .stripeWidth(12)
-            map.statStripe(
+            map.stat(
+                'composition',
                 { eurostatDatasetCode: 'agr_r_animal', filters: { unit: 'THS_HD', time: '2022' }, unitText: '1000 heads' },
                 'animals',
                 ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
                 ['bovines', 'cows', 'buffalos', 'pigs', 'sheeps', 'goats'],
                 ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f']
             )
+                .encoding('composition', { stat: 'composition' })
                 .legend({ x: 10, y: 120, title: 'Animals', boxOpacity: 0, boxFill: 'white' })
                 .seaFillStyle('white')
                 .coastalMarginColor('lightgray')

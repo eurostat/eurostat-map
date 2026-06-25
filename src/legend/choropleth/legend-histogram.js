@@ -238,5 +238,6 @@ function getColors(out) {
 
 function getData(out) {
     const map = out.map
-    return Object.values(map.statData()._data_).map((item) => item.value)
+    const statData = out.getColorStats?.(out) || map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
+    return Object.values(statData._data_).map((item) => item.value)
 }

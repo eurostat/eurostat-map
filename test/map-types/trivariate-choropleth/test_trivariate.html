@@ -34,24 +34,25 @@
                 .title('Age Structure')
                 .subtitle('Population distribution by age groups, 2023')
                 .nutsLevel(3)
-                .stat('v1', {
+                .stat('statV1', {
                     label: 'Population 15–29',
                     eurostatDatasetCode: 'demo_r_pjanind3',
                     filters: { indic_de: 'PC_Y15_29', time: 2023, unit: 'PC' },
                     unitText: '%',
                 })
-                .stat('v2', {
+                .stat('statV2', {
                     label: 'Population 45–64',
                     eurostatDatasetCode: 'demo_r_pjanind3',
                     filters: { indic_de: 'PC_Y45_64', time: 2023, unit: 'PC' },
                     unitText: '%',
                 })
-                .stat('v3', {
+                .stat('statV3', {
                     label: 'Population 75+',
                     eurostatDatasetCode: 'demo_r_pjanind3',
                     filters: { indic_de: 'PC_Y65_MAX', time: 2023, unit: 'PC' },
                     unitText: '%',
                 })
+                .encoding('color', { stats: ['statV1', 'statV2', 'statV3'] })
                 .ternarySettings({
                     hue: 160,
                     chroma: 130,
@@ -87,9 +88,9 @@
                 })
                 .zoomButtons(true)
 
-            // map.statData('v1').setData(variable1)
-            // map.statData('v2').setData(variable2)
-            // map.statData('v3').setData(variable3)
+            // map.statData('statV1').setData(variable1)
+            // map.statData('statV2').setData(variable2)
+            // map.statData('statV3').setData(variable3)
             map.build()
         </script>
     </body>

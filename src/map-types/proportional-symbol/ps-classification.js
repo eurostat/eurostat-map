@@ -9,9 +9,17 @@ export function defineClassifiers(out) {
     defineSizeClassifier(out)
 
     // colour
-    if (out.statData('color').getArray()) {
+    if (getColorData(out)?.getArray()) {
         defineColorClassifier(out)
     }
+}
+
+function getColorData(out) {
+    return out.getEncodingStatData?.('color', undefined, 'color') || out.statData('color')
+}
+
+function getSizeData(out) {
+    return out.getEncodingStatData?.('size', undefined, 'size') || (out.statData('size')?.getArray() ? out.statData('size') : out.statData())
 }
 
 function defineColorClassifier(out) {
@@ -22,12 +30,12 @@ function defineColorClassifier(out) {
     //use suitable classification type for colouring
     if (out.psClassificationMethod_ === 'quantile') {
         //https://github.com/d3/d3-scale#quantile-scales
-        const domain = out.statData('color').getArray()
+        const domain = getColorData(out).getArray()
         const range = getA(out.psClasses_)
         out.classifierColor(scaleQuantile().domain(domain).range(range))
     } else if (out.psClassificationMethod_ === 'equinter') {
         //https://github.com/d3/d3-scale#quantize-scales
-        const domain = out.statData('color').getArray()
+        const domain = getColorData(out).getArray()
         const range = getA(out.psClasses_)
         out.classifierColor(
             scaleQuantize()
@@ -45,7 +53,7 @@ function defineColorClassifier(out) {
 
 function defineSizeClassifier(out) {
     // raw values (size-specific first, fallback)
-    let rawData = out.statData('size')?.getArray() ?? out.statData()?.getArray() ?? []
+    let rawData = getSizeData(out)?.getArray() ?? []
 
     // Also check custom size legend values
     const legendConfig = out.legend()
@@ -76,7 +84,7 @@ export function applyClassificationToMap(map, root) {
     const classifier = map.classifierColor_ || root?.classifierColor_;
     if (typeof classifier !== 'function') return;
 
-    const colorData = map.statData('color');
+    const colorData = map.getEncodingStatData?.('color', undefined, 'color') || map.statData('color');
     if (!colorData) return;
 
     map.svg_.selectAll('.em-centroid')

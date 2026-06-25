@@ -42,6 +42,13 @@ export const map = function (config) {
 
     out.tooltip_.textFunction = tooltipTextFunctionMushroom
 
+    out.getMushroomStatCodes = function () {
+        return [
+            out.getEncodingStat?.('left', out.getEncodingStat?.('v1', out.mushroomCodes_[0])) || out.mushroomCodes_[0],
+            out.getEncodingStat?.('right', out.getEncodingStat?.('v2', out.mushroomCodes_[1])) || out.mushroomCodes_[1],
+        ]
+    }
+
     // ===============================
     // Getters / setters
     // ===============================
@@ -91,7 +98,7 @@ export const map = function (config) {
 
         out._mushroomScale_ = null
 
-        const [c1, c2] = out.mushroomCodes_
+        const [c1, c2] = out.getMushroomStatCodes()
         const stat1 = out.statData(c1)
         const stat2 = out.statData(c2)
 
@@ -140,7 +147,7 @@ export const map = function (config) {
 
         // dorling cartogram
         if (out.dorling_ && (out._mushroomScale_ || (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_))) {
-            const [c1, c2] = out.mushroomCodes()
+            const [c1, c2] = out.getMushroomStatCodes()
             const stat1 = out.statData(c1)
             const stat2 = out.statData(c2)
 
@@ -174,7 +181,7 @@ export const map = function (config) {
 
     out.updateSymbolsDrawOrder = function (map) {
         const gcp = getCentroidsGroup(map)
-        const [c1, c2] = out.mushroomCodes()
+        const [c1, c2] = out.getMushroomStatCodes()
 
         const stat1 = out.statData(c1)
         const stat2 = out.statData(c2)
@@ -235,7 +242,7 @@ export const map = function (config) {
 function applyStyleToMap(map) {
     if (!map.svg() || (!map._mushroomScale_ && !map.mushroomSizeScaleFunctionV1_ && !map.mushroomSizeScaleFunctionV2_)) return
     const hasIndependentScales = map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_
-    const [c1, c2] = map.mushroomCodes()
+    const [c1, c2] = map.getMushroomStatCodes?.() || map.mushroomCodes()
     const colors = map.mushroomColors()
     const orient = map.mushroomOrientation_
 
@@ -335,7 +342,7 @@ function applyStyleToMap(map) {
 // Tooltip
 // ===============================
 const tooltipTextFunctionMushroom = function (rg, map) {
-    const [c1, c2] = map.mushroomCodes()
+    const [c1, c2] = map.getMushroomStatCodes?.() || map.mushroomCodes()
     const id = rg.properties.id
     const name = rg.properties.na || ''
 

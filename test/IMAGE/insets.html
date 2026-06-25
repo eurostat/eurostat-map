@@ -388,13 +388,14 @@
 
                 if (config.stats) {
                     map.nutsLevel(config.nutsLevel)
-                    map.statData().setData({ ES: 1, LI: 2, MT: 1 })
+                    map.statData('value').setData({ ES: 1, LI: 2, MT: 1 })
                 } else {
-                    //map.statData().setData({})
+                    //map.statData('value').setData({})
                     map.nutsLevel(3)
-                    map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                    map.stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                    map.encoding('fill', { stat: 'value' })
                 }
-                //map.statData().setData(exampleData);
+                //map.statData('value').setData(exampleData);
 
                 log(`🚀 Calling map.build()...`)
                 map.build()

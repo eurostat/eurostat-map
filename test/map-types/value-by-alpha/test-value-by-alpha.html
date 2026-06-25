@@ -15,18 +15,20 @@
                 .map('alpha')
                 .title('Value by alpha test')
                 .subtitle('Population density and GDP per inhabitant')
-                .stat({
+                .stat('value', {
                     label: 'GDP',
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
-                .stat('alpha', {
+                .encoding('fill', { stat: 'value' })
+                .stat('opacityValue', {
                     label: 'Population density',
                     eurostatDatasetCode: 'demo_r_d3dens',
                     unitText: 'people/km²',
                     filters: { TIME: '2020' },
                 })
+                .encoding('opacity', { stat: 'opacityValue' })
                 .nutsLevel(3)
                 .legend({ x: 0, y: 140, title: 'Euro per inhabitant', boxOpacity: 0, histogram: false })
                 .drawCoastalMargin(false)

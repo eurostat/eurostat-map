@@ -31,8 +31,10 @@
                 .scale('60M')
                 .nutsLevel('mixed')
                 .nutsYear(2021)
-                .stat('v1', { csvURL: url, geoCol: 'NUTS', valueCol: 'perc', unitText: ' %' })
-                .stat('v2', { csvURL: url, geoCol: 'NUTS', valueCol: 'urt' })
+                .stat('statV1', { csvURL: url, geoCol: 'NUTS', valueCol: 'perc', unitText: ' %' })
+                .encoding('x', { stat: 'statV1' })
+                .stat('statV2', { csvURL: url, geoCol: 'NUTS', valueCol: 'urt' })
+                .encoding('y', { stat: 'statV2' })
                 .numberOfClasses(3)
                 .classifier1((v) => (v >= 0.3 ? 2 : v >= -0.3 ? 1 : 0))
                 .classifier2((v) => 3 - v)
@@ -72,7 +74,7 @@
                                 <tr><td>`)
 
                         //URT value
-                        const sv2 = map.statData('v2').get(rg.properties.id)
+                        const sv2 = map.statData('statV2').get(rg.properties.id)
                         if (!sv2 || (sv2.value != 0 && !sv2.value) || sv2.value == ':') buf.push(map.noDataText_)
                         else {
                             buf.push(
@@ -83,12 +85,12 @@
                         buf.push('<br>')
 
                         //stat value
-                        const sv1 = map.statData('v1').get(rg.properties.id)
+                        const sv1 = map.statData('statV1').get(rg.properties.id)
                         if (!sv1 || (sv1.value != 0 && !sv1.value) || sv1.value == ':') buf.push(map.noDataText_)
                         else {
                             buf.push(sv1.value)
                             //unit 1
-                            const unit1 = map.statData('v1').unitText()
+                            const unit1 = map.statData('statV1').unitText()
                             if (unit1) buf.push(' ' + unit1)
                         }
 

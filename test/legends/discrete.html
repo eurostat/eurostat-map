@@ -59,7 +59,7 @@
                 .title('Total population and popualtion change')
                 .subtitle('2022')
                 .width(800)
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'demo_r_pjanaggr3',
                     unitText: 'people',
                     filters: {
@@ -68,11 +68,13 @@
                         AGE: 'TOTAL', // All ages
                     },
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'demo_r_gind3',
                     filters: { indic_de: 'GROWRT', time: 2022 },
                     unitText: '‰',
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .legend({
                     x: 590,
                     y: 20,

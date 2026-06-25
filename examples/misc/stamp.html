@@ -8,13 +8,14 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
 
         <script>
             const map = eurostatmap
                 .map('choropleth')
                 .title('Stamp showing EU average')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .encoding('fill', { stat: 'value' })
                 // EU stars example
                 .stamp({
                     text: 'EU~=~21.4',
@@ -28,6 +29,7 @@
                     rx: 3,
                     strokeWidth: 1.5,
                 })
+                .encoding('fill', { stat: 'value' })
                 .zoomButtons(true)
                 .zoomButtonsPosition([750, 10])
                 .legend({ x: 570, y: 50, title: 'Population density' })

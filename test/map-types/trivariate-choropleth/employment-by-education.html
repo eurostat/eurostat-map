@@ -29,7 +29,7 @@
                     breaks: 5,
                     meanCentering: true,
                 })
-                .stat('v1', {
+                .stat('statV1', {
                     label: 'Low education (ISCED 0–2)',
                     eurostatDatasetCode: 'lfsi_educ_a',
                     filters: {
@@ -42,7 +42,7 @@
                     unitText: '%',
                 })
 
-                .stat('v2', {
+                .stat('statV2', {
                     label: 'Medium education (ISCED 3–4)',
                     eurostatDatasetCode: 'lfsi_educ_a',
                     filters: {
@@ -55,7 +55,7 @@
                     unitText: '%',
                 })
 
-                .stat('v3', {
+                .stat('statV3', {
                     label: 'High education (ISCED 5–8)',
                     eurostatDatasetCode: 'lfsi_educ_a',
                     filters: {
@@ -67,6 +67,7 @@
                     },
                     unitText: '%',
                 })
+                .encoding('color', { stats: ['statV1', 'statV2', 'statV3'] })
                 .legend({
                     title: 'Education level',
                     x: 520,
@@ -85,9 +86,9 @@
                 })
                 .zoomButtons(true)
 
-            // map.statData('v1').setData(variable1)
-            // map.statData('v2').setData(variable2)
-            // map.statData('v3').setData(variable3)
+            // map.statData('statV1').setData(variable1)
+            // map.statData('statV2').setData(variable2)
+            // map.statData('statV3').setData(variable3)
             map.build()
         </script>
     </body>

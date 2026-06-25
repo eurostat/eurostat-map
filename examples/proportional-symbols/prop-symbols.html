@@ -8,7 +8,7 @@
 
     <body>
         <svg id="map"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
 
         <!-- for formatting legend labels -->
         <script src="https://d3js.org/d3-format.v2.min.js"></script>
@@ -36,17 +36,19 @@
                 .subtitle('Total GDP (size) and GDP per inhabitant (color)')
                 .zoomExtent([1, 2])
                 //GDP per inhabitant
-                .stat('color', {
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'EUR/inhabitant',
                     filters: { unit: 'EUR_HAB', time: '2018' },
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 // total GDP
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2018' },
                 })
+                .encoding('size', { stat: 'symbolSize' })
 
                 //prop symbols size & styling
                 .psCustomSVG(euSVG) // Search https://materialdesignicons.com/ for examples and simply copy and paste the "d" string of the SVG here.

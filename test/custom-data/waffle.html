@@ -48,13 +48,14 @@
                 .waffleMinSize(10)
                 .waffleGridSize(10)
                 .insets(false)
-                .statWaffle({
+                .stat('composition', {
                     customData: landUseData,
                     categoryCodes: ['forest', 'cropland', 'pasture', 'urban', 'water'],
                     categoryLabels: ['Forest', 'Cropland', 'Pasture', 'Urban', 'Water'],
                     categoryColors: ['#27ae60', '#f39c12', '#a8e063', '#e74c3c', '#3498db'],
                     unitText: 'km²',
                 })
+                .encoding('composition', { stat: 'composition' })
                 .legend({
                     x: 10,
                     y: 140,

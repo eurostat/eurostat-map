@@ -46,18 +46,17 @@
                 .subtitle('')
                 .scale('60M')
                 .nutsLevel(0)
-                .statPie(
-                    {
-                        eurostatDatasetCode: 'apro_cpshr',
-                        filters: { strucpro: 'HPRD_HUMD_EU_THS_T', time: '2022' },
-                        unitText: '(1 000 tonnes)',
-                    },
-                    'crops', //parameter that the categories belong to
-                    cropOptions.map((d) => d.value), //category codes
-                    cropOptions.map((d) => d.text), //category labels
-                    ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
-                    'C0000' //code for the total (all causes of death)
-                )
+                .stat('composition', {
+                    eurostatDatasetCode: 'apro_cpshr',
+                    filters: { strucpro: 'HPRD_HUMD_EU_THS_T', time: '2022' },
+                    unitText: '(1 000 tonnes)',
+                    categoryParameter: 'crops', //parameter that the categories belong to
+                    categoryCodes: cropOptions.map((d) => d.value), //category codes
+                    categoryLabels: cropOptions.map((d) => d.text), //category labels
+                    categoryColors: ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
+                    totalCode: 'C0000', //code for the total (all causes of death)
+                })
+                .encoding('composition', { stat: 'composition' })
                 .pieOtherColor('#FFCC80')
                 .pieOtherText('Other')
 

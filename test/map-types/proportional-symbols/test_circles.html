@@ -62,16 +62,17 @@
                 .map('ps')
                 .title('Total GDP')
                 .scale('60M')
-                // .stat('size', {
+                // .stat('symbolSize', {
                 //     eurostatDatasetCode: 'nama_10r_3gdp',
                 //     unitText: 'Million EUR',
                 //     filters: { unit: 'MIO_EUR', time: '2023' },
                 // })
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'demo_r_pjangrp3',
                     filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
                     unitText: 'inhabitants',
                 })
+                .encoding('size', { stat: 'symbolSize' })
                 .legend({
                     title: 'Total ',
                     subtitle: 'test',

@@ -13,7 +13,8 @@
             const map = eurostatmap
                 .map('choropleth')
                 .title('stamp test')
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
+                .encoding('fill', { stat: 'value' })
                 // EU stars example
                 .stamp({
                     text: 'EUROSTAT 2024',
@@ -24,6 +25,7 @@
                     x: 80,
                     y: 120,
                 })
+                .encoding('fill', { stat: 'value' })
                 .zoomButtons(true)
                 .zoomButtonsPosition([750, 10])
                 .legend({ x: 20, y: 150, title: 'Population density' })

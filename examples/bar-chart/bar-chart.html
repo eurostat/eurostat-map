@@ -46,7 +46,7 @@
         <br />
         <svg id="map"></svg>
 
-        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
+        <!-- <script src="../../build/eurostatmap.js"></script> -->
         <script src="../../build/eurostatmap.js"></script>
         <script>
             let map
@@ -72,7 +72,7 @@
                     .barGroupWidth(8)
                     .barGroupGap(0)
                     .barGroupMaxHeight(40)
-                    .statBar({
+                    .stat('composition', {
                         eurostatDatasetCode: 'tour_occ_nin2',
                         filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
                         unitText: 'Nights',
@@ -81,6 +81,7 @@
                         categoryLabels: ['Foreign', 'Domestic'],
                         categoryColors: ['#7fc97f', '#beaed4'],
                     })
+                    .encoding('composition', { stat: 'composition' })
                     .legend({
                         x: 570,
                         y: 0,

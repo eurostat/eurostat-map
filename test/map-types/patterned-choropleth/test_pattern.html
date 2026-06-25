@@ -80,7 +80,8 @@
                 .scale('60M')
                 .nutsLevel(2)
                 .numberOfClasses(4)
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2021' } })
+                .encoding('fill', { stat: 'value' })
                 .filtersDefinitionFunction(getFillPatternDefinitionFunction)
                 .legend({
                     x: 5,
@@ -105,7 +106,7 @@
             //         labelFormatter: (val) => val.toLocaleString('en').replace(/,/gi, ' ,'),
             //     })
 
-            //     //map.statData().setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
+            //     //map.statData('value').setData({ ES: 2, FR: 3, DE: 4, HU: 5, SE:12, UK:4, IT:2,RO:7,PL:8,HR:9,SK:10 })
             // }, 10000)
         </script>
     </body>

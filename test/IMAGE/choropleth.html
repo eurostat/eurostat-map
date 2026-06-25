@@ -22,12 +22,13 @@
                 .height(625)
                 .nutsLevel('mixed')
                 .nutsYear('2024')
-                // .stat({
+                // .stat('value', {
                 //     eurostatDatasetCode: 'nama_10r_3gdp',
                 //     unitText: 'Euro per inhabitant',
                 //     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 // })
                 // .classificationMethod('threshold')
+                .encoding('fill', { stat: 'value' })
                 .colors(['rgb(255,235,153)', 'rgb(199,233,180)', 'rgb(107,205,187)', 'rgb(65,182,196)', 'rgb(16,79,153)', 'rgb(23,37,107)'])
                 .threshold([90, 92.5, 94.5, 96, 98])
                 .position({ x: 4790000, y: 3420000, z: 6400 })
@@ -45,7 +46,7 @@
                 })
                 .zoomExtent([1, 1000])
 
-            map.statData().setData(mixedNUTS)
+            map.statData('value').setData(mixedNUTS)
 
             map.build()
 

@@ -26,7 +26,7 @@
 
                 //population by age
                 .nutsLevel(0)
-                .statWaffle({
+                .stat('composition', {
                     eurostatDatasetCode: 'tour_occ_nin2',
                     filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
                     unitText: 'nights spent',
@@ -36,6 +36,7 @@
                     categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours,
                     //totalCode: 'TOTAL',
                 })
+                .encoding('composition', { stat: 'composition' })
 
                 .legend({
                     x: 570,

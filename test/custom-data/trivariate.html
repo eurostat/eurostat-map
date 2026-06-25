@@ -119,12 +119,13 @@
                     title: 'Age structure',
                 })
 
-            map.stat('v1', { code: 'v1', label: 'Youth (0–24)', unitText: '%' })
-            map.stat('v2', { code: 'v2', label: 'Working-age (25–64)', unitText: '%' })
-            map.stat('v3', { code: 'v3', label: 'Elderly (65+)', unitText: '%' })
-            map.statData('v1').setData(youth)
-            map.statData('v2').setData(workingAge)
-            map.statData('v3').setData(elderly)
+            map.stat('statV1', { code: 'v1', label: 'Youth (0–24)', unitText: '%' })
+            map.stat('statV2', { code: 'v2', label: 'Working-age (25–64)', unitText: '%' })
+            map.stat('statV3', { code: 'v3', label: 'Elderly (65+)', unitText: '%' })
+            map.encoding('color', { stats: ['statV1', 'statV2', 'statV3'] })
+            map.statData('statV1').setData(youth)
+            map.statData('statV2').setData(workingAge)
+            map.statData('statV3').setData(elderly)
             map.build()
         </script>
     </body>

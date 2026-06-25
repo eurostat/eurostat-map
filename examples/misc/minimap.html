@@ -15,7 +15,7 @@
         <svg id="spain"></svg>
         <svg id="map"></svg>
         <svg id="map2"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
@@ -98,7 +98,8 @@
                 .nutsLevel(1)
                 .nutsYear(2024)
                 .position({ x: 4400000, y: 3100000, z: 1400 })
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .encoding('fill', { stat: 'value' })
                 .zoomExtent([-100, 1000])
                 .minimap({
                     x: 705,
@@ -122,7 +123,8 @@
                 .nutsLevel(1)
                 .nutsYear(2024)
                 .position({ x: 4400000, y: 3100000, z: 1400 })
-                .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
+                .encoding('fill', { stat: 'value' })
                 .zoomExtent([-100, 1000])
                 .minimap({
                     x: 705,

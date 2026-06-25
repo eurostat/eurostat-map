@@ -24,11 +24,12 @@
                 .subtitle('2022')
                 .nutsLevel(1)
                 .nutsYear(2021)
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Euro per inhabitant',
                     filters: { TIME: '2022', UNIT: 'EUR_HAB' },
                 })
+                .encoding('fill', { stat: 'value' })
                 .tooltip({ omitRegions: ['RU', 'BY', 'IL', 'PS'] })
                 .classificationMethod('threshold')
                 .thresholds([20000, 25000, 30000, 35000, 40000, 45000, 50000])

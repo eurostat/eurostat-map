@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="en">
     <head>
-        
-        <title>Flow Map</title><meta charset="UTF-8" />
+        <title>Flow Map</title>
+        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
 
     <body>
         <svg id="flow"></svg>
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <script src="../../build/eurostatmap.js"></script>
         <script>
             const fmtCompact = new Intl.NumberFormat('en', {
                 notation: 'compact',
@@ -18,7 +18,7 @@
             const flowmap = eurostatmap
                 .map('flow')
                 .svgId('flow')
-                .width(800)
+                //.width(800)
                 .scale('60M')
                 .title('French Exports')
                 .subtitle('Top 10 European importers of goods from France in 2022')

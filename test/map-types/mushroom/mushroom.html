@@ -18,18 +18,20 @@
                 .position({ x: 4710000, y: 3550000, z: 6500 })
                 .dorling(true)
                 .mushroomOrientation('vertical')
-                .stat('v1', {
+                .stat('statV1', {
                     label: ' GDP',
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2022' },
                 })
-                .stat('v2', {
+                .encoding('left', { stat: 'statV1' })
+                .stat('statV2', {
                     label: ' Population',
                     eurostatDatasetCode: 'demo_r_pjangrp3',
                     filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
                     unitText: 'inhabitants',
                 })
+                .encoding('right', { stat: 'statV2' })
                 .zoomExtent([1, 1000])
                 .mushroomSizeScaleFunctionV1(function (value) {
                     // custom size scale function for v1 side

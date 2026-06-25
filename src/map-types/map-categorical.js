@@ -69,8 +69,10 @@ export const map = function (config) {
     }
 
     const applyClassificationToMap = function (map) {
+        const fillData = out.getEncodingStatData?.('fill', undefined, 'default') || out.statData()
+
         //get domain (unique values)
-        const domain = out.statData().getUniqueValues()
+        const domain = fillData.getUniqueValues()
 
         //get range [0,1,2,3,...,domain.length-1]
         const range = [...Array(domain.length).keys()]
@@ -93,7 +95,7 @@ export const map = function (config) {
         // Apply classifier and set 'ecl' attribute to regions based on value
         const classifyRegions = (regions) => {
             regions.attr('ecl', (rg) => {
-                const sv = out.statData().get(rg.properties.id)
+                const sv = fillData.get(rg.properties.id)
                 if (!sv) return
 
                 const v = sv.value
@@ -293,7 +295,8 @@ const tooltipTextFunCat = function (rg, map) {
         buf.push('<div class="em-tooltip-bar">' + rg.properties.na + '</div>')
     }
     //get stat value
-    const sv = map.statData().get(rg.properties.id)
+    const statData = map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
+    const sv = statData.get(rg.properties.id)
     //case when no data available
     if (!sv || (sv.value != 0 && !sv.value)) {
         buf.push(map.noDataText_)

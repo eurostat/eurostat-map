@@ -19,16 +19,18 @@
                 .title('Total GDP and GDP per inhabitant')
                 .subtitle('2022')
                 .width(800)
-                .stat('size', {
+                .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Million EUR',
                     filters: { unit: 'MIO_EUR', time: '2022' },
                 })
-                .stat('color', {
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'Euro per inhabitant',
                     filters: { unit: 'EUR_HAB', time: '2022' },
                 })
+                .encoding('color', { stat: 'symbolColor' })
                 .legend({
                     x: 590,
                     y: 20,

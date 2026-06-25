@@ -8,8 +8,8 @@
 
     <body>
         <svg id="map"></svg>
-        <!-- <script src="https://unpkg.com/eurostat-map"></script> -->
-        <script src="https://unpkg.com/eurostat-map"></script>
+        <!-- <script src="../../build/eurostatmap.js"></script> -->
+        <script src="../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3"></script>
         <script>
             let height = window.innerHeight
@@ -37,16 +37,18 @@
                 .subtitle('% people unemployed aged 20-64 years & inhabitants per km², 2023')
                 .showZoomButtons(true)
                 .nutsLevel(2)
-                .stat('v1', {
+                .stat('statV1', {
                     eurostatDatasetCode: 'demo_r_d3dens',
                     unitText: 'inh./km²',
                     filters: { time: '2023' },
                 })
-                .stat('v2', {
+                .encoding('x', { stat: 'statV1' })
+                .stat('statV2', {
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2023 },
                     unitText: '% unemployed',
                 })
+                .encoding('y', { stat: 'statV2' })
                 .numberOfClasses(n)
                 .classToFillStyle((class1, class2) => {
                     if (class1 == null || class2 == null || class1 === ':' || class2 === ':') return null

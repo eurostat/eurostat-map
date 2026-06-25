@@ -279,10 +279,13 @@
                     return geometries
                 })
 
-            map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
+            map.stat('statV1', { label: 'Inward' }).stat('statV2', { label: 'Outward' })
+            map.encoding('left', { stat: 'statV1' })
+                .encoding('right', { stat: 'statV2' })
+                .encoding('left', { stat: 'statV1' })
             map.build()
-            map.statData('v1').setData(filterNulls(inwardData))
-            map.statData('v2').setData(filterNulls(outwardData))
+            map.statData('statV1').setData(filterNulls(inwardData))
+            map.statData('statV2').setData(filterNulls(outwardData))
 
             function filterNulls(obj) {
                 return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))

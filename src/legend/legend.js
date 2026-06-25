@@ -289,7 +289,10 @@ export const legend = function (map) {
     out.getColorStats = function (out) {
         const map = out.map
         const mapType = map._mapType
-        const stats = mapType === 'ps' ? map.statData('color') : map.statData()
+        const stats =
+            mapType === 'ps'
+                ? map.getEncodingStatData?.('color', undefined, 'color') || map.statData('color')
+                : map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
         return stats
     }
 

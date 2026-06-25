@@ -47,13 +47,14 @@
                 .pieMaxRadius(20)
                 .pieMinRadius(5)
                 .insets(false)
-                .statPie({
+                .stat('composition', {
                     customData: energyData,
                     categoryCodes: ['solar', 'wind', 'hydro', 'nuclear', 'fossil'],
                     categoryLabels: ['Solar', 'Wind', 'Hydro', 'Nuclear', 'Fossil fuels'],
                     categoryColors: ['#f9ca24', '#6ab04c', '#22a6b3', '#e84393', '#636e72'],
                     unitText: 'GWh',
                 })
+                .encoding('composition', { stat: 'composition' })
                 .legend({
                     x: 10,
                     y: 150,

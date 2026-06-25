@@ -14,11 +14,12 @@
                 .map('choropleth')
                 .title('Grid cartogram')
                 .subtitle('test')
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
                     filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                 })
+                .encoding('fill', { stat: 'value' })
                 .gridCartogram(true)
                 .gridCartogramShape('square')
                 .gridCartogramCellPadding(2)

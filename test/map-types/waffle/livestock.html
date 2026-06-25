@@ -27,7 +27,7 @@
                     maxSize: 40,
                 })
                 .nutsLevel(1)
-                .statWaffle({
+                .stat('composition', {
                     eurostatDatasetCode: 'agr_r_animal',
                     filters: { unit: 'THS_HD', time: '2024' },
                     unitText: 'heads',
@@ -37,6 +37,7 @@
                     categoryColors: ['#E04040', '#208486', '#2644A7', '#AF155C', '#672DC4', '#33A033'],
                     transform: (value) => value * 1000, // convert from 1000 heads to heads
                 })
+                .encoding('composition', { stat: 'composition' })
 
                 .legend({
                     x: 600,

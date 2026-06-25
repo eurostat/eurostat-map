@@ -16,11 +16,12 @@
                 .title('GDP per inhabitant')
                 .subtitle('2022')
                 .width(width)
-                .stat({
+                .stat('value', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
                     unitText: 'euro per inhabitant',
                     filters: { TIME: '2022', UNIT: 'EUR_HAB' },
                 })
+                .encoding('fill', { stat: 'value' })
                 .classificationMethod('threshold')
                 // .numberOfClasses(7)
                 .threshold([20000, 30000, 40000, 50000, 60000])

@@ -47,13 +47,14 @@
                 .barType('stacked')
                 .barGroupMaxHeight(35)
                 .insets(false)
-                .statBar({
+                .stat('composition', {
                     customData: employmentData,
                     categoryCodes: ['services', 'industry', 'agriculture'],
                     categoryLabels: ['Services', 'Industry', 'Agriculture'],
                     categoryColors: ['#3498db', '#e67e22', '#2ecc71'],
                     unitText: 'thousands',
                 })
+                .encoding('composition', { stat: 'composition' })
                 .legend({
                     x: 10,
                     y: 150,

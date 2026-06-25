@@ -29,7 +29,7 @@ export const map = function (config) {
     const originalUpdateStatValues = out.updateStatValues
     out.updateStatValues = function () {
         //add extra alpha logic to choropleth-map.js code
-        const alpha = out.statData('alpha')
+        const alpha = out.getEncodingStatData?.('opacity', undefined, 'alpha') || out.statData('alpha')
         if (!alpha || !alpha.isReady()) {
             out.alphaData_ = null
             return out
@@ -56,9 +56,9 @@ export const map = function (config) {
         //add mapType css class
         out.svg_.classed('em--alpha', true)
 
-        const stats = out.statData()
+        const stats = out.getEncodingStatData?.('fill', undefined, 'default') || out.statData()
         if (!stats || !stats.isReady()) return out
-        const alphaData = out.statData('alpha')
+        const alphaData = out.getEncodingStatData?.('opacity', undefined, 'alpha') || out.statData('alpha')
         if (!alphaData || !alphaData.isReady()) return out
 
         const selector = getRegionsSelector(out)
@@ -101,8 +101,8 @@ export const map = function (config) {
         const regionId = region.properties.id
         buf.push(`<div class="em-tooltip-bar"><b>${regionName}</b>${regionId ? ` (${regionId})` : ''}</div>`)
 
-        const statData = map.statData()
-        const alphaData = map.alphaData_ || map.statData('alpha')
+        const statData = map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
+        const alphaData = map.alphaData_ || map.getEncodingStatData?.('opacity', undefined, 'alpha') || map.statData('alpha')
 
         const sv = statData.get(regionId)
         const av = alphaData?.get(regionId)

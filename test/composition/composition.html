@@ -47,7 +47,7 @@
                 .insets('default')
                 .transitionDuration(500)
                 .geoCenter([5000000, 3500000])
-                .statPie({
+                .stat('composition', {
                     eurostatDatasetCode: 'tour_occ_nin2',
                     filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
                     unitText: 'nights spent',
@@ -57,6 +57,7 @@
                     categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours
                     //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
                 })
+                .encoding('composition', { stat: 'composition' })
 
                 .legend({
                     x: 10,

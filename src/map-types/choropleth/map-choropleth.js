@@ -140,7 +140,8 @@ export const map = function (config) {
 
     function applyClassificationToMap(map) {
         const generateRange = (nb) => [...Array(nb).keys()]
-        const dataArray = out.statData().getArray()
+        const fillData = out.getEncodingStatData?.('fill', undefined, 'default') || out.statData()
+        const dataArray = fillData.getArray()
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
 
         if (dataArray) {
@@ -224,7 +225,7 @@ export const map = function (config) {
                 regions.each(function (rg) {
                     const sel = select(this)
 
-                    const regionData = out.statData().get(rg.properties.id)
+                    const regionData = fillData.get(rg.properties.id)
 
                     //no input
                     if (!regionData) {
@@ -580,7 +581,7 @@ const choroplethTooltipFunction = function (region, map) {
     `)
 
     // Retrieve region's data value and unit
-    const statData = map.statData()
+    const statData = map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
     const sv = statData.get(regionId)
     const unit = statData.unitText() || ''
 

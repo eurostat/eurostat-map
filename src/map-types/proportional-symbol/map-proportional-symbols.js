@@ -452,7 +452,7 @@ export const getColorLegend = function (colorFun, colorArray) {
 }
 
 export function getSizeStatData(map) {
-    return map.statData('size').getArray() ? map.statData('size') : map.statData()
+    return map.getEncodingStatData?.('size', undefined, 'size') || (map.statData('size').getArray() ? map.statData('size') : map.statData())
 }
 
 /**
@@ -478,14 +478,14 @@ const tooltipTextFunPs = function (region, map) {
     }
 
     // Stat 1
-    const v1 = map.statData('size').getArray() ? map.statData('size') : map.statData()
+    const v1 = getSizeStatData(map)
     const sv1 = v1.get(region.properties.id)
     const unit1 = v1.unitText?.() || ''
     const row1 = `<tr><td>${formatValue(sv1?.value, unit1, map.noDataText_)}</td></tr>`
 
     // Stat 2 (optional)
     let row2 = ''
-    const v2 = map.statData('color')?.getArray() ? map.statData('color') : null
+    const v2 = map.getEncodingStatData?.('color', undefined, 'color') || (map.statData('color')?.getArray() ? map.statData('color') : null)
     if (v2) {
         const sv2 = v2.get(region.properties.id)
         const unit2 = v2.unitText?.() || ''
