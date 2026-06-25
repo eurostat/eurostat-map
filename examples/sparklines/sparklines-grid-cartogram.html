@@ -23,25 +23,26 @@
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021'],
                 })
-                .sparkSettings({ type: 'line' })
-                .sparkSettings({ lineOffsets: { x: 3, y: 5 } })
-                .sparkSettings({ lineWidth: 25 })
-                .sparkSettings({ lineHeight: 50 })
-                .sparkSettings({ lineStrokeWidth: 3 })
-                .sparkSettings({ lineColor: (itemValue) => {
-                    if (itemValue > 0) return '#2644A7' //cobalt blue
-                    if (itemValue < 0) return '#E04040' //sunset red
-                    return '#999'
-                } })
-
-                .sparkSettings({ lineOpacity: 0.7 })
-                .sparkSettings({ lineCircleRadius: 0.1 })
-                .sparkSettings({ tooltipChart: {
-                    width: 150,
-                    height: 50,
-                    margin: { left: 30, right: 10, top: 10, bottom: 40 },
-                    circleRadius: 1.5,
-                } })
+                .sparkSettings({
+                    type: 'line',
+                    lineOffsets: { x: 3, y: 5 },
+                    lineWidth: 25,
+                    lineHeight: 50,
+                    lineStrokeWidth: 3,
+                    lineColor: (itemValue) => {
+                        if (itemValue > 0) return '#2644A7' //cobalt blue
+                        if (itemValue < 0) return '#E04040' //sunset red
+                        return '#999'
+                    },
+                    lineOpacity: 0.7,
+                    lineCircleRadius: 0.1,
+                    tooltipChart: {
+                                        width: 150,
+                                        height: 50,
+                                        margin: { left: 30, right: 10, top: 10, bottom: 40 },
+                                        circleRadius: 1.5,
+                                    }
+                })
                 .footnote('All-items HICP')
                 .legend({
                     title: 'Percentage change (%)',

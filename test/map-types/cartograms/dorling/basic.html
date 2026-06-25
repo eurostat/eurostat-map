@@ -27,10 +27,12 @@
                 .dorling(true)
                 //.psSettings({ shape: 'square' })
                 .backgroundMap(false)
-                .psSettings({ codeLabels: true })
-                .psSettings({ fill: '#e04a28' })
-                .psSettings({ maxSize: 100 })
-                .psSettings({ minSize: 8 })
+                .psSettings({
+                    codeLabels: true,
+                    fill: '#e04a28',
+                    maxSize: 100,
+                    minSize: 8
+                })
                 .processCentroids((centroidFeatures) => {
                     return centroidFeatures.map((feature) => {
                         if (feature.properties.id == 'TR') {

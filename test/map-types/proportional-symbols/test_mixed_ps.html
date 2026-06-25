@@ -20,9 +20,11 @@
             .legend({ x: 500, y: 100, title: 'Test' })
             .nutsLevel('mixed')
             .dorling(true)
-            .psSettings({ fill: '#4ac499' })
-            .psSettings({ maxSize: 30 })
-            .psSettings({ minSize: 5 })
+            .psSettings({
+                fill: '#4ac499',
+                maxSize: 30,
+                minSize: 5
+            })
             .nutsYear(2016)
 
         map.statData('size').setData({

@@ -52,17 +52,23 @@
 
                 //prop symbols size & styling
                 .psSettings({ customSVG: euSVG }) // Search https://materialdesignicons.com/ for examples and simply copy and paste the "d" string of the SVG here.
-                .psSettings({ maxSize: 4 })
-                .psSettings({ minSize: 1 }) //minSize/maxsize for customPaths indicates scale() value, not pixel size
-                .psSettings({ fillOpacity: 1 })
-                .psSettings({ offset: { x: -9, y: -10 } })
-                .psSettings({ stroke: 'black' })
-                .psSettings({ strokeWidth: 10 })
+                .psSettings({
+                    maxSize: 4,
+                    minSize: 1
+                }) //minSize/maxsize for customPaths indicates scale() value, not pixel size
+                .psSettings({
+                    fillOpacity: 1,
+                    offset: { x: -9, y: -10 },
+                    stroke: 'black',
+                    strokeWidth: 10
+                })
 
                 //data-driven colour configuration
-                .psSettings({ classificationMethod: 'threshold' })
-                .psSettings({ thresholds: [10000, 20000, 30200, 40000, 50000] })
-                .psSettings({ colors: ['#E9ECF6', '#C1C9EB', '#93A2DC', '#677CD2', '#3C57B0', '#15246B'] })
+                .psSettings({
+                    classificationMethod: 'threshold',
+                    thresholds: [10000, 20000, 30200, 40000, 50000],
+                    colors: ['#E9ECF6', '#C1C9EB', '#93A2DC', '#677CD2', '#3C57B0', '#15246B']
+                })
 
                 //legend config
                 .legend({

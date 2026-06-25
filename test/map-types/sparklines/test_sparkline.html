@@ -27,19 +27,20 @@
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019'],
                 })
-                .sparkSettings({ type: 'line' })
+                .sparkSettings({
+                    type: 'line',
+                    lineWidth: 30,
+                    lineHeight: 10,
+                    lineStrokeWidth: 0.8,
+                    lineColor: (itemValue, index, data) => {
+                        if (itemValue > 0) return 'blue'
+                        if (itemValue < 0) return 'red'
+                        return '#999'
+                    },
+                    lineOpacity: 0.8,
+                    lineCircleRadius: 0
+                })
                 //.sparkSettings({ lineOffsets: { x: -30, y: 3 } })
-                .sparkSettings({ lineWidth: 30 })
-                .sparkSettings({ lineHeight: 10 })
-                .sparkSettings({ lineStrokeWidth: 0.8 })
-                .sparkSettings({ lineColor: (itemValue, index, data) => {
-                    if (itemValue > 0) return 'blue'
-                    if (itemValue < 0) return 'red'
-                    return '#999'
-                } })
-
-                .sparkSettings({ lineOpacity: 0.8 })
-                .sparkSettings({ lineCircleRadius: 0 })
 
                 .tooltip({
                     xOffset: 30,

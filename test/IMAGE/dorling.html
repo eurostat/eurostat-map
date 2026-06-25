@@ -17,8 +17,10 @@
             const map = eurostatmap
                 .map('proportionalSymbol')
                 .nutsLevel('mixed')
-                .psSettings({ maxSize: 14 })
-                .psSettings({ fillOpacity: 0.8 })
+                .psSettings({
+                    maxSize: 14,
+                    fillOpacity: 0.8
+                })
                 .dorling(true)
                 .psSettings({ codeLabels: true })
                 .insets(false)

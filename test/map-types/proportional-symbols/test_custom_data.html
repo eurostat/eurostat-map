@@ -22,13 +22,17 @@
                 .map('ps')
                 .title('Total GDP')
                 .nutsLevel('mixed')
-                .psSettings({ shape: 'circle' })
-                .psSettings({ minSize: 1 })
-                .psSettings({ maxSize: 15 }) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
-                .psSettings({ strokeWidth: 0.1 })
-                .psSettings({ stroke: 'white' })
-                .psSettings({ fillOpacity: 1 })
-                .psSettings({ strokeOpacity: 0.9 })
+                .psSettings({
+                    shape: 'circle',
+                    minSize: 1,
+                    maxSize: 15
+                }) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psSettings({
+                    strokeWidth: 0.1,
+                    stroke: 'white',
+                    fillOpacity: 1,
+                    strokeOpacity: 0.9
+                })
                 .zoomExtent([1, 10])
                 .tooltip({
                     textFunction: (d, map) => {

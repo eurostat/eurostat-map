@@ -60,10 +60,14 @@ export function initMap(unitCode, naceCode) {
         .nutsLevel(2)
 
         //symbol settings
-        .psSettings({ fill: '#2644A7' })
-        .psSettings({ brightenFactor: 0.8 }) //background color brightening factor
-        .psSettings({ maxSize: 18 })
-        .psSettings({ minSize: 3 })
+        .psSettings({
+            fill: '#2644A7',
+            brightenFactor: 0.8
+        }) //background color brightening factor
+        .psSettings({
+            maxSize: 18,
+            minSize: 3
+        })
 
         //SE settings
         .footer(true)

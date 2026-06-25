@@ -46,10 +46,12 @@
                 .title('Average Annual Temperature')
                 .subtitle('Made-up °C values, 2018–2024')
                 .scale('60M')
-                .sparkSettings({ type: 'area' })
-                .sparkSettings({ lineWidth: 50 })
-                .sparkSettings({ lineHeight: 20 })
-                .sparkSettings({ lineOpacity: 0.85 })
+                .sparkSettings({
+                    type: 'area',
+                    lineWidth: 50,
+                    lineHeight: 20,
+                    lineOpacity: 0.85
+                })
                 .insets('default')
                 .legend({ x: 10, y: 160, title: 'Temperature trend (°C)' })
                 .stat({

@@ -27,15 +27,17 @@
                     dates: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                     labels: ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
                 })
-                .sparkSettings({ type: 'line' })
-                .sparkSettings({ lineWidth: 30 })
-                .sparkSettings({ lineStrokeWidth: 0.8 })
-                .sparkSettings({ lineColor: (d, i) => {
-                    return d[d.length - 1].value <= 0 ? 'red' : 'blue'
-                } })
-                .sparkSettings({ lineHeight: 20 })
-                .sparkSettings({ lineOpacity: 0.8 })
-                .sparkSettings({ lineCircleRadius: 0 })
+                .sparkSettings({
+                    type: 'line',
+                    lineWidth: 30,
+                    lineStrokeWidth: 0.8,
+                    lineColor: (d, i) => {
+                                        return d[d.length - 1].value <= 0 ? 'red' : 'blue'
+                                    },
+                    lineHeight: 20,
+                    lineOpacity: 0.8,
+                    lineCircleRadius: 0
+                })
 
                 .tooltip({
                     xOffset: 30,
@@ -43,58 +45,60 @@
                     fontSize: '12px',
                     maxWidth: Math.min(400, window.innerWidth),
                 })
-                .sparkSettings({ lineChartFunction: (node, data, width, height, isForTooltip) => {
-                    const xScale = d3
-                        .scaleLinear()
-                        .domain([0, data.length - 1])
-                        .range([0, width])
+                .sparkSettings({
+                    lineChartFunction: (node, data, width, height, isForTooltip) => {
+                                        const xScale = d3
+                                            .scaleLinear()
+                                            .domain([0, data.length - 1])
+                                            .range([0, width])
 
-                    const yScale = d3
-                        .scaleLog()
-                        .domain([1, d3.max(data, (d) => Math.max(d.value, 1))]) // avoid log(0)
-                        .range([height, 0])
+                                        const yScale = d3
+                                            .scaleLog()
+                                            .domain([1, d3.max(data, (d) => Math.max(d.value, 1))]) // avoid log(0)
+                                            .range([height, 0])
 
-                    const lineGenerator = d3
-                        .line()
-                        .x((d, i) => xScale(i))
-                        .y((d) => yScale(Math.max(d.value, 1)))
+                                        const lineGenerator = d3
+                                            .line()
+                                            .x((d, i) => xScale(i))
+                                            .y((d) => yScale(Math.max(d.value, 1)))
 
-                    // Draw the line
-                    node.append('path').datum(data).attr('fill', 'none').attr('stroke', 'purple').attr('stroke-width', 1).attr('d', lineGenerator)
+                                        // Draw the line
+                                        node.append('path').datum(data).attr('fill', 'none').attr('stroke', 'purple').attr('stroke-width', 1).attr('d', lineGenerator)
 
-                    if (isForTooltip) {
-                        // Add X-axis (with index or optional label)
-                        node.append('g')
-                            .attr('class', 'axis-x')
-                            .attr('transform', `translate(0, ${height})`)
-                            .call(
-                                d3
-                                    .axisBottom(xScale)
-                                    .ticks(data.length)
-                                    .tickFormat((d, i) => i)
-                            )
+                                        if (isForTooltip) {
+                                            // Add X-axis (with index or optional label)
+                                            node.append('g')
+                                                .attr('class', 'axis-x')
+                                                .attr('transform', `translate(0, ${height})`)
+                                                .call(
+                                                    d3
+                                                        .axisBottom(xScale)
+                                                        .ticks(data.length)
+                                                        .tickFormat((d, i) => i)
+                                                )
 
-                        // Add Y-axis (log scale ticks)
-                        node.append('g').attr('class', 'axis-y').call(d3.axisLeft(yScale).ticks(5, '~s'))
+                                            // Add Y-axis (log scale ticks)
+                                            node.append('g').attr('class', 'axis-y').call(d3.axisLeft(yScale).ticks(5, '~s'))
 
-                        // Optional: horizontal line at log(1) = 1
-                        const oneY = yScale(1)
-                        node.append('line')
-                            .attr('x1', 0)
-                            .attr('x2', width)
-                            .attr('y1', oneY)
-                            .attr('y2', oneY)
-                            .attr('stroke', 'gray')
-                            .attr('stroke-dasharray', '2,2')
-                            .attr('stroke-width', 1)
-                    }
-                } })
-                .sparkSettings({ tooltipChart: {
-                    width: 150,
-                    height: 50,
-                    margin: { left: 60, right: 40, top: 40, bottom: 40 },
-                    circleRadius: 1.5,
-                } })
+                                            // Optional: horizontal line at log(1) = 1
+                                            const oneY = yScale(1)
+                                            node.append('line')
+                                                .attr('x1', 0)
+                                                .attr('x2', width)
+                                                .attr('y1', oneY)
+                                                .attr('y2', oneY)
+                                                .attr('stroke', 'gray')
+                                                .attr('stroke-dasharray', '2,2')
+                                                .attr('stroke-width', 1)
+                                        }
+                                    },
+                    tooltipChart: {
+                                        width: 150,
+                                        height: 50,
+                                        margin: { left: 60, right: 40, top: 40, bottom: 40 },
+                                        circleRadius: 1.5,
+                                    }
+                })
                 .build()
         </script>
     </body>

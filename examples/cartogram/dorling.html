@@ -18,8 +18,10 @@
                 .map('proportionalSymbol')
                 .title('Total GDP')
                 .subtitle('2024')
-                .psSettings({ shape: 'circle' })
-                .psSettings({ spikeWidth: 7 })
+                .psSettings({
+                    shape: 'circle',
+                    spikeWidth: 7
+                })
                 .nutsLevel(0)
                 .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',

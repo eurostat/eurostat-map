@@ -35,18 +35,22 @@
                 })
                 .sparkSettings({ type: 'bar' }) //line, area, bar
 
-                .sparkSettings({ lineWidth: 29 })
-                .sparkSettings({ lineHeight: 100 })
-                .sparkSettings({ lineStrokeWidth: 3 })
+                .sparkSettings({
+                    lineWidth: 29,
+                    lineHeight: 100,
+                    lineStrokeWidth: 3
+                })
 
                 // Color based on positive/negative values
-                .sparkSettings({ lineColor: (itemValue) => {
-                    if (itemValue > 0) return 'blue'
-                    if (itemValue < 0) return 'red'
-                    return '#777777'
-                } })
-                .sparkSettings({ lineOpacity: 0.8 })
-                .sparkSettings({ lineCircleRadius: 0 })
+                .sparkSettings({
+                    lineColor: (itemValue) => {
+                        if (itemValue > 0) return 'blue'
+                        if (itemValue < 0) return 'red'
+                        return '#777777'
+                    },
+                    lineOpacity: 0.8,
+                    lineCircleRadius: 0
+                })
                 //.sparkSettings({ lineOffsets: { x: -26, y: -15 } })
                 //.sparkSettings({ lineOffsets: { x: 0, y: 10 } })
                 // .sparkSettings({ tooltipChart: {

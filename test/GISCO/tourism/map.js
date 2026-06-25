@@ -436,10 +436,12 @@ function buildPropCircle(option) {
     .svgId("europe-template-map")
     .containerId("europe-template")
     .position({ x: 47e5, y: 342e4, z: 6800 })
-    .psSettings({ maxSize: 30 })
-    .psSettings({ minSize: 2 })
-    .psSettings({ minValue: 0.1 })
-    .psSettings({ maxValue: 24.6 }) // make sure all maps share the same size scale (same min and max values)
+    .psSettings({
+        maxSize: 30,
+        minSize: 2,
+        minValue: 0.1,
+        maxValue: 24.6
+    }) // make sure all maps share the same size scale (same min and max values)
     .psSettings({ fill: "#33A033" })
     .width(mapConfig.width)
     .height(mapConfig.height)

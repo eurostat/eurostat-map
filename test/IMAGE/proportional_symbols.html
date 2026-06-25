@@ -349,8 +349,10 @@
                 .height(mapHeight)
                 .psSettings({ shape: 'circle' })
                 .nutsLevel('mixed')
-                .psSettings({ minSize: 1 })
-                .psSettings({ maxSize: 10 })
+                .psSettings({
+                    minSize: 1,
+                    maxSize: 10
+                })
                 //.psSettings({ fillOpacity: 0.8 })
                 .legend({
                     //svgId: "eurostatmap-legend",

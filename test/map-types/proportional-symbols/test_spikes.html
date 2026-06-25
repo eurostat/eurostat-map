@@ -15,8 +15,10 @@
                 .map('proportionalSymbol')
                 .title('Spikes')
                 .subtitle('good for densely packed counts')
-                .psSettings({ shape: 'spike' })
-                .psSettings({ spikeWidth: 7 })
+                .psSettings({
+                    shape: 'spike',
+                    spikeWidth: 7
+                })
                 .nutsLevel('mixed')
                 .stat('symbolSize', {
                     eurostatDatasetCode: 'nama_10r_3gdp',
@@ -27,11 +29,13 @@
                 .nutsLevel(3)
                 .legend({ title: 'Million EUR', x: 550, y: 90, boxOpacity: 0, sizeLegend: { noData: true } })
                 .insets(false)
-                .psSettings({ stroke: 'white' })
-                .psSettings({ strokeWidth: 0.5 })
-                .psSettings({ sizeScale: 'linear' })
-                .psSettings({ minSize: 1 })
-                .psSettings({ maxSize: 60 }) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
+                .psSettings({
+                    stroke: 'white',
+                    strokeWidth: 0.5,
+                    sizeScale: 'linear',
+                    minSize: 1,
+                    maxSize: 60
+                }) // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
             map.statData('symbolSize').setData({
                 ES: 100000,

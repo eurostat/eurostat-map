@@ -22,25 +22,27 @@
                     dates: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
                     labels: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
                 })
-                .sparkSettings({ type: 'bar' })
-
-                .sparkSettings({ lineWidth: 30 })
-                .sparkSettings({ lineHeight: 80 })
-                .sparkSettings({ lineOffsets: { x: 0, y: 5 } })
-                .sparkSettings({ lineStrokeWidth: 3 })
-                .sparkSettings({ lineColor: '#c44a4a' })
+                .sparkSettings({
+                    type: 'bar',
+                    lineWidth: 30,
+                    lineHeight: 80,
+                    lineOffsets: { x: 0, y: 5 },
+                    lineStrokeWidth: 3,
+                    lineColor: '#c44a4a'
+                })
 
                 // Color based on positive/negative values
-                .sparkSettings({ lineColor: (itemValue) => {
-                    if (itemValue > 0) return 'blue'
-                    if (itemValue < 0) return 'red'
-                    return '#999'
-                } })
-                .sparkSettings({ lineOpacity: 0.8 })
-                .sparkSettings({ lineCircleRadius: 0 })
-
-                .sparkSettings({ lineOpacity: 0.7 })
-                .sparkSettings({ lineCircleRadius: 1 })
+                .sparkSettings({
+                    lineColor: (itemValue) => {
+                        if (itemValue > 0) return 'blue'
+                        if (itemValue < 0) return 'red'
+                        return '#999'
+                    },
+                    lineOpacity: 0.8,
+                    lineCircleRadius: 0,
+                    lineOpacity: 0.7,
+                    lineCircleRadius: 1
+                })
                 .legend({
                     title: 'GDP change (%)',
                     x: 0,

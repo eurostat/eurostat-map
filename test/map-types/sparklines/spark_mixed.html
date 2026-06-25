@@ -24,24 +24,26 @@
                     dates: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
                     labels: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
                 })
-                .sparkSettings({ type: 'line' })
-                .sparkSettings({ lineOffsets: { x: 10, y: -15 } })
-                .sparkSettings({ lineWidth: 24 })
-                .sparkSettings({ lineHeight: 16 })
-                .sparkSettings({ lineStrokeWidth: 1.2 })
-                .sparkSettings({ lineOpacity: 0.85 })
-                .sparkSettings({ lineColor: (itemValue) => {
-                    if (itemValue >= 12) return '#b91c1c'
-                    if (itemValue >= 8) return '#c2410c'
-                    if (itemValue >= 5) return '#0369a1'
-                    return '#0f766e'
-                } })
-                .sparkSettings({ tooltipChart: {
-                    width: 220,
-                    height: 120,
-                    margin: { left: 35, right: 10, top: 8, bottom: 45 },
-                    circleRadius: 1.5,
-                } })
+                .sparkSettings({
+                    type: 'line',
+                    lineOffsets: { x: 10, y: -15 },
+                    lineWidth: 24,
+                    lineHeight: 16,
+                    lineStrokeWidth: 1.2,
+                    lineOpacity: 0.85,
+                    lineColor: (itemValue) => {
+                                        if (itemValue >= 12) return '#b91c1c'
+                                        if (itemValue >= 8) return '#c2410c'
+                                        if (itemValue >= 5) return '#0369a1'
+                                        return '#0f766e'
+                                    },
+                    tooltipChart: {
+                                        width: 220,
+                                        height: 120,
+                                        margin: { left: 35, right: 10, top: 8, bottom: 45 },
+                                        circleRadius: 1.5,
+                                    }
+                })
                 .legend({
                     title: 'Unemployment rate (%)',
                     x: 10,

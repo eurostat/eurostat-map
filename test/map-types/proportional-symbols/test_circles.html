@@ -84,13 +84,15 @@
                         //values: [100, 300000],
                     },
                 })
-                .psSettings({ shape: 'circle' })
-                .psSettings({ minSize: 2 })
-                .psSettings({ maxSize: 45 })
-                .psSettings({ strokeWidth: 0.1 })
-                .psSettings({ stroke: 'white' })
-                .psSettings({ fillOpacity: 1 })
-                .psSettings({ strokeOpacity: 0.9 })
+                .psSettings({
+                    shape: 'circle',
+                    minSize: 2,
+                    maxSize: 45,
+                    strokeWidth: 0.1,
+                    stroke: 'white',
+                    fillOpacity: 1,
+                    strokeOpacity: 0.9
+                })
                 .zoomExtent([1, 10])
                 .insets('default')
                 .psSettings({ codeLabels: false })
