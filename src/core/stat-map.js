@@ -74,17 +74,230 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * map.stat('v2', { eurostatDatasetCode: 'dataset_b' })
      */
     out.stat_ = { default: undefined }
+    out.statChannels_ = {}
+    out.statMeta_ = out.statChannels_
+    out.encodings_ = {}
+
+    const isCategoricalStatConfig = function (config) {
+        return config && typeof config === 'object' && Array.isArray(config.categoryCodes)
+    }
+
+    const makeChannelStatKey = function (channel, code, prefix) {
+        if (prefix === '') return code
+        return `${prefix || channel}:${code}`
+    }
+
+    out._registerScalarCustomStat = function (key, config) {
+        const statData = StatisticalData.statData(config)
+        statData.setData(config.customData)
+        out.statData(key, statData)
+        delete out.stat_[key]
+        return out
+    }
+
+    out._registerCategoricalStatChannel = function (channel, config, options = {}) {
+        if (config.stat) {
+            config = { ...config.stat, ...config }
+            delete config.stat
+        }
+
+        const {
+            eurostatDatasetCode,
+            customData,
+            filters,
+            unitText,
+            transform,
+            categoryParameter,
+            categoryCodes,
+            categoryLabels,
+            categoryColors,
+            totalCode,
+        } = config
+
+        if (!categoryCodes?.length) {
+            console.error('categoryCodes array is required')
+            return out
+        }
+
+        const isPrimaryCategoricalChannel = channel === 'default' || channel === 'composition' || channel === 'height'
+        const statKeyPrefix = options.statKeyPrefix === undefined ? (isPrimaryCategoricalChannel ? '' : channel) : options.statKeyPrefix
+        const statKeys = {}
+
+        for (let i = 0; i < categoryCodes.length; i++) {
+            const code = categoryCodes[i]
+            const statKey = makeChannelStatKey(channel, code, statKeyPrefix)
+            statKeys[code] = statKey
+
+            if (customData && !eurostatDatasetCode) {
+                const statData = StatisticalData.statData({ code, unitText: unitText || 'Value', transform })
+                const regionData = {}
+                for (const regionId in customData) {
+                    const value = customData[regionId]?.[code]
+                    if (value !== undefined) regionData[regionId] = value
+                }
+                if (Object.keys(regionData).length > 0) statData.setData(regionData)
+                out.statData(statKey, statData)
+                delete out.stat_[statKey]
+            } else {
+                if (!eurostatDatasetCode) {
+                    console.error('eurostatDatasetCode is required')
+                    return out
+                }
+                if (!categoryParameter) {
+                    console.error('categoryParameter is required')
+                    return out
+                }
+                const baseFilters = filters ? { ...filters } : {}
+                out.stat_[statKey] = { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, [categoryParameter]: code } }
+            }
+
+            if (categoryColors?.[i]) {
+                out.catColors_ = out.catColors_ || {}
+                out.catColors_[code] = categoryColors[i]
+            }
+            if (categoryLabels?.[i]) {
+                out.catLabels_ = out.catLabels_ || {}
+                out.catLabels_[code] = categoryLabels[i]
+            }
+        }
+
+        out.statChannels_[channel] = {
+            name: channel,
+            categoryCodes,
+            statKeys,
+            categoryLabels,
+            categoryColors,
+            unitText,
+            totalCode,
+        }
+
+        if (options.setStatCodes !== false) out.statCodes_ = categoryCodes
+
+        if (options.totalCodeKey) {
+            if (totalCode) {
+                const totalStatKey = makeChannelStatKey(channel, totalCode, statKeyPrefix)
+                out[options.totalCodeKey] = totalStatKey
+                out.statChannels_[channel].totalStatKey = totalStatKey
+
+                if (customData && !eurostatDatasetCode) {
+                    const statData = StatisticalData.statData({ code: totalCode, unitText: unitText || 'Value', transform })
+                    const regionData = {}
+                    for (const regionId in customData) {
+                        let total = customData[regionId]?.[totalCode]
+                        if (total === undefined) {
+                            total = 0
+                            categoryCodes.forEach((c) => {
+                                const v = customData[regionId]?.[c]
+                                if (v !== undefined && !isNaN(v)) total += parseFloat(v)
+                            })
+                        }
+                        if (total > 0) regionData[regionId] = total
+                    }
+                    if (Object.keys(regionData).length > 0) statData.setData(regionData)
+                    out.statData(totalStatKey, statData)
+                    delete out.stat_[totalStatKey]
+                } else {
+                    const baseFilters = filters ? { ...filters } : {}
+                    out.stat_[totalStatKey] = {
+                        eurostatDatasetCode,
+                        unitText,
+                        transform,
+                        filters: { ...baseFilters, [categoryParameter]: totalCode },
+                    }
+                }
+            } else {
+                out[options.totalCodeKey] = undefined
+            }
+        }
+
+        return out
+    }
+
+    out.encoding = function (channel, config) {
+        if (!arguments.length) return out.encodings_
+
+        if (arguments.length === 1) {
+            if (typeof channel === 'string' || channel instanceof String) return out.encodings_[channel]
+            out.encodings_ = { ...out.encodings_, ...channel }
+            applyEncodingSideEffects(channel)
+            return out
+        }
+
+        out.encodings_[channel] = config
+        applyEncodingSideEffects({ [channel]: config })
+        return out
+    }
+
+    const applyEncodingSideEffects = function (encodings) {
+        const color = encodings?.color
+        if (!color) return
+
+        if (color.values) {
+            out.catColors_ = out.catColors_ || {}
+            if (Array.isArray(color.values)) {
+                const statName = color.stat || out.encoding('height')?.stat || out.encoding('composition')?.stat || 'composition'
+                const codes = color.categoryCodes || out.statMeta_[statName]?.categoryCodes || out.statCodes_ || []
+                codes.forEach((code, i) => {
+                    if (color.values[i] != null) out.catColors_[code] = color.values[i]
+                })
+            } else {
+                out.catColors_ = { ...out.catColors_, ...color.values }
+            }
+        }
+
+        if (color.labels) {
+            out.catLabels_ = out.catLabels_ || {}
+            if (Array.isArray(color.labels)) {
+                const statName = color.stat || out.encoding('height')?.stat || out.encoding('composition')?.stat || 'composition'
+                const codes = color.categoryCodes || out.statMeta_[statName]?.categoryCodes || out.statCodes_ || []
+                codes.forEach((code, i) => {
+                    if (color.labels[i] != null) out.catLabels_[code] = color.labels[i]
+                })
+            } else {
+                out.catLabels_ = { ...out.catLabels_, ...color.labels }
+            }
+        }
+    }
+
+    out.getEncodingStat = function (channel, fallback) {
+        return out.encodings_[channel]?.stat || fallback
+    }
+
+    out.getEncodingStatKey = function (channel, categoryCode, fallbackStat) {
+        const statName = out.getEncodingStat(channel, fallbackStat || channel)
+        if (!categoryCode) return statName
+        return out.statMeta_[statName]?.statKeys?.[categoryCode] || statName
+    }
+
+    out.getEncodingStatData = function (channel, categoryCode, fallbackStat) {
+        return out.statData(out.getEncodingStatKey(channel, categoryCode, fallbackStat))
+    }
+
+    out.getEncodingValue = function (channel, regionId, categoryCode, fallbackStat) {
+        const entry = out.getEncodingStatData(channel, categoryCode, fallbackStat)?.get(regionId)
+        return entry?.value
+    }
+
+    out.getEncodingUnitText = function (channel, categoryCode, fallbackStat) {
+        const statData = out.getEncodingStatData(channel, categoryCode, fallbackStat)
+        return statData?.unitText?.() || out.encodings_[channel]?.unitText || ''
+    }
+
     out.stat = function (k, v) {
         //no argument: getter - return the default stat
         if (!arguments.length) return out.stat_['default']
         //two arguments: setter - set the config k with value v
         if (arguments.length == 2) {
+            if (isCategoricalStatConfig(v)) return out._registerCategoricalStatChannel(k, v)
+            if (v?.customData) return out._registerScalarCustomStat(k, v)
             out.stat_[k] = v
             return out
         }
         //one string argument: getter - return the config k
         if (typeof k === 'string' || k instanceof String) return out.stat_[k]
         //one non-string argument: setter - set the entire dictionnary
+        if (isCategoricalStatConfig(k)) return out._registerCategoricalStatChannel('default', k)
+        if (k?.customData) return out._registerScalarCustomStat('default', k)
         out.stat_ = k.default ? k : { default: k }
         return out
     }
@@ -466,7 +679,10 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.updateStatValues = function () {
         if (out.gridCartogram_ && out._gridCartogramNeedsStatFilterRefresh_) {
             out._gridCartogramNeedsStatFilterRefresh_ = false
-            out.svg().select('#em-zoom-group-' + out.svgId_).selectAll('*').remove()
+            out.svg()
+                .select('#em-zoom-group-' + out.svgId_)
+                .selectAll('*')
+                .remove()
             buildGridCartogramBase(out)
         }
 

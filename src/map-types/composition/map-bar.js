@@ -80,6 +80,8 @@ export const map = function (config) {
         maxWidth: 40,
         height: 8,
         groupWidth: undefined, // defaults to cell width ÷ number of categories at render time
+        groupMinWidth: 2,
+        groupMaxWidth: undefined,
         groupGap: 0,
         groupMinHeight: 2,
         groupMaxHeight: 40,
@@ -102,7 +104,9 @@ export const map = function (config) {
 
     // ── Internal ──────────────────────────────────────────────────────────────
     out.classifierSize_ = null
+    out.classifierWidth_ = null
     out._groupedMaxCatValue = 1
+    out._groupedMaxWidthValue = 1
     out.barTotalCode_ = undefined
     out.statCodes_ = undefined
 
@@ -126,6 +130,58 @@ export const map = function (config) {
     const _getAnchors = (map) =>
         map.gridCartogram_ ? map.svg().selectAll('#em-grid-container .em-grid-cell') : getCentroidsGroup(map).selectAll('g.em-centroid')
 
+    function _getPrimaryCategoricalStatName() {
+        return (
+            out.encoding('height')?.stat ||
+            out.encoding('composition')?.stat ||
+            (out.statMeta_?.height ? 'height' : undefined) ||
+            (out.statMeta_?.composition ? 'composition' : undefined) ||
+            Object.keys(out.statMeta_ || {})[0]
+        )
+    }
+
+    function _getCategoryCodes() {
+        const statName = _getPrimaryCategoricalStatName()
+        return out.statMeta_?.[statName]?.categoryCodes || out.statCodes_
+    }
+
+    function _getCategoryColor(code) {
+        const colorEncoding = out.encoding('color')
+        if (colorEncoding?.values) {
+            if (Array.isArray(colorEncoding.values)) {
+                const codes = colorEncoding.categoryCodes || _getCategoryCodes() || []
+                const index = codes.indexOf(code)
+                if (index >= 0 && colorEncoding.values[index] != null) return colorEncoding.values[index]
+            } else if (colorEncoding.values[code] != null) {
+                return colorEncoding.values[code]
+            }
+        }
+        return out.catColors_?.[code] || 'lightgray'
+    }
+
+    function _getCategoryLabel(code) {
+        const colorEncoding = out.encoding('color')
+        if (colorEncoding?.labels) {
+            if (Array.isArray(colorEncoding.labels)) {
+                const codes = colorEncoding.categoryCodes || _getCategoryCodes() || []
+                const index = codes.indexOf(code)
+                if (index >= 0 && colorEncoding.labels[index] != null) return colorEncoding.labels[index]
+            } else if (colorEncoding.labels[code] != null) {
+                return colorEncoding.labels[code]
+            }
+        }
+        return out.catLabels_?.[code] || code
+    }
+
+    function _hasGroupedData(regionId) {
+        const codes = _getCategoryCodes()
+        return !!codes?.some((code) => _getHeightValue(regionId, code) > 0)
+    }
+
+    function _getGroupedPresenceValue(regionId) {
+        return _hasGroupedData(regionId) ? 1 : undefined
+    }
+
     // ── statBar config method ────────────────────────────────────────────────
 
     out.statBar = buildStatCompositionMethod(out, 'barTotalCode_')
@@ -143,6 +199,7 @@ export const map = function (config) {
                 executeForAllInsets(out.insetTemplates_, out.svgId_, computeGroupedClassifier)
             }
             computeGroupedClassifier()
+            computeGroupedWidthClassifier()
         } else {
             // Stacked mode: classifier maps region total → total bar width (unchanged).
             if (out.insetTemplates_) {
@@ -170,8 +227,50 @@ export const map = function (config) {
         return Math.max(1, (bbox.width - Math.max(0, n - 1) * gap) / n)
     }
 
+    function _hasWidthChannel() {
+        const widthStat = out.encoding('width')?.stat
+        return !!widthStat || !!out.statMeta_?.width || !!out.statData('width')?.hasData?.()
+    }
+
+    function _getChannelStatKey(channel, code) {
+        const fallbackStat = channel === 'height' ? _getPrimaryCategoricalStatName() : channel
+        return out.getEncodingStatKey(channel, code, fallbackStat)
+    }
+
+    function _getHeightValue(regionId, code) {
+        const value = out.getEncodingValue('height', regionId, code, _getPrimaryCategoricalStatName())
+        return value != null && !isNaN(value) && value !== ':' ? +value : 0
+    }
+
+    function _getWidthValue(regionId, code) {
+        const widthStat = out.getEncodingStat('width', 'width')
+        const categoryCode = out.statMeta_?.[widthStat]?.statKeys ? code : undefined
+        const value = out.getEncodingValue('width', regionId, categoryCode, 'width')
+        return value != null && !isNaN(value) && value !== ':' ? +value : 0
+    }
+
+    function _effectiveGroupMaxWidth(n, bbox) {
+        const settings = getResponsiveBarSettings()
+        if (settings.groupMaxWidth != null) return settings.groupMaxWidth
+        if (!bbox || !n) return settings.groupWidth || 9
+        const gap = settings.groupGap
+        return Math.max(1, (bbox.width - Math.max(0, n - 1) * gap) / n)
+    }
+
+    function _resolvedVariableGroupWidth(rawValue, n, bbox) {
+        if (!_hasWidthChannel()) return _resolvedGroupWidth(n, bbox)
+        if (rawValue <= 0) return 0
+
+        const settings = getResponsiveBarSettings()
+        const widthRange = out.encoding('width')?.range
+        const maxWidth = widthRange?.[1] ?? _effectiveGroupMaxWidth(n, bbox)
+        const minWidth = Math.min(widthRange?.[0] ?? settings.groupMinWidth, maxWidth)
+        const width = out.classifierWidth_ ? out.classifierWidth_(rawValue) : maxWidth
+        return Math.min(maxWidth, Math.max(minWidth, width))
+    }
+
     function _effectiveGroupMaxHeight(bbox) {
-        const configuredMaxHeight = getResponsiveBarSettings().groupMaxHeight
+        const configuredMaxHeight = out.encoding('height')?.range?.[1] ?? getResponsiveBarSettings().groupMaxHeight
         if (!out.gridCartogram_ || !bbox) return configuredMaxHeight
         return Math.max(0, Math.min(configuredMaxHeight, bbox.height))
     }
@@ -182,7 +281,7 @@ export const map = function (config) {
         const maxHeight = _effectiveGroupMaxHeight(bbox)
         if (maxHeight <= 0) return 0
 
-        const minHeight = Math.min(getResponsiveBarSettings().groupMinHeight, maxHeight)
+        const minHeight = Math.min(out.encoding('height')?.range?.[0] ?? getResponsiveBarSettings().groupMinHeight, maxHeight)
         if (!out.gridCartogram_ || !bbox) {
             return Math.min(maxHeight, Math.max(minHeight, out.classifierSize_(rawValue)))
         }
@@ -205,17 +304,16 @@ export const map = function (config) {
      * barGroupMaxHeight. This ensures bars are comparable across regions.
      */
     function computeGroupedClassifier() {
-        if (!out.statCodes_) return
+        const codes = _getCategoryCodes()
+        if (!codes) return
 
         let maxCatValue = out.barSettings_.groupMaxValue || 0
 
         _getAnchors(out).each(function (rg) {
             const id = rg.properties.id
-            for (const code of out.statCodes_) {
-                const s = out.statData(code)?.get(id)
-                if (s && s.value != null && !isNaN(s.value)) {
-                    maxCatValue = Math.max(maxCatValue, s.value)
-                }
+            for (const code of codes) {
+                const value = _getHeightValue(id, code)
+                if (value) maxCatValue = Math.max(maxCatValue, value)
             }
         })
 
@@ -231,7 +329,37 @@ export const map = function (config) {
         if (maxCatValue === 0) maxCatValue = 1 // guard against empty data
 
         out._groupedMaxCatValue = maxCatValue
-        out.classifierSize_ = scaleLinear().domain([0, maxCatValue]).range([0, getResponsiveBarSettings().groupMaxHeight]).clamp(true)
+        out.classifierSize_ = scaleLinear()
+            .domain([0, maxCatValue])
+            .range([0, out.encoding('height')?.range?.[1] ?? getResponsiveBarSettings().groupMaxHeight])
+            .clamp(true)
+    }
+
+    function computeGroupedWidthClassifier() {
+        out.classifierWidth_ = null
+        const codes = _getCategoryCodes()
+        if (!_hasWidthChannel() || !codes) return
+
+        let maxWidthValue = out.barSettings_.groupMaxWidthValue || 0
+
+        _getAnchors(out).each(function (rg) {
+            const id = rg.properties.id
+            const widthStat = out.getEncodingStat('width', 'width')
+            if (out.statMeta_?.[widthStat]?.statKeys) {
+                for (const code of codes) {
+                    maxWidthValue = Math.max(maxWidthValue, _getWidthValue(id, code))
+                }
+            } else {
+                maxWidthValue = Math.max(maxWidthValue, _getWidthValue(id))
+            }
+        })
+
+        if (maxWidthValue === 0) maxWidthValue = 1
+
+        const settings = getResponsiveBarSettings()
+        const maxWidth = out.encoding('width')?.range?.[1] ?? settings.groupMaxWidth ?? settings.groupWidth ?? 9
+        out._groupedMaxWidthValue = maxWidthValue
+        out.classifierWidth_ = scaleLinear().domain([0, maxWidthValue]).range([0, maxWidth]).clamp(true)
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -273,16 +401,21 @@ export const map = function (config) {
      */
     function _getDorlingRadius(regionId) {
         if (out.barSettings_.type === 'grouped') {
-            const n = out.statCodes_?.length || 1
-            return _groupFootprintWidth(n, null) / 2
+            const n = _getCategoryCodes()?.length || 1
+            return _groupFootprintWidth(n, null, regionId) / 2
         }
         const total = _getRegionTotal(regionId) || 0
         return total ? out.classifierSize_(total) / 2 : 0
     }
 
     /** Total pixel width of a grouped bar cluster for n categories. */
-    function _groupFootprintWidth(n, bbox = null) {
+    function _groupFootprintWidth(n, bbox = null, regionId = null) {
         const settings = getResponsiveBarSettings()
+        const codes = _getCategoryCodes()
+        if (_hasWidthChannel() && regionId && codes?.length) {
+            const widths = codes.map((code) => _resolvedVariableGroupWidth(_getWidthValue(regionId, code), n, bbox))
+            return widths.reduce((sum, width) => sum + width, 0) + Math.max(0, n - 1) * settings.groupGap
+        }
         const bw = _resolvedGroupWidth(n, bbox)
         return n * bw + Math.max(0, n - 1) * settings.groupGap
     }
@@ -310,13 +443,13 @@ export const map = function (config) {
 
             applyCompositionRegionDataFill(
                 regions,
-                _getComposition,
+                out.barSettings_.type === 'grouped' ? _hasGroupedData : _getComposition,
                 (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'barTotalCode_'),
                 out.noDataFillStyle()
             )
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {
-                styleMixedNUTSRegions(map, regions, _getComposition)
+                styleMixedNUTSRegions(map, regions, out.barSettings_.type === 'grouped' ? _hasGroupedData : _getComposition)
             }
 
             if (out.barSettings_.type === 'grouped') {
@@ -350,7 +483,7 @@ export const map = function (config) {
         addMouseEventsToGridCartogram(
             out,
             '.barchart',
-            _getRegionTotal,
+            out.barSettings_.type === 'grouped' ? _getGroupedPresenceValue : _getRegionTotal,
             (chart) => chart.style('stroke-width', settings.strokeWidth + 1).style('stroke', 'black'),
             (chart) => chart.style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
         )
@@ -374,7 +507,7 @@ export const map = function (config) {
             const segWidth = i === codes.length - 1 ? totalWidth - x : Math.max(0, comp[code] * totalWidth)
 
             if (segWidth > 0) {
-                segments.push({ x, width: segWidth, code, color: out.catColors_[code] || 'lightgray' })
+                segments.push({ x, width: segWidth, code, color: _getCategoryColor(code) })
                 x += segWidth
             }
         }
@@ -516,30 +649,34 @@ export const map = function (config) {
      */
     function buildGroupedSegments(regionId, bbox) {
         const settings = getResponsiveBarSettings()
-        const codes = out.statCodes_
+        const codes = _getCategoryCodes()
         if (!codes?.length) return null
 
         const segments = []
         const n = codes.length
-        const bw = _resolvedGroupWidth(n, bbox) // ← was: out.barSettings_.groupWidth
         const gap = settings.groupGap
-        const totalGroupWidth = n * bw + Math.max(0, n - 1) * gap
+        const widths = codes.map((code) => _resolvedVariableGroupWidth(_getWidthValue(regionId, code), n, bbox))
+        const totalGroupWidth = widths.reduce((sum, width) => sum + width, 0) + Math.max(0, n - 1) * gap
         const startX = -totalGroupWidth / 2
+        let x = startX
 
         for (let i = 0; i < n; i++) {
             const code = codes[i]
-            const s = out.statData(code)?.get(regionId)
-            const rawValue = s?.value != null && !isNaN(s.value) ? s.value : 0
+            const rawValue = _getHeightValue(regionId, code)
+            const rawWidthValue = _getWidthValue(regionId, code)
             const barHeight = _resolvedGroupHeight(rawValue, bbox)
+            const barWidth = widths[i]
 
             segments.push({
-                x: startX + i * (bw + gap),
-                width: bw,
+                x,
+                width: barWidth,
                 height: barHeight,
                 code,
-                color: out.catColors_[code] || 'lightgray',
+                color: _getCategoryColor(code),
                 rawValue,
+                rawWidthValue,
             })
+            x += barWidth + gap
         }
 
         return segments.some((s) => s.rawValue > 0) ? segments : null
@@ -654,14 +791,13 @@ export const map = function (config) {
             map,
             getAnchors: _getAnchors,
             getRadius: (regionId) => {
-                const codes = out.statCodes_
+                const codes = _getCategoryCodes()
                 if (!codes?.length) return 0
                 let maxH = 0
                 const node = out.svg().select('#bar_' + regionId)
                 const bbox = node.empty() ? null : _getGridCellShapeBBox(node)
                 for (const code of codes) {
-                    const s = out.statData(code)?.get(regionId)
-                    const rawValue = s?.value != null && !isNaN(s.value) ? s.value : 0
+                    const rawValue = _getHeightValue(regionId, code)
                     const barHeight = _resolvedGroupHeight(rawValue, bbox)
                     maxH = Math.max(maxH, barHeight)
                 }
@@ -682,6 +818,9 @@ export const map = function (config) {
             maxWidth: getResponsiveSymbolSize(out.barSettings_.maxWidth, 6),
             height: getResponsiveSymbolSize(out.barSettings_.height, 2),
             groupWidth: out.barSettings_.groupWidth == null ? out.barSettings_.groupWidth : getResponsiveSymbolSize(out.barSettings_.groupWidth, 1),
+            groupMinWidth: getResponsiveSymbolSize(out.barSettings_.groupMinWidth, 1),
+            groupMaxWidth:
+                out.barSettings_.groupMaxWidth == null ? out.barSettings_.groupMaxWidth : getResponsiveSymbolSize(out.barSettings_.groupMaxWidth, 2),
             groupGap: getResponsiveSymbolSize(out.barSettings_.groupGap, 0),
             groupMinHeight: getResponsiveSymbolSize(out.barSettings_.groupMinHeight, 1),
             groupMaxHeight: getResponsiveSymbolSize(out.barSettings_.groupMaxHeight, 6),
@@ -739,14 +878,13 @@ export const map = function (config) {
      */
     function buildGroupedTooltipHTML(regionId) {
         const settings = getResponsiveBarSettings()
-        const codes = out.statCodes_
+        const codes = _getCategoryCodes()
         if (!codes?.length) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
         // Find if we have any valid data for this region
         let hasData = false
         codes.forEach((code) => {
-            const s = out.statData(code)?.get(regionId)
-            if (s?.value != null && !isNaN(s.value) && s.value !== ':') hasData = true
+            if (_getHeightValue(regionId, code) > 0) hasData = true
         })
         if (!hasData) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
@@ -759,21 +897,29 @@ export const map = function (config) {
         const bottomPad = valueLabelRows * valueLabelRowHeight + 4
         const svgH = maxH + bottomPad + 4
 
-        // Derive bar width from the fixed svg width, same logic as _resolvedGroupWidth
         const n = codes.length
-        const bw = Math.max(1, (svgW - Math.max(0, n - 1) * gap) / n)
-        const totalW = n * bw + Math.max(0, n - 1) * gap
+        const maxTooltipBarWidth = Math.max(1, (svgW - Math.max(0, n - 1) * gap) / n)
+        const minTooltipBarWidth = Math.min(settings.groupMinWidth || 2, maxTooltipBarWidth)
+        const widths = codes.map((code) => {
+            if (!_hasWidthChannel()) return maxTooltipBarWidth
+            const rawWidthValue = _getWidthValue(regionId, code)
+            if (rawWidthValue <= 0) return 0
+            const scaled = (rawWidthValue / (out._groupedMaxWidthValue || 1)) * maxTooltipBarWidth
+            return Math.min(maxTooltipBarWidth, Math.max(minTooltipBarWidth, scaled))
+        })
+        const totalW = widths.reduce((sum, width) => sum + width, 0) + Math.max(0, n - 1) * gap
         const offsetX = (svgW - totalW) / 2
 
         let bars = ''
         const lastLabelRightByRow = Array(valueLabelRows).fill(-Infinity)
+        let currentX = offsetX
         codes.forEach((code, i) => {
-            const s = out.statData(code)?.get(regionId)
-            const rawVal = s?.value != null && !isNaN(s.value) && s.value !== ':' ? s.value : 0
+            const rawVal = _getHeightValue(regionId, code)
             const barH = Math.max(rawVal > 0 ? settings.groupMinHeight : 0, out.classifierSize_(rawVal))
-            const x = offsetX + i * (bw + gap)
-            const color = out.catColors_?.[code] || 'lightgray'
-            const label = out.catLabels_?.[code] || code
+            const bw = widths[i]
+            const x = currentX
+            const color = _getCategoryColor(code)
+            const label = _getCategoryLabel(code)
             const fullValStr = formatRawValue(rawVal)
             const valStr = formatRawValue(rawVal)
             const centerX = x + bw / 2
@@ -801,6 +947,7 @@ export const map = function (config) {
                title="${label}: ${fullValStr}">${valStr}</text>`
                 : ''
         }`
+            currentX += bw + gap
         })
 
         return `

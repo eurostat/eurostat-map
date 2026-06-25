@@ -441,7 +441,7 @@ export const applyCompositionRegionDataFill = function (regions, getCompositionF
  *   When null, any `totalCode` in config is silently ignored.
  * @returns {Function} The configuration method to attach as `out.statPie` / `out.statWaffle` / etc.
  */
-export const buildStatCompositionMethod = function (out, totalCodeKey) {
+export const buildStatCompositionMethod = function (out, totalCodeKey, channel = 'composition') {
     return function (config, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode) {
         // ── Backwards compat: positional arguments ───────────────────────────
         // Old API: .statBar(statConfig, categoryParameter, categoryCodes, labels, colors, totalCode)
@@ -463,138 +463,7 @@ export const buildStatCompositionMethod = function (out, totalCodeKey) {
             delete config.stat
         }
 
-        const {
-            eurostatDatasetCode,
-            customData,
-            filters,
-            unitText,
-            transform,
-            categoryParameter: cp,
-            categoryCodes: cc,
-            categoryLabels: cl,
-            categoryColors: ccol,
-            totalCode: tc,
-        } = config
-        // Resolve after normalisation so all three call paths produce the same names
-        ;[categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode] = [cp, cc, cl, ccol, tc]
-
-        if (!categoryCodes?.length) {
-            console.error('categoryCodes array is required')
-            return out
-        }
-
-        // ── Custom Data Path ─────────────────────────────────────────────────
-        if (customData && !eurostatDatasetCode) {
-            // Register stub stat configs (no API call) and set colors/labels
-            for (let i = 0; i < categoryCodes.length; i++) {
-                const code = categoryCodes[i]
-                out.stat(code, { code, unitText: unitText || 'Value' })
-
-                if (categoryColors?.[i]) {
-                    out.catColors_ = out.catColors_ || {}
-                    out.catColors_[code] = categoryColors[i]
-                }
-                if (categoryLabels?.[i]) {
-                    out.catLabels_ = out.catLabels_ || {}
-                    out.catLabels_[code] = categoryLabels[i]
-                }
-            }
-
-            out.statCodes_ = categoryCodes
-
-            if (totalCodeKey) {
-                if (totalCode) {
-                    out[totalCodeKey] = totalCode
-                    out.stat(totalCode, { code: totalCode, unitText: unitText || 'Value' })
-                } else {
-                    out[totalCodeKey] = undefined
-                }
-            }
-
-            // Inject region data into statData after build
-            out._injectCustomData = function () {
-                categoryCodes.forEach((code) => {
-                    const regionData = {}
-                    for (const regionId in customData) {
-                        const value = customData[regionId]?.[code]
-                        if (value !== undefined) regionData[regionId] = value
-                    }
-                    if (Object.keys(regionData).length > 0) {
-                        out.statData(code).setData(regionData)
-                    }
-                })
-
-                if (totalCodeKey && totalCode) {
-                    const regionData = {}
-                    for (const regionId in customData) {
-                        let total = customData[regionId]?.[totalCode]
-                        if (total === undefined) {
-                            // Auto-calculate from categories
-                            total = 0
-                            categoryCodes.forEach((c) => {
-                                const v = customData[regionId]?.[c]
-                                if (v !== undefined && !isNaN(v)) total += parseFloat(v)
-                            })
-                        }
-                        if (total > 0) regionData[regionId] = total
-                    }
-                    if (Object.keys(regionData).length > 0) {
-                        out.statData(totalCode).setData(regionData)
-                    }
-                }
-
-                out.updateStatValues()
-            }
-
-            const originalBuild = out.build
-            out.build = function () {
-                const result = originalBuild.call(out)
-                out._injectCustomData()
-                return result
-            }
-
-            return out
-        }
-
-        // ── Eurostat Data Path ────────────────────────────────────────────────
-        if (!eurostatDatasetCode) {
-            console.error('eurostatDatasetCode is required')
-            return out
-        }
-        if (!categoryParameter) {
-            console.error('categoryParameter is required')
-            return out
-        }
-
-        const baseFilters = filters ? { ...filters } : {}
-
-        for (let i = 0; i < categoryCodes.length; i++) {
-            const code = categoryCodes[i]
-            out.stat(code, { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, [categoryParameter]: code } })
-
-            if (categoryColors?.[i]) {
-                out.catColors_ = out.catColors_ || {}
-                out.catColors_[code] = categoryColors[i]
-            }
-            if (categoryLabels?.[i]) {
-                out.catLabels_ = out.catLabels_ || {}
-                out.catLabels_[code] = categoryLabels[i]
-            }
-        }
-
-        out.statCodes_ = categoryCodes
-
-        // totalCode only applies when the map type supports it (totalCodeKey !== null)
-        if (totalCodeKey) {
-            if (totalCode) {
-                out[totalCodeKey] = totalCode
-                out.stat(totalCode, { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, [categoryParameter]: totalCode } })
-            } else {
-                out[totalCodeKey] = undefined
-            }
-        }
-
-        return out
+        return out._registerCategoricalStatChannel(channel, config, { statKeyPrefix: '', totalCodeKey })
     }
 }
 

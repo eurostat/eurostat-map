@@ -3,6 +3,8 @@
  * Pass this to map.stat() or as the config argument to statData().
  */
 export interface StatConfig {
+    /** Custom data keyed by region ID. Use instead of a remote data source. */
+    customData?: Record<string, number | string | { value: number | string; status?: string }>
     /** Eurostat dataset code. e.g. 'demo_r_d3dens' */
     eurostatDatasetCode?: string
     /**

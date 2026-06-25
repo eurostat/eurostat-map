@@ -148,8 +148,16 @@ export const refreshCentroids = function (map) {
 export const centroidHasStatData = function (id, map) {
     //TODO: statCodes_ is only for coxcomb and pie maps, ps maps should also be contemplated here
     if (!map.statCodes_) return true // if no data yet, keep everything
+    const statName =
+        map.encoding?.('height')?.stat ||
+        map.encoding?.('composition')?.stat ||
+        (map.statMeta_?.height ? 'height' : undefined) ||
+        (map.statMeta_?.composition ? 'composition' : undefined) ||
+        Object.keys(map.statMeta_ || {})[0]
+
     return map.statCodes_.some((code) => {
-        const s = map.statData(code)?.get(id)
+        const statKey = map.statMeta_?.[statName]?.statKeys?.[code] || code
+        const s = map.statData(statKey)?.get(id)
         return s && !isNaN(s.value) && s.value !== 0
     })
 }

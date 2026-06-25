@@ -36,6 +36,9 @@ export interface BarMap extends MapInstance {
     barGroupWidth(): number
     barGroupWidth(v: number): this
 
+    barSettings(): any
+    barSettings(v: any): this
+
     barGroupGap(): number
     barGroupGap(v: number): this
 

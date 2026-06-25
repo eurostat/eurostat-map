@@ -23,6 +23,28 @@ export interface BarMapConfig extends MapConfig {
     barHeight?: number
     /** Bar group width. */
     barGroupWidth?: number
+    /** Grouped bar settings object. */
+    barSettings?: {
+        type?: 'stacked' | 'grouped'
+        minWidth?: number
+        maxWidth?: number
+        height?: number
+        groupWidth?: number
+        groupMinWidth?: number
+        groupMaxWidth?: number
+        groupGap?: number
+        groupMinHeight?: number
+        groupMaxHeight?: number
+        groupMaxValue?: number
+        groupMaxWidthValue?: number
+        strokeFill?: string
+        strokeWidth?: number
+        cornerRadius?: number
+        otherColor?: string
+        otherText?: string
+        tooltipWidth?: number
+        tooltipHeight?: number
+    }
     /** Bar group gap. */
     barGroupGap?: number
     /** Bar group min height. */

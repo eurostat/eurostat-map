@@ -1,5 +1,6 @@
 import type { StatConfig } from './stat/StatConfig'
 import type { StatData } from './stat/StatData'
+import type { CompositionStatConfig } from '../map-types/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
@@ -7,6 +8,7 @@ import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
 import type { GridCartogramSettings } from './GridCartogramSettings'
 import type { DorlingSettings } from './DorlingSettings'
 import type { ScalebarConfig } from './decoration/ScalebarConfig'
+import type { EncodingConfig } from './encoding/EncodingConfig'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -118,9 +120,18 @@ export interface MapInstance {
      * @example map.stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } })
      */
     stat(): StatConfig
-    stat(config: StatConfig): this
+    stat(config: StatConfig | CompositionStatConfig): this
     stat(key: string): StatConfig
-    stat(key: string, config: StatConfig): this
+    stat(key: string, config: StatConfig | CompositionStatConfig): this
+
+    /**
+     * Get or set visual encodings that map named stats to visual variables.
+     * @example map.encoding('size', { stat: 'population', scale: 'sqrt', range: [4, 30] })
+     */
+    encoding(): Record<string, EncodingConfig>
+    encoding(channel: string): EncodingConfig | undefined
+    encoding(channel: string, config: EncodingConfig): this
+    encoding(configs: Record<string, EncodingConfig>): this
 
     /**
      * Get or set the StatData instance for a given key.

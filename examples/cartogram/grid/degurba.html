@@ -152,8 +152,9 @@
                 isCartogram = useCartogram
 
                 // Fetch the data
-                const response = await fetch(config.data)
+                const [response, populationResponse] = await Promise.all([fetch(config.data), fetch('data/degurba/population.json')])
                 const data = await response.json()
+                const populationData = await populationResponse.json()
 
                 // Remove existing map if it exists
                 if (map) {
@@ -194,12 +195,39 @@
                     .svgId('bar')
                     .scale('60M')
                     .nutsLevel(0)
-                    .statBar({
+                    .stat('degurbaRate', {
                         customData: data,
                         categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
-                        categoryLabels: ['Cities', 'Towns and suburbs', 'Rural areas'],
-                        categoryColors: ['#33A033', '#8F741A', '#E04040'],
                         unitText: config.unitText,
+                    })
+                    .stat('degurbaPop', {
+                        customData: populationData,
+                        categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
+                        unitText: 'inhabitants',
+                    })
+                    .encoding('height', {
+                        stat: 'degurbaRate',
+                        scale: 'linear',
+                        range: [2, GROUP_MAX_HEIGHT],
+                    })
+                    .encoding('width', {
+                        stat: 'degurbaPop',
+                        scale: 'linear',
+                        range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
+                    })
+                    .encoding('color', {
+                        stat: 'degurbaRate',
+                        by: 'category',
+                        values: {
+                            DEG1: '#33A033',
+                            DEG2: '#8F741A',
+                            DEG3: '#E04040',
+                        },
+                        labels: {
+                            DEG1: 'Cities',
+                            DEG2: 'Towns and suburbs',
+                            DEG3: 'Rural areas',
+                        },
                     })
                     .barSettings({
                         //type: 'grouped',
