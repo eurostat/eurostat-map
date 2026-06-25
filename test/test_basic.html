@@ -12,11 +12,15 @@
         <script>
             const map = eurostatmap
                 .map('choropleth')
-                .nutsLevel(2)
-                .title('basic test')
-                .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
-                .encoding('fill', { stat: 'value' })
-                .zoomExtent([1, 1000])
+                .title('Population density in Europe')
+                // define statistical dataset
+                .stat('population-density', {
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                })
+                // encode dataset into visual variable(s)
+                .encoding('fill', { stat: 'population-density', scale: 'quantile', classes: 7 })
+                .legend({ position: 'top right', title: 'Density, people/km²' })
                 .build()
         </script>
     </body>

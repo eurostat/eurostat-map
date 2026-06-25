@@ -91,13 +91,42 @@ or
 then
 
 ```javascript
-eurostatmap
+const map = eurostatmap
     .map('choropleth')
     .title('Population density in Europe')
-    .stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
-    .legend({ x: 500, y: 180, title: 'Density, people/km²' })
+    // define statistical dataset
+    .stat('population-density', {
+        eurostatDatasetCode: 'demo_r_d3dens',
+        unitText: 'people/km²',
+    })
+    // encode dataset into visual variable(s)
+    .encoding('fill', { stat: 'population-density', scale: 'quantile', classes: 7 })
+    .legend({ position: 'top right', title: 'Density, people/km²' })
     .build()
 ```
+
+For multivariate maps, you can use data-driven visual variables like so:
+
+```javascript
+const map = eurostatmap
+    .map('proportionalSymbol')
+    .nutsLevel(1)
+    .stat('population', {
+        eurostatDatasetCode: 'demo_r_pjangrp3',
+        filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2023' },
+        unitText: 'inhabitants',
+    })
+    .stat('gdpPerCapita', {
+        eurostatDatasetCode: 'nama_10r_3gdp',
+        filters: { unit: 'EUR_HAB', time: '2023' },
+        unitText: 'EUR/inhabitant',
+    })
+    .encoding('size', { stat: 'population', scale: 'sqrt', range: [5, 30] })
+    .encoding('color', { stat: 'gdpPerCapita', scale: 'quantile', classes: 5 })
+    .build()
+```
+
+Legacy patterns such as `stat({...})` for single-dataset maps or channel-named datasets (`stat('size', ...)`, `stat('color', ...)`) remain supported for backward compatibility.
 
 Want a guided setup? Try the notebook:
 https://observablehq.com/@joewdavies/eurostat-map-js
