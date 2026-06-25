@@ -21,11 +21,6 @@ export interface PieMap extends MapInstance {
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
 
-    pieSettings(): {
-        innerRadius?: number
-    }
-    pieSettings(v: { innerRadius?: number }): this
-
     compositionSettings(): {
         type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'
         /** Radar wedge radius mode: share within symbol (default) or absolute values across map. */

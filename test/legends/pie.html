@@ -41,9 +41,7 @@
                     totalCode: 'C0000', //code for the total (all causes of death)
                 })
                 .encoding('composition', { stat: 'composition' })
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
-                .pieMinRadius(6)
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other', minSize: 6 })
 
                 .legend({
                     x: 480,

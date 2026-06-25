@@ -42,9 +42,6 @@ export const map = function (config) {
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
 
-    out.pieSettings_ = {
-        innerRadius: 0,
-    }
     out.compositionSettings_ = {
         type: 'pie',
         minSize: 5,
@@ -58,6 +55,7 @@ export const map = function (config) {
         agePyramidHeightFactor: 1,
         otherColor: '#FFCC80',
         otherText: 'Other',
+        innerRadius: 0,
     }
 
     out.catColors_ = undefined
@@ -122,14 +120,7 @@ export const map = function (config) {
         const settings = getResponsiveCompositionSettings()
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, (map) =>
-                applyClassificationToMap(
-                    map,
-                    out,
-                    _getAnchors,
-                    'compositionTotalCode_',
-                    settings.minSize,
-                    settings.maxSize
-                )
+                applyClassificationToMap(map, out, _getAnchors, 'compositionTotalCode_', settings.minSize, settings.maxSize)
             )
         }
         applyClassificationToMap(out, out, _getAnchors, 'compositionTotalCode_', settings.minSize, settings.maxSize)

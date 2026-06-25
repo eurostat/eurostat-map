@@ -25,10 +25,7 @@
                 .nutsLevel('mixed')
                 .geoCenter([5000000, 3500000])
                 .zoomExtent([1, 100])
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
-                .pieMaxRadius(20)
-                .pieMinRadius(2)
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other', maxSize: 20, minSize: 2 })
                 .catLabels(Object.fromEntries(Object.entries(pieStats).map(([key, value]) => [key, value.name])))
                 .insets('default')
                 .insetBoxPosition([10, 100])
@@ -65,7 +62,7 @@
                 code: 'C0000',
                 unitText: '1 000 tonnes',
             }) // add 'all crops'
-            map.pieTotalCode('C0000') //set total code to show on map
+            map.compositionTotalCode('C0000') //set total code to show on map
 
             //set stat codes to show on map
             map.statCodes(Object.keys(pieStats))

@@ -40,7 +40,7 @@
                     //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
                 })
                 .encoding('composition', { stat: 'composition' })
-                .pieMinRadius(6)
+                .compositionSettings({ minSize: 6 })
                 .legend({
                     x: 10,
                     y: 120,

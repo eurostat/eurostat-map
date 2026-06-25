@@ -28,9 +28,7 @@
                     totalCode: 'A-R_V-Y', //code for the total (all causes of death) A-R_V-Y is no longer the code???
                 })
                 .encoding('composition', { stat: 'composition' })
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
-                .pieMinRadius(6)
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other', minSize: 6 })
                 .title('Most common causes of death, 2021')
                 .subtitle('Standardised death rate and % share of all deaths, by NUTS 1 regions')
                 .legend({

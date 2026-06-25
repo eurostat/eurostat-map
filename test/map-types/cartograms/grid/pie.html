@@ -39,8 +39,7 @@
                 .gridCartogramMargins({ top: 60, right: 90, bottom: 40, left: 1 })
                 //.gridCartogramShape('hexagon')
                 .gridCartogramCellPadding(20)
-                .pieMinRadius(10)
-                .pieMaxRadius(22)
+                .compositionSettings({ minSize: 10, maxSize: 22 })
 
                 .title('Cereal production')
                 .subtitle('')
@@ -57,8 +56,7 @@
                     totalCode: 'C0000', //code for the total (all causes of death)
                 })
                 .encoding('composition', { stat: 'composition' })
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other' })
 
                 .legend({
                     x: 550,

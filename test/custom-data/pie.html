@@ -44,8 +44,7 @@
                 .title('Electricity Generation Mix')
                 .subtitle('Made-up GWh by source')
                 .scale('60M')
-                .pieMaxRadius(20)
-                .pieMinRadius(5)
+                .compositionSettings({ maxSize: 20, minSize: 5 })
                 .insets(false)
                 .stat('composition', {
                     customData: energyData,

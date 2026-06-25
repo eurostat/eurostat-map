@@ -360,10 +360,7 @@
                     circulatory: 'circulatory',
                     respiratory: 'respiratory',
                 })
-                .pieOtherColor('#FFCC80')
-                .pieOtherText('Other')
-                .pieMinRadius(6)
-                .pieMaxRadius(20)
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other', minSize: 6, maxSize: 20 })
                 .title('Most common causes of death, 2016')
                 .legend({
                     x: 530,

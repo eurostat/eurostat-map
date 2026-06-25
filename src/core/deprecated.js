@@ -170,9 +170,9 @@ export const defineDeprecatedFunctions = (out) => {
         return out
     };
     out.pieChartInnerRadius = function (v) {
-        if (!arguments.length) return out.pieSettings ? out.pieSettings().innerRadius : undefined
-        console.warn('map.pieChartInnerRadius() is now DEPRECATED. Please use map.pieSettings({ innerRadius }) instead.')
-        if (out.pieSettings) out.pieSettings({ innerRadius: v })
+        if (!arguments.length) return out.compositionSettings ? out.compositionSettings().innerRadius : undefined
+        console.warn('map.pieChartInnerRadius() is now DEPRECATED. Please use map.compositionSettings({ innerRadius }) instead.')
+        if (out.compositionSettings) out.compositionSettings({ innerRadius: v })
         return out
     };
     out.pieStrokeFill = function (v) {
