@@ -73,7 +73,7 @@ export const legend = function (map, config = {}) {
         out.updateContainer()
 
         if (out.lgg.node()) {
-            const map = out.map
+            const map = out.layer
 
             // Draw legend background box and title if provided
             out.makeBackgroundBox()
@@ -129,7 +129,7 @@ export const legend = function (map, config = {}) {
 }
 
 export function getThresholds(out) {
-    const map = out.map
+    const map = out.layer
     const thresholds =
         map.thresholds_.length > 1
             ? map.thresholds_

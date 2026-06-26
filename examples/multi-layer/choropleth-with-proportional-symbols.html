@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Choropleth with Proportional Symbols Overlay</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map() // empty multi-layer map stack
+                .width(800)
+                .nutsYear(2021)
+                .nutsLevel(0)
+                .scale('60M')
+                .title('Population Density and Total GDP across Europe')
+                .subtitle('Choropleth (density) and Proportional Symbols (total GDP)')
+                // Shared datasets
+                .stat('density', {
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                    filters: { TIME: '2021' }
+                })
+                .stat('gdp', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Million EUR',
+                    filters: { unit: 'MIO_EUR', time: '2018' }
+                })
+                // Add layers
+                .layers([
+                    {
+                        type: 'choropleth',
+                        encoding: {
+                            fill: { stat: 'density' }
+                        },
+                        classificationMethod: 'threshold',
+                        thresholds: [30, 50, 100, 150, 200, 300, 500],
+                        colors: ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#084594'],
+                        legend: {
+                            x: 520,
+                            y: 350,
+                            title: 'Density (people/km²)'
+                        }
+                    },
+                    {
+                        type: 'proportionalSymbol',
+                        encoding: {
+                            size: { stat: 'gdp' }
+                        },
+                        psSettings: {
+                            maxSize: 30,
+                            minSize: 3,
+                            fill: '#ff7800',
+                            fillOpacity: 0.6,
+                            stroke: '#e65c00',
+                            strokeWidth: 1.5,
+                            shape: 'circle'
+                        },
+                        legend: {
+                            x: 520,
+                            y: 50,
+                            sizeLegend: {
+                                title: 'Total GDP (Mio EUR)'
+                            }
+                        }
+                    }
+                ])
+                .build()
+        </script>
+    </body>
+</html>

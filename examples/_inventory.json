@@ -328,5 +328,12 @@
         "types": [
             "waffle"
         ]
+    },
+    "multi-layer/choropleth-with-proportional-symbols.html": {
+        "path": "multi-layer/choropleth-with-proportional-symbols.html",
+        "types": [
+            "choropleth",
+            "proportionalSymbol"
+        ]
     }
 }

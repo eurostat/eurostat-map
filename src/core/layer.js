@@ -273,6 +273,9 @@ export const forwardChainableMethod = function (map, name) {
         get() {
             const layer = map.activeLayer()
             return function (...args) {
+                if (!layer) {
+                    return args.length === 0 ? undefined : map
+                }
                 const r = layer[name](...args)
                 let isGetter = args.length === 0
                 if (args.length === 1 && (name === 'encoding' || name === 'stat' || name === 'statData')) {
@@ -285,3 +288,4 @@ export const forwardChainableMethod = function (map, name) {
         },
     })
 }
+

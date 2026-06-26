@@ -235,7 +235,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     makeMapSelfLayer(out)
 
     // ── Layer stack ───────────────────────────────────────────────────────────────
-    out.layers_ = [out] // facade: the map is its own layer 0
+    out.layers_ = mapType ? [out] : [] // facade: the map is its own layer 0 if type specified, empty stack if not
     out.activeLayerIndex_ = 0
 
     out.activeLayer = () => out.layers_[out.activeLayerIndex_]
@@ -269,7 +269,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
         // Real Layer path is only available for REGISTERED types (Phase 3+).
         if (!isLayerTypeRegistered(cfg.type)) {
-            console.warn(
+            console.error(
                 `[eurostat-map] Layer type "${cfg.type}" is not yet available as a layer. ` +
                     `Use eurostatmap.map('${cfg.type}') for a standalone single-type map for now.`
             )
@@ -288,7 +288,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         if (!arguments.length) return out.layers_
         out.layers_ = []
         ;(configs || []).forEach((c) => out.addLayer(c))
-        if (out.layers_.length === 0) out.layers_ = [out] // keep facade if nothing was added
+        if (out.layers_.length === 0 && out._mapType) out.layers_ = [out] // keep facade if nothing was added and type was specified
         return out
     }
 
@@ -305,7 +305,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
             }
         }
         out.layers_ = out.layers_.filter((x) => x !== l)
-        if (out.layers_.length === 0) out.layers_ = [out]
+        if (out.layers_.length === 0 && out._mapType) out.layers_ = [out]
         if (out.activeLayerIndex_ >= out.layers_.length) out.activeLayerIndex_ = out.layers_.length - 1
         return out
     }

@@ -50,6 +50,7 @@
         'misc/scalebar.html',
         'misc/stamp.html',
         'misc/story-map/index.html',
+        'multi-layer/choropleth-with-proportional-symbols.html',
         'mushroom/mushroom.html',
         'pie-charts/prop-piecharts.html',
         'proportional-symbols/population-change.html',

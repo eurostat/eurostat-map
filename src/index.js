@@ -52,6 +52,9 @@ initProj4()
  */
 export const map = function (type, config) {
     try {
+        if (!type) {
+            return createStatMap(config || {}, true, undefined)
+        }
         //choropleth map
         if (type == 'choropleth' || type == 'ch') return Choropleth.map(config)
         //categorical map

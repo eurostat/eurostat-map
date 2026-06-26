@@ -236,7 +236,8 @@ async function run() {
         'bar-chart/bar-chart.html',
         'misc/minimap.html',
         'misc/hatching.html',
-        'choropleth/linked_maps.html'
+        'choropleth/linked_maps.html',
+        'multi-layer/choropleth-with-proportional-symbols.html'
     ];
 
     const examples = runAll 

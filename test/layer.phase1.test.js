@@ -79,6 +79,24 @@ const { registerLayerType, isLayerTypeRegistered } = library
     assert.strictEqual(m.layers_.length, before, 'second base rejected')
 }
 
+// 4b) Empty stack map and layers/addLayer behavior.
+{
+    const m = library.map()
+    assert.strictEqual(m.layers_.length, 0, 'empty stack map starts with 0 layers')
+
+    // Add overlay first
+    const l1 = m.addLayer('dummy', { id: 'over1' })
+    assert.strictEqual(m.layers_.length, 1)
+    assert.strictEqual(m.layers_[0], l1)
+
+    // Add base second
+    const l2 = m.addLayer('dummyBase', { id: 'base1' })
+    assert.strictEqual(m.layers_.length, 2)
+    // Base must be auto-ordered first (unshifted)
+    assert.strictEqual(m.layers_[0], l2, 'base layer ordered first')
+    assert.strictEqual(m.layers_[1], l1, 'overlay layer ordered second')
+}
+
 // 5) Phase 3: Choropleth is migrated to a real Layer.
 {
     const m = library.map('choropleth')

@@ -16,7 +16,7 @@ import { getCentroidsGroup } from '../../core/geo/centroids'
  * @param {*} container parent legend object from core/legend.js
  */
 export function drawSizeLegend(out, baseX, baseY) {
-    const map = out.map
+    const map = out.layer
 
     // container for size legend
     out._sizeLegendContainer = out.lgg
@@ -106,7 +106,7 @@ function addNoDataLegend(out) {
         circle: 1,
         square: 20,
     } // add some extra padding for bars and spikes
-    const padding = paddings[out.map.psShape_] || paddings['default']
+    const padding = paddings[out.layer.psShape_] || paddings['default']
     const noDataHeight = out.noDataShapeHeight
     const y = bbox.height + padding + noDataHeight / 2 // padding after the size legend
     const x = 0
@@ -123,7 +123,7 @@ function addNoDataLegend(out) {
  * @param {*} labelFormatter
  */
 function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
-    const map = out.map
+    const map = out.layer
 
     if (out.sizeLegend._cursorY == null) {
         out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
@@ -175,7 +175,7 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
  * @param {*} symbolSize
  */
 function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
-    const map = out.map
+    const map = out.layer
 
     // init stacking cursor
     if (out.sizeLegend._cursorY == null) {
@@ -219,7 +219,7 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
  * @return {d3.shape || SVG}
  */
 function getShape(out) {
-    const map = out.map
+    const map = out.layer
     let shape
     if (map.psCustomSVG_) {
         shape = map.psCustomSVG_
@@ -245,7 +245,8 @@ function getShape(out) {
 }
 
 function highlightPsRegions(map, ecl) {
-    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
+    const layer = map.activeLayer ? map.activeLayer() : map
+    const allSymbols = getCentroidsGroup(layer).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -257,17 +258,18 @@ function highlightPsRegions(map, ecl) {
     const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
     selectedSymbols.each(function (d, i) {
         let symbol = select(this)
-        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+        symbol.style('opacity', layer.psFillOpacity_) // Restore original opacity for selected regions
     })
 }
 
 // Reset all regions to their original opacitys on mouseout
 function unhighlightPsRegions(map) {
-    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
+    const layer = map.activeLayer ? map.activeLayer() : map
+    const allSymbols = getCentroidsGroup(layer).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {
         let symbol = select(this)
-        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+        symbol.style('opacity', layer.psFillOpacity_) // Restore original opacity for selected regions
     })
 }
