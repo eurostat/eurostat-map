@@ -5,51 +5,51 @@
 // ==================== Core Type Imports (needed for local use in function signatures) ====================
 
 import type { MapConfig } from './core/MapConfig'
-import type { MapType } from './map-types/MapType'
+import type { MapType } from './layers/MapType'
 import type { MapInstance } from './core/MapInstance'
 
 // Choropleth map types
-import type { ChoroplethConfig } from './map-types/choropleth/ChoroplethConfig'
-import type { ChoroplethMap } from './map-types/choropleth/ChoroplethMap'
-import type { ValueByAlphaConfig } from './map-types/choropleth/ValueByAlphaConfig'
-import type { ValueByAlphaMap } from './map-types/choropleth/ValueByAlphaMap'
-import type { BivariateChoroplethConfig } from './map-types/choropleth/BivariateChoroplethConfig'
-import type { BivariateChoroplethMap } from './map-types/choropleth/BivariateChoroplethMap'
-import type { TrivariateChoroplethConfig, TrivariateTernarySettings } from './map-types/choropleth/TrivariateChoroplethConfig'
-import type { TrivariateChoroplethMap } from './map-types/choropleth/TrivariateChoroplethMap'
+import type { ChoroplethConfig } from './layers/choropleth/ChoroplethConfig'
+import type { ChoroplethMap } from './layers/choropleth/ChoroplethMap'
+import type { ValueByAlphaConfig } from './layers/choropleth/ValueByAlphaConfig'
+import type { ValueByAlphaMap } from './layers/choropleth/ValueByAlphaMap'
+import type { BivariateChoroplethConfig } from './layers/choropleth/BivariateChoroplethConfig'
+import type { BivariateChoroplethMap } from './layers/choropleth/BivariateChoroplethMap'
+import type { TrivariateChoroplethConfig, TrivariateTernarySettings } from './layers/choropleth/TrivariateChoroplethConfig'
+import type { TrivariateChoroplethMap } from './layers/choropleth/TrivariateChoroplethMap'
 
 // Categorical map types
-import type { CategoricalMapConfig } from './map-types/CategoricalMapConfig'
-import type { CategoricalMap } from './map-types/CategoricalMap'
+import type { CategoricalMapConfig } from './layers/CategoricalMapConfig'
+import type { CategoricalMap } from './layers/CategoricalMap'
 
 // Proportional symbol map types
-import type { ProportionalSymbolConfig } from './map-types/proportional-symbol/ProportionalSymbolConfig'
-import type { ProportionalSymbolMap } from './map-types/proportional-symbol/ProportionalSymbolMap'
-import type { MushroomMapConfig } from './map-types/proportional-symbol/mushroom/MushroomMapConfig'
-import type { MushroomMap } from './map-types/proportional-symbol/mushroom/MushroomMap'
+import type { ProportionalSymbolConfig } from './layers/proportional-symbol/ProportionalSymbolConfig'
+import type { ProportionalSymbolMap } from './layers/proportional-symbol/ProportionalSymbolMap'
+import type { MushroomMapConfig } from './layers/proportional-symbol/mushroom/MushroomMapConfig'
+import type { MushroomMap } from './layers/proportional-symbol/mushroom/MushroomMap'
 
 // Composition map types
-import type { CompositionStatConfig } from './map-types/composition/CompositionStatConfig'
-import type { CoxcombMapConfig } from './map-types/composition/coxcomb/CoxcombMapConfig'
-import type { CoxcombMap } from './map-types/composition/coxcomb/CoxcombMap'
-import type { CoxcombStatConfig } from './map-types/composition/coxcomb/CoxcombStatConfig'
-import type { BarMapConfig } from './map-types/composition/bar/BarMapConfig'
-import type { BarMap } from './map-types/composition/bar/BarMap'
-import type { PieMapConfig } from './map-types/composition/pie/PieMapConfig'
-import type { PieMap } from './map-types/composition/pie/PieMap'
-import type { StripeMapConfig } from './map-types/composition/stripe/StripeMapConfig'
-import type { StripeMap } from './map-types/composition/stripe/StripeMap'
-import type { WaffleMapConfig } from './map-types/composition/waffle/WaffleMapConfig'
-import type { WaffleMap } from './map-types/composition/waffle/WaffleMap'
+import type { CompositionStatConfig } from './layers/composition/CompositionStatConfig'
+import type { CoxcombMapConfig } from './layers/composition/coxcomb/CoxcombMapConfig'
+import type { CoxcombMap } from './layers/composition/coxcomb/CoxcombMap'
+import type { CoxcombStatConfig } from './layers/composition/coxcomb/CoxcombStatConfig'
+import type { BarMapConfig } from './layers/composition/bar/BarMapConfig'
+import type { BarMap } from './layers/composition/bar/BarMap'
+import type { PieMapConfig } from './layers/composition/pie/PieMapConfig'
+import type { PieMap } from './layers/composition/pie/PieMap'
+import type { StripeMapConfig } from './layers/composition/stripe/StripeMapConfig'
+import type { StripeMap } from './layers/composition/stripe/StripeMap'
+import type { WaffleMapConfig } from './layers/composition/waffle/WaffleMapConfig'
+import type { WaffleMap } from './layers/composition/waffle/WaffleMap'
 
 // Spark map types
-import type { SparkMapConfig } from './map-types/spark/SparkMapConfig'
-import type { SparkMap } from './map-types/spark/SparkMap'
-import type { SparkStatConfig } from './map-types/spark/SparkStatConfig'
+import type { SparkMapConfig } from './layers/spark/SparkMapConfig'
+import type { SparkMap } from './layers/spark/SparkMap'
+import type { SparkStatConfig } from './layers/spark/SparkStatConfig'
 
 // Flow map types
-import type { FlowMapConfig } from './map-types/flow/FlowMapConfig'
-import type { FlowMap } from './map-types/flow/FlowMap'
+import type { FlowMapConfig } from './layers/flow/FlowMapConfig'
+import type { FlowMap } from './layers/flow/FlowMap'
 
 // ==================== Core Type Exports ====================
 
@@ -69,6 +69,9 @@ export type { DorlingSettings, DorlingStrength } from './core/DorlingSettings'
 export type { MinimapConfig } from './core/minimaps'
 export type { LocationConfig } from './core/locations'
 export type { GeometriesClass } from './core/geo/geometries'
+export type { Layer } from './core/layer/Layer'
+export type { LayerConfig } from './core/layer/LayerConfig'
+export type { LayerRole } from './core/layer/LayerRole'
 
 // ==================== Legend Configuration Type Exports ====================
 
@@ -161,7 +164,7 @@ export type {
     FlowCurvatureSettings,
     FlowWidthGradientSettings,
     FlowBundleSettings,
-} from './map-types/flow/FlowMapConfig'
+} from './layers/flow/FlowMapConfig'
 
 // ==================== Pattern Fill Options ====================
 
@@ -203,6 +206,7 @@ export interface FillPatternOptions {
  * map.build();
  * ```
  */
+export function map(): MapInstance
 export function map(type: 'choropleth' | 'ch', config?: ChoroplethConfig): ChoroplethMap
 export function map(type: 'proportionalSymbol' | 'proportionalSymbols' | 'ps', config?: ProportionalSymbolConfig): ProportionalSymbolMap
 export function map(type: 'categorical' | 'ct', config?: CategoricalMapConfig): CategoricalMap

@@ -1,20 +1,20 @@
 import './css/index.css'
-import * as Choropleth from './map-types/choropleth/map-choropleth'
-import * as ProportionalSymbol from './map-types/proportional-symbol/map-proportional-symbols'
-import * as Categorical from './map-types/map-categorical'
-import * as BivariateChoropleth from './map-types/choropleth/map-choropleth-bivariate'
-import * as TrivariateChoropleth from './map-types/choropleth/map-choropleth-trivariate'
-import * as FlowMap from './map-types/flow/map-flow'
-import * as ValueByAlpha from './map-types/choropleth/map-value-by-alpha'
-import * as Mushroom from './map-types/proportional-symbol/mushrooms/map-mushroom.js'
+import * as Choropleth from './layers/choropleth/map-choropleth'
+import * as ProportionalSymbol from './layers/proportional-symbol/map-proportional-symbols'
+import * as Categorical from './layers/map-categorical'
+import * as BivariateChoropleth from './layers/choropleth/map-choropleth-bivariate'
+import * as TrivariateChoropleth from './layers/choropleth/map-choropleth-trivariate'
+import * as FlowMap from './layers/flow/map-flow'
+import * as ValueByAlpha from './layers/choropleth/map-value-by-alpha'
+import * as Mushroom from './layers/proportional-symbol/mushrooms/map-mushroom.js'
 
 //composition maps
-import * as PieCharts from './map-types/composition/map-pie'
-import * as Sparklines from './map-types/map-spark'
-import * as Bar from './map-types/composition/map-bar.js'
-import * as Waffle from './map-types/composition/map-waffle.js'
-import * as Coxcomb from './map-types/composition/map-coxcomb.js'
-import * as StripeComposition from './map-types/composition/map-stripe.js'
+import * as PieCharts from './layers/composition/map-pie'
+import * as Sparklines from './layers/map-spark'
+import * as Bar from './layers/composition/map-bar.js'
+import * as Waffle from './layers/composition/map-waffle.js'
+import * as Coxcomb from './layers/composition/map-coxcomb.js'
+import * as StripeComposition from './layers/composition/map-stripe.js'
 
 import { DEFAULTLABELS } from './core/decoration/labels'
 import { createStatMap } from './core/stat-map'
@@ -35,7 +35,7 @@ initProj4()
 //types
 /** @typedef {import('./types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('./types/core/MapConfig').MapConfig} MapConfig */
-/** @typedef {import('./types/map-types/MapType').MapType} MapType */
+/** @typedef {import('./types/layers/MapType').MapType} MapType */
 
 /**
  * Creates and returns a eurostat-map instance of the specified type.
@@ -151,6 +151,7 @@ export const getDefaultLabels = function () {
 }
 
 export { projectFromMap, projectToMap } from './core/geo/proj4.js'
+export { registerLayerType, isLayerTypeRegistered } from './core/layer-registry.js'
 
 import pkg from '../package.json'
 

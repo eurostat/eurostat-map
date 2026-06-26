@@ -1,0 +1,446 @@
+import { max } from 'd3-array'
+import { scaleSqrt } from 'd3-scale'
+import { arc } from 'd3-shape'
+import { select } from 'd3-selection'
+import * as StatMap from '../../../core/stat-map.js'
+import { executeForAllInsets, spaceAsThousandSeparator } from '../../../core/utils.js'
+import { runDorlingSimulation, stopDorlingSimulation } from '../../../core/dorling/dorling.js'
+import { addMouseEvents } from './map-mushroom-interactions.js'
+import * as MushroomLegend from '../../../legend/legend-mushroom.js'
+import { getCentroidsGroup } from '../../../core/geo/centroids.js'
+import { getResponsiveSymbolSize } from '../../../core/responsive.js'
+//types
+/** @typedef {import('../../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../../types/layers/proportional-symbol/mushroom/MushroomMapConfig').MushroomMapConfig} MushroomMapConfig */
+/** @typedef {import('../../../types/layers/proportional-symbol/mushroom/MushroomMap').MushroomMap} MushroomMap */
+
+/**
+ * Mushroom (dual semi-circle) proportional symbol map
+ * v1 = left / top
+ * v2 = right / bottom
+ *
+ * @param {MushroomMapConfig} [config]
+ * @returns {MushroomMap}
+ */
+export const map = function (config) {
+    const out = StatMap.createStatMap(config, true, 'mushroom')
+
+    // ===============================
+    // Configuration
+    // ===============================
+
+    out.mushroomCodes_ = ['v1', 'v2']
+    out.mushroomMinSize_ = 4
+    out.mushroomMaxSize_ = 30
+    out.mushroomColors_ = ['#2c7bb6', '#d7191c']
+    out.mushroomOrientation_ = 'vertical' // 'horizontal' | 'vertical'
+    out.mushroomSizeScaleFunction_ = null // custom size scale function for both sides
+    out.mushroomSizeScaleFunctionV1_ = null // custom size scale function for v1 side
+    out.mushroomSizeScaleFunctionV2_ = null // custom size scale function for v2 side
+
+    const defaultMushroomSettings = {
+        codes: out.mushroomCodes_,
+        minSize: out.mushroomMinSize_,
+        maxSize: out.mushroomMaxSize_,
+        colors: out.mushroomColors_,
+        orientation: out.mushroomOrientation_,
+        sizeScaleFunction: out.mushroomSizeScaleFunction_,
+        sizeScaleFunctionV1: out.mushroomSizeScaleFunctionV1_,
+        sizeScaleFunctionV2: out.mushroomSizeScaleFunctionV2_,
+    }
+
+    out.mushroomSettings_ = { ...defaultMushroomSettings, ...(config?.mushroomSettings || {}) }
+    out.mushroomCodes_ = out.mushroomSettings_.codes
+    out.mushroomMinSize_ = out.mushroomSettings_.minSize
+    out.mushroomMaxSize_ = out.mushroomSettings_.maxSize
+    out.mushroomColors_ = out.mushroomSettings_.colors
+    out.mushroomOrientation_ = out.mushroomSettings_.orientation
+    out.mushroomSizeScaleFunction_ = out.mushroomSettings_.sizeScaleFunction
+    out.mushroomSizeScaleFunctionV1_ = out.mushroomSettings_.sizeScaleFunctionV1
+    out.mushroomSizeScaleFunctionV2_ = out.mushroomSettings_.sizeScaleFunctionV2
+
+    out._mushroomScale_ = null
+
+    out.tooltip_.textFunction = tooltipTextFunctionMushroom
+
+    out.getMushroomStatCodes = function () {
+        return [
+            out.getEncodingStat?.('left', out.getEncodingStat?.('v1', out.mushroomCodes_[0])) || out.mushroomCodes_[0],
+            out.getEncodingStat?.('right', out.getEncodingStat?.('v2', out.mushroomCodes_[1])) || out.mushroomCodes_[1],
+        ]
+    }
+
+    // ===============================
+    // Getters / setters
+    // ===============================
+
+    const paramNames = [
+        'mushroomCodes_',
+        'mushroomMinSize_',
+        'mushroomMaxSize_',
+        'mushroomColors_',
+        'mushroomOrientation_',
+        'mushroomSizeScaleFunction_',
+        'mushroomSizeScaleFunctionV1_',
+        'mushroomSizeScaleFunctionV2_',
+    ]
+
+    paramNames.forEach((att) => {
+        const name = att.slice(0, -1)
+        out[name] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
+        }
+    })
+
+    out.mushroomSettings = function (v) {
+        if (!arguments.length) {
+            return {
+                codes: out.mushroomCodes_,
+                minSize: out.mushroomMinSize_,
+                maxSize: out.mushroomMaxSize_,
+                colors: out.mushroomColors_,
+                orientation: out.mushroomOrientation_,
+                sizeScaleFunction: out.mushroomSizeScaleFunction_,
+                sizeScaleFunctionV1: out.mushroomSizeScaleFunctionV1_,
+                sizeScaleFunctionV2: out.mushroomSizeScaleFunctionV2_,
+            }
+        }
+
+        out.mushroomSettings_ = { ...out.mushroomSettings_, ...v }
+        if (v.codes !== undefined) out.mushroomCodes_ = v.codes
+        if (v.minSize !== undefined) out.mushroomMinSize_ = v.minSize
+        if (v.maxSize !== undefined) out.mushroomMaxSize_ = v.maxSize
+        if (v.colors !== undefined) out.mushroomColors_ = v.colors
+        if (v.orientation !== undefined) out.mushroomOrientation_ = v.orientation
+        if (v.sizeScaleFunction !== undefined) out.mushroomSizeScaleFunction_ = v.sizeScaleFunction
+        if (v.sizeScaleFunctionV1 !== undefined) out.mushroomSizeScaleFunctionV1_ = v.sizeScaleFunctionV1
+        if (v.sizeScaleFunctionV2 !== undefined) out.mushroomSizeScaleFunctionV2_ = v.sizeScaleFunctionV2
+        return out
+    }
+
+    const legacyMushroomSettingsWrappers = {
+        mushroomCodes: 'codes',
+        mushroomMinSize: 'minSize',
+        mushroomMaxSize: 'maxSize',
+        mushroomColors: 'colors',
+        mushroomOrientation: 'orientation',
+        mushroomSizeScaleFunction: 'sizeScaleFunction',
+        mushroomSizeScaleFunctionV1: 'sizeScaleFunctionV1',
+        mushroomSizeScaleFunctionV2: 'sizeScaleFunctionV2',
+    }
+
+    Object.entries(legacyMushroomSettingsWrappers).forEach(([legacyMethod, settingsKey]) => {
+        out[legacyMethod] = function (v) {
+            if (!arguments.length) return out.mushroomSettings()[settingsKey]
+            console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.mushroomSettings({ ${settingsKey} }) instead.`)
+            out.mushroomSettings({ [settingsKey]: v })
+            return out
+        }
+    })
+
+    // override via config
+    if (config) {
+        paramNames.forEach((key) => {
+            const k = key.slice(0, -1)
+            if (config[k] !== undefined) out[k](config[k])
+        })
+    }
+
+    // ===============================
+    // Classification (shared size scale)
+    // ===============================
+    //@override
+    out.updateClassification = function () {
+        if (out.mushroomSizeScaleFunction_) {
+            //allow custom user scale function
+            out._mushroomScale_ = out.mushroomSizeScaleFunction_
+            return
+        }
+        if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+            //both sides have custom user scale functions
+            return
+        }
+
+        out._mushroomScale_ = null
+
+        const [c1, c2] = out.getMushroomStatCodes()
+        const stat1 = out.statData(c1)
+        const stat2 = out.statData(c2)
+
+        if (!stat1 && !stat2) return out
+
+        // Collect numeric values from BOTH stat datasets
+        const values = []
+
+        if (stat1?.getArray) {
+            stat1.getArray().forEach((v) => {
+                const n = +v
+                if (Number.isFinite(n)) values.push(n)
+            })
+        }
+
+        if (stat2?.getArray) {
+            stat2.getArray().forEach((v) => {
+                const n = +v
+                if (Number.isFinite(n)) values.push(n)
+            })
+        }
+
+        if (!values.length) return out
+
+        const maxVal = max(values) || 0
+
+        out._mushroomScale_ = scaleSqrt()
+            .domain([0, maxVal])
+            .range([getResponsiveSymbolSize(out.mushroomMinSize_, 2), getResponsiveSymbolSize(out.mushroomMaxSize_, 5)])
+
+        return out
+    }
+
+    // ===============================
+    // Styling
+    // ===============================
+    //@override
+    out.updateStyle = function () {
+        out.updateSymbolsDrawOrder(out)
+
+        applyStyleToMap(out)
+
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+        }
+
+        // dorling cartogram
+        if (out.dorling_ && (out._mushroomScale_ || (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_))) {
+            const [c1, c2] = out.getMushroomStatCodes()
+            const stat1 = out.statData(c1)
+            const stat2 = out.statData(c2)
+
+            runDorlingSimulation(
+                out,
+                (d) => {
+                    const id = d.properties.id
+
+                    const v1 = +stat1.get(id)?.value || 0
+                    const v2 = +stat2.get(id)?.value || 0
+
+                    let r1, r2
+                    if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+                        r1 = out.mushroomSizeScaleFunctionV1_(v1)
+                        r2 = out.mushroomSizeScaleFunctionV2_(v2)
+                    } else {
+                        r1 = out._mushroomScale_(v1)
+                        r2 = out._mushroomScale_(v2)
+                    }
+
+                    return Math.sqrt((r1 * r1 + r2 * r2) / 2)
+                },
+                out.dorlingSettings_.padding || 0
+            )
+        } else {
+            stopDorlingSimulation(out)
+        }
+
+        return out
+    }
+
+    out.updateSymbolsDrawOrder = function (map) {
+        const gcp = getCentroidsGroup(map)
+        const [c1, c2] = out.getMushroomStatCodes()
+
+        const stat1 = out.statData(c1)
+        const stat2 = out.statData(c2)
+
+        // Ensure centroidFeatures exists
+        if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
+            map.Geometries.centroidsFeatures = map
+                .svg()
+                .selectAll('g.em-centroid')
+                .data()
+                .filter((d) => d?.properties?.centroid)
+        }
+
+        // Sort by visual size (largest first → drawn underneath)
+        const sorted = map.Geometries.centroidsFeatures
+            .map((d) => {
+                const id = d.properties.id
+                const v1 = +stat1.get(id)?.value || 0
+                const v2 = +stat2.get(id)?.value || 0
+                let r1, r2
+                if (out.mushroomSizeScaleFunctionV1_ && out.mushroomSizeScaleFunctionV2_) {
+                    r1 = out.mushroomSizeScaleFunctionV1_(v1)
+                    r2 = out.mushroomSizeScaleFunctionV2_(v2)
+                } else {
+                    r1 = out._mushroomScale_(v1)
+                    r2 = out._mushroomScale_(v2)
+                }
+                return { d, r: Math.max(r1, r2) }
+            })
+            .filter((o) => o.r > 0)
+            .sort((a, b) => b.r - a.r)
+            .map((o) => o.d)
+
+        // Clear old centroids
+        gcp.selectAll('g.em-centroid').remove()
+
+        // Recreate in sorted order
+        gcp.selectAll('g.em-centroid')
+            .data(sorted, (d) => d.properties.id)
+            .enter()
+            .append('g')
+            .attr('class', 'em-centroid')
+            .attr('id', (d) => 'mushroom-' + d.properties.id)
+            .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
+    }
+
+    //@override
+    out.getLegendConstructor = function () {
+        return MushroomLegend.legend
+    }
+
+    return out
+}
+
+/**
+ * Draw mushroom symbols
+ */
+function applyStyleToMap(map) {
+    if (!map.svg() || (!map._mushroomScale_ && !map.mushroomSizeScaleFunctionV1_ && !map.mushroomSizeScaleFunctionV2_)) return
+    const hasIndependentScales = map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_
+    const [c1, c2] = map.getMushroomStatCodes?.() || map.mushroomCodes()
+    const colors = map.mushroomColors()
+    const orient = map.mushroomOrientation_
+
+    const stat1 = map.statData(c1)
+    const stat2 = map.statData(c2)
+
+    const arcGen = arc().innerRadius(0)
+
+    const centroids = map.svg().selectAll('g.em-centroid')
+
+    centroids.selectAll('*').remove()
+
+    centroids.each(function (d) {
+        const id = d.properties.id
+
+        const v1 = +stat1.get(id)?.value || 0
+        const v2 = +stat2.get(id)?.value || 0
+
+        if (v1 === 0 && v2 === 0) return
+
+        let r1, r2
+        if (map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_) {
+            r1 = map.mushroomSizeScaleFunctionV1_(v1)
+            r2 = map.mushroomSizeScaleFunctionV2_(v2)
+        } else {
+            r1 = map._mushroomScale_(v1)
+            r2 = map._mushroomScale_(v2)
+        }
+
+        const g = select(this)
+
+        if (orient === 'vertical') {
+            // TOP (v1): upper semi-circle, flat at bottom
+            g.append('path')
+                .attr(
+                    'd',
+                    arcGen({
+                        startAngle: -Math.PI / 2,
+                        endAngle: Math.PI / 2,
+                        outerRadius: r1,
+                    })
+                )
+                .attr('fill', colors[0])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '0')
+
+            // BOTTOM (v2): lower semi-circle, flat at top
+            g.append('path')
+                .attr(
+                    'd',
+                    arcGen({
+                        startAngle: Math.PI / 2,
+                        endAngle: (3 * Math.PI) / 2,
+                        outerRadius: r2,
+                    })
+                )
+                .attr('fill', colors[1])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '1')
+        } else {
+            // HORIZONTAL
+
+            // v1 — LEFT (curves left, flat on right)
+            g.append('path')
+                .attr(
+                    'd',
+                    arcGen({
+                        startAngle: Math.PI,
+                        endAngle: 2 * Math.PI,
+                        outerRadius: r1,
+                    })
+                )
+                .attr('fill', colors[0])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '0')
+
+            // v2 — RIGHT (curves right, flat on left)
+            g.append('path')
+                .attr(
+                    'd',
+                    arcGen({
+                        startAngle: 0,
+                        endAngle: Math.PI,
+                        outerRadius: r2,
+                    })
+                )
+                .attr('fill', colors[1])
+                .attr('class', 'em-mushroom-segment')
+                .attr('data-mushroom-side', '1')
+        }
+    })
+
+    addMouseEvents(map, map)
+}
+
+// ===============================
+// Tooltip
+// ===============================
+const tooltipTextFunctionMushroom = function (rg, map) {
+    const [c1, c2] = map.getMushroomStatCodes?.() || map.mushroomCodes()
+    const id = rg.properties.id
+    const name = rg.properties.na || ''
+
+    const sv1 = map.statData(c1).get(id)
+    const sv2 = map.statData(c2).get(id)
+
+    const unit1 = map.statData(c1).unitText?.() || ''
+    const unit2 = map.statData(c2).unitText?.() || ''
+
+    const fmt = (v, u) => {
+        if (v === ':' || v == null) return map.noDataText_ || 'No data'
+        return spaceAsThousandSeparator(v) + (u ? ' ' + u : '')
+    }
+
+    return `
+        <div class="em-tooltip-bar">
+            ${name}${id ? ` (${id})` : ''}
+        </div>
+        <div class="em-tooltip-text">
+            <table class="em-tooltip-table">
+                <tbody>
+                    <tr>
+                        <td>${map.statData(c1).label_ || ''}</td>
+                        <td>${fmt(sv1?.value, unit1)}</td>
+                    </tr>
+                    <tr>
+                        <td>${map.statData(c2).label_ || ''}</td>
+                        <td>${fmt(sv2?.value, unit2)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `.trim()
+}

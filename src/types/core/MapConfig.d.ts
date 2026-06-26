@@ -1,5 +1,5 @@
 import type { StatConfig } from './stat/StatConfig'
-import type { CompositionStatConfig } from '../map-types/composition/CompositionStatConfig'
+import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'

@@ -1,4 +1,4 @@
-import { symbolsLibrary } from '../../map-types/proportional-symbol/symbols/d3-symbols.js'
+import { symbolsLibrary } from '../../layers/proportional-symbol/symbols/d3-symbols.js'
 import { symbol } from 'd3-shape'
 
 /**

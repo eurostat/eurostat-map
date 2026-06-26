@@ -1,6 +1,6 @@
 import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
-import { taperedPolygonForLink } from '../map-types/flow/sankey'
+import { taperedPolygonForLink } from '../layers/flow/sankey'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */

@@ -14,7 +14,13 @@ export const legend = function (map) {
     const out = {}
 
     //link map to legend
-    out.map = map
+    if (map.map) {
+        out.layer = map
+        out.map = map.map
+    } else {
+        out.layer = map
+        out.map = map
+    }
 
     //the SVG where to make the legend
     out.svgId = 'em-legend-container-' + Math.round(10e4 * Math.random())
@@ -99,14 +105,14 @@ export const legend = function (map) {
     }
 
     out.updateContainer = function () {
-        const map = out.map
+        const layer = out.layer
         const container = out.lgg
         const legendSVG = out.svg
         // Remove previous content
         container.selectAll('*').remove()
 
         //check if provided external svgId has changed or if legend SVG is not yet created, then build legend
-        const needsLegendBuild = map && container && (!legendSVG || legendSVG.attr('id') !== map.legend_.svgId)
+        const needsLegendBuild = layer && container && (!legendSVG || legendSVG.attr('id') !== layer.legend_.svgId)
         if (needsLegendBuild) {
             out.build()
         }
@@ -128,17 +134,54 @@ export const legend = function (map) {
         const bbox = getLegendBBox(container, out)
         const cornerCoords = cornerPosition ? getCornerCoords(cornerPosition, bbox, map, out.boxPadding) : null
 
-        const x = hasManualX ? out.x : cornerCoords ? cornerCoords.x : map.width() - out.width - out.boxPadding
-        const y = hasManualY ? out.y : cornerCoords ? cornerCoords.y : out.boxPadding
+        let x = hasManualX ? out.x : cornerCoords ? cornerCoords.x : map.width() - out.width - out.boxPadding
+        let y = hasManualY ? out.y : cornerCoords ? cornerCoords.y : out.boxPadding
+
+        // Stacking logic for multiple legends sharing the same corner position
+        const layout = map.legendLayout_ || 'stack'
+        if (cornerPosition && layout === 'stack' && !hasManualX && !hasManualY) {
+            // Find all legends of this map sharing this corner position
+            const sharingLegends = []
+            if (map.layers_ && Array.isArray(map.layers_)) {
+                map.layers_.forEach((l) => {
+                    const leg = l.legendObj_
+                    if (leg && leg.lgg && !leg.lgg.empty()) {
+                        const legUserPos = getCornerPosition(leg.position)
+                        const legPos = legUserPos || (!(leg.x != null) && !(leg.y != null) ? 'top right' : null)
+                        if (legPos === cornerPosition) {
+                            sharingLegends.push(leg)
+                        }
+                    }
+                })
+            }
+
+            const index = sharingLegends.indexOf(out)
+            if (index > 0) {
+                const spacing = 10
+                let offset = 0
+                for (let i = 0; i < index; i++) {
+                    const prevLeg = sharingLegends[i]
+                    const prevBBox = getLegendBBox(prevLeg.lgg, prevLeg)
+                    offset += prevBBox.height + spacing
+                }
+
+                const [vertical] = cornerPosition.split(' ')
+                if (vertical === 'bottom') {
+                    y -= offset
+                } else {
+                    y += offset
+                }
+            }
+        }
 
         container.attr('transform', `translate(${x},${y})`)
     }
 
     out.updateConfig = function () {
-        const map = out.map
+        const layer = out.layer
         // Update legend parameters if necessary
-        if (map.legend_) {
-            deepMergeExistingKeys(out, map.legend_)
+        if (layer.legend_) {
+            deepMergeExistingKeys(out, layer.legend_)
         }
     }
 
@@ -254,9 +297,10 @@ export const legend = function (map) {
     }
 
     out.getNumberOfClasses = function (out) {
+        const layer = out.layer
         const map = out.map
         const mapType = map._mapType
-        const numberOfClasses = mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_ //prop symbols or choropleth
+        const numberOfClasses = layer.numberOfClasses_ !== undefined ? layer.numberOfClasses_ : (mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_)
         return numberOfClasses
     }
 
@@ -274,27 +318,45 @@ export const legend = function (map) {
     }
 
     out.getClassToFillStyle = function (out) {
+        const layer = out.layer
         const map = out.map
         const mapType = map._mapType
-        const classToFillStyle = mapType === 'ps' ? map.psClassToFillStyle_ : map.classToFillStyle_
+        const classToFillStyle = layer.classToFillStyle_ !== undefined ? layer.classToFillStyle_ : (mapType === 'ps' ? map.psClassToFillStyle_ : map.classToFillStyle_)
         return classToFillStyle
     }
 
     out.getColorClassifier = function (out) {
+        const layer = out.layer
         const map = out.map
         const mapType = map._mapType
-        const colorClassifier = mapType === 'ps' ? map.classifierColor_ : map.classifier_
+        const colorClassifier = layer.classifier_ !== undefined ? layer.classifier_ : (mapType === 'ps' ? map.classifierColor_ : map.classifier_)
         return colorClassifier
     }
 
     out.getColorStats = function (out) {
+        const layer = out.layer
         const map = out.map
-        const mapType = map._mapType
-        const stats =
-            mapType === 'ps'
-                ? map.getEncodingStatData?.('color', undefined, 'color') || map.statData('color')
-                : map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
-        return stats
+
+        if (layer.encodings_) {
+            if (layer.encodings_['color']) {
+                return layer.getEncodingStatData('color')
+            }
+            if (layer.encodings_['fill']) {
+                return layer.getEncodingStatData('fill')
+            }
+        }
+
+        const colorStat = map.statData('color')
+        if (colorStat && colorStat.getArray && colorStat.getArray()?.length > 0) {
+            return colorStat
+        }
+
+        const defaultStat = map.statData()
+        if (defaultStat && defaultStat.getArray && defaultStat.getArray()?.length > 0) {
+            return defaultStat
+        }
+
+        return map.statData()
     }
 
     out.getHighlightFunction = function (map) {

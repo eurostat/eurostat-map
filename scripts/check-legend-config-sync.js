@@ -39,7 +39,7 @@ function getBaseLegendDefaultKeys(legendSource) {
     const defaultsBlock = legendSource.includes(stopToken) ? legendSource.slice(0, legendSource.indexOf(stopToken)) : legendSource
 
     const matches = [...defaultsBlock.matchAll(/out\.([A-Za-z_$][\w$]*)\s*=/g)]
-    const internalKeys = new Set(['map', 'svgId', 'svg', 'lgg'])
+    const internalKeys = new Set(['map', 'svgId', 'svg', 'lgg', 'layer'])
 
     return new Set(matches.map((m) => m[1]).filter((key) => !internalKeys.has(key)))
 }

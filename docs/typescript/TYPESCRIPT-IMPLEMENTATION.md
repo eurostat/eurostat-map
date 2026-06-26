@@ -137,7 +137,7 @@ build/
           │   └── index.d.ts        # Type definitions
           ├── core/                  # Core module types
           ├── legend/                # Legend types
-          ├── map-types/             # Map type definitions
+          ├── layers/                # Map type/layers definitions
           └── tooltip/               # Tooltip types
 ```
 

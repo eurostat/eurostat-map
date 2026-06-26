@@ -6,7 +6,7 @@ import { select } from 'd3-selection'
 import { drawCircleSizeLegend } from '../legend-circle-size'
 import { buildSpikeLegend } from './legend-spike'
 import { buildD3SymbolItem } from './legend-d3-shape'
-import { symbolsLibrary } from '../../map-types/proportional-symbol/symbols/d3-symbols'
+import { symbolsLibrary } from '../../layers/proportional-symbol/symbols/d3-symbols'
 import { getCentroidsGroup } from '../../core/geo/centroids'
 
 /**

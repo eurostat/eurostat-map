@@ -1,6 +1,8 @@
 import type { StatConfig } from './stat/StatConfig'
 import type { StatData } from './stat/StatData'
-import type { CompositionStatConfig } from '../map-types/composition/CompositionStatConfig'
+import type { Layer } from './layer/Layer'
+import type { LayerConfig } from './layer/LayerConfig'
+import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
@@ -486,6 +488,21 @@ export interface MapInstance {
 
     /** Returns region centroids as an array of projected coordinate pairs. */
     regionCentroids(): Array<{ id: string; x: number; y: number }>
+
+    /** Ordered thematic layer stack (bottom → top). */
+    layers_: Layer[]
+    activeLayerIndex_: number
+
+    activeLayer(): Layer
+    layer(ref?: number | string): Layer | undefined
+    layers(): Layer[]
+    layers(configs: LayerConfig[]): this
+    addLayer(type: string, config?: LayerConfig): Layer
+    addLayer(config: LayerConfig): Layer
+    removeLayer(ref: number | string): this
+    activeLayerIndex(): number
+    activeLayerIndex(i: number): this
+    updateAllLayers(): this
 
     /** Allow additional map-type-specific properties and methods. */
     [key: string]: any

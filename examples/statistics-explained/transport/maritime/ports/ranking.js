@@ -51,7 +51,7 @@ const sums = {
   ME: 2464492
 }
 
-const rankingX = portsWidth - 230;
+const rankingX = (typeof portsWidth !== "undefined" ? portsWidth : 795) - 230;
 const rankingY = 10;
 
 function createTopCountriesOverlay(svgSelector, sums, x, y) {

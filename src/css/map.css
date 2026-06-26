@@ -1,11 +1,11 @@
-@import './map-types/proportional-symbol.css';
-@import './map-types/coxcomb.css';
-@import './map-types/alpha.css';
-@import './map-types/flow.css';
-@import './map-types/pie.css';
-@import './map-types/sparkline.css';
-@import './map-types/waffle.css';
-@import './map-types/bar.css';
+@import './layers/proportional-symbol.css';
+@import './layers/coxcomb.css';
+@import './layers/alpha.css';
+@import './layers/flow.css';
+@import './layers/pie.css';
+@import './layers/sparkline.css';
+@import './layers/waffle.css';
+@import './layers/bar.css';
 
 /* wrapper DOM */
 .em-map-wrapper {

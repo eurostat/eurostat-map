@@ -8,6 +8,13 @@ import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 import { refreshCentroids } from './geo/centroids'
 import { exportMapToPNG, exportMapToSVG } from './export'
 import { buildGridCartogramBase } from './cartograms'
+import {
+    createLayer,
+    makeMapSelfLayer,
+    forwardFieldsToActiveLayer,
+    forwardChainableMethod,
+} from './layer'
+import { getRole, isLayerTypeRegistered, getLayerType } from './layer-registry'
 
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../types/core/MapConfig').MapConfig} MapConfig */
@@ -222,81 +229,98 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    out.encoding = function (channel, config) {
-        if (!arguments.length) return out.encodings_
+    // ── Layer 0 facade + thematic API ─────────────────────────────────────────────
+    // The map is its own layer 0 until its type is migrated to a real Layer (Phase 3+).
+    // makeMapSelfLayer installs the (relocated) encoding API onto the map.
+    makeMapSelfLayer(out)
 
-        if (arguments.length === 1) {
-            if (typeof channel === 'string' || channel instanceof String) return out.encodings_[channel]
-            out.encodings_ = { ...out.encodings_, ...channel }
-            applyEncodingSideEffects(channel)
-            return out
-        }
+    // ── Layer stack ───────────────────────────────────────────────────────────────
+    out.layers_ = [out] // facade: the map is its own layer 0
+    out.activeLayerIndex_ = 0
 
-        out.encodings_[channel] = config
-        applyEncodingSideEffects({ [channel]: config })
+    out.activeLayer = () => out.layers_[out.activeLayerIndex_]
+
+    out.layer = function (ref) {
+        if (ref == null) return out.activeLayer()
+        if (typeof ref === 'number') return out.layers_[ref]
+        return out.layers_.find((l) => l.id === ref || l.layerId_ === ref)
+    }
+
+    out.activeLayerIndex = function (i) {
+        if (!arguments.length) return out.activeLayerIndex_
+        out.activeLayerIndex_ = i
         return out
     }
 
-    const applyEncodingSideEffects = function (encodings) {
-        const color = encodings?.color
-        if (!color) return
+    out.addLayer = function (typeOrConfig, config) {
+        const cfg = typeof typeOrConfig === 'string' ? { type: typeOrConfig, ...(config || {}) } : { ...typeOrConfig }
+        const role = cfg.role || getRole(cfg.type)
+        const addingBase = role === 'base'
+        const onlyFacade = out.layers_.length === 1 && out.layers_[0] === out
 
-        if (color.values) {
-            out.catColors_ = out.catColors_ || {}
-            if (Array.isArray(color.values)) {
-                const statName = color.stat || out.encoding('height')?.stat || out.encoding('composition')?.stat || 'composition'
-                const codes = color.categoryCodes || out.statMeta_[statName]?.categoryCodes || out.statCodes_ || []
-                codes.forEach((code, i) => {
-                    if (color.values[i] != null) out.catColors_[code] = color.values[i]
-                })
-            } else {
-                out.catColors_ = { ...out.catColors_, ...color.values }
-            }
+        // A real base replaces the self-facade base.
+        if (addingBase && onlyFacade && out.role === 'base') out.layers_ = []
+
+        // Enforce: at most one base.
+        if (addingBase && out.layers_.some((l) => l.role === 'base')) {
+            console.error(`[eurostat-map] A base layer already exists; ignoring extra base layer "${cfg.type}".`)
+            return out.activeLayer()
         }
 
-        if (color.labels) {
-            out.catLabels_ = out.catLabels_ || {}
-            if (Array.isArray(color.labels)) {
-                const statName = color.stat || out.encoding('height')?.stat || out.encoding('composition')?.stat || 'composition'
-                const codes = color.categoryCodes || out.statMeta_[statName]?.categoryCodes || out.statCodes_ || []
-                codes.forEach((code, i) => {
-                    if (color.labels[i] != null) out.catLabels_[code] = color.labels[i]
-                })
-            } else {
-                out.catLabels_ = { ...out.catLabels_, ...color.labels }
+        // Real Layer path is only available for REGISTERED types (Phase 3+).
+        if (!isLayerTypeRegistered(cfg.type)) {
+            console.warn(
+                `[eurostat-map] Layer type "${cfg.type}" is not yet available as a layer. ` +
+                    `Use eurostatmap.map('${cfg.type}') for a standalone single-type map for now.`
+            )
+            return out.activeLayer()
+        }
+
+        const layer = createLayer(out, cfg)
+        getLayerType(cfg.type).decorate(layer, cfg)
+
+        if (addingBase) out.layers_.unshift(layer)
+        else out.layers_.push(layer)
+        return layer
+    }
+
+    out.layers = function (configs) {
+        if (!arguments.length) return out.layers_
+        out.layers_ = []
+        ;(configs || []).forEach((c) => out.addLayer(c))
+        if (out.layers_.length === 0) out.layers_ = [out] // keep facade if nothing was added
+        return out
+    }
+
+    out.removeLayer = function (ref) {
+        const l = out.layer(ref)
+        if (!l || l === out) return out
+        const svg = out.svg && out.svg()
+        if (svg) {
+            const g = svg.select('#em-layer-' + l.id + '-' + out.svgId_)
+            if (!g.empty()) g.remove()
+            if (l.legendObj_) {
+                const ls = svg.select('#' + l.legendObj_.svgId)
+                if (!ls.empty()) ls.remove()
             }
         }
+        out.layers_ = out.layers_.filter((x) => x !== l)
+        if (out.layers_.length === 0) out.layers_ = [out]
+        if (out.activeLayerIndex_ >= out.layers_.length) out.activeLayerIndex_ = out.layers_.length - 1
+        return out
     }
 
-    out.getEncodingStat = function (channel, fallback) {
-        return out.encodings_[channel]?.stat || fallback
-    }
-
-    out.getEncodingStats = function (channel, fallback) {
-        const encoding = out.encodings_[channel]
-        if (encoding?.stats) return encoding.stats
-        if (encoding?.stat) return [encoding.stat]
-        return fallback
-    }
-
-    out.getEncodingStatKey = function (channel, categoryCode, fallbackStat) {
-        const statName = out.getEncodingStat(channel, fallbackStat || channel)
-        if (!categoryCode) return statName
-        return out.statMeta_[statName]?.statKeys?.[categoryCode] || statName
-    }
-
-    out.getEncodingStatData = function (channel, categoryCode, fallbackStat) {
-        return out.statData(out.getEncodingStatKey(channel, categoryCode, fallbackStat))
-    }
-
-    out.getEncodingValue = function (channel, regionId, categoryCode, fallbackStat) {
-        const entry = out.getEncodingStatData(channel, categoryCode, fallbackStat)?.get(regionId)
-        return entry?.value
-    }
-
-    out.getEncodingUnitText = function (channel, categoryCode, fallbackStat) {
-        const statData = out.getEncodingStatData(channel, categoryCode, fallbackStat)
-        return statData?.unitText?.() || out.encodings_[channel]?.unitText || ''
+    // Orchestration: classify+style every layer, then update every layer's legend.
+    // For a legacy single-layer map this loops [out] once and is behaviour-identical.
+    out.updateAllLayers = function () {
+        out.layers_.forEach((l) => {
+            l.updateClassification?.()
+            l.updateStyle?.()
+        })
+        out.layers_.forEach((l) => {
+            if (l.legend_ && l.legendObj_) l.legendObj_.update?.()
+        })
+        return out
     }
 
     out.stat = function (k, v) {
@@ -423,22 +447,28 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.legend_ = undefined
     out.legendObj_ = undefined
 
-    const applyLegendVisibility = function () {
-        const legend = out.legendObj()
+    const applyLegendVisibilityForLayer = function (layer) {
+        const legend = layer.legendObj_
         if (!legend) return
 
-        if (out.legendButton_) {
-            if (out.legendVisible_ === undefined) {
-                // Auto-hide on mobile by default when legend button is enabled.
-                out.legendVisible_ = window.innerWidth > 768
+        let visible = out.legendVisible_
+        if (visible === undefined) {
+            if (out.legendButton_) {
+                visible = window.innerWidth > 768
+            } else {
+                visible = true
             }
-        } else {
-            out.legendVisible_ = true
         }
 
-        const legendSvg = select('#' + legend.svgId)
+        const legendSvg = out.svg().select('#' + legend.svgId)
         if (!legendSvg.empty()) {
-            legendSvg.style('display', out.legendVisible_ ? null : 'none')
+            legendSvg.style('display', visible ? null : 'none')
+        }
+    }
+
+    const applyLegendVisibility = function () {
+        if (out.layers_ && Array.isArray(out.layers_)) {
+            out.layers_.forEach(applyLegendVisibilityForLayer)
         }
     }
 
@@ -500,10 +530,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out.updateLegend = function (v) {
-        if (out.legendObj_) {
-            if (out.updateClassification) out.updateClassification()
-            if (out.updateStyle) out.updateStyle()
-            out.legendObj().update()
+        if (out.layers_ && Array.isArray(out.layers_)) {
+            out.layers_.forEach((l) => {
+                if (l.legendObj_) {
+                    if (l.updateClassification) l.updateClassification()
+                    if (l.updateStyle) l.updateStyle()
+                    l.legendObj_.update()
+                }
+            })
             applyLegendVisibility()
         }
         return out
@@ -540,9 +574,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         //legend element
-        if (out.legend()) {
-            out.buildLegend()
-        }
+        out.buildLegend()
 
         //define tooltip
         //prepare map tooltip
@@ -582,24 +614,37 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
     }
 
-    out.buildLegend = function () {
-        //create legend object
-        out.legendObj(out.getLegendConstructor()(out, out.legend()))
-        const legend = out.legendObj()
+    out.buildLegendForLayer = function (layer) {
+        const isFacade = layer === out
+        const legendConfig = isFacade ? out.legend() : layer.legend_
+        if (!legendConfig) return out
 
-        //get legend svg. If it does not exist, create it embeded within the map
-        let legendSvg = select('#' + legend.svgId)
-        if (legendSvg.size() == 0) {
-            //get legend position
-            const x = legend.x == undefined ? out.width() - 100 - legend.boxPadding : legend.x
-            const y = legend.y == undefined ? legend.boxPadding : legend.y
+        const constructor = isFacade ? out.getLegendConstructor() : layer.getLegendConstructor()
+        if (!layer.legendObj_) {
+            layer.legendObj_ = constructor(layer, legendConfig)
+        }
+        const legend = layer.legendObj_
 
-            //build legend SVG in a new group
+        let legendSvg = out.svg().select('#' + legend.svgId)
+        if (legendSvg.empty()) {
             out.svg().append('g').attr('id', legend.svgId).attr('class', 'em-legend')
         }
 
         legend.build()
-        applyLegendVisibility()
+        applyLegendVisibilityForLayer(layer)
+        return out
+    }
+
+    out.buildLegend = function () {
+        if (out.layers_ && Array.isArray(out.layers_)) {
+            out.layers_.forEach((l) => {
+                const isFacade = l === out
+                const legendConfig = isFacade ? out.legend() : l.legend_
+                if (legendConfig) {
+                    out.buildLegendForLayer(l)
+                }
+            })
+        }
     }
 
     /** Check if all stat datasets have been loaded. */
@@ -731,10 +776,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
             refreshCentroids(out)
         }
 
-        out.updateClassification()
-        out.updateStyle()
-
-        if (out.legend_ && out.legendObj()) out.legendObj().update()
+        out.updateAllLayers()
 
         return out
     }
