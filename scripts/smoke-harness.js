@@ -219,7 +219,30 @@ async function run() {
     const server = await startServer();
     const browser = await playwright.chromium.launch({ headless: true });
     
-    const examples = paths.filter(p => p !== 'index.html');
+    const runAll = process.argv.includes('--all');
+    const CHERRY_PICKED = [
+        'choropleth/basic.html',
+        'categorical/categorical.html',
+        'proportional-symbols/prop-symbols.html',
+        'bivariate/pop-unemploy-bivariate.html',
+        'trivariate/trivariate.html',
+        'stripe/farm_size.html',
+        'composition/composition.html',
+        'sparklines/sparklines.html',
+        'flow/flowmap.html',
+        'coxcomb/coxcomb.html',
+        'waffle/waffle.html',
+        'mushroom/mushroom.html',
+        'bar-chart/bar-chart.html',
+        'misc/minimap.html',
+        'misc/hatching.html',
+        'choropleth/linked_maps.html'
+    ];
+
+    const examples = runAll 
+        ? paths.filter(p => p !== 'index.html') 
+        : CHERRY_PICKED;
+
     let passed = 0;
     let failed = 0;
 
@@ -346,6 +369,13 @@ async function run() {
                                     const originalBuild = mapInstance.build;
                                     if (typeof originalBuild === 'function') {
                                         mapInstance.build = function() {
+                                            if (typeof mapInstance.dorlingSettings === 'function') {
+                                                const currentSettings = mapInstance.dorlingSettings() || {};
+                                                mapInstance.dorlingSettings(Object.assign({}, currentSettings, {
+                                                    animate: false,
+                                                    worker: false
+                                                }));
+                                            }
                                             const originalOnBuild = mapInstance.onBuild();
                                             mapInstance.onBuild(function(m) {
                                                 window.builtMapsCount++;

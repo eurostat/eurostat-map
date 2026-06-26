@@ -880,3 +880,122 @@ export const getURLParameters = function () {
     for (let i = 0; i < p.length; i++) ps[p[i]] = getURLParameterByName(p[i])
     return ps
 }
+
+/**
+ * Builds a single-layer map instance for a given type and config.
+ * Handles creating the frame, adding the layer, and forwarding legacy properties.
+ *
+ * @param {string} type
+ * @param {object} config
+ * @returns {MapInstance}
+ */
+export const buildSingleLayerMap = function (type, config) {
+    const role = getRole(type)
+    const withCenterPoints = role === 'overlay' || type === 'bar' || type === 'barComposition'
+    const CANONICAL_MAP_TYPES = {
+        choropleth: 'ch',
+        ch: 'ch',
+        categorical: 'ct',
+        ct: 'ct',
+        proportionalSymbol: 'ps',
+        proportionalSymbols: 'ps',
+        ps: 'ps',
+        bivariateChoropleth: 'chbi',
+        chbi: 'chbi',
+        trivariateChoropleth: 'chtri',
+        ternary: 'chtri',
+        chtri: 'chtri',
+        stripeComposition: 'scomp',
+        stripe: 'scomp',
+        scomp: 'scomp',
+        pieChart: 'pie',
+        pie: 'pie',
+        composition: 'pie',
+        sparkline: 'spark',
+        spark: 'spark',
+        sparklines: 'spark',
+        flow: 'flow',
+        flowmap: 'flow',
+        coxcomb: 'coxcomb',
+        polar: 'coxcomb',
+    }
+    const canonicalType = CANONICAL_MAP_TYPES[type] || type
+    const out = createStatMap(config, withCenterPoints, canonicalType)
+
+    // Remove the self-facade layer so the real layer becomes layer 0.
+    out.layers_ = []
+
+    const layer = out.addLayer(type, config)
+    out.activeLayerIndex(0)
+
+    // Forwarding accessors for backwards compatibility
+    const baseFields = [
+        'encodings_',
+        'catColors_',
+        'catLabels_',
+        'statCodes_',
+        'legend_',
+        'legendObj_',
+        'tooltip_',
+    ]
+    const baseMethods = [
+        'encoding',
+        'updateClassification',
+        'updateStyle',
+        'getLegendConstructor',
+        'legend',
+    ]
+
+    let typeFields = []
+    let typeMethods = []
+
+    if (type === 'choropleth' || type === 'ch') {
+        typeFields = [
+            'numberOfClasses_',
+            'classificationMethod_',
+            'thresholds_',
+            'makeClassifNice_',
+            'colorFunction_',
+            'classToFillStyle_',
+            'noDataFillStyle_',
+            'classifier_',
+            'colors_',
+            'colorSchemeType_',
+            'valueTransform_',
+            'valueUntransform_',
+            'pointOfDivergence_',
+            'skipNormalization_',
+            'filtersDefinitionFunction_',
+        ]
+        typeMethods = [
+            'numberOfClasses',
+            'classificationMethod',
+            'thresholds',
+            'makeClassifNice',
+            'colorFunction',
+            'classToFillStyle',
+            'noDataFillStyle',
+            'classifier',
+            'colors',
+            'colorSchemeType',
+            'valueTransform',
+            'valueUntransform',
+            'pointOfDivergence',
+            'skipNormalization',
+            'threshold',
+            'filtersDefinitionFunction',
+            'highlightRegion',
+            'clearHighlight',
+        ]
+    }
+
+    forwardFieldsToActiveLayer(out, [...baseFields, ...typeFields])
+
+    const allMethods = [...baseMethods, ...typeMethods]
+    for (const method of allMethods) {
+        forwardChainableMethod(out, method)
+    }
+
+    return out
+}
+

@@ -100,6 +100,32 @@ export const attachThematicApi = function (layer, map) {
         return sd?.unitText?.() || layer.encodings_[channel]?.unitText || ''
     }
 
+    layer.legend = function (v) {
+        if (!arguments.length) return layer.legend_
+
+        if (v === false) {
+            const legend = layer.legendObj_
+            if (legend) {
+                const legendSvg = select('#' + legend.svgId)
+                if (legendSvg.size() > 0) {
+                    legendSvg.selectAll('*').remove()
+                }
+            }
+            if (map.svg) {
+                map.svg()?.select('#em-legend-button').remove()
+            }
+            layer.legend_ = v
+            return layer
+        }
+        layer.legend_ = v
+        if (layer.legendObj_) {
+            if (layer.updateClassification) layer.updateClassification()
+            if (layer.updateStyle) layer.updateStyle()
+            layer.legendObj_.update?.()
+        }
+        return layer
+    }
+
     return layer
 }
 
@@ -160,6 +186,8 @@ export const createLayer = function (map, config = {}) {
     layer.statCodes_ = undefined
     layer.legend_ = config.legend
     layer.legendObj_ = undefined
+    layer.tooltip_ = config.tooltip || {}
+    layer.noDataFillStyle_ = config.noDataFillStyle || map.noDataFillStyle_ || '#bcbcbc'
 
     // Abstract render methods — the type's decorate() overrides these in Phase 3+.
     layer.updateClassification = function () {
@@ -246,7 +274,12 @@ export const forwardChainableMethod = function (map, name) {
             const layer = map.activeLayer()
             return function (...args) {
                 const r = layer[name](...args)
-                const isGetter = args.length === 0 || (args.length === 1 && (typeof args[0] === 'string' || args[0] instanceof String))
+                let isGetter = args.length === 0
+                if (args.length === 1 && (name === 'encoding' || name === 'stat' || name === 'statData')) {
+                    if (typeof args[0] === 'string' || args[0] instanceof String) {
+                        isGetter = true
+                    }
+                }
                 return isGetter ? r : map
             }
         },

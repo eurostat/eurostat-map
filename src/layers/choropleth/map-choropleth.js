@@ -4,7 +4,8 @@ import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
-import { createStatMap } from '../../core/stat-map'
+import { createStatMap, buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
 import {
     applyNiceNumbers,
@@ -13,6 +14,7 @@ import {
     getRegionsSelector,
     getTextColorForBackground,
     spaceAsThousandSeparator,
+    flags,
 } from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
@@ -28,35 +30,42 @@ import { applyPatternFill } from '../../core/decoration/pattern-fill'
  * @returns {ChoroplethMap}
  */
 export const map = function (config) {
-    //create map object to return, using the template
-    const out = createStatMap(config, false, 'ch')
+    return buildSingleLayerMap('choropleth', config)
+}
 
+/**
+ * Decorates a Layer object with choropleth-specific state and methods.
+ * @param {object} layer
+ * @param {object} config
+ */
+export const decorateChoroplethLayer = function (layer, config) {
     //the number of classes
-    out.numberOfClasses_ = 7
+    layer.numberOfClasses_ = 7
     //the classification method
-    out.classificationMethod_ = 'quantile' // or: ckmeans, jenks, equinter, threshold
+    layer.classificationMethod_ = 'quantile' // or: ckmeans, jenks, equinter, threshold
     //the threshold, when the classification method is 'threshold'
-    out.thresholds_ = [0]
+    layer.thresholds_ = [0]
     //colors to use for classes
-    out.colors_ = null
+    layer.colors_ = null
     //when computed automatically, ensure the threshold are nice rounded values
-    out.makeClassifNice_ = false
+    layer.makeClassifNice_ = false
     //the color function [0,1] -> color
     const paletteA = ['#D4DAF0', '#C1C9EB', '#A8B4E6', '#93A2DC', '#7C90D6', '#677CD2', '#5169BE', '#3C57B0', '#2644A7', '#15246B']
-    out.colorFunction_ = (t) => piecewise(interpolateLab, paletteA)(Math.min(Math.max(0, t), 1)) // default
+    layer.colorFunction_ = (t) => piecewise(interpolateLab, paletteA)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
-    out.classToFillStyle_ = undefined
+    layer.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
-    out.classifier_ = undefined
+    layer.classifier_ = undefined
     // set tooltip function
-    out.tooltip_.textFunction = choroplethTooltipFunction
+    layer.tooltip_ = layer.tooltip_ || {}
+    layer.tooltip_.textFunction = choroplethTooltipFunction
 
     // continuous color schemes
-    out.colorSchemeType_ = 'discrete' // or 'continuous'
-    out.valueTransform_ = (x) => x // for distribution stretching in continuous mode
-    out.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
-    out.skipNormalization_ = false // whether to skip normalization step for continuous color schemes (e.g. for pre-normalized data like quantile)
-    out.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
+    layer.colorSchemeType_ = 'discrete' // or 'continuous'
+    layer.valueTransform_ = (x) => x // for distribution stretching in continuous mode
+    layer.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
+    layer.skipNormalization_ = false // whether to skip normalization step for continuous color schemes (e.g. for pre-normalized data like quantile)
+    layer.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
     // Getter/setters for exposed attributes
     const paramNames = [
@@ -77,10 +86,10 @@ export const map = function (config) {
         'skipNormalization_',
     ]
     paramNames.forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
+        layer[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return layer[att]
+            layer[att] = v
+            return layer
         }
     })
 
@@ -88,50 +97,52 @@ export const map = function (config) {
     if (config) {
         paramNames.forEach(function (key) {
             let k = key.slice(0, -1) // remove trailing underscore
-            if (config[k] != undefined) out[k](config[k])
+            if (config[k] != undefined) layer[k](config[k])
         })
     }
 
     //override of some special getters/setters
-    out.colorFunction = function (v) {
-        if (!arguments.length) return out.colorFunction_
-        out.colorFunction_ = v
-        if (out.filtersDefinitionFunction_) {
+    layer.colorFunction = function (v) {
+        if (!arguments.length) return layer.colorFunction_
+        layer.colorFunction_ = v
+        if (layer.filtersDefinitionFunction_) {
             // dot density style
-            out.classToFillStyle(getFillPatternLegend())
+            layer.classToFillStyle(getFillPatternLegend())
         } else {
             // update color function
-            const newFunction = getColorFunction(out.colorFunction_, out.colors_, out.colorSchemeType_)
-            out.classToFillStyle(newFunction)
+            const newFunction = getColorFunction(layer.colorFunction_, layer.colors_, layer.colorSchemeType_)
+            layer.classToFillStyle(newFunction)
         }
 
-        return out
+        return layer
     }
-    out.threshold = function (v) {
-        if (!arguments.length) return out.thresholds_
-        out.thresholds_ = v
-        out.numberOfClasses(v.length + 1)
-        return out
+    layer.threshold = function (v) {
+        if (!arguments.length) return layer.thresholds_
+        layer.thresholds_ = v
+        layer.numberOfClasses(v.length + 1)
+        return layer
     }
-    out.filtersDefinitionFunction = function (v) {
-        if (!arguments.length) return out.filtersDefinitionFunction_
-        out.filtersDefinitionFunction_ = v
-        if (out.svg()) out.filtersDefinitionFunction_(out.svg(), out.numberOfClasses_)
-        return out
+    layer.filtersDefinitionFunction = function (v) {
+        if (!arguments.length) return layer.filtersDefinitionFunction_
+        layer.filtersDefinitionFunction_ = v
+        const map = layer.map
+        if (map && map.svg()) layer.filtersDefinitionFunction_(map.svg(), layer.numberOfClasses_)
+        return layer
     }
 
     //@override
-    out.updateClassification = function () {
+    layer.updateClassification = function () {
         try {
+            const map = layer.map
             // apply classification to all insets that are outside of the main map's SVG
-            if (out.insetTemplates_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+            if (map.insetTemplates_) {
+                executeForAllInsets(map.insetTemplates_, map.svgId_, applyClassificationToMap)
             }
 
             // apply to main map
-            applyClassificationToMap(out)
+            applyClassificationToMap(map)
 
-            return out
+            return layer
         } catch (e) {
             console.error('Error in updateClassification:', e.message)
             console.error(e)
@@ -140,49 +151,49 @@ export const map = function (config) {
 
     function applyClassificationToMap(map) {
         const generateRange = (nb) => [...Array(nb).keys()]
-        const fillData = out.getEncodingStatData?.('fill', undefined, 'default') || out.statData()
+        const fillData = layer.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
         const dataArray = fillData.getArray()
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
 
         if (dataArray) {
             const setupClassifier = () => {
-                const range = generateRange(out.numberOfClasses_)
+                const range = generateRange(layer.numberOfClasses_)
 
-                if (out.colorSchemeType_ === 'continuous') {
-                    const valueTransform = out.valueTransform_ || ((d) => d)
+                if (layer.colorSchemeType_ === 'continuous') {
+                    const valueTransform = layer.valueTransform_ || ((d) => d)
 
-                    if (out.skipNormalization_) {
+                    if (layer.skipNormalization_) {
                         // Transform already outputs 0-1 (e.g. quantile, jenks)
                         // No domain normalisation needed
-                        out.domain_ = null
+                        layer.domain_ = null
                     } else {
                         const transformedValues = dataArrayNumeric.map(valueTransform)
                         const minVal = min(transformedValues)
                         const maxVal = max(transformedValues)
-                        const isDiverging = checkIfDiverging(out)
-                        const isFullScale = typeof out.colorFunction_?.domain === 'function'
+                        const isDiverging = checkIfDiverging(layer)
+                        const isFullScale = typeof layer.colorFunction_?.domain === 'function'
 
                         if (!isFullScale) {
                             if (isDiverging) {
-                                const divergence = valueTransform(out.pointOfDivergence_ ?? 0)
-                                out.domain_ = [minVal, divergence, maxVal]
+                                const divergence = valueTransform(layer.pointOfDivergence_ ?? 0)
+                                layer.domain_ = [minVal, divergence, maxVal]
                             } else {
-                                out.domain_ = [minVal, maxVal]
+                                layer.domain_ = [minVal, maxVal]
                             }
                         }
                     }
 
-                    out.classifier((val) => val) // identity
+                    layer.classifier((val) => val) // identity
                 }
 
-                switch (out.classificationMethod_) {
+                switch (layer.classificationMethod_) {
                     case 'quantile': {
-                        out.classifier(scaleQuantile().domain(dataArrayNumeric).range(range))
+                        layer.classifier(scaleQuantile().domain(dataArrayNumeric).range(range))
                         break
                     }
                     case 'equal-interval':
                     case 'equinter': {
-                        out.classifier(
+                        layer.classifier(
                             scaleQuantize()
                                 .domain([min(dataArrayNumeric), max(dataArrayNumeric)])
                                 .range(range)
@@ -190,29 +201,29 @@ export const map = function (config) {
                         break
                     }
                     case 'threshold': {
-                        out.numberOfClasses(out.thresholds_.length + 1)
-                        out.classifier(scaleThreshold().domain(out.thresholds_).range(generateRange(out.numberOfClasses_)))
+                        layer.numberOfClasses(layer.thresholds_.length + 1)
+                        layer.classifier(scaleThreshold().domain(layer.thresholds_).range(generateRange(layer.numberOfClasses_)))
                         break
                     }
                     case 'jenks': {
-                        const jenksBreaks = jenks(dataArrayNumeric, out.numberOfClasses_) //data, lowerClassLimits, nClasses
+                        const jenksBreaks = jenks(dataArrayNumeric, layer.numberOfClasses_) //data, lowerClassLimits, nClasses
                         const domain = jenksBreaks.slice(1, -1)
-                        out.classifier(scaleThreshold().domain(domain).range(range))
+                        layer.classifier(scaleThreshold().domain(domain).range(range))
                         break
                     }
                     case 'ckmeans': {
-                        const ckmeansBreaks = ckmeans(dataArrayNumeric, out.numberOfClasses_).map((cluster) => cluster.pop())
+                        const ckmeansBreaks = ckmeans(dataArrayNumeric, layer.numberOfClasses_).map((cluster) => cluster.pop())
                         const domain = ckmeansBreaks.slice(0, -1)
-                        out.classifier(scaleThreshold().domain(domain).range(range))
+                        layer.classifier(scaleThreshold().domain(domain).range(range))
                         break
                     }
                 }
 
                 // For quantile, keep exact quantile thresholds so class counts stay balanced.
-                if (out.makeClassifNice_) {
-                    const rawThresholds = out.classifier_.domain()
+                if (layer.makeClassifNice_) {
+                    const rawThresholds = layer.classifier_.domain()
                     const niceThresholds = applyNiceNumbers(rawThresholds, dataArrayNumeric)
-                    out.classifier_.domain(niceThresholds)
+                    layer.classifier_.domain(niceThresholds)
                 }
             }
 
@@ -242,13 +253,13 @@ export const map = function (config) {
                     }
 
                     //continuous (raw value as attribute for color function)
-                    if (out.colorSchemeType_ === 'continuous') {
+                    if (layer.colorSchemeType_ === 'continuous') {
                         sel.attr('ecl', value)
                         return
                     }
 
                     // classification into discrete classes
-                    sel.attr('ecl', +out.classifier_(value))
+                    sel.attr('ecl', +layer.classifier_(value))
                 })
             }
 
@@ -268,17 +279,18 @@ export const map = function (config) {
     }
 
     //@override
-    out.updateStyle = function () {
+    layer.updateStyle = function () {
         try {
+            const map = layer.map
             // apply style to insets
-            if (out.insetTemplates_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            if (map.insetTemplates_) {
+                executeForAllInsets(map.insetTemplates_, map.svgId_, applyStyleToMap)
             }
 
             // apply to main map
-            applyStyleToMap(out)
+            applyStyleToMap(map)
 
-            return out
+            return layer
         } catch (e) {
             console.error('Error in updateStyle:', e.message)
             console.error(e)
@@ -287,12 +299,12 @@ export const map = function (config) {
 
     function applyStyleToMap(map) {
         // Define function to get a class' color
-        if (out.filtersDefinitionFunction_) {
+        if (layer.filtersDefinitionFunction_) {
             // Dot density style
-            out.classToFillStyle(getFillPatternLegend())
+            layer.classToFillStyle(getFillPatternLegend())
         } else {
             // Color legend style
-            out.classToFillStyle(getColorFunction(out.colorFunction_, out.colors_))
+            layer.classToFillStyle(getColorFunction(layer.colorFunction_, layer.colors_))
         }
 
         // Apply color and events to regions if SVG exists
@@ -304,7 +316,7 @@ export const map = function (config) {
             regions
                 .style('pointer-events', 'none') // disable interaction during transition
                 .transition()
-                .duration(out.transitionDuration())
+                .duration(map.transitionDuration())
                 .style('fill', regionsFillFunction)
                 .end()
                 .then(() => {
@@ -319,7 +331,7 @@ export const map = function (config) {
                     addMouseEventsToRegions(map, regions)
 
                     // update font color for grid cartograms (contrast)
-                    if (out.gridCartogram_) {
+                    if (layer.map.gridCartogram_) {
                         map.svg()
                             .selectAll('.em-grid-text')
                             .each(function () {
@@ -332,24 +344,24 @@ export const map = function (config) {
                     //console.error('Error applying transition to regions:', err)
                 })
             // Apply additional settings for mixed NUTS level view
-            if (out.nutsLevel_ === 'mixed') {
+            if (map.nutsLevel_ === 'mixed') {
                 styleMixedNUTS(map)
             }
 
             // Update labels for statistical values if required
-            if (out.labels_) {
-                if (out.labels_.values) out.updateValuesLabels(map)
+            if (map.labels_) {
+                if (map.labels_.values) map.updateValuesLabels(map)
             }
 
             //add hatching if needed
-            if (out.patternFill_) {
-                applyPatternFill(map, out.patternFill_)
+            if (map.patternFill_) {
+                applyPatternFill(map, map.patternFill_)
             }
         }
     }
 
     //@override
-    out.getLegendConstructor = function () {
+    layer.getLegendConstructor = function () {
         return ChoroplethLegend.legend
     }
 
@@ -377,39 +389,11 @@ export const map = function (config) {
             })
     }
 
-    function getContinuousColor(value, out) {
-        const colorFn = out.colorFunction_
-        const transform = out.valueTransform_ || ((d) => d)
-        const transformed = transform(value)
-        if (isNaN(transformed)) return out.noDataFillStyle_ || 'gray'
-
-        // skipNormalization: transform already returns 0-1
-        if (out.skipNormalization_) {
-            return colorFn(Math.min(Math.max(transformed, 0), 1))
-        }
-
-        const domain = out.domain_ || [0, 1]
-        const isD3Scale = typeof colorFn?.domain === 'function'
-        if (isD3Scale) return colorFn(transformed)
-
-        let t
-        if (domain.length === 3) {
-            const [d0, , d2] = domain
-            const divT = transform(out.pointOfDivergence_ ?? 0)
-            t = transformed < divT ? (0.5 * (transformed - d0)) / (divT - d0) : 0.5 + (0.5 * (transformed - divT)) / (d2 - divT)
-        } else {
-            const [d0, d1] = domain
-            t = (transformed - d0) / (d1 - d0)
-        }
-
-        return colorFn(Math.min(Math.max(t, 0), 1))
-    }
-
     const regionsFillFunction = function (rg) {
         const sel = select(this)
         const ecl = sel.attr('ecl') // may be a class index or a raw value
         const isNoInput = sel.attr('ni') === '1'
-        const colorSchemeType = out.colorSchemeType_ || 'discrete'
+        const colorSchemeType = layer.colorSchemeType_ || 'discrete'
 
         if (!ecl && ecl !== '0') {
             return // input not added
@@ -417,32 +401,32 @@ export const map = function (config) {
 
         // Data not available or region missing in input data
         if (ecl === 'nd' || isNoInput) {
-            return out.noDataFillStyle_ || 'gray'
+            return layer.noDataFillStyle_ || 'gray'
         }
 
         // Dot-density or pattern-fill mode
-        if (out.filtersDefinitionFunction_) {
-            return out.classToFillStyle_(ecl)
+        if (layer.filtersDefinitionFunction_) {
+            return layer.classToFillStyle_(ecl)
         }
 
         // Continuous color scheme
         if (colorSchemeType === 'continuous') {
             const rawValue = +ecl
-            return getContinuousColor(rawValue, out)
+            return getContinuousColor(rawValue, layer)
         }
 
         // Discrete color scheme
-        if (out.Geometries?.userGeometries) {
-            return out.classToFillStyle_(ecl, out.numberOfClasses_ || 1)
+        if (layer.map.Geometries?.userGeometries) {
+            return layer.classToFillStyle_(ecl, layer.numberOfClasses_ || 1)
         }
 
-        if (out.geo_ === 'WORLD') {
-            const fillStyle = out.classToFillStyle_(ecl, out.numberOfClasses_ || 1)
-            return fillStyle || out.cntrgFillStyle_
+        if (layer.map.geo_ === 'WORLD') {
+            const fillStyle = layer.classToFillStyle_(ecl, layer.numberOfClasses_ || 1)
+            return fillStyle || layer.map.cntrgFillStyle_
         }
 
         // Default (NUTS case)
-        return out.classToFillStyle_(ecl, out.numberOfClasses_ || 1)
+        return layer.classToFillStyle_(ecl, layer.numberOfClasses_ || 1)
     }
 
     const addMouseEventsToRegions = function (map, regions) {
@@ -452,29 +436,30 @@ export const map = function (config) {
                 if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', map.hoverColor_) // Apply highlight color
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-                if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
+                if (map._tooltip) map._tooltip.mouseover(layer.tooltip_.textFunction(rg, layer))
+                if (map.onRegionMouseOver_) map.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
-                if (out._tooltip) out._tooltip.mousemove(e)
-                if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
+                if (map._tooltip) map._tooltip.mousemove(e)
+                if (map.onRegionMouseMove_) map.onRegionMouseMove_(e, rg, this, map)
             })
             .on('mouseout', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', sel.attr('fill___')) // Revert to original color
-                if (out._tooltip) out._tooltip.mouseout()
-                if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
+                if (map._tooltip) map._tooltip.mouseout()
+                if (map.onRegionMouseOut_) map.onRegionMouseOut_(e, rg, this, map)
             })
     }
 
     // Manually highlight a region by ID (simulate mouseover)
-    out.highlightRegion = function (regionId) {
-        if (!out.svg_) return out
+    layer.highlightRegion = function (regionId) {
+        const map = layer.map
+        if (!map.svg_) return layer
 
-        const selector = getRegionsSelector(out)
-        const region = out
+        const selector = getRegionsSelector(map)
+        const region = map
             .svg()
             .selectAll(selector)
             .filter((d) => d.properties.id === regionId)
@@ -482,41 +467,42 @@ export const map = function (config) {
         if (!region.empty()) {
             const rg = region.datum()
             const sel = region
-            sel.style('fill', out.hoverColor_ || 'orange')
+            sel.style('fill', map.hoverColor_ || 'orange')
 
-            if (out._tooltip) {
-                const html = out.tooltip_.textFunction(rg, out)
-                out._tooltip.mouseover(html)
+            if (map._tooltip) {
+                const html = layer.tooltip_.textFunction(rg, layer)
+                map._tooltip.mouseover(html)
 
                 // Get region bounds (in SVG space)
                 const bbox = region.node().getBBox()
 
                 // Apply current zoom/pan transform
-                const transform = out.__lastTransform || { x: 0, y: 0, k: 1 }
+                const transform = map.__lastTransform || { x: 0, y: 0, k: 1 }
                 const scaledX = (bbox.x + bbox.width / 2) * transform.k + transform.x
                 const scaledY = (bbox.y + bbox.height / 2) * transform.k + transform.y
 
                 // Convert to screen coords
-                const mapRect = out.svg().node().getBoundingClientRect()
+                const mapRect = map.svg().node().getBoundingClientRect()
                 const x = mapRect.left + scaledX
                 const y = mapRect.top + scaledY
 
-                out._tooltip.ensureTooltipOnScreen(x, y)
+                map._tooltip.ensureTooltipOnScreen(x, y)
             }
 
-            if (out.onRegionMouseOver_) {
-                out.onRegionMouseOver_(null, rg, region.node(), out)
+            if (map.onRegionMouseOver_) {
+                map.onRegionMouseOver_(null, rg, region.node(), map)
             }
         }
-        return out
+        return layer
     }
 
     // Manually clear the highlight (simulate mouseout)
-    out.clearHighlight = function () {
-        if (!out.svg_) return out
+    layer.clearHighlight = function () {
+        const map = layer.map
+        if (!map.svg_) return layer
 
-        const selector = getRegionsSelector(out)
-        out.svg()
+        const selector = getRegionsSelector(map)
+        map.svg()
             .selectAll(selector)
             .each(function () {
                 const sel = select(this)
@@ -524,14 +510,14 @@ export const map = function (config) {
                 if (original) sel.style('fill', original)
             })
 
-        if (out._tooltip) {
-            out._tooltip.mouseout()
+        if (map._tooltip) {
+            map._tooltip.mouseout()
         }
 
-        return out
+        return layer
     }
 
-    return out
+    return layer
 }
 
 //build a color legend object
@@ -565,8 +551,8 @@ export const getFillPatternLegend = function () {
     }
 }
 
-const choroplethTooltipFunction = function (region, map) {
-    if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
+const choroplethTooltipFunction = function (region, layer) {
+    if (layer.map.tooltip_.omitRegions && layer.map.tooltip_.omitRegions.includes(region.properties.id)) {
         return '' // Skip tooltip for omitted regions
     }
     const buf = []
@@ -581,7 +567,7 @@ const choroplethTooltipFunction = function (region, map) {
     `)
 
     // Retrieve region's data value and unit
-    const statData = map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
+    const statData = layer.getEncodingStatData?.('fill', undefined, 'default') || layer.map.statData()
     const sv = statData.get(regionId)
     const unit = statData.unitText() || ''
 
@@ -591,7 +577,7 @@ const choroplethTooltipFunction = function (region, map) {
             <div class="em-tooltip-text no-data">
                 <table class="em-tooltip-table">
                     <tbody>
-                        <tr><td>${map.noDataText_}</td></tr>
+                        <tr><td>${layer.map.noDataText_}</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -612,10 +598,41 @@ const choroplethTooltipFunction = function (region, map) {
 
     // Optional status flag
     const statusFlag = sv.status
-    if (statusFlag && map.tooltip_.showFlags) {
-        const flagText = map.tooltip_.showFlags === 'short' ? statusFlag : flags[statusFlag] || statusFlag
+    if (statusFlag && layer.map.tooltip_.showFlags) {
+        const flagText = layer.map.tooltip_.showFlags === 'short' ? statusFlag : flags[statusFlag] || statusFlag
         buf.push(` <span class="status-flag">${flagText}</span>`)
     }
 
     return buf.join('')
 }
+
+function getContinuousColor(value, layer) {
+    const colorFn = layer.colorFunction_
+    const transform = layer.valueTransform_ || ((d) => d)
+    const transformed = transform(value)
+    if (isNaN(transformed)) return layer.noDataFillStyle_ || 'gray'
+
+    // skipNormalization: transform already returns 0-1
+    if (layer.skipNormalization_) {
+        return colorFn(Math.min(Math.max(transformed, 0), 1))
+    }
+
+    const domain = layer.domain_ || [0, 1]
+    const isD3Scale = typeof colorFn?.domain === 'function'
+    if (isD3Scale) return colorFn(transformed)
+
+    let t
+    if (domain.length === 3) {
+        const [d0, , d2] = domain
+        const divT = transform(layer.pointOfDivergence_ ?? 0)
+        t = transformed < divT ? (0.5 * (transformed - d0)) / (divT - d0) : 0.5 + (0.5 * (transformed - divT)) / (d2 - divT)
+    } else {
+        const [d0, d1] = domain
+        t = (transformed - d0) / (d1 - d0)
+    }
+
+    return colorFn(Math.min(Math.max(t, 0), 1))
+}
+
+registerLayerType('choropleth', 'base', decorateChoroplethLayer)
+registerLayerType('ch', 'base', decorateChoroplethLayer)

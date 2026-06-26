@@ -28,9 +28,9 @@ const library = eurostatmap.default || eurostatmap.eurostatmap || globalThis.eur
 
 const { registerLayerType, isLayerTypeRegistered } = library
 
-// 1) Zero behaviour change: a legacy choropleth is its own layer 0 (facade).
+// 1) Zero behaviour change: a legacy facade is its own layer 0.
 {
-    const m = library.map('choropleth')
+    const m = library.map('categorical')
     assert.strictEqual(m.layer(0), m, 'facade: layer(0) is the map')
     assert.strictEqual(m.activeLayer(), m, 'facade: active layer is the map')
     assert.strictEqual(m.layers_.length, 1)
@@ -42,7 +42,7 @@ const { registerLayerType, isLayerTypeRegistered } = library
 
 // 2) addLayer of an UNREGISTERED type is inert and keeps the facade.
 {
-    const m = library.map('choropleth')
+    const m = library.map('categorical')
     const before = m.layers_.length
     const r = m.addLayer('proportionalSymbol') // not registered in Phase 1
     assert.strictEqual(m.layers_.length, before, 'unregistered addLayer does not mutate the stack')
@@ -57,7 +57,7 @@ const { registerLayerType, isLayerTypeRegistered } = library
     })
     assert.ok(isLayerTypeRegistered('dummy'))
 
-    const m = library.map('choropleth') // facade base
+    const m = library.map('categorical') // facade base
     const l = m.addLayer('dummy', { encoding: { size: { stat: 'population' } } })
 
     assert.ok(l.isLayer && l.type === 'dummy' && l.role === 'overlay')
@@ -79,4 +79,18 @@ const { registerLayerType, isLayerTypeRegistered } = library
     assert.strictEqual(m.layers_.length, before, 'second base rejected')
 }
 
-console.log('Phase 1 layer tests passed')
+// 5) Phase 3: Choropleth is migrated to a real Layer.
+{
+    const m = library.map('choropleth')
+    assert.notStrictEqual(m.layer(0), m, 'choropleth: layer(0) is NOT the map')
+    assert.strictEqual(m.layer(0).type, 'choropleth')
+    assert.strictEqual(m.activeLayer(), m.layer(0), 'choropleth: active layer is layer 0')
+    assert.strictEqual(m.layers_.length, 1)
+
+    // Verify forwarding methods return the map for chaining
+    assert.strictEqual(m.numberOfClasses(7), m, 'forwarded chainable method numberOfClasses() returns map')
+    assert.strictEqual(m.activeLayer().numberOfClasses_, 7, 'setting numberOfClasses on map updates layer')
+}
+
+console.log('Phase 1 & Phase 3 layer tests passed')
+
