@@ -44,7 +44,7 @@ const { registerLayerType, isLayerTypeRegistered } = library
 {
     const m = library.map('categorical')
     const before = m.layers_.length
-    const r = m.addLayer('proportionalSymbol') // not registered in Phase 1
+    const r = m.addLayer('pieChart') // not registered yet
     assert.strictEqual(m.layers_.length, before, 'unregistered addLayer does not mutate the stack')
     assert.strictEqual(r, m.activeLayer())
 }
@@ -92,5 +92,18 @@ const { registerLayerType, isLayerTypeRegistered } = library
     assert.strictEqual(m.activeLayer().numberOfClasses_, 7, 'setting numberOfClasses on map updates layer')
 }
 
-console.log('Phase 1 & Phase 3 layer tests passed')
+// 6) Phase 4: Proportional Symbol is migrated to a real Layer.
+{
+    const m = library.map('proportionalSymbol')
+    assert.notStrictEqual(m.layer(0), m, 'ps: layer(0) is NOT the map')
+    assert.strictEqual(m.layer(0).type, 'proportionalSymbol')
+    assert.strictEqual(m.activeLayer(), m.layer(0), 'ps: active layer is layer 0')
+    assert.strictEqual(m.layers_.length, 1)
+
+    // Verify forwarding methods
+    assert.strictEqual(m.psMaxSize(45), m, 'forwarded chainable method psMaxSize() returns map')
+    assert.strictEqual(m.activeLayer().psMaxSize_, 45, 'setting psMaxSize on map updates layer')
+}
+
+console.log('Phase 1, Phase 3 & Phase 4 layer tests passed')
 

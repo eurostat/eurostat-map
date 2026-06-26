@@ -7,7 +7,7 @@ import { getCentroidsGroup } from '../../../core/geo/centroids'
  * @return {*}
  */
 export function appendCustomSymbolsToMap(map, sizeData, out) {
-    return getCentroidsGroup(map)
+    return getCentroidsGroup(out)
         .selectAll('g.em-centroid')
         .append('g')
         .filter((rg) => {

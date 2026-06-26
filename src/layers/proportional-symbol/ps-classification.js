@@ -1,93 +1,102 @@
 import { createSqrtScale, createLinearScale } from "../../core/scale.js";
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { getResponsiveSymbolSize } from '../../core/responsive.js'
+import { min, max } from 'd3-array'
+import { getCentroidsGroup } from '../../core/geo/centroids.js'
 
 /**
- * @description defines classifier functions (out.classifierColor and out.classifierSize) for both symbol size and color
+ * @description defines classifier functions (layer.classifierColor and layer.classifierSize) for both symbol size and color
  */
-export function defineClassifiers(out) {
-    defineSizeClassifier(out)
+export function defineClassifiers(layer) {
+    defineSizeClassifier(layer)
 
     // colour
-    if (getColorData(out)?.getArray()) {
-        defineColorClassifier(out)
+    if (getColorData(layer)?.getArray()) {
+        defineColorClassifier(layer)
     }
 }
 
-function getColorData(out) {
-    return out.getEncodingStatData?.('color', undefined, 'color') || out.statData('color')
+function getColorData(layer) {
+    return layer.getEncodingStatData?.('color', undefined, 'color') || (layer.map ? layer.map.statData('color') : layer.statData('color'))
 }
 
-function getSizeData(out) {
-    return out.getEncodingStatData?.('size', undefined, 'size') || (out.statData('size')?.getArray() ? out.statData('size') : out.statData())
+function getSizeData(layer) {
+    const sizeData = layer.map ? layer.map.statData('size') : layer.statData('size')
+    const defaultData = layer.map ? layer.map.statData() : layer.statData()
+    return layer.getEncodingStatData?.('size', undefined, 'size') || (sizeData?.getArray() ? sizeData : defaultData)
 }
 
-function defineColorClassifier(out) {
+function defineColorClassifier(layer) {
     //simply return the array [0,1,2,3,...,nb-1]
     const getA = function (nb) {
         return [...Array(nb).keys()]
     }
     //use suitable classification type for colouring
-    if (out.psClassificationMethod_ === 'quantile') {
+    if (layer.psClassificationMethod_ === 'quantile') {
         //https://github.com/d3/d3-scale#quantile-scales
-        const domain = getColorData(out).getArray()
-        const range = getA(out.psClasses_)
-        out.classifierColor(scaleQuantile().domain(domain).range(range))
-    } else if (out.psClassificationMethod_ === 'equinter') {
+        const domain = getColorData(layer).getArray()
+        const range = getA(layer.psClasses_)
+        layer.classifierColor(scaleQuantile().domain(domain).range(range))
+    } else if (layer.psClassificationMethod_ === 'equinter') {
         //https://github.com/d3/d3-scale#quantize-scales
-        const domain = getColorData(out).getArray()
-        const range = getA(out.psClasses_)
-        out.classifierColor(
+        const domain = getColorData(layer).getArray()
+        const range = getA(layer.psClasses_)
+        layer.classifierColor(
             scaleQuantize()
                 .domain([min(domain), max(domain)])
                 .range(range)
         )
-        if (out.makeClassifNice_) out.classifierColor().nice()
-    } else if (out.psClassificationMethod_ === 'threshold') {
+        if (layer.makeClassifNice_) layer.classifierColor().nice()
+    } else if (layer.psClassificationMethod_ === 'threshold') {
         //https://github.com/d3/d3-scale#threshold-scales
-        out.psClasses(out.psThresholds().length + 1)
-        const range = getA(out.psClasses_)
-        out.classifierColor(scaleThreshold().domain(out.psThresholds()).range(range))
+        layer.psClasses(layer.psThresholds().length + 1)
+        const range = getA(layer.psClasses_)
+        layer.classifierColor(scaleThreshold().domain(layer.psThresholds()).range(range))
     }
 }
 
-function defineSizeClassifier(out) {
+function defineSizeClassifier(layer) {
     // raw values (size-specific first, fallback)
-    let rawData = getSizeData(out)?.getArray() ?? []
+    let rawData = getSizeData(layer)?.getArray() ?? []
 
     // Also check custom size legend values
-    const legendConfig = out.legend()
+    const legendConfig = layer.legend()
     if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
         rawData = [...rawData, ...legendConfig.sizeLegend.values]
     }
 
     // choose scale type based on shape
-    const isLinear = out.psShape_ === 'spike' || out.psShape_ === 'bar' || out.psShape_ === 'line'
-    const maxSize = getResponsiveSymbolSize(out.psMaxSize_, 2)
-    const minSize = getResponsiveSymbolSize(out.psMinSize_ || 0, 0)
+    const isLinear = layer.psShape_ === 'spike' || layer.psShape_ === 'bar' || layer.psShape_ === 'line'
+    const maxSize = getResponsiveSymbolSize(layer.psMaxSize_, 2)
+    const minSize = getResponsiveSymbolSize(layer.psMinSize_ || 0, 0)
 
     const classifier = isLinear
         ? createLinearScale(rawData, maxSize, minSize)
         : createSqrtScale(rawData, maxSize, minSize)
 
-    // expose on map instance (unchanged public API)
-    out.classifierSize(classifier)
+    // expose on layer instance
+    layer.classifierSize(classifier)
 }
 
 /**
  * @description assigns a color to each symbol, based on their statistical value
  * @param {*} map
+ * @param {*} layer
  */
-export function applyClassificationToMap(map, root) {
+export function applyClassificationToMap(map, layer) {
     if (!map?.svg_) return;
 
-    const classifier = map.classifierColor_ || root?.classifierColor_;
+    const activeLayer = layer || map;
+    const classifier = activeLayer.classifierColor_;
     if (typeof classifier !== 'function') return;
 
-    const colorData = map.getEncodingStatData?.('color', undefined, 'color') || map.statData('color');
+    const colorData = activeLayer.getEncodingStatData?.('color', undefined, 'color') || map.statData('color');
     if (!colorData) return;
 
-    map.svg_.selectAll('.em-centroid')
+    const group = getCentroidsGroup(activeLayer)
+    if (!group || group.empty()) return;
+
+    group.selectAll('g.em-centroid')
         .attr('ecl', function (rg) {
             const sv = colorData.get(rg.properties.id);
             if (!sv) return 'nd';

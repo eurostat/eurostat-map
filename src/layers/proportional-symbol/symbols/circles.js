@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { getCentroidsGroup } from '../../../core/geo/centroids'
 /**
  * @description Appends <circle> elements for each region in the map SVG
  * @param {*} map map instance
@@ -9,11 +10,10 @@ import { select } from 'd3-selection'
 export function appendCirclesToMap(map, sizeData, out) {
     // Disable pointer events on containers during transition to prevent
     // hover events from firing before fill___ is properly set
-    map.svg().selectAll('g.em-centroid').style('pointer-events', 'none')
+    getCentroidsGroup(out).style('pointer-events', 'none')
 
     // Append circles to each symbol container
-    const circles = map
-        .svg()
+    const circles = getCentroidsGroup(out)
         .selectAll('g.em-centroid')
         .filter((d) => {
             const datum = sizeData.get(d.properties.id)

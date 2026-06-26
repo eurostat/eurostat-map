@@ -12,6 +12,8 @@ export const symbolsLibrary = {
     circle: symbolCircle,
 }
 
+import { getCentroidsGroup } from '../../../core/geo/centroids'
+
 /**
  * @description Appends <path> elements containing symbols for each region in the map SVG
  * @param {*} map map instance
@@ -19,8 +21,7 @@ export const symbolsLibrary = {
  * @return {*}
  */
 export function appendD3SymbolsToMap(map, sizeData, out) {
-    return map
-        .svg()
+    return getCentroidsGroup(out)
         .selectAll('g.em-centroid')
         .append('path')
         .filter((rg) => {

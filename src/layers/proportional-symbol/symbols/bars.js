@@ -4,13 +4,17 @@ import { getResponsiveSymbolSize } from '../../../core/responsive'
 /**
  * @description Appends <rect> elements containing bars for each region in the map SVG
  * @param {*} map map instance
+
+/**
+ * @description Appends <rect> elements containing bars for each region in the map SVG
+ * @param {*} map map instance
  * @param {*} sizeData e.g. map.statData('size')
  * @return {*}
  */
 export function appendBarsToMap(map, sizeData, out) {
     const barWidth = getResponsiveSymbolSize(out.psBarWidth_, 1)
     return (
-        getCentroidsGroup(map)
+        getCentroidsGroup(out)
             .selectAll('g.em-centroid')
             .append('rect')
             .filter((rg) => {

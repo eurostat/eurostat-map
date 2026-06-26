@@ -15,6 +15,8 @@ import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
 import { appendCustomSymbolsToMap } from './symbols/custom.js'
 import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
 import { getCentroidsGroup } from '../../core/geo/centroids.js'
+import { registerLayerType } from '../../core/layer-registry.js'
+
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/layers/proportional-symbol/ProportionalSymbolConfig').ProportionalSymbolConfig} ProportionalSymbolConfig */
@@ -27,87 +29,132 @@ import { getCentroidsGroup } from '../../core/geo/centroids.js'
  * @returns {ProportionalSymbolMap}
  */
 export const map = function (config) {
-    //create map object to return, using the template
-    const out = StatMap.createStatMap(config, true, 'ps')
+    return StatMap.buildSingleLayerMap('proportionalSymbol', config)
+}
 
+const getLayerAndMap = function (layerOrMap) {
+    if (layerOrMap.map) {
+        return { layer: layerOrMap, map: layerOrMap.map }
+    }
+    return { layer: layerOrMap, map: layerOrMap }
+}
+
+export const decorateProportionalSymbolLayer = function (layer, config) {
     //shape
-    out.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
-    out.psCustomShape_ // see http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT
-    out.psCustomSVG_ // see http://bl.ocks.org/jessihamel/9648495
-    out.psSpikeWidth_ = 7 // 'spike' shape widths
-    out.psOffset_ = { x: 0, y: 0 }
+    layer.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
+    layer.psCustomShape_ = undefined
+    layer.psCustomSVG_ = undefined
+    layer.psSpikeWidth_ = 7
+    layer.psOffset_ = { x: 0, y: 0 }
 
     //size
-    out.psMaxSize_ = 30 // max symbol size
-    out.psMinSize_ = 5 // min symbol size
-    out.psBarWidth_ = 10 //for vertical bars
-    out.psMaxValue_ = undefined // allow the user to manually define the domain of the sizing scale. E.g. if the user wants to use the same scale across different maps.
-    out.psMinValue_ = undefined
-    out.psSizeScale_ = undefined // 'sqrt' or 'linear'
+    layer.psMaxSize_ = 30 // max symbol size
+    layer.psMinSize_ = 5 // min symbol size
+    layer.psBarWidth_ = 10 //for vertical bars
+    layer.psMaxValue_ = undefined
+    layer.psMinValue_ = undefined
+    layer.psSizeScale_ = undefined // 'sqrt' or 'linear'
 
     //colour
-    out.psFill_ = '#009569' //same fill for all symbols when no visual variable (setData()) for 'color' is specified
-    out.psFillOpacity_ = 1
-    out.psStroke_ = '#ffffff'
-    out.psStrokeWidth_ = 0.2
-    out.psStrokeOpacity_ = 1
-    out.psClasses_ = 5 // number of classes to use for colouring
-    out.psColors_ = null //colours to use for threshold colouring
-    out.psColorFun_ = interpolateOrRd
-    out.psClassToFillStyle_ = undefined //a function returning the color from the class i
-    out.psBrightenFactor_ = 0.9 // factor for brightening background color of regions
+    layer.psFill_ = '#009569'
+    layer.psFillOpacity_ = 1
+    layer.psStroke_ = '#ffffff'
+    layer.psStrokeWidth_ = 0.2
+    layer.psStrokeOpacity_ = 1
+    layer.psClasses_ = 5
+    layer.psColors_ = null
+    layer.psColorFun_ = interpolateOrRd
+    layer.psClassToFillStyle_ = undefined
+    layer.psBrightenFactor_ = 0.9
 
     //the threshold, when the classification method is 'threshold'
-    out.psThresholds_ = [0]
+    layer.psThresholds_ = [0]
     //the classification method
-    out.psClassificationMethod_ = 'quantile' // or: equinter, threshold
+    layer.psClassificationMethod_ = 'quantile' // or: equinter, threshold
     //when computed automatically, ensure the threshold are nice rounded values
-    out.makeClassifNice_ = true
-    //
-    //the classifier: a function which return the symbol size/color from the stat value.
-    out.classifierSize_ = undefined
-    out.classifierColor_ = undefined
+    layer.makeClassifNice_ = true
+    //the classifier
+    layer.classifierSize_ = undefined
+    layer.classifierColor_ = undefined
+    
     //specific tooltip text function
-    out.tooltip_.textFunction = tooltipTextFunPs
+    layer.tooltip_ = layer.tooltip_ || {}
+    layer.tooltip_.textFunction = tooltipTextFunPs
 
-    out.psCodeLabels_ = false // show country codes in symbols
+    layer.psCodeLabels_ = false
+    
+    layer.dorling_ = config?.dorling || false
+    layer.dorlingSettings_ = Object.assign({}, layer.map?.dorlingSettings_ || {}, config?.dorlingSettings || {})
 
     const getPsSettingsSnapshot = function () {
         return {
-            shape: out.psShape_,
-            customShape: out.psCustomShape_,
-            customSVG: out.psCustomSVG_,
-            spikeWidth: out.psSpikeWidth_,
-            offset: out.psOffset_,
-            barWidth: out.psBarWidth_,
-            minValue: out.psMinValue_,
-            maxValue: out.psMaxValue_,
-            fill: out.psFill_,
-            fillOpacity: out.psFillOpacity_,
-            stroke: out.psStroke_,
-            strokeWidth: out.psStrokeWidth_,
-            strokeOpacity: out.psStrokeOpacity_,
-            sizeScale: out.psSizeScale_,
-            minSize: out.psMinSize_,
-            maxSize: out.psMaxSize_,
-            classes: out.psClasses_,
-            colors: out.psColors_,
-            colorFun: out.psColorFun_,
-            classToFillStyle: out.psClassToFillStyle_,
-            thresholds: out.psThresholds_,
-            classificationMethod: out.psClassificationMethod_,
-            brightenFactor: out.psBrightenFactor_,
-            codeLabels: out.psCodeLabels_,
+            shape: layer.psShape_,
+            customShape: layer.psCustomShape_,
+            customSVG: layer.psCustomSVG_,
+            spikeWidth: layer.psSpikeWidth_,
+            offset: layer.psOffset_,
+            barWidth: layer.psBarWidth_,
+            minValue: layer.psMinValue_,
+            maxValue: layer.psMaxValue_,
+            fill: layer.psFill_,
+            fillOpacity: layer.psFillOpacity_,
+            stroke: layer.psStroke_,
+            strokeWidth: layer.psStrokeWidth_,
+            strokeOpacity: layer.psStrokeOpacity_,
+            sizeScale: layer.psSizeScale_,
+            minSize: layer.psMinSize_,
+            maxSize: layer.psMaxSize_,
+            classes: layer.psClasses_,
+            colors: layer.psColors_,
+            colorFun: layer.psColorFun_,
+            classToFillStyle: layer.psClassToFillStyle_,
+            thresholds: layer.psThresholds_,
+            classificationMethod: layer.psClassificationMethod_,
+            brightenFactor: layer.psBrightenFactor_,
+            codeLabels: layer.psCodeLabels_,
         }
     }
 
-    /**
-     * Definition of getters/setters for all previously defined attributes.
-     * Each method follow the same pattern:
-     *  - There is a single method as getter/setter of each attribute. The name of this method is the attribute name, without the trailing "_" character.
-     *  - To get the attribute value, call the method without argument.
-     *  - To set the attribute value, call the same method with the new value as single argument.
-     */
+    layer.psSettings = function (v) {
+        if (!arguments.length) return getPsSettingsSnapshot()
+        if (!v || typeof v !== 'object' || Array.isArray(v)) return layer
+
+        if (v.shape !== undefined) layer.psShape_ = v.shape
+        if (v.customShape !== undefined) layer.psCustomShape_ = v.customShape
+        if (v.customSVG !== undefined) layer.psCustomSVG_ = v.customSVG
+        if (v.spikeWidth !== undefined) layer.psSpikeWidth_ = v.spikeWidth
+        if (v.offset !== undefined) layer.psOffset_ = v.offset
+        if (v.barWidth !== undefined) layer.psBarWidth_ = v.barWidth
+        if (v.minValue !== undefined) layer.psMinValue_ = v.minValue
+        if (v.maxValue !== undefined) layer.psMaxValue_ = v.maxValue
+        if (v.fill !== undefined) layer.psFill_ = v.fill
+        if (v.fillOpacity !== undefined) layer.psFillOpacity_ = v.fillOpacity
+        if (v.stroke !== undefined) layer.psStroke_ = v.stroke
+        if (v.strokeWidth !== undefined) layer.psStrokeWidth_ = v.strokeWidth
+        if (v.strokeOpacity !== undefined) layer.psStrokeOpacity_ = v.strokeOpacity
+        if (v.sizeScale !== undefined) layer.psSizeScale_ = v.sizeScale
+        if (v.minSize !== undefined) layer.psMinSize_ = v.minSize
+        if (v.maxSize !== undefined) layer.psMaxSize_ = v.maxSize
+        if (v.classes !== undefined) layer.psClasses_ = v.classes
+        if (v.colors !== undefined) layer.psColors_ = v.colors
+        if (v.colorFun !== undefined) layer.psColorFun_ = v.colorFun
+        if (v.classToFillStyle !== undefined) layer.psClassToFillStyle_ = v.classToFillStyle
+        if (v.classificationMethod !== undefined) layer.psClassificationMethod_ = v.classificationMethod
+        if (v.thresholds !== undefined) {
+            layer.psThresholds_ = v.thresholds
+            layer.psClassificationMethod_ = 'threshold'
+            layer.psClasses_ = v.thresholds.length + 1
+        }
+        if (v.brightenFactor !== undefined) layer.psBrightenFactor_ = v.brightenFactor
+        if (v.codeLabels !== undefined) layer.psCodeLabels_ = v.codeLabels
+
+        if (v.colorFun !== undefined || v.colors !== undefined) {
+            layer.psClassToFillStyle_ = getColorLegend(layer.psColorFun_, layer.psColors_)
+        }
+
+        return layer
+    }
+
     const paramNames = [
         'psMaxSize_',
         'psMinSize_',
@@ -137,62 +184,23 @@ export const map = function (config) {
         'psSpikeWidth_',
         'psCodeLabels_',
         'psBrightenFactor_',
+        'dorlingSettings_',
     ]
     paramNames.forEach(function (att) {
-        out[att.substring(0, att.length - 1)] = function (v) {
-            if (!arguments.length) return out[att]
-            out[att] = v
-            return out
+        layer[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return layer[att]
+            layer[att] = v
+            return layer
         }
     })
 
-    out.psSettings = function (v) {
-        if (!arguments.length) return getPsSettingsSnapshot()
-        if (!v || typeof v !== 'object' || Array.isArray(v)) return out
-
-        if (v.shape !== undefined) out.psShape_ = v.shape
-        if (v.customShape !== undefined) out.psCustomShape_ = v.customShape
-        if (v.customSVG !== undefined) out.psCustomSVG_ = v.customSVG
-        if (v.spikeWidth !== undefined) out.psSpikeWidth_ = v.spikeWidth
-        if (v.offset !== undefined) out.psOffset_ = v.offset
-        if (v.barWidth !== undefined) out.psBarWidth_ = v.barWidth
-        if (v.minValue !== undefined) out.psMinValue_ = v.minValue
-        if (v.maxValue !== undefined) out.psMaxValue_ = v.maxValue
-        if (v.fill !== undefined) out.psFill_ = v.fill
-        if (v.fillOpacity !== undefined) out.psFillOpacity_ = v.fillOpacity
-        if (v.stroke !== undefined) out.psStroke_ = v.stroke
-        if (v.strokeWidth !== undefined) out.psStrokeWidth_ = v.strokeWidth
-        if (v.strokeOpacity !== undefined) out.psStrokeOpacity_ = v.strokeOpacity
-        if (v.sizeScale !== undefined) out.psSizeScale_ = v.sizeScale
-        if (v.minSize !== undefined) out.psMinSize_ = v.minSize
-        if (v.maxSize !== undefined) out.psMaxSize_ = v.maxSize
-        if (v.classes !== undefined) out.psClasses_ = v.classes
-        if (v.colors !== undefined) out.psColors_ = v.colors
-        if (v.colorFun !== undefined) out.psColorFun_ = v.colorFun
-        if (v.classToFillStyle !== undefined) out.psClassToFillStyle_ = v.classToFillStyle
-        if (v.classificationMethod !== undefined) out.psClassificationMethod_ = v.classificationMethod
-        if (v.thresholds !== undefined) {
-            out.psThresholds_ = v.thresholds
-            out.psClassificationMethod_ = 'threshold'
-            out.psClasses_ = v.thresholds.length + 1
-        }
-        if (v.brightenFactor !== undefined) out.psBrightenFactor_ = v.brightenFactor
-        if (v.codeLabels !== undefined) out.psCodeLabels_ = v.codeLabels
-
-        if (v.colorFun !== undefined || v.colors !== undefined) {
-            out.psClassToFillStyle_ = getColorLegend(out.psColorFun_, out.psColors_)
-        }
-
-        return out
-    }
-
     //override attribute values with config values
     if (config) {
-        if (config.psSettings !== undefined) out.psSettings(config.psSettings)
+        if (config.psSettings !== undefined) layer.psSettings(config.psSettings)
 
         paramNames.forEach(function (key) {
             let k = key.slice(0, -1) // remove trailing underscore
-            if (config[k] != undefined) out[k](config[k])
+            if (config[k] != undefined) layer[k](config[k])
         })
     }
 
@@ -224,101 +232,95 @@ export const map = function (config) {
     ]
 
     deprecatedPsSettingsWrappers.forEach(function ([legacyMethod, settingsKey]) {
-        out[legacyMethod] = function (v) {
+        layer[legacyMethod] = function (v) {
             console.warn(`map.${legacyMethod}() is now DEPRECATED. Please use map.psSettings({ ${settingsKey} }) instead.`)
-            if (!arguments.length) return out.psSettings()[settingsKey]
-            out.psSettings({ [settingsKey]: v })
-            return out
+            if (!arguments.length) return layer.psSettings()[settingsKey]
+            layer.psSettings({ [settingsKey]: v })
+            return layer
         }
     })
 
     //@override
-    out.updateClassification = function () {
+    layer.updateClassification = function () {
         try {
-            //define classifiers for sizing and colouring (out.classifierSize_ & out.classifierColor_)
-            defineClassifiers(out)
+            const map = layer.map
+            //define classifiers for sizing and colouring
+            defineClassifiers(layer)
 
             // apply classification to all insets that are outside of the main map's SVG
-            if (out.insetTemplates_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => applyClassificationToMap(inset, out))
+            if (map.insetTemplates_) {
+                executeForAllInsets(map.insetTemplates_, map.svgId_, (inset) => applyClassificationToMap(inset, layer))
             }
 
             // apply to main map
-            applyClassificationToMap(out)
+            applyClassificationToMap(map, layer)
 
-            return out
+            return layer
         } catch (e) {
             console.error('Error in proportional symbols classification: ' + e.message)
             console.error(e)
         }
     }
 
-    /**
-     * Applies proportional symbol styling to a map object
-     *
-     * @param {*} map
-     * @returns
-     */
     function applyStyleToMap(map) {
         //define style per class
-        if (!out.psClassToFillStyle()) out.psClassToFillStyle(getColorLegend(out.psColorFun_, out.psColors_))
+        if (!layer.psClassToFillStyle()) layer.psClassToFillStyle(getColorLegend(layer.psColorFun_, layer.psColors_))
 
-        // update region color according to symbol color
-        const backgroundSymbolFill = out.classifierColor_ ? out.psClassToFillStyle_(out.psClasses_ - 1, out.psClasses_) : out.psFill_
-        updateBackgroundColor(map, backgroundSymbolFill)
+        // Gate background color: skip if a base layer (e.g. choropleth) is present below us!
+        const hasBaseLayer = map.layers_ && map.layers_.some(l => l.role === 'base' && l !== layer)
+        if (!hasBaseLayer) {
+            // update region color according to symbol color
+            const backgroundSymbolFill = layer.classifierColor_ ? layer.psClassToFillStyle_(layer.psClasses_ - 1, layer.psClasses_) : layer.psFill_
+            updateBackgroundColor(map, backgroundSymbolFill)
+        }
 
         // if size dataset not defined then use default
-        const sizeData = getSizeStatData(map)
+        const sizeData = getSizeStatData(layer)
 
         if (map.svg_) {
-            //clear previous centroids
-            let prevSymbols = map.svg_.selectAll(':not(#em-insets-group) g.em-centroid > *')
-            prevSymbols.remove()
+            //clear previous symbols in this layer group
+            const centroidsGroup = getCentroidsGroup(layer)
+            centroidsGroup.selectAll('g.em-centroid > *').remove()
 
             // 'small' centroids on top of big ones
-            out.updateSymbolsDrawOrder(map)
+            layer.updateSymbolsDrawOrder(map)
 
             // append symbols to centroids
             let symb
-            if (out.psCustomSVG_) {
-                symb = appendCustomSymbolsToMap(map, sizeData, out)
-            } else if (out.psShape_ == 'bar') {
-                symb = appendBarsToMap(map, sizeData, out)
-            } else if (out.psShape_ == 'circle') {
-                symb = appendCirclesToMap(map, sizeData, out)
-            } else if (out.psShape_ == 'spike') {
-                symb = appendSpikesToMap(map, sizeData, out)
+            if (layer.psCustomSVG_) {
+                symb = appendCustomSymbolsToMap(map, sizeData, layer)
+            } else if (layer.psShape_ == 'bar') {
+                symb = appendBarsToMap(map, sizeData, layer)
+            } else if (layer.psShape_ == 'circle') {
+                symb = appendCirclesToMap(map, sizeData, layer)
+            } else if (layer.psShape_ == 'spike') {
+                symb = appendSpikesToMap(map, sizeData, layer)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
-                symb = appendD3SymbolsToMap(map, sizeData, out)
+                symb = appendD3SymbolsToMap(map, sizeData, layer)
             }
 
             setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
-            appendLabelsToSymbols(map, sizeData, out)
+            appendLabelsToSymbols(map, sizeData, layer)
 
-            // Mouse events are added after transitions complete
-            // The symbol append functions (appendCirclesToMap, etc.) handle this via .on('end')
-            // We need to wait for all transitions to complete before adding mouse events
-            const transitionDuration = out.transitionDuration_ || 0
+            const transitionDuration = map.transitionDuration_ || 0
             if (transitionDuration > 0) {
-                // Wait for transitions to complete
                 setTimeout(() => {
-                    addMouseEvents(map, out)
+                    addMouseEvents(map, layer)
                 }, transitionDuration + 100)
             } else {
-                // No transition, add events immediately
-                addMouseEvents(map, out)
+                addMouseEvents(map, layer)
             }
 
             // Update labels for statistical values if required
-            if (out.labels_?.values) {
-                out.updateValuesLabels(map)
+            if (map.labels_?.values) {
+                map.updateValuesLabels(map)
             }
 
             //add hatching if needed
-            if (out.patternFill_) {
-                applyPatternFill(map, out.patternFill_)
+            if (map.patternFill_) {
+                applyPatternFill(map, map.patternFill_)
             }
         }
         return map
@@ -348,17 +350,21 @@ export const map = function (config) {
                 }
             })
 
-            // 1) clear any previous inline fill so CSS can apply to regions that now have data
-            regions.style('fill', null)
+            // Only apply no-data fill colors if we are styling the background
+            const hasBaseLayer = map.layers_ && map.layers_.some(l => l.role === 'base' && l !== layer)
+            if (!hasBaseLayer) {
+                // 1) clear any previous inline fill so CSS can apply to regions that now have data
+                regions.style('fill', null)
 
-            // 2) apply gray only to current no-data (":") regions
-            regions
-                .filter((rg) => {
-                    const sv = sizeData.get(rg.properties.id)
-                    return sv && sv.value === ':'
-                })
-                .style('fill', out.noDataFillStyle())
-                .attr('fill___', out.noDataFillStyle()) // save for legend mouseover
+                // 2) apply gray only to current no-data (":") regions
+                regions
+                    .filter((rg) => {
+                        const sv = sizeData.get(rg.properties.id)
+                        return sv && sv.value === ':'
+                    })
+                    .style('fill', layer.noDataFillStyle())
+                    .attr('fill___', layer.noDataFillStyle()) // save for legend mouseover
+            }
         }
     }
 
@@ -367,29 +373,29 @@ export const map = function (config) {
      * @param {d3.selection} symb symbols d3 selection
      */
     function setSymbolStyles(symb) {
-        symb.attr('fill-opacity', out.psFillOpacity())
-            .attr('stroke-opacity', out.psStrokeOpacity())
-            .attr('stroke', out.psStroke())
-            .attr('stroke-width', out.psStrokeWidth())
+        symb.attr('fill-opacity', layer.psFillOpacity())
+            .attr('stroke-opacity', layer.psStrokeOpacity())
+            .attr('stroke', layer.psStroke())
+            .attr('stroke-width', layer.psStrokeWidth())
             .style('fill', function () {
-                if (out.classifierColor_) {
+                if (layer.classifierColor_) {
                     //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
                     const ecl = select(this.parentNode).attr('ecl')
-                    if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
-                    let color = out.psClassToFillStyle_(ecl, out.psClasses_)
+                    if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
+                    let color = layer.psClassToFillStyle_(ecl, layer.psClasses_)
                     return color
                 } else {
-                    return out.psFill_
+                    return layer.psFill_
                 }
             })
             .attr('fill___', function () {
                 // Set fill___ to the same value as fill (don't read back style, as it may not be applied yet during transitions)
-                if (out.classifierColor_) {
+                if (layer.classifierColor_) {
                     const ecl = select(this.parentNode).attr('ecl')
-                    if (!ecl || ecl === 'nd') return out.noDataFillStyle_ || 'gray'
-                    return out.psClassToFillStyle_(ecl, out.psClasses_)
+                    if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
+                    return layer.psClassToFillStyle_(ecl, layer.psClasses_)
                 } else {
-                    return out.psFill_
+                    return layer.psFill_
                 }
             })
     }
@@ -398,8 +404,8 @@ export const map = function (config) {
      * @description Updates the draw order of the symbols according to their data values
      * @param {*} map map instance
      */
-    out.updateSymbolsDrawOrder = function (map) {
-        const sizeData = getSizeStatData(map)
+    layer.updateSymbolsDrawOrder = function (map) {
+        const sizeData = getSizeStatData(layer)
 
         // Ensure centroidFeatures is populated (important for mixed)
         if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
@@ -420,10 +426,11 @@ export const map = function (config) {
             .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
 
         // Clear old symbol containers
-        getCentroidsGroup(map).selectAll('g.em-centroid').remove()
+        const centroidsGroup = getCentroidsGroup(layer)
+        centroidsGroup.selectAll('g.em-centroid').remove()
 
         // Re-select fresh, then recreate sorted symbol containers
-        getCentroidsGroup(map)
+        centroidsGroup
             .selectAll('g.em-centroid')
             .data(sorted, (d) => d.properties.id)
             .enter()
@@ -433,7 +440,7 @@ export const map = function (config) {
             .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
 
         // Re-apply classification to the new containers
-        applyClassificationToMap(map, out)
+        applyClassificationToMap(map, layer)
     }
 
     /**
@@ -480,7 +487,7 @@ export const map = function (config) {
                 const sv = sizeData.get(rg.properties.id)
                 if (!sv || !sv.value) {
                     return
-                } else if (out.geo_ == 'WORLD') {
+                } else if (map.geo_ == 'WORLD') {
                     if (lvl !== '0') {
                         return strokeWidth || '#777'
                     }
@@ -489,33 +496,34 @@ export const map = function (config) {
     }
 
     //@override
-    out.updateStyle = function () {
+    layer.updateStyle = function () {
         try {
+            const map = layer.map
             // apply to main map
-            applyStyleToMap(out)
+            applyStyleToMap(map)
 
             // apply style to insets
-            if (out.insetTemplates_) {
-                executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            if (map.insetTemplates_) {
+                executeForAllInsets(map.insetTemplates_, map.svgId_, applyStyleToMap)
             }
 
             // dorling cartogram
-            if (out.dorling_) {
-                const sizeData = getSizeStatData(out)
+            if (layer.dorling_) {
+                const sizeData = getSizeStatData(layer)
                 runDorlingSimulation(
-                    out,
+                    map,
                     (d) => {
                         const datum = sizeData.get(d.properties.id)
-                        const r = datum ? out.classifierSize_(+datum.value) : 0
-                        return out.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
+                        const r = datum ? layer.classifierSize_(+datum.value) : 0
+                        return layer.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                     },
-                    out.dorlingSettings_.padding || 0
+                    layer.dorlingSettings_.padding || 0
                 )
             } else {
-                stopDorlingSimulation(out)
+                stopDorlingSimulation(map)
             }
 
-            return out
+            return layer
         } catch (e) {
             console.error('Error in proportional symbols styling: ' + e.message)
             console.error(e)
@@ -523,11 +531,11 @@ export const map = function (config) {
     }
 
     //@override
-    out.getLegendConstructor = function () {
+    layer.getLegendConstructor = function () {
         return ProportionalSymbolLegend.legend
     }
 
-    return out
+    return layer
 }
 
 //build a color legend object
@@ -543,18 +551,20 @@ export const getColorLegend = function (colorFun, colorArray) {
     }
 }
 
-export function getSizeStatData(map) {
-    return map.getEncodingStatData?.('size', undefined, 'size') || (map.statData('size').getArray() ? map.statData('size') : map.statData())
+export function getSizeStatData(layerOrMap) {
+    const { layer, map } = getLayerAndMap(layerOrMap)
+    return layer.getEncodingStatData?.('size', undefined, 'size') || (map.statData('size').getArray() ? map.statData('size') : map.statData())
 }
 
 /**
  * Specific function for tooltip text.
  *
  * @param {*} rg The region to show information on.
- * @param {*} map The map element
+ * @param {*} layerOrMap The layer or map element
  */
 
-const tooltipTextFunPs = function (region, map) {
+const tooltipTextFunPs = function (region, layerOrMap) {
+    const { layer, map } = getLayerAndMap(layerOrMap)
     if (map.tooltip_.omitRegions && map.tooltip_.omitRegions.includes(region.properties.id)) {
         return '' // Skip tooltip for omitted regions
     }
@@ -570,7 +580,7 @@ const tooltipTextFunPs = function (region, map) {
     }
 
     // Stat 1
-    const v1 = getSizeStatData(map)
+    const v1 = getSizeStatData(layer)
     const sv1 = v1.get(region.properties.id)
     const unit1 = v1.unitText?.() || ''
     const row1 = `<tr><td>${formatValue(sv1?.value, unit1, map.noDataText_)}</td></tr>`
@@ -578,9 +588,9 @@ const tooltipTextFunPs = function (region, map) {
     // Stat 2 (optional)
     let row2 = ''
     let v2 = null
-    const encodedColorStat = map.getEncodingStat?.('color')
+    const encodedColorStat = layer.getEncodingStat?.('color')
     if (encodedColorStat) {
-        const encodedColorData = map.getEncodingStatData?.('color')
+        const encodedColorData = layer.getEncodingStatData?.('color')
         if (encodedColorData?.getArray()?.length) v2 = encodedColorData
     } else {
         const legacyColorData = map.statData('color')
@@ -607,3 +617,7 @@ const tooltipTextFunPs = function (region, map) {
     </div>
   `.trim()
 }
+
+registerLayerType('proportionalSymbol', 'overlay', decorateProportionalSymbolLayer)
+registerLayerType('ps', 'overlay', decorateProportionalSymbolLayer)
+registerLayerType('proportionalSymbols', 'overlay', decorateProportionalSymbolLayer)

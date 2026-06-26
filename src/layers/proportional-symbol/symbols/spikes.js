@@ -1,10 +1,11 @@
 import { getResponsiveSymbolSize } from '../../../core/responsive'
+import { getCentroidsGroup } from '../../../core/geo/centroids'
 
 export function appendSpikesToMap(map, sizeData, out) {
     //The spike function creates a triangular path of the given length (height) with a base width of 7 pixels.
     const spikeWidth = getResponsiveSymbolSize(out.psSpikeWidth_, 1)
     const spike = (length, width = spikeWidth) => `M${-width / 2},0L0,${-length}L${width / 2},0`
-    let symbolContainers = map.svg().selectAll('g.em-centroid')
+    let symbolContainers = getCentroidsGroup(out).selectAll('g.em-centroid')
 
     // Append circles to each symbol container
     const spikes = symbolContainers

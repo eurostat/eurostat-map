@@ -17,11 +17,46 @@ export const createMapSVG = function (out) {
     }
     svg.attr('class', 'em-map')
     if (out.isInset) svg.classed('em-inset', true)
-    //add mapType css class
-    svg.classed('em--' + out._mapType, true)
-    // pies and coxcombs are proportional symbols, so add proportional-symbols class too
-    if (out._mapType === 'pie' || out._mapType === 'coxcomb') {
-        svg.classed('em--ps', true)
+
+    // Determine the base map type
+    const baseLayer = out.layers_ && out.layers_.find(l => l.role === 'base')
+    const mapType = baseLayer ? (baseLayer.type || baseLayer._mapType) : out._mapType
+
+    const CANONICAL_MAP_TYPES = {
+        choropleth: 'ch',
+        ch: 'ch',
+        categorical: 'ct',
+        ct: 'ct',
+        proportionalSymbol: 'ps',
+        proportionalSymbols: 'ps',
+        ps: 'ps',
+        bivariateChoropleth: 'chbi',
+        chbi: 'chbi',
+        trivariateChoropleth: 'chtri',
+        ternary: 'chtri',
+        chtri: 'chtri',
+        stripeComposition: 'scomp',
+        stripe: 'scomp',
+        scomp: 'scomp',
+        pieChart: 'pie',
+        pie: 'pie',
+        composition: 'pie',
+        sparkline: 'spark',
+        spark: 'spark',
+        sparklines: 'spark',
+        flow: 'flow',
+        flowmap: 'flow',
+        coxcomb: 'coxcomb',
+        polar: 'coxcomb',
+    }
+    const typeClass = CANONICAL_MAP_TYPES[mapType] || mapType
+
+    if (typeClass) {
+        svg.classed('em--' + typeClass, true)
+        // pies and coxcombs are proportional symbols, so add proportional-symbols class too
+        if (typeClass === 'pie' || typeClass === 'coxcomb' || typeClass === 'ps') {
+            svg.classed('em--ps', true)
+        }
     }
     return svg
 }
