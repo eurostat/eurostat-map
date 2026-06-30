@@ -38,7 +38,7 @@
   <table>
     <tr>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/choropleth/population-density.html" target="_blank"><img src="examples/img/previews/choropleth/population-density.png" alt="Population density example"  /></a></td>
-      <td><a href="https://eurostat.github.io/eurostat-map/examples/proportional/prop-circles.html" target="_blank"><img src="examples/img/previews/proportional/prop-circles.png" alt="Proportional circles example"  /></a></td>
+      <td><a href="https://eurostat.github.io/eurostat-map/examples/proportional-symbols/prop-circles.html" target="_blank"><img src="examples/img/previews/proportional/prop-circles.png" alt="Proportional circles example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/flow/flowmap.html" target="_blank"><img src="examples/img/previews/flow/flowmap.png" alt="Flow map example"  /></a></td>
       <td><a href="https://eurostat.github.io/eurostat-map/examples/mushroom/mushroom.html" target="_blank"><img src="examples/img/previews/mushroom/mushroom.png" alt="Mushroom map example"  /></a></td>
     </tr>
