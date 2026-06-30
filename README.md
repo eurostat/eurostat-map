@@ -105,9 +105,6 @@ const map = eurostatmap
     .build()
 ```
 
-Legend corner placement supports `position: 'top right' | 'top left' | 'bottom right' | 'bottom left'`.
-When `header(false)` is used and a title/subtitle is drawn in the main SVG, top-corner legends are automatically shifted down only when they would overlap the title text.
-
 For multivariate maps, you can use data-driven visual variables like so:
 
 ```javascript
