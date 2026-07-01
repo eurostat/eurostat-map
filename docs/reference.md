@@ -81,6 +81,8 @@ The `map` can then be customised with the methods listed in the tables below. Mo
 
 It is also possible to specify the map parameters as an object: `let map = eurostatmap.map( mapType, { param1: v1, param2: v2} );`. This is equivalent to: `let map = eurostatmap.map( mapType ).param1(v1).param2(v2);`
 
+For multi-layer stacks, call `eurostatmap.map()` **without** a map type and define thematic layers with `.layers([...])` (or `.addLayer(...)`). See [Multi-layer guide](multi-layer-guide.md).
+
 ### Map definition
 
 Specify the map SVG element.
@@ -91,6 +93,8 @@ Specify the map SVG element.
 | _map_.**containerId**([*value*]) | String | _same as svgId_ | Optional container element used for tooltip bounds and (when explicitly set) height constraints.        |
 | _map_.**width**([*value*])       | int    | _800_           | The width of the map, in pixel.                                                                         |
 | _map_.**height**([*value*])      | int    | _auto_          | The height of the map, in pixel. If not specified, the height is set automatically as 85% of the width. |
+| _map_.**layers**([*value*])      | Array  | _[]_            | Multi-layer stack declaration. Use only when `map()` is created without a map type. Each item is a layer config object (for example `{ type: 'choropleth', encoding: { fill: { stat: 'density' } } }`). See [Multi-layer guide](multi-layer-guide.md). |
+| _map_.**addLayer**([*value*])    | Function | _undefined_    | Add one layer to a multi-layer map and return the layer instance for chaining. Example: `map.addLayer('choropleth').encoding('fill', { stat: 'density' })`. See [Multi-layer guide](multi-layer-guide.md). |
 
 Height note:
 

@@ -23,7 +23,14 @@ function getColorData(layer) {
 function getSizeData(layer) {
     const sizeData = layer.map ? layer.map.statData('size') : layer.statData('size')
     const defaultData = layer.map ? layer.map.statData() : layer.statData()
-    return layer.getEncodingStatData?.('size', undefined, 'size') || (sizeData?.getArray() ? sizeData : defaultData)
+    const encodedSizeData = layer.getEncodingStatData?.('size', undefined, 'size')
+    if (encodedSizeData?.getArray?.()?.length) return encodedSizeData
+
+    if (sizeData?.getArray?.()?.length) return sizeData
+
+    // Backward compatibility for older proportional-symbol maps using
+    // map.statData().setData(...) without a dedicated size stat key.
+    return defaultData
 }
 
 function defineColorClassifier(layer) {

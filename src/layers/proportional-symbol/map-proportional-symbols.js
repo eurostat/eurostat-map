@@ -274,30 +274,34 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             updateBackgroundColor(map, backgroundSymbolFill)
         }
 
+        // For facade maps (single-layer), inset styling must target the current map.
+        // For real overlay layers, keep targeting the layer object.
+        const symbolTarget = layer.map ? layer : map
+
         // if size dataset not defined then use default
-        const sizeData = getSizeStatData(layer)
+        const sizeData = getSizeStatData(symbolTarget)
 
         if (map.svg_) {
             //clear previous symbols in this layer group
-            const centroidsGroup = getCentroidsGroup(layer)
+            const centroidsGroup = getCentroidsGroup(symbolTarget)
             centroidsGroup.selectAll('g.em-centroid > *').remove()
 
             // 'small' centroids on top of big ones
-            layer.updateSymbolsDrawOrder(map)
+            layer.updateSymbolsDrawOrder.call(symbolTarget, map)
 
             // append symbols to centroids
             let symb
             if (layer.psCustomSVG_) {
-                symb = appendCustomSymbolsToMap(map, sizeData, layer)
+                symb = appendCustomSymbolsToMap(map, sizeData, symbolTarget)
             } else if (layer.psShape_ == 'bar') {
-                symb = appendBarsToMap(map, sizeData, layer)
+                symb = appendBarsToMap(map, sizeData, symbolTarget)
             } else if (layer.psShape_ == 'circle') {
-                symb = appendCirclesToMap(map, sizeData, layer)
+                symb = appendCirclesToMap(map, sizeData, symbolTarget)
             } else if (layer.psShape_ == 'spike') {
-                symb = appendSpikesToMap(map, sizeData, layer)
+                symb = appendSpikesToMap(map, sizeData, symbolTarget)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
-                symb = appendD3SymbolsToMap(map, sizeData, layer)
+                symb = appendD3SymbolsToMap(map, sizeData, symbolTarget)
             }
 
             setRegionStyles(map, sizeData)
@@ -330,28 +334,32 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         // set style of symbols
         const selector = getRegionsSelector(map)
         const regions = map.svg().selectAll(selector)
+        const hasBaseLayer = map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer)
 
         if (map.geo_ !== 'WORLD') {
             if (map.nutsLevel_ == 'mixed') {
                 styleMixedNUTSRegions(map, sizeData, regions)
             }
 
-            // apply 'nd' class to no data regions for legend item hover
-            regions.attr('ecl', function (rg) {
-                const sv = sizeData.get(rg.properties.id)
-                if (!sv || (!sv.value && sv !== 0 && sv.value !== 0 && sv.value !== '0')) {
-                    // NO INPUT
-                    return 'ni'
-                } else if (sv && sv.value) {
-                    if (sv.value == ':') {
-                        // DATA NOT AVAILABLE (no data)
-                        return 'nd'
+            // In layered maps with a base layer, preserve region ecl classes from the base
+            // so choropleth legend hover remains functional.
+            if (!hasBaseLayer) {
+                // apply 'nd' class to no data regions for legend item hover
+                regions.attr('ecl', function (rg) {
+                    const sv = sizeData.get(rg.properties.id)
+                    if (!sv || (!sv.value && sv !== 0 && sv.value !== 0 && sv.value !== '0')) {
+                        // NO INPUT
+                        return 'ni'
+                    } else if (sv && sv.value) {
+                        if (sv.value == ':') {
+                            // DATA NOT AVAILABLE (no data)
+                            return 'nd'
+                        }
                     }
-                }
-            })
+                })
+            }
 
             // Only apply no-data fill colors if we are styling the background
-            const hasBaseLayer = map.layers_ && map.layers_.some(l => l.role === 'base' && l !== layer)
             if (!hasBaseLayer) {
                 // 1) clear any previous inline fill so CSS can apply to regions that now have data
                 regions.style('fill', null)
@@ -405,7 +413,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
      * @param {*} map map instance
      */
     layer.updateSymbolsDrawOrder = function (map) {
-        const sizeData = getSizeStatData(layer)
+        const target = this || layer
+        const sizeData = getSizeStatData(target)
 
         // Ensure centroidFeatures is populated (important for mixed)
         if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
@@ -426,7 +435,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
 
         // Clear old symbol containers
-        const centroidsGroup = getCentroidsGroup(layer)
+        const centroidsGroup = getCentroidsGroup(target)
         centroidsGroup.selectAll('g.em-centroid').remove()
 
         // Re-select fresh, then recreate sorted symbol containers
@@ -440,7 +449,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
 
         // Re-apply classification to the new containers
-        applyClassificationToMap(map, layer)
+        applyClassificationToMap(map, target)
     }
 
     /**
@@ -509,6 +518,12 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
 
             // dorling cartogram
             if (layer.dorling_) {
+                // Dorling currently reads nodes from map.Geometries.centroidsFeatures.
+                // In migrated single-layer maps, centroids are maintained on the active layer.
+                if (layer.centroidsFeatures_?.length) {
+                    map.Geometries.centroidsFeatures = layer.centroidsFeatures_
+                }
+
                 const sizeData = getSizeStatData(layer)
                 runDorlingSimulation(
                     map,
@@ -553,7 +568,15 @@ export const getColorLegend = function (colorFun, colorArray) {
 
 export function getSizeStatData(layerOrMap) {
     const { layer, map } = getLayerAndMap(layerOrMap)
-    return layer.getEncodingStatData?.('size', undefined, 'size') || (map.statData('size').getArray() ? map.statData('size') : map.statData())
+    const encodedSizeData = layer.getEncodingStatData?.('size', undefined, 'size')
+    if (encodedSizeData?.getArray?.()?.length) return encodedSizeData
+
+    const legacySizeData = map.statData('size')
+    if (legacySizeData?.getArray?.()?.length) return legacySizeData
+
+    // Backward compatibility: old proportional-symbol maps often populated the
+    // default stat dataset via map.statData().setData(...)
+    return map.statData()
 }
 
 /**

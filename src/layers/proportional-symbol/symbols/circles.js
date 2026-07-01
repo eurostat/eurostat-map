@@ -8,35 +8,53 @@ import { getCentroidsGroup } from '../../../core/geo/centroids'
  * @return {void}
  */
 export function appendCirclesToMap(map, sizeData, out) {
-    // Disable pointer events on containers during transition to prevent
-    // hover events from firing before fill___ is properly set
-    getCentroidsGroup(out).style('pointer-events', 'none')
+    const centroidsGroup = getCentroidsGroup(out)
+    const symbolContainers = centroidsGroup.selectAll('g.em-centroid')
+    const transitionDuration = out.transitionDuration_ || 0
+
+    // Disable pointer events only while an animated transition is running.
+    if (transitionDuration > 0) {
+        symbolContainers.style('pointer-events', 'none')
+    }
 
     // Append circles to each symbol container
-    const circles = getCentroidsGroup(out)
-        .selectAll('g.em-centroid')
-        .filter((d) => {
-            const datum = sizeData.get(d.properties.id)
-            return datum && datum.value !== ':' && datum.value
-        })
+    const circles = symbolContainers
         .append('circle')
         .attr('stroke-width', out.psStrokeWidth_)
         .attr('stroke', out.psStroke_)
         .attr('fill-opacity', out.psFillOpacity_)
         .attr('stroke-opacity', out.psStrokeOpacity_)
-        .transition()
-        .duration(out.transitionDuration_)
-        .attr('r', function (d) {
-            const datum = sizeData.get(d.properties.id)
-            const radius = out.classifierSize_(+datum.value)
-            if (radius < 0) console.error('Negative radius for circle:', d.properties.id)
-            if (isNaN(radius)) console.error('NaN radius for circle:', d.properties.id)
-            return radius
-        })
-        .on('end', function () {
-            // Re-enable pointer events on the container after animation completes
-            select(this.parentNode).style('pointer-events', null)
-        })
+
+    const setRadius = function (d) {
+        const regionId = d?.properties?.id
+        const datum = regionId ? sizeData.get(regionId) : null
+        const rawValue = datum?.value
+
+        if (rawValue == null || rawValue === ':' || Number.isNaN(+rawValue)) return 0
+
+        const radius = out.classifierSize_(+rawValue)
+        if (radius < 0) console.error('Negative radius for circle:', regionId)
+        if (isNaN(radius)) console.error('NaN radius for circle:', regionId)
+        return radius
+    }
+
+    if (transitionDuration > 0) {
+        // Ensure circles always have a radius even if the transition is interrupted.
+        circles
+            .attr('r', 0)
+            .transition()
+            .duration(transitionDuration)
+            .attr('r', setRadius)
+            .on('end', function () {
+                select(this.parentNode).style('pointer-events', null)
+            })
+            .on('interrupt', function (event, d) {
+                select(this).attr('r', setRadius(d))
+                select(this.parentNode).style('pointer-events', null)
+            })
+    } else {
+        circles.attr('r', setRadius)
+    }
 
     return circles
 }

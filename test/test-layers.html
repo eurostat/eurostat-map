@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>test-layers</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            eurostatmap
+                .map()
+                .width(900)
+                .nutsYear(2021)
+                .nutsLevel(0)
+                .scale('60M')
+                .title('Layer Stack Test')
+                .subtitle('Choropleth base + proportional symbol overlay')
+                .stat('density', {
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                    filters: { TIME: '2021' },
+                })
+                .stat('population', {
+                    eurostatDatasetCode: 'demo_r_pjangrp3',
+                    unitText: 'people',
+                    filters: { TIME: '2021', sex: 'T', age: 'TOTAL' },
+                })
+                .layers([
+                    {
+                        type: 'choropleth',
+                        encoding: {
+                            fill: { stat: 'density' },
+                        },
+                        classificationMethod: 'quantile',
+                        numberOfClasses: 7,
+                        legend: {
+                            position: 'top-right',
+                            title: 'Density (people/km²)',
+                        },
+                    },
+                    {
+                        type: 'proportionalSymbol',
+                        encoding: {
+                            size: { stat: 'population' },
+                        },
+                        psSettings: {
+                            shape: 'circle',
+                            maxSize: 28,
+                            minSize: 3,
+                            fill: '#ff8f00',
+                            fillOpacity: 0.6,
+                            stroke: '#d16500',
+                            strokeWidth: 1.5,
+                        },
+                        legend: {
+                            position: 'top-right',
+                            sizeLegend: {
+                                title: 'Population',
+                            },
+                        },
+                    },
+                ])
+                .build()
+        </script>
+    </body>
+</html>

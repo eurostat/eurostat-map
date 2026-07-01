@@ -159,7 +159,8 @@ export function getPropSymbolColorLabelFormatter(out) {
 
 // Highlight selected regions on mouseover
 export function highlightPsSymbols(map, ecl) {
-    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
+    const layer = map.activeLayer ? map.activeLayer() : map
+    const allSymbols = getCentroidsGroup(layer).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -171,17 +172,18 @@ export function highlightPsSymbols(map, ecl) {
     const selectedSymbols = allSymbols.filter("[ecl='" + ecl + "']")
     selectedSymbols.each(function (d, i) {
         let symbol = select(this)
-        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+        symbol.style('opacity', layer.psFillOpacity_) // Restore original opacity for selected regions
     })
 }
 
 // Reset all regions to their original opacitys on mouseout
 export function unhighlightPsSymbols(map) {
-    const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
+    const layer = map.activeLayer ? map.activeLayer() : map
+    const allSymbols = getCentroidsGroup(layer).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {
         let symbol = select(this)
-        symbol.style('opacity', map.psFillOpacity_) // Restore original opacity for selected regions
+        symbol.style('opacity', layer.psFillOpacity_) // Restore original opacity for selected regions
     })
 }

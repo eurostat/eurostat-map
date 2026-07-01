@@ -268,15 +268,23 @@ export const forwardFieldsToActiveLayer = function (map, fieldNames) {
  * Getter calls (0 args, or a single string arg) return the underlying value.
  */
 export const forwardChainableMethod = function (map, name) {
+    const originalMapMethod = typeof map[name] === 'function' ? map[name].bind(map) : null
+
     Object.defineProperty(map, name, {
         configurable: true,
         get() {
-            const layer = map.activeLayer()
             return function (...args) {
-                if (!layer) {
+                const layer = map.activeLayer()
+                // Facade maps are their own active layer. In that case, calling layer[name]
+                // would recurse through this forwarding getter.
+                const layerMethod = layer && layer !== map && typeof layer[name] === 'function' ? layer[name].bind(layer) : null
+                const targetMethod = layerMethod || originalMapMethod
+
+                if (!targetMethod) {
                     return args.length === 0 ? undefined : map
                 }
-                const r = layer[name](...args)
+
+                const r = targetMethod(...args)
                 let isGetter = args.length === 0
                 if (args.length === 1 && (name === 'encoding' || name === 'stat' || name === 'statData')) {
                     if (typeof args[0] === 'string' || args[0] instanceof String) {

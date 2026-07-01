@@ -13,7 +13,7 @@
         <script>
             // basic barebones proportional circles example
             let map = eurostatmap
-                .map('ps')
+                .map('ps').dorling(true)
                 .nutsLevel(2)
                 .scale('60M')
                 .title('Total GDP and GDP per inhabitant')
@@ -48,7 +48,6 @@
                     maxSize: 15
                 })
                 .transitionDuration(900)
-                .dorling(true)
                 .dorlingStrength({ x: 0.1, y: 0.1 })
                 .dorlingIterations(1)
                 .animateDorling(true) // Set to false for non-animated dorling cartograms

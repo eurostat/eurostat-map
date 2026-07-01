@@ -4,18 +4,27 @@ import { select } from 'd3-selection'
 
 export function addMouseEvents(map, layer) {
     // Clear any existing event handlers first to prevent duplicates during rebuilds
-    clearMouseEvents(map)
+    clearMouseEvents(map, layer)
 
     addMouseEventsToSymbols(map, layer)
-    addMouseEventsToRegions(map, layer)
+    if (shouldHandleRegionHover(map, layer)) {
+        addMouseEventsToRegions(map, layer)
+    }
 }
 
-function clearMouseEvents(map) {
+function shouldHandleRegionHover(map, layer) {
+    // In multi-layer maps, keep polygon hover/tooltip owned by the base layer.
+    return !(map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer))
+}
+
+function clearMouseEvents(map, layer) {
     // Remove existing handlers from symbols
     map.svg().selectAll('g.em-centroid').on('mouseover', null).on('mousemove', null).on('mouseout', null)
 
-    // Remove existing handlers from regions
-    map.svg().selectAll(getRegionsSelector(map)).on('mouseover', null).on('mousemove', null).on('mouseout', null)
+    // Only clear region handlers when proportional-symbol owns region hover.
+    if (shouldHandleRegionHover(map, layer)) {
+        map.svg().selectAll(getRegionsSelector(map)).on('mouseover', null).on('mousemove', null).on('mouseout', null)
+    }
 }
 
 const addMouseEventsToRegions = function (map, layer) {

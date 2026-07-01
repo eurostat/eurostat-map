@@ -5,7 +5,8 @@ import { getCentroidsGroup } from '../geo/centroids'
 export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
     // Common function to start a simulation on a single map (main or inset)
     const runSim = (singleMap) => {
-        const nodes = singleMap.Geometries.centroidsFeatures || []
+        const activeLayer = typeof singleMap.activeLayer === 'function' ? singleMap.activeLayer() : null
+        const nodes = activeLayer?.centroidsFeatures_ || singleMap.Geometries.centroidsFeatures || []
         if (!nodes.length) return
 
         stopDorlingSimulation(singleMap)
@@ -30,7 +31,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
             }
         }
 
-        const containers = getCentroidsGroup(singleMap).selectAll('g.em-centroid')
+        const containers = singleMap.svg().selectAll('g.em-centroid')
 
         const tickTransform = (sel) => {
             sel.attr('transform', (d) => {
