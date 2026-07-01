@@ -6,11 +6,37 @@ import type { MapInstance } from './MapInstance'
 export const LOCATION_SHAPES: {
     CIRCLE: 'circle'
     SQUARE: 'square'
+    PIN: 'pin'
     DIAMOND: 'diamond'
-    TRIANGLE: 'triangle'
     STAR: 'star'
     CROSS: 'cross'
-    PLUS: 'plus'
+}
+
+/**
+ * Available location marker shapes
+ */
+export type LocationShape = 'circle' | 'square' | 'pin' | 'diamond' | 'cross' | 'star'
+
+/**
+ * Text label style for a location marker
+ */
+export interface LocationLabelStyle {
+    /** CSS font size. @default '12px' */
+    fontSize?: string
+    /** CSS font family. @default 'inherit' */
+    fontFamily?: string
+    /** Text fill color. @default '#222' */
+    fill?: string
+    /** Text opacity. @default 1 */
+    opacity?: number
+    /** Text stroke color. @default '#fff' */
+    stroke?: string
+    /** Text stroke width in pixels. @default 3 */
+    strokeWidth?: number
+    /** SVG paint-order value. @default 'stroke' */
+    paintOrder?: string
+    /** SVG text-anchor value. @default 'start' */
+    textAnchor?: 'start' | 'middle' | 'end'
 }
 
 /**
@@ -19,26 +45,28 @@ export const LOCATION_SHAPES: {
 export interface LocationConfig {
     /** Unique identifier for the location */
     id?: string
-    /** Longitude coordinate */
-    lon: number
-    /** Latitude coordinate */
-    lat: number
+    /** Geographic X coordinate (longitude / easting) */
+    x: number
+    /** Geographic Y coordinate (latitude / northing) */
+    y: number
     /** Label text to display */
     label?: string
     /** Marker shape. @default 'circle' */
-    shape?: 'circle' | 'square' | 'diamond' | 'triangle' | 'star' | 'cross' | 'plus'
-    /** Marker size in pixels. @default 8 */
-    size?: number
-    /** Fill color. @default '#e74c3c' */
-    color?: string
+    shape?: LocationShape
+    /** Marker radius in pixels. @default 6 */
+    radius?: number
+    /** Fill color. @default '#e84040' */
+    fill?: string
+    /** Fill opacity. @default 1 */
+    opacity?: number
     /** Stroke color. @default '#fff' */
     stroke?: string
-    /** Stroke width in pixels. @default 1 */
+    /** Stroke width in pixels. @default 1.5 */
     strokeWidth?: number
-    /** Custom CSS class */
-    class?: string
-    /** Custom data attached to the location */
-    data?: any
+    /** Label offset from projected point in pixels. @default [7, -4] */
+    labelOffset?: [number, number]
+    /** Label text style overrides */
+    labelStyle?: LocationLabelStyle
 }
 
 /**

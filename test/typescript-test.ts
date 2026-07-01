@@ -4,7 +4,7 @@
  */
 
 import * as eurostatmap from '../src/index'
-import type { MapConfig, ChoroplethConfig, ProportionalSymbolConfig, CategoricalMapConfig } from '../src/types'
+import type { MapConfig, ChoroplethConfig, ProportionalSymbolConfig, CategoricalMapConfig, LocationConfig } from '../src/types'
 
 // Test 1: Basic choropleth map
 const choroplethConfig: ChoroplethConfig = {
@@ -199,5 +199,35 @@ const mapWithCallback = eurostatmap.map('choropleth', {
 // Test 10: Version export
 console.log('eurostatmap version:', eurostatmap.version)
 
+// Test 11: Location markers
+const locationConfig: LocationConfig = {
+    x: 13.4,
+    y: 52.5,
+    id: 'berlin',
+    label: 'Berlin',
+    shape: 'pin',
+    radius: 8,
+    fill: '#00aeef',
+    opacity: 0.85,
+    stroke: '#fff',
+    strokeWidth: 1.5,
+    labelOffset: [7, -4],
+    labelStyle: {
+        fontSize: '12px',
+        fontFamily: 'inherit',
+        fill: '#222',
+        opacity: 1,
+        stroke: '#fff',
+        strokeWidth: 3,
+        paintOrder: 'stroke',
+        textAnchor: 'middle',
+    },
+}
+
+map1.addLocation(locationConfig).removeLocation('berlin').clearLocations()
+map1.locations([locationConfig])
+const locations = map1.locations()
+map1.updateLocations()
+
 // Export for validation
-export { map1, map2, map3, map4, map5, mapWithCallback }
+export { map1, map2, map3, map4, map5, mapWithCallback, locations }

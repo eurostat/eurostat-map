@@ -64,6 +64,7 @@ const DEFAULT_LOCATION = {
         stroke: '#fff',
         strokeWidth: 3,
         paintOrder: 'stroke',
+        textAnchor: 'start',
     },
     id: undefined,
 }
@@ -230,6 +231,7 @@ export const updateLocations = (map) => {
                 .attr('stroke', ls.stroke)
                 .attr('stroke-width', ls.strokeWidth)
                 .attr('paint-order', ls.paintOrder)
+                .attr('text-anchor', ls.textAnchor)
                 .text(d.label)
         }
     })
@@ -259,7 +261,7 @@ export const attachLocationsApi = (out) => {
      * @param {string}   [config.stroke]       Stroke colour
      * @param {number}   [config.strokeWidth]  Stroke width in px
      * @param {number[]} [config.labelOffset]  [dx, dy] offset from point in px
-     * @param {Object}   [config.labelStyle]   Overrides for label text style
+     * @param {Object}   [config.labelStyle]   Overrides for label text style, including textAnchor
      * @returns {out}
      */
     out.addLocation = function (config) {

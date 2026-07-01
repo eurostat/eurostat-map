@@ -11,6 +11,7 @@ import type { GridCartogramSettings } from './GridCartogramSettings'
 import type { DorlingSettings } from './DorlingSettings'
 import type { ScalebarConfig } from './decoration/ScalebarConfig'
 import type { EncodingConfig } from './encoding/EncodingConfig'
+import type { LocationConfig } from './locations'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -289,6 +290,22 @@ export interface MapInstance {
     /** Returns the D3 selection of the SVG element. */
     svg(): any
     svg(s: any): this
+
+    /** Add or replace a custom point location marker. */
+    addLocation(config: LocationConfig): this
+
+    /** Remove a custom point location marker by id. */
+    removeLocation(id: string): this
+
+    /** Remove all custom point location markers. */
+    clearLocations(): this
+
+    /** Get or replace all custom point location markers. */
+    locations(): LocationConfig[]
+    locations(configs: LocationConfig[] | null | undefined): this
+
+    /** Redraw custom point location markers. */
+    updateLocations(): this
 
     /** Custom geometry filtering function. */
     filterGeometriesFunction(): ((geometry: any) => boolean) | undefined
