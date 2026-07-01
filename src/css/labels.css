@@ -18,6 +18,8 @@
     opacity: 0.9;
 }
 
+.em-label-halo,
+.em-flow-label-halo,
 .em-label-shadow,
 .em-flow-label-shadow {
     font-size: 12px;
@@ -38,6 +40,7 @@
     stroke-width: 0.5px;
 }
 
+.em-stat-label-halo,
 .em-stat-label-shadow {
     fill: none;
     stroke: white;
@@ -46,6 +49,7 @@
 }
 
 .em-stat-label,
+.em-stat-label-halo,
 .em-stat-label-shadow {
     font-size: 13px;
 }
@@ -54,6 +58,7 @@
     font-size: 12px;
 }
 
+.em-label-halo-cc,
 .em-label-shadow-cc {
     font-size: 12px;
     stroke-width: 3px;
@@ -64,6 +69,7 @@
     font-size: 10px;
 }
 
+.em-label-halo-countries,
 .em-label-shadow-countries {
     font-size: 10px;
     stroke-width: 3px;
@@ -76,6 +82,7 @@
     opacity: 0.7;
 }
 
+.em-label-halo-seas,
 .em-label-shadow-seas {
     font-size: 9px;
     letter-spacing: 0.25em;
@@ -97,12 +104,14 @@
     opacity: 0.9;
 }
 
+.em-flow-label-halo,
 .em-flow-label-shadow {
     font-size: 13px;
     stroke-width: 3px;
 }
 
 .em-circle-stat-label,
+.em-circle-stat-label-halo,
 .em-circle-stat-label-shadow {
     text-anchor: middle;
     stroke-linejoin: round;
@@ -114,6 +123,7 @@
 }
 
 .em-circle-code-label,
+.em-circle-code-label-halo,
 .em-circle-code-label-shadow {
     text-anchor: middle;
     stroke-linejoin: round;

@@ -1378,15 +1378,16 @@ map.onBuild(() => {
             stroke: '#333',
             strokeWidth: 1,
             // Label positioning and styling
-            labelOffset: [7, -4], // [dx, dy] from point in px
+            labelOffset: [7, -6], // [dx, dy] from point in px
             labelStyle: {
                 fontSize: '12px',
                 fontFamily: 'inherit',
+                fontWeight: 'normal',
                 fill: '#222',
                 opacity: 1,
-                stroke: '#fff',
-                strokeWidth: 3,
-                paintOrder: 'stroke',
+                haloColor: '#fff',
+                haloWidth: 3,
+                textAnchor: 'start',
             },
         })
     })

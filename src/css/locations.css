@@ -1,0 +1,9 @@
+.em-loc-label,
+.em-loc-label-halo {
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    font-family: Arial, Helvetica, sans-serif;
+    dominant-baseline: central;
+    pointer-events: none;
+    paint-order: stroke fill;
+}

@@ -55,15 +55,15 @@ const DEFAULT_LOCATION = {
     stroke: '#fff',
     strokeWidth: 1.5,
     label: '',
-    labelOffset: [7, -4], // [dx, dy] from projected point, px
+    labelOffset: [7, -6], // [dx, dy] from projected point, px
     labelStyle: {
         fontSize: '12px',
         fontFamily: 'inherit',
+        fontWeight: 'normal',
         fill: '#222',
         opacity: 1,
-        stroke: '#fff',
-        strokeWidth: 3,
-        paintOrder: 'stroke',
+        haloColor: '#fff',
+        haloWidth: 3,
         textAnchor: 'start',
     },
     id: undefined,
@@ -96,18 +96,17 @@ const shapePath = (shape, r) => {
         }
 
         case LOCATION_SHAPES.PIN: {
-            // Teardrop: a circle at the top, tapering to a tip below.
-            // The projected coordinate aligns with the circle centre.
-            const tipY = r * 2.4
-            const angle = Math.asin(r / tipY)
-            const tx = Math.cos(angle) * r
-            const ty = Math.sin(angle) * r // tangent point y (positive = below centre)
+            // Classic map-pin silhouette: round head with a tapered tail.
+            const headR = r * 0.95
+            const shoulderX = headR * 0.78
+            const shoulderY = headR * 0.6
+            const tipY = r * 2.25
             return [
-                `M0,${-r}`,
-                `A${r},${r},0,1,1,${-tx},${ty}`, // arc to left tangent
-                `L0,${tipY}`, // left edge to tip
-                `L${tx},${ty}`, // tip to right tangent
-                `A${r},${r},0,0,1,0,${-r}`, // arc back to top
+                `M0,${-headR}`,
+                `A${headR},${headR},0,0,1,${shoulderX},${shoulderY}`,
+                `Q${shoulderX * 0.85},${headR * 1.55},0,${tipY}`,
+                `Q${-shoulderX * 0.85},${headR * 1.55},${-shoulderX},${shoulderY}`,
+                `A${headR},${headR},0,0,1,0,${-headR}`,
                 'Z',
             ].join(' ')
         }
@@ -217,20 +216,37 @@ export const updateLocations = (map) => {
         }
 
         // ── Label ────────────────────────────────────────────────
+        grp.select('text.em-loc-label-halo').remove()
         grp.select('text.em-loc-label').remove()
         if (d.label) {
             const ls = d.labelStyle
+            const haloColor = ls.haloColor
+            const haloWidth = ls.haloWidth
+            if (haloWidth > 0 && haloColor && haloColor !== 'none') {
+                grp.append('text')
+                    .attr('class', 'em-loc-label-halo')
+                    .attr('x', d.labelOffset[0])
+                    .attr('y', d.labelOffset[1])
+                    .attr('font-size', ls.fontSize)
+                    .attr('font-family', ls.fontFamily)
+                    .attr('font-weight', ls.fontWeight)
+                    .attr('fill', 'none')
+                    .attr('opacity', ls.opacity)
+                    .attr('stroke', haloColor)
+                    .attr('stroke-width', haloWidth)
+                    .attr('text-anchor', ls.textAnchor)
+                    .text(d.label)
+            }
+
             grp.append('text')
                 .attr('class', 'em-loc-label')
                 .attr('x', d.labelOffset[0])
                 .attr('y', d.labelOffset[1])
                 .attr('font-size', ls.fontSize)
                 .attr('font-family', ls.fontFamily)
+                .attr('font-weight', ls.fontWeight)
                 .attr('fill', ls.fill)
                 .attr('opacity', ls.opacity)
-                .attr('stroke', ls.stroke)
-                .attr('stroke-width', ls.strokeWidth)
-                .attr('paint-order', ls.paintOrder)
                 .attr('text-anchor', ls.textAnchor)
                 .text(d.label)
         }

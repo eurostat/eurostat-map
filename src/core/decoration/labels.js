@@ -8,6 +8,8 @@ import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColo
 const PS_LABEL_MIN_FONT_SIZE = 9
 const PS_LABEL_OVERFLOW_FONT_SIZE = 11 //  when overflowing outside circle
 
+const labelsHaveHalos = (labelsConfig) => !!(labelsConfig?.halos ?? labelsConfig?.shadows)
+
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
@@ -30,17 +32,17 @@ export const addLabelsToMap = function (map, zg) {
     let labelsArray = map.labels_?.labels || DEFAULTLABELS[`${map.geo}_${map.proj_}.cc`]
 
     if (labelsArray) {
-        const shadowg = ensureGroup(labelsContainer, 'em-label-shadows')
+        const halog = ensureGroup(labelsContainer, 'em-label-halos')
         const labelg = ensureGroup(labelsContainer, 'em-labels')
 
-        if (map.labels_?.shadows) {
-            shadowg
+        if (labelsHaveHalos(map.labels_)) {
+            halog
                 .selectAll('text')
                 .data(labelsArray)
                 .enter()
                 .append('text')
-                .attr('id', (d) => 'em-label-shadow-' + d.text.replace(/\s+/g, '-'))
-                .attr('class', (d) => 'em-label-shadow em-label-shadow-' + d.class)
+                .attr('id', (d) => 'em-label-halo-' + d.text.replace(/\s+/g, '-'))
+                .attr('class', (d) => 'em-label-halo em-label-halo-' + d.class)
                 .attr('x', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[0]))
                 .attr('y', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[1]))
                 .attr('dy', -7)
@@ -81,7 +83,7 @@ export const addLabelsToMap = function (map, zg) {
  *   Labels are formatted with map._statLabelFormatter (same as choropleth stat labels).
  *   When the radius-derived font size would fall below PS_LABEL_MIN_FONT_SIZE the label
  *   overflows outside the circle rather than becoming illegibly tiny.
- *   Shadows are rendered when map.labels_.shadows is truthy, consistent with choropleth behaviour.
+ *   Halos are rendered when map.labels_.halos is truthy, consistent with choropleth behaviour.
  */
 export const appendLabelsToSymbols = function (map, sizeData, out) {
     // Ensure the formatter is set (mirrors the guard in addLabelsToMap / updateLabels)
@@ -89,7 +91,7 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
 
     const symbolContainers = map.svg().selectAll('g.em-centroid')
     const hasStatLabels = !!out.labels_?.values
-    const hasShadows = !!out.labels_?.shadows
+    const hasHalos = labelsHaveHalos(out.labels_)
 
     // ── helpers ──────────────────────────────────────────────────────────────
 
@@ -116,12 +118,12 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
         let factor = hasStatLabels ? 0.9 : 0.9
         if (out.psShape_ === 'square') factor -= 0.4
 
-        const appendCodeLabel = (container, isShadow) =>
+        const appendCodeLabel = (container, isHalo) =>
             validRegions(container)
                 .append('text')
                 .attr('class', (d) => {
                     const overflow = isOverflowing(getRadius(d), CODE_FACTOR)
-                    const base = isShadow ? 'em-circle-code-label-shadow' : 'em-circle-code-label'
+                    const base = isHalo ? 'em-circle-code-label-halo' : 'em-circle-code-label'
                     return overflow ? `${base} em-code-overflowing` : base
                 })
                 .text((d) => {
@@ -149,19 +151,19 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 })
                 .style('pointer-events', 'none')
 
-        if (hasShadows) appendCodeLabel(symbolContainers, true)
+        if (hasHalos) appendCodeLabel(symbolContainers, true)
         appendCodeLabel(symbolContainers, false)
     }
 
     // ── stat value labels ─────────────────────────────────────────────────────
 
     if (hasStatLabels) {
-        const appendStatLabel = (container, isShadow) =>
+        const appendStatLabel = (container, isHalo) =>
             validRegions(container)
                 .append('text')
                 .attr('class', (d) => {
                     const overflow = isOverflowing(getRadius(d), STAT_FACTOR)
-                    const base = isShadow ? 'em-circle-stat-label-shadow' : 'em-circle-stat-label'
+                    const base = isHalo ? 'em-circle-stat-label-halo' : 'em-circle-stat-label'
                     return overflow ? `${base} em-stat-overflowing` : base
                 })
                 .text((d) => {
@@ -177,19 +179,19 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                     return `${Math.max(r * STAT_FACTOR, PS_LABEL_MIN_FONT_SIZE)}px`
                 })
                 .attr('fill', function (d) {
-                    if (isShadow) return 'none'
+                    if (isHalo) return 'none'
                     // const r = getRadius(d)
                     // if (isOverflowing(r, STAT_FACTOR)) return '#333333'
                     const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
                     return getTextColorForBackground(fill)
                 })
                 .attr('stroke', (d) => {
-                    if (!isShadow) return 'none'
-                    // Only shadow overflowing labels — inside labels have contrast already
+                    if (!isHalo) return 'none'
+                    // Only halo overflowing labels — inside labels have contrast already
                     return isOverflowing(getRadius(d), STAT_FACTOR) ? '#3333335e' : 'none'
                 })
                 .attr('stroke-width', (d) => {
-                    if (!isShadow) return 0
+                    if (!isHalo) return 0
                     return isOverflowing(getRadius(d), STAT_FACTOR) ? 3 : 0
                 })
                 .attr('paint-order', 'stroke')
@@ -201,7 +203,7 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 // })
                 .style('pointer-events', 'none')
 
-        if (hasShadows) appendStatLabel(symbolContainers, true)
+        if (hasHalos) appendStatLabel(symbolContainers, true)
         appendStatLabel(symbolContainers, false)
     }
 }
@@ -221,9 +223,9 @@ export function addFlowValueLabels(out, svg) {
     const container = ensureGroup(labelsContainer, 'em-flow-labels')
 
     // Add halo effect
-    if (out.labels_?.shadows) {
-        const labelsShadowGroup = container.append('g').attr('class', 'em-flow-label-shadow')
-        labelsShadowGroup
+    if (labelsHaveHalos(out.labels_)) {
+        const labelsHaloGroup = container.append('g').attr('class', 'em-flow-label-halo')
+        labelsHaloGroup
             .selectAll('text')
             .data(filteredNodes)
             .join('text')
@@ -327,8 +329,8 @@ export const updateValuesLabels = function (map) {
     //clear previous labels
     let prevLabels = map.svg_.selectAll('g.em-stat-label > *')
     prevLabels.remove()
-    let prevShadows = map.svg_.selectAll('g.em-stat-label-shadow > *')
-    prevShadows.remove()
+    let prevHalos = map.svg_.selectAll('g.em-stat-label-halo > *')
+    prevHalos.remove()
     let statLabels = map.svg_.selectAll('g.em-stat-label')
 
     // filter stat-label elements to only show those with data
@@ -381,10 +383,10 @@ export const updateValuesLabels = function (map) {
             .attr('class', 'em-label-background')
     }
 
-    //add shadows to labels
-    if (map.labels_?.shadows) {
+    //add halos to labels
+    if (labelsHaveHalos(map.labels_)) {
         map.svg_
-            .selectAll('g.em-stat-label-shadow')
+            .selectAll('g.em-stat-label-halo')
             .filter((rg) => filterFunction(rg, map))
             .append('text')
             .text((d) => statLabelsTextFunction(d, statData, map)) // Use 'd' directly for the label text)
@@ -426,9 +428,9 @@ const defaultStatLabelFilter = (region, map) => {
 }
 
 const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
-    //values label shadows parent <g>
+    //values label halos parent <g>
     // create or reuse container
-    const gsls = ensureGroup(labelsContainer, 'em-stat-labels-shadows')
+    const gsls = ensureGroup(labelsContainer, 'em-stat-labels-halos')
 
     // values labels parent <g>
     const statLabelsGroup = ensureGroup(labelsContainer, 'em-stat-labels')
@@ -465,8 +467,8 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
         })
         .attr('class', 'em-stat-label')
 
-    // stat labels shadows
-    if (map.labels_?.shadows) {
+    // stat labels halos
+    if (labelsHaveHalos(map.labels_)) {
         gsls.selectAll('g')
             .data(statLabelRegions)
             .enter()
@@ -492,7 +494,7 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
                 }
             })
 
-            .attr('class', 'em-stat-label-shadow')
+            .attr('class', 'em-stat-label-halo')
     }
 }
 

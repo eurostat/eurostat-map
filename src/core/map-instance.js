@@ -472,6 +472,12 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         if (!arguments.length) return out.labels_
         //set
         out.labels_ = v
+        if (out.labels_ && typeof out.labels_ === 'object') {
+            out.labels_ = { ...out.labels_ }
+            if (out.labels_.halos === undefined && out.labels_.shadows !== undefined) {
+                out.labels_.halos = out.labels_.shadows
+            }
+        }
         // DEFAULT: scaleOnZoom = true
         if (out.labels_ && out.labels_?.scaleOnZoom === undefined) {
             out.labels_.scaleOnZoom = true

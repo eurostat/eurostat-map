@@ -288,7 +288,7 @@ const scaleLocations = function (transform, map) {
     const t = invScale === 1 ? null : `scale(${invScale})`
 
     zoomGroup.selectAll(`#em-locations-${map.svgId_} .em-loc-symbol`).attr('transform', t)
-    zoomGroup.selectAll(`#em-locations-${map.svgId_} .em-loc-label`).attr('transform', t)
+    zoomGroup.selectAll(`#em-locations-${map.svgId_} .em-loc-label, #em-locations-${map.svgId_} .em-loc-label-halo`).attr('transform', t)
 }
 
 /**

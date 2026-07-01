@@ -3,10 +3,134 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+            }
+
+            #map {
+                width: 100vw;
+                height: 100vh;
+                display: block;
+                margin-left:300px;
+            }
+
+            .controls {
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                z-index: 10;
+                width: 300px;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.95);
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .controls h2 {
+                margin: 0 0 10px;
+                font-size: 16px;
+            }
+
+            .controls .row {
+                margin-bottom: 8px;
+            }
+
+            .controls label {
+                display: block;
+                font-size: 12px;
+                color: #333;
+                margin-bottom: 4px;
+            }
+
+            .controls input,
+            .controls select,
+            .controls textarea,
+            .controls button {
+                width: 100%;
+                box-sizing: border-box;
+                font-size: 13px;
+            }
+
+            .controls textarea {
+                min-height: 120px;
+                resize: vertical;
+                font-family: Consolas, monospace;
+            }
+
+            .controls button {
+                margin-top: 6px;
+                padding: 8px;
+                border: 1px solid #888;
+                background: #f5f5f5;
+                cursor: pointer;
+                border-radius: 4px;
+            }
+
+            .controls .status {
+                margin-top: 6px;
+                font-size: 12px;
+                color: #444;
+                min-height: 16px;
+            }
+        </style>
     </head>
 
     <body>
-        <svg id="map"></svg>
+        <div class="controls">
+            <h2>Location style controls</h2>
+
+            <div class="row">
+                <label for="shape">Shape</label>
+                <select id="shape">
+                    <option value="circle">circle</option>
+                    <option value="square">square</option>
+                    <option value="pin">pin</option>
+                    <option value="diamond">diamond</option>
+                    <option value="cross">cross</option>
+                    <option value="star" selected>star</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <label for="radius">Radius: <span id="radius-value">7</span></label>
+                <input id="radius" type="range" min="3" max="20" step="1" value="7" />
+            </div>
+
+            <div class="row">
+                <label for="fill">Fill</label>
+                <input id="fill" type="color" value="#ffd700" />
+            </div>
+
+            <div class="row">
+                <label for="stroke">Stroke</label>
+                <input id="stroke" type="color" value="#333333" />
+            </div>
+
+            <div class="row">
+                <label for="label-style">labelStyle (JSON object)</label>
+                <textarea id="label-style">{
+  "fontSize": "12px",
+  "fontFamily": "inherit",
+    "fontWeight": "normal",
+  "fill": "#222",
+  "labelOffset": [7, -7],
+  "opacity": 1,
+    "haloColor": "#fff",
+    "haloWidth": 3,
+  "textAnchor": "start"
+}</textarea>
+                <button id="apply-label-style" type="button">Apply labelStyle</button>
+                <div id="status" class="status"></div>
+            </div>
+        </div>
+
+        <div>
+            <svg id="map"></svg>
+        </div>
+     
         <script src="../../../build/eurostatmap.js"></script>
 
         <script>
@@ -23,6 +147,35 @@
                 { lon: 16.37, lat: 48.21, label: 'Vienna' },
             ]
 
+            const defaultLabelStyle = {
+                fontSize: '12px',
+                fontFamily: 'inherit',
+                fontWeight: 'normal',
+                fill: '#222',
+                opacity: 1,
+                haloColor: '#fff',
+                haloWidth: 3,
+                textAnchor: 'start',
+            }
+
+            const uiState = {
+                shape: 'star',
+                radius: 7,
+                fill: '#FFD700',
+                stroke: '#333333',
+                labelOffset: [7, -4],
+                labelStyle: { ...defaultLabelStyle },
+            }
+
+            const shapeInput = document.getElementById('shape')
+            const radiusInput = document.getElementById('radius')
+            const radiusValue = document.getElementById('radius-value')
+            const fillInput = document.getElementById('fill')
+            const strokeInput = document.getElementById('stroke')
+            const labelStyleInput = document.getElementById('label-style')
+            const applyLabelStyleBtn = document.getElementById('apply-label-style')
+            const statusEl = document.getElementById('status')
+
             const map = eurostatmap
                 .map('choropleth')
                 .nutsLevel(2)
@@ -31,6 +184,79 @@
                 .encoding('fill', { stat: 'value' })
                 .zoomExtent([1, 1000])
                 .build()
+
+            const applyLocationStyles = () => {
+                const current = map.locations()
+                if (!current || !current.length) return
+
+                const updated = current.map((loc) => ({
+                    ...loc,
+                    shape: uiState.shape,
+                    radius: uiState.radius,
+                    fill: uiState.fill,
+                    stroke: uiState.stroke,
+                    labelOffset: uiState.labelOffset,
+                    labelStyle: {
+                        ...loc.labelStyle,
+                        ...uiState.labelStyle,
+                    },
+                }))
+
+                map.locations(updated)
+            }
+
+            const setStatus = (text, isError = false) => {
+                statusEl.textContent = text
+                statusEl.style.color = isError ? '#b00020' : '#1f6f3f'
+            }
+
+            const parseAndApplyLabelStyle = () => {
+                try {
+                    const parsed = JSON.parse(labelStyleInput.value)
+                    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                        throw new Error('labelStyle must be a JSON object')
+                    }
+
+                    const nextLabelStyle = { ...parsed }
+                    if (nextLabelStyle.labelOffset !== undefined) {
+                        const offset = nextLabelStyle.labelOffset
+                        if (!Array.isArray(offset) || offset.length !== 2 || !Number.isFinite(offset[0]) || !Number.isFinite(offset[1])) {
+                            throw new Error('labelOffset must be an array with 2 numbers, e.g. [7, -4]')
+                        }
+                        uiState.labelOffset = [Number(offset[0]), Number(offset[1])]
+                        delete nextLabelStyle.labelOffset
+                    }
+
+                    uiState.labelStyle = { ...defaultLabelStyle, ...nextLabelStyle }
+                    applyLocationStyles()
+                    setStatus('labelStyle applied')
+                } catch (err) {
+                    setStatus(`Invalid JSON: ${err.message}`, true)
+                }
+            }
+
+            shapeInput.addEventListener('change', () => {
+                uiState.shape = shapeInput.value
+                applyLocationStyles()
+            })
+
+            radiusInput.addEventListener('input', () => {
+                uiState.radius = Number(radiusInput.value)
+                radiusValue.textContent = String(uiState.radius)
+                applyLocationStyles()
+            })
+
+            fillInput.addEventListener('input', () => {
+                uiState.fill = fillInput.value
+                applyLocationStyles()
+            })
+
+            strokeInput.addEventListener('input', () => {
+                uiState.stroke = strokeInput.value
+                applyLocationStyles()
+            })
+
+            applyLabelStyleBtn.addEventListener('click', parseAndApplyLabelStyle)
 
             map.onBuild(() => {
                 capitals.forEach(({ lon, lat, label }) => {
@@ -42,25 +268,19 @@
                         // Optional core settings
                         id: `capital-${label.toLowerCase()}`, // Auto-generated if omitted
                         label,
-                        shape: 'star', // 'circle'|'square'|'pin'|'diamond'|'cross'|'star'
-                        radius: 7,
-                        fill: '#FFD700',
+                        shape: uiState.shape, // 'circle'|'square'|'pin'|'diamond'|'cross'|'star'
+                        radius: uiState.radius,
+                        fill: uiState.fill,
                         opacity: 0.9,
-                        stroke: '#333',
+                        stroke: uiState.stroke,
                         strokeWidth: 1,
                         // Label positioning and styling
-                        labelOffset: [7, -4], // [dx, dy] from point in px
-                        labelStyle: {
-                            fontSize: '12px',
-                            fontFamily: 'inherit',
-                            fill: '#222',
-                            opacity: 1,
-                            stroke: '#fff',
-                            strokeWidth: 3,
-                            paintOrder: 'stroke',
-                        },
+                        labelOffset: uiState.labelOffset, // [dx, dy] from point in px
+                        labelStyle: { ...uiState.labelStyle },
                     })
                 })
+
+                setStatus('Locations ready')
             }).build()
         </script>
     </body>

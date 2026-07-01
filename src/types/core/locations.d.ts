@@ -25,16 +25,16 @@ export interface LocationLabelStyle {
     fontSize?: string
     /** CSS font family. @default 'inherit' */
     fontFamily?: string
+    /** CSS font weight. @default 'normal' */
+    fontWeight?: string | number
     /** Text fill color. @default '#222' */
     fill?: string
     /** Text opacity. @default 1 */
     opacity?: number
-    /** Text stroke color. @default '#fff' */
-    stroke?: string
-    /** Text stroke width in pixels. @default 3 */
-    strokeWidth?: number
-    /** SVG paint-order value. @default 'stroke' */
-    paintOrder?: string
+    /** Label halo color. @default '#fff' */
+    haloColor?: string
+    /** Label halo width in pixels. @default 3 */
+    haloWidth?: number
     /** SVG text-anchor value. @default 'start' */
     textAnchor?: 'start' | 'middle' | 'end'
 }
@@ -63,7 +63,7 @@ export interface LocationConfig {
     stroke?: string
     /** Stroke width in pixels. @default 1.5 */
     strokeWidth?: number
-    /** Label offset from projected point in pixels. @default [7, -4] */
+    /** Label offset from projected point in pixels. @default [7, -6] */
     labelOffset?: [number, number]
     /** Label text style overrides */
     labelStyle?: LocationLabelStyle
