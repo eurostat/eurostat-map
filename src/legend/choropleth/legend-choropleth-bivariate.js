@@ -27,6 +27,7 @@ export const legend = function (map, config) {
         x: { low: 'Low', high: 'High' },
         y: { low: 'Low', high: 'High' },
     }
+    out.showAxisExtremes = true
 
     //corner annotations
     out.annotations = {
@@ -36,6 +37,8 @@ export const legend = function (map, config) {
         bottomRight: undefined,
     }
     out.annotationLineLength = 18
+    out.annotationOffsets = undefined
+    out.annotationLineEndOffset = undefined
     out.annotationPadding = 8
 
     //get the font size of the texts
@@ -70,7 +73,9 @@ export const legend = function (map, config) {
     //override attribute values with config values
     if (config) for (let key in config) out[key] = config[key]
 
-    if (config?.axisExtremes) {
+    if (config?.axisExtremes === false) {
+        out.showAxisExtremes = false
+    } else if (config?.axisExtremes) {
         out.axisExtremes = {
             x: { ...(out.axisExtremes?.x || {}), ...(config.axisExtremes.x || {}) },
             y: { ...(out.axisExtremes?.y || {}), ...(config.axisExtremes.y || {}) },
@@ -135,7 +140,9 @@ export const legend = function (map, config) {
         }
 
         addAxisTitles()
-        addAxisEndpointLabels()
+        if (out.showAxisExtremes) {
+            addAxisEndpointLabels()
+        }
         if (out.axisArrows) {
             addAxisArrows()
         }
@@ -339,7 +346,11 @@ export const legend = function (map, config) {
             )
 
         // X axis title
-        let xAxisTitleY = out.squareSize + out.xAxisLabelsOffset.y + (out.axisArrows ? out.arrowPadding + out.arrowHeight : 7)
+        const xAxisTitleArrowGap = 5
+        let xAxisTitleY =
+            out.squareSize +
+            out.xAxisLabelsOffset.y +
+            (out.axisArrows ? out.arrowPadding + out.arrowHeight + xAxisTitleArrowGap : 7)
         let xAxisTitleX = initialX
         if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
         if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
@@ -392,7 +403,8 @@ export const legend = function (map, config) {
         }
 
         const xLabelY = xAxisLineY + (out.axisArrows ? out.arrowHeight + 2 : 8)
-        const yLabelX = yAxisLineX - (out.axisArrows ? out.arrowHeight + 2 : 8)
+        // Keep Y-axis endpoint labels clear of left-side annotation callout lines.
+        const yLabelX = yAxisLineX - (out.axisArrows ? out.arrowHeight + 2 : 8) - 4
 
         axisLabels
             .append('text')
@@ -462,17 +474,18 @@ export const legend = function (map, config) {
             const norm = Math.hypot(vx, vy) || 1
             const ux = vx / norm
             const uy = vy / norm
-            const cornerPadding = getAnnotationPadding(cornerName)
+            const cornerOffset = getAnnotationOffset(cornerName, ux, uy)
+            const cornerLineLength = getAnnotationLineLength(cornerName, ux, uy, cornerOffset)
 
-            const x1 = x0 + ux * out.annotationLineLength
-            const y1 = y0 + uy * out.annotationLineLength
-            const tx = x1 + ux * cornerPadding
-            const ty = y1 + uy * cornerPadding
+            const x1 = x0 + ux * cornerLineLength
+            const y1 = y0 + uy * cornerLineLength
+            const tx = x1 + cornerOffset.x
+            const ty = y1 + cornerOffset.y
 
             const anchor = ux > 0.2 ? 'start' : ux < -0.2 ? 'end' : 'middle'
             const lines = splitAnnotationLines(text)
 
-            annotationsGroup
+            const annotationLine = annotationsGroup
                 .append('line')
                 .attr('class', 'em-bivariate-corner-annotation-line')
                 .attr('x1', x0)
@@ -493,10 +506,99 @@ export const legend = function (map, config) {
             }
 
             appendMultilineText(annotationText, lines, tx)
+
+            const lineEndOffset = getAnnotationLineEndOffset(cornerName)
+            const lineEnd = getLineEndpointToAnnotationLabel(x0, y0, annotationText, x1, y1, lineEndOffset)
+            annotationLine.attr('x2', lineEnd.x).attr('y2', lineEnd.y)
         })
     }
 
-    function getAnnotationPadding(cornerName) {
+    function getLineEndpointToAnnotationLabel(x0, y0, annotationText, fallbackX, fallbackY, lineEndOffset = { x: 0, y: 0 }) {
+        const node = annotationText?.node && annotationText.node()
+        if (!node || typeof node.getBBox !== 'function') {
+            return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
+        }
+
+        const bbox = node.getBBox()
+        if (!bbox || !Number.isFinite(bbox.x) || !Number.isFinite(bbox.y)) {
+            return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
+        }
+
+        const closestX = clamp(x0, bbox.x, bbox.x + bbox.width)
+        const closestY = clamp(y0, bbox.y, bbox.y + bbox.height)
+
+        const vx = closestX - x0
+        const vy = closestY - y0
+        const vLen = Math.hypot(vx, vy)
+        if (!vLen) {
+            return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
+        }
+
+        const labelGap = 1.5
+        return {
+            x: closestX - (vx / vLen) * labelGap + lineEndOffset.x,
+            y: closestY - (vy / vLen) * labelGap + lineEndOffset.y,
+        }
+    }
+
+    function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value))
+    }
+
+    function getAnnotationLineEndOffset(cornerName) {
+        const defaultOffset = { x: 0, y: 0 }
+        const offsets = out.annotationLineEndOffset
+
+        if (!offsets || typeof offsets !== 'object') {
+            return defaultOffset
+        }
+
+        const cornerOffset = offsets[cornerName]
+        if (cornerOffset && typeof cornerOffset === 'object') {
+            return {
+                x: typeof cornerOffset.x === 'number' && Number.isFinite(cornerOffset.x) ? cornerOffset.x : defaultOffset.x,
+                y: typeof cornerOffset.y === 'number' && Number.isFinite(cornerOffset.y) ? cornerOffset.y : defaultOffset.y,
+            }
+        }
+
+        if (typeof offsets.x === 'number' || typeof offsets.y === 'number') {
+            return {
+                x: typeof offsets.x === 'number' && Number.isFinite(offsets.x) ? offsets.x : defaultOffset.x,
+                y: typeof offsets.y === 'number' && Number.isFinite(offsets.y) ? offsets.y : defaultOffset.y,
+            }
+        }
+
+        return defaultOffset
+    }
+
+    function getAnnotationOffset(cornerName, ux, uy) {
+        const defaultOffset = { x: ux * 8, y: uy * 8, isCustom: false }
+        const offsets = out.annotationOffsets
+
+        if (offsets && typeof offsets === 'object') {
+            const cornerOffset = offsets[cornerName]
+            if (cornerOffset && typeof cornerOffset === 'object') {
+                const x = typeof cornerOffset.x === 'number' && Number.isFinite(cornerOffset.x) ? cornerOffset.x : defaultOffset.x
+                const y = typeof cornerOffset.y === 'number' && Number.isFinite(cornerOffset.y) ? cornerOffset.y : defaultOffset.y
+                return { x, y, isCustom: true }
+            }
+
+            const x = typeof offsets.x === 'number' && Number.isFinite(offsets.x) ? offsets.x : defaultOffset.x
+            const y = typeof offsets.y === 'number' && Number.isFinite(offsets.y) ? offsets.y : defaultOffset.y
+            if (typeof offsets.x === 'number' || typeof offsets.y === 'number') {
+                return { x, y, isCustom: true }
+            }
+        }
+
+        const legacyPadding = getLegacyAnnotationPadding(cornerName)
+        if (legacyPadding != null) {
+            return { x: ux * legacyPadding, y: uy * legacyPadding, isCustom: false }
+        }
+
+        return defaultOffset
+    }
+
+    function getLegacyAnnotationPadding(cornerName) {
         const padding = out.annotationPadding
         if (typeof padding === 'number' && Number.isFinite(padding)) {
             return padding
@@ -509,7 +611,25 @@ export const legend = function (map, config) {
                 return value
             }
         }
-        return 8
+        return null
+    }
+
+    function getAnnotationLineLength(cornerName, ux, uy, cornerOffset) {
+        let baseLineLength = 18
+        const lineLengthConfig = out.annotationLineLength
+
+        if (typeof lineLengthConfig === 'number' && Number.isFinite(lineLengthConfig)) {
+            baseLineLength = lineLengthConfig
+        } else if (lineLengthConfig && typeof lineLengthConfig === 'object') {
+            const value = lineLengthConfig[cornerName]
+            if (typeof value === 'number' && Number.isFinite(value)) {
+                baseLineLength = value
+            }
+        }
+
+        // When per-annotation offsets are used, adapt the line so its end stays close to the moved label.
+        const radialOffset = cornerOffset?.isCustom ? ux * cornerOffset.x + uy * cornerOffset.y : 0
+        return Math.max(2, baseLineLength + radialOffset)
     }
 
     function splitAnnotationLines(text) {
@@ -562,7 +682,7 @@ export const legend = function (map, config) {
 
         let xStart = initialX
         let xEnd = initialX + out.squareSize
-        if (xLowBBox && xHighBBox) {
+        if (out.showAxisExtremes && xLowBBox && xHighBBox) {
             xStart = Math.max(initialX, xLowBBox.x + xLowBBox.width + labelGap)
             xEnd = Math.min(initialX + out.squareSize, xHighBBox.x - labelGap - arrowTipClearance)
         }
@@ -591,7 +711,7 @@ export const legend = function (map, config) {
 
         let yStart = out.squareSize
         let yEnd = 0
-        if (yLowBBox && yHighBBox) {
+        if (out.showAxisExtremes && yLowBBox && yHighBBox) {
             yStart = Math.min(out.squareSize, yLowBBox.y - labelGap)
             yEnd = Math.max(0, yHighBBox.y + yHighBBox.height + labelGap + arrowTipClearance)
         }

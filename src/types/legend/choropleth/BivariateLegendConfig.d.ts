@@ -66,6 +66,9 @@ export interface BivariateLegendConfig extends LegendConfig {
         y?: { low?: string; high?: string }
     }
 
+    /** Whether to show low/high endpoint labels on both axes. @default true */
+    showAxisExtremes?: boolean
+
     /**
      * Optional text annotations for each corner of the bivariate square.
      * Add text for any combination of topRight, bottomRight, bottomLeft, topLeft.
@@ -78,13 +81,51 @@ export interface BivariateLegendConfig extends LegendConfig {
         topLeft?: string
     }
 
-    /** Length of corner annotation callout lines in pixels. @default 18 */
-    annotationLineLength?: number
+    /**
+     * Length of corner annotation callout lines in pixels.
+     * Can be a single number for all corners, or per-corner values.
+     * @default 18
+     */
+    annotationLineLength?:
+        | number
+        | {
+              topRight?: number
+              bottomRight?: number
+              bottomLeft?: number
+              topLeft?: number
+          }
 
     /**
-     * Padding between corner annotation callout line end and text in pixels.
-     * Can be a single number for all corners, or per-corner values.
-     * @default 8
+     * Annotation text offsets in pixels.
+     * Use global `{ x, y }` or per-corner values.
+     * @default auto (based on corner direction)
+     */
+    annotationOffsets?:
+        | { x?: number; y?: number }
+        | {
+              topRight?: { x?: number; y?: number }
+              bottomRight?: { x?: number; y?: number }
+              bottomLeft?: { x?: number; y?: number }
+              topLeft?: { x?: number; y?: number }
+          }
+
+    /**
+     * Extra offset applied to the leader-line endpoint where it meets the annotation label.
+     * Use global `{ x, y }` or per-corner values.
+     * @default { x: 0, y: 0 }
+     */
+    annotationLineEndOffset?:
+        | { x?: number; y?: number }
+        | {
+              topRight?: { x?: number; y?: number }
+              bottomRight?: { x?: number; y?: number }
+              bottomLeft?: { x?: number; y?: number }
+              topLeft?: { x?: number; y?: number }
+          }
+
+    /**
+     * @deprecated Use annotationOffsets instead.
+     * Radial padding between corner annotation callout line end and text in pixels.
      */
     annotationPadding?:
         | number

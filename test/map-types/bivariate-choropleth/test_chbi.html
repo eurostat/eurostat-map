@@ -32,15 +32,17 @@
                 .legend({
                     //rotation: -45,
                     boxOpacity: 1,
-                    squareSize: 100,
+                    boxPadding:5,
+                    squareSize: 90,
                     label1: 'Inhabitants per km²',
                     label2: '% unemployed',
                     // breaks1: [100, 200],
                     // breaks2: [5, 10],
-                    axisExtremes: {
-                        x: { low: 'Low', high: 'High' },
-                        y: { low: 'Low', high: 'High' },
-                    },
+                    showAxisExtremes: false,
+                    // axisExtremes: {
+                    //     x: { low: 'Low', high: 'High' },
+                    //     y: { low: 'Low', high: 'High' },
+                    // },
                     annotations: {
                         topLeft: 'Low density <br>& High unemployment',
                         topRight: 'High density <br>& High unemployment',
@@ -48,14 +50,26 @@
                         bottomRight: 'High density <br>& Low unemployment',
                     },
                     xAxisTitleOffset: {x: 0, y: 8},
-                    annotationLineLength: 10,
-                    annotationPadding: {
-                        topLeft: 19,
+                    annotationLineLength: {
+                        topLeft: 12,
                         topRight: 10,
-                        bottomLeft: 25,
+                        bottomLeft: 14,
                         bottomRight: 10,
                     },
+                    annotationOffsets: {
+                        topLeft: { x: 5, y: -13 },
+                        topRight: { x: 4, y: -4 },
+                        bottomLeft: { x: 0, y: 8 },
+                        bottomRight: { x: 10, y: 0 },
+                    },
+                    annotationLineEndOffset: {
+                        // topLeft: { x: -2, y: -1 },
+                        // topRight: { x: 1, y: -1 },
+                        // bottomLeft: { x: -2, y: 1 },
+                        bottomRight: { x: -5, y: 10 },
+                    },
                     position: 'top-right',
+                    noData:false
                 })
                 .zoomExtent([1, 100])
                 .drawGraticule(false)
