@@ -30,7 +30,7 @@ const choroplethConfig: ChoroplethConfig = {
 const map1 = eurostatmap.map('choropleth', choroplethConfig)
 
 // Test builder pattern methods
-map1.width(900).height(700).scale(1000).nutsLevel(3).title('Updated Title').build()
+map1.width(900).height(700).scale('20M').nutsLevel(3).title('Updated Title').build()
 
 // Test 2: Proportional symbol map
 const psConfig: ProportionalSymbolConfig = {
@@ -217,9 +217,8 @@ const locationConfig: LocationConfig = {
         fontFamily: 'inherit',
         fill: '#222',
         opacity: 1,
-        stroke: '#fff',
-        strokeWidth: 3,
-        paintOrder: 'stroke',
+        haloColor: '#fff',
+        haloWidth: 3,
         textAnchor: 'middle',
     },
 }
