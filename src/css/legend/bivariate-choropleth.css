@@ -8,6 +8,19 @@
 }
 .em-bivariate-axis-title {
     font-size: 15px;
+    fill: #696969;
+}
+.em-bivariate-axis-arrow {
+    stroke: #696969;
+    stroke-width: 1.5;
+}
+.em-bivariate-arrowhead {
+    stroke: #696969;
+    fill: #696969;
+}
+.em-bivariate-axis-end-label {
+    font-size: 11px;
+    fill: #444;
 }
 .em-bivariate-tick {
     stroke: #696969;
@@ -21,4 +34,13 @@
     stroke: #696969;
     stroke-width: 0.5;
     cursor: pointer;
+}
+.em-bivariate-corner-annotation-line {
+    stroke: #696969;
+    stroke-width: 0.8;
+    fill: none;
+}
+.em-bivariate-corner-annotation {
+    font-size: 11px;
+    fill: #333;
 }

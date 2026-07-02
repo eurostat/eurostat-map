@@ -1581,6 +1581,10 @@ In addition to [the default legend parameters](#map-legend), bivariate choroplet
 | **arrowHeight**       | number   | _15_             | Height of axis arrows                                                                       |
 | **arrowWidth**        | number   | _14_             | Width of axis arrows                                                                        |
 | **arrowPadding**      | number   | _10_             | Padding between arrow and axis label                                                        |
+| **axisExtremes**      | Object   | _{ x: { low: "Low", high: "High" }, y: { low: "Low", high: "High" } }_ | Labels shown at low/high ends of x and y axes.                        |
+| **annotations**       | Object   | _undefined_      | Optional corner annotation text: topLeft, topRight, bottomLeft, bottomRight. Supports line breaks with `<br>`/`<br/>` or a newline. |
+| **annotationLineLength** | number | _18_            | Length of corner annotation callout lines (pixels)                                          |
+| **annotationPadding** | number or Object | _8_       | Padding between corner annotation callout line and text (pixels). Use a number for all corners or an object with topLeft, topRight, bottomLeft, bottomRight. |
 
 ### Proportional symbol legends
 
