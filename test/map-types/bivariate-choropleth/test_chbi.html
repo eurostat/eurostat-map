@@ -33,7 +33,7 @@
                     //rotation: -45,
                     boxOpacity: 1,
                     boxPadding:5,
-                    squareSize: 90,
+                    squareSize: 80,
                     label1: 'Inhabitants per km²',
                     label2: '% unemployed',
                     // breaks1: [100, 200],
@@ -44,17 +44,17 @@
                     //     y: { low: 'Low', high: 'High' },
                     // },
                     annotations: {
-                        topLeft: 'Low density <br>& High unemployment',
-                        topRight: 'High density <br>& High unemployment',
-                        bottomLeft: 'Low density <br>& Low unemployment',
-                        bottomRight: 'High density <br>& Low unemployment',
+                        topLeft: 'Low density &<br> High unemployment',
+                        topRight: 'High density &<br> High unemployment',
+                        bottomLeft: 'Low density &<br> Low unemployment',
+                        bottomRight: 'High density &<br> Low unemployment',
                     },
                     xAxisTitleOffset: {x: 0, y: 8},
                     annotationLineLength: {
-                        topLeft: 12,
-                        topRight: 10,
-                        bottomLeft: 14,
-                        bottomRight: 10,
+                        topLeft: 35,
+                        topRight: 18,
+                        bottomLeft: 22,
+                        bottomRight: 18,
                     },
                     annotationOffsets: {
                         topLeft: { x: 5, y: -13 },
@@ -69,7 +69,7 @@
                         bottomRight: { x: -5, y: 10 },
                     },
                     position: 'top-right',
-                    noData:false
+                    noDataPadding: -10
                 })
                 .zoomExtent([1, 100])
                 .drawGraticule(false)

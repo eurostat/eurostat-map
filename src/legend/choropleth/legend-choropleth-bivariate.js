@@ -447,11 +447,14 @@ export const legend = function (map, config) {
         if (!out.annotations) return
 
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
+        const numberOfClasses = out.map.numberOfClasses_ || 3
+        const cellSize = out.squareSize / numberOfClasses
         const corners = {
-            topLeft: [0, 0],
-            topRight: [out.squareSize, 0],
-            bottomLeft: [0, out.squareSize],
-            bottomRight: [out.squareSize, out.squareSize],
+            // Anchor each annotation at the center of the corresponding corner class cell.
+            topLeft: [cellSize / 2, cellSize / 2],
+            topRight: [out.squareSize - cellSize / 2, cellSize / 2],
+            bottomLeft: [cellSize / 2, out.squareSize - cellSize / 2],
+            bottomRight: [out.squareSize - cellSize / 2, out.squareSize - cellSize / 2],
         }
         const cx = out.squareSize / 2
         const cy = out.squareSize / 2
