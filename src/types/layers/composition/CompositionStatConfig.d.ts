@@ -31,6 +31,7 @@ export interface CompositionStatConfig<TCustomData = Record<string, Record<strin
     filters?: Record<string, any>
     /** Unit text. */
     unitText?: string
+    preprocess?: (regionId: string, value: any) => any
     transform?: (value: number) => number
 
     /** Category parameter. Required when not using `customData`. */
@@ -52,6 +53,7 @@ export interface CompositionStatConfig<TCustomData = Record<string, Record<strin
         filters?: Record<string, any>
         /** Unit text. */
         unitText?: string
+        preprocess?: (regionId: string, value: any) => any
         transform?: (value: number) => number
     }
 }

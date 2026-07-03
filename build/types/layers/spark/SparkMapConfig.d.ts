@@ -37,6 +37,7 @@ export interface SparkMapConfig extends MapConfig {
     customData?: Record<string, Record<string, number>>
     filters?: Record<string, any>
     unitText?: string
+    preprocess?: (regionId: string, value: any) => any
     transform?: (value: any) => any
 
     sparkLineColor?: string | ((value: number, index: number, data: any[]) => string)

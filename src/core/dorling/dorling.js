@@ -2,16 +2,25 @@ import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { executeForAllInsets } from '../utils'
 import { getCentroidsGroup } from '../geo/centroids'
 
-export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
+const getLayerAndMap = function (layerOrMap) {
+    if (layerOrMap?.map) {
+        return { layer: layerOrMap, map: layerOrMap.map }
+    }
+    return { layer: layerOrMap, map: layerOrMap }
+}
+
+export function runDorlingSimulation(layerOrMap, radiusAccessor, padding = 0) {
     // Common function to start a simulation on a single map (main or inset)
-    const runSim = (singleMap) => {
-        const activeLayer = typeof singleMap.activeLayer === 'function' ? singleMap.activeLayer() : null
-        const nodes = activeLayer?.centroidsFeatures_ || singleMap.Geometries.centroidsFeatures || []
+    const runSim = (singleLayerOrMap) => {
+        const { layer, map } = getLayerAndMap(singleLayerOrMap)
+        const activeLayer = typeof map?.activeLayer === 'function' ? map.activeLayer() : null
+        const targetLayer = layer?.centroidsFeatures_ ? layer : activeLayer || layer
+        const nodes = targetLayer?.centroidsFeatures_ || map?.Geometries?.centroidsFeatures || []
         if (!nodes.length) return
 
-        stopDorlingSimulation(singleMap)
+        stopDorlingSimulation(targetLayer)
 
-        const settings = singleMap.dorlingSettings_ || {}
+        const settings = targetLayer?.dorlingSettings_ || map?.dorlingSettings_ || {}
         const effectivePadding = settings.padding ?? padding
         const strengthX = settings.strength?.x ?? 1
         const strengthY = settings.strength?.y ?? 1
@@ -21,7 +30,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
 
         // Compute initial projected coordinates
         for (const n of nodes) {
-            const projected = singleMap._projection?.(n.geometry.coordinates)
+            const projected = map?._projection?.(n.geometry.coordinates)
             if (projected) {
                 n.x = projected[0]
                 n.y = projected[1]
@@ -31,7 +40,8 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
             }
         }
 
-        const containers = singleMap.svg().selectAll('g.em-centroid')
+    const containers = getCentroidsGroup(targetLayer)?.selectAll('g.em-centroid')
+        if (!containers || containers.empty()) return
 
         const tickTransform = (sel) => {
             sel.attr('transform', (d) => {
@@ -56,7 +66,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
                     if (i % 10 === 0) tickTransform(containers)
                 }
                 tickTransform(containers)
-                updateDorlingProgress(1, singleMap)
+                updateDorlingProgress(1, targetLayer)
                 return sim
             } else {
                 // === Web Worker branch ===
@@ -74,7 +84,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
                 worker.onmessage = (e) => {
                     const { type, nodes: finalNodes, progress, total } = e.data
                     if (type === 'progress') {
-                        updateDorlingProgress(progress / total, singleMap)
+                        updateDorlingProgress(progress / total, targetLayer)
                         return
                     }
                     if (type === 'end' && finalNodes) {
@@ -83,7 +93,7 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
                             node.y = finalNodes[i].y
                         })
                         tickTransform(containers)
-                        updateDorlingProgress(1, singleMap)
+                        updateDorlingProgress(1, targetLayer)
                         worker.terminate()
                     }
                 }
@@ -92,20 +102,22 @@ export function runDorlingSimulation(map, radiusAccessor, padding = 0) {
         }
 
         // === Animated branch ===
-        singleMap.simulation = forceSimulation(nodes)
+        targetLayer.simulation = forceSimulation(nodes)
             .force('x', forceX((d) => d.properties.centroid[0]).strength(strengthX))
             .force('y', forceY((d) => d.properties.centroid[1]).strength(strengthY))
             .force('collide', forceCollide((d) => Math.max(0, radiusAccessor(d) + effectivePadding)).iterations(iterations))
             .on('tick', () => tickTransform(containers))
 
-        return singleMap.simulation
+        return targetLayer.simulation
     }
 
+    const { map } = getLayerAndMap(layerOrMap)
+
     // Run on main map
-    runSim(map)
+    runSim(layerOrMap)
 
     // Run on all insets
-    if (map.insetTemplates_) {
+    if (map?.insetTemplates_) {
         executeForAllInsets(map.insetTemplates_, map.svgId_, (inset) => {
             runSim(inset)
         })
@@ -119,10 +131,25 @@ function updateDorlingProgress(progress, map) {
 }
 
 export function stopDorlingSimulation(map) {
-    if (!map.simulation) return
-    map.simulation.stop()
-    map.simulation.on('tick', null)
-    map.simulation = null
+    if (!map) return
+
+    if (map.layers_ && Array.isArray(map.layers_)) {
+        map.layers_.forEach((layer) => {
+            // In legacy/single-layer maps, layers_ can include the map object itself.
+            if (layer && layer !== map) stopDorlingSimulation(layer)
+        })
+    }
+
+    if (map.simulation) {
+        map.simulation.stop()
+        map.simulation.on('tick', null)
+        map.simulation = null
+    }
+
+    // If this is a pure map container, we've already stopped child layers above.
+    if (map.layers_ && Array.isArray(map.layers_)) {
+        return
+    }
 }
 
 // Optional API setters

@@ -2,6 +2,7 @@ import { json, csv } from 'd3-fetch'
 import { getEstatDataURL } from './utils'
 import JSONstat from 'jsonstat-toolkit'
 import { csvToIndex, jsonstatToIndex } from './utils'
+import { showEurostatApiErrorToast } from './toast'
 
 /** @typedef {import('../types/core/stat/StatData').StatData} StatData */
 /** @typedef {import('../types/core/stat/StatConfig').StatConfig} StatConfig */
@@ -25,8 +26,47 @@ export const statData = function (config) {
      */
     out._data_ = undefined
 
-    // new property
+    // optional preprocessing and transform hooks
+    out.preprocess_ = undefined // optional (regionId, value, entry) => newValue | {value,status} | null/undefined/false to filter out
     out.transform_ = undefined // optional (value) => value function
+
+    const applyPreprocessAndTransform = function () {
+        if (!out._data_) return
+
+        // preprocess first: allows filtering and value/status editing with region context
+        if (out.preprocess_) {
+            Object.keys(out._data_).forEach((regionId) => {
+                const entry = out._data_[regionId]
+                if (!entry || typeof entry !== 'object') return
+
+                const next = out.preprocess_(regionId, entry.value, entry)
+
+                // explicit filter out
+                if (next === null || next === undefined || next === false) {
+                    delete out._data_[regionId]
+                    return
+                }
+
+                // allow replacing full stat entry when returning { value, status? }
+                if (typeof next === 'object' && next !== null && Object.prototype.hasOwnProperty.call(next, 'value')) {
+                    out._data_[regionId] = next
+                    return
+                }
+
+                // otherwise treat return value as the new entry value
+                entry.value = next
+            })
+        }
+
+        // preserve existing transform semantics: apply to non-null, non-":" values
+        if (out.transform_) {
+            Object.values(out._data_).forEach((entry) => {
+                if (entry && entry.value != null && entry.value !== ':') {
+                    entry.value = out.transform_(entry.value)
+                }
+            })
+        }
+    }
 
     /**
      * Return the stat value {value,status} from a nuts id.
@@ -90,6 +130,7 @@ export const statData = function (config) {
         out.__data = data // for debugging
         out._data_ = {} // overwrite existing data
         Object.keys(data).forEach((nutsId) => out.set(nutsId, data[nutsId]))
+        applyPreprocessAndTransform()
         return out
     }
 
@@ -255,51 +296,55 @@ export const statData = function (config) {
         //erase previous data
         out._data_ = null
 
-        getEurobasePromise(nutsLevel, lang).then(function (data___) {
-            if (data___.error) return console.error('Error retrieving Eurostat data: ' + data___.error[0]?.label)
-            //decode stat data
-            const jsd = JSONstat(data___)
-
-            //store jsonstat metadata
-            out.metadata = {
-                label: jsd.label,
-                href: jsd.href,
-                source: jsd.source,
-                updated: jsd.updated,
-                extension: jsd.extension,
-            }
-            out.metadata.time = jsd.Dimension('time').id[0]
-
-            //index
-            out._data_ = jsonstatToIndex(jsd)
-            //TODO: use maybe https://github.com/badosa/JSON-stat/blob/master/utils/fromtable.md to build directly an index ?
-
-            //handle null values
-            // #172 when using jsonstat-toolkit, values of null mean 'no data' and are converted to ":"
-            Object.keys(out._data_).forEach((k) => {
-                // Handle case where entire entry is null
-                if (out._data_[k] === null) {
-                    out._data_[k] = { value: ':' }
-                } else if (out._data_[k].value === null) {
-                    // Handle case where entry exists but value is null
-                    out._data_[k].value = ':'
+        getEurobasePromise(nutsLevel, lang)
+            .then(function (data___) {
+                if (data___.error) {
+                    const label = data___.error[0]?.label || 'Eurostat API request failed.'
+                    showEurostatApiErrorToast('Eurostat API request failed: ' + label)
+                    console.error('Error retrieving Eurostat data: ' + label)
+                    return
                 }
-            })
+                //decode stat data
+                const jsd = JSONstat(data___)
 
-            //e.g. PTZZ
-            removeNonGeoRegions(out._data_)
+                //store jsonstat metadata
+                out.metadata = {
+                    label: jsd.label,
+                    href: jsd.href,
+                    source: jsd.source,
+                    updated: jsd.updated,
+                    extension: jsd.extension,
+                }
+                out.metadata.time = jsd.Dimension('time').id[0]
 
-            //apply user transform
-            if (out.transform_) {
-                Object.values(out._data_).forEach((entry) => {
-                    if (entry && entry.value != null && entry.value !== ':') {
-                        entry.value = out.transform_(entry.value)
+                //index
+                out._data_ = jsonstatToIndex(jsd)
+                //TODO: use maybe https://github.com/badosa/JSON-stat/blob/master/utils/fromtable.md to build directly an index ?
+
+                //handle null values
+                // #172 when using jsonstat-toolkit, values of null mean 'no data' and are converted to ":"
+                Object.keys(out._data_).forEach((k) => {
+                    // Handle case where entire entry is null
+                    if (out._data_[k] === null) {
+                        out._data_[k] = { value: ':' }
+                    } else if (out._data_[k].value === null) {
+                        // Handle case where entry exists but value is null
+                        out._data_[k].value = ':'
                     }
                 })
-            }
 
-            if (callback) callback()
-        })
+                //e.g. PTZZ
+                removeNonGeoRegions(out._data_)
+
+                applyPreprocessAndTransform()
+
+                if (callback) callback()
+            })
+            .catch(function (err) {
+                const message = err?.message || 'Network or parsing error while retrieving Eurostat data.'
+                showEurostatApiErrorToast('Eurostat API request failed: ' + message)
+                console.error('Error retrieving Eurostat data:', err)
+            })
     }
 
     /** Filter out pseudo-regions with no geographic location (e.g. PTZZ, ESZZ). */
@@ -350,13 +395,7 @@ export const statData = function (config) {
             //store some metadata
             out.metadata = { href: out.csvURL_ }
 
-            if (out.transform_) {
-                Object.values(out._data_).forEach((entry) => {
-                    if (entry && entry.value != null && entry.value !== ':') {
-                        entry.value = out.transform_(entry.value)
-                    }
-                })
-            }
+            applyPreprocessAndTransform()
 
             if (callback) callback()
         })

@@ -76,13 +76,13 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     //the classifier
     layer.classifierSize_ = undefined
     layer.classifierColor_ = undefined
-    
+
     //specific tooltip text function
     layer.tooltip_ = layer.tooltip_ || {}
     layer.tooltip_.textFunction = tooltipTextFunPs
 
     layer.psCodeLabels_ = false
-    
+
     layer.dorling_ = config?.dorling || false
     layer.dorlingSettings_ = Object.assign({}, layer.map?.dorlingSettings_ || {}, config?.dorlingSettings || {})
 
@@ -267,7 +267,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         if (!layer.psClassToFillStyle()) layer.psClassToFillStyle(getColorLegend(layer.psColorFun_, layer.psColors_))
 
         // Gate background color: skip if a base layer (e.g. choropleth) is present below us!
-        const hasBaseLayer = map.layers_ && map.layers_.some(l => l.role === 'base' && l !== layer)
+        const hasBaseLayer = map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer)
         if (!hasBaseLayer) {
             // update region color according to symbol color
             const backgroundSymbolFill = layer.classifierColor_ ? layer.psClassToFillStyle_(layer.psClasses_ - 1, layer.psClasses_) : layer.psFill_
@@ -526,7 +526,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
 
                 const sizeData = getSizeStatData(layer)
                 runDorlingSimulation(
-                    map,
+                    layer,
                     (d) => {
                         const datum = sizeData.get(d.properties.id)
                         const r = datum ? layer.classifierSize_(+datum.value) : 0

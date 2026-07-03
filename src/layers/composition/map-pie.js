@@ -173,6 +173,25 @@ export const map = function (config) {
                         const baseSize = out.classifierSize_(total) || 0
                         const type = out.compositionSettings_?.type || 'pie'
 
+                        if (type === 'radar') {
+                            const radarValueMode = out.compositionSettings_?.radarValueMode || 'share'
+                            if (radarValueMode === 'absolute') {
+                                const comp = _getComposition(d.properties.id)
+                                const globalMax = out.radarAbsoluteMax_ || 1
+                                if (!comp || globalMax <= 0) return 0
+
+                                let regionalMaxRaw = 0
+                                Object.values(comp).forEach((share) => {
+                                    const raw = (+share || 0) * total
+                                    if (raw > regionalMaxRaw) regionalMaxRaw = raw
+                                })
+
+                                // Radar(absolute) draws wedges with radius: r * sqrt(raw/globalMax).
+                                // Dorling should use the actual outer footprint, not the full pie radius.
+                                return baseSize * Math.sqrt(regionalMaxRaw / globalMax)
+                            }
+                        }
+
                         // Dorling collide expects a circle radius. For non-circular symbols,
                         // inflate radius to circumscribed-circle size to reduce overlap.
                         if (type === 'flag') return Math.SQRT2 * baseSize

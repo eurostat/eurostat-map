@@ -20,7 +20,7 @@
                 .subtitle('2024')
                 .psSettings({
                     shape: 'circle',
-                    spikeWidth: 7
+                    spikeWidth: 7,
                 })
                 .nutsLevel(0)
                 .stat('symbolSize', {
@@ -29,7 +29,7 @@
                     filters: { unit: 'MIO_EUR', time: '2024' },
                 })
                 .encoding('size', { stat: 'symbolSize' })
-                .legend({ title: 'Euro', x: 550, y: 90, boxOpacity: 0, sizeLegend: { noData: true } })
+                .legend({ title: 'Euro', boxOpacity: 1, sizeLegend: { noData: true } })
                 .labels({ values: true, shadows: true })
                 .insets(false)
                 .psSettings({
@@ -41,6 +41,13 @@
                     maxSize: 60,
                 })
                 .dorling(true)
+                .dorlingSettings({
+                    animate: false,
+                    strength: { x: 0.35, y: 0.35 },
+                    iterations: 4,
+                    padding: 1,
+                    worker: false,
+                })
             // try: cross, diamond, star, square, wye, circle, triangle, rectangle https://github.com/d3/d3-shape#symbols
 
             map.build()

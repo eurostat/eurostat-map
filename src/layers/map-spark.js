@@ -189,6 +189,7 @@ export const map = function (config) {
      * @param {String} config.eurostatDatasetCode
      * @param {Object} [config.filters]
      * @param {String} [config.unitText]
+     * @param {Function} [config.preprocess] - Optional preprocess(regionId, value) applied before transform and before data reaches the map
      * @param {Function} [config.transform] - Optional transform(value) applied after data loads
      * @param {Array}  config.dates - Time values to query (e.g. ['2018','2019',...])
      * @param {Array}  [config.labels] - Optional display labels for each date
@@ -202,7 +203,7 @@ export const map = function (config) {
      * })
      */
     out.statSpark = function (config) {
-        const { eurostatDatasetCode, customData, filters, unitText, transform, dates, labels } = config
+        const { eurostatDatasetCode, customData, filters, unitText, preprocess, transform, dates, labels } = config
 
         // ── Custom Data Path ─────────────────────────────────────────────────
         if (customData && !eurostatDatasetCode) {
@@ -237,7 +238,7 @@ export const map = function (config) {
 
         for (let i = 0; i < dates.length; i++) {
             const date = dates[i]
-            out.stat(date, { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, time: date } })
+            out.stat(date, { eurostatDatasetCode, unitText, preprocess, transform, filters: { ...baseFilters, time: date } })
 
             if (labels?.[i]) {
                 out.catLabels_ = out.catLabels_ || {}
@@ -254,7 +255,7 @@ export const map = function (config) {
         if (args.length === 1 && args[0] && typeof args[0] === 'object' && !Array.isArray(args[0])) {
             const cfg = args[0]
             if (cfg.dates && (cfg.eurostatDatasetCode || cfg.customData)) {
-                const { eurostatDatasetCode, customData, filters, unitText, transform, dates, labels } = cfg
+                const { eurostatDatasetCode, customData, filters, unitText, preprocess, transform, dates, labels } = cfg
 
                 if (customData && !eurostatDatasetCode) {
                     const resolvedDates = dates?.length ? dates : Object.keys(customData[Object.keys(customData)[0]] || {})
@@ -286,6 +287,7 @@ export const map = function (config) {
                     superStat.call(out, date, {
                         eurostatDatasetCode,
                         unitText,
+                        preprocess,
                         transform,
                         filters: { ...baseFilters, time: date },
                     })

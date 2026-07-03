@@ -24,6 +24,7 @@ export interface SparkStatConfig {
     filters?: Record<string, any>
     /** Unit text. */
     unitText?: string
+    preprocess?: (regionId: string, value: any) => any
     transform?: (value: number) => number
     /** Date keys to fetch. Required when not using `customData`. */
     dates?: string[]

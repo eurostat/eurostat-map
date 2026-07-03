@@ -8,12 +8,7 @@ import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 import { refreshCentroids } from './geo/centroids'
 import { exportMapToPNG, exportMapToSVG } from './export'
 import { buildGridCartogramBase } from './cartograms'
-import {
-    createLayer,
-    makeMapSelfLayer,
-    forwardFieldsToActiveLayer,
-    forwardChainableMethod,
-} from './layer'
+import { createLayer, makeMapSelfLayer, forwardFieldsToActiveLayer, forwardChainableMethod } from './layer'
 import { getRole, isLayerTypeRegistered, getLayerType } from './layer-registry'
 
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -113,6 +108,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
             customData,
             filters,
             unitText,
+            preprocess,
             transform,
             categoryParameter,
             categoryCodes,
@@ -145,7 +141,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
             statKeys[code] = statKey
 
             if (customData && !eurostatDatasetCode) {
-                const statData = StatisticalData.statData({ code, unitText: unitText || 'Value', transform })
+                const statData = StatisticalData.statData({ code, unitText: unitText || 'Value', preprocess, transform })
                 const regionData = {}
                 for (const regionId in customData) {
                     const value = customData[regionId]?.[code]
@@ -164,7 +160,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                     return out
                 }
                 const baseFilters = filters ? { ...filters } : {}
-                out.stat_[statKey] = { eurostatDatasetCode, unitText, transform, filters: { ...baseFilters, [categoryParameter]: code } }
+                out.stat_[statKey] = { eurostatDatasetCode, unitText, preprocess, transform, filters: { ...baseFilters, [categoryParameter]: code } }
             }
 
             if (categoryColors?.[i]) {
@@ -196,7 +192,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                 out.statChannels_[channel].totalStatKey = totalStatKey
 
                 if (customData && !eurostatDatasetCode) {
-                    const statData = StatisticalData.statData({ code: totalCode, unitText: unitText || 'Value', transform })
+                    const statData = StatisticalData.statData({ code: totalCode, unitText: unitText || 'Value', preprocess, transform })
                     const regionData = {}
                     for (const regionId in customData) {
                         let total = customData[regionId]?.[totalCode]
@@ -217,6 +213,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                     out.stat_[totalStatKey] = {
                         eurostatDatasetCode,
                         unitText,
+                        preprocess,
                         transform,
                         filters: { ...baseFilters, [categoryParameter]: totalCode },
                     }
@@ -929,22 +926,8 @@ export const buildSingleLayerMap = function (type, config) {
     out.activeLayerIndex(0)
 
     // Forwarding accessors for backwards compatibility
-    const baseFields = [
-        'encodings_',
-        'catColors_',
-        'catLabels_',
-        'statCodes_',
-        'legend_',
-        'legendObj_',
-        'tooltip_',
-    ]
-    const baseMethods = [
-        'encoding',
-        'updateClassification',
-        'updateStyle',
-        'getLegendConstructor',
-        'legend',
-    ]
+    const baseFields = ['encodings_', 'catColors_', 'catLabels_', 'statCodes_', 'legend_', 'legendObj_', 'tooltip_']
+    const baseMethods = ['encoding', 'updateClassification', 'updateStyle', 'getLegendConstructor', 'legend']
 
     let typeFields = []
     let typeMethods = []
@@ -1063,4 +1046,3 @@ export const buildSingleLayerMap = function (type, config) {
 
     return out
 }
-

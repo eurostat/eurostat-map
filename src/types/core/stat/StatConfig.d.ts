@@ -25,6 +25,8 @@ export interface StatConfig {
     valueCol?: string
     /** Unit of measure label shown in tooltips. e.g. 'people/km²' */
     unitText?: string
+    /** Optional preprocessing hook called with (regionId, value) before transform. Return null/undefined/false to filter out the region. */
+    preprocess?: (regionId: string, value: any) => any
     /** Optional transform function applied to raw values after data loads. e.g. v => v * 1000 */
     transform?: (value: number) => number
     /** Dataset label/name from the Eurostat API response. */
