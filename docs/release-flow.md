@@ -127,6 +127,7 @@ Use this markdown structure for release notes output:
 Snippet conventions:
 
 - after each meaningful bullet, add a short `Example` label and a fenced code block
+- always include a language on fenced code blocks (use `javascript` for JS examples and `ts` for TypeScript snippets)
 - keep snippets short (roughly 5-20 lines) and focused on a single change
 - prefer real API names and options exactly as released
 

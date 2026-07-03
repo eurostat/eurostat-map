@@ -71,17 +71,15 @@ map.stat('size', {
 Example:
 
 ```js
-map
-    .encoding('width', {
-        stat: 'totalPop',
-        scale: 'linear',
-        range: [2, 16],
-    })
-    .legend({
-        widthLegend: {
-            title: 'Population',
-        },
-    })
+map.encoding('width', {
+    stat: 'totalPop',
+    scale: 'linear',
+    range: [2, 16],
+}).legend({
+    widthLegend: {
+        title: 'Population',
+    },
+})
 ```
 
 ### Fixes
@@ -106,10 +104,7 @@ eurostatmap
 Example:
 
 ```js
-eurostatmap
-    .map('choropleth')
-    .insets('default')
-    .build()
+eurostatmap.map('choropleth').insets('default').build()
 ```
 
 - Added runtime toast notification for Eurostat API failures to improve error visibility in interactive maps.
