@@ -71,6 +71,15 @@ export const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.colorLegend
+        const layerLegendConfig = out.layer?.legend_ || {}
+        const hasExplicitColorTitlePadding =
+            !!layerLegendConfig.colorLegend && Object.prototype.hasOwnProperty.call(layerLegendConfig.colorLegend, 'titlePadding')
+        const hasExplicitRootTitlePadding = Object.prototype.hasOwnProperty.call(layerLegendConfig, 'titlePadding')
+        const legendTitlePadding = hasExplicitColorTitlePadding
+            ? config.titlePadding
+            : hasExplicitRootTitlePadding
+              ? out.titlePadding
+              : config.titlePadding
 
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend').attr('transform', `translate(${baseX},${baseY})`)
 
@@ -87,7 +96,7 @@ export const legend = function (map, config) {
         let i = 0
         const scs = map.catColors()
         for (let code in scs) {
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const y = legendTitlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
 
             out._colorLegendContainer
                 .append('rect')
@@ -122,13 +131,9 @@ export const legend = function (map, config) {
         }
 
         if (config.noData) {
-            const y =
-                out.colorLegend.marginTop +
-                out.boxPadding +
-                (config.title ? out.titleFontSize + out.boxPadding : 0) +
-                i * (config.shapeHeight + config.shapePadding)
+            const y = legendTitlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding) + out.boxPadding
 
-            const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding},${y})`)
+            const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(0,${y})`)
             out.appendNoDataLegend(container, config.noDataText || out.noDataText, highlightRegions, unhighlightRegions)
         }
     }

@@ -20,24 +20,31 @@
                 .nutsLevel(2)
                 .nutsYear(2013)
                 .stripeSettings({ width: 10 })
-            //.stripeOrientation(45)
-            map.stat(
-                'composition',
-                {
-                    eurostatDatasetCode: 'ef_kvaareg',
-                    filters: { indic_ef: 'TOTAREA_HA', legtype: 'TOTAL', time: '2013' },
-                    unitText: '',
-                },
-                'agrarea',
-                ['HA_LT2', 'HA2-4', 'HA5-9', 'HA10-19', 'HA20-29', 'HA30-49', 'HA50-99', 'HA_GE100'].reverse(),
-                ['< 2 ha', '2 to 4.9 ha', '5 to 9.9 ha', '10 to 19.9 ha', '20 to 29.9 ha', '30 to 49.9 ha', '50 to 99.9 ha', '> 100 ha'].reverse(),
-                ['#FFEB99', '#D8EAAC', '#A3DDB7', '#66CABC', '#48B9C3', '#2E7AAC', '#15438C', '#17256B'].reverse()
-            )
+                //.stripeOrientation(45)
+                .stat(
+                    'composition',
+                    {
+                        eurostatDatasetCode: 'ef_kvaareg',
+                        filters: { indic_ef: 'TOTAREA_HA', legtype: 'TOTAL', time: '2013' },
+                        unitText: '',
+                    },
+                    'agrarea',
+                    ['HA_LT2', 'HA2-4', 'HA5-9', 'HA10-19', 'HA20-29', 'HA30-49', 'HA50-99', 'HA_GE100'].reverse(),
+                    [
+                        '< 2 ha',
+                        '2 to 4.9 ha',
+                        '5 to 9.9 ha',
+                        '10 to 19.9 ha',
+                        '20 to 29.9 ha',
+                        '30 to 49.9 ha',
+                        '50 to 99.9 ha',
+                        '> 100 ha',
+                    ].reverse(),
+                    ['#FFEB99', '#D8EAAC', '#A3DDB7', '#66CABC', '#48B9C3', '#2E7AAC', '#15438C', '#17256B'].reverse()
+                )
                 .encoding('composition', { stat: 'composition' })
-                .legend({ x: 10, y: 65, title: 'Farm size', subtitle: 'hectares', boxOpacity: 0.8, boxFill: 'white' })
+                .legend({ position: 'top left', title: 'Farm size', subtitle: 'hectares', boxOpacity: 0.8, boxFill: 'white' })
                 .insets('default')
-                .seaFillStyle('white')
-                .coastalMarginColor('lightgray')
                 .drawGraticule(false)
                 .build()
         </script>

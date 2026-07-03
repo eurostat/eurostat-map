@@ -36,6 +36,17 @@ export const legend = function (map, config) {
         noDataText: 'No data',
     }
 
+    // ── Width legend config (grouped mode + data-driven width) ─────────────
+    out.widthLegend = {
+        title: 'Bar width',
+        titlePadding: 10,
+        marginTop: 20,
+        barHeight: 8,
+        offsetX: 10,
+        values: null, // custom values; null -> auto [max, mid, 10% max]
+        labelFormatter: undefined,
+    }
+
     // ── Colour legend config ─────────────────────────────────────────────────
     out.colorLegend = {
         title: null,
@@ -52,7 +63,7 @@ export const legend = function (map, config) {
     // ── Config override ──────────────────────────────────────────────────────
     if (config) {
         for (const key in config) {
-            if (key === 'colorLegend' || key === 'sizeLegend') {
+            if (key === 'colorLegend' || key === 'sizeLegend' || key === 'widthLegend') {
                 if (config[key] === false) {
                     out[key] = false
                 } else {
@@ -113,6 +124,22 @@ export const legend = function (map, config) {
             }
         }
 
+        if (map.barSettings_?.type === 'grouped' && map.classifierWidth_ && out.widthLegend !== false) {
+            const y = baseY + getLegendBlockHeight(out._sizeLegendContainer) + out.widthLegend.marginTop
+            out._widthLegendContainer = lgg.append('g').attr('class', 'em-bar-width-legend').attr('transform', `translate(${baseX}, ${y})`)
+
+            drawGroupedWidthLegend(
+                out,
+                out._widthLegendContainer,
+                out.widthLegend.values,
+                map.classifierWidth_,
+                out.widthLegend.title,
+                out.widthLegend.titlePadding,
+                out.widthLegend.barHeight,
+                out.widthLegend.offsetX
+            )
+        }
+
         buildColorLegend(out, baseX, baseY)
 
         if (map.patternFill_) {
@@ -125,6 +152,55 @@ export const legend = function (map, config) {
         }
 
         out.setBoxDimension()
+    }
+
+    // ── Grouped width legend ────────────────────────────────────────────────
+
+    /**
+     * Draw horizontal bars at representative width-channel values.
+     * Width encodes the value; height is fixed for visual comparison.
+     */
+    function drawGroupedWidthLegend(legend, container, values, classifierWidth, title, titlePadding, barHeight, offsetX) {
+        const domain = classifierWidth.domain()
+        const maxDomain = domain?.[1] ?? 1
+        const legendValues = values || [maxDomain, Math.round(maxDomain / 2), Math.max(1, Math.round(maxDomain * 0.1))]
+        const sortedValues = [...legendValues].sort((a, b) => b - a)
+
+        const h = barHeight ?? 8
+        const x0 = offsetX ?? 0
+        const maxBarWidth = classifierWidth(sortedValues[0])
+        const rowPadding = 4
+
+        let y = 0
+        if (title) {
+            container.append('text').attr('class', 'em-size-legend-title').attr('x', 0).attr('y', y).attr('dominant-baseline', 'hanging').text(title)
+            y += legend.titleFontSize + titlePadding
+        }
+
+        for (const val of sortedValues) {
+            const w = classifierWidth(val)
+            container
+                .append('rect')
+                .attr('x', x0)
+                .attr('y', y)
+                .attr('width', w)
+                .attr('height', h)
+                .attr('rx', legend.map?.barSettings_?.cornerRadius ?? 1)
+                .attr('ry', legend.map?.barSettings_?.cornerRadius ?? 1)
+                .attr('fill', '#7f7f7f')
+                .attr('stroke', legend.map?.barSettings_?.strokeFill || 'white')
+                .attr('stroke-width', (legend.map?.barSettings_?.strokeWidth ?? 0.3) + 'px')
+
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', x0 + maxBarWidth + 8)
+                .attr('y', y + h / 2)
+                .attr('dominant-baseline', 'middle')
+                .text(formatValue(val, legend.widthLegend?.labelFormatter))
+
+            y += h + rowPadding
+        }
     }
 
     // ── Stacked size legend ───────────────────────────────────────────────────
@@ -303,12 +379,12 @@ export const legend = function (map, config) {
 
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-bar-color-legend')
 
-        if (out._sizeLegendContainer) {
-            const sizeLegendHeight = out._sizeLegendContainer.node().getBBox().height
-            out._colorLegendContainer.attr('transform', `translate(${baseX}, ${sizeLegendHeight + cfg.marginTop})`)
-        } else {
-            out._colorLegendContainer.attr('transform', `translate(${baseX}, ${baseY})`)
-        }
+        const sizeLegendHeight = getLegendBlockHeight(out._sizeLegendContainer)
+        const widthLegendHeight = getLegendBlockHeight(out._widthLegendContainer)
+        const widthLegendMargin = widthLegendHeight > 0 ? out.widthLegend?.marginTop || 0 : 0
+        const y =
+            baseY + sizeLegendHeight + widthLegendMargin + widthLegendHeight + (sizeLegendHeight > 0 || widthLegendHeight > 0 ? cfg.marginTop : 0)
+        out._colorLegendContainer.attr('transform', `translate(${baseX}, ${y})`)
 
         if (cfg.title) {
             out._colorLegendContainer.append('text').attr('class', 'em-color-legend-title').attr('x', 0).attr('y', out.titleFontSize).text(cfg.title)
@@ -352,19 +428,16 @@ export const legend = function (map, config) {
 
         // No-data swatch
         if (cfg.noData) {
-            const sizeLegendHeight = out._sizeLegendContainer ? out._sizeLegendContainer.node().getBBox().height : 0
+            const y = cfg.titlePadding + (cfg.title ? out.titleFontSize : 0) + i * (cfg.shapeHeight + cfg.shapePadding) + out.boxPadding
 
-            const y =
-                sizeLegendHeight +
-                cfg.marginTop +
-                out.boxPadding +
-                (cfg.title ? out.titleFontSize + out.boxPadding : 0) +
-                i * (cfg.shapeHeight + cfg.shapePadding)
-
-            const container = out.lgg.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${out.boxPadding}, ${y})`)
+            const container = out._colorLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(0, ${y})`)
 
             out.appendNoDataLegend(container, out.noDataText, highlightRegions, unhighlightRegions)
         }
+    }
+
+    function getLegendBlockHeight(container) {
+        return container?.node ? container.node()?.getBBox?.().height || 0 : 0
     }
 
     // ── Highlight helpers ─────────────────────────────────────────────────────

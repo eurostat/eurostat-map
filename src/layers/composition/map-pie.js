@@ -200,7 +200,9 @@ export const map = function (config) {
                             const h = out.compositionSettings_?.agePyramidHeightFactor || 1
                             return Math.sqrt(1 + h * h) * baseSize
                         }
-                        if (type === 'halftone') return 1.2 * baseSize
+                        // Halftone symbols already spread dots around the center;
+                        // a large collide radius over-separates charts in dorling mode.
+                        if (type === 'halftone') return baseSize
 
                         return baseSize
                     },

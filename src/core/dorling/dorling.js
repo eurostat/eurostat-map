@@ -40,7 +40,7 @@ export function runDorlingSimulation(layerOrMap, radiusAccessor, padding = 0) {
             }
         }
 
-    const containers = getCentroidsGroup(targetLayer)?.selectAll('g.em-centroid')
+        const containers = getCentroidsGroup(targetLayer)?.selectAll('g.em-centroid')
         if (!containers || containers.empty()) return
 
         const tickTransform = (sel) => {

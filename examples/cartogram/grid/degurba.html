@@ -89,9 +89,16 @@
                 </select>
             </div>
             <div class="control-group">
-                <label for="cartogram-toggle">Grid Cartogram:</label>
+                <label for="cartogram-toggle">Grid Cartogram</label>
                 <label class="toggle-switch">
                     <input type="checkbox" id="cartogram-toggle" checked />
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="control-group">
+                <label for="width-total-toggle">Bar width = population</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="width-total-toggle" />
                     <span class="slider"></span>
                 </label>
             </div>
@@ -109,7 +116,7 @@
                     subtitle: 'Share of people aged 15-74, by degree of urbanisation, 2025',
                     legendTitle: 'Degree of urbanisation',
                     sizeLegendTitle: '% of people aged 15-74',
-                    noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'LI', 'RS', 'ME', 'MK', 'AL', 'GE'],
+                    noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'LI', 'RS', 'ME', 'AL', 'GE'],
                 },
                 flat: {
                     data: 'data/degurba/flat.json',
@@ -145,6 +152,7 @@
             let map = null
             let currentDataset = 'flat'
             let isCartogram = true
+            let useTotalPopWidth = false
 
             async function buildMap(configKey, useCartogram) {
                 const config = configs[configKey]
@@ -155,6 +163,7 @@
                 const [response, populationResponse] = await Promise.all([fetch(config.data), fetch('data/degurba/population.json')])
                 const data = await response.json()
                 const populationData = await populationResponse.json()
+                const totalPopulationData = Object.fromEntries(Object.entries(populationData).map(([geo, values]) => [geo, values?.TOTAL ?? null]))
 
                 // Remove existing map if it exists
                 if (map) {
@@ -166,7 +175,7 @@
 
                 // Build new map with selected configuration
                 const GROUP_MAX_HEIGHT = useCartogram ? 48 : 45
-                map = eurostatmap
+                let mapBuilder = eurostatmap
                     .map('bar')
                     .dorling(true)
                     .hoverColor('#ffffbf')
@@ -205,16 +214,15 @@
                         categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
                         unitText: 'inhabitants',
                     })
+                    .stat('totalPop', {
+                        customData: totalPopulationData,
+                        unitText: 'inhabitants',
+                    })
                     .encoding('height', {
                         stat: 'degurbaRate',
                         scale: 'linear',
                         range: [2, GROUP_MAX_HEIGHT],
                     })
-                    // .encoding('width', {
-                    //     stat: 'degurbaPop',
-                    //     scale: 'linear',
-                    //     range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
-                    // })
                     .encoding('color', {
                         stat: 'degurbaRate',
                         by: 'category',
@@ -247,6 +255,9 @@
                             title: config.sizeLegendTitle,
                             titlePadding: 10,
                         },
+                        widthLegend: {
+                            title: 'Population',
+                        },
                         colorLegend: {
                             title: config.legendTitle,
                             noData: false,
@@ -263,6 +274,16 @@
                     .noDataFillStyle('#ffffff')
                     .zoomButtons(false)
 
+                if (useTotalPopWidth) {
+                    mapBuilder = mapBuilder.encoding('width', {
+                        stat: 'totalPop',
+                        scale: 'linear',
+                        range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
+                    })
+                }
+
+                map = mapBuilder
+
                 map.build()
             }
 
@@ -277,6 +298,11 @@
             // Add event listener for cartogram toggle
             document.getElementById('cartogram-toggle').addEventListener('change', function (e) {
                 buildMap(currentDataset, e.target.checked)
+            })
+
+            document.getElementById('width-total-toggle').addEventListener('change', function (e) {
+                useTotalPopWidth = e.target.checked
+                buildMap(currentDataset, isCartogram)
             })
         </script>
     </body>

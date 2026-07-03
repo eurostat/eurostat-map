@@ -75,6 +75,17 @@ export const defineDefaultPosition = function (map) {
 
 export const getDefaultZ = function (map) {
     const defaultPosition = _defaultPosition[map.geo_ + '_' + map.proj_]
+    const isInsetMap = !!(map.isInset || map.isInset_)
+
+    // Insets historically relied on curated per-geo pixelSize defaults.
+    // During migration we started using bbox-fit for all maps, which made
+    // default inset views noticeably too zoomed out.
+    if (isInsetMap && defaultPosition?.pixelSize) {
+        const referenceWidth = 800 // pixelSize values in _defaultPosition are defined for 800px-wide maps
+        const targetWidth = map.width_ || referenceWidth
+        return defaultPosition.pixelSize * (referenceWidth / targetWidth)
+    }
+
     if (defaultPosition) {
         return getPixelSizeToFitBbox(map, [map.position_.x ?? defaultPosition.geoCenter[0], map.position_.y ?? defaultPosition.geoCenter[1]])
     } else if (map.Geometries.defaultGeoData?.bbox) {
