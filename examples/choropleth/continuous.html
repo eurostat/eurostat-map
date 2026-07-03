@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Continuous Choropleth</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+
+        <script>
+            const sorted = []
+            let map1
+
+            const valueTransform = function (v) {
+                if (!sorted.length) {
+                    const raw = map1.statData('value').getArray()
+                    const values = raw.filter((x) => x !== ':' && Number.isFinite(+x)).map(Number)
+                    sorted.push(...[...values].sort((a, b) => a - b))
+                }
+                if (!sorted.length) return 0
+                let lo = 0,
+                    hi = sorted.length
+                while (lo < hi) {
+                    const mid = (lo + hi) >> 1
+                    if (sorted[mid] <= v) lo = mid + 1
+                    else hi = mid
+                }
+                return lo / sorted.length
+            }
+
+            const valueUntransform = function (t) {
+                if (!sorted.length) return t
+                const idx = Math.round(t * (sorted.length - 1))
+                return sorted[Math.max(0, Math.min(idx, sorted.length - 1))]
+            }
+
+            map1 = eurostatmap
+                .map('choropleth')
+                .title('Continuous (quantile)')
+                .header(true)
+                .subtitle(
+                    '.skipNormalization(true) with quantile <tspan style="font-style:italic;">map.valueTransform</tspan> and <tspan style="font-style:italic;">map.valueUntransform</tspan>'
+                )
+                .stat('value', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .encoding('fill', { stat: 'value' })
+                .colorSchemeType('continuous')
+                .colorFunction(d3.interpolatePurples)
+                .valueTransform(valueTransform)
+                .valueUntransform(valueUntransform)
+                .skipNormalization(true) // skip the default normalization to [0,1] since we will do a custom quantile-based transformation
+                .nutsLevel(2)
+                .legend({
+                    title: 'GDP per inhabitant',
+                    x: 10,
+                    y: 135,
+                    width: 200,
+                    shapeWidth: 20,
+                    tickLength: 7,
+                    decimals: 0,
+                    orientation: 'vertical',
+                    boxOpacity: 0,
+                    highlightTolerance: 5000,
+                })
+                .zoomExtent([1, 10])
+                .insets('default')
+                .build()
+        </script>
+    </body>
+</html>

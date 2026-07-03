@@ -29,11 +29,28 @@
 
 ### New
 
+- Encoding visual variables. You can now define named stats and bind them explicitly to visual channels with `encoding(channel, ...)`.
+
+Example:
+
+```javascript
+const map = eurostatmap
+    .map('bar')
+    .stat('degurbaRate', {
+        customData: rateData,
+        categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
+    })
+    .stat('totalPop', { customData: totalPopulation })
+    .encoding('height', { stat: 'degurbaRate', scale: 'linear', range: [2, 45] })
+    .encoding('width', { stat: 'totalPop', scale: 'linear', range: [2, 16] })
+    .build()
+```
+
 - Added public multi-layer composition support so you can combine layers (for example choropleth + proportional symbols) with explicit layer roles and shared map interactions.
 
 Example:
 
-```js
+```javascript
 const map = eurostatmap
     .map('choropleth')
     .layers([
@@ -55,7 +72,7 @@ const map = eurostatmap
 
 Example:
 
-```js
+```javascript
 map.stat('size', {
     eurostatDatasetCode: 'demo_r_pjangrp3',
     filters: { time: '2024', sex: 'T' },
@@ -66,11 +83,90 @@ map.stat('size', {
 
 ### Improvements
 
+- Preserved compatibility during the migration: existing channel-named stats and composition helper methods continue to work while the encoding-first API is the recommended path.
+
+Example:
+
+```javascript
+// Legacy style (still supported)
+map.stat('size', { eurostatDatasetCode: 'tps00001', filters: { TIME: '2024' } })
+
+// Recommended style
+map.stat('population', { eurostatDatasetCode: 'tps00001', filters: { TIME: '2024' } }).encoding('size', { stat: 'population' })
+```
+
+- Consolidated many map-type options into grouped settings objects (for example `barSettings(...)`, `psSettings(...)`, and `compositionSettings(...)`) to reduce fragmented prefixed setters and make configuration updates easier.
+
+Example:
+
+```javascript
+// Before (legacy style, still supported with deprecation warnings)
+map.barGroupGap(1).barGroupMaxHeight(40).barStrokeWidth(0.3)
+
+// After (recommended)
+map.barSettings({
+    groupGap: 1,
+    groupMaxHeight: 40,
+    strokeWidth: 0.3,
+})
+```
+
+- Added legacy-to-grouped compatibility wrappers for these consolidated settings, so existing code keeps working while migrating incrementally.
+
+Example:
+
+```javascript
+// Legacy proportional-symbol setters still work:
+map.psMaxSize(24).psMinSize(4)
+
+// Recommended equivalent:
+map.psSettings({
+    maxSize: 24,
+    minSize: 4,
+})
+```
+
+- Improved responsive behavior on mobile/tablet: maps now constrain default height to available viewport/container space, symbols scale down more gracefully on small screens, and responsive typography/button styles reduce overlap.
+
+Example:
+
+```javascript
+// Works automatically in 4.5.0 on small screens.
+// Keep explicit width and let eurostat-map choose a responsive height.
+eurostatmap.map('proportional-symbol').width(720).labels({ scaleOnZoom: true }).build()
+```
+
+- Expanded bivariate legend customization with axis endpoint labels and corner annotations, including per-corner callout length/offset controls.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('bivariate')
+    .legend({
+        showAxisExtremes: true,
+        axisExtremes: {
+            x: { low: 'Low unemployment', high: 'High unemployment' },
+            y: { low: 'Low population change', high: 'High population change' },
+        },
+        annotations: {
+            topRight: 'High unemployment\nHigh population change',
+            bottomLeft: 'Low unemployment\nLow population change',
+        },
+        annotationLineLength: { topRight: 24, bottomLeft: 20 },
+        annotationOffsets: {
+            topRight: { x: 8, y: -2 },
+            bottomLeft: { x: -8, y: 4 },
+        },
+    })
+    .build()
+```
+
 - Added a grouped-bar width legend block (`legend.widthLegend`) when bar width is data-driven, so users can interpret the width channel directly.
 
 Example:
 
-```js
+```javascript
 map.encoding('width', {
     stat: 'totalPop',
     scale: 'linear',
@@ -82,13 +178,31 @@ map.encoding('width', {
 })
 ```
 
+- Improved locations label styling with explicit halo and anchor options (`labelStyle.haloColor`, `labelStyle.haloWidth`, `labelStyle.textAnchor`) and updated default marker/label alignment.
+
+Example:
+
+```javascript
+map.addLocation({
+    x: 2.35,
+    y: 48.85,
+    label: 'Paris',
+    shape: 'pin',
+    labelStyle: {
+        haloColor: '#fff',
+        haloWidth: 3,
+        textAnchor: 'start',
+    },
+})
+```
+
 ### Fixes
 
 - Fixed Dorling simulation behavior and interaction consistency across composition and proportional-symbol layers (including tooltip hover reliability and improved collision sizing in radar/halftone composition modes).
 
 Example:
 
-```js
+```javascript
 eurostatmap
     .map('pie')
     .dorling(true)
@@ -103,7 +217,7 @@ eurostatmap
 
 Example:
 
-```js
+```javascript
 eurostatmap.map('choropleth').insets('default').build()
 ```
 
@@ -111,7 +225,7 @@ eurostatmap.map('choropleth').insets('default').build()
 
 Example:
 
-```js
+```javascript
 eurostatmap
     .map('choropleth')
     .stat({
@@ -124,11 +238,47 @@ eurostatmap
 
 ### Breaking Changes
 
+- The stat/encoding model is now the primary API direction. Integrations that depended on implicit stat-channel coupling should migrate to explicit `stat(name, ...)` + `encoding(channel, { stat: name })` bindings.
+
+Example:
+
+```javascript
+// Before
+map.stat('color', { eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } })
+
+// After
+map.stat('density', { eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } }).encoding('color', { stat: 'density' })
+```
+
+- The locations API was normalized: location coordinates now use `x`/`y` (instead of `lon`/`lat`), marker styling uses `radius`/`fill`/`opacity` (instead of `size`/`color`), and label style uses halo fields (`haloColor`, `haloWidth`) instead of text stroke fields.
+
+Example:
+
+```javascript
+// Before
+map.addLocation({
+    lon: 13.4,
+    lat: 52.5,
+    size: 8,
+    color: '#e74c3c',
+    labelStyle: { stroke: '#fff', strokeWidth: 3, paintOrder: 'stroke' },
+})
+
+// After
+map.addLocation({
+    x: 13.4,
+    y: 52.5,
+    radius: 8,
+    fill: '#e84040',
+    labelStyle: { haloColor: '#fff', haloWidth: 3, textAnchor: 'start' },
+})
+```
+
 - Layer-oriented architecture is now the primary model for combined visualizations, and layer-specific behavior (classification, style updates, legend interactions) is resolved through active layer context. Existing combined-map integrations that relied on implicit map-level assumptions may require adjustment.
 
 Example:
 
-```js
+```javascript
 const baseLayer = map.layers()[0]
 const overlayLayer = map.layers()[1]
 
