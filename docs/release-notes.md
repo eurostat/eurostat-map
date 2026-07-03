@@ -25,6 +25,126 @@
     - broader `MapConfig.stat` composition support,
     - composition helper overload parity.
 
+## 4.5.0
+
+### New
+
+- Added public multi-layer composition support so you can combine layers (for example choropleth + proportional symbols) with explicit layer roles and shared map interactions.
+
+Example:
+
+```js
+const map = eurostatmap
+    .map('choropleth')
+    .layers([
+        {
+            type: 'choropleth',
+            role: 'base',
+            stat: { eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } },
+        },
+        {
+            type: 'proportional-symbol',
+            role: 'overlay',
+            stat: { eurostatDatasetCode: 'tps00001', filters: { TIME: '2024' } },
+        },
+    ])
+    .build()
+```
+
+- Added `preprocess` support on statistical data loading, executed before `transform`, with access to region id and value.
+
+Example:
+
+```js
+map.stat('size', {
+    eurostatDatasetCode: 'demo_r_pjangrp3',
+    filters: { time: '2024', sex: 'T' },
+    preprocess: ({ regionId, value }) => (regionId === 'LI' ? null : value),
+    transform: (value) => value / 1000,
+})
+```
+
+### Improvements
+
+- Added a grouped-bar width legend block (`legend.widthLegend`) when bar width is data-driven, so users can interpret the width channel directly.
+
+Example:
+
+```js
+map
+    .encoding('width', {
+        stat: 'totalPop',
+        scale: 'linear',
+        range: [2, 16],
+    })
+    .legend({
+        widthLegend: {
+            title: 'Population',
+        },
+    })
+```
+
+### Fixes
+
+- Fixed Dorling simulation behavior and interaction consistency across composition and proportional-symbol layers (including tooltip hover reliability and improved collision sizing in radar/halftone composition modes).
+
+Example:
+
+```js
+eurostatmap
+    .map('pie')
+    .dorling(true)
+    .compositionSettings({
+        type: 'radar',
+        radarValueMode: 'absolute',
+    })
+    .build()
+```
+
+- Restored expected default inset zoom behavior by using inset-aware default positioning/scaling again.
+
+Example:
+
+```js
+eurostatmap
+    .map('choropleth')
+    .insets('default')
+    .build()
+```
+
+- Added runtime toast notification for Eurostat API failures to improve error visibility in interactive maps.
+
+Example:
+
+```js
+eurostatmap
+    .map('choropleth')
+    .stat({
+        eurostatDatasetCode: 'invalid_dataset_code',
+        filters: { TIME: '2024' },
+    })
+    .build()
+// Shows a toast when Eurostat API request fails.
+```
+
+### Breaking Changes
+
+- Layer-oriented architecture is now the primary model for combined visualizations, and layer-specific behavior (classification, style updates, legend interactions) is resolved through active layer context. Existing combined-map integrations that relied on implicit map-level assumptions may require adjustment.
+
+Example:
+
+```js
+const baseLayer = map.layers()[0]
+const overlayLayer = map.layers()[1]
+
+baseLayer.updateClassification()
+overlayLayer.updateStyle()
+```
+
+### Notes
+
+- Release tag format used: `4.5.0` (no `v` prefix)
+
 ## 4.4.5
 
 ### Fixes
