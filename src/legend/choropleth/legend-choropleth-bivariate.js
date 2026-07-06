@@ -28,7 +28,7 @@ export const legend = function (map, config) {
             bottomRight: { x: 25, y: -10 },
         },
     }
-    const defaultNoDataYOffsetByRotation = { 0: 10, '-45': 50 }
+    const defaultNoDataYOffsetByRotation = { 0: 15, '-45': 50 }
     const hasCustomAnnotationOffsets = !!(config && Object.prototype.hasOwnProperty.call(config, 'annotationOffsets'))
     const hasCustomNoDataYOffset = !!(config && Object.prototype.hasOwnProperty.call(config, 'noDataYOffset'))
 
@@ -101,7 +101,7 @@ export const legend = function (map, config) {
     out.xAxisTitleOffset = { x: 0, y: 0 }
 
     //override padding
-    out.boxPadding = out.labelFontSize
+    out.boxPadding = 5
 
     //arrows
     out.axisArrows = true // if set to true, arrows are drawn at the end of the axes
@@ -389,9 +389,20 @@ export const legend = function (map, config) {
 
         const spans = computeAxisArrowSpans()
 
-        // X axis title centered on the X arrow segment.
+        // X axis title centered on the X arrow segment and placed below arrow + endpoint labels.
+        const xAxisTitlePadding = 7
         let xAxisTitleX = (spans.xStart + spans.xEnd) / 2
-        let xAxisTitleY = out.axisArrows ? out._xAxisArrowY + out.arrowHeight + 2 : out.squareSize + 8
+        let xAxisTitleY = out.axisArrows ? out._xAxisArrowY + out.arrowHeight + xAxisTitlePadding : out.squareSize + 8 + xAxisTitlePadding
+
+        const xLowNode = out.lgg.select('.em-bivariate-axis-end-label-x-low').node()
+        const xHighNode = out.lgg.select('.em-bivariate-axis-end-label-x-high').node()
+        const xLowBBox = xLowNode && typeof xLowNode.getBBox === 'function' ? xLowNode.getBBox() : null
+        const xHighBBox = xHighNode && typeof xHighNode.getBBox === 'function' ? xHighNode.getBBox() : null
+        const xLabelsBottom = Math.max(xLowBBox ? xLowBBox.y + xLowBBox.height : -Infinity, xHighBBox ? xHighBBox.y + xHighBBox.height : -Infinity)
+        if (Number.isFinite(xLabelsBottom)) {
+            xAxisTitleY = Math.max(xAxisTitleY, xLabelsBottom + xAxisTitlePadding)
+        }
+
         if (out.xAxisTitleOffset) xAxisTitleX += out.xAxisTitleOffset.x
         if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
         axisTitles
@@ -404,13 +415,23 @@ export const legend = function (map, config) {
             .attr('dominant-baseline', 'hanging')
             .attr('alignment-baseline', 'hanging')
 
-        // Y axis title centered on the Y arrow segment.
-        const yAxisTitleLineGap = (out.axisArrows ? out.arrowHeight + 2 : 8) + (out.rotation === -45 ? 14 : 10)
-        let yAxisTitleX = out._yAxisArrowX - yAxisTitleLineGap
+        // Y axis title centered on the Y arrow segment and placed outside arrow + endpoint labels.
+        const yAxisTitlePadding = 12
+        let yAxisTitleX = out._yAxisArrowX - (out.axisArrows ? out.arrowHeight + yAxisTitlePadding : 8 + yAxisTitlePadding)
         let yAxisTitleY = (spans.yStart + spans.yEnd) / 2
+
+        const yLowNode = out.lgg.select('.em-bivariate-axis-end-label-y-low').node()
+        const yHighNode = out.lgg.select('.em-bivariate-axis-end-label-y-high').node()
+        const yLowBBox = yLowNode && typeof yLowNode.getBBox === 'function' ? yLowNode.getBBox() : null
+        const yHighBBox = yHighNode && typeof yHighNode.getBBox === 'function' ? yHighNode.getBBox() : null
+        const yLabelsLeft = Math.min(yLowBBox ? yLowBBox.x : Infinity, yHighBBox ? yHighBBox.x : Infinity)
+        if (Number.isFinite(yLabelsLeft)) {
+            yAxisTitleX = Math.min(yAxisTitleX, yLabelsLeft - yAxisTitlePadding)
+        }
+
         if (out.yAxisTitleOffset) yAxisTitleX += out.yAxisTitleOffset.x
         if (out.yAxisTitleOffset) yAxisTitleY += out.yAxisTitleOffset.y
-        axisTitles
+        const yAxisTitle = axisTitles
             .append('text')
             .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-y')
             .attr('x', yAxisTitleX)
@@ -418,7 +439,8 @@ export const legend = function (map, config) {
             .text(out.label2)
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
-            .attr('transform', `rotate(${out.rotation === -45 ? 90 : -90} ${yAxisTitleX} ${yAxisTitleY})`)
+
+        yAxisTitle.attr('transform', `rotate(-90 ${yAxisTitleX} ${yAxisTitleY})`)
     }
 
     function addAxisEndpointLabels() {
@@ -444,7 +466,7 @@ export const legend = function (map, config) {
         }
 
         const xAxisYOffsetReduction = out.rotation === -45 ? 6 : 0
-        const xLabelY = xAxisLineY + (out.axisArrows ? out.arrowHeight + 2 : 8) - xAxisYOffsetReduction
+        const xLabelY = (out.axisArrows ? out._xAxisArrowY : xAxisLineY + 8) - xAxisYOffsetReduction
         // Keep Y-axis endpoint labels clear of left-side annotation callout lines.
         const yLabelX = yAxisLineX - (out.axisArrows ? out.arrowHeight + 2 : 8) - 4
 
@@ -455,7 +477,7 @@ export const legend = function (map, config) {
             .attr('y', xLabelY)
             .text(out.axisExtremes?.x?.low || 'Low')
             .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'hanging')
+            .attr('dominant-baseline', out.axisArrows ? 'middle' : 'hanging')
 
         axisLabels
             .append('text')
@@ -464,7 +486,7 @@ export const legend = function (map, config) {
             .attr('y', xLabelY)
             .text(out.axisExtremes?.x?.high || 'High')
             .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'hanging')
+            .attr('dominant-baseline', out.axisArrows ? 'middle' : 'hanging')
 
         axisLabels
             .append('text')
@@ -717,10 +739,10 @@ export const legend = function (map, config) {
             )
 
         const spans = computeAxisArrowSpans()
-
+        // X axis arrow
         axisArrows
             .append('path')
-            .attr('class', 'em-bivariate-axis-arrow')
+            .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-x')
             .attr(
                 'd',
                 line()([
@@ -730,9 +752,10 @@ export const legend = function (map, config) {
             )
             .attr('marker-end', 'url(#arrowhead)')
 
+        // Y axis arrow
         axisArrows
             .append('path')
-            .attr('class', 'em-bivariate-axis-arrow')
+            .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-y')
             .attr(
                 'd',
                 line()([
@@ -758,6 +781,9 @@ export const legend = function (map, config) {
         if (out.showAxisExtremes && xLowBBox && xHighBBox) {
             xStart = Math.max(initialX, xLowBBox.x + xLowBBox.width + labelGap)
             xEnd = Math.min(initialX + out.squareSize, xHighBBox.x - labelGap - arrowTipClearance)
+        } else if (!out.showAxisExtremes) {
+            // Keep arrowhead inside axis extent when endpoint labels are hidden.
+            xEnd = Math.max(initialX, initialX + out.squareSize - arrowTipClearance)
         }
         if (xEnd <= xStart) {
             xStart = initialX
@@ -774,6 +800,9 @@ export const legend = function (map, config) {
         if (out.showAxisExtremes && yLowBBox && yHighBBox) {
             yStart = Math.min(out.squareSize, yLowBBox.y - labelGap)
             yEnd = Math.max(0, yHighBBox.y + yHighBBox.height + labelGap + arrowTipClearance)
+        } else if (!out.showAxisExtremes) {
+            // Keep arrowhead inside axis extent when endpoint labels are hidden.
+            yEnd = Math.min(out.squareSize, arrowTipClearance)
         }
         if (yStart <= yEnd) {
             yStart = out.squareSize
@@ -790,6 +819,8 @@ export const legend = function (map, config) {
         }
         if (out.rotation === -45) {
             out._xAxisArrowY -= 6
+        } else if (out.rotation === 0) {
+            out._xAxisArrowY -= 3
         }
 
         out._yAxisArrowX = -out.tickLength - out.arrowPadding
