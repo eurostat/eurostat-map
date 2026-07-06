@@ -20,7 +20,7 @@
 }
 .em-bivariate-axis-end-label {
     font-size: 11px;
-    fill: #444;
+    fill: #696969;
 }
 .em-bivariate-tick {
     stroke: #696969;
@@ -42,5 +42,5 @@
 }
 .em-bivariate-corner-annotation {
     font-size: 11px;
-    fill: #333;
+    fill: #696969;
 }

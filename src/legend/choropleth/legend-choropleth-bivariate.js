@@ -14,8 +14,43 @@ export const legend = function (map, config) {
     //build generic legend object for the map
     const out = Legend.legend(map)
 
+    const defaultAnnotationOffsetsByRotation = {
+        0: {
+            topLeft: { x: 5, y: -13 },
+            topRight: { x: 4, y: -7 },
+            bottomLeft: { x: -15, y: 10 },
+            bottomRight: { x: 25, y: -10 },
+        },
+        '-45': {
+            topLeft: { x: 5, y: -13 },
+            topRight: { x: 4, y: -7 },
+            bottomLeft: { x: -15, y: 18 },
+            bottomRight: { x: 25, y: -10 },
+        },
+    }
+    const defaultNoDataYOffsetByRotation = { 0: 10, '-45': 50 }
+    const hasCustomAnnotationOffsets = !!(config && Object.prototype.hasOwnProperty.call(config, 'annotationOffsets'))
+    const hasCustomNoDataYOffset = !!(config && Object.prototype.hasOwnProperty.call(config, 'noDataYOffset'))
+
+    const cloneAnnotationOffsets = (offsets) => ({
+        topLeft: { ...offsets.topLeft },
+        topRight: { ...offsets.topRight },
+        bottomLeft: { ...offsets.bottomLeft },
+        bottomRight: { ...offsets.bottomRight },
+    })
+
+    const applyRotationDependentDefaults = () => {
+        const rotationKey = out.rotation === -45 ? '-45' : 0
+        if (!hasCustomAnnotationOffsets) {
+            out.annotationOffsets = cloneAnnotationOffsets(defaultAnnotationOffsetsByRotation[rotationKey])
+        }
+        if (!hasCustomNoDataYOffset) {
+            out.noDataYOffset = defaultNoDataYOffsetByRotation[rotationKey]
+        }
+    }
+
     //size
-    out.squareSize = 100
+    out.squareSize = 80
 
     //orientation
     out.rotation = 0
@@ -36,10 +71,17 @@ export const legend = function (map, config) {
         bottomLeft: undefined,
         bottomRight: undefined,
     }
-    out.annotationLineLength = 18
-    out.annotationOffsets = undefined
-    out.annotationLineEndOffset = undefined
+    out.annotationLineLength = {
+        topLeft: 35,
+        topRight: 18,
+        bottomLeft: 32,
+        bottomRight: 18,
+    }
+    out.annotationOffsets = cloneAnnotationOffsets(defaultAnnotationOffsetsByRotation[0])
+    out.annotationLineEndOffsets = { bottomRight: { x: -5, y: 10 } }
     out.annotationPadding = 8
+    //add extra distance between legend and no data item
+    out.noDataYOffset = defaultNoDataYOffsetByRotation[0]
 
     //get the font size of the texts
     out.axisTitleFontSize = getFontSizeFromClass('em-bivariate-axis-title')
@@ -60,9 +102,6 @@ export const legend = function (map, config) {
 
     //override padding
     out.boxPadding = out.labelFontSize
-
-    //add extra distance between legend and no data item
-    out.noDataYOffset = 30
 
     //arrows
     out.axisArrows = true // if set to true, arrows are drawn at the end of the axes
@@ -90,6 +129,7 @@ export const legend = function (map, config) {
     out.update = function () {
         out.updateConfig()
         out.updateContainer()
+        applyRotationDependentDefaults()
 
         // Horizontal shift to move everything right (adjust this value as needed)
         out._horizontalOffset = out.axisTitleFontSize + out.arrowPadding // Adjust this value to move the whole legend to the right
@@ -139,10 +179,13 @@ export const legend = function (map, config) {
             computeAxisArrowAnchors()
         }
 
-        addAxisTitles()
         if (out.showAxisExtremes) {
             addAxisEndpointLabels()
         }
+
+        // Titles are positioned from final arrow geometry, so endpoint labels must exist first.
+        addAxisTitles()
+
         if (out.axisArrows) {
             addAxisArrows()
         }
@@ -335,7 +378,6 @@ export const legend = function (map, config) {
 
     function addAxisTitles() {
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
-        const initialX = 0
 
         const axisTitles = out.lgg
             .append('g')
@@ -345,39 +387,38 @@ export const legend = function (map, config) {
                 `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
             )
 
-        // X axis title
-        const xAxisTitleArrowGap = 5
-        let xAxisTitleY =
-            out.squareSize +
-            out.xAxisLabelsOffset.y +
-            (out.axisArrows ? out.arrowPadding + out.arrowHeight + xAxisTitleArrowGap : 7)
-        let xAxisTitleX = initialX
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
-        if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
+        const spans = computeAxisArrowSpans()
+
+        // X axis title centered on the X arrow segment.
+        let xAxisTitleX = (spans.xStart + spans.xEnd) / 2
+        let xAxisTitleY = out.axisArrows ? out._xAxisArrowY + out.arrowHeight + 2 : out.squareSize + 8
         if (out.xAxisTitleOffset) xAxisTitleX += out.xAxisTitleOffset.x
+        if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
         axisTitles
             .append('text')
             .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-x')
             .attr('x', xAxisTitleX)
             .attr('y', xAxisTitleY)
             .text(out.label1)
+            .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'hanging')
             .attr('alignment-baseline', 'hanging')
 
-        // Y axis title
-        let yAxisTitleY = (out.axisArrows ? out._yAxisArrowX - out.arrowPadding : 7) + (out.rotation == -45 ? -4 : -10) // adjust for rotation
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) xAxisTitleY += getFontSizeFromClass('em-bivariate-tick-label') // move over for tick labels
-        let yAxisTitleX = -out.squareSize
-        //manual offsets
-        if (out.yAxisTitleOffset) yAxisTitleY += out.yAxisTitleOffset.y
+        // Y axis title centered on the Y arrow segment.
+        const yAxisTitleLineGap = (out.axisArrows ? out.arrowHeight + 2 : 8) + (out.rotation === -45 ? 14 : 10)
+        let yAxisTitleX = out._yAxisArrowX - yAxisTitleLineGap
+        let yAxisTitleY = (spans.yStart + spans.yEnd) / 2
         if (out.yAxisTitleOffset) yAxisTitleX += out.yAxisTitleOffset.x
+        if (out.yAxisTitleOffset) yAxisTitleY += out.yAxisTitleOffset.y
         axisTitles
             .append('text')
             .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-y')
             .attr('x', yAxisTitleX)
             .attr('y', yAxisTitleY)
             .text(out.label2)
-            .style('transform', out.rotation < 0 ? `translate(${out.axisArrows ? -51 : -15}px, 95px) rotate(90deg)` : 'rotate(-90deg)')
+            .attr('text-anchor', 'middle')
+            .attr('dominant-baseline', 'middle')
+            .attr('transform', `rotate(${out.rotation === -45 ? 90 : -90} ${yAxisTitleX} ${yAxisTitleY})`)
     }
 
     function addAxisEndpointLabels() {
@@ -402,7 +443,8 @@ export const legend = function (map, config) {
             yAxisLineX -= out.labelFontSize / 2
         }
 
-        const xLabelY = xAxisLineY + (out.axisArrows ? out.arrowHeight + 2 : 8)
+        const xAxisYOffsetReduction = out.rotation === -45 ? 6 : 0
+        const xLabelY = xAxisLineY + (out.axisArrows ? out.arrowHeight + 2 : 8) - xAxisYOffsetReduction
         // Keep Y-axis endpoint labels clear of left-side annotation callout lines.
         const yLabelX = yAxisLineX - (out.axisArrows ? out.arrowHeight + 2 : 8) - 4
 
@@ -550,7 +592,7 @@ export const legend = function (map, config) {
 
     function getAnnotationLineEndOffset(cornerName) {
         const defaultOffset = { x: 0, y: 0 }
-        const offsets = out.annotationLineEndOffset
+        const offsets = out.annotationLineEndOffsets
 
         if (!offsets || typeof offsets !== 'object') {
             return defaultOffset
@@ -664,9 +706,6 @@ export const legend = function (map, config) {
 
     function addAxisArrows() {
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
-        const initialX = 0
-        const labelGap = 6
-        const arrowTipClearance = Math.max(0, out.arrowWidth || 0)
 
         // group with horizontal offset
         const axisArrows = out.lgg
@@ -677,7 +716,38 @@ export const legend = function (map, config) {
                 `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
             )
 
-        // Fit the X arrow between low/high endpoint labels so it does not overlap their text.
+        const spans = computeAxisArrowSpans()
+
+        axisArrows
+            .append('path')
+            .attr('class', 'em-bivariate-axis-arrow')
+            .attr(
+                'd',
+                line()([
+                    [spans.xStart, out._xAxisArrowY],
+                    [spans.xEnd, out._xAxisArrowY],
+                ])
+            )
+            .attr('marker-end', 'url(#arrowhead)')
+
+        axisArrows
+            .append('path')
+            .attr('class', 'em-bivariate-axis-arrow')
+            .attr(
+                'd',
+                line()([
+                    [out._yAxisArrowX, spans.yStart],
+                    [out._yAxisArrowX, spans.yEnd],
+                ])
+            )
+            .attr('marker-end', 'url(#arrowhead)')
+    }
+
+    function computeAxisArrowSpans() {
+        const initialX = 0
+        const labelGap = 6
+        const arrowTipClearance = Math.max(0, out.arrowWidth || 0)
+
         const xLowNode = out.lgg.select('.em-bivariate-axis-end-label-x-low').node()
         const xHighNode = out.lgg.select('.em-bivariate-axis-end-label-x-high').node()
         const xLowBBox = xLowNode && typeof xLowNode.getBBox === 'function' ? xLowNode.getBBox() : null
@@ -694,19 +764,6 @@ export const legend = function (map, config) {
             xEnd = initialX + out.squareSize
         }
 
-        axisArrows
-            .append('path')
-            .attr('class', 'em-bivariate-axis-arrow')
-            .attr(
-                'd',
-                line()([
-                    [xStart, out._xAxisArrowY],
-                    [xEnd, out._xAxisArrowY],
-                ])
-            )
-            .attr('marker-end', 'url(#arrowhead)')
-
-        // Fit the Y arrow between low/high endpoint labels so it does not overlap their text.
         const yLowNode = out.lgg.select('.em-bivariate-axis-end-label-y-low').node()
         const yHighNode = out.lgg.select('.em-bivariate-axis-end-label-y-high').node()
         const yLowBBox = yLowNode && typeof yLowNode.getBBox === 'function' ? yLowNode.getBBox() : null
@@ -723,23 +780,16 @@ export const legend = function (map, config) {
             yEnd = 0
         }
 
-        axisArrows
-            .append('path')
-            .attr('class', 'em-bivariate-axis-arrow')
-            .attr(
-                'd',
-                line()([
-                    [out._yAxisArrowX, yStart],
-                    [out._yAxisArrowX, yEnd],
-                ])
-            )
-            .attr('marker-end', 'url(#arrowhead)')
+        return { xStart, xEnd, yStart, yEnd }
     }
 
     function computeAxisArrowAnchors() {
         out._xAxisArrowY = out.squareSize + out.tickLength + out.arrowPadding
         if (out.showBreaks || (out.breaks1 && out.breaks2)) {
-            out._xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5
+            out._xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label')
+        }
+        if (out.rotation === -45) {
+            out._xAxisArrowY -= 6
         }
 
         out._yAxisArrowX = -out.tickLength - out.arrowPadding

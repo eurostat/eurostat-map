@@ -16,29 +16,26 @@
                 .nutsLevel(2)
                 .width(Math.min(1000, window.innerHeight))
                 .nutsYear(2021)
-                .stat('statV1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
-                .encoding('x', { stat: 'statV1' })
-                .stat('statV2', {
+                .stat('population-density', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .encoding('x', { stat: 'population-density' })
+                .stat('unemployment', {
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
                     filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
                     unitText: '%',
                 })
-                .encoding('y', { stat: 'statV2' })
+                .encoding('y', { stat: 'unemployment' })
                 //.insets('default')
                 //.scale('60M')
-
                 .breaks1([100, 200])
                 .breaks2([5, 10])
                 .legend({
-                    //rotation: -45,
+                    rotation: -45,
                     boxOpacity: 1,
-                    boxPadding:5,
+                    boxPadding: 5,
                     squareSize: 80,
                     label1: 'Inhabitants per km²',
                     label2: '% unemployed',
-                    // breaks1: [100, 200],
-                    // breaks2: [5, 10],
-                    showAxisExtremes: false,
+                    showAxisExtremes: true,
                     // axisExtremes: {
                     //     x: { low: 'Low', high: 'High' },
                     //     y: { low: 'Low', high: 'High' },
@@ -46,30 +43,10 @@
                     annotations: {
                         topLeft: 'Low density &<br> High unemployment',
                         topRight: 'High density &<br> High unemployment',
-                        bottomLeft: 'Low density &<br> Low unemployment',
+                        //bottomLeft: 'Low density &<br> Low unemployment',
                         bottomRight: 'High density &<br> Low unemployment',
                     },
-                    xAxisTitleOffset: {x: 0, y: 8},
-                    annotationLineLength: {
-                        topLeft: 35,
-                        topRight: 18,
-                        bottomLeft: 22,
-                        bottomRight: 18,
-                    },
-                    annotationOffsets: {
-                        topLeft: { x: 5, y: -13 },
-                        topRight: { x: 4, y: -4 },
-                        bottomLeft: { x: 0, y: 8 },
-                        bottomRight: { x: 10, y: 0 },
-                    },
-                    annotationLineEndOffset: {
-                        // topLeft: { x: -2, y: -1 },
-                        // topRight: { x: 1, y: -1 },
-                        // bottomLeft: { x: -2, y: 1 },
-                        bottomRight: { x: -5, y: 10 },
-                    },
                     position: 'top-right',
-                    noDataPadding: -10
                 })
                 .zoomExtent([1, 100])
                 .drawGraticule(false)

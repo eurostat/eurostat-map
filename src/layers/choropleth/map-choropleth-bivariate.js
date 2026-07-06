@@ -1,6 +1,9 @@
 import { select } from 'd3-selection'
 import { scaleQuantile, scaleThreshold } from 'd3-scale'
+import { cross } from 'd3-array'
+import { rgb } from 'd3-color'
 import { interpolateRgb } from 'd3-interpolate'
+import { schemeBlues, schemeOranges } from 'd3-scale-chromatic'
 import * as BivariateLegend from '../../legend/choropleth/legend-choropleth-bivariate'
 import {
     getCSSPropertyFromClass,
@@ -317,9 +320,24 @@ export const map = function (config) {
 }
 
 const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {
-    //color ramps, by row
+    // Default palette from examples/bivariate/pop-unemploy-bivariate.html.
+    // Keep the same extremes by resampling fixed 5-class ramps used in that example.
+    const baseOranges = schemeOranges[6]?.slice(0, -1)
+    const baseBlues = schemeBlues[6]?.slice(0, -1)
+
+    const oranges = baseOranges && resampleColorRamp(baseOranges, numberOfClasses)
+    const blues = baseBlues && resampleColorRamp(baseBlues, numberOfClasses)
+
+    if (oranges && blues) {
+        const palette = cross(blues, oranges).map(([a, b]) => mixblend(a, b))
+        return function (ecl1, ecl2) {
+            if (ecl1 == null || ecl2 == null || ecl1 === ':' || ecl2 === ':') return null
+            return palette[ecl1 * numberOfClasses + ecl2]
+        }
+    }
+
+    // Legacy fallback for unsupported class counts.
     const cs = []
-    //interpolate from first and last columns
     const rampS1 = interpolateRgb(startColor, color1)
     const ramp2E = interpolateRgb(color2, endColor)
     for (let i = 0; i < numberOfClasses; i++) {
@@ -329,11 +347,37 @@ const scaleBivariate = function (numberOfClasses, startColor, color1, color2, en
         for (let j = 0; j < numberOfClasses; j++) row.push(colFun(j / (numberOfClasses - 1)))
         cs.push(row)
     }
-    //TODO compute other matrix based on rows, and average both?
 
     return function (ecl1, ecl2) {
         return cs[ecl1][ecl2]
     }
+}
+
+const mixblend = function (a, b) {
+    const colorA = rgb(a)
+    const colorB = rgb(b)
+    const l = Math.min(250, colorB.r + colorB.g + colorB.b)
+    colorA.r *= colorB.r / l
+    colorA.g *= colorB.g / l
+    colorA.b *= colorB.b / l
+    return colorA.formatHex()
+}
+
+const resampleColorRamp = function (ramp, count) {
+    if (!Array.isArray(ramp) || !ramp.length || count <= 0) return []
+    if (count === 1) return [ramp[0]]
+    if (count === ramp.length) return ramp.slice()
+
+    const last = ramp.length - 1
+    const sampled = []
+    for (let i = 0; i < count; i++) {
+        const t = (i / (count - 1)) * last
+        const idx = Math.floor(t)
+        const nextIdx = Math.min(last, idx + 1)
+        const localT = t - idx
+        sampled.push(localT === 0 ? ramp[idx] : interpolateRgb(ramp[idx], ramp[nextIdx])(localT))
+    }
+    return sampled
 }
 
 /**
