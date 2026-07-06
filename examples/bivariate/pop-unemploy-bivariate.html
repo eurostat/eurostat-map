@@ -12,23 +12,7 @@
         <script src="../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3"></script>
         <script>
-            let height = window.innerHeight
-            const n = 5
-            const oranges = d3.schemeOranges[n + 1].slice(0, -1)
-            const blues = d3.schemeBlues[n + 1].slice(0, -1)
-            const color = {
-                domain: d3.range(n * n),
-                range: d3.cross(blues, oranges).map(mixblend),
-            }
-            function mixblend([a, b]) {
-                a = d3.rgb(a)
-                b = d3.rgb(b)
-                const l = Math.min(250, b.r + b.g + b.b)
-                a.r *= b.r / l
-                a.g *= b.g / l
-                a.b *= b.b / l
-                return a.hex()
-            }
+            const n = 3
             const map = eurostatmap
                 .map('chbi')
                 .scale('60M')
@@ -37,29 +21,35 @@
                 .subtitle('% people unemployed aged 20-64 years & inhabitants per km², 2023')
                 .showZoomButtons(true)
                 .nutsLevel(2)
+                .startColor('#F3E6E2')
+                .color1('#327BA8')
+                .color2('#DC530D')
+                .endColor('#2D2C0A')
                 .stat('population-density', {
                     eurostatDatasetCode: 'demo_r_d3dens',
                     unitText: 'inh./km²',
-                    filters: { time: '2023' },
+                    filters: { time: 2024 },
                 })
                 .encoding('x', { stat: 'population-density' })
                 .stat('unemployment', {
                     eurostatDatasetCode: 'lfst_r_lfu3rt',
-                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2023 },
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2024 },
                     unitText: '% unemployed',
                 })
                 .encoding('y', { stat: 'unemployment' })
                 .numberOfClasses(n)
-                .classToFillStyle((class1, class2) => {
-                    if (class1 == null || class2 == null || class1 === ':' || class2 === ':') return null
-
-                    const idx = class1 * n + class2
-                    return color.range[idx]
-                })
                 .legend({
-                    label1: 'Population',
-                    label2: 'Unemployment',
-                    // rotation: -45,
+                    label1: 'Inhabitants per km²',
+                    label2: '% unemployed',
+                    showAxisExtremes: false,
+                    annotations: {
+                        topLeft: 'Low density &<br> High unemployment',
+                        topRight: 'High density &<br> High unemployment',
+                        //bottomLeft: 'Low density &<br> Low unemployment',
+                        bottomRight: 'High density &<br> Low unemployment',
+                    },
+                    position: 'top-right',
+                    noData: false,
                 })
                 .noDataFillStyle('#bfbfbf')
                 .zoomExtent([0.9, 100])

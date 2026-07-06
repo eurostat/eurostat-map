@@ -34,10 +34,10 @@ export const map = function (config) {
     out.numberOfClasses_ = 3
     //stevens.greenblue
     //TODO make it possible to use diverging color ramps ?
-    out.startColor_ = '#e8e8e8'
-    out.color1_ = '#73ae80'
-    out.color2_ = '#6c83b5'
-    out.endColor_ = '#2a5a5b'
+    out.startColor_ = undefined
+    out.color1_ = undefined
+    out.color2_ = undefined
+    out.endColor_ = undefined
     //a function returning the colors for the classes i,j
     out.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
@@ -320,36 +320,81 @@ export const map = function (config) {
 }
 
 const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {
-    // Default palette from examples/bivariate/pop-unemploy-bivariate.html.
-    // Keep the same extremes by resampling fixed 5-class ramps used in that example.
-    const baseOranges = schemeOranges[6]?.slice(0, -1)
-    const baseBlues = schemeBlues[6]?.slice(0, -1)
+    const steps = Math.max(1, numberOfClasses)
+    const hasCustomCorners = [startColor, color1, color2, endColor].every((c) => typeof c === 'string' && c.trim().length > 0)
+    const defaultPalette = buildLegacyDefaultPalette(steps)
 
-    const oranges = baseOranges && resampleColorRamp(baseOranges, numberOfClasses)
-    const blues = baseBlues && resampleColorRamp(baseBlues, numberOfClasses)
-
-    if (oranges && blues) {
-        const palette = cross(blues, oranges).map(([a, b]) => mixblend(a, b))
-        return function (ecl1, ecl2) {
-            if (ecl1 == null || ecl2 == null || ecl1 === ':' || ecl2 === ':') return null
-            return palette[ecl1 * numberOfClasses + ecl2]
+    // Default palette: old oranges/blues blend behavior.
+    if (!hasCustomCorners) {
+        if (defaultPalette) {
+            return function (ecl1, ecl2) {
+                if (ecl1 == null || ecl2 == null || ecl1 === ':' || ecl2 === ':') return null
+                return defaultPalette[ecl1 * steps + ecl2]
+            }
         }
     }
 
-    // Legacy fallback for unsupported class counts.
+    // If custom corners match legacy defaults, return exact legacy palette so explicit
+    // corner configuration yields identical output as leaving colors unspecified.
+    if (hasCustomCorners && defaultPalette) {
+        const legacyCorners = getPaletteCorners(defaultPalette, steps)
+        if (
+            areColorsEqual(startColor, legacyCorners.startColor) &&
+            areColorsEqual(color1, legacyCorners.color1) &&
+            areColorsEqual(color2, legacyCorners.color2) &&
+            areColorsEqual(endColor, legacyCorners.endColor)
+        ) {
+            return function (ecl1, ecl2) {
+                if (ecl1 == null || ecl2 == null || ecl1 === ':' || ecl2 === ':') return null
+                return defaultPalette[ecl1 * steps + ecl2]
+            }
+        }
+    }
+
+    // Custom palette from explicit corner colors.
     const cs = []
+    const denom = Math.max(1, steps - 1)
     const rampS1 = interpolateRgb(startColor, color1)
     const ramp2E = interpolateRgb(color2, endColor)
-    for (let i = 0; i < numberOfClasses; i++) {
-        const t = i / (numberOfClasses - 1)
+    for (let i = 0; i < steps; i++) {
+        const t = i / denom
         const colFun = interpolateRgb(rampS1(t), ramp2E(t))
         const row = []
-        for (let j = 0; j < numberOfClasses; j++) row.push(colFun(j / (numberOfClasses - 1)))
+        for (let j = 0; j < steps; j++) row.push(colFun(j / denom))
         cs.push(row)
     }
 
     return function (ecl1, ecl2) {
+        if (ecl1 == null || ecl2 == null || ecl1 === ':' || ecl2 === ':') return null
         return cs[ecl1][ecl2]
+    }
+}
+
+const buildLegacyDefaultPalette = function (count) {
+    const baseOranges = schemeOranges[6]?.slice(0, -1)
+    const baseBlues = schemeBlues[6]?.slice(0, -1)
+    const oranges = baseOranges && resampleColorRamp(baseOranges, count)
+    const blues = baseBlues && resampleColorRamp(baseBlues, count)
+    if (!oranges || !blues) return null
+    return cross(blues, oranges).map(([a, b]) => mixblend(a, b))
+}
+
+const getPaletteCorners = function (palette, count) {
+    const idx = (i, j) => i * count + j
+    return {
+        startColor: palette[idx(0, 0)],
+        color1: palette[idx(count - 1, 0)],
+        color2: palette[idx(0, count - 1)],
+        endColor: palette[idx(count - 1, count - 1)],
+    }
+}
+
+const areColorsEqual = function (a, b) {
+    if (typeof a !== 'string' || typeof b !== 'string') return false
+    try {
+        return rgb(a).formatHex().toLowerCase() === rgb(b).formatHex().toLowerCase()
+    } catch {
+        return a.trim().toLowerCase() === b.trim().toLowerCase()
     }
 }
 
