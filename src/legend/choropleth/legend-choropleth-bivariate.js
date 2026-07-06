@@ -22,15 +22,21 @@ export const legend = function (map, config) {
             bottomRight: { x: 25, y: -10 },
         },
         '-45': {
-            topLeft: { x: 5, y: -13 },
-            topRight: { x: 4, y: -7 },
+            topLeft: { x: 25, y: -13 },
+            topRight: { x: -20, y: -35 },
             bottomLeft: { x: -15, y: 18 },
             bottomRight: { x: 25, y: -10 },
         },
     }
-    const defaultNoDataYOffsetByRotation = { 0: 15, '-45': 50 }
+    const defaultNoDataYOffsetByRotation = { 0: 15, '-45': 45 }
     const hasCustomAnnotationOffsets = !!(config && Object.prototype.hasOwnProperty.call(config, 'annotationOffsets'))
+    const hasCustomAnnotationLineEndOffsets = !!(config && Object.prototype.hasOwnProperty.call(config, 'annotationLineEndOffsets'))
     const hasCustomNoDataYOffset = !!(config && Object.prototype.hasOwnProperty.call(config, 'noDataYOffset'))
+
+    const defaultAnnotationLineEndOffsetsByRotation = {
+        0: { bottomRight: { x: -5, y: 10 } },
+        '-45': { bottomRight: { x: -2, y: 6 }, topRight: { x: 18, y: 25 } },
+    }
 
     const cloneAnnotationOffsets = (offsets) => ({
         topLeft: { ...offsets.topLeft },
@@ -39,10 +45,22 @@ export const legend = function (map, config) {
         bottomRight: { ...offsets.bottomRight },
     })
 
+    const cloneAnnotationLineEndOffsets = (offsets) => {
+        if (!offsets || typeof offsets !== 'object') return undefined
+        const outOffsets = {}
+        Object.entries(offsets).forEach(([key, value]) => {
+            if (value && typeof value === 'object') outOffsets[key] = { ...value }
+        })
+        return outOffsets
+    }
+
     const applyRotationDependentDefaults = () => {
         const rotationKey = out.rotation === -45 ? '-45' : 0
         if (!hasCustomAnnotationOffsets) {
             out.annotationOffsets = cloneAnnotationOffsets(defaultAnnotationOffsetsByRotation[rotationKey])
+        }
+        if (!hasCustomAnnotationLineEndOffsets) {
+            out.annotationLineEndOffsets = cloneAnnotationLineEndOffsets(defaultAnnotationLineEndOffsetsByRotation[rotationKey])
         }
         if (!hasCustomNoDataYOffset) {
             out.noDataYOffset = defaultNoDataYOffsetByRotation[rotationKey]
@@ -78,7 +96,7 @@ export const legend = function (map, config) {
         bottomRight: 18,
     }
     out.annotationOffsets = cloneAnnotationOffsets(defaultAnnotationOffsetsByRotation[0])
-    out.annotationLineEndOffsets = { bottomRight: { x: -5, y: 10 } }
+    out.annotationLineEndOffsets = cloneAnnotationLineEndOffsets(defaultAnnotationLineEndOffsetsByRotation[0])
     out.annotationPadding = 8
     //add extra distance between legend and no data item
     out.noDataYOffset = defaultNoDataYOffsetByRotation[0]
@@ -213,7 +231,133 @@ export const legend = function (map, config) {
         }
 
         // Set legend box dimensions
-        out.setBoxDimension()
+        setBivariateLegendBoxDimension()
+    }
+
+    function setBivariateLegendBoxDimension() {
+        if (!out.lgg.node()) return
+
+        const fullBBox = out.lgg.node().getBBox({ stroke: true })
+        let x = fullBBox.x
+        let y = fullBBox.y
+        let width = fullBBox.width
+        let height = fullBBox.height
+
+        // With rotation -45, the transformed corner-annotation group can create oversized
+        // empty bbox corners. Build an accurate bbox from transformed child geometry.
+        if (out.rotation === -45) {
+            const annotationsGroup = out.lgg.select('.bivariate-corner-annotations')
+            if (!annotationsGroup.empty()) {
+                const previousDisplay = annotationsGroup.style('display')
+                annotationsGroup.style('display', 'none')
+                const baseBBox = out.lgg.node().getBBox({ stroke: true })
+                annotationsGroup.style('display', previousDisplay || null)
+
+                const annotationBBox = getAccurateTransformedChildrenBBox(annotationsGroup.node(), out.lgg.node())
+                const mergedBBox = annotationBBox ? unionBBox(baseBBox, annotationBBox) : baseBBox
+
+                // Keep horizontal extent from full bbox (avoids left/right clipping),
+                // but use trimmed vertical bounds to remove oversized top/bottom whitespace.
+                x = fullBBox.x
+                y = mergedBBox.y
+                width = fullBBox.width
+                height = mergedBBox.height
+
+                // Fine-tune: trim a bit more top padding for the rotated (-45) layout.
+                const topTrim = 60
+                const hasBottomLeftAnnotation = typeof out.annotations?.bottomLeft === 'string' && out.annotations.bottomLeft.trim().length > 0
+                const bottomExtraBase = out.noData ? 8 : -8
+                const bottomExtra = bottomExtraBase - (hasBottomLeftAnnotation ? 30 : 0)
+                const baseSideTrim = 10
+                const leftTrim = baseSideTrim + (hasBottomLeftAnnotation ? 20 : 0)
+                const rightTrim = baseSideTrim
+
+                // Reduce left/right whitespace while keeping annotation content visible.
+                x += leftTrim
+                width = Math.max(0, width - leftTrim - rightTrim)
+
+                y += topTrim
+                height = Math.max(0, height - topTrim + bottomExtra)
+            }
+        }
+
+        const p = out.boxPadding
+        out.svg
+            .select('#em-legend-background')
+            .attr('x', x - p)
+            .attr('y', y - p)
+            .attr('width', width + 2 * p)
+            .attr('height', height + 2 * p)
+
+        out.applyPosition()
+    }
+
+    function unionBBox(a, b) {
+        const minX = Math.min(a.x, b.x)
+        const minY = Math.min(a.y, b.y)
+        const maxX = Math.max(a.x + a.width, b.x + b.width)
+        const maxY = Math.max(a.y + a.height, b.y + b.height)
+        return { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
+    }
+
+    function getAccurateTransformedChildrenBBox(groupNode, containerNode) {
+        if (!groupNode || !containerNode || !groupNode.getScreenCTM || !containerNode.getScreenCTM) return null
+
+        const groupScreenCTM = groupNode.getScreenCTM()
+        const containerScreenCTM = containerNode.getScreenCTM()
+        if (!groupScreenCTM || !containerScreenCTM) return null
+
+        // Convert points from annotation-group local coordinates to legend-group local coordinates.
+        const matrix = containerScreenCTM.inverse().multiply(groupScreenCTM)
+
+        const children = Array.from(groupNode.children || [])
+        let minX = Infinity
+        let minY = Infinity
+        let maxX = -Infinity
+        let maxY = -Infinity
+
+        children.forEach((child) => {
+            if (!child.getBBox) return
+            let bb
+            try {
+                bb = child.getBBox()
+            } catch {
+                return
+            }
+
+            const corners = [
+                transformPoint(matrix, bb.x, bb.y, containerNode),
+                transformPoint(matrix, bb.x + bb.width, bb.y, containerNode),
+                transformPoint(matrix, bb.x, bb.y + bb.height, containerNode),
+                transformPoint(matrix, bb.x + bb.width, bb.y + bb.height, containerNode),
+            ]
+
+            corners.forEach((p) => {
+                minX = Math.min(minX, p.x)
+                minY = Math.min(minY, p.y)
+                maxX = Math.max(maxX, p.x)
+                maxY = Math.max(maxY, p.y)
+            })
+        })
+
+        if (!Number.isFinite(minX) || !Number.isFinite(minY) || !Number.isFinite(maxX) || !Number.isFinite(maxY)) {
+            return null
+        }
+
+        return { x: minX, y: minY, width: maxX - minX, height: maxY - minY }
+    }
+
+    function transformPoint(matrix, x, y, node) {
+        const svg = node.ownerSVGElement
+        if (svg && svg.createSVGPoint) {
+            const p = svg.createSVGPoint()
+            p.x = x
+            p.y = y
+            const tp = p.matrixTransform(matrix)
+            return { x: tp.x, y: tp.y }
+        }
+        const tp = new DOMPoint(x, y).matrixTransform(matrix)
+        return { x: tp.x, y: tp.y }
     }
 
     function addNoDataElement() {
@@ -440,7 +584,8 @@ export const legend = function (map, config) {
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
 
-        yAxisTitle.attr('transform', `rotate(-90 ${yAxisTitleX} ${yAxisTitleY})`)
+        const yAxisTitleRotation = out.rotation === -45 ? 90 : -90
+        yAxisTitle.attr('transform', `rotate(${yAxisTitleRotation} ${yAxisTitleX} ${yAxisTitleY})`)
     }
 
     function addAxisEndpointLabels() {
@@ -465,10 +610,9 @@ export const legend = function (map, config) {
             yAxisLineX -= out.labelFontSize / 2
         }
 
-        const xAxisYOffsetReduction = out.rotation === -45 ? 6 : 0
-        const xLabelY = (out.axisArrows ? out._xAxisArrowY : xAxisLineY + 8) - xAxisYOffsetReduction
+        const xLabelY = out.axisArrows ? out._xAxisArrowY : xAxisLineY + 8
         // Keep Y-axis endpoint labels clear of left-side annotation callout lines.
-        const yLabelX = yAxisLineX - (out.axisArrows ? out.arrowHeight + 2 : 8) - 4
+        const yLabelX = out.axisArrows ? out._yAxisArrowX : yAxisLineX - 8 - 4
 
         axisLabels
             .append('text')

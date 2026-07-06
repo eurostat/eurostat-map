@@ -34,7 +34,7 @@ export const legend = function (map) {
 
     //the legend box
     out.boxPadding = 7
-    out.boxOpacity = 0.7
+    out.boxOpacity = 0.9
 
     //legend title
     out.title = ''
@@ -300,7 +300,8 @@ export const legend = function (map) {
         const layer = out.layer
         const map = out.map
         const mapType = map._mapType
-        const numberOfClasses = layer.numberOfClasses_ !== undefined ? layer.numberOfClasses_ : (mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_)
+        const numberOfClasses =
+            layer.numberOfClasses_ !== undefined ? layer.numberOfClasses_ : mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_
         return numberOfClasses
     }
 
@@ -321,7 +322,8 @@ export const legend = function (map) {
         const layer = out.layer
         const map = out.map
         const mapType = map._mapType
-        const classToFillStyle = layer.classToFillStyle_ !== undefined ? layer.classToFillStyle_ : (mapType === 'ps' ? map.psClassToFillStyle_ : map.classToFillStyle_)
+        const classToFillStyle =
+            layer.classToFillStyle_ !== undefined ? layer.classToFillStyle_ : mapType === 'ps' ? map.psClassToFillStyle_ : map.classToFillStyle_
         return classToFillStyle
     }
 
@@ -329,7 +331,7 @@ export const legend = function (map) {
         const layer = out.layer
         const map = out.map
         const mapType = map._mapType
-        const colorClassifier = layer.classifier_ !== undefined ? layer.classifier_ : (mapType === 'ps' ? map.classifierColor_ : map.classifier_)
+        const colorClassifier = layer.classifier_ !== undefined ? layer.classifier_ : mapType === 'ps' ? map.classifierColor_ : map.classifier_
         return colorClassifier
     }
 
@@ -438,6 +440,17 @@ export const legend = function (map) {
 
     function getLegendBBox(container, legend) {
         const node = container.node()
+        // Prefer the background rect bounds when available: it represents the visual legend
+        // box and is less sensitive to rotated child geometry artifacts.
+        const backgroundNode = node?.querySelector?.('#em-legend-background')
+        if (backgroundNode && typeof backgroundNode.getBBox === 'function') {
+            try {
+                const bgBBox = backgroundNode.getBBox({ stroke: true })
+                if (Number.isFinite(bgBBox.width) && Number.isFinite(bgBBox.height) && (bgBBox.width || bgBBox.height)) return bgBBox
+            } catch (e) {
+                // Fall back to group bbox below.
+            }
+        }
         try {
             const bbox = node.getBBox({ stroke: true })
             if (Number.isFinite(bbox.width) && Number.isFinite(bbox.height) && (bbox.width || bbox.height)) return bbox

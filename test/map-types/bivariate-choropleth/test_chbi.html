@@ -29,7 +29,7 @@
                 .breaks1([100, 200])
                 .breaks2([5, 10])
                 .legend({
-                    //rotation: -45,
+                    rotation: -45,
                     label1: 'Inhabitants per km²',
                     label2: '% unemployed',
                     showAxisExtremes: false,
@@ -40,14 +40,13 @@
                     annotations: {
                         topLeft: 'Low density &<br> High unemployment',
                         topRight: 'High density &<br> High unemployment',
-                        //bottomLeft: 'Low density &<br> Low unemployment',
+                        bottomLeft: 'Low density &<br> Low unemployment',
                         bottomRight: 'High density &<br> Low unemployment',
                     },
                     position: 'top-right',
+                    noData: false,
                 })
                 .zoomExtent([1, 100])
-                .drawGraticule(false)
-                .seaFillStyle('#d3dee8')
                 .build()
         </script>
     </body>
