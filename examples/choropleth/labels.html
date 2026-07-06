@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Basic Choropleth</title>
+        <title>Choropleth with data labelling</title>
     </head>
 
     <body>
@@ -16,10 +16,12 @@
                 .subtitle('2024')
                 .classificationMethod('threshold')
                 .thresholds([30, 50, 100, 150, 200, 300, 500])
+                .nutsLevel(0)
                 .colors(['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#b10026'])
                 .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2024' } })
                 .encoding('fill', { stat: 'value' })
-                .legend({ title: 'Density, people/km²' })
+                .legend({ title: 'Density', subtitle: 'people per km²' })
+                .labels({ values: true })
                 .build()
         </script>
     </body>
