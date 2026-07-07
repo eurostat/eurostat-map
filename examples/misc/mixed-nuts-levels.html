@@ -14,9 +14,11 @@
 
             const map = eurostatmap
                 .map('ps')
+                .title('You can mix NUTS levels on the same map')
+                .subtitle('For example NUTS 0 and NUTS 1 at the same time')
                 .width(mapWidth)
                 .height(mapHeight)
-                .legend({ title: 'Test' })
+                .legend({ title: 'Example data' })
                 .nutsLevel('mixed')
                 .dorling(true)
                 .psSettings({

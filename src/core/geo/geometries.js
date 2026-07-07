@@ -95,7 +95,13 @@ export const Geometries = function (map, withCenterPoints) {
                 out.defaultGeoData = filtered[0]
 
                 if (withCenterPoints) {
-                    out.centroidsData = nutsLevel === 'mixed' ? [filtered[4], filtered[5], filtered[6], filtered[7]] : filtered[1]
+                    // Always store as an array indexed by level [0,1,2,3].
+                    // Mixed: centroid files are at filtered[4..7].
+                    // Non-mixed: centroid files are at filtered[1..4] (all 4 levels pre-fetched).
+                    out.centroidsData =
+                        nutsLevel === 'mixed'
+                            ? [filtered[4], filtered[5], filtered[6], filtered[7]]
+                            : [filtered[1], filtered[2], filtered[3], filtered[4]]
                 }
 
                 const isWorld = geo === 'WORLD'
@@ -190,11 +196,15 @@ export const Geometries = function (map, withCenterPoints) {
             promises.push(fetchWithCache(worldMapTopojsonURL))
         } else {
             const mainUrl = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)
-            promises.push(fetchWithCache(mainUrl))
+            promises.push(fetchWithCache(mainUrl)) // index 0: polygon topology for current level
 
             if (withCenterPoints) {
-                const ptUrl = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_, true)
-                promises.push(fetchWithCache(ptUrl))
+                // Pre-fetch ALL 4 centroid levels so nutsLevel switches are instant from cache.
+                // Results land at indices 1, 2, 3, 4 (for levels 0, 1, 2, 3).
+                nutsLevels.forEach((lvl) => {
+                    const ptUrl = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, lvl, true)
+                    promises.push(fetchWithCache(ptUrl))
+                })
             }
         }
 

@@ -30,37 +30,37 @@ function clearMouseEvents(map, layer) {
 const addMouseEventsToRegions = function (map, layer) {
     const regions = map.svg().selectAll(getRegionsSelector(map))
     const sizeData = getSizeStatData(layer)
+
+    // Country polygons (em-cntrg) are only interactive when the active level shows country-level symbols.
+    const isActiveRegion = function (element) {
+        const isCountry = element.parentNode.classList.contains('em-cntrg')
+        if (!isCountry) return true
+        const lvl = map.nutsLevel_
+        return lvl === 0 || lvl === '0' || lvl === 'mixed'
+    }
+
     regions
         .on('mouseover', function (e, rg) {
+            if (!isActiveRegion(this)) return
             const sv = sizeData.get(rg.properties.id)
-
-            // Skip regions with no input data at all
-            if (!sv || sv.value === undefined || sv.value === null) {
-                return
-            }
+            if (!sv || sv.value === undefined || sv.value === null) return
 
             select(this).style('fill', map.hoverColor_)
             if (map._tooltip) map._tooltip.mouseover(layer.tooltip_.textFunction(rg, layer))
             if (map.onRegionMouseOver_) map.onRegionMouseOver_(e, rg, this, map)
         })
         .on('mousemove', function (e, rg) {
+            if (!isActiveRegion(this)) return
             const sv = sizeData.get(rg.properties.id)
-
-            // Skip regions with no input data at all
-            if (!sv || sv.value === undefined || sv.value === null) {
-                return
-            }
+            if (!sv || sv.value === undefined || sv.value === null) return
 
             if (map._tooltip) map._tooltip.mousemove(e)
             if (map.onRegionMouseMove_) map.onRegionMouseMove_(e, rg, this, map)
         })
         .on('mouseout', function (e, rg) {
+            if (!isActiveRegion(this)) return
             const sv = sizeData.get(rg.properties.id)
-
-            // Skip regions with no input data at all
-            if (!sv || sv.value === undefined || sv.value === null) {
-                return
-            }
+            if (!sv || sv.value === undefined || sv.value === null) return
 
             const sel = select(this)
             sel.style('fill', sel.attr('fill___'))

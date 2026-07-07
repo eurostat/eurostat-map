@@ -16,8 +16,6 @@
                 .title('Total GDP')
                 .width(800)
                 .legend({
-                    x: 500,
-                    y: 20,
                     sizeLegend: {
                         title: 'title',
                         noData: false,
@@ -27,7 +25,7 @@
                 .insets(false)
                 .psSettings({
                     minSize: 1,
-                    maxSize: 30
+                    maxSize: 30,
                 })
                 .patternFill([
                     {
@@ -39,7 +37,8 @@
                     },
                 ])
 
-            map.statData().setData({ ES: 1, DE: 0, FR: 3, PL: 5, UA: 0 })
+                .stat('test-data', { customData: { ES: 1, DE: 0, FR: 3, PL: 5, UA: 0 } })
+                .encoding('size', { stat: 'test-data' })
             map.build()
         </script>
     </body>

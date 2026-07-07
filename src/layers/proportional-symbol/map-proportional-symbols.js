@@ -335,6 +335,12 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         const selector = getRegionsSelector(map)
         const regions = map.svg().selectAll(selector)
         const hasBaseLayer = map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer)
+        const dataRegions =
+            map.nutsLevel_ === 0 || map.nutsLevel_ === '0' || map.nutsLevel_ === 'mixed'
+                ? regions
+                : regions.filter(function () {
+                      return !this.parentNode.classList.contains('em-cntrg')
+                  })
 
         if (map.geo_ !== 'WORLD') {
             if (map.nutsLevel_ == 'mixed') {
@@ -345,7 +351,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             // so choropleth legend hover remains functional.
             if (!hasBaseLayer) {
                 // apply 'nd' class to no data regions for legend item hover
-                regions.attr('ecl', function (rg) {
+                dataRegions.attr('ecl', function (rg) {
                     const sv = sizeData.get(rg.properties.id)
                     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0 && sv.value !== '0')) {
                         // NO INPUT
@@ -357,15 +363,21 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                         }
                     }
                 })
+
+                // RS and EL cntrg polygons are excluded from getRegionsSelector because they
+                // include territory not in the NUTS topology (Kosovo for RS, Mount Athos for EL).
+                // They never receive ecl='ni' via the main loop, so they inherit the has-data tint
+                // from the em-cntrg group CSS rule.  Override that by always marking them no-input.
+                map.svg().selectAll('#em-cntrg-RS, #em-cntrg-EL').attr('ecl', 'ni')
             }
 
             // Only apply no-data fill colors if we are styling the background
             if (!hasBaseLayer) {
                 // 1) clear any previous inline fill so CSS can apply to regions that now have data
-                regions.style('fill', null)
+                dataRegions.style('fill', null)
 
                 // 2) apply gray only to current no-data (":") regions
-                regions
+                dataRegions
                     .filter((rg) => {
                         const sv = sizeData.get(rg.properties.id)
                         return sv && sv.value === ':'
@@ -416,18 +428,22 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         const target = this || layer
         const sizeData = getSizeStatData(target)
 
-        // Ensure centroidFeatures is populated (important for mixed)
-        if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
-            // Build features from whatever is currently bound to centroids
-            map.Geometries.centroidsFeatures = map
-                .svg()
-                .selectAll('g.em-centroid')
-                .data()
-                .filter((d) => d?.properties?.centroid)
+        // target.centroidsFeatures_ is the authoritative, level-filtered set kept up-to-date
+        // by renderCentroidsForLayer / refreshCentroidsForLayer for BOTH facade and real
+        // layers.  map.Geometries.centroidsFeatures is only updated for the facade path
+        // (layer === map), so using it here caused level switches to use stale NUTS-N-1
+        // features and produce an empty sorted set → no circles.
+        let centroidFeatures = target.centroidsFeatures_
+        if (!centroidFeatures?.length) {
+            // Fallback: read from DOM on very first render before centroidsFeatures_ is set
+            centroidFeatures = map.svg().selectAll('g.em-centroid').data().filter((d) => d?.properties?.centroid)
+            target.centroidsFeatures_ = centroidFeatures
         }
+        // Keep the legacy property in sync for any external readers
+        map.Geometries.centroidsFeatures = centroidFeatures
 
         // Sort features by descending value (largest first so small ones are on top)
-        const sorted = map.Geometries.centroidsFeatures
+        const sorted = centroidFeatures
             .filter((f) => {
                 const v = sizeData.get?.(f.properties.id)?.value
                 return v != null && v !== ':' // exclude no-data
@@ -569,7 +585,9 @@ export const getColorLegend = function (colorFun, colorArray) {
 export function getSizeStatData(layerOrMap) {
     const { layer, map } = getLayerAndMap(layerOrMap)
     const encodedSizeData = layer.getEncodingStatData?.('size', undefined, 'size')
-    if (encodedSizeData?.getArray?.()?.length) return encodedSizeData
+    const hasExplicitSizeSource = !!(layer.getEncodingStat?.('size') || map.stat_?.size || layer.stat_?.size)
+
+    if (hasExplicitSizeSource) return encodedSizeData || map.statData('size')
 
     const legacySizeData = map.statData('size')
     if (legacySizeData?.getArray?.()?.length) return legacySizeData

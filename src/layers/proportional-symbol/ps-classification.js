@@ -1,4 +1,4 @@
-import { createSqrtScale, createLinearScale } from "../../core/scale.js";
+import { createSqrtScale, createLinearScale } from '../../core/scale.js'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { getResponsiveSymbolSize } from '../../core/responsive.js'
 import { min, max } from 'd3-array'
@@ -24,7 +24,9 @@ function getSizeData(layer) {
     const sizeData = layer.map ? layer.map.statData('size') : layer.statData('size')
     const defaultData = layer.map ? layer.map.statData() : layer.statData()
     const encodedSizeData = layer.getEncodingStatData?.('size', undefined, 'size')
-    if (encodedSizeData?.getArray?.()?.length) return encodedSizeData
+    const hasExplicitSizeSource = !!(layer.getEncodingStat?.('size') || (layer.map ? layer.map.stat_?.size : layer.stat_?.size))
+
+    if (hasExplicitSizeSource) return encodedSizeData || sizeData
 
     if (sizeData?.getArray?.()?.length) return sizeData
 
@@ -77,9 +79,7 @@ function defineSizeClassifier(layer) {
     const maxSize = getResponsiveSymbolSize(layer.psMaxSize_, 2)
     const minSize = getResponsiveSymbolSize(layer.psMinSize_ || 0, 0)
 
-    const classifier = isLinear
-        ? createLinearScale(rawData, maxSize, minSize)
-        : createSqrtScale(rawData, maxSize, minSize)
+    const classifier = isLinear ? createLinearScale(rawData, maxSize, minSize) : createSqrtScale(rawData, maxSize, minSize)
 
     // expose on layer instance
     layer.classifierSize(classifier)
@@ -91,26 +91,25 @@ function defineSizeClassifier(layer) {
  * @param {*} layer
  */
 export function applyClassificationToMap(map, layer) {
-    if (!map?.svg_) return;
+    if (!map?.svg_) return
 
-    const activeLayer = layer || map;
-    const classifier = activeLayer.classifierColor_;
-    if (typeof classifier !== 'function') return;
+    const activeLayer = layer || map
+    const classifier = activeLayer.classifierColor_
+    if (typeof classifier !== 'function') return
 
-    const colorData = activeLayer.getEncodingStatData?.('color', undefined, 'color') || map.statData('color');
-    if (!colorData) return;
+    const colorData = activeLayer.getEncodingStatData?.('color', undefined, 'color') || map.statData('color')
+    if (!colorData) return
 
     const group = getCentroidsGroup(activeLayer)
-    if (!group || group.empty()) return;
+    if (!group || group.empty()) return
 
-    group.selectAll('g.em-centroid')
-        .attr('ecl', function (rg) {
-            const sv = colorData.get(rg.properties.id);
-            if (!sv) return 'nd';
+    group.selectAll('g.em-centroid').attr('ecl', function (rg) {
+        const sv = colorData.get(rg.properties.id)
+        if (!sv) return 'nd'
 
-            const v = sv.value;
-            if ((v !== 0 && !v) || v === ':') return 'nd';
+        const v = sv.value
+        if ((v !== 0 && !v) || v === ':') return 'nd'
 
-            return +classifier(+v);
-        });
+        return +classifier(+v)
+    })
 }

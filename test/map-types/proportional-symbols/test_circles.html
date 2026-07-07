@@ -76,8 +76,6 @@
                 .legend({
                     title: 'Total ',
                     subtitle: 'test',
-                    x: 5,
-                    y: 125,
                     sizeLegend: {
                         title: 'Total ',
                         subtitle: 'test',
@@ -91,11 +89,11 @@
                     strokeWidth: 0.1,
                     stroke: 'white',
                     fillOpacity: 1,
-                    strokeOpacity: 0.9
+                    strokeOpacity: 0.9,
+                    codeLabels: false,
                 })
                 .zoomExtent([1, 10])
                 .insets(false)
-                .psSettings({ codeLabels: false })
                 .dorling(true)
                 .labels({
                     labels: [],
@@ -113,7 +111,9 @@
             const select = document.getElementById('nutsLevel')
             select.addEventListener('change', (e) => {
                 const level = +e.target.value // number 0–3
-                map.nutsLevel(level).psSettings({ maxSize: [55, 20, 20, 15][level] }).build() // reapply and rebuild
+                map.nutsLevel(level)
+                    .psSettings({ maxSize: [55, 20, 20, 15][level] })
+                    .build() // reapply and rebuild
             })
         </script>
     </body>

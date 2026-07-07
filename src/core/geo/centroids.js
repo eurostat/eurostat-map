@@ -39,20 +39,20 @@ const setupBaseCentroids = function (map) {
             centroidFeatures = (map.Geometries.geoJSONs.cntrg || []).map((feature) => {
                 const newFeature = { ...feature }
                 newFeature.geometry = { coordinates: geoCentroid(feature), type: 'Point' }
+                newFeature.properties = { ...newFeature.properties, lvl: 0 }
                 return newFeature
             })
         }
     } else {
-        if (map.nutsLevel_ == 'mixed') {
-            centroidFeatures = [
-                ...map.Geometries.centroidsData[0].features,
-                ...map.Geometries.centroidsData[1].features,
-                ...map.Geometries.centroidsData[2].features,
-                ...map.Geometries.centroidsData[3].features,
-            ]
-        } else {
-            centroidFeatures = map.Geometries.centroidsData.features
-        }
+        // centroidsData is always an array [lvl0, lvl1, lvl2, lvl3].
+        // Explicitly tag each feature with its level so the filter is reliable
+        // even if the source GeoJSON does not carry a lvl property.
+        centroidFeatures = [
+            ...map.Geometries.centroidsData[0].features.map((f) => ({ ...f, properties: { ...f.properties, lvl: 0 } })),
+            ...map.Geometries.centroidsData[1].features.map((f) => ({ ...f, properties: { ...f.properties, lvl: 1 } })),
+            ...map.Geometries.centroidsData[2].features.map((f) => ({ ...f, properties: { ...f.properties, lvl: 2 } })),
+            ...map.Geometries.centroidsData[3].features.map((f) => ({ ...f, properties: { ...f.properties, lvl: 3 } })),
+        ]
     }
 
     if (map.processCentroids_) centroidFeatures = map.processCentroids_(centroidFeatures)
@@ -64,7 +64,9 @@ const setupBaseCentroids = function (map) {
     })
 
     // Supplement with any cntrg region not covered by the nuts centroid files.
-    if (map.Geometries.geoJSONs.cntrg && map.geo_ !== 'WORLD') {
+    // Only relevant for level-0 and mixed maps; higher levels don't have non-NUTS country subdivisions.
+    const needsCntrgSupplement = map.nutsLevel_ === 'mixed' || map.nutsLevel_ === 0 || map.nutsLevel_ === '0'
+    if (needsCntrgSupplement && map.Geometries.geoJSONs.cntrg && map.geo_ !== 'WORLD') {
         const existingIds = new Set(projectedCentroids.map((d) => d.properties.id))
         for (const feature of map.Geometries.geoJSONs.cntrg) {
             if (existingIds.has(feature.properties.id)) continue
@@ -73,7 +75,7 @@ const setupBaseCentroids = function (map) {
             projectedCentroids.push({
                 ...feature,
                 geometry: { type: 'Point', coordinates: projected },
-                properties: { ...feature.properties, centroid: projected },
+                properties: { ...feature.properties, lvl: 0, centroid: projected },
             })
         }
     }
@@ -86,7 +88,14 @@ const renderCentroidsForLayer = function (layer) {
     const map = layer.map || layer
     if (!map.Geometries._allCentroidsFeatures) return
 
-    layer.centroidsFeatures_ = map.Geometries._allCentroidsFeatures.filter((d) => centroidHasStatData(d.properties.id, layer))
+    layer.centroidsFeatures_ = map.Geometries._allCentroidsFeatures.filter((d) => {
+        // Filter to the active NUTS level (pass all for mixed)
+        if (map.nutsLevel_ !== 'mixed') {
+            const featureLvl = d?.properties?.lvl
+            if (featureLvl !== undefined && featureLvl !== null && `${featureLvl}` !== `${map.nutsLevel_}`) return false
+        }
+        return centroidHasStatData(d.properties.id, layer)
+    })
 
     if (layer === map) {
         map.Geometries.centroidsFeatures = layer.centroidsFeatures_
@@ -130,7 +139,7 @@ export const addCentroidsToMap = function (layerOrMap) {
         // It's a map! We must first set up the base centroids on the map
         const map = layerOrMap
         setupBaseCentroids(map)
-        
+
         // Then add centroids for each layer
         map.layers_.forEach((l) => {
             renderCentroidsForLayer(l)
@@ -154,7 +163,7 @@ export const addCentroidsToMap = function (layerOrMap) {
  */
 export const getCentroidsGroup = function (layerOrMap) {
     const { layer, map } = getLayerAndMap(layerOrMap)
-    
+
     // For a real Layer overlay path:
     if (layer !== map && typeof layer.group === 'function') {
         const lg = layer.group()
@@ -165,7 +174,7 @@ export const getCentroidsGroup = function (layerOrMap) {
         }
         return g
     }
-    
+
     // For legacy/facade map path:
     return map.svg() ? map.svg().select(`#em-centroids-${map.svgId_}`) : null
 }
@@ -179,8 +188,15 @@ const refreshCentroidsForLayer = function (layerOrMap) {
     const allCentroids = map.Geometries._allCentroidsFeatures
     if (!allCentroids) return
 
-    layer.centroidsFeatures_ = allCentroids.filter((d) => centroidHasStatData(d.properties.id, layer))
-    
+    layer.centroidsFeatures_ = allCentroids.filter((d) => {
+        // Filter to the active NUTS level (pass all for mixed)
+        if (map.nutsLevel_ !== 'mixed') {
+            const featureLvl = d?.properties?.lvl
+            if (featureLvl !== undefined && featureLvl !== null && `${featureLvl}` !== `${map.nutsLevel_}`) return false
+        }
+        return centroidHasStatData(d.properties.id, layer)
+    })
+
     if (layer === map) {
         map.Geometries.centroidsFeatures = layer.centroidsFeatures_
     }
@@ -219,9 +235,9 @@ export const refreshCentroids = function (layerOrMap) {
 // Small helper to check if region has statistical data
 export const centroidHasStatData = function (id, layerOrMap) {
     const { layer, map } = getLayerAndMap(layerOrMap)
-    
+
     if (!layer.statCodes_) return true // if no data yet, keep everything
-    
+
     const statName =
         layer.encoding?.('height')?.stat ||
         layer.encoding?.('composition')?.stat ||
@@ -235,4 +251,3 @@ export const centroidHasStatData = function (id, layerOrMap) {
         return s && !isNaN(s.value) && s.value !== 0
     })
 }
-

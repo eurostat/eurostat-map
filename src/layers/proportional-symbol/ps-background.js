@@ -11,7 +11,15 @@ export function updateBackgroundColor(map, symbolFill) {
     const backgroundColor = getBackgroundColor(hexColor, brightenFactor)
 
     updateCSSRule(`#${mapId}.em--ps .em-nutsrg`, 'fill', backgroundColor)
-    updateCSSRule(`#${mapId}.em--ps .em-cntrg`, 'fill', backgroundColor)
+
+    // Always update the em-cntrg rule so a previous mixed/level-0 build's rule
+    // does not persist when the user switches to a different level.
+    // For level-0 and mixed, apply the same tint (country regions carry real data).
+    // For all other levels, reset to '' so the static .em--ps .em-cntrg { fill:#f2f2f2 }
+    // rule takes effect again.
+    const lvl = map.nutsLevel_
+    const cntrgFill = (lvl === 0 || lvl === '0' || lvl === 'mixed') ? backgroundColor : ''
+    updateCSSRule(`#${mapId}.em--ps .em-cntrg`, 'fill', cntrgFill)
 }
 
 function getBackgroundColor(fillColor, brightenFactor) {
