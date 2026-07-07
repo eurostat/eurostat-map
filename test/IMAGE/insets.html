@@ -365,19 +365,13 @@
                 map = eurostatmap
                     .map('ch')
                     .title(config.title)
-                    // .colors(config.colors)
-                    // .thresholds([100, 110, 150, 180])
-                    // .classificationMethod('threshold')
-                    //.psSettings({ fill: 'red' })
                     .svgId('mappy')
                     .containerId('container')
-                    //.legend({ x: 10, y: 150 })
                     .nutsLevel('mixed')
                     .transitionDuration(0)
                     .insets(insetsCfg)
                     .legend({ title: 'test', x: 0, y: 130 })
                     .insetBoxPosition(insetBoxPosition)
-                    //.zoomButtonsPosition([94, 580])
                     .onBuild((m) => {
                         callbackCount++
                         log(`🔔 Callback ${callbackCount}/${expectedCallbacks}`)
@@ -388,15 +382,12 @@
 
                 if (config.stats) {
                     map.nutsLevel(config.nutsLevel)
-                    map.statData('value').setData({ ES: 1, LI: 2, MT: 1 })
+                    map.statData('value').setData(config.stats)
                 } else {
-                    //map.statData('value').setData({})
                     map.nutsLevel(3)
                     map.stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
-                    map.encoding('fill', { stat: 'value' })
                 }
-                //map.statData('value').setData(exampleData);
-
+                map.encoding('fill', { stat: 'value' })
                 log(`🚀 Calling map.build()...`)
                 map.build()
             }

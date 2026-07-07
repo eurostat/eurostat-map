@@ -353,9 +353,24 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.insets = function () {
         if (!arguments.length) return out.insets_
         if (arguments.length == 1 && arguments[0] === 'default') out.insets_ = 'default'
+        else if (arguments.length == 1 && arguments[0] === true) out.insets_ = 'default'
         else if (arguments.length == 1 && arguments[0] === false) out.insets_ = false
         else if (arguments.length == 1 && Array.isArray(arguments[0])) out.insets_ = arguments[0]
         else out.insets_ = arguments
+        return out
+    }
+
+    // insets button getter/setter
+    out.insetsButton = function (v) {
+        if (!arguments.length) return out.insetsButton_
+        out.insetsButton_ = v
+
+        // If the insets toggle button is enabled but no insets were configured,
+        // default to the standard inset set so the button always has content to toggle.
+        if (v === true && (out.insets_ === undefined || (Array.isArray(out.insets_) && out.insets_.length === 0))) {
+            out.insets_ = 'default'
+        }
+
         return out
     }
 

@@ -151,7 +151,22 @@ export const decorateChoroplethLayer = function (layer, config) {
 
     function applyClassificationToMap(map) {
         const generateRange = (nb) => [...Array(nb).keys()]
-        const fillData = layer.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
+        const resolveFillData = () => {
+            const rootMap = layer.map || map
+            const preferred = layer.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
+            if (preferred?.getArray?.()?.length) return preferred
+
+            // Backward compatibility: some legacy flows populate a single named
+            // stat dataset (e.g. statData('value').setData(...)) without setting
+            // encoding('fill', ...) or stat('default', ...).
+            const allStats = rootMap?.statData_ || {}
+            const populatedKeys = Object.keys(allStats).filter((k) => k !== 'default' && allStats[k]?.getArray?.()?.length)
+            if (populatedKeys.length === 1) return allStats[populatedKeys[0]]
+
+            return preferred
+        }
+
+        const fillData = resolveFillData()
         const dataArray = fillData.getArray()
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
 
@@ -312,37 +327,49 @@ export const decorateChoroplethLayer = function (layer, config) {
             const selector = getRegionsSelector(map)
             const regions = map.svg().selectAll(selector)
 
-            // Apply transition and set initial fill colors with data-driven logic
-            regions
-                .style('pointer-events', 'none') // disable interaction during transition
-                .transition()
-                .duration(map.transitionDuration())
-                .style('fill', regionsFillFunction)
-                .end()
-                .then(() => {
-                    // Re-enable interaction after the transition
-                    regions.style('pointer-events', null)
-                    // Store the original color for each region
-                    regions.each(function () {
-                        const sel = select(this)
-                        sel.attr('fill___', sel.style('fill'))
-                    })
-                    // Set up mouse events
-                    addMouseEventsToRegions(map, regions)
+            const finalizeRegionStyling = () => {
+                // Store the original color for each region
+                regions.each(function () {
+                    const sel = select(this)
+                    sel.attr('fill___', sel.style('fill'))
+                })
+                // Set up mouse events
+                addMouseEventsToRegions(map, regions)
 
-                    // update font color for grid cartograms (contrast)
-                    if (layer.map.gridCartogram_) {
-                        map.svg()
-                            .selectAll('.em-grid-text')
-                            .each(function () {
-                                const cellColor = select(this.parentNode).style('fill')
-                                select(this).attr('fill', getTextColorForBackground(cellColor))
-                            })
-                    }
-                })
-                .catch((err) => {
-                    //console.error('Error applying transition to regions:', err)
-                })
+                // update font color for grid cartograms (contrast)
+                if (layer.map.gridCartogram_) {
+                    map.svg()
+                        .selectAll('.em-grid-text')
+                        .each(function () {
+                            const cellColor = select(this.parentNode).style('fill')
+                            select(this).attr('fill', getTextColorForBackground(cellColor))
+                        })
+                }
+            }
+
+            // Apply transition and set initial fill colors with data-driven logic
+            regions.style('pointer-events', 'none') // disable interaction during transition
+
+            if ((map.transitionDuration?.() || 0) <= 0) {
+                // Synchronous path avoids transition interruption races during rapid rebuilds.
+                regions.style('fill', regionsFillFunction)
+                regions.style('pointer-events', null)
+                finalizeRegionStyling()
+            } else {
+                regions
+                    .transition()
+                    .duration(map.transitionDuration())
+                    .style('fill', regionsFillFunction)
+                    .end()
+                    .then(() => {
+                        // Re-enable interaction after the transition
+                        regions.style('pointer-events', null)
+                        finalizeRegionStyling()
+                    })
+                    .catch((err) => {
+                        //console.error('Error applying transition to regions:', err)
+                    })
+            }
             // Apply additional settings for mixed NUTS level view
             if (map.nutsLevel_ === 'mixed') {
                 styleMixedNUTS(map)
@@ -430,25 +457,26 @@ export const decorateChoroplethLayer = function (layer, config) {
     }
 
     const addMouseEventsToRegions = function (map, regions) {
+        const tooltipHost = map._tooltip || layer.map?._tooltip
         const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
         regions
             .on('mouseover', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', map.hoverColor_) // Apply highlight color
-                if (map._tooltip) map._tooltip.mouseover(layer.tooltip_.textFunction(rg, layer))
+                if (tooltipHost) tooltipHost.mouseover(layer.tooltip_.textFunction(rg, layer))
                 if (map.onRegionMouseOver_) map.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
-                if (map._tooltip) map._tooltip.mousemove(e)
+                if (tooltipHost) tooltipHost.mousemove(e)
                 if (map.onRegionMouseMove_) map.onRegionMouseMove_(e, rg, this, map)
             })
             .on('mouseout', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
                 const sel = select(this)
                 sel.style('fill', sel.attr('fill___')) // Revert to original color
-                if (map._tooltip) map._tooltip.mouseout()
+                if (tooltipHost) tooltipHost.mouseout()
                 if (map.onRegionMouseOut_) map.onRegionMouseOut_(e, rg, this, map)
             })
     }

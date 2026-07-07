@@ -275,9 +275,10 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             updateBackgroundColor(map, backgroundSymbolFill)
         }
 
-        // For facade maps (single-layer), inset styling must target the current map.
-        // For real overlay layers, keep targeting the layer object.
-        const symbolTarget = layer.map ? layer : map
+        // Render symbols against the main layer group on the main map, but against
+        // the inset map container when styling an inset. Otherwise inset symbols
+        // can be cleared/appended in the main map group instead of the inset.
+        const symbolTarget = map === layer.map ? layer : map
 
         // if size dataset not defined then use default
         const sizeData = getSizeStatData(symbolTarget)

@@ -34,16 +34,45 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
         out.insets_ = defaultInsetConfig(out.insetBoxWidth_, out.insetBoxPadding_)
     }
 
+    const previousInsetSvgIdsByGeo = out._lastInsetSvgIdsByGeo_ || {}
+    const consumePreviousInsetSvgId = (geo) => {
+        const previous = previousInsetSvgIdsByGeo[geo]
+        if (!previous) return undefined
+        if (Array.isArray(previous)) return previous.shift()
+        delete previousInsetSvgIdsByGeo[geo]
+        return previous
+    }
+
     for (let i = 0; i < out.insets_.length; i++) {
         const config = out.insets_[i]
+        const x = config.x == undefined ? out.insetBoxPadding_ : config.x
+        const y = config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
 
-        config.svgId = config.svgId || 'inset' + config.geo + Math.random().toString(36).substring(7)
+        config.svgId = config.svgId || consumePreviousInsetSvgId(config.geo) || 'inset' + config.geo + Math.random().toString(36).substring(7)
 
         let svg = select('#' + config.svgId)
 
+        if (svg.size() > 0) {
+            // Ensure active inset containers are visible when reusing existing nodes.
+            svg.style('display', null)
+
+            const nodeName = (svg.node()?.nodeName || '').toLowerCase()
+
+            // Custom inset containers can be pre-created as <g id="..."> outside
+            // em-insets-group, so they require absolute positioning including box offset.
+            if (nodeName === 'g') {
+                svg.attr('transform', 'translate(' + (x + out.insetBoxPosition_[0]) + ', ' + (y + out.insetBoxPosition_[1]) + ')')
+            } else {
+                // Built-in inset wrappers are <g id="em-inset-..."><svg id="...">,
+                // so positioning is relative to em-insets-group.
+                const wrapper = select(svg.node()?.parentNode)
+                if (!wrapper.empty() && wrapper.attr('id') === 'em-inset-' + config.svgId) {
+                    wrapper.attr('transform', 'translate(' + x + ',' + y + ')')
+                }
+            }
+        }
+
         if (svg.size() == 0) {
-            const x = config.x == undefined ? out.insetBoxPadding_ : config.x
-            const y = config.y == undefined ? out.insetBoxPadding_ + i * (out.insetBoxPadding_ + out.insetBoxWidth_) : config.y
             const ggeo = insetsGroup
                 .append('g')
                 .attr('id', 'em-inset-' + config.svgId)
@@ -126,7 +155,7 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     })
 
     //copy stat map attributes/methods
-    ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', 'classToText_'].forEach(function (att) {
+    ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', '_tooltip', 'classToText_'].forEach(function (att) {
         mt[att] = out[att]
     })
 
@@ -147,11 +176,39 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
  */
 export const removeInsets = function (out) {
     if (out.insetTemplates_) {
+        out._lastInsetSvgIdsByGeo_ = {}
+
+        const clearInset = (entry) => {
+            if (!entry) return
+            if (Array.isArray(entry)) {
+                entry.forEach(clearInset)
+                return
+            }
+            const id = entry.svgId_
+            if (!id) return
+
+            const geo = entry.geo_
+            if (geo) {
+                const current = out._lastInsetSvgIdsByGeo_[geo]
+                if (!current) {
+                    out._lastInsetSvgIdsByGeo_[geo] = id
+                } else if (Array.isArray(current)) {
+                    current.push(id)
+                } else {
+                    out._lastInsetSvgIdsByGeo_[geo] = [current, id]
+                }
+            }
+
+            const existing = select('#' + id)
+            if (!existing.empty()) {
+                existing.html('') // empty them, but dont remove them.
+                // Hide stale custom inset placeholders; active ones are unhidden when reused.
+                existing.style('display', 'none')
+            }
+        }
+
         for (let template in out.insetTemplates_) {
-            let id = out.insetTemplates_[template].svgId_
-            let existing = select('#' + id)
-            // if (existing) existing.remove()
-            if (existing) existing.html('') // empty them, but dont remove them.
+            clearInset(out.insetTemplates_[template])
         }
         out.insetTemplates_ = {} //  GISCO-2676
     }

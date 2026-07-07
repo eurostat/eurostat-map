@@ -230,12 +230,14 @@ export interface MapInstance {
 
     /**
      * Inset map configurations. Pass 'default' for the standard
-     * eurostat overseas territory insets, false to disable.
+     * eurostat overseas territory insets. Passing true is an alias for 'default'.
+     * Pass false to disable.
      * @example map.insets('default')
+     * @example map.insets(true)
      * @example map.insets([{ geo: 'MT' }, { geo: 'LI' }])
      */
     insets(): InsetConfig[] | 'default' | false
-    insets(config: InsetConfig[] | 'default' | false): this
+    insets(config: InsetConfig[] | 'default' | true | false): this
 
     /** Decoration. */
 
@@ -323,7 +325,10 @@ export interface MapInstance {
     minimap(): any
     minimap(config: any): this
 
-    /** Show/hide inset map toggle button. */
+    /**
+     * Show/hide inset map toggle button.
+     * When enabled and no insets are configured, the map automatically uses insets('default').
+     */
     insetsButton(): boolean
     insetsButton(show: boolean): this
 

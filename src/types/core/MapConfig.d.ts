@@ -76,8 +76,8 @@ export interface MapConfig {
     /** Tooltip configuration. */
     tooltip?: TooltipConfig
 
-    /** Insets (small additional maps). */
-    insets?: InsetConfig[]
+    /** Insets (small additional maps). true is an alias for 'default'. */
+    insets?: InsetConfig[] | 'default' | true | false
 
     /** Zoom and pan settings. */
     zoomExtent?: [number, number]
@@ -120,7 +120,10 @@ export interface MapConfig {
     /** Show/hide zoom +/- buttons. */
     zoomButtons?: boolean
 
-    /** Show/hide inset map toggle button. */
+    /**
+     * Show/hide inset map toggle button.
+     * When true and no insets are configured, the map automatically uses insets('default').
+     */
     insetsButton?: boolean
 
     /** Show/hide legend toggle button. */

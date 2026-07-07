@@ -87,14 +87,14 @@ For multi-layer stacks, call `eurostatmap.map()` **without** a map type and defi
 
 Specify the map SVG element.
 
-| Method                           | Type   | Default value   | Description                                                                                             |
-| -------------------------------- | ------ | --------------- | ------------------------------------------------------------------------------------------------------- |
-| _map_.**svgId**([*value*])       | String | _"map"_         | The id of the SVG element of the HTML page where to draw the map.                                       |
-| _map_.**containerId**([*value*]) | String | _same as svgId_ | Optional container element used for tooltip bounds and (when explicitly set) height constraints.        |
-| _map_.**width**([*value*])       | int    | _800_           | The width of the map, in pixel.                                                                         |
-| _map_.**height**([*value*])      | int    | _auto_          | The height of the map, in pixel. If not specified, the height is set automatically as 85% of the width. |
-| _map_.**layers**([*value*])      | Array  | _[]_            | Multi-layer stack declaration. Use only when `map()` is created without a map type. Each item is a layer config object (for example `{ type: 'choropleth', encoding: { fill: { stat: 'density' } } }`). See [Multi-layer guide](multi-layer-guide.md). |
-| _map_.**addLayer**([*value*])    | Function | _undefined_    | Add one layer to a multi-layer map and return the layer instance for chaining. Example: `map.addLayer('choropleth').encoding('fill', { stat: 'density' })`. See [Multi-layer guide](multi-layer-guide.md). |
+| Method                           | Type     | Default value   | Description                                                                                                                                                                                                                                            |
+| -------------------------------- | -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| _map_.**svgId**([*value*])       | String   | _"map"_         | The id of the SVG element of the HTML page where to draw the map.                                                                                                                                                                                      |
+| _map_.**containerId**([*value*]) | String   | _same as svgId_ | Optional container element used for tooltip bounds and (when explicitly set) height constraints.                                                                                                                                                       |
+| _map_.**width**([*value*])       | int      | _800_           | The width of the map, in pixel.                                                                                                                                                                                                                        |
+| _map_.**height**([*value*])      | int      | _auto_          | The height of the map, in pixel. If not specified, the height is set automatically as 85% of the width.                                                                                                                                                |
+| _map_.**layers**([*value*])      | Array    | _[]_            | Multi-layer stack declaration. Use only when `map()` is created without a map type. Each item is a layer config object (for example `{ type: 'choropleth', encoding: { fill: { stat: 'density' } } }`). See [Multi-layer guide](multi-layer-guide.md). |
+| _map_.**addLayer**([*value*])    | Function | _undefined_     | Add one layer to a multi-layer map and return the layer instance for chaining. Example: `map.addLayer('choropleth').encoding('fill', { stat: 'density' })`. See [Multi-layer guide](multi-layer-guide.md).                                             |
 
 Height note:
 
@@ -1569,36 +1569,36 @@ For histogram legends you can use the following settings:
 
 In addition to [the default legend parameters](#map-legend), bivariate choropleth maps have the following specific legend parameters:
 
-| Parameter             | Type     | Default value    | Description                                                                                 |
-| --------------------- | -------- | ---------------- | ------------------------------------------------------------------------------------------- |
-| **squareSize**        | number   | _50_             | The size, in pixel, of the legend square.                                                   |
-| **rotation**          | number   | _0_              | The rotation to apply to the main legend. Recommended values are either 0 or -45            |
-| **label1**            | string   | _"Variable 1"_   | The text for the label of variable 1.                                                       |
-| **label2**            | string   | _"Variable 2"_   | The text for the label of variable 1.                                                       |
-| **showBreaks**        | boolean  | _false_          | If set to true and breaks1 and breaks2 are undefined then breaks are automatically defined. |
-| **breaks1**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 1                                     |
-| **breaks2**           | string[] | _undefined_      | An array of strings shown as axis labels for variable 2                                     |
-| **labelFontSize**     | int      | _12_             | The font size of the legend label.                                                          |
-| **noData**            | boolean  | _true_           | Show/hide 'no data' style in the legend.                                                    |
-| **noDataShapeHeight** | number   | _15_             | The height, in pixel, of the 'No data' legend shape.                                        |
-| **noDataShapeWidth**  | number   | _15_             | The width, in pixel, of the 'No data' legend shape.                                         |
-| **noDataText**        | Text     | _"No data"_      | 'No data' text label.                                                                       |
-| **noDataYOffset**     | Text     | 0                | Add distance between the main legend and the 'no data' item in pixels                       |
-| **yAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks1                                         |
-| **xAxisLabelsOffset** | Object   | _{ x: 0, y: 0 }_ | Offset the axis labels that correspond with breaks2                                         |
-| **yAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
-| **xAxisTitleOffset**  | Object   | _{ x: 0, y: 0 }_ | Offset the axis titles                                                                      |
-| **axisArrows**        | boolean  | _true_           | Show axis arrows                                                                            |
-| **arrowHeight**       | number   | _15_             | Height of axis arrows                                                                       |
-| **arrowWidth**        | number   | _14_             | Width of axis arrows                                                                        |
-| **arrowPadding**      | number   | _10_             | Padding between arrow and axis label                                                        |
-| **showAxisExtremes**  | boolean  | _true_           | Show or hide low/high endpoint labels on both axes.                                         |
-| **axisExtremes**      | Object   | _{ x: { low: "Low", high: "High" }, y: { low: "Low", high: "High" } }_ | Labels shown at low/high ends of x and y axes.                        |
-| **annotations**       | Object   | _undefined_      | Optional corner annotation text: topLeft, topRight, bottomLeft, bottomRight. Supports line breaks with `<br>`/`<br/>` or a newline. |
-| **annotationLineLength** | number or Object | _18_ | Length of corner annotation callout lines (pixels). Use a number for all corners or an object with topLeft, topRight, bottomLeft, bottomRight. |
-| **annotationOffsets** | Object | _auto_ | Annotation label offsets. Use `{ x, y }` for all corners or per-corner objects: `topLeft`, `topRight`, `bottomLeft`, `bottomRight`, each with `{ x, y }`. |
-| **annotationLineEndOffset** | Object | _{ x: 0, y: 0 }_ | Extra offset applied to where each leader line meets its annotation label. Supports global `{ x, y }` or per-corner `{ topLeft, topRight, bottomLeft, bottomRight }` with `{ x, y }`. |
-| **annotationPadding** | number or Object | _deprecated_ | Legacy radial padding (kept for backward compatibility). Prefer `annotationOffsets`. |
+| Parameter                   | Type             | Default value                                                          | Description                                                                                                                                                                           |
+| --------------------------- | ---------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **squareSize**              | number           | _50_                                                                   | The size, in pixel, of the legend square.                                                                                                                                             |
+| **rotation**                | number           | _0_                                                                    | The rotation to apply to the main legend. Recommended values are either 0 or -45                                                                                                      |
+| **label1**                  | string           | _"Variable 1"_                                                         | The text for the label of variable 1.                                                                                                                                                 |
+| **label2**                  | string           | _"Variable 2"_                                                         | The text for the label of variable 1.                                                                                                                                                 |
+| **showBreaks**              | boolean          | _false_                                                                | If set to true and breaks1 and breaks2 are undefined then breaks are automatically defined.                                                                                           |
+| **breaks1**                 | string[]         | _undefined_                                                            | An array of strings shown as axis labels for variable 1                                                                                                                               |
+| **breaks2**                 | string[]         | _undefined_                                                            | An array of strings shown as axis labels for variable 2                                                                                                                               |
+| **labelFontSize**           | int              | _12_                                                                   | The font size of the legend label.                                                                                                                                                    |
+| **noData**                  | boolean          | _true_                                                                 | Show/hide 'no data' style in the legend.                                                                                                                                              |
+| **noDataShapeHeight**       | number           | _15_                                                                   | The height, in pixel, of the 'No data' legend shape.                                                                                                                                  |
+| **noDataShapeWidth**        | number           | _15_                                                                   | The width, in pixel, of the 'No data' legend shape.                                                                                                                                   |
+| **noDataText**              | Text             | _"No data"_                                                            | 'No data' text label.                                                                                                                                                                 |
+| **noDataYOffset**           | Text             | 0                                                                      | Add distance between the main legend and the 'no data' item in pixels                                                                                                                 |
+| **yAxisLabelsOffset**       | Object           | _{ x: 0, y: 0 }_                                                       | Offset the axis labels that correspond with breaks1                                                                                                                                   |
+| **xAxisLabelsOffset**       | Object           | _{ x: 0, y: 0 }_                                                       | Offset the axis labels that correspond with breaks2                                                                                                                                   |
+| **yAxisTitleOffset**        | Object           | _{ x: 0, y: 0 }_                                                       | Offset the axis titles                                                                                                                                                                |
+| **xAxisTitleOffset**        | Object           | _{ x: 0, y: 0 }_                                                       | Offset the axis titles                                                                                                                                                                |
+| **axisArrows**              | boolean          | _true_                                                                 | Show axis arrows                                                                                                                                                                      |
+| **arrowHeight**             | number           | _15_                                                                   | Height of axis arrows                                                                                                                                                                 |
+| **arrowWidth**              | number           | _14_                                                                   | Width of axis arrows                                                                                                                                                                  |
+| **arrowPadding**            | number           | _10_                                                                   | Padding between arrow and axis label                                                                                                                                                  |
+| **showAxisExtremes**        | boolean          | _true_                                                                 | Show or hide low/high endpoint labels on both axes.                                                                                                                                   |
+| **axisExtremes**            | Object           | _{ x: { low: "Low", high: "High" }, y: { low: "Low", high: "High" } }_ | Labels shown at low/high ends of x and y axes.                                                                                                                                        |
+| **annotations**             | Object           | _undefined_                                                            | Optional corner annotation text: topLeft, topRight, bottomLeft, bottomRight. Supports line breaks with `<br>`/`<br/>` or a newline.                                                   |
+| **annotationLineLength**    | number or Object | _18_                                                                   | Length of corner annotation callout lines (pixels). Use a number for all corners or an object with topLeft, topRight, bottomLeft, bottomRight.                                        |
+| **annotationOffsets**       | Object           | _auto_                                                                 | Annotation label offsets. Use `{ x, y }` for all corners or per-corner objects: `topLeft`, `topRight`, `bottomLeft`, `bottomRight`, each with `{ x, y }`.                             |
+| **annotationLineEndOffset** | Object           | _{ x: 0, y: 0 }_                                                       | Extra offset applied to where each leader line meets its annotation label. Supports global `{ x, y }` or per-corner `{ topLeft, topRight, bottomLeft, bottomRight }` with `{ x, y }`. |
+| **annotationPadding**       | number or Object | _deprecated_                                                           | Legacy radial padding (kept for backward compatibility). Prefer `annotationOffsets`.                                                                                                  |
 
 ### Proportional symbol legends
 
@@ -1779,6 +1779,8 @@ eurostatmap.map(...)
 	.insets("default");
 ```
 
+`map.insets(true)` is equivalent to `map.insets("default")`.
+
 To specify more precisely which insets to show, their geographical extent, scale, position, etc., specify the list of insets such as:
 
 ```javascript
@@ -1820,7 +1822,7 @@ map.minimap({
 
 ## Buttons
 
-You can add zoom buttons with `map.zoomButtons(true)` and an inset toggle with `map.insetsButton(true)`. See ui.css for their styling.
+You can add zoom buttons with `map.zoomButtons(true)` and an inset toggle with `map.insetsButton(true)`. If `insetsButton(true)` is set and no insets were configured, eurostat-map automatically applies `map.insets('default')`. See ui.css for their styling.
 
 ## Export
 

@@ -28,6 +28,22 @@ const nextLayerId = () => 'layer' + ++_layerSeq
 export const attachThematicApi = function (layer, map) {
     layer.encodings_ = layer.encodings_ || {}
 
+    const hasLoadedStatData = (key) => !!map.statData_?.[key]?.getArray?.()?.length
+    const hasStatConfig = (key) => map.stat_?.[key] != null
+
+    const inferImplicitFillStat = () => {
+        // Common built-in channels that should not be auto-picked as choropleth fill defaults.
+        const reserved = new Set(['default', 'color', 'size', 'v1', 'v2', 'v3'])
+
+        const configured = Object.keys(map.stat_ || {}).filter((k) => !reserved.has(k) && hasStatConfig(k))
+        if (configured.length === 1) return configured[0]
+
+        const loaded = Object.keys(map.statData_ || {}).filter((k) => !reserved.has(k) && hasLoadedStatData(k))
+        if (loaded.length === 1) return loaded[0]
+
+        return undefined
+    }
+
     const applyEncodingSideEffects = function (encodings) {
         const color = encodings?.color
         if (!color) return
@@ -75,7 +91,23 @@ export const attachThematicApi = function (layer, map) {
         return layer
     }
 
-    layer.getEncodingStat = (channel, fallback) => layer.encodings_[channel]?.stat || fallback
+    layer.getEncodingStat = (channel, fallback) => {
+        const explicit = layer.encodings_[channel]?.stat
+        if (explicit) return explicit
+
+        if (channel === 'fill') {
+            const fallbackKey = fallback || 'default'
+            if (fallbackKey && (hasStatConfig(fallbackKey) || hasLoadedStatData(fallbackKey))) return fallbackKey
+
+            // Convenience default for choropleths: if users define exactly one
+            // custom stat dataset (e.g. statData('value').setData(...)) and do
+            // not provide encoding('fill', ...), use that dataset for fill.
+            const implicit = inferImplicitFillStat()
+            if (implicit) return implicit
+        }
+
+        return fallback
+    }
 
     layer.getEncodingStats = (channel, fallback) => {
         const e = layer.encodings_[channel]
