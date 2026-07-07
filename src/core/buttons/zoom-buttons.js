@@ -62,9 +62,10 @@ export function updateZoomButtonsPosition(map) {
 function positionZoomButtons(map, buttonGroup, buttonSize) {
     const padding = getButtonPadding()
     const extent = getMapDrawingExtent(map)
+    const ribbonOffsetY = map.showEstatRibbon_ ? 10 : 0
     buttonGroup.attr(
         'transform',
-        `translate(${extent.x + extent.width - buttonSize - padding}, ${extent.y + extent.height - buttonSize * 2 - padding * 2})`
+        `translate(${extent.x + extent.width - buttonSize - padding}, ${extent.y + extent.height - buttonSize * 2 - padding * 2 - ribbonOffsetY})`
     )
 }
 

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Population density in Europe')
+                .header(true)
+                .footer(true)
+                .showEstatLogo(true)
+                .showEstatRibbon(true)
+                // define statistical dataset
+                .stat('population-density', {
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                })
+                // encode dataset into visual variable(s)
+                .encoding('fill', { stat: 'population-density', scale: 'quantile', classes: 7 })
+                .legend({ position: 'top right', title: 'Density, people/km²' })
+                .build()
+        </script>
+    </body>
+</html>
