@@ -117,7 +117,7 @@
                     classes: 6,
                     stroke: 'black',
                     strokeWidth: '1',
-                    offset: { x: -5, y: -10 }
+                    offset: { x: -5, y: -10 },
                 })
                 .legend({
                     x: 530,
@@ -166,7 +166,7 @@
                     colorFun: d3.interpolateGreens,
                     classes: 6,
                     stroke: 'black',
-                    strokeWidth: '1'
+                    strokeWidth: '1',
                 })
                 .legend({
                     x: 530,
@@ -222,10 +222,10 @@
                     fill: '#fa8dfc',
                     stroke: 'white',
                     strokeWidth: '1',
-                    maxSize: 70
+                    maxSize: 70,
                 })
                 .tooltipShowFlags('long')
-                .psSettings({ colors: ['#fee5d9', '#fcbba1', '#fc9272', '#fb6a4a', '#de2d26', '#a50f15'].reverse( }))
+                .psSettings({ colors: ['#fee5d9', '#fcbba1', '#fc9272', '#fb6a4a', '#de2d26', '#a50f15'].reverse() })
                 .legend({
                     x: 550,
                     y: 20,
@@ -269,8 +269,8 @@
                     minSize: 1,
                     maxSize: 100,
                     fillOpacity: 1,
-                    stroke: 'black',
-                    strokeWidth: '1'
+                    //stroke: 'black',
+                    //strokeWidth: '1',
                 })
                 .tooltipShowFlags('long')
                 .psSettings({ colorFun: d3.interpolateReds })
@@ -281,7 +281,6 @@
                         title: 'Total population',
                         labelFormatter: compactNumber,
                         titlePadding: 20,
-
                     },
                     colorLegend: {
                         title: 'Inhabitants per km²',

@@ -18,7 +18,7 @@ export function updateBackgroundColor(map, symbolFill) {
     // For all other levels, reset to '' so the static .em--ps .em-cntrg { fill:#f2f2f2 }
     // rule takes effect again.
     const lvl = map.nutsLevel_
-    const cntrgFill = (lvl === 0 || lvl === '0' || lvl === 'mixed') ? backgroundColor : ''
+    const cntrgFill = lvl === 0 || lvl === '0' || lvl === 'mixed' ? backgroundColor : ''
     updateCSSRule(`#${mapId}.em--ps .em-cntrg`, 'fill', cntrgFill)
 }
 

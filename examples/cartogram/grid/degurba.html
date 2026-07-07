@@ -163,7 +163,6 @@
                 const [response, populationResponse] = await Promise.all([fetch(config.data), fetch('data/degurba/population.json')])
                 const data = await response.json()
                 const populationData = await populationResponse.json()
-                const totalPopulationData = Object.fromEntries(Object.entries(populationData).map(([geo, values]) => [geo, values?.TOTAL ?? null]))
 
                 // Remove existing map if it exists
                 if (map) {
@@ -212,10 +211,6 @@
                     .stat('degurbaPop', {
                         customData: populationData,
                         categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
-                        unitText: 'inhabitants',
-                    })
-                    .stat('totalPop', {
-                        customData: totalPopulationData,
                         unitText: 'inhabitants',
                     })
                     .encoding('height', {
@@ -276,7 +271,7 @@
 
                 if (useTotalPopWidth) {
                     mapBuilder = mapBuilder.encoding('width', {
-                        stat: 'totalPop',
+                        stat: 'degurbaPop',
                         scale: 'linear',
                         range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
                     })

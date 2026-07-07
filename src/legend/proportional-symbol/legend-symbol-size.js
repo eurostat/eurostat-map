@@ -59,6 +59,21 @@ export function drawSizeLegend(out, baseX, baseY) {
                 .text(out.sizeLegend.title)
         }
 
+        // subtitle
+        if (out.sizeLegend.subtitle) {
+            const subtitleFontSize = getFontSizeFromClass('em-legend-subtitle')
+            const titleH = out.sizeLegend.title ? getFontSizeFromClass('em-size-legend-title') : 0
+            container
+                .append('text')
+                .attr('class', 'em-legend-subtitle')
+                .attr('x', 0)
+                .attr('y', titleH + subtitleFontSize + (out.sizeLegend.title ? 2 : 0))
+                .html(out.sizeLegend.subtitle)
+            out.sizeLegend._subtitleHeight = subtitleFontSize + 2
+        } else {
+            out.sizeLegend._subtitleHeight = 0
+        }
+
         // define format for labels
         const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
         const domain = map.classifierSize_.domain()
@@ -126,7 +141,7 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
     const map = out.layer
 
     if (out.sizeLegend._cursorY == null) {
-        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
+        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0) + (out.sizeLegend._subtitleHeight || 0)
     }
 
     const maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
@@ -179,7 +194,7 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
 
     // init stacking cursor
     if (out.sizeLegend._cursorY == null) {
-        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
+        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0) + (out.sizeLegend._subtitleHeight || 0)
     }
 
     const x = out.boxPadding // bars start from the left

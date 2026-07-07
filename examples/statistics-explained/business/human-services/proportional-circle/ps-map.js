@@ -4,15 +4,15 @@ const compactIntlFormatter = new Intl.NumberFormat('en', {
     maximumFractionDigits: 1,
 })
 
-const longIntlFormatter = new Intl.NumberFormat('en', {
-    maximumFractionDigits: 0,
-})
-
 const compactFormatter = {
     format(value) {
         return compactIntlFormatter.format(value).replace(/,/g, ' ')
     },
 }
+
+const longIntlFormatter = new Intl.NumberFormat('en', {
+    maximumFractionDigits: 0,
+})
 
 const longFormatter = {
     format(value) {
@@ -63,11 +63,11 @@ export function initMap(unitCode, naceCode) {
         //symbol settings
         .psSettings({
             fill: '#2644A7',
-            brightenFactor: 0.8
+            brightenFactor: 0.8,
         }) //background color brightening factor
         .psSettings({
             maxSize: 20,
-            minSize: 2
+            minSize: 2,
         })
 
         //SE settings

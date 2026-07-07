@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
 import { interpolateOrRd } from 'd3-scale-chromatic'
+import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
 import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
@@ -62,7 +63,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     layer.psStrokeWidth_ = 0.2
     layer.psStrokeOpacity_ = 1
     layer.psClasses_ = 5
-    layer.psColors_ = null
+    layer.psColors_ = ['#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d']
     layer.psColorFun_ = interpolateOrRd
     layer.psClassToFillStyle_ = undefined
     layer.psBrightenFactor_ = 0.9
@@ -436,7 +437,11 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         let centroidFeatures = target.centroidsFeatures_
         if (!centroidFeatures?.length) {
             // Fallback: read from DOM on very first render before centroidsFeatures_ is set
-            centroidFeatures = map.svg().selectAll('g.em-centroid').data().filter((d) => d?.properties?.centroid)
+            centroidFeatures = map
+                .svg()
+                .selectAll('g.em-centroid')
+                .data()
+                .filter((d) => d?.properties?.centroid)
             target.centroidsFeatures_ = centroidFeatures
         }
         // Keep the legacy property in sync for any external readers
@@ -573,8 +578,13 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
 export const getColorLegend = function (colorFun, colorArray) {
     colorFun = colorFun || interpolateOrRd
     if (colorArray) {
+        // Build a piecewise Lab interpolator across the palette so any number of
+        // classes maps cleanly onto the full color range, even when numberOfClasses
+        // differs from colorArray.length.
+        const interpolator = piecewise(interpolateLab, colorArray)
         return function (ecl, numberOfClasses) {
-            return colorArray[ecl]
+            if (numberOfClasses <= 1) return colorArray[0]
+            return interpolator(ecl / (numberOfClasses - 1))
         }
     }
     return function (ecl, numberOfClasses) {

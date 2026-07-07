@@ -1,7 +1,7 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator } from '../core/utils'
+import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass } from '../core/utils'
 import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -95,6 +95,12 @@ export function drawDiscreteLegend(out, x, y) {
             .text(out.colorLegend.title)
     }
 
+    // subtitle
+    if (out.colorLegend?.subtitle) {
+        const titleH = out.colorLegend.title ? getFontSizeFromClass('em-color-legend-title') + 2 : 0
+        out._discreteLegendContainer.append('text').attr('class', 'em-legend-subtitle').attr('x', 0).attr('y', titleH).html(out.colorLegend.subtitle)
+    }
+
     // choropleths dont have multiple visual variables (yet), so we use the root legend config
     const config = out.map._mapType == 'ps' ? out.colorLegend : out // Use out.colorLegend for proportional symbols, out for choropleth
 
@@ -122,6 +128,7 @@ function getTitlePadding(out) {
     const map = out.map
     let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
     if (out.maxMin) p += 10 // extra padding if max/min labels are shown
+    if (out.colorLegend?.subtitle) p += getFontSizeFromClass('em-legend-subtitle') + 2
     return p
 }
 

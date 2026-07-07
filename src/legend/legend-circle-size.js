@@ -20,6 +20,19 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
             .text(title)
     }
 
+    // subtitle
+    if (out.sizeLegend?.subtitle) {
+        const subtitleFontSize = getFontSizeFromClass('em-legend-subtitle')
+        const titleH = title ? getFontSizeFromClass('em-size-legend-title') : 0
+        container
+            .append('text')
+            .attr('class', 'em-legend-subtitle')
+            .attr('x', 0)
+            .attr('y', titleH + subtitleFontSize)
+            .html(out.sizeLegend.subtitle)
+        titlePadding += subtitleFontSize + 2
+    }
+
     //assign default circle radiuses if none specified by user
     let domain = sizeScale.domain()
     if (!values) {
@@ -102,8 +115,17 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
 function formatSizeLabel(value, decimals) {
     if (!Number.isFinite(value)) return ''
     const dec = typeof decimals === 'number' ? decimals : detectValuePrecision(value)
-    const rounded = Number(value.toFixed(dec))
-    return spaceAsThousandSeparator(rounded)
+    const compactIntlFormatter = new Intl.NumberFormat('en', {
+        notation: 'compact',
+        compactDisplay: 'long',
+        maximumFractionDigits: dec,
+    })
+    const compactFormatter = {
+        format(value) {
+            return spaceAsThousandSeparator(compactIntlFormatter.format(value))
+        },
+    }
+    return compactFormatter.format(value)
 }
 
 function detectValuePrecision(value) {

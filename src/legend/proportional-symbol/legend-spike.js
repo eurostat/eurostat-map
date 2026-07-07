@@ -40,6 +40,18 @@ export function buildSpikeLegend(out) {
         currentY += titleFontSize + 8
     }
 
+    // subtitle
+    if (out.sizeLegend.subtitle) {
+        const subtitleFontSize = getFontSizeFromClass('em-legend-subtitle')
+        container
+            .append('text')
+            .attr('class', 'em-legend-subtitle')
+            .attr('x', 0)
+            .attr('y', titleFontSize + subtitleFontSize + (out.sizeLegend.title ? 2 : 0))
+            .html(out.sizeLegend.subtitle)
+        currentY += subtitleFontSize + 2
+    }
+
     // Items container (centered under title)
     // Horizontal spacing based on spike width and maximum label length
     // const spikeSpacing = Math.max(map.psSpikeWidth_ * 1.2, labelFontSize * 2.5)

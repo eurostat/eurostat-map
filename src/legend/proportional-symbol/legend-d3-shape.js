@@ -40,7 +40,7 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
 
     // Initialize running Y cursor for stacking
     if (out.sizeLegend._cursorY == null) {
-        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0)
+        out.sizeLegend._cursorY = out.boxPadding + (out.sizeLegend.title ? out.sizeLegend.titlePadding : 0) + (out.sizeLegend._subtitleHeight || 0)
     }
 
     const maxSize = map.classifierSize_(map.classifierSize_.domain()[1])
