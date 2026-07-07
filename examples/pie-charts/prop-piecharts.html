@@ -28,21 +28,19 @@
                 })
                 .nutsLevel(1)
                 .stat('composition', {
-                    eurostatDatasetCode: 'agr_r_animal',
+                    eurostatDatasetCode: 'apro_mt_ls_r',
                     filters: { unit: 'THS_HD', time: '2024' },
                     unitText: 'heads',
                     categoryParameter: 'animals',
-                    categoryCodes: ['A2000', 'A2300', 'A2400', 'A3100', 'A4100', 'A4200'],
-                    categoryLabels: ['Bovines', 'Cows', 'Buffalos', 'Pigs', 'Sheep', 'Goats'],
-                    categoryColors: ['#E04040', '#208486', '#2644A7', '#AF155C', '#672DC4', '#33A033'],
+                    categoryCodes: ['A2000', 'A3100', 'A4100', 'A4200'],
+                    categoryLabels: ['Bovines', 'Pigs', 'Sheep', 'Goats'],
+                    categoryColors: ['#0060FA', '#E04040', '#33A033', '#BF9500'],
                     transform: (value) => value * 1000, // convert from 1000 heads to heads
                 })
                 .encoding('composition', { stat: 'composition' })
 
                 .legend({
-                    x: 600,
-                    y: 70,
-                    boxOpacity: 0,
+                    boxOpacity: 1,
                     boxFill: 'white',
                     titleFontWeight: 'bold',
                     sizeLegend: {

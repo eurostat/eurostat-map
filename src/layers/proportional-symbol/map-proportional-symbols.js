@@ -265,7 +265,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
 
     function applyStyleToMap(map) {
         //define style per class
-        if (!layer.psClassToFillStyle()) layer.psClassToFillStyle(getColorLegend(layer.psColorFun_, layer.psColors_))
+        if (!layer.psClassToFillStyle_) layer.psClassToFillStyle_ = getColorLegend(layer.psColorFun_, layer.psColors_)
 
         // Gate background color: skip if a base layer (e.g. choropleth) is present below us!
         const hasBaseLayer = map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer)
@@ -394,10 +394,10 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
      * @param {d3.selection} symb symbols d3 selection
      */
     function setSymbolStyles(symb) {
-        symb.attr('fill-opacity', layer.psFillOpacity())
-            .attr('stroke-opacity', layer.psStrokeOpacity())
-            .attr('stroke', layer.psStroke())
-            .attr('stroke-width', layer.psStrokeWidth())
+        symb.attr('fill-opacity', layer.psFillOpacity_)
+            .attr('stroke-opacity', layer.psStrokeOpacity_)
+            .attr('stroke', layer.psStroke_)
+            .attr('stroke-width', layer.psStrokeWidth_)
             .style('fill', function () {
                 if (layer.classifierColor_) {
                     //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template

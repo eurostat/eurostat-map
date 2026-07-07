@@ -1,5 +1,6 @@
 import { max } from 'd3-array'
 import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
+import { formatSizeLabel } from './legend-utils'
 
 /**
  * @description builds a nested circle legend for proportional circles

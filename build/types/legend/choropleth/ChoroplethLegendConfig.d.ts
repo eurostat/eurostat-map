@@ -63,7 +63,7 @@ export interface ChoroplethLegendConfig extends LegendConfig {
     /** Explicit tick labels for continuous legends. */
     tickLabels?: Array<string | number>
 
-    /** Pixel tolerance used when hovering continuous legends to highlight nearby regions. @default 10 */
+    /** Total data-value span highlighted when hovering continuous legends. @default 10 */
     highlightTolerance?: number
 
     /** Whether to show dataset min/max labels where supported. @default true */

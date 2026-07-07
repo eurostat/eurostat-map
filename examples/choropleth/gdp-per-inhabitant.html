@@ -22,7 +22,7 @@
                 //.stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2020' } })
                 .stat('value', { eurostatDatasetCode: 'nama_10r_3gdp', unitText: 'EUR/inhabitant', filters: { unit: 'EUR_HAB', time: '2022' } })
                 .encoding('fill', { stat: 'value' })
-                .nutsLevel(0)
+                .nutsLevel(3)
                 .zoomExtent([1, 1000])
 
                 .classificationMethod('threshold')
@@ -33,10 +33,7 @@
                 .legend({
                     //svgId: 'legend',
                     title: 'Euro per inhabitant',
-                    //subtitle: 'per 1000 inhabitants',
-                    x: 560,
-                    y: 90,
-                    width: 200,
+                    titlePadding: -5,
                     boxOpacity: 1,
                     noDataText: 'Data not available',
                     maxMin: true,

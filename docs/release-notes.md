@@ -1,12 +1,46 @@
 # Release notes
 
+## 4.6.1
+
+### Fixes
+
+- **Continuous legend hover tolerance now matches configured width** - `highlightTolerance` is now interpreted as the total highlighted value span (not plus/minus each side). For example, `highlightTolerance: 1` highlights a width of exactly 1 unit.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ch')
+    .colorSchemeType('continuous')
+    .legend({
+        highlightTolerance: 1, // highlights exactly a 1-unit value band
+    })
+    .build()
+```
+
+- **Removed false proportional-symbol deprecation warnings from internal rendering** - deprecated `ps*` wrappers are no longer called internally during style updates, so deprecation warnings now appear only when user code calls deprecated APIs.
+
+Example:
+
+```javascript
+// Preferred API (no deprecation warning):
+map.psSettings({
+    fillOpacity: 0.9,
+    stroke: '#fff',
+    strokeWidth: 0.2,
+})
+
+// Deprecated API still warns (only when called by user code):
+// map.psFillOpacity(0.9)
+```
+
 ## 4.6.0
 
 ### New
 
 - **`sizeLegend.subtitle` and `colorLegend.subtitle`** — proportional-symbol legends now support a subtitle line rendered below the title in both the size and colour sections.
 
-- **Per-level symbol filtering** — `map.nutsLevel(n)` now strictly enforces that only NUTS level *n* symbols are rendered. Setting `nutsLevel('mixed')` continues to show all levels simultaneously.
+- **Per-level symbol filtering** — `map.nutsLevel(n)` now strictly enforces that only NUTS level _n_ symbols are rendered. Setting `nutsLevel('mixed')` continues to show all levels simultaneously.
 
 - **All centroid levels pre-cached on build** — when switching NUTS levels (`nutsLevel(n).build()`), all four centroid files are fetched and cached on the first build so subsequent level switches are instant and never produce a blank map.
 

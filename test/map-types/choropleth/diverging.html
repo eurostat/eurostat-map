@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            .em-subtitle {
+                font-size: 14px;
+                fill: #585858;
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+        <script>
+            const year = 2024
+            eurostatmap.strictApi(false)
+
+            const m = eurostatmap
+                .map('ch')
+                .title('Population change')
+                .subtitle(`Change per 1 000 persons, ${year}`)
+                .subtitleFontSize(15)
+                .fontFamily('Source serif pro')
+                .nutsLevel(2)
+                .nutsYear(2024)
+                .insets('default')
+                .stat({
+                    eurostatDatasetCode: 'demo_r_gind3',
+                    filters: {
+                        indic_de: 'GROWRT',
+                        time: year,
+                    },
+                    unitText: '‰',
+                })
+                .colorSchemeType('continuous')
+                .colorFunction(
+                    d3
+                        .scaleDiverging()
+                        .domain([-15, 0, 15])
+                        .interpolator((t) => d3.interpolateRdBu(1 - t))
+                )
+                .transitionDuration(0)
+                .insetsButton(true)
+                .THISISNTAFUNCTION(false)
+                .legend({
+                    x: 10,
+                    y: 150,
+                    title: `Change per thousand `,
+                    subtitle: '(‰)',
+                    tickValues: [-15, -5, 0, 5, 15],
+                    tickLabels: ['-15', '-5', '0', '+5', '+15'],
+                    lowLabel: 'decrease',
+                    highLabel: 'increase',
+                    pointOfDivergenceLabel: 'no change',
+                    highlightTolerance: 1,
+                    boxOpacity: 0,
+                })
+            m.build()
+        </script>
+    </body>
+</html>

@@ -308,6 +308,11 @@ function getHighlightTolerance(map, out) {
     return map.legend_.highlightTolerance ?? 1
 }
 
+function getHighlightHalfSpan(map, out) {
+    const tolerance = Math.max(0, +getHighlightTolerance(map, out) || 0)
+    return tolerance / 2
+}
+
 function getHighlightFunction(map) {
     if (map._mapType === 'ps') return highlightPsSymbols
     // tolerance read lazily at call time, not at setup time
@@ -323,7 +328,7 @@ function getUnHighlightFunction(map) {
 }
 
 function highlightPsSymbols(map, rawVal, out) {
-    const tolerance = getHighlightTolerance(map, out)
+    const halfSpan = getHighlightHalfSpan(map, out)
     const allSymbols = getCentroidsGroup(map).selectAll('[ecl]')
 
     allSymbols.each(function () {
@@ -342,7 +347,7 @@ function highlightPsSymbols(map, rawVal, out) {
         }
 
         const val = +ecl // raw stat value
-        if (val >= rawVal - tolerance && val <= rawVal + tolerance) {
+        if (val >= rawVal - halfSpan && val <= rawVal + halfSpan) {
             // Within range: keep full opacity
             symbol.style('opacity', map.psFillOpacity_)
         } else {
@@ -458,7 +463,8 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
 
     rect.on('mousemove', function (event) {
         // Read tolerance lazily so it picks up the merged config value
-        const tolerance = getHighlightTolerance(map, out)
+        const tolerance = Math.max(0, +getHighlightTolerance(map, out) || 0)
+        const halfSpan = tolerance / 2
 
         const [mx, my] = pointer(event, this)
         const along = isVertical ? my : mx
@@ -478,12 +484,12 @@ function addMouseEvents(rect, out, legendLength, isVertical) {
         container.selectAll('.em-hover-line, .em-hover-tick, .em-hover-label, .em-hover-band').remove()
 
         if (tolerance > 0) {
-            drawBandIndicator(clamped, rawVal - tolerance, rawVal + tolerance)
+            drawBandIndicator(clamped, rawVal - halfSpan, rawVal + halfSpan)
         } else {
             drawPointIndicator(clamped, formatter(rawVal))
         }
 
-        highlightFunction(map, rawVal)
+        highlightFunction(map, rawVal, out)
     })
 
     rect.on('mouseout', function () {

@@ -583,6 +583,7 @@ export function getDimmedFill(map) {
 
 export function highlightRegions(map, eclOrValue, options = {}) {
     const { tolerance = 0, continuous = false } = options && typeof options === 'object' && !Array.isArray(options) ? options : {}
+    const halfTolerance = Math.max(0, +tolerance || 0) / 2
     currentHighlight = eclOrValue
     const dimmedFill = getDimmedFill(map)
     const selector = getLegendRegionsSelector(map)
@@ -613,7 +614,7 @@ export function highlightRegions(map, eclOrValue, options = {}) {
             return
         }
 
-        const match = continuous ? +ecl >= eclOrValue - tolerance && +ecl <= eclOrValue + tolerance : ecl === String(eclOrValue)
+        const match = continuous ? +ecl >= eclOrValue - halfTolerance && +ecl <= eclOrValue + halfTolerance : ecl === String(eclOrValue)
 
         sel.style('fill', match ? sel.attr('data-fill') : dimmedFill)
     })

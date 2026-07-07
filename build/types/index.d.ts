@@ -157,14 +157,7 @@ export type { SparkMapConfig, SparkMap, SparkStatConfig }
 
 // Flow map types
 export type { FlowMapConfig, FlowMap }
-export type {
-    FlowNode,
-    FlowLink,
-    FlowGraph,
-    FlowCurvatureSettings,
-    FlowWidthGradientSettings,
-    FlowBundleSettings,
-} from './layers/flow/FlowMapConfig'
+export type { FlowNode, FlowLink, FlowGraph, FlowCurvatureSettings, FlowWidthGradientSettings, FlowBundleSettings } from './layers/flow/FlowMapConfig'
 
 // ==================== Pattern Fill Options ====================
 
@@ -223,6 +216,13 @@ export function map(type: 'sparkline' | 'spark' | 'sparklines', config?: SparkMa
 export function map(type: 'flow' | 'flowmap', config?: FlowMapConfig): FlowMap
 export function map(type: MapType, config?: MapConfig): MapInstance
 
+/**
+ * Enable or disable strict API guard for map chaining.
+ * When enabled, unknown method calls throw descriptive errors.
+ *
+ * @param enabled - True to enable strict API checks
+ * @returns Current strict API state
+ */
 // ==================== Utility Functions ====================
 
 /**

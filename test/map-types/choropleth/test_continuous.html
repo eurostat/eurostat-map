@@ -23,7 +23,7 @@
             const valueTransform = function (v) {
                 if (!sorted.length) {
                     const values = map1
-                        .statData()
+                        .statData('value')
                         .getArray()
                         .filter((v) => v !== ':' && !isNaN(v) && isFinite(v))
                     sorted.push(...[...values].sort((a, b) => a - b))
@@ -69,7 +69,7 @@
                     tickLength: 7,
                     decimals: 0,
                     orientation: 'vertical',
-                    boxOpacity: 0,
+                    boxOpacity: 1,
                     highlightTolerance: 5000,
                 })
                 .zoomExtent([1, 10])
