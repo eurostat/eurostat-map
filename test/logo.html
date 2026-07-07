@@ -15,6 +15,7 @@
                 .title('Population density in Europe')
                 .header(true)
                 .footer(true)
+                .insetsButton(true)
                 .showEstatLogo(true)
                 .showEstatRibbon(true)
                 // define statistical dataset
@@ -24,7 +25,7 @@
                 })
                 // encode dataset into visual variable(s)
                 .encoding('fill', { stat: 'population-density', scale: 'quantile', classes: 7 })
-                .legend({ position: 'top right', title: 'Density, people/km²' })
+                .legend({ position: 'top left', title: 'Density, people/km²' })
                 .build()
         </script>
     </body>

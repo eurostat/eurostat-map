@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { createMapInstance } from './map-instance'
 import { getDefaultScalebarConfig } from './decoration/scalebar'
+import { getButtonPadding, getButtonSize } from './buttons/button-utils'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -18,7 +19,8 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     }
 
     if (!out.insetBoxPosition_) {
-        out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_]
+        const buttonClearanceY = out.insetsButton_ ? getButtonSize() + getButtonPadding() : 0
+        out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_ + buttonClearanceY]
     }
 
     let svg = select('#' + out.svgId_)
