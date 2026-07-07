@@ -3,6 +3,7 @@ import { format } from 'd3-format'
 import * as Legend from '../legend'
 import { executeForAllInsets } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
+import { formatSizeLabel } from '../legend-utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -197,7 +198,7 @@ export const legend = function (map, config) {
                 .attr('x', x0 + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
-                .text(formatValue(val, legend.widthLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.widthLegend?.labelFormatter))
 
             y += h + rowPadding
         }
@@ -262,7 +263,7 @@ export const legend = function (map, config) {
                 .attr('x', offsetX + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
-                .text(formatValue(val, legend.sizeLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter))
 
             y += h + padding
         }
@@ -367,7 +368,7 @@ export const legend = function (map, config) {
                 .attr('y', labelY)
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
-                .text(formatValue(val, legend.sizeLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter))
         })
     }
 
@@ -454,15 +455,6 @@ export const legend = function (map, config) {
 
     function unhighlightRegions(map) {
         map.svg_.selectAll('.barchart').selectAll('rect[code]').style('opacity', 1)
-    }
-
-    // ── Shared utilities ──────────────────────────────────────────────────────
-
-    function formatValue(val, customFormatter) {
-        if (customFormatter) return customFormatter(val)
-        if (val >= 1_000_000) return format('.1f')(val / 1_000_000) + 'M'
-        if (val >= 1_000) return format('.1f')(val / 1_000) + 'K'
-        return format('.0f')(val)
     }
 
     return out

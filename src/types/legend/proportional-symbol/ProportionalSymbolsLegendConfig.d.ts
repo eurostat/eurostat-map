@@ -7,6 +7,9 @@ export interface ProportionalSymbolSizeLegendConfig {
     /** Title for the size legend. */
     title?: string | null
 
+    /** Subtitle displayed below the title. */
+    subtitle?: string | null
+
     /** Padding between title and legend content in pixels. @default 15 */
     titlePadding?: number
 
@@ -56,6 +59,9 @@ export interface ProportionalSymbolSizeLegendConfig {
 export interface ProportionalSymbolColorLegendConfig {
     /** Title for the color legend. */
     title?: string | null
+
+    /** Subtitle displayed below the title. */
+    subtitle?: string | null
 
     /** Padding between title and legend content in pixels. @default 10 */
     titlePadding?: number

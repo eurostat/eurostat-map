@@ -3,6 +3,7 @@ import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
+import { formatSizeLabel } from './legend-utils'
 
 /**
  * A legend for waffle chart maps.
@@ -297,26 +298,10 @@ export const legend = function (map, config) {
                 .attr('x', labelX)
                 .attr('y', y + labelY)
                 .attr('dominant-baseline', 'middle')
-                .text(formatValue(val, legend.sizeLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter))
 
             y += waffleSize + 8
         }
-    }
-
-    /**
-     * Format large numbers for legend labels
-     */
-    function formatValue(val, customFormatter) {
-        if (customFormatter) {
-            return customFormatter(val)
-        }
-
-        if (val >= 1000000) {
-            return format('.1f')(val / 1000000) + 'M'
-        } else if (val >= 1000) {
-            return format('.1f')(val / 1000) + 'K'
-        }
-        return format('.0f')(val)
     }
 
     return out
