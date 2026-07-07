@@ -1,5 +1,33 @@
 # Release notes
 
+## 4.6.0
+
+### New
+
+- **`sizeLegend.subtitle` and `colorLegend.subtitle`** — proportional-symbol legends now support a subtitle line rendered below the title in both the size and colour sections.
+
+- **Per-level symbol filtering** — `map.nutsLevel(n)` now strictly enforces that only NUTS level *n* symbols are rendered. Setting `nutsLevel('mixed')` continues to show all levels simultaneously.
+
+- **All centroid levels pre-cached on build** — when switching NUTS levels (`nutsLevel(n).build()`), all four centroid files are fetched and cached on the first build so subsequent level switches are instant and never produce a blank map.
+
+- **Default proportional-symbol colour palette** — the built-in colour sequence for colour-classified PS maps is now `['#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d']` (a blue ramp) instead of `interpolateOrRd`.
+
+### Improvements
+
+- **Piecewise Lab colour interpolation** — `psColors` arrays are now interpolated through `piecewise(interpolateLab)` so any `numberOfClasses` maps smoothly onto the full palette range, even when the number of classes differs from the number of colours provided.
+
+- **`preprocess` is the sole source of truth for PS size scaling** — when a `preprocess` function is used on the size stat, the size classifier domain is derived exclusively from the post-preprocess values.
+
+- **Country-region tooltips suppressed for NUTS 1–3** — hovering over `em-cntrg` polygons (country outlines) no longer triggers a tooltip when the active level is 1, 2 or 3; tooltips remain active for level 0 and mixed.
+
+- **RS / EL background fixed** — Serbia (`RS`) and Greece (`EL`) `cntrg` polygons no longer inherit the has-data background tint because their polygons intentionally differ from NUTS0 (Kosovo / Mount Athos). They are now always marked `ecl='ni'`.
+
+- **Background CSS reset on level switch** — the dynamic `em-cntrg` CSS fill rule is always explicitly updated when the map renders, preventing a tint set during a previous level from persisting after switching.
+
+### Fixes
+
+- **Level switch blank map** — switching NUTS levels (e.g. level 1 → level 2) no longer produces a blank symbol layer. `updateSymbolsDrawOrder` now reads from the authoritative `target.centroidsFeatures_` (level-filtered) instead of the stale `map.Geometries.centroidsFeatures`.
+
 ## Unreleased
 
 ### New
