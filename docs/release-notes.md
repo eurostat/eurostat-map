@@ -1,5 +1,55 @@
 # Release notes
 
+## 4.6.2
+
+### Fixes
+
+- **Choropleth now auto-resolves fill data when no explicit fill encoding is provided** - legacy setups that only define one named stat dataset now render without requiring `encoding('fill', ...)`.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .stat('value', { customData: { FR: 10, DE: 20, ES: 15 } })
+    // no explicit encoding('fill', { stat: 'value' }) needed
+    .build()
+```
+
+- **Inset updates now reliably reuse/reposition external inset SVG containers and clear stale placeholders** - switching inset layouts repeatedly no longer leaves stale external inset scaffolding visible.
+
+Example:
+
+```javascript
+map.insets(overseasInsets).build()
+
+// Later switch to a smaller inset set (for example LI/MT-only) and back again.
+map.insets(liMtInsets).build()
+map.insets(overseasInsets).build()
+```
+
+- **Proportional-symbol circles now render again in external inset SVGs after map-type switches** - inset symbol drawing now uses the owning proportional-symbol layer state for size/classifier while still rendering inside inset containers.
+
+Example:
+
+```javascript
+const map = eurostatmap.map('ps').stat('population', { customData: values }).encoding('size', { stat: 'population' }).insets(overseasInsets).build()
+```
+
+- **Proportional-symbol tooltips now work on external inset symbols** - tooltip handlers now resolve the tooltip host from inset context with fallback to the parent map tooltip instance.
+
+Example:
+
+```javascript
+const map = eurostatmap
+    .map('ps')
+    .tooltip({
+        textFunction: (id, name, value) => `<b>${name}</b><br/>${value}`,
+    })
+    .insets(overseasInsets)
+    .build()
+```
+
 ## 4.6.1
 
 ### Fixes

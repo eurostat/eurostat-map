@@ -4,10 +4,12 @@ import { getCentroidsGroup } from '../../../core/geo/centroids'
  * @description Appends <circle> elements for each region in the map SVG
  * @param {*} map map instance
  * @param {*} sizeData statistical data for size e.g. map.statData('size')
- * @param {*} out 'main' map object (as opposed to an inset map object)
+ * @param {*} out rendering target (layer or inset map object)
+ * @param {*} styleSource source object holding PS style/classifier state
  * @return {void}
  */
-export function appendCirclesToMap(map, sizeData, out) {
+export function appendCirclesToMap(map, sizeData, out, styleSource) {
+    const style = styleSource || out
     const centroidsGroup = getCentroidsGroup(out)
     const symbolContainers = centroidsGroup.selectAll('g.em-centroid')
     const transitionDuration = out.transitionDuration_ || 0
@@ -20,10 +22,10 @@ export function appendCirclesToMap(map, sizeData, out) {
     // Append circles to each symbol container
     const circles = symbolContainers
         .append('circle')
-        .attr('stroke-width', out.psStrokeWidth_)
-        .attr('stroke', out.psStroke_)
-        .attr('fill-opacity', out.psFillOpacity_)
-        .attr('stroke-opacity', out.psStrokeOpacity_)
+        .attr('stroke-width', style.psStrokeWidth_)
+        .attr('stroke', style.psStroke_)
+        .attr('fill-opacity', style.psFillOpacity_)
+        .attr('stroke-opacity', style.psStrokeOpacity_)
 
     const setRadius = function (d) {
         const regionId = d?.properties?.id
@@ -32,7 +34,7 @@ export function appendCirclesToMap(map, sizeData, out) {
 
         if (rawValue == null || rawValue === ':' || Number.isNaN(+rawValue)) return 0
 
-        const radius = out.classifierSize_(+rawValue)
+        const radius = style.classifierSize_(+rawValue)
         if (radius < 0) console.error('Negative radius for circle:', regionId)
         if (isNaN(radius)) console.error('NaN radius for circle:', regionId)
         return radius

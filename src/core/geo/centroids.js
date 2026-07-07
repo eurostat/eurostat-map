@@ -185,6 +185,13 @@ const refreshCentroidsForLayer = function (layerOrMap) {
     // Skip for grid cartograms
     if (map.gridCartogram_) return
 
+    // Insets can reach refresh before their centroid cache is initialized.
+    // Build it lazily here so symbol layers (e.g. proportional circles)
+    // always have anchors in external inset SVG containers.
+    if (!map.Geometries._allCentroidsFeatures) {
+        setupBaseCentroids(map)
+    }
+
     const allCentroids = map.Geometries._allCentroidsFeatures
     if (!allCentroids) return
 

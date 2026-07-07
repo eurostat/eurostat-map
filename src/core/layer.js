@@ -328,4 +328,3 @@ export const forwardChainableMethod = function (map, name) {
         },
     })
 }
-

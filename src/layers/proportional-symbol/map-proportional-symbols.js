@@ -15,7 +15,7 @@ import { appendBarsToMap } from './symbols/bars.js'
 import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
 import { appendCustomSymbolsToMap } from './symbols/custom.js'
 import { appendLabelsToSymbols } from '../../core/decoration/labels.js'
-import { getCentroidsGroup } from '../../core/geo/centroids.js'
+import { addCentroidsToMap, getCentroidsGroup } from '../../core/geo/centroids.js'
 import { registerLayerType } from '../../core/layer-registry.js'
 
 //types
@@ -281,11 +281,20 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         const symbolTarget = map === layer.map ? layer : map
 
         // if size dataset not defined then use default
-        const sizeData = getSizeStatData(symbolTarget)
+        // Always source size data from the owning PS layer. Inset map objects
+        // may not carry populated stat datasets, especially with external inset SVGs.
+        const sizeData = getSizeStatData(layer)
 
         if (map.svg_) {
+            // Ensure centroid anchors exist for the target context (main map or inset).
+            // External inset SVG containers may not have centroid groups yet.
+            let centroidsGroup = getCentroidsGroup(symbolTarget)
+            if (!centroidsGroup || centroidsGroup.empty() || centroidsGroup.selectAll('g.em-centroid').size() === 0) {
+                addCentroidsToMap(symbolTarget)
+                centroidsGroup = getCentroidsGroup(symbolTarget)
+            }
+
             //clear previous symbols in this layer group
-            const centroidsGroup = getCentroidsGroup(symbolTarget)
             centroidsGroup.selectAll('g.em-centroid > *').remove()
 
             // 'small' centroids on top of big ones
@@ -298,7 +307,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             } else if (layer.psShape_ == 'bar') {
                 symb = appendBarsToMap(map, sizeData, symbolTarget)
             } else if (layer.psShape_ == 'circle') {
-                symb = appendCirclesToMap(map, sizeData, symbolTarget)
+                symb = appendCirclesToMap(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'spike') {
                 symb = appendSpikesToMap(map, sizeData, symbolTarget)
             } else {
@@ -428,7 +437,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
      */
     layer.updateSymbolsDrawOrder = function (map) {
         const target = this || layer
-        const sizeData = getSizeStatData(target)
+        // Draw-order must use the layer's size dataset, not inset-local stat data.
+        const sizeData = getSizeStatData(layer)
 
         // target.centroidsFeatures_ is the authoritative, level-filtered set kept up-to-date
         // by renderCentroidsForLayer / refreshCentroidsForLayer for BOTH facade and real

@@ -84,6 +84,7 @@
         <div>
             <button id="btn-build1">Build Map 1</button>
             <button id="btn-build2">Build Map 2</button>
+            <button id="btn-maptype">Change Map Type (Current: Choropleth)</button>
             <button id="btn-legend">Update legend</button>
             <button id="btn-insets">Update insets</button>
             <button id="btn-clear">Clear Map</button>
@@ -160,26 +161,42 @@
 
             let buildCount = 0
             let map = null // Global map variable
+            let insetLayoutState = 'overseas'
+            let currentMapType = 'ch'
+            let lastBuildConfig = null
+
+            function mapTypeLabel() {
+                return currentMapType === 'ps' ? 'Proportional Circles' : 'Choropleth'
+            }
+
+            function updateMapTypeButtonLabel() {
+                const btn = document.getElementById('btn-maptype')
+                if (btn) btn.textContent = `Change Map Type (Current: ${mapTypeLabel()})`
+            }
 
             // Create DOM elements for insets dynamically based on config
-            function createInsetDOMElements(insetsCfg, insetBoxPosition) {
+            function createInsetDOMElements(insetsCfg, insetBoxPosition, options = {}) {
                 const insetsGroup = document.getElementById('newInsets')
                 if (!insetsGroup) return
                 insetsGroup.innerHTML = '' // Clear previous
+
+                const includeOverseasDecor = options.includeOverseasDecor ?? insetsCfg.length > 2
 
                 const ns = 'http://www.w3.org/2000/svg'
                 const bx = insetBoxPosition[0]
                 const by = insetBoxPosition[1]
 
-                // Background rect
-                const rect = document.createElementNS(ns, 'rect')
-                rect.setAttribute('id', 'image-insets-background-rect')
-                rect.setAttribute('x', bx)
-                rect.setAttribute('y', by)
-                rect.setAttribute('width', '243')
-                rect.setAttribute('height', '265')
-                rect.setAttribute('fill', 'white')
-                insetsGroup.appendChild(rect)
+                // Background rect (overseas layout only)
+                if (includeOverseasDecor) {
+                    const rect = document.createElementNS(ns, 'rect')
+                    rect.setAttribute('id', 'image-insets-background-rect')
+                    rect.setAttribute('x', bx)
+                    rect.setAttribute('y', by)
+                    rect.setAttribute('width', '243')
+                    rect.setAttribute('height', '265')
+                    rect.setAttribute('fill', 'white')
+                    insetsGroup.appendChild(rect)
+                }
 
                 // Create <g> elements for each inset
                 insetsCfg.forEach((inset, i) => {
@@ -190,7 +207,12 @@
                     insetsGroup.appendChild(g)
                 })
 
-                // Separator lines group
+                // Separator lines group (overseas layout only)
+                if (!includeOverseasDecor) {
+                    log(`Created ${insetsCfg.length} inset DOM elements`)
+                    return
+                }
+
                 const separatorLines = document.createElementNS(ns, 'g')
                 separatorLines.setAttribute('id', 'insets-separator-lines')
                 separatorLines.setAttribute('height', '265px')
@@ -337,6 +359,9 @@
             function buildMap(config) {
                 buildCount++
                 log(`\n========== BUILD ${buildCount} ==========`)
+                log(`🧭 Map type: ${mapTypeLabel()}`)
+                insetLayoutState = 'overseas'
+                lastBuildConfig = config
 
                 // Clear previous map content
                 document.getElementById('mappy').innerHTML = ''
@@ -363,7 +388,7 @@
 
                 // Build map
                 map = eurostatmap
-                    .map('ch')
+                    .map(currentMapType)
                     .title(config.title)
                     .svgId('mappy')
                     .containerId('container')
@@ -387,7 +412,14 @@
                     map.nutsLevel(3)
                     map.stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2023' } })
                 }
-                map.encoding('fill', { stat: 'value' })
+
+                if (currentMapType === 'ps') {
+                    map.psSettings({ shape: 'circle', fill: '#2b6cb0', stroke: '#ffffff', minSize: 4, maxSize: 24 })
+                    map.encoding('size', { stat: 'value' })
+                } else {
+                    map.encoding('fill', { stat: 'value' })
+                }
+
                 log(`🚀 Calling map.build()...`)
                 map.build()
             }
@@ -401,6 +433,15 @@
             // Button handlers
             document.getElementById('btn-build1').addEventListener('click', () => buildMap(configs.map1))
             document.getElementById('btn-build2').addEventListener('click', () => buildMap(configs.map2))
+            document.getElementById('btn-maptype').addEventListener('click', () => {
+                currentMapType = currentMapType === 'ch' ? 'ps' : 'ch'
+                updateMapTypeButtonLabel()
+                log(`🧭 Switched map type to ${mapTypeLabel()}`)
+
+                if (lastBuildConfig) {
+                    buildMap(lastBuildConfig)
+                }
+            })
             document.getElementById('btn-legend').addEventListener('click', () => {
                 if (map) {
                     map.legend({ x: 10, y: 150, title: 'Updated Legend', sizeLegend: { values: [1, 2] } })
@@ -454,15 +495,39 @@
                         zoomButtons: false,
                     }
 
-                    const newInsets = includeLI ? [insetLI, insetMT] : [insetMT]
-                    map.insets(newInsets).insetBoxPosition([530, 20]).build()
-                    log('🗺️ Insets updated with LI and MT configurations')
+                    if (insetLayoutState === 'overseas') {
+                        const newInsets = includeLI ? [insetLI, insetMT] : [insetMT]
+
+                        // Rebuild custom inset DOM for reduced LI/MT layout, reusing
+                        // current inset ids when available.
+                        const insetsWithSvgIds = newInsets.map((inset) => {
+                            const current = map.insetTemplates_?.[inset.geo]
+                            const currentInset = Array.isArray(current) ? current[0] : current
+                            return {
+                                ...inset,
+                                svgId: currentInset?.svgId_ || `inset-${inset.geo}-${Math.random().toString(36).slice(2, 8)}`,
+                            }
+                        })
+
+                        createInsetDOMElements(insetsWithSvgIds, [530, 20], { includeOverseasDecor: false })
+                        map.insets(insetsWithSvgIds).insetBoxPosition([530, 20]).build()
+                        insetLayoutState = 'li-mt'
+                        log('🗺️ Insets switched to LI/MT layout')
+                    } else {
+                        // Switch back to full overseas layout.
+                        const overseasInsets = createOutermostInsetsConfig()
+                        createInsetDOMElements(overseasInsets, [530, 20], { includeOverseasDecor: true })
+                        map.insets(overseasInsets).insetBoxPosition([530, 20]).build()
+                        insetLayoutState = 'overseas'
+                        log('🗺️ Insets switched to overseas layout')
+                    }
                 } else {
                     log('❌ No map built yet. Build a map first.')
                 }
             })
             document.getElementById('btn-clear').addEventListener('click', clearMap)
 
+            updateMapTypeButtonLabel()
             log('Page loaded. Click "Build Map 1" to start.')
         </script>
     </body>

@@ -155,9 +155,11 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     })
 
     //copy stat map attributes/methods
-    ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', '_tooltip', 'classToText_'].forEach(function (att) {
-        mt[att] = out[att]
-    })
+    ;['stat', 'statData', 'legend', 'legendObj', 'noDataText', 'language', 'transitionDuration', 'tooltip_', '_tooltip', 'classToText_'].forEach(
+        function (att) {
+            mt[att] = out[att]
+        }
+    )
 
     //apply config values for inset
     for (let key in config) mt[key + '_'] = config[key]

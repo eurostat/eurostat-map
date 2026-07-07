@@ -30,6 +30,7 @@ function clearMouseEvents(map, layer) {
 const addMouseEventsToRegions = function (map, layer) {
     const regions = map.svg().selectAll(getRegionsSelector(map))
     const sizeData = getSizeStatData(layer)
+    const tooltipHost = map._tooltip || layer.map?._tooltip
 
     // Country polygons (em-cntrg) are only interactive when the active level shows country-level symbols.
     const isActiveRegion = function (element) {
@@ -46,7 +47,7 @@ const addMouseEventsToRegions = function (map, layer) {
             if (!sv || sv.value === undefined || sv.value === null) return
 
             select(this).style('fill', map.hoverColor_)
-            if (map._tooltip) map._tooltip.mouseover(layer.tooltip_.textFunction(rg, layer))
+            if (tooltipHost) tooltipHost.mouseover(layer.tooltip_.textFunction(rg, layer))
             if (map.onRegionMouseOver_) map.onRegionMouseOver_(e, rg, this, map)
         })
         .on('mousemove', function (e, rg) {
@@ -54,7 +55,7 @@ const addMouseEventsToRegions = function (map, layer) {
             const sv = sizeData.get(rg.properties.id)
             if (!sv || sv.value === undefined || sv.value === null) return
 
-            if (map._tooltip) map._tooltip.mousemove(e)
+            if (tooltipHost) tooltipHost.mousemove(e)
             if (map.onRegionMouseMove_) map.onRegionMouseMove_(e, rg, this, map)
         })
         .on('mouseout', function (e, rg) {
@@ -64,24 +65,25 @@ const addMouseEventsToRegions = function (map, layer) {
 
             const sel = select(this)
             sel.style('fill', sel.attr('fill___'))
-            if (map._tooltip) map._tooltip.mouseout()
+            if (tooltipHost) tooltipHost.mouseout()
             if (map.onRegionMouseOut_) map.onRegionMouseOut_(e, rg, this, map)
         })
 }
 
 const addMouseEventsToSymbols = function (map, layer) {
     const symbols = map.svg().selectAll('g.em-centroid')
+    const tooltipHost = map._tooltip || layer.map?._tooltip
     //symbols
     symbols
         .on('mouseover', function (e, rg) {
             const sel = select(this.childNodes[0])
             sel.attr('fill___', sel.style('fill'))
             sel.style('fill', map.hoverColor_)
-            if (map._tooltip) map._tooltip.mouseover(layer.tooltip_.textFunction(rg, layer))
+            if (tooltipHost) tooltipHost.mouseover(layer.tooltip_.textFunction(rg, layer))
             if (map.onRegionMouseOver_) map.onRegionMouseOver_(e, rg, this, map)
         })
         .on('mousemove', function (e, rg) {
-            if (map._tooltip) map._tooltip.mousemove(e)
+            if (tooltipHost) tooltipHost.mousemove(e)
             if (map.onRegionMouseMove_) map.onRegionMouseMove_(e, rg, this, map)
         })
         .on('mouseout', function (e, rg) {
@@ -89,7 +91,7 @@ const addMouseEventsToSymbols = function (map, layer) {
             let newFill = sel.attr('fill___')
             if (newFill) {
                 sel.style('fill', newFill)
-                if (map._tooltip) map._tooltip.mouseout()
+                if (tooltipHost) tooltipHost.mouseout()
             }
             if (map.onRegionMouseOut_) map.onRegionMouseOut_(e, rg, this, map)
         })
