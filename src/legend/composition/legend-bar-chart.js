@@ -155,6 +155,22 @@ export const legend = function (map, config) {
         out.setBoxDimension()
     }
 
+    // ── Legend precision helper ───────────────────────────────────────────────
+
+    /**
+     * Detect the number of decimal places in the domain max value.
+     * Used to format all legend labels with the same precision as the actual dataset
+     * rather than the precision of the auto-computed representative values (which can
+     * introduce extra decimals, e.g. domain[1] * 0.1 = 2.47 when data has 1 d.p.).
+     */
+    function getMaxDomainPrecision(classifier) {
+        const domain = classifier?.domain?.()
+        const maxVal = domain?.[1] ?? 0
+        if (!Number.isFinite(maxVal)) return 0
+        const str = Number.parseFloat(maxVal.toFixed(12)).toString()
+        return str.includes('.') ? str.split('.')[1].length : 0
+    }
+
     // ── Grouped width legend ────────────────────────────────────────────────
 
     /**
@@ -166,6 +182,7 @@ export const legend = function (map, config) {
         const maxDomain = domain?.[1] ?? 1
         const legendValues = values || [maxDomain, Math.round(maxDomain / 2), Math.max(1, Math.round(maxDomain * 0.1))]
         const sortedValues = [...legendValues].sort((a, b) => b - a)
+        const dec = typeof legend.widthLegend?.labelFormatter === 'function' ? undefined : getMaxDomainPrecision(classifierWidth)
 
         const h = barHeight ?? 8
         const x0 = offsetX ?? 0
@@ -198,7 +215,7 @@ export const legend = function (map, config) {
                 .attr('x', x0 + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
-                .text(formatSizeLabel(val, legend.widthLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.widthLegend?.labelFormatter ?? dec))
 
             y += h + rowPadding
         }
@@ -224,6 +241,7 @@ export const legend = function (map, config) {
         const domain = classifierSize.domain()
         const legendValues = values || [domain[0], Math.round((domain[0] + domain[1]) / 2), domain[1]]
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
+        const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : getMaxDomainPrecision(classifierSize)
         const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         let y = 0
@@ -263,7 +281,7 @@ export const legend = function (map, config) {
                 .attr('x', offsetX + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
-                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter ?? dec))
 
             y += h + padding
         }
@@ -300,6 +318,7 @@ export const legend = function (map, config) {
         const domain = classifierSize.domain()
         const legendValues = values || [domain[1], Math.round((domain[0] + domain[1]) / 2), Math.max(domain[0], domain[1] * 0.1)]
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
+        const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : getMaxDomainPrecision(classifierSize)
         const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         const bw = barGroupWidth ?? 16
@@ -368,7 +387,7 @@ export const legend = function (map, config) {
                 .attr('y', labelY)
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
-                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter))
+                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter ?? dec))
         })
     }
 

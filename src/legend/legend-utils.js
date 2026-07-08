@@ -1,8 +1,15 @@
 import { spaceAsThousandSeparator } from '../core/utils'
 
-export function formatSizeLabel(value, decimals) {
+export function formatSizeLabel(value, formatterOrDecimals) {
     if (!Number.isFinite(value)) return ''
-    const dec = typeof decimals === 'number' ? decimals : detectValuePrecision(value)
+    const normalizedValue = normalizeFloatingPointValue(value)
+
+    // Support user-provided custom label formatter callbacks.
+    if (typeof formatterOrDecimals === 'function') {
+        return formatterOrDecimals(normalizedValue)
+    }
+
+    const dec = typeof formatterOrDecimals === 'number' ? formatterOrDecimals : detectValuePrecision(normalizedValue)
     const compactIntlFormatter = new Intl.NumberFormat('en', {
         notation: 'compact',
         compactDisplay: 'long',
@@ -13,7 +20,12 @@ export function formatSizeLabel(value, decimals) {
             return spaceAsThousandSeparator(compactIntlFormatter.format(value))
         },
     }
-    return compactFormatter.format(value)
+    return compactFormatter.format(normalizedValue)
+}
+
+function normalizeFloatingPointValue(value) {
+    const rounded = Number.parseFloat(value.toFixed(12))
+    return Object.is(rounded, -0) ? 0 : rounded
 }
 
 function detectValuePrecision(value) {

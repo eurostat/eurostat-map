@@ -4,6 +4,7 @@ import { createStatMap } from '../../core/stat-map'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator, formatRawValue } from '../../core/utils'
+import { formatSizeLabel } from '../../legend/legend-utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
@@ -1009,12 +1010,47 @@ export const map = function (config) {
             currentX += bw + gap
         })
 
+        const breakdown = _hasWidthChannel() ? buildGroupedTooltipBreakdownHTML(regionId, codes) : ''
         return `
     <div class="em-tooltip-barchart-container">
         <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;">
             ${bars}
         </svg>
-    </div>`
+    </div>
+    ${breakdown}`
+    }
+
+    function buildGroupedTooltipBreakdownHTML(regionId, codes) {
+        const heightUnit = out.getEncodingUnitText('height', codes[0], _getPrimaryCategoricalStatName())
+        const hasWidthChannel = _hasWidthChannel()
+        const widthStat = hasWidthChannel ? out.getEncodingStat('width', 'width') : null
+        const widthHasCategoryKeys = !!(widthStat && out.statMeta_?.[widthStat]?.statKeys)
+        const widthUnit = hasWidthChannel ? out.getEncodingUnitText('width', widthHasCategoryKeys ? codes[0] : undefined, 'width') : ''
+
+        let html = `<div class="em-tooltip-breakdown">`
+        for (const code of codes) {
+            const color = _getCategoryColor(code)
+            const hVal = _getHeightValue(regionId, code)
+            let text = `${formatSizeLabel(hVal)}${heightUnit ? ` ${heightUnit}` : ''}`
+            if (hasWidthChannel && widthHasCategoryKeys) {
+                const wVal = _getWidthValue(regionId, code)
+                text += `, ${formatSizeLabel(wVal)}${widthUnit ? ` ${widthUnit}` : ''}`
+            }
+            html += `
+        <div class="em-breakdown-item">
+            <span class="em-breakdown-color" style="background:${color}"></span>
+            <span class="em-breakdown-value">${text}</span>
+        </div>`
+        }
+        if (hasWidthChannel && !widthHasCategoryKeys) {
+            const wVal = _getWidthValue(regionId)
+            html += `
+        <div class="em-breakdown-item em-total">
+            <span class="em-breakdown-value">${formatSizeLabel(wVal)}${widthUnit ? ` ${widthUnit}` : ''}</span>
+        </div>`
+        }
+        html += `</div>`
+        return html
     }
 
     function compactValue(value) {
