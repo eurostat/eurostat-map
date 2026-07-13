@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Life expectancy at birth - CH02M02</title>
+        <link rel="stylesheet" href="../../insets/insets.css" />
+        <link rel="stylesheet" href="../../styles.css" />
+        <link rel="stylesheet" href="../../dropdown-choropleth.css" />
+    </head>
+
+    <body>
+        <div id="container">
+            <div class="header">
+                <div class="em-title" id="map-title">Life expectancy at birth</div>
+                <div class="em-subtitle" id="map-subtitle"></div>
+                <div class="dropdown-containers">
+                    <div class="dropdown-container">
+                        <div class="dropdown-label">Select a sex:</div>
+                        <ewc-singleselect
+                            id="optionSelect"
+                            options='[
+    [
+    { "name": "Females", "code": "A", "status": "active" },
+    { "name": "Males", "code": "B", "status": "active" }
+    ]
+  ]'
+                            defaultOption="A"
+                            activeOption="A"
+                            dropdownHeight="200px"
+                            selectedLabel="Select below"
+                            invertColors="false"
+                            searchMode=""
+                        ></ewc-singleselect>
+                    </div>
+                </div>
+            </div>
+
+            <div id="map-container">
+                <svg id="map-frame" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+                    <svg id="map"></svg>
+                    <g id="newInsets"></g>
+                </svg>
+            </div>
+        </div>
+
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/d3@7"></script>
+        <script src="../../../statistics-explained/business/human-services/choropleth/dropdown/ewc-singleselect.js"></script>
+        <script src="../../insets/overseas.js"></script>
+        <script src="../../dropdown-choropleth.js"></script>
+        <script>
+            RYBDropdownChoropleth.init({
+                dataUrl: './data/CH02M02.json',
+            })
+        </script>
+    </body>
+</html>

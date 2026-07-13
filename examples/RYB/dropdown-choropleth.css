@@ -1,0 +1,83 @@
+/* Shared styles for the RYB 2026 dropdown choropleth maps - copied from
+   examples/statistics-explained/business/human-services/choropleth/styles.css (same dropdown,
+   same layout rules), paired with RYB/styles.css + RYB/insets/insets.css. */
+
+html,
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+#container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 900px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.header {
+    flex-shrink: 0;
+}
+
+#map-container {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* No width/height:100% here deliberately: #map is nested inside another percentage-sized SVG
+   (#map-frame, below), and percentage sizing on a <svg> nested inside another percentage-sized
+   <svg> resolves unreliably in Chromium (the rendered box can end up many times too large, at a
+   large negative offset, instead of matching #map-frame's actual size) - even though #map-frame
+   itself measures correctly (its own parent is a plain HTML div, not another SVG). Leaving #map
+   unsized here lets its own width/height ATTRIBUTES (set correctly by the library via
+   .width()/.height()) govern its rendered box directly, which sidesteps the bug entirely. */
+
+.dropdown-container {
+    position: relative;
+    padding: 6px;
+    padding-top: 0px;
+}
+
+.dropdown-label {
+    font-size: 14px;
+    font-weight: 100;
+    color: #333;
+    opacity: 0.9;
+    margin-bottom: 4px;
+    padding-left: 2px;
+    align-self: center;
+    margin-right: 10px;
+}
+
+.em-legend-title {
+    font-size: 1rem !important;
+}
+
+.em-legend-subtitle {
+    font-size: 14px !important;
+}
+
+.em-legend-button-rect {
+    fill: #333 !important;
+    stroke: #000 !important;
+}
+
+/* RYB-specific: the map SVG is wrapped in an extra <svg id="map-frame"> so the static overseas
+   insets group (<g id="newInsets">) has a valid SVG rendering context and can survive #map being
+   cleared and rebuilt on every dropdown change (see dropdown-choropleth.js). No width/height:100%
+   here either - dropdown-choropleth.js sets explicit pixel width/height attributes on #map-frame
+   directly (matching the proven working pattern elsewhere in RYB/2026, e.g. CH02M03.html, whose
+   wrapping <svg id="container"> always uses a fixed pixel height, never a percentage). */
+#map-frame {
+    display: block;
+}
+
+.em-cntbn {
+    stroke: white !important;
+}

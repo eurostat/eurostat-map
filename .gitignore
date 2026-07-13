@@ -9,3 +9,5 @@ input/
 .cursorrules
 .venv
 .agents
+.claude
+*.xlsx

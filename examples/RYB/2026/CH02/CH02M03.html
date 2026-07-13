@@ -7,6 +7,9 @@
         <link rel="stylesheet" href="../../styles.css" />
         <link rel="stylesheet" href="../../insets/insets.css" />
         <style>
+            body {
+                font-family: 'Arial';
+            }
             .em-cntbn {
                 opacity: 0.7 !important;
             }
@@ -147,11 +150,6 @@
                                 .attr('class', 'em-footnote')
                                 .attr('id', 'em-footnote-2')
                                 .html('Cartography: Eurostat – GISCO, 06/2026')
-
-                            const newInsets = d3.select('#newInsets')
-                            if (!newInsets.empty()) {
-                                d3.select('#map').node().appendChild(newInsets.node())
-                            }
                         })
                 }
 
@@ -184,7 +182,8 @@
                             .dorling(true)
                             .svgId('map')
                             .insets(insetsCfg)
-                            .containerId('container')
+                            .insetBoxPosition(insetBoxPosition)
+                            .containerId('maps-wrapper')
                             .scale('20M')
                             .nutsLevel('mixed')
                             .nutsYear(2024)
@@ -193,6 +192,9 @@
                                 categoryCodes,
                                 categoryLabels,
                                 categoryColors,
+                                transform: (d) => {
+                                    return parseFloat(d.toFixed(1))
+                                }, // drop ridiculous amount of uneccessary decimal places they provided me with.
                             })
                             .compositionSettings(patch)
                     )
@@ -219,6 +221,7 @@
                             .map('stripe')
                             .svgId('map')
                             .insets(insetsCfg)
+                            .insetBoxPosition(insetBoxPosition)
                             .containerId('container')
                             .scale('20M')
                             .nutsLevel(1)

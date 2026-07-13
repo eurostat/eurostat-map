@@ -188,6 +188,15 @@ const refreshCentroidsForLayer = function (layerOrMap) {
     // Insets can reach refresh before their centroid cache is initialized.
     // Build it lazily here so symbol layers (e.g. proportional circles)
     // always have anchors in external inset SVG containers.
+    //
+    // But an inset can ALSO reach this before ITS OWN defineProjection() has run (it happens in
+    // buildMapTemplate(), called once that inset's geometry fetch resolves - separate from, and
+    // later than, buildMapTemplateBase(), which is what wires the inset up in the first place).
+    // This path is reached externally via executeForAllInsets() whenever an incremental stat
+    // update (e.g. compositionSettings()) on the OUTER map sweeps every inset's centroids, so an
+    // inset that hasn't finished its own initial build yet has nothing to project with. Skip it
+    // for now; that inset's own build will populate its centroids once it's ready.
+    if (typeof map._projection !== 'function') return
     if (!map.Geometries._allCentroidsFeatures) {
         setupBaseCentroids(map)
     }

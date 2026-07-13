@@ -18,8 +18,14 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
         return out
     }
 
+    // On mobile, insets are hidden by default to save space (see the display:none below), and the
+    // toggle button is auto-shown so they can still be revealed (see map-instance.js) unless the
+    // user has explicitly configured insetsButton themselves.
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+    const showsInsetsButton = out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobile)
+
     if (!out.insetBoxPosition_) {
-        const buttonClearanceY = out.insetsButton_ ? getButtonSize() + getButtonPadding() : 0
+        const buttonClearanceY = showsInsetsButton ? getButtonSize() + getButtonPadding() : 0
         out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_ + buttonClearanceY]
     }
 
@@ -31,6 +37,12 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
         .attr('id', 'em-insets-group')
         .attr('class', 'em-insets')
         .attr('transform', 'translate(' + out.insetBoxPosition_[0] + ',' + out.insetBoxPosition_[1] + ')')
+
+    // Hidden by default on mobile to save space; the auto-shown insets button (or an explicitly
+    // configured one) toggles this same display style, exactly as it already does on desktop.
+    if (isMobile) {
+        insetsGroup.style('display', 'none')
+    }
 
     if (out.insets_ === 'default') {
         out.insets_ = defaultInsetConfig(out.insetBoxWidth_, out.insetBoxPadding_)

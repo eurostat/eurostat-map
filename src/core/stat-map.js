@@ -444,18 +444,25 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.legend_ = undefined
     out.legendObj_ = undefined
 
+    // Shared by the initial render AND toggleLegendVisibility, so both agree on what "undefined"
+    // (i.e. the user never called setLegendVisibility/toggleLegendVisibility) means. These used to
+    // be computed independently: the initial render defaulted to hidden on mobile
+    // (window.innerWidth <= 768) when a legend button is present, but toggleLegendVisibility's
+    // fallback always assumed "currently visible" regardless of screen width. On mobile that made
+    // the first click a no-op (it computed current=true, flipped to false, re-applied display:none
+    // - the legend was already hidden) and the second click was the one that actually showed it.
+    const getDefaultLegendVisible = function () {
+        if (out.legendButton_) {
+            return typeof window === 'undefined' || window.innerWidth > 768
+        }
+        return true
+    }
+
     const applyLegendVisibilityForLayer = function (layer) {
         const legend = layer.legendObj_
         if (!legend) return
 
-        let visible = out.legendVisible_
-        if (visible === undefined) {
-            if (out.legendButton_) {
-                visible = window.innerWidth > 768
-            } else {
-                visible = true
-            }
-        }
+        const visible = out.legendVisible_ === undefined ? getDefaultLegendVisible() : out.legendVisible_
 
         const legendSvg = out.svg().select('#' + legend.svgId)
         if (!legendSvg.empty()) {
@@ -476,7 +483,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out.toggleLegendVisibility = function () {
-        const current = out.legendVisible_ === undefined ? true : !!out.legendVisible_
+        const current = out.legendVisible_ === undefined ? getDefaultLegendVisible() : !!out.legendVisible_
         out.legendVisible_ = !current
         applyLegendVisibility()
         return out

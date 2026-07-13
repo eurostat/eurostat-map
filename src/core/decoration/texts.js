@@ -198,17 +198,27 @@ export const addFootnote = function (out) {
         lineIndex++
     }
 
+    // Visible (rendered) length, ignoring embedded markup (e.g. an italic <tspan> a caller wraps
+    // around part of the footnote, such as "Source"). Markup characters must not count toward the
+    // wrap threshold, or a line wraps well before it actually reaches that visible width.
+    const visibleLength = (str) => str.replace(/<[^>]*>/g, '').length
+
     const parts = String(text).split(/<br\s*\/?>/gi)
 
     parts.forEach((part, partIndex) => {
-        const words = part.split(/(\s+)/) // keep whitespace tokens
+        // Tokenize into: a whole open/close tag pair (kept atomic - never split across lines,
+        // e.g. that italic <tspan>...</tspan>), a standalone tag, whitespace, or visible text.
+        // (A plain split on whitespace would also break inside tag attributes, e.g. the space in
+        // style="font-style: italic;", corrupting the tag when each wrapped line becomes its own
+        // separate .html() call.)
+        const tokens = part.match(/<(\w+)[^>]*>[\s\S]*?<\/\1>|<[^>]+>|\s+|\S+/g) || []
 
-        for (const w of words) {
-            if ((line + w).length > wrap && line.trim().length > 0) {
+        for (const tok of tokens) {
+            if (visibleLength(line) + visibleLength(tok) > wrap && line.trim().length > 0) {
                 appendLine(line)
-                line = w
+                line = tok
             } else {
-                line += w
+                line += tok
             }
         }
 
