@@ -169,13 +169,31 @@
 }
 
 .em-tooltip-bar-grouped-row {
-    margin: 4px 0;
+    margin: 2px 0;
+}
+
+.em-tooltip-bar-grouped-row-missing {
+    margin: 3px 0 5px;
+}
+
+.em-tooltip-bar-grouped-missing-label {
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
 .em-tooltip-bar-grouped-row-inner {
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.em-tooltip-bar-grouped-missing-value {
+    color: #555;
+    font-size: 12px;
+    font-style: italic;
+    padding-left: 2px;
 }
 
 .em-tooltip-bar-grouped-badge {
@@ -191,7 +209,6 @@
 
 .em-tooltip-bar-grouped-label {
     font-size: 15px;
-    font-weight: 600;
     min-width: 0;
     flex: 1 1 auto;
     white-space: nowrap;
@@ -208,4 +225,35 @@
 .em-tooltip-bar-grouped-value-inside {
     flex: 0 0 auto;
     padding-left: 4px;
+}
+
+.em-tooltip-bar-grouped-value-outside {
+    color: #333;
+}
+
+.em-tooltip-bar-grouped-width-values {
+    margin-top: 3px;
+    padding-top: 3px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.em-tooltip-bar-grouped-width-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin: 1px 0;
+}
+
+.em-tooltip-bar-grouped-width-label {
+    color: #555;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.em-tooltip-bar-grouped-width-value {
+    color: #222;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
 }

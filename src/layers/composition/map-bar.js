@@ -312,6 +312,12 @@ export const map = function (config) {
         return value != null && !isNaN(value) && value !== ':' ? +value : 0
     }
 
+    function _getRawWidthValue(regionId, code) {
+        const widthStat = out.getEncodingStat('width', 'width')
+        const categoryCode = out.statMeta_?.[widthStat]?.statKeys ? code : undefined
+        return out.getEncodingValue('width', regionId, categoryCode, 'width')
+    }
+
     function _effectiveGroupMaxWidth(n, bbox) {
         const settings = getResponsiveBarSettings()
         if (settings.groupMaxWidth != null) return settings.groupMaxWidth
@@ -971,15 +977,23 @@ export const map = function (config) {
             const rawValue = _getRawHeightValue(regionId, code)
             const isMissing = _isMissingTooltipValue(rawValue)
             const numericValue = isMissing ? null : +rawValue
-            const color = isMissing ? noDataColor : _getCategoryColor(code)
-            const textColor = _getContrastTextColor(color)
-            const label = _getCategoryLabel(code)
             const unitText = out.getEncodingUnitText('height', code, _getPrimaryCategoricalStatName())
             const valueText = _formatTooltipValue(rawValue, unitText)
+            if (isMissing) {
+                html += `
+                    <div class="em-tooltip-bar-grouped-row em-tooltip-bar-grouped-row-missing">
+                        <span class="em-tooltip-bar-grouped-missing-label">${_getCategoryLabel(code)}:</span>
+                        <span class="em-tooltip-bar-grouped-missing-value">${out.noDataText()}</span>
+                    </div>
+                `
+                return
+            }
+
+            const color = _getCategoryColor(code)
+            const textColor = _getContrastTextColor(color)
+            const label = _getCategoryLabel(code)
             const reservedValueWidth = Math.max(28, Math.ceil(valueText.length * 6.5))
-            const barWidth = isMissing
-                ? Math.round(chartWidth * 0.45)
-                : Math.max(1, Math.round((Math.max(0, numericValue) / globalMaxValue) * chartWidth))
+            const barWidth = Math.max(1, Math.round((Math.max(0, numericValue) / globalMaxValue) * chartWidth))
             const canShowValueInside = barWidth >= reservedValueWidth + 28
 
             html += `
@@ -998,6 +1012,46 @@ export const map = function (config) {
                 </div>
             `
         })
+        html += '</div>'
+        html += buildGroupedTooltipWidthValues(regionId, codes)
+        return html
+    }
+
+    function buildGroupedTooltipWidthValues(regionId, codes) {
+        if (!_hasWidthChannel()) return ''
+
+        const widthStat = out.getEncodingStat('width', 'width')
+        const widthHasCategoryKeys = !!(widthStat && out.statMeta_?.[widthStat]?.statKeys)
+
+        let html = '<div class="em-tooltip-bar-grouped-width-values">'
+
+        if (widthHasCategoryKeys) {
+            codes.forEach((code) => {
+                const rawWidthValue = _getRawWidthValue(regionId, code)
+                const label = _getCategoryLabel(code)
+                const unitText = out.getEncodingUnitText('width', code, 'width')
+                const valueText = _formatTooltipValue(rawWidthValue, unitText)
+
+                html += `
+                    <div class="em-tooltip-bar-grouped-width-row">
+                        <span class="em-tooltip-bar-grouped-width-label">${label} width:</span>
+                        <span class="em-tooltip-bar-grouped-width-value">${valueText}</span>
+                    </div>
+                `
+            })
+        } else {
+            const rawWidthValue = _getRawWidthValue(regionId)
+            const unitText = out.getEncodingUnitText('width', undefined, 'width')
+            const valueText = _formatTooltipValue(rawWidthValue, unitText)
+
+            html += `
+                <div class="em-tooltip-bar-grouped-width-row">
+                    <span class="em-tooltip-bar-grouped-width-label">Width:</span>
+                    <span class="em-tooltip-bar-grouped-width-value">${valueText}</span>
+                </div>
+            `
+        }
+
         html += '</div>'
         return html
     }
