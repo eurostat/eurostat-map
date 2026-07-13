@@ -77,7 +77,13 @@ body {
 #map-frame {
     display: block;
 }
-
+#map-title,
+#map-subtitle {
+    padding-left: 6px;
+}
+#map-subtitle {
+    margin-bottom: 6px;
+}
 .em-cntbn {
     stroke: white !important;
 }
