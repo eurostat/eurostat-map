@@ -122,12 +122,12 @@
             const map = eurostatmap
                 .map('mushroom')
                 .svgId('map')
-                .title('Maritime passengers carried')
+                .title('Maritime passengers embarked and disembarked')
                 .subtitle('(by main ports, 2024)')
                 .footer(true)
                 .header(true)
                 .footnote(
-                    'Note: the map shows data for ports with at least 100 000 passengers carried (total of embarked and disembarked). Top 10 labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
+                    'Note: the map shows data for ports with at least 100 000 passengers embarked and disembarked. Top 10 EU ports labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
                 )
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
@@ -142,7 +142,7 @@
                     x: 10,
                     y: 220,
                     sizeLegend: {
-                        title: 'Passengers carried',
+                        title: 'Number of passengers',
                         values: [5700000, 1000000],
                         labels: ['5.7 million', '1 million'],
                     },
