@@ -161,7 +161,7 @@
                 .height(mapHeight)
                 .scale(json.scale)
                 .nutsLevel(json.nutsLevel)
-                .position(resolvedPosition)
+                //.position(resolvedPosition)
                 .insets(insetsCfg)
                 .insetBoxPosition(resolvedInsetBoxPosition)
                 .zoomButtons(true)
