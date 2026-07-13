@@ -966,7 +966,7 @@ export const map = function (config) {
         const chartWidth = getResponsiveBarSettings().tooltipWidth
         const noDataColor = out.noDataFillStyle?.() || '#d9d9d9'
 
-        let html = '<div class="em-tooltip-breakdown" style="min-width:170px;">'
+        let html = '<div class="em-tooltip-breakdown em-tooltip-bar-grouped-breakdown">'
         codes.forEach((code) => {
             const rawValue = _getRawHeightValue(regionId, code)
             const isMissing = _isMissingTooltipValue(rawValue)
@@ -983,17 +983,17 @@ export const map = function (config) {
             const canShowValueInside = barWidth >= reservedValueWidth + 28
 
             html += `
-                <div style="margin:4px 0;">
-                    <div style="display:flex;align-items:center;gap:6px;">
-                        <div style="height:18px;width:${barWidth}px;background:${color};border-radius:3px;display:flex;align-items:center;padding:0 6px;overflow:hidden;min-width:0;">
-                            <span style="font-size:11px;font-weight:600;color:${textColor};min-width:0;flex:1 1 auto;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${label}:</span>
+                <div class="em-tooltip-bar-grouped-row">
+                    <div class="em-tooltip-bar-grouped-row-inner">
+                        <div class="em-tooltip-bar-grouped-badge" style="width:${barWidth}px;background:${color};">
+                            <span class="em-tooltip-bar-grouped-label" style="color:${textColor};">${label}:</span>
                             ${
                                 canShowValueInside
-                                    ? `<span style="font-size:11px;font-weight:700;color:${textColor};flex:0 0 auto;white-space:nowrap;padding-left:4px;">${valueText}</span>`
+                                    ? `<span class="em-tooltip-bar-grouped-value em-tooltip-bar-grouped-value-inside" style="color:${textColor};">${valueText}</span>`
                                     : ''
                             }
                         </div>
-                        ${canShowValueInside ? '' : `<span style="font-size:11px;font-weight:700;color:#333;white-space:nowrap;">${valueText}</span>`}
+                        ${canShowValueInside ? '' : `<span class="em-tooltip-bar-grouped-value em-tooltip-bar-grouped-value-outside">${valueText}</span>`}
                     </div>
                 </div>
             `

@@ -163,3 +163,49 @@
     width: 100%;
     box-sizing: border-box;
 }
+
+.em-tooltip-bar-grouped-breakdown {
+    min-width: 170px;
+}
+
+.em-tooltip-bar-grouped-row {
+    margin: 4px 0;
+}
+
+.em-tooltip-bar-grouped-row-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.em-tooltip-bar-grouped-badge {
+    height: 18px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    overflow: hidden;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.em-tooltip-bar-grouped-label {
+    font-size: 15px;
+    font-weight: 600;
+    min-width: 0;
+    flex: 1 1 auto;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.em-tooltip-bar-grouped-value {
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.em-tooltip-bar-grouped-value-inside {
+    flex: 0 0 auto;
+    padding-left: 4px;
+}
