@@ -127,7 +127,10 @@ export const recalculateLayout = function (out) {
     svg.attr('width', out.width_).attr('height', totalHeight)
 
     if (out.zoomButtons_ && !out.gridCartogram_) updateZoomButtonsPosition(out)
-    if (out.insetsButton_) updateInsetsButtonPosition(out)
+    // Always attempt this (not gated on out.insetsButton_): the button may exist even when that
+    // flag is false, via the mobile auto-show default in map-instance.js. updateInsetsButtonPosition
+    // itself no-ops safely if the button isn't in the DOM.
+    updateInsetsButtonPosition(out)
     if (out.legendButton_) updateLegendButtonPosition(out)
     if (out.legendObj_?.applyPosition) out.legendObj_.applyPosition()
 }

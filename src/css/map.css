@@ -59,6 +59,7 @@ a text {
 .em-title,
 .em-inset-title {
     fill: #4c4b4b;
+    color: #4c4b4b;
     stroke: none;
 }
 
@@ -70,6 +71,7 @@ a text {
 .em-subtitle,
 .em-inset-subtitle {
     fill: #4c4b4b;
+    color: #4c4b4b;
     fill-opacity: 0.9;
     stroke: none;
     stroke-linejoin: round;
@@ -134,9 +136,8 @@ a text {
 
 /* Bottom text and symbol styling */
 .em-footnote {
-    fill: #848280;
+    fill: #4c4b4b;
     pointer-events: all;
-    cursor: pointer !important;
     font-size: 11px;
     transform: translate(5px, -5px);
 }

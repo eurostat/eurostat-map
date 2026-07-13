@@ -132,6 +132,16 @@ export const attachThematicApi = function (layer, map) {
         return sd?.unitText?.() || layer.encodings_[channel]?.unitText || ''
     }
 
+    // Forward stat and statData methods to the map for backwards compatibility.
+    // Legacy tooltip functions expect layer.statData('size') to work.
+    layer.stat = function (...args) {
+        return map.stat(...args)
+    }
+
+    layer.statData = function (...args) {
+        return map.statData(...args)
+    }
+
     layer.legend = function (v) {
         if (!arguments.length) return layer.legend_
 

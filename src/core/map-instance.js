@@ -133,6 +133,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.zoomButtons_ = true // show zoom buttons
     out.zoomButtonsPosition_ = undefined // [x,y] position of zoom buttons. If not specified, they are positioned in the top right corner
     out.insetsButton_ = false // show insets button
+    out._insetsButtonExplicit_ = false // true once the user has explicitly called insetsButton(v)
     out.insetsButtonPosition_ = undefined // [x,y] position of insets button. If not specified, they are positioned in the top right corner
     out.legendButton_ = false // show legend toggle button
     out.legendButtonPosition_ = undefined // [x,y] position of legend button. If not specified, they are positioned in the top left corner
@@ -364,6 +365,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.insetsButton = function (v) {
         if (!arguments.length) return out.insetsButton_
         out.insetsButton_ = v
+        out._insetsButtonExplicit_ = true
 
         // If the insets toggle button is enabled but no insets were configured,
         // default to the standard inset set so the button always has content to toggle.
@@ -747,8 +749,15 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         }
 
         //insets buttons
-        if (out.insetsButton_) {
-            appendInsetsButton(out)
+        // On mobile, insets are hidden by default (see buildInsets in insets.js) to save space, so
+        // auto-show the toggle button whenever insets exist and the user hasn't explicitly
+        // configured insetsButton themselves - otherwise there would be no way to reveal them.
+        {
+            const isMobileForInsetsButton = typeof window !== 'undefined' && window.innerWidth <= 768
+            const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
+            if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
+                appendInsetsButton(out)
+            }
         }
 
         // legend button

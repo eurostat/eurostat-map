@@ -339,7 +339,14 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
  * @param {Function} getCompositionFn - Function(id) → composition or undefined
  */
 export const styleMixedNUTSRegions = function (map, regions, getCompositionFn) {
-    const inScopeFill = map.svg().select('#em-mixed-nutsrg path').style('fill') || map.svg().select('#em-nutsrg path').style('fill') || '#fffeef'
+    // An inset swept here via executeForAllInsets (e.g. during an incremental style update on the
+    // outer map, see updateStyle() in map-pie.js) may not have drawn its own region paths yet.
+    // .select(...) then returns an empty selection, and .style('fill') on an empty selection
+    // throws (it reads .style off a null node) rather than returning undefined - so check .empty()
+    // before reading, same as the '#fffeef' fallback already handles "no fill found".
+    const mixedFillSel = map.svg().select('#em-mixed-nutsrg path')
+    const nutsrgFillSel = map.svg().select('#em-nutsrg path')
+    const inScopeFill = (!mixedFillSel.empty() && mixedFillSel.style('fill')) || (!nutsrgFillSel.empty() && nutsrgFillSel.style('fill')) || '#fffeef'
 
     regions.each(function (rg) {
         const sel = select(this)
