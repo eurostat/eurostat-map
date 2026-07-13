@@ -237,6 +237,14 @@
     border-top: 1px solid #e0e0e0;
 }
 
+.em-tooltip-bar-grouped-width-title {
+    margin-bottom: 2px;
+    color: #333;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
 .em-tooltip-bar-grouped-width-row {
     display: flex;
     align-items: center;

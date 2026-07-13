@@ -236,7 +236,7 @@
                         categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
                         unitText: config.unitText,
                     })
-                    .stat('degurbaPop', {
+                    .stat('Population', {
                         customData: populationData,
                         categoryCodes: ['DEG1', 'DEG2', 'DEG3'],
                         unitText: 'inhabitants',
@@ -297,7 +297,7 @@
 
                 if (useTotalPopWidth) {
                     mapBuilder = mapBuilder.encoding('width', {
-                        stat: 'degurbaPop',
+                        stat: 'Population',
                         scale: 'linear',
                         range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
                     })

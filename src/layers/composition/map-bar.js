@@ -3,6 +3,7 @@ import { select } from 'd3-selection'
 import { createStatMap } from '../../core/stat-map'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
+import { formatSizeLabel } from '../../legend/legend-utils'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
@@ -1022,19 +1023,21 @@ export const map = function (config) {
 
         const widthStat = out.getEncodingStat('width', 'width')
         const widthHasCategoryKeys = !!(widthStat && out.statMeta_?.[widthStat]?.statKeys)
+        const widthSectionTitle = widthStat || 'Width'
 
-        let html = '<div class="em-tooltip-bar-grouped-width-values">'
+        let html = '<div class="em-tooltip-breakdown em-tooltip-bar-grouped-width-values">'
+        html += `<div class="em-tooltip-bar-grouped-width-title">${widthSectionTitle}</div>`
 
         if (widthHasCategoryKeys) {
             codes.forEach((code) => {
                 const rawWidthValue = _getRawWidthValue(regionId, code)
                 const label = _getCategoryLabel(code)
                 const unitText = out.getEncodingUnitText('width', code, 'width')
-                const valueText = _formatTooltipValue(rawWidthValue, unitText)
+                const valueText = _formatWidthTooltipValue(rawWidthValue, unitText)
 
                 html += `
                     <div class="em-tooltip-bar-grouped-width-row">
-                        <span class="em-tooltip-bar-grouped-width-label">${label} width:</span>
+                        <span class="em-tooltip-bar-grouped-width-label">${label}</span>
                         <span class="em-tooltip-bar-grouped-width-value">${valueText}</span>
                     </div>
                 `
@@ -1042,11 +1045,11 @@ export const map = function (config) {
         } else {
             const rawWidthValue = _getRawWidthValue(regionId)
             const unitText = out.getEncodingUnitText('width', undefined, 'width')
-            const valueText = _formatTooltipValue(rawWidthValue, unitText)
+            const valueText = _formatWidthTooltipValue(rawWidthValue, unitText)
 
             html += `
                 <div class="em-tooltip-bar-grouped-width-row">
-                    <span class="em-tooltip-bar-grouped-width-label">Width:</span>
+                    <span class="em-tooltip-bar-grouped-width-label">Value</span>
                     <span class="em-tooltip-bar-grouped-width-value">${valueText}</span>
                 </div>
             `
@@ -1054,6 +1057,12 @@ export const map = function (config) {
 
         html += '</div>'
         return html
+    }
+
+    function _formatWidthTooltipValue(rawValue, unitText) {
+        if (_isMissingTooltipValue(rawValue)) return out.noDataText()
+        const formattedValue = formatSizeLabel(+rawValue)
+        return unitText ? `${formattedValue} ${unitText}` : formattedValue
     }
 
     // ── Legend ───────────────────────────────────────────────────────────────
