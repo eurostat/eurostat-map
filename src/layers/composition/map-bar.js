@@ -3,8 +3,7 @@ import { select } from 'd3-selection'
 import { createStatMap } from '../../core/stat-map'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
-import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator, formatRawValue } from '../../core/utils'
-import { formatSizeLabel } from '../../legend/legend-utils'
+import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
@@ -302,6 +301,10 @@ export const map = function (config) {
         return value != null && !isNaN(value) && value !== ':' ? +value : 0
     }
 
+    function _getRawHeightValue(regionId, code) {
+        return out.getEncodingValue('height', regionId, code, _getPrimaryCategoricalStatName())
+    }
+
     function _getWidthValue(regionId, code) {
         const widthStat = out.getEncodingStat('width', 'width')
         const categoryCode = out.statMeta_?.[widthStat]?.statKeys ? code : undefined
@@ -351,6 +354,26 @@ export const map = function (config) {
             .range([0, maxHeight])
             .clamp(true)(rawValue)
         return Math.min(maxHeight, Math.max(minHeight, height))
+    }
+
+    function _isMissingTooltipValue(value) {
+        return value === ':' || value === null || value === undefined || value === '' || Number.isNaN(+value)
+    }
+
+    function _formatTooltipValue(rawValue, unitText) {
+        if (_isMissingTooltipValue(rawValue)) return 'n/a'
+        return `${rawValue}${unitText ? ` ${unitText}` : ''}`
+    }
+
+    function _getContrastTextColor(hexColor) {
+        const hex = (hexColor || '').replace('#', '')
+        if (hex.length !== 6) return '#000000'
+
+        const r = parseInt(hex.slice(0, 2), 16)
+        const g = parseInt(hex.slice(2, 4), 16)
+        const b = parseInt(hex.slice(4, 6), 16)
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+        return luminance > 0.6 ? '#000000' : '#ffffff'
     }
 
     function _getGridCellShapeBBox(cellSelection) {
@@ -932,137 +955,51 @@ export const map = function (config) {
         return html
     }
 
-    /**
-     * Build a mini grouped bar chart for the tooltip.
-     * Shows the same vertical layout as the map, with value labels below each bar.
-     */
     function buildGroupedTooltipHTML(regionId) {
-        const settings = getResponsiveBarSettings()
         const codes = _getCategoryCodes()
         if (!codes?.length) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
+        const rawValues = codes.map((code) => _getRawHeightValue(regionId, code))
+        const hasAnyData = rawValues.some((value) => !_isMissingTooltipValue(value))
+        if (!hasAnyData) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
 
-        // Find if we have any valid data for this region
-        let hasData = false
+        const globalMaxValue = Math.max(1, out._groupedMaxCatValue || 0)
+        const chartWidth = getResponsiveBarSettings().tooltipWidth
+        const noDataColor = out.noDataFillStyle?.() || '#d9d9d9'
+
+        let html = '<div class="em-tooltip-breakdown" style="min-width:170px;">'
         codes.forEach((code) => {
-            if (_getHeightValue(regionId, code) > 0) hasData = true
-        })
-        if (!hasData) return `<div class="em-tooltip-text">${out.noDataText()}</div>`
-
-        const gap = settings.groupGap
-        const maxH = settings.groupMaxHeight
-        const svgW = settings.tooltipWidth
-        const valueLabelFontSize = 12
-        const valueLabelRowHeight = valueLabelFontSize + 2
-        const valueLabelRows = 2
-        const bottomPad = valueLabelRows * valueLabelRowHeight + 4
-        const svgH = maxH + bottomPad + 4
-
-        const n = codes.length
-        const maxTooltipBarWidth = Math.max(1, (svgW - Math.max(0, n - 1) * gap) / n)
-        const minTooltipBarWidth = Math.min(settings.groupMinWidth || 2, maxTooltipBarWidth)
-        const widths = codes.map((code) => {
-            if (!_hasWidthChannel()) return maxTooltipBarWidth
-            const rawWidthValue = _getWidthValue(regionId, code)
-            if (rawWidthValue <= 0) return 0
-            const scaled = (rawWidthValue / (out._groupedMaxWidthValue || 1)) * maxTooltipBarWidth
-            return Math.min(maxTooltipBarWidth, Math.max(minTooltipBarWidth, scaled))
-        })
-        const totalW = widths.reduce((sum, width) => sum + width, 0) + Math.max(0, n - 1) * gap
-        const offsetX = (svgW - totalW) / 2
-
-        let bars = ''
-        const lastLabelRightByRow = Array(valueLabelRows).fill(-Infinity)
-        let currentX = offsetX
-        codes.forEach((code, i) => {
-            const rawVal = _getHeightValue(regionId, code)
-            const barH = Math.max(rawVal > 0 ? settings.groupMinHeight : 0, out.classifierSize_(rawVal))
-            const bw = widths[i]
-            const x = currentX
-            const color = _getCategoryColor(code)
+            const rawValue = _getRawHeightValue(regionId, code)
+            const isMissing = _isMissingTooltipValue(rawValue)
+            const numericValue = isMissing ? null : +rawValue
+            const color = isMissing ? noDataColor : _getCategoryColor(code)
+            const textColor = _getContrastTextColor(color)
             const label = _getCategoryLabel(code)
-            const fullValStr = formatRawValue(rawVal)
-            const valStr = formatRawValue(rawVal)
-            const centerX = x + bw / 2
-            const estimatedLabelWidth = valStr.length * valueLabelFontSize * 0.62
-            const labelLeft = centerX - estimatedLabelWidth / 2
-            const labelRight = centerX + estimatedLabelWidth / 2
+            const unitText = out.getEncodingUnitText('height', code, _getPrimaryCategoricalStatName())
+            const valueText = _formatTooltipValue(rawValue, unitText)
+            const reservedValueWidth = Math.max(28, Math.ceil(valueText.length * 6.5))
+            const barWidth = isMissing
+                ? Math.round(chartWidth * 0.45)
+                : Math.max(1, Math.round((Math.max(0, numericValue) / globalMaxValue) * chartWidth))
+            const canShowValueInside = barWidth >= reservedValueWidth + 28
 
-            let rowIndex = -1
-            for (let r = 0; r < valueLabelRows; r++) {
-                if (labelLeft > lastLabelRightByRow[r] + 2) {
-                    rowIndex = r
-                    break
-                }
-            }
-            if (rowIndex >= 0) lastLabelRightByRow[rowIndex] = labelRight
-            const labelY = maxH + valueLabelRowHeight * (rowIndex + 1) - 1
-
-            bars += `
-        <rect x="${x}" y="${maxH - barH}" width="${bw}" height="${barH}"
-              fill="${color}" rx="1" ry="1"/>
-        ${
-            rowIndex >= 0
-                ? `<text x="${centerX}" y="${labelY}" text-anchor="middle"
-               font-size="${valueLabelFontSize}" fill="#555"
-               title="${label}: ${fullValStr}">${valStr}</text>`
-                : ''
-        }`
-            currentX += bw + gap
+            html += `
+                <div style="margin:4px 0;">
+                    <div style="display:flex;align-items:center;gap:6px;">
+                        <div style="height:18px;width:${barWidth}px;background:${color};border-radius:3px;display:flex;align-items:center;padding:0 6px;overflow:hidden;min-width:0;">
+                            <span style="font-size:11px;font-weight:600;color:${textColor};min-width:0;flex:1 1 auto;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;">${label}:</span>
+                            ${
+                                canShowValueInside
+                                    ? `<span style="font-size:11px;font-weight:700;color:${textColor};flex:0 0 auto;white-space:nowrap;padding-left:4px;">${valueText}</span>`
+                                    : ''
+                            }
+                        </div>
+                        ${canShowValueInside ? '' : `<span style="font-size:11px;font-weight:700;color:#333;white-space:nowrap;">${valueText}</span>`}
+                    </div>
+                </div>
+            `
         })
-
-        const breakdown = _hasWidthChannel() ? buildGroupedTooltipBreakdownHTML(regionId, codes) : ''
-        return `
-    <div class="em-tooltip-barchart-container">
-        <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" style="display:block;">
-            ${bars}
-        </svg>
-    </div>
-    ${breakdown}`
-    }
-
-    function buildGroupedTooltipBreakdownHTML(regionId, codes) {
-        const heightUnit = out.getEncodingUnitText('height', codes[0], _getPrimaryCategoricalStatName())
-        const hasWidthChannel = _hasWidthChannel()
-        const widthStat = hasWidthChannel ? out.getEncodingStat('width', 'width') : null
-        const widthHasCategoryKeys = !!(widthStat && out.statMeta_?.[widthStat]?.statKeys)
-        const widthUnit = hasWidthChannel ? out.getEncodingUnitText('width', widthHasCategoryKeys ? codes[0] : undefined, 'width') : ''
-
-        let html = `<div class="em-tooltip-breakdown">`
-        for (const code of codes) {
-            const color = _getCategoryColor(code)
-            const hVal = _getHeightValue(regionId, code)
-            let text = `${formatSizeLabel(hVal)}${heightUnit ? ` ${heightUnit}` : ''}`
-            if (hasWidthChannel && widthHasCategoryKeys) {
-                const wVal = _getWidthValue(regionId, code)
-                text += `, ${formatSizeLabel(wVal)}${widthUnit ? ` ${widthUnit}` : ''}`
-            }
-            html += `
-        <div class="em-breakdown-item">
-            <span class="em-breakdown-color" style="background:${color}"></span>
-            <span class="em-breakdown-value">${text}</span>
-        </div>`
-        }
-        if (hasWidthChannel && !widthHasCategoryKeys) {
-            const wVal = _getWidthValue(regionId)
-            html += `
-        <div class="em-breakdown-item em-total">
-            <span class="em-breakdown-value">${formatSizeLabel(wVal)}${widthUnit ? ` ${widthUnit}` : ''}</span>
-        </div>`
-        }
-        html += `</div>`
+        html += '</div>'
         return html
-    }
-
-    function compactValue(value) {
-        const abs = Math.abs(value)
-        if (abs >= 1e9) return `${trimTrailingZero((value / 1e9).toFixed(1))}B`
-        if (abs >= 1e6) return `${trimTrailingZero((value / 1e6).toFixed(1))}M`
-        if (abs >= 1e3) return `${trimTrailingZero((value / 1e3).toFixed(1))}K`
-        return String(Math.round(value))
-    }
-
-    function trimTrailingZero(v) {
-        return v.endsWith('.0') ? v.slice(0, -2) : v
     }
 
     // ── Legend ───────────────────────────────────────────────────────────────

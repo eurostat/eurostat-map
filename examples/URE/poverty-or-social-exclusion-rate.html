@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>DEGURBA</title>
+        <title>At risk of poverty or social exclusion rate</title>
         <style>
             body {
                 margin: 0;
@@ -12,7 +12,6 @@
             }
             .controls {
                 padding: 15px;
-
                 display: flex;
                 gap: 20px;
                 align-items: center;
@@ -24,12 +23,6 @@
             }
             label {
                 font-weight: bold;
-            }
-            select {
-                padding: 5px 10px;
-                font-size: 14px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
             }
             .toggle-switch {
                 position: relative;
@@ -80,15 +73,6 @@
     <body>
         <div class="controls">
             <div class="control-group">
-                <label for="dataset-select">Select Dataset:</label>
-                <select id="dataset-select">
-                    <option value="unemployment">Unemployment rate</option>
-                    <option value="flat">Population living in flats</option>
-                    <option value="education">Education level</option>
-                    <option value="social">Social network use</option>
-                </select>
-            </div>
-            <div class="control-group">
                 <label for="cartogram-toggle">Grid Cartogram</label>
                 <label class="toggle-switch">
                     <input type="checkbox" id="cartogram-toggle" checked />
@@ -104,95 +88,85 @@
             </div>
         </div>
 
-        <script src="../../../build/eurostatmap.js"></script>
+        <script src="../../build/eurostatmap.js"></script>
 
         <script>
-            // Configuration for each dataset
+            const DATA_FILE = 'data/F2A At risk of poverty or social exclusion rate_degurba_2025.json'
+            const POPULATION_FILE = '../cartogram/grid/data/degurba/population.json'
+            const COUNTRY_TO_ISO2 = {
+                Austria: 'AT',
+                Belgium: 'BE',
+                Bulgaria: 'BG',
+                Croatia: 'HR',
+                Cyprus: 'CY',
+                Czechia: 'CZ',
+                Denmark: 'DK',
+                Estonia: 'EE',
+                Finland: 'FI',
+                France: 'FR',
+                Germany: 'DE',
+                Greece: 'EL',
+                Hungary: 'HU',
+                Ireland: 'IE',
+                Italy: 'IT',
+                Latvia: 'LV',
+                Lithuania: 'LT',
+                Luxembourg: 'LU',
+                Malta: 'MT',
+                Netherlands: 'NL',
+                Norway: 'NO',
+                Poland: 'PL',
+                Portugal: 'PT',
+                Romania: 'RO',
+                Slovakia: 'SK',
+                Slovenia: 'SI',
+                Spain: 'ES',
+                Sweden: 'SE',
+                Switzerland: 'CH',
+                EU: 'EU27_2020',
+            }
 
-            const configs = {
-                unemployment: {
-                    data: 'data/degurba/unemployment.json',
-                    title: 'Unemployment rate',
-                    subtitle: 'Share of people aged 15-74, by degree of urbanisation, 2025',
-                    legendTitle: 'Degree of urbanisation',
-                    unitText: '%',
-                    sizeLegendTitle: '% of people aged 15-74',
-                    noDataRegions: ['IS', 'UK', 'BA', 'ME', 'TR', 'MD', 'LI', 'ME', 'AL', 'GE', 'UA'],
-                },
-                flat: {
-                    data: 'data/degurba/flat.json',
-                    title: 'Population living in flats',
-                    subtitle: 'Share of people currently living in flats, by degree of urbanisation, 2025',
-                    unitText: '%',
-                    legendTitle: 'Degree of urbanisation',
-                    sizeLegendTitle: '% of people',
-                    noDataRegions: ['IS', 'CH', 'UK', 'LI', 'RS', 'ME', 'AL', 'BA', 'MK', 'TR'],
-                },
+            const config = {
+                title: 'At risk of poverty or social exclusion rate',
+                subtitle: 'Share of people, by degree of urbanisation, 2025',
+                legendTitle: 'Degree of urbanisation',
+                unitText: '%',
+                sizeLegendTitle: '% of people',
+                noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'MK', 'TR', 'MD', 'GE', 'UA'],
+            }
 
-                education: {
-                    data: 'data/degurba/education.json',
-                    title: 'Participation rate in education and training',
-                    subtitle: 'Share of people aged 18-64, by degree of urbanisation, 2025',
-                    unitText: '%',
-                    legendTitle: 'Degree of urbanisation',
-                    sizeLegendTitle: '% of people aged 18-64',
-                    noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'TR'],
-                },
-                social: {
-                    data: 'data/degurba/social.json',
-                    title: 'Participation in social networks',
-                    subtitle: 'Share of all people, by degree of urbanisation, 2025',
-                    footnote: 'Includes creating user profile, posting messages or other contributions to facebook, twitter, etc.',
-                    unitText: '%',
-                    legendTitle: 'Degree of urbanisation',
-                    sizeLegendTitle: '% of people',
-                    noDataRegions: ['RS', 'ME', 'LI', 'UK', 'IS'],
-                },
+            const CATEGORY_COLORS = {
+                DEG1: '#33A033',
+                DEG2: '#8F741A',
+                DEG3: '#E04040',
             }
 
             let map = null
-            let currentDataset = 'flat'
             let isCartogram = true
             let useTotalPopWidth = false
 
-            function getLegendSizeValues(data) {
-                const allValues = []
-                Object.values(data || {}).forEach((regionValues) => {
-                    ;['DEG1', 'DEG2', 'DEG3'].forEach((code) => {
-                        const value = regionValues?.[code]
-                        if (value !== ':' && value !== null && value !== undefined && value !== '') {
-                            const numericValue = +value
-                            if (!Number.isNaN(numericValue)) allValues.push(numericValue)
-                        }
-                    })
-                })
-
-                if (!allValues.length) return undefined
-
-                const min = Math.min(...allValues)
-                const max = Math.max(...allValues)
-                const mid = (min + max) / 2
-
-                return [max, mid, min]
+            function normalizeData(rawData) {
+                const out = {}
+                for (const entry of rawData.data || []) {
+                    const iso2 = COUNTRY_TO_ISO2[entry.country]
+                    if (!iso2 || iso2 === 'EU27_2020') continue
+                    out[iso2] = {
+                        DEG1: entry.cities,
+                        DEG2: entry.towns_suburbs,
+                        DEG3: entry.rural,
+                    }
+                }
+                return out
             }
 
-            async function buildMap(configKey, useCartogram) {
-                const config = configs[configKey]
-                currentDataset = configKey
+            async function buildMap(useCartogram) {
                 isCartogram = useCartogram
 
-                // Fetch the data
-                const [response, populationResponse] = await Promise.all([fetch(config.data), fetch('data/degurba/population.json')])
-                const data = await response.json()
+                const [response, populationResponse] = await Promise.all([fetch(DATA_FILE), fetch(POPULATION_FILE)])
+                const rawData = await response.json()
                 const populationData = await populationResponse.json()
-                const sizeLegendValues = getLegendSizeValues(data)
-                const categoryColors = {
-                    DEG1: '#E04040',
-                    DEG2: '#8F741A',
-                    DEG3: '#33A033',
-                }
+                const data = normalizeData(rawData)
 
-                // Remove existing map if it exists
                 if (map) {
                     const svg = document.getElementById('bar')
                     if (svg) {
@@ -200,14 +174,13 @@
                     }
                 }
 
-                // Build new map with selected configuration
                 const GROUP_MAX_HEIGHT = useCartogram ? 48 : 45
                 let mapBuilder = eurostatmap
                     .map('bar')
                     .dorling(true)
                     .hoverColor('#ffffbf')
-                    .dorling(!useCartogram) // use dorling when NOT in cartogram mode
-                    .gridCartogram(useCartogram) // enable grid cartogram when toggled
+                    .dorling(!useCartogram)
+                    .gridCartogram(useCartogram)
                     .gridCartogramSettings({
                         spacing: 0,
                         cellPadding: 12,
@@ -249,7 +222,7 @@
                     .encoding('color', {
                         stat: 'degurbaRate',
                         by: 'category',
-                        values: categoryColors,
+                        values: CATEGORY_COLORS,
                         labels: {
                             DEG1: 'Cities',
                             DEG2: 'Towns and suburbs',
@@ -257,10 +230,7 @@
                         },
                     })
                     .barSettings({
-                        //type: 'grouped',
-                        //groupWidth: useCartogram ? 17 : 9,
                         groupMaxHeight: GROUP_MAX_HEIGHT,
-                        //groupMaxValue: 100, // optional override for grouped mode max value - for sharing scales across maps
                     })
                     .title(config.title)
                     .header(true)
@@ -273,7 +243,6 @@
                         sizeLegend: {
                             title: config.sizeLegendTitle,
                             titlePadding: 10,
-                            values: sizeLegendValues,
                         },
                         widthLegend: {
                             title: 'Population',
@@ -304,26 +273,18 @@
                 }
 
                 map = mapBuilder
-
                 map.build()
             }
 
-            // Initialize with first dataset
-            buildMap('unemployment', true)
+            buildMap(true)
 
-            // Add event listener for dropdown
-            document.getElementById('dataset-select').addEventListener('change', function (e) {
-                buildMap(e.target.value, isCartogram)
-            })
-
-            // Add event listener for cartogram toggle
             document.getElementById('cartogram-toggle').addEventListener('change', function (e) {
-                buildMap(currentDataset, e.target.checked)
+                buildMap(e.target.checked)
             })
 
             document.getElementById('width-total-toggle').addEventListener('change', function (e) {
                 useTotalPopWidth = e.target.checked
-                buildMap(currentDataset, isCartogram)
+                buildMap(isCartogram)
             })
         </script>
     </body>

@@ -1,0 +1,184 @@
+{
+  "data": [
+    {
+      "country": "EU",
+      "cities": 16,
+      "towns_suburbs": 16,
+      "rural": 17.2
+    },
+    {
+      "country": "Belgium",
+      "cities": 17.4,
+      "towns_suburbs": 7.9,
+      "rural": 8.8
+    },
+    {
+      "country": "Bulgaria",
+      "cities": 14.1,
+      "towns_suburbs": 20.7,
+      "rural": 31.4
+    },
+    {
+      "country": "Czechia",
+      "cities": 9.7,
+      "towns_suburbs": 10.3,
+      "rural": 8.9
+    },
+    {
+      "country": "Denmark",
+      "cities": 15.4,
+      "towns_suburbs": 9.6,
+      "rural": 9.8
+    },
+    {
+      "country": "Germany",
+      "cities": 19.2,
+      "towns_suburbs": 14.8,
+      "rural": 12.8
+    },
+    {
+      "country": "Estonia",
+      "cities": 19.4,
+      "towns_suburbs": 19.4,
+      "rural": 19.6
+    },
+    {
+      "country": "Ireland",
+      "cities": 9.4,
+      "towns_suburbs": 11.8,
+      "rural": 16.2
+    },
+    {
+      "country": "Greece",
+      "cities": 15.3,
+      "towns_suburbs": 19.3,
+      "rural": 26.8
+    },
+    {
+      "country": "Spain",
+      "cities": 16.7,
+      "towns_suburbs": 23,
+      "rural": 22
+    },
+    {
+      "country": "France",
+      "cities": 19.7,
+      "towns_suburbs": 17.5,
+      "rural": 11.4
+    },
+    {
+      "country": "Croatia",
+      "cities": 13.5,
+      "towns_suburbs": 20,
+      "rural": 24.4
+    },
+    {
+      "country": "Italy",
+      "cities": 16.8,
+      "towns_suburbs": 19.1,
+      "rural": 20.3
+    },
+    {
+      "country": "Cyprus",
+      "cities": 13.2,
+      "towns_suburbs": 15.5,
+      "rural": 19
+    },
+    {
+      "country": "Latvia",
+      "cities": 18.2,
+      "towns_suburbs": 19.1,
+      "rural": 26.9
+    },
+    {
+      "country": "Lithuania",
+      "cities": 14.5,
+      "towns_suburbs": 26.3,
+      "rural": 29.8
+    },
+    {
+      "country": "Luxembourg",
+      "cities": 13.9,
+      "towns_suburbs": 14.3,
+      "rural": 15.9
+    },
+    {
+      "country": "Hungary",
+      "cities": 8.3,
+      "towns_suburbs": 13.2,
+      "rural": 20.7
+    },
+    {
+      "country": "Malta",
+      "cities": 17.4,
+      "towns_suburbs": 16.5,
+      "rural": 10.2
+    },
+    {
+      "country": "Netherlands",
+      "cities": 15.4,
+      "towns_suburbs": 10.9,
+      "rural": 8.5
+    },
+    {
+      "country": "Austria",
+      "cities": 23.7,
+      "towns_suburbs": 12,
+      "rural": 12
+    },
+    {
+      "country": "Poland",
+      "cities": 9,
+      "towns_suburbs": 12,
+      "rural": 18.5
+    },
+    {
+      "country": "Portugal",
+      "cities": 13,
+      "towns_suburbs": 15.8,
+      "rural": 19.7
+    },
+    {
+      "country": "Romania",
+      "cities": 5.1,
+      "towns_suburbs": 14.9,
+      "rural": 30.7
+    },
+    {
+      "country": "Slovenia",
+      "cities": 13.4,
+      "towns_suburbs": 14.7,
+      "rural": 14.3
+    },
+    {
+      "country": "Slovakia",
+      "cities": 6.7,
+      "towns_suburbs": 11.8,
+      "rural": 16.1
+    },
+    {
+      "country": "Finland",
+      "cities": 15.5,
+      "towns_suburbs": 12.4,
+      "rural": 11.4
+    },
+    {
+      "country": "Sweden",
+      "cities": 16.4,
+      "towns_suburbs": 14.8,
+      "rural": 15.2
+    },
+    {
+      "country": "Norway",
+      "cities": 12,
+      "towns_suburbs": 11.2,
+      "rural": 10.5
+    },
+    {
+      "country": "Switzerland",
+      "cities": 16.9,
+      "towns_suburbs": 15.5,
+      "rural": 15
+    }
+  ]
+}
