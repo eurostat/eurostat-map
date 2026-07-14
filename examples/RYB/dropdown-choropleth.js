@@ -183,7 +183,7 @@
                 .showSourceLink(false)
                 .footnote(buildFootnote(option.footnote, option.source))
                 .footnoteTooltipText(false)
-                .footnoteWrap(110)
+                .footnoteWrap(100)
 
                 .legendButton(true)
                 .legend({
