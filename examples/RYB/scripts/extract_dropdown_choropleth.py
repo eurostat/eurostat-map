@@ -159,13 +159,25 @@ def extract_option(ws, code):
     data = {}
     for r in range(2, max_row + 1):
         nuts = ws.cell(row=r, column=1).value
+        if not nuts:
+            continue
         value = ws.cell(row=r, column=3).value
-        if not nuts or value in (None, ":", ""):
+        if value is None or value == "":
+            # No row at all for this region in this sheet - distinct from an explicit ":"
+            # "data not available" marker, which IS kept (see below).
+            continue
+        if isinstance(value, str) and value.strip() == ":":
+            # Eurostat's "data not available" marker. Must be kept (not skipped) so the map
+            # renders these regions with the no-data style instead of them being invisible/
+            # excluded from the geometry entirely - eurostat-map's StatData treats a non-numeric
+            # string value as explicit no-data (see src/core/stat-data.js).
+            data[str(nuts)] = ":"
             continue
         try:
             data[str(nuts)] = float(value)
         except (TypeError, ValueError):
-            continue
+            # Any other non-numeric marker (rare) - preserve verbatim rather than silently drop it.
+            data[str(nuts)] = str(value).strip()
 
     title = clean_text(ws.cell(row=6, column=9).value)  # I6
     subtitle = clean_text(ws.cell(row=7, column=9).value)  # I7

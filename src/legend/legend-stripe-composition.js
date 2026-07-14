@@ -21,7 +21,7 @@ export const legend = function (map, config) {
         shapeHeight: 20,
         shapePadding: 1,
         noData: true,
-        noDataText: 'No data',
+        noDataText: map.noDataText() || 'Data unavailable',
     }
 
     //override attribute values with config values
