@@ -401,7 +401,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * @default 'No data available'
      * @example map.noDataText('Data not available')
      */
-    out.noDataText_ = 'No data available'
+    out.noDataText_ = 'Data unavailable'
     /**
      * BCP 47 language tag used when fetching labels from the Eurostat API.
      * @type {string}

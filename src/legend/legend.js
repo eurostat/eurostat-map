@@ -72,7 +72,7 @@ export const legend = function (map) {
     //show no data
     out.noData = true
     //no data label text
-    out.noDataText = 'No data'
+    out.noDataText = out.map.noDataText_ || 'Data unavailable'
     //gap between legend and 'no data' legend
     out.noDataPadding = 5
     out.noDataShapeWidth = 25
