@@ -15,7 +15,7 @@ body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 900px;
+    max-width: 800px;
     height: 100%;
     overflow: hidden;
 }
