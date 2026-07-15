@@ -1,5 +1,36 @@
 # Release notes
 
+## 4.7.0
+
+### New
+
+- **Legend hover opacity/highlighting can now be gated to only apply while the map is zoomed in** - `legend({ onlyApplyOpacityWhileZoomed: true })` suppresses hover highlighting at the initial zoom level, and re-enables it automatically once the user zooms in; zooming back out to the initial view disables it again.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .legend({
+        onlyApplyOpacityWhileZoomed: true,
+    })
+    .build()
+```
+
+### Fixes
+
+- **Scalebars on insets no longer render with `NaN` coordinates** - the scalebar is now redrawn once the map's position/pixel-size is fully resolved, instead of relying only on a subsequent zoom event. Previously, an inset scalebar drawn before its pixel size was known (e.g. before geo data finished loading) could permanently bake `NaN` into its tick/midline coordinates if that inset was never panned or zoomed afterwards.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .insets(overseasInsetsWithScalebars)
+    .scalebar(true)
+    .build()
+```
+
 ## 4.6.2
 
 ### Fixes
