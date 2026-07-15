@@ -36,6 +36,9 @@ export const legend = function (map) {
     out.boxPadding = 7
     out.boxOpacity = 0.9
 
+    // Only apply legend hover effects while the map is currently zoomed away from its initial view.
+    out.onlyApplyOpacityWhileZoomed = false
+
     //legend title
     out.title = ''
     //legend subtitle
@@ -116,6 +119,16 @@ export const legend = function (map) {
         if (needsLegendBuild) {
             out.build()
         }
+
+        // Use a capture listener so this also covers hover handlers implemented by
+        // individual legend types. The namespace ensures updates do not stack listeners.
+        container.on(
+            'mouseover.zoomOpacityGate',
+            function (event) {
+                if (out.onlyApplyOpacityWhileZoomed && !out.map.__hasZoomed) event.stopImmediatePropagation()
+            },
+            true
+        )
 
         out.applyPosition()
     }

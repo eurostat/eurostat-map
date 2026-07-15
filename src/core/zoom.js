@@ -27,6 +27,7 @@ function defineGridCartogramZoom(map) {
         .on('zoom', (event) => {
             zoomGroup.attr('transform', event.transform)
             map.__lastTransform = event.transform
+            map.__hasZoomed = event.transform.k !== 1
             map.onZoom_?.(event, map)
         })
         .on('end', (event) => {
@@ -160,6 +161,7 @@ const panHandler = (event, map) => {
 
 const zoomHandler = (event, previousT, map) => {
     const t = event.transform
+    map.__hasZoomed = t.k !== 1
     const cx = (map.width_ / 2 - t.x) / t.k
     const cy = (map.height_ / 2 - t.y) / t.k
     const [projectedX, projectedY] = map._projection.invert([cx, cy])
