@@ -17,7 +17,7 @@ import { initProj4 } from './geo/proj4.js'
 import { addEurostatLogo, addEurostatRibbon } from './decoration/logo.js'
 import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
-import { addScalebarToMap, getDefaultScalebarConfig } from './decoration/scalebar.js'
+import { addScalebarToMap, getDefaultScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
 import { createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
 import { defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
@@ -664,6 +664,12 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
                 drawBackgroundMap(out)
             }
         }
+
+        // The initial scalebar draw in buildMapTemplateBase() can run before position_.z is
+        // resolved here (it's only known once geo data has loaded, for maps without an explicit
+        // z), leaving pixelSizeM undefined and baking NaN coordinates into the scalebar. Redraw it
+        // now that position_.z is final, instead of waiting for a zoom event that may never come.
+        updateScalebar(out)
 
         // d3 zoom
         if (out.zoomExtent_ || out.zoomButtons_) {
