@@ -94,7 +94,7 @@ export const Geometries = function (map, withCenterPoints) {
                 out.allNUTSGeoData = filtered
                 out.defaultGeoData = filtered[0]
 
-                if (withCenterPoints) {
+                if (withCenterPoints && geo !== 'WORLD') {
                     // Always store as an array indexed by level [0,1,2,3].
                     // Mixed: centroid files are at filtered[4..7].
                     // Non-mixed: centroid files are at filtered[1..4] (all 4 levels pre-fetched).

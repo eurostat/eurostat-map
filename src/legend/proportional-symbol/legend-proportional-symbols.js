@@ -67,7 +67,20 @@ export const legend = function (map, config) {
     }
 
     //override attribute values with config values
-    if (config)
+    if (config) {
+        // Back-compat/convenience: a root-level noData/noDataText (e.g. .legend({ noData: true }))
+        // applies to both the size and color legend sections, since PS maps split what used to be
+        // a single flat config into nested colorLegend/sizeLegend objects. An explicit nested
+        // override (e.g. sizeLegend: { noData: false }) below still takes precedence.
+        if (config.noData !== undefined) {
+            out.sizeLegend.noData = config.noData
+            out.colorLegend.noData = config.noData
+        }
+        if (config.noDataText !== undefined) {
+            out.sizeLegend.noDataText = config.noDataText
+            out.colorLegend.noDataText = config.noDataText
+        }
+
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
                 for (let p in out[key]) {
@@ -81,6 +94,7 @@ export const legend = function (map, config) {
                 out[key] = config[key]
             }
         }
+    }
 
     //@override
     out.update = function () {

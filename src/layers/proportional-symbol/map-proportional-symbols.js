@@ -488,6 +488,19 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
 
         // Re-apply classification to the new containers
         applyClassificationToMap(map, target)
+
+        // applyClassificationToMap() only tags g.em-centroid with [ecl] when a color
+        // encoding is configured - for a size-only PS map it bails out early, leaving
+        // symbols without an [ecl] attribute at all. The size legend's no-data swatch
+        // hover (highlightPsRegions/highlightPsSymbols) relies on that attribute to find
+        // and dim/restore symbols, so it silently did nothing. Fall back to tagging by
+        // the SIZE stat's own resolvability whenever there's no color classifier.
+        if (!target.classifierColor_) {
+            centroidsGroup.selectAll('g.em-centroid').attr('ecl', (d) => {
+                const v = sizeData.get(d.properties.id)?.value
+                return v == null || v === ':' ? 'nd' : 'has-data'
+            })
+        }
     }
 
     /**

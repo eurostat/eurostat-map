@@ -1305,8 +1305,9 @@ map = eurostatmap.map(...)
             { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'ocean', letterSpacing: 4 },
         ],
         values: true, // label statistical values directly
-        backgrounds: true, // for better legibility of labelled values
-        shadows: true,
+        // Choose one readability treatment for all geographic and value labels:
+        backgrounds: true,
+        halos: false,
         processValueLabelCentroids: (region, centroid) => {
             // (optional) adjust NUTS1 label positions manually to avoid overlapping
             if (region.properties.id == 'ES4') {
