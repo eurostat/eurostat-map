@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+
+    <body style="font-family: sans-serif">
+        <svg id="map61"></svg>
+
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            async function buildMap() {
+                const config = await fetch('./data/gdp-change.json').then((response) => {
+                    if (!response.ok) throw new Error(`Could not load GDP map data (${response.status})`)
+                    return response.json()
+                })
+                const [lowerThreshold, upperThreshold] = config.thresholds
+
+                eurostatmap
+                    .map('bivariateChoropleth')
+                    .svgId('map61')
+                    .header(true)
+                    .footer(true)
+                    .scale(config.scale)
+                    .nutsLevel(config.nutsLevel)
+                    .nutsYear(config.nutsYear)
+                    .title(config.title)
+                    .subtitle(config.subtitle)
+                    .footnote([config.footnote, config.source].filter(Boolean).join(' '))
+                    .stat('gdpChange', { customData: config.stats.gdpChange, unitText: 'percentage points' })
+                    .encoding('x', { stat: 'gdpChange' })
+                    .stat('urbanRuralType', { customData: config.stats.urbanRuralType })
+                    .encoding('y', { stat: 'urbanRuralType' })
+                    .numberOfClasses(3)
+                    .classifier1((value) => (value >= upperThreshold ? 2 : value >= lowerThreshold ? 1 : 0))
+                    .classifier2((v) => 3 - v)
+                    .classToFillStyle((i, j) => {
+                        const classId = config.classMatrix[2 - i]?.[2 - j]
+                        return config.colorsByClass[classId] || config.colorsByClass[':']
+                    })
+                    .tooltip({
+                        textFunction: function (rg, map) {
+                            if (rg.properties.id === 'UK') return ' '
+                            const buf = []
+                            // Header with region name and ID
+                            const regionName = rg.properties.na || rg.properties.name
+                            const regionId = rg.properties.id
+                            buf.push(`
+                        <div class="em-tooltip-bar">
+                            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+                        </div>
+                    `)
+
+                            //start table
+                            buf.push(`
+                    <div class="em-tooltip-text no-data">
+                        <table class="em-tooltip-table">
+                            <tbody>
+                                <tr><td>`)
+
+                            //URT value
+                            const sv2 = map.statData('urbanRuralType').get(rg.properties.id)
+                            if (!sv2 || (sv2.value != 0 && !sv2.value) || sv2.value == ':') buf.push(map.noDataText_)
+                            else {
+                                buf.push(config.urbanRuralLabels[sv2.value])
+                            }
+
+                            buf.push('<br>')
+
+                            //stat value
+                            const sv1 = map.statData('gdpChange').get(rg.properties.id)
+                            if (!sv1 || (sv1.value != 0 && !sv1.value) || sv1.value == ':') buf.push(map.noDataText_)
+                            else {
+                                buf.push(sv1.value)
+                                //unit 1
+                                const unit1 = map.statData('gdpChange').unitText()
+                                if (unit1) buf.push(' ' + unit1)
+                            }
+
+                            //close table
+                            buf.push(`</td></tr>
+                            </tbody>
+                        </table>
+                    </div>`)
+
+                            return buf.join('')
+                        },
+                    })
+                    .legend({
+                        label2: config.urbanRuralLegendLabel,
+                        label1: config.gdpLegendLabel,
+                        // breaks1: config.thresholds.map(String),
+                        x: 40,
+                        y: 120,
+                        squareSize: 75,
+                        noDataPadding: 30,
+                        noDataShapeHeight: 16,
+                        noDataShapeWidth: 16,
+                    })
+                    .zoomExtent([1, 3])
+                    .insets('default')
+                    .build()
+            }
+
+            buildMap().catch((error) => console.error(error))
+        </script>
+    </body>
+</html>

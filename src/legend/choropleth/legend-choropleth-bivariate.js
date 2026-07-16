@@ -107,7 +107,6 @@ export const legend = function (map, config) {
     //breaks
     out.breaks1 = undefined
     out.breaks2 = undefined
-    out.showBreaks = false // if set to true and breaks1 and breaks2 are undefined then breaks are automatically defined
     out.tickLength = 5 // length of the ticks
 
     //axis
@@ -168,27 +167,7 @@ export const legend = function (map, config) {
         // Square group with horizontal offset
         addSquares()
 
-        // set breaks if user hasnt defined them but has enabled them
-        // set breaks if user hasn't defined them but has enabled them
-        if (!out.breaks1 && !out.breaks2 && out.showBreaks) {
-            // Extract breaks from classifier1_
-            const c1 = map.classifier1_
-            if (typeof c1.quantiles === 'function') {
-                out.breaks1 = c1.quantiles().map((d) => parseFloat(d.toFixed(0)))
-            } else if (c1.domain) {
-                out.breaks1 = c1.domain().map((d) => parseFloat(d.toFixed(0)))
-            }
-
-            // Extract breaks from classifier2_
-            const c2 = map.classifier2_
-            if (typeof c2.quantiles === 'function') {
-                out.breaks2 = c2.quantiles().map((d) => parseFloat(d.toFixed(0)))
-            } else if (c2.domain) {
-                out.breaks2 = c2.domain().map((d) => parseFloat(d.toFixed(0)))
-            }
-        }
-
-        // Draw breaks labels 1 (X axis)
+        // Break labels are opt-in: each axis is drawn only when its breaks array is supplied.
         addBreakLabels()
 
         out._xAxisArrowY = 0
@@ -601,13 +580,13 @@ export const legend = function (map, config) {
             )
 
         let xAxisLineY = out.squareSize + out.tickLength
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) {
+        if (Array.isArray(out.breaks1) && out.breaks1.length) {
             xAxisLineY += getFontSizeFromClass('em-bivariate-tick-label') / 1.5
         }
 
         let yAxisLineX = -out.tickLength
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) {
-            yAxisLineX -= out.labelFontSize / 2
+        if (Array.isArray(out.breaks2) && out.breaks2.length) {
+            yAxisLineX -= getFontSizeFromClass('em-bivariate-tick-label') / 1.5
         }
 
         const xLabelY = out.axisArrows ? out._xAxisArrowY : xAxisLineY + 8
@@ -958,18 +937,16 @@ export const legend = function (map, config) {
 
     function computeAxisArrowAnchors() {
         out._xAxisArrowY = out.squareSize + out.tickLength + out.arrowPadding
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) {
+        if (Array.isArray(out.breaks1) && out.breaks1.length) {
             out._xAxisArrowY += getFontSizeFromClass('em-bivariate-tick-label')
         }
         if (out.rotation === -45) {
             out._xAxisArrowY -= 6
-        } else if (out.rotation === 0) {
-            out._xAxisArrowY -= 3
         }
 
         out._yAxisArrowX = -out.tickLength - out.arrowPadding
-        if (out.showBreaks || (out.breaks1 && out.breaks2)) {
-            out._yAxisArrowX -= out.labelFontSize / 2
+        if (Array.isArray(out.breaks2) && out.breaks2.length) {
+            out._yAxisArrowX -= getFontSizeFromClass('em-bivariate-tick-label')
         }
     }
 
@@ -978,6 +955,8 @@ export const legend = function (map, config) {
         const selector = getLegendRegionsSelector(map)
         const dimmedFill = Legend.getDimmedFill(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
+
+        map._bivariateLegendHighlightActive = true
 
         allRegions.each(function () {
             const sel = select(this)
@@ -1005,6 +984,7 @@ export const legend = function (map, config) {
                 const original = sel.attr('data-fill')
                 if (original) sel.style('fill', original)
             })
+        map._bivariateLegendHighlightActive = false
     }
 
     return out

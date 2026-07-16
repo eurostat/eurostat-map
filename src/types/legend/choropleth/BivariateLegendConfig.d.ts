@@ -18,14 +18,11 @@ export interface BivariateLegendConfig extends LegendConfig {
     /** Label for the second variable (x-axis). @default 'Variable 2' */
     label2?: string
 
-    /** Break points for the first variable. Auto-calculated if undefined. */
-    breaks1?: number[]
+    /** Break labels for the first variable. Omit to hide first-axis break labels. */
+    breaks1?: Array<number | string>
 
-    /** Break points for the second variable. Auto-calculated if undefined. */
-    breaks2?: number[]
-
-    /** Whether to show break labels on the axes. @default false */
-    showBreaks?: boolean
+    /** Break labels for the second variable. Omit to hide second-axis break labels. */
+    breaks2?: Array<number | string>
 
     /** Length of axis tick marks in pixels. @default 5 */
     tickLength?: number

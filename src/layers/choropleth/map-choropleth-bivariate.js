@@ -287,9 +287,24 @@ export const map = function (config) {
     const addMouseEventsToRegions = (map, regions) => {
         const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
 
+        const clearStaleLegendHighlight = () => {
+            if (!map._bivariateLegendHighlightActive) return
+
+            regions.filter('[ecl1],[ecl2]').each(function () {
+                const sel = select(this)
+                const original = sel.attr('data-fill')
+                if (original) sel.style('fill', original)
+            })
+            map._bivariateLegendHighlightActive = false
+        }
+
         regions
             .on('mouseover', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
+                // A legend square can miss mouseout when the pointer moves rapidly onto the map
+                // while that square is being raised. Restore every dimmed region before applying
+                // the normal single-region hover style.
+                clearStaleLegendHighlight()
                 select(this).style('fill', map.hoverColor_)
                 out._tooltip?.mouseover(out.tooltip_.textFunction(rg, out))
                 if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
