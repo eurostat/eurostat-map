@@ -18,13 +18,24 @@
 
             .gdp-small-multiples {
                 display: grid;
+                grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
                 gap: 0.4rem;
                 padding: 0.75rem 0 0.75rem 0.75rem;
+                box-sizing: border-box;
+                height: 100vh;
+                height: 100dvh;
+                max-height: 100vh;
+                max-height: 100dvh;
+                overflow: hidden;
             }
 
             .gdp-small-map-card {
+                display: flex;
+                flex-direction: column;
                 min-width: 0;
+                min-height: 0;
                 width: 100%;
+                overflow: hidden;
             }
 
             .gdp-small-map-card h2 {
@@ -39,9 +50,13 @@
             .gdp-small-map-card svg,
             .gdp-main-map svg {
                 display: block;
-                width: 100%;
                 max-width: 100%;
                 height: auto;
+            }
+
+            .gdp-small-map-card .em-map-wrapper {
+                flex: 1 1 auto;
+                min-height: 0;
             }
 
             .gdp-shared-scale {
@@ -92,6 +107,8 @@
 
                 .gdp-small-multiples {
                     grid-template-columns: repeat(3, minmax(0, 1fr));
+                    grid-template-rows: auto auto;
+                    height: auto;
                     padding: 0.5rem;
                 }
 
@@ -103,6 +120,9 @@
             @media (max-width: 600px) {
                 .gdp-small-multiples {
                     grid-template-columns: 1fr;
+                    grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
+                    height: 100vh;
+                    height: 100dvh;
                 }
             }
         </style>
@@ -139,16 +159,16 @@
                 })
                 const [lowerThreshold, upperThreshold] = config.thresholds
                 const divergingColors = {
-                    1: ['#7f1d1d', '#c2413b', '#f5a19b', '#fff7f7', '#e98a9b', '#bd4962', '#7f1d3d'],
-                    2: ['#6f451f', '#a66a32', '#d5aa75', '#fff8f0', '#c59b72', '#8b5e3c', '#593820'],
-                    3: ['#436b2b', '#72a84f', '#b7d89b', '#f5fbf5', '#93c9a3', '#3f9460', '#176b43'],
+                    1: ['#8c2d04', '#d94801', '#fdbb84', '#fff7f7', '#f29ca3', '#c94b5b', '#8f1738'],
+                    2: ['#8c510a', '#bf812d', '#dfc27d', '#fff8f0', '#c2a27d', '#8c6845', '#543b25'],
+                    3: ['#4d7c0f', '#84ad32', '#c2d77a', '#f5fbf5', '#91c6a4', '#43956a', '#146b4a'],
                 }
                 const numericGdpValues = Object.values(config.stats.gdpChange).map(Number).filter(Number.isFinite)
                 const maxAbsoluteChange = Math.max(...numericGdpValues.map(Math.abs))
                 const third = maxAbsoluteChange / 3
                 const divergingThresholds = [-2 * third, -third, -Number.EPSILON, Number.EPSILON, third, 2 * third]
 
-                buildSmallMultiples(config, divergingColors, divergingThresholds)
+                buildSmallMultiples(config, divergingColors, divergingThresholds, getSmallMapSize())
                 renderSharedScale(divergingColors, maxAbsoluteChange)
 
                 eurostatmap
@@ -236,12 +256,20 @@
                         noDataShapeHeight: 16,
                         noDataShapeWidth: 16,
                     })
-                    .zoomExtent([1, 3])
+                    .zoomExtent([0.1, 3])
                     .insets('default')
                     .build()
             }
 
-            function buildSmallMultiples(config, colorsByTypology, thresholds) {
+            function getSmallMapSize() {
+                const container = document.querySelector('.gdp-small-multiples')
+                const width = Math.max(320, Math.floor(container.clientWidth - 12))
+                const reservedHeight = 190
+                const height = Math.max(105, Math.floor((document.documentElement.clientHeight - reservedHeight) / 3))
+                return { width, height }
+            }
+
+            function buildSmallMultiples(config, colorsByTypology, thresholds, size) {
                 const typologies = [
                     { value: 1, svgId: 'gdp-urban' },
                     { value: 2, svgId: 'gdp-intermediate' },
@@ -256,8 +284,8 @@
                     eurostatmap
                         .map('choropleth')
                         .svgId(svgId)
-                        .width(520)
-                        .height(300)
+                        .width(size.width)
+                        .height(size.height)
                         .header(false)
                         .footer(false)
                         .bottomText(false)
@@ -271,8 +299,9 @@
                         .colors(colorsByTypology[value])
                         .noDataFillStyle('#f1f1f1')
                         .legend(false)
-                        .zoomExtent([1, 8])
+                        .zoomExtent([0.1, 8])
                         .zoomButtons(false)
+                        .position({ x: 4800000, y: 3400000, z: 6000 })
                         .transitionDuration(0)
                         .tooltip({
                             textFunction: function (region, map) {
