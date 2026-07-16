@@ -142,6 +142,14 @@ export const legend = function (map, config) {
         out.annotations = { ...out.annotations, ...config.annotations }
     }
 
+    const isAxisOptionEnabled = (option, axis) => {
+        if (option && typeof option === 'object') return option[axis] !== false
+        return option !== false
+    }
+
+    const hasAxisArrow = (axis) => isAxisOptionEnabled(out.axisArrows, axis)
+    const hasAxisExtremes = (axis) => isAxisOptionEnabled(out.showAxisExtremes, axis)
+
     //@override
     out.update = function () {
         out.updateConfig()
@@ -172,18 +180,18 @@ export const legend = function (map, config) {
 
         out._xAxisArrowY = 0
         out._yAxisArrowX = 0
-        if (out.axisArrows) {
+        if (hasAxisArrow('x') || hasAxisArrow('y')) {
             computeAxisArrowAnchors()
         }
 
-        if (out.showAxisExtremes) {
+        if (hasAxisExtremes('x') || hasAxisExtremes('y')) {
             addAxisEndpointLabels()
         }
 
         // Titles are positioned from final arrow geometry, so endpoint labels must exist first.
         addAxisTitles()
 
-        if (out.axisArrows) {
+        if (hasAxisArrow('x') || hasAxisArrow('y')) {
             addAxisArrows()
         }
         addCornerAnnotations()
@@ -515,7 +523,7 @@ export const legend = function (map, config) {
         // X axis title centered on the X arrow segment and placed below arrow + endpoint labels.
         const xAxisTitlePadding = 7
         let xAxisTitleX = (spans.xStart + spans.xEnd) / 2
-        let xAxisTitleY = out.axisArrows ? out._xAxisArrowY + out.arrowHeight + xAxisTitlePadding : out.squareSize + 8 + xAxisTitlePadding
+        let xAxisTitleY = hasAxisArrow('x') ? out._xAxisArrowY + out.arrowHeight + xAxisTitlePadding : out.squareSize + 8 + xAxisTitlePadding
 
         const xLowNode = out.lgg.select('.em-bivariate-axis-end-label-x-low').node()
         const xHighNode = out.lgg.select('.em-bivariate-axis-end-label-x-high').node()
@@ -540,7 +548,7 @@ export const legend = function (map, config) {
 
         // Y axis title centered on the Y arrow segment and placed outside arrow + endpoint labels.
         const yAxisTitlePadding = 12
-        let yAxisTitleX = out._yAxisArrowX - (out.axisArrows ? out.arrowHeight + yAxisTitlePadding : 8 + yAxisTitlePadding)
+        let yAxisTitleX = out._yAxisArrowX - (hasAxisArrow('y') ? out.arrowHeight + yAxisTitlePadding : 8 + yAxisTitlePadding)
         let yAxisTitleY = (spans.yStart + spans.yEnd) / 2
 
         const yLowNode = out.lgg.select('.em-bivariate-axis-end-label-y-low').node()
@@ -589,45 +597,49 @@ export const legend = function (map, config) {
             yAxisLineX -= getFontSizeFromClass('em-bivariate-tick-label') / 1.5
         }
 
-        const xLabelY = out.axisArrows ? out._xAxisArrowY : xAxisLineY + 8
+        const xLabelY = hasAxisArrow('x') ? out._xAxisArrowY : xAxisLineY + 8
         // Keep Y-axis endpoint labels clear of left-side annotation callout lines.
-        const yLabelX = out.axisArrows ? out._yAxisArrowX : yAxisLineX - 8 - 4
+        const yLabelX = hasAxisArrow('y') ? out._yAxisArrowX : yAxisLineX - 8 - 4
 
-        axisLabels
-            .append('text')
-            .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-x-low')
-            .attr('x', initialX)
-            .attr('y', xLabelY)
-            .text(out.axisExtremes?.x?.low || 'Low')
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', out.axisArrows ? 'middle' : 'hanging')
+        if (hasAxisExtremes('x')) {
+            axisLabels
+                .append('text')
+                .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-x-low')
+                .attr('x', initialX)
+                .attr('y', xLabelY)
+                .text(out.axisExtremes?.x?.low || 'Low')
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', hasAxisArrow('x') ? 'middle' : 'hanging')
 
-        axisLabels
-            .append('text')
-            .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-x-high')
-            .attr('x', initialX + out.squareSize)
-            .attr('y', xLabelY)
-            .text(out.axisExtremes?.x?.high || 'High')
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', out.axisArrows ? 'middle' : 'hanging')
+            axisLabels
+                .append('text')
+                .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-x-high')
+                .attr('x', initialX + out.squareSize)
+                .attr('y', xLabelY)
+                .text(out.axisExtremes?.x?.high || 'High')
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', hasAxisArrow('x') ? 'middle' : 'hanging')
+        }
 
-        axisLabels
-            .append('text')
-            .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-y-low')
-            .attr('x', yLabelX)
-            .attr('y', out.squareSize)
-            .text(out.axisExtremes?.y?.low || 'Low')
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
+        if (hasAxisExtremes('y')) {
+            axisLabels
+                .append('text')
+                .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-y-low')
+                .attr('x', yLabelX)
+                .attr('y', out.squareSize)
+                .text(out.axisExtremes?.y?.low || 'Low')
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
 
-        axisLabels
-            .append('text')
-            .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-y-high')
-            .attr('x', yLabelX)
-            .attr('y', 0)
-            .text(out.axisExtremes?.y?.high || 'High')
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'middle')
+            axisLabels
+                .append('text')
+                .attr('class', 'em-bivariate-axis-end-label em-bivariate-axis-end-label-y-high')
+                .attr('x', yLabelX)
+                .attr('y', 0)
+                .text(out.axisExtremes?.y?.high || 'High')
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+        }
     }
 
     function addCornerAnnotations() {
@@ -863,30 +875,34 @@ export const legend = function (map, config) {
 
         const spans = computeAxisArrowSpans()
         // X axis arrow
-        axisArrows
-            .append('path')
-            .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-x')
-            .attr(
-                'd',
-                line()([
-                    [spans.xStart, out._xAxisArrowY],
-                    [spans.xEnd, out._xAxisArrowY],
-                ])
-            )
-            .attr('marker-end', 'url(#arrowhead)')
+        if (hasAxisArrow('x')) {
+            axisArrows
+                .append('path')
+                .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-x')
+                .attr(
+                    'd',
+                    line()([
+                        [spans.xStart, out._xAxisArrowY],
+                        [spans.xEnd, out._xAxisArrowY],
+                    ])
+                )
+                .attr('marker-end', 'url(#arrowhead)')
+        }
 
         // Y axis arrow
-        axisArrows
-            .append('path')
-            .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-y')
-            .attr(
-                'd',
-                line()([
-                    [out._yAxisArrowX, spans.yStart],
-                    [out._yAxisArrowX, spans.yEnd],
-                ])
-            )
-            .attr('marker-end', 'url(#arrowhead)')
+        if (hasAxisArrow('y')) {
+            axisArrows
+                .append('path')
+                .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-y')
+                .attr(
+                    'd',
+                    line()([
+                        [out._yAxisArrowX, spans.yStart],
+                        [out._yAxisArrowX, spans.yEnd],
+                    ])
+                )
+                .attr('marker-end', 'url(#arrowhead)')
+        }
     }
 
     function computeAxisArrowSpans() {
@@ -901,10 +917,10 @@ export const legend = function (map, config) {
 
         let xStart = initialX
         let xEnd = initialX + out.squareSize
-        if (out.showAxisExtremes && xLowBBox && xHighBBox) {
+        if (hasAxisExtremes('x') && xLowBBox && xHighBBox) {
             xStart = Math.max(initialX, xLowBBox.x + xLowBBox.width + labelGap)
             xEnd = Math.min(initialX + out.squareSize, xHighBBox.x - labelGap - arrowTipClearance)
-        } else if (!out.showAxisExtremes) {
+        } else if (!hasAxisExtremes('x')) {
             // Keep arrowhead inside axis extent when endpoint labels are hidden.
             xEnd = Math.max(initialX, initialX + out.squareSize - arrowTipClearance)
         }
@@ -920,10 +936,10 @@ export const legend = function (map, config) {
 
         let yStart = out.squareSize
         let yEnd = 0
-        if (out.showAxisExtremes && yLowBBox && yHighBBox) {
+        if (hasAxisExtremes('y') && yLowBBox && yHighBBox) {
             yStart = Math.min(out.squareSize, yLowBBox.y - labelGap)
             yEnd = Math.max(0, yHighBBox.y + yHighBBox.height + labelGap + arrowTipClearance)
-        } else if (!out.showAxisExtremes) {
+        } else if (!hasAxisExtremes('y')) {
             // Keep arrowhead inside axis extent when endpoint labels are hidden.
             yEnd = Math.min(out.squareSize, arrowTipClearance)
         }
