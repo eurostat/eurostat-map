@@ -351,9 +351,10 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     }
 
     //insets getter/setter
+    const insetPresetNames = ['default', 'image', 'eu', 'euEfta']
     out.insets = function () {
         if (!arguments.length) return out.insets_
-        if (arguments.length == 1 && arguments[0] === 'default') out.insets_ = 'default'
+        if (arguments.length == 1 && insetPresetNames.includes(arguments[0])) out.insets_ = arguments[0]
         else if (arguments.length == 1 && arguments[0] === true) out.insets_ = 'default'
         else if (arguments.length == 1 && arguments[0] === false) out.insets_ = false
         else if (arguments.length == 1 && Array.isArray(arguments[0])) out.insets_ = arguments[0]
