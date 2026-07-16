@@ -1,5 +1,36 @@
 # Release notes
 
+## 4.8.0
+
+### New
+
+- **Geographic labels (country/sea names) now support the same `backgrounds` readability treatment previously only available for statistical value labels** - a solid background rectangle behind each label instead of (or as well as configured) a stroke halo. New `backgroundFill` option controls the rectangle's fill color.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .labels({
+        labels: eurostatmap.getDefaultLabels().EUR_3035.en,
+        backgrounds: true,
+        backgroundFill: '#ffe4b5',
+    })
+    .build()
+```
+
+### Improvements
+
+- **World-map centroid selection no longer depends on incidental state ordering** - `geo_ == 'WORLD'` is now checked before falling back on `centroidsData` presence, so stale or malformed centroid state can't accidentally route a world map through the wrong (NUTS-level-indexed) centroid path.
+- **Statistical label halos on mixed-level maps no longer duplicate at the wrong centroid for regions present in more than one geometry collection** (noticeable for Serbia) - halos now bind to the same deduplicated feature set the value-label layer itself uses.
+- **Bivariate legend break labels are now opt-in per axis**, drawn only when `breaks1`/`breaks2` arrays are explicitly supplied, instead of an unreliable auto-derive-from-classifier path (`showBreaks`) that has been removed.
+
+### Fixes
+
+- **Continuous (choropleth) legend domain is now correctly forwarded from the active layer to the map facade** - `domain_` was missing from `stat-map.js`'s field-forwarding list (every other classification field was already forwarded), so the continuous legend always read the `[0,1]` fallback instead of the real computed domain, placing tick labels tens of thousands of pixels off-canvas and inflating the legend background box to an enormous height.
+- **Proportional-symbol draw-order sorting no longer drops symbols whose centroid id has no directly-matching value** - filtering these out entirely (rather than sorting them last) could wipe out every symbol for a layer or inset whose own centroid ids don't literally match a coarser dataset's ids (e.g. an inset's NUTS2/3-level ids against a country-level dataset). Symbols without a resolvable value already render at `r=0` downstream, so keeping them in the sort only affects z-order, not which regions end up visible.
+- **Categorical map tooltips now correctly show the "no data" state for explicit `':'` values**, not just `undefined`/falsy ones, and render it in the same table markup as populated tooltips instead of a bare text node.
+
 ## 4.7.1
 
 ### Fixes
