@@ -23,7 +23,7 @@
 
             .gdp-small-multiples {
                 display: grid;
-                grid-template-rows: repeat(3, minmax(0, 1fr));
+                grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
                 gap: 0.4rem;
                 padding: 0.75rem 0 0.75rem 0.75rem;
                 box-sizing: border-box;
@@ -68,6 +68,13 @@
                 min-width: 0;
             }
 
+            .gdp-small-multiples-legend {
+                display: block;
+                width: 100%;
+                height: 70px;
+                overflow: visible;
+            }
+
             @media (max-width: 900px) {
                 .gdp-map-layout {
                     grid-template-columns: 1fr;
@@ -79,12 +86,16 @@
                     height: auto;
                     padding: 0.5rem;
                 }
+
+                .gdp-small-multiples-legend {
+                    grid-column: 1 / -1;
+                }
             }
 
             @media (max-width: 600px) {
                 .gdp-small-multiples {
                     grid-template-columns: 1fr;
-                    grid-template-rows: repeat(3, minmax(0, 1fr));
+                    grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
                     height: 100vh;
                     height: 100dvh;
                 }
@@ -107,6 +118,7 @@
                     <h2>Rural regions</h2>
                     <svg id="gdp-rural"></svg>
                 </section>
+                <svg id="gdp-small-multiples-legend" class="gdp-small-multiples-legend" aria-label="GDP change legend"></svg>
             </aside>
             <main class="gdp-main-map">
                 <svg id="map61"></svg>
@@ -224,20 +236,34 @@
             function getSmallMapSize() {
                 const container = document.querySelector('.gdp-small-multiples')
                 const width = Math.max(320, Math.floor(container.clientWidth - 12))
-                const reservedHeight = 90
+                const legend = document.getElementById('gdp-small-multiples-legend')
+                const legendHeight = 70
+                legend.setAttribute('width', width)
+                legend.setAttribute('height', legendHeight)
+                const reservedHeight = 160
                 const height = Math.max(105, Math.floor((document.documentElement.clientHeight - reservedHeight) / 3))
                 return { width, height }
             }
 
             function makeContinuousDivergingScale(min, max) {
-                const divergenceT = (0 - min) / (max - min)
+                const signedLog = (value) => Math.sign(value) * Math.log1p(Math.abs(value))
+                const signedExp = (value) => Math.sign(value) * Math.expm1(Math.abs(value))
+                const transformedMin = signedLog(min)
+                const transformedMax = signedLog(max)
+                const divergenceT = -transformedMin / (transformedMax - transformedMin)
                 const valueTransform = (value) => {
-                    if (value < 0) return (divergenceT * (value - min)) / -min
-                    return divergenceT + ((1 - divergenceT) * value) / max
+                    const transformedValue = signedLog(value)
+                    if (transformedValue < 0) {
+                        return (divergenceT * (transformedValue - transformedMin)) / -transformedMin
+                    }
+                    return divergenceT + ((1 - divergenceT) * transformedValue) / transformedMax
                 }
                 const valueUntransform = (t) => {
-                    if (t < divergenceT) return min + (t / divergenceT) * -min
-                    return ((t - divergenceT) / (1 - divergenceT)) * max
+                    const transformedValue =
+                        t < divergenceT
+                            ? transformedMin + (t / divergenceT) * -transformedMin
+                            : ((t - divergenceT) / (1 - divergenceT)) * transformedMax
+                    return signedExp(transformedValue)
                 }
                 const balancedColor = d3.piecewise(d3.interpolateRgb, ['#4a1486', '#b6a0d2', '#f7f7f7', '#9ecae1', '#08519c'])
                 const colorFunction = (t) => {
@@ -282,10 +308,11 @@
                         .legend(
                             value === 3
                                 ? {
+                                      svgId: 'gdp-small-multiples-legend',
                                       title: 'GDP change (percentage points)',
                                       orientation: 'horizontal',
                                       x: 20,
-                                      y: size.height - 55,
+                                      y: 4,
                                       width: size.width - 40,
                                       shapeHeight: 10,
                                       tickLength: 5,
