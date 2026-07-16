@@ -1,5 +1,40 @@
 # Release notes
 
+## 4.8.1
+
+### New
+
+- **`.insets()` accepts three new named presets alongside `'default'`: `'image'`, `'eu'`, and `'euEfta'`.** `'image'` is a fully hand-tuned overseas-territories layout (Malta, Liechtenstein, and the EU/EFTA overseas and remote territories) with connecting decoration - a background box, separator lines between adjacent insets, and soft blur/fade gradients on a few edges - built in instead of requiring the caller to hand-roll the layout and decoration DOM themselves. `'eu'` and `'euEfta'` are simpler undecorated grid layouts of the same territory sets (the latter adding Liechtenstein and Svalbard), for callers who want the territory selection without the `'image'` chrome.
+
+Example:
+
+```javascript
+eurostatmap.map('choropleth').insets('image').insetBoxPosition([545, 81]).build()
+```
+
+- **Bivariate legend axis arrows and extreme labels can now be set independently per axis.** `axisArrows` and `showAxisExtremes` accept either a single boolean (both axes) or `{ x, y }` to control each axis separately.
+
+Example:
+
+```javascript
+map.legend({
+    axisArrows: { x: true, y: false },
+    showAxisExtremes: { x: true, y: false },
+})
+```
+
+- **Bivariate legend axis titles support multiline text**, using the same pilcrow (`¶`) line-break convention as other map text fields.
+
+Example:
+
+```javascript
+map.legend({ label1: 'GDP per¶capita', label2: 'Population¶density' })
+```
+
+### Fixes
+
+- **The `'image'` inset preset no longer shows a stray grey frame around every inset.** Every map instance (main map and insets alike) gets a `.em-frame` rect from the generic build path regardless of preset; `'image'`'s own separator lines already provide the visual separation this layout wants, so frames are now hidden by default for this preset and re-enabled only on the small zoomed-in detail insets (the Guadeloupe/Açores close-ups) that declare their own `frameStrokeWidth`.
+
 ## 4.8.0
 
 ### New
