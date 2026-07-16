@@ -12,6 +12,7 @@ import type { DorlingSettings } from './DorlingSettings'
 import type { ScalebarConfig } from './decoration/ScalebarConfig'
 import type { EncodingConfig } from './encoding/EncodingConfig'
 import type { LocationConfig } from './locations'
+import type { LabelsConfig } from './decoration/LabelsConfig'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -257,9 +258,12 @@ export interface MapInstance {
     placenames(): boolean
     placenames(show: boolean): this
 
-    /** Geographic label configuration. See docs/reference.md#labelling */
-    labels(): object | undefined
-    labels(config: object): this
+    /**
+     * Get or set label configuration for country names, statistical values, etc.
+     * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122' })
+     */
+    labels(): LabelsConfig | undefined
+    labels(config: LabelsConfig): this
 
     /** Annotation configuration for d3-svg-annotation. */
     annotations(): any
