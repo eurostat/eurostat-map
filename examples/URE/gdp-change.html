@@ -37,9 +37,11 @@
             .gdp-small-map-card {
                 display: flex;
                 flex-direction: column;
+                justify-self: center;
                 min-width: 0;
                 min-height: 0;
                 width: 100%;
+                aspect-ratio: 1;
                 overflow: hidden;
             }
 
@@ -235,14 +237,19 @@
 
             function getSmallMapSize() {
                 const container = document.querySelector('.gdp-small-multiples')
-                const width = Math.max(320, Math.floor(container.clientWidth - 12))
+                const cards = [...container.querySelectorAll('.gdp-small-map-card')]
+                const availableWidth = Math.floor(cards[0].clientWidth)
                 const legend = document.getElementById('gdp-small-multiples-legend')
                 const legendHeight = 70
-                legend.setAttribute('width', width)
+                const legendWidth = Math.floor(container.clientWidth - 12)
+                legend.setAttribute('width', legendWidth)
                 legend.setAttribute('height', legendHeight)
                 const reservedHeight = 160
-                const height = Math.max(105, Math.floor((document.documentElement.clientHeight - reservedHeight) / 3))
-                return { width, height }
+                const availableHeight = Math.floor((document.documentElement.clientHeight - reservedHeight) / 3)
+                const side = Math.max(1, Math.min(availableWidth, availableHeight))
+                cards.forEach((card) => (card.style.width = `${side}px`))
+                const titleHeight = Math.ceil(cards[0].querySelector('h2').getBoundingClientRect().height)
+                return { width: side, height: Math.max(1, side - titleHeight) }
             }
 
             function makeContinuousDivergingScale(min, max) {
