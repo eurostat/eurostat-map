@@ -3,11 +3,117 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="./styles.css" />
+        <style>
+            body {
+                margin: 0;
+                font-family: sans-serif;
+            }
+
+            .gdp-map-layout {
+                display: grid;
+                grid-template-columns: minmax(250px, 30%) minmax(0, 70%);
+                width: 100%;
+                align-items: start;
+            }
+
+            .gdp-small-multiples {
+                display: grid;
+                gap: 0.4rem;
+                padding: 0.75rem 0 0.75rem 0.75rem;
+            }
+
+            .gdp-small-map-card {
+                min-width: 0;
+            }
+
+            .gdp-small-map-card h2 {
+                margin: 0 0 0.1rem;
+                color: #333;
+                font-size: 0.9rem;
+                font-weight: 600;
+                text-align: center;
+            }
+
+            .gdp-small-map-card svg,
+            .gdp-main-map svg {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .gdp-shared-scale {
+                padding: 0.15rem 0.5rem 0.25rem;
+                font-size: 0.72rem;
+                color: #444;
+            }
+
+            .gdp-shared-scale-title {
+                margin-bottom: 0.25rem;
+                text-align: center;
+                font-weight: 600;
+            }
+
+            .gdp-shared-scale-colors {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                height: 0.55rem;
+            }
+
+            .gdp-shared-scale-labels {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 0.2rem;
+            }
+
+            .gdp-main-map {
+                min-width: 0;
+            }
+
+            @media (max-width: 900px) {
+                .gdp-map-layout {
+                    grid-template-columns: 1fr;
+                }
+
+                .gdp-small-multiples {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                    padding: 0.5rem;
+                }
+
+                .gdp-shared-scale {
+                    grid-column: 1 / -1;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .gdp-small-multiples {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
     </head>
 
-    <body style="font-family: sans-serif">
-        <svg id="map61"></svg>
+    <body>
+        <div class="gdp-map-layout">
+            <aside class="gdp-small-multiples" aria-label="GDP change by urban-rural typology">
+                <section class="gdp-small-map-card">
+                    <h2>Urban regions</h2>
+                    <svg id="gdp-urban"></svg>
+                </section>
+                <section class="gdp-small-map-card">
+                    <h2>Intermediate regions</h2>
+                    <svg id="gdp-intermediate"></svg>
+                </section>
+                <section class="gdp-small-map-card">
+                    <h2>Rural regions</h2>
+                    <svg id="gdp-rural"></svg>
+                </section>
+                <div id="gdp-shared-scale" class="gdp-shared-scale" aria-label="Shared GDP change colour scale"></div>
+            </aside>
+            <main class="gdp-main-map">
+                <svg id="map61"></svg>
+            </main>
+        </div>
 
         <script src="../../build/eurostatmap.js"></script>
         <script>
@@ -17,10 +123,20 @@
                     return response.json()
                 })
                 const [lowerThreshold, upperThreshold] = config.thresholds
+                const divergingColors = ['#8c2d04', '#d94801', '#fdbb84', '#f7f7f7', '#9ecae1', '#4292c6', '#08519c']
+                const numericGdpValues = Object.values(config.stats.gdpChange).map(Number).filter(Number.isFinite)
+                const maxAbsoluteChange = Math.max(...numericGdpValues.map(Math.abs))
+                const third = maxAbsoluteChange / 3
+                const divergingThresholds = [-2 * third, -third, -Number.EPSILON, Number.EPSILON, third, 2 * third]
+
+                buildSmallMultiples(config, divergingColors, divergingThresholds)
+                renderSharedScale(divergingColors, maxAbsoluteChange)
 
                 eurostatmap
                     .map('bivariateChoropleth')
                     .svgId('map61')
+                    .width(900)
+                    .height(680)
                     .header(true)
                     .footer(true)
                     .scale(config.scale)
@@ -96,7 +212,7 @@
                         // breaks1: config.thresholds.map(String),
                         x: 40,
                         y: 120,
-                        squareSize: 75,
+                        squareSize: 85,
                         noDataPadding: 30,
                         noDataShapeHeight: 16,
                         noDataShapeWidth: 16,
@@ -104,6 +220,66 @@
                     .zoomExtent([1, 3])
                     .insets('default')
                     .build()
+            }
+
+            function buildSmallMultiples(config, colors, thresholds) {
+                const typologies = [
+                    { value: 1, svgId: 'gdp-urban' },
+                    { value: 2, svgId: 'gdp-intermediate' },
+                    { value: 3, svgId: 'gdp-rural' },
+                ]
+
+                typologies.forEach(({ value, svgId }) => {
+                    const typedData = Object.fromEntries(
+                        Object.entries(config.stats.gdpChange).filter(([regionId]) => Number(config.stats.urbanRuralType[regionId]) === value)
+                    )
+
+                    eurostatmap
+                        .map('choropleth')
+                        .svgId(svgId)
+                        .width(320)
+                        .height(190)
+                        .header(false)
+                        .footer(false)
+                        .scale(config.scale)
+                        .nutsLevel(config.nutsLevel)
+                        .nutsYear(config.nutsYear)
+                        .stat('gdpChange', { customData: typedData, unitText: 'percentage points' })
+                        .encoding('fill', { stat: 'gdpChange' })
+                        .classificationMethod('threshold')
+                        .thresholds(thresholds)
+                        .colors(colors)
+                        .noDataFillStyle('#f1f1f1')
+                        .legend(false)
+                        .zoomButtons(false)
+                        .transitionDuration(0)
+                        .tooltip({
+                            textFunction: function (region, map) {
+                                const regionId = region.properties.id
+                                const regionName = region.properties.na || region.properties.name
+                                const stat = map.statData('gdpChange').get(regionId)
+                                if (!stat || stat.value === ':' || !Number.isFinite(Number(stat.value))) return `${regionName}: ${map.noDataText_}`
+                                const sign = Number(stat.value) > 0 ? '+' : ''
+                                return `${regionName}: ${sign}${stat.value} percentage points`
+                            },
+                        })
+                        .build()
+                })
+            }
+
+            function renderSharedScale(colors, maxAbsoluteChange) {
+                const scale = document.getElementById('gdp-shared-scale')
+                const roundedMaximum = Math.ceil(maxAbsoluteChange)
+                scale.innerHTML = `
+                    <div class="gdp-shared-scale-title">GDP change (percentage points)</div>
+                    <div class="gdp-shared-scale-colors">
+                        ${colors.map((color) => `<span style="background:${color}"></span>`).join('')}
+                    </div>
+                    <div class="gdp-shared-scale-labels">
+                        <span>−${roundedMaximum}</span>
+                        <span>0</span>
+                        <span>+${roundedMaximum}</span>
+                    </div>`
             }
 
             buildMap().catch((error) => console.error(error))
