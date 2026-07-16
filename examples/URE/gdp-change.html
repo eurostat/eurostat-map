@@ -224,7 +224,7 @@
                         label2: config.gdpLegendLabel,
                         axisArrows: { x: false, y: true },
                         showAxisExtremes: { x: false, y: true },
-                        // breaks1: config.thresholds.map(String),
+                        breaks2: config.thresholds.map((value) => `${value > 0 ? '+' : ''}${value}%`),
                         x: 40,
                         y: 120,
                         squareSize: 85,
