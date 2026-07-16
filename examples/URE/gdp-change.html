@@ -30,14 +30,14 @@
                     .subtitle(config.subtitle)
                     .footnote([config.footnote, config.source].filter(Boolean).join(' '))
                     .stat('gdpChange', { customData: config.stats.gdpChange, unitText: 'percentage points' })
-                    .encoding('x', { stat: 'gdpChange' })
+                    .encoding('y', { stat: 'gdpChange' })
                     .stat('urbanRuralType', { customData: config.stats.urbanRuralType })
-                    .encoding('y', { stat: 'urbanRuralType' })
+                    .encoding('x', { stat: 'urbanRuralType' })
                     .numberOfClasses(3)
-                    .classifier1((value) => (value >= upperThreshold ? 2 : value >= lowerThreshold ? 1 : 0))
-                    .classifier2((v) => 3 - v)
+                    .classifier1((v) => v - 1)
+                    .classifier2((value) => (value >= upperThreshold ? 2 : value >= lowerThreshold ? 1 : 0))
                     .classToFillStyle((i, j) => {
-                        const classId = config.classMatrix[2 - i]?.[2 - j]
+                        const classId = config.classMatrix[i]?.[j]
                         return config.colorsByClass[classId] || config.colorsByClass[':']
                     })
                     .tooltip({
@@ -89,8 +89,10 @@
                         },
                     })
                     .legend({
-                        label2: config.urbanRuralLegendLabel,
-                        label1: config.gdpLegendLabel,
+                        label1: config.urbanRuralLegendLabel,
+                        label2: config.gdpLegendLabel,
+                        axisArrows: { x: false, y: true },
+                        showAxisExtremes: { x: false, y: true },
                         // breaks1: config.thresholds.map(String),
                         x: 40,
                         y: 120,
