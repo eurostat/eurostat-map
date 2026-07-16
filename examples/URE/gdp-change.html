@@ -188,17 +188,17 @@
                             const regionName = rg.properties.na || rg.properties.name
                             const regionId = rg.properties.id
                             buf.push(`
-                        <div class="em-tooltip-bar">
-                            <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-                        </div>
-                    `)
+                                <div class="em-tooltip-bar">
+                                    <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+                                </div>
+                            `)
 
                             //start table
                             buf.push(`
-                    <div class="em-tooltip-text no-data">
-                        <table class="em-tooltip-table">
-                            <tbody>
-                                <tr><td>`)
+                            <div class="em-tooltip-text no-data">
+                                <table class="em-tooltip-table">
+                                    <tbody>
+                                        <tr><td>`)
 
                             //URT value
                             const sv2 = map.statData('urbanRuralType').get(rg.properties.id)
@@ -221,9 +221,9 @@
 
                             //close table
                             buf.push(`</td></tr>
-                            </tbody>
-                        </table>
-                    </div>`)
+                                    </tbody>
+                                </table>
+                            </div>`)
 
                             return buf.join('')
                         },
@@ -234,7 +234,11 @@
                         axisArrows: { x: false, y: true },
                         showAxisExtremes: { x: false, y: true },
                         breaks2: config.thresholds.map((value) => `${value > 0 ? '+' : ''}${value}%`),
-                        x: 40,
+                        axisExtremes: {
+                            x: { low: 'Low', high: 'High' },
+                            y: { low: 'Decrease', high: 'Increase' },
+                        },
+                        x: 60,
                         y: 120,
                         squareSize: 85,
                         noDataPadding: 30,
@@ -332,7 +336,7 @@
                                       svgId: 'gdp-small-multiples-legend',
                                       title: 'GDP change (percentage points)',
                                       orientation: 'horizontal',
-                                      x: 30,
+                                      x: 50,
                                       y: 4,
                                       width: size.width - 40,
                                       shapeHeight: 10,
@@ -356,13 +360,13 @@
                                 const stat = map.statData('gdpChange').get(regionId)
                                 const buf = [
                                     `
-                                    <div class="em-tooltip-bar">
-                                        <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-                                    </div>
-                                    <div class="em-tooltip-text no-data">
-                                        <table class="em-tooltip-table">
-                                            <tbody>
-                                                <tr><td>`,
+                                            <div class="em-tooltip-bar">
+                                                <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+                                            </div>
+                                            <div class="em-tooltip-text no-data">
+                                                <table class="em-tooltip-table">
+                                                    <tbody>
+                                                        <tr><td>`,
                                 ]
 
                                 buf.push(config.urbanRuralLabels[typology] || map.noDataText_)
@@ -376,9 +380,9 @@
                                 }
 
                                 buf.push(`</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>`)
+                                                    </tbody>
+                                                </table>
+                                            </div>`)
                                 return buf.join('')
                             },
                         })
