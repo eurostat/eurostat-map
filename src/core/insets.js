@@ -126,7 +126,7 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     }
 
     if (presetName === 'image') {
-        buildOverseasInsetsDecoration(insetsGroup)
+        buildOverseasInsetsDecoration(insetsGroup, out.insets_)
     }
 
     return out
@@ -740,9 +740,25 @@ const overseasInsetConfig = function () {
  * hand-positioned separator lines between adjacent territory insets, soft blur/fade gradients on
  * a few edges (French Guyane's box edge, Liechtenstein's cramped corner), and Liechtenstein's
  * title (rendered separately since its inset is too small to fit a title inside it).
+ *
+ * Every inset gets a `.em-frame` rect from the generic map-instance build path regardless of
+ * preset; the separator lines above already provide the visual separation this layout wants, so
+ * frames are hidden by default here and re-enabled only on the small zoomed-in detail insets
+ * (Guadeloupe/Açores close-ups) that declare their own `frameStrokeWidth`, to help them read as
+ * distinct from the territory they're zoomed into.
  * @param {*} insetsGroup d3 selection of the (already box-positioned) insets container group
+ * @param {*} insetConfigs resolved inset config array, in the same order the insets were built
  */
-const buildOverseasInsetsDecoration = function (insetsGroup) {
+const buildOverseasInsetsDecoration = function (insetsGroup, insetConfigs) {
+    insetsGroup.selectAll('.em-frame').style('stroke', 'none', 'important')
+    ;(insetConfigs || []).forEach((config) => {
+        if (!config.frameStrokeWidth || !config.svgId) return
+        insetsGroup
+            .select('#em-inset-' + config.svgId + ' .em-frame')
+            .style('stroke', 'grey', 'important')
+            .style('stroke-width', config.frameStrokeWidth + 'px', 'important')
+    })
+
     const lineColor = { class: 'em-inset-separator-line' }
     const thinLineColor = { class: 'em-inset-separator-line-thin' }
 
