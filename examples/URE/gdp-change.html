@@ -16,6 +16,11 @@
                 align-items: start;
             }
 
+            .gdp-small-multiples .em-cntbn,
+            .em-cntbn-halo {
+                stroke: none !important;
+            }
+
             .gdp-small-multiples {
                 display: grid;
                 grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
@@ -77,23 +82,10 @@
                 height: 0.55rem;
             }
 
-            .gdp-shared-scale-row {
-                display: grid;
-                grid-template-columns: 4.8rem 1fr;
-                align-items: center;
-                gap: 0.35rem;
-                margin-top: 0.2rem;
-            }
-
-            .gdp-shared-scale-row-label {
-                text-align: right;
-            }
-
             .gdp-shared-scale-labels {
                 display: flex;
                 justify-content: space-between;
                 margin-top: 0.2rem;
-                margin-left: 5.15rem;
             }
 
             .gdp-main-map {
@@ -158,11 +150,7 @@
                     return response.json()
                 })
                 const [lowerThreshold, upperThreshold] = config.thresholds
-                const divergingColors = {
-                    1: ['#8c2d04', '#d94801', '#fdbb84', '#fff7f7', '#f29ca3', '#c94b5b', '#8f1738'],
-                    2: ['#8c510a', '#bf812d', '#dfc27d', '#fff8f0', '#c2a27d', '#8c6845', '#543b25'],
-                    3: ['#4d7c0f', '#84ad32', '#c2d77a', '#f5fbf5', '#91c6a4', '#43956a', '#146b4a'],
-                }
+                const divergingColors = ['#4a1486', '#7b52ab', '#b6a0d2', '#f7f7f7', '#9ecae1', '#4f97c5', '#08519c']
                 const numericGdpValues = Object.values(config.stats.gdpChange).map(Number).filter(Number.isFinite)
                 const maxAbsoluteChange = Math.max(...numericGdpValues.map(Math.abs))
                 const third = maxAbsoluteChange / 3
@@ -269,7 +257,7 @@
                 return { width, height }
             }
 
-            function buildSmallMultiples(config, colorsByTypology, thresholds, size) {
+            function buildSmallMultiples(config, colors, thresholds, size) {
                 const typologies = [
                     { value: 1, svgId: 'gdp-urban' },
                     { value: 2, svgId: 'gdp-intermediate' },
@@ -296,7 +284,7 @@
                         .encoding('fill', { stat: 'gdpChange' })
                         .classificationMethod('threshold')
                         .thresholds(thresholds)
-                        .colors(colorsByTypology[value])
+                        .colors(colors)
                         .noDataFillStyle('#f1f1f1')
                         .legend(false)
                         .zoomExtent([0.1, 8])
@@ -341,27 +329,14 @@
                 })
             }
 
-            function renderSharedScale(colorsByTypology, maxAbsoluteChange) {
+            function renderSharedScale(colors, maxAbsoluteChange) {
                 const scale = document.getElementById('gdp-shared-scale')
                 const roundedMaximum = Math.ceil(maxAbsoluteChange)
-                const scaleRows = [
-                    ['Urban', colorsByTypology[1]],
-                    ['Intermediate', colorsByTypology[2]],
-                    ['Rural', colorsByTypology[3]],
-                ]
                 scale.innerHTML = `
                     <div class="gdp-shared-scale-title">GDP change (percentage points)</div>
-                    ${scaleRows
-                        .map(
-                            ([label, colors]) => `
-                                <div class="gdp-shared-scale-row">
-                                    <span class="gdp-shared-scale-row-label">${label}</span>
-                                    <div class="gdp-shared-scale-colors">
-                                        ${colors.map((color) => `<span style="background:${color}"></span>`).join('')}
-                                    </div>
-                                </div>`
-                        )
-                        .join('')}
+                    <div class="gdp-shared-scale-colors">
+                        ${colors.map((color) => `<span style="background:${color}"></span>`).join('')}
+                    </div>
                     <div class="gdp-shared-scale-labels">
                         <span>−${roundedMaximum}</span>
                         <span>0</span>
