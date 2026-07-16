@@ -967,6 +967,7 @@ export const buildSingleLayerMap = function (type, config) {
             'pointOfDivergence_',
             'skipNormalization_',
             'filtersDefinitionFunction_',
+            'domain_',
         ]
         typeMethods = [
             'numberOfClasses',

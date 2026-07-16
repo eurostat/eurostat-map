@@ -458,13 +458,19 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         // Keep the legacy property in sync for any external readers
         map.Geometries.centroidsFeatures = centroidFeatures
 
-        // Sort features by descending value (largest first so small ones are on top)
-        const sorted = centroidFeatures
-            .filter((f) => {
-                const v = sizeData.get?.(f.properties.id)?.value
-                return v != null && v !== ':' // exclude no-data
-            })
-            .sort((a, b) => sizeData.get(b.properties.id).value - sizeData.get(a.properties.id).value)
+        // Sort features by descending value (largest first so small ones are on top).
+        // Keep every anchor, even ones with no resolvable value here - dropping them
+        // entirely (rather than sorting them last) used to wipe out every symbol for a
+        // layer/inset whose own centroid ids (e.g. an inset's NUTS2/3-level anchors like
+        // 'ES70', 'FRY1') don't literally match a coarser dataset (e.g. country-level
+        // 'ES', 'FR'). appendCirclesToMap() already renders r=0 (invisible) for any
+        // anchor without a real value, so keeping them here is harmless and only affects
+        // z-order, not which regions end up with a visible circle.
+        const valueOf = (f) => {
+            const v = sizeData.get?.(f.properties.id)?.value
+            return v != null && v !== ':' && !isNaN(+v) ? +v : -Infinity
+        }
+        const sorted = centroidFeatures.slice().sort((a, b) => valueOf(b) - valueOf(a))
 
         // Clear old symbol containers
         const centroidsGroup = getCentroidsGroup(target)
