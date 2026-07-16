@@ -77,15 +77,30 @@
             }
 
             .gdp-shared-scale-colors {
-                display: grid;
-                grid-template-columns: repeat(7, 1fr);
+                display: flex;
                 height: 0.55rem;
             }
 
             .gdp-shared-scale-labels {
-                display: flex;
-                justify-content: space-between;
+                position: relative;
+                height: 1em;
                 margin-top: 0.2rem;
+            }
+
+            .gdp-shared-scale-labels span {
+                position: absolute;
+            }
+
+            .gdp-shared-scale-label-min {
+                left: 0;
+            }
+
+            .gdp-shared-scale-label-zero {
+                transform: translateX(-50%);
+            }
+
+            .gdp-shared-scale-label-max {
+                right: 0;
             }
 
             .gdp-main-map {
@@ -152,12 +167,23 @@
                 const [lowerThreshold, upperThreshold] = config.thresholds
                 const divergingColors = ['#4a1486', '#7b52ab', '#b6a0d2', '#f7f7f7', '#9ecae1', '#4f97c5', '#08519c']
                 const numericGdpValues = Object.values(config.stats.gdpChange).map(Number).filter(Number.isFinite)
-                const maxAbsoluteChange = Math.max(...numericGdpValues.map(Math.abs))
-                const third = maxAbsoluteChange / 3
-                const divergingThresholds = [-2 * third, -third, -Number.EPSILON, Number.EPSILON, third, 2 * third]
+                const dataDomain = {
+                    min: Math.min(...numericGdpValues),
+                    max: Math.max(...numericGdpValues),
+                }
+                const negativeThird = Math.abs(dataDomain.min) / 3
+                const positiveThird = dataDomain.max / 3
+                const divergingThresholds = [
+                    dataDomain.min + negativeThird,
+                    dataDomain.min + 2 * negativeThird,
+                    -Number.EPSILON,
+                    Number.EPSILON,
+                    positiveThird,
+                    2 * positiveThird,
+                ]
 
                 buildSmallMultiples(config, divergingColors, divergingThresholds, getSmallMapSize())
-                renderSharedScale(divergingColors, maxAbsoluteChange)
+                renderSharedScale(divergingColors, dataDomain)
 
                 eurostatmap
                     .map('bivariateChoropleth')
@@ -329,18 +355,31 @@
                 })
             }
 
-            function renderSharedScale(colors, maxAbsoluteChange) {
+            function renderSharedScale(colors, domain) {
                 const scale = document.getElementById('gdp-shared-scale')
-                const roundedMaximum = Math.ceil(maxAbsoluteChange)
+                const negativeClassWidth = Math.abs(domain.min) / 3
+                const positiveClassWidth = domain.max / 3
+                const neutralClassWidth = Math.max((domain.max - domain.min) * 0.01, 1)
+                const classWidths = [
+                    negativeClassWidth,
+                    negativeClassWidth,
+                    negativeClassWidth,
+                    neutralClassWidth,
+                    positiveClassWidth,
+                    positiveClassWidth,
+                    positiveClassWidth,
+                ]
+                const displayedDomainWidth = Math.abs(domain.min) + neutralClassWidth + domain.max
+                const zeroPosition = ((Math.abs(domain.min) + neutralClassWidth / 2) / displayedDomainWidth) * 100
                 scale.innerHTML = `
                     <div class="gdp-shared-scale-title">GDP change (percentage points)</div>
                     <div class="gdp-shared-scale-colors">
-                        ${colors.map((color) => `<span style="background:${color}"></span>`).join('')}
+                        ${colors.map((color, index) => `<span style="background:${color};flex:${classWidths[index]} 1 0"></span>`).join('')}
                     </div>
                     <div class="gdp-shared-scale-labels">
-                        <span>−${roundedMaximum}</span>
-                        <span>0</span>
-                        <span>+${roundedMaximum}</span>
+                        <span class="gdp-shared-scale-label-min">${domain.min}</span>
+                        <span class="gdp-shared-scale-label-zero" style="left:${zeroPosition}%">0</span>
+                        <span class="gdp-shared-scale-label-max">+${domain.max}</span>
                     </div>`
             }
 
