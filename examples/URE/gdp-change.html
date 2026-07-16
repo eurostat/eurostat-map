@@ -11,7 +11,7 @@
 
             .gdp-map-layout {
                 display: grid;
-                grid-template-columns: minmax(250px, 30%) minmax(0, 70%);
+                grid-template-columns: minmax(320px, 35%) minmax(0, 65%);
                 width: 100%;
                 align-items: start;
             }
@@ -237,10 +237,11 @@
                     eurostatmap
                         .map('choropleth')
                         .svgId(svgId)
-                        .width(320)
-                        .height(190)
+                        .width(400)
+                        .height(240)
                         .header(false)
                         .footer(false)
+                        .bottomText(false)
                         .scale(config.scale)
                         .nutsLevel(config.nutsLevel)
                         .nutsYear(config.nutsYear)
@@ -251,16 +252,41 @@
                         .colors(colors)
                         .noDataFillStyle('#f1f1f1')
                         .legend(false)
-                        .zoomButtons(false)
+                        .zoomExtent([1, 8])
+                        .zoomButtons(true)
                         .transitionDuration(0)
                         .tooltip({
                             textFunction: function (region, map) {
                                 const regionId = region.properties.id
                                 const regionName = region.properties.na || region.properties.name
+                                const typology = config.stats.urbanRuralType[regionId]
                                 const stat = map.statData('gdpChange').get(regionId)
-                                if (!stat || stat.value === ':' || !Number.isFinite(Number(stat.value))) return `${regionName}: ${map.noDataText_}`
-                                const sign = Number(stat.value) > 0 ? '+' : ''
-                                return `${regionName}: ${sign}${stat.value} percentage points`
+                                const buf = [
+                                    `
+                                    <div class="em-tooltip-bar">
+                                        <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
+                                    </div>
+                                    <div class="em-tooltip-text no-data">
+                                        <table class="em-tooltip-table">
+                                            <tbody>
+                                                <tr><td>`,
+                                ]
+
+                                buf.push(config.urbanRuralLabels[typology] || map.noDataText_)
+                                buf.push('<br>')
+
+                                if (!stat || stat.value === ':' || !Number.isFinite(Number(stat.value))) {
+                                    buf.push(map.noDataText_)
+                                } else {
+                                    const sign = Number(stat.value) > 0 ? '+' : ''
+                                    buf.push(`${sign}${stat.value} percentage points`)
+                                }
+
+                                buf.push(`</td></tr>
+                                            </tbody>
+                                        </table>
+                                    </div>`)
+                                return buf.join('')
                             },
                         })
                         .build()
