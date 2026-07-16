@@ -12,3 +12,19 @@
     stroke: grey;
     stroke-width: 0.3px !important;
 }
+
+/* 'default' overseas inset layout decoration (see buildOverseasInsetsDecoration in insets.js) */
+.em-insets-background {
+    fill: white;
+}
+.em-inset-separator-line {
+    stroke: black;
+    stroke-width: 0.3px;
+}
+.em-inset-separator-line-thin {
+    stroke: black;
+    stroke-width: 0.1px;
+}
+.em-inset-blur-stop {
+    stop-color: rgb(255, 255, 255);
+}

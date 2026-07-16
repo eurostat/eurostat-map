@@ -230,15 +230,20 @@ export interface MapInstance {
     /** Insets. */
 
     /**
-     * Inset map configurations. Pass 'default' for the standard
-     * eurostat overseas territory insets. Passing true is an alias for 'default'.
-     * Pass false to disable.
+     * Inset map configurations. Pass a named preset string, or a custom array, or false to
+     * disable. Passing true is an alias for 'default'.
+     * - 'default': simple grid layout of overseas territories.
+     * - 'image': Malta, Liechtenstein and EU/EFTA overseas/remote territories, hand-tuned
+     *   layout with connecting decoration (background box, separator lines, blur gradients).
+     * - 'eu': simple grid layout of EU overseas/outermost territories, no decoration.
+     * - 'euEfta': like 'eu', plus Liechtenstein and Svalbard, no decoration.
      * @example map.insets('default')
+     * @example map.insets('image')
      * @example map.insets(true)
      * @example map.insets([{ geo: 'MT' }, { geo: 'LI' }])
      */
-    insets(): InsetConfig[] | 'default' | false
-    insets(config: InsetConfig[] | 'default' | true | false): this
+    insets(): InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | false
+    insets(config: InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | true | false): this
 
     /** Decoration. */
 
