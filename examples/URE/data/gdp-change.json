@@ -6,8 +6,8 @@
     "chapterTitle": "Economy",
     "title": "Map 1: Overall change in GDP per inhabitant, by urban-rural typology, 2013–23",
     "subtitle": "(by NUTS 3 regions)",
-    "gdpLegendLabel": "Change (percentage points)",
-    "urbanRuralLegendLabel": "Urban-rural typology",
+    "gdpLegendLabel": "Change\n(percentage points)",
+    "urbanRuralLegendLabel": "Urban-Int.-Rural",
     "thresholds": [-5.0, 5.0],
     "urbanRuralLabels": {
         "1": "Urban",
@@ -27,9 +27,9 @@
         ":": "rgb(178,178,178)"
     },
     "classMatrix": [
-        [1, 4, 7],
-        [2, 5, 8],
-        [3, 6, 9]
+        [3, 2, 1],
+        [6, 5, 4],
+        [9, 8, 7]
     ],
     "footnote": "Note: based on the change in an index with EU = 100. Poland and Slovakia: break in series.",
     "source": "Source: Eurostat (online data code: nama_10r_3gdp)",

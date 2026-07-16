@@ -536,15 +536,15 @@ export const legend = function (map, config) {
 
         if (out.xAxisTitleOffset) xAxisTitleX += out.xAxisTitleOffset.x
         if (out.xAxisTitleOffset) xAxisTitleY += out.xAxisTitleOffset.y
-        axisTitles
+        const xAxisTitle = axisTitles
             .append('text')
             .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-x')
             .attr('x', xAxisTitleX)
             .attr('y', xAxisTitleY)
-            .text(out.label1)
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'hanging')
             .attr('alignment-baseline', 'hanging')
+        appendMultilineText(xAxisTitle, splitMultilineText(out.label1), xAxisTitleX, false)
 
         // Y axis title centered on the Y arrow segment and placed outside arrow + endpoint labels.
         const yAxisTitlePadding = 12
@@ -567,9 +567,9 @@ export const legend = function (map, config) {
             .attr('class', 'em-bivariate-axis-title em-bivariate-axis-title-y')
             .attr('x', yAxisTitleX)
             .attr('y', yAxisTitleY)
-            .text(out.label2)
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
+        appendMultilineText(yAxisTitle, splitMultilineText(out.label2), yAxisTitleX)
 
         const yAxisTitleRotation = out.rotation === -45 ? 90 : -90
         yAxisTitle.attr('transform', `rotate(${yAxisTitleRotation} ${yAxisTitleX} ${yAxisTitleY})`)
@@ -685,7 +685,7 @@ export const legend = function (map, config) {
             const ty = y1 + cornerOffset.y
 
             const anchor = ux > 0.2 ? 'start' : ux < -0.2 ? 'end' : 'middle'
-            const lines = splitAnnotationLines(text)
+            const lines = splitMultilineText(text)
 
             const annotationLine = annotationsGroup
                 .append('line')
@@ -834,7 +834,8 @@ export const legend = function (map, config) {
         return Math.max(2, baseLineLength + radialOffset)
     }
 
-    function splitAnnotationLines(text) {
+    function splitMultilineText(text) {
+        if (typeof text !== 'string') return []
         const breakPattern = new RegExp('<br\\s*\\/?>(?:\\r?\\n)?|\\r?\\n', 'gi')
         return text
             .split(breakPattern)
@@ -842,7 +843,7 @@ export const legend = function (map, config) {
             .filter(Boolean)
     }
 
-    function appendMultilineText(textSelection, lines, x) {
+    function appendMultilineText(textSelection, lines, x, centered = true) {
         if (!lines.length) return
         if (lines.length === 1) {
             textSelection.text(lines[0])
@@ -850,7 +851,7 @@ export const legend = function (map, config) {
         }
 
         const lineHeight = 1.15
-        const startDy = -((lines.length - 1) * lineHeight) / 2
+        const startDy = centered ? -((lines.length - 1) * lineHeight) / 2 : 0
 
         lines.forEach((line, index) => {
             textSelection

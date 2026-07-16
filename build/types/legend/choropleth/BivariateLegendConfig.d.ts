@@ -12,10 +12,10 @@ export interface BivariateLegendConfig extends LegendConfig {
     /** Rotation angle of the legend in degrees. @default 0 */
     rotation?: number
 
-    /** Label for the first variable (y-axis). @default 'Variable 1' */
+    /** Label for the first variable (x-axis). Supports `\\n` and `<br>` line breaks. @default 'Variable 1' */
     label1?: string
 
-    /** Label for the second variable (x-axis). @default 'Variable 2' */
+    /** Label for the second variable (y-axis). Supports `\\n` and `<br>` line breaks. @default 'Variable 2' */
     label2?: string
 
     /** Break labels for the first variable. Omit to hide first-axis break labels. */
