@@ -91,6 +91,7 @@ export const addLabelsToMap = function (map, zg) {
                     .attr('y', bbox.y - paddingY)
                     .attr('width', bbox.width + paddingX * 2)
                     .attr('height', bbox.height + paddingY * 2)
+                    .attr('fill', map.labels_.backgroundFill || '#ffffff')
             })
         }
     }
@@ -291,6 +292,7 @@ export function addFlowValueLabels(out, svg) {
                 .attr('y', bbox.y - paddingY)
                 .attr('width', bbox.width + 2 * paddingX)
                 .attr('height', bbox.height + 2 * paddingY)
+                .attr('fill', out.labels_.backgroundFill || '#ffffff')
         })
     }
 }
@@ -400,6 +402,7 @@ export const updateValuesLabels = function (map) {
             .attr('width', labelWidth + 2 * paddingX) // Width of the rect with padding
             .attr('height', labelHeight + 2 * paddingY) // Height of the rect with padding
             .attr('class', 'em-label-background')
+            .attr('fill', map.labels_.backgroundFill || '#ffffff')
     }
 
     //add halos to labels

@@ -176,6 +176,16 @@
                         <input name="decoration" type="radio" value="background" />
                         Backgrounds
                     </label>
+                    <label>
+                        Background color
+                        <select id="background-color">
+                            <option value="white" selected>White</option>
+                            <option value="#B19122">Gold (#B19122)</option>
+                            <option value="#E8F4F8">Light blue</option>
+                            <option value="rgba(255, 255, 255, 0.8)">White 80%</option>
+                            <option value="#FFE4B5">Moccasin</option>
+                        </select>
+                    </label>
                     <label class="check">
                         <input id="scale-on-zoom" type="checkbox" checked />
                         Scale labels on zoom
@@ -234,10 +244,18 @@
             }
             const defaultLabels = eurostatmap.getDefaultLabels().EUR_3035
             const controls = Object.fromEntries(
-                ['label-set', 'language', 'values', 'scale-on-zoom', 'formatter', 'filter', 'offset-values', 'position-x', 'position-y'].map((id) => [
-                    id,
-                    document.getElementById(id),
-                ])
+                [
+                    'label-set',
+                    'language',
+                    'values',
+                    'scale-on-zoom',
+                    'formatter',
+                    'filter',
+                    'offset-values',
+                    'position-x',
+                    'position-y',
+                    'background-color',
+                ].map((id) => [id, document.getElementById(id)])
             )
 
             const map = eurostatmap
@@ -309,6 +327,7 @@
                     values: controls.values.checked,
                     halos: decoration === 'halo',
                     backgrounds: decoration === 'background',
+                    backgroundFill: controls['background-color'].value,
                     scaleOnZoom: controls['scale-on-zoom'].checked,
                     statLabelsPositions: {
                         AL: { x: +controls['position-x'].value, y: +controls['position-y'].value },
@@ -330,6 +349,7 @@
                     values: options.values,
                     halos: options.halos,
                     backgrounds: options.backgrounds,
+                    backgroundFill: options.backgroundFill,
                     scaleOnZoom: options.scaleOnZoom,
                     statLabelsPositions: options.statLabelsPositions,
                 }
