@@ -42,8 +42,8 @@ export interface BivariateLegendConfig extends LegendConfig {
     /** Extra vertical offset for the "no data" legend item in pixels. @default 30 */
     noDataYOffset?: number
 
-    /** Whether to show arrows at the end of the axes. @default true */
-    axisArrows?: boolean
+    /** Whether to show arrows at the end of both axes, or for each axis independently. @default true */
+    axisArrows?: boolean | { x?: boolean; y?: boolean }
 
     /** Height of axis arrows in pixels. @default 15 */
     arrowHeight?: number
@@ -63,8 +63,8 @@ export interface BivariateLegendConfig extends LegendConfig {
         y?: { low?: string; high?: string }
     }
 
-    /** Whether to show low/high endpoint labels on both axes. @default true */
-    showAxisExtremes?: boolean
+    /** Whether to show low/high endpoint labels on both axes, or for each axis independently. @default true */
+    showAxisExtremes?: boolean | { x?: boolean; y?: boolean }
 
     /**
      * Optional text annotations for each corner of the bivariate square.
