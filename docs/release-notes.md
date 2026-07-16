@@ -1,5 +1,46 @@
 # Release notes
 
+## 4.7.1
+
+### Fixes
+
+- **Legends no longer forced into the top-right corner when rendered into a caller-managed external container (`svgId`)** - if you position your own legend `<g>` yourself (e.g. as a sibling of the map's zoom group, so it stays fixed during pan/zoom) and pass its id via `legend({ svgId })` without `x`/`y`/`position`, the legend now renders into your container without eurostat-map overwriting its transform. Previously, an unscoped default-position fallback was applied regardless, and a scoped-vs-unscoped selector mismatch elsewhere could also cause a second, wrongly-positioned duplicate element to be created.
+
+Example:
+
+```javascript
+// caller-managed container, positioned externally via its own transform - not by eurostat-map
+eurostatmap
+    .map('choropleth')
+    .legend({ svgId: 'my-external-legend-container' })
+    .build()
+```
+
+- **Proportional-symbol insets no longer show phantom, off-position circles for unrelated countries** - insets were supplementing their centroids from the same unscoped, whole-map country list the main map uses, then projecting those through the inset's own (tiny, zoomed-in) projection - placing symbols for countries far outside the inset's own territory well outside its visible viewBox. Insets now only use their own NUTS-scoped centroids.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ps')
+    .nutsLevel('mixed')
+    .insets(true) // e.g. Malta, Liechtenstein, Açores, Madeira insets
+    .encoding('size', { stat: 'population' })
+    .build()
+```
+
+- **Scalebar config objects built with `a ?? b` style fallback chains no longer clobber defaults with explicit `undefined`** - a partial scalebar config (main map, `.scalebar({...})`, or an inset's `scalebar` config) that included a key present-but-`undefined` (a common byproduct of normalizing legacy option names) previously overwrote a good default via `Object.assign`, which could throw `TypeError: Cannot read properties of undefined (reading '0')` inside `addScalebarToMap`. Merging now skips explicitly-`undefined` keys.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .scalebar({ position: [10, 10] }) // other fields safely fall back to defaults, even if a caller
+    // builds this object with `field: a ?? b` where both a and b are undefined
+    .build()
+```
+
 ## 4.7.0
 
 ### New
