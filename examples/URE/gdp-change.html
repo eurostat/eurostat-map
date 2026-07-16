@@ -23,7 +23,7 @@
 
             .gdp-small-multiples {
                 display: grid;
-                grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
+                grid-template-rows: repeat(3, minmax(0, 1fr));
                 gap: 0.4rem;
                 padding: 0.75rem 0 0.75rem 0.75rem;
                 box-sizing: border-box;
@@ -64,45 +64,6 @@
                 min-height: 0;
             }
 
-            .gdp-shared-scale {
-                padding: 0.15rem 0.5rem 0.25rem;
-                font-size: 0.72rem;
-                color: #444;
-            }
-
-            .gdp-shared-scale-title {
-                margin-bottom: 0.25rem;
-                text-align: center;
-                font-weight: 600;
-            }
-
-            .gdp-shared-scale-colors {
-                display: flex;
-                height: 0.55rem;
-            }
-
-            .gdp-shared-scale-labels {
-                position: relative;
-                height: 1em;
-                margin-top: 0.2rem;
-            }
-
-            .gdp-shared-scale-labels span {
-                position: absolute;
-            }
-
-            .gdp-shared-scale-label-min {
-                left: 0;
-            }
-
-            .gdp-shared-scale-label-zero {
-                transform: translateX(-50%);
-            }
-
-            .gdp-shared-scale-label-max {
-                right: 0;
-            }
-
             .gdp-main-map {
                 min-width: 0;
             }
@@ -118,16 +79,12 @@
                     height: auto;
                     padding: 0.5rem;
                 }
-
-                .gdp-shared-scale {
-                    grid-column: 1 / -1;
-                }
             }
 
             @media (max-width: 600px) {
                 .gdp-small-multiples {
                     grid-template-columns: 1fr;
-                    grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
+                    grid-template-rows: repeat(3, minmax(0, 1fr));
                     height: 100vh;
                     height: 100dvh;
                 }
@@ -150,7 +107,6 @@
                     <h2>Rural regions</h2>
                     <svg id="gdp-rural"></svg>
                 </section>
-                <div id="gdp-shared-scale" class="gdp-shared-scale" aria-label="Shared GDP change colour scale"></div>
             </aside>
             <main class="gdp-main-map">
                 <svg id="map61"></svg>
@@ -158,6 +114,7 @@
         </div>
 
         <script src="../../build/eurostatmap.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
         <script>
             async function buildMap() {
                 const config = await fetch('./data/gdp-change.json').then((response) => {
@@ -165,25 +122,14 @@
                     return response.json()
                 })
                 const [lowerThreshold, upperThreshold] = config.thresholds
-                const divergingColors = ['#4a1486', '#7b52ab', '#b6a0d2', '#f7f7f7', '#9ecae1', '#4f97c5', '#08519c']
                 const numericGdpValues = Object.values(config.stats.gdpChange).map(Number).filter(Number.isFinite)
                 const dataDomain = {
                     min: Math.min(...numericGdpValues),
                     max: Math.max(...numericGdpValues),
                 }
-                const negativeThird = Math.abs(dataDomain.min) / 3
-                const positiveThird = dataDomain.max / 3
-                const divergingThresholds = [
-                    dataDomain.min + negativeThird,
-                    dataDomain.min + 2 * negativeThird,
-                    -Number.EPSILON,
-                    Number.EPSILON,
-                    positiveThird,
-                    2 * positiveThird,
-                ]
+                const continuousScale = makeContinuousDivergingScale(dataDomain.min, dataDomain.max)
 
-                buildSmallMultiples(config, divergingColors, divergingThresholds, getSmallMapSize())
-                renderSharedScale(divergingColors, dataDomain)
+                buildSmallMultiples(config, continuousScale, dataDomain, getSmallMapSize())
 
                 eurostatmap
                     .map('bivariateChoropleth')
@@ -278,12 +224,30 @@
             function getSmallMapSize() {
                 const container = document.querySelector('.gdp-small-multiples')
                 const width = Math.max(320, Math.floor(container.clientWidth - 12))
-                const reservedHeight = 190
+                const reservedHeight = 90
                 const height = Math.max(105, Math.floor((document.documentElement.clientHeight - reservedHeight) / 3))
                 return { width, height }
             }
 
-            function buildSmallMultiples(config, colors, thresholds, size) {
+            function makeContinuousDivergingScale(min, max) {
+                const divergenceT = (0 - min) / (max - min)
+                const valueTransform = (value) => {
+                    if (value < 0) return (divergenceT * (value - min)) / -min
+                    return divergenceT + ((1 - divergenceT) * value) / max
+                }
+                const valueUntransform = (t) => {
+                    if (t < divergenceT) return min + (t / divergenceT) * -min
+                    return ((t - divergenceT) / (1 - divergenceT)) * max
+                }
+                const balancedColor = d3.piecewise(d3.interpolateRgb, ['#4a1486', '#b6a0d2', '#f7f7f7', '#9ecae1', '#08519c'])
+                const colorFunction = (t) => {
+                    if (t < divergenceT) return balancedColor((0.5 * t) / divergenceT)
+                    return balancedColor(0.5 + (0.5 * (t - divergenceT)) / (1 - divergenceT))
+                }
+                return { colorFunction, valueTransform, valueUntransform }
+            }
+
+            function buildSmallMultiples(config, continuousScale, domain, size) {
                 const typologies = [
                     { value: 1, svgId: 'gdp-urban' },
                     { value: 2, svgId: 'gdp-intermediate' },
@@ -308,11 +272,30 @@
                         .nutsYear(config.nutsYear)
                         .stat('gdpChange', { customData: typedData, unitText: 'percentage points' })
                         .encoding('fill', { stat: 'gdpChange' })
-                        .classificationMethod('threshold')
-                        .thresholds(thresholds)
-                        .colors(colors)
+                        .colorSchemeType('continuous')
+                        .colorFunction(continuousScale.colorFunction)
+                        .valueTransform(continuousScale.valueTransform)
+                        .valueUntransform(continuousScale.valueUntransform)
+                        .skipNormalization(true)
+                        .pointOfDivergence(0)
                         .noDataFillStyle('#f1f1f1')
-                        .legend(false)
+                        .legend(
+                            value === 3
+                                ? {
+                                      title: 'GDP change (percentage points)',
+                                      orientation: 'horizontal',
+                                      x: 20,
+                                      y: size.height - 55,
+                                      width: size.width - 40,
+                                      shapeHeight: 10,
+                                      tickLength: 5,
+                                      tickValues: [domain.min, 0, domain.max],
+                                      tickLabels: [String(domain.min), '0', `+${domain.max}`],
+                                      decimals: 0,
+                                      noData: false,
+                                  }
+                                : false
+                        )
                         .zoomExtent([0.1, 8])
                         .zoomButtons(false)
                         .position({ x: 4800000, y: 3400000, z: 6000 })
@@ -353,34 +336,6 @@
                         })
                         .build()
                 })
-            }
-
-            function renderSharedScale(colors, domain) {
-                const scale = document.getElementById('gdp-shared-scale')
-                const negativeClassWidth = Math.abs(domain.min) / 3
-                const positiveClassWidth = domain.max / 3
-                const neutralClassWidth = Math.max((domain.max - domain.min) * 0.01, 1)
-                const classWidths = [
-                    negativeClassWidth,
-                    negativeClassWidth,
-                    negativeClassWidth,
-                    neutralClassWidth,
-                    positiveClassWidth,
-                    positiveClassWidth,
-                    positiveClassWidth,
-                ]
-                const displayedDomainWidth = Math.abs(domain.min) + neutralClassWidth + domain.max
-                const zeroPosition = ((Math.abs(domain.min) + neutralClassWidth / 2) / displayedDomainWidth) * 100
-                scale.innerHTML = `
-                    <div class="gdp-shared-scale-title">GDP change (percentage points)</div>
-                    <div class="gdp-shared-scale-colors">
-                        ${colors.map((color, index) => `<span style="background:${color};flex:${classWidths[index]} 1 0"></span>`).join('')}
-                    </div>
-                    <div class="gdp-shared-scale-labels">
-                        <span class="gdp-shared-scale-label-min">${domain.min}</span>
-                        <span class="gdp-shared-scale-label-zero" style="left:${zeroPosition}%">0</span>
-                        <span class="gdp-shared-scale-label-max">+${domain.max}</span>
-                    </div>`
             }
 
             buildMap().catch((error) => console.error(error))
