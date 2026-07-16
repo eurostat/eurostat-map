@@ -548,6 +548,7 @@ export const legend = function (map, config) {
 
         // Y axis title centered on the Y arrow segment and placed outside arrow + endpoint labels.
         const yAxisTitlePadding = 12
+        const yAxisTitleLines = splitMultilineText(out.label2)
         let yAxisTitleX = out._yAxisArrowX - (hasAxisArrow('y') ? out.arrowHeight + yAxisTitlePadding : 8 + yAxisTitlePadding)
         let yAxisTitleY = (spans.yStart + spans.yEnd) / 2
 
@@ -559,6 +560,10 @@ export const legend = function (map, config) {
         if (Number.isFinite(yLabelsLeft)) {
             yAxisTitleX = Math.min(yAxisTitleX, yLabelsLeft - yAxisTitlePadding)
         }
+        if (yAxisTitleLines.length > 1) {
+            const multilineHalfDepth = ((yAxisTitleLines.length - 1) * out.axisTitleFontSize * 1.15) / 2
+            yAxisTitleX -= multilineHalfDepth + 3
+        }
 
         if (out.yAxisTitleOffset) yAxisTitleX += out.yAxisTitleOffset.x
         if (out.yAxisTitleOffset) yAxisTitleY += out.yAxisTitleOffset.y
@@ -569,7 +574,7 @@ export const legend = function (map, config) {
             .attr('y', yAxisTitleY)
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
-        appendMultilineText(yAxisTitle, splitMultilineText(out.label2), yAxisTitleX)
+        appendMultilineText(yAxisTitle, yAxisTitleLines, yAxisTitleX)
 
         const yAxisTitleRotation = out.rotation === -45 ? 90 : -90
         yAxisTitle.attr('transform', `rotate(${yAxisTitleRotation} ${yAxisTitleX} ${yAxisTitleY})`)
