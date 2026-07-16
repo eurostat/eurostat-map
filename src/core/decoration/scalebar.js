@@ -7,7 +7,10 @@
  * @param {MapInstance} out
  */
 export const addScalebarToMap = function (out) {
-    const sb = out.scalebar_ || getDefaultScalebarConfig()
+    // Defensive merge: out.scalebar_ may be a partial/malformed config if a caller (or an inset's
+    // normalized legacy config) built it with fallback chains that leave some keys explicitly
+    // `undefined` — see mergeScalebarConfig() for why that's unsafe to Object.assign directly.
+    const sb = mergeScalebarConfig(out.scalebar_)
     if (!sb.position || sb.position.length !== 2) return
 
     // remove existing before redraw
@@ -190,6 +193,27 @@ export const getDefaultScalebarConfig = function () {
         segmentHeight: 6,
         tickHeight: 8,
     }
+}
+
+/**
+ * @function mergeScalebarConfig
+ * @description Merges a partial scalebar config onto a base config (the defaults, by default),
+ * skipping any key whose value is explicitly `undefined`. Plain `Object.assign` copies a source
+ * key regardless of its value, so a partial config built with fallback chains like
+ * `a ?? b` (a common pattern when normalizing legacy/deprecated option names) can end up with
+ * keys that are present but `undefined` — which then silently overwrites a perfectly good default,
+ * producing things like `sb.textOffset === undefined` deep inside the scalebar renderer.
+ * @param {object} [partial] partial scalebar config to overlay
+ * @param {object} [base] base config to merge onto (defaults to getDefaultScalebarConfig())
+ */
+export const mergeScalebarConfig = function (partial, base) {
+    const merged = Object.assign({}, base || getDefaultScalebarConfig())
+    if (partial) {
+        for (const key in partial) {
+            if (partial[key] !== undefined) merged[key] = partial[key]
+        }
+    }
+    return merged
 }
 
 function debounce(func, wait) {

@@ -65,7 +65,15 @@ const setupBaseCentroids = function (map) {
 
     // Supplement with any cntrg region not covered by the nuts centroid files.
     // Only relevant for level-0 and mixed maps; higher levels don't have non-NUTS country subdivisions.
-    const needsCntrgSupplement = map.nutsLevel_ === 'mixed' || map.nutsLevel_ === 0 || map.nutsLevel_ === '0'
+    // Skipped for insets: an inset is always zoomed to one specific micro-territory, and
+    // map.Geometries.geoJSONs.cntrg here is the same *unscoped, full* country list the main map
+    // uses — so this would "supplement" the inset with every other country the inset's own NUTS
+    // centroids don't already cover, i.e. almost every country there is. Each gets a centroid via
+    // map._pathFunction.centroid(), computed against the inset's own (tiny) projection — which
+    // places it wherever that country's full, un-clipped polygon happens to fall in the inset's
+    // local coordinate space, almost always far outside the inset's small viewBox. That produced
+    // phantom, wrongly-positioned symbols for unrelated countries inside every inset.
+    const needsCntrgSupplement = (map.nutsLevel_ === 'mixed' || map.nutsLevel_ === 0 || map.nutsLevel_ === '0') && !map.isInset
     if (needsCntrgSupplement && map.Geometries.geoJSONs.cntrg && map.geo_ !== 'WORLD') {
         const existingIds = new Set(projectedCentroids.map((d) => d.properties.id))
         for (const feature of map.Geometries.geoJSONs.cntrg) {

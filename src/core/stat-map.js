@@ -297,7 +297,9 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
             const g = svg.select('#em-layer-' + l.id + '-' + out.svgId_)
             if (!g.empty()) g.remove()
             if (l.legendObj_) {
-                const ls = svg.select('#' + l.legendObj_.svgId)
+                // Global lookup, not svg.select(...): a caller-managed external legend container
+                // (see _hasExternalSvgId) may live outside this map's own SVG subtree.
+                const ls = select('#' + l.legendObj_.svgId)
                 if (!ls.empty()) ls.remove()
             }
         }
@@ -464,7 +466,9 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
         const visible = out.legendVisible_ === undefined ? getDefaultLegendVisible() : out.legendVisible_
 
-        const legendSvg = out.svg().select('#' + legend.svgId)
+        // Global lookup, not out.svg().select(...): a caller-managed external legend container
+        // (see _hasExternalSvgId) may live outside this map's own SVG subtree.
+        const legendSvg = select('#' + legend.svgId)
         if (!legendSvg.empty()) {
             legendSvg.style('display', visible ? null : 'none')
         }
@@ -629,7 +633,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
         const legend = layer.legendObj_
 
-        let legendSvg = out.svg().select('#' + legend.svgId)
+        // Global lookup, not out.svg().select(...): a caller-managed external legend container
+        // (see _hasExternalSvgId in legend.js) is commonly kept outside the map's own SVG
+        // subtree entirely — e.g. as a sibling of the map's zoom group, so it stays fixed on
+        // screen during pan/zoom — so it would never be found by a lookup scoped to out.svg().
+        // Scoping this to out.svg() meant such containers were never found, and a second,
+        // wrongly-nested element with the same id got created here instead, leaving the
+        // caller-managed one empty while the real legend rendered into the wrong element.
+        let legendSvg = select('#' + legend.svgId)
         if (legendSvg.empty()) {
             out.svg().append('g').attr('id', legend.svgId).attr('class', 'em-legend')
         }
