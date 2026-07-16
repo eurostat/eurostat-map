@@ -42,12 +42,14 @@
                 min-height: 0;
                 width: 100%;
                 aspect-ratio: 1;
+                border: 1px solid var(--typology-color, #333);
+                box-sizing: border-box;
                 overflow: hidden;
             }
 
             .gdp-small-map-card h2 {
                 margin: 0 0 0.1rem;
-                color: #333;
+                color: var(--typology-color, #333);
                 font-size: 0.9rem;
                 font-weight: 600;
                 text-align: center;
@@ -288,6 +290,9 @@
                 ]
 
                 typologies.forEach(({ value, svgId }) => {
+                    const darkestClassId = config.classMatrix[value - 1]?.at(-1)
+                    const typologyColor = config.colorsByClass[darkestClassId]
+                    document.getElementById(svgId).closest('.gdp-small-map-card').style.setProperty('--typology-color', typologyColor)
                     const typedData = Object.fromEntries(
                         Object.entries(config.stats.gdpChange).filter(([regionId]) => Number(config.stats.urbanRuralType[regionId]) === value)
                     )
