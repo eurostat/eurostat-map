@@ -395,7 +395,7 @@
                     .nutsLevel('mixed')
                     .transitionDuration(0)
                     .insets(insetsCfg)
-                    .legend({ title: 'test', x: 0, y: 130 })
+                    .legend({ title: 'test', x: 0, y: 130, noData: true })
                     .insetBoxPosition(insetBoxPosition)
                     .onBuild((m) => {
                         callbackCount++
@@ -444,7 +444,7 @@
             })
             document.getElementById('btn-legend').addEventListener('click', () => {
                 if (map) {
-                    map.legend({ x: 10, y: 150, title: 'Updated Legend', sizeLegend: { values: [1, 2] } })
+                    map.legend({ x: 10, y: 150, title: 'Updated Legend', sizeLegend: { values: [1, 2] }, noData: true })
                     log('📊 Legend updated with sizeLegend values [1, 2]')
                 } else {
                     log('❌ No map built yet. Build a map first.')

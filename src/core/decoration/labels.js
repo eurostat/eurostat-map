@@ -8,7 +8,9 @@ import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColo
 const PS_LABEL_MIN_FONT_SIZE = 9
 const PS_LABEL_OVERFLOW_FONT_SIZE = 11 //  when overflowing outside circle
 
-const labelsHaveHalos = (labelsConfig) => !!(labelsConfig?.halos ?? labelsConfig?.shadows)
+// Backgrounds and halos are alternative readability treatments. When both legacy
+// booleans are supplied, backgrounds take precedence.
+const labelsHaveHalos = (labelsConfig) => !labelsConfig?.backgrounds && !!(labelsConfig?.halos ?? labelsConfig?.shadows)
 
 // ─── Public API ──────────────────────────────────────────────────────────────
 
@@ -56,24 +58,41 @@ export const addLabelsToMap = function (map, zg) {
                 .text((d) => d.text)
         }
 
-        labelg
-            .selectAll('text')
+        const labelItems = labelg
+            .selectAll('g.em-geographic-label')
             .data(labelsArray)
             .enter()
+            .append('g')
+            .attr('class', 'em-geographic-label')
+            .attr('transform', (d) => {
+                const [x, y] = map._projection([d.x, d.y])
+                return `translate(${x},${y})${d.rotate ? ` rotate(${d.rotate})` : ''}`
+            })
+
+        const labelTexts = labelItems
             .append('text')
             .attr('id', (d) => 'em-label-' + d.text.replace(/\s+/g, '-'))
             .attr('class', (d) => 'em-label em-label-' + d.class)
-            .attr('x', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[0]))
-            .attr('y', (d) => (d.rotate ? 0 : map._projection([d.x, d.y])[1]))
+            .attr('x', 0)
+            .attr('y', 0)
             .attr('dy', -7)
-            .attr('transform', (d) => {
-                if (d.rotate) {
-                    const [x, y] = map._projection([d.x, d.y])
-                    return `translate(${x},${y}) rotate(${d.rotate})`
-                }
-                return 'rotate(0)'
-            })
             .text((d) => d.text)
+
+        if (map.labels_.backgrounds) {
+            labelTexts.each(function () {
+                const text = this
+                const bbox = text.getBBox()
+                const paddingX = 4
+                const paddingY = 2
+                select(text.parentNode)
+                    .insert('rect', () => text)
+                    .attr('class', 'em-label-background em-geographic-label-background')
+                    .attr('x', bbox.x - paddingX)
+                    .attr('y', bbox.y - paddingY)
+                    .attr('width', bbox.width + paddingX * 2)
+                    .attr('height', bbox.height + paddingY * 2)
+            })
+        }
     }
 }
 
@@ -470,7 +489,10 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
     // stat labels halos
     if (labelsHaveHalos(map.labels_)) {
         gsls.selectAll('g')
-            .data(statLabelRegions)
+            // Use the same deduplicated features as the value-label layer. Mixed-level maps
+            // can contain the same region in multiple geometry collections; binding the raw
+            // array here creates extra halos at different centroids (notably for RS).
+            .data(filteredRegions)
             .enter()
             .append('g')
             .attr('transform', function (d) {

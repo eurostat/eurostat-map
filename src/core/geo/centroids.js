@@ -14,35 +14,35 @@ const getLayerAndMap = function (layerOrMap) {
 const setupBaseCentroids = function (map) {
     let centroidFeatures
 
-    if (!map.Geometries.centroidsData) {
-        // if centroids data is absent (e.g. for world maps) then calculate manually
-        if (map.geo_ == 'WORLD') {
-            centroidFeatures = []
-            map.Geometries.geoJSONs.worldrg.forEach((feature) => {
-                let newFeature = { ...feature }
-                // exception for France (because guyane)
-                if (feature.properties.id == 'FR') {
-                    newFeature.geometry = {
-                        coordinates: [2.2, 46.2],
-                        type: 'Point',
-                    }
-                } else {
-                    newFeature.geometry = {
-                        coordinates: geoCentroid(feature),
-                        type: 'Point',
-                    }
+    if (map.geo_ == 'WORLD') {
+        // World maps do not have separate centroid files; derive them from country polygons.
+        // Check the map type first so stale or malformed NUTS centroid state cannot select
+        // the level-indexed centroid path below.
+        centroidFeatures = []
+        map.Geometries.geoJSONs.worldrg.forEach((feature) => {
+            let newFeature = { ...feature }
+            // exception for France (because guyane)
+            if (feature.properties.id == 'FR') {
+                newFeature.geometry = {
+                    coordinates: [2.2, 46.2],
+                    type: 'Point',
                 }
-                centroidFeatures.push(newFeature)
-            })
-        } else {
-            // Fallback: compute centroids from cntrg polygon geometries
-            centroidFeatures = (map.Geometries.geoJSONs.cntrg || []).map((feature) => {
-                const newFeature = { ...feature }
-                newFeature.geometry = { coordinates: geoCentroid(feature), type: 'Point' }
-                newFeature.properties = { ...newFeature.properties, lvl: 0 }
-                return newFeature
-            })
-        }
+            } else {
+                newFeature.geometry = {
+                    coordinates: geoCentroid(feature),
+                    type: 'Point',
+                }
+            }
+            centroidFeatures.push(newFeature)
+        })
+    } else if (!map.Geometries.centroidsData) {
+        // Fallback: compute centroids from cntrg polygon geometries
+        centroidFeatures = (map.Geometries.geoJSONs.cntrg || []).map((feature) => {
+            const newFeature = { ...feature }
+            newFeature.geometry = { coordinates: geoCentroid(feature), type: 'Point' }
+            newFeature.properties = { ...newFeature.properties, lvl: 0 }
+            return newFeature
+        })
     } else {
         // centroidsData is always an array [lvl0, lvl1, lvl2, lvl3].
         // Explicitly tag each feature with its level so the filter is reliable

@@ -3,23 +3,243 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Labels API playground</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                color: #202124;
+                background: #f4f6f8;
+                font:
+                    14px/1.4 Arial,
+                    sans-serif;
+            }
+            main {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 18px;
+                align-items: start;
+                width: 100%;
+                padding: 18px;
+            }
+            .map-card,
+            .controls {
+                border: 1px solid #d8dde3;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+            }
+            .map-card {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            .map-card > #map {
+                display: block;
+                width: 100% !important;
+                max-width: none !important;
+                height: auto !important;
+            }
+            .controls {
+                position: sticky;
+                top: 18px;
+                padding: 16px;
+            }
+            h1 {
+                margin: 0 0 4px;
+                font-size: 20px;
+            }
+            .intro {
+                margin: 0 0 14px;
+                color: #5f6368;
+            }
+            fieldset {
+                margin: 0 0 14px;
+                padding: 10px 12px 12px;
+                border: 1px solid #d8dde3;
+                border-radius: 6px;
+            }
+            legend {
+                padding: 0 5px;
+                font-weight: 700;
+            }
+            label {
+                display: block;
+                margin-top: 8px;
+            }
+            label:first-of-type {
+                margin-top: 0;
+            }
+            .check {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+            select,
+            input[type='number'] {
+                width: 100%;
+                margin-top: 3px;
+                padding: 6px 8px;
+                border: 1px solid #b8c0ca;
+                border-radius: 4px;
+                background: white;
+            }
+            input[type='checkbox'] {
+                margin: 0;
+            }
+            .position-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 8px;
+            }
+            pre {
+                max-height: 260px;
+                margin: 0;
+                overflow: auto;
+                padding: 10px;
+                border-radius: 5px;
+                color: #e8eaed;
+                background: #202124;
+                font:
+                    12px/1.45 Consolas,
+                    monospace;
+                white-space: pre-wrap;
+            }
+            .em-label-seas {
+                fill: #245a85;
+                font-style: italic;
+            }
+            @media (max-width: 1080px) {
+                main {
+                    grid-template-columns: 1fr;
+                }
+                .controls {
+                    position: static;
+                }
+            }
+        </style>
     </head>
 
     <body>
-        <svg id="map"></svg>
+        <main>
+            <section class="map-card" aria-label="Map preview">
+                <svg id="map"></svg>
+            </section>
+
+            <aside class="controls">
+                <h1>Labels API playground</h1>
+                <p class="intro">
+                    Every control updates
+                    <code>map.labels(options)</code>
+                    immediately.
+                </p>
+
+                <fieldset>
+                    <legend>Geographic labels</legend>
+                    <label>
+                        Label set
+                        <select id="label-set">
+                            <option value="names" selected>Country names</option>
+                            <option value="codes">Country codes</option>
+                            <option value="countries-and-seas">Countries and seas</option>
+                            <option value="seas">Seas only</option>
+                            <option value="none">None</option>
+                        </select>
+                    </label>
+                    <label>
+                        Language
+                        <select id="language">
+                            <option value="en" selected>English</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                        </select>
+                    </label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Appearance</legend>
+                    <label class="check">
+                        <input id="values" type="checkbox" checked />
+                        Statistical values
+                    </label>
+                    <label class="check">
+                        <input name="decoration" type="radio" value="none" />
+                        No decoration
+                    </label>
+                    <label class="check">
+                        <input name="decoration" type="radio" value="halo" checked />
+                        Halos
+                    </label>
+                    <label class="check">
+                        <input name="decoration" type="radio" value="background" />
+                        Backgrounds
+                    </label>
+                    <label class="check">
+                        <input id="scale-on-zoom" type="checkbox" checked />
+                        Scale labels on zoom
+                    </label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Value labels</legend>
+                    <label>
+                        Formatter
+                        <select id="formatter">
+                            <option value="default" selected>Default</option>
+                            <option value="compact">Compact (1.2k)</option>
+                            <option value="decimal">One decimal</option>
+                            <option value="percent">Percent</option>
+                        </select>
+                    </label>
+                    <label>
+                        Filter
+                        <select id="filter">
+                            <option value="all" selected>All values</option>
+                            <option value="gte100">Values ≥ 100</option>
+                            <option value="balkans">Balkan example only</option>
+                        </select>
+                    </label>
+                    <label class="check">
+                        <input id="offset-values" type="checkbox" />
+                        Offset calculated centroids
+                    </label>
+                    <div class="position-grid">
+                        <label>
+                            AL fixed X
+                            <input id="position-x" type="number" step="1000" value="5150000" />
+                        </label>
+                        <label>
+                            AL fixed Y
+                            <input id="position-y" type="number" step="1000" value="2000000" />
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Generated API call</legend>
+                    <pre id="api-preview"></pre>
+                </fieldset>
+            </aside>
+        </main>
+
         <script src="../build/eurostatmap.js"></script>
-        <script
-            src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"
-            integrity="sha512-vc58qvvBdrDR4etbxMdlTt4GBQk1qjvyORR2nrsPsFPyrs+/u5c3+1Ct6upOgdZoIl7eq6k3a1UPDSNAQi/32A=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-        ></script>
-        <!-- <script src="https://d3js.org/d3-color.v2.min.js"></script>
-        <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
-        <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script> -->
         <script>
-            const IMAGE = { width: 797, height: 625, position: { x: 4790000, y: 3420000, z: 6400 } }
+            const mapCard = document.querySelector('.map-card')
+            const IMAGE = {
+                width: Math.floor(mapCard.clientWidth),
+                height: 625,
+                position: { x: 4790000, y: 3420000, z: 6400 },
+            }
             const defaultLabels = eurostatmap.getDefaultLabels().EUR_3035
+            const controls = Object.fromEntries(
+                ['label-set', 'language', 'values', 'scale-on-zoom', 'formatter', 'filter', 'offset-values', 'position-x', 'position-y'].map((id) => [
+                    id,
+                    document.getElementById(id),
+                ])
+            )
+
             const map = eurostatmap
                 .map('choropleth')
                 .width(IMAGE.width)
@@ -28,45 +248,17 @@
                 .svgId('map')
                 .zoomExtent([1, 20])
                 .title('Labels test')
-                .subtitle('map.labels({yourOptions})')
-                .width(900)
+                .subtitle('Interactive map.labels(options) playground')
                 .nutsLevel('mixed')
                 .nutsYear(2024)
                 .tooltipShowFlags(false)
-                .legend({ title: 'test', decimals: 0, x: 15, y: 160 })
-                //styling
+                .legend({ title: 'Example values', decimals: 0, x: 15, y: 160 })
                 .language('en')
                 .seaFillStyle('aliceblue')
                 .drawCoastalMargin(false)
                 .nutsbnStroke({ 0: 'black', 1: 'grey', 2: 'grey', 3: 'grey', oth: 'lightgrey', co: 'black' })
                 .graticuleStroke('lightgrey')
                 .graticuleStrokeWidth(0.4)
-                //.projectionFunction(d3.geoAzimuthalEqualArea().rotate([-20.5, -41.5]).scale(11000))
-                .labels({
-                    //labels: eurostatmap.getDefaultLabels().EUR_3035.en,
-                    labels: defaultLabels.en,
-                    values: true,
-                    shadows: true,
-                    // statLabelsPositions: {
-                    //     AL: { x: 20.1683, y: 41.1533 },
-                    // },
-                    // processValueLabelCentroids: (centroids) => {
-
-                    // },
-                })
-                .insets([
-                    {
-                        geo: 'MT',
-                        scale: '01M',
-                        position: { z: 600 },
-                        title: 'Malta',
-                        width: 150,
-                        height: 90,
-                        x: 0,
-                        y: 0,
-                        labels: { values: true, backgrounds: true, statLabelsPositions: { MT: { x: 4701000, y: 1430000 } } },
-                    },
-                ])
 
             map.statData().setData({
                 MD: 32,
@@ -80,13 +272,89 @@
                 BG: 400,
                 RO: 500,
                 HR: 600,
-                UA: 123,
-                GE: 123,
-                BY: 123,
-                IR: 123,
+                UA: 1230,
+                GE: 12300,
+                BY: 123000,
+                IR: 1230000,
             })
-            map.build()
-            console.log(eurostatmap.getDefaultLabels())
+
+            const formatters = {
+                default: undefined,
+                compact: Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format,
+                decimal: Intl.NumberFormat('en', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format,
+                percent: (value) => `${Intl.NumberFormat('en', { maximumFractionDigits: 1 }).format(value)}%`,
+            }
+            const filters = {
+                all: undefined,
+                gte100: (region, currentMap) => (currentMap.statData().get(region.properties.id)?.value || 0) >= 100,
+                balkans: (region) => ['AL', 'BA', 'BG', 'GR', 'HR', 'ME', 'MK', 'RS', 'XK'].includes(region.properties.id),
+            }
+
+            function geographicLabels() {
+                const mode = controls['label-set'].value
+                const language = controls.language.value
+                const names = defaultLabels[language] || defaultLabels.en || []
+                const codes = defaultLabels.cc || []
+                if (mode === 'none') return []
+                if (mode === 'codes') return codes
+                if (mode === 'seas') return names.filter((label) => label.class === 'seas')
+                if (mode === 'countries-and-seas') return names
+                return names.filter((label) => label.class !== 'seas')
+            }
+
+            function getOptions() {
+                const decoration = document.querySelector('input[name="decoration"]:checked').value
+                const options = {
+                    labels: geographicLabels(),
+                    values: controls.values.checked,
+                    halos: decoration === 'halo',
+                    backgrounds: decoration === 'background',
+                    scaleOnZoom: controls['scale-on-zoom'].checked,
+                    statLabelsPositions: {
+                        AL: { x: +controls['position-x'].value, y: +controls['position-y'].value },
+                    },
+                }
+                const formatter = formatters[controls.formatter.value]
+                const filter = filters[controls.filter.value]
+                if (formatter) options.valuesFormatter = formatter
+                if (filter) options.statLabelsFilterFunction = filter
+                if (controls['offset-values'].checked) {
+                    options.processValueLabelCentroids = (region, centroid) => [centroid[0] + 12, centroid[1] - 12]
+                }
+                return options
+            }
+
+            function previewOptions(options) {
+                const preview = {
+                    labels: `/* ${options.labels.length} labels from getDefaultLabels().EUR_3035 */`,
+                    values: options.values,
+                    halos: options.halos,
+                    backgrounds: options.backgrounds,
+                    scaleOnZoom: options.scaleOnZoom,
+                    statLabelsPositions: options.statLabelsPositions,
+                }
+                if (options.valuesFormatter) preview.valuesFormatter = formatters[controls.formatter.value].toString()
+                if (options.statLabelsFilterFunction) preview.statLabelsFilterFunction = filters[controls.filter.value].toString()
+                if (options.processValueLabelCentroids) {
+                    preview.processValueLabelCentroids = '(region, centroid) => [centroid[0] + 12, centroid[1] - 12]'
+                }
+                document.getElementById('api-preview').textContent = `map.labels(${JSON.stringify(preview, null, 2)})`
+            }
+
+            function applyLabels() {
+                map.language(controls.language.value)
+                const options = getOptions()
+                previewOptions(options)
+                // Geometry loading is asynchronous. Ignore unusually early interaction until
+                // the projection exists; the initial options are already queued before build().
+                if (typeof map._projection === 'function') map.labels(options)
+            }
+
+            document.querySelector('.controls').addEventListener('input', applyLabels)
+            document.querySelector('.controls').addEventListener('change', applyLabels)
+
+            map.labels(getOptions()).build()
+            previewOptions(getOptions())
         </script>
     </body>
 </html>
