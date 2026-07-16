@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { createMapInstance } from './map-instance'
-import { getDefaultScalebarConfig } from './decoration/scalebar'
+import { getDefaultScalebarConfig, mergeScalebarConfig } from './decoration/scalebar'
 import { getButtonPadding, getButtonSize } from './buttons/button-utils'
 
 //types
@@ -137,10 +137,13 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
 
     // Inset configs often pass partial scalebar objects (e.g., just position/maxWidth).
     // Merge with defaults to avoid undefined numeric fields producing NaN SVG coordinates.
+    // Use mergeScalebarConfig (not a raw Object.assign) since callers commonly build this object
+    // with `a ?? b` fallback chains, which can leave keys present but explicitly `undefined` —
+    // Object.assign would copy those and clobber the default instead of falling back to it.
     if (config.scalebar === true) {
         config.scalebar = getDefaultScalebarConfig()
     } else if (config.scalebar && typeof config.scalebar === 'object') {
-        config.scalebar = Object.assign({}, getDefaultScalebarConfig(), config.scalebar)
+        config.scalebar = mergeScalebarConfig(config.scalebar)
     }
 
     //copy main map attributes

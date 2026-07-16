@@ -141,7 +141,12 @@ export const legend = function (map) {
         const hasManualX = out.x != null
         const hasManualY = out.y != null
         const userCornerPosition = getCornerPosition(out.position)
-        const cornerPosition = userCornerPosition || (!hasManualX && !hasManualY ? 'top right' : null)
+        // Don't fall back to a default 'top right' position for a caller-managed external
+        // container (see _hasExternalSvgId in updateConfig()) — the caller positioned it
+        // themselves and expects us to leave that transform alone unless they also opt into
+        // x/y/position explicitly.
+        const autoCornerFallback = !out._hasExternalSvgId
+        const cornerPosition = userCornerPosition || (!hasManualX && !hasManualY && autoCornerFallback ? 'top right' : null)
         if (!hasManualX && !hasManualY && !cornerPosition) return
 
         const bbox = getLegendBBox(container, out)
@@ -194,6 +199,12 @@ export const legend = function (map) {
         const layer = out.layer
         // Update legend parameters if necessary
         if (layer.legend_) {
+            // A caller-supplied svgId means the legend renders into a container the caller
+            // manages themselves (created and positioned outside eurostat-map, commonly kept
+            // outside the map's zoom group so it stays fixed on screen during pan/zoom). Track
+            // that so applyPosition() knows not to impose its own default position on it — see
+            // the _hasExternalSvgId check there.
+            if (layer.legend_.svgId !== undefined) out._hasExternalSvgId = true
             deepMergeExistingKeys(out, layer.legend_)
         }
     }

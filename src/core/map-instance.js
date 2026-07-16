@@ -17,7 +17,7 @@ import { initProj4 } from './geo/proj4.js'
 import { addEurostatLogo, addEurostatRibbon } from './decoration/logo.js'
 import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
-import { addScalebarToMap, getDefaultScalebarConfig, updateScalebar } from './decoration/scalebar.js'
+import { addScalebarToMap, getDefaultScalebarConfig, mergeScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
 import { createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
 import { defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
@@ -432,7 +432,9 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         }
 
         if (typeof v === 'object' && v !== null) {
-            out.scalebar_ = Object.assign({}, getDefaultScalebarConfig(), out.scalebar_ || {}, v)
+            // mergeScalebarConfig (not a raw Object.assign) so a `v` built with `a ?? b` fallback
+            // chains can't clobber existing/default values via explicitly-undefined keys.
+            out.scalebar_ = mergeScalebarConfig(v, mergeScalebarConfig(out.scalebar_))
             return out
         }
 
