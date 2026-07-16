@@ -298,8 +298,20 @@ const tooltipTextFunCat = function (rg, map) {
     const statData = map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
     const sv = statData.get(rg.properties.id)
     //case when no data available
-    if (!sv || (sv.value != 0 && !sv.value)) {
-        buf.push(map.noDataText_)
+    if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {
+        buf.push(`
+    <div class="em-tooltip-text no-data">
+    <table class="em-tooltip-table">
+    <tbody>
+    <tr>
+    <td>
+    ${map.noDataText_}
+    </td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+`)
         return buf.join('')
     }
     const val = sv.value
