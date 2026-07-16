@@ -1,3 +1,12 @@
+.bivariate-break-labels,
+.em-bivariate-tick,
+.em-bivariate-frame,
+.em-bivariate-nodata,
+.em-bivariate-corner-annotation-line,
+.em-bivariate-arrowhead,
+.em-bivariate-axis-arrow {
+    fill: #696969;
+}
 .em-bivariate-nodata-label {
     font-size: 14px;
     dominant-baseline: middle;
@@ -11,11 +20,10 @@
     fill: #696969;
 }
 .em-bivariate-axis-arrow {
-    stroke: #696969;
     stroke-width: 1.5;
+    stroke: #696969;
 }
 .em-bivariate-arrowhead {
-    stroke: #696969;
     fill: #696969;
 }
 .em-bivariate-axis-end-label {
@@ -23,20 +31,17 @@
     fill: #696969;
 }
 .em-bivariate-tick {
-    stroke: #696969;
     stroke-width: 1;
 }
+
 .em-bivariate-frame {
     fill: none;
-    stroke: #696969;
 }
 .em-bivariate-nodata {
-    stroke: #696969;
     stroke-width: 0.5;
     cursor: pointer;
 }
 .em-bivariate-corner-annotation-line {
-    stroke: #696969;
     stroke-width: 0.8;
     fill: none;
 }
