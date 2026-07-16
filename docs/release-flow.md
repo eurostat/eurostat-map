@@ -83,6 +83,12 @@ This flow assumes:
 - keep notes concise and copy-pasteable for GitHub Releases
 - commit and push this documentation update if it was not already included
 
+8. Create GitHub Release
+
+- check whether `gh` CLI is available and authenticated (`gh auth status`)
+- if available, follow "GitHub Release (gh CLI available)" below
+- if not available, follow "GitHub Release (No gh CLI)" below
+
 ## Agent Output Requirements
 
 After completing the flow, the agent should report:
@@ -105,9 +111,19 @@ When preparing release notes for users:
 - exclude changes limited to `examples/**`, `docs/**`, or generated `build/**` artifacts from user release notes
 - include non-`src/**` changes only when they reflect a real library/API/runtime behavior change that users of the package consume
 
+## GitHub Release (gh CLI available)
+
+When `gh` CLI is available and authenticated (`gh auth status` succeeds), create the GitHub Release directly rather than just handing the user markdown to paste:
+
+- write the release notes for this version (same content added to `docs/release-notes.md`, without the leading `## X.Y.Z` heading) to a scratch file
+- create the release from the pushed tag:
+    - `gh release create X.Y.Z --title "X.Y.Z" --notes-file <scratch-file-path>`
+- verify it was created against the right tag/commit:
+    - `gh release view X.Y.Z --json tagName,targetCommitish,url`
+
 ## GitHub Release (No gh CLI)
 
-When `gh` CLI is not available, do not attempt automated GitHub release creation.
+When `gh` CLI is not available or not authenticated, do not attempt automated GitHub release creation.
 
 Instead, the agent must provide this exact deliverable to the user:
 
@@ -137,3 +153,4 @@ Snippet conventions:
 - Do not amend unrelated commits.
 - Never reset or discard user changes unless explicitly requested.
 - If unexpected unrelated modifications appear mid-release, pause and ask the user how to proceed.
+- Never add a `Co-Authored-By: Claude ...` trailer to any commit made as part of this flow (release commit, release-notes commit, or otherwise).
