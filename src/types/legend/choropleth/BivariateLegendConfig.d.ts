@@ -39,6 +39,9 @@ export interface BivariateLegendConfig extends LegendConfig {
     /** Offset adjustments for x-axis title. @default { x: 0, y: 0 } */
     xAxisTitleOffset?: { x: number; y: number }
 
+    /** Font size of the axis titles in pixels. Defaults to the value defined by the legend CSS. */
+    axisTitleFontSize?: number
+
     /** Extra vertical offset for the "no data" legend item in pixels. @default 30 */
     noDataYOffset?: number
 
@@ -111,7 +114,7 @@ export interface BivariateLegendConfig extends LegendConfig {
      * Use global `{ x, y }` or per-corner values.
      * @default { x: 0, y: 0 }
      */
-    annotationLineEndOffset?:
+    annotationLineEndOffsets?:
         | { x?: number; y?: number }
         | {
               topRight?: { x?: number; y?: number }
