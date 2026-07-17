@@ -11,7 +11,7 @@
 
             .gdp-map-layout {
                 display: grid;
-                grid-template-columns: minmax(360px, 40%) minmax(0, 60%);
+                grid-template-columns: minmax(420px, 45%) minmax(0, 55%);
                 width: 100%;
                 align-items: start;
             }
@@ -23,15 +23,10 @@
 
             .gdp-small-multiples {
                 display: grid;
-                grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
+                grid-template-rows: repeat(3, auto) auto;
                 gap: 0;
                 padding: 0;
                 box-sizing: border-box;
-                height: 100vh;
-                height: 100dvh;
-                max-height: 100vh;
-                max-height: 100dvh;
-                overflow: hidden;
             }
 
             .gdp-small-map-card {
@@ -100,8 +95,6 @@
                 .gdp-small-multiples {
                     grid-template-columns: 1fr;
                     grid-template-rows: repeat(3, minmax(0, 1fr)) auto;
-                    height: 100vh;
-                    height: 100dvh;
                 }
             }
 
@@ -259,9 +252,7 @@
                 const legendWidth = Math.floor(container.clientWidth)
                 legend.setAttribute('width', legendWidth)
                 legend.setAttribute('height', legendHeight)
-                const reservedHeight = 100
-                const availableHeight = Math.floor((document.documentElement.clientHeight - reservedHeight) / 3)
-                const side = Math.max(1, Math.min(availableWidth, availableHeight))
+                const side = Math.max(1, availableWidth)
                 cards.forEach((card) => (card.style.width = `${side}px`))
                 const titleHeight = Math.ceil(cards[0].querySelector('h2').getBoundingClientRect().height)
                 return { width: side, height: Math.max(1, side - titleHeight) }
