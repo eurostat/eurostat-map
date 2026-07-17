@@ -23,10 +23,12 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     // user has explicitly configured insetsButton themselves.
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
     const showsInsetsButton = out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobile)
+    const presetName = typeof out.insets_ === 'string' ? out.insets_ : null
 
     if (!out.insetBoxPosition_) {
         const buttonClearanceY = showsInsetsButton ? getButtonSize() + getButtonPadding() : 0
-        out.insetBoxPosition_ = [out.width_ - out.insetBoxWidth_ - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_ + buttonClearanceY]
+        const insetBoxWidth = presetName === 'image' ? OVERSEAS_BOX_WIDTH : out.insetBoxWidth_
+        out.insetBoxPosition_ = [out.width_ - insetBoxWidth - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_ + buttonClearanceY]
     }
 
     let svg = select('#' + out.svgId_)
@@ -47,7 +49,6 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     // Named inset presets. 'default' is the original simple grid layout. 'image', 'eu' and
     // 'euEfta' are hand-tuned overseas-territory arrangements; only 'image' draws the extra
     // connecting decoration (background box, separator lines, blur gradients).
-    const presetName = typeof out.insets_ === 'string' ? out.insets_ : null
     insetsGroup.classed('em-insets-image', presetName === 'image')
     if (presetName === 'default') {
         out.insets_ = defaultInsetConfig(out.insetBoxWidth_, out.insetBoxPadding_)
