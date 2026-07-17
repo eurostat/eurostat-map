@@ -11,7 +11,7 @@
                     13px Arial,
                     sans-serif;
                 display: grid;
-                grid-template-columns: minmax(0, 800px) minmax(340px, 1fr);
+                grid-template-columns: minmax(0, 1000px) minmax(340px, 1fr);
                 height: 100vh;
             }
             #map {
@@ -33,7 +33,7 @@
             }
             label {
                 display: grid;
-                grid-template-columns: 1fr 120px;
+                grid-template-columns: minmax(0, 1fr) minmax(120px, 160px);
                 align-items: center;
                 gap: 8px;
                 margin: 5px 0;
@@ -239,7 +239,9 @@
                 fieldset.innerHTML = `<legend>${title}</legend>`
                 controls.forEach(([path, type, options, step]) => {
                     const label = document.createElement('label')
-                    label.append(path)
+                    const labelText = document.createElement('span')
+                    labelText.textContent = path
+                    label.append(labelText)
                     const input = document.createElement(type === 'select' ? 'select' : 'input')
                     if (type === 'select') {
                         input.append(...options.map((option) => new Option(option, option)))
