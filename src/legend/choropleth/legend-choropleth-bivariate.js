@@ -462,7 +462,7 @@ export const legend = function (map, config) {
         if (out.breaks1) {
             for (let i = 0; i < out.breaks1.length; i++) {
                 const x = initialX + sz * (i + 1)
-                const y = out.squareSize + getFontSizeFromClass('em-bivariate-tick-label')
+                const y = out.squareSize + out.tickLength + getFontSizeFromClass('em-bivariate-tick-label')
 
                 breakLabels
                     .append('text')
