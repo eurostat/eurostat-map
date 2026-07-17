@@ -33,7 +33,7 @@
             }
             label {
                 display: grid;
-                grid-template-columns: minmax(0, 1fr) minmax(120px, 160px);
+                grid-template-columns: 180px 140px;
                 align-items: center;
                 gap: 8px;
                 margin: 5px 0;
@@ -44,7 +44,7 @@
                 width: 100%;
             }
             input[type='checkbox'] {
-                justify-self: end;
+                justify-self: start;
                 width: auto;
             }
             @media (max-width: 800px) {
@@ -113,43 +113,6 @@
                 .build()
 
             const groups = {
-                'Shared: placement and titles': [
-                    ['x', 'number'],
-                    ['y', 'number'],
-                    ['position', 'select', ['top right', 'bottom right', 'top left', 'bottom left']],
-                    ['width', 'number'],
-                    ['height', 'number'],
-                    ['title', 'text'],
-                    ['subtitle', 'text'],
-                    ['titleFontSize', 'number'],
-                    ['titlePadding', 'number'],
-                ],
-                'Shared: box and labels': [
-                    ['boxPadding', 'number'],
-                    ['boxOpacity', 'number', null, 0.1],
-                    ['onlyApplyOpacityWhileZoomed', 'checkbox'],
-                    ['labelFontSize', 'number'],
-                    ['labelOffsets.x', 'number'],
-                    ['labelOffsets.y', 'number'],
-                    ['labelFormatter', 'select', ['default', 'fixed (0 decimals)', 'fixed (1 decimal)']],
-                    ['decimals', 'number'],
-                    ['orientation', 'select', ['vertical', 'horizontal']],
-                    ['ascending', 'checkbox'],
-                ],
-                'Shared: shapes and no data': [
-                    ['shapeWidth', 'number'],
-                    ['shapeHeight', 'number'],
-                    ['shapePadding', 'number'],
-                    ['sepLineLength', 'number'],
-                    ['noData', 'checkbox'],
-                    ['noDataText', 'text'],
-                    ['noDataPadding', 'number'],
-                    ['noDataShapeWidth', 'number'],
-                    ['noDataShapeHeight', 'number'],
-                    ['maxMin', 'checkbox'],
-                    ['maxMinLabels.0', 'text'],
-                    ['maxMinLabels.1', 'text'],
-                ],
                 'Bivariate: grid and axes': [
                     ['squareSize', 'number'],
                     ['rotation', 'select', ['0', '-45']],
