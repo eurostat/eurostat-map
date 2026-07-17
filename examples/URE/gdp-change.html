@@ -11,7 +11,7 @@
 
             .gdp-map-layout {
                 display: grid;
-                grid-template-columns: minmax(420px, 45%) minmax(0, 55%);
+                grid-template-columns: repeat(2, minmax(0, 1fr));
                 width: 100%;
                 align-items: start;
             }
@@ -35,10 +35,13 @@
                 gap: 0.5rem;
                 padding: 0.35rem;
                 font-size: 0.9rem;
+                border: 0;
             }
 
-            .gdp-typology-picker select {
-                font: inherit;
+            .gdp-typology-picker label {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.2rem;
             }
 
             .gdp-small-map-card {
@@ -48,7 +51,6 @@
                 min-width: 0;
                 min-height: 0;
                 width: 100%;
-                aspect-ratio: 1;
                 border: 1px solid var(--typology-color, #333);
                 box-sizing: border-box;
                 overflow: hidden;
@@ -79,13 +81,6 @@
                 min-width: 0;
             }
 
-            .gdp-small-multiples-legend {
-                display: block;
-                width: 100%;
-                height: 70px;
-                overflow: visible;
-            }
-
             @media (max-width: 900px) {
                 .gdp-map-layout {
                     grid-template-columns: 1fr;
@@ -96,10 +91,6 @@
                     grid-template-rows: auto auto auto;
                     height: auto;
                     padding: 0.5rem;
-                }
-
-                .gdp-small-multiples-legend {
-                    grid-column: 1 / -1;
                 }
             }
 
@@ -117,19 +108,25 @@
     <body>
         <div class="gdp-map-layout">
             <aside class="gdp-small-multiples" aria-label="GDP change by urban-rural typology">
-                <label class="gdp-typology-picker">
-                    Region typology
-                    <select id="gdp-typology">
-                        <option value="1">Urban</option>
-                        <option value="2">Intermediate</option>
-                        <option value="3">Rural</option>
-                    </select>
-                </label>
+                <fieldset class="gdp-typology-picker">
+                    <legend>Region typology</legend>
+                    <label>
+                        <input type="radio" name="gdp-typology" value="1" checked />
+                        Urban
+                    </label>
+                    <label>
+                        <input type="radio" name="gdp-typology" value="2" />
+                        Intermediate
+                    </label>
+                    <label>
+                        <input type="radio" name="gdp-typology" value="3" />
+                        Rural
+                    </label>
+                </fieldset>
                 <section class="gdp-small-map-card">
                     <h2 id="gdp-typology-title">Urban regions</h2>
                     <svg id="gdp-typology-map"></svg>
                 </section>
-                <svg id="gdp-small-multiples-legend" class="gdp-small-multiples-legend" aria-label="GDP change legend"></svg>
             </aside>
             <main class="gdp-main-map">
                 <svg id="map61"></svg>
@@ -151,14 +148,15 @@
                     max: Math.max(...numericGdpValues),
                 }
                 const continuousScale = makeContinuousDivergingScale(dataDomain.min, dataDomain.max)
+                const mapSize = { width: 900, height: 680 }
 
-                buildTypologyMap(config, continuousScale, dataDomain, getSmallMapSize())
+                buildTypologyMap(config, continuousScale, dataDomain, mapSize)
 
                 eurostatmap
                     .map('bivariateChoropleth')
                     .svgId('map61')
-                    .width(900)
-                    .height(680)
+                    .width(mapSize.width)
+                    .height(mapSize.height)
                     .header(true)
                     .footer(true)
                     .scale(config.scale)
@@ -248,21 +246,6 @@
                     .build()
             }
 
-            function getSmallMapSize() {
-                const container = document.querySelector('.gdp-small-multiples')
-                const cards = [...container.querySelectorAll('.gdp-small-map-card')]
-                const availableWidth = Math.floor(cards[0].clientWidth)
-                const legend = document.getElementById('gdp-small-multiples-legend')
-                const legendHeight = 70
-                const legendWidth = Math.floor(container.clientWidth)
-                legend.setAttribute('width', legendWidth)
-                legend.setAttribute('height', legendHeight)
-                const side = Math.max(1, availableWidth)
-                cards.forEach((card) => (card.style.width = `${side}px`))
-                const titleHeight = Math.ceil(cards[0].querySelector('h2').getBoundingClientRect().height)
-                return { width: side, height: Math.max(1, side - titleHeight) }
-            }
-
             function makeContinuousDivergingScale(min, max) {
                 const signedLog = (value) => Math.sign(value) * Math.log1p(Math.abs(value))
                 const signedExp = (value) => Math.sign(value) * Math.expm1(Math.abs(value))
@@ -333,12 +316,11 @@
                     .pointOfDivergence(0)
                     .noDataFillStyle('#f1f1f1')
                     .legend({
-                        svgId: 'gdp-small-multiples-legend',
                         title: 'GDP change (percentage points)',
                         orientation: 'horizontal',
                         x: 50,
-                        y: 4,
-                        width: size.width - 40,
+                        y: size.height - 65,
+                        width: size.width - 100,
                         shapeHeight: 10,
                         tickLength: 5,
                         tickValues: [domain.min, 0, domain.max],
@@ -386,11 +368,14 @@
                     })
                     .build()
 
-                document.getElementById('gdp-typology').addEventListener('change', (event) => {
-                    const value = Number(event.target.value)
-                    applyTypologyStyle(value)
-                    typologyMap.statData('gdpChange').setData(getTypedData(value))
-                    typologyMap.updateStatValues()
+                document.querySelectorAll('input[name="gdp-typology"]').forEach((input) => {
+                    input.addEventListener('change', (event) => {
+                        if (!event.target.checked) return
+                        const value = Number(event.target.value)
+                        applyTypologyStyle(value)
+                        typologyMap.statData('gdpChange').setData(getTypedData(value))
+                        typologyMap.updateStatValues()
+                    })
                 })
             }
 
