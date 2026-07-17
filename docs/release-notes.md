@@ -1,5 +1,18 @@
 # Release notes
 
+## 4.8.2
+
+### Fixes
+
+- **Proportional symbols (and other centroid-based layers) could end up permanently empty in inset maps.** An optimistic first render pass could run before an inset's own async geometry fetch resolved; that premature pass cached an *empty* centroid list, and since an empty array is still truthy, every later readiness check treated it as "already computed" and skipped recomputing it - even after the real geometry arrived. Symbols now only get cached once the inset's own projection is actually ready, so late-resolving insets pick up their data correctly instead of silently staying blank. Affects every inset style (`'image'`, `'eu'`, `'euEfta'`, and manually-configured insets), and is most visible on proportional-symbol maps, where it previously required manually rebuilding the insets (e.g. toggling the inset style off and back on) to see the circles appear.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap.map('proportionalSymbol').insets('image').build()
+// Inset symbols (Guadeloupe, Réunion, Malta, etc.) now render correctly on the first build.
+```
+
 ## 4.8.1
 
 ### New

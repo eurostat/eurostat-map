@@ -12,6 +12,15 @@ const getLayerAndMap = function (layerOrMap) {
 }
 
 const setupBaseCentroids = function (map) {
+    // Guards against a premature call (e.g. an optimistic first symbol-placement pass that
+    // fires before this map/inset's own async geometry fetch has resolved). Without this, an
+    // early call falls through to the cntrg/centroidsData fallback branches below with nothing
+    // loaded yet, computes an empty result, and caches it into _allCentroidsFeatures - which
+    // permanently "locks in" as empty, since `![]` is false and every caller's memoization guard
+    // (`if (!map.Geometries._allCentroidsFeatures)`) reads an empty array as "already computed".
+    // The real data that arrives moments later then never gets a chance to populate it.
+    if (typeof map._projection !== 'function') return
+
     let centroidFeatures
 
     if (map.geo_ == 'WORLD') {
