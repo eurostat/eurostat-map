@@ -1,4 +1,20 @@
 /**
+ * A single map label (country name, statistical value label, etc.)
+ */
+export interface Label {
+    text: string
+    x: number
+    y: number
+    class?: string
+    /** Font size in pixels. @deprecated Use CSS classes instead. */
+    size?: number
+    rotate?: number | null
+    letterSpacing?: number
+    /** Country code, when this label represents a country. */
+    cc?: string
+}
+
+/**
  * Configuration for map labels (country names, statistical values, etc.)
  */
 export interface LabelsConfig {
@@ -6,16 +22,7 @@ export interface LabelsConfig {
      * Array of label objects with text and coordinates.
      * Use eurostatmap.getDefaultLabels() to get predefined geographic labels.
      */
-    labels?: Array<{
-        text: string
-        x: number
-        y: number
-        class?: string
-        size?: number
-        rotate?: number
-        letterSpacing?: number
-        cc?: string
-    }>
+    labels?: Label[]
 
     /**
      * Show statistical values as labels on regions.
