@@ -10,6 +10,10 @@
 .em-insets-image text {
     fill: #696969 !important;
 }
+.em-insets-image .em-inset-title,
+.em-insets-image .em-inset-subtitle {
+    font-size: 8.5px !important;
+}
 .em-insets-image line {
     stroke: #696969 !important;
 }

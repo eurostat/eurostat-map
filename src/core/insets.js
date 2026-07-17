@@ -620,7 +620,7 @@ const overseasInsetConfig = function () {
             width: 23,
             height: 15,
             position: { x: 493000, y: 1998000, z: 1200 },
-            frameStrokeWidth: 0.8,
+            frameStrokeWidth: 0.2,
         },
         {
             geo: 'MQ',
@@ -707,7 +707,7 @@ const overseasInsetConfig = function () {
             width: 20,
             height: 20,
             position: { x: 140000, y: 4385000, z: 2800 },
-            frameStrokeWidth: 0.8,
+            frameStrokeWidth: 0.2,
         },
         {
             geo: 'PT20',
@@ -726,7 +726,7 @@ const overseasInsetConfig = function () {
                     return feature
                 })
             },
-            frameStrokeWidth: 0.8,
+            frameStrokeWidth: 0.2,
         },
         {
             geo: 'PT30',
