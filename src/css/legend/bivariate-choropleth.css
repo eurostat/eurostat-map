@@ -2,10 +2,12 @@
 .em-bivariate-tick,
 .em-bivariate-frame,
 .em-bivariate-nodata,
-.em-bivariate-corner-annotation-line,
 .em-bivariate-arrowhead,
 .em-bivariate-axis-arrow {
     fill: #696969;
+}
+.em-bivariate-corner-annotation-line {
+    stroke: #696969;
 }
 .em-bivariate-nodata-label {
     font-size: 14px;
