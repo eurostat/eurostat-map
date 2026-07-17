@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { createMapInstance } from './map-instance'
-import { getDefaultScalebarConfig, mergeScalebarConfig } from './decoration/scalebar'
+import { getDefaultScalebarConfig, mergeScalebarConfig, normalizeLegacyScalebarFields } from './decoration/scalebar'
 import { getButtonPadding, getButtonSize } from './buttons/button-utils'
 
 //types
@@ -139,6 +139,11 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
     //for(let key__ in map) {
     //mt[key__] = map[key__];
     //}
+
+    // Built-in inset presets ('image', 'eu', 'euEfta') still use the deprecated flat scalebar
+    // fields; normalize them onto `scalebar` here so every inset config path (built-in presets and
+    // caller-supplied configs alike) ends up with a working scalebar_.
+    config = normalizeLegacyScalebarFields(config)
 
     config.isInset = true
     const mt = createMapInstance(config, withCenterPoints, mapType)

@@ -1,5 +1,18 @@
 # Release notes
 
+## 4.8.4
+
+### Fixes
+
+- **Overseas inset scalebars (`'image'`, `'eu'`, `'euEfta'` presets) never rendered.** These built-in presets set scalebars via the deprecated flat fields (`showScalebar`, `scalebarPosition`, etc.), but the scalebar renderer only reads the modern nested `scalebar` config - so `scalebar_` stayed unset and nothing drew. Legacy flat scalebar fields on any inset config (built-in presets or your own) are now normalized onto `scalebar` automatically.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap.map('choropleth').insets('image').build()
+// Every overseas inset (Guadeloupe, Réunion, Malta, etc.) now shows its scalebar again.
+```
+
 ## 4.8.3
 
 ### Improvements
