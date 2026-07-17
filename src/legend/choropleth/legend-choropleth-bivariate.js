@@ -29,9 +29,10 @@ export const legend = function (map, config) {
         },
     }
     const defaultNoDataYOffsetByRotation = { 0: 15, '-45': 45 }
-    const hasCustomAnnotationOffsets = !!(config && Object.prototype.hasOwnProperty.call(config, 'annotationOffsets'))
-    const hasCustomAnnotationLineEndOffsets = !!(config && Object.prototype.hasOwnProperty.call(config, 'annotationLineEndOffsets'))
-    const hasCustomNoDataYOffset = !!(config && Object.prototype.hasOwnProperty.call(config, 'noDataYOffset'))
+    const hasConfiguredValue = (key) => {
+        const currentConfig = out.layer?.legend_ || config
+        return currentConfig?.[key] != null
+    }
 
     const defaultAnnotationLineEndOffsetsByRotation = {
         0: { bottomRight: { x: -5, y: 10 } },
@@ -56,13 +57,13 @@ export const legend = function (map, config) {
 
     const applyRotationDependentDefaults = () => {
         const rotationKey = out.rotation === -45 ? '-45' : 0
-        if (!hasCustomAnnotationOffsets) {
+        if (!hasConfiguredValue('annotationOffsets')) {
             out.annotationOffsets = cloneAnnotationOffsets(defaultAnnotationOffsetsByRotation[rotationKey])
         }
-        if (!hasCustomAnnotationLineEndOffsets) {
+        if (!hasConfiguredValue('annotationLineEndOffsets')) {
             out.annotationLineEndOffsets = cloneAnnotationLineEndOffsets(defaultAnnotationLineEndOffsetsByRotation[rotationKey])
         }
-        if (!hasCustomNoDataYOffset) {
+        if (!hasConfiguredValue('noDataYOffset')) {
             out.noDataYOffset = defaultNoDataYOffsetByRotation[rotationKey]
         }
     }
