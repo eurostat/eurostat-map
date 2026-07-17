@@ -1,5 +1,58 @@
 # Release notes
 
+## 4.8.3
+
+### Improvements
+
+- **`InsetConfig` now types the fields insets actually accept**, instead of an untyped catch-all. Adds `svgId`, `position`, `titlePosition`, `subtitlePosition`, `labels`, `zoomButtons`, `nuts2jsonBaseURL`, `projectionFunction`, `insets` (for nested insets), `insetBoxPosition`, and the scalebar-related fields (`scalebar`, plus the deprecated flat `scalebarPosition`/`scalebarUnits`/etc. still accepted at runtime).
+
+Example:
+
+```typescript
+import type { InsetConfig } from 'eurostat-map'
+
+const inset: InsetConfig = {
+    geo: 'MT',
+    x: 0,
+    y: 0,
+    width: 90,
+    height: 100,
+    svgId: 'inset-mt',
+    scalebar: { show: true, position: [1, 60] },
+}
+```
+
+- **`LabelsConfig` and its `Label` entry type are now exported from the package root** (previously only used internally, so consumers had to redeclare the shape themselves).
+
+Example:
+
+```typescript
+import type { LabelsConfig, Label } from 'eurostat-map'
+```
+
+- **`LocationConfig`'s `LocationLabelStyle` and `LocationShape` types are now exported from the package root**, alongside the already-exported `LocationConfig`.
+
+Example:
+
+```typescript
+import type { LocationLabelStyle, LocationShape } from 'eurostat-map'
+```
+
+### Fixes
+
+- **`CategoricalMapConfig` was missing `classToText`**, even though `.classToText()` has always been a real, supported categorical-map builder method (used for legend/tooltip labels). The config-object type now matches the builder API.
+
+Example:
+
+```typescript
+import type { CategoricalMapConfig } from 'eurostat-map'
+
+const config: CategoricalMapConfig = {
+    classToFillStyle: { A: '#1f78b4', B: '#33a02c' },
+    classToText: { A: 'Category A', B: 'Category B' },
+}
+```
+
 ## 4.8.2
 
 ### Fixes
