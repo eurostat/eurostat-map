@@ -211,7 +211,15 @@ export const legend = function (map) {
 
     /** Draw legend background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background').style('opacity', out.boxOpacity)
+        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background')
+        out.updateBackgroundBoxOpacity()
+    }
+
+    /** Keep conditional background opacity synchronized with the current zoom state. */
+    out.updateBackgroundBoxOpacity = function () {
+        const opacity = out.onlyApplyOpacityWhileZoomed && !out.map.__hasZoomed ? 0 : out.boxOpacity
+        out.lgg?.select('#em-legend-background').style('opacity', opacity)
+        return out
     }
 
     out.addTitle = function () {

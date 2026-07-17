@@ -28,6 +28,7 @@ function defineGridCartogramZoom(map) {
             zoomGroup.attr('transform', event.transform)
             map.__lastTransform = event.transform
             map.__hasZoomed = event.transform.k !== 1
+            updateLegendBackgroundOpacity(map)
             map.onZoom_?.(event, map)
         })
         .on('end', (event) => {
@@ -162,6 +163,7 @@ const panHandler = (event, map) => {
 const zoomHandler = (event, previousT, map) => {
     const t = event.transform
     map.__hasZoomed = t.k !== 1
+    updateLegendBackgroundOpacity(map)
     const cx = (map.width_ / 2 - t.x) / t.k
     const cy = (map.height_ / 2 - t.y) / t.k
     const [projectedX, projectedY] = map._projection.invert([cx, cy])
@@ -190,6 +192,11 @@ const zoomHandler = (event, previousT, map) => {
 
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
     if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
+}
+
+const updateLegendBackgroundOpacity = (map) => {
+    const layers = map.layers_?.length ? map.layers_ : [map]
+    layers.forEach((layer) => layer.legendObj_?.updateBackgroundBoxOpacity?.())
 }
 
 /**
