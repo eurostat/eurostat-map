@@ -1,6 +1,22 @@
 # Release notes
 
-## 4.8.4
+## 4.8.5
+
+### New
+
+- **`BivariateLegendConfig` gained `axisTitleFontSize`**, for overriding the axis title font size independently of the legend CSS default.
+
+Example:
+
+```javascript
+map.legend({ axisTitleFontSize: 13 })
+```
+
+### Improvements
+
+- **The legend background box's conditional opacity (`onlyApplyOpacityWhileZoomed`) now stays synced with the live zoom state** instead of only being applied once, at legend creation.
+- **Bivariate legend option changes made via a live `.legend()` call are now correctly honoured** on the next redraw - `annotationOffsets`, `annotationLineEndOffsets` and `noDataYOffset` were previously only checked against the *initial* config, so a later `.legend({...})` update with these fields could get silently overridden by rotation-dependent defaults.
+- **Bivariate legend x-axis break labels no longer sit on top of their tick marks** - label position now accounts for `tickLength`.
 
 ### Fixes
 
@@ -11,6 +27,17 @@ Example (no code changes needed - just upgrade):
 ```javascript
 eurostatmap.map('choropleth').insets('image').build()
 // Every overseas inset (Guadeloupe, Réunion, Malta, etc.) now shows its scalebar again.
+```
+
+### Breaking Changes
+
+- **`BivariateLegendConfig`'s `annotationLineEndOffset` is renamed to `annotationLineEndOffsets`**, for naming consistency with the other per-corner offset options.
+- **`BivariateLegendConfig`'s deprecated `annotationPadding` option is removed.** Use `annotationOffsets`/`annotationLineEndOffsets` instead.
+
+Example:
+
+```javascript
+map.legend({ annotationLineEndOffsets: { x: 2, y: -2 } })
 ```
 
 ## 4.8.3
