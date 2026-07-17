@@ -216,6 +216,48 @@ export const mergeScalebarConfig = function (partial, base) {
     return merged
 }
 
+/**
+ * @function normalizeLegacyScalebarFields
+ * @description Merges an inset config's deprecated flat scalebar fields (showScalebar,
+ * scalebarPosition, scalebarUnits, scalebarTextOffset, scalebarMaxWidth, scalebarSegmentHeight,
+ * scalebarTickHeight) into its modern nested `scalebar` object. Without this, a config built with
+ * only the flat fields (as this library's own built-in 'image'/'eu'/'euEfta' inset presets are)
+ * never populates `scalebar_`, and addScalebarToMap()/updateScalebar() bail out on `!out.scalebar_`
+ * - so the scalebar silently never renders. Does not mutate the input config; returns it unchanged
+ * if no legacy keys are present.
+ * @param {object} config an inset config, possibly with deprecated flat scalebar fields
+ * @returns {object}
+ */
+export const normalizeLegacyScalebarFields = function (config) {
+    const hasLegacyKeys =
+        config.showScalebar !== undefined ||
+        config.scalebarPosition !== undefined ||
+        config.scalebarUnits !== undefined ||
+        config.scalebarTextOffset !== undefined ||
+        config.scalebarMaxWidth !== undefined ||
+        config.scalebarSegmentHeight !== undefined ||
+        config.scalebarTickHeight !== undefined
+
+    if (!hasLegacyKeys) return config
+
+    const overrides = {
+        show: config.showScalebar,
+        position: config.scalebarPosition,
+        units: config.scalebarUnits,
+        textOffset: config.scalebarTextOffset,
+        maxWidth: config.scalebarMaxWidth,
+        segmentHeight: config.scalebarSegmentHeight,
+        tickHeight: config.scalebarTickHeight,
+    }
+
+    const mergedScalebar = Object.assign({}, config.scalebar || {})
+    for (const key in overrides) {
+        if (overrides[key] !== undefined) mergedScalebar[key] = overrides[key]
+    }
+
+    return Object.assign({}, config, { scalebar: mergedScalebar })
+}
+
 function debounce(func, wait) {
     let timeout
     return function (...args) {
