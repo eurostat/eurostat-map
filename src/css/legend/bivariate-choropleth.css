@@ -6,7 +6,8 @@
 .em-bivariate-axis-arrow {
     fill: #696969;
 }
-.em-bivariate-corner-annotation-line {
+.em-bivariate-corner-annotation-line,
+.em-bivariate-tick {
     stroke: #696969;
 }
 .em-bivariate-nodata-label {
