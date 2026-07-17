@@ -1,0 +1,3 @@
+- we should take care of updates for the user after they have changed something. For example after they build the map initially, then they change the data, they have to know to call updateStatValues or something. It would be a lot easier if they just set the data, then call map.update() and we check what has changed and call the necessary update functions for them (like updateLegend, updateStatValues, updateClassification etc).
+- this would then allow updating the map type/layer without completely rebuilding the map and refetching geometries etc. and therefore make our implementation in IMAGE Angular app faster when changing map template/type.
+- allow users to define the padding/size of stat value label backgrounds
