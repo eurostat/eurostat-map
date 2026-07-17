@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bivariate legend API controls</title>
+        <style>
+            body {
+                margin: 0;
+                font:
+                    13px Arial,
+                    sans-serif;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) 340px;
+                height: 100vh;
+            }
+            #map {
+                width: 100%;
+                height: 100%;
+            }
+            #controls {
+                overflow: auto;
+                padding: 0 12px 16px;
+                border-left: 1px solid #ccc;
+                background: #fafafa;
+            }
+            fieldset {
+                margin: 10px 0;
+                border: 1px solid #ccc;
+            }
+            legend {
+                font-weight: bold;
+            }
+            label {
+                display: grid;
+                grid-template-columns: 1fr 120px;
+                align-items: center;
+                gap: 8px;
+                margin: 5px 0;
+            }
+            input,
+            select {
+                box-sizing: border-box;
+                width: 100%;
+            }
+            input[type='checkbox'] {
+                justify-self: end;
+                width: auto;
+            }
+            @media (max-width: 800px) {
+                body {
+                    grid-template-columns: 1fr;
+                    grid-template-rows: 60vh auto;
+                    height: auto;
+                }
+                #controls {
+                    border-left: 0;
+                    border-top: 1px solid #ccc;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <aside id="controls">
+            <h2>Bivariate legend API</h2>
+            <p>Changes are applied directly to the legend configuration.</p>
+            <form id="legend-controls"></form>
+        </aside>
+
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            const legendConfig = {
+                rotation: -45,
+                label1: 'Inhabitants per km²',
+                label2: '% unemployed',
+                axisArrows: { x: false, y: true },
+                showAxisExtremes: { x: true, y: true },
+                axisExtremes: {
+                    x: { low: 'Low', high: 'High' },
+                    y: { low: 'Low', high: 'High' },
+                },
+                annotations: {
+                    topLeft: 'Low density &<br> High unemployment',
+                    topRight: 'High density &<br> High unemployment',
+                    bottomLeft: 'Low density &<br> Low unemployment',
+                    bottomRight: 'High density &<br> Low unemployment',
+                },
+                position: 'top right',
+                noData: false,
+            }
+
+            const map = eurostatmap
+                .map('bivariateChoropleth')
+                .title('Unemployment and population density')
+                .subtitle('Inhabitants per km² and % unemployed, 2021')
+                .nutsLevel(2)
+                .width(Math.min(1000, window.innerHeight))
+                .nutsYear(2021)
+                .stat('population-density', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .encoding('x', { stat: 'population-density' })
+                .stat('unemployment', {
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                    unitText: '%',
+                })
+                .encoding('y', { stat: 'unemployment' })
+                .breaks1([100, 200])
+                .breaks2([5, 10])
+                .legend(legendConfig)
+                .zoomExtent([1, 100])
+                .build()
+
+            const groups = {
+                'Shared: placement and titles': [
+                    ['x', 'number'],
+                    ['y', 'number'],
+                    ['position', 'select', ['top right', 'bottom right', 'top left', 'bottom left']],
+                    ['width', 'number'],
+                    ['height', 'number'],
+                    ['title', 'text'],
+                    ['subtitle', 'text'],
+                    ['titleFontSize', 'number'],
+                    ['titlePadding', 'number'],
+                ],
+                'Shared: box and labels': [
+                    ['boxPadding', 'number'],
+                    ['boxOpacity', 'number', null, 0.1],
+                    ['onlyApplyOpacityWhileZoomed', 'checkbox'],
+                    ['labelFontSize', 'number'],
+                    ['labelOffsets.x', 'number'],
+                    ['labelOffsets.y', 'number'],
+                    ['labelFormatter', 'select', ['default', 'fixed (0 decimals)', 'fixed (1 decimal)']],
+                    ['decimals', 'number'],
+                    ['orientation', 'select', ['vertical', 'horizontal']],
+                    ['ascending', 'checkbox'],
+                ],
+                'Shared: shapes and no data': [
+                    ['shapeWidth', 'number'],
+                    ['shapeHeight', 'number'],
+                    ['shapePadding', 'number'],
+                    ['sepLineLength', 'number'],
+                    ['noData', 'checkbox'],
+                    ['noDataText', 'text'],
+                    ['noDataPadding', 'number'],
+                    ['noDataShapeWidth', 'number'],
+                    ['noDataShapeHeight', 'number'],
+                    ['maxMin', 'checkbox'],
+                    ['maxMinLabels.0', 'text'],
+                    ['maxMinLabels.1', 'text'],
+                ],
+                'Bivariate: grid and axes': [
+                    ['squareSize', 'number'],
+                    ['rotation', 'select', ['0', '-45']],
+                    ['label1', 'text'],
+                    ['label2', 'text'],
+                    ['breaks1', 'csv'],
+                    ['breaks2', 'csv'],
+                    ['tickLength', 'number'],
+                    ['axisTitleFontSize', 'number'],
+                    ['yAxisLabelsOffset.x', 'number'],
+                    ['yAxisLabelsOffset.y', 'number'],
+                    ['xAxisLabelsOffset.x', 'number'],
+                    ['xAxisLabelsOffset.y', 'number'],
+                    ['yAxisTitleOffset.x', 'number'],
+                    ['yAxisTitleOffset.y', 'number'],
+                    ['xAxisTitleOffset.x', 'number'],
+                    ['xAxisTitleOffset.y', 'number'],
+                ],
+                'Bivariate: arrows and extremes': [
+                    ['axisArrows.x', 'checkbox'],
+                    ['axisArrows.y', 'checkbox'],
+                    ['arrowHeight', 'number'],
+                    ['arrowWidth', 'number'],
+                    ['arrowPadding', 'number'],
+                    ['showAxisExtremes.x', 'checkbox'],
+                    ['showAxisExtremes.y', 'checkbox'],
+                    ['axisExtremes.x.low', 'text'],
+                    ['axisExtremes.x.high', 'text'],
+                    ['axisExtremes.y.low', 'text'],
+                    ['axisExtremes.y.high', 'text'],
+                ],
+                'Bivariate: annotations': [
+                    ['annotations.topLeft', 'text'],
+                    ['annotations.topRight', 'text'],
+                    ['annotations.bottomLeft', 'text'],
+                    ['annotations.bottomRight', 'text'],
+                    ['annotationLineLength.topLeft', 'number'],
+                    ['annotationLineLength.topRight', 'number'],
+                    ['annotationLineLength.bottomLeft', 'number'],
+                    ['annotationLineLength.bottomRight', 'number'],
+                    ['annotationOffsets.topLeft.x', 'number'],
+                    ['annotationOffsets.topLeft.y', 'number'],
+                    ['annotationOffsets.topRight.x', 'number'],
+                    ['annotationOffsets.topRight.y', 'number'],
+                    ['annotationOffsets.bottomLeft.x', 'number'],
+                    ['annotationOffsets.bottomLeft.y', 'number'],
+                    ['annotationOffsets.bottomRight.x', 'number'],
+                    ['annotationOffsets.bottomRight.y', 'number'],
+                    ['annotationLineEndOffsets.topLeft.x', 'number'],
+                    ['annotationLineEndOffsets.topLeft.y', 'number'],
+                    ['annotationLineEndOffsets.topRight.x', 'number'],
+                    ['annotationLineEndOffsets.topRight.y', 'number'],
+                    ['annotationLineEndOffsets.bottomLeft.x', 'number'],
+                    ['annotationLineEndOffsets.bottomLeft.y', 'number'],
+                    ['annotationLineEndOffsets.bottomRight.x', 'number'],
+                    ['annotationLineEndOffsets.bottomRight.y', 'number'],
+                    ['annotationPadding', 'number'],
+                    ['noDataYOffset', 'number'],
+                ],
+            }
+
+            const form = document.querySelector('#legend-controls')
+            const getPath = (object, path) => path.split('.').reduce((value, key) => value?.[key], object)
+            const setPath = (object, path, value) => {
+                const keys = path.split('.')
+                const last = keys.pop()
+                const target = keys.reduce((value, key) => (value[key] ??= {}), object)
+                target[last] = value
+            }
+
+            const updateLegend = (path, input, type) => {
+                let value
+                if (type === 'checkbox') value = input.checked
+                else if (type === 'number') value = input.value === '' ? undefined : +input.value
+                else if (type === 'csv') value = input.value === '' ? undefined : input.value.split(',').map((item) => item.trim())
+                else if (path === 'labelFormatter') {
+                    value =
+                        input.value === 'default' ? null : input.value.includes('(0') ? (number) => number.toFixed(0) : (number) => number.toFixed(1)
+                } else value = input.value === '' ? undefined : input.value
+
+                setPath(legendConfig, path, value)
+                map.legend(legendConfig)
+            }
+
+            Object.entries(groups).forEach(([title, controls]) => {
+                const fieldset = document.createElement('fieldset')
+                fieldset.innerHTML = `<legend>${title}</legend>`
+                controls.forEach(([path, type, options, step]) => {
+                    const label = document.createElement('label')
+                    label.append(path)
+                    const input = document.createElement(type === 'select' ? 'select' : 'input')
+                    if (type === 'select') {
+                        input.append(...options.map((option) => new Option(option, option)))
+                    } else {
+                        input.type = type === 'csv' ? 'text' : type
+                        if (step) input.step = step
+                    }
+
+                    const current = getPath(legendConfig, path)
+                    if (type === 'checkbox') input.checked = current ?? getPath(map.legendObj() || {}, path) ?? false
+                    else if (path === 'labelFormatter') input.value = 'default'
+                    else if (current !== undefined) input.value = Array.isArray(current) ? current.join(', ') : current
+                    else input.placeholder = String(getPath(map.legendObj() || {}, path) ?? '')
+
+                    input.addEventListener(type === 'text' || type === 'csv' ? 'change' : 'input', () => updateLegend(path, input, type))
+                    label.append(input)
+                    fieldset.append(label)
+                })
+                form.append(fieldset)
+            })
+        </script>
+    </body>
+</html>
