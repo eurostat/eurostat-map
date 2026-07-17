@@ -1,5 +1,9 @@
 # URE maps
 
+## Urban-rural typology maps
+
+- [Overall change in GDP per inhabitant, 2013–23](https://eurostat.github.io/eurostat-map/examples/URE/gdp-change.html)
+
 ## DEGURBA maps
 
 - [At risk of poverty or social exclusion rate](https://eurostat.github.io/eurostat-map/examples/URE/poverty-or-social-exclusion-rate.html)
