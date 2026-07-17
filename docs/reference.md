@@ -1598,7 +1598,6 @@ In addition to [the default legend parameters](#map-legend), bivariate choroplet
 | **annotationLineLength**    | number or Object  | _18_                                                                   | Length of corner annotation callout lines (pixels). Use a number for all corners or an object with topLeft, topRight, bottomLeft, bottomRight.                                        |
 | **annotationOffsets**       | Object            | _auto_                                                                 | Annotation label offsets. Use `{ x, y }` for all corners or per-corner objects: `topLeft`, `topRight`, `bottomLeft`, `bottomRight`, each with `{ x, y }`.                             |
 | **annotationLineEndOffset** | Object            | _{ x: 0, y: 0 }_                                                       | Extra offset applied to where each leader line meets its annotation label. Supports global `{ x, y }` or per-corner `{ topLeft, topRight, bottomLeft, bottomRight }` with `{ x, y }`. |
-| **annotationPadding**       | number or Object  | _deprecated_                                                           | Legacy radial padding (kept for backward compatibility). Prefer `annotationOffsets`.                                                                                                  |
 
 ### Proportional symbol legends
 
