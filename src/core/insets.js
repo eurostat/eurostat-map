@@ -48,6 +48,7 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     // 'euEfta' are hand-tuned overseas-territory arrangements; only 'image' draws the extra
     // connecting decoration (background box, separator lines, blur gradients).
     const presetName = typeof out.insets_ === 'string' ? out.insets_ : null
+    insetsGroup.classed('em-insets-image', presetName === 'image')
     if (presetName === 'default') {
         out.insets_ = defaultInsetConfig(out.insetBoxWidth_, out.insetBoxPadding_)
     } else if (presetName === 'image') {
@@ -337,8 +338,28 @@ const euInsetConfig = function () {
     const scalebarY = 58
 
     const config = [
-        { geo: 'IC', x: 0, y: 0, width: w, height: h, title: 'Canarias (ES)', position: { z: 6000, x: 410000, y: 3180000 }, showScalebar: true, scalebarPosition: [1, scalebarY] },
-        { geo: 'GP', x: w + p, y: 0, width: w, height: h, title: 'Guadeloupe (FR)', position: { x: 660000, y: 1800000 }, showScalebar: true, scalebarPosition: [1, scalebarY] },
+        {
+            geo: 'IC',
+            x: 0,
+            y: 0,
+            width: w,
+            height: h,
+            title: 'Canarias (ES)',
+            position: { z: 6000, x: 410000, y: 3180000 },
+            showScalebar: true,
+            scalebarPosition: [1, scalebarY],
+        },
+        {
+            geo: 'GP',
+            x: w + p,
+            y: 0,
+            width: w,
+            height: h,
+            title: 'Guadeloupe (FR)',
+            position: { x: 660000, y: 1800000 },
+            showScalebar: true,
+            scalebarPosition: [1, scalebarY],
+        },
         { geo: 'GP', x: w + p + 5, y: 15, width: 23, height: 15, position: { z: 1200, x: 493000, y: 1998000 } },
         {
             geo: 'MQ',
@@ -379,7 +400,16 @@ const euInsetConfig = function () {
         },
         { geo: 'PT20', x: w + p + 35, y: 2 * h + 2 * p + 17, width: 30, height: 35, position: { z: 4000, x: 650000, y: 4150000 } },
         { geo: 'PT20', x: w + p + 5, y: 2 * h + 2 * p + 17, width: 20, height: 25, position: { z: 2500, x: 140000, y: 4390000 } },
-        { geo: 'PT30', x: 2 * w + 2 * p, y: 2 * h + 2 * p, width: w, height: h, title: 'Madeira (PT)', showScalebar: true, scalebarPosition: [1, scalebarY] },
+        {
+            geo: 'PT30',
+            x: 2 * w + 2 * p,
+            y: 2 * h + 2 * p,
+            width: w,
+            height: h,
+            title: 'Madeira (PT)',
+            showScalebar: true,
+            scalebarPosition: [1, scalebarY],
+        },
     ]
 
     config.forEach((c) => {
@@ -459,8 +489,24 @@ const euEftaInsetConfig = function () {
             showScalebar: true,
             scalebarPosition: [43, scalebarY],
         },
-        { geo: 'PT20', x: w + p + 40, y: 3 * h + 3 * p + 17, width: 23, height: 30, position: { z: 5000, x: 650000, y: 4150000 }, showScalebar: false },
-        { geo: 'PT20', x: w + p + 5, y: 3 * h + 3 * p + 17, width: 15, height: 20, position: { z: 3500, x: 140000, y: 4390000 }, showScalebar: false },
+        {
+            geo: 'PT20',
+            x: w + p + 40,
+            y: 3 * h + 3 * p + 17,
+            width: 23,
+            height: 30,
+            position: { z: 5000, x: 650000, y: 4150000 },
+            showScalebar: false,
+        },
+        {
+            geo: 'PT20',
+            x: w + p + 5,
+            y: 3 * h + 3 * p + 17,
+            width: 15,
+            height: 20,
+            position: { z: 3500, x: 140000, y: 4390000 },
+            showScalebar: false,
+        },
         { geo: 'PT30', x: 0, y: 4 * h + 4 * p, width: w, height: h, title: 'Madeira (PT)', showScalebar: true, scalebarPosition: [1, scalebarY] },
         {
             geo: 'LI',
@@ -760,7 +806,8 @@ const buildOverseasInsetsDecoration = function (insetsGroup, insetConfigs) {
         if (!config.frameStrokeWidth || !config.svgId) return
         insetsGroup
             .select('#em-inset-' + config.svgId + ' .em-frame')
-            .style('stroke', 'grey', 'important')
+            .classed('em-inset-detail-frame', true)
+            .style('stroke', null)
             .style('stroke-width', config.frameStrokeWidth + 'px', 'important')
     })
 
@@ -805,13 +852,27 @@ const buildOverseasInsetsDecoration = function (insetsGroup, insetConfigs) {
         { id: 'em-inset-grad-t', x1: '100%', y1: '100%', x2: '100%', y2: '0%' },
     ]
     gradients.forEach(({ id, x1, y1, x2, y2 }) => {
-        const gradient = defs.append('linearGradient').attr('id', id).attr('x1', x1).attr('y1', y1).attr('x2', x2).attr('y2', y2).attr('gradientUnits', 'objectBoundingBox')
+        const gradient = defs
+            .append('linearGradient')
+            .attr('id', id)
+            .attr('x1', x1)
+            .attr('y1', y1)
+            .attr('x2', x2)
+            .attr('y2', y2)
+            .attr('gradientUnits', 'objectBoundingBox')
         gradient.append('stop').attr('offset', '0').attr('stop-opacity', '0.1').attr('class', 'em-inset-blur-stop')
         gradient.append('stop').attr('offset', '1').attr('class', 'em-inset-blur-stop')
     })
 
     const blurRect = (x, y, height, width, gradId) =>
-        insetsGroup.append('rect').attr('class', 'em-inset-blur').attr('x', x).attr('y', y).attr('height', height).attr('width', width).attr('fill', `url(#${gradId})`)
+        insetsGroup
+            .append('rect')
+            .attr('class', 'em-inset-blur')
+            .attr('x', x)
+            .attr('y', y)
+            .attr('height', height)
+            .attr('width', width)
+            .attr('fill', `url(#${gradId})`)
 
     blurRect(92, 180, 10, 75, 'em-inset-grad-b')
     blurRect(90, 106, 79, 10, 'em-inset-grad-l')

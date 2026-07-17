@@ -7,6 +7,15 @@
 .em-inset-subtitle {
     font-size: 12px;
 }
+.em-insets-image text {
+    fill: #696969 !important;
+}
+.em-insets-image line {
+    stroke: #696969 !important;
+}
+.em-insets-image .em-inset-detail-frame {
+    stroke: #696969 !important;
+}
 .em-insets .em-frame {
     /* this will give a frame to inset maps */
     stroke: grey;
