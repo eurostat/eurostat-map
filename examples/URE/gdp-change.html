@@ -11,8 +11,9 @@
 
             .gdp-map-layout {
                 display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(2, 50%);
                 width: 100%;
+                max-width: 100%;
                 align-items: start;
             }
 
@@ -27,6 +28,8 @@
                 gap: 0;
                 padding: 0;
                 box-sizing: border-box;
+                min-width: 0;
+                width: 100%;
             }
 
             .gdp-typology-picker {
@@ -78,6 +81,7 @@
 
             .gdp-main-map {
                 min-width: 0;
+                width: 100%;
             }
 
             @media (max-width: 900px) {
@@ -147,7 +151,8 @@
                     max: Math.max(...numericGdpValues),
                 }
                 const continuousScale = makeContinuousDivergingScale(dataDomain.min, dataDomain.max)
-                const mapSize = { width: 900, height: 680 }
+                const clientWidth = document.documentElement.clientWidth
+                const mapSize = { width: Math.floor(clientWidth <= 900 ? clientWidth : clientWidth / 2), height: 680 }
 
                 buildTypologyMap(config, continuousScale, dataDomain, mapSize)
 
