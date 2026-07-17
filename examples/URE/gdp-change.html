@@ -235,8 +235,8 @@
                         },
                         x: 60,
                         y: 120,
-                        squareSize: 85,
-                        noDataPadding: 10,
+                        squareSize: 100,
+                        noDataPadding: 0,
                         noDataShapeHeight: 16,
                         noDataShapeWidth: 16,
                     })
@@ -315,11 +315,8 @@
                     .pointOfDivergence(0)
                     .noDataFillStyle('#f1f1f1')
                     .legend({
-                        title: 'GDP change (percentage points)',
-                        orientation: 'horizontal',
-                        x: 50,
-                        y: size.height - 65,
-                        width: size.width - 100,
+                        title: 'GDP change',
+                        //orientation: 'horizontal',
                         shapeHeight: 10,
                         tickLength: 5,
                         tickValues: [domain.min, 0, domain.max],
