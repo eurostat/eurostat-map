@@ -25,7 +25,7 @@ export interface LegendConfig {
     boxPadding?: number
     /** Background opacity of the legend box. */
     boxOpacity?: number
-    /** Apply legend hover opacity/highlighting only while the map is currently zoomed in (scale != 1); disabled again once zoomed back out to the initial view. */
+    /** Apply legend hover opacity/highlighting only while the map is currently zoomed in (scale != 1). The legend box is transparent at the initial view and returns to its configured opacity while zoomed. */
     onlyApplyOpacityWhileZoomed?: boolean
     /** Padding between the title block and legend body. */
     titlePadding?: number
