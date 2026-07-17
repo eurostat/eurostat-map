@@ -123,16 +123,4 @@ export interface BivariateLegendConfig extends LegendConfig {
               topLeft?: { x?: number; y?: number }
           }
 
-    /**
-     * @deprecated Use annotationOffsets instead.
-     * Radial padding between corner annotation callout line end and text in pixels.
-     */
-    annotationPadding?:
-        | number
-        | {
-              topRight?: number
-              bottomRight?: number
-              bottomLeft?: number
-              topLeft?: number
-          }
 }

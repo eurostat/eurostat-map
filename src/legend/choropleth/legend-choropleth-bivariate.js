@@ -98,7 +98,6 @@ export const legend = function (map, config) {
     }
     out.annotationOffsets = cloneAnnotationOffsets(defaultAnnotationOffsetsByRotation[0])
     out.annotationLineEndOffsets = cloneAnnotationLineEndOffsets(defaultAnnotationLineEndOffsetsByRotation[0])
-    out.annotationPadding = 8
     //add extra distance between legend and no data item
     out.noDataYOffset = defaultNoDataYOffsetByRotation[0]
 
@@ -798,28 +797,7 @@ export const legend = function (map, config) {
             }
         }
 
-        const legacyPadding = getLegacyAnnotationPadding(cornerName)
-        if (legacyPadding != null) {
-            return { x: ux * legacyPadding, y: uy * legacyPadding, isCustom: false }
-        }
-
         return defaultOffset
-    }
-
-    function getLegacyAnnotationPadding(cornerName) {
-        const padding = out.annotationPadding
-        if (typeof padding === 'number' && Number.isFinite(padding)) {
-            return padding
-        }
-        if (padding && typeof padding === 'object') {
-            // Accept legacy typo key 'ropRight' as alias for 'topRight'.
-            const key = cornerName === 'topRight' && padding.topRight == null ? 'ropRight' : cornerName
-            const value = padding[key]
-            if (typeof value === 'number' && Number.isFinite(value)) {
-                return value
-            }
-        }
-        return null
     }
 
     function getAnnotationLineLength(cornerName, ux, uy, cornerOffset) {
