@@ -4,9 +4,9 @@
     "nutsYear": 2024,
     "scale": "60M",
     "chapterTitle": "Economy",
-    "title": "Map 1: Overall change in GDP per inhabitant, by urban-rural typology, 2013–23",
-    "subtitle": "(by NUTS 3 regions)",
-    "gdpLegendLabel": "Change\n(percentage points)",
+    "title": "Overall change in GDP per inhabitant, by urban-rural typology, 2013–23",
+    "subtitle": "(in percentage points, by NUTS 3 regions)",
+    "gdpLegendLabel": "GDP change",
     "urbanRuralLegendLabel": "Urban-Int.-Rural",
     "thresholds": [-5.0, 5.0],
     "urbanRuralLabels": {
