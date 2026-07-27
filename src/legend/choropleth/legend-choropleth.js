@@ -6,7 +6,6 @@ import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from '../legend-continuous'
 import { drawDiscreteLegend, buildDiscreteLabelFormatter, resolveDecimals } from '../legend-discrete'
 import { createAlphaLegend } from './legend-value-by-alpha'
-import { createRankedBarChartLegend } from './legend-ranked-bar-chart'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/legend/choropleth/ChoroplethLegendConfig').ChoroplethLegendConfig} ChoroplethLegendConfig */
@@ -36,10 +35,6 @@ export const legend = function (map, config = {}) {
 
     // Histogram config as nested object
     out.histogram = null
-
-    // Ranked bar chart: one bar per region below the class-color legend (falls back to the
-    // histogram distribution above an internal region-count threshold)
-    out.rankedBarChart = false
 
     //diverging line
     out.pointOfDivergenceLabel = undefined
@@ -104,13 +99,6 @@ export const legend = function (map, config = {}) {
                 createContinuousLegend(out, baseX, baseY)
             } else {
                 drawDiscreteLegend(out, baseX, baseY)
-            }
-
-            // Append ranked bar chart BELOW the main legend (skip if a histogram is already
-            // showing - the two are mutually exclusive distribution views)
-            if (out.rankedBarChart && !out.histogram) {
-                const legendHeight = out.lgg.node().getBBox().height
-                createRankedBarChartLegend(out, baseX, baseY + legendHeight + out.boxPadding + 8)
             }
 
             // Draw opacity legend if value-by-alpha is active

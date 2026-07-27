@@ -1,8 +1,12 @@
 // legend-ranked-bar-chart.js
 import { scaleLinear } from 'd3-scale'
+import * as Legend from '../legend'
 import { executeForAllInsets } from '../../core/utils'
 import { buildDiscreteLabelFormatter } from '../legend-discrete'
 import { createHistogramLegend } from './legend-histogram'
+//types
+/** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
+/** @typedef {import('../../types/legend/choropleth/RankedBarChartConfig').RankedBarChartConfig} RankedBarChartConfig */
 
 // Above this many eligible regions, drawing one bar per region stops being legible (and for
 // NUTS1/2/3 maps could be hundreds/thousands of regions) - fall back to the histogram
@@ -15,15 +19,63 @@ const LABEL_COLUMN_WIDTH = 55
 const LABEL_BAR_GAP = 4
 
 /**
- * Ranked bar chart legend: one horizontal bar per region, sorted by value, colored by the
- * region's own class color, labeled with its id and value. Falls back to the histogram
- * distribution view when there are too many regions to list individually.
+ * A ranked bar chart element for choropleth-classified maps: one horizontal bar per region,
+ * sorted by value, colored by the region's own class color, labeled with its id and value.
+ * Falls back to the histogram distribution view when there are too many regions to list
+ * individually.
  *
- * @param {object} out - legend instance (see legend-choropleth.js)
- * @param {number} baseX
- * @param {number} baseY
+ * Independent of the legend: has its own svgId/positioning (see the base Legend.legend()), so
+ * it can render into its own container - including an entirely different <svg> to the legend's -
+ * rather than being a sub-feature of it.
+ *
+ * @param {MapInstance} map
+ * @param {RankedBarChartConfig} [config]
  */
-export function createRankedBarChartLegend(out, baseX, baseY) {
+export const rankedBarChart = function (map, config = {}) {
+    // build generic legend-like object (inherit) - gives us svgId/positioning/build/
+    // updateContainer/box-background/getColorStats/getColorClassifier/getClassToFillStyle/
+    // getNumberOfClasses/getLabelFormatter for free, exactly like legend-choropleth.js does.
+    const out = Legend.legend(map)
+
+    // Histogram config used for the too-many-regions fallback. Not part of RankedBarChartConfig -
+    // always derived internally from the map's own labelType/ascending settings.
+    out.histogram = null
+
+    //override attribute values with config values
+    for (let key in config) {
+        out[key] = config[key]
+    }
+
+    out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
+
+        if (!out.lgg.node()) return
+
+        const map = out.layer
+
+        out.makeBackgroundBox()
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
+
+        //exit early if no classifier
+        if (!map.classToFillStyle()) return
+
+        //exit early if stat data not yet available
+        if (!out.getColorStats(out)?.getArray()?.length) return
+
+        const baseY = out.getBaseY()
+        const baseX = out.getBaseX()
+
+        drawRankedBarChart(out, baseX, baseY)
+
+        out.setBoxDimension()
+    }
+
+    return out
+}
+
+function drawRankedBarChart(out, baseX, baseY) {
     const map = out.map
     const stat = out.getColorStats(out)
     const index = stat?.get ? stat.get() : undefined
@@ -60,10 +112,7 @@ export function createRankedBarChartLegend(out, baseX, baseY) {
     const rowHeight = out.shapeHeight + BAR_HEIGHT_PADDING
     const barStartX = baseX + LABEL_COLUMN_WIDTH
 
-    const container = out.lgg
-        .append('g')
-        .attr('class', 'em-legend-ranked-bar-chart')
-        .attr('transform', `translate(0, ${baseY})`)
+    const container = out.lgg.append('g').attr('class', 'em-legend-ranked-bar-chart').attr('transform', `translate(0, ${baseY})`)
 
     entries.forEach((entry, i) => {
         const y = i * rowHeight
@@ -91,14 +140,14 @@ export function createRankedBarChartLegend(out, baseX, baseY) {
             .attr('ecl', ecl)
             .on('mouseover', function () {
                 highlightFunction(map, ecl)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, ecl)
                 }
             })
             .on('mouseout', function () {
                 unhighlightFunction(map, ecl)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
+                if (map.insetTemplates_) {
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, ecl)
                 }
             })
     })

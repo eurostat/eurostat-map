@@ -4,6 +4,7 @@ import type { Layer } from './layer/Layer'
 import type { LayerConfig } from './layer/LayerConfig'
 import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
+import type { RankedBarChartConfig } from '../legend/choropleth/RankedBarChartConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
 import type { CoastalMarginSettings } from './decoration/CoastalMarginSettings'
@@ -203,6 +204,20 @@ export interface MapInstance {
 
     /** Force-update the legend after data or style changes. */
     updateLegend(): this
+
+    /** Ranked bar chart. */
+
+    /**
+     * Get or set ranked bar chart configuration (choropleth-classified map types only). Pass
+     * false to remove it. Independent of the legend - has its own positioning and can render
+     * into an entirely different container/SVG to the legend's.
+     * @example map.rankedBarChart({ svgId: 'my-bar-chart-container' })
+     */
+    rankedBarChart(): RankedBarChartConfig | false
+    rankedBarChart(config: RankedBarChartConfig | false): this
+
+    /** Force-update the ranked bar chart after data or style changes. */
+    updateRankedBarChart(): this
 
     /** Tooltip. */
 

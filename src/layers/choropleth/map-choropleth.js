@@ -7,6 +7,7 @@ import { piecewise, interpolateLab } from 'd3-interpolate'
 import { createStatMap, buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
+import * as RankedBarChart from '../../legend/choropleth/legend-ranked-bar-chart'
 import {
     applyNiceNumbers,
     checkIfDiverging,
@@ -390,6 +391,11 @@ export const decorateChoroplethLayer = function (layer, config) {
     //@override
     layer.getLegendConstructor = function () {
         return ChoroplethLegend.legend
+    }
+
+    //@override
+    layer.getRankedBarChartConstructor = function () {
+        return RankedBarChart.rankedBarChart
     }
 
     // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)

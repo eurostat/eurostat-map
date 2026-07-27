@@ -87,6 +87,7 @@ export type { ChoroplethLegendConfig } from './legend/choropleth/ChoroplethLegen
 export type { BivariateLegendConfig } from './legend/choropleth/BivariateLegendConfig'
 export type { HistogramLegendConfig } from './legend/choropleth/HistogramLegendConfig'
 export type { TrivariateLegendConfig } from './legend/choropleth/TrivariateLegendConfig'
+export type { RankedBarChartConfig } from './legend/choropleth/RankedBarChartConfig'
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'
