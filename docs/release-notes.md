@@ -1,5 +1,26 @@
 # Release notes
 
+## 4.9.4
+
+### New
+
+- **`rankedBarChart()` now works on proportional-symbol maps**, not just choropleth maps. Bars are colored using the map's own color classification (previously only reachable on choropleth layers), falling back to a flat bar color on map/layer types that don't classify regions into colored classes at all.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ps')
+    .encoding('size', { stat: 'symbolSize' })
+    .encoding('color', { stat: 'symbolColor' })
+    .rankedBarChart({ countryGroup: 'eu' })
+    .build()
+```
+
+### Improvements
+
+- **Hovering a bar in the ranked bar chart now highlights only that bar's own region on the map**, instead of highlighting every region that shares its color class. No config changes needed - this is automatic.
+
 ## 4.9.3
 
 ### Breaking Changes
