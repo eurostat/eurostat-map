@@ -1,5 +1,43 @@
 # Release notes
 
+## 4.9.0
+
+### New
+
+- **New independent `rankedBarChart` map element** (`map.rankedBarChart(config)`), for choropleth-classified maps - separate from the legend, not a sub-feature of it: one horizontal bar per region, sorted by value, colored by the region's own class color, labeled with its id and value, in the style of statistical-atlas publications. Bars are right-anchored to a common edge and grow leftward as value increases; the value label is drawn inside the bar (automatically switching between black/white for contrast against the bar's own fill) when it fits, otherwise outside to the left of the bar; the region code sits in a bold-italic column that starts right after the bars' shared edge. Above an internal 40-region threshold, automatically falls back to the histogram distribution view instead of drawing one bar per region. Supports `title`/`subtitle` like the legend, and has its own `svgId`/positioning - it can render into a completely separate container/SVG element to the legend's.
+
+Example:
+
+```javascript
+map.rankedBarChart({
+    svgId: 'my-bar-chart-container',
+    title: 'GDP per inhabitant',
+    subtitle: 'EU member states only',
+    countryGroup: 'eu',
+})
+```
+
+- **`RankedBarChartConfig` gained `countryGroup`**, to limit which regions appear in the ranked bar chart to a political grouping: `'eu'` (27 member states), `'euEfta'` (+ Iceland, Liechtenstein, Norway, Switzerland), or `'euEftaCc'` (+ current EU candidate countries). Applied before the 40-region histogram-fallback threshold, so filtering a large dataset down to `'eu'` can bring it back within the bar-chart limit.
+
+Example:
+
+```javascript
+map.rankedBarChart({ countryGroup: 'euEfta' })
+```
+
+## 4.8.6
+
+### Fixes
+
+- **Legend hover-highlight interactions on exported/zoomable maps were unintentionally blocked by `onlyApplyOpacityWhileZoomed` until the user zoomed in.** That setting now purely controls the legend box's own background opacity (its documented purpose) and no longer incidentally blocks the swatch hover-to-highlight interaction via a capture-phase `stopImmediatePropagation()` on legend `mouseover`.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+map.legend({ onlyApplyOpacityWhileZoomed: true })
+// Hovering a legend swatch now highlights the map immediately, even before zooming in.
+```
+
 ## 4.8.5
 
 ### New
