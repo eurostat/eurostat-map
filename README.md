@@ -9,7 +9,9 @@
 
 <br>
 <div align="center">
-  <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/eurostat-map-logo-cropped.png" alt="examples" width="400"/>
+  <a href="https://github.com/eurostat/eurostat-map">
+    <img src="https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/eurostat-map-logo-cropped.png" alt="Eurostat Map" width="400"/>
+  </a>
 </div>
 <div align="center">
   <em>Build publication-ready statistical maps of Europe in minutes.</em>
