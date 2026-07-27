@@ -91,6 +91,11 @@ export const rankedBarChart = function (map, config = {}) {
     // Undefined (default) means no filtering - every region with a value is shown.
     out.countryGroup = undefined
 
+    // Maximum total height in pixels for the rendered chart (title/subtitle + bars). Undefined
+    // (default) lets the chart grow to fit its content - which for ~35 EU/EFTA/CC regions can
+    // easily exceed the map's own height. See drawRankedBarChart() for how this is enforced.
+    out.height = undefined
+
     //override attribute values with config values
     for (let key in config) {
         out[key] = config[key]
@@ -203,7 +208,19 @@ function drawRankedBarChart(out, baseX, baseY) {
         .domain([0, Math.max(...entries.map((e) => e.value), 0)])
         .range([0, MAX_BAR_WIDTH])
 
-    const rowHeight = out.shapeHeight + BAR_HEIGHT_PADDING
+    // Fit the whole bar list within out.height when set, rather than letting it grow unbounded
+    // with region count - all ~35 EU/EFTA/CC countries at the default row height can easily end
+    // up taller than the map itself. Bar height and label font size are scaled down together by
+    // the same factor so labels stay proportionate to their own (shorter) bars; bar width/x
+    // layout is left alone since it doesn't grow with region count the way height does.
+    const naturalRowHeight = out.shapeHeight + BAR_HEIGHT_PADDING
+    const naturalHeight = entries.length * naturalRowHeight
+    const availableHeight = out.height != null ? out.height - baseY : undefined
+    const scale = availableHeight != null && availableHeight > 0 && naturalHeight > availableHeight ? availableHeight / naturalHeight : 1
+
+    const barHeight = out.shapeHeight * scale
+    const rowHeight = naturalRowHeight * scale
+    const fontSize = out.labelFontSize * scale
 
     // Bars are right-anchored to a common edge and grow leftward as value increases (matching
     // the reference statistical-atlas style), with the country code column starting right after
@@ -226,7 +243,7 @@ function drawRankedBarChart(out, baseX, baseY) {
             .attr('x', barLeftX)
             .attr('y', y)
             .attr('width', barWidth)
-            .attr('height', out.shapeHeight)
+            .attr('height', barHeight)
             .style('fill', fillColor)
             .attr('ecl', ecl)
             .on('mouseover', function () {
@@ -248,8 +265,9 @@ function drawRankedBarChart(out, baseX, baseY) {
             .attr('class', 'em-legend-label em-legend-ranked-bar-chart-code')
             .attr('text-anchor', 'start')
             .attr('x', barRightX + CODE_GAP)
-            .attr('y', y + out.shapeHeight)
+            .attr('y', y + barHeight)
             .attr('dy', '-0.15em')
+            .style('font-size', `${fontSize}px`)
             .text(entry.id)
 
         // Value: try inside the bar first (right-aligned against its right edge); if it doesn't
@@ -259,8 +277,9 @@ function drawRankedBarChart(out, baseX, baseY) {
             .attr('class', 'em-legend-label')
             .attr('text-anchor', 'end')
             .attr('x', barRightX - VALUE_PADDING)
-            .attr('y', y + out.shapeHeight)
+            .attr('y', y + barHeight)
             .attr('dy', '-0.15em')
+            .style('font-size', `${fontSize}px`)
             .style('fill', getTextColorForBackground(fillColor))
             .text(valueFormatter(entry.value))
 
