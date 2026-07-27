@@ -1,5 +1,20 @@
 # Release notes
 
+## 4.9.2
+
+### Fixes
+
+- **`rankedBarChart` never rendered when enabled after the map's initial build** (e.g. a live "show ranked bar chart" toggle switched on after the map had already finished loading). The lazy first-time build only called `.build()` on the new bar-chart object, which just sets up its empty container - the actual bar drawing happens in `.update()`, which is otherwise triggered later by an internal pass tied to stat data resolving, a pass that had already run before the object existed. `.update()` is now called immediately after the lazy build so the bars draw right away.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+// Enabling rankedBarChart after the map is already built and rendered now works correctly.
+map.build()
+// ...later, in response to a user toggle...
+map.rankedBarChart({ svgId: 'my-bar-chart-container', countryGroup: 'eu' })
+```
+
 ## 4.9.1
 
 ### Fixes
