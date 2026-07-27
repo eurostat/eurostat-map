@@ -592,8 +592,23 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
         //set new ranked bar chart config
         out.rankedBarChart_ = v
-        //update if existing ranked bar chart
-        if (out.rankedBarChartObj_) out.updateRankedBarChart()
+        if (out.rankedBarChartObj_) {
+            //update if already built
+            out.updateRankedBarChart()
+        } else if (out._finalized_) {
+            // Unlike the legend (always present from the first build), the ranked bar chart
+            // commonly starts disabled and gets turned on later via a live toggle, after the map
+            // has already finished its initial build. Build it now instead of silently doing
+            // nothing until some future map.build() that may never happen again.
+            out.buildRankedBarChart()
+            // buildRankedBarChart() only calls .build() on the new object (sets up its empty
+            // container) - the actual content draw happens in .update(), which is normally
+            // triggered later by updateAllLayers() once stat data resolves. That pass already
+            // ran during the initial build, before this object existed, and won't run again on
+            // its own - so without this, the container stays empty until some unrelated future
+            // update happens to sweep it in.
+            out.updateRankedBarChart()
+        }
         return out
     }
 
