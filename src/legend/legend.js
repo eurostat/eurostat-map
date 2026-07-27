@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
+import { getCornerPosition, getCornerCoords } from '../core/decoration/corner-position'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 //types
@@ -202,7 +203,8 @@ export const legend = function (map) {
         if (!hasManualX && !hasManualY && !cornerPosition) return
 
         const bbox = getLegendBBox(container, out)
-        const cornerCoords = cornerPosition ? getCornerCoords(cornerPosition, bbox, map, out.boxPadding) : null
+        const buttonReserve = cornerPosition ? getLegendButtonReserve(map, cornerPosition) : 0
+        const cornerCoords = cornerPosition ? getCornerCoords(cornerPosition, bbox, map, out.boxPadding, buttonReserve) : null
 
         let x = hasManualX ? out.x : cornerCoords ? cornerCoords.x : map.width() - out.width - out.boxPadding
         let y = hasManualY ? out.y : cornerCoords ? cornerCoords.y : out.boxPadding
@@ -455,13 +457,6 @@ export const legend = function (map) {
         return unhighlightRegions
     }
 
-    function getCornerPosition(position) {
-        if (typeof position !== 'string') return null
-        const normalized = position.trim().toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ')
-        const supported = ['top right', 'bottom right', 'top left', 'bottom left']
-        return supported.includes(normalized) ? normalized : null
-    }
-
     function getLegendBBox(container, legend) {
         const node = container.node()
         // Prefer the background rect bounds when available: it represents the visual legend
@@ -484,66 +479,6 @@ export const legend = function (map) {
         return { x: 0, y: 0, width: legend.width || 0, height: legend.height || 0 }
     }
 
-    function getCornerCoords(position, bbox, map, padding) {
-        const [vertical, horizontal] = position.split(' ')
-        const extent = getMapDrawingExtent(map)
-        const buttonReserve = getLegendButtonReserve(map, position)
-        const maxX = Math.max(extent.x + padding, extent.x + extent.width - bbox.width - padding)
-        const minY = extent.y + padding
-        const maxY = Math.max(minY, extent.y + extent.height - bbox.height - padding)
-        const left = horizontal === 'right' ? maxX : extent.x + padding
-        const baseTop = vertical === 'bottom' ? maxY - buttonReserve : minY + buttonReserve
-        let top = Math.max(minY, Math.min(maxY, baseTop))
-
-        if (vertical === 'top') {
-            const overlapOffset = getTopTextOverlapOffset(map, padding, bbox, left, top)
-            if (overlapOffset > 0) {
-                top = Math.max(minY, Math.min(maxY, top + overlapOffset))
-            }
-        }
-
-        return {
-            x: left - bbox.x,
-            y: top - bbox.y,
-        }
-    }
-
-    function getTopTextOverlapOffset(map, padding, legendBBox, legendLeft, legendTop) {
-        // When header is disabled, title/subtitle are drawn in the root SVG and can overlap top legends.
-        if (map.header_ || map.isInset) return 0
-        if (!map.title_ && !map.subtitle_) return 0
-
-        const svg = map.svg?.()
-        if (!svg) return 0
-
-        const title = svg.select?.('#title' + map.geo_)
-        const subtitle = svg.select?.('#subtitle' + map.geo_)
-
-        let textBottom = 0
-        let textLeft = Infinity
-        let textRight = -Infinity
-        ;[title, subtitle].forEach((textSel) => {
-            if (!textSel || textSel.empty()) return
-            try {
-                const bb = textSel.node().getBBox({ stroke: true })
-                textBottom = Math.max(textBottom, bb.y + bb.height)
-                textLeft = Math.min(textLeft, bb.x)
-                textRight = Math.max(textRight, bb.x + bb.width)
-            } catch (e) {
-                // Ignore bbox errors and keep fallback offset.
-            }
-        })
-
-        if (!textBottom || textLeft === Infinity || textRight === -Infinity) return 0
-
-        const legendRight = legendLeft + (legendBBox?.width || 0)
-        const overlapsHorizontally = legendLeft < textRight && legendRight > textLeft
-        if (!overlapsHorizontally) return 0
-
-        const requiredTop = textBottom + padding
-        return Math.max(0, requiredTop - legendTop)
-    }
-
     function getLegendButtonReserve(map, position) {
         if (!map.legendButton_ || map.legendButtonPosition_) return 0
 
@@ -559,24 +494,6 @@ export const legend = function (map) {
             return bbox.height + 8
         } catch (e) {
             return 38
-        }
-    }
-
-    function getMapDrawingExtent(map) {
-        const fallback = { x: 0, y: 0, width: map.width(), height: map.height() }
-        const svg = map.svg?.()
-        if (!svg) return fallback
-
-        const drawing = svg.select?.('#em-drawing-' + map.svgId_)
-        if (!drawing || drawing.empty()) return fallback
-
-        const transform = drawing.attr('transform') || ''
-        const match = transform.match(/translate\(\s*([-\d.]+)(?:[,\s]+([-\d.]+))?\s*\)/)
-        return {
-            x: match ? Number(match[1]) || 0 : 0,
-            y: match ? Number(match[2]) || 0 : 0,
-            width: map.width(),
-            height: map.height(),
         }
     }
 

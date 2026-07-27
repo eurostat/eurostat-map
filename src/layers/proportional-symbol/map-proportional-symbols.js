@@ -3,6 +3,7 @@ import { interpolateOrRd } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
+import * as RankedBarChart from '../../core/decoration/ranked-bar-chart.js'
 import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
 import { applyPatternFill } from '../../core/decoration/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
@@ -599,6 +600,11 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     //@override
     layer.getLegendConstructor = function () {
         return ProportionalSymbolLegend.legend
+    }
+
+    //@override
+    layer.getRankedBarChartConstructor = function () {
+        return RankedBarChart.rankedBarChart
     }
 
     return layer

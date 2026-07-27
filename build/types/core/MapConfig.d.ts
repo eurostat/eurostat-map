@@ -1,7 +1,7 @@
 import type { StatConfig } from './stat/StatConfig'
 import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
-import type { RankedBarChartConfig } from '../legend/choropleth/RankedBarChartConfig'
+import type { RankedBarChartConfig } from './decoration/RankedBarChartConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
 import type { MapInstance as EurostatMap } from './MapInstance'
