@@ -1,5 +1,19 @@
 # Release notes
 
+## 4.9.1
+
+### Fixes
+
+- **Legend rendered into a caller-managed external container (`legend({ svgId: ... })`) could jump to a default top-right corner position instead of staying where the caller placed it**, when the map's stat data loaded from a remote source (i.e. wasn't already available synchronously at build time). A deferred internal layout pass could run `applyPosition()` before the legend's "this container is externally positioned, leave it alone" flag had been set - which only happened on the legend's first full content update, itself gated on stat data being ready - so it fell back to positioning the legend itself, permanently overwriting the caller's transform.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+map.legend({ svgId: 'my-legend-container' })
+// The legend now reliably stays wherever #my-legend-container is positioned,
+// even when statistical data is fetched remotely.
+```
+
 ## 4.9.0
 
 ### New
