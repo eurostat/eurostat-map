@@ -7,7 +7,7 @@ import { piecewise, interpolateLab } from 'd3-interpolate'
 import { createStatMap, buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
-import * as RankedBarChart from '../../legend/choropleth/legend-ranked-bar-chart'
+import * as RankedBarChart from '../../core/decoration/ranked-bar-chart'
 import {
     applyNiceNumbers,
     checkIfDiverging,

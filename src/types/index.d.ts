@@ -65,6 +65,7 @@ export type { CoastalMarginSettings } from './core/decoration/CoastalMarginSetti
 export type { ScalebarConfig } from './core/decoration/ScalebarConfig'
 export type { StampConfig } from './core/decoration/StampConfig'
 export type { LabelsConfig, Label } from './core/decoration/LabelsConfig'
+export type { RankedBarChartConfig } from './core/decoration/RankedBarChartConfig'
 export type { GridCartogramSettings, GridCartogramMargins } from './core/GridCartogramSettings'
 export type { DorlingSettings, DorlingStrength } from './core/DorlingSettings'
 export type { MinimapConfig } from './core/minimaps'
@@ -87,7 +88,6 @@ export type { ChoroplethLegendConfig } from './legend/choropleth/ChoroplethLegen
 export type { BivariateLegendConfig } from './legend/choropleth/BivariateLegendConfig'
 export type { HistogramLegendConfig } from './legend/choropleth/HistogramLegendConfig'
 export type { TrivariateLegendConfig } from './legend/choropleth/TrivariateLegendConfig'
-export type { RankedBarChartConfig } from './legend/choropleth/RankedBarChartConfig'
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'

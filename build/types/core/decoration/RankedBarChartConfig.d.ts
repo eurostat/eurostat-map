@@ -1,11 +1,12 @@
 /**
- * Configuration for the ranked bar chart element on choropleth-classified maps: one horizontal
- * bar per region, sorted by value, colored by the region's own class color, labeled with its id
- * and value. Above an internal region-count threshold, falls back automatically to the histogram
- * distribution view instead of drawing one bar per region.
+ * Configuration for the ranked bar chart map element: one horizontal bar per region, sorted by
+ * value, labeled with its id and value. Colored by the region's own class color on map/layer types
+ * that classify regions into colored classes (choropleth, proportional symbols' color encoding),
+ * or a flat fallback color otherwise. Above an internal region-count threshold, falls back
+ * automatically to the histogram distribution view instead of drawing one bar per region.
  *
- * A standalone element, independent of the legend - not a sub-feature of it, and deliberately not
- * an extension of LegendConfig: it has its own container/positioning and doesn't carry the
+ * A standalone chart element - not a legend and not a sub-feature of one, and deliberately not an
+ * extension of LegendConfig: it has its own container/positioning and doesn't carry the
  * legend-only concepts (no-data swatch, max/min labels, etc.) that don't apply to it. Set via
  * `map.rankedBarChart(config)`, separately from `map.legend(config)`.
  */
