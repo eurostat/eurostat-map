@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <!-- Reproduces the IMAGE bug scenario: map built WITHOUT the ranked bar chart enabled,
+             then toggled on afterward via a live .rankedBarChart(config) call - not set upfront
+             before .build(). -->
+        <svg id="map"></svg>
+        <svg id="bar-chart-panel"></svg>
+
+        <button id="toggleBtn" style="position: fixed; top: 10px; right: 10px; z-index: 999">Toggle ranked bar chart ON</button>
+
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Ranked bar chart TOGGLE test')
+                .subtitle('GDP per inhabitant, country level (NUTS0)')
+                .scale('60M')
+                .nutsLevel(0)
+                .stat('value', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .encoding('fill', { stat: 'value' })
+                .numberOfClasses(6)
+                .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .colorSchemeType('discrete')
+                .classificationMethod('quantile')
+                .legend({
+                    x: 600,
+                    y: 20,
+                    width: 200,
+                    title: 'GDP per inhabitant',
+                    boxOpacity: 0.9,
+                })
+                .insets('default')
+                .zoomExtent([1, 10])
+                .build()
+
+            document.getElementById('toggleBtn').addEventListener('click', () => {
+                console.log('Toggling ranked bar chart ON, after initial build')
+                map.rankedBarChart({
+                    svgId: 'bar-chart-panel',
+                    x: 10,
+                    y: 10,
+                    title: 'Ranked: GDP per inhabitant',
+                    subtitle: 'EU member states only',
+                    countryGroup: 'eu',
+                })
+                console.log('rankedBarChart config after call:', map.rankedBarChart())
+            })
+        </script>
+    </body>
+</html>
