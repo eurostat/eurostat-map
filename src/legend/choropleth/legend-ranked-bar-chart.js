@@ -15,7 +15,6 @@ const MAX_BARS = 40
 
 const BAR_HEIGHT_PADDING = 3
 const MAX_BAR_WIDTH = 130
-const LABEL_COLUMN_WIDTH = 55
 const LABEL_BAR_GAP = 4
 
 /**
@@ -70,9 +69,33 @@ export const rankedBarChart = function (map, config = {}) {
         drawRankedBarChart(out, baseX, baseY)
 
         out.setBoxDimension()
+        resizeContainerToFitContent(out)
     }
 
     return out
+}
+
+// Ranked bar chart height varies a lot with the number of regions, so a caller can't reasonably
+// pre-size a container for it up front. If the target element is an actual <svg> (as opposed to
+// a <g> nested inside an already-correctly-sized parent SVG, e.g. IMAGE's own usage), grow its
+// width/height attributes to fit the rendered content - otherwise the SVG's own viewport silently
+// clips anything beyond whatever fixed size the caller happened to set.
+function resizeContainerToFitContent(out) {
+    const node = out.svg?.node()
+    if (!node || node.tagName?.toLowerCase() !== 'svg') return
+
+    const background = out.svg.select('#em-legend-background')
+    if (background.empty()) return
+
+    const width = +background.attr('width') || 0
+    const height = +background.attr('height') || 0
+    if (!width || !height) return
+
+    const currentWidth = +node.getAttribute('width') || 0
+    const currentHeight = +node.getAttribute('height') || 0
+
+    if (width > currentWidth) node.setAttribute('width', width)
+    if (height > currentHeight) node.setAttribute('height', height)
 }
 
 function drawRankedBarChart(out, baseX, baseY) {
@@ -110,29 +133,29 @@ function drawRankedBarChart(out, baseX, baseY) {
         .range([0, MAX_BAR_WIDTH])
 
     const rowHeight = out.shapeHeight + BAR_HEIGHT_PADDING
-    const barStartX = baseX + LABEL_COLUMN_WIDTH
 
     const container = out.lgg.append('g').attr('class', 'em-legend-ranked-bar-chart').attr('transform', `translate(0, ${baseY})`)
 
-    entries.forEach((entry, i) => {
+    // Pass 1: draw each row's label (provisionally right-anchored at baseX) and the bar, without
+    // knowing the final label column width yet.
+    const rows = entries.map((entry, i) => {
         const y = i * rowHeight
         const ecl = classifier(entry.value)
         const fillColor = classToFillStyle(ecl, numberOfClasses)
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
-        itemContainer
+        const label = itemContainer
             .append('text')
             .attr('class', 'em-legend-label')
             .attr('text-anchor', 'end')
-            .attr('x', baseX + LABEL_COLUMN_WIDTH - LABEL_BAR_GAP)
+            .attr('x', baseX)
             .attr('y', y + out.shapeHeight)
             .attr('dy', '-0.15em')
             .text(`${valueFormatter(entry.value)} ${entry.id}`)
 
-        itemContainer
+        const bar = itemContainer
             .append('rect')
             .attr('class', 'em-legend-rect')
-            .attr('x', barStartX)
             .attr('y', y)
             .attr('width', Math.max(barScale(entry.value), 1))
             .attr('height', out.shapeHeight)
@@ -150,5 +173,18 @@ function drawRankedBarChart(out, baseX, baseY) {
                     executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, ecl)
                 }
             })
+
+        return { label, bar }
+    })
+
+    // Pass 2: now that every label is rendered, measure the widest one and align the whole
+    // column to it (text-anchor 'end' means moving x right-aligns everything consistently,
+    // and no label - regardless of how many digits/characters it has - overflows past baseX).
+    const maxLabelWidth = Math.max(0, ...rows.map((r) => r.label.node().getComputedTextLength()))
+    const barStartX = baseX + maxLabelWidth + LABEL_BAR_GAP
+
+    rows.forEach(({ label, bar }) => {
+        label.attr('x', barStartX - LABEL_BAR_GAP)
+        bar.attr('x', barStartX)
     })
 }
