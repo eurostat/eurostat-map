@@ -1,7 +1,7 @@
 // legend-ranked-bar-chart.js
 import { scaleLinear } from 'd3-scale'
 import * as Legend from '../legend'
-import { executeForAllInsets } from '../../core/utils'
+import { executeForAllInsets, getTextColorForBackground } from '../../core/utils'
 import { buildDiscreteLabelFormatter } from '../legend-discrete'
 import { createHistogramLegend } from './legend-histogram'
 //types
@@ -15,7 +15,10 @@ const MAX_BARS = 40
 
 const BAR_HEIGHT_PADDING = 3
 const MAX_BAR_WIDTH = 130
-const LABEL_BAR_GAP = 4
+// Gap between the bars' fixed right edge and the country code column that starts there.
+const CODE_GAP = 6
+// Padding between the value label and the bar edge it sits against, whichever side it ends up on.
+const VALUE_PADDING = 5
 
 /**
  * A ranked bar chart element for choropleth-classified maps: one horizontal bar per region,
@@ -134,30 +137,27 @@ function drawRankedBarChart(out, baseX, baseY) {
 
     const rowHeight = out.shapeHeight + BAR_HEIGHT_PADDING
 
+    // Bars are right-anchored to a common edge and grow leftward as value increases (matching
+    // the reference statistical-atlas style), with the country code column starting right after
+    // that fixed edge - so the code column stays put regardless of how long any given bar is.
+    const barRightX = baseX + MAX_BAR_WIDTH
+
     const container = out.lgg.append('g').attr('class', 'em-legend-ranked-bar-chart').attr('transform', `translate(0, ${baseY})`)
 
-    // Pass 1: draw each row's label (provisionally right-anchored at baseX) and the bar, without
-    // knowing the final label column width yet.
-    const rows = entries.map((entry, i) => {
+    entries.forEach((entry, i) => {
         const y = i * rowHeight
         const ecl = classifier(entry.value)
         const fillColor = classToFillStyle(ecl, numberOfClasses)
+        const barWidth = Math.max(barScale(entry.value), 1)
+        const barLeftX = barRightX - barWidth
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
-        const label = itemContainer
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('text-anchor', 'end')
-            .attr('x', baseX)
-            .attr('y', y + out.shapeHeight)
-            .attr('dy', '-0.15em')
-            .text(`${valueFormatter(entry.value)} ${entry.id}`)
-
-        const bar = itemContainer
+        itemContainer
             .append('rect')
             .attr('class', 'em-legend-rect')
+            .attr('x', barLeftX)
             .attr('y', y)
-            .attr('width', Math.max(barScale(entry.value), 1))
+            .attr('width', barWidth)
             .attr('height', out.shapeHeight)
             .style('fill', fillColor)
             .attr('ecl', ecl)
@@ -174,17 +174,31 @@ function drawRankedBarChart(out, baseX, baseY) {
                 }
             })
 
-        return { label, bar }
-    })
+        // Country code: fixed column starting right after the bars' common right edge.
+        itemContainer
+            .append('text')
+            .attr('class', 'em-legend-label em-legend-ranked-bar-chart-code')
+            .attr('text-anchor', 'start')
+            .attr('x', barRightX + CODE_GAP)
+            .attr('y', y + out.shapeHeight)
+            .attr('dy', '-0.15em')
+            .text(entry.id)
 
-    // Pass 2: now that every label is rendered, measure the widest one and align the whole
-    // column to it (text-anchor 'end' means moving x right-aligns everything consistently,
-    // and no label - regardless of how many digits/characters it has - overflows past baseX).
-    const maxLabelWidth = Math.max(0, ...rows.map((r) => r.label.node().getComputedTextLength()))
-    const barStartX = baseX + maxLabelWidth + LABEL_BAR_GAP
+        // Value: try inside the bar first (right-aligned against its right edge); if it doesn't
+        // fit, move it outside, to the left of the bar's own (variable) left edge instead.
+        const valueLabel = itemContainer
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('text-anchor', 'end')
+            .attr('x', barRightX - VALUE_PADDING)
+            .attr('y', y + out.shapeHeight)
+            .attr('dy', '-0.15em')
+            .style('fill', getTextColorForBackground(fillColor))
+            .text(valueFormatter(entry.value))
 
-    rows.forEach(({ label, bar }) => {
-        label.attr('x', barStartX - LABEL_BAR_GAP)
-        bar.attr('x', barStartX)
+        const fitsInsideBar = valueLabel.node().getComputedTextLength() + 2 * VALUE_PADDING <= barWidth
+        if (!fitsInsideBar) {
+            valueLabel.attr('x', barLeftX - VALUE_PADDING).style('fill', null)
+        }
     })
 }

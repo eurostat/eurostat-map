@@ -59,6 +59,11 @@
     dominant-baseline: unset;
 }
 
+.em-legend-ranked-bar-chart-code {
+    font-style: italic;
+    font-weight: bold;
+}
+
 .em-legend-label-max,
 .em-legend-label-min,
 .em-legend-label-no-data {
