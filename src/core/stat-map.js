@@ -708,6 +708,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         legend.build()
+        // Resolve config (incl. _hasExternalSvgId) synchronously, right after construction.
+        // Layout passes (e.g. recalculateLayout's deferred applyPosition() call) can run before
+        // stat data resolves and the legend's first full update() ever fires - without this, that
+        // premature applyPosition() sees _hasExternalSvgId still unset, wrongly concludes the
+        // legend is unpositioned, and stamps a default 'top right' transform over the caller's
+        // own positioning that update() never gets a chance to correct afterwards (update()'s own
+        // applyPosition() call then finds _hasExternalSvgId=true and leaves the bad transform alone).
+        legend.updateConfig()
         applyLegendVisibilityForLayer(layer)
         return out
     }
