@@ -1,5 +1,25 @@
 # Release notes
 
+## 4.9.3
+
+### Breaking Changes
+
+- **`RankedBarChartConfig` no longer extends `LegendConfig`.** It's a genuinely independent element, not a legend sub-feature, and the inheritance pulled in legend-only concepts (`noData`, `maxMin`/`maxMinLabels`, `titleFontSize`, `titlePadding`, `labelOffsets`, `shapeWidth`, `shapePadding`, `sepLineLength`, etc.) that never did anything for the bar chart. `RankedBarChartConfig` now declares only the fields it actually reads. If you were setting any of those legend-only fields on `rankedBarChart()`, they had no effect before and can simply be removed.
+
+### New
+
+- **`RankedBarChartConfig` gained `height`.** Without it, the bar list grows with region count - all ~35 EU/EFTA/CC countries at the default row height can end up taller than the map itself. When set, bar height and label font size scale down together proportionally so the chart never exceeds that budget.
+
+Example:
+
+```javascript
+map.rankedBarChart({
+    svgId: 'my-bar-chart-container',
+    countryGroup: 'eu',
+    height: 300, // bars and labels shrink together to fit this budget
+})
+```
+
 ## 4.9.2
 
 ### Fixes
