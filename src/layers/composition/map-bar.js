@@ -4,7 +4,7 @@ import { createStatMap } from '../../core/stat-map'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
 import { formatSizeLabel } from '../../legend/legend-utils'
-import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
+import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator, getTextColorForBackground } from '../../core/utils'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartAnchor } from '../../core/cartograms'
 import {
@@ -370,17 +370,6 @@ export const map = function (config) {
     function _formatTooltipValue(rawValue, unitText) {
         if (_isMissingTooltipValue(rawValue)) return 'n/a'
         return `${rawValue}${unitText ? ` ${unitText}` : ''}`
-    }
-
-    function _getContrastTextColor(hexColor) {
-        const hex = (hexColor || '').replace('#', '')
-        if (hex.length !== 6) return '#000000'
-
-        const r = parseInt(hex.slice(0, 2), 16)
-        const g = parseInt(hex.slice(2, 4), 16)
-        const b = parseInt(hex.slice(4, 6), 16)
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-        return luminance > 0.6 ? '#000000' : '#ffffff'
     }
 
     function _getGridCellShapeBBox(cellSelection) {
@@ -991,7 +980,7 @@ export const map = function (config) {
             }
 
             const color = _getCategoryColor(code)
-            const textColor = _getContrastTextColor(color)
+            const textColor = getTextColorForBackground(color)
             const label = _getCategoryLabel(code)
             const reservedValueWidth = Math.max(28, Math.ceil(valueText.length * 6.5))
             const barWidth = Math.max(1, Math.round((Math.max(0, numericValue) / globalMaxValue) * chartWidth))
