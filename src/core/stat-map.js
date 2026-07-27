@@ -309,7 +309,8 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    // Orchestration: classify+style every layer, then update every layer's legend.
+    // Orchestration: classify+style every layer, then update every layer's legend and (if
+    // present, independently) ranked bar chart.
     // For a legacy single-layer map this loops [out] once and is behaviour-identical.
     out.updateAllLayers = function () {
         out.layers_.forEach((l) => {
@@ -318,6 +319,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         })
         out.layers_.forEach((l) => {
             if (l.legend_ && l.legendObj_) l.legendObj_.update?.()
+            if (l.rankedBarChart_ && l.rankedBarChartObj_) l.rankedBarChartObj_.update?.()
         })
         return out
     }
@@ -446,6 +448,16 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.legend_ = undefined
     out.legendObj_ = undefined
 
+    /**
+     * Ranked bar chart configuration object, independent of the legend (its own container/
+     * positioning - may render into an entirely different SVG element to the legend's).
+     * @type {object|undefined}
+     * @example
+     * map.rankedBarChart({ svgId: 'my-bar-chart-container' })
+     */
+    out.rankedBarChart_ = undefined
+    out.rankedBarChartObj_ = undefined
+
     // Shared by the initial render AND toggleLegendVisibility, so both agree on what "undefined"
     // (i.e. the user never called setLegendVisibility/toggleLegendVisibility) means. These used to
     // be computed independently: the initial render defaulted to hidden on mobile
@@ -500,15 +512,24 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    ;['legend_', 'legendObj_', 'noDataText_', 'language_', 'transitionDuration_', 'tooltipText_', 'filtersDefinitionFunction_', 'onBuild_'].forEach(
-        function (att) {
-            out[att.substring(0, att.length - 1)] = function (v) {
-                if (!arguments.length) return out[att]
-                out[att] = v
-                return out
-            }
+    ;[
+        'legend_',
+        'legendObj_',
+        'rankedBarChart_',
+        'rankedBarChartObj_',
+        'noDataText_',
+        'language_',
+        'transitionDuration_',
+        'tooltipText_',
+        'filtersDefinitionFunction_',
+        'onBuild_',
+    ].forEach(function (att) {
+        out[att.substring(0, att.length - 1)] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = v
+            return out
         }
-    )
+    })
 
     //override attribute values with config values
     if (config) for (let key in config) if (out[key] && config[key] != undefined) out[key](config[key])
@@ -551,6 +572,44 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
+    // override rankedBarChart for updating after build. Deliberately independent of legend_/
+    // legendObj_ above - its own container/positioning, so it can render into an entirely
+    // different SVG element to the legend's rather than being a sub-feature of it.
+    out.rankedBarChart = function (v) {
+        if (!arguments.length) return out.rankedBarChart_
+
+        // clear existing ranked bar chart
+        if (v == false) {
+            const rankedBarChartObj = out.rankedBarChartObj()
+            if (rankedBarChartObj) {
+                const rbcSvg = select('#' + rankedBarChartObj.svgId)
+                if (rbcSvg.size() > 0) {
+                    rbcSvg.selectAll('*').remove()
+                }
+            }
+            out.rankedBarChart_ = v
+            return out
+        }
+        //set new ranked bar chart config
+        out.rankedBarChart_ = v
+        //update if existing ranked bar chart
+        if (out.rankedBarChartObj_) out.updateRankedBarChart()
+        return out
+    }
+
+    out.updateRankedBarChart = function () {
+        if (out.layers_ && Array.isArray(out.layers_)) {
+            out.layers_.forEach((l) => {
+                if (l.rankedBarChartObj_) {
+                    if (l.updateClassification) l.updateClassification()
+                    if (l.updateStyle) l.updateStyle()
+                    l.rankedBarChartObj_.update()
+                }
+            })
+        }
+        return out
+    }
+
     /**
      * Builds the map from scratch. Should be called once after initial configuration.
      * Triggers geo data retrieval, stat data retrieval, legend build, and tooltip setup.
@@ -583,6 +642,9 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
         //legend element
         out.buildLegend()
+
+        //ranked bar chart element (independent of the legend)
+        out.buildRankedBarChart()
 
         //define tooltip
         //prepare map tooltip
@@ -657,6 +719,44 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                 const legendConfig = isFacade ? out.legend() : l.legend_
                 if (legendConfig) {
                     out.buildLegendForLayer(l)
+                }
+            })
+        }
+    }
+
+    // Independent of buildLegendForLayer/buildLegend above - its own container, so it can render
+    // into an entirely different SVG element to the legend's (see rankedBarChart() override).
+    out.buildRankedBarChartForLayer = function (layer) {
+        const isFacade = layer === out
+        const rankedBarChartConfig = isFacade ? out.rankedBarChart() : layer.rankedBarChart_
+        if (!rankedBarChartConfig) return out
+
+        const constructor = isFacade ? out.getRankedBarChartConstructor() : layer.getRankedBarChartConstructor()
+        if (!constructor) return out
+        if (!layer.rankedBarChartObj_) {
+            layer.rankedBarChartObj_ = constructor(layer, rankedBarChartConfig)
+        }
+        const rankedBarChartObj = layer.rankedBarChartObj_
+
+        // Global lookup, not out.svg().select(...): a caller-managed external container may live
+        // outside this map's own SVG subtree entirely (see the equivalent comment on
+        // buildLegendForLayer above).
+        let rbcSvg = select('#' + rankedBarChartObj.svgId)
+        if (rbcSvg.empty()) {
+            out.svg().append('g').attr('id', rankedBarChartObj.svgId).attr('class', 'em-ranked-bar-chart')
+        }
+
+        rankedBarChartObj.build()
+        return out
+    }
+
+    out.buildRankedBarChart = function () {
+        if (out.layers_ && Array.isArray(out.layers_)) {
+            out.layers_.forEach((l) => {
+                const isFacade = l === out
+                const rankedBarChartConfig = isFacade ? out.rankedBarChart() : l.rankedBarChart_
+                if (rankedBarChartConfig) {
+                    out.buildRankedBarChartForLayer(l)
                 }
             })
         }
@@ -834,6 +934,15 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     /**
+     * Abstract method, overridden by map types that support it (see map-choropleth.js).
+     * Function which returns the ranked bar chart constructor function for the map, or
+     * undefined for map types that don't support it.
+     */
+    out.getRankedBarChartConstructor = function () {
+        return undefined
+    }
+
+    /**
      * Returns the time stamp of the loaded Eurostat dataset.
      * Useful when fetching the most recent available data and wanting to
      * display the actual time period in the map title.
@@ -944,8 +1053,8 @@ export const buildSingleLayerMap = function (type, config) {
     out.activeLayerIndex(0)
 
     // Forwarding accessors for backwards compatibility
-    const baseFields = ['encodings_', 'catColors_', 'catLabels_', 'statCodes_', 'legend_', 'legendObj_', 'tooltip_']
-    const baseMethods = ['encoding', 'updateClassification', 'updateStyle', 'getLegendConstructor', 'legend']
+    const baseFields = ['encodings_', 'catColors_', 'catLabels_', 'statCodes_', 'legend_', 'legendObj_', 'rankedBarChart_', 'rankedBarChartObj_', 'tooltip_']
+    const baseMethods = ['encoding', 'updateClassification', 'updateStyle', 'getLegendConstructor', 'legend', 'getRankedBarChartConstructor', 'rankedBarChart']
 
     let typeFields = []
     let typeMethods = []

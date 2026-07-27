@@ -1,6 +1,7 @@
 import type { StatConfig } from './stat/StatConfig'
 import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
+import type { RankedBarChartConfig } from '../legend/choropleth/RankedBarChartConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
 import type { MapInstance as EurostatMap } from './MapInstance'
@@ -72,6 +73,13 @@ export interface MapConfig {
 
     /** Legend configuration. */
     legend?: LegendConfig | false
+
+    /**
+     * Ranked bar chart configuration (choropleth-classified map types only). Independent of the
+     * legend - has its own positioning and can render into an entirely different container/SVG
+     * to the legend's, rather than being a sub-feature of it.
+     */
+    rankedBarChart?: RankedBarChartConfig | false
 
     /** Tooltip configuration. */
     tooltip?: TooltipConfig

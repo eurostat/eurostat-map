@@ -6,13 +6,19 @@
     </head>
 
     <body>
+        <!-- The map (with its own, normally-positioned legend) -->
         <svg id="map"></svg>
+
+        <!-- A completely separate SVG element for the ranked bar chart, proving it's an
+             independent element from the legend, not a sub-feature of it -->
+        <svg id="bar-chart-panel" width="260" height="500" style="border: 1px solid #ccc"></svg>
+
         <script src="../../../build/eurostatmap.js"></script>
 
         <script>
             const map = eurostatmap
                 .map('choropleth')
-                .title('Ranked bar chart test')
+                .title('Ranked bar chart test (independent element)')
                 .subtitle('GDP per inhabitant, country level (NUTS0)')
                 .scale('60M')
                 .nutsLevel(0)
@@ -27,12 +33,18 @@
                 .colorSchemeType('discrete')
                 .classificationMethod('quantile')
                 .legend({
-                    x: 700,
+                    x: 600,
                     y: 20,
                     width: 200,
                     title: 'GDP per inhabitant',
                     boxOpacity: 0.9,
-                    rankedBarChart: true,
+                })
+                .rankedBarChart({
+                    svgId: 'bar-chart-panel',
+                    x: 10,
+                    y: 10,
+                    title: 'Ranked: GDP per inhabitant',
+                    boxOpacity: 0,
                 })
                 .insets('default')
                 .zoomExtent([1, 10])
