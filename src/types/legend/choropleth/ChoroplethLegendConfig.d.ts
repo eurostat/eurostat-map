@@ -77,4 +77,12 @@ export interface ChoroplethLegendConfig extends LegendConfig {
 
     /** Whether to append region names to min/max labels. */
     maxMinRegionLabels?: boolean
+
+    /**
+     * Show a ranked bar chart below the class-color legend: one horizontal bar per region,
+     * sorted by value, colored by the region's own class color, labeled with its id and value.
+     * Above an internal region-count threshold, automatically falls back to the histogram
+     * distribution view instead of drawing one bar per region. @default false
+     */
+    rankedBarChart?: boolean
 }

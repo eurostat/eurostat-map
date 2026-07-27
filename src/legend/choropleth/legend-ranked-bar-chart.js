@@ -1,0 +1,105 @@
+// legend-ranked-bar-chart.js
+import { scaleLinear } from 'd3-scale'
+import { executeForAllInsets } from '../../core/utils'
+import { buildDiscreteLabelFormatter } from '../legend-discrete'
+import { createHistogramLegend } from './legend-histogram'
+
+// Above this many eligible regions, drawing one bar per region stops being legible (and for
+// NUTS1/2/3 maps could be hundreds/thousands of regions) - fall back to the histogram
+// distribution view instead. Comfortably covers country-level maps (EU/EFTA/candidates ~35).
+const MAX_BARS = 40
+
+const BAR_HEIGHT_PADDING = 3
+const MAX_BAR_WIDTH = 130
+const LABEL_COLUMN_WIDTH = 55
+const LABEL_BAR_GAP = 4
+
+/**
+ * Ranked bar chart legend: one horizontal bar per region, sorted by value, colored by the
+ * region's own class color, labeled with its id and value. Falls back to the histogram
+ * distribution view when there are too many regions to list individually.
+ *
+ * @param {object} out - legend instance (see legend-choropleth.js)
+ * @param {number} baseX
+ * @param {number} baseY
+ */
+export function createRankedBarChartLegend(out, baseX, baseY) {
+    const map = out.map
+    const stat = out.getColorStats(out)
+    const index = stat?.get ? stat.get() : undefined
+    if (!index) return
+
+    const entries = Object.entries(index)
+        .filter(([, entry]) => typeof entry?.value === 'number' && Number.isFinite(entry.value))
+        .map(([id, entry]) => ({ id, value: entry.value }))
+
+    if (!entries.length) return
+
+    if (entries.length > MAX_BARS) {
+        // Too many regions to list individually - show the distribution instead.
+        out.histogram = out.histogram || { orientation: 'horizontal' }
+        createHistogramLegend(out, baseX, baseY)
+        return
+    }
+
+    entries.sort((a, b) => (out.ascending ? a.value - b.value : b.value - a.value))
+
+    const classifier = out.getColorClassifier(out)
+    const classToFillStyle = out.getClassToFillStyle(out)
+    const numberOfClasses = out.getNumberOfClasses(out)
+    const highlightFunction = out.getHighlightFunction(map)
+    const unhighlightFunction = out.getUnHighlightFunction(map)
+    // Always format the region's own raw value - never the 'ranges' class-label formatter,
+    // regardless of the legend's own labelType setting.
+    const valueFormatter = buildDiscreteLabelFormatter(out, () => [], stat, 'thresholds', out.labelFormatter)
+
+    const barScale = scaleLinear()
+        .domain([0, Math.max(...entries.map((e) => e.value), 0)])
+        .range([0, MAX_BAR_WIDTH])
+
+    const rowHeight = out.shapeHeight + BAR_HEIGHT_PADDING
+    const barStartX = baseX + LABEL_COLUMN_WIDTH
+
+    const container = out.lgg
+        .append('g')
+        .attr('class', 'em-legend-ranked-bar-chart')
+        .attr('transform', `translate(0, ${baseY})`)
+
+    entries.forEach((entry, i) => {
+        const y = i * rowHeight
+        const ecl = classifier(entry.value)
+        const fillColor = classToFillStyle(ecl, numberOfClasses)
+        const itemContainer = container.append('g').attr('class', 'em-legend-item')
+
+        itemContainer
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('text-anchor', 'end')
+            .attr('x', baseX + LABEL_COLUMN_WIDTH - LABEL_BAR_GAP)
+            .attr('y', y + out.shapeHeight)
+            .attr('dy', '-0.15em')
+            .text(`${valueFormatter(entry.value)} ${entry.id}`)
+
+        itemContainer
+            .append('rect')
+            .attr('class', 'em-legend-rect')
+            .attr('x', barStartX)
+            .attr('y', y)
+            .attr('width', Math.max(barScale(entry.value), 1))
+            .attr('height', out.shapeHeight)
+            .style('fill', fillColor)
+            .attr('ecl', ecl)
+            .on('mouseover', function () {
+                highlightFunction(map, ecl)
+                if (out.map.insetTemplates_) {
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
+                }
+            })
+            .on('mouseout', function () {
+                unhighlightFunction(map, ecl)
+                if (out.map.insetTemplates_) {
+                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
+                }
+            })
+    })
+}

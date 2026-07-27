@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('choropleth')
+                .title('Ranked bar chart test')
+                .subtitle('GDP per inhabitant, country level (NUTS0)')
+                .scale('60M')
+                .nutsLevel(0)
+                .stat('value', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'euro per inhabitant',
+                    filters: { TIME: '2021', UNIT: 'EUR_HAB' },
+                })
+                .encoding('fill', { stat: 'value' })
+                .numberOfClasses(6)
+                .colors(['#E3E8F0', '#BBD8E5', '#93C7CF', '#5FA7B5', '#27758E', '#003C50'])
+                .colorSchemeType('discrete')
+                .classificationMethod('quantile')
+                .legend({
+                    x: 700,
+                    y: 20,
+                    width: 200,
+                    title: 'GDP per inhabitant',
+                    boxOpacity: 0.9,
+                    rankedBarChart: true,
+                })
+                .insets('default')
+                .zoomExtent([1, 10])
+                .build()
+        </script>
+    </body>
+</html>
