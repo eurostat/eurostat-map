@@ -11,4 +11,12 @@ import type { LegendConfig } from '../LegendConfig'
  * legend's, rather than being a sub-feature of it. Set via `map.rankedBarChart(config)`,
  * separately from `map.legend(config)`.
  */
-export interface RankedBarChartConfig extends LegendConfig {}
+export interface RankedBarChartConfig extends LegendConfig {
+    /**
+     * Limit which regions appear to a political grouping: EU member states, EU + EFTA, or
+     * EU + EFTA + EU candidate countries. Applied before the region-count threshold that
+     * triggers the histogram distribution fallback. Omit (default) to show every region with
+     * a value, unfiltered.
+     */
+    countryGroup?: 'eu' | 'euEfta' | 'euEftaCc'
+}

@@ -1,6 +1,7 @@
 // legend-ranked-bar-chart.js
 import { scaleLinear } from 'd3-scale'
 import * as Legend from '../legend'
+import { deepMergeExistingKeys } from '../legend'
 import { executeForAllInsets, getTextColorForBackground } from '../../core/utils'
 import { buildDiscreteLabelFormatter } from '../legend-discrete'
 import { createHistogramLegend } from './legend-histogram'
@@ -19,6 +20,49 @@ const MAX_BAR_WIDTH = 130
 const CODE_GAP = 6
 // Padding between the value label and the bar edge it sits against, whichever side it ends up on.
 const VALUE_PADDING = 5
+
+// EU member states (27).
+const EU_CODES = [
+    'AT',
+    'BE',
+    'BG',
+    'CY',
+    'CZ',
+    'DE',
+    'DK',
+    'EE',
+    'EL',
+    'ES',
+    'FI',
+    'FR',
+    'HR',
+    'HU',
+    'IE',
+    'IT',
+    'LT',
+    'LU',
+    'LV',
+    'MT',
+    'NL',
+    'PL',
+    'PT',
+    'RO',
+    'SE',
+    'SI',
+    'SK',
+]
+// EFTA member states (4).
+const EFTA_CODES = ['IS', 'LI', 'NO', 'CH']
+// EU candidate countries. Excludes Kosovo (XK), listed by the EU as a potential candidate
+// rather than a candidate. This list changes with real-world accession status more often than
+// EU/EFTA membership does, so treat it as best-effort rather than permanently authoritative.
+const CANDIDATE_COUNTRY_CODES = ['AL', 'BA', 'GE', 'MD', 'ME', 'MK', 'RS', 'TR', 'UA']
+
+const COUNTRY_GROUP_CODES = {
+    eu: EU_CODES,
+    euEfta: [...EU_CODES, ...EFTA_CODES],
+    euEftaCc: [...EU_CODES, ...EFTA_CODES, ...CANDIDATE_COUNTRY_CODES],
+}
 
 /**
  * A ranked bar chart element for choropleth-classified maps: one horizontal bar per region,
@@ -43,9 +87,26 @@ export const rankedBarChart = function (map, config = {}) {
     // always derived internally from the map's own labelType/ascending settings.
     out.histogram = null
 
+    // Limit which regions appear to a political grouping ('eu' | 'euEfta' | 'euEftaCc').
+    // Undefined (default) means no filtering - every region with a value is shown.
+    out.countryGroup = undefined
+
     //override attribute values with config values
     for (let key in config) {
         out[key] = config[key]
+    }
+
+    // Override the base updateConfig(): the shared Legend.legend() implementation is hardcoded to
+    // re-merge from layer.legend_ (the LEGEND's own config), which would silently clobber this
+    // object's own config (title, subtitle, countryGroup, ...) with the legend's every update -
+    // exactly the "independent element" guarantee this module exists for would otherwise break.
+    // Merge from layer.rankedBarChart_ instead, mirroring the base version's own logic.
+    out.updateConfig = function () {
+        const layer = out.layer
+        if (layer.rankedBarChart_) {
+            if (layer.rankedBarChart_.svgId !== undefined) out._hasExternalSvgId = true
+            deepMergeExistingKeys(out, layer.rankedBarChart_)
+        }
     }
 
     out.update = function () {
@@ -107,9 +168,16 @@ function drawRankedBarChart(out, baseX, baseY) {
     const index = stat?.get ? stat.get() : undefined
     if (!index) return
 
-    const entries = Object.entries(index)
+    let entries = Object.entries(index)
         .filter(([, entry]) => typeof entry?.value === 'number' && Number.isFinite(entry.value))
         .map(([id, entry]) => ({ id, value: entry.value }))
+
+    // Limit to a political grouping if configured, applied before the MAX_BARS check below so
+    // e.g. filtering a NUTS0 dataset down to 'eu' can bring a too-large set within the bar limit.
+    const allowedCodes = COUNTRY_GROUP_CODES[out.countryGroup]
+    if (allowedCodes) {
+        entries = entries.filter((e) => allowedCodes.includes(e.id))
+    }
 
     if (!entries.length) return
 
