@@ -117,7 +117,7 @@ export const rankedBarChart = function (map, config = {}) {
     // chart title/subtitle
     out.title = ''
     out.subtitle = ''
-    out.titleFontSize = getFontSizeFromClass('em-legend-title')
+    out.titleFontSize = getFontSizeFromClass('em-ranked-bar-chart-title')
     out.width = 150
     // Maximum total height in pixels for the rendered chart (title/subtitle + bars). Undefined
     // (default) lets the chart grow to fit its content - which for ~35 EU/EFTA/CC regions can
@@ -125,7 +125,7 @@ export const rankedBarChart = function (map, config = {}) {
     out.height = undefined
 
     out.shapeHeight = 20
-    out.labelFontSize = getFontSizeFromClass('em-legend-label')
+    out.labelFontSize = getFontSizeFromClass('em-ranked-bar-chart-label')
     out.labelFormatter = null
     out.decimals = undefined
     out.ascending = true
@@ -270,24 +270,24 @@ export const rankedBarChart = function (map, config = {}) {
 
     /** Draw chart background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background')
+        out.lgg.append('rect').attr('id', 'em-ranked-bar-chart-background').attr('class', 'em-ranked-bar-chart-background')
         out.updateBackgroundBoxOpacity()
     }
 
     /** Keep conditional background opacity synchronized with the current zoom state. */
     out.updateBackgroundBoxOpacity = function () {
         const opacity = out.onlyApplyOpacityWhileZoomed && !out.map.__hasZoomed ? 0 : out.boxOpacity
-        out.lgg?.select('#em-legend-background').style('opacity', opacity)
+        out.lgg?.select('#em-ranked-bar-chart-background').style('opacity', opacity)
         return out
     }
 
     out.addTitle = function () {
         if (out.title) {
-            const titlesContainer = out.lgg.append('g').attr('id', 'em-legend-titles')
-            let cssFontSize = getFontSizeFromClass('em-legend-title')
+            const titlesContainer = out.lgg.append('g').attr('id', 'em-ranked-bar-chart-titles')
+            let cssFontSize = getFontSizeFromClass('em-ranked-bar-chart-title')
             titlesContainer
                 .append('text')
-                .attr('class', 'em-legend-title')
+                .attr('class', 'em-ranked-bar-chart-title')
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding + cssFontSize)
                 .text(out.title)
@@ -296,12 +296,12 @@ export const rankedBarChart = function (map, config = {}) {
 
     out.addSubtitle = function () {
         if (out.subtitle) {
-            const titlesContainer = out.lgg.select('#em-legend-titles')
-            let titleFontSize = getFontSizeFromClass('em-legend-title')
-            let subtitleFontSize = getFontSizeFromClass('em-legend-subtitle')
+            const titlesContainer = out.lgg.select('#em-ranked-bar-chart-titles')
+            let titleFontSize = getFontSizeFromClass('em-ranked-bar-chart-title')
+            let subtitleFontSize = getFontSizeFromClass('em-ranked-bar-chart-subtitle')
             titlesContainer
                 .append('text')
-                .attr('class', 'em-legend-subtitle')
+                .attr('class', 'em-ranked-bar-chart-subtitle')
                 .attr('x', out.boxPadding)
                 .attr('y', out.boxPadding + titleFontSize + subtitleFontSize + 3) // 3px padding after title
                 .html(out.subtitle)
@@ -311,8 +311,8 @@ export const rankedBarChart = function (map, config = {}) {
     out.getBaseY = function () {
         return (
             out.boxPadding +
-            (out.title ? getFontSizeFromClass('em-legend-title') : 0) +
-            (out.subtitle ? getFontSizeFromClass('em-legend-subtitle') : 0) +
+            (out.title ? getFontSizeFromClass('em-ranked-bar-chart-title') : 0) +
+            (out.subtitle ? getFontSizeFromClass('em-ranked-bar-chart-subtitle') : 0) +
             10
         )
     }
@@ -326,7 +326,7 @@ export const rankedBarChart = function (map, config = {}) {
             const bb = out.lgg.node().getBBox({ stroke: true })
             const p = out.boxPadding
             out.svg
-                .select('#em-legend-background')
+                .select('#em-ranked-bar-chart-background')
                 .attr('x', bb.x - p)
                 .attr('y', bb.y - p)
                 .attr('width', bb.width + 2 * p)
@@ -398,7 +398,7 @@ function resizeContainerToFitContent(out) {
     const node = out.svg?.node()
     if (!node || node.tagName?.toLowerCase() !== 'svg') return
 
-    const background = out.svg.select('#em-legend-background')
+    const background = out.svg.select('#em-ranked-bar-chart-background')
     if (background.empty()) return
 
     const width = +background.attr('width') || 0
@@ -416,7 +416,7 @@ function getChartBBox(container, obj) {
     const node = container.node()
     // Prefer the background rect bounds when available: it represents the visual chart box and
     // is less sensitive to rotated child geometry artifacts.
-    const backgroundNode = node?.querySelector?.('#em-legend-background')
+    const backgroundNode = node?.querySelector?.('#em-ranked-bar-chart-background')
     if (backgroundNode && typeof backgroundNode.getBBox === 'function') {
         try {
             const bgBBox = backgroundNode.getBBox({ stroke: true })
@@ -454,9 +454,11 @@ function drawRankedBarChart(out, baseX, baseY) {
     if (!entries.length) return
 
     if (entries.length > MAX_BARS) {
-        // Too many regions to list individually - show the distribution instead.
+        // Too many regions to list individually - show the distribution instead. Pass this
+        // element's own class prefix through - it's not a legend, so its histogram fallback
+        // shouldn't carry em-legend-* classes either (see legend-histogram.js).
         out.histogram = out.histogram || { orientation: 'horizontal' }
-        createHistogramLegend(out, baseX, baseY)
+        createHistogramLegend(out, baseX, baseY, 'em-ranked-bar-chart')
         return
     }
 
@@ -493,7 +495,7 @@ function drawRankedBarChart(out, baseX, baseY) {
     // that fixed edge - so the code column stays put regardless of how long any given bar is.
     const barRightX = baseX + MAX_BAR_WIDTH
 
-    const container = out.lgg.append('g').attr('class', 'em-legend-ranked-bar-chart').attr('transform', `translate(0, ${baseY})`)
+    const container = out.lgg.append('g').attr('class', 'em-ranked-bar-chart-list').attr('transform', `translate(0, ${baseY})`)
 
     entries.forEach((entry, i) => {
         const y = i * rowHeight
@@ -501,11 +503,11 @@ function drawRankedBarChart(out, baseX, baseY) {
         const fillColor = hasClassifier ? classToFillStyle(ecl, numberOfClasses) : FALLBACK_BAR_COLOR
         const barWidth = Math.max(barScale(entry.value), 1)
         const barLeftX = barRightX - barWidth
-        const itemContainer = container.append('g').attr('class', 'em-legend-item')
+        const itemContainer = container.append('g').attr('class', 'em-ranked-bar-chart-item')
 
         itemContainer
             .append('rect')
-            .attr('class', 'em-legend-rect')
+            .attr('class', 'em-ranked-bar-chart-rect')
             .attr('x', barLeftX)
             .attr('y', y)
             .attr('width', barWidth)
@@ -528,7 +530,7 @@ function drawRankedBarChart(out, baseX, baseY) {
         // Country code: fixed column starting right after the bars' common right edge.
         itemContainer
             .append('text')
-            .attr('class', 'em-legend-label em-legend-ranked-bar-chart-code')
+            .attr('class', 'em-ranked-bar-chart-label em-ranked-bar-chart-code')
             .attr('text-anchor', 'start')
             .attr('x', barRightX + CODE_GAP)
             .attr('y', y + barHeight)
@@ -540,7 +542,7 @@ function drawRankedBarChart(out, baseX, baseY) {
         // fit, move it outside, to the left of the bar's own (variable) left edge instead.
         const valueLabel = itemContainer
             .append('text')
-            .attr('class', 'em-legend-label')
+            .attr('class', 'em-ranked-bar-chart-label em-ranked-bar-chart-value')
             .attr('text-anchor', 'end')
             .attr('x', barRightX - VALUE_PADDING)
             .attr('y', y + barHeight)

@@ -1,6 +1,7 @@
 @import 'map.css';
 @import 'tooltip.css';
 @import 'legend/legend.css';
+@import 'decoration/ranked-bar-chart.css';
 @import 'labels.css';
 @import 'locations.css';
 @import 'annotations.css';

@@ -1,5 +1,11 @@
 # Release notes
 
+## 4.9.5
+
+### Improvements
+
+- **The ranked bar chart no longer uses any `em-legend-*` CSS classes**, including its own >40-region histogram fallback. It's not a legend and never shared markup with one on purpose - the shared class names were an oversight that let legend-targeted stylesheets accidentally (and often incorrectly) restyle the bar chart too, most notably clobbering the per-bar value label's contrast-computed text color. Its elements now use their own `em-ranked-bar-chart-*` classes with their own default stylesheet. If you had custom CSS targeting the bar chart via `em-legend-*` selectors, update it to the new class names (see `src/core/decoration/ranked-bar-chart.js` and `src/css/decoration/ranked-bar-chart.css`).
+
 ## 4.9.4
 
 ### New
@@ -123,7 +129,7 @@ map.legend({ axisTitleFontSize: 13 })
 ### Improvements
 
 - **The legend background box's conditional opacity (`onlyApplyOpacityWhileZoomed`) now stays synced with the live zoom state** instead of only being applied once, at legend creation.
-- **Bivariate legend option changes made via a live `.legend()` call are now correctly honoured** on the next redraw - `annotationOffsets`, `annotationLineEndOffsets` and `noDataYOffset` were previously only checked against the *initial* config, so a later `.legend({...})` update with these fields could get silently overridden by rotation-dependent defaults.
+- **Bivariate legend option changes made via a live `.legend()` call are now correctly honoured** on the next redraw - `annotationOffsets`, `annotationLineEndOffsets` and `noDataYOffset` were previously only checked against the _initial_ config, so a later `.legend({...})` update with these fields could get silently overridden by rotation-dependent defaults.
 - **Bivariate legend x-axis break labels no longer sit on top of their tick marks** - label position now accounts for `tickLength`.
 
 ### Fixes
@@ -205,7 +211,7 @@ const config: CategoricalMapConfig = {
 
 ### Fixes
 
-- **Proportional symbols (and other centroid-based layers) could end up permanently empty in inset maps.** An optimistic first render pass could run before an inset's own async geometry fetch resolved; that premature pass cached an *empty* centroid list, and since an empty array is still truthy, every later readiness check treated it as "already computed" and skipped recomputing it - even after the real geometry arrived. Symbols now only get cached once the inset's own projection is actually ready, so late-resolving insets pick up their data correctly instead of silently staying blank. Affects every inset style (`'image'`, `'eu'`, `'euEfta'`, and manually-configured insets), and is most visible on proportional-symbol maps, where it previously required manually rebuilding the insets (e.g. toggling the inset style off and back on) to see the circles appear.
+- **Proportional symbols (and other centroid-based layers) could end up permanently empty in inset maps.** An optimistic first render pass could run before an inset's own async geometry fetch resolved; that premature pass cached an _empty_ centroid list, and since an empty array is still truthy, every later readiness check treated it as "already computed" and skipped recomputing it - even after the real geometry arrived. Symbols now only get cached once the inset's own projection is actually ready, so late-resolving insets pick up their data correctly instead of silently staying blank. Affects every inset style (`'image'`, `'eu'`, `'euEfta'`, and manually-configured insets), and is most visible on proportional-symbol maps, where it previously required manually rebuilding the insets (e.g. toggling the inset style off and back on) to see the circles appear.
 
 Example (no code changes needed - just upgrade):
 
@@ -290,10 +296,7 @@ Example:
 
 ```javascript
 // caller-managed container, positioned externally via its own transform - not by eurostat-map
-eurostatmap
-    .map('choropleth')
-    .legend({ svgId: 'my-external-legend-container' })
-    .build()
+eurostatmap.map('choropleth').legend({ svgId: 'my-external-legend-container' }).build()
 ```
 
 - **Proportional-symbol insets no longer show phantom, off-position circles for unrelated countries** - insets were supplementing their centroids from the same unscoped, whole-map country list the main map uses, then projecting those through the inset's own (tiny, zoomed-in) projection - placing symbols for countries far outside the inset's own territory well outside its visible viewBox. Insets now only use their own NUTS-scoped centroids.
@@ -345,11 +348,7 @@ eurostatmap
 Example:
 
 ```javascript
-eurostatmap
-    .map('choropleth')
-    .insets(overseasInsetsWithScalebars)
-    .scalebar(true)
-    .build()
+eurostatmap.map('choropleth').insets(overseasInsetsWithScalebars).scalebar(true).build()
 ```
 
 ## 4.6.2
