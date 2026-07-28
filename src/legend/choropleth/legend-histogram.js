@@ -6,7 +6,13 @@ import { executeForAllInsets, getFontSizeFromClass } from '../../core/utils'
 import { getChoroplethLabelFormatter, getThresholds } from './legend-choropleth'
 import { highlightRegions, unhighlightRegions } from '../legend'
 
-export const createHistogramLegend = (out, baseX, baseY) => {
+/**
+ * @param {string} [classPrefix] - Class prefix for the rendered elements. Defaults to 'em-legend'
+ * for its original legend caller; the ranked bar chart's own fallback (used when there are too
+ * many regions to list individually) passes 'em-ranked-bar-chart' instead, since that element is
+ * not a legend and must not carry em-legend-* classes.
+ */
+export const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legend') => {
     const orientation = out.histogram.orientation || 'horizontal'
     const showCounts = out.histogram.showCounts
     const showPercentages = out.histogram.showPercentages
@@ -33,7 +39,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
 
     const total = counts.reduce((sum, d) => sum + d, 0)
 
-    const barGroup = out.lgg.append('g').attr('class', 'em-legend-histogram').attr('transform', `translate(${baseX}, ${baseY})`)
+    const barGroup = out.lgg.append('g').attr('class', `${classPrefix}-histogram`).attr('transform', `translate(${baseX}, ${baseY})`)
 
     if (orientation === 'vertical') {
         drawVerticalHistogram(barGroup)
@@ -59,7 +65,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
             .selectAll('rect')
             .data(reversedCounts)
             .join('rect')
-            .attr('class', 'em-legend-histogram-bar')
+            .attr('class', `${classPrefix}-histogram-bar`)
             .attr('y', (_, i) => yScale(i))
             .attr('x', margin.left)
             .attr('height', yScale.bandwidth())
@@ -75,7 +81,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
                 .selectAll('text.em-histogram-label')
                 .data(reversedCounts)
                 .join('text')
-                .attr('class', 'em-legend-label em-histogram-label')
+                .attr('class', `${classPrefix}-label em-histogram-label`)
                 .attr('x', (d) => xScale(d) + 5)
                 .attr('y', (_, i) => yScale(i) + yScale.bandwidth() / 2)
                 .attr('alignment-baseline', 'middle')
@@ -86,7 +92,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
 
         // Axis
         // Axis (threshold boundaries, not band centers)
-        const axisGroup = barGroup.append('g').attr('id', 'em-legend-histogram-y-axis').attr('transform', `translate(${margin.left},0)`)
+        const axisGroup = barGroup.append('g').attr('id', `${classPrefix}-histogram-y-axis`).attr('transform', `translate(${margin.left},0)`)
 
         if (out.labelType === 'thresholds') {
             const positions = []
@@ -115,7 +121,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
             )
         }
 
-        axisGroup.selectAll('text').attr('class', 'em-legend-label em-tick-label').attr('text-anchor', 'end')
+        axisGroup.selectAll('text').attr('class', `${classPrefix}-label em-tick-label`).attr('text-anchor', 'end')
     }
 
     function drawHorizontalHistogram(barGroup) {
@@ -139,7 +145,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
             .selectAll('rect')
             .data(reversedCounts)
             .join('rect')
-            .attr('class', 'em-legend-histogram-bar')
+            .attr('class', `${classPrefix}-histogram-bar`)
             .attr('x', (_, i) => xScale(i))
             .attr('y', (d) => yScale(d))
             .attr('width', xScale.bandwidth())
@@ -155,7 +161,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
                 .selectAll('text.em-histogram-label')
                 .data(reversedCounts)
                 .join('text')
-                .attr('class', 'em-legend-label em-histogram-label')
+                .attr('class', `${classPrefix}-label em-histogram-label`)
                 .attr('x', (_, i) => xScale(i) + xScale.bandwidth() / 2)
                 .attr('y', (d) => yScale(d) - 5)
                 .attr('text-anchor', 'middle')
@@ -165,7 +171,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
         // Axis (only for labelType === 'thresholds')
         const axisGroup = barGroup
             .append('g')
-            .attr('id', 'em-legend-histogram-x-axis')
+            .attr('id', `${classPrefix}-histogram-x-axis`)
             .attr('transform', `translate(0, ${height - margin.bottom})`)
 
         if (out.labelType === 'thresholds') {
@@ -187,7 +193,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
             )
             axisGroup
                 .selectAll('text')
-                .attr('class', 'em-legend-label em-tick-label')
+                .attr('class', `${classPrefix}-label em-tick-label`)
                 .attr('text-anchor', 'end')
                 .attr('dy', '0em')
                 .attr('dx', '-0.45em')
@@ -201,7 +207,7 @@ export const createHistogramLegend = (out, baseX, baseY) => {
             )
             axisGroup
                 .selectAll('text')
-                .attr('class', 'em-legend-label em-tick-label')
+                .attr('class', `${classPrefix}-label em-tick-label`)
                 .attr('text-anchor', 'end')
                 .attr('dy', '0.35em')
                 .attr('dx', '-0.35em')

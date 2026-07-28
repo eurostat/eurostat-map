@@ -1,0 +1,52 @@
+/* Ranked bar chart - a standalone map decoration, not a legend (see
+   src/core/decoration/ranked-bar-chart.js). Its classes are named accordingly (em-ranked-bar-chart-*),
+   deliberately distinct from em-legend-* so consumer stylesheets that target legends don't
+   accidentally also restyle this element - notably its per-bar value label, whose fill is computed
+   per item for contrast against that bar's own color and must not be overridden by a blanket rule. */
+
+.em-ranked-bar-chart-background {
+    fill: white;
+    opacity: 0.9;
+    rx: 0;
+    ry: 0;
+    pointer-events: none;
+    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+}
+
+/* titles */
+.em-ranked-bar-chart-title {
+    font-weight: bold;
+    font-size: 15px;
+    fill: #4c4b4b;
+}
+
+.em-ranked-bar-chart-subtitle {
+    font-size: 15px;
+    fill: #696969;
+    opacity: 0.8;
+}
+
+/* labels */
+.em-ranked-bar-chart-label {
+    font-size: 14px;
+    stroke: none;
+    fill: #5e5e5e;
+    dominant-baseline: unset;
+}
+
+.em-ranked-bar-chart-code {
+    font-style: italic;
+    font-weight: bold;
+}
+
+/* cursor: pointer */
+.em-ranked-bar-chart-rect,
+.em-ranked-bar-chart-histogram-bar {
+    cursor: pointer;
+}
+
+/* hover */
+.em-ranked-bar-chart-rect:hover {
+    stroke-width: 2;
+    stroke: red;
+}
