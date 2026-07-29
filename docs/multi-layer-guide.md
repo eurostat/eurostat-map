@@ -93,7 +93,23 @@ To prevent visual conflicts, layers have distinct roles:
 
 ---
 
-## 4. Backwards Compatibility & Legacy Sugar
+## 4. Categorical exceptions within a single base layer
+
+Because a map can have **at most one base layer**, you cannot stack a `categorical` layer on top of a `choropleth` layer to give a handful of regions their own named category (e.g. "no railway lines" on a map of electrification rate) — attempting to `addLayer('categorical')` when a `choropleth` base already exists is rejected with `A base layer already exists; ignoring extra base layer`.
+
+For that specific need — a small, closed set of regions whose raw value isn't a number and deserves its own legend/tooltip entry, mixed into an otherwise numeric classification — use `categoryFillStyle`/`categoryText` on the choropleth layer itself instead of a second base layer:
+
+```javascript
+eurostatmap
+    .map('ch')
+    .categoryFillStyle({ '-': '#cccccc' })
+    .categoryText({ '-': 'No railway lines' })
+    .build()
+```
+
+Regions whose raw stat value matches a configured key get their own fill colour, legend swatch, and tooltip label instead of numeric classification or generic "no data" treatment. See the [choropleth map reference](./reference.md#choropleth-map) for details. If you need genuinely independent classifications for two variables rendered on top of each other (not just a few named exceptions), reach for the overlay-layer stack in this guide instead (e.g. a `categorical` base plus a `proportionalSymbol` overlay).
+
+## 5. Backwards Compatibility & Legacy Sugar
 
 All legacy single-type constructors and setters remain fully supported:
 - `eurostatmap.map('choropleth')` still instantiates a single-type choropleth map.
