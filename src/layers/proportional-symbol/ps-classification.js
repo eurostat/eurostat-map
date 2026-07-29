@@ -100,7 +100,12 @@ export function applyClassificationToMap(map, layer) {
     const colorData = activeLayer.getEncodingStatData?.('color', undefined, 'color') || map.statData('color')
     if (!colorData) return
 
-    const group = getCentroidsGroup(activeLayer)
+    // classifierColor_/getEncodingStatData above always live on the shared layer (an inset has
+    // no classifier state of its own), but the DOM group to tag belongs to whichever instance is
+    // actually being styled: the shared layer's own group when `map` is the real main map, or -
+    // for an inset - that inset's own facade group. Always resolving via activeLayer would
+    // silently re-tag the main map's centroids instead of the inset's.
+    const group = getCentroidsGroup(map === activeLayer.map ? activeLayer : map)
     if (!group || group.empty()) return
 
     group.selectAll('g.em-centroid').attr('ecl', function (rg) {
