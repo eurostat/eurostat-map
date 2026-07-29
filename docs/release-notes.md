@@ -1,5 +1,21 @@
 # Release notes
 
+## 4.10.3
+
+### Fixes
+
+- **Multivariate (size + color) proportional-symbol maps with insets could throw `"... is not a function"` and render no symbols at all in their insets**, while the main map rendered fine. `applyClassificationToMap()` and the draw-order fallback both checked the color classifier on the per-call target object - which for an inset is that inset's own separate map instance, not the shared layer that actually holds the classifier. Insets were treated as if they had no color classifier at all, so their symbols got tagged with a placeholder `'has-data'`/`'nd'` class instead of a numeric one; styling then tried to divide that placeholder to pick a color, producing `NaN` and an "is not a function" error that aborted styling for every inset.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap
+    .map('ps')
+    .psSettings({ classificationMethod: 'threshold', colors, thresholds })
+    .insets('eu')
+    .build()
+```
+
 ## 4.10.2
 
 ### Fixes
