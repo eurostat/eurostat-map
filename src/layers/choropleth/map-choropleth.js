@@ -16,6 +16,8 @@ import {
     getTextColorForBackground,
     spaceAsThousandSeparator,
     flags,
+    toCategoryEcl,
+    fromCategoryEcl,
 } from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
@@ -57,6 +59,12 @@ export const decorateChoroplethLayer = function (layer, config) {
     layer.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
     layer.classifier_ = undefined
+    /** Fill style for extra categorical values mixed into this choropleth's classification.
+     * Ex.: { '-': '#cccccc' } to give regions whose raw value is the string '-' their own colour
+     * instead of falling into a numeric class or being treated as plain "no data". */
+    layer.categoryFillStyle_ = undefined
+    /** Legend/tooltip text for each extra category. Ex.: { '-': 'No railway lines' } */
+    layer.categoryText_ = undefined
     // set tooltip function
     layer.tooltip_ = layer.tooltip_ || {}
     layer.tooltip_.textFunction = choroplethTooltipFunction
@@ -77,6 +85,8 @@ export const decorateChoroplethLayer = function (layer, config) {
         'colorFunction_',
         'classToFillStyle_',
         'noDataFillStyle_',
+        'categoryFillStyle_',
+        'categoryText_',
         'classifier_',
         'colors_',
         'colorFunction_',
@@ -262,6 +272,14 @@ export const decorateChoroplethLayer = function (layer, config) {
 
                     const value = regionData.value
 
+                    // extra categorical value (e.g. "no railway lines") mixed into this
+                    // otherwise numeric/discrete classification - takes priority over
+                    // both numeric classification and the generic no-data handling below
+                    if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, value)) {
+                        sel.attr('ecl', toCategoryEcl(value))
+                        return
+                    }
+
                     // no data
                     if (value === ':' || value == null || Number.isNaN(value)) {
                         sel.attr('ecl', 'nd')
@@ -437,6 +455,12 @@ export const decorateChoroplethLayer = function (layer, config) {
             return layer.noDataFillStyle_ || 'gray'
         }
 
+        // Extra categorical value mixed into this classification
+        const categoryValue = fromCategoryEcl(ecl)
+        if (categoryValue !== undefined) {
+            return (layer.categoryFillStyle_ && layer.categoryFillStyle_[categoryValue]) || layer.noDataFillStyle_ || 'gray'
+        }
+
         // Dot-density or pattern-fill mode
         if (layer.filtersDefinitionFunction_) {
             return layer.classToFillStyle_(ecl)
@@ -604,6 +628,21 @@ const choroplethTooltipFunction = function (region, layer) {
     const statData = layer.getEncodingStatData?.('fill', undefined, 'default') || layer.map.statData()
     const sv = statData.get(regionId)
     const unit = statData.unitText() || ''
+
+    // Extra categorical value case (e.g. "no railway lines")
+    if (sv && layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, sv.value)) {
+        const categoryLabel = (layer.categoryText_ && layer.categoryText_[sv.value]) || sv.value
+        buf.push(`
+            <div class="em-tooltip-text no-data">
+                <table class="em-tooltip-table">
+                    <tbody>
+                        <tr><td>${categoryLabel}</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `)
+        return buf.join('')
+    }
 
     // No data case
     if (!sv || (sv.value !== 0 && !sv.value) || sv.value === ':') {

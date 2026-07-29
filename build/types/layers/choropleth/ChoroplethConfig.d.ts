@@ -28,6 +28,15 @@ export interface ChoroplethConfig extends MapConfig {
     /** No-data styling. */
     noDataFillStyle?: string
 
+    /** Fill style for extra categorical values mixed into this choropleth's classification,
+     * keyed by the raw data value (e.g. `{ '-': '#cccccc' }` for regions whose value is the
+     * string '-'). Matching regions get their own legend/tooltip entry instead of being
+     * classified numerically or treated as generic "no data". */
+    categoryFillStyle?: { [rawValue: string]: string }
+    /** Legend/tooltip text for each extra category, keyed by the same raw data value as
+     * `categoryFillStyle`. Ex.: `{ '-': 'No railway lines' }` */
+    categoryText?: { [rawValue: string]: string }
+
     /** Value transformation (for continuous schemes). */
     valueTransform?: (x: number) => number
     valueUntransform?: (x: number) => number

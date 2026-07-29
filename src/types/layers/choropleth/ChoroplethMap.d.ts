@@ -45,4 +45,10 @@ export interface ChoroplethMap extends MapInstance {
 
     noDataFillStyle(): string
     noDataFillStyle(style: string): this
+
+    categoryFillStyle(): { [rawValue: string]: string } | undefined
+    categoryFillStyle(v: { [rawValue: string]: string }): this
+
+    categoryText(): { [rawValue: string]: string } | undefined
+    categoryText(v: { [rawValue: string]: string }): this
 }
