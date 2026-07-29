@@ -1,5 +1,21 @@
 # Release notes
 
+## 4.10.0
+
+### New
+
+- **Choropleth maps can now mix a small set of categorical exceptions into an otherwise numeric classification**, via `categoryFillStyle`/`categoryText`. Useful when a handful of regions have no meaningful numeric value for a metric (e.g. "no railway lines" on a map of electrification rate) but still deserve their own legend entry and colour, instead of being lumped into the generic "no data" class or forced into a second base layer (mixing two base layers, e.g. a categorical layer on top of a choropleth, is rejected - a region can only be classified by one base layer). Regions whose raw stat value matches a configured key get their own fill colour, legend swatch, and tooltip label instead of numeric classification or default no-data treatment.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ch')
+    .categoryFillStyle({ '-': '#cccccc' })
+    .categoryText({ '-': 'No railway lines' })
+    .build()
+```
+
 ## 4.9.5
 
 ### Improvements
