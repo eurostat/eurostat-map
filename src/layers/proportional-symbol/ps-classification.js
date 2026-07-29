@@ -58,9 +58,9 @@ function defineColorClassifier(layer) {
         if (layer.makeClassifNice_) layer.classifierColor().nice()
     } else if (layer.psClassificationMethod_ === 'threshold') {
         //https://github.com/d3/d3-scale#threshold-scales
-        layer.psClasses(layer.psThresholds().length + 1)
+        layer.psClasses_ = layer.psThresholds_.length + 1
         const range = getA(layer.psClasses_)
-        layer.classifierColor(scaleThreshold().domain(layer.psThresholds()).range(range))
+        layer.classifierColor(scaleThreshold().domain(layer.psThresholds_).range(range))
     }
 }
 

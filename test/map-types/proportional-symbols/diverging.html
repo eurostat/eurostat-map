@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../build/eurostatmap.js"></script>
+        <!-- <script src="../../../build/eurostatmap.min.js"></script> -->
+        <script>
+            // basic barebones proportional circles example
+            let map = eurostatmap
+                .map('ps')
+                .nutsLevel(2)
+                .scale('60M')
+                .title('Total GDP and GDP per inhabitant')
+                .subtitle('2022')
+                .width(800)
+                .stat('symbolSize', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Million EUR',
+                    filters: { unit: 'MIO_EUR', time: '2022' },
+                })
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', {
+                    eurostatDatasetCode: 'nama_10r_3gdp',
+                    unitText: 'Euro per inhabitant',
+                    filters: { unit: 'EUR_HAB', time: '2022' },
+                })
+                .encoding('color', { stat: 'symbolColor' })
+                .legend({
+                    x: 590,
+                    y: 20,
+                    boxOpacity: 1,
+                    sizeLegend: { title: 'Million EUR', values: [800000, 10000] },
+                    colorLegend: {
+                        title: 'EUR per inhabitant',
+                        labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
+                        pointOfDivergenceLabel: 'Increase|Decrease',
+                        pointOfDivergence: 4,
+                    },
+                })
+                .psSettings({
+                    thresholds: [10000, 20000, 30000, 40000],
+                    colors: ['#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'],
+                    shape: 'circle',
+                    maxSize: 15,
+                })
+                .transitionDuration(900)
+                .dorling(true)
+                .dorlingStrength({ x: 0.1, y: 0.1 })
+                .dorlingIterations(1)
+                .animateDorling(true) // Set to false for non-animated dorling cartograms
+                .dorlingWorker(false) // You can use a web worker for (non-animated) dorling cartograms in order to not block the main thread
+                //.dorlingWorkerD3URL('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js') // Use this in case you need its D3 dependency to be internally hosted.
+                .onDorlingProgress(function (progress, map) {
+                    console.log('Dorling progress:', progress)
+                })
+                .insets(false)
+
+            map.build()
+        </script>
+    </body>
+</html>
