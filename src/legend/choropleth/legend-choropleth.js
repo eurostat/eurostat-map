@@ -86,8 +86,8 @@ export const legend = function (map, config = {}) {
             //exit early if stat data not yet available
             if (!out.getColorStats(out)?.getArray()?.length) return
 
-            //set default point of divergence if applicable
-            if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = map.numberOfClasses_ / 2
+            //set default point of divergence if applicable (rounded so it lines up with an actual class index in discrete legends)
+            if (out.pointOfDivergenceLabel && !out.pointOfDivergence) out.pointOfDivergence = Math.round(map.numberOfClasses_ / 2)
 
             // initial x and y positions for the internal legend elements
             const baseY = out.getBaseY()

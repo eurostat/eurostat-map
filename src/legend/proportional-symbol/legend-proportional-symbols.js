@@ -125,6 +125,12 @@ export const legend = function (map, config) {
                 drawSizeLegend(out, baseX, baseY)
             }
             if (map.classifierColor_ && out.colorLegend) {
+                // default point of divergence to the middle of the classes, mirroring choropleth legend behaviour
+                // (rounded so it lines up with an actual class index in the discrete legend)
+                if (out.colorLegend.pointOfDivergenceLabel && !out.colorLegend.pointOfDivergence) {
+                    out.colorLegend.pointOfDivergence = Math.round(out.getNumberOfClasses(out) / 2)
+                }
+
                 let x = baseX
                 let y = baseY
                 if (out._sizeLegendContainer) {
