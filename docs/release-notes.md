@@ -1,5 +1,48 @@
 # Release notes
 
+## 4.10.1
+
+### New
+
+- **Diverging discrete legends (choropleth and proportional-symbol color legends) gained several new styling options**, all optional and backward compatible:
+    - `showDivergingLine` - hide the horizontal divergence line/tick and show only the up/down arrows.
+    - `divergingLinePadding` - control the gap left after the longest legend label when computing the line's length, instead of a fixed 15px.
+    - `pointOfDivergenceLabelsAtExtremes` - position the 2 arrow labels near the top/bottom of the whole scale instead of near the divergence point. Unless `divergingArrowLength` is explicitly set, the arrows stretch to reach near their own label.
+    - `pointOfDivergenceLabelsStacked` - position the 2 labels above/below their arrowhead (starting at the arrow's x position) instead of beside it, to save horizontal width.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ch')
+    .legend({
+        pointOfDivergenceLabel: 'Increase|Decrease',
+        pointOfDivergence: 3,
+        showDivergingLine: false,
+        pointOfDivergenceLabelsAtExtremes: true,
+        pointOfDivergenceLabelsStacked: true,
+    })
+    .build()
+```
+
+### Fixes
+
+- **Diverging proportional-symbol color legends (`colorLegend.pointOfDivergence`/`pointOfDivergenceLabel`) didn't reliably render.** PS classification called deprecated `psThresholds()`/`psClasses()` wrappers internally (spamming console warnings on every threshold-based classification), and the PS legend never defaulted `pointOfDivergence` when only the label was set - unlike the choropleth legend, whose own default could itself land on a non-integer class index for odd class counts, silently skipping the divergence line since it's matched by strict equality.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap
+    .map('ps')
+    .psSettings({ classificationMethod: 'threshold', colors, thresholds })
+    .legend({ colorLegend: { pointOfDivergenceLabel: 'Increase|Decrease' } }) // pointOfDivergence now defaults correctly
+    .build()
+```
+
+- **Custom tooltip `textFunction`s reading `map.noDataText_` for `':'` values got `undefined` instead of the configured no-data text**, for both choropleth and proportional-symbol maps. Region hover events call `textFunction(region, layer)` with the internal layer object, not the map - `noDataText_` is map-level state and was never forwarded onto it, unlike `statData`. Now forwarded the same way.
+
+- **The divergence point's own threshold-value label was always relocated (or removed) to avoid overlapping the horizontal divergence line**, even when `showDivergingLine: false` left no line to overlap. It now stays in its normal place next to its own tick in that case.
+
 ## 4.10.0
 
 ### New
