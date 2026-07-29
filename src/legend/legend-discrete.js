@@ -2,7 +2,8 @@
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass, toCategoryEcl } from '../core/utils'
-import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js'
+import { highlightRegions, getDimmedFill } from './legend.js'
+import { getCentroidsGroup } from '../core/geo/centroids'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -311,9 +312,10 @@ function createThresholdsLegend(out, config) {
                     highlightMaxRegion(map, numberOfClasses, globalMaxRegionId)
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(map)
+                    const unhighlightFunction = out.getUnHighlightFunction(map)
+                    unhighlightFunction(map)
                     if (map.insetTemplates_) {
-                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction)
                     }
                 })
                 .attr('class', 'em-legend-label em-legend-label-max')
@@ -342,9 +344,10 @@ function createThresholdsLegend(out, config) {
                     highlightMinRegion(map, globalMinRegionId)
                 })
                 .on('mouseout', function () {
-                    unhighlightRegions(map)
+                    const unhighlightFunction = out.getUnHighlightFunction(map)
+                    unhighlightFunction(map)
                     if (map.insetTemplates_) {
-                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegions)
+                        executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction)
                     }
                 })
                 .attr('class', 'em-legend-label em-legend-label-min')
@@ -539,18 +542,33 @@ function drawDivergingLine(out, y, config, scaleTopY, scaleBottomY) {
         const downTipY = y + downLength
 
         if (labelsStacked) {
-            container
+            // Gap in pixels between an arrow tip and its label, when not positioned at the
+            // scale extremes (where the labels instead sit flush with the max/min value labels).
+            const stackedLabelGap = 10
+
+            const topLabel = container
                 .append('text')
                 .attr('class', 'em-legend-label')
                 .attr('x', directionLineX)
-                .attr('y', labelsAtExtremes ? scaleTopY : upTipY - 4)
+                .attr('y', labelsAtExtremes ? scaleTopY : upTipY - stackedLabelGap)
                 .text(labels[0])
+            if (labelsAtExtremes) {
+                // Sits on the same y as the max stat value label (which uses dy=0.3em to center
+                // its text on that y) - match it so this label never renders further north than
+                // the max label's own text does.
+                topLabel.attr('dy', '0.3em')
+            } else {
+                // Pull the text further up, away from the tip, the same way the bottom label's
+                // dy pushes it further down - otherwise the (undescended) baseline sitting only
+                // stackedLabelGap above the tip reads as almost touching it.
+                topLabel.attr('dy', '-0.3em')
+            }
 
             container
                 .append('text')
                 .attr('class', 'em-legend-label')
                 .attr('x', directionLineX)
-                .attr('y', labelsAtExtremes ? scaleBottomY : downTipY + 4)
+                .attr('y', labelsAtExtremes ? scaleBottomY : downTipY + stackedLabelGap)
                 .attr('dy', labelsAtExtremes ? '0.3em' : '0.9em')
                 .text(labels[1])
         } else {
@@ -621,6 +639,11 @@ function highlightMinRegion(map, id) {
 }
 
 function applyMaxMinHighlight(map, ecl, id) {
+    if (map._mapType === 'ps') {
+        applyMaxMinHighlightPs(map, id)
+        return
+    }
+
     highlightRegions(map, ecl)
     const selector = getLegendRegionsSelector(map)
     map.svg_
@@ -629,5 +652,16 @@ function applyMaxMinHighlight(map, ecl, id) {
         .each(function (d) {
             if (!d?.properties?.id) return
             if (d.properties.id !== id) select(this).style('fill', getDimmedFill(map))
+        })
+}
+
+// Isolate a single proportional symbol by region id, dimming every other symbol regardless
+// of its class (the max/min region is a single feature, not "the whole top/bottom class").
+function applyMaxMinHighlightPs(map, id) {
+    const layer = map.activeLayer ? map.activeLayer() : map
+    getCentroidsGroup(layer)
+        .selectAll('[ecl]')
+        .each(function (d) {
+            select(this).style('opacity', d?.properties?.id === id ? layer.psFillOpacity_ : '0')
         })
 }
