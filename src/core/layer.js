@@ -142,6 +142,17 @@ export const attachThematicApi = function (layer, map) {
         return map.statData(...args)
     }
 
+    // noDataText is map-level state (set once via map.noDataText(...)), not per-layer.
+    // Custom tooltip textFunctions are called as textFunction(region, layer) and, per the
+    // documented API, read the "map"-like second argument's .noDataText_ directly - forward
+    // it here so that still resolves instead of silently reading undefined.
+    if (layer !== map) {
+        Object.defineProperty(layer, 'noDataText_', {
+            configurable: true,
+            get: () => map.noDataText_,
+        })
+    }
+
     layer.legend = function (v) {
         if (!arguments.length) return layer.legend_
 
