@@ -1,5 +1,23 @@
 # Release notes
 
+## 4.10.2
+
+### Fixes
+
+- **Hovering the max/min stat-value label in a discrete legend now correctly highlights the matching feature on proportional-symbol maps too, not just choropleths.** The mouseover handler isolated a single region by id using choropleth-only region-fill logic (`getLegendRegionsSelector`/`highlightRegions`), and mouseout always called the choropleth-only `unhighlightRegions` - neither worked for PS symbols, which live in a separate centroids group and are highlighted via opacity, not fill.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap
+    .map('ps')
+    .psSettings({ classificationMethod: 'threshold', colors, thresholds })
+    .legend({ maxMin: true, colorLegend: { maxMin: true } }) // hover the max/min labels - now highlights the right circle
+    .build()
+```
+
+- **`pointOfDivergenceLabelsStacked` + `pointOfDivergenceLabelsAtExtremes` positioned the top diverging label further north than the max stat value label**, and (independently) sat its label almost flush against the arrow tip when `pointOfDivergenceLabelsAtExtremes` was false. Both labels now use consistent vertical offsets that match the max/min value labels' own centering, with a wider, balanced gap from the arrow tip in the non-extremes case.
+
 ## 4.10.1
 
 ### New
