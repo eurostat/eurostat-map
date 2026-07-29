@@ -333,53 +333,65 @@ export const legend = function (map) {
         }
     }
 
-    //'no data' legend box
-    out.appendNoDataLegend = function (container, noDataText, highlightFunction, unhighlightFunction) {
+    //shared 'single swatch + label' legend item, used for both the 'no data' box and
+    //extra categorical classes mixed into an otherwise numeric/discrete classification
+    function appendLegendSwatch(container, ecl, color, text, labelClass, highlightFunction, unhighlightFunction) {
         const map = out.map
 
         //append symbol & style
         container
             .append('rect')
             .attr('class', 'em-legend-rect')
-            .style('fill', map.noDataFillStyle())
+            .style('fill', color)
             .attr('y', out.noDataPadding)
             .attr('width', out.noDataShapeWidth)
             .attr('height', out.noDataShapeHeight)
             .on('mouseover', function () {
-                highlightFunction(map, 'nd')
+                highlightFunction(map, ecl)
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, ecl)
                 }
             })
             .on('mouseout', function () {
-                unhighlightFunction(map, 'nd')
+                unhighlightFunction(map, ecl)
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, ecl)
                 }
             })
 
-        //'no data' label
+        //label
         container
             .append('text')
-            .attr('class', 'em-legend-label em-legend-label-no-data')
+            .attr('class', labelClass)
             .attr('dy', '0.35em')
             .attr('x', out.noDataShapeWidth + 5)
             .attr('y', out.noDataShapeHeight / 2 + out.noDataPadding)
             .style('pointer-events', 'all')
             .style('cursor', 'pointer')
             .on('mouseover', function () {
-                highlightFunction(map, 'nd')
+                highlightFunction(map, ecl)
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, ecl)
                 }
             })
             .on('mouseout', function () {
-                unhighlightFunction(map, 'nd')
+                unhighlightFunction(map, ecl)
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, 'nd')
+                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, ecl)
                 }
             })
-            .text(noDataText)
+            .text(text)
+    }
+
+    //'no data' legend box
+    out.appendNoDataLegend = function (container, noDataText, highlightFunction, unhighlightFunction) {
+        appendLegendSwatch(container, 'nd', out.map.noDataFillStyle(), noDataText, 'em-legend-label em-legend-label-no-data', highlightFunction, unhighlightFunction)
+    }
+
+    //legend box for an extra categorical value mixed into an otherwise numeric/discrete
+    //classification (e.g. a "no railway lines" class on a choropleth of electrification rates)
+    out.appendCategoryLegend = function (container, ecl, color, text, highlightFunction, unhighlightFunction) {
+        appendLegendSwatch(container, ecl, color, text, 'em-legend-label em-legend-label-category', highlightFunction, unhighlightFunction)
     }
 
     out.getNumberOfClasses = function (out) {

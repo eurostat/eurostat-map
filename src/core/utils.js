@@ -395,6 +395,22 @@ export const checkIfDiverging = function (map) {
 }
 
 /**
+ * Prefix used to tag a region's `ecl` attribute when its raw value matches a layer's
+ * configured extra category (e.g. "no railway lines") instead of a numeric classification
+ * bin. Lets a small set of categorical exceptions be mixed into an otherwise numeric/discrete
+ * layer (choropleth) without needing a second base layer.
+ */
+export const CATEGORY_ECL_PREFIX = 'cat__'
+
+export function toCategoryEcl(rawValue) {
+    return CATEGORY_ECL_PREFIX + rawValue
+}
+
+export function fromCategoryEcl(ecl) {
+    return typeof ecl === 'string' && ecl.startsWith(CATEGORY_ECL_PREFIX) ? ecl.slice(CATEGORY_ECL_PREFIX.length) : undefined
+}
+
+/**
  * Wraps a diverging color interpolator so that it centers around a meaningful divergence point.
  * Ensures that transformed values are mapped symmetrically around the divergence point (e.g. 0).
  *

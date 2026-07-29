@@ -1,7 +1,7 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass } from '../core/utils'
+import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass, toCategoryEcl } from '../core/utils'
 import { unhighlightRegions, highlightRegions, getDimmedFill } from './legend.js'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -120,6 +120,24 @@ export function drawDiscreteLegend(out, x, y) {
         const highlightFunction = out.getHighlightFunction(out.map)
         const unhighlightFunction = out.getUnHighlightFunction(out.map)
         out.appendNoDataLegend(container, config.noDataText, highlightFunction, unhighlightFunction)
+    }
+
+    // Optionally add extra categorical classes mixed into this choropleth's classification
+    // (e.g. a "no railway lines" class alongside numeric electrification-rate classes)
+    const categoryFillStyle = out.layer?.categoryFillStyle_
+    if (categoryFillStyle) {
+        const categoryText = out.layer.categoryText_
+        let y = out.getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3
+        if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding
+        if (config.noData) y += out.noDataShapeHeight + out.noDataPadding // stack below the no-data box
+        const highlightFunction = out.getHighlightFunction(out.map)
+        const unhighlightFunction = out.getUnHighlightFunction(out.map)
+        Object.keys(categoryFillStyle).forEach((rawValue) => {
+            const container = out._discreteLegendContainer.append('g').attr('class', 'em-category-legend').attr('transform', `translate(0,${y})`)
+            const text = (categoryText && categoryText[rawValue]) || rawValue
+            out.appendCategoryLegend(container, toCategoryEcl(rawValue), categoryFillStyle[rawValue], text, highlightFunction, unhighlightFunction)
+            y += out.noDataShapeHeight + out.noDataPadding
+        })
     }
 }
 
