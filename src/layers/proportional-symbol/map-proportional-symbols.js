@@ -487,8 +487,12 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             .attr('id', (d) => 'ps' + d.properties.id)
             .attr('transform', (d) => `translate(${d.properties.centroid[0].toFixed(3)},${d.properties.centroid[1].toFixed(3)})`)
 
-        // Re-apply classification to the new containers
-        applyClassificationToMap(map, target)
+        // Re-apply classification to the new containers. Pass the real (shared) layer, not
+        // target: classifierColor_ is only ever defined on the owning layer - an inset is a
+        // separate map instance with no classifier of its own - so passing target here made
+        // applyClassificationToMap() think color classification wasn't configured for insets,
+        // skipping it and leaving their centroids without a numeric [ecl] class.
+        applyClassificationToMap(map, layer)
 
         // applyClassificationToMap() only tags g.em-centroid with [ecl] when a color
         // encoding is configured - for a size-only PS map it bails out early, leaving
@@ -496,7 +500,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         // hover (highlightPsRegions/highlightPsSymbols) relies on that attribute to find
         // and dim/restore symbols, so it silently did nothing. Fall back to tagging by
         // the SIZE stat's own resolvability whenever there's no color classifier.
-        if (!target.classifierColor_) {
+        if (!layer.classifierColor_) {
             centroidsGroup.selectAll('g.em-centroid').attr('ecl', (d) => {
                 const v = sizeData.get(d.properties.id)?.value
                 return v == null || v === ':' ? 'nd' : 'has-data'
