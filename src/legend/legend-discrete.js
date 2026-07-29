@@ -496,7 +496,7 @@ function drawDivergingLine(out, y, config, scaleTopY, scaleBottomY) {
         // When labels sit at the scale extremes and the caller hasn't pinned an explicit
         // arrow length, stretch each arrow to reach near its own label instead of stopping
         // at the short default length meant for a divergence-point-adjacent label.
-        const extremesArrowMargin = 14
+        const extremesArrowMargin = 20
         const autoExtendArrows = labelsAtExtremes && config.divergingArrowLength == null
         const upLength = autoExtendArrows ? Math.max(y - scaleTopY - extremesArrowMargin, markerHeight) : directionLineLength
         const downLength = autoExtendArrows ? Math.max(scaleBottomY - y - extremesArrowMargin, markerHeight) : directionLineLength

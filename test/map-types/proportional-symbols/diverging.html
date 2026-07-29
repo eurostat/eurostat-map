@@ -38,9 +38,13 @@
                     sizeLegend: { title: 'Million EUR', values: [800000, 10000] },
                     colorLegend: {
                         title: 'EUR per inhabitant',
-                        labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
+                        //labels: ['< 10k', '10k - 20k', '20k - 30k', '30k - 40k', '> 40k'].reverse(),
                         pointOfDivergenceLabel: 'Increase|Decrease',
-                        pointOfDivergence: 4,
+                        pointOfDivergence: 3,
+                        showDivergingLine: true, // set to false to hide the horizontal line/tick and show only the arrows (when there are 2 labels)
+                        divergingLinePadding: 20, // extra gap after the longest legend label, when divergingLineLength isn't explicitly set
+                        pointOfDivergenceLabelsAtExtremes: true, // position the 2 labels near the top/bottom of the scale instead of near the divergence point
+                        pointOfDivergenceLabelsStacked: true, // at end of arrow tip
                     },
                 })
                 .psSettings({
