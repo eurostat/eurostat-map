@@ -64,6 +64,10 @@ export const legend = function (map, config) {
         pointOfDivergencePadding: 7,
         divergingLineLength: undefined,
         divergingArrowLength: undefined,
+        showDivergingLine: true, // set to false to hide the horizontal line/tick and show only the arrows (when there are 2 labels)
+        divergingLinePadding: 15, // extra gap after the longest legend label, when divergingLineLength isn't explicitly set
+        pointOfDivergenceLabelsAtExtremes: false, // position the 2 labels near the top/bottom of the scale instead of near the divergence point
+        pointOfDivergenceLabelsStacked: false, // position the 2 labels above/below their arrowhead instead of beside it
     }
 
     //override attribute values with config values

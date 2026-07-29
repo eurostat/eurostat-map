@@ -48,6 +48,24 @@ export interface ChoroplethLegendConfig extends LegendConfig {
     /** Explicit diverging arrow length in pixels. */
     divergingArrowLength?: number
 
+    /** Whether to draw the horizontal divergence line/tick. Set to false to show only the
+     * arrows (when pointOfDivergenceLabel has 2 parts separated by '|'). @default true */
+    showDivergingLine?: boolean
+
+    /** Extra gap in pixels added after the longest legend label when computing the diverging
+     * line's length, if divergingLineLength isn't explicitly set. @default 15 */
+    divergingLinePadding?: number
+
+    /** Position the 2 diverging labels near the top/bottom of the whole scale instead of near
+     * the divergence point. Unless divergingArrowLength is explicitly set, the arrows also
+     * stretch to reach near their own label. @default false */
+    pointOfDivergenceLabelsAtExtremes?: boolean
+
+    /** Position the 2 diverging labels above/below their arrowhead, starting at the arrow's x
+     * position, instead of beside it. Shorten divergingArrowLength to leave room for the
+     * label text. @default false */
+    pointOfDivergenceLabelsStacked?: boolean
+
     /** Label shown at the low end of continuous legends. @default 'Low' */
     lowLabel?: string
 

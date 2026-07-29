@@ -42,6 +42,10 @@ export const legend = function (map, config = {}) {
     out.pointOfDivergencePadding = 7
     out.divergingLineLength = undefined
     out.divergingArrowLength = undefined
+    out.showDivergingLine = true // set to false to hide the horizontal line/tick and show only the arrows (when there are 2 labels)
+    out.divergingLinePadding = 15 // extra gap after the longest legend label, when divergingLineLength isn't explicitly set
+    out.pointOfDivergenceLabelsAtExtremes = false // position the 2 labels near the top/bottom of the scale instead of near the divergence point
+    out.pointOfDivergenceLabelsStacked = false // position the 2 labels above/below their arrowhead instead of beside it
 
     //continuous legend
     out.lowLabel = 'Low' //'Low'
