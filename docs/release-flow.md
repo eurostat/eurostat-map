@@ -24,6 +24,10 @@ This flow assumes:
 - Target version (example: `4.4.3`)
 - Release type context (bugfix, feature, breaking change)
 
+## Before you start: batch, don't bump per fix
+
+If you're iterating (building a feature, then fixing bugs the user spots in review, one after another) and **nothing has been published to npm yet**, do not bump the version and re-tag for every individual fix. Keep committing fixes normally, but only go through this flow's version-bump/tag step once, when the whole batch is believed ready. If you already tagged/pushed one or more intermediate versions before the batch was done, squash them back into a single commit under the original version number (`git reset --soft <commit before the first intermediate release>`, redo the version bump/build, commit once, move the tag) rather than stacking `X.Y.(Z+1)`, `X.Y.(Z+2)`, etc. — this does mean deleting/re-pushing already-pushed tags and force-pushing `master`, which is safe here specifically because nothing under those tags was ever `npm publish`ed. Confirm with the user before force-pushing regardless.
+
 ## Release Steps
 
 1. Preflight checks
@@ -43,8 +47,11 @@ This flow assumes:
 3. Build distributables
 
 - run production build:
-    - `npm run build-prod`
-- verify build artifacts were updated as expected
+    - `npm run build-prod` (rebuilds `build/eurostatmap.min.js`, the `main`/`unpkg` target)
+- **also rebuild the unminified dev bundle** if `src/**` changed:
+    - `npm start` (runs `webpack --config webpack/webpack.config.dev.js`, a one-shot build despite the script name — not a watcher)
+    - this regenerates `build/eurostatmap.js`, which is the package's `module` field target and is tracked in git separately from the min bundle. `build-prod` does **not** touch it — skipping this step ships a stale `build/eurostatmap.js` that silently lacks the release's changes for any consumer resolving via `module` (e.g. a bundler-based app like IMAGE).
+- verify build artifacts were updated as expected (e.g. `grep` for a distinctive new identifier in both `build/eurostatmap.min.js` and `build/eurostatmap.js`)
 
 4. Commit + tag + push
 
@@ -59,7 +66,8 @@ This flow assumes:
 
 5. Publish to npm
 
-- publish from repo root:
+- **stop and get explicit user permission before running `npm publish`**, even though every earlier step in this flow (version bump, build, commit, tag, push) can proceed without asking again. Do not fold the publish into the same autonomous batch of actions as the rest of the flow — report that the tagged commit is built/pushed and ready, state the version, and wait for an explicit go-ahead. This holds even if the user already approved the change itself and the version number; the publish step gets its own separate confirmation.
+- once confirmed, publish from repo root:
     - `npm publish`
 - if npm asks for browser auth, complete it and continue
 - verify published version:
@@ -150,7 +158,8 @@ Snippet conventions:
 ## Operational Notes
 
 - Avoid interactive git workflows.
-- Do not amend unrelated commits.
+- Do not amend unrelated commits (only amend a release commit you just made yourself, and only if it hasn't been pushed yet).
 - Never reset or discard user changes unless explicitly requested.
 - If unexpected unrelated modifications appear mid-release, pause and ask the user how to proceed.
 - Never add a `Co-Authored-By: Claude ...` trailer to any commit made as part of this flow (release commit, release-notes commit, or otherwise).
+- The user may be working directly in this same local checkout concurrently (their own commits, their own `npm publish`, uncommitted debug scratch files/`console.log`s). Before assuming your own view of `master`/npm is current, re-check `git log`, `git status`, and `npm view eurostat-map versions --json` rather than trusting what you last knew — don't touch or revert files you didn't create that look like in-progress exploration (e.g. `*.tmp.js` scratch files, an uncommitted debug log statement).

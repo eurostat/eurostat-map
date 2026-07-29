@@ -305,6 +305,8 @@ eurostatmap
 | _map_.**colorFunction**([*value*])        | Function    | _d3.interpolateYlOrBr_ | The color function, as defined in [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic/)                                                                                         |
 | _map_.**classToFillStyle**([*value*])     | Function    | See description        | A function returning a fill style for each class number. The default values is the function returned by `eurostatmap.getColorFunction(colorFun())`.                                       |
 | _map_.**noDataFillStyle**([*value*])      | String      | _"lightgray"_          | The fill style to be used for regions where no data is available.                                                                                                                         |
+| _map_.**categoryFillStyle**([*value*])    | Object      | _undefined_             | Fill style for extra categorical values mixed into this choropleth's classification, keyed by the raw data value (e.g. `{ '-': '#cccccc' }`). Matching regions get their own legend/tooltip entry instead of being classified numerically or treated as generic "no data". See [Multi-Layer Stack Guide](./multi-layer-guide.md) for why this exists instead of layering a categorical layer on top. |
+| _map_.**categoryText**([*value*])         | Object      | _undefined_             | Legend/tooltip text for each extra category, keyed by the same raw data value as `categoryFillStyle`. Ex.: `{ '-': 'No railway lines' }`                                                  |
 | _map_.**colorSchemeType**([*value*])      | String      | _"discrete"_           | Discrete or continuous                                                                                                                                                                    |
 | _map_.**valueTransform**([*value*])       | Function    | _"(val)=>val"_         | Transform your data for distribution stretching when using continuous colour schemes.                                                                                                     |
 | _map_.**valueUntransform**([*value*])     | Function    | _"(val)=>val"_         | Unransform your data when distribution stretching when using continuous colour schemes to show true values in .                                                                           |
@@ -1545,7 +1547,10 @@ In addition to [the default legend parameters](#map-legend), choropleth maps hav
 | **divergingLineLength**      | Number                   | undefined                         | Manually override the length of the divergence line.                                                                                                                                      |
 | **divergingArrowLength**     | Number                   | undefined                         | Manually override the length of the divergence arrows (when using the pipe symbol in your pointOfDivergenceLabel).                                                                        |
 | **pointOfDivergencePadding** | Number                   | 7                                 | The amount of padding in pixels between the line of divergence and the other legend elements.                                                                                             |
-| **pointOfDivergencePadding** | Number                   | 7                                 | The amount of padding in pixels between the line of divergence and the other legend elements.                                                                                             |
+| **showDivergingLine**        | Boolean                  | _true_                            | Set to false to hide the horizontal divergence line/tick and show only the up/down arrows (when pointOfDivergenceLabel has 2 parts separated by `\|`).                                     |
+| **divergingLinePadding**     | Number                   | 15                                | Extra gap in pixels added after the longest legend label when computing the diverging line's length, if divergingLineLength isn't explicitly set.                                        |
+| **pointOfDivergenceLabelsAtExtremes** | Boolean         | _false_                           | Position the 2 diverging labels near the top/bottom of the whole scale instead of near the divergence point. Unless divergingArrowLength is explicitly set, the arrows stretch to reach near their own label. |
+| **pointOfDivergenceLabelsStacked**    | Boolean         | _false_                           | Position the 2 diverging labels above/below their arrowhead (starting at the arrow's x position) instead of beside it, to save horizontal width.                                          |
 
 For histogram legends you can use the following settings:
 
@@ -1653,6 +1658,16 @@ The following parameters are properties of the colorLegend object:
 | **sepLineLength**      | Number   | _17_                              | The length of the separation line between classes.                            |
 | **sepLineStroke**      | Number   | _black_                           | The colour of the separation line between classes.                            |
 | **sepLineStrokeWidth** | Number   | _1_                               | The width of the separation line between classes.                             |
+| **maxMin**             | Boolean  | _false_                           | When labelType is 'thresholds', show a hoverable tick for the max/min values - hovering highlights the matching symbol on the map.                             |
+| **pointOfDivergence**  | Number   | _undefined_                       | For a diverging classificationMethod (e.g. on multivariate/bivariate proportional-symbol maps), the class index at which your diverging colour scheme diverges.                          |
+| **pointOfDivergenceLabel** | String | _undefined_                    | The label to show at the point of divergence. Use the pipe symbol for two arrows pointing in opposite directions, e.g. `'Increase \| Decrease'`.                                          |
+| **divergingLineLength** | Number  | _undefined_                       | Manually override the length of the divergence line.                          |
+| **divergingArrowLength** | Number | _undefined_                       | Manually override the length of the divergence arrows (when using the pipe symbol in pointOfDivergenceLabel). |
+| **pointOfDivergencePadding** | Number | _7_                           | Padding in pixels between the line of divergence and the other legend elements. |
+| **showDivergingLine**  | Boolean  | _true_                            | Set to false to hide the horizontal divergence line/tick and show only the up/down arrows. |
+| **divergingLinePadding** | Number | _15_                              | Extra gap in pixels added after the longest legend label when computing the diverging line's length, if divergingLineLength isn't explicitly set. |
+| **pointOfDivergenceLabelsAtExtremes** | Boolean | _false_              | Position the 2 diverging labels near the top/bottom of the whole scale instead of near the divergence point. Unless divergingArrowLength is explicitly set, the arrows stretch to reach near their own label. |
+| **pointOfDivergenceLabelsStacked** | Boolean | _false_                  | Position the 2 diverging labels above/below their arrowhead instead of beside it, to save horizontal width. |
 
 ### Pie chart legends
 
