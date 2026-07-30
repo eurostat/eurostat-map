@@ -213,7 +213,7 @@ export function map(type: 'bar' | 'barComposition', config?: BarMapConfig): BarM
 export function map(type: 'stripeComposition' | 'scomp' | 'stripe', config?: StripeMapConfig): StripeMap
 export function map(type: 'waffle', config?: WaffleMapConfig): WaffleMap
 export function map(type: 'mushroom', config?: MushroomMapConfig): MushroomMap
-export function map(type: 'pieChart' | 'pie', config?: PieMapConfig): PieMap
+export function map(type: 'pieChart' | 'pie' | 'composition', config?: PieMapConfig): PieMap
 export function map(type: 'sparkline' | 'spark' | 'sparklines', config?: SparkMapConfig): SparkMap
 export function map(type: 'flow' | 'flowmap', config?: FlowMapConfig): FlowMap
 export function map(type: MapType, config?: MapConfig): MapInstance

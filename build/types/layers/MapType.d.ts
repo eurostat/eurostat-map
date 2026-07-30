@@ -19,6 +19,7 @@ export type MapType =
     | 'stripe'
     | 'pieChart'
     | 'pie'
+    | 'composition'
     | 'sparkline'
     | 'spark'
     | 'sparklines'
