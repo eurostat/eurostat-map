@@ -41,7 +41,13 @@
                     labelType: 'threshold',
                     pointOfDivergenceLabel: 'Increase|Decrease',
                     pointOfDivergence: 4,
-                    divergingArrowLength: 50,
+                    //pointOfDivergencePadding: 17,
+                    //divergingLineLength: 50, //horizontal line
+                    //divergingArrowLength: 80,
+                    showDivergingLine: false, // set to false to hide the horizontal line/tick and show only the arrows (when there are 2 labels)
+                    divergingLinePadding: 25, // extra gap after the longest legend label, when divergingLineLength isn't explicitly set
+                    pointOfDivergenceLabelsAtExtremes: true, // position the 2 labels near the top/bottom of the scale instead of near the divergence point
+                    pointOfDivergenceLabelsStacked: true, // position the 2 labels above/below their arrowhead instead of beside it
                     boxOpacity: 1,
                     noData: false,
                 })
