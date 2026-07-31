@@ -1,5 +1,52 @@
 # Release notes
 
+## 4.10.5
+
+### New
+
+- **Proportional-symbol color datasets can now contain categorical exceptions alongside numeric values.** Configure `categoryFillStyle` with the category's symbol fill and `categoryText` with its user-facing legend or tooltip label. Numeric values continue through the configured color classification.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ps')
+    .stat('size', populationByRegion)
+    .stat('color', densityWithExceptions)
+    .categoryFillStyle({ confidential: '#777777' })
+    .categoryText({ confidential: 'Confidential' })
+    .build()
+```
+
+- **Statistical value label backgrounds are now fully configurable.** Labels support independent text color and padding, rectangular or circular backgrounds, and rounded rectangle corners.
+
+Example:
+
+```javascript
+eurostatmap.map('ch').labels({
+    values: true,
+    backgrounds: true,
+    backgroundFill: '#ffffff',
+    statLabelTextColor: '#222222',
+    backgroundPadding: { x: 6, y: 3 },
+    backgroundShape: 'rect',
+    backgroundBorderRadius: 4,
+})
+```
+
+### Improvements
+
+- **All standalone thematic map types now use the common layer implementation internally.** Their existing fluent APIs remain available through the active layer, while applications can use the same layer architecture consistently across choropleth, categorical, proportional-symbol, composition, flow, spark, and multivariate maps.
+
+Example:
+
+```javascript
+const map = eurostatmap.map('ps')
+map.encoding('size', { stat: 'population' })
+map.psSettings({ sizeMin: 2, sizeMax: 30 })
+map.build()
+```
+
 ## 4.10.4
 
 ### Fixes
