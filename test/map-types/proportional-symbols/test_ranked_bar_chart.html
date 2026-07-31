@@ -36,6 +36,7 @@
                 .stat('symbolColor', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
                 .encoding('color', { stat: 'symbolColor' })
                 .psSettings({ shape: 'circle', minSize: 1, maxSize: 40 })
+                .legend(true)
                 .rankedBarChart({
                     svgId: 'bar-chart-country',
                     x: 10,
@@ -59,6 +60,7 @@
                 .stat('symbolColor', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
                 .encoding('color', { stat: 'symbolColor' })
                 .psSettings({ shape: 'circle', minSize: 1, maxSize: 40 })
+                .legend(true)
                 .rankedBarChart({
                     svgId: 'bar-chart-nuts3',
                     x: 10,
