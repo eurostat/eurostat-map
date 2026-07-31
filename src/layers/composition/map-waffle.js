@@ -310,15 +310,18 @@ export const map = function (config) {
 
             chartNode
                 .on('mouseover', function (e, rg) {
+                    if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
                     select(this)
                         .style('stroke-width', settings.strokeWidth + 0.5)
                         .style('stroke', 'black')
                     if (map._tooltip) map._tooltip.mouseover(out.tooltip_.textFunction(rg, map))
                 })
-                .on('mousemove', function (e) {
+                .on('mousemove', function (e, rg) {
+                    if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
                     if (map._tooltip) map._tooltip.mousemove(e)
                 })
-                .on('mouseout', function () {
+                .on('mouseout', function (e, rg) {
+                    if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
                     select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
                     if (map._tooltip) map._tooltip.mouseout()
                 })
