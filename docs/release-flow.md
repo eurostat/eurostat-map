@@ -66,7 +66,7 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 
 5. Publish to npm
 
-- **stop and get explicit user permission before running `npm publish`**, even though every earlier step in this flow (version bump, build, commit, tag, push) can proceed without asking again. Do not fold the publish into the same autonomous batch of actions as the rest of the flow — report that the tagged commit is built/pushed and ready, state the version, and wait for an explicit go-ahead. This holds even if the user already approved the change itself and the version number; the publish step gets its own separate confirmation.
+- **stop and get explicit user permission before running `npm publish`**, even though every earlier step in this flow (version bump, build, commit, tag, push) can proceed without asking again. Do not fold the publish into the same autonomous batch of actions as the rest of the flow — report that the tagged commit is built/pushed and ready, state the version, and wait for an explicit go-ahead. This holds even if the user already approved the change itself and the version number; the publish step gets its own separate confirmation. **The ask must be its own standalone question about publishing itself** — a "release now" style option elsewhere whose description merely *mentions* "publish to npm" alongside other steps does not count as having asked; if the user picks such an option, still ask the dedicated publish question before actually running it.
 - once confirmed, publish from repo root:
     - `npm publish`
 - if npm asks for browser auth, complete it and continue
@@ -93,7 +93,8 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 
 8. Create GitHub Release
 
-- check whether `gh` CLI is available and authenticated (`gh auth status`)
+- **stop and get explicit, standalone user permission before creating the GitHub release**, the same way step 5 requires for `npm publish` — a "go ahead with the release" approval given earlier for the version bump/publish does **not** cover this step too; ask again, specifically for this action, even in the same conversation turn.
+- once confirmed: check whether `gh` CLI is available and authenticated (`gh auth status`)
 - if available, follow "GitHub Release (gh CLI available)" below
 - if not available, follow "GitHub Release (No gh CLI)" below
 
