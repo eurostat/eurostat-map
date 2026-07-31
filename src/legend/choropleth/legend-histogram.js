@@ -5,6 +5,7 @@ import { max } from 'd3-array'
 import { executeForAllInsets, getFontSizeFromClass } from '../../core/utils'
 import { getChoroplethLabelFormatter, getThresholds } from './legend-choropleth'
 import { highlightRegions, unhighlightRegions } from '../legend'
+import { formatSizeLabel } from '../legend-utils'
 
 /**
  * @param {string} [classPrefix] - Class prefix for the rendered elements. Defaults to 'em-legend'
@@ -29,11 +30,15 @@ export const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legen
     const colors = getColors(out)
     const thresholds = getThresholds(out)
 
-    // Count class memberships
-    data.forEach((value) => {
-        const classIndex = colorClassifier(value)
+    // Tally class memberships. For a proportional-symbol ranked bar chart (the only caller whose
+    // `out` exposes getSizeStats), each region contributes its SIZE value - the "total counts"
+    // the symbol areas are proportional to - rather than a flat +1, so bars represent total size
+    // per class instead of a plain region tally. Every other caller (real legends, non-ps ranked
+    // bar charts) keeps the original region-count behaviour since weight defaults to 1.
+    data.forEach(({ colorValue, weight }) => {
+        const classIndex = colorClassifier(colorValue)
         if (typeof classIndex === 'number' && classIndex >= 0 && classIndex < counts.length) {
-            counts[classIndex]++
+            counts[classIndex] += weight ?? 1
         }
     })
 
@@ -86,7 +91,7 @@ export const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legen
                 .attr('y', (_, i) => yScale(i) + yScale.bandwidth() / 2)
                 .attr('alignment-baseline', 'middle')
                 .text((_, i) => {
-                    return showPercentages ? `${reversedPercentages[i].toFixed(1)}%` : reversedCounts[i]
+                    return showPercentages ? `${reversedPercentages[i].toFixed(1)}%` : formatSizeLabel(reversedCounts[i])
                 })
         }
 
@@ -165,7 +170,7 @@ export const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legen
                 .attr('x', (_, i) => xScale(i) + xScale.bandwidth() / 2)
                 .attr('y', (d) => yScale(d) - 5)
                 .attr('text-anchor', 'middle')
-                .text((d, i) => (showPercentages ? `${reversedPercentages[i].toFixed(1)}%` : d))
+                .text((d, i) => (showPercentages ? `${reversedPercentages[i].toFixed(1)}%` : formatSizeLabel(d)))
         }
 
         // Axis (only for labelType === 'thresholds')
@@ -234,16 +239,20 @@ export const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legen
     }
 }
 function getColors(out) {
-    const map = out.map
-    return map.colors_
-        ? map.colors_
-        : Array.from({ length: map.numberOfClasses_ }).map((_, index) => {
-              return map.classToFillStyle()(index, map.numberOfClasses_)
-          })
+    const numberOfClasses = out.getNumberOfClasses(out)
+    const classToFillStyle = out.getClassToFillStyle(out)
+    if (!classToFillStyle) return []
+    return Array.from({ length: numberOfClasses }).map((_, index) => classToFillStyle(index, numberOfClasses))
 }
 
 function getData(out) {
     const map = out.map
     const statData = out.getColorStats?.(out) || map.getEncodingStatData?.('fill', undefined, 'default') || map.statData()
-    return Object.values(statData._data_).map((item) => item.value)
+    // Only the ps ranked bar chart's `out` exposes getSizeStats (see ranked-bar-chart.js) - real
+    // legends and non-ps ranked bar charts fall back to weight undefined, i.e. a plain +1 count.
+    const sizeStat = map._mapType === 'ps' && typeof out.getSizeStats === 'function' ? out.getSizeStats(out) : null
+    return Object.entries(statData._data_).map(([id, item]) => ({
+        colorValue: item.value,
+        weight: sizeStat?.get(id)?.value,
+    }))
 }
