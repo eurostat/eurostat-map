@@ -364,8 +364,9 @@ export const updateValuesLabels = function (map) {
             const sel = select(this)
             const labelText = statLabelsTextFunction(d, statData, map) // Use 'd' directly for the label text
 
-            // Append rectangle behind label
-            if (map.labels_.backgrounds) appendRect(labelText, sel)
+            // Append rectangle behind label (only when there's actually a label - e.g. not for
+            // 'data not available' regions, whose text function returns nothing)
+            if (map.labels_.backgrounds && labelText) appendRect(labelText, sel)
 
             // Append text after the rectangle
             sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
