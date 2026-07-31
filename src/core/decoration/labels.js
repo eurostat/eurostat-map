@@ -364,18 +364,23 @@ export const updateValuesLabels = function (map) {
             const sel = select(this)
             const labelText = statLabelsTextFunction(d, statData, map) // Use 'd' directly for the label text
 
-            // Append rectangle behind label (only when there's actually a label - e.g. not for
+            // Append a background shape (only when there's actually a label - e.g. not for
             // 'data not available' regions, whose text function returns nothing)
-            if (map.labels_.backgrounds && labelText) appendRect(labelText, sel)
+            if (map.labels_.backgrounds && labelText) appendBackground(labelText, sel)
 
-            // Append text after the rectangle
-            sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
+            // Append text after the background so it remains on top. Set both fill and
+            // stroke because the default .em-stat-label rule defines both.
+            const text = sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
+            if (map.labels_.statLabelTextColor) {
+                text.attr('fill', map.labels_.statLabelTextColor).attr('stroke', map.labels_.statLabelTextColor)
+            }
         })
 
-    // Function to append a rectangle behind the label
-    function appendRect(labelText, container) {
-        const paddingX = 5 // Add some padding around the text
-        const paddingY = 2 // Add some padding around the text
+    // Append the configured background shape behind a statistical label.
+    function appendBackground(labelText, container) {
+        const padding = map.labels_.backgroundPadding
+        const paddingX = typeof padding === 'number' ? padding : (padding?.x ?? 5)
+        const paddingY = typeof padding === 'number' ? padding : (padding?.y ?? 2)
 
         // Create a temporary text element to get the size
         const bbox = container
@@ -391,19 +396,29 @@ export const updateValuesLabels = function (map) {
         // Remove the temporary text element after getting the bounding box
         container.select('text[visibility="hidden"]').remove()
 
-        // Calculate the position of the rectangle to be centered on the text
-        const x = -labelWidth / 2 - paddingX // Center the rect horizontally
-        const y = -labelHeight / 2 - paddingY // Center the rect vertically
-
-        // Append rectangle with padding
-        container
-            .append('rect')
-            .attr('x', x) // Position rect horizontally
-            .attr('y', y) // Position rect vertically
-            .attr('width', labelWidth + 2 * paddingX) // Width of the rect with padding
-            .attr('height', labelHeight + 2 * paddingY) // Height of the rect with padding
+        const width = labelWidth + 2 * paddingX
+        const height = labelHeight + 2 * paddingY
+        const shape = map.labels_.backgroundShape === 'circle' ? 'circle' : 'rect'
+        const background = container
+            .append(shape)
             .attr('class', 'em-label-background')
             .attr('fill', map.labels_.backgroundFill || '#ffffff')
+
+        if (shape === 'circle') {
+            background
+                .attr('cx', 0)
+                .attr('cy', 0)
+                .attr('r', Math.max(width, height) / 2)
+        } else {
+            const radius = map.labels_.backgroundBorderRadius ?? 0
+            background
+                .attr('x', -width / 2)
+                .attr('y', -height / 2)
+                .attr('width', width)
+                .attr('height', height)
+                .attr('rx', radius)
+                .attr('ry', radius)
+        }
     }
 
     //add halos to labels
