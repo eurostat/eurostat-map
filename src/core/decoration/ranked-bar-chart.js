@@ -388,7 +388,11 @@ function highlightRegionById(map, regionId) {
         .selectAll(selector)
         .filter((d) => d?.properties?.id === regionId)
     if (region.empty()) return
-    region.style('fill', map.hoverColor_ || 'orange')
+    region.each(function () {
+        const sel = select(this)
+        sel.attr('fill___', sel.style('fill'))
+        sel.style('fill', map.hoverColor_ || 'orange')
+    })
 }
 
 function unhighlightRegionById(map, regionId) {
