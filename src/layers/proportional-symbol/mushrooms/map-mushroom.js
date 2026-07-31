@@ -3,6 +3,7 @@ import { scaleSqrt } from 'd3-scale'
 import { arc } from 'd3-shape'
 import { select } from 'd3-selection'
 import * as StatMap from '../../../core/stat-map.js'
+import { registerLayerType } from '../../../core/layer-registry.js'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../../../core/utils.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../../core/dorling/dorling.js'
 import { addMouseEvents } from './map-mushroom-interactions.js'
@@ -23,7 +24,10 @@ import { getResponsiveSymbolSize } from '../../../core/responsive.js'
  * @returns {MushroomMap}
  */
 export const map = function (config) {
-    const out = StatMap.createStatMap(config, true, 'mushroom')
+    return StatMap.buildSingleLayerMap('mushroom', config)
+}
+
+export const decorateMushroomLayer = function (out, config) {
 
     // ===============================
     // Configuration
@@ -302,6 +306,8 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('mushroom', 'overlay', decorateMushroomLayer)
 
 /**
  * Draw mushroom symbols

@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as WaffleChartLegend from '../../legend/legend-waffle-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
@@ -37,7 +38,10 @@ import { getMobileSymbolScale, getResponsiveSymbolSize } from '../../core/respon
  * @returns {WaffleMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, true, 'waffle')
+    return buildSingleLayerMap('waffle', config)
+}
+
+export const decorateWaffleLayer = function (out, config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
@@ -433,3 +437,5 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('waffle', 'overlay', decorateWaffleLayer)

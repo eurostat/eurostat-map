@@ -1,7 +1,8 @@
 import { select } from 'd3-selection'
 import { arc, pie } from 'd3-shape'
 import { interpolate } from 'd3-interpolate'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as PiechartLegend from '../../legend/legend-pie-chart'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
@@ -37,7 +38,10 @@ import { getMobileSymbolScale, getResponsiveSymbolSize } from '../../core/respon
  * @returns {PieMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, true, 'pie')
+    return buildSingleLayerMap('pieChart', config)
+}
+
+export const decoratePieLayer = function (out, config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
@@ -707,3 +711,7 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('pieChart', 'overlay', decoratePieLayer)
+registerLayerType('pie', 'overlay', decoratePieLayer)
+registerLayerType('composition', 'overlay', decoratePieLayer)

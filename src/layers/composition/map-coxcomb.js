@@ -2,7 +2,8 @@ import { scaleBand } from 'd3-scale'
 import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
@@ -34,7 +35,10 @@ import { getResponsiveSymbolSize } from '../../core/responsive'
  * @returns {CoxcombMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, true, 'coxcomb')
+    return buildSingleLayerMap('coxcomb', config)
+}
+
+export const decorateCoxcombLayer = function (out, config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
 
@@ -1173,3 +1177,6 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('coxcomb', 'overlay', decorateCoxcombLayer)
+registerLayerType('polar', 'overlay', decorateCoxcombLayer)

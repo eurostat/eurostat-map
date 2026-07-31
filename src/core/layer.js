@@ -227,6 +227,21 @@ const orderLayerGroups = function (map) {
  */
 export const createLayer = function (map, config = {}) {
     const layer = {}
+    // A thematic layer owns its encoding/rendering state, while geometry, SVG,
+    // interaction and lifecycle services remain map-level. Inherit those services
+    // so decorators can use the same public surface as legacy single-type maps.
+    // Own layer properties always win and no map state is copied.
+    const mapServices = {}
+    Object.keys(map).forEach((key) => {
+        Object.defineProperty(mapServices, key, {
+            configurable: true,
+            get: () => map[key],
+            set(value) {
+                Object.defineProperty(this, key, { configurable: true, enumerable: true, writable: true, value })
+            },
+        })
+    })
+    Object.setPrototypeOf(layer, mapServices)
     layer.map = map
     layer.isLayer = true
     layer.id = config.id || nextLayerId()

@@ -1075,6 +1075,8 @@ export const buildSingleLayerMap = function (type, config) {
     const layer = out.addLayer(type, config)
     out.activeLayerIndex(0)
 
+    if (!layer || layer === out) return out
+
     // Forwarding accessors for backwards compatibility
     const baseFields = ['encodings_', 'catColors_', 'catLabels_', 'statCodes_', 'legend_', 'legendObj_', 'rankedBarChart_', 'rankedBarChartObj_', 'tooltip_']
     const baseMethods = ['encoding', 'updateClassification', 'updateStyle', 'getLegendConstructor', 'legend', 'getRankedBarChartConstructor', 'rankedBarChart']
@@ -1191,6 +1193,18 @@ export const buildSingleLayerMap = function (type, config) {
             'dorlingWorkerD3URL',
         ]
     }
+
+    // Every registered decorator may add its own fluent API. Discover it here so
+    // standalone maps retain the historical map.foo() facade without maintaining
+    // a second per-type list every time a layer is migrated.
+    Object.keys(layer).forEach((key) => {
+        if (key === 'map' || key === 'id' || key === 'type' || key === 'role' || key === 'isLayer') return
+        if (key.endsWith('_')) typeFields.push(key)
+        else if (typeof layer[key] === 'function') typeMethods.push(key)
+    })
+
+    typeFields = [...new Set(typeFields)]
+    typeMethods = [...new Set(typeMethods)]
 
     forwardFieldsToActiveLayer(out, [...baseFields, ...typeFields])
 

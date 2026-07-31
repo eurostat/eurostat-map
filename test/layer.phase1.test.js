@@ -28,25 +28,35 @@ const library = eurostatmap.default || eurostatmap.eurostatmap || globalThis.eur
 
 const { registerLayerType, isLayerTypeRegistered } = library
 
-// 1) Zero behaviour change: a legacy facade is its own layer 0.
+// 1) Standalone factories use a real layer while preserving the fluent map facade.
 {
     const m = library.map('categorical')
-    assert.strictEqual(m.layer(0), m, 'facade: layer(0) is the map')
-    assert.strictEqual(m.activeLayer(), m, 'facade: active layer is the map')
+    assert.notStrictEqual(m.layer(0), m, 'layer(0) is a real layer')
+    assert.strictEqual(m.activeLayer(), m.layer(0), 'the real layer is active')
     assert.strictEqual(m.layers_.length, 1)
-    // encoding API works on the facade (relocated, behaviour-identical)
+    // The map-level compatibility API forwards to the active layer.
     m.encoding('fill', { stat: 'default', classes: 5 })
     assert.strictEqual(m.encoding('fill').classes, 5)
     assert.strictEqual(m.encoding('fill', { stat: 'default' }), m, 'set returns the map (chaining preserved)')
 }
 
-// 2) addLayer of an UNREGISTERED type is inert and keeps the facade.
+// 2) Every public map type has been migrated and can be added as a real layer.
 {
-    const m = library.map('categorical')
-    const before = m.layers_.length
-    const r = m.addLayer('pieChart') // not registered yet
-    assert.strictEqual(m.layers_.length, before, 'unregistered addLayer does not mutate the stack')
-    assert.strictEqual(r, m.activeLayer())
+    const types = [
+        'choropleth', 'ch', 'categorical', 'ct', 'proportionalSymbol', 'proportionalSymbols', 'ps',
+        'bivariateChoropleth', 'chbi', 'trivariateChoropleth', 'ternary', 'chtri',
+        'stripeComposition', 'scomp', 'stripe', 'pieChart', 'pie', 'composition',
+        'sparkline', 'spark', 'sparklines', 'flow', 'flowmap', 'coxcomb', 'polar',
+        'alpha', 'valueByAlpha', 'mushroom', 'waffle', 'bar', 'barComposition'
+    ]
+
+    types.forEach((type) => {
+        assert.ok(isLayerTypeRegistered(type), `${type} is registered`)
+        const m = library.map()
+        const layer = m.addLayer(type)
+        assert.ok(layer?.isLayer && layer !== m, `${type} creates a real layer`)
+        assert.strictEqual(layer.type, type)
+    })
 }
 
 // 3) createLayer path via a dummy registered overlay: facade base retained, overlay pushed.
@@ -124,4 +134,3 @@ const { registerLayerType, isLayerTypeRegistered } = library
 }
 
 console.log('Phase 1, Phase 3 & Phase 4 layer tests passed')
-
