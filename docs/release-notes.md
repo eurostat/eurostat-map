@@ -4,6 +4,21 @@
 
 ### Fixes
 
+- **Ranked bar charts crashed on proportional-symbol maps once the region count crossed the histogram-fallback threshold**, throwing "Cannot read properties of undefined (reading 'length')". The histogram fallback assumed the active layer was always a choropleth (reading `thresholds_`/`classToFillStyle()` directly), which isn't true for layers reached via the encoding API such as proportional symbols. It now goes through the map-type-generic `getColorClassifier`/`getNumberOfClasses`/`getClassToFillStyle` accessors instead. Proportional-symbol ranked bar charts now also rank/size bars by the **size** encoding (the value symbol areas are proportional to) rather than the color encoding.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap
+    .map('ps')
+    .encoding('size', { stat: 'population' })
+    .encoding('color', { stat: 'density' })
+    .rankedBarChart({ countryGroup: 'eu' }) // no longer crashes past the histogram-fallback threshold
+    .build()
+```
+
+- **Ranked bar chart hover highlight never cleared on mouseout.** `highlightRegionById()` set the hover color without first stashing the region's original fill into `fill___`, so `unhighlightRegionById()` (which reads `fill___` to restore it) always found it empty and left the region stuck in the hover color.
+
 - **Statistical label backgrounds ignored their configured colour, and left a stray empty rectangle behind for 'data not available' regions.** The `.em-label-background` CSS class hardcoded `fill: #ffffff`, which - being an actual CSS declaration rather than a presentation attribute - always overrode the colour set via `.labels({ backgroundFill })`, no matter what was configured. Background rectangles were also appended even for regions with no label text to show.
 
 Example (no code changes needed - just upgrade):
