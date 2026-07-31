@@ -4,7 +4,7 @@ import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
 import * as RankedBarChart from '../../core/decoration/ranked-bar-chart.js'
-import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
+import { spaceAsThousandSeparator, executeForAllInsets, fromCategoryEcl, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
 import { applyPatternFill } from '../../core/decoration/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
 import { applyClassificationToMap, defineClassifiers } from './ps-classification.js'
@@ -68,6 +68,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     layer.psColorFun_ = interpolateOrRd
     layer.psClassToFillStyle_ = undefined
     layer.psBrightenFactor_ = 0.9
+    layer.categoryFillStyle_ = undefined
+    layer.categoryText_ = undefined
 
     //the threshold, when the classification method is 'threshold'
     layer.psThresholds_ = [0]
@@ -186,6 +188,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         'psSpikeWidth_',
         'psCodeLabels_',
         'psBrightenFactor_',
+        'categoryFillStyle_',
+        'categoryText_',
         'dorlingSettings_',
     ]
     paramNames.forEach(function (att) {
@@ -410,9 +414,11 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             .attr('stroke', layer.psStroke_)
             .attr('stroke-width', layer.psStrokeWidth_)
             .style('fill', function () {
+                const ecl = select(this.parentNode).attr('ecl')
+                const categoryValue = fromCategoryEcl(ecl)
+                if (categoryValue !== undefined) return layer.categoryFillStyle_?.[categoryValue] || layer.psFill_
                 if (layer.classifierColor_) {
                     //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
-                    const ecl = select(this.parentNode).attr('ecl')
                     if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
                     let color = layer.psClassToFillStyle_(ecl, layer.psClasses_)
                     return color
@@ -421,9 +427,11 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                 }
             })
             .attr('fill___', function () {
+                const ecl = select(this.parentNode).attr('ecl')
+                const categoryValue = fromCategoryEcl(ecl)
+                if (categoryValue !== undefined) return layer.categoryFillStyle_?.[categoryValue] || layer.psFill_
                 // Set fill___ to the same value as fill (don't read back style, as it may not be applied yet during transitions)
                 if (layer.classifierColor_) {
-                    const ecl = select(this.parentNode).attr('ecl')
                     if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
                     return layer.psClassToFillStyle_(ecl, layer.psClasses_)
                 } else {
