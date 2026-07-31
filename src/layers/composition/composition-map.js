@@ -246,17 +246,21 @@ export const ensureCategoryColors = function (out, totalCodeKey, otherColor, oth
  * @param {Object} out - The map object
  */
 export const addMouseEventsToRegions = function (regions, out) {
+    const shouldOmit = (id) => out.tooltip_.omitRegions?.includes(id)
     regions
         .on('mouseover', function (e, rg) {
+            if (shouldOmit(rg.properties.id)) return
             const sel = select(this)
             sel.attr('fill___', sel.style('fill'))
             sel.style('fill', out.hoverColor_)
             if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
         })
-        .on('mousemove', function (e) {
+        .on('mousemove', function (e, rg) {
+            if (shouldOmit(rg.properties.id)) return
             if (out._tooltip) out._tooltip.mousemove(e)
         })
-        .on('mouseout', function () {
+        .on('mouseout', function (e, rg) {
+            if (shouldOmit(rg.properties.id)) return
             const sel = select(this)
             const newFill = sel.attr('fill___')
             if (newFill) {
@@ -284,12 +288,13 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
         const cell = select(element.closest('.em-grid-cell'))
         return cell.datum()
     }
+    const shouldOmit = (id) => out.tooltip_.omitRegions?.includes(id)
 
     const handleMouseOver = function (e) {
         const rg = getRegionData(this)
         if (!rg) return
         const regionId = rg.properties.id
-        if (!getRegionTotalFn(regionId)) return
+        if (!getRegionTotalFn(regionId) || shouldOmit(regionId)) return
 
         const cell = select(this.closest('.em-grid-cell'))
         const shape = cell.select('.em-grid-shape')
@@ -303,7 +308,7 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
 
     const handleMouseMove = function (e) {
         const rg = getRegionData(this)
-        if (!rg || !getRegionTotalFn(rg.properties.id)) return
+        if (!rg || !getRegionTotalFn(rg.properties.id) || shouldOmit(rg.properties.id)) return
         if (out._tooltip) out._tooltip.mousemove(e)
     }
 
@@ -311,7 +316,7 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
         const rg = getRegionData(this)
         if (!rg) return
         const regionId = rg.properties.id
-        if (!getRegionTotalFn(regionId)) return
+        if (!getRegionTotalFn(regionId) || shouldOmit(regionId)) return
 
         const cell = select(this.closest('.em-grid-cell'))
         const shape = cell.select('.em-grid-shape')
