@@ -1,5 +1,41 @@
 # Release notes
 
+## 4.10.4
+
+### Fixes
+
+- **Statistical label backgrounds ignored their configured colour, and left a stray empty rectangle behind for 'data not available' regions.** The `.em-label-background` CSS class hardcoded `fill: #ffffff`, which - being an actual CSS declaration rather than a presentation attribute - always overrode the colour set via `.labels({ backgroundFill })`, no matter what was configured. Background rectangles were also appended even for regions with no label text to show.
+
+Example (no code changes needed - just upgrade):
+
+```javascript
+eurostatmap
+    .map('ch')
+    .labels({ values: true, backgrounds: true, backgroundFill: '#ffcc00' }) // now actually applied
+    .build()
+```
+
+- **`tooltip.omitRegions` was ignored on pie, bar, and waffle composition maps** - an omitted region still highlighted and showed its tooltip on hover. Choropleth, categorical, coxcomb, and proportional-symbol maps already respected it; the shared composition-map mouseover handlers and each chart type's own glyph-level handler now check it too.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('pie')
+    .tooltip({ omitRegions: ['FR'] }) // FR is now correctly excluded from hover/tooltip
+    .build()
+```
+
+- **Diverging discrete legends using `pointOfDivergenceLabelsAtExtremes` positioned each label too close to its arrow tip**, most noticeable on the shorter of the two arrows. The reserved margin is widened from 14px to 20px.
+
+- **Proportional-symbol spike legends' title now shares the common `em-size-legend-title` CSS class** used by other legend types, so shared title styling/selectors apply consistently across legend types.
+
+- **`'composition'` is now a recognized `MapType` in TypeScript**, matching what the runtime already accepted as an alias for the pie map type.
+
+```ts
+eurostatmap.map('composition') // no longer a type error
+```
+
 ## 4.10.3
 
 ### Fixes
