@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <!-- NUTS0: few enough regions for the individual-bars view. Bars rank/size by the SIZE
+             encoding (population) while their fill color still reflects the COLOR encoding
+             (density) - the two are unrelated metrics, decoupled on purpose. -->
+        <svg id="map-country"></svg>
+        <svg id="bar-chart-country"></svg>
+
+        <!-- NUTS3: thousands of regions, well past the individual-bars limit, so this exercises
+             the histogram fallback - each class bar sums the SIZE (population) of its member
+             regions instead of just counting them. This combination used to throw
+             "Cannot read properties of undefined (reading 'length')" before the fix. -->
+        <svg id="map-nuts3"></svg>
+        <svg id="bar-chart-nuts3"></svg>
+
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            eurostatmap
+                .map('proportionalSymbol')
+                .svgId('map-country')
+                .title('Population, 2019 (country level)')
+                .nutsLevel(0)
+                .stat('symbolSize', {
+                    eurostatDatasetCode: 'demo_r_pjangrp3',
+                    filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2019' },
+                    unitText: 'inhabitants',
+                })
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
+                .encoding('color', { stat: 'symbolColor' })
+                .psSettings({ shape: 'circle', minSize: 1, maxSize: 40 })
+                .rankedBarChart({
+                    svgId: 'bar-chart-country',
+                    x: 10,
+                    y: 10,
+                    height: 500,
+                    title: 'Ranked: population (size), colored by density',
+                })
+                .build()
+
+            eurostatmap
+                .map('proportionalSymbol')
+                .svgId('map-nuts3')
+                .title('Population density, 2019 (NUTS3)')
+                .nutsLevel(3)
+                .stat('symbolSize', {
+                    eurostatDatasetCode: 'demo_r_pjangrp3',
+                    filters: { age: 'TOTAL', sex: 'T', unit: 'NR', time: '2019' },
+                    unitText: 'inhabitants',
+                })
+                .encoding('size', { stat: 'symbolSize' })
+                .stat('symbolColor', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', time: '2019' })
+                .encoding('color', { stat: 'symbolColor' })
+                .psSettings({ shape: 'circle', minSize: 1, maxSize: 40 })
+                .rankedBarChart({
+                    svgId: 'bar-chart-nuts3',
+                    x: 10,
+                    y: 10,
+                    title: 'Ranked (histogram fallback): total population by density class',
+                    histogram: { orientation: 'horizontal', showCounts: true },
+                })
+                .build()
+        </script>
+    </body>
+</html>
