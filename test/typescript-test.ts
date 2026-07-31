@@ -31,6 +31,14 @@ const map1 = eurostatmap.map('choropleth', choroplethConfig)
 
 // Test builder pattern methods
 map1.width(900).height(700).scale('20M').nutsLevel(3).title('Updated Title').build()
+map1.labels({
+    values: true,
+    backgrounds: true,
+    statLabelTextColor: '#ffffff',
+    backgroundPadding: { x: 6, y: 3 },
+    backgroundShape: 'rect',
+    backgroundBorderRadius: 4,
+})
 
 // Test 2: Proportional symbol map
 const psConfig: ProportionalSymbolConfig = {

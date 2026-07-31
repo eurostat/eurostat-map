@@ -280,7 +280,7 @@ export interface MapInstance {
 
     /**
      * Get or set label configuration for country names, statistical values, etc.
-     * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122' })
+     * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122', statLabelTextColor: '#fff', backgroundPadding: { x: 6, y: 3 }, backgroundBorderRadius: 4 })
      */
     labels(): LabelsConfig | undefined
     labels(config: LabelsConfig): this

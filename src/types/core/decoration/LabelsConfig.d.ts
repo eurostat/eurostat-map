@@ -60,6 +60,25 @@ export interface LabelsConfig {
     backgroundFill?: string
 
     /**
+     * Fill/stroke color for statistical value label text.
+     * @default '#111111'
+     */
+    statLabelTextColor?: string
+
+    /**
+     * Padding between statistical label text and its background edge, in pixels.
+     * A number applies equal padding on both axes; an object controls each axis.
+     * @default { x: 5, y: 2 }
+     */
+    backgroundPadding?: number | { x?: number; y?: number }
+
+    /** Background shape used for statistical value labels. @default 'rect' */
+    backgroundShape?: 'rect' | 'circle'
+
+    /** Corner radius in pixels when backgroundShape is 'rect'. @default 0 */
+    backgroundBorderRadius?: number
+
+    /**
      * Scale labels when zooming in/out.
      * @default true
      */
