@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { arc, pie } from 'd3-shape'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import * as StripeCompositionLegend from '../../legend/legend-stripe-composition'
 import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
 import {
@@ -28,7 +29,10 @@ import {
  * @returns {StripeMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, false, 'scomp')
+    return buildSingleLayerMap('stripeComposition', config)
+}
+
+export const decorateStripeLayer = function (out, config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
 
@@ -322,3 +326,7 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('stripeComposition', 'base', decorateStripeLayer)
+registerLayerType('scomp', 'base', decorateStripeLayer)
+registerLayerType('stripe', 'base', decorateStripeLayer)

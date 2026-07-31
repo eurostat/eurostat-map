@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import * as TrivariateLegend from '../../legend/choropleth/legend-choropleth-trivariate'
 import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
 import { tricolore, tricoloreSextant, CompositionUtils } from '../../lib/tricolore/src'
@@ -15,7 +16,10 @@ import { tricolore, tricoloreSextant, CompositionUtils } from '../../lib/tricolo
  * @returns {TrivariateChoroplethMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, false, 'chtri')
+    return buildSingleLayerMap('trivariateChoropleth', config)
+}
+
+export const decorateTrivariateChoroplethLayer = function (out, config) {
 
     // ===============================
     // Configuration
@@ -306,6 +310,10 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('trivariateChoropleth', 'base', decorateTrivariateChoroplethLayer)
+registerLayerType('ternary', 'base', decorateTrivariateChoroplethLayer)
+registerLayerType('chtri', 'base', decorateTrivariateChoroplethLayer)
 
 // ===============================
 // Tooltip

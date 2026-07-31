@@ -4,6 +4,8 @@ import * as Choropleth from './map-choropleth'
 import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
 import { select } from 'd3-selection'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/layers/choropleth/ValueByAlphaConfig').ValueByAlphaConfig} ValueByAlphaConfig */
@@ -14,8 +16,11 @@ import { select } from 'd3-selection'
  * @returns {ValueByAlphaMap}
  */
 export const map = function (config) {
-    // inherits and extends choropleth map
-    const out = Choropleth.map(config)
+    return buildSingleLayerMap('valueByAlpha', config)
+}
+
+export const decorateValueByAlphaLayer = function (out, config) {
+    Choropleth.decorateChoroplethLayer(out, config)
 
     out.alphaData_ = null
     out.opacityScale_ = null
@@ -151,3 +156,6 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('alpha', 'base', decorateValueByAlphaLayer)
+registerLayerType('valueByAlpha', 'base', decorateValueByAlphaLayer)

@@ -3,7 +3,8 @@
 
 import { min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import * as FlowLegend from '../../legend/flow/legend-flow'
 import { select } from 'd3-selection'
 import { createSankeyFlowMap } from './sankey'
@@ -26,8 +27,10 @@ import { getResponsiveSymbolSize } from '../../core/responsive'
  * @returns {FlowMap}
  */
 export const map = function (config) {
-    //create map object to return, using the template
-    const out = createStatMap(config, true, 'flow')
+    return buildSingleLayerMap('flow', config)
+}
+
+export const decorateFlowLayer = function (out, config) {
     out.strokeWidthScale = null // function to scale flow widths
 
     // override tooltip function
@@ -348,6 +351,9 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('flow', 'overlay', decorateFlowLayer)
+registerLayerType('flowmap', 'overlay', decorateFlowLayer)
 
 function defineWidthScale(out) {
     const data = out.flowGraph_.links

@@ -12,7 +12,8 @@ import {
     getRegionsSelector,
     getTextColorForBackground,
 } from '../../core/utils'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -27,8 +28,10 @@ import { createStatMap } from '../../core/stat-map'
  * @returns {BivariateChoroplethMap}
  */
 export const map = function (config) {
-    //create map object to return, using the template
-    const out = createStatMap(config, false, 'chbi')
+    return buildSingleLayerMap('bivariateChoropleth', config)
+}
+
+export const decorateBivariateChoroplethLayer = function (out, config) {
 
     //number of classes for the classification. Same for both variables.
     out.numberOfClasses_ = 3
@@ -333,6 +336,9 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('bivariateChoropleth', 'base', decorateBivariateChoroplethLayer)
+registerLayerType('chbi', 'base', decorateBivariateChoroplethLayer)
 
 const scaleBivariate = function (numberOfClasses, startColor, color1, color2, endColor) {
     const steps = Math.max(1, numberOfClasses)

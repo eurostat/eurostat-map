@@ -4,7 +4,8 @@ import { scaleOrdinal } from 'd3-scale'
 import * as CategoricalLegend from '../legend/legend-categorical'
 import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/decoration/pattern-fill'
-import { createStatMap } from '../core/stat-map'
+import { buildSingleLayerMap } from '../core/stat-map'
+import { registerLayerType } from '../core/layer-registry'
 import { DEFAULT_CATEGORICAL_COLORS } from '../core/color-palettes'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -18,8 +19,10 @@ import { DEFAULT_CATEGORICAL_COLORS } from '../core/color-palettes'
  * @returns {CategoricalMap}
  */
 export const map = function (config) {
-    //create map object to return, using the template
-    const out = createStatMap(config, false, 'ct')
+    return buildSingleLayerMap('categorical', config)
+}
+
+export const decorateCategoricalLayer = function (out, config) {
 
     /** Fill style for each category/class. Ex.: { urb: "#fdb462", int: "#ffffb3", rur: "#ccebc5" } */
     out.classToFillStyle_ = undefined
@@ -278,6 +281,9 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('categorical', 'base', decorateCategoricalLayer)
+registerLayerType('ct', 'base', decorateCategoricalLayer)
 
 /**
  * Specific function for tooltip text.

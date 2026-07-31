@@ -69,6 +69,13 @@ root cause, so check for it first when a symptom looks similar:
   and check whether it's actually reachable from every object that might get passed around as
   "the current map", not just the one call site.
 
+## Layer decorators and map services
+
+- Every public `MapType` alias must be registered in `core/layer-registry.js` by its module and
+  constructed through `buildSingleLayerMap`; add a registry-enumeration test when adding a type.
+- Real layers inherit live map services through the forwarding prototype built by `createLayer`.
+  Keep thematic state as own properties on the layer; do not copy map state into decorators.
+
 ## Never add a Co-Authored-By / AI-authorship trailer
 
 Do not add a `Co-Authored-By: <agent name>` (or any AI/assistant authorship) trailer to

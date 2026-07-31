@@ -3,7 +3,8 @@ import { scaleLinear } from 'd3-scale'
 import { easeLinear } from 'd3-ease'
 import { line, area } from 'd3-shape'
 import { axisBottom, axisLeft } from 'd3-axis'
-import { createStatMap } from '../core/stat-map'
+import { buildSingleLayerMap } from '../core/stat-map'
+import { registerLayerType } from '../core/layer-registry'
 import * as SparkLegend from '../legend/legend-spark.js'
 import { executeForAllInsets, getRegionsSelector } from '../core/utils'
 import { getGridCartogramChartOffset } from '../core/cartograms'
@@ -27,7 +28,10 @@ import { getCentroidsGroup } from '../core/geo/centroids'
  * @returns {SparkMap}
  */
 export const map = function (config) {
-    const out = createStatMap(config, true, 'spark')
+    return buildSingleLayerMap('spark', config)
+}
+
+export const decorateSparkLayer = function (out, config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
 
@@ -761,6 +765,10 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('spark', 'overlay', decorateSparkLayer)
+registerLayerType('sparkline', 'overlay', decorateSparkLayer)
+registerLayerType('sparklines', 'overlay', decorateSparkLayer)
 
 export const getColorLegend = function (colorFun) {
     colorFun = colorFun || interpolateYlOrRd

@@ -1,6 +1,7 @@
 import { scaleSqrt, scaleLinear } from 'd3-scale'
 import { select } from 'd3-selection'
-import { createStatMap } from '../../core/stat-map'
+import { buildSingleLayerMap } from '../../core/stat-map'
+import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import * as BarChartLegend from '../../legend/composition/legend-bar-chart'
 import { formatSizeLabel } from '../../legend/legend-utils'
@@ -68,7 +69,10 @@ import { getMobileSymbolScale, getResponsiveSymbolSize } from '../../core/respon
  *   .build()
  */
 export const map = function (config) {
-    const out = createStatMap(config, true, 'bar')
+    return buildSingleLayerMap('bar', config)
+}
+
+export const decorateBarLayer = function (out, config) {
 
     // ── Config defaults ──────────────────────────────────────────────────────
 
@@ -1068,3 +1072,6 @@ export const map = function (config) {
 
     return out
 }
+
+registerLayerType('bar', 'base', decorateBarLayer)
+registerLayerType('barComposition', 'base', decorateBarLayer)
