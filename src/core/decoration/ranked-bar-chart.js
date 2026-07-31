@@ -9,6 +9,7 @@ import { buildDiscreteLabelFormatter } from '../../legend/legend-discrete'
 import { createHistogramLegend } from '../../legend/choropleth/legend-histogram'
 import { getChoroplethLabelFormatter } from '../../legend/choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter } from '../../legend/proportional-symbol/legend-proportional-symbols'
+import { formatSizeLabel } from '../../legend/legend-utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/core/decoration/RankedBarChartConfig').RankedBarChartConfig} RankedBarChartConfig */
@@ -203,6 +204,20 @@ export const rankedBarChart = function (map, config = {}) {
         }
 
         return map.statData()
+    }
+
+    // Proportional-symbol maps encode two separate stats: SIZE (what the symbol area is
+    // proportional to - typically a count/total) and COLOR (often a different, rate-based
+    // metric used only for the fill). The bars in a ranked bar chart rank/size by SIZE for ps
+    // maps, matching the "proportional" quantity the symbols themselves represent - see
+    // drawRankedBarChart().
+    out.getSizeStats = function (out) {
+        const layer = out.layer
+        const map = out.map
+        if (layer.encodings_?.['size']) {
+            return layer.getEncodingStatData('size')
+        }
+        return map.statData('size')
     }
 
     // Only used by the histogram fallback (see legend-histogram.js), which calls it on `out` itself.
@@ -436,13 +451,19 @@ function getChartBBox(container, obj) {
 
 function drawRankedBarChart(out, baseX, baseY) {
     const map = out.map
-    const stat = out.getColorStats(out)
+    const isPs = map._mapType === 'ps'
+    // Proportional-symbol maps encode SIZE (what the symbol area is proportional to - typically
+    // a count/total) separately from COLOR (often an unrelated, rate-based metric used only for
+    // the fill). Bars rank/size by SIZE for ps maps, matching the quantity the symbols
+    // themselves represent - see getSizeStats(). Bar fill color still comes from the COLOR stat.
+    const stat = isPs ? out.getSizeStats(out) : out.getColorStats(out)
+    const colorStat = isPs ? out.getColorStats(out) : stat
     const index = stat?.get ? stat.get() : undefined
     if (!index) return
 
     let entries = Object.entries(index)
         .filter(([, entry]) => typeof entry?.value === 'number' && Number.isFinite(entry.value))
-        .map(([id, entry]) => ({ id, value: entry.value }))
+        .map(([id, entry]) => ({ id, value: entry.value, colorValue: colorStat?.get?.(id)?.value }))
 
     // Limit to a political grouping if configured, applied before the MAX_BARS check below so
     // e.g. filtering a NUTS0 dataset down to 'eu' can bring a too-large set within the bar limit.
@@ -469,8 +490,11 @@ function drawRankedBarChart(out, baseX, baseY) {
     const numberOfClasses = out.getNumberOfClasses(out)
     const hasClassifier = typeof classifier === 'function' && typeof classToFillStyle === 'function'
     // Always format the region's own raw value - never a 'ranges' class-label formatter,
-    // regardless of any legend's own labelType setting.
-    const valueFormatter = buildDiscreteLabelFormatter(out, () => [], stat, 'thresholds', out.labelFormatter)
+    // regardless of any legend's own labelType setting. Ps bars show a SIZE value (often a large
+    // count), so default to the same compact-notation formatter used by other size legends
+    // (waffle/bar/circle-size) rather than a plain fixed-decimal one - unless the caller set
+    // their own labelFormatter, which always takes priority.
+    const valueFormatter = isPs && !out.labelFormatter ? formatSizeLabel : buildDiscreteLabelFormatter(out, () => [], stat, 'thresholds', out.labelFormatter)
 
     const barScale = scaleLinear()
         .domain([0, Math.max(...entries.map((e) => e.value), 0)])
@@ -499,8 +523,8 @@ function drawRankedBarChart(out, baseX, baseY) {
 
     entries.forEach((entry, i) => {
         const y = i * rowHeight
-        const ecl = hasClassifier ? classifier(entry.value) : null
-        const fillColor = hasClassifier ? classToFillStyle(ecl, numberOfClasses) : FALLBACK_BAR_COLOR
+        const ecl = hasClassifier && entry.colorValue != null ? classifier(entry.colorValue) : null
+        const fillColor = ecl != null ? classToFillStyle(ecl, numberOfClasses) : FALLBACK_BAR_COLOR
         const barWidth = Math.max(barScale(entry.value), 1)
         const barLeftX = barRightX - barWidth
         const itemContainer = container.append('g').attr('class', 'em-ranked-bar-chart-item')

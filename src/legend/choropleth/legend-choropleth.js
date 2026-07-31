@@ -133,16 +133,16 @@ export const legend = function (map, config = {}) {
 }
 
 export function getThresholds(out) {
-    const map = out.layer
-    const thresholds =
-        map.thresholds_.length > 1
-            ? map.thresholds_
-            : Array.from({ length: map.numberOfClasses_ })
-                  .map((_, index) => {
-                      return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
-                  })
-                  .slice(1) // Remove the first entry and return the rest as an array
-    return thresholds
+    const layer = out.layer
+    const classifier = out.getColorClassifier(out)
+    // layer.thresholds_ is a choropleth-only field (undefined for other map/layer types e.g.
+    // proportional symbols) - fall back to deriving thresholds from the classifier itself, via
+    // the already map-type-generic getColorClassifier/getNumberOfClasses.
+    if (layer.thresholds_?.length > 1) return layer.thresholds_
+    if (!classifier) return []
+    return Array.from({ length: out.getNumberOfClasses(out) })
+        .map((_, index) => classifier.invertExtent(index)[out.ascending ? 0 : 1])
+        .slice(1) // Remove the first entry and return the rest as an array
 }
 
 export function getChoroplethLabelFormatter(out) {
