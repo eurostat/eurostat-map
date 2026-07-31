@@ -31,6 +31,11 @@ export interface ProportionalSymbolSettings {
  * Configuration for proportional symbol maps
  */
 export interface ProportionalSymbolConfig extends MapConfig {
+    /** Fill styles for categorical exceptions in the color dataset, keyed by raw value. */
+    categoryFillStyle?: { [rawValue: string]: string }
+    /** Legend and tooltip labels for categorical exceptions, keyed by raw value. */
+    categoryText?: { [rawValue: string]: string }
+
     /** Symbol shape used for markers. */
     symbol?: 'circle' | 'square'
     /** Base symbol size factor. */

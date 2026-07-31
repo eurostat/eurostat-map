@@ -3,6 +3,7 @@ import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { getResponsiveSymbolSize } from '../../core/responsive.js'
 import { min, max } from 'd3-array'
 import { getCentroidsGroup } from '../../core/geo/centroids.js'
+import { toCategoryEcl } from '../../core/utils.js'
 
 /**
  * @description defines classifier functions (layer.classifierColor and layer.classifierSize) for both symbol size and color
@@ -114,6 +115,10 @@ export function applyClassificationToMap(map, layer) {
 
         const v = sv.value
         if ((v !== 0 && !v) || v === ':') return 'nd'
+
+        if (activeLayer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(activeLayer.categoryFillStyle_, v)) {
+            return toCategoryEcl(v)
+        }
 
         return +classifier(+v)
     })

@@ -5,6 +5,12 @@ import type { ProportionalSymbolSettings } from './ProportionalSymbolConfig'
  * Proportional symbol map object
  */
 export interface ProportionalSymbolMap extends MapInstance {
+    categoryFillStyle(): { [rawValue: string]: string } | undefined
+    categoryFillStyle(v: { [rawValue: string]: string }): this
+
+    categoryText(): { [rawValue: string]: string } | undefined
+    categoryText(v: { [rawValue: string]: string }): this
+
     psSettings(): ProportionalSymbolSettings
     psSettings(v: ProportionalSymbolSettings): this
 
