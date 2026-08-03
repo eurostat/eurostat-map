@@ -319,7 +319,14 @@ export const forwardFieldsToActiveLayer = function (map, fieldNames) {
         Object.defineProperty(map, f, {
             configurable: true,
             get() {
-                return map.activeLayer()?.[f]
+                const l = map.activeLayer()
+                if (!l) return undefined
+                // Read the layer's OWN value only. A layer's prototype (mapServices, set up in
+                // createLayer) falls back to reading map[key] for any key it doesn't own itself -
+                // and this property IS map[f], since this getter is what's redefining it. A layer
+                // that never set its own `f` (e.g. no ranked bar chart configured) would otherwise
+                // bounce straight back into this same getter and recurse until the stack overflows.
+                return Object.prototype.hasOwnProperty.call(l, f) ? l[f] : undefined
             },
             set(v) {
                 const l = map.activeLayer()
@@ -344,8 +351,14 @@ export const forwardChainableMethod = function (map, name) {
             return function (...args) {
                 const layer = map.activeLayer()
                 // Facade maps are their own active layer. In that case, calling layer[name]
-                // would recurse through this forwarding getter.
-                const layerMethod = layer && layer !== map && typeof layer[name] === 'function' ? layer[name].bind(layer) : null
+                // would recurse through this forwarding getter. Likewise, only use layer[name]
+                // when the layer OWNS it: otherwise the lookup falls through to the layer's
+                // mapServices prototype (see createLayer), which reads map[name] - i.e. this
+                // very forwarding wrapper - and would call itself forever.
+                const layerMethod =
+                    layer && layer !== map && Object.prototype.hasOwnProperty.call(layer, name) && typeof layer[name] === 'function'
+                        ? layer[name].bind(layer)
+                        : null
                 const targetMethod = layerMethod || originalMapMethod
 
                 if (!targetMethod) {
