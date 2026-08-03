@@ -1197,8 +1197,14 @@ export const buildSingleLayerMap = function (type, config) {
     // Every registered decorator may add its own fluent API. Discover it here so
     // standalone maps retain the historical map.foo() facade without maintaining
     // a second per-type list every time a layer is migrated.
+    // 'stat'/'statData' are skipped: attachThematicApi() already defines them on the
+    // layer as backwards-compat forwarders TO the map (layer.stat calls map.stat).
+    // The map's own 'stat'/'statData' are its real, authoritative implementations -
+    // wrapping them here to forward back to the layer would make map.stat() call
+    // layer.stat() call map.stat() forever.
     Object.keys(layer).forEach((key) => {
         if (key === 'map' || key === 'id' || key === 'type' || key === 'role' || key === 'isLayer') return
+        if (key === 'stat' || key === 'statData') return
         if (key.endsWith('_')) typeFields.push(key)
         else if (typeof layer[key] === 'function') typeMethods.push(key)
     })
