@@ -1,5 +1,25 @@
 # Release notes
 
+## 4.10.6
+
+### Fixes
+
+- **Fixed a `RangeError: Maximum call stack size exceeded` that made every standalone map type (choropleth, proportional-symbol, categorical, etc.) fail to build.** Introduced by the 4.10.5 layers migration: a layer's inherited `mapServices` prototype fell back to reading `map[key]` for any field/method it didn't own itself, while the map's own forwarding accessors read the opposite direction (`map[key]` → `layer[key]`) - for any forwarded field or method a layer never set on itself (e.g. no ranked bar chart configured), this bounced back and forth until the stack overflowed. No API changes; existing code that calls `.build()` on any map type now works again.
+
+Example:
+
+```javascript
+// Previously threw "RangeError: Maximum call stack size exceeded" for every
+// migrated map type - now builds normally again.
+eurostatmap.map('ch').stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.10.6`
+- Dist-tag `latest` points to `4.10.6`
+- Release tag format used: `4.10.6` (no `v` prefix)
+
 ## 4.10.5
 
 ### New
