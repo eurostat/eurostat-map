@@ -133,7 +133,14 @@ function updateDorlingProgress(progress, map) {
 export function stopDorlingSimulation(map) {
     if (!map) return
 
-    if (map.layers_ && Array.isArray(map.layers_)) {
+    // layers_ is only ever assigned as an OWN property on the facade map (see stat-map.js).
+    // A layer object's inherited mapServices prototype forwards map[key] lookups for any key
+    // it doesn't own itself - so `layer.layers_` would otherwise silently resolve to the
+    // facade's own layers_ array (containing sibling layers), and recursing into it here would
+    // bounce between siblings forever instead of stopping at the leaf.
+    const ownsLayers = Object.prototype.hasOwnProperty.call(map, 'layers_') && Array.isArray(map.layers_)
+
+    if (ownsLayers) {
         map.layers_.forEach((layer) => {
             // In legacy/single-layer maps, layers_ can include the map object itself.
             if (layer && layer !== map) stopDorlingSimulation(layer)
@@ -147,7 +154,7 @@ export function stopDorlingSimulation(map) {
     }
 
     // If this is a pure map container, we've already stopped child layers above.
-    if (map.layers_ && Array.isArray(map.layers_)) {
+    if (ownsLayers) {
         return
     }
 }
