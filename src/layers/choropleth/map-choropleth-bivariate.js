@@ -210,6 +210,28 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
         if (map.svg()) {
             const selector = getRegionsSelector(map)
             let regions = map.svg().selectAll(selector)
+            const finalizeStyle = () => {
+                // A later map/inset update can interrupt this transition. Interaction
+                // must be restored whether the transition completes or is cancelled.
+                regions.style('pointer-events', null)
+
+                regions.each(function () {
+                    const sel = select(this)
+                    sel.attr('fill___', sel.style('fill'))
+                })
+
+                addMouseEventsToRegions(map, regions)
+
+                if (out.gridCartogram_) {
+                    map.svg()
+                        .selectAll('.em-grid-text')
+                        .each(function () {
+                            const cellColor = select(this.parentNode).style('fill')
+                            select(this).attr('fill', getTextColorForBackground(cellColor))
+                        })
+                }
+            }
+
             regions
                 .style('pointer-events', 'none') // disable interaction during transition
                 .transition()
@@ -226,34 +248,7 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
                     return color
                 })
                 .end()
-                .then(
-                    () => {
-                        // Re-enable after animation completes
-                        regions.style('pointer-events', null)
-
-                        // Store the original color for each region
-                        regions.each(function () {
-                            const sel = select(this)
-                            sel.attr('fill___', sel.style('fill'))
-                        })
-
-                        // Set up mouse events
-                        addMouseEventsToRegions(map, regions)
-
-                        // update font color for grid cartograms (contrast)
-                        if (out.gridCartogram_) {
-                            map.svg()
-                                .selectAll('.em-grid-text')
-                                .each(function () {
-                                    const cellColor = select(this.parentNode).style('fill')
-                                    select(this).attr('fill', getTextColorForBackground(cellColor))
-                                })
-                        }
-                    },
-                    (err) => {
-                        // rejection
-                    }
-                )
+                .then(finalizeStyle, finalizeStyle)
 
             if (out.nutsLevel_ == 'mixed') {
                 styleMixedNUTS(map)

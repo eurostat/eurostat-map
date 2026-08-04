@@ -68,6 +68,9 @@ root cause, so check for it first when a symptom looks similar:
   `core/layer.js`, `map-choropleth.js`, `map-proportional-symbols.js`, and `ps-classification.js`
   and check whether it's actually reachable from every object that might get passed around as
   "the current map", not just the one call site.
+- If interaction is disabled during a D3 transition, restore `pointer-events` and attach handlers
+  on both transition fulfillment and interruption. Insets or repeated updates can interrupt the
+  transition; an empty rejection handler leaves the map permanently non-interactive.
 
 ## Layer decorators and map services
 
