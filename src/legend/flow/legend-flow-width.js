@@ -7,7 +7,9 @@ const comma = d3format ? d3format(',') : (v) => String(v)
 
 export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     if (!out) return null
-    const map = out.map || out
+    // out.map is the top-level facade; strokeWidthScale is only ever set on the actual
+    // flow layer, exposed here as out.layer.
+    const map = out.layer || out
     if (!map || !map.strokeWidthScale) return null
 
     // remove previous container if any
@@ -36,8 +38,8 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
 
     // sample values (linear interpolation across domain)
     const sampleVals = []
-    const max = out.map.maxFlowCount
-    const min = out.map.minFlowCount
+    const max = map.maxFlowCount
+    const min = map.minFlowCount
     for (let i = 0; i < segments; i++) {
         const t = segments === 1 ? 0.5 : i / (segments - 1)
         sampleVals.push(min + t * (max - min))
@@ -113,7 +115,9 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
 }
 
 export function drawVerticalFlowWidthLegend(out, baseX, baseY) {
-    const map = out.map
+    // out.map is the top-level facade; strokeWidthScale is only ever set on the actual
+    // flow layer, exposed here as out.layer.
+    const map = out.layer || out
     if (!map.strokeWidthScale) return
     out._flowWidthContainer = out.lgg.append('g').attr('class', 'em-flow-width-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
@@ -130,8 +134,8 @@ export function drawVerticalFlowWidthLegend(out, baseX, baseY) {
 
     // Representative values (min, mid, max or user-defined)
     const sampleVals = []
-    const max = out.map.maxFlowCount
-    const min = out.map.minFlowCount
+    const max = map.maxFlowCount
+    const min = map.minFlowCount
     for (let i = 0; i < segments; i++) {
         const t = segments === 1 ? 0.5 : i / (segments - 1)
         sampleVals.push(min + t * (max - min))

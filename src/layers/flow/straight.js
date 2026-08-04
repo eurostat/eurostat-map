@@ -393,18 +393,18 @@ export function onFlowLineMouseOver(out, sourceId, targetId, flow, arrowIds) {
         select(this).attr('stroke', hoveredColor).attr('stroke-opacity', 1) // highlight with solid hover color
         if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true)
 
-        if (out._tooltip) {
+        if (out.map._tooltip) {
             const sourceNode = out.flowGraph_.nodes.find((n) => n.id === sourceId)
             const targetNode = out.flowGraph_.nodes.find((n) => n.id === targetId)
             const linkObj = { source: sourceNode, target: targetNode, value: flow }
-            out._tooltip.mouseover(out.tooltip_.textFunction(linkObj, out))
+            out.map._tooltip.mouseover(out.tooltip_.textFunction(linkObj, out))
         }
     }
 }
 
 export function onFlowLineMouseMove(out) {
     return function (e) {
-        if (out._tooltip) out._tooltip.mousemove(e)
+        if (out.map._tooltip) out.map._tooltip.mousemove(e)
     }
 }
 
@@ -412,6 +412,6 @@ export function onFlowLineMouseOut(out, baseColor, arrowIds) {
     return function () {
         select(this).attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_) // restore solid base color
         if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false)
-        if (out._tooltip) out._tooltip.mouseout()
+        if (out.map._tooltip) out.map._tooltip.mouseout()
     }
 }

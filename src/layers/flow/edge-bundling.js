@@ -82,7 +82,7 @@ export function drawEdgeBundleLines(out, lineGroup) {
             onFlowLineMouseOver(out, originId, destId, val, arrowIds).call(this, event)
         })
         .on('mousemove', function (event) {
-            if (out._tooltip) out._tooltip.mousemove(event)
+            if (out.map._tooltip) out.map._tooltip.mousemove(event)
         })
         .on('mouseout', function (event, d) {
             const baseColor = select(this).attr('data-color')
