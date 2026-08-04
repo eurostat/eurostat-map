@@ -25,11 +25,11 @@ function addMouseEventsToSymbols(map, out) {
                 p.style('stroke-width', 1)
             })
 
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
         })
         .on('mousemove', function (e, rg) {
-            if (out._tooltip) out._tooltip.mousemove(e)
+            if (out.map._tooltip) out.map._tooltip.mousemove(e)
             if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
         })
         .on('mouseout', function (e, rg) {
@@ -46,7 +46,7 @@ function addMouseEventsToSymbols(map, out) {
                 if (originalStrokeWidth) p.style('stroke-width', originalStrokeWidth)
             })
 
-            if (out._tooltip) out._tooltip.mouseout()
+            if (out.map._tooltip) out.map._tooltip.mouseout()
             if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
         })
 }
@@ -57,17 +57,17 @@ function addMouseEventsToRegions(map, out) {
     regions
         .on('mouseover', function (e, rg) {
             select(this).style('fill', map.hoverColor_)
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
         })
         .on('mousemove', function (e, rg) {
-            if (out._tooltip) out._tooltip.mousemove(e)
+            if (out.map._tooltip) out.map._tooltip.mousemove(e)
             if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
         })
         .on('mouseout', function (e, rg) {
             const sel = select(this)
             sel.style('fill', sel.attr('fill___'))
-            if (out._tooltip) out._tooltip.mouseout()
+            if (out.map._tooltip) out.map._tooltip.mouseout()
             if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
         })
 }

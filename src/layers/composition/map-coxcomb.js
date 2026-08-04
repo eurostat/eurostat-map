@@ -902,10 +902,10 @@ export const decorateCoxcombLayer = function (out, config) {
                 const sel = select(this)
                 sel.attr('fill___', sel.style('fill'))
                 sel.style('fill', out.hoverColor_)
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             // .on('mousemove', function (e) {
-            //     if (out._tooltip) out._tooltip.mousemove(e)
+            //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
             // })
             .on('mouseleave', function (e, rg) {
                 console.log('mouseleave', rg.properties.id)
@@ -914,7 +914,7 @@ export const decorateCoxcombLayer = function (out, config) {
                 if (newFill) {
                     sel.style('fill', newFill)
                     sel.attr('fill___', null)
-                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.map._tooltip) out.map._tooltip.mouseout()
                 }
             })
     }
@@ -943,12 +943,12 @@ export const decorateCoxcombLayer = function (out, config) {
                 cachedSelection.attr('fill___', cachedSelection.style('fill'))
                 cachedSelection.style('fill', out.hoverColor_)
                 highlightCoxcombChart(cachedSelection, true)
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             // .on('mousemove', function (e, rg) {
             //     // Use cached data to avoid expensive checks on every mousemove
             //     if (!cachedRegion) return
-            //     if (out._tooltip) out._tooltip.mousemove(e)
+            //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
             // })
             .on('mouseleave', function (e, rg) {
                 // Use cached data for consistent behavior
@@ -957,7 +957,7 @@ export const decorateCoxcombLayer = function (out, config) {
                 cachedSelection.style('fill', cachedSelection.attr('fill___') || '')
                 cachedSelection.attr('fill___', null)
                 highlightCoxcombChart(cachedSelection, false)
-                if (out._tooltip) out._tooltip.mouseout()
+                if (out.map._tooltip) out.map._tooltip.mouseout()
 
                 // Clear cache
                 cachedRegion = null
@@ -986,13 +986,13 @@ export const decorateCoxcombLayer = function (out, config) {
             const shape = cachedCell.select('.em-grid-shape')
             shape.attr('fill___', shape.style('fill')).style('fill', out.hoverColor_)
             highlightCoxcombChart(cachedCell, true)
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
         }
 
         const handleMouseMove = function (e) {
             // Use cached data to avoid expensive DOM lookups on every mousemove
             if (!cachedRegion) return
-            if (out._tooltip) out._tooltip.mousemove(e)
+            if (out.map._tooltip) out.map._tooltip.mousemove(e)
         }
 
         const handleMouseOut = function (e) {
@@ -1002,7 +1002,7 @@ export const decorateCoxcombLayer = function (out, config) {
             const shape = cachedCell.select('.em-grid-shape')
             shape.style('fill', shape.attr('fill___') || '').attr('fill___', null)
             highlightCoxcombChart(cachedCell, false)
-            if (out._tooltip) out._tooltip.mouseout()
+            if (out.map._tooltip) out.map._tooltip.mouseout()
 
             // Clear cache
             cachedRegion = null

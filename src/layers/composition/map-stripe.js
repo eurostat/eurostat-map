@@ -200,9 +200,10 @@ export const decorateStripeLayer = function (out, config) {
         if (!map.svg_) return
 
         // Insets can be external SVGs and may not initialize their own tooltip instance.
-        // Reuse the main map tooltip so hover still works.
-        if (!map._tooltip && out._tooltip) {
-            map._tooltip = out._tooltip
+        // Reuse the main map tooltip so hover still works. out is the stripe layer, so its
+        // real tooltip lives on out.map (the facade), not on out itself.
+        if (!map._tooltip && out.map._tooltip) {
+            map._tooltip = out.map._tooltip
         }
 
         // Apply stripe fill patterns directly to region paths

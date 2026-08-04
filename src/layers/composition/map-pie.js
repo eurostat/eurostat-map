@@ -227,8 +227,9 @@ export const decoratePieLayer = function (out, config) {
 
         // Insets are built from map templates and may not initialize their own tooltip instance.
         // Reuse the main map tooltip so hover on external inset SVGs still shows tooltip content.
-        if (!map._tooltip && out._tooltip) {
-            map._tooltip = out._tooltip
+        // out is the pie layer, so its real tooltip lives on out.map (the facade), not on out itself.
+        if (!map._tooltip && out.map._tooltip) {
+            map._tooltip = out.map._tooltip
         }
 
         if (map.gridCartogram_) {
