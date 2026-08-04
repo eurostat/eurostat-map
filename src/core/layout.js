@@ -68,11 +68,34 @@ export const wrapMapSvg = function (svg) {
     const parent = node.parentNode
     if (!parent) return
 
-    //  If parent is SVG (e.g. IMAGE), abandon wrapping
-    if (parent instanceof SVGElement) return
-
     // already wrapped
     if (parent.classList?.contains('em-map-wrapper')) return parent
+
+    // If parent is itself SVG (e.g. IMAGE, which nests the whole map inside one outer
+    // <svg> so static PNG/SVG exports are a single self-contained document), a plain HTML
+    // <div> can't be inserted there and the map node can't be reparented into one without
+    // breaking its coordinate system. Walk up to the first non-SVG ancestor (the real HTML
+    // element the SVG document sits in) and overlay the spinner/tooltip wrapper there instead.
+    if (parent instanceof SVGElement) {
+        let host = parent
+        while (host instanceof SVGElement) {
+            host = host.parentNode
+            if (!host) return
+        }
+
+        if (host.classList?.contains('em-map-wrapper')) return host
+
+        const overlayHost = document.createElement('div')
+        overlayHost.className = 'em-map-wrapper'
+        overlayHost.style.position = 'absolute'
+        overlayHost.style.inset = '0'
+        if (getComputedStyle(host).position === 'static') {
+            host.style.position = 'relative'
+        }
+        host.appendChild(overlayHost)
+
+        return overlayHost
+    }
 
     const wrapper = document.createElement('div')
     wrapper.className = 'em-map-wrapper'
