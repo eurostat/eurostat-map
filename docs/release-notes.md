@@ -1,5 +1,35 @@
 # Release notes
 
+## 4.10.7
+
+### Fixes
+
+- **Fixed hover tooltips silently doing nothing across most layer types** - bar, pie, waffle, stripe, coxcomb, sparklines, categorical, choropleth-trivariate, and mushroom proportional symbols. Layer-decorator code read map-level state (`_tooltip`, `_pathFunction`, `_projection`, `_statLabelFormatter`) directly off the layer object, but the layers migration only ever sets those on the top-level facade map, during `build()` - after the layer's own property-forwarding snapshot was already taken. `if (out._tooltip)` then silently evaluated to `false` everywhere it was read this way. Fixed by reading these off the owning facade (`out.map`) instead.
+- **Fixed flow maps not rendering at all** (same root cause as above, but flow map code dereferences the missing property immediately - `out._pathFunction.centroid(...)` - so it crashed instead of silently no-oping).
+- **Fixed flow map lines rendering off-screen, collapsed on top of each other, when node coordinates come from region centroids.** The centroid fallback used the map's already-projected `pathFunction.centroid()`, then projected those screen coordinates a second time.
+- **Fixed a `RangeError: Maximum call stack size exceeded` in multi-layer maps combining a Dorling cartogram with other layers** (e.g. choropleth + proportional-symbol). `stopDorlingSimulation` recursed into `layers_`, but a layer only *inherits* that array from its facade rather than owning it - so every layer saw its sibling layers as children, and two siblings recursed into each other forever.
+- **Fixed the coxcomb size legend throwing `sizeScale is not a function`**, and the coxcomb time-segment legend silently never appearing - both read the relevant scale off the map facade instead of the coxcomb layer that actually owns it.
+- **Fixed bivariate choropleth tooltips and hover interactions**, including regions staying non-interactive after a map update interrupted an in-progress region-color transition.
+- **Fixed the loading spinner never appearing when the map's SVG is nested inside another `<svg>` element** (e.g. static image export).
+- Fixed two Statistics Explained business examples (`construction`, `distributive-trade`) whose page referenced the shared library script with a broken relative path.
+
+Example (previously threw, or silently produced no tooltip, depending on layer type):
+
+```javascript
+// Tooltips now appear on hover; previously silently did nothing.
+eurostatmap.map('bar').gridCartogram(true).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+
+// Flow lines now render at the correct on-screen position; previously
+// rendered collapsed together, off-screen.
+eurostatmap.map('flow').flowGraph({ nodes: [...], links: [...] }).build()
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.10.7`
+- Dist-tag `latest` points to `4.10.7`
+- Release tag format used: `4.10.7` (no `v` prefix)
+
 ## 4.10.6
 
 ### Fixes
