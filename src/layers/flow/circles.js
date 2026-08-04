@@ -131,16 +131,16 @@ export function drawNodeCircles(out, container) {
             .style("cursor", "pointer")
             .on("mouseover", function (event) {
                 select(this).attr("stroke-width", 1.5)
-                if (out._tooltip) out._tooltip.mouseover(makeTooltip(locKey))
+                if (out.map._tooltip) out.map._tooltip.mouseover(makeTooltip(locKey))
                 highlightLines(locKey)
             })
             .on("mouseout", function(event)  {
                 select(this).attr("stroke-width", 0.5)
-                if (out._tooltip) out._tooltip.mouseout(event)
+                if (out.map._tooltip) out.map._tooltip.mouseout(event)
                 unhighlightLines()
             })
             .on("mousemove", event => {
-                if (out._tooltip) out._tooltip.mousemove(event)
+                if (out.map._tooltip) out.map._tooltip.mousemove(event)
             })
 
     })

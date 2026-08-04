@@ -240,14 +240,14 @@ function addMouseEvents(out, mainSel, ctx) {
     mainSel
         .on('mouseover', function () {
             select(this).attr('fill', out.hoverColor_)
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(link, out))
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(link, out))
         })
         .on('mousemove', (e) => {
-            if (out._tooltip) out._tooltip.mousemove(e)
+            if (out.map._tooltip) out.map._tooltip.mousemove(e)
         })
         .on('mouseout', function () {
             select(this).attr('fill', paint)
-            if (out._tooltip) out._tooltip.mouseout()
+            if (out.map._tooltip) out.map._tooltip.mouseout()
         })
 }
 // Sample an SVG path string into points using DOM path length

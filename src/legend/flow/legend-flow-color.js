@@ -2,7 +2,8 @@ import { select, selectAll } from 'd3-selection'
 
 // explain flow line colors
 export function drawFlowColorLegend(out, x, y) {
-    const map = out.map
+    // out.map is the top-level facade; flow-specific state lives on the actual layer (out.layer).
+    const map = out.layer
 
     // Create/clear container
     out._flowColorContainer?.remove()

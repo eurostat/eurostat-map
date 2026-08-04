@@ -73,15 +73,15 @@ export function drawNodeDonuts(out, container) {
             .attr('stroke-width', 0.5)
             .style('cursor', 'pointer')
             .on('mouseover', function (event, d) {
-                if (out._tooltip) out._tooltip.mouseover(mouseoverFunction(d, out))
+                if (out.map._tooltip) out.map._tooltip.mouseover(mouseoverFunction(d, out))
                 highlightDonut(event, out.svg_)
                 highlightLines(locKey)
             })
             .on('mousemove', function (event, d) {
-                if (out._tooltip) out._tooltip.mousemove(event)
+                if (out.map._tooltip) out.map._tooltip.mousemove(event)
             })
             .on('mouseout', function (event, d) {
-                if (out._tooltip) out._tooltip.mouseout()
+                if (out.map._tooltip) out.map._tooltip.mouseout()
                 unhighlightDonut(event, out.svg_)
                 unhighlightLines()
             })
@@ -94,15 +94,15 @@ export function drawNodeDonuts(out, container) {
             .on('mouseover', function (event) {
                 // Reuse the first arc's data for tooltip content
                 const firstArcDatum = pieData[0]
-                if (out._tooltip) out._tooltip.mouseover(mouseoverFunction(firstArcDatum, out))
+                if (out.map._tooltip) out.map._tooltip.mouseover(mouseoverFunction(firstArcDatum, out))
                 highlightDonut(event, out.svg_)
                 highlightLines(locKey)
             })
             .on('mousemove', function (event) {
-                if (out._tooltip) out._tooltip.mousemove(event)
+                if (out.map._tooltip) out.map._tooltip.mousemove(event)
             })
             .on('mouseout', function (event) {
-                if (out._tooltip) out._tooltip.mouseout()
+                if (out.map._tooltip) out.map._tooltip.mouseout()
                 unhighlightDonut(event, out.svg_)
                 unhighlightLines()
             })

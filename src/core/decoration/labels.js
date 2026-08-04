@@ -242,6 +242,10 @@ export function addFlowValueLabels(out, svg) {
     // create or reuse container
     const container = ensureGroup(labelsContainer, 'em-flow-labels')
 
+    // out is the flow layer; _statLabelFormatter is set on the map itself (during render),
+    // so read it off out.map rather than out (see addLabelsToMap).
+    const statLabelFormatter = out.map?._statLabelFormatter || out._statLabelFormatter || spaceAsThousandSeparator
+
     // Add halo effect
     if (labelsHaveHalos(out.labels_)) {
         const labelsHaloGroup = container.append('g').attr('class', 'em-flow-label-halo')
@@ -252,7 +256,7 @@ export function addFlowValueLabels(out, svg) {
             .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
             .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? d.x + out.flowLabelOffsets_.x : d.x - out.flowLabelOffsets_.x))
             .attr('y', (d) => d.y + out.flowLabelOffsets_.y)
-            .text((d) => out._statLabelFormatter(d.value))
+            .text((d) => statLabelFormatter(d.value))
     }
 
     // Add labels
@@ -272,7 +276,7 @@ export function addFlowValueLabels(out, svg) {
         .attr('text-anchor', (d) => (d.x > d.targetLinks[0].source.x ? 'start' : 'end'))
         .attr('x', (d) => (d.x > d.targetLinks[0].source.x ? out.flowLabelOffsets_.x : -out.flowLabelOffsets_.x))
         .attr('y', out.flowLabelOffsets_.y)
-        .text((d) => out._statLabelFormatter(d.value))
+        .text((d) => statLabelFormatter(d.value))
 
     // Add background rectangles after text is rendered
 

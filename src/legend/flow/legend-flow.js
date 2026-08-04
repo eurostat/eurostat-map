@@ -125,7 +125,10 @@ export const legend = function (map, config) {
      *
      */
     function buildFlowLegend(out) {
-        const map = out.map
+        // out.map is the top-level facade; flow-specific computed state (strokeWidthScale,
+        // maxFlowCount, importerRegionIds, ...) is only ever set on the actual flow layer,
+        // exposed here as out.layer.
+        const map = out.layer
         let baseX = out.getBaseX()
         let baseY = out.getBaseY()
 
@@ -193,7 +196,7 @@ export const legend = function (map, config) {
             .attr('dy', '0.35em')
             .text(out.regionColorLegend.title || 'Region fill colors')
 
-        const map = out.map
+        const map = out.layer
         const items = {
             [out.regionColorLegend.labels[0]]: map.flowRegionColors_[0],
             [out.regionColorLegend.labels[1]]: map.flowRegionColors_[1],

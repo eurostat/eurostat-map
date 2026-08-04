@@ -3,6 +3,7 @@
 
 import { min, max } from 'd3-array'
 import { scaleLinear } from 'd3-scale'
+import { geoPath } from 'd3-geo'
 import { buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as FlowLegend from '../../legend/flow/legend-flow'
@@ -459,8 +460,12 @@ function computeTopFlowLocations(out) {
         ])
 }
 
-// if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead
+// if nodes in the graph dont have coordinates specified by the user then use nuts2json centroids instead.
+// Coordinates set here are RAW (un-projected), same coordinate space as the region geometries -
+// projectAllNodeCoordinates() is the single place downstream that projects them to screen space.
 function addCoordinatesToGraph(out) {
+    // deliberately unprojected: gives the centroid in the feature's own (pre-projection) coordinate space
+    const rawPath = geoPath()
     out.flowGraph_.nodes.forEach((node) => {
         if (typeof node.x !== 'number' || typeof node.y !== 'number') {
             if (out.Geometries.centroidsFeatures) {
@@ -477,8 +482,7 @@ function addCoordinatesToGraph(out) {
             } else {
                 const features = out.Geometries.getRegionFeatures?.()
                 const feature = features?.find((f) => f.properties.id === node.id)
-                const centroid = feature?.properties?.centroid || out._pathFunction.centroid(feature)
-                const [x, y] = centroid
+                const [x, y] = rawPath.centroid(feature)
                 node.x = x
                 node.y = y
             }
@@ -489,7 +493,7 @@ function addCoordinatesToGraph(out) {
 function projectAllNodeCoordinates(out) {
     const nodes = out.flowGraph_.nodes
     for (const node of nodes) {
-        const screenCoords = out._projection([node.x, node.y])
+        const screenCoords = out.map._projection([node.x, node.y])
         node.x = screenCoords[0]
         node.y = screenCoords[1]
     }
