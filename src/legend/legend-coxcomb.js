@@ -76,7 +76,7 @@ export const legend = function (map, config) {
                 out,
                 container,
                 out.sizeLegend.values,
-                out.map.classifierChartSize_,
+                map.classifierChartSize_,
                 out.sizeLegend.title,
                 out.sizeLegend.titlePadding
             )
@@ -98,8 +98,8 @@ export const legend = function (map, config) {
 
         // Default values if none provided
         if (!values) {
-            const globalMax = out.map._globalMonthlyMax || 1
-            const globalMin = out.map._globalMonthlyMin || 0
+            const globalMax = map._globalMonthlyMax || 1
+            const globalMin = map._globalMonthlyMin || 0
             values = [globalMax, globalMin]
         }
 
@@ -212,13 +212,13 @@ export const legend = function (map, config) {
                 .on('mouseover', function () {
                     highlightCoxcombWedges(out.map, code)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightCoxcombWedges, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId_, highlightCoxcombWedges, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightCoxcombWedges(out.map)
                     if (out.map.insetTemplates_) {
-                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightCoxcombWedges, code)
+                        executeForAllInsets(out.map.insetTemplates_, out.map.svgId_, unhighlightCoxcombWedges, code)
                     }
                 })
 
@@ -251,7 +251,7 @@ export const legend = function (map, config) {
      * Labels each segment (e.g., Jan, Feb) around the circle.
      */
     function buildCoxcombTimeLegend(out, baseX, baseY) {
-        const times = out.map._coxTimes || []
+        const times = map._coxTimes || []
         const radius = out.timeLegend.radius || 40
 
         if (!times.length) return
