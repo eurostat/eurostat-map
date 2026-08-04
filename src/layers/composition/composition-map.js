@@ -253,7 +253,7 @@ export const addMouseEventsToRegions = function (regions, out) {
             const sel = select(this)
             sel.attr('fill___', sel.style('fill'))
             sel.style('fill', out.hoverColor_)
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
         })
         .on('mousemove', function (e, rg) {
             if (shouldOmit(rg.properties.id)) return
@@ -303,7 +303,7 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
         shape.attr('fill___', shape.style('fill'))
         shape.style('fill', out.hoverColor_)
         if (!chart.empty()) onHighlight(chart)
-        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
     }
 
     const handleMouseMove = function (e) {

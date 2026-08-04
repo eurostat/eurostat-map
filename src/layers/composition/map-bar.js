@@ -660,7 +660,7 @@ export const decorateBarLayer = function (out, config) {
                     select(this)
                         .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
                 })
                 .on('mousemove', function (e, rg) {
                     if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
@@ -830,7 +830,7 @@ export const decorateBarLayer = function (out, config) {
                     select(this)
                         .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
                 })
                 .on('mousemove', function (e, rg) {
                     if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
