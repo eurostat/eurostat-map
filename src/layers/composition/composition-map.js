@@ -253,11 +253,11 @@ export const addMouseEventsToRegions = function (regions, out) {
             const sel = select(this)
             sel.attr('fill___', sel.style('fill'))
             sel.style('fill', out.hoverColor_)
-            if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
         })
         .on('mousemove', function (e, rg) {
             if (shouldOmit(rg.properties.id)) return
-            if (out._tooltip) out._tooltip.mousemove(e)
+            if (out.map._tooltip) out.map._tooltip.mousemove(e)
         })
         .on('mouseout', function (e, rg) {
             if (shouldOmit(rg.properties.id)) return
@@ -265,7 +265,7 @@ export const addMouseEventsToRegions = function (regions, out) {
             const newFill = sel.attr('fill___')
             if (newFill) {
                 sel.style('fill', newFill)
-                if (out._tooltip) out._tooltip.mouseout()
+                if (out.map._tooltip) out.map._tooltip.mouseout()
             }
         })
 }
@@ -303,13 +303,13 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
         shape.attr('fill___', shape.style('fill'))
         shape.style('fill', out.hoverColor_)
         if (!chart.empty()) onHighlight(chart)
-        if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
+        if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
     }
 
     const handleMouseMove = function (e) {
         const rg = getRegionData(this)
         if (!rg || !getRegionTotalFn(rg.properties.id) || shouldOmit(rg.properties.id)) return
-        if (out._tooltip) out._tooltip.mousemove(e)
+        if (out.map._tooltip) out.map._tooltip.mousemove(e)
     }
 
     const handleMouseOut = function (e) {
@@ -325,7 +325,7 @@ export const addMouseEventsToGridCartogram = function (out, chartSelector, getRe
         shape.style('fill', shape.attr('fill___') || '')
         shape.attr('fill___', null)
         if (!chart.empty()) onUnhighlight(chart)
-        if (out._tooltip) out._tooltip.mouseout()
+        if (out.map._tooltip) out.map._tooltip.mouseout()
     }
 
     shapes.on('mouseover', handleMouseOver).on('mousemove', handleMouseMove).on('mouseout', handleMouseOut)

@@ -451,18 +451,18 @@ export const decorateSparkLayer = function (out, config) {
                 const sel = select(this)
                 sel.attr('fill___', sel.style('fill'))
                 sel.style('fill', out.hoverColor_)
-                if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
             })
             .on('mousemove', function (e, rg) {
                 if (!getSparkData(rg.properties.id)) return
-                if (out._tooltip) out._tooltip.mousemove(e)
+                if (out.map._tooltip) out.map._tooltip.mousemove(e)
             })
             .on('mouseout', function () {
                 const sel = select(this)
                 const prevFill = sel.attr('fill___')
                 if (prevFill) {
                     sel.style('fill', prevFill)
-                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.map._tooltip) out.map._tooltip.mouseout()
                 }
             })
     }

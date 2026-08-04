@@ -660,16 +660,16 @@ export const decorateBarLayer = function (out, config) {
                     select(this)
                         .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
+                    if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
                 })
                 .on('mousemove', function (e, rg) {
                     if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
-                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (out.map._tooltip) out.map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function (e, rg) {
                     if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
                     select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
-                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.map._tooltip) out.map._tooltip.mouseout()
                 })
         })
     }
@@ -830,16 +830,16 @@ export const decorateBarLayer = function (out, config) {
                     select(this)
                         .style('stroke-width', settings.strokeWidth + 1)
                         .style('stroke', 'black')
-                    if (out._tooltip) out._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
+                    if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
                 })
                 .on('mousemove', function (e, rg) {
                     if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
-                    if (out._tooltip) out._tooltip.mousemove(e)
+                    if (out.map._tooltip) out.map._tooltip.mousemove(e)
                 })
                 .on('mouseout', function (e, rg) {
                     if (out.tooltip_.omitRegions?.includes(rg.properties.id)) return
                     select(this).style('stroke-width', settings.strokeWidth).style('stroke', settings.strokeFill)
-                    if (out._tooltip) out._tooltip.mouseout()
+                    if (out.map._tooltip) out.map._tooltip.mouseout()
                 })
         })
     }
