@@ -53,7 +53,7 @@ export const tooltip = function (config) {
         tooltip.attr('class', 'em-tooltip')
     }
 
-    my.mouseover = function (html) {
+    my.mouseover = function (html, pointerEvent) {
         // Only update HTML if it actually changed - avoids expensive DOM operations
         if (html !== currentHtml) {
             tooltip.html(html)
@@ -62,8 +62,11 @@ export const tooltip = function (config) {
             refreshBoundsAndSize()
         }
         if (html) {
-            let x = event.pageX
-            let y = event.pageY
+            // Do not rely on the legacy window.event global: it is not available in
+            // every browser and can be cleared before asynchronous handlers run.
+            const activeEvent = pointerEvent || window.event
+            let x = activeEvent?.pageX || 0
+            let y = activeEvent?.pageY || 0
             lastX = x
             lastY = y
             if (!parentRect) refreshBoundsAndSize()
