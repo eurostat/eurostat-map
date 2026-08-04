@@ -71,6 +71,9 @@ root cause, so check for it first when a symptom looks similar:
 - If interaction is disabled during a D3 transition, restore `pointer-events` and attach handlers
   on both transition fulfillment and interruption. Insets or repeated updates can interrupt the
   transition; an empty rejection handler leaves the map permanently non-interactive.
+- `_tooltip` is created on the owning map during `build()`, after real layers are constructed, so
+  do not expect `layer._tooltip` to inherit it. Interaction handlers on layers must resolve
+  `layer.map._tooltip` (with the current map/inset tooltip as the first choice).
 
 ## Layer decorators and map services
 

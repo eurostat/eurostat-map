@@ -283,6 +283,8 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
 
     const addMouseEventsToRegions = (map, regions) => {
         const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
+        const tooltipHost = map._tooltip || map.map?._tooltip || out.map?._tooltip
+        const publicMap = map.map || map
 
         const clearStaleLegendHighlight = () => {
             if (!map._bivariateLegendHighlightActive) return
@@ -303,13 +305,11 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
                 // the normal single-region hover style.
                 clearStaleLegendHighlight()
                 select(this).style('fill', map.hoverColor_)
-                const tooltipHost = map._tooltip || out._tooltip
-                tooltipHost?.mouseover(out.tooltip_.textFunction(rg, map), e)
+                tooltipHost?.mouseover(out.tooltip_.textFunction(rg, publicMap), e)
                 if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
-                const tooltipHost = map._tooltip || out._tooltip
                 tooltipHost?.mousemove(e)
                 if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             })
@@ -319,7 +319,6 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
                 const newFill = sel.attr('fill___')
                 if (newFill) {
                     sel.style('fill', newFill)
-                    const tooltipHost = map._tooltip || out._tooltip
                     tooltipHost?.mouseout()
                 }
                 if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
