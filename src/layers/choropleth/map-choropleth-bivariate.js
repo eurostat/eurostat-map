@@ -32,7 +32,6 @@ export const map = function (config) {
 }
 
 export const decorateBivariateChoroplethLayer = function (out, config) {
-
     //number of classes for the classification. Same for both variables.
     out.numberOfClasses_ = 3
     //stevens.greenblue
@@ -309,12 +308,14 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
                 // the normal single-region hover style.
                 clearStaleLegendHighlight()
                 select(this).style('fill', map.hoverColor_)
-                out._tooltip?.mouseover(out.tooltip_.textFunction(rg, out))
+                const tooltipHost = map._tooltip || out._tooltip
+                tooltipHost?.mouseover(out.tooltip_.textFunction(rg, map), e)
                 if (out.onRegionMouseOver_) out.onRegionMouseOver_(e, rg, this, map)
             })
             .on('mousemove', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
-                out._tooltip?.mousemove(e)
+                const tooltipHost = map._tooltip || out._tooltip
+                tooltipHost?.mousemove(e)
                 if (out.onRegionMouseMove_) out.onRegionMouseMove_(e, rg, this, map)
             })
             .on('mouseout', function (e, rg) {
@@ -323,7 +324,8 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
                 const newFill = sel.attr('fill___')
                 if (newFill) {
                     sel.style('fill', newFill)
-                    out._tooltip?.mouseout()
+                    const tooltipHost = map._tooltip || out._tooltip
+                    tooltipHost?.mouseout()
                 }
                 if (out.onRegionMouseOut_) out.onRegionMouseOut_(e, rg, this, map)
             })
@@ -453,6 +455,7 @@ const resampleColorRamp = function (ramp, count) {
  * @param {*} map The map element
  */
 const tooltipTextFunBiv = function (rg, map) {
+    const layer = map.activeLayer?.() || map
     const buf = []
     //region name
     const regionName = rg.properties.na || rg.properties.name
@@ -465,13 +468,13 @@ const tooltipTextFunBiv = function (rg, map) {
     }
 
     //stat 1 value
-    const c1 = map.getEncodingStat?.('x', map.getEncodingStat?.('v1', 'v1')) || 'v1'
-    const c2 = map.getEncodingStat?.('y', map.getEncodingStat?.('v2', 'v2')) || 'v2'
-    const sv1 = map.statData(c1).get(rg.properties.id)
-    const unit1 = map.statData(c1).unitText()
+    const c1 = layer.getEncodingStat?.('x', layer.getEncodingStat?.('v1', 'v1')) || 'v1'
+    const c2 = layer.getEncodingStat?.('y', layer.getEncodingStat?.('v2', 'v2')) || 'v2'
+    const sv1 = layer.statData(c1).get(rg.properties.id)
+    const unit1 = layer.statData(c1).unitText()
     //stat 2 value
-    const sv2 = map.statData(c2).get(rg.properties.id)
-    const unit2 = map.statData(c2).unitText()
+    const sv2 = layer.statData(c2).get(rg.properties.id)
+    const unit2 = layer.statData(c2).unitText()
 
     buf.push(`
         <div class="em-tooltip-text" style="background: #ffffff;color: #171a22;padding: 4px;font-size:15px;">
@@ -480,13 +483,13 @@ const tooltipTextFunBiv = function (rg, map) {
         <tr>
         <td>
         ${sv1 && sv1.value ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && sv1.value ? unit1 : ''}
-        ${!sv1 || (sv1.value != 0 && !sv1.value) ? map.noDataText_ : ''}
+        ${!sv1 || (sv1.value != 0 && !sv1.value) ? layer.noDataText_ : ''}
         </td>
         </tr>
         <tr>
         <td>
         ${sv2 && sv2.value ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && sv2.value ? unit2 : ''}
-        ${!sv2 || (sv2.value != 0 && !sv2.value) ? map.noDataText_ : ''}
+        ${!sv2 || (sv2.value != 0 && !sv2.value) ? layer.noDataText_ : ''}
         </td>
         </tr>
         </tbody>
