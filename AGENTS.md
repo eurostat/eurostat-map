@@ -75,6 +75,29 @@ root cause, so check for it first when a symptom looks similar:
   do not expect `layer._tooltip` to inherit it. Interaction handlers on layers must resolve
   `layer.map._tooltip` (with the current map/inset tooltip as the first choice).
 
+## `nutsLevel_ === 'mixed'` and remote stat refetches
+
+`stat-map.js`'s `updateStatData()` used to unconditionally force the fetch level to country
+(`nl = 0`) whenever `out.nutsLevel_ === 'mixed'` (every map type except `spark`), regardless of
+what `geoLevel` the caller already set in their `stat()` config's `filters`. Fixed (2026-08) in
+`stat-data.js`'s `getEurobasePromise`: an explicit `filters_.geoLevel` is now respected the same
+way an explicit `filters_.geo` already was - confirmed with a live headless-browser test (not
+just reading source) that a `stat({filters:{geoLevel:'nuts3'}}).updateStatData()` call was
+silently fetching country-level data before the fix. If a similar "remote refetch ignores my
+filter" symptom comes up again for a mixed-level map, check this code path first.
+
+Separately - and easy to get wrong when building on the above - `nutsLevel_ === 'mixed'` itself
+gates a large amount of unrelated rendering logic (grep `nutsLevel_ === 'mixed'`: region
+visibility in `map-choropleth.js`'s `styleMixedNUTS()` and `map-proportional-symbols.js`'s
+`styleMixedNUTSRegions()`, geometry loading in `core/geo/geometries.js`, centroids in
+`core/geo/centroids.js`, plus categorical/bivariate/pie/bar/waffle/coxcomb layers). Never call
+`map.nutsLevel(someConcreteLevel)` on a mixed-level map just to change which level's *data* is
+shown - that flips the map out of mixed mode and breaks all of the above. A consumer that wants
+"show me NUTS level N's data on an otherwise-mixed map" (e.g. IMAGE's exported-HTML NUTS-level
+dropdown, issue ESTAT/image#176) should leave `nutsLevel('mixed')` alone and only change the
+`geoLevel` stat filter on refetch - `styleMixedNUTS`/`styleMixedNUTSRegions` already show exactly
+the regions that end up with a classified/sized value from whatever data was just fetched.
+
 ## Layer decorators and map services
 
 - Every public `MapType` alias must be registered in `core/layer-registry.js` by its module and
