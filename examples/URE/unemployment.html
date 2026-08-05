@@ -88,16 +88,9 @@
                 </select>
             </div>
             <div class="control-group">
-                <label for="cartogram-toggle">Grid Cartogram</label>
+                <label for="cartogram-toggle">Grid cartogram</label>
                 <label class="toggle-switch">
                     <input type="checkbox" id="cartogram-toggle" checked />
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="control-group">
-                <label for="width-total-toggle">Bar width = population</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="width-total-toggle" />
                     <span class="slider"></span>
                 </label>
             </div>
@@ -147,7 +140,11 @@
                 legendTitle: 'Degree of urbanisation',
                 unitText: '%',
                 sizeLegendTitle: '% of people aged 15-74',
-                noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'MK', 'TR', 'MD', 'GE', 'UA'],
+                // TODO: replace with the exact Eurostat online data code for this table
+                source: 'Source: Eurostat',
+                footnote:
+                    'Note: Luxembourg – cities, not available due to low reliability; towns and suburbs, low reliability for males and females; rural areas, not available due to low reliability for males and females. Malta – rural areas, not available due to low reliability. Slovenia – cities, low reliability for males.',
+                noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'MK', 'TR', 'MD', 'GE', 'RS', 'UA'],
                 dimensions: {
                     total: 'Total',
                     male: 'Male',
@@ -157,7 +154,6 @@
 
             let map = null
             let isCartogram = true
-            let useTotalPopWidth = false
             let selectedDimension = 'total'
 
             function normalizeData(rawData, dimension) {
@@ -197,7 +193,7 @@
                 }
 
                 const GROUP_MAX_HEIGHT = useCartogram ? 48 : 45
-                let mapBuilder = eurostatmap
+                map = eurostatmap
                     .map('bar')
                     .dorling(true)
                     .hoverColor('#ffffbf')
@@ -206,7 +202,7 @@
                     .gridCartogramSettings({
                         spacing: 0,
                         cellPadding: 12,
-                        margins: { top: 5, right: 100, bottom: 0, left: 0 },
+                        margins: { top: 14, right: 100, bottom: 0, left: 0 },
                         positions: `
                                     ,IS,  ,  ,NO,SE,FI,  ,  ,  ,  ,  ,
                                     ,  ,  ,  ,  ,  ,  ,EE,  ,  ,  ,  ,
@@ -216,8 +212,8 @@
                                     ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
                                     ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
                                     ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
-                                    ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,  
-                                    ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,  
+                                    ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,
+                                    ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,
                                     ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `,
                         countryLabels: 'name',
                         countryLabelPadding: { x: 2, y: -3 },
@@ -257,11 +253,14 @@
                     })
                     .barSettings({
                         groupMaxHeight: GROUP_MAX_HEIGHT,
+                        showCategoryLabels: false,
                     })
                     .title(config.title + ' - ' + dimLabel)
                     .header(true)
                     .footer(true)
                     .subtitle(config.subtitle + ' (' + dimLabel + ')')
+                    .footnoteWrap(130)
+                    .footnote([config.footnote, config.source].filter(Boolean).join('<br>'))
                     .legend({
                         position: 'top right',
                         boxOpacity: 0.8,
@@ -290,15 +289,6 @@
                     .noDataFillStyle('#ffffff')
                     .zoomButtons(false)
 
-                if (useTotalPopWidth) {
-                    mapBuilder = mapBuilder.encoding('width', {
-                        stat: 'Population',
-                        scale: 'linear',
-                        range: [useCartogram ? 3 : 2, useCartogram ? 16 : 9],
-                    })
-                }
-
-                map = mapBuilder
                 map.build()
             }
 
@@ -311,11 +301,6 @@
 
             document.getElementById('cartogram-toggle').addEventListener('change', function (e) {
                 buildMap(e.target.checked)
-            })
-
-            document.getElementById('width-total-toggle').addEventListener('change', function (e) {
-                useTotalPopWidth = e.target.checked
-                buildMap(isCartogram)
             })
         </script>
     </body>

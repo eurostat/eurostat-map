@@ -98,6 +98,7 @@ export const decorateBarLayer = function (out, config) {
         otherText: 'Other',
         tooltipWidth: 150,
         tooltipHeight: 10,
+        showCategoryLabels: true, // show the category name (e.g. "Cities:") before each tooltip value
     }
 
     out.barSettings_ = { ...defaultBarSettings, ...(config?.barSettings || {}) }
@@ -373,7 +374,10 @@ export const decorateBarLayer = function (out, config) {
 
     function _formatTooltipValue(rawValue, unitText) {
         if (_isMissingTooltipValue(rawValue)) return 'n/a'
-        return `${rawValue}${unitText ? ` ${unitText}` : ''}`
+        const numericValue = +rawValue
+        const formattedValue = Number.isInteger(numericValue) ? numericValue.toFixed(1) : rawValue
+        const separator = unitText && unitText !== '%' ? ' ' : ''
+        return `${formattedValue}${unitText ? `${separator}${unitText}` : ''}`
     }
 
     function _getGridCellShapeBBox(cellSelection) {
@@ -972,6 +976,8 @@ export const decorateBarLayer = function (out, config) {
         const chartWidth = getResponsiveBarSettings().tooltipWidth
         const noDataColor = out.noDataFillStyle?.() || '#d9d9d9'
 
+        const showCategoryLabels = out.barSettings_.showCategoryLabels !== false
+
         let html = '<div class="em-tooltip-breakdown em-tooltip-bar-grouped-breakdown">'
         codes.forEach((code) => {
             const rawValue = _getRawHeightValue(regionId, code)
@@ -979,10 +985,11 @@ export const decorateBarLayer = function (out, config) {
             const numericValue = isMissing ? null : +rawValue
             const unitText = out.getEncodingUnitText('height', code, _getPrimaryCategoricalStatName())
             const valueText = _formatTooltipValue(rawValue, unitText)
+            const labelPrefix = showCategoryLabels ? `${_getCategoryLabel(code)}: ` : ''
             if (isMissing) {
                 html += `
                     <div class="em-tooltip-bar-grouped-row em-tooltip-bar-grouped-row-missing">
-                        <span class="em-tooltip-bar-grouped-missing-label">${_getCategoryLabel(code)}:</span>
+                        ${showCategoryLabels ? `<span class="em-tooltip-bar-grouped-missing-label">${_getCategoryLabel(code)}:</span>` : ''}
                         <span class="em-tooltip-bar-grouped-missing-value">${out.noDataText()}</span>
                     </div>
                 `
@@ -991,8 +998,7 @@ export const decorateBarLayer = function (out, config) {
 
             const color = _getCategoryColor(code)
             const textColor = getTextColorForBackground(color)
-            const label = _getCategoryLabel(code)
-            const reservedValueWidth = Math.max(28, Math.ceil(valueText.length * 6.5))
+            const reservedValueWidth = Math.max(28, Math.ceil((labelPrefix.length + valueText.length) * 6.5))
             const barWidth = Math.max(1, Math.round((Math.max(0, numericValue) / globalMaxValue) * chartWidth))
             const canShowValueInside = barWidth >= reservedValueWidth + 28
 
@@ -1000,14 +1006,13 @@ export const decorateBarLayer = function (out, config) {
                 <div class="em-tooltip-bar-grouped-row">
                     <div class="em-tooltip-bar-grouped-row-inner">
                         <div class="em-tooltip-bar-grouped-badge" style="width:${barWidth}px;background:${color};">
-                            <span class="em-tooltip-bar-grouped-label" style="color:${textColor};">${label}:</span>
                             ${
                                 canShowValueInside
-                                    ? `<span class="em-tooltip-bar-grouped-value em-tooltip-bar-grouped-value-inside" style="color:${textColor};">${valueText}</span>`
+                                    ? `<span class="em-tooltip-bar-grouped-value em-tooltip-bar-grouped-value-inside" style="color:${textColor};">${labelPrefix}${valueText}</span>`
                                     : ''
                             }
                         </div>
-                        ${canShowValueInside ? '' : `<span class="em-tooltip-bar-grouped-value em-tooltip-bar-grouped-value-outside">${valueText}</span>`}
+                        ${canShowValueInside ? '' : `<span class="em-tooltip-bar-grouped-value em-tooltip-bar-grouped-value-outside">${labelPrefix}${valueText}</span>`}
                     </div>
                 </div>
             `

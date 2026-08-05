@@ -3,141 +3,12 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-            body {
-                margin: 0;
-                font-family: sans-serif;
-            }
-
-            .gdp-map-layout {
-                display: grid;
-                grid-template-columns: repeat(2, 50%);
-                width: 100%;
-                max-width: 100%;
-                align-items: start;
-            }
-
-            .gdp-small-multiples .em-cntbn,
-            .em-cntbn-halo {
-                stroke: none !important;
-            }
-
-            .gdp-small-multiples {
-                display: grid;
-                grid-template-rows: auto auto auto;
-                gap: 0;
-                padding: 0;
-                box-sizing: border-box;
-                min-width: 0;
-                width: 100%;
-            }
-
-            .gdp-typology-picker {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                padding: 0.35rem;
-                font-size: 0.9rem;
-                border: 0;
-            }
-
-            .gdp-typology-picker label {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.2rem;
-            }
-
-            .gdp-small-map-card {
-                display: flex;
-                flex-direction: column;
-                justify-self: center;
-                min-width: 0;
-                min-height: 0;
-                width: 100%;
-                box-sizing: border-box;
-                overflow: hidden;
-            }
-
-            .gdp-small-map-card h2 {
-                margin: 0 0 0.1rem;
-                color: var(--typology-color, #333);
-                font-size: 1.2rem;
-                font-weight: 600;
-                text-align: center;
-            }
-
-            .gdp-small-map-card .em-map-wrapper,
-            .gdp-small-map-card svg,
-            .gdp-main-map svg {
-                display: block;
-                max-width: 100%;
-                height: auto;
-            }
-
-            .gdp-small-map-card .em-map-wrapper {
-                flex: 1 1 auto;
-                min-height: 0;
-            }
-
-            .gdp-main-map {
-                min-width: 0;
-                width: 100%;
-            }
-
-            @media (max-width: 900px) {
-                .gdp-map-layout {
-                    grid-template-columns: 1fr;
-                }
-
-                .gdp-small-multiples {
-                    grid-template-columns: 1fr;
-                    grid-template-rows: auto auto auto;
-                    height: auto;
-                    padding: 0.5rem;
-                }
-            }
-
-            .em-bn-1,
-            .em-bn-2,
-            .em-bn-3,
-            .em-nutsrg [lvl='3'],
-            .em-nutsrg [lvl='2'],
-            .em-nutsrg [lvl='1'] {
-                stroke: none !important;
-            }
-        </style>
     </head>
 
     <body>
-        <div class="gdp-map-layout">
-            <aside class="gdp-small-multiples" aria-label="GDP change by urban-rural typology">
-                <fieldset class="gdp-typology-picker">
-                    <legend>Region typology</legend>
-                    <label>
-                        <input type="radio" name="gdp-typology" value="1" checked />
-                        Urban
-                    </label>
-                    <label>
-                        <input type="radio" name="gdp-typology" value="2" />
-                        Intermediate
-                    </label>
-                    <label>
-                        <input type="radio" name="gdp-typology" value="3" />
-                        Rural
-                    </label>
-                </fieldset>
-                <section class="gdp-small-map-card">
-                    <h2 id="gdp-typology-title">Urban regions</h2>
-                    <svg id="gdp-typology-map"></svg>
-                </section>
-            </aside>
-            <main class="gdp-main-map">
-                <svg id="map61"></svg>
-            </main>
-        </div>
+        <svg id="map61"></svg>
 
         <script src="../../build/eurostatmap.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
         <script>
             async function buildMap() {
                 const config = await fetch('./data/gdp-change.json').then((response) => {
@@ -145,16 +16,8 @@
                     return response.json()
                 })
                 const [lowerThreshold, upperThreshold] = config.thresholds
-                const numericGdpValues = Object.values(config.stats.gdpChange).map(Number).filter(Number.isFinite)
-                const dataDomain = {
-                    min: Math.min(...numericGdpValues),
-                    max: Math.max(...numericGdpValues),
-                }
-                const continuousScale = makeContinuousDivergingScale(dataDomain.min, dataDomain.max)
                 const clientWidth = document.documentElement.clientWidth
-                const mapSize = { width: Math.floor(clientWidth <= 900 ? clientWidth : clientWidth / 2), height: 680 }
-
-                buildTypologyMap(config, continuousScale, dataDomain, mapSize)
+                const mapSize = { width: Math.min(Math.floor(clientWidth), 700), height: 680 }
 
                 eurostatmap
                     .map('bivariateChoropleth')
@@ -168,7 +31,11 @@
                     .nutsYear(config.nutsYear)
                     .title(config.title)
                     .subtitle(config.subtitle)
-                    .footnote([config.footnote, config.source].filter(Boolean).join(' '))
+                    .hoverColor('#ffff33')
+                    .showSourceLink(false)
+                    .footnote(
+                        ['Administrative boundaries: ©EuroGeographics ©OpenStreetMap', config.footnote, config.source].filter(Boolean).join('<br>')
+                    )
                     .stat('gdpChange', { customData: config.stats.gdpChange, unitText: 'percentage points' })
                     .encoding('y', { stat: 'gdpChange' })
                     .stat('urbanRuralType', { customData: config.stats.urbanRuralType })
@@ -245,139 +112,10 @@
                         noDataShapeHeight: 16,
                         noDataShapeWidth: 16,
                     })
-                    .zoomExtent([0.1, 3])
+                    //.zoomExtent([0.1, 3])
+                    .zoomButtons(true)
                     .insets('image')
                     .build()
-            }
-
-            function makeContinuousDivergingScale(min, max) {
-                const signedLog = (value) => Math.sign(value) * Math.log1p(Math.abs(value))
-                const signedExp = (value) => Math.sign(value) * Math.expm1(Math.abs(value))
-                const transformedMin = signedLog(min)
-                const transformedMax = signedLog(max)
-                const divergenceT = -transformedMin / (transformedMax - transformedMin)
-                const valueTransform = (value) => {
-                    const transformedValue = signedLog(value)
-                    if (transformedValue < 0) {
-                        return (divergenceT * (transformedValue - transformedMin)) / -transformedMin
-                    }
-                    return divergenceT + ((1 - divergenceT) * transformedValue) / transformedMax
-                }
-                const valueUntransform = (t) => {
-                    const transformedValue =
-                        t < divergenceT
-                            ? transformedMin + (t / divergenceT) * -transformedMin
-                            : ((t - divergenceT) / (1 - divergenceT)) * transformedMax
-                    return signedExp(transformedValue)
-                }
-                const balancedColor = d3.piecewise(d3.interpolateRgb, ['#4a1486', '#b6a0d2', '#f7f7f7', '#9ecae1', '#08519c'])
-                const colorFunction = (t) => {
-                    if (t < divergenceT) return balancedColor((0.5 * t) / divergenceT)
-                    return balancedColor(0.5 + (0.5 * (t - divergenceT)) / (1 - divergenceT))
-                }
-                return { colorFunction, valueTransform, valueUntransform }
-            }
-
-            function buildTypologyMap(config, continuousScale, domain, size) {
-                const typologies = [
-                    { value: 1, label: 'Urban' },
-                    { value: 2, label: 'Intermediate' },
-                    { value: 3, label: 'Rural' },
-                ]
-                const getTypedData = (value) =>
-                    Object.fromEntries(
-                        Object.entries(config.stats.gdpChange).filter(([regionId]) => Number(config.stats.urbanRuralType[regionId]) === value)
-                    )
-                const applyTypologyStyle = (value) => {
-                    const typology = typologies.find((item) => item.value === value)
-                    const darkestClassId = config.classMatrix[value - 1]?.at(-1)
-                    const typologyColor = config.colorsByClass[darkestClassId]
-                    document.querySelector('.gdp-small-map-card').style.setProperty('--typology-color', typologyColor)
-                    document.getElementById('gdp-typology-title').textContent = `${typology.label} regions`
-                }
-
-                const initialValue = 1
-                applyTypologyStyle(initialValue)
-
-                const typologyMap = eurostatmap
-                    .map('choropleth')
-                    .svgId('gdp-typology-map')
-                    .width(size.width)
-                    .height(size.height)
-                    .header(false)
-                    .footer(false)
-                    .bottomText(false)
-                    .scale(config.scale)
-                    .nutsLevel(config.nutsLevel)
-                    .nutsYear(config.nutsYear)
-                    .stat('gdpChange', { customData: getTypedData(initialValue), unitText: 'percentage points' })
-                    .encoding('fill', { stat: 'gdpChange' })
-                    .colorSchemeType('continuous')
-                    .colorFunction(continuousScale.colorFunction)
-                    .valueTransform(continuousScale.valueTransform)
-                    .valueUntransform(continuousScale.valueUntransform)
-                    .skipNormalization(true)
-                    .pointOfDivergence(0)
-                    .noDataFillStyle('#f1f1f1')
-                    .legend({
-                        title: 'GDP change',
-                        //orientation: 'horizontal',
-                        shapeHeight: 10,
-                        tickLength: 5,
-                        tickValues: [domain.min, 0, domain.max],
-                        tickLabels: [String(domain.min), '0', `+${domain.max}`],
-                        decimals: 0,
-                        noData: false,
-                    })
-                    .zoomExtent([0.1, 8])
-                    .zoomButtons(false)
-                    //.position({ x: 4800000, y: 3400000, z: 6000 })
-                    .transitionDuration(0)
-                    .tooltip({
-                        textFunction: function (region, map) {
-                            const regionId = region.properties.id
-                            const regionName = region.properties.na || region.properties.name
-                            const typology = config.stats.urbanRuralType[regionId]
-                            const stat = map.statData('gdpChange').get(regionId)
-                            const buf = [
-                                `
-                                            <div class="em-tooltip-bar">
-                                                <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
-                                            </div>
-                                            <div class="em-tooltip-text no-data">
-                                                <table class="em-tooltip-table">
-                                                    <tbody>
-                                                        <tr><td>`,
-                            ]
-
-                            buf.push(config.urbanRuralLabels[typology] || map.noDataText_)
-                            buf.push('<br>')
-
-                            if (!stat || stat.value === ':' || !Number.isFinite(Number(stat.value))) {
-                                buf.push(map.noDataText_)
-                            } else {
-                                const sign = Number(stat.value) > 0 ? '+' : ''
-                                buf.push(`${sign}${stat.value} percentage points`)
-                            }
-
-                            buf.push(`</td></tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>`)
-                            return buf.join('')
-                        },
-                    })
-                    .build()
-
-                document.querySelectorAll('input[name="gdp-typology"]').forEach((input) => {
-                    input.addEventListener('change', (event) => {
-                        if (!event.target.checked) return
-                        const value = Number(event.target.value)
-                        applyTypologyStyle(value)
-                        typologyMap.statData('gdpChange').setData(getTypedData(value))
-                        typologyMap.updateStatValues()
-                    })
-                })
             }
 
             buildMap().catch((error) => console.error(error))
