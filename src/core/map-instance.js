@@ -841,12 +841,21 @@ export const updateGeoMapTemplate = function (callback, map) {
         if (callback) callback()
     } else {
         // use default
-        map.Geometries.getDefaultGeoData(map.geo_, map.filterGeometriesFunction_, map.nutsLevel_).then(() => {
-            map.buildMapTemplate()
+        map.Geometries.getDefaultGeoData(map.geo_, map.filterGeometriesFunction_, map.nutsLevel_)
+            .then(() => {
+                map.buildMapTemplate()
 
-            // Execute callback if defined
-            if (callback) callback()
-        })
+                // Execute callback if defined
+                if (callback) callback()
+            })
+            .catch((err) => {
+                // A rejected fetch (network blip, rate limit, ...) must still run the callback -
+                // otherwise the caller's loading counter (which drives the spinner overlay) never
+                // decrements for this target and the spinner spins forever, even though every
+                // other map/inset loaded fine. This map/inset just won't have geometry to draw.
+                console.error(`[eurostat-map] Failed to load geo data for "${map.svgId_ || map.geo_}":`, err)
+                if (callback) callback()
+            })
     }
 
     // Use executeForAllInsets for recursive inset updates
