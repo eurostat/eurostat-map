@@ -1,5 +1,17 @@
 # Release notes
 
+## 4.10.9
+
+### Fixes
+
+- **Fixed the loading spinner never disappearing on a normal successful load, for maps whose SVG is nested inside another `<svg>`** (e.g. IMAGE, which nests the whole map template in one outer `<svg>` for static export). `wrapMapSvg()` created a brand-new overlay host `<div>` every time the map rebuilt (any settings change, not just the initial build), instead of reusing the one from the previous build - the stale overlay was left orphaned on top of the new map, still in whatever visibility state it was last in when abandoned, while the new overlay (the one `showSpinner`/`hideSpinner` now actually control) sat correctly hidden underneath/behind it. `wrapMapSvg()` now looks for an existing `.em-map-wrapper` overlay host on the shared ancestor and reuses it instead of creating a new one.
+
+### Notes
+
+- Published package: `eurostat-map@4.10.9`
+- Dist-tag `latest` points to `4.10.9`
+- Release tag format used: `4.10.9` (no `v` prefix)
+
 ## 4.10.8
 
 ### Fixes

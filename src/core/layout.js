@@ -83,7 +83,15 @@ export const wrapMapSvg = function (svg) {
             if (!host) return
         }
 
-        if (host.classList?.contains('em-map-wrapper')) return host
+        // Reuse the existing overlay host rather than creating a new one on every rebuild -
+        // buildMapTemplateBase() calls wrapMapSvg() again on each build()/update(), and each
+        // fresh div left the previous one (potentially still showing "Loading...") orphaned on
+        // top of the new map, since it's a sibling overlay appended to `host` rather than a
+        // container the old svg node was reparented into (unlike the non-nested-SVG branch below,
+        // where `parent.classList.contains('em-map-wrapper')` correctly detects reuse because the
+        // svg node's own parent *is* the wrapper).
+        const existingOverlayHost = host.querySelector(':scope > .em-map-wrapper')
+        if (existingOverlayHost) return existingOverlayHost
 
         const overlayHost = document.createElement('div')
         overlayHost.className = 'em-map-wrapper'
