@@ -38,9 +38,8 @@
                     .subtitle(config.subtitle)
                     .hoverColor('#ffff33')
                     .showSourceLink(false)
-                    .footnote(
-                        ['Administrative boundaries: ©EuroGeographics ©OpenStreetMap', config.footnote, config.source].filter(Boolean).join('<br>')
-                    )
+                    .footnote([config.footnote, config.source].filter(Boolean).join('<br>'))
+                    .footnoteWrap(55)
                     .stat('gdpChange', { customData: config.stats.gdpChange, unitText: 'percentage points' })
                     .encoding('y', { stat: 'gdpChange' })
                     .stat('urbanRuralType', { customData: config.stats.urbanRuralType })
@@ -120,6 +119,20 @@
                     //.zoomExtent([0.1, 3])
                     .zoomButtons(true)
                     .insets('image')
+                    .callback(function () {
+                        // Boundaries copyright goes on the right, below the map — footnote/source stay on the left.
+                        const footer = document.getElementById('em-footer-map61')
+                        if (!footer) return
+                        footer.querySelector('#em-footnote-boundaries')?.remove()
+                        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+                        text.setAttribute('id', 'em-footnote-boundaries')
+                        text.setAttribute('class', 'em-footnote')
+                        text.setAttribute('x', mapSize.width - 5)
+                        text.setAttribute('y', 10)
+                        text.setAttribute('text-anchor', 'end')
+                        text.innerHTML = 'Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM'
+                        footer.appendChild(text)
+                    })
                     .build()
             }
 
