@@ -1,5 +1,19 @@
 # Release notes
 
+## 4.10.8
+
+### Fixes
+
+- **Fixed the loading spinner never disappearing after a stat data fetch fails.** `updateEurobase`'s API-error branch and its `.catch`, plus `updateCSV` (which had no `.catch` at all), skipped the completion callback on failure. The caller's loading counter (which drives the spinner overlay) only decrements inside that callback, so any Eurostat API error, network blip, or CSV fetch failure left the counter stuck above zero and the spinner spinning forever - the geo-loading side already had this exact fix, but the stat-data side didn't.
+- The SVG-nested overlay host used when the map's SVG sits inside another `<svg>` (e.g. IMAGE's static export layout) now sets `pointer-events: none` on itself, so it doesn't block hover/click on the map underneath while hidden.
+- Geo data fetch failures in `updateGeoMapTemplate` now also run the completion callback (same reasoning as the stat-data fix above), so a failed geo fetch for one map/inset no longer leaves the spinner stuck even though other maps/insets loaded fine.
+
+### Notes
+
+- Published package: `eurostat-map@4.10.8`
+- Dist-tag `latest` points to `4.10.8`
+- Release tag format used: `4.10.8` (no `v` prefix)
+
 ## 4.10.7
 
 ### Fixes
