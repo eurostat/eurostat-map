@@ -302,6 +302,10 @@ export const statData = function (config) {
                     const label = data___.error[0]?.label || 'Eurostat API request failed.'
                     showEurostatApiErrorToast('Eurostat API request failed: ' + label)
                     console.error('Error retrieving Eurostat data: ' + label)
+                    // Caller's loading counter (which drives the spinner overlay) only decrements
+                    // inside this callback - skipping it on an API-reported error left the spinner
+                    // spinning forever even though the request itself completed.
+                    if (callback) callback()
                     return
                 }
                 //decode stat data
@@ -344,6 +348,9 @@ export const statData = function (config) {
                 const message = err?.message || 'Network or parsing error while retrieving Eurostat data.'
                 showEurostatApiErrorToast('Eurostat API request failed: ' + message)
                 console.error('Error retrieving Eurostat data:', err)
+                // Same reasoning as the data___.error branch above: a rejected fetch must still
+                // run the callback or the spinner never hides.
+                if (callback) callback()
             })
     }
 
@@ -388,17 +395,26 @@ export const statData = function (config) {
         out._data_ = null
 
         //retrieve csv data
-        getCSVPromise().then(function (data___) {
-            //decode stat data
-            out._data_ = csvToIndex(data___, out.geoCol_, out.valueCol_)
+        getCSVPromise()
+            .then(function (data___) {
+                //decode stat data
+                out._data_ = csvToIndex(data___, out.geoCol_, out.valueCol_)
 
-            //store some metadata
-            out.metadata = { href: out.csvURL_ }
+                //store some metadata
+                out.metadata = { href: out.csvURL_ }
 
-            applyPreprocessAndTransform()
+                applyPreprocessAndTransform()
 
-            if (callback) callback()
-        })
+                if (callback) callback()
+            })
+            .catch(function (err) {
+                // Same reasoning as updateEurobase's .catch: a rejected fetch must still run the
+                // callback, or the caller's loading counter never decrements and the spinner spins forever.
+                const message = err?.message || 'Network or parsing error while retrieving CSV data.'
+                showEurostatApiErrorToast('CSV data request failed: ' + message)
+                console.error('Error retrieving CSV data:', err)
+                if (callback) callback()
+            })
     }
 
     /**

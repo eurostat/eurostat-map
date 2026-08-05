@@ -89,6 +89,11 @@ export const wrapMapSvg = function (svg) {
         overlayHost.className = 'em-map-wrapper'
         overlayHost.style.position = 'absolute'
         overlayHost.style.inset = '0'
+        // This div sits on top of the existing map content (rather than containing it, like the
+        // normal wrapper below), so it must not block hover/click on the map underneath. Only
+        // #em-loading-overlay (which sets its own pointer-events: auto while visible) should
+        // ever intercept events here.
+        overlayHost.style.pointerEvents = 'none'
         if (getComputedStyle(host).position === 'static') {
             host.style.position = 'relative'
         }
