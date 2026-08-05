@@ -119,7 +119,14 @@
                     //.zoomExtent([0.1, 3])
                     .zoomButtons(true)
                     .insets('image')
-                    .callback(function () {
+                    .onBuild(function (m) {
+                        // The library's default view fits the full geometry bbox with ~27% padding
+                        // around it (DEFAULT_FIT_ZOOM in src/core/geo/projection.js). That's too much
+                        // breathing room for this map, so zoom in a bit further on top of that default.
+                        const ZOOM_IN_FACTOR = 0.9 // < 1 zooms in, > 1 zooms out, relative to the auto-fit view
+                        const defaultPosition = m.position()
+                        m.position({ ...defaultPosition, z: defaultPosition.z * ZOOM_IN_FACTOR })
+
                         // Boundaries copyright goes on the right, below the map — footnote/source stay on the left.
                         const footer = document.getElementById('em-footer-map61')
                         if (!footer) return
