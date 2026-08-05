@@ -274,8 +274,11 @@ export const statData = function (config) {
     const getEurobasePromise = function (nutsLevel, lang) {
         //set precision //DEPRECATED 16/11/2021 https://ec.europa.eu/eurostat/online-help/public/en/NAVIGATION_WDDSTranslator_migration_en/#DECOMMISSION
         //out.filters_["precision"] = out.precision_;
-        //select only required geo groups, depending on the specified nuts level
-        if (!out.filters_.geo) {
+        //select only required geo groups, depending on the specified nuts level.
+        //an explicit geo or geoLevel already set by the caller (e.g. a stat() config's filters)
+        //is always respected as-is - it reflects a deliberate choice (like a NUTS-level dropdown
+        //re-fetch) and must not be silently overwritten by the map's own nutsLevel_.
+        if (!out.filters_.geo && !out.filters_.geoLevel) {
             if (nutsLevel === 'mixed') {
                 // Mixed-level maps need all available NUTS levels from the dataset.
                 delete out.filters_.geoLevel
