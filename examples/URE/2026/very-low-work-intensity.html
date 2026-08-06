@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Severe material and social deprivation rate</title>
+        <title>People living in households with very low work intensity</title>
         <style>
             body {
                 margin: 0;
@@ -81,11 +81,11 @@
             </div>
         </div>
 
-        <script src="../../build/eurostatmap.js"></script>
+        <script src="../../../build/eurostatmap.js"></script>
 
         <script>
-            const DATA_FILE = 'data/F2C Severe material and social deprivation rate_degurba_2025.json'
-            const POPULATION_FILE = '../cartogram/grid/data/degurba/population.json'
+            const DATA_FILE = '../data/F2D People living in households with very low work intensity_degurba, 2025.json'
+            const POPULATION_FILE = '../../cartogram/grid/data/degurba/population.json'
             const COUNTRY_TO_ISO2 = {
                 Austria: 'AT',
                 Belgium: 'BE',
@@ -120,7 +120,7 @@
             }
 
             const config = {
-                title: 'Severe material and social deprivation rate',
+                title: 'People living in households with very low work intensity',
                 subtitle: 'Share of people, by degree of urbanisation, 2025',
                 legendTitle: 'Degree of urbanisation',
                 unitText: '%',
