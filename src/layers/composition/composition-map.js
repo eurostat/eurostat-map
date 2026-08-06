@@ -246,6 +246,12 @@ export const ensureCategoryColors = function (out, totalCodeKey, otherColor, oth
  * @param {Object} out - The map object
  */
 export const addMouseEventsToRegions = function (regions, out) {
+    // `out` is a real Layer (out.map set by createLayer, see src/core/layer.js) when called for
+    // the main map, but insets are called via applyStyleToMap(insetMapInstance) - a raw map
+    // instance that never goes through createLayer and so has no .map self-reference (see
+    // buildInset in src/core/insets.js). Fall back to `out` itself in that case, or mouseover/
+    // mousemove crash on insets ("Cannot read properties of undefined (reading '_tooltip')").
+    const tooltipHost = out.map || out
     const shouldOmit = (id) => out.tooltip_.omitRegions?.includes(id)
     regions
         .on('mouseover', function (e, rg) {
@@ -253,11 +259,11 @@ export const addMouseEventsToRegions = function (regions, out) {
             const sel = select(this)
             sel.attr('fill___', sel.style('fill'))
             sel.style('fill', out.hoverColor_)
-            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
+            if (tooltipHost._tooltip) tooltipHost._tooltip.mouseover(out.tooltip_.textFunction(rg, out), e)
         })
         .on('mousemove', function (e, rg) {
             if (shouldOmit(rg.properties.id)) return
-            if (out.map._tooltip) out.map._tooltip.mousemove(e)
+            if (tooltipHost._tooltip) tooltipHost._tooltip.mousemove(e)
         })
         .on('mouseout', function (e, rg) {
             if (shouldOmit(rg.properties.id)) return
@@ -265,7 +271,7 @@ export const addMouseEventsToRegions = function (regions, out) {
             const newFill = sel.attr('fill___')
             if (newFill) {
                 sel.style('fill', newFill)
-                if (out.map._tooltip) out.map._tooltip.mouseout()
+                if (tooltipHost._tooltip) tooltipHost._tooltip.mouseout()
             }
         })
 }
