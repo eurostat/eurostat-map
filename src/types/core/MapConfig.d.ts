@@ -176,6 +176,12 @@ export interface MapConfig {
     /** Position adjustment for insets button: [x, y] */
     insetsButtonPosition?: [number, number]
 
+    /**
+     * Viewport width (px) at/below which insets start hidden (behind the insets button) unless
+     * insetsButton was set explicitly. @default 768
+     */
+    insetsVisibilityBreakpoint?: number
+
     /** Position adjustment for legend button: [x, y] */
     legendButtonPosition?: [number, number]
 

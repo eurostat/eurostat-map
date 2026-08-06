@@ -135,6 +135,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.insetsButton_ = false // show insets button
     out._insetsButtonExplicit_ = false // true once the user has explicitly called insetsButton(v)
     out.insetsButtonPosition_ = undefined // [x,y] position of insets button. If not specified, they are positioned in the top right corner
+    out.insetsVisibilityBreakpoint_ = 768 // viewport width (px) at/below which insets start hidden (behind the insets button) unless insetsButton was set explicitly. See isMobile checks in insets.js and appendInsetsButton's caller in map-instance.js.
     out.legendButton_ = false // show legend toggle button
     out.legendButtonPosition_ = undefined // [x,y] position of legend button. If not specified, they are positioned in the top left corner
     out.legendVisible_ = undefined // legend visibility state (initialized in stat-map when legendButton is enabled)
@@ -763,7 +764,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         // auto-show the toggle button whenever insets exist and the user hasn't explicitly
         // configured insetsButton themselves - otherwise there would be no way to reveal them.
         {
-            const isMobileForInsetsButton = typeof window !== 'undefined' && window.innerWidth <= 768
+            const isMobileForInsetsButton = typeof window !== 'undefined' && window.innerWidth <= out.insetsVisibilityBreakpoint_
             const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
             if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
                 appendInsetsButton(out)
