@@ -7,30 +7,26 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     margin: 0;
     padding: 0;
-    overflow: hidden;
-    height: 100%;
 }
 
+/* Content-driven height, not viewport-filling: #container/#map-container used to be pinned to
+   height:100% with overflow:hidden, sized on the assumption that the footer band (footnote +
+   our two cartography credit lines, see addCartographyCredits in dropdown-choropleth.js) would
+   fit inside a fixed budget below the drawing area. That budget can't be predicted reliably -
+   footnote length varies per page/dropdown option, so it wraps to a different number of lines
+   - and whenever the real content was taller than budgeted, overflow:hidden silently clipped
+   the credits instead of showing them. Letting the page grow to whatever height the map+footer
+   actually need (matching the fixed-pixel RYB maps' own model) means nothing can ever clip. */
 #container {
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 700px;
-    height: 100%;
-    overflow: hidden;
-}
-
-.header {
-    flex-shrink: 0;
 }
 
 #map-container {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    /* #map-frame is sized to a square in dropdown-choropleth.js (see the comment there on why
-       #map must stay 1:1) and is rarely as wide as this container - center it instead of leaving
-       it flush against the left edge. */
+    /* #map-frame is rarely as wide as this container - center it instead of leaving it flush
+       against the left edge. */
     display: flex;
     justify-content: center;
 }
