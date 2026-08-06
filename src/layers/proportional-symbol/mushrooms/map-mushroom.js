@@ -208,12 +208,23 @@ export const decorateMushroomLayer = function (out, config) {
     // ===============================
     //@override
     out.updateStyle = function () {
-        out.updateSymbolsDrawOrder(out)
+        // updateSymbolsDrawOrder() + applyStyleToMap() must run together for a given
+        // map/inset, in that order (draw order rebuilds this scope's own g.em-centroid
+        // elements; applyStyleToMap only draws into whatever centroids already exist for its
+        // scope). Previously updateSymbolsDrawOrder() only ran for the main map, and
+        // applyStyleToMap() selected centroids via the unscoped map.svg().selectAll(...)
+        // (the whole SVG, not just this map/inset's own group) - so every inset pass
+        // redrew mushroom arcs into every other inset's (and the main map's) centroids too,
+        // duplicating each port once per inset.
+        const applyToScope = (map) => {
+            out.updateSymbolsDrawOrder(map)
+            applyStyleToMap(map, out)
+        }
 
-        applyStyleToMap(out)
+        applyToScope(out)
 
         if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, applyStyleToMap)
+            executeForAllInsets(out.insetTemplates_, out.svgId_, applyToScope)
         }
 
         // dorling cartogram
@@ -257,10 +268,12 @@ export const decorateMushroomLayer = function (out, config) {
         const stat1 = out.statData(c1)
         const stat2 = out.statData(c2)
 
-        // Ensure centroidFeatures exists
+        // Ensure centroidFeatures exists. Scoped to this map/inset's own centroids group (gcp,
+        // computed above) - main map and insets share one physical <svg> (disambiguated only by
+        // ID suffix, see getCentroidsGroup), so an unscoped map.svg().selectAll(...) here would
+        // pull in every other map/inset's centroids too.
         if (!map.Geometries.centroidsFeatures || !map.Geometries.centroidsFeatures.length) {
-            map.Geometries.centroidsFeatures = map
-                .svg()
+            map.Geometries.centroidsFeatures = gcp
                 .selectAll('g.em-centroid')
                 .data()
                 .filter((d) => d?.properties?.centroid)
@@ -310,21 +323,33 @@ export const decorateMushroomLayer = function (out, config) {
 registerLayerType('mushroom', 'overlay', decorateMushroomLayer)
 
 /**
- * Draw mushroom symbols
+ * Draw mushroom symbols.
+ *
+ * `map` scopes DOM/geometry lookups (svg, centroids group) to the specific map/inset being
+ * styled. `layer` supplies the classification/style state (_mushroomScale_, mushroomColors_,
+ * etc.) - that state lives only on the owning layer (`out` in decorateMushroomLayer), since
+ * buildInset()'s attribute-copy allowlist (see insets.js) never copies mushroom-specific fields
+ * onto inset map instances, only a fixed set of generic ones plus stat/statData/legend method
+ * references. Reading those off `map` for an inset previously always failed (undefined), which
+ * made this function bail out before drawing anything for any inset.
  */
-function applyStyleToMap(map) {
-    if (!map.svg() || (!map._mushroomScale_ && !map.mushroomSizeScaleFunctionV1_ && !map.mushroomSizeScaleFunctionV2_)) return
-    const hasIndependentScales = map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_
-    const [c1, c2] = map.getMushroomStatCodes?.() || map.mushroomCodes()
-    const colors = map.mushroomColors()
-    const orient = map.mushroomOrientation_
+function applyStyleToMap(map, layer) {
+    if (!map.svg() || (!layer._mushroomScale_ && !layer.mushroomSizeScaleFunctionV1_ && !layer.mushroomSizeScaleFunctionV2_)) return
+    const hasIndependentScales = layer.mushroomSizeScaleFunctionV1_ && layer.mushroomSizeScaleFunctionV2_
+    const [c1, c2] = layer.getMushroomStatCodes?.() || layer.mushroomCodes()
+    const colors = layer.mushroomColors()
+    const orient = layer.mushroomOrientation_
 
-    const stat1 = map.statData(c1)
-    const stat2 = map.statData(c2)
+    const stat1 = layer.statData(c1)
+    const stat2 = layer.statData(c2)
 
     const arcGen = arc().innerRadius(0)
 
-    const centroids = map.svg().selectAll('g.em-centroid')
+    // Scoped to this map/inset's own centroids group - map.svg().selectAll(...) would match
+    // every map/inset sharing the same SVG, redrawing into (and duplicating) their symbols too.
+    const centroidsGroup = getCentroidsGroup(map)
+    if (!centroidsGroup || centroidsGroup.empty()) return
+    const centroids = centroidsGroup.selectAll('g.em-centroid')
 
     centroids.selectAll('*').remove()
 
@@ -337,12 +362,12 @@ function applyStyleToMap(map) {
         if (v1 === 0 && v2 === 0) return
 
         let r1, r2
-        if (map.mushroomSizeScaleFunctionV1_ && map.mushroomSizeScaleFunctionV2_) {
-            r1 = map.mushroomSizeScaleFunctionV1_(v1)
-            r2 = map.mushroomSizeScaleFunctionV2_(v2)
+        if (layer.mushroomSizeScaleFunctionV1_ && layer.mushroomSizeScaleFunctionV2_) {
+            r1 = layer.mushroomSizeScaleFunctionV1_(v1)
+            r2 = layer.mushroomSizeScaleFunctionV2_(v2)
         } else {
-            r1 = map._mushroomScale_(v1)
-            r2 = map._mushroomScale_(v2)
+            r1 = layer._mushroomScale_(v1)
+            r2 = layer._mushroomScale_(v2)
         }
 
         const g = select(this)
@@ -408,7 +433,7 @@ function applyStyleToMap(map) {
         }
     })
 
-    addMouseEvents(map, map)
+    addMouseEvents(map, layer)
 }
 
 // ===============================

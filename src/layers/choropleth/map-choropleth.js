@@ -21,6 +21,7 @@ import {
 } from '../../core/utils'
 import { jenks, ckmeans } from 'simple-statistics'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
+import { getMaxDomainPrecision } from '../../legend/legend-utils'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -609,6 +610,31 @@ export const getFillPatternLegend = function () {
     }
 }
 
+/**
+ * Formats a tooltip value, preserving trailing zeros to a fixed decimal count instead of
+ * spaceAsThousandSeparator's toLocaleString-based formatting (which silently drops them, e.g.
+ * 7.0 -> "7" - toLocaleString has no way to distinguish "no decimals" from "decimals that
+ * happen to be zero"). Precision is explicit tooltip_.decimals when set (a per-map/dataset
+ * property no JS number can recover on its own); otherwise falls back to the max precision
+ * seen across the stat's own values, reusing the legend's getMaxDomainPrecision - see
+ * comments.md's tooltip decimal-truncation item for the reasoning.
+ */
+function formatTooltipValue(value, statData, tooltipConfig) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return spaceAsThousandSeparator(value)
+
+    const decimals =
+        typeof tooltipConfig?.decimals === 'number'
+            ? tooltipConfig.decimals
+            : getMaxDomainPrecision({ domain: () => [0, max((statData.getArray?.() || []).map((v) => +v).filter(Number.isFinite)) ?? value] })
+
+    // toFixed()'s decimal part is kept as a literal string (spaceAsThousandSeparator/toLocaleString
+    // would round-trip through Number and re-drop trailing zeros, e.g. Number("7.0") === 7).
+    // Only the integer part goes through the normal thousand-separator formatting.
+    const [integerPart, decimalPart] = value.toFixed(decimals).split('.')
+    const formattedInteger = spaceAsThousandSeparator(Number(integerPart))
+    return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger
+}
+
 const choroplethTooltipFunction = function (region, layer) {
     if (layer.map.tooltip_.omitRegions && layer.map.tooltip_.omitRegions.includes(region.properties.id)) {
         return '' // Skip tooltip for omitted regions
@@ -659,11 +685,15 @@ const choroplethTooltipFunction = function (region, layer) {
     }
 
     // Data display
+    // unit is used verbatim, right after the value with no separator inserted - callers control
+    // spacing entirely through unitText itself (e.g. unitText: ' years' for "17.4 years",
+    // unitText: '%' for "17.4%"), rather than the library guessing when a space belongs.
+    const formattedValue = formatTooltipValue(sv.value, statData, layer.map.tooltip_)
     buf.push(`
         <div class="em-tooltip-text">
             <table class="em-tooltip-table">
                 <tbody>
-                    <tr><td>${spaceAsThousandSeparator(sv.value)} ${unit}</td></tr>
+                    <tr><td>${formattedValue}${unit}</td></tr>
                 </tbody>
             </table>
         </div>

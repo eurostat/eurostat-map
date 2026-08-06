@@ -5,10 +5,10 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger a-left",
-        "x": 359.07,
-        "y": 524.35,
-        "dy": 0.65,
-        "dx": 11.02
+        "x": 554,
+        "y": 809,
+        "dy": 1,
+        "dx": 17
     },
     {
         "note": {
@@ -16,10 +16,10 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger a-left calabria",
-        "x": 357.13,
-        "y": 559.35,
-        "dy": 10.37,
-        "dx": 6.48
+        "x": 551,
+        "y": 863,
+        "dy": 16,
+        "dx": 10
     },
     {
         "note": {
@@ -27,10 +27,10 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger a-napoli",
-        "x": 341.57,
-        "y": 486.11,
-        "dy": -5.83,
-        "dx": 10.37
+        "x": 527,
+        "y": 750,
+        "dy": -9,
+        "dx": 16
     },
     {
         "note": {
@@ -38,10 +38,10 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger a-left",
-        "x": 462.13,
-        "y": 542.5,
-        "dy": 12.96,
-        "dx": 31.11
+        "x": 713,
+        "y": 837,
+        "dy": 20,
+        "dx": 48
     },
     {
         "note": {
@@ -49,10 +49,10 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger a-left",
-        "x": 409.63,
-        "y": 178.24,
+        "x": 632,
+        "y": 275,
         "dy": 0,
-        "dx": 7.13
+        "dx": 11
     },
     {
         "note": {
@@ -60,9 +60,9 @@
             "align": "middle"
         },
         "className": "em-annotation-top-passenger",
-        "x": 191.2,
-        "y": 525,
-        "dy": 8.43,
+        "x": 295,
+        "y": 810,
+        "dy": 13,
         "dx": 0
     },
     {
@@ -72,10 +72,10 @@
             "wrap": 10
         },
         "className": "em-annotation-top-passenger a-right paloukia",
-        "x": 440.09,
-        "y": 536.02,
-        "dy": 12.31,
-        "dx": -9.07
+        "x": 679,
+        "y": 827,
+        "dy": 19,
+        "dx": -14
     },
     {
         "note": {
@@ -83,10 +83,10 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger",
-        "x": 460.83,
-        "y": 510.74,
-        "dy": -7.13,
-        "dx": 11.67
+        "x": 711,
+        "y": 788,
+        "dy": -11,
+        "dx": 18
     },
     {
         "note": {
@@ -94,10 +94,10 @@
             "align": "right"
         },
         "className": "em-annotation-top-passenger a-right",
-        "x": 191.2,
-        "y": 329.91,
-        "dy": -5.19,
-        "dx": -4.54
+        "x": 295,
+        "y": 509,
+        "dy": -8,
+        "dx": -7
     },
     {
         "note": {
@@ -105,9 +105,9 @@
             "align": "left"
         },
         "className": "em-annotation-top-passenger a-left",
-        "x": 356.48,
-        "y": 202.22,
+        "x": 550,
+        "y": 312,
         "dy": 0,
-        "dx": 8.43
+        "dx": 13
     }
 ]

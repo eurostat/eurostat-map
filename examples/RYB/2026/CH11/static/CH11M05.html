@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Maritime passengers mushroom map</title>
-        <link rel="stylesheet" href="../../styles.css" />
+        <link rel="stylesheet" href="../../../styles.css" />
         <style>
             body {
                 margin: 0;
@@ -54,7 +54,7 @@
     </head>
 
     <body>
-        <div style="display: none">
+        <div>
             <button id="toggle-edit-mode-btn" type="button">Toggle annotation edit mode</button>
             <button id="export-annotations-btn" type="button">Export annotations JSON</button>
             |
@@ -62,18 +62,14 @@
             <button id="export-svg-btn" type="button">Download map as SVG</button>
         </div>
         <svg id="map"></svg>
-        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="../../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
         <script src="./exportAnnotations.js"></script>
 
         <script type="module">
-            // Resized from the original print layout (1080x900) to a 700px-wide web embed - see
-            // the matching comment in CH11M04.html and comments.md's "700px wide for online
-            // websites" item for the full rationale.
-            const RESIZE_SCALE = 700 / 1080
-            const MAPWIDTH = 700
-            const MAPHEIGHT = Math.round(900 * RESIZE_SCALE)
+            const MAPWIDTH = 1080
+            const MAPHEIGHT = 900
             const annotationsFileName = 'maritime-passengers-annotations.json'
             const annotationsFilePath = `./data/M05/${annotationsFileName}`
             const loadedAnnotations = await (await fetch(annotationsFilePath)).json()
@@ -120,50 +116,36 @@
             const portsProjection = d3.geoIdentity().reflectY(true).fitSize([MAPWIDTH, MAPHEIGHT], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
 
             // build map
-            // insetWidth nudged up from the strict 94*scale (61px) to 76px - see the matching
-            // comment in CH11M04.html (the longest inset title, "Guadeloupe (FR)", otherwise gets
-            // clipped by its own box since inset title font-size doesn't shrink with it).
-            const insetHeight = Math.round(90 * RESIZE_SCALE),
-                insetWidth = 76,
-                padding = Math.round(10 * RESIZE_SCALE)
+            const insetHeight = 90,
+                insetWidth = 94,
+                padding = 10
             const map = eurostatmap
                 .map('mushroom')
                 .svgId('map')
                 .title('Maritime passengers embarked and disembarked')
                 .subtitle('(by main ports, 2024)')
                 .footer(true)
-                .footnoteWrap(90)
                 .header(true)
                 .footnote(
                     'Note: the map shows data for ports with at least 100 000 passengers embarked and disembarked. Top 10 EU ports labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
                 )
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
-                // z scaled up (smaller canvas needs a higher z to show the same geographic extent
-                // at the same on-screen position/size relative to the frame)
-                .position({ x: 4500000, y: 3300000, z: 7000 })
+                .position({ x: 4790000, y: 3420000, z: 4500 })
                 .nutsLevel(0)
                 .dorling(true)
-                .zoomButtons(true)
-                .zoomExtent([0.9, 100])
+                .zoomButtons(false)
                 .showEstatLogo(true)
-                .logoPosition([3, 624])
                 .hoverColor('#ffa500')
-                .mushroomSettings({
-                    minSize: 0.1,
-                    maxSize: 14,
-                    colors: ['#33A033', '#B09120'],
-                    orientation: 'horizontal',
-                })
+                .mushroomSettings({ minSize: 0.2, maxSize: 17, colors: ['#33A033', '#B09120'], orientation: 'horizontal' })
                 .legend({
                     //title: 'Passengers',
-                    onlyApplyOpacityWhileZoomed: true,
-                    x: Math.round(10 * RESIZE_SCALE),
-                    y: Math.round(220 * RESIZE_SCALE),
+                    x: 10,
+                    y: 220,
                     sizeLegend: {
                         title: 'Number of passengers',
-                        values: [6000000, 100000],
-                        labels: ['6 million', '100 thousand'],
+                        values: [5700000, 1000000],
+                        labels: ['5.7 million', '1 million'],
                     },
                     colorLegend: { title: 'Passenger movements', marginTop: 20, titlePadding: -5 },
                 })
@@ -172,47 +154,68 @@
                 })
                 .insetBoxPosition([MAPWIDTH - insetWidth - 20, 10])
                 .insets([
+                    // {
+                    //     x: -230,
+                    //     y: 0,
+                    //     title: 'Belgium / Netherlands',
+                    //     geo: 'EUR',
+                    //     position: { x: 3900000, y: 3200000, z: 1000 },
+                    // },
+                    // {
+                    //     x: -230,
+                    //     y: 220,
+                    //     title: 'Germany / Denmark',
+                    //     geo: 'EUR',
+                    //     position: { x: 4300000, y: 3490000, z: 2000 },
+                    // },
                     {
-                        title: 'Canarias',
+                        title: 'Canarias (ES)',
                         geo: 'IC',
                         x: 0,
                         y: 0,
-                        position: { z: 7000 },
+                        position: { z: 6400 },
                         width: insetWidth,
                         height: insetHeight,
-                        titlePosition: [4, 14],
                     },
                     {
-                        title: 'Guadeloupe',
+                        title: 'Guadeloupe (FR)',
                         geo: 'GP',
                         x: 0,
                         y: insetHeight + padding,
                         width: insetWidth,
                         height: insetHeight,
-                        position: { x: 680000, y: 1810000, z: 2300 },
+                        position: { x: 680000, y: 1810000, z: 2000 },
                         titlePosition: [4, 14],
                         // showScalebar: true,
                         // scalebarPosition: [48, 55],
                     },
                     {
-                        title: 'Martinique',
+                        title: 'Martinique (FR)',
                         geo: 'MQ',
                         x: 0,
                         y: insetHeight * 2 + padding * 2,
-                        position: { z: 1700 },
+                        position: { z: 1000 },
                         width: insetWidth,
                         height: insetHeight,
-                        titlePosition: [4, 14],
                     },
+                    // {
+                    //     title: 'Reunion (FR)',
+                    //     geo: 'RE',
+                    //     x: 0,
+                    //     y: insetHeight * 3 + padding * 3,
+                    //     position: { x: 348011, y: 7661627, z: 2000 },
+                    //     width: insetWidth,
+                    //     height: insetHeight,
+                    // },
                     {
-                        title: 'Réunion',
-                        geo: 'RE',
+                        geo: 'MT',
                         x: 0,
                         y: insetHeight * 3 + padding * 3,
-                        position: { x: 348011, y: 7671627, z: 2000 },
+                        scale: '01M',
+                        position: { x: 4721000, y: 1449000, z: 500 },
+                        title: 'Malta',
                         width: insetWidth,
                         height: insetHeight,
-                        titlePosition: [4, 14],
                     },
                 ])
                 .onBuild(() => {
@@ -225,24 +228,19 @@
                     })
 
                     // --- REMOVE if it already exists ---
-                    // Right-aligned at a fixed right margin and stacked as two lines (rather than
-                    // the original print layout's side-by-side placement, which only fit at the
-                    // wider 1080px canvas) so both lines fit within the narrower 700px web width.
                     d3.select('#map #em-footnote-2').remove()
                     d3.select('#map')
                         .append('text')
-                        .attr('x', MAPWIDTH - 10)
+                        .attr('x', MAPWIDTH - 272)
                         .attr('y', MAPHEIGHT + 83)
-                        .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Administrative Boundaries: ©EuroGeographics ©OSM')
 
                     d3.select('#map')
                         .append('text')
-                        .attr('x', MAPWIDTH - 10)
+                        .attr('x', MAPWIDTH - 209)
                         .attr('y', MAPHEIGHT + 96)
-                        .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: Eurostat – GISCO, 06/2026')
@@ -360,10 +358,10 @@
                     })
                     return geometries
                 })
-            // .annotations({
-            //     editMode: annotationsEditMode,
-            //     annotations: window.ch11M05Annotations,
-            // })
+                .annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M05Annotations,
+                })
 
             map.stat('v1', { label: 'Disembarked' }).stat('v2', { label: 'Embarked' })
             map.build()
@@ -441,9 +439,7 @@
             const exportBtnPNG = document.getElementById('export-png-btn')
             exportBtnPNG.addEventListener('click', function () {
                 const factor = 1
-                // +140 (was +120): the footnote now wraps to more lines at this width
-                // (footnoteWrap(90)), so the footer band is slightly taller than before.
-                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 140 * factor) // width, height, scale (for better quality)
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
             })
 
             const exportBtnSVG = document.getElementById('export-svg-btn')

@@ -179,6 +179,12 @@ export interface MapConfig {
     /** Position adjustment for legend button: [x, y] */
     legendButtonPosition?: [number, number]
 
+    /**
+     * Viewport width (px) at/below which the legend starts hidden (behind the legend button)
+     * when legendButton is enabled. @default 768
+     */
+    legendVisibilityBreakpoint?: number
+
     /** Pointer hover color for NUTS regions. */
     hoverColor?: string
 

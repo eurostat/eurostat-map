@@ -64,6 +64,22 @@ def clean_text(v):
     return re.sub(r"\s+", " ", str(v)).strip()
 
 
+# eurostat-map's tooltip renders unitText immediately after the value with no separator inserted
+# (the caller controls spacing entirely via the string itself - see choroplethTooltipFunction in
+# src/layers/choropleth/map-choropleth.js). Symbol-style units (%, ‰, °C, ...) read correctly
+# glued to the value ("17.4%"); word-style units (years, hectares, EUR/inhabitant, ...) need a
+# leading space ("85.0 years") to avoid running into the number. clean_text() unconditionally
+# strips whitespace from the raw Excel cell, so that leading space can't just be typed into the
+# spreadsheet - add it here instead, once, so every generated JSON file is correct regardless of
+# what's in the source cell.
+NO_SPACE_UNIT_TEXTS = {"", "%", "‰"}
+
+
+def format_unit_text(v):
+    text = clean_text(v) or ""
+    return text if text in NO_SPACE_UNIT_TEXTS else " " + text
+
+
 def rgb_to_css(value):
     m = RGB_RE.search(str(value))
     if not m:
@@ -189,7 +205,7 @@ def extract_option(ws, code):
         "title": title,
         "subtitle": subtitle,
         "chapterTitle": clean_text(ws.cell(row=4, column=9).value),  # I4
-        "unitText": clean_text(ws.cell(row=17, column=9).value) or "",  # I17
+        "unitText": format_unit_text(ws.cell(row=17, column=9).value),  # I17
         "data": data,
     }
 

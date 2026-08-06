@@ -1,5 +1,21 @@
 import { spaceAsThousandSeparator } from '../core/utils'
 
+/**
+ * Detect the number of decimal places in a d3 scale's domain max value.
+ * Used to format labels with the same precision as the actual dataset rather than the
+ * precision of an auto-computed representative value (which can introduce extra decimals,
+ * e.g. domain[1] * 0.1 = 2.47 when the data itself only has 1 d.p.).
+ * @param {Object} classifier - A d3 scale (or similar) exposing .domain()
+ * @returns {number}
+ */
+export function getMaxDomainPrecision(classifier) {
+    const domain = classifier?.domain?.()
+    const maxVal = domain?.[1] ?? 0
+    if (!Number.isFinite(maxVal)) return 0
+    const str = Number.parseFloat(maxVal.toFixed(12)).toString()
+    return str.includes('.') ? str.split('.')[1].length : 0
+}
+
 export function formatSizeLabel(value, formatterOrDecimals) {
     if (!Number.isFinite(value)) return ''
     const normalizedValue = normalizeFloatingPointValue(value)

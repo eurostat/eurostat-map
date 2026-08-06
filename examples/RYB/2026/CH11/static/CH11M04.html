@@ -3,8 +3,8 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Maritime passengers mushroom map</title>
-        <link rel="stylesheet" href="../../styles.css" />
+        <title>Maritime freight mushroom map</title>
+        <link rel="stylesheet" href="../../../styles.css" />
         <style>
             body {
                 margin: 0;
@@ -32,29 +32,36 @@
             .em-kosovo-bn {
                 opacity: 0.4;
             }
-            g.em-annotation-be-nl .connector {
-                transform: translate(-20px, -13px);
-            }
+            /* .em-annotations {
+                pointer-events: none;
+            } */
+
             .em-cntrg {
                 fill: #f2f2f2 !important;
             }
             .em-cntbn {
                 opacity: 0.4 !important;
             }
-            .a-napoli .annotation-note-title {
-                transform: translate(0px, 10px);
+
+            g.em-annotation-be-nl .annotation-subject {
+                transform: translate(-30px, -13px);
             }
-            .paloukia .annotation-note-title {
-                transform: translate(14px, -3px);
+            g.em-annotation-be-nl .annotation-connector {
+                transform: translate(-39px, 20px);
             }
-            .calabria .annotation-note-title {
-                transform: translate(-3px, -1px);
+            .em-annotation-de-dk path,
+            .em-annotation-be-nl path,
+            .em-insets #em-frame-EUR {
+                stroke: #17256b !important;
+                stroke-width: 2px !important;
+                opacity: 0.2;
+                pointer-events: none;
             }
         </style>
     </head>
 
     <body>
-        <div style="display: none">
+        <div>
             <button id="toggle-edit-mode-btn" type="button">Toggle annotation edit mode</button>
             <button id="export-annotations-btn" type="button">Export annotations JSON</button>
             |
@@ -62,28 +69,24 @@
             <button id="export-svg-btn" type="button">Download map as SVG</button>
         </div>
         <svg id="map"></svg>
-        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="../../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
         <script src="./exportAnnotations.js"></script>
 
         <script type="module">
-            // Resized from the original print layout (1080x900) to a 700px-wide web embed - see
-            // the matching comment in CH11M04.html and comments.md's "700px wide for online
-            // websites" item for the full rationale.
-            const RESIZE_SCALE = 700 / 1080
-            const MAPWIDTH = 700
-            const MAPHEIGHT = Math.round(900 * RESIZE_SCALE)
-            const annotationsFileName = 'maritime-passengers-annotations.json'
-            const annotationsFilePath = `./data/M05/${annotationsFileName}`
+            const MAPWIDTH = 1080
+            const MAPHEIGHT = 900
+            const annotationsFileName = 'maritime-freight-annotations.json'
+            const annotationsFilePath = `./data/M04/${annotationsFileName}`
             const loadedAnnotations = await (await fetch(annotationsFilePath)).json()
-            window.ch11M05Annotations = loadedAnnotations
+            window.ch11M04Annotations = loadedAnnotations
             let annotationsEditMode = false
 
             //data load
-            const [stats] = await Promise.all([d3.json('./data/M05/maritime-passengers.json')])
-            const inwardData = indexByCode([...stats], 'disembarked')
-            const outwardData = indexByCode([...stats], 'embarked')
+            const [freightData] = await Promise.all([d3.json('./data/M04/maritime-freight.json')])
+            const inwardData = indexByCode([...freightData], 'ton_2024_inward')
+            const outwardData = indexByCode([...freightData], 'ton_2024_outward')
 
             //projection
             // european projection
@@ -120,52 +123,34 @@
             const portsProjection = d3.geoIdentity().reflectY(true).fitSize([MAPWIDTH, MAPHEIGHT], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
 
             // build map
-            // insetWidth nudged up from the strict 94*scale (61px) to 76px - see the matching
-            // comment in CH11M04.html (the longest inset title, "Guadeloupe (FR)", otherwise gets
-            // clipped by its own box since inset title font-size doesn't shrink with it).
-            const insetHeight = Math.round(90 * RESIZE_SCALE),
-                insetWidth = 76,
-                padding = Math.round(10 * RESIZE_SCALE)
+            const insetHeight = 90,
+                insetWidth = 94,
+                padding = 10
             const map = eurostatmap
                 .map('mushroom')
                 .svgId('map')
-                .title('Maritime passengers embarked and disembarked')
-                .subtitle('(by main ports, 2024)')
-                .footer(true)
-                .footnoteWrap(90)
                 .header(true)
-                .footnote(
-                    'Note: the map shows data for ports with at least 100 000 passengers embarked and disembarked. Top 10 EU ports labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
-                )
+                .title('Maritime freight handled')
+                .subtitle('(by main ports, 2024)')
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
-                // z scaled up (smaller canvas needs a higher z to show the same geographic extent
-                // at the same on-screen position/size relative to the frame)
-                .position({ x: 4500000, y: 3300000, z: 7000 })
+                .position({ x: 4790000, y: 3420000, z: 4500 })
                 .nutsLevel(0)
                 .dorling(true)
-                .zoomButtons(true)
-                .zoomExtent([0.9, 100])
+                .zoomButtons(false)
                 .showEstatLogo(true)
-                .logoPosition([3, 624])
                 .hoverColor('#ffa500')
-                .mushroomSettings({
-                    minSize: 0.1,
-                    maxSize: 14,
-                    colors: ['#33A033', '#B09120'],
-                    orientation: 'horizontal',
-                })
+                .mushroomSettings({ minSize: 1, maxSize: 40, colors: ['#33A033', '#B09120'], orientation: 'horizontal' })
                 .legend({
-                    //title: 'Passengers',
-                    onlyApplyOpacityWhileZoomed: true,
-                    x: Math.round(10 * RESIZE_SCALE),
-                    y: Math.round(220 * RESIZE_SCALE),
+                    // subtitle: 'handled',
+                    x: 10,
+                    y: 220,
                     sizeLegend: {
-                        title: 'Number of passengers',
-                        values: [6000000, 100000],
-                        labels: ['6 million', '100 thousand'],
+                        title: 'Tonnes of freight handled',
+                        values: [288000000, 100000000, 10000000],
+                        labels: ['288 million ', '100 million', '10 million'],
                     },
-                    colorLegend: { title: 'Passenger movements', marginTop: 20, titlePadding: -5 },
+                    colorLegend: { title: 'Freight movements', titlePadding: -5, marginTop: 20 },
                 })
                 .tooltip({
                     textFunction: tooltipTextFunction,
@@ -173,79 +158,114 @@
                 .insetBoxPosition([MAPWIDTH - insetWidth - 20, 10])
                 .insets([
                     {
-                        title: 'Canarias',
+                        x: -230,
+                        y: 0,
+                        title: 'Germany / Denmark',
+                        geo: 'EUR',
+                        position: { x: 4300000, y: 3490000, z: 2000 },
+                    },
+                    {
+                        x: -230,
+                        y: 220,
+                        title: 'Belgium / Netherlands',
+                        geo: 'EUR',
+                        position: { x: 3900000, y: 3200000, z: 1000 },
+                    },
+
+                    {
+                        title: 'Canarias (ES)',
                         geo: 'IC',
                         x: 0,
                         y: 0,
-                        position: { z: 7000 },
+                        position: { z: 6400 },
                         width: insetWidth,
                         height: insetHeight,
-                        titlePosition: [4, 14],
                     },
                     {
-                        title: 'Guadeloupe',
+                        title: 'Guadeloupe (FR)',
                         geo: 'GP',
                         x: 0,
                         y: insetHeight + padding,
                         width: insetWidth,
                         height: insetHeight,
-                        position: { x: 680000, y: 1810000, z: 2300 },
+                        position: { x: 680000, y: 1810000, z: 2000 },
                         titlePosition: [4, 14],
                         // showScalebar: true,
                         // scalebarPosition: [48, 55],
                     },
                     {
-                        title: 'Martinique',
+                        title: 'Martinique (FR)',
                         geo: 'MQ',
                         x: 0,
                         y: insetHeight * 2 + padding * 2,
-                        position: { z: 1700 },
+                        position: { z: 1000 },
                         width: insetWidth,
                         height: insetHeight,
-                        titlePosition: [4, 14],
                     },
                     {
-                        title: 'Réunion',
+                        title: 'Réunion (FR)',
                         geo: 'RE',
                         x: 0,
                         y: insetHeight * 3 + padding * 3,
-                        position: { x: 348011, y: 7671627, z: 2000 },
+                        position: { x: 348011, y: 7661627, z: 2000 },
                         width: insetWidth,
                         height: insetHeight,
-                        titlePosition: [4, 14],
                     },
                 ])
+                .footer(true)
+                .footnote(
+                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). Top 10 EU ports labelled. <br>Source: Eurostat (online data code: mar_go_aa)'
+                )
                 .onBuild(() => {
-                    const portKeys = stats.map((d) => d.code)
+                    const portKeys = freightData.map((d) => d.code)
                     //color regions
-                    d3.selectAll('#map .em-nutsrg path').attr('fill', (d) => {
-                        const iso = d.properties.id // e.g. "NL"
-                        const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
-                        return hasPort ? '#fff4cc' : '#F2F2F2'
-                    })
+                    d3.selectAll('#map .em-nutsrg path')
+                        // .style('fill', (d) => {
+                        //     const iso = d.properties.id // e.g. "NL"
+
+                        //     // Check if ANY port key starts with this ISO
+                        //     const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+
+                        //     return hasPort ? 'rgba(178, 232, 215,0.4)' : '#F2F2F2'
+                        // })
+                        .attr('fill', (d) => {
+                            const iso = d.properties.id // e.g. "NL"
+
+                            // Check if ANY port key starts with this ISO
+                            const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+
+                            return hasPort ? '#fff4cc' : 'rgb(242, 242, 242)'
+                        })
 
                     // --- REMOVE if it already exists ---
-                    // Right-aligned at a fixed right margin and stacked as two lines (rather than
-                    // the original print layout's side-by-side placement, which only fit at the
-                    // wider 1080px canvas) so both lines fit within the narrower 700px web width.
                     d3.select('#map #em-footnote-2').remove()
                     d3.select('#map')
                         .append('text')
-                        .attr('x', MAPWIDTH - 10)
+                        .attr('x', MAPWIDTH - 272)
                         .attr('y', MAPHEIGHT + 83)
-                        .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Administrative Boundaries: ©EuroGeographics ©OSM')
 
                     d3.select('#map')
                         .append('text')
-                        .attr('x', MAPWIDTH - 10)
+                        .attr('x', MAPWIDTH - 209)
                         .attr('y', MAPHEIGHT + 96)
-                        .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: Eurostat – GISCO, 06/2026')
+
+                    //createTopCountriesOverlay("#map", sums, rankingX, rankingY);
+
+                    //move annotations to below centroids
+                    const svgEl = document.querySelector('#map')
+                    if (svgEl) {
+                        const centroidsGroup = svgEl.querySelector('#em-centroids-map')
+                        const annotationsGroup = svgEl.querySelector('#em-annotations')
+                        if (centroidsGroup && annotationsGroup) {
+                            centroidsGroup.parentNode.insertBefore(centroidsGroup, annotationsGroup.nextSibling)
+                        }
+                    }
                 })
                 .filterGeometriesFunction((geometries, map) => {
                     //remove greenland to stop title overlap
@@ -265,29 +285,26 @@
                     //
                     // This same filter function runs once for the main map AND once per inset
                     // (see AGENTS.md/comments.md - filterGeometriesFunction is forwarded to
-                    // insets as-is). The overseas insets (Canarias/Guadeloupe/Martinique) only
-                    // ever want their own single designated port (matched below by code),
+                    // insets as-is). The overseas insets (Canarias/Guadeloupe/Martinique/Réunion)
+                    // only ever want their own single designated port (matched below by code),
                     // reprojected into that inset's own local space - not every port on the
                     // mainland map reprojected (usually nonsensically) into their tiny viewport.
-                    // Malta has no dedicated port/reprojection case below, so it gets none rather
-                    // than every port smeared into it.
+                    // The two 'EUR' insets (Germany/Denmark, Belgium/Netherlands) are just
+                    // zoomed-in views of the same mainland extent as the main map, so they get
+                    // every port like the main map does.
                     const overseasInsetPortCodes = {
-                        IC: ['ES02ESLPA', 'ES0ESLPA'],
-                        GP: ['FR04GPPTP', 'FR0GPPTP'],
-                        MQ: ['FR04MQFDF', 'FR0MQFDF'],
+                        IC: 'ES02ESLPA',
+                        GP: 'FR04GPPTP',
+                        MQ: 'FR04MQFDF',
+                        RE: 'FR05RELPT',
                     }
                     const isOverseasInset = map?.isInset && Object.prototype.hasOwnProperty.call(overseasInsetPortCodes, map.geo_)
-                    const isUnmappedInset = map?.isInset && !isOverseasInset && map.geo_ !== 'EUR'
-                    const portsForThisMap = isUnmappedInset
-                        ? []
-                        : isOverseasInset
-                          ? stats.filter((d) => overseasInsetPortCodes[map.geo_].includes(d.code))
-                          : stats
+                    const portsForThisMap = isOverseasInset ? freightData.filter((d) => d.code === overseasInsetPortCodes[map.geo_]) : freightData
 
                     let centroids = geometries[1]
                     ;[...portsForThisMap].forEach((d) => {
                         let newCentroid
-                        if (d.code == 'ES02ESLPA' || d.code == 'ES0ESLPA') {
+                        if (d.code == 'ES02ESLPA') {
                             // handle canarias (inset map)
                             newCentroid = {
                                 type: 'Feature',
@@ -301,7 +318,7 @@
                                     na: d.name,
                                 },
                             }
-                        } else if (d.code == 'FR04GPPTP' || d.code == 'FR0GPPTP') {
+                        } else if (d.code == 'FR04GPPTP') {
                             newCentroid = {
                                 type: 'Feature',
                                 geometry: {
@@ -314,7 +331,7 @@
                                     na: d.name,
                                 },
                             }
-                        } else if (d.code == 'FR04MQFDF' || d.code == 'FR0MQFDF') {
+                        } else if (d.code == 'FR04MQFDF') {
                             newCentroid = {
                                 type: 'Feature',
                                 geometry: {
@@ -327,7 +344,7 @@
                                     na: d.name,
                                 },
                             }
-                        } else if (d.code == 'FR05RELPT' || d.code == 'FR0RELPT') {
+                        } else if (d.code == 'FR05RELPT') {
                             newCentroid = {
                                 type: 'Feature',
                                 geometry: {
@@ -360,12 +377,12 @@
                     })
                     return geometries
                 })
-            // .annotations({
-            //     editMode: annotationsEditMode,
-            //     annotations: window.ch11M05Annotations,
-            // })
+                .annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M04Annotations,
+                })
 
-            map.stat('v1', { label: 'Disembarked' }).stat('v2', { label: 'Embarked' })
+            map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
             map.build()
             map.statData('v1').setData(filterNulls(inwardData))
             map.statData('v2').setData(filterNulls(outwardData))
@@ -375,13 +392,13 @@
                 annotationsEditMode = !annotationsEditMode
                 map.annotations({
                     editMode: annotationsEditMode,
-                    annotations: window.ch11M05Annotations,
+                    annotations: window.ch11M04Annotations,
                 })
             })
 
             const exportAnnotationsBtn = document.getElementById('export-annotations-btn')
             exportAnnotationsBtn.addEventListener('click', function () {
-                const result = generateMapAnnotations(window.ch11M05Annotations)
+                const result = generateMapAnnotations(window.ch11M04Annotations)
                 downloadAnnotationsJSON(result, annotationsFileName)
                 console.log('Exported annotations:', result)
             })
@@ -405,23 +422,23 @@
 
                 if (isCountry) {
                     // 🇪🇺 Country hover → sum all ports in that country
-                    stats.forEach((d) => {
+                    freightData.forEach((d) => {
                         if (d.country === regionId) {
-                            inward += +d.disembarked || 0
-                            outward += +d.embarked || 0
+                            inward += +d.ton_2024_inward || 0
+                            outward += +d.ton_2024_outward || 0
                         }
                     })
                 } else {
                     // ⚓ Port hover → direct lookup
-                    const port = stats.find((d) => d.code === regionId)
+                    const port = freightData.find((d) => d.code === regionId)
                     if (port) {
-                        inward = +port.disembarked || 0
-                        outward = +port.embarked || 0
+                        inward = +port.ton_2024_inward || 0
+                        outward = +port.ton_2024_outward || 0
                     }
                 }
 
-                const row1 = `<tr><td>Disembarked: ${(inward / 1e6).toFixed(1)} million passengers</td></tr>`
-                const row2 = `<tr><td>Embarked: ${(outward / 1e6).toFixed(1)} million passengers</td></tr>`
+                const row1 = `<tr><td>Inward: ${(inward / 1e6).toFixed(1)} million tonnes</td></tr>`
+                const row2 = `<tr><td>Outward: ${(outward / 1e6).toFixed(1)} million tonnes</td></tr>`
 
                 return `
                 <div class="em-tooltip-bar">
@@ -441,14 +458,12 @@
             const exportBtnPNG = document.getElementById('export-png-btn')
             exportBtnPNG.addEventListener('click', function () {
                 const factor = 1
-                // +140 (was +120): the footnote now wraps to more lines at this width
-                // (footnoteWrap(90)), so the footer band is slightly taller than before.
-                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 140 * factor) // width, height, scale (for better quality)
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
             })
 
             const exportBtnSVG = document.getElementById('export-svg-btn')
             exportBtnSVG.addEventListener('click', function () {
-                map.exportMapToSVG('CH11M05-maritime-passengers') // filename without extension
+                map.exportMapToSVG('CH11M04-ports') // filename without extension
             })
         </script>
     </body>

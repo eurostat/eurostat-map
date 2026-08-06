@@ -461,13 +461,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     // Shared by the initial render AND toggleLegendVisibility, so both agree on what "undefined"
     // (i.e. the user never called setLegendVisibility/toggleLegendVisibility) means. These used to
     // be computed independently: the initial render defaulted to hidden on mobile
-    // (window.innerWidth <= 768) when a legend button is present, but toggleLegendVisibility's
-    // fallback always assumed "currently visible" regardless of screen width. On mobile that made
-    // the first click a no-op (it computed current=true, flipped to false, re-applied display:none
-    // - the legend was already hidden) and the second click was the one that actually showed it.
+    // (window.innerWidth <= legendVisibilityBreakpoint_) when a legend button is present, but
+    // toggleLegendVisibility's fallback always assumed "currently visible" regardless of screen
+    // width. On mobile that made the first click a no-op (it computed current=true, flipped to
+    // false, re-applied display:none - the legend was already hidden) and the second click was the
+    // one that actually showed it.
     const getDefaultLegendVisible = function () {
         if (out.legendButton_) {
-            return typeof window === 'undefined' || window.innerWidth > 768
+            return typeof window === 'undefined' || window.innerWidth > out.legendVisibilityBreakpoint_
         }
         return true
     }

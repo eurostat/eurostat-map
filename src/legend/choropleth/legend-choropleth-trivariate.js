@@ -148,8 +148,19 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
                 },
             },
 
+            // The triangle background is tiled with many small colour-swatch grid cells
+            // (createDiscretePlot's polygons) covering the WHOLE plot area, not just where data
+            // points actually sit - hovering any cell, including ones with no plotted point
+            // underneath, matched and highlighted every region sharing that colour. That's the
+            // desired interaction when colorTarget is 'triangles' (hover a colour area, see which
+            // regions belong to it), but when colorTarget is 'points' the intended interaction is
+            // dataPointHandlers above (hover an actual plotted region, see just that one) - the
+            // background grid should be inert then, not a second, coarser, easy-to-trigger-by-
+            // accident highlight path. Gate the whole handler on colorTarget so 'points' mode skips
+            // it entirely.
             triangleHandlers: {
                 mouseover: (e, color) => {
+                    if (out.colorTarget !== 'triangles') return
                     cancelReset()
                     isHighlighting = true
                     const el = select(e.currentTarget)
@@ -172,6 +183,7 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
                 },
 
                 mouseout: (e) => {
+                    if (out.colorTarget !== 'triangles') return
                     if (!isHighlighting) return
                     const el = select(e.currentTarget)
                     el.attr('stroke', null).attr('stroke-width', null).lower()
