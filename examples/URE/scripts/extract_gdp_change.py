@@ -7,8 +7,8 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 URE_ROOT = Path(__file__).resolve().parents[1]
-WORKBOOK = URE_ROOT / "data/input/Economy_URE2026.xlsx"
-OUTPUT = URE_ROOT / "data/gdp-change.json"
+WORKBOOK = URE_ROOT / "2026/data/input/Economy_URE2026.xlsx"
+OUTPUT = URE_ROOT / "2026/data/gdp-change.json"
 RGB_RE = re.compile(r"R(\d+)\s*/\s*G(\d+)\s*/\s*B(\d+)")
 
 

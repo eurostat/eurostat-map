@@ -14,7 +14,7 @@
 
 ## Data
 
-Data for these maps is stored in [examples/URE/data/](https://github.com/eurostat/eurostat-map/tree/master/examples/URE/data):
+Data for these maps is stored in [examples/URE/2026/data/](https://github.com/eurostat/eurostat-map/tree/master/examples/URE/2026/data):
 
 - `F2A At risk of poverty or social exclusion rate_degurba_2025.json`
 - `F2B At risk of poverty rate_degurba_2025.json`
