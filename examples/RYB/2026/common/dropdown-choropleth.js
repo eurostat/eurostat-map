@@ -221,15 +221,22 @@
                 .footnoteTooltipText(false)
                 .footnoteWrap(75)
 
-                .legendButton(true)
+                //legendButton(true)
                 .legend({
                     title: json.legendTitle,
                     position: isMobile ? 'top left' : '',
                     x: isMobile ? undefined : 5,
-                    y: isMobile ? undefined : 50,
+                    y: isMobile ? undefined : 90,
                     boxPadding: 4,
                     boxOpacity: 0.9,
-                    tickLength: 8,
+                    tickLength: 3,
+                    sepLineLength: 15,
+                    titlePadding: 0,
+                    shapeHeight: 15,
+                    shapeWidth: 15,
+                    noDataShapeWidth: 15,
+                    noDataShapeHeight: 15,
+                    noDataPadding: 2,
                     maxMin: false,
                     labelFormatter: labelFormatter,
                     onlyApplyOpacityWhileZoomed: true,
