@@ -31,6 +31,9 @@
             .em-legend {
                 filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
             }
+            #newInsets {
+                display: none;
+            }
         </style>
     </head>
     <body>
@@ -48,11 +51,11 @@
         <script src="../common/insets/overseas.js"></script>
         <script src="../common/responsive-map.js"></script>
         <script>
-            const MAPWIDTH = 797
-            const MAPHEIGHT = 677
-            const LEGENDX = 629
+            const MAPWIDTH = 700
+            const MAPHEIGHT = 600
+            const LEGENDX = 530
             const LEGENDY = 327
-            const INSETBOXPOSITION = [550, 70]
+            const INSETBOXPOSITION = [405, 70]
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
             createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, INSETBOXPOSITION)
@@ -124,7 +127,7 @@
                     .header(true)
                     .title('Nights spent in tourist accommodation')
                     .subtitle('(by NUTS 2 regions, 2024)')
-                    .position({ x: 4800000, y: 3400000, z: 6000 })
+                    .position({ x: 4800000, y: 3400000, z: 7000 })
                     .dorling(true)
                     .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
                     .dorlingIterations(1) // Collision detection iterations
@@ -145,6 +148,7 @@
                     .zoomButtons(false)
                     .insets(insetsCfg)
                     .insetBoxPosition(INSETBOXPOSITION)
+                    .insetsButton(true)
                     .legend({
                         boxOpacity: 1,
                         x: LEGENDX,
@@ -178,6 +182,23 @@
                         if (!newInsets.empty()) {
                             d3.select('#map').node().appendChild(newInsets.node())
                         }
+
+                        // #newInsets holds the actual visible overseas insets (Canarias, Malta,
+                        // etc. - built by overseas.js/createInsetDOMElements, NOT the library's own
+                        // .insets() rendering target, #em-insets-group, which stays empty on this
+                        // page). insetsButton(true)'s own click handler only toggles #em-insets-group
+                        // (see appendInsetsButton in src/core/buttons/insets-button.js), so it has no
+                        // visible effect here - wire it to #newInsets directly instead.
+                        d3.select('#em-insets-button').on('click', (event) => {
+                            event.preventDefault()
+                            event.stopPropagation()
+                            const el = document.getElementById('newInsets')
+                            const hidden = getComputedStyle(el).display === 'none'
+                            // 'block' (not '') - #newInsets's display:none comes from the stylesheet
+                            // rule above, and an empty inline value wouldn't override it since it's
+                            // the SAME element the stylesheet rule already targets.
+                            el.style.display = hidden ? 'block' : 'none'
+                        })
 
                         //add cartography footnote
                         d3.select('#map #em-footnote-2').remove()
