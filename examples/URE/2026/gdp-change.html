@@ -13,10 +13,10 @@
     <body>
         <svg id="map61"></svg>
 
-        <script src="../../build/eurostatmap.js"></script>
+        <script src="../../../build/eurostatmap.js"></script>
         <script>
             async function buildMap() {
-                const config = await fetch('./data/gdp-change.json').then((response) => {
+                const config = await fetch('../data/gdp-change.json').then((response) => {
                     if (!response.ok) throw new Error(`Could not load GDP map data (${response.status})`)
                     return response.json()
                 })

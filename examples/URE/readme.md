@@ -2,15 +2,15 @@
 
 ## Urban-rural typology maps
 
-- [Overall change in GDP per inhabitant, 2013–23](https://eurostat.github.io/eurostat-map/examples/URE/gdp-change.html)
+- [Overall change in GDP per inhabitant, 2013–23](https://eurostat.github.io/eurostat-map/examples/URE/2026/gdp-change.html)
 
 ## DEGURBA maps
 
-- [At risk of poverty or social exclusion rate](https://eurostat.github.io/eurostat-map/examples/URE/poverty-or-social-exclusion-rate.html)
-- [At risk of poverty rate](https://eurostat.github.io/eurostat-map/examples/URE/poverty-rate.html)
-- [Severe material and social deprivation rate](https://eurostat.github.io/eurostat-map/examples/URE/severe-material-social-deprivation-rate.html)
-- [People living in households with very low work intensity](https://eurostat.github.io/eurostat-map/examples/URE/very-low-work-intensity.html)
-- [Unemployment rate](https://eurostat.github.io/eurostat-map/examples/URE/unemployment.html)
+- [At risk of poverty or social exclusion rate](https://eurostat.github.io/eurostat-map/examples/URE/2026/poverty-or-social-exclusion-rate.html)
+- [At risk of poverty rate](https://eurostat.github.io/eurostat-map/examples/URE/2026/poverty-rate.html)
+- [Severe material and social deprivation rate](https://eurostat.github.io/eurostat-map/examples/URE/2026/severe-material-social-deprivation-rate.html)
+- [People living in households with very low work intensity](https://eurostat.github.io/eurostat-map/examples/URE/2026/very-low-work-intensity.html)
+- [Unemployment rate](https://eurostat.github.io/eurostat-map/examples/URE/2026/unemployment.html)
 
 ## Data
 

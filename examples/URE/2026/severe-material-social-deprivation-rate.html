@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>At risk of poverty or social exclusion rate</title>
+        <title>Severe material and social deprivation rate</title>
         <style>
             body {
                 margin: 0;
@@ -81,11 +81,11 @@
             </div>
         </div>
 
-        <script src="../../build/eurostatmap.js"></script>
+        <script src="../../../build/eurostatmap.js"></script>
 
         <script>
-            const DATA_FILE = 'data/F2A At risk of poverty or social exclusion rate_degurba_2025.json'
-            const POPULATION_FILE = '../cartogram/grid/data/degurba/population.json'
+            const DATA_FILE = '../data/F2C Severe material and social deprivation rate_degurba_2025.json'
+            const POPULATION_FILE = '../../cartogram/grid/data/degurba/population.json'
             const COUNTRY_TO_ISO2 = {
                 Austria: 'AT',
                 Belgium: 'BE',
@@ -120,7 +120,7 @@
             }
 
             const config = {
-                title: 'At risk of poverty or social exclusion rate',
+                title: 'Severe material and social deprivation rate',
                 subtitle: 'Share of people, by degree of urbanisation, 2025',
                 legendTitle: 'Degree of urbanisation',
                 unitText: '%',
@@ -129,12 +129,6 @@
                 source: 'Source: Eurostat',
                 footnote: 'Note: CH, 2024.',
                 noDataRegions: ['IS', 'UK', 'LI', 'BA', 'ME', 'AL', 'MK', 'TR', 'MD', 'GE', 'RS', 'UA'],
-            }
-
-            const CATEGORY_COLORS = {
-                DEG1: '#E04040',
-                DEG2: '#8F741A',
-                DEG3: '#33A033',
             }
 
             let map = null
@@ -217,7 +211,11 @@
                     .encoding('color', {
                         stat: 'degurbaRate',
                         by: 'category',
-                        values: CATEGORY_COLORS,
+                        values: {
+                            DEG1: '#E04040',
+                            DEG2: '#8F741A',
+                            DEG3: '#33A033',
+                        },
                         labels: {
                             DEG1: 'Cities',
                             DEG2: 'Towns and suburbs',
