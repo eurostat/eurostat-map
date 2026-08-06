@@ -252,7 +252,12 @@
                     // rendering at its fixed native size (see responsive-map.js). Internal layout
                     // (annotations, symbol sizes, insets) keeps its native MAPWIDTH/MAPHEIGHT pixel
                     // values - only the rendered box is scaled via a viewBox + CSS.
-                    RYBResponsiveMap.makeResponsive('map', MAPWIDTH, MAPHEIGHT + 140)
+                    //
+                    // Deferred: the library grows #map's height attribute to fit a wrapped footnote
+                    // in its own setTimeout(..., 20) inside recalculateLayout() (see
+                    // src/core/map-instance.js), which runs AFTER onBuild fires. Reading #map's
+                    // height synchronously here would catch it still at its pre-growth value.
+                    setTimeout(() => RYBResponsiveMap.makeResponsive('map', 'map'), 30)
                 })
                 .filterGeometriesFunction((geometries, map) => {
                     //remove greenland to stop title overlap

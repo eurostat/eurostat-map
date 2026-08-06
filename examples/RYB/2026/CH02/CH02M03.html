@@ -118,8 +118,16 @@
                         // Make the whole map responsive: scale #container fluidly up to 700px wide
                         // instead of rendering at its fixed native size (see responsive-map.js).
                         // #map itself keeps its native MAPWIDTH/MAPHEIGHT pixel attributes - only
-                        // the OUTER #container gets a viewBox and is scaled down/up via CSS.
-                        RYBResponsiveMap.makeResponsive('container', MAPWIDTH, MAPHEIGHT + 120)
+                        // the OUTER #container gets a viewBox (matching #map's real height
+                        // attribute) and is scaled down/up via CSS.
+                        //
+                        // Deferred: the library grows #map's height attribute to fit a wrapped
+                        // footnote in its own setTimeout(..., 20) inside recalculateLayout() (see
+                        // src/core/map-instance.js), which runs AFTER onBuild fires. Reading #map's
+                        // height synchronously here would catch it still at its pre-growth value,
+                        // clipping the footnote/credits whenever the footnote wraps to more lines
+                        // than the original MAPHEIGHT budget assumed.
+                        setTimeout(() => RYBResponsiveMap.makeResponsive('container', 'map'), 30)
                     })
                     .dorling(true)
                     .dorlingSettings({ padding: 0 })

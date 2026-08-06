@@ -13,15 +13,24 @@
     // Every RYB 2026 interactive map maxes out at 700px wide once embedded (see comments.md).
     const DEFAULT_MAX_WIDTH = 700
 
-    // svgId: id of the OUTERMOST svg element for this map (the one with the real pixel
-    // width/height attributes - #container where present, otherwise #map directly).
-    // nativeWidth/nativeHeight: the full rendered content size in CSS pixels, including any
-    // manually-appended footer/credits lines below the library's own height attribute (pass the
-    // same total used for PNG export, e.g. MAPWIDTH/MAPHEIGHT + footer budget).
-    function makeResponsive(svgId, nativeWidth, nativeHeight, maxWidth) {
+    // svgId: id of the OUTERMOST svg element for this map (the one to apply the viewBox/CSS
+    // scaling to - #container where present, otherwise #map directly).
+    // mapSvgId: id of the #map svg itself (always 'map' in practice). Its height ATTRIBUTE is
+    // read directly rather than trusting a caller-supplied constant - callers used to pass a
+    // guessed nativeHeight (e.g. MAPHEIGHT + 120), which clipped the footnote/credits whenever
+    // the real footnote wrapped to more lines than the guess assumed (its actual wrapped line
+    // count depends on text length and only the library knows it, at build time - see
+    // AGENTS.md/comments.md). #map's height attribute is already grown correctly by the library
+    // (recalculateLayout in src/core/layout.js) and by our own manual footer/credit appends, so
+    // reading it back is always accurate, never a guess.
+    function makeResponsive(svgId, mapSvgId, maxWidth) {
         const svg = document.getElementById(svgId)
-        if (!svg) return
+        const mapSvg = document.getElementById(mapSvgId)
+        if (!svg || !mapSvg) return
         const cap = maxWidth || DEFAULT_MAX_WIDTH
+
+        const nativeWidth = parseFloat(mapSvg.getAttribute('width')) || svg.getBoundingClientRect().width
+        const nativeHeight = parseFloat(mapSvg.getAttribute('height')) || svg.getBoundingClientRect().height
 
         svg.setAttribute('viewBox', `0 0 ${nativeWidth} ${nativeHeight}`)
         svg.setAttribute('preserveAspectRatio', 'xMinYMin meet')
