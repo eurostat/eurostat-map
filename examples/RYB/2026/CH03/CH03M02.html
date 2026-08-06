@@ -18,6 +18,9 @@
             .em-legend-subtitle {
                 font-size: 12px;
             }
+            .em-subtitle {
+                font-size: 17px;
+            }
             #newInsets {
                 filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
             }
@@ -44,6 +47,9 @@
                 max-width: 100%;
                 height: auto;
             }
+            .em-ternary-center-annotation-label {
+                transform: translate(0px, 15px);
+            }
         </style>
         <div>
             <button id="export-png-btn" type="button">Download map as PNG</button>
@@ -54,8 +60,8 @@
             <svg id="container">
                 <svg id="map"></svg>
                 <g id="newInsets"></g>
+                <svg id="legend-container" width="250" height="250" style="transform: translate(484px, 327px)"></svg>
             </svg>
-            <svg id="legend-container" width="310" height="300"></svg>
         </div>
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
@@ -70,7 +76,7 @@
 
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
-            const insetBoxPosition = [548, 69]
+            const insetBoxPosition = [455, 69]
             createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
 
             //get data
@@ -89,8 +95,8 @@
             const breaks = 29
             const spread = 3.5
 
-            const MAPWIDTH = 797
-            const MAPHEIGHT = 677
+            const MAPWIDTH = 700
+            const MAPHEIGHT = 600
 
             const map = eurostatmap
                 .map('trivariateChoropleth')
@@ -101,7 +107,7 @@
                 .header(true)
                 .showEstatLogo(true)
                 .insetBoxPosition(insetBoxPosition)
-                .position({ x: 4950000, y: 3440000, z: 5950 })
+                .position({ x: 4890000, y: 3500000, z: 7000 })
                 .footnote(
                     'Note: share of students enrolled in ISCED levels 6, 7 and 8. Germany: NUTS level 1. The Netherlands and Albania: national data. Iceland and Albania: 2023. Liechtenstein and Türkiye: 2022. <br>Source: Eurostat (online data code: educ_uoe_enrt06)'
                 )
@@ -123,15 +129,15 @@
                 })
                 .legend({
                     svgId: 'legend-container',
-                    title: 'Education level',
-                    subtitle: getLegendSubtitle(),
-
+                    //title: 'Education level',
+                    //subtitle: getLegendSubtitle(),
+                    //onlyApplyOpacityWhileZoomed: true,
                     boxOpacity: 0.99,
-                    width: 310,
-                    height: 300,
+                    width: 200,
+                    height: 160,
                     labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
                     labelPosition: legendLabelPosition,
-                    padding: { top: 15, right: 30, bottom: 0, left: 47 },
+                    padding: { top: -10, right: 30, bottom: 0, left: 47 },
                     showLines: true,
                     gridBreaks: 5,
                     minorSubdivisions: 2,
@@ -140,8 +146,8 @@
                     showData: true,
                     colorTarget: legendColorTarget, // 'points' | 'triangles'
                     centerAnnotationOffsets: {
-                        labelX: -35,
-                        labelY: 140,
+                        labelX: -25,
+                        labelY: 120,
                         curveX: 0,
                         curveY: 0,
                     },
