@@ -35,7 +35,7 @@
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
         </div>
-        <svg id="container" width="100%" height="900px">
+        <svg id="container">
             <svg id="map"></svg>
             <g id="newInsets"></g>
         </svg>
@@ -43,6 +43,7 @@
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
         <script src="../../insets/overseas.js"></script>
+        <script src="../../responsive-map.js"></script>
         <script>
             const MAPWIDTH = 797
             const MAPHEIGHT = 677
@@ -192,6 +193,12 @@
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .html('Cartography: Eurostat – GISCO, 06/2026')
+
+                        // Make the whole map responsive: scale #container fluidly up to 700px wide
+                        // instead of rendering at its fixed native size (see responsive-map.js).
+                        // #map itself keeps its native MAPWIDTH/MAPHEIGHT pixel attributes - only
+                        // the OUTER #container gets a viewBox and is scaled down/up via CSS.
+                        RYBResponsiveMap.makeResponsive('container', MAPWIDTH, MAPHEIGHT + 120)
                     })
                     .zoomExtent([0.9, 100])
                     .build()

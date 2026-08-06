@@ -1,3 +1,17 @@
+/* Shared safety net so every RYB 2026 interactive map (embedded in iframes on the Eurostat
+   website - see comments.md's "consistent map container sizing" item) never grows scrollbars or
+   overflows its embedding container, regardless of viewport width. Individual pages/CSS may
+   already declare stricter rules; these are just the floor. */
+html,
+body {
+    margin: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+svg {
+    max-width: 100%;
+}
+
 .em-legend-background {
     filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.2)) !important;
 }
