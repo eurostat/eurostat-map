@@ -59,6 +59,19 @@
             svg.attr('height', creditsBottom)
         }
 
+        // #map-frame (the outer wrapper #map sits in - see the comment on it in measure()) must
+        // grow to match, or ITS OWN svg viewport clips the credits even though #map itself now
+        // fits them: a nested <svg> clips independently of its parent's size, so growing #map
+        // alone isn't enough. #map-container has no fixed height any more (see
+        // dropdown-choropleth.css), so growing #map-frame here simply makes the whole page taller
+        // to fit - nothing is clipped, regardless of how many lines the footnote wraps to.
+        const mapFrameEl = document.getElementById('map-frame')
+        if (mapFrameEl) {
+            const frameHeight = parseFloat(mapFrameEl.getAttribute('height')) || 0
+            const finalHeight = Math.max(frameHeight, creditsBottom)
+            if (finalHeight > frameHeight) mapFrameEl.setAttribute('height', finalHeight)
+        }
+
         svg.append('text')
             .attr('x', rightEdge)
             .attr('y', creditsY)
@@ -93,35 +106,20 @@
         // Mutable sizing state, recomputed by measure() on init and on every resize (see the
         // resize listener at the bottom of init()) so the map stays fluid - CSS alone (#container's
         // max-width: 700px) shrinks the surrounding HTML boxes, but #map/#map-frame's own SVG
-        // width/height ATTRIBUTES only change when we explicitly recompute and re-apply them here.
-        let isMobile, mapWidth, mapHeight, mapFrameHeight, resolvedPosition, resolvedInsetBoxPosition
+        // width ATTRIBUTE only changes when we explicitly recompute and re-apply it here.
+        let isMobile, mapWidth, mapHeight, resolvedPosition, resolvedInsetBoxPosition
 
         function measure() {
             isMobile = window.innerWidth <= 699
             mapWidth = mapContainer ? mapContainer.clientWidth : isMobile ? window.innerWidth : 700
-            const containerHeight = mapContainer ? mapContainer.clientHeight : isMobile ? Math.round(window.innerHeight - 230) : 550
 
-            // Reserve room below the drawing area for the footer band: the library's own footer
-            // (footnote, ~2 lines) plus our two cartography credit lines (see addCartographyCredits).
-            // #map-container has overflow:hidden and a fixed (viewport-derived) height, so anything
-            // rendered past this budget is silently clipped rather than pushing the container taller.
-            //
-            // Capped at ~0.82x mapWidth (the continental-Europe framing's natural aspect ratio): on a
-            // tall embedding container (e.g. a full-height iframe), containerHeight - 100 can be far
-            // taller than the map content actually needs. The drawing area itself doesn't stretch to
-            // fill that (its content is governed by .position()/.scale(), not by mapHeight), but the
-            // library still positions the footer group - and with it the footnote and our credits
-            // lines below it - at the BOTTOM of the full mapHeight canvas. Uncapped, that leaves a
-            // large blank gap under the visible map with the footnote/credits stranded far below it,
-            // down near the bottom of the page instead of sitting just under the map.
-            mapHeight = Math.min(Math.max(containerHeight - 100, 240), Math.round(mapWidth * 0.82))
-            // Budget for the footer band below mapHeight: the library's own footer (footnote, up to
-            // ~4 wrapped lines) plus our two cartography credit lines (see addCartographyCredits,
-            // which grows #map's own height attribute to fit this content). #map-frame must be at
-            // least as tall as #map ends up after that growth, or its own SVG viewport (overflow:
-            // hidden, like any nested <svg>) clips the credits even though they exist in the DOM.
-            const footerBudget = 100
-            mapFrameHeight = mapHeight + footerBudget
+            // #map-container is content-driven height now (see dropdown-choropleth.css), not
+            // clamped to a fixed viewport-derived height - so mapHeight only needs to express the
+            // drawing area's own natural framing (continental Europe, ~0.82x mapWidth), not fit
+            // inside any pre-existing container budget. #map-frame/#map-container then grow to
+            // whatever the map (drawing area + footer + our credits, see addCartographyCredits)
+            // actually renders at - nothing is ever clipped, regardless of footnote length.
+            mapHeight = Math.max(Math.round(mapWidth * 0.82), 240)
 
             // #map-frame wraps #map only so the static insets group (<g id="newInsets">) has a valid
             // SVG rendering context (see the comment on #map in dropdown-choropleth.css). Percentage
@@ -129,14 +127,13 @@
             // HTML element) resolves unreliably in Chromium - #map-frame's own rendered box can end up
             // many times too large. Giving it explicit pixel dimensions here (matching the proven
             // working pattern in CH02M03.html/CH10M02.html, whose wrapping <svg id="container"> always
-            // has a fixed pixel height, never height:100%) sidesteps that entirely. Sized to
-            // mapFrameHeight (mapHeight + footerBudget, not the full, possibly much taller
-            // containerHeight) so it neither stretches into blank space below the actual map content
-            // nor clips the footer/credits growth beneath it.
+            // has a fixed pixel height, never height:100%) sidesteps that entirely. Height is set to
+            // match mapHeight for now and grown further in addCartographyCredits once the real
+            // (footnote-length-dependent) footer content height is known.
             const mapFrameEl = document.getElementById('map-frame')
             if (mapFrameEl) {
                 mapFrameEl.setAttribute('width', mapWidth)
-                mapFrameEl.setAttribute('height', mapFrameHeight)
+                mapFrameEl.setAttribute('height', mapHeight)
             }
 
             // Default continental-Europe framing; overseas regions are shown separately via the static insets.
@@ -164,12 +161,12 @@
 
         // Title/subtitle are rendered as external HTML (see .map-title/.map-subtitle in the
         // skeleton), NOT via the library's internal .header()/.title()/.subtitle() - an internal
-        // SVG header adds its own height on top of .height(mapHeight), which overflows the fixed-
-        // height #map-container and pushes the drawing area (and the zoom buttons anchored to its
-        // bottom edge, see positionZoomButtons()) below the visible/clipped viewport. Keeping
-        // title/subtitle outside the SVG (matching examples/statistics-explained/.../human-services)
-        // avoids that entirely. Must be kept in sync manually since some maps (e.g. CH04M3) change
-        // title text per dropdown option.
+        // SVG header adds its own height on top of .height(mapHeight), which would push the
+        // drawing area (and the zoom buttons anchored to its bottom edge, see
+        // positionZoomButtons()) further down than expected. Keeping title/subtitle outside the
+        // SVG (matching examples/statistics-explained/.../human-services) avoids that entirely.
+        // Must be kept in sync manually since some maps (e.g. CH04M3) change title text per
+        // dropdown option.
         function syncHeaderText(option) {
             const titleEl = document.getElementById('map-title')
             if (titleEl) titleEl.textContent = option.title
