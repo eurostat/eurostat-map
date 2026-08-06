@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Maritime freight mushroom map</title>
+        <link rel="stylesheet" href="../../../styles.css" />
+        <style>
+            body {
+                margin: 0;
+            }
+            .em-legend-background {
+                filter: none;
+            }
+            .em-mushroom-segment {
+                stroke: white;
+                stroke-width: 0.5;
+            }
+            .em-zoom-buttons {
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                transform: translate(95%, 89%);
+                display: none;
+            }
+            .em-inset {
+                filter: drop-shadow(0.7px 0.7px 0.7px rgba(0, 0, 0, 0.5));
+            }
+            .em-insets .em-frame {
+                stroke: grey;
+                stroke-width: 1px !important;
+            }
+            .em-cntbn,
+            .em-kosovo-bn {
+                opacity: 0.4;
+            }
+            /* .em-annotations {
+                pointer-events: none;
+            } */
+
+            .em-cntrg {
+                fill: #f2f2f2 !important;
+            }
+            .em-cntbn {
+                opacity: 0.4 !important;
+            }
+
+            g.em-annotation-be-nl .annotation-subject {
+                transform: translate(-30px, -13px);
+            }
+            g.em-annotation-be-nl .annotation-connector {
+                transform: translate(-39px, 20px);
+            }
+            .em-annotation-de-dk path,
+            .em-annotation-be-nl path,
+            .em-insets #em-frame-EUR {
+                stroke: #17256b !important;
+                stroke-width: 2px !important;
+                opacity: 0.2;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div>
+            <button id="toggle-edit-mode-btn" type="button">Toggle annotation edit mode</button>
+            <button id="export-annotations-btn" type="button">Export annotations JSON</button>
+            |
+            <button id="export-png-btn" type="button">Download map as PNG</button>
+            <button id="export-svg-btn" type="button">Download map as SVG</button>
+        </div>
+        <svg id="map"></svg>
+        <script src="../../../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/d3@7"></script>
+        <script src="https://unpkg.com/proj4"></script>
+        <script src="./exportAnnotations.js"></script>
+
+        <script type="module">
+            const MAPWIDTH = 1080
+            const MAPHEIGHT = 900
+            const annotationsFileName = 'maritime-freight-annotations.json'
+            const annotationsFilePath = `./data/M04/${annotationsFileName}`
+            const loadedAnnotations = await (await fetch(annotationsFilePath)).json()
+            window.ch11M04Annotations = loadedAnnotations
+            let annotationsEditMode = false
+
+            //data load
+            const [freightData] = await Promise.all([d3.json('./data/M04/maritime-freight.json')])
+            const inwardData = indexByCode([...freightData], 'ton_2024_inward')
+            const outwardData = indexByCode([...freightData], 'ton_2024_outward')
+
+            //projection
+            // european projection
+            proj4.defs('EPSG:3035', '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 ' + '+ellps=GRS80 +units=m +no_defs +type=crs')
+            const to3035 = ([lon, lat]) => proj4('EPSG:4326', 'EPSG:3035', [lon, lat])
+            //canarias
+            proj4.defs('EPSG:32628', '+proj=utm +zone=28 +datum=WGS84 +units=m +no_defs +type=crs')
+            const to32628 = ([lon, lat]) => proj4('EPSG:4326', 'EPSG:32628', [lon, lat])
+            //guadeloupe, martinique
+            proj4.defs('EPSG:32620', '+proj=utm +zone=20 +datum=WGS84 +units=m +no_defs +type=crs')
+            const to32620 = ([lon, lat]) => proj4('EPSG:4326', 'EPSG:32620', [lon, lat])
+            //reunion
+            proj4.defs('EPSG:32740', '+proj=utm +zone=40 +south +datum=WGS84 +units=m +no_defs +type=crs')
+            const to32740 = ([lon, lat]) => proj4('EPSG:4326', 'EPSG:32740', [lon, lat])
+
+            const getBBOXAsGeoJSON = function (bb) {
+                return {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'MultiPoint',
+                        coordinates: [
+                            [bb[0], bb[1]],
+                            [bb[2], bb[3]],
+                        ],
+                    },
+                }
+            }
+            const getApproxCurrentGeoBbox = function () {
+                const defaultPosition = { x: 4790000, y: 3420000, z: 1000 }
+                const halfWidth = 0.6 * defaultPosition.z * MAPWIDTH
+                const halfHeight = 0.6 * defaultPosition.z * MAPHEIGHT
+                return [defaultPosition.x - halfWidth, defaultPosition.y - halfHeight, defaultPosition.x + halfWidth, defaultPosition.y + halfHeight]
+            }
+            const portsProjection = d3.geoIdentity().reflectY(true).fitSize([MAPWIDTH, MAPHEIGHT], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
+
+            // build map
+            const insetHeight = 90,
+                insetWidth = 94,
+                padding = 10
+            const map = eurostatmap
+                .map('mushroom')
+                .svgId('map')
+                .header(true)
+                .title('Maritime freight handled')
+                .subtitle('(by main ports, 2024)')
+                .width(MAPWIDTH)
+                .height(MAPHEIGHT)
+                .position({ x: 4790000, y: 3420000, z: 4500 })
+                .nutsLevel(0)
+                .dorling(true)
+                .zoomButtons(false)
+                .showEstatLogo(true)
+                .hoverColor('#ffa500')
+                .mushroomSettings({ minSize: 1, maxSize: 40, colors: ['#33A033', '#B09120'], orientation: 'horizontal' })
+                .legend({
+                    // subtitle: 'handled',
+                    x: 10,
+                    y: 220,
+                    sizeLegend: {
+                        title: 'Tonnes of freight handled',
+                        values: [288000000, 100000000, 10000000],
+                        labels: ['288 million ', '100 million', '10 million'],
+                    },
+                    colorLegend: { title: 'Freight movements', titlePadding: -5, marginTop: 20 },
+                })
+                .tooltip({
+                    textFunction: tooltipTextFunction,
+                })
+                .insetBoxPosition([MAPWIDTH - insetWidth - 20, 10])
+                .insets([
+                    {
+                        x: -230,
+                        y: 0,
+                        title: 'Germany / Denmark',
+                        geo: 'EUR',
+                        position: { x: 4300000, y: 3490000, z: 2000 },
+                    },
+                    {
+                        x: -230,
+                        y: 220,
+                        title: 'Belgium / Netherlands',
+                        geo: 'EUR',
+                        position: { x: 3900000, y: 3200000, z: 1000 },
+                    },
+
+                    {
+                        title: 'Canarias (ES)',
+                        geo: 'IC',
+                        x: 0,
+                        y: 0,
+                        position: { z: 6400 },
+                        width: insetWidth,
+                        height: insetHeight,
+                    },
+                    {
+                        title: 'Guadeloupe (FR)',
+                        geo: 'GP',
+                        x: 0,
+                        y: insetHeight + padding,
+                        width: insetWidth,
+                        height: insetHeight,
+                        position: { x: 680000, y: 1810000, z: 2000 },
+                        titlePosition: [4, 14],
+                        // showScalebar: true,
+                        // scalebarPosition: [48, 55],
+                    },
+                    {
+                        title: 'Martinique (FR)',
+                        geo: 'MQ',
+                        x: 0,
+                        y: insetHeight * 2 + padding * 2,
+                        position: { z: 1000 },
+                        width: insetWidth,
+                        height: insetHeight,
+                    },
+                    {
+                        title: 'Réunion (FR)',
+                        geo: 'RE',
+                        x: 0,
+                        y: insetHeight * 3 + padding * 3,
+                        position: { x: 348011, y: 7661627, z: 2000 },
+                        width: insetWidth,
+                        height: insetHeight,
+                    },
+                ])
+                .footer(true)
+                .footnote(
+                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). Top 10 EU ports labelled. <br>Source: Eurostat (online data code: mar_go_aa)'
+                )
+                .onBuild(() => {
+                    const portKeys = freightData.map((d) => d.code)
+                    //color regions
+                    d3.selectAll('#map .em-nutsrg path')
+                        // .style('fill', (d) => {
+                        //     const iso = d.properties.id // e.g. "NL"
+
+                        //     // Check if ANY port key starts with this ISO
+                        //     const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+
+                        //     return hasPort ? 'rgba(178, 232, 215,0.4)' : '#F2F2F2'
+                        // })
+                        .attr('fill', (d) => {
+                            const iso = d.properties.id // e.g. "NL"
+
+                            // Check if ANY port key starts with this ISO
+                            const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+
+                            return hasPort ? '#fff4cc' : 'rgb(242, 242, 242)'
+                        })
+
+                    // --- REMOVE if it already exists ---
+                    d3.select('#map #em-footnote-2').remove()
+                    d3.select('#map')
+                        .append('text')
+                        .attr('x', MAPWIDTH - 272)
+                        .attr('y', MAPHEIGHT + 83)
+                        .attr('class', 'em-footnote')
+                        .attr('id', 'em-footnote-2')
+                        .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+
+                    d3.select('#map')
+                        .append('text')
+                        .attr('x', MAPWIDTH - 209)
+                        .attr('y', MAPHEIGHT + 96)
+                        .attr('class', 'em-footnote')
+                        .attr('id', 'em-footnote-2')
+                        .html('Cartography: Eurostat – GISCO, 06/2026')
+
+                    //createTopCountriesOverlay("#map", sums, rankingX, rankingY);
+
+                    //move annotations to below centroids
+                    const svgEl = document.querySelector('#map')
+                    if (svgEl) {
+                        const centroidsGroup = svgEl.querySelector('#em-centroids-map')
+                        const annotationsGroup = svgEl.querySelector('#em-annotations')
+                        if (centroidsGroup && annotationsGroup) {
+                            centroidsGroup.parentNode.insertBefore(centroidsGroup, annotationsGroup.nextSibling)
+                        }
+                    }
+                })
+                .filterGeometriesFunction((geometries, map) => {
+                    //remove greenland to stop title overlap
+                    let nuts2json = geometries[0]
+                    let countries = nuts2json.objects.cntrg.geometries
+                    countries = countries.filter((f) => {
+                        if (f.properties.id !== 'GL' && f.properties.na !== 'Greenland') {
+                            return f
+                        } else {
+                            return false
+                        }
+                    })
+                    nuts2json.objects.cntrg.geometries = countries
+
+                    // add ports to centroids array
+                    // each port location must be reprojected to the map projection
+                    //
+                    // This same filter function runs once for the main map AND once per inset
+                    // (see AGENTS.md/comments.md - filterGeometriesFunction is forwarded to
+                    // insets as-is). The overseas insets (Canarias/Guadeloupe/Martinique/Réunion)
+                    // only ever want their own single designated port (matched below by code),
+                    // reprojected into that inset's own local space - not every port on the
+                    // mainland map reprojected (usually nonsensically) into their tiny viewport.
+                    // The two 'EUR' insets (Germany/Denmark, Belgium/Netherlands) are just
+                    // zoomed-in views of the same mainland extent as the main map, so they get
+                    // every port like the main map does.
+                    const overseasInsetPortCodes = {
+                        IC: 'ES02ESLPA',
+                        GP: 'FR04GPPTP',
+                        MQ: 'FR04MQFDF',
+                        RE: 'FR05RELPT',
+                    }
+                    const isOverseasInset = map?.isInset && Object.prototype.hasOwnProperty.call(overseasInsetPortCodes, map.geo_)
+                    const portsForThisMap = isOverseasInset ? freightData.filter((d) => d.code === overseasInsetPortCodes[map.geo_]) : freightData
+
+                    let centroids = geometries[1]
+                    ;[...portsForThisMap].forEach((d) => {
+                        let newCentroid
+                        if (d.code == 'ES02ESLPA') {
+                            // handle canarias (inset map)
+                            newCentroid = {
+                                type: 'Feature',
+                                geometry: {
+                                    coordinates: to32628([d.lon, d.lat]), // IC_32628 fixed position in inset
+                                    type: 'Point',
+                                },
+                                properties: {
+                                    centroid: undefined,
+                                    id: d.code,
+                                    na: d.name,
+                                },
+                            }
+                        } else if (d.code == 'FR04GPPTP') {
+                            newCentroid = {
+                                type: 'Feature',
+                                geometry: {
+                                    coordinates: to32620([d.lon, d.lat]), // GP_32620 fixed position in inset
+                                    type: 'Point',
+                                },
+                                properties: {
+                                    centroid: undefined,
+                                    id: d.code,
+                                    na: d.name,
+                                },
+                            }
+                        } else if (d.code == 'FR04MQFDF') {
+                            newCentroid = {
+                                type: 'Feature',
+                                geometry: {
+                                    coordinates: to32620([d.lon, d.lat]), // MQ_32620 fixed position in inset
+                                    type: 'Point',
+                                },
+                                properties: {
+                                    centroid: undefined,
+                                    id: d.code,
+                                    na: d.name,
+                                },
+                            }
+                        } else if (d.code == 'FR05RELPT') {
+                            newCentroid = {
+                                type: 'Feature',
+                                geometry: {
+                                    coordinates: to32740([d.lon, d.lat]), // RE_32740 fixed position in inset
+                                    type: 'Point',
+                                },
+                                properties: {
+                                    centroid: undefined,
+                                    id: d.code,
+                                    na: d.name,
+                                },
+                            }
+                        } else {
+                            let coords = to3035([d.lon, d.lat])
+                            newCentroid = {
+                                type: 'Feature',
+                                geometry: {
+                                    coordinates: coords,
+                                    type: 'Point',
+                                },
+                                properties: {
+                                    centroid: portsProjection(coords),
+                                    id: d.code,
+                                    na: d.name,
+                                },
+                            }
+                        }
+
+                        centroids.features.push(newCentroid)
+                    })
+                    return geometries
+                })
+                .annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M04Annotations,
+                })
+
+            map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
+            map.build()
+            map.statData('v1').setData(filterNulls(inwardData))
+            map.statData('v2').setData(filterNulls(outwardData))
+
+            const editModeBtn = document.getElementById('toggle-edit-mode-btn')
+            editModeBtn.addEventListener('click', function () {
+                annotationsEditMode = !annotationsEditMode
+                map.annotations({
+                    editMode: annotationsEditMode,
+                    annotations: window.ch11M04Annotations,
+                })
+            })
+
+            const exportAnnotationsBtn = document.getElementById('export-annotations-btn')
+            exportAnnotationsBtn.addEventListener('click', function () {
+                const result = generateMapAnnotations(window.ch11M04Annotations)
+                downloadAnnotationsJSON(result, annotationsFileName)
+                console.log('Exported annotations:', result)
+            })
+
+            function filterNulls(obj) {
+                return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))
+            }
+
+            function indexByCode(portsData, valueKey) {
+                return Object.fromEntries(portsData.map((p) => [p.code, p[valueKey]]))
+            }
+
+            function tooltipTextFunction(region, map) {
+                const regionName = region.properties.na
+                const regionId = region.properties.id
+
+                const isCountry = regionId.length === 2
+
+                let inward = 0
+                let outward = 0
+
+                if (isCountry) {
+                    // 🇪🇺 Country hover → sum all ports in that country
+                    freightData.forEach((d) => {
+                        if (d.country === regionId) {
+                            inward += +d.ton_2024_inward || 0
+                            outward += +d.ton_2024_outward || 0
+                        }
+                    })
+                } else {
+                    // ⚓ Port hover → direct lookup
+                    const port = freightData.find((d) => d.code === regionId)
+                    if (port) {
+                        inward = +port.ton_2024_inward || 0
+                        outward = +port.ton_2024_outward || 0
+                    }
+                }
+
+                const row1 = `<tr><td>Inward: ${(inward / 1e6).toFixed(1)} million tonnes</td></tr>`
+                const row2 = `<tr><td>Outward: ${(outward / 1e6).toFixed(1)} million tonnes</td></tr>`
+
+                return `
+                <div class="em-tooltip-bar">
+                    <b>${regionName}</b>
+                </div>
+                <div class="em-tooltip-text">
+                    <table class="em-tooltip-table">
+                        <tbody>
+                            ${row1}
+                            ${row2}
+                        </tbody>
+                    </table>
+                </div>
+            `.trim()
+            }
+
+            const exportBtnPNG = document.getElementById('export-png-btn')
+            exportBtnPNG.addEventListener('click', function () {
+                const factor = 1
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+            })
+
+            const exportBtnSVG = document.getElementById('export-svg-btn')
+            exportBtnSVG.addEventListener('click', function () {
+                map.exportMapToSVG('CH11M04-ports') // filename without extension
+            })
+        </script>
+    </body>
+</html>

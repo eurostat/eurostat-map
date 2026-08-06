@@ -1,7 +1,7 @@
 {
   "nutsLevel": 2,
   "scale": "20M",
-  "unitText": "years",
+  "unitText": " years",
   "legendTitle": "years",
   "colors": [
     "rgb(228,230,255)",

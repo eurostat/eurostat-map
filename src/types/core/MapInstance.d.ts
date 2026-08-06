@@ -412,6 +412,13 @@ export interface MapInstance {
     legendButtonPosition(): [number, number] | undefined
     legendButtonPosition(pos: [number, number]): this
 
+    /**
+     * Viewport width (px) at/below which the legend starts hidden (behind the legend button)
+     * when legendButton is enabled. @default 768
+     */
+    legendVisibilityBreakpoint(): number
+    legendVisibilityBreakpoint(px: number): this
+
     /** Pointer hover color for NUTS regions. */
     hoverColor(): string
     hoverColor(color: string): this

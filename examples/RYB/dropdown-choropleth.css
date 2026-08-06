@@ -28,6 +28,11 @@ body {
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    /* #map-frame is sized to a square in dropdown-choropleth.js (see the comment there on why
+       #map must stay 1:1) and is rarely as wide as this container - center it instead of leaving
+       it flush against the left edge. */
+    display: flex;
+    justify-content: center;
 }
 
 /* No width/height:100% here deliberately: #map is nested inside another percentage-sized SVG

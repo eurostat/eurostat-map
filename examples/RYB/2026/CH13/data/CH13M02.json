@@ -1,7 +1,7 @@
 {
   "nutsLevel": 2,
   "scale": "20M",
-  "unitText": "hectares",
+  "unitText": " hectares",
   "legendTitle": "hectares",
   "colors": [
     "rgb(184,186,253)",

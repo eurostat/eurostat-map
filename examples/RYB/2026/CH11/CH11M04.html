@@ -16,11 +16,6 @@
                 stroke: white;
                 stroke-width: 0.5;
             }
-            .em-zoom-buttons {
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-                transform: translate(95%, 89%);
-                display: none;
-            }
             .em-inset {
                 filter: drop-shadow(0.7px 0.7px 0.7px rgba(0, 0, 0, 0.5));
             }
@@ -55,12 +50,13 @@
                 stroke: #17256b !important;
                 stroke-width: 2px !important;
                 opacity: 0.2;
+                pointer-events: none;
             }
         </style>
     </head>
 
     <body>
-        <div>
+        <div style="display: none">
             <button id="toggle-edit-mode-btn" type="button">Toggle annotation edit mode</button>
             <button id="export-annotations-btn" type="button">Export annotations JSON</button>
             |
@@ -74,8 +70,16 @@
         <script src="./exportAnnotations.js"></script>
 
         <script type="module">
-            const MAPWIDTH = 1080
-            const MAPHEIGHT = 900
+            // Resized from the original print layout (1080x900) to a 700px-wide web embed.
+            // Every pixel-dependent value below (map size, zoom z, inset sizes, symbol sizes,
+            // legend position) is scaled by the same ratio (700/1080 ~= 0.648) so the map stays
+            // geographically coherent - see comments.md's "700px wide for online websites" item.
+            // Annotation positions are scaled by the same ratio in maritime-freight-annotations.json,
+            // but label text doesn't shrink/reflow the same way circles do, so some may still need
+            // manual nudging via "Toggle annotation edit mode" -> drag -> "Export annotations JSON".
+            const RESIZE_SCALE = 700 / 1080
+            const MAPWIDTH = 700
+            const MAPHEIGHT = Math.round(900 * RESIZE_SCALE)
             const annotationsFileName = 'maritime-freight-annotations.json'
             const annotationsFilePath = `./data/M04/${annotationsFileName}`
             const loadedAnnotations = await (await fetch(annotationsFilePath)).json()
@@ -122,9 +126,12 @@
             const portsProjection = d3.geoIdentity().reflectY(true).fitSize([MAPWIDTH, MAPHEIGHT], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
 
             // build map
-            const insetHeight = 90,
-                insetWidth = 94,
-                padding = 10
+            // insetWidth nudged up from the strict 94*scale (61px) to 76px: at that scale the
+            // longest inset title ("Guadeloupe (FR)") got clipped by its own box, since inset
+            // title font-size (8.5px, see insets.css) doesn't shrink along with the box.
+            const insetHeight = Math.round(90 * RESIZE_SCALE),
+                insetWidth = 76,
+                padding = Math.round(10 * RESIZE_SCALE)
             const map = eurostatmap
                 .map('mushroom')
                 .svgId('map')
@@ -133,20 +140,31 @@
                 .subtitle('(by main ports, 2024)')
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)
-                .position({ x: 4790000, y: 3420000, z: 4500 })
+                // z scaled up (smaller canvas needs a higher z to show the same geographic extent
+                // at the same on-screen position/size relative to the frame)
+                .position({ x: 4790000, y: 3420000, z: Math.round(4500 / RESIZE_SCALE) })
                 .nutsLevel(0)
                 .dorling(true)
-                .zoomButtons(false)
+                .zoomButtons(true)
+                .showEstatLogo(true)
+                .zoomExtent([0.9, 100])
+                .logoPosition([3, 624])
                 .hoverColor('#ffa500')
-                .mushroomSettings({ minSize: 1, maxSize: 40, colors: ['#33A033', '#B09120'], orientation: 'horizontal' })
+                .mushroomSettings({
+                    minSize: Math.max(1, 1 * RESIZE_SCALE),
+                    maxSize: Math.round(40 * RESIZE_SCALE),
+                    colors: ['#33A033', '#B09120'],
+                    orientation: 'horizontal',
+                })
                 .legend({
                     // subtitle: 'handled',
-                    x: 10,
-                    y: 220,
+                    x: Math.round(10 * RESIZE_SCALE),
+                    y: Math.round(220 * RESIZE_SCALE),
+                    onlyApplyOpacityWhileZoomed: true,
                     sizeLegend: {
                         title: 'Tonnes of freight handled',
-                        values: [288000000, 100000000, 10000000],
-                        labels: ['288 million ', '100 million', '10 million'],
+                        values: [288000000, 50000000],
+                        labels: ['288 million', '50 million'],
                     },
                     colorLegend: { title: 'Freight movements', titlePadding: -5, marginTop: 20 },
                 })
@@ -156,61 +174,50 @@
                 .insetBoxPosition([MAPWIDTH - insetWidth - 20, 10])
                 .insets([
                     {
-                        x: -230,
-                        y: 0,
-                        title: 'Germany / Denmark',
-                        geo: 'EUR',
-                        position: { x: 4300000, y: 3490000, z: 2000 },
-                    },
-                    {
-                        x: -230,
-                        y: 220,
-                        title: 'Belgium / Netherlands',
-                        geo: 'EUR',
-                        position: { x: 3900000, y: 3200000, z: 1000 },
-                    },
-
-                    {
-                        title: 'Canarias (ES)',
+                        title: 'Canarias',
                         geo: 'IC',
                         x: 0,
                         y: 0,
-                        position: { z: 6400 },
+                        position: { z: 7000 },
                         width: insetWidth,
                         height: insetHeight,
+                        titlePosition: [4, 14],
                     },
                     {
-                        title: 'Guadeloupe (FR)',
+                        title: 'Guadeloupe',
                         geo: 'GP',
                         x: 0,
                         y: insetHeight + padding,
                         width: insetWidth,
                         height: insetHeight,
-                        position: { x: 680000, y: 1810000, z: 2000 },
+                        position: { x: 680000, y: 1810000, z: 2300 },
                         titlePosition: [4, 14],
                         // showScalebar: true,
                         // scalebarPosition: [48, 55],
                     },
                     {
-                        title: 'Martinique (FR)',
+                        title: 'Martinique',
                         geo: 'MQ',
                         x: 0,
                         y: insetHeight * 2 + padding * 2,
-                        position: { z: 1000 },
+                        position: { z: 1700 },
                         width: insetWidth,
                         height: insetHeight,
+                        titlePosition: [4, 14],
                     },
                     {
-                        title: 'Réunion (FR)',
+                        title: 'Réunion',
                         geo: 'RE',
                         x: 0,
                         y: insetHeight * 3 + padding * 3,
-                        position: { x: 348011, y: 7661627, z: 2000 },
+                        position: { x: 348011, y: 7671627, z: 2000 },
                         width: insetWidth,
                         height: insetHeight,
+                        titlePosition: [4, 14],
                     },
                 ])
                 .footer(true)
+                .footnoteWrap(90)
                 .footnote(
                     'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). Top 10 EU ports labelled. <br>Source: Eurostat (online data code: mar_go_aa)'
                 )
@@ -236,19 +243,24 @@
                         })
 
                     // --- REMOVE if it already exists ---
+                    // Right-aligned at a fixed right margin and stacked as two lines (rather than
+                    // the original print layout's side-by-side placement, which only fit at the
+                    // wider 1080px canvas) so both lines fit within the narrower 700px web width.
                     d3.select('#map #em-footnote-2').remove()
                     d3.select('#map')
                         .append('text')
-                        .attr('x', MAPWIDTH - 272)
+                        .attr('x', MAPWIDTH - 10)
                         .attr('y', MAPHEIGHT + 83)
+                        .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Administrative Boundaries: ©EuroGeographics ©OSM')
 
                     d3.select('#map')
                         .append('text')
-                        .attr('x', MAPWIDTH - 209)
+                        .attr('x', MAPWIDTH - 10)
                         .attr('y', MAPHEIGHT + 96)
+                        .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: Eurostat – GISCO, 06/2026')
@@ -265,7 +277,7 @@
                         }
                     }
                 })
-                .filterGeometriesFunction((geometries) => {
+                .filterGeometriesFunction((geometries, map) => {
                     //remove greenland to stop title overlap
                     let nuts2json = geometries[0]
                     let countries = nuts2json.objects.cntrg.geometries
@@ -280,8 +292,27 @@
 
                     // add ports to centroids array
                     // each port location must be reprojected to the map projection
+                    //
+                    // This same filter function runs once for the main map AND once per inset
+                    // (see AGENTS.md/comments.md - filterGeometriesFunction is forwarded to
+                    // insets as-is). The overseas insets (Canarias/Guadeloupe/Martinique/Réunion)
+                    // only ever want their own single designated port (matched below by code),
+                    // reprojected into that inset's own local space - not every port on the
+                    // mainland map reprojected (usually nonsensically) into their tiny viewport.
+                    // The two 'EUR' insets (Germany/Denmark, Belgium/Netherlands) are just
+                    // zoomed-in views of the same mainland extent as the main map, so they get
+                    // every port like the main map does.
+                    const overseasInsetPortCodes = {
+                        IC: 'ES02ESLPA',
+                        GP: 'FR04GPPTP',
+                        MQ: 'FR04MQFDF',
+                        RE: 'FR05RELPT',
+                    }
+                    const isOverseasInset = map?.isInset && Object.prototype.hasOwnProperty.call(overseasInsetPortCodes, map.geo_)
+                    const portsForThisMap = isOverseasInset ? freightData.filter((d) => d.code === overseasInsetPortCodes[map.geo_]) : freightData
+
                     let centroids = geometries[1]
-                    ;[...freightData].forEach((d) => {
+                    ;[...portsForThisMap].forEach((d) => {
                         let newCentroid
                         if (d.code == 'ES02ESLPA') {
                             // handle canarias (inset map)
@@ -356,10 +387,10 @@
                     })
                     return geometries
                 })
-                .annotations({
-                    editMode: annotationsEditMode,
-                    annotations: window.ch11M04Annotations,
-                })
+            // .annotations({
+            //     editMode: annotationsEditMode,
+            //     annotations: window.ch11M04Annotations,
+            // })
 
             map.stat('v1', { label: 'Inward' }).stat('v2', { label: 'Outward' })
             map.build()
@@ -437,7 +468,9 @@
             const exportBtnPNG = document.getElementById('export-png-btn')
             exportBtnPNG.addEventListener('click', function () {
                 const factor = 1
-                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 120 * factor) // width, height, scale (for better quality)
+                // +140 (was +120): the footnote now wraps to 3 lines at this width (footnoteWrap(90)),
+                // so the footer band is slightly taller than before.
+                map.exportMapToPNG(MAPWIDTH * factor, MAPHEIGHT + 140 * factor) // width, height, scale (for better quality)
             })
 
             const exportBtnSVG = document.getElementById('export-svg-btn')

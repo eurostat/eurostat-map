@@ -90,7 +90,16 @@ export const Geometries = function (map, withCenterPoints) {
         const promises = out.getDefaultGeoDataPromise()
         return Promise.all(promises)
             .then((results) => {
-                const filtered = typeof filterGeometriesFunction === 'function' ? filterGeometriesFunction(results) : results
+                // Pass the owning map/inset as a 2nd argument so a caller injecting custom point
+                // data (e.g. non-NUTS centroids merged into the centroids geometry, as with the
+                // mushroom ports maps) can tell main-map calls from inset calls via map?.isInset,
+                // and skip injecting into insets whose small local extent/projection isn't meant
+                // to show that data. Before this, filterGeometriesFunction ran identically for
+                // every inset (this same Geometries instance's owning map, forwarded to insets
+                // via out.filterGeometriesFunction_ - see insets.js), so unconditional injection
+                // put every custom point into every inset too, each reprojected into that inset's
+                // own tiny local space - duplicating the data across the main map and every inset.
+                const filtered = typeof filterGeometriesFunction === 'function' ? filterGeometriesFunction(results, map) : results
                 out.allNUTSGeoData = filtered
                 out.defaultGeoData = filtered[0]
 

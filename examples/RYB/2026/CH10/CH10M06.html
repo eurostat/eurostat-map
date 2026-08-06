@@ -44,10 +44,10 @@
         <script src="https://unpkg.com/d3@7"></script>
         <script src="../../insets/overseas.js"></script>
         <script>
-            const MAPWIDTH = 797
-            const MAPHEIGHT = 677
-            const INSETBOXPOSITION = [550, 70]
-            const LEGENDX = 632
+            const MAPWIDTH = 700
+            const MAPHEIGHT = 660
+            const INSETBOXPOSITION = [455, 70]
+            const LEGENDX = 536
             const LEGENDY = 327
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
@@ -120,7 +120,7 @@
                     .height(MAPHEIGHT)
                     .title('Guest nights spent at short-stay accommodation ')
                     .subtitle('(offered via selected online booking platforms, by NUTS 2 regions, 2025)')
-                    .position({ x: 4800000, y: 3400000, z: 6000 })
+                    .position({ x: 4790000, y: 3400000, z: 6300 })
                     .dorling(true)
                     .dorlingStrength({ x: 10, y: 10 })
                     .dorlingIterations(1)
@@ -159,7 +159,7 @@
                     .bottomText(false)
                     .header(true)
                     .footer(true)
-                    // .logoPosition([2, MAPHEIGHT - 12])
+                    .showEstatLogo(true)
                     // .ribbonPosition([MAPWIDTH - 180, MAPHEIGHT - 17])
                     .ribbonWidth(300)
                     .ribbonHeight(50)

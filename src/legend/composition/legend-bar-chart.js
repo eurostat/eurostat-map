@@ -3,7 +3,7 @@ import { format } from 'd3-format'
 import * as Legend from '../legend'
 import { executeForAllInsets } from '../../core/utils'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
-import { formatSizeLabel } from '../legend-utils'
+import { formatSizeLabel, getMaxDomainPrecision } from '../legend-utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -153,22 +153,6 @@ export const legend = function (map, config) {
         }
 
         out.setBoxDimension()
-    }
-
-    // ── Legend precision helper ───────────────────────────────────────────────
-
-    /**
-     * Detect the number of decimal places in the domain max value.
-     * Used to format all legend labels with the same precision as the actual dataset
-     * rather than the precision of the auto-computed representative values (which can
-     * introduce extra decimals, e.g. domain[1] * 0.1 = 2.47 when data has 1 d.p.).
-     */
-    function getMaxDomainPrecision(classifier) {
-        const domain = classifier?.domain?.()
-        const maxVal = domain?.[1] ?? 0
-        if (!Number.isFinite(maxVal)) return 0
-        const str = Number.parseFloat(maxVal.toFixed(12)).toString()
-        return str.includes('.') ? str.split('.')[1].length : 0
     }
 
     // ── Grouped width legend ────────────────────────────────────────────────

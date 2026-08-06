@@ -138,6 +138,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.legendButton_ = false // show legend toggle button
     out.legendButtonPosition_ = undefined // [x,y] position of legend button. If not specified, they are positioned in the top left corner
     out.legendVisible_ = undefined // legend visibility state (initialized in stat-map when legendButton is enabled)
+    out.legendVisibilityBreakpoint_ = 699 // viewport width (px) at/below which the legend starts hidden (behind the legend button) when legendButton is enabled. See getDefaultLegendVisible() in stat-map.js.
 
     //tooltip
     out.tooltip_ = {

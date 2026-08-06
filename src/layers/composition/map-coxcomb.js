@@ -3,6 +3,7 @@ import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
 import { max, min } from 'd3-array'
 import { buildSingleLayerMap } from '../../core/stat-map'
+import * as StatisticalData from '../../core/stat-data'
 import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
@@ -268,95 +269,53 @@ export const decorateCoxcombLayer = function (out, config) {
         }
 
         // ── Custom Data Path ─────────────────────────────────────────────────
+        // Registers each time:category statData object directly (setData(), synchronously -
+        // same pattern as _registerCategoricalStatChannel used by pie/bar/waffle/stripe), rather
+        // than registering an empty out.stat() config and deferring the real data into a patched
+        // out.build(). That build-patching approach silently broke when eurostatmap.map('coxcomb')
+        // started returning a facade distinct from this layer (the "migrate to layers" change):
+        // the facade's own .build() - the one callers actually invoke - never delegated to this
+        // patched version, so the data injection never ran and no region ever got stat data.
+        // Setting data synchronously here sidesteps the problem entirely: by the time build()
+        // runs, out.statData_[key].isReady() is already true for every key, exactly as if a
+        // remote fetch had already resolved.
         if (customData && !eurostatDatasetCode) {
             assignCategoryProperties()
 
-            // Store custom data and config for use after build (like pie charts)
-            out._customData = customData
-            out._customTimes = times
-            out._customCategories = [...categoryCodes] // clone
-            out._customTotalCode = totalCode
-            out._customUnitText = unitText || 'Value'
+            const setStatData = (key, regionData) => {
+                if (Object.keys(regionData).length === 0) return
+                const statData = StatisticalData.statData({ code: key, unitText: unitText || 'Value' })
+                statData.setData(regionData)
+                out.statData(key, statData)
+            }
 
-            // Set up stat configs for each time:category combination (no data fetching)
             times.forEach((time) => {
                 categoryCodes.forEach((category) => {
-                    const key = `${time}:${category}`
-                    out.stat(key, {
-                        code: key,
-                        unitText: unitText || 'Value',
-                    })
+                    const regionData = {}
+                    for (const regionId in customData) {
+                        const value = customData[regionId]?.[time]?.[category]
+                        if (value !== undefined) regionData[regionId] = value
+                    }
+                    setStatData(`${time}:${category}`, regionData)
                 })
 
                 if (totalCode) {
-                    const key = `${time}:${totalCode}`
-                    out.stat(key, {
-                        code: key,
-                        unitText: unitText || 'Value',
-                    })
+                    const regionData = {}
+                    for (const regionId in customData) {
+                        let total = customData[regionId]?.[time]?.[totalCode]
+                        if (total === undefined) {
+                            // Auto-calculate total from categories
+                            total = 0
+                            categoryCodes.forEach((cat) => {
+                                const val = customData[regionId]?.[time]?.[cat]
+                                if (val !== undefined && !isNaN(val)) total += parseFloat(val)
+                            })
+                        }
+                        if (total === ':' || total > 0) regionData[regionId] = total
+                    }
+                    setStatData(`${time}:${totalCode}`, regionData)
                 }
             })
-
-            // Store method to inject data after build (like pie charts do it manually)
-            out._injectCustomData = function () {
-                out._customTimes.forEach((time) => {
-                    out._customCategories.forEach((category) => {
-                        const key = `${time}:${category}`
-                        const regionData = {}
-
-                        for (const regionId in out._customData) {
-                            if (regionId === 'UA') console.log('UA M01:DOM value:', out._customData['UA']?.['M01']?.['DOM'])
-                            const value = out._customData[regionId]?.[time]?.[category]
-
-                            if (value !== undefined) {
-                                regionData[regionId] = value
-                            }
-                        }
-
-                        if (Object.keys(regionData).length > 0) {
-                            out.statData(key).setData(regionData)
-                        }
-                    })
-
-                    if (out._customTotalCode) {
-                        const key = `${time}:${out._customTotalCode}`
-                        const regionData = {}
-
-                        for (const regionId in out._customData) {
-                            let total = out._customData[regionId]?.[time]?.[out._customTotalCode]
-                            if (total === undefined) {
-                                // Auto-calculate total from categories
-                                total = 0
-                                out._customCategories.forEach((cat) => {
-                                    const val = out._customData[regionId]?.[time]?.[cat]
-                                    if (val !== undefined && !isNaN(val)) total += parseFloat(val)
-                                })
-                            }
-                            if (total === ':' || total > 0) {
-                                regionData[regionId] = total
-                            }
-                        }
-
-                        if (Object.keys(regionData).length > 0) {
-                            out.statData(key).setData(regionData)
-                        }
-                    }
-                })
-
-                // After data injection, update the visualization
-                out.updateStatValues()
-            }
-
-            // Set up build override to automatically inject data after build
-            const originalBuild = out.build
-            out.build = function () {
-                const result = originalBuild.call(out)
-
-                // Inject custom data after build completes
-                out._injectCustomData()
-
-                return result
-            }
 
             return out
         }

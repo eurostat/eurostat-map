@@ -18,10 +18,6 @@
             .em-legend-subtitle {
                 font-size: 12px;
             }
-            #legend-container {
-                transform: translate(826px, 73px);
-                filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
-            }
             #newInsets {
                 filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
             }
@@ -33,117 +29,34 @@
             #em-ternary-axis-title-1-badge {
                 transform: translate(0px, 6px);
             }
-            .map-controls {
-                display: grid;
-                grid-template-columns: auto 280px auto;
-                align-items: center;
-                column-gap: 12px;
-                row-gap: 8px;
-                margin-top: 12px;
-                padding-left: 12px;
-                font-family: Arial, sans-serif;
-                font-size: 14px;
-            }
-            .map-controls input[type='range'] {
-                width: 280px;
-            }
-            .map-controls-output {
-                min-width: 54px;
-                font-variant-numeric: tabular-nums;
-            }
+            /* Narrow (~700px) embed layout: main map, legend stacked directly underneath -
+               no small multiples, no colour controls (see comments.md). */
             .map-layout {
                 display: flex;
-                align-items: flex-start;
-                gap: 14px;
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                max-width: 797px;
             }
             #container {
-                width: 860px;
-                max-width: 100%;
-                flex: 1 1 860px;
-            }
-            .small-multiples {
-                width: 320px;
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 10px;
-                flex: 0 0 320px;
-            }
-            .small-multiples svg {
                 width: 100%;
-                height: 248px;
-                border: 1px solid #d6d6d6;
-                border-radius: 4px;
-                background: white;
+                max-width: 797px;
             }
-            .small-multiples .em-source-link,
-            .small-multiples .em-footer,
-            .small-multiples .em-zoom-buttons {
-                display: none;
-            }
-            @media (max-width: 1260px) {
-                .small-multiples {
-                    width: 100%;
-                    grid-template-columns: repeat(3, minmax(210px, 1fr));
-                    flex: 1 1 100%;
-                }
-            }
-            @media (max-width: 900px) {
-                .small-multiples {
-                    grid-template-columns: 1fr;
-                }
-            }
-            .small-multiples .em-cntbn path,
-            .small-multiples .em-cntbn-halo path {
-                stroke-width: 0.1px !important;
-            }
-            .small-multiples .em-nutsbn path {
-                opacity: 0.1 !important;
-                stroke-width: 0.1px !important;
-            }
-            .small-multiples .em-nutsrg path {
-                stroke-width: 0px !important;
+            #legend-container {
+                filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
             }
         </style>
         <div>
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
             <button id="export-legend-btn" type="button">Download legend as SVG</button>
-            <button id="export-small-multiples-btn" type="button">Download small multiples</button>
         </div>
         <div class="map-layout">
-            <div class="small-multiples">
-                <svg id="small-map-v1"></svg>
-                <svg id="small-map-v2"></svg>
-                <svg id="small-map-v3"></svg>
-            </div>
-
-            <svg id="container" width="100%" height="820px">
+            <svg id="container" width="100%" height="700px">
                 <svg id="map"></svg>
                 <g id="newInsets"></g>
-                <svg id="legend-container"></svg>
             </svg>
-        </div>
-        <div class="map-controls">
-            <label for="hue-slider">Hue</label>
-            <input id="hue-slider" type="range" min="0" max="360" step="1" value="160" />
-            <output id="hue-slider-value" class="map-controls-output" for="hue-slider">160</output>
-
-            <label for="chroma-slider">Chroma</label>
-            <input id="chroma-slider" type="range" min="0" max="360" step="1" value="130" />
-            <output id="chroma-slider-value" class="map-controls-output" for="chroma-slider">130</output>
-
-            <label for="lightness-slider">Lightness</label>
-            <input id="lightness-slider" type="range" min="0" max="100" step="1" value="50" />
-            <output id="lightness-slider-value" class="map-controls-output" for="lightness-slider">50</output>
-
-            <label for="breaks-slider">Breaks</label>
-            <input id="breaks-slider" type="range" min="3" max="60" step="1" value="29" />
-            <output id="breaks-slider-value" class="map-controls-output" for="breaks-slider">29</output>
-
-            <label for="spread-slider">Spread</label>
-            <input id="spread-slider" type="range" min="0" max="8" step="0.1" value="3.5" />
-            <output id="spread-slider-value" class="map-controls-output" for="spread-slider">3.5</output>
+            <svg id="legend-container" width="310" height="300"></svg>
         </div>
         <script src="../../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/d3@7"></script>
@@ -153,7 +66,7 @@
         <script type="module">
             import { json } from 'https://cdn.jsdelivr.net/npm/d3-fetch@3/+esm'
 
-            const { tricolore, tricoloreSextant, CompositionUtils } = window.tricolore
+            const { tricolore, CompositionUtils } = window.tricolore
 
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
@@ -170,40 +83,14 @@
             const legendLabelPosition = 'edge' // 'corner' | 'inside'
             const legendColorTarget = 'points' // 'points' | 'triangles'
             const meanCentering = true
-            const initialHue = 160
-            const initialLightness = 50
-            const initialChroma = 130
-            const initialBreaks = 29
-            const initialSpread = 3.5
+            const hue = 160
+            const lightness = 50
+            const chroma = 130
+            const breaks = 29
+            const spread = 3.5
 
             const MAPWIDTH = 797
             const MAPHEIGHT = 677
-            const SMALL_MAP_WIDTH = 320
-            const SMALL_MAP_HEIGHT = 278
-
-            const smallMultipleDefinitions = [
-                {
-                    svgId: 'small-map-v1',
-                    title: "Bachelor's",
-                    subtitle: '% share, 2024',
-                    colorRamp: ['#eff8ef', '#d6ecd7', '#a7d8a8', '#72c374', '#33a033'],
-                    data: bachelor,
-                },
-                {
-                    svgId: 'small-map-v2',
-                    title: "Master's",
-                    subtitle: '% share, 2024',
-                    colorRamp: ['#eef4fc', '#d0e1f7', '#a7c9f0', '#6ea6e6', '#388ae2'],
-                    data: masters,
-                },
-                {
-                    svgId: 'small-map-v3',
-                    title: 'PhD',
-                    subtitle: '% share, 2024',
-                    colorRamp: ['#fdeeee', '#f8d3d3', '#efa8a8', '#e97575', '#e04040'],
-                    data: phd,
-                },
-            ]
 
             const map = eurostatmap
                 .map('trivariateChoropleth')
@@ -212,6 +99,7 @@
                 .containerId('container')
                 .footer(true)
                 .header(true)
+                .showEstatLogo(true)
                 .insetBoxPosition(insetBoxPosition)
                 .position({ x: 4950000, y: 3440000, z: 5950 })
                 .footnote(
@@ -223,19 +111,15 @@
                 .height(MAPHEIGHT)
                 .title('Students enrolled in tertiary education')
                 .subtitle('(% of all tertiary students excluding short-cycle tertiary education, by NUTS 2 regions, 2024)')
-                // .subtitle(
-                //     `<tspan x="14" dy="5"><tspan class="badge-var1">Bachelor's</tspan> , <tspan class="badge-var2">Master's</tspan> or <tspan class="badge-var3">PhD</tspan> students.</tspan>`
-                // )
                 .nutsLevel('mixed')
                 .ternarySettings({
-                    hue: initialHue,
-                    chroma: initialChroma,
-                    lightness: initialLightness,
+                    hue,
+                    chroma,
+                    lightness,
                     contrast: 0.3,
-                    spread: initialSpread,
-                    breaks: initialBreaks,
-                    meanCentering: meanCentering,
-                    //sextant: true,
+                    spread,
+                    breaks,
+                    meanCentering,
                 })
                 .legend({
                     svgId: 'legend-container',
@@ -302,10 +186,6 @@
             map.statData('v2').setData(filterNulls(masters))
             map.statData('v3').setData(filterNulls(phd))
 
-            buildSmallMultipleMaps()
-
-            // map.updateStatValues()
-
             function getTernaryCenter() {
                 const stat1 = map.statData('v1').get() || {}
                 const stat2 = map.statData('v2').get() || {}
@@ -338,58 +218,26 @@
                     [0, 0, 1],
                 ]
 
-                const colors = ternarySettings.sextant
-                    ? tricoloreSextant(extremePoints, {
-                          center,
-                          values: ternarySettings.sextantColors,
-                      })
-                    : tricolore(extremePoints, {
-                          center,
-                          breaks: ternarySettings.breaks,
-                          hue: ternarySettings.hue,
-                          chroma: ternarySettings.chroma,
-                          lightness: ternarySettings.lightness,
-                          contrast: ternarySettings.contrast,
-                          spread: ternarySettings.spread,
-                      })
+                const colors = tricolore(extremePoints, {
+                    center,
+                    breaks: ternarySettings.breaks,
+                    hue: ternarySettings.hue,
+                    chroma: ternarySettings.chroma,
+                    lightness: ternarySettings.lightness,
+                    contrast: ternarySettings.contrast,
+                    spread: ternarySettings.spread,
+                })
 
                 ;[var1Color, var2Color, var3Color] = colors.map((color, index) => color || [var1Color, var2Color, var3Color][index])
             }
 
             function getLegendSubtitle() {
                 return `
-                    <tspan x="8" dy="0">Compared to the average...</tspan> 
+                    <tspan x="8" dy="0">Compared to the average...</tspan>
                         <tspan x="8" dy="1.2em">Areas with more   <tspan class="badge-legend-var1">green</tspan>  have a higher % of bachelor's students.</tspan>
                         <tspan x="8" dy="1.2em">Areas with more   <tspan class="badge-legend-var2">blue</tspan>  have a higher % of master's students.</tspan>
                         <tspan x="8" dy="1.2em">Areas with more   <tspan class="badge-legend-var3">red</tspan>  have a higher % of PhD students.</tspan>
                     `
-            }
-
-            function getLegendConfig() {
-                return {
-                    svgId: 'legend-container',
-                    title: 'Education level',
-                    subtitle: getLegendSubtitle(),
-                    boxOpacity: 0.99,
-                    width: 310,
-                    height: 300,
-                    labels: legendLabelPosition == 'corner' ? ["Bachelor's", "Master's", 'PhD'] : ["← Bachelor's", "Master's →", 'PhD →'],
-                    labelPosition: legendLabelPosition,
-                    padding: { top: 15, right: 30, bottom: 0, left: 47 },
-                    showLines: true,
-                    gridBreaks: 5,
-                    minorSubdivisions: 2,
-                    showCenter: meanCentering,
-                    centerLabel: 'Average',
-                    showData: true,
-                    colorTarget: legendColorTarget,
-                    centerAnnotationOffsets: {
-                        labelX: -35,
-                        labelY: 140,
-                        curveX: 0,
-                        curveY: 0,
-                    },
-                }
             }
 
             function refreshBadgeColors() {
@@ -435,77 +283,6 @@
 
             function filterNulls(obj) {
                 return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null))
-            }
-
-            function buildSmallMultipleMaps() {
-                smallMultipleDefinitions.forEach((config) => {
-                    const smallMap = eurostatmap
-                        .map('choropleth')
-                        .svgId(config.svgId)
-                        .width(SMALL_MAP_WIDTH)
-                        .height(SMALL_MAP_HEIGHT)
-                        .nutsLevel('mixed')
-                        .nutsYear(2024)
-                        .position({ x: 4950000, y: 3200000, z: 16500 })
-                        .title(config.title)
-                        .titlePosition([5, 20])
-                        //.subtitle(config.subtitle)
-                        .header(false)
-                        .footer(false)
-                        .showSourceLink(false)
-                        .zoomButtons(false)
-                        .hoverColor('#FFCC00')
-                        .classificationMethod('quantile')
-                        .makeClassifNice(false)
-                        .numberOfClasses(config.colorRamp.length)
-                        .colors(config.colorRamp)
-                        .legend({
-                            x: SMALL_MAP_WIDTH - 80,
-                            y: 6,
-                            title: '%',
-                            titlePadding: -10,
-                            noData: false,
-                            noDataText: 'No data',
-                            boxOpacity: 0.94,
-                        })
-
-                    smallMap.build()
-                    smallMap.statData().setData(filterNulls(config.data))
-                })
-            }
-
-            function buildSmallMultiplesExportSVG() {
-                const container = document.querySelector('.small-multiples')
-                if (!container) return null
-
-                const sourceSvgs = Array.from(container.querySelectorAll('svg'))
-                if (!sourceSvgs.length) return null
-
-                const SVG_NS = 'http://www.w3.org/2000/svg'
-                const containerRect = container.getBoundingClientRect()
-                const width = Math.ceil(containerRect.width)
-                const height = Math.ceil(containerRect.height)
-
-                const exportSvg = document.createElementNS(SVG_NS, 'svg')
-                exportSvg.setAttribute('width', width)
-                exportSvg.setAttribute('height', height)
-                exportSvg.setAttribute('viewBox', `0 0 ${width} ${height}`)
-
-                sourceSvgs.forEach((sourceSvg) => {
-                    const rect = sourceSvg.getBoundingClientRect()
-                    const x = rect.left - containerRect.left
-                    const y = rect.top - containerRect.top
-
-                    const clonedSvg = sourceSvg.cloneNode(true)
-                    clonedSvg.setAttribute('x', `${x}`)
-                    clonedSvg.setAttribute('y', `${y}`)
-                    clonedSvg.setAttribute('width', `${Math.ceil(rect.width)}`)
-                    clonedSvg.setAttribute('height', `${Math.ceil(rect.height)}`)
-
-                    exportSvg.appendChild(clonedSvg)
-                })
-
-                return exportSvg
             }
 
             function applyBadgeToElement(el, color, pad = { x: 3, y: 2 }) {
@@ -558,69 +335,6 @@
             exportLegendBtn.addEventListener('click', function () {
                 const legendSVG = document.getElementById('legend-container')
                 exportToSVG(legendSVG, 'CH03M02-legend.svg')
-            })
-
-            const exportSmallMultiplesBtn = document.getElementById('export-small-multiples-btn')
-            exportSmallMultiplesBtn.addEventListener('click', function () {
-                const smallMultiplesSVG = buildSmallMultiplesExportSVG()
-                if (!smallMultiplesSVG) return
-                exportToSVG(smallMultiplesSVG, 'CH03M02-small-multiples.svg')
-            })
-
-            const hueSlider = document.getElementById('hue-slider')
-            const hueSliderValue = document.getElementById('hue-slider-value')
-            const chromaSlider = document.getElementById('chroma-slider')
-            const chromaSliderValue = document.getElementById('chroma-slider-value')
-            const breaksSlider = document.getElementById('breaks-slider')
-            const breaksSliderValue = document.getElementById('breaks-slider-value')
-            const spreadSlider = document.getElementById('spread-slider')
-            const spreadSliderValue = document.getElementById('spread-slider-value')
-            const lightnessSlider = document.getElementById('lightness-slider')
-            const lightnessSliderValue = document.getElementById('lightness-slider-value')
-
-            updateTernaryControls()
-
-            function updateTernaryControls() {
-                const hue = Number(hueSlider.value)
-                const chroma = Number(chromaSlider.value)
-                const breaks = Number(breaksSlider.value)
-                const spread = Number(spreadSlider.value)
-                const lightness = Number(lightnessSlider.value)
-
-                hueSliderValue.textContent = String(hue)
-                chromaSliderValue.textContent = String(chroma)
-                breaksSliderValue.textContent = String(breaks)
-                spreadSliderValue.textContent = spread.toFixed(1)
-                lightnessSliderValue.textContent = String(lightness)
-
-                map.ternarySettings({ hue, chroma, breaks, spread, lightness })
-                updateExtremeColors()
-                map.updateClassification()
-                map.updateStyle()
-                map.legend(getLegendConfig())
-                map.updateLegend()
-                refreshBadgeColors()
-                //if (map.legendObj()) map.legendObj().update()
-            }
-
-            hueSlider.addEventListener('input', function () {
-                updateTernaryControls()
-            })
-
-            chromaSlider.addEventListener('input', function () {
-                updateTernaryControls()
-            })
-
-            breaksSlider.addEventListener('input', function () {
-                updateTernaryControls()
-            })
-
-            spreadSlider.addEventListener('input', function () {
-                updateTernaryControls()
-            })
-
-            lightnessSlider.addEventListener('input', function () {
-                updateTernaryControls()
             })
         </script>
     </body>

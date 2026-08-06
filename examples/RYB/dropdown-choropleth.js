@@ -38,11 +38,15 @@
             const groupY = transformMatch ? Number(transformMatch[1]) || 0 : 0
             const node = footerGroup.node()
             const bbox = node && node.getBBox ? node.getBBox() : null
-            if (bbox) creditsY = groupY + bbox.y + bbox.height - 10
+            // Bottom edge of the footer group's own content (note + source, see buildFootnote),
+            // in absolute SVG space, plus a small gap - not "- 10", which landed the credits'
+            // baseline at roughly the SAME height as the footnote's own baseline (overlapping it)
+            // rather than below its full rendered box.
+            if (bbox) creditsY = groupY + bbox.y + bbox.height + 12
         }
 
         const rightEdge = mapWidth - 10
-        const creditsBottom = creditsY // second line's y + its own line height
+        const creditsBottom = creditsY + 13 + 4 // second line's y (creditsY + 13, set below) + its own line height
 
         // The library sizes #map's own height ATTRIBUTE to just fit its own header/drawing/footer
         // content (see recalculateLayout in src/core/layout.js). A nested <svg> clips its content
@@ -61,7 +65,7 @@
             .attr('text-anchor', 'end')
             .attr('class', 'em-footnote')
             .attr('id', 'em-footnote-2')
-            .html('Administrative Boundaries: ©EuroGeographics ©OSM')
+            .html('Administrative boundaries: ©EuroGeographics ©OSM')
         svg.append('text')
             .attr('x', rightEdge)
             .attr('y', creditsY + 13)
@@ -85,7 +89,7 @@
         const res = await fetch(dataUrl)
         const json = await res.json()
 
-        const isMobile = window.innerWidth <= 768
+        const isMobile = window.innerWidth <= 699
         const mapContainer = document.getElementById(mapContainerId)
         const mapWidth = mapContainer ? mapContainer.clientWidth : isMobile ? window.innerWidth : 700
         const containerHeight = mapContainer ? mapContainer.clientHeight : isMobile ? Math.round(window.innerHeight - 230) : 550
@@ -106,10 +110,10 @@
         // (footnote, ~2 lines) plus our two cartography credit lines (see addCartographyCredits).
         // #map-container has overflow:hidden and a fixed (viewport-derived) height, so anything
         // rendered past this budget is silently clipped rather than pushing the container taller.
-        const mapHeight = Math.max(containerHeight - 90, 240)
+        const mapHeight = Math.max(containerHeight - 100, 240)
 
         // Default continental-Europe framing; overseas regions are shown separately via the static insets.
-        const resolvedPosition = position || { x: 4970000, y: 3400000, z: isMobile ? 7000 : 5500 }
+        const resolvedPosition = position || { x: 4970000, y: 3300000, z: 7000 }
         const resolvedInsetBoxPosition = insetBoxPosition || [mapWidth - 250, 8]
 
         const labelFormatter = d3.format('.' + json.decimals + 'f')
@@ -160,12 +164,17 @@
                 .width(mapWidth)
                 .height(mapHeight)
                 .scale(json.scale)
-                .nutsLevel(json.nutsLevel)
-                //.position(resolvedPosition)
+                // 'mixed' (not the concrete json.nutsLevel) so any country whose data is only
+                // coded at country level (e.g. Bosnia and Herzegovina, Türkiye - see comments.md)
+                // renders as a single flat "data not available" region with no regional
+                // boundaries, matching Ukraine and the static maps - see AGENTS.md's
+                // "nutsLevel_ === 'mixed'" section for what this flips on.
+                .nutsLevel('mixed')
+                .position(resolvedPosition)
                 .insets(insetsCfg)
                 .insetBoxPosition(resolvedInsetBoxPosition)
                 .zoomButtons(true)
-                .zoomExtent(zoomExtent || (isMobile ? [0.7, 10] : [1, 10]))
+                .zoomExtent(zoomExtent || (isMobile ? [0.7, 10] : [0.6, 10]))
 
                 // classification (fixed across all dropdown options)
                 .colors(json.colors)
@@ -183,19 +192,20 @@
                 .showSourceLink(false)
                 .footnote(buildFootnote(option.footnote, option.source))
                 .footnoteTooltipText(false)
-                .footnoteWrap(100)
+                .footnoteWrap(75)
 
                 .legendButton(true)
                 .legend({
                     title: json.legendTitle,
                     position: isMobile ? 'top left' : '',
                     x: isMobile ? undefined : 5,
-                    y: isMobile ? undefined : 100,
+                    y: isMobile ? undefined : 50,
                     boxPadding: 4,
                     boxOpacity: 0.9,
                     tickLength: 8,
                     maxMin: false,
                     labelFormatter: labelFormatter,
+                    onlyApplyOpacityWhileZoomed: true,
                 })
 
                 .stat({
