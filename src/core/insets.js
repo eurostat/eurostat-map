@@ -21,7 +21,7 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     // On mobile, insets are hidden by default to save space (see the display:none below), and the
     // toggle button is auto-shown so they can still be revealed (see map-instance.js) unless the
     // user has explicitly configured insetsButton themselves.
-    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= out.insetsVisibilityBreakpoint_
     const showsInsetsButton = out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobile)
     const presetName = typeof out.insets_ === 'string' ? out.insets_ : null
 

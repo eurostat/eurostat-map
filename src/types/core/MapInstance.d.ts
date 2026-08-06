@@ -408,6 +408,13 @@ export interface MapInstance {
     insetsButtonPosition(): [number, number] | undefined
     insetsButtonPosition(pos: [number, number]): this
 
+    /**
+     * Viewport width (px) at/below which insets start hidden (behind the insets button) unless
+     * insetsButton was set explicitly. @default 768
+     */
+    insetsVisibilityBreakpoint(): number
+    insetsVisibilityBreakpoint(px: number): this
+
     /** Position adjustment for legend button: [x, y] */
     legendButtonPosition(): [number, number] | undefined
     legendButtonPosition(pos: [number, number]): this
