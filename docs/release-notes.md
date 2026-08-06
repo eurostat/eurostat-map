@@ -1,5 +1,81 @@
 # Release notes
 
+## 4.10.10
+
+### New
+
+- **`legendVisibilityBreakpoint` option**: the viewport width (px) at/below which the legend starts hidden behind the legend toggle button, when `legendButton(true)` is set. Previously hardcoded to `768`; now configurable per map. Default remains `768`.
+
+Example:
+
+```javascript
+// Legend starts hidden (behind the toggle button) at viewport widths <= 1000px,
+// instead of the default 768px.
+eurostatmap
+    .map('choropleth')
+    .legendButton(true)
+    .legendVisibilityBreakpoint(1000)
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+- **`tooltip({ decimals })` option** for choropleth maps: fixes the tooltip's displayed value to a set number of decimal places, preserving trailing zeros (e.g. `7` → `"7.0"`) that the default formatter previously dropped. When unset, precision is auto-detected from the max precision seen across the stat dataset's own values.
+
+Example:
+
+```javascript
+// Tooltip always shows one decimal place, e.g. "85.0 years" instead of "85 years".
+eurostatmap
+    .map('choropleth')
+    .tooltip({ decimals: 1 })
+    .stat({ eurostatDatasetCode: 'demo_r_mlifexp', unitText: ' years' })
+    .build()
+```
+
+- **`filterGeometriesFunction` now receives the calling map/inset as a 2nd argument**, so a custom filter can tell the main map apart from each inset (via `map.isInset` / `map.geo_`) and, for example, only inject custom point data (like a mushroom map's port locations) into the maps/insets it actually belongs to.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('mushroom')
+    .filterGeometriesFunction((geometries, map) => {
+        if (map?.isInset) {
+            // e.g. only include this inset's own designated point(s)
+        }
+        return geometries
+    })
+    .build()
+```
+
+### Breaking Changes
+
+- **Choropleth tooltips no longer insert a space between the value and `unitText` automatically.** Previously the tooltip always rendered `${value} ${unitText}`; now it renders `${value}${unitText}` verbatim, so the space (or lack of one) is controlled entirely by `unitText` itself. Any existing `unitText` that relied on the automatic space (e.g. `unitText: 'years'` expecting `"85 years"`) needs a leading space added (`unitText: ' years'`) to keep the same tooltip text. Unit strings that don't want a space (e.g. `'%'`) are unaffected.
+
+Example:
+
+```javascript
+// Before 4.10.10: unitText: 'years' rendered as "85 years" (space auto-inserted).
+// From 4.10.10 on: unitText must include its own leading space for the same result.
+eurostatmap
+    .map('choropleth')
+    .stat({ eurostatDatasetCode: 'demo_r_mlifexp', unitText: ' years' }) // was: 'years'
+    .build()
+```
+
+### Fixes
+
+- **Fixed coxcomb maps with `statCoxcomb({ customData })` never rendering any data.** The custom-data path patched `layer.build` to inject data after building, but since the 4.10.x layers migration, `eurostatmap.map('coxcomb')` returns a facade whose own `.build()` (the one callers actually invoke) never delegated to that patched layer method - so custom data was never injected and no region ever got a coxcomb glyph. Custom stat data is now registered synchronously at `statCoxcomb()` call time instead.
+- **Fixed mushroom (dual semi-circle) proportional-symbol maps duplicating every symbol once per inset.** `updateSymbolsDrawOrder()` only ran for the main map, and `applyStyleToMap()` selected centroids via an unscoped `map.svg().selectAll('g.em-centroid')` (matching every map/inset sharing the page's SVG) instead of the properly-scoped centroids group - so every inset redraw duplicated every symbol into every other map/inset's centroids too. Mushroom classification state (size scale, colors) is now also correctly read from the owning layer for insets, which previously had no classification state of their own and so never rendered any symbols at all.
+- **Fixed a legend hover bug on trivariate/ternary choropleth legends**: hovering any point in the legend triangle's background colour grid - not just an actual plotted data point - spuriously highlighted/dimmed regions on the map by colour-matching, even over blank areas with no data plotted there. This background-hover behavior is now gated on `colorTarget: 'triangles'`; the default (`colorTarget: 'points'`) only responds to hovering an actual plotted point, as intended.
+- `getMaxDomainPrecision` (decimal-precision detection for legend labels) moved from a `legend-bar-chart.js`-local helper to the shared `src/legend/legend-utils.js`, so it can be reused by the new tooltip decimal formatting above. No behavior change for existing bar-chart legends.
+
+### Notes
+
+- Published package: `eurostat-map@4.10.10`
+- Dist-tag `latest` points to `4.10.10`
+- Release tag format used: `4.10.10` (no `v` prefix)
+
 ## 4.10.9
 
 ### Fixes
