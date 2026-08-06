@@ -66,6 +66,7 @@
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
         <script src="./exportAnnotations.js"></script>
+        <script src="../../responsive-map.js"></script>
 
         <script type="module">
             // Resized from the original print layout (1080x900) to a 700px-wide web embed - see
@@ -246,6 +247,12 @@
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
                         .html('Cartography: Eurostat – GISCO, 06/2026')
+
+                    // Make the map responsive: scale #map fluidly up to 700px wide instead of
+                    // rendering at its fixed native size (see responsive-map.js). Internal layout
+                    // (annotations, symbol sizes, insets) keeps its native MAPWIDTH/MAPHEIGHT pixel
+                    // values - only the rendered box is scaled via a viewBox + CSS.
+                    RYBResponsiveMap.makeResponsive('map', MAPWIDTH, MAPHEIGHT + 140)
                 })
                 .filterGeometriesFunction((geometries, map) => {
                     //remove greenland to stop title overlap
