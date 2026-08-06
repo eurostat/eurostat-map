@@ -137,7 +137,7 @@
             }
 
             // Default continental-Europe framing; overseas regions are shown separately via the static insets.
-            resolvedPosition = position || { x: 4970000, y: 3300000, z: 7000 }
+            resolvedPosition = position || { x: 4900000, y: 3400000, z: 7000 }
             resolvedInsetBoxPosition = insetBoxPosition || [mapWidth - 250, 8]
         }
 
