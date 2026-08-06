@@ -31,9 +31,9 @@
             .em-legend {
                 filter: drop-shadow(0px 1px 1px rgba(0, 0, 0, 0.3));
             }
-            #newInsets {
+            /* #newInsets {
                 display: none;
-            }
+            } */
         </style>
     </head>
     <body>
@@ -53,9 +53,9 @@
         <script>
             const MAPWIDTH = 700
             const MAPHEIGHT = 600
-            const LEGENDX = 530
+            const INSETBOXPOSITION = [455, 70]
+            const LEGENDX = 536
             const LEGENDY = 327
-            const INSETBOXPOSITION = [405, 70]
             // Generate fresh inset config with new svgIds (from overseas.js)
             const insetsCfg = createOutermostInsetsConfig()
             createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, INSETBOXPOSITION)
@@ -145,7 +145,8 @@
                         unitText: 'Nights',
                     })
                     .coxcombSettings({ maxRadius: 34, minRadius: 5, strokeWidth: 0.1, strokeFill: 'none', rings: false })
-                    .zoomButtons(false)
+                    .zoomButtons(true)
+                    .zoomButtonsPosition([5, 80])
                     .insets(insetsCfg)
                     .insetBoxPosition(INSETBOXPOSITION)
                     .insetsButton(true)
@@ -172,7 +173,7 @@
                     .ribbonPosition([MAPWIDTH - 180, MAPHEIGHT - 17])
                     .ribbonWidth(300)
                     .ribbonHeight(50)
-                    .footnoteWrap(90)
+                    .footnoteWrap(70)
                     .footnote(
                         "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year. <br>Source: Eurostat (online data codes: tour_occ_nin2m and tour_occ_nim)"
                     )
@@ -194,10 +195,7 @@
                             event.stopPropagation()
                             const el = document.getElementById('newInsets')
                             const hidden = getComputedStyle(el).display === 'none'
-                            // 'block' (not '') - #newInsets's display:none comes from the stylesheet
-                            // rule above, and an empty inline value wouldn't override it since it's
-                            // the SAME element the stylesheet rule already targets.
-                            el.style.display = hidden ? 'block' : 'none'
+                            el.style.display = hidden ? '' : 'none'
                         })
 
                         //add cartography footnote
@@ -205,7 +203,7 @@
                         d3.select('#map')
                             .append('text')
                             .attr('x', MAPWIDTH - 272)
-                            .attr('y', MAPHEIGHT + 83)
+                            .attr('y', MAPHEIGHT + 88)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .html('Administrative Boundaries: ©EuroGeographics ©OSM')
@@ -213,7 +211,7 @@
                         d3.select('#map')
                             .append('text')
                             .attr('x', MAPWIDTH - 209)
-                            .attr('y', MAPHEIGHT + 96)
+                            .attr('y', MAPHEIGHT + 102)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .html('Cartography: Eurostat – GISCO, 06/2026')
