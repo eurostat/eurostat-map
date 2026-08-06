@@ -31,7 +31,7 @@
         </style>
     </head>
     <body>
-        <div>
+        <div style="display: none">
             <button id="export-png-btn" type="button">Download map as PNG</button>
             <button id="export-svg-btn" type="button">Download map as SVG</button>
         </div>
@@ -46,7 +46,7 @@
         <script src="../common/responsive-map.js"></script>
         <script>
             const MAPWIDTH = 700
-            const MAPHEIGHT = 660
+            const MAPHEIGHT = 600
             const INSETBOXPOSITION = [455, 70]
             const LEGENDX = 536
             const LEGENDY = 327
@@ -121,7 +121,7 @@
                     .height(MAPHEIGHT)
                     .title('Guest nights spent at short-stay accommodation ')
                     .subtitle('(offered via selected online booking platforms, by NUTS 2 regions, 2025)')
-                    .position({ x: 4790000, y: 3400000, z: 6300 })
+                    .position({ x: 4800000, y: 3400000, z: 7000 })
                     .dorling(true)
                     .dorlingStrength({ x: 10, y: 10 })
                     .dorlingIterations(1)
@@ -139,7 +139,8 @@
                         unitText: 'Nights',
                     })
                     .coxcombSettings({ maxRadius: 35, minRadius: 5, strokeWidth: 0.1, rings: false })
-                    .zoomButtons(false)
+                    .zoomButtons(true)
+                    .zoomButtonsPosition([5, 80])
                     .insets(insetsCfg)
                     .insetBoxPosition(INSETBOXPOSITION)
                     .legend({
@@ -164,7 +165,7 @@
                     // .ribbonPosition([MAPWIDTH - 180, MAPHEIGHT - 17])
                     .ribbonWidth(300)
                     .ribbonHeight(50)
-                    .footnoteWrap(90)
+                    .footnoteWrap(80)
                     .footnote(
                         "Note: the individual symbols for each region should be read like a clock, with 12 o'clock being the start and end of the year. <br>Source: Eurostat (online data code: tour_ce_omn12)"
                     )
@@ -180,7 +181,7 @@
                         d3.select('#map')
                             .append('text')
                             .attr('x', MAPWIDTH - 272)
-                            .attr('y', MAPHEIGHT + 83)
+                            .attr('y', MAPHEIGHT + 88)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .html('Administrative Boundaries: ©EuroGeographics ©OSM')
@@ -188,7 +189,7 @@
                         d3.select('#map')
                             .append('text')
                             .attr('x', MAPWIDTH - 209)
-                            .attr('y', MAPHEIGHT + 96)
+                            .attr('y', MAPHEIGHT + 102)
                             .attr('class', 'em-footnote')
                             .attr('id', 'em-footnote-2')
                             .html('Cartography: Eurostat – GISCO, 06/2026')
