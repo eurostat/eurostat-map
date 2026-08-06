@@ -2,7 +2,7 @@
 Extracts data for the RYB 2026 dropdown choropleth maps (see examples/RYB/2026/dropdown-maps.md).
 
 For each dropdown map, reads one or more sheets from a chapter's "-for maps.xlsx" workbook and
-writes a single JSON file consumed by examples/RYB/dropdown-choropleth.js.
+writes a single JSON file consumed by examples/RYB/2026/common/dropdown-choropleth.js.
 
 Sheet layout (consistent across chapters, verified against CH02/CH04/CH08/CH13):
     A: NUTS code            C: Value

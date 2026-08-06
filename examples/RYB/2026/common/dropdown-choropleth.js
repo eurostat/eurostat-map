@@ -9,7 +9,7 @@
 // empty). This module only wires the 'option-selected' listener and (re)builds the map.
 //
 // Requires (loaded before this script): eurostatmap.js, d3@7, ewc-singleselect.js,
-// and RYB/insets/overseas.js (createOutermostInsetsConfig/createInsetDOMElements).
+// and 2026/common/insets/overseas.js (createOutermostInsetsConfig/createInsetDOMElements).
 ;(function () {
     function buildFootnote(footnote, source) {
         const parts = []

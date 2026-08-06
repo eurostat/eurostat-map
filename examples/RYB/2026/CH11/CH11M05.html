@@ -4,7 +4,7 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Maritime passengers mushroom map</title>
-        <link rel="stylesheet" href="../../styles.css" />
+        <link rel="stylesheet" href="../common/styles.css" />
         <style>
             body {
                 margin: 0;
@@ -66,7 +66,7 @@
         <script src="https://unpkg.com/d3@7"></script>
         <script src="https://unpkg.com/proj4"></script>
         <script src="./exportAnnotations.js"></script>
-        <script src="../../responsive-map.js"></script>
+        <script src="../common/responsive-map.js"></script>
 
         <script type="module">
             // Resized from the original print layout (1080x900) to a 700px-wide web embed - see
@@ -133,7 +133,7 @@
                 .title('Maritime passengers embarked and disembarked')
                 .subtitle('(by main ports, 2024)')
                 .footer(true)
-                .footnoteWrap(90)
+                .footnoteWrap(78)
                 .header(true)
                 .footnote(
                     'Note: the map shows data for ports with at least 100 000 passengers embarked and disembarked. Estonian ports excluded. Top 10 EU ports labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
@@ -233,7 +233,7 @@
                     d3.select('#map')
                         .append('text')
                         .attr('x', MAPWIDTH - 10)
-                        .attr('y', MAPHEIGHT + 83)
+                        .attr('y', MAPHEIGHT + 88)
                         .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
@@ -242,7 +242,7 @@
                     d3.select('#map')
                         .append('text')
                         .attr('x', MAPWIDTH - 10)
-                        .attr('y', MAPHEIGHT + 96)
+                        .attr('y', MAPHEIGHT + 102)
                         .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
