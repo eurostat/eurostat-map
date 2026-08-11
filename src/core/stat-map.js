@@ -521,7 +521,6 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         'noDataText_',
         'language_',
         'transitionDuration_',
-        'tooltipText_',
         'filtersDefinitionFunction_',
         'onBuild_',
     ].forEach(function (att) {
@@ -984,7 +983,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     /**
      * Set some map attributes based on the following URL parameters:
      * "w":width, "h":height, "x":xGeoCenter, "y":yGeoCenter, "z":pixGeoSize, "s":scale, "lvl":nuts level, "time":time,
-     * "proj":CRS, "geo":geo territory, "ny":nuts version, "language":langage, "numberOfClasses":class number
+     * "proj":CRS, "geo":geo territory, "ny":nuts version, "language":langage, "sl":show legend, "numberOfClasses":class number
      */
     out.setFromURL = function () {
         const opts = getURLParameters()
@@ -1002,6 +1001,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         if (opts.geo) out.geo(opts.geo)
         if (opts.ny) out.nutsYear(opts.ny)
         if (opts.language) out.language(opts.language)
+        if (opts.sl) out.setLegendVisibility(true)
         if (opts.numberOfClasses) out.numberOfClasses(+opts.numberOfClasses)
         return out
     }

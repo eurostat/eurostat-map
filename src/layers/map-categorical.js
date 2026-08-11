@@ -41,7 +41,7 @@ export const decorateCategoricalLayer = function (out, config) {
      *  - To get the attribute value, call the method without argument.
      *  - To set the attribute value, call the same method with the new value as single argument.
      */
-    const paramNames = ['classToFillStyle_', 'classToText_', 'noDataFillStyle_', 'tooltipText_', 'classifier_']
+    const paramNames = ['classToFillStyle_', 'classToText_', 'noDataFillStyle_', 'classifier_']
     paramNames.forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
