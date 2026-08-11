@@ -35,6 +35,7 @@
         svg.selectAll('#em-footnote-2, #em-footnote-3').remove()
 
         let creditsY = 20
+        let footerBottom = 0
         const footerGroup = svg.select('#em-footer-' + svgId)
         if (!footerGroup.empty()) {
             const transformMatch = (footerGroup.attr('transform') || '').match(/translate\(\s*[-\d.]+(?:[,\s]+([-\d.]+))?\s*\)/)
@@ -42,10 +43,20 @@
             const footnoteText = footerGroup.select('#em-footnote')
             const footnoteY = footnoteText.empty() ? null : Number(footnoteText.attr('y'))
             if (footnoteY != null && !Number.isNaN(footnoteY)) creditsY = groupY + footnoteY
+
+            // The footnote (note + source) can wrap to more lines than the fixed 2-line credits
+            // block, e.g. CH04M03's long "low reliability" note - in that case the credits' own
+            // bottom (below) is NOT the tallest content in the footer, so sizing the SVG/frame off
+            // it alone leaves the footnote's later lines clipped. Track the footer group's own
+            // rendered bottom edge so the height-growing logic below can take whichever is taller.
+            const node = footerGroup.node()
+            const bbox = node && node.getBBox ? node.getBBox() : null
+            if (bbox) footerBottom = groupY + bbox.y + bbox.height
         }
 
         const rightEdge = mapWidth - 10
-        const creditsBottom = creditsY + 13 + 4 // second line's y (creditsY + 13, set below) + its own line height
+        const creditsOwnBottom = creditsY + 13 + 4 // second line's y (creditsY + 13, set below) + its own line height
+        const creditsBottom = Math.max(creditsOwnBottom, footerBottom + 4)
 
         // The library sizes #map's own height ATTRIBUTE to just fit its own header/drawing/footer
         // content (see recalculateLayout in src/core/layout.js). A nested <svg> clips its content
