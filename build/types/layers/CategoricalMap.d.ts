@@ -4,18 +4,18 @@ import type { MapInstance } from '../core/MapInstance'
  * Categorical map type.
  */
 export interface CategoricalMap extends MapInstance {
-    classToFillStyle(): any
-    classToFillStyle(v: any): this
+    /** Fill color for each category value. Auto-generated from a default palette when unset. */
+    classToFillStyle(): Record<string, string> | undefined
+    classToFillStyle(v: Record<string, string>): this
 
-    classToText(): any
-    classToText(v: any): this
+    /** Legend/tooltip label for each category value. */
+    classToText(): Record<string, string> | undefined
+    classToText(v: Record<string, string>): this
 
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
 
-    tooltipText(): any
-    tooltipText(v: any): this
-
-    classifier(): any
-    classifier(v: any): this
+    /** The classifier (d3 ordinal scale) mapping a category value to a class number. */
+    classifier(): ((value: string | number) => number) & { domain: (d?: (string | number)[]) => any }
+    classifier(v: ((value: string | number) => number) & { domain?: (d?: (string | number)[]) => any }): this
 }

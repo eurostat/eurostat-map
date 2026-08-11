@@ -40,6 +40,27 @@ export interface InsetConfig {
     /** Custom D3 projection function for this inset. */
     projectionFunction?: Function | boolean
 
+    /** Show/hide the graticule (coordinate grid lines) for this inset. @default false */
+    drawGraticule?: boolean
+
+    /** Show/hide zoom +/- buttons for this inset. @default false */
+    zoomButtons?: boolean
+
+    /** D3 zoom scale extent [min, max] for this inset. */
+    zoomExtent?: [number, number]
+
+    /** Show the link to the remote Eurostat statistical dataset for this inset. @default false */
+    showSourceLink?: boolean
+
+    /** Footnote text shown below this inset. @default '' */
+    footnote?: string
+
+    /** Function to adjust calculated centroids for this inset's symbols/labels. */
+    processCentroids?: (centroidFeatures: any[]) => any[]
+
+    /** Stroke width in pixels applied to this inset's frame (`.em-frame`). Unset hides the frame. */
+    frameStrokeWidth?: number
+
     /** Scalebar settings for this inset. `true` uses the default scalebar config. */
     scalebar?: ScalebarConfig | boolean
 

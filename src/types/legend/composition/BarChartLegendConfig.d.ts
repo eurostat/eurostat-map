@@ -21,6 +21,35 @@ export interface BarChartSizeLegendConfig {
 
     /** Text label for "no data" item. @default 'No data' */
     noDataText?: string
+
+    /** Horizontal offset in pixels applied to the size/width legend content. @default 10 */
+    offsetX?: number
+}
+
+/**
+ * Configuration for the width legend in grouped-mode bar chart maps (data-driven bar width).
+ */
+export interface BarChartWidthLegendConfig {
+    /** Title for the width legend. @default 'Bar width' */
+    title?: string | null
+
+    /** Padding between title and legend content in pixels. @default 10 */
+    titlePadding?: number
+
+    /** Top margin (distance from the size legend) in pixels. @default 20 */
+    marginTop?: number
+
+    /** Height of the example bars in pixels. @default 8 */
+    barHeight?: number
+
+    /** Horizontal offset in pixels applied to the legend content. @default 10 */
+    offsetX?: number
+
+    /** Custom values to display. If null, auto-generates [max, mid, 10% max]. */
+    values?: number[] | null
+
+    /** Custom formatter function for legend labels. */
+    labelFormatter?: ((value: number) => string) | undefined
 }
 
 /**
@@ -62,6 +91,9 @@ export interface BarChartColorLegendConfig {
 export interface BarChartLegendConfig extends LegendConfig {
     /** Configuration for the bar size legend. Set to false to hide. */
     sizeLegend?: Partial<BarChartSizeLegendConfig> | false
+
+    /** Configuration for the grouped-mode bar width legend (data-driven bar width). */
+    widthLegend?: Partial<BarChartWidthLegendConfig>
 
     /** Configuration for the color/category legend. Set to false to hide. */
     colorLegend?: Partial<BarChartColorLegendConfig> | false

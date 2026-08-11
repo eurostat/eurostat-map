@@ -1,4 +1,6 @@
-export interface TrivariateLegendConfig {
+import type { LegendConfig } from '../LegendConfig'
+
+export interface TrivariateLegendConfig extends LegendConfig {
     /** Width of the legend in pixels. @default 160 */
     width?: number
     /** Height of the legend in pixels. @default 160 */
@@ -13,6 +15,8 @@ export interface TrivariateLegendConfig {
     centerLabel?: string
     /** Whether to show grid lines. @default false */
     showLines?: boolean
+    /** Number of major grid breaks. @default 5 */
+    gridBreaks?: number
     /** Number of minor grid subdivisions between major grid lines. @default 5 */
     minorSubdivisions?: number
     /** Axis corner labels. @default ['Variable 1', 'Variable 2', 'Variable 3'] */
@@ -25,8 +29,4 @@ export interface TrivariateLegendConfig {
     showData?: boolean
     /** Offsets for the center annotation label and curve. */
     centerAnnotationOffsets?: { labelX: number; labelY: number; curveX: number; curveY: number }
-    /** Legend title. */
-    title?: string
-    /** Legend subtitle. */
-    subtitle?: string
 }

@@ -6,7 +6,7 @@ import { LegendConfig } from '../LegendConfig'
  * with color squares representing different class combinations.
  */
 export interface BivariateLegendConfig extends LegendConfig {
-    /** Size of the legend square grid in pixels. @default 100 */
+    /** Size of the legend square grid in pixels. @default 80 */
     squareSize?: number
 
     /** Rotation angle of the legend in degrees. @default 0 */
@@ -42,19 +42,19 @@ export interface BivariateLegendConfig extends LegendConfig {
     /** Font size of the axis titles in pixels. Defaults to the value defined by the legend CSS. */
     axisTitleFontSize?: number
 
-    /** Extra vertical offset for the "no data" legend item in pixels. @default 30 */
+    /** Extra vertical offset for the "no data" legend item in pixels. @default 15 (45 when rotation is -45) */
     noDataYOffset?: number
 
     /** Whether to show arrows at the end of both axes, or for each axis independently. @default true */
     axisArrows?: boolean | { x?: boolean; y?: boolean }
 
-    /** Height of axis arrows in pixels. @default 15 */
+    /** Height of axis arrows in pixels. @default 5 */
     arrowHeight?: number
 
-    /** Width of axis arrows in pixels. @default 14 */
+    /** Width of axis arrows in pixels. @default 5 */
     arrowWidth?: number
 
-    /** Padding between arrow and axis label in pixels. @default 10 */
+    /** Padding between arrow and axis label in pixels. @default 12 */
     arrowPadding?: number
 
     /**

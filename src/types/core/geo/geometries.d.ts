@@ -35,8 +35,16 @@ export interface GeometriesClass {
     /** Master copy of all centroid features before filtering */
     _allCentroidsFeatures: any[]
 
+    /** Returns GeoJSON features for all statistical regions at the map's current NUTS level
+     * (or the 4-level array [rg0,rg1,rg2,rg3] when nutsLevel is 'mixed', or worldrg for WORLD geo). */
+    getRegionFeatures(): any[]
+
     /** Fetches default geographic data from NUTS2JSON */
-    getDefaultGeoData(geo: string, filterFunction: any, nutsLevel: number | string): Promise<void>
+    getDefaultGeoData(geo: string, filterFunction: any, nutsLevel: number | string): Promise<any[]>
+    /** Returns the array of NUTS2JSON fetch promises used by getDefaultGeoData(). */
+    getDefaultGeoDataPromise(): Promise<any>[]
+    /** Returns true once default geo data (or user geometries) has loaded for this map and every inset. */
+    isGeoReady(): boolean
     /** Sets user-defined custom geometries */
     setUserGeometries(geometries: any[]): void
     /** Adds default NUTS geometries to the map */
@@ -60,6 +68,10 @@ export interface GeometriesClass {
     ): void
     /** Adds user-defined geometries to the map */
     addUserGeometriesToMap(geometries: any[], zoomGroup: any, pathFunction: any): void
+    /** Returns all statistical region features (used e.g. for statistical value labelling). */
+    getAllRegionFeatures(): any[]
+    /** Returns a Map of region id -> projected [x, y] centroid, computed via the given d3 path function. */
+    getRegionCentroids(pathFunction: any): Map<string, [number, number]>
 }
 
 /**

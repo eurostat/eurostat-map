@@ -75,11 +75,11 @@ All map types are fully typed with specific configuration interfaces:
 import type {
     ChoroplethConfig,
     ProportionalSymbolConfig,
-    CategoricalConfig,
+    CategoricalMapConfig,
     BivariateChoroplethConfig,
     TrivariateChoroplethConfig,
-    PieChartConfig,
-    SparklineConfig,
+    PieMapConfig,
+    SparkMapConfig,
     FlowMapConfig,
 } from 'eurostatmap'
 ```
@@ -130,14 +130,15 @@ const config: ProportionalSymbolConfig = {
         filters: { age: 'TOTAL', sex: 'T', time: '2020' },
         unitText: 'inhabitants',
     },
-    symbol: 'circle', // or 'square'
-    size: 50,
-    sizeMin: 5,
-    sizeMax: 100,
-    symbolFillStyle: '#3498db',
-    symbolStrokeStyle: '#2c3e50',
-    symbolStrokeWidth: 0.5,
-    psScale: 'sqrt', // 'sqrt' | 'linear' | 'radial'
+    psSettings: {
+        shape: 'circle', // 'circle' | 'bar' | 'square' | 'star' | 'diamond' | 'wye' | 'cross' | 'spike'
+        minSize: 5,
+        maxSize: 100,
+        fill: '#3498db',
+        stroke: '#2c3e50',
+        strokeWidth: 0.5,
+        sizeScale: 'sqrt', // 'sqrt' | 'linear'
+    },
 }
 
 const map = eurostatmap.map('proportionalSymbol', config)
@@ -148,9 +149,9 @@ map.build()
 
 ```typescript
 import eurostatmap from 'eurostatmap'
-import type { CategoricalConfig } from 'eurostatmap'
+import type { CategoricalMapConfig } from 'eurostatmap'
 
-const config: CategoricalConfig = {
+const config: CategoricalMapConfig = {
     svgId: 'categorical-map',
     title: 'Urban-Rural Typology',
     stat: {
@@ -158,10 +159,10 @@ const config: CategoricalConfig = {
         geoCol: 'geo',
         valueCol: 'type',
     },
-    classToStyle: {
-        urban: { fill: '#e74c3c', stroke: '#c0392b', strokeWidth: 1 },
-        intermediate: { fill: '#f39c12', stroke: '#d68910', strokeWidth: 1 },
-        rural: { fill: '#2ecc71', stroke: '#27ae60', strokeWidth: 1 },
+    classToFillStyle: {
+        urban: '#e74c3c',
+        intermediate: '#f39c12',
+        rural: '#2ecc71',
     },
     classToText: {
         urban: 'Urban Areas',
@@ -212,9 +213,9 @@ map.statData().setData({
 
 map.numberOfClasses(5).classificationMethod('quantile').build()
 
-// Get data back
-const data = map.statData().getData()
-console.log(data) // { FR: 118.3, DE: 237.5, ... }
+// Get a value back
+const franceValue = map.statData().get('FR')
+console.log(franceValue) // { value: 118.3 }
 ```
 
 ## Custom Callbacks
@@ -295,7 +296,6 @@ const config: ChoroplethConfig = {
     scale: '20M',
     nutsLevel: 2,
     nutsYear: 2021,
-    geoCenter: [4370000, 3210000],
 
     // Statistical data
     stat: {
@@ -310,7 +310,6 @@ const config: ChoroplethConfig = {
     makeClassifNice: true,
 
     // Styling
-    backgroundColor: '#f0f0f0',
     noDataFillStyle: '#cccccc',
 
     // Legend
@@ -319,8 +318,8 @@ const config: ChoroplethConfig = {
         y: 150,
         title: 'Population Density',
         titleFontSize: 16,
-        boxWidth: 250,
-        boxHeight: 350,
+        width: 250,
+        height: 350,
         orientation: 'vertical',
         ascending: true,
         noData: true,
@@ -329,11 +328,10 @@ const config: ChoroplethConfig = {
 
     // Tooltip
     tooltip: {
-        maxWidth: 350,
         textFunction: (region, map) => {
             const value = map.statData().get(region.properties.id)
             return `<b>${region.properties.na}</b><br/>
-                    Density: ${value ? value.toFixed(1) : 'N/A'} people/km²`
+                    Density: ${value?.value ? Number(value.value).toFixed(1) : 'N/A'} people/km²`
         },
     },
 
@@ -342,25 +340,22 @@ const config: ChoroplethConfig = {
 
     // Zoom settings
     zoomExtent: [1, 10],
-    showBtns: true,
+    zoomButtons: true,
 
     // Coastal margin
-    coastal: true,
-    coastalMarginWidth: 0.5,
-    coastalMarginColor: '#4682b4',
-
-    // Borders
-    borderWidth: 0.3,
-    borderColor: '#444',
+    drawCoastalMargin: true,
+    coastalMarginSettings: {
+        strokeWidth: 0.5,
+        color: '#4682b4',
+    },
 
     // Labels
-    labelling: true,
-    labelSizeThreshold: 5000,
-    labelOpacity: 0.8,
+    labels: {
+        values: true,
+    },
 
     // Footer
-    bottomText: 'Source: Eurostat (2020)',
-    footnote: '* Some regions may have incomplete data',
+    footnote: 'Source: Eurostat (2020). * Some regions may have incomplete data',
 
     // Callback
     onBuild: (map) => {
@@ -368,7 +363,7 @@ const config: ChoroplethConfig = {
 
         // Export SVG after build
         setTimeout(() => {
-            map.exportSVG()
+            map.exportMapToSVG()
         }, 1000)
     },
 }
@@ -400,29 +395,44 @@ function createMap(config: ChoroplethConfig): EurostatMap {
 - `MapConfig` - Base configuration for all maps
 - `ChoroplethConfig` - Choropleth map configuration
 - `ProportionalSymbolConfig` - Proportional symbol map configuration
-- `CategoricalConfig` - Categorical map configuration
+- `CategoricalMapConfig` - Categorical map configuration
 - `BivariateChoroplethConfig` - Bivariate choropleth configuration
 - `TrivariateChoroplethConfig` - Trivariate (ternary) choropleth configuration, including continuous and sextant ternary settings
-- `PieChartConfig` - Pie chart map configuration
-- `SparklineConfig` - Sparkline map configuration
-- `WaffleConfig` - Waffle map configuration
+- `ValueByAlphaConfig` - Value-by-alpha choropleth map configuration
+- `MushroomMapConfig` - Mushroom (dual semi-circle proportional symbol) map configuration
+- `PieMapConfig` - Pie chart map configuration
+- `BarMapConfig` - Bar chart composition map configuration
+- `WaffleMapConfig` - Waffle chart composition map configuration
+- `CoxcombMapConfig` - Coxcomb (polar area) chart map configuration
+- `StripeMapConfig` - Stripe composition map configuration
+- `SparkMapConfig` - Sparkline map configuration
 - `FlowMapConfig` - Flow map configuration
 
 ### Supporting Interfaces
 
-- `StatConfig` - Statistical data source configuration
-- `LegendConfig` - Legend configuration
+- `StatConfig` - Statistical data source configuration for single-value map types
+- `CompositionStatConfig` - Statistical data source configuration for composition map types (pie, bar, waffle, coxcomb, stripe)
+- `EncodingConfig` - Visual encoding configuration mapping a named stat to a visual channel
+- `LegendConfig` - Base legend configuration
 - `TooltipConfig` - Tooltip configuration
 - `InsetConfig` - Map inset configuration
+- `LayerConfig` - Multi-layer map layer configuration
 - `FillPatternOptions` - Fill pattern options
 
 ### Map Objects
 
-- `EurostatMap` - Base map interface with all common methods
+- `EurostatMap` (alias for `MapInstance`) - Base map interface with all common methods
 - `ChoroplethMap` - Choropleth map with specific methods
 - `ProportionalSymbolMap` - Proportional symbol map with specific methods
 - `CategoricalMap` - Categorical map with specific methods
 - `BivariateChoroplethMap` - Bivariate choropleth map with specific methods
+- `TrivariateChoroplethMap` - Trivariate choropleth map with specific methods
+- `ValueByAlphaMap` - Value-by-alpha choropleth map with specific methods
+- `MushroomMap` - Mushroom map with specific methods
+- `PieMap`, `BarMap`, `WaffleMap`, `CoxcombMap`, `StripeMap` - Composition map types with their specific methods
+- `SparkMap` - Sparkline map with specific methods
+- `FlowMap` - Flow map with specific methods
+- `Layer` - A single layer in a multi-layer map's layer stack
 - `StatData` - Statistical data object
 
 ### Type Unions
@@ -437,10 +447,10 @@ To verify your TypeScript configuration is working correctly:
 # Check types without emitting files
 npm run type-check
 
-# Build with type generation
-npm run build-types
+# Copy hand-written types from src/types to build/types
+npm run copy-types
 
-# Full production build (includes type generation)
+# Full production build (includes copying types to build/)
 npm run build-prod
 ```
 

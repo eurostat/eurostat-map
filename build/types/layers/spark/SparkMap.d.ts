@@ -13,8 +13,8 @@ export interface SparkMap extends MapInstance {
     legend(): SparklineLegendConfig | false
     legend(config: SparklineLegendConfig | false): this
 
-    sparkLineColor(): any
-    sparkLineColor(v: any): this
+    sparkLineColor(): string | ((value: number, index: number, data: any[]) => string)
+    sparkLineColor(v: string | ((value: number, index: number, data: any[]) => string)): this
 
     showOnlyWhenComplete(): boolean
     showOnlyWhenComplete(v: boolean): this
@@ -37,14 +37,20 @@ export interface SparkMap extends MapInstance {
     sparkLineCircleRadius(): number
     sparkLineCircleRadius(v: number): this
 
-    sparkLineAreaColor(): any
-    sparkLineAreaColor(v: any): this
+    /** Alias for the areaColor setting (backward-compatible name). */
+    sparkLineAreaColor(): string | ((value: number, index: number, data: any[]) => string)
+    sparkLineAreaColor(v: string | ((value: number, index: number, data: any[]) => string)): this
 
-    sparkTooltipChart(): any
-    sparkTooltipChart(v: any): this
+    sparkTooltipChart(): { width: number; height: number; margin: { left: number; right: number; top: number; bottom: number }; circleRadius: number }
+    sparkTooltipChart(v: {
+        width: number
+        height: number
+        margin: { left: number; right: number; top: number; bottom: number }
+        circleRadius: number
+    }): this
 
-    sparkLineChartFunction(): any
-    sparkLineChartFunction(v: any): this
+    sparkLineChartFunction(): ((node: any, data: any[], width: number, height: number, isForTooltip?: boolean) => void) | undefined
+    sparkLineChartFunction(v: (node: any, data: any[], width: number, height: number, isForTooltip?: boolean) => void): this
 
     sparkLineOffsets(): { x: number; y: number }
     sparkLineOffsets(v: { x: number; y: number }): this

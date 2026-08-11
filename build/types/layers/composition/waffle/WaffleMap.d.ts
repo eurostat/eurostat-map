@@ -9,11 +9,11 @@ export interface WaffleMap extends MapInstance {
     legend(): WaffleLegendConfig | false
     legend(config: WaffleLegendConfig | false): this
 
-    catColors(): any
-    catColors(v: any): this
+    catColors(): Record<string, string> | undefined
+    catColors(v: Record<string, string>): this
 
-    catLabels(): any
-    catLabels(v: any): this
+    catLabels(): Record<string, string> | undefined
+    catLabels(v: Record<string, string>): this
 
     showOnlyWhenComplete(): boolean
     showOnlyWhenComplete(v: boolean): this

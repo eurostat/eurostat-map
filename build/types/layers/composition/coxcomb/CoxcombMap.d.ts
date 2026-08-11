@@ -26,11 +26,11 @@ export interface CoxcombMap extends MapInstance {
         offsets?: { x: number; y: number }
     }): this
 
-    catColors(): any
-    catColors(v: any): this
+    catColors(): Record<string, string> | undefined
+    catColors(v: Record<string, string>): this
 
-    catLabels(): any
-    catLabels(v: any): this
+    catLabels(): Record<string, string> | undefined
+    catLabels(v: Record<string, string>): this
 
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
@@ -63,8 +63,9 @@ export interface CoxcombMap extends MapInstance {
     hoverColor(): string
     hoverColor(v: string): this
 
-    classifierSize(): any
-    classifierSize(v: any): this
+    /** D3 radial scale mapping a stat value to a wedge radius in pixels. */
+    classifierSize(): ((value: number) => number) | null
+    classifierSize(v: (value: number) => number): this
 
     /** @deprecated Use coxcombSettings({ offsets }) */
     coxcombOffsets(): { x: number; y: number }

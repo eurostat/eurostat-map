@@ -40,8 +40,8 @@ export interface CoxcombMapConfig extends MapConfig {
     catLabels?: Record<string, string>
     /** No data fill style. */
     noDataFillStyle?: string
-    /** Classifier size. */
-    classifierSize?: any
+    /** D3 radial scale mapping a stat value to a wedge radius in pixels. */
+    classifierSize?: (value: number) => number
     /** Legend. */
     legend?: CoxcombLegendConfig | false
 }
