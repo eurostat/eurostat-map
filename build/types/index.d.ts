@@ -65,6 +65,7 @@ export type { CoastalMarginSettings } from './core/decoration/CoastalMarginSetti
 export type { ScalebarConfig } from './core/decoration/ScalebarConfig'
 export type { StampConfig } from './core/decoration/StampConfig'
 export type { LabelsConfig, Label } from './core/decoration/LabelsConfig'
+export type { PatternFillConfig } from './core/decoration/PatternFillConfig'
 export type { RankedBarChartConfig } from './core/decoration/RankedBarChartConfig'
 export type { GridCartogramSettings, GridCartogramMargins } from './core/GridCartogramSettings'
 export type { DorlingSettings, DorlingStrength } from './core/DorlingSettings'
@@ -74,6 +75,8 @@ export type { GeometriesClass } from './core/geo/geometries'
 export type { Layer } from './core/layer/Layer'
 export type { LayerConfig } from './core/layer/LayerConfig'
 export type { LayerRole } from './core/layer/LayerRole'
+
+import type { LayerRole } from './core/layer/LayerRole'
 
 // ==================== Legend Configuration Type Exports ====================
 
@@ -91,14 +94,14 @@ export type { TrivariateLegendConfig } from './legend/choropleth/TrivariateLegen
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'
-export type { BarChartSizeLegendConfig, BarChartColorLegendConfig } from './legend/composition/BarChartLegendConfig'
+export type { BarChartSizeLegendConfig, BarChartWidthLegendConfig, BarChartColorLegendConfig } from './legend/composition/BarChartLegendConfig'
 export type { CoxcombLegendConfig } from './legend/composition/CoxcombLegendConfig'
 export type { CoxcombSizeLegendConfig, CoxcombColorLegendConfig, CoxcombTimeLegendConfig } from './legend/composition/CoxcombLegendConfig'
 export type { PieChartLegendConfig } from './legend/composition/PieChartLegendConfig'
 export type { PieChartSizeLegendConfig, PieChartColorLegendConfig } from './legend/composition/PieChartLegendConfig'
 export type { WaffleLegendConfig } from './legend/composition/WaffleLegendConfig'
 export type { WaffleSizeLegendConfig, WaffleColorLegendConfig } from './legend/composition/WaffleLegendConfig'
-export type { StripeCompositionLegendConfig } from './legend/composition/StripeCompositionLegendConfig'
+export type { StripeCompositionLegendConfig, StripeCompositionColorLegendConfig } from './legend/composition/StripeCompositionLegendConfig'
 export type {
     SparklineLegendConfig,
     SparklineScaleLegendConfig,
@@ -236,9 +239,31 @@ export function map(type: MapType, config?: MapConfig): MapInstance
 export function getFillPatternDefinitionFunction(opts?: FillPatternOptions): (svg: any, numberOfClasses: number) => void
 
 /**
+ * @deprecated Use getFillPatternDefinitionFunction instead. Kept as an alias for backwards
+ * compatibility.
+ */
+export function getFillPatternDefinitionFun(opts?: FillPatternOptions): (svg: any, numberOfClasses: number) => void
+
+/**
  * Get default labels for the map
  */
 export function getDefaultLabels(): { [key: string]: any }
+
+/**
+ * Registers a custom layer type so it can be used with map.addLayer() and, once the type
+ * itself is recognized elsewhere in the build chain, with eurostatmap.map(type).
+ *
+ * @param type - Unique layer type identifier
+ * @param role - 'base' (paints shared region geometry, at most one per map) or 'overlay'
+ * @param decorate - Function that attaches the layer's fluent API/behavior onto a created Layer
+ */
+export function registerLayerType(type: string, role: LayerRole, decorate: (layer: any, config: any) => void): void
+
+/**
+ * Returns true if the given layer type has been registered via registerLayerType (or is a
+ * built-in type available through the multi-layer API).
+ */
+export function isLayerTypeRegistered(type: string): boolean
 
 /**
  * Project coordinates from map pixel space to geographic coordinates
@@ -246,9 +271,9 @@ export function getDefaultLabels(): { [key: string]: any }
  * @param map - The map object
  * @param x - X pixel coordinate
  * @param y - Y pixel coordinate
- * @returns [longitude, latitude]
+ * @returns [longitude, latitude], or null if projection fails
  */
-export function projectFromMap(map: MapInstance, x: number, y: number): [number, number]
+export function projectFromMap(map: MapInstance, x: number, y: number): [number, number] | null
 
 /**
  * Project geographic coordinates to map pixel space
@@ -256,9 +281,9 @@ export function projectFromMap(map: MapInstance, x: number, y: number): [number,
  * @param map - The map object
  * @param lon - Longitude
  * @param lat - Latitude
- * @returns [x, y] pixel coordinates
+ * @returns [x, y] pixel coordinates, or null if projection fails
  */
-export function projectToMap(map: MapInstance, lon: number, lat: number): [number, number]
+export function projectToMap(map: MapInstance, lon: number, lat: number): [number, number] | null
 
 /**
  * Library version
@@ -272,12 +297,18 @@ declare const eurostatmap: {
     map: typeof map
     /** Get fill pattern definition function. */
     getFillPatternDefinitionFunction: typeof getFillPatternDefinitionFunction
+    /** @deprecated Use getFillPatternDefinitionFunction instead. */
+    getFillPatternDefinitionFun: typeof getFillPatternDefinitionFun
     /** Get default labels. */
     getDefaultLabels: typeof getDefaultLabels
     /** Project from map. */
     projectFromMap: typeof projectFromMap
     /** Project to map. */
     projectToMap: typeof projectToMap
+    /** Register a custom layer type. */
+    registerLayerType: typeof registerLayerType
+    /** Check whether a layer type is registered. */
+    isLayerTypeRegistered: typeof isLayerTypeRegistered
     /** Version. */
     version: typeof version
 }

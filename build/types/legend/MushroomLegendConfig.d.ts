@@ -4,6 +4,12 @@ import { LegendConfig } from './LegendConfig'
  * Configuration for size legend in mushroom (dual semi-circle) charts.
  */
 export interface MushroomSizeLegendConfig {
+    /** Title for the size legend. */
+    title?: string
+
+    /** Padding between title and legend content in pixels. @default 5 */
+    titlePadding?: number
+
     /** Top margin for the size legend in pixels. @default 15 */
     marginTop?: number
 
@@ -36,11 +42,20 @@ export interface MushroomSizeLegendConfig {
  * Configuration for color legend in mushroom (dual semi-circle) charts.
  */
 export interface MushroomColorLegendConfig {
+    /** Title for the color legend. */
+    title?: string
+
+    /** Padding between title and legend content in pixels. @default 5 */
+    titlePadding?: number
+
     /** Top margin for the color legend in pixels. @default 5 */
     marginTop?: number
 
     /** Offset adjustments for labels. @default { x: 5, y: 5 } */
     labelOffsets?: { x: number; y: number }
+
+    /** Custom labels for the two color swatches (v1, v2). @default the stat datasets' own labels */
+    labels?: [string, string]
 }
 
 /**

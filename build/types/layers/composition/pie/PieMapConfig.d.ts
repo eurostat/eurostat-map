@@ -27,10 +27,6 @@ export interface PieMapConfig extends MapConfig {
         otherColor?: string
         otherText?: string
     }
-    /** Tooltip pie radius. */
-    tooltipPieRadius?: number
-    /** Tooltip pie inner radius. */
-    tooltipPieInnerRadius?: number
     /** Cat colors. */
     catColors?: Record<string, string>
     /** Cat labels. */

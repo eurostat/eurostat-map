@@ -25,13 +25,13 @@ export interface FlowMap extends MapInstance {
         nodeType: 'circle' | 'donut'
         labelOffsets: { x: number; y: number }
         lineType: 'curved' | 'straight' | 'sankey'
-        nodeSizeScale: any
+        nodeSizeScale: ((value: number) => number) | null
         opacity: number
         internal: boolean
         topLocations: number
         topLocationsType: 'sum' | 'origin' | 'destination'
         curvatureSettings: FlowCurvatureSettings
-        order: any
+        order: (a: any, b: any) => number
         widthGradient: boolean
         opacityGradient: boolean
         widthGradientSettings: FlowWidthGradientSettings
@@ -56,13 +56,13 @@ export interface FlowMap extends MapInstance {
         nodeType?: 'circle' | 'donut'
         labelOffsets?: { x: number; y: number }
         lineType?: 'curved' | 'straight' | 'sankey'
-        nodeSizeScale?: any
+        nodeSizeScale?: (value: number) => number
         opacity?: number
         internal?: boolean
         topLocations?: number
         topLocationsType?: 'sum' | 'origin' | 'destination'
         curvatureSettings?: FlowCurvatureSettings
-        order?: any
+        order?: (a: any, b: any) => number
         widthGradient?: boolean
         opacityGradient?: boolean
         widthGradientSettings?: FlowWidthGradientSettings
@@ -152,9 +152,9 @@ export interface FlowMap extends MapInstance {
     flowLineType(v: 'curved' | 'straight' | 'sankey'): this
 
     /** @deprecated Use flowSettings({ nodeSizeScale }) */
-    flowNodeSizeScale(): any
+    flowNodeSizeScale(): ((value: number) => number) | null
     /** @deprecated Use flowSettings({ nodeSizeScale }) */
-    flowNodeSizeScale(v: any): this
+    flowNodeSizeScale(v: (value: number) => number): this
 
     /** @deprecated Use flowSettings({ opacity }) */
     flowOpacity(): number
@@ -182,9 +182,9 @@ export interface FlowMap extends MapInstance {
     flowCurvatureSettings(v: FlowCurvatureSettings): this
 
     /** @deprecated Use flowSettings({ order }) */
-    flowOrder(): any
+    flowOrder(): (a: any, b: any) => number
     /** @deprecated Use flowSettings({ order }) */
-    flowOrder(v: any): this
+    flowOrder(v: (a: any, b: any) => number): this
 
     /** @deprecated Use flowSettings({ widthGradient }) */
     flowWidthGradient(): boolean

@@ -69,5 +69,4 @@ export interface LegendConfig {
     maxMin?: boolean
     /** Text affixes for min/max labels as [minSuffix, maxSuffix]. */
     maxMinLabels?: [string, string]
-    layer?: any
 }

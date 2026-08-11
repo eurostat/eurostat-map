@@ -14,6 +14,9 @@ import type { ScalebarConfig } from './decoration/ScalebarConfig'
 import type { EncodingConfig } from './encoding/EncodingConfig'
 import type { LocationConfig } from './locations'
 import type { LabelsConfig } from './decoration/LabelsConfig'
+import type { PatternFillConfig } from './decoration/PatternFillConfig'
+import type { MinimapConfig } from './minimaps'
+import type { StampConfig } from './decoration/StampConfig'
 
 /**
  * A eurostat-map instance. Created by eurostatmap.map() and extended
@@ -238,6 +241,14 @@ export interface MapInstance {
     zoomButtons(): boolean
     zoomButtons(show: boolean): this
 
+    /** D3 zoom translate extent (pan boundaries), as [[x0, y0], [x1, y1]]. */
+    translateExtent(): [[number, number], [number, number]] | undefined
+    translateExtent(extent: [[number, number], [number, number]]): this
+
+    /** If true, panning is disabled until the user has zoomed at least once. @default true */
+    lockPanUntilZoom(): boolean
+    lockPanUntilZoom(lock: boolean): this
+
     /** Grid cartogram settings (shape, margins, cell padding, layout positions). */
     gridCartogramSettings(): GridCartogramSettings
     gridCartogramSettings(settings: Partial<GridCartogramSettings>): this
@@ -259,6 +270,26 @@ export interface MapInstance {
      */
     insets(): InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | false
     insets(config: InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | true | false): this
+
+    /** Position [x, y] of the box containing the default/named-preset insets layout. */
+    insetBoxPosition(): [number, number] | undefined
+    insetBoxPosition(pos: [number, number]): this
+
+    /** Padding in pixels around/between insets in the default insets box layout. @default 5 */
+    insetBoxPadding(): number
+    insetBoxPadding(px: number): this
+
+    /** Width in pixels of each inset in the default insets box layout. @default 210 */
+    insetBoxWidth(): number
+    insetBoxWidth(px: number): this
+
+    /** Default NUTS2JSON scale used for insets that don't specify their own. @default '03M' */
+    insetScale(): string
+    insetScale(scale: string): this
+
+    /** Default D3 zoom scale extent for insets. `null` disables zoom on insets. */
+    insetZoomExtent(): [number, number] | null
+    insetZoomExtent(extent: [number, number] | null): this
 
     /** Decoration. */
 
@@ -285,13 +316,19 @@ export interface MapInstance {
     labels(): LabelsConfig | undefined
     labels(config: LabelsConfig): this
 
-    /** Annotation configuration for d3-svg-annotation. */
-    annotations(): any
-    annotations(config: any): this
+    /**
+     * Annotation configuration, rendered via the d3-svg-annotation library.
+     * `annotations` is an array of d3-svg-annotation annotation objects; each object's `type`
+     * may be one of 'annotationLabel' (default), 'annotationCallout', 'annotationCalloutRect',
+     * 'annotationCalloutCircle', 'annotationXYThreshold', resolved to the matching d3-svg-annotation
+     * function internally.
+     */
+    annotations(): { annotations: any[]; editMode?: boolean } | undefined
+    annotations(config: { annotations: any[]; editMode?: boolean }): this
 
     /** Stamp/watermark annotation. @example { x: 10, y: 10, text: 'DRAFT', size: 40 } */
-    stamp(): object | undefined
-    stamp(config: { x: number; y: number; text: string; size?: number }): this
+    stamp(): StampConfig | undefined
+    stamp(config: StampConfig): this
 
     /** Scalebar configuration. */
     scalebar(): ScalebarConfig | null
@@ -309,9 +346,25 @@ export interface MapInstance {
     showEstatLogo(): boolean
     showEstatLogo(show: boolean): this
 
+    /** Width in pixels of the Eurostat logo. @default 200 */
+    logoWidth(): number | undefined
+    logoWidth(px: number): this
+
+    /** Height in pixels of the Eurostat logo. @default 40 */
+    logoHeight(): number | undefined
+    logoHeight(px: number): this
+
     /** Show the Eurostat ribbon banner. */
     showEstatRibbon(): boolean
     showEstatRibbon(show: boolean): this
+
+    /** Width in pixels of the Eurostat ribbon banner. @default 200 */
+    ribbonWidth(): number | undefined
+    ribbonWidth(px: number): this
+
+    /** Height in pixels of the Eurostat ribbon banner. @default 40 */
+    ribbonHeight(): number | undefined
+    ribbonHeight(px: number): this
 
     /** Returns the D3 selection of the SVG element. */
     svg(): any
@@ -345,9 +398,9 @@ export interface MapInstance {
     backgroundMap(): boolean
     backgroundMap(show: boolean): this
 
-    /** Minimap configuration. */
-    minimap(): any
-    minimap(config: any): this
+    /** Minimap (globe inset showing current viewport) configuration. */
+    minimap(): MinimapConfig | undefined
+    minimap(config: MinimapConfig): this
 
     /**
      * Show/hide inset map toggle button.
@@ -408,6 +461,13 @@ export interface MapInstance {
     insetsButtonPosition(): [number, number] | undefined
     insetsButtonPosition(pos: [number, number]): this
 
+    /**
+     * Viewport width (px) at/below which insets start hidden (behind the insets button) unless
+     * insetsButton was set explicitly. @default 768
+     */
+    insetsVisibilityBreakpoint(): number
+    insetsVisibilityBreakpoint(px: number): this
+
     /** Position adjustment for legend button: [x, y] */
     legendButtonPosition(): [number, number] | undefined
     legendButtonPosition(pos: [number, number]): this
@@ -431,9 +491,9 @@ export interface MapInstance {
     showSourceLink(): boolean
     showSourceLink(show: boolean): this
 
-    /** Pattern fill configurations. */
-    patternFill(): any
-    patternFill(config: any): this
+    /** Pattern fill (hatching/dots/crosshatch) overlays for specific regions. */
+    patternFill(): PatternFillConfig | PatternFillConfig[] | undefined
+    patternFill(config: PatternFillConfig | PatternFillConfig[]): this
 
     /** Dorling. */
 
@@ -513,15 +573,17 @@ export interface MapInstance {
     /**
      * Exports the map as an SVG file and triggers a browser download.
      * Computed CSS styles are inlined before export.
+     * @param filename - Download filename without extension. @default 'eurostatmap'
      */
-    exportMapToSVG(): this
+    exportMapToSVG(filename?: string): this
 
     /**
      * Exports the map as a PNG file and triggers a browser download.
      * @param width - Output width in pixels. Defaults to SVG width.
      * @param height - Output height in pixels. Defaults to SVG height.
+     * @param filename - Download filename without extension. @default 'eurostatmap'
      */
-    exportMapToPNG(width?: number, height?: number): Promise<this>
+    exportMapToPNG(width?: number, height?: number, filename?: string): Promise<this>
 
     /** Misc. */
 
@@ -539,8 +601,8 @@ export interface MapInstance {
     filtersDefinitionFunction(): ((svg: any, numberOfClasses: number) => void) | undefined
     filtersDefinitionFunction(fn: (svg: any, numberOfClasses: number) => void): this
 
-    /** Returns region centroids as an array of projected coordinate pairs. */
-    regionCentroids(): Array<{ id: string; x: number; y: number }>
+    /** Returns a Map of region id -> projected [x, y] centroid coordinate pair. */
+    regionCentroids(): Map<string, [number, number]>
 
     /** Ordered thematic layer stack (bottom → top). */
     layers_: Layer[]

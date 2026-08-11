@@ -27,11 +27,11 @@ export interface StripeMap extends MapInstance {
     /** @deprecated Use stripeSettings({ orientation }) */
     stripeOrientation(v: number): this
 
-    catColors(): any
-    catColors(v: any): this
+    catColors(): Record<string, string> | undefined
+    catColors(v: Record<string, string>): this
 
-    catLabels(): any
-    catLabels(v: any): this
+    catLabels(): Record<string, string> | undefined
+    catLabels(v: Record<string, string>): this
 
     /** @deprecated Use stripeSettings({ otherColor }) */
     stripeOtherColor(): string

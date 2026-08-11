@@ -43,7 +43,7 @@ const getLayerAndMap = function (layerOrMap) {
 
 export const decorateProportionalSymbolLayer = function (layer, config) {
     //shape
-    layer.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross
+    layer.psShape_ = 'circle' // accepted values: circle, bar, square, star, diamond, wye, cross, triangle, spike
     layer.psCustomShape_ = undefined
     layer.psCustomSVG_ = undefined
     layer.psSpikeWidth_ = 7

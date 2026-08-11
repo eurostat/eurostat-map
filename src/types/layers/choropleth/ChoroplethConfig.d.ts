@@ -22,8 +22,8 @@ export interface ChoroplethConfig extends MapConfig {
     colorFunction?: (t: number) => string
     /** Color scheme type. */
     colorSchemeType?: 'discrete' | 'continuous'
-    /** Class to fill style. */
-    classToFillStyle?: { [classIndex: number]: string }
+    /** Function mapping a class index (or category ecl code) and the number of classes to a fill color. */
+    classToFillStyle?: (ecl: number | string, numberOfClasses: number) => string
 
     /** No-data styling. */
     noDataFillStyle?: string
@@ -44,5 +44,5 @@ export interface ChoroplethConfig extends MapConfig {
     skipNormalization?: boolean
 
     /** Diverging schemes. */
-    pointOfDivergence?: number
+    pointOfDivergence?: number | null
 }

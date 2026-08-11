@@ -41,11 +41,13 @@ export interface ProportionalSymbolMap extends MapInstance {
     psStrokeWidth(): number
     psStrokeWidth(v: number): this
 
-    classifierSize(): any
-    classifierSize(v: any): this
+    /** D3 scale mapping a stat value to a symbol size in pixels. */
+    classifierSize(): ((value: number) => number) & { domain: (d?: number[]) => any }
+    classifierSize(v: ((value: number) => number) & { domain?: (d?: number[]) => any }): this
 
-    classifierColor(): any
-    classifierColor(v: any): this
+    /** D3 scale mapping a stat value to a color class index. */
+    classifierColor(): ((value: number) => number) | undefined
+    classifierColor(v: (value: number) => number): this
 
     psShape(): string
     psShape(v: string): this
@@ -56,14 +58,16 @@ export interface ProportionalSymbolMap extends MapInstance {
     psBarWidth(): number
     psBarWidth(v: number): this
 
-    psClassToFillStyle(): any
-    psClassToFillStyle(v: any): this
+    /** Function mapping a class index and the number of classes to a fill color. */
+    psClassToFillStyle(): (ecl: number, numberOfClasses: number) => string
+    psClassToFillStyle(v: (ecl: number, numberOfClasses: number) => string): this
 
-    psColorFun(): any
-    psColorFun(v: any): this
+    /** d3-scale-chromatic interpolator used to auto-generate psColors when not set explicitly. */
+    psColorFun(): (t: number) => string
+    psColorFun(v: (t: number) => string): this
 
-    psSizeScale(): any
-    psSizeScale(v: any): this
+    psSizeScale(): 'sqrt' | 'linear' | undefined
+    psSizeScale(v: 'sqrt' | 'linear'): this
 
     noDataFillStyle(): string
     noDataFillStyle(v: string): this

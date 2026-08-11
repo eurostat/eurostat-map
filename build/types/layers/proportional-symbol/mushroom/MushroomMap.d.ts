@@ -4,15 +4,19 @@ import type { MapInstance } from '../../../core/MapInstance'
  * Mushroom map type.
  */
 export interface MushroomMap extends MapInstance {
+    /** Returns the resolved [v1, v2] stat codes for the two mushroom sides, honoring any
+     * 'left'/'right' or 'v1'/'v2' encodings before falling back to mushroomCodes. */
+    getMushroomStatCodes(): [string, string]
+
     mushroomSettings(): {
         codes: [string, string]
         minSize: number
         maxSize: number
         colors: [string, string]
         orientation: 'horizontal' | 'vertical'
-        sizeScaleFunction: any
-        sizeScaleFunctionV1: any
-        sizeScaleFunctionV2: any
+        sizeScaleFunction: ((value: number) => number) | null
+        sizeScaleFunctionV1: ((value: number) => number) | null
+        sizeScaleFunctionV2: ((value: number) => number) | null
     }
     mushroomSettings(v: {
         codes?: [string, string]
@@ -20,9 +24,9 @@ export interface MushroomMap extends MapInstance {
         maxSize?: number
         colors?: [string, string]
         orientation?: 'horizontal' | 'vertical'
-        sizeScaleFunction?: any
-        sizeScaleFunctionV1?: any
-        sizeScaleFunctionV2?: any
+        sizeScaleFunction?: ((value: number) => number) | null
+        sizeScaleFunctionV1?: ((value: number) => number) | null
+        sizeScaleFunctionV2?: ((value: number) => number) | null
     }): this
 
     /** @deprecated Use mushroomSettings({ codes }) */
@@ -51,17 +55,17 @@ export interface MushroomMap extends MapInstance {
     mushroomOrientation(v: 'horizontal' | 'vertical'): this
 
     /** @deprecated Use mushroomSettings({ sizeScaleFunction }) */
-    mushroomSizeScaleFunction(): any
+    mushroomSizeScaleFunction(): ((value: number) => number) | null
     /** @deprecated Use mushroomSettings({ sizeScaleFunction }) */
-    mushroomSizeScaleFunction(v: any): this
+    mushroomSizeScaleFunction(v: (value: number) => number): this
 
     /** @deprecated Use mushroomSettings({ sizeScaleFunctionV1 }) */
-    mushroomSizeScaleFunctionV1(): any
+    mushroomSizeScaleFunctionV1(): ((value: number) => number) | null
     /** @deprecated Use mushroomSettings({ sizeScaleFunctionV1 }) */
-    mushroomSizeScaleFunctionV1(v: any): this
+    mushroomSizeScaleFunctionV1(v: (value: number) => number): this
 
     /** @deprecated Use mushroomSettings({ sizeScaleFunctionV2 }) */
-    mushroomSizeScaleFunctionV2(): any
+    mushroomSizeScaleFunctionV2(): ((value: number) => number) | null
     /** @deprecated Use mushroomSettings({ sizeScaleFunctionV2 }) */
-    mushroomSizeScaleFunctionV2(v: any): this
+    mushroomSizeScaleFunctionV2(v: (value: number) => number): this
 }

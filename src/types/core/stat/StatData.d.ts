@@ -1,5 +1,3 @@
-import type { StatConfig } from './StatConfig'
-
 /**
  * A statistical dataset indexed by NUTS region ID.
  * Returned by map.statData() and created internally by statData().
@@ -101,6 +99,8 @@ export interface StatData {
     eurostatDatasetCode_?: string
     /** CSV source URL. */
     csvURL_?: string
+    /** Dataset label/name from the Eurostat API response or stat() config. */
+    label_?: string
 
     /**
      * Fetches data from the configured remote source (Eurostat API or CSV).

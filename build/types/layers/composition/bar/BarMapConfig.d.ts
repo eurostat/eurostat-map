@@ -5,7 +5,7 @@ import type { BarChartLegendConfig } from '../../../legend/composition/BarChartL
  * Configuration for bar chart composition maps.
  */
 export interface BarMapConfig extends MapConfig {
-    /** Bar type. */
+    /** @deprecated Use barSettings.type */
     barType?: 'stacked' | 'grouped'
     /** Cat colors. */
     catColors?: Record<string, string>
@@ -15,27 +15,32 @@ export interface BarMapConfig extends MapConfig {
     showOnlyWhenComplete?: boolean
     /** No data fill style. */
     noDataFillStyle?: string
-    /** Bar min width. */
+    /** @deprecated Use barSettings.minWidth */
     barMinWidth?: number
-    /** Bar max width. */
+    /** @deprecated Use barSettings.maxWidth */
     barMaxWidth?: number
-    /** Bar height. */
+    /** @deprecated Use barSettings.height */
     barHeight?: number
-    /** Bar group width. */
+    /** @deprecated Use barSettings.groupWidth */
     barGroupWidth?: number
-    /** Grouped bar settings object. */
+    /** Consolidated bar chart style settings. */
     barSettings?: {
+        /** 'stacked': one bar per region, category segments stacked; 'grouped': category bars
+         * side-by-side. @default 'grouped' */
         type?: 'stacked' | 'grouped'
         minWidth?: number
         maxWidth?: number
         height?: number
+        /** Width of each grouped bar. Defaults to cell width / number of categories. */
         groupWidth?: number
         groupMinWidth?: number
         groupMaxWidth?: number
         groupGap?: number
         groupMinHeight?: number
         groupMaxHeight?: number
+        /** Optional override for the grouped-mode max value, for sharing scales across maps. */
         groupMaxValue?: number
+        /** Optional override for the grouped-mode max width-encoded value. */
         groupMaxWidthValue?: number
         strokeFill?: string
         strokeWidth?: number
@@ -44,26 +49,28 @@ export interface BarMapConfig extends MapConfig {
         otherText?: string
         tooltipWidth?: number
         tooltipHeight?: number
+        /** Show the category name (e.g. "Cities:") before each tooltip value. @default true */
+        showCategoryLabels?: boolean
     }
-    /** Bar group gap. */
+    /** @deprecated Use barSettings.groupGap */
     barGroupGap?: number
-    /** Bar group min height. */
+    /** @deprecated Use barSettings.groupMinHeight */
     barGroupMinHeight?: number
-    /** Bar group max height. */
+    /** @deprecated Use barSettings.groupMaxHeight */
     barGroupMaxHeight?: number
-    /** Bar stroke fill. */
+    /** @deprecated Use barSettings.strokeFill */
     barStrokeFill?: string
-    /** Bar stroke width. */
+    /** @deprecated Use barSettings.strokeWidth */
     barStrokeWidth?: number
-    /** Bar corner radius. */
+    /** @deprecated Use barSettings.cornerRadius */
     barCornerRadius?: number
-    /** Bar other color. */
+    /** @deprecated Use barSettings.otherColor */
     barOtherColor?: string
-    /** Bar other text. */
+    /** @deprecated Use barSettings.otherText */
     barOtherText?: string
-    /** Bar tooltip width. */
+    /** @deprecated Use barSettings.tooltipWidth */
     barTooltipWidth?: number
-    /** Bar tooltip height. */
+    /** @deprecated Use barSettings.tooltipHeight */
     barTooltipHeight?: number
     /** Dorling. */
     dorling?: boolean

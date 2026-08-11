@@ -9,17 +9,21 @@ export interface PieMap extends MapInstance {
     legend(): PieChartLegendConfig | false
     legend(config: PieChartLegendConfig | false): this
 
-    catColors(): any
-    catColors(v: any): this
+    catColors(): Record<string, string> | undefined
+    catColors(v: Record<string, string>): this
 
-    catLabels(): any
-    catLabels(v: any): this
+    catLabels(): Record<string, string> | undefined
+    catLabels(v: Record<string, string>): this
 
     showOnlyWhenComplete(): boolean
     showOnlyWhenComplete(v: boolean): this
 
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
+
+    /** Pie-specific rendering settings, independent of compositionSettings. */
+    pieSettings(): { innerRadius?: number }
+    pieSettings(v: { innerRadius?: number }): this
 
     compositionSettings(): {
         type?: 'flag' | 'pie' | 'ring' | 'segment' | 'radar' | 'agepyramid' | 'halftone'

@@ -22,6 +22,9 @@ export interface BivariateChoroplethConfig extends MapConfig {
     color2?: string
     /** End color. */
     endColor?: string
+    /** Function mapping the two class indices (ecl1, ecl2) to a fill color. Auto-derived from
+     * startColor/color1/color2/endColor (or the legacy oranges/blues default) when unset. */
+    classToFillStyle?: (ecl1: number, ecl2: number) => string | null
     /** No data fill style. */
     noDataFillStyle?: string
 }

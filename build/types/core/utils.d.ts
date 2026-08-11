@@ -196,3 +196,47 @@ export const compactFormatter: Intl.NumberFormat
  * Long number formatter.
  */
 export const longFormatter: Intl.NumberFormat
+
+/**
+ * Formats a raw numeric value as a space-thousands-separated string (e.g. 1234567 -> "1 234 567").
+ * Returns '0' for null/undefined/NaN input.
+ */
+export function formatRawValue(value: number | null | undefined): string
+
+/**
+ * Prefix used to encode extra categorical values (e.g. "no data" exceptions) mixed into an
+ * otherwise-numeric choropleth classification, so they don't collide with numeric class indices.
+ */
+export const CATEGORY_ECL_PREFIX: string
+
+/**
+ * Encodes a raw categorical value as an `ecl` attribute value, prefixed with CATEGORY_ECL_PREFIX.
+ */
+export function toCategoryEcl(rawValue: string | number): string
+
+/**
+ * Decodes an `ecl` attribute value produced by toCategoryEcl() back to its raw categorical value.
+ * Returns undefined if the input isn't a category-prefixed ecl value.
+ */
+export function fromCategoryEcl(ecl: string): string | undefined
+
+/**
+ * Rounds a value to the nearest "nice" number (1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, or 10 times a
+ * power of ten), clamped to the given [min, max] range (with a small margin).
+ */
+export function roundToNiceNumber(value: number, min: number, max: number): number
+
+/**
+ * Adjusts a sorted array of unique threshold values to have exactly targetCount entries, splitting
+ * the largest gap (including the gaps to min/max) when rounding produced duplicates/fewer values
+ * than requested.
+ */
+export function adjustDuplicateThresholds(uniqueThresholds: number[], targetCount: number, min: number, max: number): number[]
+
+/**
+ * Rounds classification thresholds to nice, legible values while preserving the original
+ * threshold count, resolving any duplicates introduced by rounding.
+ * @param thresholds - Raw threshold values from the classifier
+ * @param values - Full data array (used to derive min/max bounds)
+ */
+export function applyNiceNumbers(thresholds: number[], values: number[]): number[]

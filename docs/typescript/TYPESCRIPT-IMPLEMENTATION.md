@@ -50,9 +50,9 @@ This document summarizes the comprehensive TypeScript support added to the euros
 
 2. **`package.json`**
 
-    - Added `types` and `typings` entry points
-    - Added `build-types` script
-    - Updated `build-prod` to include type generation
+    - Added `types` entry point (`build/types/index.d.ts`)
+    - Added `copy-types` script (copies hand-written `src/types/**/*.d.ts` to `build/types/`)
+    - Updated `build-prod` to run `copy-types`
     - Added `type-check` script for CI/CD
 
 3. **`src/index.js`**
@@ -72,12 +72,11 @@ This document summarizes the comprehensive TypeScript support added to the euros
 - `MapConfig` - Base configuration (50+ properties)
 - `ChoroplethConfig` - Choropleth-specific settings
 - `ProportionalSymbolConfig` - Proportional symbols settings
-- `CategoricalConfig` - Categorical map settings
+- `CategoricalMapConfig` - Categorical map settings
 - `BivariateChoroplethConfig` - Bivariate settings
 - `TrivariateChoroplethConfig` - Trivariate/ternary settings, including optional sextant mode and sextant color palette
-- `PieChartConfig` - Pie chart settings
-- `SparklineConfig` - Sparkline settings
-- `WaffleConfig` - Waffle map settings
+- `PieMapConfig`, `BarMapConfig`, `WaffleMapConfig`, `CoxcombMapConfig`, `StripeMapConfig` - Composition map settings
+- `SparkMapConfig` - Sparkline settings
 - `FlowMapConfig` - Flow map settings
 
 ### Supporting Interfaces
@@ -90,11 +89,12 @@ This document summarizes the comprehensive TypeScript support added to the euros
 
 ### Map Object Interfaces
 
-- `EurostatMap` - Base map with 40+ methods
+- `EurostatMap` (alias for `MapInstance`) - Base map with 40+ methods
 - `ChoroplethMap` - Extended with choropleth-specific methods
 - `ProportionalSymbolMap` - Extended with symbol-specific methods
 - `CategoricalMap` - Extended with categorical-specific methods
-- `BivariateChoroplethMap` - Extended with bivariate methods
+- `BivariateChoroplethMap`, `TrivariateChoroplethMap`, `ValueByAlphaMap` - Extended choropleth variants
+- `PieMap`, `BarMap`, `WaffleMap`, `CoxcombMap`, `StripeMap`, `SparkMap`, `FlowMap`, `MushroomMap` - Other map-type-specific methods
 - `StatData` - Statistical data manipulation
 
 ### Type Unions
@@ -112,33 +112,31 @@ This document summarizes the comprehensive TypeScript support added to the euros
 ### Scripts Added
 
 ```bash
-# Generate TypeScript declarations
-npm run build-types
+# Copy hand-written declarations from src/types/ to build/types/
+npm run copy-types
 
 # Type check without building
 npm run type-check
 
-# Full production build (includes types)
+# Full production build (includes copying types)
 npm run build-prod
 ```
 
 ### Output Structure
 
+`build/types/` mirrors the `src/types/` source tree module-for-module (it is a mechanical,
+unmodified copy - never hand-edited):
+
 ```
 build/
-  ├── eurostatmap.min.js           # Minified bundle
-  ├── eurostatmap.js                # Non-minified bundle
-  └── types/                        # Type definitions
-      └── src/
-          ├── index.d.ts            # Main entry point
-          ├── index.d.ts.map        # Source map
-          ├── eurostat-map.d.ts     # Core types
-          ├── types/
-          │   └── index.d.ts        # Type definitions
-          ├── core/                  # Core module types
-          ├── legend/                # Legend types
-          ├── layers/                # Map type/layers definitions
-          └── tooltip/               # Tooltip types
+  ├── eurostatmap.min.js      # Minified bundle
+  ├── eurostatmap.js          # Non-minified bundle
+  └── types/                  # Copy of src/types/
+      ├── index.d.ts          # Main entry point
+      ├── core/                # Core module types
+      ├── legend/              # Legend types
+      ├── layers/              # Map type/layers definitions
+      └── utils/               # Shared utility types
 ```
 
 ## Usage Examples
@@ -258,11 +256,12 @@ npm run type-check  # Validates types without building
 
 When adding new features:
 
-1. Add configuration properties to relevant interface in `src/types/index.d.ts`
-2. Add methods to relevant map interface
+1. Add configuration properties to the relevant interface under `src/types/` (mirroring the
+   `src/` module layout - see `src/types/index.d.ts` for the barrel re-export)
+2. Add methods to the relevant map interface
 3. Update JSDoc documentation
 4. Run `npm run type-check` to validate
-5. Run `npm run build-types` to regenerate
+5. Run `npm run copy-types` to refresh `build/types/`
 
 ### Best Practices
 
@@ -327,7 +326,7 @@ For TypeScript-related issues:
 - **TypeScript Version**: 5.9.3+
 - **Target**: ES2018
 - **Module System**: ESNext
-- **Declaration Files**: Generated in build/types/
+- **Declaration Files**: Hand-written in `src/types/`, copied to `build/types/` for publishing
 
 ---
 

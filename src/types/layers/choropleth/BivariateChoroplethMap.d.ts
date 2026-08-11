@@ -25,15 +25,18 @@ export interface BivariateChoroplethMap extends MapInstance {
     endColor(): string
     endColor(v: string): this
 
-    classToFillStyle(): any
-    classToFillStyle(v: any): this
+    /** Function mapping the two class indices (ecl1, ecl2) to a fill color. */
+    classToFillStyle(): (ecl1: number, ecl2: number) => string | null
+    classToFillStyle(v: (ecl1: number, ecl2: number) => string | null): this
 
     noDataFillStyle(): string
     noDataFillStyle(v: string): this
 
-    classifier1(): any
-    classifier1(v: any): this
+    /** The classifier (d3 scale) mapping the first variable's stat value to a class number. */
+    classifier1(): ((value: number) => number) | undefined
+    classifier1(v: (value: number) => number): this
 
-    classifier2(): any
-    classifier2(v: any): this
+    /** The classifier (d3 scale) mapping the second variable's stat value to a class number. */
+    classifier2(): ((value: number) => number) | undefined
+    classifier2(v: (value: number) => number): this
 }

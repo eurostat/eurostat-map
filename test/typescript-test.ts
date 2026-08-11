@@ -4,7 +4,15 @@
  */
 
 import * as eurostatmap from '../src/index'
-import type { MapConfig, ChoroplethConfig, ProportionalSymbolConfig, CategoricalMapConfig, LocationConfig } from '../src/types'
+import type {
+    MapConfig,
+    ChoroplethConfig,
+    ProportionalSymbolConfig,
+    CategoricalMapConfig,
+    SparkMapConfig,
+    LocationConfig,
+    Layer,
+} from '../src/types'
 
 // Test 1: Basic choropleth map
 const choroplethConfig: ChoroplethConfig = {
@@ -40,6 +48,13 @@ map1.labels({
     backgroundBorderRadius: 4,
 })
 
+// Choropleth-specific methods, including the categorical-exception fields and highlight helpers
+map1
+    .categoryFillStyle({ '-': '#cccccc' })
+    .categoryText({ '-': 'No railway lines' })
+    .highlightRegion('DE')
+    .clearHighlight()
+
 // Test 2: Proportional symbol map
 const psConfig: ProportionalSymbolConfig = {
     svgId: 'map2',
@@ -47,15 +62,17 @@ const psConfig: ProportionalSymbolConfig = {
     stat: {
         eurostatDatasetCode: 'demo_r_pjangrp3',
     },
-    symbol: 'circle',
-    size: 50,
-    sizeMin: 5,
-    sizeMax: 100,
-    symbolFillStyle: '#3498db',
+    psSettings: {
+        shape: 'circle',
+        minSize: 5,
+        maxSize: 100,
+        fill: '#3498db',
+        sizeScale: 'sqrt',
+    },
 }
 
 const map2 = eurostatmap.map('ps', psConfig)
-map2.symbol('square').size(60).build()
+map2.psShape('square').psMaxSize(60).psMinSize(4).dorling(true).build()
 
 // Test 3: Categorical map
 const catConfig: CategoricalMapConfig = {
@@ -66,9 +83,9 @@ const catConfig: CategoricalMapConfig = {
         geoCol: 'NUTS_ID',
         valueCol: 'CATEGORY',
     },
-    classToStyle: {
-        urban: { fill: '#e74c3c', stroke: '#000' },
-        rural: { fill: '#2ecc71', stroke: '#000' },
+    classToFillStyle: {
+        urban: '#e74c3c',
+        rural: '#2ecc71',
     },
     classToText: {
         urban: 'Urban Areas',
@@ -99,9 +116,15 @@ map4.numberOfClasses(5).classificationMethod('jenks').build()
 const labels = eurostatmap.getDefaultLabels()
 console.log('Default labels:', labels)
 
-// Test projection functions
-const [lon, lat] = eurostatmap.projectFromMap(map1, 400, 300)
-const [x, y] = eurostatmap.projectToMap(map1, 10, 50)
+// Test projection functions (may return null if projection isn't ready)
+const fromMap = eurostatmap.projectFromMap(map1, 400, 300)
+const toMap = eurostatmap.projectToMap(map1, 10, 50)
+if (fromMap) {
+    const [lon, lat] = fromMap
+}
+if (toMap) {
+    const [x, y] = toMap
+}
 
 // Test 6: Fill pattern function
 const patternFn = eurostatmap.getFillPatternDefinitionFunction({
@@ -112,6 +135,9 @@ const patternFn = eurostatmap.getFillPatternDefinitionFunction({
     bckColor: 'white',
     symbColor: 'black',
 })
+
+// Deprecated alias, kept for backwards compatibility
+const patternFnLegacy = eurostatmap.getFillPatternDefinitionFun({ shape: 'square' })
 
 // Test 7: Advanced configurations
 const advancedConfig: ChoroplethConfig = {
@@ -124,7 +150,6 @@ const advancedConfig: ChoroplethConfig = {
     scale: '20M',
     nutsLevel: 2,
     nutsYear: 2021,
-    geoCenter: [4370000, 3210000],
 
     stat: {
         eurostatDatasetCode: 'demo_r_d3dens',
@@ -152,7 +177,7 @@ const advancedConfig: ChoroplethConfig = {
     },
 
     tooltip: {
-        maxWidth: 300,
+        textFunction: (region, map) => `${region.properties.na}`,
     },
 
     insets: [
@@ -161,20 +186,31 @@ const advancedConfig: ChoroplethConfig = {
     ],
 
     zoomExtent: [1, 10],
-    showBtns: true,
+    zoomButtons: true,
 
-    coastal: true,
-    coastalMarginWidth: 0.5,
-    coastalMarginColor: '#4682b4',
+    drawCoastalMargin: true,
+    coastalMarginSettings: {
+        strokeWidth: 0.5,
+        color: '#4682b4',
+    },
 
-    borderWidth: 0.3,
-    borderColor: '#444',
+    labels: {
+        values: true,
+    },
 
-    labelling: true,
-    labelSizeThreshold: 5000,
-
-    bottomText: 'Source: Eurostat',
     footnote: 'Data for 2020',
+
+    // Pattern fill overlay for specific regions
+    patternFill: [{ pattern: 'hatching', regionIds: ['DE', 'FR'], color: '#000', legendLabel: 'Estimated' }],
+
+    // Minimap globe inset
+    minimap: {
+        x: 705,
+        y: 90,
+        z: 160,
+        size: 160,
+        highlightIds: ['DE'],
+    },
 
     onBuild: (map) => {
         console.log('Map built successfully!')
@@ -199,8 +235,8 @@ const mapWithCallback = eurostatmap.map('choropleth', {
     svgId: 'map6',
     onBuild: (map) => {
         // Map should have correct type here
-        map.update()
-        map.exportSVG()
+        map.updateStyle()
+        map.exportMapToSVG('choropleth-export')
     },
 })
 
@@ -236,5 +272,35 @@ map1.locations([locationConfig])
 const locations = map1.locations()
 map1.updateLocations()
 
+// Test 12: Sparkline map with a dates-keyed stat config
+const sparkConfig: SparkMapConfig = {
+    svgId: 'map7',
+    title: 'Sparkline Test',
+    stat: {
+        eurostatDatasetCode: 'demo_pjan',
+        dates: ['2018', '2019', '2020', '2021'],
+        labels: ['2018', '2019', '2020', '2021'],
+        unitText: 'people',
+    },
+    sparkSettings: {
+        type: 'area',
+        lineWidth: 70,
+        lineHeight: 20,
+    },
+}
+
+const map7 = eurostatmap.map('sparkline', sparkConfig)
+map7.statSpark({ eurostatDatasetCode: 'demo_pjan', dates: ['2018', '2019'] }).build()
+
+// Test 13: Multi-layer map + layer registry utilities
+const multiLayerMap = eurostatmap.map()
+const choroplethLayer: Layer = multiLayerMap.addLayer('choropleth', {
+    encoding: { fill: { stat: 'default' } },
+})
+multiLayerMap.stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+multiLayerMap.build()
+
+const isChoroplethRegistered: boolean = eurostatmap.isLayerTypeRegistered('choropleth')
+
 // Export for validation
-export { map1, map2, map3, map4, map5, mapWithCallback, locations }
+export { map1, map2, map3, map4, map5, map7, mapWithCallback, locations, choroplethLayer, isChoroplethRegistered }

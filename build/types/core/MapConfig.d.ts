@@ -10,6 +10,10 @@ import type { GridCartogramSettings } from './GridCartogramSettings'
 import type { DorlingSettings } from './DorlingSettings'
 import type { ScalebarConfig } from './decoration/ScalebarConfig'
 import type { EncodingConfig } from './encoding/EncodingConfig'
+import type { LabelsConfig } from './decoration/LabelsConfig'
+import type { PatternFillConfig } from './decoration/PatternFillConfig'
+import type { MinimapConfig } from './minimaps'
+import type { StampConfig } from './decoration/StampConfig'
 
 /**
  * Base configuration for all map types. Each specific map type will extend this with its own properties, but these are the common ones that apply to all maps.
@@ -30,8 +34,8 @@ export interface MapConfig {
     projectionFunction?: () => any
     /** Scale of the map, for NUTSjson geometries. */
     scale?: '60M' | '20M' | '10M' | '03M' | '01M'
-    /** NUTS level (0, 1, 2, 3). */
-    nutsLevel?: number
+    /** NUTS level (0, 1, 2, 3), or 'mixed' to let each region use its most granular level. */
+    nutsLevel?: number | 'mixed'
     /** NUTS boundary year. */
     nutsYear?: number | string
     /** Geographic center as [longitude, latitude]. */
@@ -56,8 +60,21 @@ export interface MapConfig {
     subtitle?: string
     /** Footnote text shown below the map. */
     footnote?: string
-    /** Data source text. */
-    source?: string
+
+    /** Tooltip text shown when hovering over the footnote. */
+    footnoteTooltipText?: string | false
+
+    /** Wrap footnote text at this many characters. */
+    footnoteWrap?: number | false
+
+    /** Text shown in the tooltip and legend for regions with no data. @default 'No data available' */
+    noDataText?: string
+
+    /** BCP 47 language tag used when fetching labels from the Eurostat API. @default 'en' */
+    language?: string
+
+    /** Duration in milliseconds for D3 transitions when the map updates. Set to 0 to disable. @default 500 */
+    transitionDuration?: number
 
     /**
      * Statistical data configuration.
@@ -84,11 +101,40 @@ export interface MapConfig {
     /** Tooltip configuration. */
     tooltip?: TooltipConfig
 
-    /** Insets (small additional maps). true is an alias for 'default'. */
-    insets?: InsetConfig[] | 'default' | true | false
+    /**
+     * Inset map configurations. Pass a named preset string, or a custom array, or false to
+     * disable. Passing true is an alias for 'default'.
+     * - 'default': simple grid layout of overseas territories.
+     * - 'image': Malta, Liechtenstein and EU/EFTA overseas/remote territories, hand-tuned
+     *   layout with connecting decoration (background box, separator lines, blur gradients).
+     * - 'eu': simple grid layout of EU overseas/outermost territories, no decoration.
+     * - 'euEfta': like 'eu', plus Liechtenstein and Svalbard, no decoration.
+     */
+    insets?: InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | true | false
+
+    /** Position [x, y] of the box containing the default/named-preset insets layout. */
+    insetBoxPosition?: [number, number]
+
+    /** Padding in pixels around/between insets in the default insets box layout. @default 5 */
+    insetBoxPadding?: number
+
+    /** Width in pixels of each inset in the default insets box layout. @default 210 */
+    insetBoxWidth?: number
+
+    /** Default NUTS2JSON scale used for insets that don't specify their own. @default '03M' */
+    insetScale?: string
+
+    /** Default D3 zoom scale extent for insets. `null` disables zoom on insets. */
+    insetZoomExtent?: [number, number] | null
 
     /** Zoom and pan settings. */
     zoomExtent?: [number, number]
+
+    /** D3 zoom translate extent (pan boundaries), as [[x0, y0], [x1, y1]]. */
+    translateExtent?: [[number, number], [number, number]]
+
+    /** If true, panning is disabled until the user has zoomed at least once. @default true */
+    lockPanUntilZoom?: boolean
 
     /** Grid cartogram layout settings. */
     gridCartogramSettings?: Partial<GridCartogramSettings>
@@ -104,14 +150,26 @@ export interface MapConfig {
     /** Graticule. */
     drawGraticule?: boolean
 
-    /** Labels. */
-    labelling?: boolean
+    /**
+     * Get or set label configuration for country names, statistical values, etc.
+     * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122' })
+     */
+    labels?: LabelsConfig
 
     /** Fires once the map is built. */
     onBuild?: (map: EurostatMap) => void
 
     /** Scalebar configuration. Can be boolean or configuration object. */
     scalebar?: ScalebarConfig | boolean
+
+    /**
+     * Annotation configuration, rendered via the d3-svg-annotation library.
+     * `annotations` is an array of d3-svg-annotation annotation objects; each object's `type`
+     * may be one of 'annotationLabel' (default), 'annotationCallout', 'annotationCalloutRect',
+     * 'annotationCalloutCircle', 'annotationXYThreshold', resolved to the matching d3-svg-annotation
+     * function internally.
+     */
+    annotations?: { annotations: any[]; editMode?: boolean }
 
     /** Grid cartogram enabled or disabled. */
     gridCartogram?: boolean
@@ -122,8 +180,11 @@ export interface MapConfig {
     /** Toggle background map rendering (sea, country boundaries, etc.). */
     backgroundMap?: boolean
 
-    /** Minimap configuration. */
-    minimap?: any
+    /** Minimap (globe inset showing current viewport) configuration. */
+    minimap?: MinimapConfig
+
+    /** Stamp/watermark annotation. @example { x: 10, y: 10, text: 'DRAFT', size: 40 } */
+    stamp?: StampConfig
 
     /** Show/hide zoom +/- buttons. */
     zoomButtons?: boolean
@@ -164,17 +225,41 @@ export interface MapConfig {
     /** Position adjustment for footnote text: [x, y] */
     footnotePosition?: [number, number]
 
+    /** Show the Eurostat logo. */
+    showEstatLogo?: boolean
+
     /** Position adjustment for Eurostat logo: [x, y] */
     logoPosition?: [number, number]
 
+    /** Width in pixels of the Eurostat logo. @default 200 */
+    logoWidth?: number
+
+    /** Height in pixels of the Eurostat logo. @default 40 */
+    logoHeight?: number
+
+    /** Show the Eurostat ribbon banner. */
+    showEstatRibbon?: boolean
+
     /** Position adjustment for ribbon banner: [x, y] */
     ribbonPosition?: [number, number]
+
+    /** Width in pixels of the Eurostat ribbon banner. @default 200 */
+    ribbonWidth?: number
+
+    /** Height in pixels of the Eurostat ribbon banner. @default 40 */
+    ribbonHeight?: number
 
     /** Position adjustment for zoom buttons: [x, y] */
     zoomButtonsPosition?: [number, number]
 
     /** Position adjustment for insets button: [x, y] */
     insetsButtonPosition?: [number, number]
+
+    /**
+     * Viewport width (px) at/below which insets start hidden (behind the insets button) unless
+     * insetsButton was set explicitly. @default 768
+     */
+    insetsVisibilityBreakpoint?: number
 
     /** Position adjustment for legend button: [x, y] */
     legendButtonPosition?: [number, number]
@@ -194,8 +279,8 @@ export interface MapConfig {
     /** Show the link to the remote Eurostat statistical dataset. */
     showSourceLink?: boolean
 
-    /** Pattern fill configurations. */
-    patternFill?: any
+    /** Pattern fill (hatching/dots/crosshatch) overlays for specific regions. */
+    patternFill?: PatternFillConfig | PatternFillConfig[]
 
     /** Allow additional properties for extensibility. */
     [key: string]: any
