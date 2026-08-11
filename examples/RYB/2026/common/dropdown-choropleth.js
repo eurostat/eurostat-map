@@ -25,8 +25,11 @@
     // the same fixed offsets run text off the right edge. Right-align instead (text-anchor: end at a
     // fixed right margin) so it fits regardless of mapWidth or exact rendered text width.
     //
-    // Y position is relative to the ACTUAL rendered footer bottom (not a fixed offset from
-    // mapHeight, for the same reason - our footnote, note + source combined, is taller than theirs).
+    // Y position matches the FIRST line of the left-hand footnote (#em-footnote's own y, i.e. its
+    // first tspan's baseline - see addFootnote in src/core/decoration/texts.js, which sets the
+    // <text> element's y to the footnote position and gives the first tspan dy=0), not the bottom
+    // of the whole (possibly multi-line) footnote block - the two credit lines run alongside the
+    // footnote, not below it.
     function addCartographyCredits(svgId, mapWidth) {
         const svg = d3.select('#' + svgId)
         svg.selectAll('#em-footnote-2, #em-footnote-3').remove()
@@ -36,13 +39,9 @@
         if (!footerGroup.empty()) {
             const transformMatch = (footerGroup.attr('transform') || '').match(/translate\(\s*[-\d.]+(?:[,\s]+([-\d.]+))?\s*\)/)
             const groupY = transformMatch ? Number(transformMatch[1]) || 0 : 0
-            const node = footerGroup.node()
-            const bbox = node && node.getBBox ? node.getBBox() : null
-            // Bottom edge of the footer group's own content (note + source, see buildFootnote),
-            // in absolute SVG space, plus a small gap - not "- 10", which landed the credits'
-            // baseline at roughly the SAME height as the footnote's own baseline (overlapping it)
-            // rather than below its full rendered box.
-            if (bbox) creditsY = groupY + bbox.y + bbox.height + 12
+            const footnoteText = footerGroup.select('#em-footnote')
+            const footnoteY = footnoteText.empty() ? null : Number(footnoteText.attr('y'))
+            if (footnoteY != null && !Number.isNaN(footnoteY)) creditsY = groupY + footnoteY
         }
 
         const rightEdge = mapWidth - 10
@@ -230,18 +229,18 @@
                     boxPadding: 4,
                     boxOpacity: 0.9,
                     tickLength: 3,
-                    sepLineLength: 15,
+                    sepLineLength: 22,
+                    labelOffsets: { x: 5, y: 0 },
                     titlePadding: 0,
                     shapeHeight: 15,
-                    shapeWidth: 15,
-                    noDataShapeWidth: 15,
+                    shapeWidth: 20,
+                    noDataShapeWidth: 20,
                     noDataShapeHeight: 15,
                     noDataPadding: 2,
                     maxMin: false,
                     labelFormatter: labelFormatter,
                     onlyApplyOpacityWhileZoomed: true,
                 })
-
                 .stat({
                     customData: option.data,
                     unitText: json.unitText,
