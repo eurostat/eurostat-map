@@ -113,7 +113,7 @@ without asking first.
       `connector.points`) by the same ratio (700/1080 ≈ 0.648), so the whole layout stays
       geographically/proportionally coherent rather than just shrinking the canvas around
       unscaled content. Also fixed two things the scale-down exposed that weren't purely
-      proportional: (1) the footnote credits ("Administrative Boundaries...", "Cartography...")
+      proportional: (1) the footnote credits ("Administrative boundaries...", "Cartography...")
       were positioned side-by-side at fixed offsets tuned for the wider canvas and started
       overlapping - now right-aligned and stacked as two lines, matching the pattern already used
       in `dropdown-choropleth.js`; (2) the map's own `.footnote()` note text had no
@@ -156,7 +156,7 @@ without asking first.
       sit). Not yet done.
 - [x] Palestine tooltip wording — explicitly excluded from this pass per your instruction.
 - [x] Bosnia and Herzegovina — see "Bosnia/Türkiye" item above (fixed via `nutsLevel('mixed')`).
-- [x] Copyright note: "Administrative Boundaries" → "Administrative boundaries" (lowercase b), to
+- [x] Copyright note: "Administrative boundaries" → "Administrative boundaries" (lowercase b), to
       match the static maps. Fixed in `dropdown-choropleth.js`'s `addCartographyCredits()`.
 
 ### Life expectancy at birth (CH02M02)
