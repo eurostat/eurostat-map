@@ -21,6 +21,15 @@ sitting uncommitted in the working tree.
 
 ## Release process: version bumps and npm publish need explicit sign-off
 
+**Before running any release step (version bump, `npm publish`, git tag, or GitHub Release),
+read `docs/release-flow.md` in full and follow it end-to-end.** It is the authoritative,
+step-by-step release procedure (preflight checks, build-both-bundles, commit/tag/push order,
+the standalone confirmation required before `npm publish` *and* again before creating a GitHub
+Release, post-publish verification, and release-notes structure) - the summary below is not a
+substitute for it and omits steps (e.g. creating and pushing the git tag, and the GitHub Release)
+that `docs/release-flow.md` requires. Skipping it produces a real gap: e.g. a version published to
+npm with no matching git tag ever created.
+
 This package is consumed by `image` (the sibling repo at `c:\Github\image\image`, dependency
 `eurostat-map` in its `package.json`) and possibly other consumers, so releases are not casual:
 
