@@ -1,5 +1,26 @@
 # Release notes
 
+## 4.10.12
+
+### Fixes
+
+- **`map.labels()`, `map.stamp()`, and `map.annotations()` (and the matching `MapConfig` properties `labels`/`stamp`) now accept `false` to clear/disable, matching their actual runtime behavior.** All three already treated a falsy config as "remove this element" at runtime, but their TypeScript types didn't declare a `false` overload, forcing consumers into an `as any` cast to compile a perfectly valid clear/disable call - this broke a real build (IMAGE) after `labels`/`stamp`/`annotations` were tightened from loose/`any` types in `4.10.10`.
+
+Example:
+
+```typescript
+// Now type-checks without a cast:
+map.labels(false)
+map.stamp(false)
+map.annotations(false)
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.10.12`
+- Dist-tag `latest` points to `4.10.12`
+- Release tag format used: `4.10.12` (no `v` prefix)
+
 ## 4.10.11
 
 ### Fixes
