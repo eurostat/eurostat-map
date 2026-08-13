@@ -1,5 +1,17 @@
 # Release notes
 
+## 4.10.11
+
+### Fixes
+
+- **Ranked bar chart bars no longer fall back to flat gray on a proportional-symbol map with no color encoding configured.** A plain (single-color) `ps` map has no color classifier, so `rankedBarChart()` fell back to a hardcoded mid-gray for every bar instead of the map's own flat symbol fill color, making the bars visually disconnected from the map they rank. The no-classifier fallback now mirrors each map type's own flat fill color (`psFill_` for `ps`) instead.
+
+### Notes
+
+- Published package: `eurostat-map@4.10.11`
+- Dist-tag `latest` points to `4.10.11`
+- Release tag format used: `4.10.11` (no `v` prefix)
+
 ## 4.10.10
 
 ### New
