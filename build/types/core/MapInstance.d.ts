@@ -314,7 +314,7 @@ export interface MapInstance {
      * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122', statLabelTextColor: '#fff', backgroundPadding: { x: 6, y: 3 }, backgroundBorderRadius: 4 })
      */
     labels(): LabelsConfig | undefined
-    labels(config: LabelsConfig): this
+    labels(config: LabelsConfig | false): this
 
     /**
      * Annotation configuration, rendered via the d3-svg-annotation library.
@@ -324,11 +324,11 @@ export interface MapInstance {
      * function internally.
      */
     annotations(): { annotations: any[]; editMode?: boolean } | undefined
-    annotations(config: { annotations: any[]; editMode?: boolean }): this
+    annotations(config: { annotations: any[]; editMode?: boolean } | false): this
 
     /** Stamp/watermark annotation. @example { x: 10, y: 10, text: 'DRAFT', size: 40 } */
     stamp(): StampConfig | undefined
-    stamp(config: StampConfig): this
+    stamp(config: StampConfig | false): this
 
     /** Scalebar configuration. */
     scalebar(): ScalebarConfig | null

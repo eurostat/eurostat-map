@@ -154,7 +154,7 @@ export interface MapConfig {
      * Get or set label configuration for country names, statistical values, etc.
      * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122' })
      */
-    labels?: LabelsConfig
+    labels?: LabelsConfig | false
 
     /** Fires once the map is built. */
     onBuild?: (map: EurostatMap) => void
@@ -184,7 +184,7 @@ export interface MapConfig {
     minimap?: MinimapConfig
 
     /** Stamp/watermark annotation. @example { x: 10, y: 10, text: 'DRAFT', size: 40 } */
-    stamp?: StampConfig
+    stamp?: StampConfig | false
 
     /** Show/hide zoom +/- buttons. */
     zoomButtons?: boolean
