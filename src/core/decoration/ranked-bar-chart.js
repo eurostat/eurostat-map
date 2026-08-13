@@ -157,8 +157,8 @@ export const rankedBarChart = function (map, config = {}) {
 
     // ── Color/classification, generalized across map types ──────────────────────────────────
     // Choropleth and proportional-symbol maps classify regions into colored classes - reuse
-    // whichever one the layer has. Any other map/layer type (no classifier configured) falls back
-    // to a flat bar color instead of crashing - see FALLBACK_BAR_COLOR in drawRankedBarChart().
+    // whichever one the layer has. Any other map/layer type (or a ps map with no color encoding
+    // configured) falls back to that type's own flat fill color instead - see getFallbackColor().
     out.getNumberOfClasses = function (out) {
         const layer = out.layer
         const map = out.map
@@ -178,6 +178,17 @@ export const rankedBarChart = function (map, config = {}) {
         const map = out.map
         const mapType = map._mapType
         return layer.classToFillStyle_ !== undefined ? layer.classToFillStyle_ : mapType === 'ps' ? map.psClassToFillStyle_ : map.classToFillStyle_
+    }
+
+    // Used when the layer has no color classifier (e.g. a plain, single-color proportional-symbol
+    // map with no color encoding configured) - mirrors each map type's own flat fill color rather
+    // than the constant FALLBACK_BAR_COLOR, so bars match what the map itself actually renders.
+    out.getFallbackColor = function (out) {
+        const layer = out.layer
+        const map = out.map
+        const mapType = map._mapType
+        if (mapType === 'ps') return layer.psFill_ !== undefined ? layer.psFill_ : map.psFill_
+        return FALLBACK_BAR_COLOR
     }
 
     out.getColorStats = function (out) {
@@ -525,10 +536,12 @@ function drawRankedBarChart(out, baseX, baseY) {
 
     const container = out.lgg.append('g').attr('class', 'em-ranked-bar-chart-list').attr('transform', `translate(0, ${baseY})`)
 
+    const fallbackColor = out.getFallbackColor(out)
+
     entries.forEach((entry, i) => {
         const y = i * rowHeight
         const ecl = hasClassifier && entry.colorValue != null ? classifier(entry.colorValue) : null
-        const fillColor = ecl != null ? classToFillStyle(ecl, numberOfClasses) : FALLBACK_BAR_COLOR
+        const fillColor = ecl != null ? classToFillStyle(ecl, numberOfClasses) : fallbackColor
         const barWidth = Math.max(barScale(entry.value), 1)
         const barLeftX = barRightX - barWidth
         const itemContainer = container.append('g').attr('class', 'em-ranked-bar-chart-item')
