@@ -240,8 +240,8 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
     // ── stat value labels ─────────────────────────────────────────────────────
 
     if (hasStatLabels) {
-        const appendStatLabel = (container, isHalo) =>
-            validRegions(container)
+        const appendStatLabel = (container, isHalo) => {
+            const selection = validRegions(container)
                 .append('text')
                 .attr('class', (d) => {
                     const overflow = isOverflowing(getRadius(d), STAT_FACTOR)
@@ -262,8 +262,9 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 })
                 .attr('fill', function (d) {
                     if (isHalo) return 'none'
-                    // const r = getRadius(d)
-                    // if (isOverflowing(r, STAT_FACTOR)) return '#333333'
+                    // A user-configured font colour always wins over the auto-computed contrast
+                    // colour, matching choropleth/geographic label behaviour (statLabelTextColor).
+                    if (out.labels_?.statLabelTextColor) return out.labels_.statLabelTextColor
                     const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
                     return getTextColorForBackground(fill)
                 })
@@ -284,6 +285,32 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 //     return out.psCodeLabels_ ? r + PS_LABEL_OVERFLOW_FONT_SIZE : -(r + PS_LABEL_OVERFLOW_FONT_SIZE * 0.5)
                 // })
                 .style('pointer-events', 'none')
+
+            // Background decoration (map.labels_.backgrounds), matching choropleth's stat labels -
+            // only for the real (non-halo) label, appended once text exists so its bbox is known.
+            if (!isHalo && out.labels_?.backgrounds) {
+                selection.each(function (d) {
+                    const datum = sizeData.get(d.properties.id)
+                    if (datum?.value == null || datum.value === ':') return
+                    const text = this
+                    const bbox = text.getBBox()
+                    if (!bbox.width || !bbox.height) return
+                    const paddingX = 3
+                    const paddingY = 1
+                    select(text.parentNode)
+                        .insert('rect', () => text)
+                        .attr('class', 'em-label-background')
+                        .attr('x', bbox.x - paddingX)
+                        .attr('y', bbox.y - paddingY)
+                        .attr('width', bbox.width + paddingX * 2)
+                        .attr('height', bbox.height + paddingY * 2)
+                        .attr('fill', out.labels_.backgroundFill || '#ffffff')
+                        .style('pointer-events', 'none')
+                })
+            }
+
+            return selection
+        }
 
         if (hasHalos) appendStatLabel(symbolContainers, true)
         appendStatLabel(symbolContainers, false)
