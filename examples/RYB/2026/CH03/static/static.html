@@ -161,7 +161,11 @@
             createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
 
             //get data
-            const [bachelor, masters, phd] = await Promise.all([json('./data/bachelors.json'), json('./data/masters.json'), json('./data/phd.json')])
+            const [bachelor, masters, phd] = await Promise.all([
+                json('../data/bachelors.json'),
+                json('../data/masters.json'),
+                json('../data/phd.json'),
+            ])
 
             let var1Color = '#33A033'
             let var2Color = '#388AE2'
