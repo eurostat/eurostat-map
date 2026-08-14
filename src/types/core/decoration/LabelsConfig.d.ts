@@ -60,7 +60,8 @@ export interface LabelsConfig {
     backgroundFill?: string
 
     /**
-     * Fill/stroke color for statistical value label text.
+     * Fill/stroke color for label text - applies to statistical value labels and to
+     * geographic labels (country names, country codes, seas) alike.
      * @default '#111111'
      */
     statLabelTextColor?: string
