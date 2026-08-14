@@ -9,6 +9,18 @@ body {
     padding: 0;
 }
 
+/* ewc-singleselect (the dropdown web component) has its own internal min-width that doesn't
+   shrink with its container, so on narrow containers/iframes it overflows #container's own
+   max-width and forces a horizontal scrollbar - most visibly on pages with long option labels
+   (e.g. CH04M03's "No more than lower secondary education"). Same fix as the reference this
+   dropdown was copied from (human-services/choropleth/styles.css). */
+@media (max-width: 768px) {
+    ewc-singleselect {
+        max-width: 100% !important;
+        min-width: unset !important;
+    }
+}
+
 /* Content-driven height, not viewport-filling: #container/#map-container used to be pinned to
    height:100% with overflow:hidden, sized on the assumption that the footer band (footnote +
    our two cartography credit lines, see addCartographyCredits in dropdown-choropleth.js) would
@@ -72,9 +84,10 @@ body {
 /* RYB-specific: the map SVG is wrapped in an extra <svg id="map-frame"> so the static overseas
    insets group (<g id="newInsets">) has a valid SVG rendering context and can survive #map being
    cleared and rebuilt on every dropdown change (see dropdown-choropleth.js). No width/height:100%
-   here either - dropdown-choropleth.js sets explicit pixel width/height attributes on #map-frame
-   directly (matching the proven working pattern elsewhere in RYB/2026, e.g. CH02M03.html, whose
-   wrapping <svg id="container"> always uses a fixed pixel height, never a percentage). */
+   here - dropdown-choropleth.js sets explicit pixel width/height attributes on #map-frame once, up
+   front, then hands it off to RYBResponsiveMap.makeResponsive() (see responsive-map.js) after every
+   build, which adds a viewBox and scales it fluidly via inline styles - the same fluid-scaling
+   pattern every other RYB/2026 interactive map uses on its own outermost svg. */
 #map-frame {
     display: block;
 }
