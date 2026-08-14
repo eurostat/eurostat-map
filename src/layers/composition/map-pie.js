@@ -20,6 +20,7 @@ import {
     styleMixedNUTSRegions,
     hasExplicitNoDataForComposition,
     applyCompositionRegionDataFill,
+    buildCompositionCategoryColorFn,
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
@@ -68,6 +69,8 @@ export const decoratePieLayer = function (out, config) {
     out.classifierSize_ = null
     out.compositionTotalCode_ = undefined
     out.statCodes_ = undefined
+    out.categoryFillStyle_ = undefined
+    out.categoryText_ = undefined
 
     // ── Getters/setters ──────────────────────────────────────────────────────
     buildGetterSetters(out, [
@@ -78,6 +81,8 @@ export const decoratePieLayer = function (out, config) {
         'dorling_',
         'compositionTotalCode_',
         'statCodes_',
+        'categoryFillStyle_',
+        'categoryText_',
     ])
 
     out.pieSettings = function (v) {
@@ -258,7 +263,8 @@ export const decoratePieLayer = function (out, config) {
                 regions,
                 _getComposition,
                 (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'compositionTotalCode_'),
-                out.noDataFillStyle()
+                out.noDataFillStyle(),
+                buildCompositionCategoryColorFn(map, out)
             )
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {

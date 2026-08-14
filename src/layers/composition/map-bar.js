@@ -20,6 +20,7 @@ import {
     styleMixedNUTSRegions,
     hasExplicitNoDataForComposition,
     applyCompositionRegionDataFill,
+    buildCompositionCategoryColorFn,
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
@@ -107,6 +108,8 @@ export const decorateBarLayer = function (out, config) {
     out.catColors_ = undefined
     out.catLabels_ = undefined
     out.showOnlyWhenComplete_ = false
+    out.categoryFillStyle_ = undefined
+    out.categoryText_ = undefined
 
     // ── Internal ──────────────────────────────────────────────────────────────
     out.classifierSize_ = null
@@ -184,7 +187,17 @@ export const decorateBarLayer = function (out, config) {
         if (Object.keys(legacySettingsPatch).length) out.barSettings(legacySettingsPatch)
     }
 
-    buildGetterSetters(out, ['catColors_', 'catLabels_', 'showOnlyWhenComplete_', 'noDataFillStyle_', 'dorling_', 'barTotalCode_', 'statCodes_'])
+    buildGetterSetters(out, [
+        'catColors_',
+        'catLabels_',
+        'showOnlyWhenComplete_',
+        'noDataFillStyle_',
+        'dorling_',
+        'barTotalCode_',
+        'statCodes_',
+        'categoryFillStyle_',
+        'categoryText_',
+    ])
 
     applyConfigValues(out, config, ['catColors', 'catLabels', 'showOnlyWhenComplete', 'noDataFillStyle', 'statCodes'])
 
@@ -532,7 +545,8 @@ export const decorateBarLayer = function (out, config) {
                 regions,
                 out.barSettings_.type === 'grouped' ? _hasGroupedData : _getComposition,
                 (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'barTotalCode_'),
-                out.noDataFillStyle()
+                out.noDataFillStyle(),
+                buildCompositionCategoryColorFn(map, out)
             )
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {

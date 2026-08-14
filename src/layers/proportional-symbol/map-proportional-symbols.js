@@ -4,14 +4,7 @@ import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
 import * as RankedBarChart from '../../core/decoration/ranked-bar-chart.js'
-import {
-    spaceAsThousandSeparator,
-    executeForAllInsets,
-    fromCategoryEcl,
-    toCategoryEcl,
-    getRegionsSelector,
-    getTextColorForBackground,
-} from '../../core/utils.js'
+import { spaceAsThousandSeparator, executeForAllInsets, toCategoryEcl, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
 import { applyPatternFill } from '../../core/decoration/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
 import { applyClassificationToMap, defineClassifiers } from './ps-classification.js'
@@ -370,6 +363,21 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                 styleMixedNUTSRegions(map, sizeData, regions)
             }
 
+            // An extra categorical value (e.g. IMAGE's "edit classification" categories, like a
+            // region belonging to some qualitative group) colors the region's own polygon here,
+            // independently of its symbol - a region can have both a sized symbol (e.g. a sheep
+            // count) AND a categorical polygon color (e.g. membership of a welfare scheme) at
+            // once, since they're two different visual channels. A region whose value IS the
+            // category string (no separate numeric size) still gets no symbol - see
+            // circles.js's setRadius() - but its polygon is colored here regardless.
+            const getCategoryColor = (rg) => {
+                const sv = sizeData.get(rg.properties.id)
+                if (sv && layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, sv.value)) {
+                    return layer.categoryFillStyle_[sv.value]
+                }
+                return undefined
+            }
+
             // In layered maps with a base layer, preserve region ecl classes from the base
             // so choropleth legend hover remains functional.
             if (!hasBaseLayer) {
@@ -384,6 +392,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                             // DATA NOT AVAILABLE (no data)
                             return 'nd'
                         }
+                        const categoryColor = getCategoryColor(rg)
+                        if (categoryColor !== undefined) return toCategoryEcl(sv.value)
                     }
                 })
 
@@ -407,6 +417,12 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                     })
                     .style('fill', layer.noDataFillStyle())
                     .attr('fill___', layer.noDataFillStyle()) // save for legend mouseover
+
+                // 3) paint regions whose value matches an extra categorical class
+                dataRegions
+                    .filter((rg) => getCategoryColor(rg) !== undefined)
+                    .style('fill', getCategoryColor)
+                    .attr('fill___', getCategoryColor) // save for legend mouseover
             }
         }
     }
@@ -422,8 +438,6 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             .attr('stroke-width', layer.psStrokeWidth_)
             .style('fill', function () {
                 const ecl = select(this.parentNode).attr('ecl')
-                const categoryValue = fromCategoryEcl(ecl)
-                if (categoryValue !== undefined) return layer.categoryFillStyle_?.[categoryValue] || layer.psFill_
                 if (layer.classifierColor_) {
                     //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
                     if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
@@ -435,8 +449,6 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             })
             .attr('fill___', function () {
                 const ecl = select(this.parentNode).attr('ecl')
-                const categoryValue = fromCategoryEcl(ecl)
-                if (categoryValue !== undefined) return layer.categoryFillStyle_?.[categoryValue] || layer.psFill_
                 // Set fill___ to the same value as fill (don't read back style, as it may not be applied yet during transitions)
                 if (layer.classifierColor_) {
                     if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
@@ -518,17 +530,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         if (!layer.classifierColor_) {
             centroidsGroup.selectAll('g.em-centroid').attr('ecl', (d) => {
                 const v = sizeData.get(d.properties.id)?.value
-                if (v == null || v === ':') return 'nd'
-                // An extra categorical value (e.g. edited via IMAGE's "edit classification") mixed
-                // into an otherwise numeric size-only PS map - same check as applyClassificationToMap()
-                // performs when a color classifier IS configured. Without this, a categorical value
-                // here always fell through to 'has-data', so setSymbolStyles() (which reads this ecl
-                // via fromCategoryEcl()) never found the category and rendered the default fill/no
-                // label instead of the configured category color/text.
-                if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, v)) {
-                    return toCategoryEcl(v)
-                }
-                return 'has-data'
+                return v == null || v === ':' ? 'nd' : 'has-data'
             })
         }
     }
@@ -610,20 +612,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                     layer,
                     (d) => {
                         const datum = sizeData.get(d.properties.id)
-                        const value = datum?.value
-                        let r = 0
-                        if (value != null && value !== ':') {
-                            if (Number.isNaN(+value)) {
-                                // Same categorical-value case as circles.js's setRadius() - a
-                                // category has no magnitude, so give it a fixed mid-range size
-                                // instead of collapsing to an invisible 0 radius.
-                                if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, value)) {
-                                    r = ((layer.psMinSize_ ?? 5) + (layer.psMaxSize_ ?? 30)) / 2
-                                }
-                            } else {
-                                r = layer.classifierSize_(+value)
-                            }
-                        }
+                        const r = datum ? layer.classifierSize_(+datum.value) : 0
                         return layer.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                     },
                     layer.dorlingSettings_.padding || 0

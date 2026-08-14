@@ -18,6 +18,7 @@ import {
     styleMixedNUTSRegions,
     hasExplicitNoDataForComposition,
     applyCompositionRegionDataFill,
+    buildCompositionCategoryColorFn,
     buildStatCompositionMethod,
     buildTooltipBreakdownHTML,
 } from './composition-map'
@@ -65,6 +66,8 @@ export const decorateWaffleLayer = function (out, config) {
     out.classifierSize_ = null
     out.waffleTotalCode_ = undefined
     out.statCodes_ = undefined
+    out.categoryFillStyle_ = undefined
+    out.categoryText_ = undefined
 
     // ── Getters/setters ──────────────────────────────────────────────────────
     buildGetterSetters(out, [
@@ -76,6 +79,8 @@ export const decorateWaffleLayer = function (out, config) {
         'dorling_',
         'waffleTotalCode_',
         'statCodes_',
+        'categoryFillStyle_',
+        'categoryText_',
     ])
 
     out.waffleSettings = function (v) {
@@ -203,7 +208,8 @@ export const decorateWaffleLayer = function (out, config) {
                 regions,
                 _getComposition,
                 (regionId) => hasExplicitNoDataForComposition(map, out, regionId, 'waffleTotalCode_'),
-                out.noDataFillStyle()
+                out.noDataFillStyle(),
+                buildCompositionCategoryColorFn(map, out)
             )
 
             if (map.geo_ !== 'WORLD' && map.nutsLevel_ == 'mixed') {

@@ -36,7 +36,11 @@ export interface ProportionalSymbolSettings {
  * Configuration for proportional symbol maps
  */
 export interface ProportionalSymbolConfig extends MapConfig {
-    /** Fill styles for categorical exceptions in the color dataset, keyed by raw value. */
+    /**
+     * Fill styles for categorical exceptions, keyed by raw value - colors the matching region's
+     * own polygon, independently of its symbol (which represents a separate, numeric value and
+     * doesn't render at all for a region whose value is a category with no magnitude).
+     */
     categoryFillStyle?: { [rawValue: string]: string }
     /** Legend and tooltip labels for categorical exceptions, keyed by raw value. */
     categoryText?: { [rawValue: string]: string }
