@@ -32,7 +32,21 @@ export function appendCirclesToMap(map, sizeData, out, styleSource) {
         const datum = regionId ? sizeData.get(regionId) : null
         const rawValue = datum?.value
 
-        if (rawValue == null || rawValue === ':' || Number.isNaN(+rawValue)) return 0
+        if (rawValue == null || rawValue === ':') return 0
+
+        if (Number.isNaN(+rawValue)) {
+            // A non-numeric value matching an extra categorical class (e.g. "edit classification")
+            // has no magnitude to size the circle by - without this, it fell through to the same
+            // 0 radius as genuinely missing data, so the region got its correct category colour/
+            // legend/tooltip but rendered as an invisible, zero-size circle. Use a fixed mid-range
+            // size instead so the category is actually visible on the map.
+            if (style.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(style.categoryFillStyle_, rawValue)) {
+                const minSize = style.psMinSize_ ?? 5
+                const maxSize = style.psMaxSize_ ?? 30
+                return (minSize + maxSize) / 2
+            }
+            return 0
+        }
 
         const radius = style.classifierSize_(+rawValue)
         if (radius < 0) console.error('Negative radius for circle:', regionId)

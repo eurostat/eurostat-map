@@ -610,7 +610,20 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                     layer,
                     (d) => {
                         const datum = sizeData.get(d.properties.id)
-                        const r = datum ? layer.classifierSize_(+datum.value) : 0
+                        const value = datum?.value
+                        let r = 0
+                        if (value != null && value !== ':') {
+                            if (Number.isNaN(+value)) {
+                                // Same categorical-value case as circles.js's setRadius() - a
+                                // category has no magnitude, so give it a fixed mid-range size
+                                // instead of collapsing to an invisible 0 radius.
+                                if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, value)) {
+                                    r = ((layer.psMinSize_ ?? 5) + (layer.psMaxSize_ ?? 30)) / 2
+                                }
+                            } else {
+                                r = layer.classifierSize_(+value)
+                            }
+                        }
                         return layer.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                     },
                     layer.dorlingSettings_.padding || 0
