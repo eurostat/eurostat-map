@@ -4,7 +4,14 @@ import { piecewise, interpolateLab } from 'd3-interpolate'
 import * as StatMap from '../../core/stat-map.js'
 import * as ProportionalSymbolLegend from '../../legend/proportional-symbol/legend-proportional-symbols.js'
 import * as RankedBarChart from '../../core/decoration/ranked-bar-chart.js'
-import { spaceAsThousandSeparator, executeForAllInsets, fromCategoryEcl, getRegionsSelector, getTextColorForBackground } from '../../core/utils.js'
+import {
+    spaceAsThousandSeparator,
+    executeForAllInsets,
+    fromCategoryEcl,
+    toCategoryEcl,
+    getRegionsSelector,
+    getTextColorForBackground,
+} from '../../core/utils.js'
 import { applyPatternFill } from '../../core/decoration/pattern-fill.js'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling.js'
 import { applyClassificationToMap, defineClassifiers } from './ps-classification.js'
@@ -511,7 +518,17 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         if (!layer.classifierColor_) {
             centroidsGroup.selectAll('g.em-centroid').attr('ecl', (d) => {
                 const v = sizeData.get(d.properties.id)?.value
-                return v == null || v === ':' ? 'nd' : 'has-data'
+                if (v == null || v === ':') return 'nd'
+                // An extra categorical value (e.g. edited via IMAGE's "edit classification") mixed
+                // into an otherwise numeric size-only PS map - same check as applyClassificationToMap()
+                // performs when a color classifier IS configured. Without this, a categorical value
+                // here always fell through to 'has-data', so setSymbolStyles() (which reads this ecl
+                // via fromCategoryEcl()) never found the category and rendered the default fill/no
+                // label instead of the configured category color/text.
+                if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, v)) {
+                    return toCategoryEcl(v)
+                }
+                return 'has-data'
             })
         }
     }

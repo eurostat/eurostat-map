@@ -85,6 +85,14 @@ export interface LabelsConfig {
     scaleOnZoom?: boolean
 
     /**
+     * Nudge geographic labels (country names/codes/seas) apart using a force-collision
+     * simulation so neighbouring labels don't overlap. Does not affect statistical value
+     * labels, which are positioned at region centroids.
+     * @default false
+     */
+    preventOverlap?: boolean
+
+    /**
      * Custom formatter function for statistical value labels.
      * @example (value) => value.toFixed(1) + '%'
      */
