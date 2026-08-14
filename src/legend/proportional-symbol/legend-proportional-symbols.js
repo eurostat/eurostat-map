@@ -2,7 +2,7 @@ import { select } from 'd3-selection'
 import * as Legend from '../legend'
 import { appendPatternFillLegend } from '../legend-pattern-fill'
 import { drawSizeLegend } from './legend-symbol-size'
-import { drawDiscreteLegend, buildDiscreteLabelFormatter } from '../legend-discrete'
+import { drawDiscreteLegend, buildDiscreteLabelFormatter, appendCategoryLegendItems } from '../legend-discrete'
 import { getCentroidsGroup } from '../../core/geo/centroids'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -142,6 +142,17 @@ export const legend = function (map, config) {
                     y += out._sizeLegendContainer.node().getBBox().height + out.colorLegend.marginTop
                 }
                 drawDiscreteLegend(out, x, y)
+            } else if (!map.classifierColor_ && out.map.categoryFillStyle_ && out.colorLegend) {
+                // Size-only map (no color classifier configured) with extra categorical values
+                // mixed in (e.g. via IMAGE's "edit classification") - there's no numeric discrete
+                // legend to draw, but the category swatches still need their own legend items.
+                let x = baseX
+                let y = baseY
+                if (out._sizeLegendContainer) {
+                    y += out._sizeLegendContainer.node().getBBox().height + out.colorLegend.marginTop
+                }
+                out._discreteLegendContainer = out.lgg.append('g').attr('class', 'em-discrete-legend-container').attr('transform', `translate(${x},${y})`)
+                appendCategoryLegendItems(out, 0)
             }
 
             // Append pattern fill legend items BELOW the main legend

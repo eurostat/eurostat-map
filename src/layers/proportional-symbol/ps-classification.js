@@ -96,10 +96,6 @@ export function applyClassificationToMap(map, layer) {
 
     const activeLayer = layer || map
     const classifier = activeLayer.classifierColor_
-    if (typeof classifier !== 'function') return
-
-    const colorData = activeLayer.getEncodingStatData?.('color', undefined, 'color') || map.statData('color')
-    if (!colorData) return
 
     // classifierColor_/getEncodingStatData above always live on the shared layer (an inset has
     // no classifier state of its own), but the DOM group to tag belongs to whichever instance is
@@ -108,6 +104,31 @@ export function applyClassificationToMap(map, layer) {
     // silently re-tag the main map's centroids instead of the inset's.
     const group = getCentroidsGroup(map === activeLayer.map ? activeLayer : map)
     if (!group || group.empty()) return
+
+    if (typeof classifier !== 'function') {
+        // Size-only map with no color classifier configured. This is the ONLY tagging path that
+        // ever runs again after the initial draw - layer.updateClassification() (invoked whenever
+        // e.g. IMAGE's "edit classification" UI changes categoryFillStyle_ on an already-built
+        // map) always calls this function, regardless of whether a color classifier exists. Still
+        // tag category ecls when categoryFillStyle_ is configured, and fall back to a generic
+        // has-data/no-data ecl for everything else (mirrors the initial-draw-only fallback in
+        // map-proportional-symbols.js's updateSymbolsDrawOrder()).
+        const sizeData = activeLayer.getEncodingStatData?.('size', undefined, 'size') || map.statData('size') || map.statData()
+        if (!sizeData) return
+        group.selectAll('g.em-centroid').attr('ecl', function (rg) {
+            const sv = sizeData.get(rg.properties.id)
+            const v = sv?.value
+            if (v == null || v === ':') return 'nd'
+            if (activeLayer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(activeLayer.categoryFillStyle_, v)) {
+                return toCategoryEcl(v)
+            }
+            return 'has-data'
+        })
+        return
+    }
+
+    const colorData = activeLayer.getEncodingStatData?.('color', undefined, 'color') || map.statData('color')
+    if (!colorData) return
 
     group.selectAll('g.em-centroid').attr('ecl', function (rg) {
         const sv = colorData.get(rg.properties.id)

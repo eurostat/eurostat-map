@@ -125,21 +125,33 @@ export function drawDiscreteLegend(out, x, y) {
 
     // Optionally add extra categorical classes mixed into this choropleth's classification
     // (e.g. a "no railway lines" class alongside numeric electrification-rate classes)
+    let categoryY = out.getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3
+    if (config.pointOfDivergence && config.pointOfDivergencePadding) categoryY += config.pointOfDivergencePadding
+    if (config.noData) categoryY += out.noDataShapeHeight + out.noDataPadding // stack below the no-data box
+    appendCategoryLegendItems(out, categoryY)
+}
+
+/**
+ * Appends one legend swatch per extra categorical class (out.layer.categoryFillStyle_/
+ * categoryText_ - e.g. IMAGE's "edit classification" categories) into out._discreteLegendContainer,
+ * stacked starting at startY. Shared by drawDiscreteLegend() (choropleth/prop-symbol maps that
+ * already have a numeric color classifier) and callers that only have categories and no numeric
+ * classifier at all (e.g. a size-only proportional-symbol map - see legend-proportional-symbols.js).
+ * No-ops if there are no categories configured.
+ */
+export function appendCategoryLegendItems(out, startY) {
     const categoryFillStyle = out.layer?.categoryFillStyle_
-    if (categoryFillStyle) {
-        const categoryText = out.layer.categoryText_
-        let y = out.getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3
-        if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding
-        if (config.noData) y += out.noDataShapeHeight + out.noDataPadding // stack below the no-data box
-        const highlightFunction = out.getHighlightFunction(out.map)
-        const unhighlightFunction = out.getUnHighlightFunction(out.map)
-        Object.keys(categoryFillStyle).forEach((rawValue) => {
-            const container = out._discreteLegendContainer.append('g').attr('class', 'em-category-legend').attr('transform', `translate(0,${y})`)
-            const text = (categoryText && categoryText[rawValue]) || rawValue
-            out.appendCategoryLegend(container, toCategoryEcl(rawValue), categoryFillStyle[rawValue], text, highlightFunction, unhighlightFunction)
-            y += out.noDataShapeHeight + out.noDataPadding
-        })
-    }
+    if (!categoryFillStyle) return
+    const categoryText = out.layer.categoryText_
+    let y = startY
+    const highlightFunction = out.getHighlightFunction(out.map)
+    const unhighlightFunction = out.getUnHighlightFunction(out.map)
+    Object.keys(categoryFillStyle).forEach((rawValue) => {
+        const container = out._discreteLegendContainer.append('g').attr('class', 'em-category-legend').attr('transform', `translate(0,${y})`)
+        const text = (categoryText && categoryText[rawValue]) || rawValue
+        out.appendCategoryLegend(container, toCategoryEcl(rawValue), categoryFillStyle[rawValue], text, highlightFunction, unhighlightFunction)
+        y += out.noDataShapeHeight + out.noDataPadding
+    })
 }
 
 function getTitlePadding(out) {

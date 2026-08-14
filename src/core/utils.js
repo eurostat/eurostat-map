@@ -665,6 +665,8 @@ export const convertRectanglesToPaths = function (x, y, width, height) {
 }
 
 export const getTextColorForBackground = function (backgroundColor) {
+    if (!backgroundColor) return 'black'
+
     let r, g, b
 
     // Create a temporary element to handle named colors
