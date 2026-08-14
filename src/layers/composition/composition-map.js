@@ -414,14 +414,25 @@ export const hasExplicitNoDataForComposition = function (map, out, regionId, tot
 /**
  * Apply polygon background fill for composition maps:
  * - explicit no-data (':') regions get noDataFillStyle
+ * - regions matching an extra categorical class (layer.categoryFillStyle_) get that class's
+ *   color - independently of whatever composition symbol (pie/bar/waffle) is drawn on top, the
+ *   same way a proportional-symbol map's region polygon can be categorically colored alongside
+ *   its own separately-sized symbol (see setRegionStyles() in map-proportional-symbols.js)
  * - regions with composition data clear inline fill so in-scope CSS applies
  *
  * @param {Object} regions - d3 selection of region elements
  * @param {Function} getCompositionFn - Function(regionId) => composition|undefined
  * @param {Function} hasExplicitNoDataFn - Function(regionId) => boolean
  * @param {string} noDataFillStyle - Fill for explicit no-data regions
+ * @param {Function} [getCategoryColorFn] - optional Function(regionId) => color string|undefined
  */
-export const applyCompositionRegionDataFill = function (regions, getCompositionFn, hasExplicitNoDataFn, noDataFillStyle) {
+export const applyCompositionRegionDataFill = function (
+    regions,
+    getCompositionFn,
+    hasExplicitNoDataFn,
+    noDataFillStyle,
+    getCategoryColorFn
+) {
     regions
         .attr('nd', function (d) {
             const regionId = d.properties.id
@@ -430,9 +441,35 @@ export const applyCompositionRegionDataFill = function (regions, getCompositionF
         })
         .style('fill', function (d) {
             const regionId = d.properties.id
+            const categoryColor = getCategoryColorFn?.(regionId)
+            if (categoryColor !== undefined) return categoryColor
             const hasComposition = !!getCompositionFn(regionId)
             return !hasComposition && hasExplicitNoDataFn(regionId) ? noDataFillStyle || 'gray' : null
         })
+}
+
+/**
+ * Builds a getCategoryColorFn for applyCompositionRegionDataFill() - composition maps (pie, bar,
+ * waffle) have no single "value" per region the way a proportional-symbol map does (they show a
+ * breakdown across several stat codes instead), so the region's own default/unnamed stat
+ * (map.statData(), the same one ps maps fall back to when no dedicated size stat is set) is used
+ * as the categorical field. Returns undefined when no category is configured or the region's
+ * value doesn't match one.
+ *
+ * @param {Object} map - map or inset instance (for map.statData())
+ * @param {Object} layer - the shared layer holding categoryFillStyle_
+ * @returns {Function} regionId => color string|undefined
+ */
+export const buildCompositionCategoryColorFn = function (map, layer) {
+    if (!layer.categoryFillStyle_) return undefined
+    const defaultData = map.statData()
+    return (regionId) => {
+        const sv = defaultData?.get(regionId)
+        if (sv && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, sv.value)) {
+            return layer.categoryFillStyle_[sv.value]
+        }
+        return undefined
+    }
 }
 
 // ─── Stat composition config builder ─────────────────────────────────────────

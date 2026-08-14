@@ -41,6 +41,13 @@ export interface PieMapConfig extends MapConfig {
     compositionTotalCode?: string
     /** Stat codes. */
     statCodes?: string[]
+    /**
+     * Fill styles for categorical exceptions, keyed by raw value - colors the matching region's
+     * own polygon, independently of its pie symbol.
+     */
+    categoryFillStyle?: { [rawValue: string]: string }
+    /** Legend and tooltip labels for categorical exceptions, keyed by raw value. */
+    categoryText?: { [rawValue: string]: string }
     /** Legend. */
     legend?: PieChartLegendConfig | false
 }

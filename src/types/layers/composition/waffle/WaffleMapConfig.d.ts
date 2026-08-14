@@ -53,6 +53,13 @@ export interface WaffleMapConfig extends MapConfig {
     waffleTotalCode?: string
     /** Stat codes. */
     statCodes?: string[]
+    /**
+     * Fill styles for categorical exceptions, keyed by raw value - colors the matching region's
+     * own polygon, independently of its waffle symbol.
+     */
+    categoryFillStyle?: { [rawValue: string]: string }
+    /** Legend and tooltip labels for categorical exceptions, keyed by raw value. */
+    categoryText?: { [rawValue: string]: string }
     /** Legend. */
     legend?: WaffleLegendConfig | false
 }

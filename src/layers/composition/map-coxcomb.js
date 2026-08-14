@@ -11,7 +11,7 @@ import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
 import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartOffset } from '../../core/cartograms'
-import { buildGetterSetters, applyConfigValues } from '../composition/composition-map'
+import { buildGetterSetters, applyConfigValues, buildCompositionCategoryColorFn } from '../composition/composition-map'
 import { createRadialScale } from '../../core/scale.js'
 import { getCentroidsGroup } from '../../core/geo/centroids'
 import { DEFAULT_CATEGORICAL_COLORS } from '../../core/color-palettes'
@@ -54,6 +54,8 @@ export const decorateCoxcombLayer = function (out, config) {
     out.catColors_ = undefined
     out.catLabels_ = undefined
     out.classifierSize_ = null
+    out.categoryFillStyle_ = undefined
+    out.categoryText_ = undefined
 
     out.statCodes_ = undefined
     out.totalCode_ = undefined
@@ -90,6 +92,8 @@ export const decorateCoxcombLayer = function (out, config) {
         'hoverColor_',
         'classifierSize_',
         'coxcombOffsets_',
+        'categoryFillStyle_',
+        'categoryText_',
     ])
 
     out.coxcombSettings = function (v) {
@@ -996,6 +1000,10 @@ export const decorateCoxcombLayer = function (out, config) {
         const selector = getRegionsSelector(map)
         const regions = map.svg().selectAll(selector)
         const status = out.coxStatus_
+        // A region's own default/unnamed stat (independent of coxStatus_, coxcomb's own
+        // composition-presence tracker) can hold an extra categorical value - colors the
+        // region's polygon, same as ps/pie/bar/waffle - see buildCompositionCategoryColorFn().
+        const getCategoryColor = buildCompositionCategoryColorFn(map, out)
 
         // For cntrg regions (RS, EL), we need to apply ecl to ALL paths inside, including Kosovo/XK
         // even though the cntrg container itself is excluded from the main selector
@@ -1016,6 +1024,13 @@ export const decorateCoxcombLayer = function (out, config) {
 
         // Apply no-data fill style only to regions in the filtered selector
         regions.filter((rg) => status.get(rg.properties.id)?.value === ':').style('fill', out.noDataFillStyle())
+
+        // Apply category fill for regions matching an extra categorical class
+        if (getCategoryColor) {
+            regions
+                .filter((rg) => getCategoryColor(rg.properties.id) !== undefined)
+                .style('fill', (rg) => getCategoryColor(rg.properties.id))
+        }
     }
 
     function styleMixedNUTSRegions(map, status, regions) {
