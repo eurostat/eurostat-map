@@ -9,7 +9,8 @@
 // empty). This module only wires the 'option-selected' listener and (re)builds the map.
 //
 // Requires (loaded before this script): eurostatmap.js, d3@7, ewc-singleselect.js,
-// and 2026/common/insets/overseas.js (createOutermostInsetsConfig/createInsetDOMElements).
+// 2026/common/insets/overseas.js (createOutermostInsetsConfig/createInsetDOMElements), and
+// 2026/common/responsive-map.js (RYBResponsiveMap.makeResponsive).
 ;(function () {
     function buildFootnote(footnote, source) {
         const parts = []
@@ -19,11 +20,9 @@
     }
 
     // Boilerplate cartography credit lines used across RYB/2026 maps (see CH02M03.html, CH03M02.html,
-    // CH10M02.html). Those pages position each line at a hand-tuned "mapWidth - N" left edge, which
-    // only avoids clipping because they all use one large fixed MAPWIDTH (797) the offsets were
-    // tuned against. Our mapWidth is computed from the actual (possibly much narrower) container, so
-    // the same fixed offsets run text off the right edge. Right-align instead (text-anchor: end at a
-    // fixed right margin) so it fits regardless of mapWidth or exact rendered text width.
+    // CH10M02.html). Those pages position each line at a hand-tuned "mapWidth - N" left edge, tuned
+    // against their own fixed MAPWIDTH. Right-align instead (text-anchor: end at a fixed right
+    // margin) so it fits regardless of exact rendered text width, without needing per-page tuning.
     //
     // Y position matches the FIRST line of the left-hand footnote (#em-footnote's own y, i.e. its
     // first tspan's baseline - see addFootnote in src/core/decoration/texts.js, which sets the
@@ -69,7 +68,7 @@
             svg.attr('height', creditsBottom)
         }
 
-        // #map-frame (the outer wrapper #map sits in - see the comment on it in measure()) must
+        // #map-frame (the outer wrapper #map sits in - see the comment on it above in init()) must
         // grow to match, or ITS OWN svg viewport clips the credits even though #map itself now
         // fits them: a nested <svg> clips independently of its parent's size, so growing #map
         // alone isn't enough. #map-container has no fixed height any more (see
@@ -99,59 +98,37 @@
     }
 
     async function init(config) {
-        const {
-            dataUrl,
-            mapContainerId = 'map-container',
-            svgId = 'map',
-            dropdownSelectId = 'optionSelect',
-            position,
-            insetBoxPosition,
-            zoomExtent,
-        } = config
+        const { dataUrl, svgId = 'map', dropdownSelectId = 'optionSelect', position, insetBoxPosition, zoomExtent } = config
 
         const res = await fetch(dataUrl)
         const json = await res.json()
 
-        const mapContainer = document.getElementById(mapContainerId)
-        // Mutable sizing state, recomputed by measure() on init and on every resize (see the
-        // resize listener at the bottom of init()) so the map stays fluid - CSS alone (#container's
-        // max-width: 700px) shrinks the surrounding HTML boxes, but #map/#map-frame's own SVG
-        // width ATTRIBUTE only changes when we explicitly recompute and re-apply it here.
-        let isMobile, mapWidth, mapHeight, resolvedPosition, resolvedInsetBoxPosition
+        // Fixed native pixel size the map is built at - matching every other RYB 2026 interactive
+        // map (see responsive-map.js) instead of measuring the embedding container's width and
+        // rebuilding to match it. The rendered box is then scaled fluidly via CSS/viewBox
+        // (RYBResponsiveMap.makeResponsive, called after each build below), which reacts to the
+        // container's actual rendered size on every layout pass - unlike a JS 'resize' listener,
+        // which only fires for the window's own size changing and can miss an embedding iframe
+        // being resized purely via CSS (e.g. a responsive layout on the page that embeds it).
+        const mapWidth = 700
+        const mapHeight = Math.round(mapWidth * 0.82)
 
-        function measure() {
-            isMobile = window.innerWidth <= 699
-            mapWidth = mapContainer ? mapContainer.clientWidth : isMobile ? window.innerWidth : 700
-
-            // #map-container is content-driven height now (see dropdown-choropleth.css), not
-            // clamped to a fixed viewport-derived height - so mapHeight only needs to express the
-            // drawing area's own natural framing (continental Europe, ~0.82x mapWidth), not fit
-            // inside any pre-existing container budget. #map-frame/#map-container then grow to
-            // whatever the map (drawing area + footer + our credits, see addCartographyCredits)
-            // actually renders at - nothing is ever clipped, regardless of footnote length.
-            mapHeight = Math.max(Math.round(mapWidth * 0.82), 240)
-
-            // #map-frame wraps #map only so the static insets group (<g id="newInsets">) has a valid
-            // SVG rendering context (see the comment on #map in dropdown-choropleth.css). Percentage
-            // width/height on a NESTED <svg> (one inside another <svg>, as opposed to inside a plain
-            // HTML element) resolves unreliably in Chromium - #map-frame's own rendered box can end up
-            // many times too large. Giving it explicit pixel dimensions here (matching the proven
-            // working pattern in CH02M03.html/CH10M02.html, whose wrapping <svg id="container"> always
-            // has a fixed pixel height, never height:100%) sidesteps that entirely. Height is set to
-            // match mapHeight for now and grown further in addCartographyCredits once the real
-            // (footnote-length-dependent) footer content height is known.
-            const mapFrameEl = document.getElementById('map-frame')
-            if (mapFrameEl) {
-                mapFrameEl.setAttribute('width', mapWidth)
-                mapFrameEl.setAttribute('height', mapHeight)
-            }
-
-            // Default continental-Europe framing; overseas regions are shown separately via the static insets.
-            resolvedPosition = position || { x: 4900000, y: 3400000, z: 7000 }
-            resolvedInsetBoxPosition = insetBoxPosition || [mapWidth - 250, 8]
+        // #map-frame wraps #map only so the static insets group (<g id="newInsets">) has a valid
+        // SVG rendering context (see the comment on #map in dropdown-choropleth.css). Percentage
+        // width/height on a NESTED <svg> (one inside another <svg>, as opposed to inside a plain
+        // HTML element) resolves unreliably in Chromium - #map-frame's own rendered box can end up
+        // many times too large. Giving it explicit pixel dimensions here sidesteps that entirely;
+        // RYBResponsiveMap.makeResponsive() (called after each build) then takes over #map-frame's
+        // actual rendered size via CSS, so this only needs to be set once, up front.
+        const mapFrameEl = document.getElementById('map-frame')
+        if (mapFrameEl) {
+            mapFrameEl.setAttribute('width', mapWidth)
+            mapFrameEl.setAttribute('height', mapHeight)
         }
 
-        measure()
+        // Default continental-Europe framing; overseas regions are shown separately via the static insets.
+        const resolvedPosition = position || { x: 4900000, y: 3400000, z: 7000 }
+        const resolvedInsetBoxPosition = insetBoxPosition || [mapWidth - 250, 8]
 
         const labelFormatter = d3.format('.' + json.decimals + 'f')
 
@@ -211,7 +188,7 @@
                 .insets(insetsCfg)
                 .insetBoxPosition(resolvedInsetBoxPosition)
                 .zoomButtons(true)
-                .zoomExtent(zoomExtent || (isMobile ? [0.7, 10] : [0.6, 10]))
+                .zoomExtent(zoomExtent || [1, 10])
 
                 // classification (fixed across all dropdown options)
                 .colors(json.colors)
@@ -234,21 +211,20 @@
                 //legendButton(true)
                 .legend({
                     title: json.legendTitle,
-                    position: isMobile ? 'top left' : '',
-                    x: isMobile ? undefined : 5,
-                    y: isMobile ? undefined : 90,
+                    x: 5,
+                    y: 90,
                     boxPadding: 4,
                     boxOpacity: 0.9,
                     tickLength: 3,
                     sepLineLength: 22,
                     labelOffsets: { x: 5, y: 0 },
-                    titlePadding: 0,
+                    titlePadding: -7,
                     shapeHeight: 15,
                     shapeWidth: 20,
                     noDataShapeWidth: 20,
                     noDataShapeHeight: 15,
-                    noDataPadding: 2,
-                    maxMin: false,
+                    noDataPadding: 5,
+                    maxMin: true,
                     labelFormatter: labelFormatter,
                     onlyApplyOpacityWhileZoomed: true,
                 })
@@ -262,7 +238,16 @@
                     // area) in its own setTimeout(..., 20) inside recalculateLayout(), which runs
                     // AFTER onBuild fires. Measuring #em-footer-* here would catch it still at its
                     // untransformed (0,0) position, near the top of the SVG - defer past that.
-                    setTimeout(() => addCartographyCredits(svgId, mapWidth), 30)
+                    setTimeout(() => {
+                        addCartographyCredits(svgId, mapWidth)
+                        // Scale #map-frame fluidly via CSS/viewBox (see responsive-map.js) instead
+                        // of leaving it pinned at its native pixel size. Must run AFTER
+                        // addCartographyCredits, which may grow #map's height attribute to fit the
+                        // credits/footnote - makeResponsive reads that attribute to build the
+                        // viewBox, so calling it first would scale to a stale (too-short) height
+                        // and clip the credits once scaled.
+                        RYBResponsiveMap.makeResponsive('map-frame', svgId)
+                    }, 30)
                 })
 
             map.build()
@@ -270,25 +255,6 @@
 
         let currentCode = json.options[0].code
         buildMap(currentCode)
-
-        // Re-measure and rebuild on resize so the map stays fluid for its whole lifetime, not just
-        // at initial load - these maps are embedded in iframes on the Eurostat website, which can
-        // resize the iframe (e.g. on window resize/orientation change) without reloading the page.
-        // Debounced since a full rebuild re-fetches nothing but does redraw geometries/insets, which
-        // isn't free; only the container WIDTH actually matters (CSS max-width: 700px already caps
-        // it), so skip rebuilding on pure height-only changes (e.g. a mobile URL bar hide/show).
-        let resizeTimer = null
-        let lastMeasuredWidth = mapWidth
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer)
-            resizeTimer = setTimeout(() => {
-                const newWidth = mapContainer ? mapContainer.clientWidth : window.innerWidth
-                if (newWidth === lastMeasuredWidth) return
-                lastMeasuredWidth = newWidth
-                measure()
-                buildMap(currentCode)
-            }, 150)
-        })
 
         // dropdown: the <ewc-singleselect> element (with its `options` attribute) is already
         // declared in the page HTML - just wire it up, exactly like human-services/dropdown.js.
