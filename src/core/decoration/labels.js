@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColorForBackground, compactFormatter } from '../utils'
 
 // handles all map labels e.g. stat values, or labels specified in map.labels({labels:[text:'myLabel', x:123, y: 123]})
@@ -37,10 +38,16 @@ export const addLabelsToMap = function (map, zg) {
         const halog = ensureGroup(labelsContainer, 'em-label-halos')
         const labelg = ensureGroup(labelsContainer, 'em-labels')
 
-        if (labelsHaveHalos(map.labels_)) {
+        // Seas labels don't clash with anything else on the map, so they always keep their
+        // default halo regardless of the configured decoration (even under 'backgrounds').
+        const haloLabels = labelsHaveHalos(map.labels_)
+            ? labelsArray
+            : labelsArray.filter((d) => d.class === 'seas')
+
+        if (haloLabels.length) {
             halog
                 .selectAll('text')
-                .data(labelsArray)
+                .data(haloLabels)
                 .enter()
                 .append('text')
                 .attr('id', (d) => 'em-label-halo-' + d.text.replace(/\s+/g, '-'))
@@ -79,22 +86,77 @@ export const addLabelsToMap = function (map, zg) {
             .text((d) => d.text)
 
         if (map.labels_.backgrounds) {
-            labelTexts.each(function () {
-                const text = this
-                const bbox = text.getBBox()
-                const paddingX = 4
-                const paddingY = 2
-                select(text.parentNode)
-                    .insert('rect', () => text)
-                    .attr('class', 'em-label-background em-geographic-label-background')
-                    .attr('x', bbox.x - paddingX)
-                    .attr('y', bbox.y - paddingY)
-                    .attr('width', bbox.width + paddingX * 2)
-                    .attr('height', bbox.height + paddingY * 2)
-                    .attr('fill', map.labels_.backgroundFill || '#ffffff')
-            })
+            // Seas labels don't clash with anything else on the map, so they keep their
+            // default halo only and never get a background treatment.
+            labelTexts
+                .filter((d) => d.class !== 'seas')
+                .each(function () {
+                    const text = this
+                    const bbox = text.getBBox()
+                    const paddingX = 4
+                    const paddingY = 2
+                    select(text.parentNode)
+                        .insert('rect', () => text)
+                        .attr('class', 'em-label-background em-geographic-label-background')
+                        .attr('x', bbox.x - paddingX)
+                        .attr('y', bbox.y - paddingY)
+                        .attr('width', bbox.width + paddingX * 2)
+                        .attr('height', bbox.height + paddingY * 2)
+                        .attr('fill', map.labels_.backgroundFill || '#ffffff')
+                })
+        }
+
+        if (map.labels_.preventOverlap) {
+            applyLabelOverlapPrevention(labelItems, labelTexts)
         }
     }
+}
+
+/**
+ * @function applyLabelOverlapPrevention
+ * @description Nudges geographic label positions apart using a d3-force collision simulation,
+ *   so that neighbouring labels (e.g. small/densely-labelled countries) don't overlap each other.
+ *   Runs synchronously (not animated) - same approach as the Dorling cartogram simulation.
+ * @param {Object} labelItems d3 selection of 'g.em-geographic-label' (one per label, holds the transform)
+ * @param {Object} labelTexts d3 selection of the label '<text>' elements (used to measure bbox)
+ */
+function applyLabelOverlapPrevention(labelItems, labelTexts) {
+    const nodes = []
+    labelItems.each(function (d) {
+        const transform = this.getAttribute('transform') || ''
+        const match = /translate\(([^,]+),([^)]+)\)/.exec(transform)
+        if (!match) return
+        d.__origX = d.x0 = parseFloat(match[1])
+        d.__origY = d.y0 = parseFloat(match[2])
+        d.x = d.x0
+        d.y = d.y0
+        nodes.push(d)
+    })
+    if (!nodes.length) return
+
+    const radii = new Map()
+    labelTexts.each(function (d) {
+        const bbox = this.getBBox()
+        // radius of the circle that encloses the label's bounding box, plus a little breathing room
+        radii.set(d, Math.hypot(bbox.width, bbox.height) / 2 + 2)
+    })
+
+    const sim = forceSimulation(nodes)
+        .force('x', forceX((d) => d.x0).strength(0.3))
+        .force('y', forceY((d) => d.y0).strength(0.3))
+        .force(
+            'collide',
+            forceCollide((d) => radii.get(d) ?? 8).iterations(3)
+        )
+        .stop()
+
+    const nTicks = Math.ceil(Math.log(sim.alphaMin()) / Math.log(1 - sim.alphaDecay()))
+    for (let i = 0; i < nTicks; i++) sim.tick()
+
+    labelItems.attr('transform', (d) => {
+        const rotate = d.rotate ? ` rotate(${d.rotate})` : ''
+        return `translate(${d.x},${d.y})${rotate}`
+    })
 }
 
 /**

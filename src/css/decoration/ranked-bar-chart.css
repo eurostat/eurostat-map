@@ -9,6 +9,9 @@
     opacity: 0.9;
     rx: 0;
     ry: 0;
+    /* Overridden inline (pointer-events) once opacity is set: fully opaque (1) means no map is
+       visible behind the box, so it blocks pointer events reaching the map underneath instead of
+       letting them pass through to a hidden tooltip. See updateBackgroundBoxOpacity(). */
     pointer-events: none;
     filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
 }

@@ -16,6 +16,11 @@ export function getMaxDomainPrecision(classifier) {
     return str.includes('.') ? str.split('.')[1].length : 0
 }
 
+// Below this magnitude, spelling the value out in words (e.g. "15 thousand") reads as more
+// vague than just showing the number (e.g. "15 000") - word notation only starts pulling its
+// weight once the plain number gets long enough to be hard to parse at a glance (millions+).
+const WORD_NOTATION_THRESHOLD = 1_000_000
+
 export function formatSizeLabel(value, formatterOrDecimals) {
     if (!Number.isFinite(value)) return ''
     const normalizedValue = normalizeFloatingPointValue(value)
@@ -26,6 +31,11 @@ export function formatSizeLabel(value, formatterOrDecimals) {
     }
 
     const dec = typeof formatterOrDecimals === 'number' ? formatterOrDecimals : detectValuePrecision(normalizedValue)
+
+    if (Math.abs(normalizedValue) < WORD_NOTATION_THRESHOLD) {
+        return spaceAsThousandSeparator(Number(normalizedValue.toFixed(dec)))
+    }
+
     const compactIntlFormatter = new Intl.NumberFormat('en', {
         notation: 'compact',
         compactDisplay: 'long',

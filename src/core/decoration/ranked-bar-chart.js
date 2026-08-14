@@ -303,7 +303,13 @@ export const rankedBarChart = function (map, config = {}) {
     /** Keep conditional background opacity synchronized with the current zoom state. */
     out.updateBackgroundBoxOpacity = function () {
         const opacity = out.onlyApplyOpacityWhileZoomed && !out.map.__hasZoomed ? 0 : out.boxOpacity
-        out.lgg?.select('#em-ranked-bar-chart-background').style('opacity', opacity)
+        // At full opacity there's no map visible behind the box, so it should block pointer
+        // events reaching the map underneath rather than let them pass through to a hidden
+        // tooltip. Below full opacity the map remains visible/interactive through the box.
+        out.lgg
+            ?.select('#em-ranked-bar-chart-background')
+            .style('opacity', opacity)
+            .style('pointer-events', opacity >= 1 ? 'auto' : 'none')
         return out
     }
 
@@ -391,13 +397,25 @@ export const rankedBarChart = function (map, config = {}) {
 // works across map/layer types since getRegionsSelector() is geometry-based, not tied to a
 // specific map type. Mirrors the fill___ / hoverColor_ convention already used for region hover
 // elsewhere in the codebase (see map-choropleth.js's own highlightRegion()).
-
+//
+// Insets are rendered as their own <svg> nested INSIDE the main map's <svg> (see insets.js), and
+// region ids (e.g. em-cntrg-MT) can exist in both the main map's own layer and an inset's layer
+// (e.g. small "country" insets like MT/LI, which render the same country-level geometry as the
+// main map does). map.svg().selectAll(selector) is a descendant selector, so calling it on the
+// main map would otherwise also match nodes that actually belong to a nested inset's own <svg> -
+// scope the match to nodes whose nearest ancestor <svg> is this map's own, so a region highlighted
+// via the main map and (separately) via executeForAllInsets on the inset don't double-hit the same
+// DOM nodes and clobber each other's saved fill___ (which left inset regions like MT/LI stuck
+// highlighted, since the second, inset-scoped call would re-save the already-highlighted color).
 function highlightRegionById(map, regionId) {
+    const ownSvg = map.svg().node()
     const selector = getRegionsSelector(map)
     const region = map
         .svg()
         .selectAll(selector)
-        .filter((d) => d?.properties?.id === regionId)
+        .filter(function (d) {
+            return d?.properties?.id === regionId && this.closest('svg') === ownSvg
+        })
     if (region.empty()) return
     region.each(function () {
         const sel = select(this)
@@ -407,11 +425,14 @@ function highlightRegionById(map, regionId) {
 }
 
 function unhighlightRegionById(map, regionId) {
+    const ownSvg = map.svg().node()
     const selector = getRegionsSelector(map)
     const region = map
         .svg()
         .selectAll(selector)
-        .filter((d) => d?.properties?.id === regionId)
+        .filter(function (d) {
+            return d?.properties?.id === regionId && this.closest('svg') === ownSvg
+        })
     region.each(function () {
         const sel = select(this)
         const original = sel.attr('fill___')
@@ -558,13 +579,13 @@ function drawRankedBarChart(out, baseX, baseY) {
             .on('mouseover', function () {
                 highlightRegionById(map, entry.id)
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionById, entry.id)
+                    executeForAllInsets(map.insetTemplates_, map.svgId_, highlightRegionById, entry.id)
                 }
             })
             .on('mouseout', function () {
                 unhighlightRegionById(map, entry.id)
                 if (map.insetTemplates_) {
-                    executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightRegionById, entry.id)
+                    executeForAllInsets(map.insetTemplates_, map.svgId_, unhighlightRegionById, entry.id)
                 }
             })
 
