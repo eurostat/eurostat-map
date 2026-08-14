@@ -11,10 +11,6 @@
 
     <body>
         <style>
-            .em-zoom-buttons {
-                transform: translate(1%, 15%);
-                display: none;
-            }
             .em-legend-subtitle {
                 font-size: 12px;
             }
@@ -152,9 +148,9 @@
                         curveY: 0,
                     },
                 })
-                .zoomButtons(false)
-                .zoomButtonsPosition([740, 590])
-                .zoomExtent([0.9, 100])
+                .zoomButtons(true)
+                //.zoomButtonsPosition([740, 590])
+                .zoomExtent([1, 100])
 
             map.onBuild(() => {
                 //add footnote
