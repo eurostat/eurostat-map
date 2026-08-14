@@ -489,11 +489,20 @@ export const updateValuesLabels = function (map) {
 
     //add halos to labels
     if (labelsHaveHalos(map.labels_)) {
-        map.svg_
+        const halos = map.svg_
             .selectAll('g.em-stat-label-halo')
             .filter((rg) => filterFunction(rg, map))
             .append('text')
             .text((d) => statLabelsTextFunction(d, statData, map)) // Use 'd' directly for the label text)
+
+        // The halo's job is to keep the label legible against the map behind it, so its stroke
+        // must contrast with the label's own text color - the CSS default (white) only works
+        // for the default dark text color. Override it inline whenever a custom font color is
+        // set, picking whichever of black/white contrasts with that color (e.g. a white font
+        // color gets a black halo instead of an invisible white-on-white one).
+        if (map.labels_.statLabelTextColor) {
+            halos.attr('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
+        }
     }
     return map
 }
