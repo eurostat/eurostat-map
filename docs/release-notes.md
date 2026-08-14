@@ -1,5 +1,56 @@
 # Release notes
 
+## 4.11.0
+
+### New
+
+- **`labels({ preventOverlap: true })`**: nudges geographic labels (country names, codes, seas) apart using a d3-force collision simulation, so neighbouring labels no longer overlap. Doesn't affect statistical value labels, which stay pinned to region centroids.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .labels({ labels: eurostatmap.getDefaultLabels().EUR_3035.en, preventOverlap: true })
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+### Improvements
+
+- **Ranked bar chart / size-legend labels only spell out compact word notation ("15 thousand") for values of 1 million or more.** Smaller values now render as plain space-separated digits ("15 000") instead, which is easier to parse at a glance than a spelled-out word for a short number.
+- **Ranked bar chart container opacity now drives its pointer-events.** At full opacity (`boxOpacity: 1`) the container blocks pointer events instead of letting them reach the map underneath - previously it always ignored pointer events, so hovering the (invisible) map behind an opaque chart could still trigger its tooltip.
+
+Example:
+
+```javascript
+// At boxOpacity 1 the box now blocks pointer events to whatever's behind it.
+eurostatmap.map('ch').rankedBarChart({ boxOpacity: 1 }).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+```
+
+### Fixes
+
+- **Seas labels (e.g. "MEDITERRANEAN SEA") no longer get a background treatment under `labels({ backgrounds: true })`.** They don't visually clash with anything else on the map, so they keep their default halo instead - a background box around them was unnecessary chrome.
+- **Ranked bar chart: hovering the bar for an inset-only region (e.g. MT, LI) no longer gets stuck highlighted after mouseout.** The region-highlight lookup was a descendant selector against the main map's `<svg>`, which also matched the same region's path inside a nested inset `<svg>` - a second, inset-scoped highlight call then re-saved the already-highlighted color as the "original" to restore, permanently stuck. Highlight/unhighlight now scope their match to each map instance's own `<svg>` subtree.
+- **Proportional-symbol maps: a size value matching a `categoryFillStyle`/`categoryText` category (e.g. an "edit classification" categorical override) is now rendered with its configured color, on maps with no separate color encoding.** Previously the size-only classification fallback always tagged these symbols generically, so the category's colour/label never took effect and the map fell back to the default fill.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ps')
+    .categoryFillStyle({ Noanimals: '#B19122' })
+    .categoryText({ Noanimals: 'No animals' })
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.11.0`
+- Dist-tag `latest` points to `4.11.0`
+- Release tag format used: `4.11.0` (no `v` prefix)
+
 ## 4.10.12
 
 ### Fixes
