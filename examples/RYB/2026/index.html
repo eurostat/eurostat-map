@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>RYB 2026 Maps - Table of Contents</title>
+        <style>
+            :root {
+                --bg: #f6f8fb;
+                --card: #ffffff;
+                --text: #4c4b4b;
+                --muted: #6b7280;
+                --line: #dbe2ea;
+                --accent: #004494;
+                --accent-dark: #00306b;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                background: var(--bg);
+                color: var(--text);
+            }
+
+            .wrap {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 32px 20px 56px;
+            }
+
+            header.hero {
+                margin-bottom: 32px;
+            }
+
+            h1 {
+                margin: 0 0 6px;
+                font-size: 26px;
+                font-weight: bold;
+                color: var(--text);
+            }
+
+            .sub {
+                margin: 0;
+                color: var(--muted);
+                font-size: 15px;
+            }
+
+            .links {
+                margin-top: 14px;
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .links a {
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: bold;
+                color: var(--accent);
+                border: 1px solid var(--line);
+                background: var(--card);
+                border-radius: 8px;
+                padding: 6px 10px;
+            }
+
+            .links a:hover {
+                border-color: var(--accent);
+                color: var(--accent-dark);
+            }
+
+            h2.category {
+                font-size: 13px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: var(--muted);
+                margin: 34px 0 12px;
+                padding-bottom: 6px;
+                border-bottom: 1px solid var(--line);
+            }
+
+            h2.category:first-of-type {
+                margin-top: 0;
+            }
+
+            .grid {
+                display: grid;
+                gap: 12px;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            }
+
+            a.card {
+                display: block;
+                text-decoration: none;
+                color: inherit;
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                padding: 14px 16px;
+                transition:
+                    border-color 120ms ease,
+                    box-shadow 120ms ease,
+                    transform 120ms ease;
+            }
+
+            a.card:hover,
+            a.card:focus-visible {
+                border-color: var(--accent);
+                box-shadow: 0 4px 14px rgba(0, 68, 148, 0.12);
+                transform: translateY(-1px);
+            }
+
+            .chapter {
+                display: inline-block;
+                font-size: 11px;
+                font-weight: bold;
+                letter-spacing: 0.03em;
+                color: var(--accent);
+                background: rgba(0, 68, 148, 0.08);
+                border-radius: 5px;
+                padding: 2px 6px;
+                margin-bottom: 8px;
+            }
+
+            .card-title {
+                font-size: 15px;
+                font-weight: bold;
+                color: var(--text);
+                line-height: 1.3;
+            }
+
+            details {
+                margin-top: 40px;
+                border-top: 1px solid var(--line);
+                padding-top: 14px;
+            }
+
+            details summary {
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: bold;
+                color: var(--muted);
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+            }
+
+            details .grid {
+                margin-top: 14px;
+            }
+
+            .card-note {
+                margin-top: 4px;
+                font-size: 12px;
+                color: var(--muted);
+            }
+
+            footer {
+                margin-top: 48px;
+                font-size: 12px;
+                color: var(--muted);
+            }
+
+            footer a {
+                color: var(--accent);
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="wrap">
+            <header class="hero">
+                <h1>Regional Yearbook 2026 — Interactive Maps</h1>
+                <p class="sub">Table of contents for every RYB 2026 chapter map, grouped by type.</p>
+                <nav class="links">
+                    <a href="../readme.md">Readme (source)</a>
+                    <a href="../../index.html">All eurostat-map examples</a>
+                </nav>
+            </header>
+
+            <main>
+                <h2 class="category">Dropdown choropleths</h2>
+                <div class="grid">
+                    <a class="card" href="CH02/CH02M02.html">
+                        <span class="chapter">CH02M02</span>
+                        <div class="card-title">Life expectancy at birth (by sex)</div>
+                    </a>
+                    <a class="card" href="CH04/CH04M03.html">
+                        <span class="chapter">CH04M03</span>
+                        <div class="card-title">Employment rate by educational attainment</div>
+                    </a>
+                    <a class="card" href="CH08/CH08M03.html">
+                        <span class="chapter">CH08M03</span>
+                        <div class="card-title">Regional specialisation in manufacturing</div>
+                    </a>
+                    <a class="card" href="CH08/CH08M04.html">
+                        <span class="chapter">CH08M04</span>
+                        <div class="card-title">Labour market indicators</div>
+                    </a>
+                    <a class="card" href="CH13/CH13M02.html">
+                        <span class="chapter">CH13M02</span>
+                        <div class="card-title">Average size of farms (by year)</div>
+                    </a>
+                </div>
+
+                <h2 class="category">Pie charts</h2>
+                <div class="grid">
+                    <a class="card" href="CH02/CH02M03.html">
+                        <span class="chapter">CH02M03</span>
+                        <div class="card-title">Causes of death</div>
+                    </a>
+                </div>
+
+                <h2 class="category">Ternary</h2>
+                <div class="grid">
+                    <a class="card" href="CH03/CH03M02.html">
+                        <span class="chapter">CH03M02</span>
+                        <div class="card-title">Tertiary education</div>
+                    </a>
+                </div>
+
+                <h2 class="category">Coxcomb (tourism)</h2>
+                <div class="grid">
+                    <a class="card" href="CH10/CH10M02.html">
+                        <span class="chapter">CH10M02</span>
+                        <div class="card-title">Tourist nights</div>
+                    </a>
+                    <a class="card" href="CH10/CH10M06.html">
+                        <span class="chapter">CH10M06</span>
+                        <div class="card-title">Short stay accommodation</div>
+                    </a>
+                </div>
+
+                <h2 class="category">Mushroom (ports)</h2>
+                <div class="grid">
+                    <a class="card" href="CH11/CH11M04.html">
+                        <span class="chapter">CH11M04</span>
+                        <div class="card-title">Maritime freight</div>
+                    </a>
+                    <a class="card" href="CH11/CH11M05.html">
+                        <span class="chapter">CH11M05</span>
+                        <div class="card-title">Maritime passengers</div>
+                    </a>
+                </div>
+
+                <details>
+                    <summary>Static / print layouts</summary>
+                    <div class="grid">
+                        <a class="card" href="CH03/static/static.html">
+                            <span class="chapter">CH03M02</span>
+                            <div class="card-title">Tertiary education (static)</div>
+                            <div class="card-note">Dev/testing build: colour controls + small multiples</div>
+                        </a>
+                        <a class="card" href="CH11/static/CH11M04.html">
+                            <span class="chapter">CH11M04</span>
+                            <div class="card-title">Maritime freight (static)</div>
+                        </a>
+                        <a class="card" href="CH11/static/CH11M05.html">
+                            <span class="chapter">CH11M05</span>
+                            <div class="card-title">Maritime passengers (static)</div>
+                        </a>
+                    </div>
+                </details>
+            </main>
+
+            <footer>
+                <p>Fixed-size print layouts for PDF export - not responsive, see <a href="../readme.md">readme.md</a>.</p>
+            </footer>
+        </div>
+    </body>
+</html>
