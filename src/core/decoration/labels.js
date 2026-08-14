@@ -490,13 +490,16 @@ export const updateValuesLabels = function (map) {
             // 'data not available' regions, whose text function returns nothing)
             if (map.labels_.backgrounds && labelText) appendBackground(labelText, sel)
 
-            // Append text after the background so it remains on top. Set both fill and stroke
-            // via .style(), not .attr(): the default .em-stat-label CSS rule defines both, and a
+            // Append text after the background so it remains on top. Set fill/stroke via
+            // .style(), not .attr(): the default .em-stat-label CSS rule defines both, and a
             // CSS class rule always beats a presentation attribute (though not an inline style).
+            // When a background shape is drawn behind the text, the halo-style stroke is not
+            // needed for contrast and just makes the text look too thick, so force it off.
             const text = sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
             if (map.labels_.statLabelTextColor) {
-                text.style('fill', map.labels_.statLabelTextColor).style('stroke', map.labels_.statLabelTextColor)
+                text.style('fill', map.labels_.statLabelTextColor)
             }
+            text.style('stroke', map.labels_.backgrounds ? 'none' : map.labels_.statLabelTextColor || null)
         })
 
     // Append the configured background shape behind a statistical label.
