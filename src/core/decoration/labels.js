@@ -65,9 +65,11 @@ export const addLabelsToMap = function (map, zg) {
                 .text((d) => d.text)
 
             // Keep the halo legible against a custom font colour, same reasoning as the stat
-            // label halo fix - a light font colour needs a dark halo and vice versa.
+            // label halo fix - a light font colour needs a dark halo and vice versa. Must be
+            // .style(), not .attr(): .em-label-halo's own CSS rule sets `stroke: white`, and a
+            // CSS class rule always beats a presentation attribute (though not an inline style).
             if (map.labels_.statLabelTextColor) {
-                halog.selectAll('text').attr('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
+                halog.selectAll('text').style('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
             }
         }
 
@@ -92,9 +94,12 @@ export const addLabelsToMap = function (map, zg) {
             .text((d) => d.text)
 
         // A configured font colour applies to every geographic label (country names/codes/seas),
-        // not just statistical value labels - overrides each class's own default CSS fill.
+        // not just statistical value labels - overrides each class's own default CSS fill. Must
+        // be .style(), not .attr(): classes like .em-label-countries/.em-label-seas set their own
+        // `fill` in CSS, and a CSS class rule always beats a presentation attribute (though not
+        // an inline style) - .attr('fill', ...) here was silently overridden for those classes.
         if (map.labels_.statLabelTextColor) {
-            labelTexts.attr('fill', map.labels_.statLabelTextColor)
+            labelTexts.style('fill', map.labels_.statLabelTextColor)
         }
 
         if (map.labels_.backgrounds) {
@@ -129,36 +134,46 @@ export const addLabelsToMap = function (map, zg) {
  * @description Nudges geographic label positions apart using a d3-force collision simulation,
  *   so that neighbouring labels (e.g. small/densely-labelled countries) don't overlap each other.
  *   Runs synchronously (not animated) - same approach as the Dorling cartogram simulation.
+ *
+ *   Simulation state is kept on separate wrapper nodes, never on the label datum `d` itself:
+ *   `d.x`/`d.y` are that label's actual geographic coordinates (read elsewhere via
+ *   `map._projection([d.x, d.y])` every time labels are rebuilt). Earlier this wrote the
+ *   simulation's own nudged *screen-pixel* x/y straight onto `d.x`/`d.y` - labelsArray is a
+ *   shared/reused array, so those geographic coordinates got permanently overwritten with pixel
+ *   values on the first run. Any subsequent rebuild (e.g. toggling this setting off then on)
+ *   then reprojected those already-pixel values as if they were still geographic coordinates,
+ *   sending labels to nonsensical positions that never recovered.
  * @param {Object} labelItems d3 selection of 'g.em-geographic-label' (one per label, holds the transform)
  * @param {Object} labelTexts d3 selection of the label '<text>' elements (used to measure bbox)
  */
 function applyLabelOverlapPrevention(labelItems, labelTexts) {
-    const nodes = []
+    const nodeByDatum = new Map()
     labelItems.each(function (d) {
         const transform = this.getAttribute('transform') || ''
         const match = /translate\(([^,]+),([^)]+)\)/.exec(transform)
         if (!match) return
-        d.__origX = d.x0 = parseFloat(match[1])
-        d.__origY = d.y0 = parseFloat(match[2])
-        d.x = d.x0
-        d.y = d.y0
-        nodes.push(d)
+        const x0 = parseFloat(match[1])
+        const y0 = parseFloat(match[2])
+        nodeByDatum.set(d, { x0, y0, x: x0, y: y0 })
     })
-    if (!nodes.length) return
+    if (!nodeByDatum.size) return
+    const nodes = [...nodeByDatum.values()]
 
     const radii = new Map()
     labelTexts.each(function (d) {
+        const node = nodeByDatum.get(d)
+        if (!node) return
         const bbox = this.getBBox()
         // radius of the circle that encloses the label's bounding box, plus a little breathing room
-        radii.set(d, Math.hypot(bbox.width, bbox.height) / 2 + 2)
+        radii.set(node, Math.hypot(bbox.width, bbox.height) / 2 + 2)
     })
 
     const sim = forceSimulation(nodes)
-        .force('x', forceX((d) => d.x0).strength(0.3))
-        .force('y', forceY((d) => d.y0).strength(0.3))
+        .force('x', forceX((n) => n.x0).strength(0.3))
+        .force('y', forceY((n) => n.y0).strength(0.3))
         .force(
             'collide',
-            forceCollide((d) => radii.get(d) ?? 8).iterations(3)
+            forceCollide((n) => radii.get(n) ?? 8).iterations(3)
         )
         .stop()
 
@@ -166,8 +181,10 @@ function applyLabelOverlapPrevention(labelItems, labelTexts) {
     for (let i = 0; i < nTicks; i++) sim.tick()
 
     labelItems.attr('transform', (d) => {
+        const node = nodeByDatum.get(d)
+        if (!node) return null
         const rotate = d.rotate ? ` rotate(${d.rotate})` : ''
-        return `translate(${d.x},${d.y})${rotate}`
+        return `translate(${node.x},${node.y})${rotate}`
     })
 }
 
@@ -473,11 +490,12 @@ export const updateValuesLabels = function (map) {
             // 'data not available' regions, whose text function returns nothing)
             if (map.labels_.backgrounds && labelText) appendBackground(labelText, sel)
 
-            // Append text after the background so it remains on top. Set both fill and
-            // stroke because the default .em-stat-label rule defines both.
+            // Append text after the background so it remains on top. Set both fill and stroke
+            // via .style(), not .attr(): the default .em-stat-label CSS rule defines both, and a
+            // CSS class rule always beats a presentation attribute (though not an inline style).
             const text = sel.append('text').text(labelText).attr('class', 'em-stat-label-text')
             if (map.labels_.statLabelTextColor) {
-                text.attr('fill', map.labels_.statLabelTextColor).attr('stroke', map.labels_.statLabelTextColor)
+                text.style('fill', map.labels_.statLabelTextColor).style('stroke', map.labels_.statLabelTextColor)
             }
         })
 
@@ -538,9 +556,11 @@ export const updateValuesLabels = function (map) {
         // must contrast with the label's own text color - the CSS default (white) only works
         // for the default dark text color. Override it inline whenever a custom font color is
         // set, picking whichever of black/white contrasts with that color (e.g. a white font
-        // color gets a black halo instead of an invisible white-on-white one).
+        // color gets a black halo instead of an invisible white-on-white one). Must be .style(),
+        // not .attr(): .em-stat-label-halo's own CSS rule sets `stroke: white`, which always
+        // beats a presentation attribute (though not an inline style).
         if (map.labels_.statLabelTextColor) {
-            halos.attr('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
+            halos.style('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
         }
     }
     return map
