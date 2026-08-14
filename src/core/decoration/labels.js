@@ -63,6 +63,12 @@ export const addLabelsToMap = function (map, zg) {
                     return 'rotate(0)'
                 })
                 .text((d) => d.text)
+
+            // Keep the halo legible against a custom font colour, same reasoning as the stat
+            // label halo fix - a light font colour needs a dark halo and vice versa.
+            if (map.labels_.statLabelTextColor) {
+                halog.selectAll('text').attr('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
+            }
         }
 
         const labelItems = labelg
@@ -84,6 +90,12 @@ export const addLabelsToMap = function (map, zg) {
             .attr('y', 0)
             .attr('dy', -7)
             .text((d) => d.text)
+
+        // A configured font colour applies to every geographic label (country names/codes/seas),
+        // not just statistical value labels - overrides each class's own default CSS fill.
+        if (map.labels_.statLabelTextColor) {
+            labelTexts.attr('fill', map.labels_.statLabelTextColor)
+        }
 
         if (map.labels_.backgrounds) {
             // Seas labels don't clash with anything else on the map, so they keep their
