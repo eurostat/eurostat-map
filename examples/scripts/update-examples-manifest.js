@@ -111,6 +111,7 @@ ${stringifyPaths(paths)}
         secondaryTypeMatchers.forEach(([type, pattern]) => {
             if (pattern.test(examplePath) && !types.includes(type)) types.push(type)
         })
+        if (types.includes('Trivariate') && !types.includes('Choropleth')) types.push('Choropleth')
         return types
     }
 
