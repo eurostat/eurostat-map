@@ -162,6 +162,13 @@ Because script execution can be disabled in certain PowerShell environments, alw
 * Maintain existing formatting standards defined in `.prettierrc`.
 * Do not leave active console logging statements or unfinished debugger codes in production files.
 
+## Example gallery categories
+
+- Gallery examples can belong to multiple map-type filters. Keep `typesForPath()` in
+  `examples/scripts/update-examples-manifest.js` and its generated
+  `examples/scripts/example-manifest.js` output synchronized; `typeForPath()` is only the
+  backward-compatible primary category.
+
 ## Keep this file current for the next agent
 
 Different agents and sessions (potentially different providers entirely) work in this repo over
