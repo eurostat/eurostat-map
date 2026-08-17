@@ -26,7 +26,10 @@ export function runDorlingSimulation(layerOrMap, radiusAccessor, padding = 0) {
         const strengthY = settings.strength?.y ?? 1
         const iterations = settings.iterations ?? 1
         const useWorker = settings.worker !== false
-        const d3URL = settings.workerD3URL || 'https://unpkg.com/d3@7/dist/d3.min.js'
+        // Undefined by default: the worker bundles d3-force itself (see dorling-worker.js), so no
+        // network fetch is needed. Only set dorlingSettings({ workerD3URL }) to override this with
+        // a full d3 build fetched at runtime (e.g. to pin a different d3 version).
+        const d3URL = settings.workerD3URL
 
         // Compute initial projected coordinates
         for (const n of nodes) {
