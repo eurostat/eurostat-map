@@ -1,5 +1,35 @@
 # Release notes
 
+## 4.11.2
+
+### Fixes
+
+- **Spike proportional-symbol legend labels no longer overlap.** Item spacing was estimated from a character-count heuristic (`chars * fontSize * 0.45`) that underestimated real glyph widths for some labels. Each label's actual rendered width (`getBBox()`) is now measured after render and items are spaced from that instead.
+
+Example:
+
+```javascript
+eurostatmap.map('ps').psShape('spike').sizeLegend({ values: [4200, 50000, 100000, 185100] }).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+```
+
+- **Dorling cartograms no longer fetch a full d3 v7 bundle from an external CDN on every toggle.** The simulation's default (non-animated) Web Worker path re-fetched `https://unpkg.com/d3@7/dist/d3.min.js` via `importScripts()` every time, even though only 4 named `d3-force` exports are used - a fresh network round-trip (worker spin-up + fetch + cache revalidation) each time, and the likely cause of Dorling cartograms getting noticeably slower to enable over time. `d3-force` is now bundled directly into the worker at build time; `importScripts` is only used as an explicit opt-in via `dorlingSettings({ workerD3URL })`.
+
+Example:
+
+```javascript
+// No network dependency by default:
+eurostatmap.map('ps').dorling(true).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+
+// Opt-in override, if you need to pin a specific d3 build in the worker:
+eurostatmap.map('ps').dorling(true).dorlingSettings({ workerD3URL: 'https://unpkg.com/d3@7/dist/d3.min.js' }).build()
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.11.2`
+- Dist-tag `latest` points to `4.11.2`
+- Release tag format used: `4.11.2` (no `v` prefix)
+
 ## 4.11.1
 
 ### New
