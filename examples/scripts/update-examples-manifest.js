@@ -59,6 +59,7 @@ ${stringifyPaths(paths)}
     const isShowcasePath = (examplePath) =>
         !examplePath.startsWith('statistics-explained/') &&
         !examplePath.startsWith('RYB/') &&
+        !examplePath.startsWith('URE/') &&
         !examplePath.startsWith('ur/') &&
         !examplePath.startsWith('CCM/')
 
