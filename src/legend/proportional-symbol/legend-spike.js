@@ -52,14 +52,8 @@ export function buildSpikeLegend(out) {
         currentY += subtitleFontSize + 2
     }
 
-    // Items container (centered under title)
-    // Horizontal spacing based on spike width and maximum label length
-    // const spikeSpacing = Math.max(map.psSpikeWidth_ * 1.2, labelFontSize * 2.5)
-    const formattedLabels = legendValues.map((d) => String(labelFormatter(d)))
-    const maxLabelLength = Math.max(...formattedLabels.map((s) => s.length))
-    const labelPixelWidth = maxLabelLength * labelFontSize * 0.45
-    const spikeSpacing = labelPixelWidth + 5
-
+    // Items container (centered under title). Positioned with a placeholder spacing first - the
+    // real spacing is only known once each label's actual rendered width has been measured below.
     const items = container
         .append('g')
         .attr('id', 'em-spike-legend-items')
@@ -69,7 +63,6 @@ export function buildSpikeLegend(out) {
         .selectAll('g')
         .data(legendValues)
         .join('g')
-        .attr('transform', (d, i) => `translate(${i * spikeSpacing},0)`)
 
     // Spikes
     items
@@ -81,9 +74,23 @@ export function buildSpikeLegend(out) {
         .attr('stroke-width', map.psStrokeWidth_)
 
     // Labels
-    items
+    const labels = items
         .append('text')
         .attr('class', 'em-legend-label em-spike-legend-label')
         .attr('dy', labelOffset)
         .text((d) => labelFormatter(d))
+
+    // Horizontal spacing based on each label's actual rendered width (text-anchor is 'middle', so
+    // a label extends roughly half its width either side of its item's x position) - a character-
+    // count estimate here previously underestimated real glyph widths for some fonts/labels,
+    // letting adjacent labels overlap. Measured after the labels are in the DOM so getBBox() is
+    // accurate.
+    let maxLabelWidth = 0
+    labels.each(function () {
+        const w = this.getBBox().width
+        if (w > maxLabelWidth) maxLabelWidth = w
+    })
+    const spikeSpacing = maxLabelWidth + 16
+
+    items.attr('transform', (d, i) => `translate(${i * spikeSpacing},0)`)
 }
