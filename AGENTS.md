@@ -114,6 +114,10 @@ the regions that end up with a classified/sized value from whatever data was jus
   constructed through `buildSingleLayerMap`; add a registry-enumeration test when adding a type.
 - Real layers inherit live map services through the forwarding prototype built by `createLayer`.
   Keep thematic state as own properties on the layer; do not copy map state into decorators.
+- `stat()` and `statData()` remain map-owned to avoid map-to-layer forwarding recursion. A layer
+  that needs to expand a special one-object stat config (spark's `dates`, for example) must expose
+  an own `handleStatConfig` hook; do not override `layer.stat()` and expect the public map facade
+  to call it.
 
 ## Never add a Co-Authored-By / AI-authorship trailer
 

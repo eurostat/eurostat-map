@@ -327,6 +327,20 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     out.stat = function (k, v) {
         //no argument: getter - return the default stat
         if (!arguments.length) return out.stat_['default']
+
+        // Some layer types need to expand the public one-object stat config before it is
+        // registered on the shared map (for example, spark maps register one dataset per date).
+        // Keep stat()/statData() map-owned to avoid map <-> layer forwarding recursion, but let
+        // the active layer explicitly handle this specialized config shape when required.
+        if (arguments.length === 1 && k && typeof k === 'object' && !Array.isArray(k)) {
+            const layer = out.activeLayer?.()
+            const handler =
+                layer && Object.prototype.hasOwnProperty.call(layer, 'handleStatConfig') && typeof layer.handleStatConfig === 'function'
+                    ? layer.handleStatConfig
+                    : null
+            if (handler?.call(layer, k)) return out
+        }
+
         //legacy multi-argument API for categorical composition stats:
         // .stat('composition', statConfig, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode)
         if (
