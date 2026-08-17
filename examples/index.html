@@ -321,7 +321,7 @@
 
         <script src="./scripts/example-manifest.js"></script>
         <script>
-            const { paths, previewPathFor, legacyPreviewPathFor, isShowcasePath, typeForPath } = window.eurostatMapExamples
+            const { paths, previewPathFor, legacyPreviewPathFor, isShowcasePath, typeForPath, typesForPath } = window.eurostatMapExamples
             const fallbackPreview = '../docs/img/previews/euro.png'
 
             const toTitle = (path) => {
@@ -373,7 +373,8 @@
             let examples = []
 
             // Build sidebar nav
-            const allTypes = ['All', ...Array.from(new Set(showcasePaths.map((p) => typeForPath(p) || 'Other'))).sort()]
+            const getTypes = (path) => (typesForPath ? typesForPath(path) : [typeForPath(path) || 'Other'])
+            const allTypes = ['All', ...Array.from(new Set(showcasePaths.flatMap(getTypes))).sort()]
             let activeType = 'All'
 
             const sidebarNav = document.getElementById('sidebar-nav')
@@ -400,7 +401,7 @@
 
             const loadExamples = async () => {
                 const loaded = await Promise.all(
-                    showcasePaths.map(async (path) => [path, await resolveTitle(path), detectDesc(path), previewPathFor(path), typeForPath(path)])
+                    showcasePaths.map(async (path) => [path, await resolveTitle(path), detectDesc(path), previewPathFor(path), getTypes(path)])
                 )
                 examples = loaded
                 renderExamples(search.value)
@@ -408,8 +409,8 @@
 
             const renderExamples = (query) => {
                 const q = (query || '').trim().toLowerCase()
-                const filtered = examples.filter(([file, title, desc, , type]) => {
-                    const matchesType = activeType === 'All' || type === activeType
+                const filtered = examples.filter(([file, title, desc, , types]) => {
+                    const matchesType = activeType === 'All' || types.includes(activeType)
                     if (!matchesType) return false
                     if (!q) return true
                     return file.toLowerCase().includes(q) || title.toLowerCase().includes(q) || desc.toLowerCase().includes(q)

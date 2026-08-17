@@ -119,7 +119,7 @@
         !examplePath.startsWith('ur/') &&
         !examplePath.startsWith('CCM/')
 
-    const typeForPath = (examplePath) => {
+    const primaryTypeForPath = (examplePath) => {
         if (examplePath.startsWith('bar-chart/')) return 'Bar Chart'
         if (examplePath.startsWith('bivariate/')) return 'Bivariate'
         if (examplePath.startsWith('cartogram/')) return 'Cartogram'
@@ -135,7 +135,7 @@
         if (examplePath.startsWith('pie-charts/')) return 'Pie Charts'
         if (examplePath.startsWith('proportional/')) return 'Proportional'
         if (examplePath.startsWith('RYB/')) return 'RYB'
-        if (examplePath.startsWith('sparklines/')) return 'Sparklines'
+        if (examplePath.startsWith('sparklines/')) return 'Spark charts'
         if (examplePath.startsWith('statistics-explained/')) return 'Statistics Explained'
         if (examplePath.startsWith('stripe/')) return 'Stripe'
         if (examplePath.startsWith('trivariate/')) return 'Trivariate'
@@ -144,11 +144,40 @@
         return 'Other'
     }
 
+    const secondaryTypeMatchers = [
+        ['Bar Chart', /(^|[/_-])bar(?:-chart)?([/_.-]|$)/],
+        ['Bivariate', /(^|[/_-])bivariate([/_.-]|$)/],
+        ['Cartogram', /cartogram/],
+        ['Categorical', /(^|[/_-])categorical([/_.-]|$)/],
+        ['Choropleth', /(^|[/_-])choropleth([/_.-]|$)/],
+        ['Coxcomb', /(^|[/_-])coxcomb([/_.-]|$)/],
+        ['Dot Density', /dot-density/],
+        ['Flow Map', /(^|[/_-])flow([/_.-]|$)/],
+        ['Mushroom', /(^|[/_-])mushroom([/_.-]|$)/],
+        ['Pie Charts', /(^|[/_-])pie([/_.-]|$)/],
+        ['Proportional', /(^|[/_-])proportional([/_.-]|$)/],
+        ['Spark charts', /spark/],
+        ['Stripe', /(^|[/_-])stripe([/_.-]|$)/],
+        ['Trivariate', /(^|[/_-])trivariate([/_.-]|$)/],
+        ['Waffle', /(^|[/_-])waffle([/_.-]|$)/],
+    ]
+
+    const typesForPath = (examplePath) => {
+        const types = [primaryTypeForPath(examplePath)]
+        secondaryTypeMatchers.forEach(([type, pattern]) => {
+            if (pattern.test(examplePath) && !types.includes(type)) types.push(type)
+        })
+        return types
+    }
+
+    const typeForPath = (examplePath) => typesForPath(examplePath)[0]
+
     return {
         paths,
         previewPathFor,
         legacyPreviewPathFor,
         isShowcasePath,
         typeForPath,
+        typesForPath,
     }
 })
