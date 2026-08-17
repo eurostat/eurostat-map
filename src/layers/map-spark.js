@@ -28,11 +28,16 @@ import { getCentroidsGroup } from '../core/geo/centroids'
  * @returns {SparkMap}
  */
 export const map = function (config) {
-    return buildSingleLayerMap('spark', config)
+    // createStatMap applies top-level config before the real spark layer exists. Defer the
+    // specialized stat config until after the layer has installed its date-expansion hook.
+    const statConfig = config?.stat
+    const mapConfig = statConfig ? { ...config, stat: undefined } : config
+    const out = buildSingleLayerMap('spark', mapConfig)
+    if (statConfig) out.stat(statConfig)
+    return out
 }
 
 export const decorateSparkLayer = function (out, config) {
-
     // ── Config defaults ──────────────────────────────────────────────────────
 
     out.sparkLineColor_ = 'black'
@@ -254,57 +259,54 @@ export const decorateSparkLayer = function (out, config) {
         return out
     }
 
-    const superStat = out.stat
-    out.stat = function (...args) {
-        if (args.length === 1 && args[0] && typeof args[0] === 'object' && !Array.isArray(args[0])) {
-            const cfg = args[0]
-            if (cfg.dates && (cfg.eurostatDatasetCode || cfg.customData)) {
-                const { eurostatDatasetCode, customData, filters, unitText, preprocess, transform, dates, labels } = cfg
+    out.handleStatConfig = function (cfg) {
+        if (cfg.dates && (cfg.eurostatDatasetCode || cfg.customData)) {
+            const { eurostatDatasetCode, customData, filters, unitText, preprocess, transform, dates, labels } = cfg
 
-                if (customData && !eurostatDatasetCode) {
-                    const resolvedDates = dates?.length ? dates : Object.keys(customData[Object.keys(customData)[0]] || {})
-                    if (!resolvedDates.length) {
-                        console.error('stat({...}): dates array or customData with date keys is required for sparkline maps')
-                        return out
-                    }
-                    resolvedDates.forEach((date, i) => {
-                        if (labels?.[i]) {
-                            out.catLabels_ = out.catLabels_ || {}
-                            out.catLabels_[date] = labels[i]
-                        }
-                    })
-                    return out.sparklineData(customData)
+            if (customData && !eurostatDatasetCode) {
+                const resolvedDates = dates?.length ? dates : Object.keys(customData[Object.keys(customData)[0]] || {})
+                if (!resolvedDates.length) {
+                    console.error('stat({...}): dates array or customData with date keys is required for sparkline maps')
+                    return true
                 }
-
-                if (!eurostatDatasetCode) {
-                    console.error('stat({...}): eurostatDatasetCode is required for sparkline maps when dates are provided')
-                    return out
-                }
-                if (!dates?.length) {
-                    console.error('stat({...}): dates array is required for sparkline maps')
-                    return out
-                }
-
-                const baseFilters = filters ? { ...filters } : {}
-                for (let i = 0; i < dates.length; i++) {
-                    const date = dates[i]
-                    superStat.call(out, date, {
-                        eurostatDatasetCode,
-                        unitText,
-                        preprocess,
-                        transform,
-                        filters: { ...baseFilters, time: date },
-                    })
+                resolvedDates.forEach((date, i) => {
                     if (labels?.[i]) {
                         out.catLabels_ = out.catLabels_ || {}
                         out.catLabels_[date] = labels[i]
                     }
-                }
-                out._statDates = dates
-                return out
+                })
+                out.sparklineData(customData)
+                return true
             }
+
+            if (!eurostatDatasetCode) {
+                console.error('stat({...}): eurostatDatasetCode is required for sparkline maps when dates are provided')
+                return true
+            }
+            if (!dates?.length) {
+                console.error('stat({...}): dates array is required for sparkline maps')
+                return true
+            }
+
+            const baseFilters = filters ? { ...filters } : {}
+            for (let i = 0; i < dates.length; i++) {
+                const date = dates[i]
+                out.stat(date, {
+                    eurostatDatasetCode,
+                    unitText,
+                    preprocess,
+                    transform,
+                    filters: { ...baseFilters, time: date },
+                })
+                if (labels?.[i]) {
+                    out.catLabels_ = out.catLabels_ || {}
+                    out.catLabels_[date] = labels[i]
+                }
+            }
+            out._statDates = dates
+            return true
         }
-        return superStat.apply(out, args)
+        return false
     }
 
     // ── Data helpers ─────────────────────────────────────────────────────────

@@ -133,4 +133,24 @@ const { registerLayerType, isLayerTypeRegistered } = library
     assert.strictEqual(m.activeLayer().psMaxSize_, 45, 'setting psMaxSize on map updates layer')
 }
 
+// 7) Spark's public stat({ dates }) facade expands into one shared map dataset per date.
+{
+    const config = {
+        eurostatDatasetCode: 'demo_r_d3dens',
+        filters: { unit: 'PER_KM2' },
+        dates: ['2022', '2023'],
+        labels: ['2022 label', '2023 label']
+    }
+    const m = library.map('sparkline').stat(config)
+    assert.strictEqual(m.stat('default'), undefined, 'spark config is not registered as one default dataset')
+    assert.strictEqual(m.stat('2022').filters.time, '2022')
+    assert.strictEqual(m.stat('2023').filters.time, '2023')
+    assert.deepStrictEqual(m.activeLayer()._statDates, ['2022', '2023'])
+    assert.strictEqual(m.activeLayer().catLabels_['2022'], '2022 label')
+
+    const configuredAtConstruction = library.map('sparkline', { stat: config })
+    assert.strictEqual(configuredAtConstruction.stat('2022').filters.time, '2022')
+    assert.deepStrictEqual(configuredAtConstruction.activeLayer()._statDates, ['2022', '2023'])
+}
+
 console.log('Phase 1, Phase 3 & Phase 4 layer tests passed')
