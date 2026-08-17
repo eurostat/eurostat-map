@@ -13,6 +13,16 @@ const PS_LABEL_OVERFLOW_FONT_SIZE = 11 //  when overflowing outside circle
 // booleans are supplied, backgrounds take precedence.
 const labelsHaveHalos = (labelsConfig) => !labelsConfig?.backgrounds && !!(labelsConfig?.halos ?? labelsConfig?.shadows)
 
+// Geographic labels (country names, country codes, seas) each have their own independent colour
+// field - deliberately distinct from statLabelTextColor, which is for statistical value labels
+// only. Returns only the [class, color] pairs that are actually configured.
+const geographicLabelColorsByClass = (map) =>
+    [
+        ['countries', map.labels_.countryLabelTextColor],
+        ['cc', map.labels_.countryCodeLabelTextColor],
+        ['seas', map.labels_.seaLabelTextColor],
+    ].filter(([, color]) => !!color)
+
 // ─── Public API ──────────────────────────────────────────────────────────────
 
 /**
@@ -64,12 +74,12 @@ export const addLabelsToMap = function (map, zg) {
                 })
                 .text((d) => d.text)
 
-            // Keep the halo legible against a custom font colour, same reasoning as the stat
-            // label halo fix - a light font colour needs a dark halo and vice versa. Must be
+            // Keep the halo legible against a custom label colour, same reasoning as the stat
+            // label halo fix - a light label colour needs a dark halo and vice versa. Must be
             // .style(), not .attr(): .em-label-halo's own CSS rule sets `stroke: white`, and a
             // CSS class rule always beats a presentation attribute (though not an inline style).
-            if (map.labels_.statLabelTextColor) {
-                halog.selectAll('text').style('stroke', getTextColorForBackground(map.labels_.statLabelTextColor))
+            for (const [cls, color] of geographicLabelColorsByClass(map)) {
+                halog.selectAll('text').filter((d) => d.class === cls).style('stroke', getTextColorForBackground(color))
             }
         }
 
@@ -93,13 +103,14 @@ export const addLabelsToMap = function (map, zg) {
             .attr('dy', -7)
             .text((d) => d.text)
 
-        // A configured font colour applies to every geographic label (country names/codes/seas),
-        // not just statistical value labels - overrides each class's own default CSS fill. Must
-        // be .style(), not .attr(): classes like .em-label-countries/.em-label-seas set their own
-        // `fill` in CSS, and a CSS class rule always beats a presentation attribute (though not
-        // an inline style) - .attr('fill', ...) here was silently overridden for those classes.
-        if (map.labels_.statLabelTextColor) {
-            labelTexts.style('fill', map.labels_.statLabelTextColor)
+        // Each geographic label class (country names/codes/seas) has its own independent colour
+        // field - statLabelTextColor is for statistical value labels only (see its name), and
+        // must not leak into these. Must be .style(), not .attr(): classes like
+        // .em-label-countries/.em-label-seas set their own `fill` in CSS, and a CSS class rule
+        // always beats a presentation attribute (though not an inline style) - .attr('fill', ...)
+        // here would be silently overridden for those classes.
+        for (const [cls, color] of geographicLabelColorsByClass(map)) {
+            labelTexts.filter((d) => d.class === cls).style('fill', color)
         }
 
         if (map.labels_.backgrounds) {

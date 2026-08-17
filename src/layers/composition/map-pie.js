@@ -43,7 +43,6 @@ export const map = function (config) {
 }
 
 export const decoratePieLayer = function (out, config) {
-
     // ── Config defaults ──────────────────────────────────────────────────────
     out.dorling_ = config?.dorling || false
 
@@ -52,7 +51,7 @@ export const decoratePieLayer = function (out, config) {
         minSize: 5,
         maxSize: 15,
         strokeFill: 'white',
-        strokeWidth: 0.3,
+        strokeWidth: 0,
         radarValueMode: 'share',
         reverseOrder: false,
         stripesOrientation: 0,
