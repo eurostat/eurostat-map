@@ -233,14 +233,24 @@ export const decorateChoroplethLayer = function (layer, config) {
                         break
                     }
                     case 'jenks': {
-                        const jenksBreaks = jenks(dataArrayNumeric, layer.numberOfClasses_) //data, lowerClassLimits, nClasses
-                        const domain = jenksBreaks.slice(1, -1)
+                        // jenks()/ckmeans() (simple-statistics) can't produce more classes than
+                        // there are data points - jenks returns null outright when asked to
+                        // (crashing the .slice() below), so clamp rather than pass the configured
+                        // class count through unchecked. layer.numberOfClasses_ itself is left
+                        // alone so the legend still shows its configured number of classes/colors;
+                        // any classes beyond what the data supports simply end up unused.
+                        const nClasses = Math.min(layer.numberOfClasses_, dataArrayNumeric.length) || 1
+                        const jenksBreaks = jenks(dataArrayNumeric, nClasses) //data, lowerClassLimits, nClasses
+                        const domain = jenksBreaks ? jenksBreaks.slice(1, -1) : []
                         layer.classifier(scaleThreshold().domain(domain).range(range))
                         break
                     }
                     case 'ckmeans': {
-                        const ckmeansBreaks = ckmeans(dataArrayNumeric, layer.numberOfClasses_).map((cluster) => cluster.pop())
-                        const domain = ckmeansBreaks.slice(0, -1)
+                        // Unlike jenks(), ckmeans() throws rather than returning null when asked
+                        // for more classes than there are data points - guard the zero-data case
+                        // explicitly rather than relying on the clamp below to avoid it.
+                        const nClasses = Math.min(layer.numberOfClasses_, dataArrayNumeric.length)
+                        const domain = nClasses > 0 ? ckmeans(dataArrayNumeric, nClasses).map((cluster) => cluster.pop()).slice(0, -1) : []
                         layer.classifier(scaleThreshold().domain(domain).range(range))
                         break
                     }
