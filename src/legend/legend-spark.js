@@ -110,6 +110,7 @@ export const legend = function (map, config) {
         out.updateContainer()
 
         const map = out.map
+        const layer = out.layer || map
         const lgg = out.lgg
 
         // Remove previous content
@@ -127,7 +128,7 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         // Draw the scale legend
-        if (map.sparkYScale_) {
+        if (layer.sparkYScale_) {
             out._scaleLegendContainer = lgg
                 .append('g')
                 .attr('class', 'em-spark-scale-legend em-grid-cell')
@@ -146,18 +147,19 @@ export const legend = function (map, config) {
 
     function drawScaleLegend(legend, container) {
         const map = legend.map
+        const layer = legend.layer || map
         /** @type {SparklineScaleLegendConfig} */
         const config = legend.scaleLegend
         const margin = config.margin
 
-        const dates = map._statDates || []
+        const dates = layer._statDates || []
         if (!dates.length) return
 
         // -----------------------------------
         // Aspect ratio (MATCH MAP SPARKS)
         // -----------------------------------
-        const sparkWidth = map.sparkLineWidth_ || 30
-        const sparkHeight = map.sparkLineHeight_ || 20
+        const sparkWidth = layer.sparkLineWidth_ || 30
+        const sparkHeight = layer.sparkLineHeight_ || 20
         const aspectRatio = sparkHeight / sparkWidth
 
         // -----------------------------------
@@ -169,7 +171,7 @@ export const legend = function (map, config) {
         // -----------------------------------
         // Collect ALL region series (WITH ID)
         // -----------------------------------
-        const regionIds = getRegionIds(map)
+        const regionIds = getRegionIds(map, layer)
 
         const allSeries = regionIds
             .map((id) => {
@@ -228,7 +230,7 @@ export const legend = function (map, config) {
                     .tickValues(xTickValues)
                     .tickFormat((i) => {
                         const d = dates[i]
-                        return map.catLabels_?.[d] || d
+                        return layer.catLabels_?.[d] || d
                     })
             )
             .selectAll('text')
@@ -256,7 +258,7 @@ export const legend = function (map, config) {
             .append('path')
             .attr('d', (d) => lineGen(d.series))
             .attr('fill', 'none')
-            .attr('stroke', map.sparkLineColor_ || '#000')
+            .attr('stroke', layer.sparkLineColor_ || '#000')
             .attr('stroke-width', config.lineStrokeWidth || 1)
             .attr('opacity', config.lineOpacity)
             .style('cursor', 'pointer')
@@ -408,7 +410,7 @@ export const legend = function (map, config) {
     /**
      * Get region IDs from the map
      */
-    function getRegionIds(map) {
+    function getRegionIds(map, layer) {
         const ids = []
 
         const svg = map.svg_ || map.svg()
@@ -421,7 +423,7 @@ export const legend = function (map, config) {
                 }
             })
         } else {
-            const centroidsGroup = getCentroidsGroup ? getCentroidsGroup(map) : null
+            const centroidsGroup = getCentroidsGroup ? getCentroidsGroup(layer) : null
             if (centroidsGroup) {
                 centroidsGroup.selectAll('g.em-centroid').each(function (d) {
                     if (d && d.properties && d.properties.id) {
