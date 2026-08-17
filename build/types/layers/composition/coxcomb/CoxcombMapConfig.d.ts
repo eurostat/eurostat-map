@@ -38,6 +38,13 @@ export interface CoxcombMapConfig extends MapConfig {
     catColors?: Record<string, string>
     /** Cat labels. */
     catLabels?: Record<string, string>
+    /**
+     * Fill styles for categorical exceptions, keyed by raw value - colors the matching region's
+     * own polygon, independently of its coxcomb symbol.
+     */
+    categoryFillStyle?: { [rawValue: string]: string }
+    /** Legend and tooltip labels for categorical exceptions, keyed by raw value. */
+    categoryText?: { [rawValue: string]: string }
     /** No data fill style. */
     noDataFillStyle?: string
     /** D3 radial scale mapping a stat value to a wedge radius in pixels. */
