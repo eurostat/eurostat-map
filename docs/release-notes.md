@@ -1,5 +1,50 @@
 # Release notes
 
+## 4.11.1
+
+### New
+
+- **Pie, bar chart, waffle, and coxcomb composition maps now support `categoryFillStyle`/`categoryText` region-level categorical coloring**, matching proportional-symbol maps. On proportional-symbol maps this also corrects 4.11.0's version of the feature, which colored the symbol itself instead of the region's polygon - a region can now have both a sized/composition symbol and an independently-categorized polygon at once (e.g. a sheep-count circle plus a "member of welfare scheme" polygon colour).
+
+Example:
+
+```javascript
+eurostatmap
+    .map('pie')
+    .categoryFillStyle({ Noanimals: '#B19122' })
+    .categoryText({ Noanimals: 'No animals' })
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+- **Proportional-symbol stat value labels now respect `statLabelTextColor` and `backgrounds`**, matching choropleth's stat labels. Previously ps stat labels always auto-computed a contrast colour against the symbol's own fill and never drew a background box, ignoring both settings entirely.
+
+Example:
+
+```javascript
+eurostatmap.map('ps').labels({ backgrounds: true, backgroundFill: '#B19122', statLabelTextColor: '#ffffff' }).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+```
+
+### Fixes
+
+- **`statLabelTextColor` and its halo-contrast adjustment now reliably apply everywhere they're configured.** The color now also applies to geographic labels (country names, country codes, seas), not just statistical value labels - and every one of these overrides is now set as an inline style rather than an SVG attribute, since a CSS class rule (each label class sets its own default `fill`/`stroke`) always wins over a plain attribute regardless of specificity, which was silently discarding the override before.
+
+Example:
+
+```javascript
+eurostatmap.map('ch').labels({ labels: eurostatmap.getDefaultLabels().EUR_3035.en, statLabelTextColor: '#ffffff' }).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+```
+
+- **Statistical value label text no longer renders with a thick double-stroke outline under `labels({ backgrounds: true })`.** The stroke is now forced off whenever a background box is drawn behind the label - it was only ever needed for contrast against the bare map, not against its own background.
+- **Proportional-symbol maps: a `categoryFillStyle`/`categoryText` category added via a live classification change (e.g. an "edit classification" UI) now updates the map and legend correctly.** Previously this only took effect if the category was configured before the map's initial `.build()` - the only re-tagging path invoked on a later change bailed out entirely for size-only ps maps, and the legend had no swatch-drawing path for that case either.
+- **Label overlap prevention (`labels({ preventOverlap: true })`) no longer permanently corrupts a label's position after being toggled off and back on.** The force simulation was writing its own nudged screen-pixel coordinates directly onto the label datum's `x`/`y` - geographic coordinates that get re-projected on every rebuild, and that are frequently a reference into eurostat-map's own shared default-labels data. Simulation state now lives on separate wrapper objects, never on the datum itself.
+
+### Notes
+
+- Published package: `eurostat-map@4.11.1`
+- Dist-tag `latest` points to `4.11.1`
+- Release tag format used: `4.11.1` (no `v` prefix)
+
 ## 4.11.0
 
 ### New
