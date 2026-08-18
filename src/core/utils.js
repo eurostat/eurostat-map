@@ -1,6 +1,19 @@
 import { scaleLinear } from 'd3-scale'
 import { color } from 'd3-color'
 
+export const MOBILE_BREAKPOINT = 768
+
+/**
+ * Determine whether the current viewport is at or below the mobile breakpoint.
+ * Returns false when no browser window is available (for example during SSR).
+ *
+ * @param {number} breakpoint
+ * @returns {boolean}
+ */
+export function isMobile(breakpoint = MOBILE_BREAKPOINT) {
+    return typeof window !== 'undefined' && window.innerWidth <= breakpoint
+}
+
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 

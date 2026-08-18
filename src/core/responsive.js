@@ -1,6 +1,8 @@
+import { isMobile, MOBILE_BREAKPOINT } from './utils'
+
 export function getMobileSymbolScale() {
-    if (typeof window === 'undefined' || window.innerWidth > 768) return 1
-    return Math.max(0.45, Math.min(1, window.innerWidth / 768))
+    if (!isMobile()) return 1
+    return Math.max(0.45, Math.min(1, window.innerWidth / MOBILE_BREAKPOINT))
 }
 
 export function getResponsiveSymbolSize(value, minimum = 0) {
