@@ -60,11 +60,31 @@ export interface LabelsConfig {
     backgroundFill?: string
 
     /**
-     * Fill/stroke color for label text - applies to statistical value labels and to
-     * geographic labels (country names, country codes, seas) alike.
+     * Fill/stroke color for statistical value label text only (the labels shown when
+     * `values` is enabled, and the value labels inside proportional symbols). Does not affect
+     * geographic labels (country names, country codes, seas) - see countryLabelTextColor,
+     * countryCodeLabelTextColor and seaLabelTextColor for those.
      * @default '#111111'
      */
     statLabelTextColor?: string
+
+    /**
+     * Fill/stroke color for country name labels (`class: 'countries'`).
+     * @default '#111111'
+     */
+    countryLabelTextColor?: string
+
+    /**
+     * Fill/stroke color for country code labels (`class: 'cc'`).
+     * @default '#000000'
+     */
+    countryCodeLabelTextColor?: string
+
+    /**
+     * Fill/stroke color for sea/ocean labels (`class: 'seas'`).
+     * @default '#2a58b3'
+     */
+    seaLabelTextColor?: string
 
     /**
      * Padding between statistical label text and its background edge, in pixels.
