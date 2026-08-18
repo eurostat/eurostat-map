@@ -1,4 +1,4 @@
-import { executeForAllInsets } from './utils'
+import { executeForAllInsets, isMobile } from './utils'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
@@ -482,7 +482,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     // one that actually showed it.
     const getDefaultLegendVisible = function () {
         if (out.legendButton_) {
-            return typeof window === 'undefined' || window.innerWidth > out.legendVisibilityBreakpoint_
+            return !isMobile(out.legendVisibilityBreakpoint_)
         }
         return true
     }

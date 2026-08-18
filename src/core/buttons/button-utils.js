@@ -1,11 +1,11 @@
-import { getCSSPropertyFromClass } from '../utils'
+import { getCSSPropertyFromClass, isMobile } from '../utils'
 
 export function getButtonSize() {
     return parseFloat(getCSSPropertyFromClass('em-button', 'width')) || 35
 }
 
 export function getButtonPadding() {
-    return typeof window !== 'undefined' && window.innerWidth <= 768 ? 8 : 10
+    return isMobile() ? 8 : 10
 }
 
 export function getMapDrawingExtent(map) {

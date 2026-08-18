@@ -1,5 +1,5 @@
 import { select, selectAll } from 'd3-selection'
-import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox } from './utils'
+import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox, isMobile } from './utils'
 import { appendAnnotations } from './decoration/annotations'
 import { addLabelsToMap, updateLabels, updateValuesLabels } from './decoration/labels'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -550,10 +550,10 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             const maxTotalHeight = 0.99 * availableHeight
 
             // Estimate header/footer/padding overhead to find maximum allowed map height
-            const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-            const overhead = isMobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
+            const mobile = isMobile()
+            const overhead = mobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
             const maxMapHeight = Math.max(150, maxTotalHeight - overhead)
-            let defaultHeight = isMobile ? maxMapHeight : (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
+            let defaultHeight = mobile ? maxMapHeight : (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
 
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height(defaultHeight)
@@ -764,7 +764,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         // auto-show the toggle button whenever insets exist and the user hasn't explicitly
         // configured insetsButton themselves - otherwise there would be no way to reveal them.
         {
-            const isMobileForInsetsButton = typeof window !== 'undefined' && window.innerWidth <= out.insetsVisibilityBreakpoint_
+            const isMobileForInsetsButton = isMobile(out.insetsVisibilityBreakpoint_)
             const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
             if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
                 appendInsetsButton(out)

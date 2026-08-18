@@ -1,4 +1,4 @@
-import { getFontSizeFromClass } from '../utils'
+import { getFontSizeFromClass, isMobile } from '../utils'
 
 export function addTitle(out) {
     // define default position
@@ -83,7 +83,7 @@ export function addSubtitle(out) {
 }
 
 function wrapTextForMobile(textSelection, out, x) {
-    if (typeof window === 'undefined' || window.innerWidth > 768) return
+    if (!isMobile()) return
 
     const node = textSelection.node()
     if (!node) return
