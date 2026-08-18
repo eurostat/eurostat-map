@@ -786,14 +786,43 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         return out
     }
 
+    /**
+     * Shows or hides the background map (sea, graticule, country/NUTS boundary geometry) on an
+     * already-built map instance, without a full rebuild. Draws it on demand the first time it's
+     * switched on if backgroundMap_ was false at build time (so it was never drawn), and always
+     * lowers it to the back of the zoom group so z-order matches what buildMapTemplate() would
+     * have produced. No-op for grid cartograms (backgroundMap_ is never drawn for those - see
+     * buildMapTemplate()) and for insets (only applies to the map instance out is called on).
+     */
+    out.updateBackgroundMap = function () {
+        if (out.gridCartogram_) return out
+
+        const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+        const backgroundGroup = zoomGroup.select('.em-background-map-group')
+
+        if (out.backgroundMap_) {
+            if (backgroundGroup.empty()) {
+                drawBackgroundMap(out)
+            }
+            zoomGroup.select('.em-background-map-group').lower()
+        } else {
+            backgroundGroup.remove()
+        }
+
+        return out
+    }
+
     return out
 }
 
 const drawBackgroundMap = function (out) {
-    //draw background map
+    //draw background map, wrapped in one group so it can be toggled/reordered as a unit by
+    //updateBackgroundMap() without needing a full rebuild
     const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
+    const backgroundGroup = zoomGroup.append('g').attr('class', 'em-background-map-group')
+
     //draw sea
-    zoomGroup
+    backgroundGroup
         .append('rect')
         .attr('id', 'sea')
         .attr('class', 'em-sea')
@@ -804,15 +833,15 @@ const drawBackgroundMap = function (out) {
 
     //sphere for world map
     if (out.geo_ == 'WORLD') {
-        zoomGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
+        backgroundGroup.append('path').datum({ type: 'Sphere' }).attr('id', 'sphere').attr('d', out._pathFunction).attr('class', 'em-graticule')
     }
 
     // draw polygons and borders
     if (out.geometries_) {
-        out.Geometries.addUserGeometriesToMap(out.geometries_, zoomGroup, out._pathFunction)
+        out.Geometries.addUserGeometriesToMap(out.geometries_, backgroundGroup, out._pathFunction)
     } else {
         out.Geometries.addDefaultGeometriesToMap(
-            zoomGroup,
+            backgroundGroup,
             out.drawGraticule_,
             out._pathFunction,
             out.nutsLevel_,
