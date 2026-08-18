@@ -1,5 +1,39 @@
 # Release notes
 
+## 4.11.3
+
+### Fixes
+
+- **Geographic label colours (country names, country codes, seas) are now independent of `statLabelTextColor`.** A previous fix made `statLabelTextColor` apply to every geographic label class as well as statistical value labels, despite the name - too broad a scope, since it meant a font-colour change for country names/codes also silently recoloured sea/ocean labels. `statLabelTextColor` now only affects statistical value labels again; country names, country codes and seas each get their own independent colour field.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ch')
+    .labels({
+        labels: eurostatmap.getDefaultLabels().EUR_3035.en,
+        countryLabelTextColor: '#111111',
+        seaLabelTextColor: '#2a58b3', // independent of country label colour
+    })
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+- **Choropleth classification no longer crashes on sparse data.** `setupClassifier`'s `jenks`/`ckmeans` branches called `.slice()` on `jenks()`'s result unconditionally - `jenks()` (from `simple-statistics`) returns `null` rather than throwing when asked for more classes than there are data points, which is a real situation whenever a live re-fetch (e.g. an interactive dropdown) returns fewer distinct values than the map's configured class count. Both branches now clamp the requested class count to the available data and degrade to an empty domain instead of crashing.
+- **Spark maps: the `stat({ dates: [...], eurostatDatasetCode: ... })` multi-date config shape works again.** A prior internal refactor moved layer-specific behaviour behind a shared `activeLayer` pattern, which broke sparkline maps' specialized stat config (one dataset per date) - restored via an explicit `handleStatConfig` hook the active layer can implement.
+- **Spark map legends read their scale/style properties from the layer again, not the map.** After the same internal refactor, spark legends were reading `sparkYScale_`, `_statDates`, `sparkLineWidth_`/`sparkLineHeight_`/`sparkLineColor_` and region centroids from the shared map object, which no longer holds them - they live on the layer instance now. Legends now read from the layer (falling back to the map where relevant).
+
+### Improvements
+
+- **Insets start hiding behind the insets button at a narrower viewport by default.** `insetsVisibilityBreakpoint()`'s default dropped from 768px to 700px, so insets stay visible over a slightly wider range of tablet/small-desktop widths before switching to the button-triggered mobile layout.
+
+### Notes
+
+- Published package: `eurostat-map@4.11.3`
+- Dist-tag `latest` points to `4.11.3`
+- Release tag format used: `4.11.3` (no `v` prefix)
+
 ## 4.11.2
 
 ### Fixes
