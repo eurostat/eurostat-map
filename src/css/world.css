@@ -23,8 +23,8 @@
 
 .em-bn-d {
     /* disputed */
-    stroke: #000;
-    stroke-width: 0.1;
+    stroke: #818181;
+    stroke-width: 0.1px;
     opacity: 0.9;
     fill: none;
     stroke-dasharray: 1 1;

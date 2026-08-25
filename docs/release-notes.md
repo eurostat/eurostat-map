@@ -1,5 +1,26 @@
 # Release notes
 
+## 4.11.4
+
+### New
+
+- **`map.updateBackgroundMap()` toggles the background map (sea/sphere/NUTS geometry) live, without a full `map.build()`.** Previously the only way to show/hide the background map after the initial build was a full rebuild. The new method draws the background layer on demand if it hasn't been built yet, or removes/re-lowers it in place otherwise - useful for a "show background map" toggle on a Dorling cartogram.
+
+Example:
+
+```javascript
+const map = eurostatmap.map('ps').dorling(true).backgroundMap(true).stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+
+// later, toggling the setting live:
+map.backgroundMap(false).updateBackgroundMap()
+```
+
+### Notes
+
+- Published package: `eurostat-map@4.11.4`
+- Dist-tag `latest` points to `4.11.4`
+- Release tag format used: `4.11.4` (no `v` prefix)
+
 ## 4.11.3
 
 ### Fixes

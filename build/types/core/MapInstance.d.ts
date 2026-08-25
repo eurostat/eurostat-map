@@ -398,6 +398,13 @@ export interface MapInstance {
     backgroundMap(): boolean
     backgroundMap(show: boolean): this
 
+    /**
+     * Shows or hides the background map on an already-built instance to match the current
+     * backgroundMap() value, without a full rebuild - draws it on demand if it wasn't already
+     * built. No-op for grid cartograms.
+     */
+    updateBackgroundMap(): this
+
     /** Minimap (globe inset showing current viewport) configuration. */
     minimap(): MinimapConfig | undefined
     minimap(config: MinimapConfig): this
