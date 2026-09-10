@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>URE 2026 Maps - Table of Contents</title>
+        <style>
+            :root {
+                --bg: #f6f8fb;
+                --card: #ffffff;
+                --text: #4c4b4b;
+                --muted: #6b7280;
+                --line: #dbe2ea;
+                --accent: #004494;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                background: var(--bg);
+                color: var(--text);
+            }
+
+            .wrap {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 32px 20px 56px;
+            }
+
+            header.hero {
+                margin-bottom: 32px;
+            }
+
+            h1 {
+                margin: 0 0 6px;
+                font-size: 26px;
+                font-weight: bold;
+            }
+
+            h2.category {
+                margin: 34px 0 12px;
+                padding-bottom: 6px;
+                border-bottom: 1px solid var(--line);
+                color: var(--muted);
+                font-size: 13px;
+                font-weight: bold;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+            }
+
+            h2.category:first-of-type {
+                margin-top: 0;
+            }
+
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 12px;
+            }
+
+            a.card {
+                display: block;
+                padding: 14px 16px;
+                border: 1px solid var(--line);
+                border-radius: 10px;
+                background: var(--card);
+                color: inherit;
+                text-decoration: none;
+                transition:
+                    border-color 120ms ease,
+                    box-shadow 120ms ease,
+                    transform 120ms ease;
+            }
+
+            a.card:hover,
+            a.card:focus-visible {
+                border-color: var(--accent);
+                box-shadow: 0 4px 14px rgba(0, 68, 148, 0.12);
+                transform: translateY(-1px);
+            }
+
+            .chapter {
+                display: inline-block;
+                margin-bottom: 8px;
+                padding: 2px 6px;
+                border-radius: 5px;
+                background: rgba(0, 68, 148, 0.08);
+                color: var(--accent);
+                font-size: 11px;
+                font-weight: bold;
+                letter-spacing: 0.03em;
+            }
+
+            .card-title {
+                color: var(--text);
+                font-size: 15px;
+                font-weight: bold;
+                line-height: 1.3;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="wrap">
+            <header class="hero">
+                <h1>URE 2026 — Interactive Maps</h1>
+            </header>
+
+            <main>
+                <h2 class="category">Economy</h2>
+                <div class="grid">
+                    <a class="card" href="gdp-change.html">
+                        <span class="chapter">M01</span>
+                        <div class="card-title">Overall change in GDP per inhabitant</div>
+                    </a>
+                </div>
+
+                <h2 class="category">Labour market and living conditions</h2>
+                <div class="grid">
+                    <a class="card" href="poverty-or-social-exclusion-rate.html">
+                        <span class="chapter">F2A</span>
+                        <div class="card-title">At risk of poverty or social exclusion rate</div>
+                    </a>
+                    <a class="card" href="poverty-rate.html">
+                        <span class="chapter">F2B</span>
+                        <div class="card-title">At risk of poverty rate</div>
+                    </a>
+                    <a class="card" href="severe-material-social-deprivation-rate.html">
+                        <span class="chapter">F2C</span>
+                        <div class="card-title">Severe material and social deprivation rate</div>
+                    </a>
+                    <a class="card" href="very-low-work-intensity.html">
+                        <span class="chapter">F2D</span>
+                        <div class="card-title">People living in households with very low work intensity</div>
+                    </a>
+                    <a class="card" href="unemployment.html">
+                        <span class="chapter">F14</span>
+                        <div class="card-title">Unemployment rate</div>
+                    </a>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>
