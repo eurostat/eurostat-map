@@ -6,12 +6,15 @@
     })
     const [lowerThreshold, upperThreshold] = config.thresholds
     const mapWidth = Math.min(Math.floor(document.documentElement.clientWidth), 700)
+    // Match the RYB report's map aspect ratio (CH11 etc.: 900/1080) so maps from both
+    // reports render at the same size when placed side by side.
+    const mapHeight = Math.round(mapWidth * (900 / 1080))
 
     eurostatmap
         .map('bivariateChoropleth')
         .svgId('map')
         .width(mapWidth)
-        .height(680)
+        .height(mapHeight)
         .header(true)
         .footer(true)
         .scale(config.scale)
