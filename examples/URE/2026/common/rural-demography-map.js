@@ -53,6 +53,7 @@
             label1: 'Urban-Int.-Rural',
             label2: config.valueLegendLabel,
             axisArrows: { x: false, y: true },
+            axisArrowsBidirectional: { y: !!config.bidirectionalYAxis },
             showAxisExtremes: { x: false, y: true },
             breaks2: config.thresholds.map((value) => `${value}${config.unitText}`),
             axisExtremes: {
