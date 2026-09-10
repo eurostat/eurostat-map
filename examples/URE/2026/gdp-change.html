@@ -118,6 +118,9 @@
                     //.zoomExtent([0.1, 3])
                     .zoomButtons(true)
                     .insets('image')
+                    // Right margin matches the RYB report's convention (CH11 etc.: MAPWIDTH - insetWidth - 20).
+                    // 243 is the 'image' preset's fixed panel width (OVERSEAS_BOX_WIDTH in src/core/insets.js).
+                    .insetBoxPosition([mapWidth - 243 - 20, 10])
                     .onBuild(function (m) {
                         // The library's default view fits the full geometry bbox with ~27% padding
                         // around it (DEFAULT_FIT_ZOOM in src/core/geo/projection.js). That's too much
