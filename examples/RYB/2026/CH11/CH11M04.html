@@ -308,25 +308,27 @@
                     // This same filter function runs once for the main map AND once per inset
                     // (see AGENTS.md/comments.md - filterGeometriesFunction is forwarded to
                     // insets as-is). The overseas insets (Canarias/Guadeloupe/Martinique/Réunion)
-                    // only ever want their own single designated port (matched below by code),
+                    // only ever want their own designated port(s) (matched below by code),
                     // reprojected into that inset's own local space - not every port on the
                     // mainland map reprojected (usually nonsensically) into their tiny viewport.
                     // The two 'EUR' insets (Germany/Denmark, Belgium/Netherlands) are just
                     // zoomed-in views of the same mainland extent as the main map, so they get
                     // every port like the main map does.
                     const overseasInsetPortCodes = {
-                        IC: 'ES02ESLPA',
-                        GP: 'FR04GPPTP',
-                        MQ: 'FR04MQFDF',
-                        RE: 'FR05RELPT',
+                        IC: ['ES02ESLPA', 'ES02ESSCT'],
+                        GP: ['FR04GPPTP'],
+                        MQ: ['FR04MQFDF'],
+                        RE: ['FR05RELPT'],
                     }
                     const isOverseasInset = map?.isInset && Object.prototype.hasOwnProperty.call(overseasInsetPortCodes, map.geo_)
-                    const portsForThisMap = isOverseasInset ? freightData.filter((d) => d.code === overseasInsetPortCodes[map.geo_]) : freightData
+                    const portsForThisMap = isOverseasInset
+                        ? freightData.filter((d) => overseasInsetPortCodes[map.geo_].includes(d.code))
+                        : freightData
 
                     let centroids = geometries[1]
                     ;[...portsForThisMap].forEach((d) => {
                         let newCentroid
-                        if (d.code == 'ES02ESLPA') {
+                        if (d.code == 'ES02ESLPA' || d.code == 'ES02ESSCT') {
                             // handle canarias (inset map)
                             newCentroid = {
                                 type: 'Feature',
