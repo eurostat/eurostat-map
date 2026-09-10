@@ -4,6 +4,18 @@ body {
     font-family: Arial, sans-serif;
 }
 
+.em--bar .em-cntbn {
+    stroke: white !important;
+}
+
+.em-title {
+    font-size: 18px !important;
+}
+
+.em-subtitle {
+    font-size: 14px !important;
+}
+
 .controls {
     padding: 15px;
     display: flex;
