@@ -9,12 +9,22 @@
     // Match the RYB report's map aspect ratio (CH11 etc.: 900/1080) so maps from both
     // reports render at the same size when placed side by side.
     const mapHeight = Math.round(mapWidth * (900 / 1080))
+    // Explicit position, matching RYB's convention (see CH11M04.html/dropdown-choropleth.js)
+    // of hardcoding x/y/z rather than relying on the library's auto-fit-to-box default. x/y are
+    // exactly the auto-fit's own center point for this geometry (verified via map.position()),
+    // so this is a deterministic equivalent, not a different framing. z is tuned for mapWidth
+    // 700 (auto-fit's z there, further zoomed in ~5% - see the old onBuild comment this
+    // replaced) and scaled proportionally so narrower responsive widths keep the same
+    // geographic extent rather than zooming in as the canvas shrinks.
+    const BASE_Z_AT_700 = 7489
+    const position = { x: 4790000, y: 3420000, z: BASE_Z_AT_700 * (700 / mapWidth) }
 
     eurostatmap
         .map('bivariateChoropleth')
         .svgId('map')
         .width(mapWidth)
         .height(mapHeight)
+        .position(position)
         .header(true)
         .footer(true)
         .scale(config.scale)
@@ -77,12 +87,6 @@
         // 243 is the 'image' preset's fixed panel width (OVERSEAS_BOX_WIDTH in src/core/insets.js).
         .insetBoxPosition([mapWidth - 243 - 20, 10])
         .onBuild(function (map) {
-            const defaultPosition = map.position()
-            // Zoom factor re-tuned for the RYB-matched aspect ratio above: fitting Europe's
-            // bbox to this shorter box needs slightly less zoom-in than the old 680-height
-            // box did, or the top (Scandinavia) and bottom (Crete/Cyprus/Malta) get clipped.
-            map.position({ ...defaultPosition, z: defaultPosition.z * 1.05 })
-
             const footer = document.getElementById('em-footer-map')
             if (!footer) return
             footer.querySelector('#em-footnote-boundaries')?.remove()
