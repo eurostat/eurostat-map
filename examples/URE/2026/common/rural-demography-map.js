@@ -75,7 +75,10 @@
         .insets('image')
         .onBuild(function (map) {
             const defaultPosition = map.position()
-            map.position({ ...defaultPosition, z: defaultPosition.z * 0.9 })
+            // Zoom factor re-tuned for the RYB-matched aspect ratio above: fitting Europe's
+            // bbox to this shorter box needs slightly less zoom-in than the old 680-height
+            // box did, or the top (Scandinavia) and bottom (Crete/Cyprus/Malta) get clipped.
+            map.position({ ...defaultPosition, z: defaultPosition.z * 1.05 })
 
             const footer = document.getElementById('em-footer-map')
             if (!footer) return
