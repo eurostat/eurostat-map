@@ -279,7 +279,7 @@
                     // Malta has no dedicated port/reprojection case below, so it gets none rather
                     // than every port smeared into it.
                     const overseasInsetPortCodes = {
-                        IC: ['ES02ESLPA', 'ES0ESLPA'],
+                        IC: ['ES02ESLPA', 'ES0ESLPA', 'ES02ESSCT', 'ES0ESSCT'],
                         GP: ['FR04GPPTP', 'FR0GPPTP'],
                         MQ: ['FR04MQFDF', 'FR0MQFDF'],
                     }
@@ -294,7 +294,7 @@
                     let centroids = geometries[1]
                     ;[...portsForThisMap].forEach((d) => {
                         let newCentroid
-                        if (d.code == 'ES02ESLPA' || d.code == 'ES0ESLPA') {
+                        if (d.code == 'ES02ESLPA' || d.code == 'ES0ESLPA' || d.code == 'ES02ESSCT' || d.code == 'ES0ESSCT') {
                             // handle canarias (inset map)
                             newCentroid = {
                                 type: 'Feature',
