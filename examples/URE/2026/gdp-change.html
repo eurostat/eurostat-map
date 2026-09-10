@@ -3,11 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-            .em-title {
-                font-size: 20.5px !important;
-            }
-        </style>
+        <link rel="stylesheet" href="common/ure-common.css" />
     </head>
 
     <body>
@@ -22,7 +18,10 @@
                 })
                 const [lowerThreshold, upperThreshold] = config.thresholds
                 const clientWidth = document.documentElement.clientWidth
-                const mapSize = { width: Math.min(Math.floor(clientWidth), 700), height: 680 }
+                const mapWidth = Math.min(Math.floor(clientWidth), 700)
+                // Match the RYB report's map aspect ratio (CH11 etc.: 900/1080) so maps from both
+                // reports render at the same size when placed side by side.
+                const mapSize = { width: mapWidth, height: Math.round(mapWidth * (900 / 1080)) }
 
                 eurostatmap
                     .map('bivariateChoropleth')
@@ -123,7 +122,9 @@
                         // The library's default view fits the full geometry bbox with ~27% padding
                         // around it (DEFAULT_FIT_ZOOM in src/core/geo/projection.js). That's too much
                         // breathing room for this map, so zoom in a bit further on top of that default.
-                        const ZOOM_IN_FACTOR = 0.9 // < 1 zooms in, > 1 zooms out, relative to the auto-fit view
+                        // (1.05, not <1, because the box above is shorter than the old 680-height one -
+                        // see rural-demography-map.js for the same fix and why.)
+                        const ZOOM_IN_FACTOR = 1.05 // < 1 zooms in, > 1 zooms out, relative to the auto-fit view
                         const defaultPosition = m.position()
                         m.position({ ...defaultPosition, z: defaultPosition.z * ZOOM_IN_FACTOR })
 
