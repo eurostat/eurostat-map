@@ -7,6 +7,7 @@
   "title": "Average annual population change, 2015–24",
   "subtitle": "(by NUTS 3 regions)",
   "valueLegendLabel": "Population change",
+  "bidirectionalYAxis": true,
   "unitText": "%",
   "urbanRuralLegendLabel": "Urban-rural typology",
   "thresholds": [
