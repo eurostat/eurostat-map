@@ -100,6 +100,7 @@
         'stripe/livestock_composition.html',
         'trivariate/trivariate.html',
         'URE/2026/gdp-change.html',
+        'URE/2026/index.html',
         'URE/2026/poverty-or-social-exclusion-rate.html',
         'URE/2026/poverty-rate.html',
         'URE/2026/severe-material-social-deprivation-rate.html',
