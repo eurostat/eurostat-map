@@ -122,6 +122,7 @@ export const legend = function (map, config) {
 
     //arrows
     out.axisArrows = true // if set to true, arrows are drawn at the end of the axes
+    out.axisArrowsBidirectional = false // if set to true, arrows are drawn at both ends of the axes
     out.arrowHeight = 5
     out.arrowWidth = 5
     out.arrowPadding = 12 // padding between arrow and axis label
@@ -149,6 +150,14 @@ export const legend = function (map, config) {
 
     const hasAxisArrow = (axis) => isAxisOptionEnabled(out.axisArrows, axis)
     const hasAxisExtremes = (axis) => isAxisOptionEnabled(out.showAxisExtremes, axis)
+
+    // Opt-in flag: unlike axisArrows/showAxisExtremes, a missing axis key here means "not enabled"
+    // (not "enabled"), so { x: true } does not implicitly turn on the y axis too.
+    const isBidirectionalOptionEnabled = (option, axis) => {
+        if (option && typeof option === 'object') return option[axis] === true
+        return option === true
+    }
+    const hasBidirectionalArrow = (axis) => hasAxisArrow(axis) && isBidirectionalOptionEnabled(out.axisArrowsBidirectional, axis)
 
     //@override
     out.update = function () {
@@ -197,8 +206,8 @@ export const legend = function (map, config) {
         addCornerAnnotations()
 
         // Arrow defs
-        out.lgg
-            .append('defs')
+        const arrowDefs = out.lgg.append('defs')
+        arrowDefs
             .append('marker')
             .attr('viewBox', `0 0 ${out.arrowWidth} ${out.arrowHeight}`)
             .attr('id', 'arrowhead')
@@ -210,6 +219,21 @@ export const legend = function (map, config) {
             .attr('orient', 'auto')
             .append('path')
             .attr('d', `M 0 0 L ${out.arrowWidth} ${out.arrowHeight / 2} L 0 ${out.arrowHeight}`)
+            .attr('markerUnits', 'userSpaceOnUse')
+
+        // Reverse-facing arrowhead, used at the start of an axis when that axis is bidirectional.
+        arrowDefs
+            .append('marker')
+            .attr('viewBox', `0 0 ${out.arrowWidth} ${out.arrowHeight}`)
+            .attr('id', 'arrowhead-start')
+            .attr('class', 'em-bivariate-arrowhead')
+            .attr('refX', out.arrowWidth)
+            .attr('refY', out.arrowHeight / 2)
+            .attr('markerWidth', out.arrowWidth)
+            .attr('markerHeight', out.arrowHeight)
+            .attr('orient', 'auto')
+            .append('path')
+            .attr('d', `M ${out.arrowWidth} 0 L 0 ${out.arrowHeight / 2} L ${out.arrowWidth} ${out.arrowHeight}`)
             .attr('markerUnits', 'userSpaceOnUse')
 
         // 'No data' legend box
@@ -871,6 +895,7 @@ export const legend = function (map, config) {
                         [spans.xEnd, out._xAxisArrowY],
                     ])
                 )
+                .attr('marker-start', hasBidirectionalArrow('x') ? 'url(#arrowhead-start)' : null)
                 .attr('marker-end', 'url(#arrowhead)')
         }
 
@@ -886,6 +911,7 @@ export const legend = function (map, config) {
                         [out._yAxisArrowX, spans.yEnd],
                     ])
                 )
+                .attr('marker-start', hasBidirectionalArrow('y') ? 'url(#arrowhead-start)' : null)
                 .attr('marker-end', 'url(#arrowhead)')
         }
     }
@@ -900,14 +926,16 @@ export const legend = function (map, config) {
         const xLowBBox = xLowNode && typeof xLowNode.getBBox === 'function' ? xLowNode.getBBox() : null
         const xHighBBox = xHighNode && typeof xHighNode.getBBox === 'function' ? xHighNode.getBBox() : null
 
+        const bidirX = hasBidirectionalArrow('x')
         let xStart = initialX
         let xEnd = initialX + out.squareSize
         if (hasAxisExtremes('x') && xLowBBox && xHighBBox) {
-            xStart = Math.max(initialX, xLowBBox.x + xLowBBox.width + labelGap)
+            xStart = Math.max(initialX, xLowBBox.x + xLowBBox.width + labelGap + (bidirX ? arrowTipClearance : 0))
             xEnd = Math.min(initialX + out.squareSize, xHighBBox.x - labelGap - arrowTipClearance)
         } else if (!hasAxisExtremes('x')) {
             // Keep arrowhead inside axis extent when endpoint labels are hidden.
-            xEnd = Math.max(initialX, initialX + out.squareSize - arrowTipClearance)
+            xStart = bidirX ? initialX + arrowTipClearance : initialX
+            xEnd = Math.max(xStart, initialX + out.squareSize - arrowTipClearance)
         }
         if (xEnd <= xStart) {
             xStart = initialX
@@ -919,14 +947,16 @@ export const legend = function (map, config) {
         const yLowBBox = yLowNode && typeof yLowNode.getBBox === 'function' ? yLowNode.getBBox() : null
         const yHighBBox = yHighNode && typeof yHighNode.getBBox === 'function' ? yHighNode.getBBox() : null
 
+        const bidirY = hasBidirectionalArrow('y')
         let yStart = out.squareSize
         let yEnd = 0
         if (hasAxisExtremes('y') && yLowBBox && yHighBBox) {
-            yStart = Math.min(out.squareSize, yLowBBox.y - labelGap)
+            yStart = Math.min(out.squareSize, yLowBBox.y - labelGap - (bidirY ? arrowTipClearance : 0))
             yEnd = Math.max(0, yHighBBox.y + yHighBBox.height + labelGap + arrowTipClearance)
         } else if (!hasAxisExtremes('y')) {
             // Keep arrowhead inside axis extent when endpoint labels are hidden.
-            yEnd = Math.min(out.squareSize, arrowTipClearance)
+            yStart = bidirY ? Math.max(0, out.squareSize - arrowTipClearance) : out.squareSize
+            yEnd = Math.min(yStart, arrowTipClearance)
         }
         if (yStart <= yEnd) {
             yStart = out.squareSize
