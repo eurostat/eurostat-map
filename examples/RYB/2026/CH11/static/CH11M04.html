@@ -293,18 +293,20 @@
                     // zoomed-in views of the same mainland extent as the main map, so they get
                     // every port like the main map does.
                     const overseasInsetPortCodes = {
-                        IC: 'ES02ESLPA',
-                        GP: 'FR04GPPTP',
-                        MQ: 'FR04MQFDF',
-                        RE: 'FR05RELPT',
+                        IC: ['ES02ESLPA', 'ES0ESLPA', 'ES02ESSCT'],
+                        GP: ['FR04GPPTP', 'FR0GPPTP'],
+                        MQ: ['FR04MQFDF', 'FR0MQFDF'],
+                        RE: ['FR05RELPT'],
                     }
                     const isOverseasInset = map?.isInset && Object.prototype.hasOwnProperty.call(overseasInsetPortCodes, map.geo_)
-                    const portsForThisMap = isOverseasInset ? freightData.filter((d) => d.code === overseasInsetPortCodes[map.geo_]) : freightData
+                    const portsForThisMap = isOverseasInset
+                        ? freightData.filter((d) => overseasInsetPortCodes[map.geo_].includes(d.code))
+                        : freightData
 
                     let centroids = geometries[1]
                     ;[...portsForThisMap].forEach((d) => {
                         let newCentroid
-                        if (d.code == 'ES02ESLPA') {
+                        if (d.code == 'ES02ESLPA' || d.code == 'ES0ESLPA' || d.code == 'ES02ESSCT') {
                             // handle canarias (inset map)
                             newCentroid = {
                                 type: 'Feature',
