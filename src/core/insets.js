@@ -599,8 +599,6 @@ const overseasInsetConfig = function () {
             position: { x: 420000, y: 3150000, z: 6800 },
             scalebarPosition: [1, 55],
             showScalebar: true,
-            scalebarMaxWidth: 30,
-            scalebarUnits: ' km',
         },
         {
             geo: 'GP',
