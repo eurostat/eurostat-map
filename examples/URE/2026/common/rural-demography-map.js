@@ -50,7 +50,7 @@
             },
         })
         .legend({
-            label1: 'Urban-rural',
+            label1: 'Urban-Int.-Rural',
             label2: config.valueLegendLabel,
             axisArrows: { x: false, y: true },
             showAxisExtremes: { x: false, y: true },
@@ -62,6 +62,7 @@
             x: 60,
             y: 120,
             squareSize: 100,
+            noData: false,
             noDataPadding: 0,
             noDataShapeHeight: 16,
             noDataShapeWidth: 16,

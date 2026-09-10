@@ -14,8 +14,8 @@
     0.0
   ],
   "valueClassLabels": [
-    "Falling quickly",
-    "Falling slowly",
+    "Falling",
+    "Stable",
     "Rising"
   ],
   "urbanRuralLabels": {
