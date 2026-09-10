@@ -169,6 +169,12 @@ Because script execution can be disabled in certain PowerShell environments, alw
   `examples/scripts/example-manifest.js` output synchronized; `typeForPath()` is only the
   backward-compatible primary category.
 
+## Built-in IMAGE insets
+
+- The `.insets('image')` preset renders each inset in a nested `<svg>`, unlike the RYB helper's
+  `<g>` containers. Keep `.em-insets-image .em-inset { overflow: visible; }`: compact scale bars
+  such as Svalbard's extend beyond the inset viewport and are otherwise silently clipped.
+
 ## Keep this file current for the next agent
 
 Different agents and sessions (potentially different providers entirely) work in this repo over
