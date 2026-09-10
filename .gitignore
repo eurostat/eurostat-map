@@ -11,3 +11,4 @@ input/
 .agents
 .claude
 *.xlsx
+__pycache__/

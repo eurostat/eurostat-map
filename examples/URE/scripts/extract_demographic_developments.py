@@ -26,6 +26,10 @@ LEGEND_LABELS = {
     "M05": "Net migration",
 }
 
+VALUE_CLASS_LABELS = {
+    "M04": ["Falling", "Stable", "Rising"],
+}
+
 # The workbook's 3 x 3 legend uses red for predominantly urban, ochre for
 # intermediate, and green for predominantly rural regions. Within each hue,
 # dark/medium/light represent the three ordered value classes.
@@ -105,6 +109,7 @@ def extract_sheet(ws):
 
     value_class_labels = [clean_text(ws.cell(row, 12).value) for row in range(17, 14, -1)]
     value_class_labels = [re.split(r"\s+\(", label, maxsplit=1)[0] for label in value_class_labels]
+    value_class_labels = VALUE_CLASS_LABELS.get(ws.title, value_class_labels)
 
     return {
         "sheet": ws.title,
