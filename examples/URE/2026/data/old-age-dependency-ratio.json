@@ -7,7 +7,6 @@
   "title": "Old-age dependency ratio, 1 January 2025",
   "subtitle": "(by NUTS 3 regions)",
   "valueLegendLabel": "Old-age dependency ratio",
-  "bidirectionalYAxis": true,
   "unitText": "%",
   "urbanRuralLegendLabel": "Urban-rural typology",
   "thresholds": [
