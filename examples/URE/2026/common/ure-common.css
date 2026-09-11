@@ -4,8 +4,16 @@ body {
     font-family: Arial, sans-serif;
 }
 
-.em--bar .em-cntbn {
+.em-cntbn {
     stroke: white !important;
+}
+.em-cntbn-halo {
+    stroke-width: 1.1px !important;
+}
+.em-kosovo-bn {
+    stroke: white !important;
+    stroke-width: 0.7px !important;
+    opacity: 1 !important;
 }
 
 .em-title {

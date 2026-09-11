@@ -28,9 +28,11 @@
                 stroke: grey;
                 stroke-width: 1px !important;
             }
-            .em-cntbn,
+            .em-cntbn {
+                opacity: 0.4 !important;
+            }
             .em-kosovo-bn {
-                opacity: 0.4;
+                opacity: 0.3 !important;
             }
             g.em-annotation-be-nl .connector {
                 transform: translate(-20px, -13px);
@@ -176,6 +178,7 @@
                         position: { z: 6400 },
                         width: insetWidth,
                         height: insetHeight,
+                        titlePosition: [4, 14],
                     },
                     {
                         title: 'Guadeloupe (FR)',
@@ -197,25 +200,27 @@
                         position: { z: 1000 },
                         width: insetWidth,
                         height: insetHeight,
+                        titlePosition: [4, 14],
                     },
-                    // {
-                    //     title: 'Reunion (FR)',
-                    //     geo: 'RE',
-                    //     x: 0,
-                    //     y: insetHeight * 3 + padding * 3,
-                    //     position: { x: 348011, y: 7661627, z: 2000 },
-                    //     width: insetWidth,
-                    //     height: insetHeight,
-                    // },
                     {
-                        geo: 'MT',
+                        title: 'Reunion (FR)',
+                        geo: 'RE',
                         x: 0,
                         y: insetHeight * 3 + padding * 3,
-                        scale: '01M',
-                        position: { x: 4721000, y: 1449000, z: 500 },
-                        title: 'Malta',
+                        position: { x: 348011, y: 7661627, z: 2000 },
                         width: insetWidth,
                         height: insetHeight,
+                        titlePosition: [4, 14],
+                    },
+                    {
+                        title: 'Malta',
+                        geo: 'MT',
+                        x: 0,
+                        y: insetHeight * 4 + padding * 4,
+                        position: { x: 4720000, y: 1450000, z: 1000 },
+                        width: insetWidth,
+                        height: insetHeight,
+                        titlePosition: [4, 14],
                     },
                 ])
                 .onBuild(() => {
@@ -243,7 +248,7 @@
                         .attr('y', MAPHEIGHT + 96)
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
-                        .html('Cartography: Eurostat – GISCO, 06/2026')
+                        .html('Cartography: Eurostat – GISCO, 09/2026')
                 })
                 .filterGeometriesFunction((geometries, map) => {
                     //remove greenland to stop title overlap
