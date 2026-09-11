@@ -2,7 +2,7 @@ import { getApproxCurrentGeoBbox, getBBOXAsGeoJSON, getParameterByName } from '.
 import { geoIdentity, geoPath } from 'd3-geo'
 import { geoRobinson } from 'd3-geo-projection'
 
-const DEFAULT_FIT_ZOOM = 1.27
+export const DEFAULT_FIT_ZOOM = 1.27
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -105,7 +105,7 @@ const getPixelSizeToFitBbox = function (map, center) {
     const requiredWidth = 2 * Math.max(Math.abs(cx - minX), Math.abs(maxX - cx))
     const requiredHeight = 2 * Math.max(Math.abs(cy - minY), Math.abs(maxY - cy))
 
-    return Math.max(requiredWidth / map.width_, requiredHeight / map.height_) / DEFAULT_FIT_ZOOM
+    return Math.max(requiredWidth / map.width_, requiredHeight / map.height_) / (map.defaultFitZoom_ ?? DEFAULT_FIT_ZOOM)
 }
 
 /** Get x,y,z elements from URL and assign them to the view. */
