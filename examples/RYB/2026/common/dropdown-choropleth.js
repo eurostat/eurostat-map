@@ -94,7 +94,7 @@
             .attr('text-anchor', 'end')
             .attr('class', 'em-footnote')
             .attr('id', 'em-footnote-3')
-            .html('Cartography: Eurostat – GISCO, 06/2026')
+            .html('Cartography: Eurostat – GISCO, 09/2026')
     }
 
     async function init(config) {
