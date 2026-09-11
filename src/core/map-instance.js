@@ -20,7 +20,7 @@ import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/
 import { addScalebarToMap, getDefaultScalebarConfig, mergeScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
 import { createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
-import { defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
+import { DEFAULT_FIT_ZOOM, defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
 import { addCentroidsToMap } from './geo/centroids'
 
 //types
@@ -55,6 +55,10 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.proj_ = '3035'
     out.projectionFunction_ = undefined // e.g. d3.geoRobinson()
     out.filterGeometriesFunction_ = undefined // user defined filter function
+    // Divides the exact bbox-fit pixel size when z is not set explicitly, so the default
+    // view is zoomed in a bit tighter than an exact fit (which tends to look too zoomed out).
+    // Higher = more zoomed in by default; 1 = exact fit.
+    out.defaultFitZoom_ = DEFAULT_FIT_ZOOM
     out.scale_ = '20M' //TODO choose automatically?
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
     out.placenames_ = false // load placenames from placenames.js
