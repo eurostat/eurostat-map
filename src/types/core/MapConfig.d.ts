@@ -130,6 +130,14 @@ export interface MapConfig {
     /** Zoom and pan settings. */
     zoomExtent?: [number, number]
 
+    /**
+     * Divides the exact bbox-fit pixel size used when position().z is left unset, so the
+     * default view is zoomed in tighter than an exact fit (which tends to look too zoomed
+     * out). Higher = more zoomed in by default; 1 = exact fit.
+     * @default 1.27
+     */
+    defaultFitZoom?: number
+
     /** D3 zoom translate extent (pan boundaries), as [[x0, y0], [x1, y1]]. */
     translateExtent?: [[number, number], [number, number]]
 

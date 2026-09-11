@@ -186,6 +186,7 @@ const advancedConfig: ChoroplethConfig = {
     ],
 
     zoomExtent: [1, 10],
+    defaultFitZoom: 1.5,
     zoomButtons: true,
 
     drawCoastalMargin: true,
