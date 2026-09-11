@@ -13,7 +13,7 @@ body {
 .em-kosovo-bn {
     stroke: white !important;
     stroke-width: 0.7px !important;
-    opacity: 1 !important;
+    opacity: 0.8 !important;
 }
 
 .em-title {
@@ -27,16 +27,16 @@ body {
 /* Matches RYB's CH11M04.html/CH11M05.html custom inset styling (border + drop-shadow) - without
    it the 'image' preset's white panel has no border of its own and blends into the page instead
    of reading as a positioned box in the corner, even though its margins already match RYB's. */
-.em-insets-background {
+/* .em-insets-background {
     stroke: grey;
     stroke-width: 1px;
-}
+} */
 .em-insets-image {
     filter: drop-shadow(0.7px 0.7px 0.7px rgba(0, 0, 0, 0.5));
 }
 
 .controls {
-    padding: 15px;
+    padding: 10px 0px 0px 5px;
     display: flex;
     gap: 20px;
     align-items: center;
