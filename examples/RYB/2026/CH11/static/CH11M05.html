@@ -63,8 +63,8 @@
         </div>
         <svg id="map"></svg>
         <script src="../../vendor/eurostatmap.min.js"></script>
-        <script src="https://unpkg.com/d3@7"></script>
-        <script src="https://unpkg.com/proj4"></script>
+        <script src="../../vendor/d3.v7.min.js"></script>
+        <script src="../../vendor/proj4.js"></script>
         <script src="./exportAnnotations.js"></script>
 
         <script type="module">
@@ -127,7 +127,7 @@
                 .footer(true)
                 .header(true)
                 .footnote(
-                    'Note: the map shows data for ports with at least 100 000 passengers embarked and disembarked. Top 10 EU ports labelled. <br> Source: Eurostat (online data code: mar_pa_aa)'
+                    'Note: the map shows data for ports with at least 100 000 passengers embarked and disembarked. <br> Source: Eurostat (online data code: mar_pa_aa)'
                 )
                 .width(MAPWIDTH)
                 .height(MAPHEIGHT)

@@ -70,8 +70,8 @@
         </div>
         <svg id="map"></svg>
         <script src="../../vendor/eurostatmap.min.js"></script>
-        <script src="https://unpkg.com/d3@7"></script>
-        <script src="https://unpkg.com/proj4"></script>
+        <script src="../../vendor/d3.v7.min.js"></script>
+        <script src="../../vendor/proj4.js"></script>
         <script src="./exportAnnotations.js"></script>
 
         <script type="module">
@@ -214,7 +214,7 @@
                 ])
                 .footer(true)
                 .footnote(
-                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). Top 10 EU ports labelled. <br>Source: Eurostat (online data code: mar_go_aa)'
+                    'Note: the map shows data for ports with at least 2.0 million tonnes of freight handled (inward and outward combined). <br>Source: Eurostat (online data code: mar_go_aa)'
                 )
                 .onBuild(() => {
                     const portKeys = freightData.map((d) => d.code)
