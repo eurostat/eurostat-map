@@ -216,6 +216,16 @@
                         height: insetHeight,
                         titlePosition: [4, 14],
                     },
+                    {
+                        title: 'Malta',
+                        geo: 'MT',
+                        x: 0,
+                        y: insetHeight * 4 + padding * 4,
+                        position: { x: 4720000, y: 1450000, z: 1000 },
+                        width: insetWidth,
+                        height: insetHeight,
+                        titlePosition: [4, 14],
+                    },
                 ])
                 .footer(true)
                 .footnoteWrap(90)
@@ -264,17 +274,19 @@
                         .attr('text-anchor', 'end')
                         .attr('class', 'em-footnote')
                         .attr('id', 'em-footnote-2')
-                        .html('Cartography: Eurostat – GISCO, 06/2026')
+                        .html('Cartography: Eurostat – GISCO, 09/2026')
 
                     //createTopCountriesOverlay("#map", sums, rankingX, rankingY);
 
                     //move annotations to below centroids
                     const svgEl = document.querySelector('#map')
                     if (svgEl) {
-                        const centroidsGroup = svgEl.querySelector('#em-centroids-map')
+                        // Main map's centroids now live inside its .em-layer group (not at
+                        // #em-centroids-map) since the layer migration, so select by class instead.
+                        const centroidsGroup = svgEl.querySelector('.em-layer .em-centroids')
                         const annotationsGroup = svgEl.querySelector('#em-annotations')
                         if (centroidsGroup && annotationsGroup) {
-                            centroidsGroup.parentNode.insertBefore(centroidsGroup, annotationsGroup.nextSibling)
+                            annotationsGroup.parentNode.insertBefore(centroidsGroup, annotationsGroup.nextSibling)
                         }
                     }
 
