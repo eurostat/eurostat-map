@@ -278,6 +278,7 @@
                         IC: ['ES02ESLPA', 'ES0ESLPA', 'ES0ESSCT'],
                         GP: ['FR04GPPTP', 'FR0GPPTP'],
                         MQ: ['FR04MQFDF', 'FR0MQFDF'],
+                        MT: ['MT0MTMLA', 'MT0MTCKW', 'MT0MTMGZ'],
                     }
                     const isOverseasInset = map?.isInset && Object.prototype.hasOwnProperty.call(overseasInsetPortCodes, map.geo_)
                     const isUnmappedInset = map?.isInset && !isOverseasInset && map.geo_ !== 'EUR'
@@ -335,6 +336,19 @@
                                 type: 'Feature',
                                 geometry: {
                                     coordinates: to32740([d.lon, d.lat]), // RE_32740 fixed position in inset
+                                    type: 'Point',
+                                },
+                                properties: {
+                                    centroid: undefined,
+                                    id: d.code,
+                                    na: d.name,
+                                },
+                            }
+                        } else if (d.code == 'MT0MTMLA' || d.code == 'MT0MTCKW' || d.code == 'MT0MTMGZ') {
+                            newCentroid = {
+                                type: 'Feature',
+                                geometry: {
+                                    coordinates: to3035([d.lon, d.lat]), // MT_3035 fixed position in inset
                                     type: 'Point',
                                 },
                                 properties: {

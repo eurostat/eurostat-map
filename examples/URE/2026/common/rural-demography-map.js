@@ -85,7 +85,7 @@
         .insets('image')
         // Right margin matches the RYB report's convention (CH11 etc.: MAPWIDTH - insetWidth - 20).
         // 243 is the 'image' preset's fixed panel width (OVERSEAS_BOX_WIDTH in src/core/insets.js).
-        .insetBoxPosition([mapWidth - 243 - 20, 10])
+        .insetBoxPosition([mapWidth - 250, 5])
         .onBuild(function (map) {
             const footer = document.getElementById('em-footer-map')
             if (!footer) return
