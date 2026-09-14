@@ -44,6 +44,9 @@
             .calabria .annotation-note-title {
                 transform: translate(-3px, -1px);
             }
+            .em-mushroom-size-legend > g:nth-of-type(2) .em-legend-label {
+                transform: translate(0px, 5px) !important;
+            }
         </style>
     </head>
 
@@ -157,8 +160,8 @@
                     y: Math.round(220 * RESIZE_SCALE),
                     sizeLegend: {
                         title: 'Number of passengers',
-                        values: [6000000, 100000],
-                        labels: ['6 million', '100 thousand'],
+                        values: [6000000, 1000000],
+                        labels: ['6 million', '1 million'],
                     },
                     colorLegend: { title: 'Passenger movements', marginTop: 20, titlePadding: -5 },
                 })
