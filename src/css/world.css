@@ -24,7 +24,7 @@
 .em-bn-d {
     /* disputed */
     stroke: #818181;
-    stroke-width: 0.1px;
+    stroke-width: 0.3px;
     opacity: 0.9;
     fill: none;
     stroke-dasharray: 1 1;
@@ -37,7 +37,5 @@
 }
 /* world boundary halo (not coastline, disputed) */
 .em-worldbn-halo:not(.em-bn-co) .em-bn-d {
-    stroke: rgba(141, 141, 141, 0.3);
-    stroke-width: 1px;
-    stroke-dasharray: 1 1;
+    stroke-width: 0px;
 }
