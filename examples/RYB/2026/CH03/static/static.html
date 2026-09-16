@@ -104,6 +104,10 @@
             .small-multiples .em-nutsrg path {
                 stroke-width: 0px !important;
             }
+            /* Match CH13M02's country boundary color (default is dark #353535). */
+            .em-cntbn {
+                stroke: white !important;
+            }
         </style>
         <div>
             <button id="export-png-btn" type="button">Download map as PNG</button>
@@ -212,6 +216,7 @@
             const map = eurostatmap
                 .map('trivariateChoropleth')
                 .hoverColor('#FFCC00')
+                .noDataFillStyle('#bcbcbc')
                 .insets(insetsCfg)
                 .containerId('container')
                 .footer(true)

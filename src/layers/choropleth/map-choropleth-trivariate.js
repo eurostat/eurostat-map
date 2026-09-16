@@ -124,7 +124,15 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
         const seenIds = new Set()
 
         allMaps.forEach((map) => {
-            const features = flattenRegionFeatures(map.Geometries.getRegionFeatures())
+            const regionFeatures = flattenRegionFeatures(map.Geometries.getRegionFeatures())
+            // For nutsLevel 'mixed', getRegionFeatures() only returns the mixed NUTS 0-3 levels -
+            // it excludes the raw cntrg (background country) layer, even though those regions are
+            // still rendered and styled (see getRegionsSelector, which always includes #em-cntrg
+            // path). Without this, background-only countries with no NUTS0-equivalent entry (e.g.
+            // Moldova, Georgia) never get classified and always fall back to the CSS background
+            // fill, no matter what their stat value is.
+            const cntrgFeatures = map.Geometries.geoJSONs?.cntrg || []
+            const features = regionFeatures.concat(cntrgFeatures)
             if (!features || features.length === 0) return
             features.forEach((f) => {
                 const id = f?.properties?.id
