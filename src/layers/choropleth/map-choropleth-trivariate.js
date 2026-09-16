@@ -27,7 +27,7 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
 
     out.ternaryCodes_ = ['v1', 'v2', 'v3']
 
-    out.noDataFillStyle_ = '#ccc'
+    out.noDataFillStyle_ = '#ADADAD'
 
     // tricolore parameters
     out.ternarySettings_ = {

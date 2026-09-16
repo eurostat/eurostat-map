@@ -215,7 +215,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
 
     //style for no data regions
-    out.noDataFillStyle_ = '#bcbcbc'
+    out.noDataFillStyle_ = '#ADADAD'
 
     /**
      * Insets.
