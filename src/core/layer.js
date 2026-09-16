@@ -255,7 +255,7 @@ export const createLayer = function (map, config = {}) {
     layer.legend_ = config.legend
     layer.legendObj_ = undefined
     layer.tooltip_ = config.tooltip || {}
-    layer.noDataFillStyle_ = config.noDataFillStyle || map.noDataFillStyle_ || '#bcbcbc'
+    layer.noDataFillStyle_ = config.noDataFillStyle || map.noDataFillStyle_ || '#ADADAD'
 
     // Abstract render methods — the type's decorate() overrides these in Phase 3+.
     layer.updateClassification = function () {
