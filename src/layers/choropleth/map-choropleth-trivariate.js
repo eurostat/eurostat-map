@@ -101,6 +101,7 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
         out._ternaryData_ = []
         out._ternaryColorById_ = new Map()
         out._ternaryClassById_ = new Map()
+        out._ternaryNoDataIds_ = new Set()
         out._ternaryCenter_ = null
 
         const flattenRegionFeatures = (features) => {
@@ -130,11 +131,18 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
                 if (!id) return
                 if (seenIds.has(id)) return
                 seenIds.add(id)
-                const v1 = +statData1.get(id)?.value
-                const v2 = +statData2.get(id)?.value
-                const v3 = +statData3.get(id)?.value
+                const sv1 = statData1.get(id)
+                const sv2 = statData2.get(id)
+                const sv3 = statData3.get(id)
+                const v1 = +sv1?.value
+                const v2 = +sv2?.value
+                const v3 = +sv3?.value
                 if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
                     filtered.push({ id, values: [v1, v2, v3] })
+                } else if (sv1 || sv2 || sv3) {
+                    // region is part of the dataset (e.g. value ':') but has no usable composition -
+                    // flag it explicitly so it's styled as "no data" rather than left as background
+                    out._ternaryNoDataIds_.add(id)
                 }
             })
         })
@@ -170,6 +178,7 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => {
                 inset._ternaryColorById_ = out._ternaryColorById_
                 inset._ternaryClassById_ = out._ternaryClassById_
+                inset._ternaryNoDataIds_ = out._ternaryNoDataIds_
                 inset._ternaryCenter_ = out._ternaryCenter_
                 inset._ternaryData_ = out._ternaryData_
             })
@@ -190,17 +199,6 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
         return out
     }
 
-    function regionsFillFunction(rg) {
-        const id = rg.properties.id
-        const c = out._ternaryColorById_.get(id)
-        const cls = out._ternaryClassById_.get(id)
-
-        const sel = select(this)
-        sel.attr('ecl', cls ?? null)
-
-        return c ?? map.noDataFillStyle_
-    }
-
     function styleRegions(map) {
         if (!map.svg() || !map._ternaryColorById_) return
 
@@ -213,7 +211,11 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
             const c = map._ternaryColorById_.get(id)
             const cls = map._ternaryClassById_.get(id)
             select(this).attr('ecl', cls ?? null)
-            return c ?? out.noDataFillStyle_
+            if (c != null) return c
+            // explicit no-data (e.g. value ':') gets the no-data fill; regions that aren't
+            // part of the dataset at all are left unstyled so the CSS background fill shows
+            if (map._ternaryNoDataIds_?.has(id)) return out.noDataFillStyle_
+            return null
         }
 
         regions
