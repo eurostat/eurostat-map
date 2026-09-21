@@ -79,6 +79,7 @@ body {
 
 label {
     font-weight: bold;
+    color: #4c4b4b;
 }
 
 select {
@@ -86,51 +87,52 @@ select {
     font-size: 14px;
     border-radius: 4px;
     border: 1px solid #ccc;
+    color: #4c4b4b;
 }
 
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
+/* Grid cartogram / map view switch - segmented control (two mutually exclusive radio
+   buttons styled as adjoining pill buttons), matching the map's own text colour (#4c4b4b). */
+.segmented-control {
+    display: inline-flex;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-.toggle-switch input {
+.segmented-control input[type='radio'] {
+    position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.slider {
-    position: absolute;
+.segmented-control label {
+    margin: 0;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: normal;
+    color: #4c4b4b;
+    background: #ffffff;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 24px;
+    user-select: none;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
 }
 
-.slider:before {
-    position: absolute;
-    content: '';
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
+.segmented-control label:not(:last-of-type) {
+    border-right: 1px solid #ccc;
 }
 
-input:checked + .slider {
-    background-color: #2196f3;
+.segmented-control input[type='radio']:checked + label {
+    background: #4c4b4b;
+    color: #ffffff;
+    font-weight: bold;
 }
 
-input:checked + .slider:before {
-    transform: translateX(26px);
+.segmented-control input[type='radio']:focus-visible + label {
+    outline: 2px solid #4c4b4b;
+    outline-offset: -2px;
 }
 
 .em-grid-cell rect {
