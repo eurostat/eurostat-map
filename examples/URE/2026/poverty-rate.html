@@ -10,11 +10,12 @@
     <body>
         <div class="controls">
             <div class="control-group">
-                <label for="cartogram-toggle">Grid cartogram</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="cartogram-toggle" checked />
-                    <span class="slider"></span>
-                </label>
+                <div class="segmented-control" role="radiogroup" aria-label="Map view">
+                    <input type="radio" name="view-mode" id="view-cartogram" checked />
+                    <label for="view-cartogram">Grid cartogram</label>
+                    <input type="radio" name="view-mode" id="view-map" />
+                    <label for="view-map">Map</label>
+                </div>
             </div>
         </div>
 
@@ -229,8 +230,11 @@
 
             buildMap(true)
 
-            document.getElementById('cartogram-toggle').addEventListener('change', function (e) {
-                buildMap(e.target.checked)
+            document.getElementById('view-cartogram').addEventListener('change', function () {
+                buildMap(true)
+            })
+            document.getElementById('view-map').addEventListener('change', function () {
+                buildMap(false)
             })
         </script>
     </body>
