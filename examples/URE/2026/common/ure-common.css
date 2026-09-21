@@ -45,11 +45,11 @@ body {
 }
 
 .em-title {
-    font-size: 18px !important;
+    font-size: 19px !important;
 }
 
 .em-subtitle {
-    font-size: 14px !important;
+    font-size: 16px !important;
 }
 
 /* Matches RYB's CH11M04.html/CH11M05.html custom inset styling (border + drop-shadow) - without
