@@ -48,6 +48,9 @@ export interface BivariateLegendConfig extends LegendConfig {
     /** Whether to show arrows at the end of both axes, or for each axis independently. @default true */
     axisArrows?: boolean | { x?: boolean; y?: boolean }
 
+    /** Whether axis arrows are bidirectional (arrowhead at both ends), for both axes or each axis independently. Has no effect on an axis where `axisArrows` is disabled. @default false */
+    axisArrowsBidirectional?: boolean | { x?: boolean; y?: boolean }
+
     /** Height of axis arrows in pixels. @default 5 */
     arrowHeight?: number
 
