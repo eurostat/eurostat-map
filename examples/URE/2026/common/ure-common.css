@@ -137,3 +137,21 @@ input:checked + .slider:before {
     stroke: #999 !important;
     stroke-width: 0 !important;
 }
+
+/* Degurba tooltip breakdown table (poverty/deprivation/unemployment/work-intensity maps) -
+   feint row and column borders. */
+.em-degurba-tooltip-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.em-degurba-tooltip-table td {
+    padding: 4px 8px;
+    border: 1px solid #eee;
+    font-size: 15px;
+}
+
+.em-degurba-tooltip-table td:last-child {
+    text-align: right;
+    font-weight: 500;
+}
