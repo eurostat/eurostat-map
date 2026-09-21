@@ -86,6 +86,16 @@ export interface MapInstance {
     position(): { x: number; y: number; z: number }
 
     /**
+     * Divides the exact bbox-fit pixel size used when position().z is left unset, so the
+     * default view is zoomed in tighter than an exact fit (which tends to look too zoomed
+     * out). Higher = more zoomed in by default; 1 = exact fit.
+     * @default 1.27
+     * @example map.defaultFitZoom(1.5)
+     */
+    defaultFitZoom(): number
+    defaultFitZoom(factor: number): this
+
+    /**
      * Custom D3 projection function. When set, also call proj('4326').
      * @example map.projectionFunction(d3.geoAzimuthalEquidistant().rotate([-10, -52]))
      */

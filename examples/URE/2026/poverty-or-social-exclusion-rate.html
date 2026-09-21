@@ -160,6 +160,34 @@
                             DEG3: 'Rural areas',
                         },
                     })
+                    .tooltip({
+                        textFunction(rg, map) {
+                            const regionName = rg.properties.na || rg.properties.name
+                            const regionId = rg.properties.id
+                            const values = data[regionId] || {}
+                            const categories = [
+                                { code: 'DEG1', label: 'Cities', color: '#E04040' },
+                                { code: 'DEG2', label: 'Towns and suburbs', color: '#8F741A' },
+                                { code: 'DEG3', label: 'Rural areas', color: '#33A033' },
+                            ]
+
+                            let html = `<div class="em-tooltip-bar">${regionName}${regionId ? ` (${regionId})` : ''}</div>`
+                            html += '<div class="em-tooltip-breakdown">'
+                            categories.forEach((cat) => {
+                                const value = values[cat.code]
+                                const isMissing = value === undefined || value === null || value === ':' || Number.isNaN(+value)
+                                const valueText = isMissing ? map.noDataText_ : `${Number(value).toFixed(1)}${config.unitText}`
+                                html += `
+                                    <div class="em-breakdown-item">
+                                        <span class="em-breakdown-color" style="background:${cat.color}"></span>
+                                        <span class="em-breakdown-label">${cat.label}</span>
+                                        <span class="em-breakdown-value">${valueText}</span>
+                                    </div>`
+                            })
+                            html += '</div>'
+                            return html
+                        },
+                    })
                     .barSettings({
                         groupMaxHeight: GROUP_MAX_HEIGHT,
                         showCategoryLabels: false,
