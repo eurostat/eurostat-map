@@ -107,5 +107,5 @@ input:checked + .slider:before {
 
 .em-grid-cell rect {
     stroke: #999 !important;
-    stroke-width: 0 !important;
+    stroke-width: 0.75px !important;
 }
