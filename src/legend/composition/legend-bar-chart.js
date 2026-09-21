@@ -337,6 +337,14 @@ export const legend = function (map, config) {
             .attr('stroke', '#aaa')
             .attr('stroke-width', 0.8)
 
+        // Labels are only staggered onto multiple rows to dodge overlap - if the bar spacing
+        // already gives each label enough horizontal room (estimated from character count, same
+        // ~6.5px/char heuristic used for the map's own bar-badge labels), keep them all on one row.
+        const formattedLabels = sortedValues.map((val) => formatSizeLabel(val, legend.sizeLegend?.labelFormatter ?? dec))
+        const maxLabelWidth = Math.max(...formattedLabels.map((t) => String(t).length * 6.5))
+        const labelSpacing = 14
+        const needsStagger = bw + gap < maxLabelWidth + 6
+
         sortedValues.forEach((val, i) => {
             const minHeight = legend.map?.barSettings_?.groupMinHeight ?? 0
             const barH = Math.max(val > 0 ? minHeight : 0, classifierSize(val))
@@ -356,9 +364,7 @@ export const legend = function (map, config) {
                 .attr('stroke', legend.map?.barSettings_?.strokeFill || 'white')
                 .attr('stroke-width', (legend.map?.barSettings_?.strokeWidth ?? 0.3) + 'px')
 
-            // Staggered value label centered below baseline to prevent overlap
-            const labelSpacing = 14
-            const labelY = baseline + 12 + i * labelSpacing
+            const labelY = baseline + 12 + (needsStagger ? i * labelSpacing : 0)
 
             // Vertical tick line from baseline to label
             container
@@ -377,7 +383,7 @@ export const legend = function (map, config) {
                 .attr('y', labelY)
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
-                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter ?? dec))
+                .text(formattedLabels[i])
         })
     }
 
