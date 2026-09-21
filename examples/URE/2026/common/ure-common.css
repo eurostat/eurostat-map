@@ -41,7 +41,7 @@ body {
 .em-kosovo-bn {
     stroke: rgb(145, 145, 145) !important;
     stroke-width: 0.5px !important;
-    opacity: 0.3 !important;
+    opacity: 0.2 !important;
 }
 
 .em-title {
@@ -125,13 +125,13 @@ select {
 }
 
 .segmented-control input[type='radio']:checked + label {
-    background: #4c4b4b;
+    background: #0e47cb;
     color: #ffffff;
     font-weight: bold;
 }
 
 .segmented-control input[type='radio']:focus-visible + label {
-    outline: 2px solid #4c4b4b;
+    outline: 2px solid #0e47cb;
     outline-offset: -2px;
 }
 
