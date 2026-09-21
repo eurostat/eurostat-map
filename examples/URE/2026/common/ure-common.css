@@ -10,6 +10,14 @@ body {
 .em-cntbn-halo {
     stroke-width: 1.1px !important;
 }
+
+/* The bar map's dorling/geographic view has a near-white background (see
+   .em--bar .em-nutsrg / .em-cntrg in bar.css), so the white country border
+   above is invisible there - override it to a visible grey, same as the
+   default coastline stroke used elsewhere on this map. */
+.em--bar .em-cntbn {
+    stroke: grey !important;
+}
 .em-kosovo-bn {
     stroke: white !important;
     stroke-width: 0.7px !important;
