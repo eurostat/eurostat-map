@@ -7,7 +7,7 @@ body {
 .em-cntbn {
     stroke: white !important;
 }
-.em-cntbn-halo {
+.em-cntbn-halo:not(.em-bn-co) {
     stroke-width: 1.1px !important;
 }
 
@@ -17,6 +17,10 @@ body {
    default coastline stroke used elsewhere on this map. */
 .em--bar .em-cntbn {
     stroke: grey !important;
+}
+
+.em-bn-co {
+    stroke: rgb(189, 189, 189) !important;
 }
 
 /* URE bar maps only cover EU Member States + EFTA. bar.css fills every .em-nutsrg region
@@ -35,9 +39,9 @@ body {
     fill: #f2f2f2 !important;
 }
 .em-kosovo-bn {
-    stroke: white !important;
-    stroke-width: 0.7px !important;
-    opacity: 0.8 !important;
+    stroke: rgb(145, 145, 145) !important;
+    stroke-width: 0.5px !important;
+    opacity: 0.6 !important;
 }
 
 .em-title {

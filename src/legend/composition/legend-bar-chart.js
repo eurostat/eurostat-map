@@ -32,9 +32,11 @@ export const legend = function (map, config) {
         titlePadding: 10,
         offsetX: 10,
         values: null, // custom values; null → auto [min, mid, max]
+        valueCount: 3, // grouped mode only, when values is null; 2 → auto [min, max], 3 → auto [min, mid, max]
         labelFormatter: undefined,
         noData: false,
         noDataText: 'No data',
+        barGap: null, // grouped mode only; gap between example bars. null → falls back to the map's own barSettings.groupGap
     }
 
     // ── Width legend config (grouped mode + data-driven width) ─────────────
@@ -300,13 +302,17 @@ export const legend = function (map, config) {
      */
     function drawGroupedSizeLegend(legend, container, values, classifierSize, title, titlePadding, barGroupWidth, barGroupGap, catColors) {
         const domain = classifierSize.domain()
-        const legendValues = values || [domain[1], Math.round((domain[0] + domain[1]) / 2), Math.max(domain[0], domain[1] * 0.1)]
+        const autoValues =
+            legend.sizeLegend?.valueCount === 2
+                ? [domain[1], Math.max(domain[0], domain[1] * 0.1)]
+                : [domain[1], Math.round((domain[0] + domain[1]) / 2), Math.max(domain[0], domain[1] * 0.1)]
+        const legendValues = values || autoValues
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
         const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : getMaxDomainPrecision(classifierSize)
         const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         const bw = barGroupWidth ?? 16
-        const gap = barGroupGap ?? 0
+        const gap = legend.sizeLegend?.barGap ?? barGroupGap ?? 0
         const maxBarHeight = classifierSize(sortedValues[0])
         const colors = catColors ? Object.values(catColors) : ['#7f7f7f']
 
