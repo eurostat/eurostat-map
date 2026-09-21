@@ -18,6 +18,22 @@ body {
 .em--bar .em-cntbn {
     stroke: grey !important;
 }
+
+/* URE bar maps only cover EU Member States + EFTA. bar.css fills every .em-nutsrg region
+   (in-scope or not) with the same cream colour, but some candidate countries/Ukraine have a
+   NUTS0-equivalent region in the GISCO topology (unlike e.g. Russia, which only has a plain
+   .em-cntrg background entry and is already grey) - so without this they wrongly render as
+   "in scope". Force them to the same grey as .em-cntrg. */
+#em-nutsrg-AL,
+#em-nutsrg-BA,
+#em-nutsrg-ME,
+#em-nutsrg-MK,
+#em-nutsrg-RS,
+#em-nutsrg-TR,
+#em-nutsrg-UA,
+#em-nutsrg-XK {
+    fill: #f2f2f2 !important;
+}
 .em-kosovo-bn {
     stroke: white !important;
     stroke-width: 0.7px !important;
