@@ -44,11 +44,11 @@
                 ,  ,  ,  ,  ,  ,  ,LV,  ,  ,  ,  ,
                 ,IE,  ,  ,  ,DK,  ,LT,  ,  ,  ,  ,
                 ,  ,  ,  ,NL,DE,PL,  ,  ,  ,  ,  ,
-                ,  ,  ,BE,LU,CZ,SK,UA,  ,  ,  ,  ,
-                ,  ,FR,CH,LI,AT,HU,RO,MD,  ,  ,  ,
-                ,PT,ES,  ,IT,SI,HR,RS,BG,  ,  ,  ,
-                ,  ,  ,  ,  ,  ,BA,ME,MK,  ,  ,  ,
-                ,  ,  ,  ,  ,  ,  ,AL,EL,TR,GE,  ,
+                ,  ,  ,BE,LU,CZ,SK,  ,  ,  ,  ,  ,
+                ,  ,FR,CH,LI,AT,HU,RO,  ,  ,  ,  ,
+                ,PT,ES,  ,IT,SI,HR,  ,BG,  ,  ,  ,
+                ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,  ,
+                ,  ,  ,  ,  ,  ,  ,  ,EL,  ,  ,  ,
                 ,  ,  ,  ,MT,  ,  ,  ,  ,CY,  ,  ,  `
 
     function clearMapSvg(svgId) {

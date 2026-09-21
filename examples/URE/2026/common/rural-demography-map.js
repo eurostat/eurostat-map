@@ -19,6 +19,15 @@
     const BASE_Z_AT_700 = 7489
     const position = { x: 4790000, y: 3420000, z: BASE_Z_AT_700 * (700 / mapWidth) }
 
+    // URE maps only show EU members + EFTA - candidate countries and others (UK, Turkey,
+    // Ukraine, Western Balkans, Moldova, Georgia...) are dropped entirely rather than shown
+    // as no-data, since this report's scope is EU + EFTA only.
+    const EU_EFTA_COUNTRIES = new Set([
+        'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'EL', 'HU', 'IE', 'IT',
+        'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', // EU
+        'IS', 'LI', 'NO', 'CH', // EFTA
+    ])
+
     eurostatmap
         .map('bivariateChoropleth')
         .svgId('map')
@@ -27,6 +36,32 @@
         .position(position)
         .header(true)
         .footer(true)
+        .filterGeometriesFunction((results) => {
+            // nutsLevel 'mixed' fetches one topology per NUTS level (0-3); a fixed nutsLevel
+            // only populates results[0]. Either way, only results[0] carries cntrg/cntbn.
+            for (const topo of results) {
+                if (!topo || !topo.objects) continue
+                if (topo.objects.cntrg) {
+                    topo.objects.cntrg.geometries = topo.objects.cntrg.geometries.filter((g) => EU_EFTA_COUNTRIES.has(g.properties.id))
+                }
+                if (topo.objects.nutsrg) {
+                    topo.objects.nutsrg.geometries = topo.objects.nutsrg.geometries.filter((g) =>
+                        EU_EFTA_COUNTRIES.has(g.properties.id.substring(0, 2))
+                    )
+                }
+                if (topo.objects.cntbn) {
+                    topo.objects.cntbn.geometries = topo.objects.cntbn.geometries.filter(
+                        (g) => g.properties.eu === 'T' || g.properties.efta === 'T' || g.properties.co === 'T'
+                    )
+                }
+                if (topo.objects.nutsbn) {
+                    topo.objects.nutsbn.geometries = topo.objects.nutsbn.geometries.filter(
+                        (g) => g.properties.eu === 'T' || g.properties.efta === 'T' || g.properties.co === 'T'
+                    )
+                }
+            }
+            return results
+        })
         .scale(config.scale)
         .nutsLevel(config.nutsLevel)
         .nutsYear(config.nutsYear)
@@ -49,7 +84,6 @@
         })
         .tooltip({
             textFunction(region, map) {
-                if (region.properties.id === 'UK') return ' '
                 const regionName = region.properties.na || region.properties.name
                 const regionId = region.properties.id
                 const regionType = map.statData('urbanRuralType').get(regionId)
