@@ -115,6 +115,16 @@
                             .attr('id', 'em-footnote-2')
                             .html('Cartography: Eurostat – GISCO, 09/2026')
 
+                        // #newInsets is built as a sibling of #map inside #container (see
+                        // overseas.js/createInsetDOMElements), so it renders fine live, but
+                        // exportMapToSVG only clones #map's own subtree (see src/core/export.js) -
+                        // without moving it inside #map first, the insets silently vanish from the
+                        // exported SVG (and PNG, which rasterizes the same clone).
+                        const newInsets = d3.select('#newInsets')
+                        if (!newInsets.empty()) {
+                            d3.select('#map').node().appendChild(newInsets.node())
+                        }
+
                         // Make the whole map responsive: scale #container fluidly up to 700px wide
                         // instead of rendering at its fixed native size (see responsive-map.js).
                         // #map itself keeps its native MAPWIDTH/MAPHEIGHT pixel attributes - only
