@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pie chart map - CH02M03</title>
+        <link rel="stylesheet" href="../../common/styles.css" />
+        <link rel="stylesheet" href="../../common/insets/insets.css" />
+        <style>
+            .em-cntbn {
+                opacity: 0.7 !important;
+            }
+            .em-zoom-buttons {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <body style="margin: 0">
+        <div style="display: none">
+            <button id="export-png-btn" type="button">Download map as PNG</button>
+            <button id="export-svg-btn" type="button">Download map as SVG</button>
+        </div>
+        <div id="maps-wrapper">
+            <svg id="container">
+                <svg id="map"></svg>
+                <g id="newInsets"></g>
+            </svg>
+        </div>
+
+        <script src="../../vendor/eurostatmap.min.js"></script>
+        <script src="../../common/insets/overseas.js"></script>
+        <script src="../../vendor/d3.v7.min.js"></script>
+
+        <script>
+            const PIESIZE = 9
+            const MAPWIDTH = 700
+            const MAPHEIGHT = 600
+            const PIE_MIN_SIZE = 11
+            const PIE_MAX_SIZE = 11
+
+            async function loadCustomPieData() {
+                const [circulatory, cancer, respiratory, other] = await Promise.all([
+                    fetch('../data/circulatory.json').then((r) => r.json()),
+                    fetch('../data/cancer.json').then((r) => r.json()),
+                    fetch('../data/respiratory.json').then((r) => r.json()),
+                    fetch('../data/other.json').then((r) => r.json()),
+                ])
+
+                const countries = new Set([...Object.keys(circulatory), ...Object.keys(cancer), ...Object.keys(respiratory), ...Object.keys(other)])
+
+                const myData = {}
+
+                countries.forEach((country) => {
+                    myData[country] = {
+                        I: circulatory[country] ?? 0,
+                        C: cancer[country] ?? 0,
+                        J: respiratory[country] ?? 0,
+                        Other: other[country] ?? 0,
+                    }
+                })
+
+                return myData
+            }
+
+            async function initMap() {
+                const myData = await loadCustomPieData()
+                const categoryCodes = ['I', 'C', 'J', 'Other']
+                const categoryLabels = ['Circulatory system', 'Cancer (malignant neoplasms)', 'Respiratory system', 'Other']
+                const categoryColors = ['#33A033', '#2644A7', '#C05F03', '#B09120']
+
+                const insetBoxPosition = [MAPWIDTH - 250, 70]
+                const insetsCfg = createOutermostInsetsConfig()
+                createInsetDOMElements(document.getElementById('newInsets'), insetsCfg, insetBoxPosition)
+
+                const currentMap = eurostatmap
+                    .map('pie')
+                    .width(MAPWIDTH)
+                    .height(MAPHEIGHT)
+                    .title('Main causes of death')
+                    .subtitle('(% of all deaths, by NUTS 1 regions, 2023)')
+                    .header(true)
+                    .footer(true)
+                    .footnote(
+                        'Note: the most common causes of death in the EU were – diseases of the circulatory system (32.5%), cancer (malignant neoplasms; 24.2%), diseases of the respiratory system (7.8%). Source: Eurostat (online data code: hlth_cd_asdr2)'
+                    )
+                    .footnoteWrap(75)
+                    .zoomButtons(false)
+                    .showEstatLogo(true)
+                    .legend({
+                        x: 0,
+                        y: 160,
+                        boxOpacity: 0,
+                        boxFill: 'white',
+                        sizeLegend: false,
+                        colorLegend: {
+                            title: 'Cause of death',
+                        },
+                        noDataPadding: -10,
+                        noDataText: 'Data not available',
+                    })
+                    .onBuild(() => {
+                        d3.select('#map #em-footnote-2').remove()
+                        d3.select('#map')
+                            .append('text')
+                            .attr('x', MAPWIDTH - 272)
+                            .attr('y', MAPHEIGHT + 88)
+                            .attr('class', 'em-footnote')
+                            .attr('id', 'em-footnote-2')
+                            .html('Administrative boundaries: ©EuroGeographics ©OSM')
+
+                        d3.select('#map')
+                            .append('text')
+                            .attr('x', MAPWIDTH - 209)
+                            .attr('y', MAPHEIGHT + 102)
+                            .attr('class', 'em-footnote')
+                            .attr('id', 'em-footnote-2')
+                            .html('Cartography: Eurostat – GISCO, 09/2026')
+
+                        // Static (fixed-size) embed: pin #container to #map's real, fully-grown
+                        // pixel size instead of scaling it fluidly (see responsive-map.js, which
+                        // the /static versions intentionally don't use - AGENTS.md).
+                        //
+                        // Deferred: the library grows #map's height attribute to fit a wrapped
+                        // footnote in its own setTimeout(..., 20) inside recalculateLayout() (see
+                        // src/core/map-instance.js), which runs AFTER onBuild fires. Reading #map's
+                        // height synchronously here would catch it still at its pre-growth value,
+                        // clipping the footnote/credits whenever the footnote wraps to more lines
+                        // than the original MAPHEIGHT budget assumed.
+                        setTimeout(() => {
+                            const mapSvg = document.getElementById('map')
+                            const containerSvg = document.getElementById('container')
+                            const w = mapSvg.getAttribute('width')
+                            const h = mapSvg.getAttribute('height')
+                            containerSvg.setAttribute('width', w)
+                            containerSvg.setAttribute('height', h)
+                            containerSvg.setAttribute('viewBox', `0 0 ${w} ${h}`)
+                        }, 30)
+                    })
+                    .dorling(true)
+                    .dorlingSettings({ padding: 0 })
+                    .svgId('map')
+                    .insets(insetsCfg)
+                    .insetBoxPosition(insetBoxPosition)
+                    .containerId('maps-wrapper')
+                    .scale('20M')
+                    .nutsLevel('mixed')
+                    .nutsYear(2024)
+                    .statPie({
+                        customData: myData,
+                        categoryCodes,
+                        categoryLabels,
+                        categoryColors,
+                        transform: (d) => {
+                            return parseFloat(d.toFixed(1))
+                        }, // drop ridiculous amount of uneccessary decimal places they provided me with.
+                    })
+                    .compositionSettings({
+                        type: 'pie',
+                        minSize: PIE_MIN_SIZE,
+                        maxSize: PIE_MAX_SIZE,
+                        otherColor: '#EFD18C',
+                        otherText: 'Other',
+                        reverseOrder: false,
+                        stripesOrientation: 0,
+                    })
+
+                currentMap.build()
+
+                document.getElementById('export-png-btn').addEventListener('click', () => {
+                    currentMap.exportMapToPNG(MAPWIDTH, MAPHEIGHT + 120)
+                })
+
+                document.getElementById('export-svg-btn').addEventListener('click', () => {
+                    currentMap.exportMapToSVG('CH02M03')
+                })
+            }
+
+            initMap()
+        </script>
+    </body>
+</html>
