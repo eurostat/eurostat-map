@@ -37,6 +37,8 @@ export interface InsetConfig {
     zoomButtons?: boolean
     /** Custom base URL for this inset's nuts2json boundary data. */
     nuts2jsonBaseURL?: string
+    /** Custom URL for this inset's world boundaries topojson (only relevant if the inset's `geo` is 'WORLD'). */
+    worldTopojsonURL?: string
     /** Custom D3 projection function for this inset. */
     projectionFunction?: Function | boolean
 

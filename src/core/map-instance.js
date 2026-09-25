@@ -213,6 +213,11 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.nuts2jsonBaseURL_ = window.location.hostname.includes('ec.europa.eu')
         ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/nuts2json/v2/'
         : 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2'
+    //URL of the world boundaries topojson used by geo('WORLD') maps. Not part of Nuts2json (a
+    //separate, bundled eurostat-map asset), so it isn't derived from nuts2jsonBaseURL_.
+    out.worldTopojsonURL_ = window.location.hostname.includes('ec.europa.eu')
+        ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/IMAGE/WORLD_4326.json'
+        : 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
 
     //style for no data regions
     out.noDataFillStyle_ = '#ADADAD'
@@ -261,7 +266,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     }
 
     //special ones which affect also the insets
-    ;['tooltip_', 'nuts2jsonBaseURL_', 'processCentroids_', 'coastalMarginSettings_'].forEach(function (att) {
+    ;['tooltip_', 'nuts2jsonBaseURL_', 'worldTopojsonURL_', 'processCentroids_', 'coastalMarginSettings_'].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
 

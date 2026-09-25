@@ -88,6 +88,16 @@ export interface MapInstance {
     nuts2jsonBaseURL(url: string): this
 
     /**
+     * URL of the world boundaries topojson file used by `geo('WORLD')` maps. Not part of
+     * Nuts2json (a separate, bundled eurostat-map asset), so it is independent of
+     * `nuts2jsonBaseURL`. Setting this on the top-level map also propagates it to all insets.
+     * @default 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
+     * (or the ec.europa.eu asset host when running on an ec.europa.eu host)
+     */
+    worldTopojsonURL(): string
+    worldTopojsonURL(url: string): this
+
+    /**
      * Initial map viewport. x/y in projected coordinates, z is pixel size
      * (map units per screen pixel — smaller = more zoomed in).
      * @example map.position({ x: 4800000, y: 3400000, z: 6000 })

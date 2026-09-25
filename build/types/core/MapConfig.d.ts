@@ -46,6 +46,16 @@ export interface MapConfig {
      * ec.europa.eu cache when running on an ec.europa.eu host)
      */
     nuts2jsonBaseURL?: string
+
+    /**
+     * URL of the world boundaries topojson file used by `geo: 'WORLD'` maps. Not part of
+     * Nuts2json (a separate, bundled eurostat-map asset), so it is independent of
+     * `nuts2jsonBaseURL`. Applies to the top-level map and all of its insets.
+     * @default 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
+     * (or the ec.europa.eu asset host when running on an ec.europa.eu host)
+     */
+    worldTopojsonURL?: string
+
     /** Geographic center as [longitude, latitude]. */
     geoCenter?: [number, number]
 
