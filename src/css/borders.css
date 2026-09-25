@@ -13,13 +13,6 @@
     stroke: white;
 }
 
-/* kosovo */
-.em-kosovo-bn {
-    stroke: #666666;
-    stroke-width: 0.5px;
-    opacity: 0.8;
-}
-
 /* country boundaries */
 .em-cntbn {
     stroke: #353535;
@@ -34,6 +27,13 @@
     opacity: 1;
 }
 
+/* kosovo */
+.em-kosovo-bn {
+    stroke: #666666;
+    stroke-width: 0.5px;
+    opacity: 0.8;
+}
+
 /* NUTS boundaries stroke color */
 .em-bn-1,
 .em-bn-2,
@@ -44,7 +44,7 @@
     stroke: #868686;
 }
 
-/*  boundaries stroke-width */
+/*  regional and coastal boundaries stroke-width */
 .em-bn-0 {
     stroke: none;
 }
