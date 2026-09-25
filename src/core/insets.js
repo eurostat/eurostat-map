@@ -196,6 +196,8 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
         'projectionFunction_',
         'filterGeometriesFunction_',
         'processCentroids_',
+        'nuts2jsonBaseURL_',
+        'worldTopojsonURL_',
     ].forEach(function (att) {
         mt[att] = out[att]
     })

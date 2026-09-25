@@ -198,11 +198,7 @@ export const Geometries = function (map, withCenterPoints) {
                 })
             }
         } else if (map.geo_ === 'WORLD') {
-            const worldMapTopojsonURL = window.location.hostname.includes('ec.europa.eu')
-                ? 'https://ec.europa.eu/assets/estat/E/E4/gisco/IMAGE/WORLD_4326.json'
-                : 'https://raw.githubusercontent.com/eurostat/eurostat-map/master/src/assets/topojson/WORLD_4326.json'
-
-            promises.push(fetchWithCache(worldMapTopojsonURL))
+            promises.push(fetchWithCache(map.worldTopojsonURL_))
         } else {
             const mainUrl = buildUrl(map.nuts2jsonBaseURL_, map.nutsYear_, map.geo_, map.proj_, map.scale_, map.nutsLevel_)
             promises.push(fetchWithCache(mainUrl)) // index 0: polygon topology for current level
