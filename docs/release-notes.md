@@ -1,6 +1,6 @@
 # Release notes
 
-## 4.11.4
+## 4.12.0
 
 ### New
 
@@ -15,11 +15,69 @@ const map = eurostatmap.map('ps').dorling(true).backgroundMap(true).stat({ euros
 map.backgroundMap(false).updateBackgroundMap()
 ```
 
+- **`map.worldTopojsonURL()` lets you self-host/proxy the boundaries file used by `geo('WORLD')` maps.** This is a separate, bundled eurostat-map asset (not Nuts2json data), so it was previously hardcoded with no override - unlike `nuts2jsonBaseURL()`, which only ever affected non-`WORLD` geographies.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('ch')
+    .geo('WORLD')
+    .worldTopojsonURL('https://my-proxy.example.com/WORLD_4326.json')
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+- **`map.defaultFitZoom()` exposes the auto-fit zoom factor as a public accessor.** Previously a module-private constant controlling how tightly the auto-computed view fits the geometry bbox when `position().z` is left unset (default stayed a 1.27x zoomed-in crop); now it's a regular chainable getter/setter.
+
+Example:
+
+```javascript
+eurostatmap.map('ch').defaultFitZoom(1) /* exact bbox fit, no crop */.stat({ eurostatDatasetCode: 'demo_r_d3dens' }).build()
+```
+
+- **Bivariate choropleth legends can draw arrowheads at both ends of an axis**, via `axisArrowsBidirectional`, for metrics that range from strongly negative to strongly positive (e.g. net migration). Only enable it per-axis for metrics that can actually go negative - a one-sided (always-positive) axis should keep the default single arrow.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('bivariateChoropleth')
+    .legend({ axisArrowsBidirectional: { x: true, y: false } })
+    .stat({ ... })
+    .build()
+```
+
+- **Grouped bar-chart legends (`bar` map type) gain `sizeLegend.valueCount` and `sizeLegend.barGap`.** `valueCount: 2` trims the auto-generated legend to `[min, max]` instead of `[min, mid, max]`; `barGap` lets the legend's example bars use their own spacing independent of the map's real `barSettings.groupGap`. Labels only stagger onto multiple rows when the spacing is too tight for them to sit side by side, so a wider `barGap` keeps them on one line.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('bar')
+    .legend({ sizeLegend: { valueCount: 2, barGap: 16 } })
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens' })
+    .build()
+```
+
+### Improvements
+
+- **The library-wide default no-data fill is now `#ADADAD`.** Previously inconsistent across map types (`#bcbcbc` on the shared map/layer default, `#ccc` hardcoded in the trivariate layer) - now a single shared default everywhere. Set `noDataFillStyle()` explicitly if you relied on the old shade.
+- **Insets, world/disputed borders, and Kosovo's border got a visual pass**: the `insets('image')` preset's scale bar text/line color and label darkness now match the RYB styling more closely and no longer clips; the world map's disputed-border stroke width increased slightly and its now-unused halo effect was removed; Kosovo's border is a touch thicker and lighter. All are CSS-only default changes - override the relevant `.em-*` classes (see `src/css/borders.css`, `src/css/world.css`, `src/css/insets.css`) if you need the previous look.
+- **The shared tooltip container (`.em-tooltip`) now has rounded corners and a light grey border** by default, for a softer look across all map types.
+
+### Fixes
+
+- **`nuts2jsonBaseURL()` is now typed on `MapConfig`/`MapInstance`.** It always worked at runtime (and was already typed on `InsetConfig`), but TypeScript consumers calling `.nuts2jsonBaseURL(...)` on the top-level map, or passing it in their map config, got a compile error despite the plain-JS call working fine.
+- **Insets now actually inherit a custom `nuts2jsonBaseURL()`.** Setting it on the top-level map correctly redirected the main map's geometry fetches, but every inset (default/`'image'`/`'eu'`/`'euEfta'` presets, and custom insets) silently kept fetching from the real Nuts2json host regardless - `buildInset()`'s attribute-copy list was simply missing the field.
+- **Trivariate choropleth no-data styling no longer conflates "outside the dataset" with "present but unusable".** Regions absent from the stat data entirely (e.g. the UK) were being force-filled with the same flat no-data grey as regions explicitly present with an unusable value (e.g. `:`), instead of falling back to the standard CSS background fill used elsewhere.
+- **Trivariate no-data classification no longer skips background-only countries on mixed-NUTS maps.** `nutsLevel('mixed')` excludes the raw `cntrg` background-country layer from region-feature lookups, even though those regions are rendered and styled - so countries with no NUTS0-equivalent entry (Moldova, Georgia, etc.) never got classified and always fell back to the plain CSS background fill regardless of their actual value.
+
 ### Notes
 
-- Published package: `eurostat-map@4.11.4`
-- Dist-tag `latest` points to `4.11.4`
-- Release tag format used: `4.11.4` (no `v` prefix)
+- Published package: `eurostat-map@4.12.0`
+- Dist-tag `latest` points to `4.12.0`
+- Release tag format used: `4.12.0` (no `v` prefix)
 
 ## 4.11.3
 
