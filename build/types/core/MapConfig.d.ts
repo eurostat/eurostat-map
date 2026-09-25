@@ -38,6 +38,14 @@ export interface MapConfig {
     nutsLevel?: number | 'mixed'
     /** NUTS boundary year. */
     nutsYear?: number | string
+
+    /**
+     * Base URL used to fetch NUTS2JSON boundary geometries. Applies to the top-level map and
+     * (unless a given inset overrides it via `InsetConfig.nuts2jsonBaseURL`) all of its insets.
+     * @default 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2' (or the
+     * ec.europa.eu cache when running on an ec.europa.eu host)
+     */
+    nuts2jsonBaseURL?: string
     /** Geographic center as [longitude, latitude]. */
     geoCenter?: [number, number]
 
