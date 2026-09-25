@@ -78,6 +78,16 @@ export interface MapInstance {
     nutsYear(year: number): this
 
     /**
+     * Base URL used to fetch NUTS2JSON boundary geometries (and, for insets, whatever
+     * base URL is set on the owning map, unless overridden per-inset). Setting this on the
+     * top-level map also propagates it to all insets.
+     * @default 'https://raw.githubusercontent.com/eurostat/Nuts2json/master/pub/v2' (or the
+     * ec.europa.eu cache when running on an ec.europa.eu host)
+     */
+    nuts2jsonBaseURL(): string
+    nuts2jsonBaseURL(url: string): this
+
+    /**
      * Initial map viewport. x/y in projected coordinates, z is pixel size
      * (map units per screen pixel — smaller = more zoomed in).
      * @example map.position({ x: 4800000, y: 3400000, z: 6000 })
