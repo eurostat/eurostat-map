@@ -1,5 +1,38 @@
 # Release notes
 
+## 4.12.1
+
+### Fixes
+
+- **Ranked bar chart hover now highlights the region on the main map.** Previously hovering a bar only ever affected inset copies of the region (visible only for Malta/Liechtenstein), never the main map, whenever the map was built into an existing `<g>` container via `svgId()` rather than a dedicated `<svg>`. Region scoping now uses the `em-map` root class instead of assuming the map root is an `<svg>` tag.
+
+Example:
+
+```javascript
+// hovering a bar now highlights e.g. Italy on the main map, not just in insets
+eurostatmap.map('ps').svgId('my-g-container').rankedBarChart({ show: true }).stat({ eurostatDatasetCode: 'nama_10r_3gdp', filters: { unit: 'MIO_EUR' } }).build()
+```
+
+- **Consistent decimal precision for word/compact-notation size labels** (e.g. "4.2 million"). `formatSizeLabel` used to pick decimals from each raw value's own digit count before scaling, so entries in the same legend/chart could show "4 million" next to "1.05 million". Values ≥ 1 million now default to 1 decimal place; an explicit decimals argument still overrides it.
+
+Example:
+
+```javascript
+// ranked bar chart / size legends now render: 4.2 million, 2.8 million, 1.5 million, 1.1 million ...
+eurostatmap.map('ps').rankedBarChart({ show: true }).stat({ eurostatDatasetCode: 'nama_10r_3gdp', filters: { unit: 'MIO_EUR' } }).build()
+```
+
+- **World map disputed-border halos no longer render thicker than regular borders.** The rule zeroing the halo width on disputed borders used a descendant selector that never matched (both classes sit on the same path).
+
+Example:
+
+```css
+/* now applied as intended */
+.em-worldbn-halo.em-bn-d:not(.em-bn-co) {
+    stroke-width: 0px;
+}
+```
+
 ## 4.12.0
 
 ### New
