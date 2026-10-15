@@ -35,7 +35,10 @@
     stroke: rgba(216, 216, 216, 0.3);
     stroke-width: 1px;
 }
-/* world boundary halo (not coastline, disputed) */
-.em-worldbn-halo:not(.em-bn-co) .em-bn-d {
+/* world boundary halo (not coastline, disputed) - disputed halo paths carry both classes on the
+   SAME <path> (see geometries.js, 'em-bn-d em-worldbn-halo'), so this must be a compound selector,
+   not a descendant one, or it never matches and the halo falls back to the generic 1px width above,
+   making disputed borders look far thicker than regular ones - see issue #389. */
+.em-worldbn-halo.em-bn-d:not(.em-bn-co) {
     stroke-width: 0px;
 }
