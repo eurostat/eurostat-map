@@ -49,7 +49,7 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 - run production build:
     - `npm run build-prod` (rebuilds `build/eurostatmap.min.js`, the `main`/`unpkg` target)
 - **also rebuild the unminified dev bundle** if `src/**` changed:
-    - `npm start` (runs `webpack --config webpack/webpack.config.dev.js`, a one-shot build despite the script name — not a watcher)
+    - `npx webpack --config webpack/webpack.config.dev.js --no-watch` (not `npm start`: the dev config sets `watch: true`, so without `--no-watch` it compiles once and then never exits)
     - this regenerates `build/eurostatmap.js`, which is the package's `module` field target and is tracked in git separately from the min bundle. `build-prod` does **not** touch it — skipping this step ships a stale `build/eurostatmap.js` that silently lacks the release's changes for any consumer resolving via `module` (e.g. a bundler-based app like IMAGE).
 - verify build artifacts were updated as expected (e.g. `grep` for a distinctive new identifier in both `build/eurostatmap.min.js` and `build/eurostatmap.js`)
 
