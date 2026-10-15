@@ -398,15 +398,26 @@ export const rankedBarChart = function (map, config = {}) {
 // specific map type. Mirrors the fill___ / hoverColor_ convention already used for region hover
 // elsewhere in the codebase (see map-choropleth.js's own highlightRegion()).
 //
-// Insets are rendered as their own <svg> nested INSIDE the main map's <svg> (see insets.js), and
+// Insets are rendered as their own <svg> nested INSIDE the main map's root (see insets.js), and
 // region ids (e.g. em-cntrg-MT) can exist in both the main map's own layer and an inset's layer
 // (e.g. small "country" insets like MT/LI, which render the same country-level geometry as the
 // main map does). map.svg().selectAll(selector) is a descendant selector, so calling it on the
 // main map would otherwise also match nodes that actually belong to a nested inset's own <svg> -
-// scope the match to nodes whose nearest ancestor <svg> is this map's own, so a region highlighted
-// via the main map and (separately) via executeForAllInsets on the inset don't double-hit the same
-// DOM nodes and clobber each other's saved fill___ (which left inset regions like MT/LI stuck
-// highlighted, since the second, inset-scoped call would re-save the already-highlighted color).
+// scope the match to nodes whose nearest ancestor map root is this map's own, so a region
+// highlighted via the main map and (separately) via executeForAllInsets on the inset don't
+// double-hit the same DOM nodes and clobber each other's saved fill___ (which left inset regions
+// like MT/LI stuck highlighted, since the second, inset-scoped call would re-save the already-
+// highlighted color).
+//
+// That "own map root" can't be found via closest('svg'): createMapSVG() (core/layout.js) reuses
+// whatever element the caller's svgId already points to if one exists, rather than always
+// creating a fresh <svg> - IMAGE passes the id of its own template's <g> map container, so
+// map.svg() there is a <g>, not an <svg>, and closest('svg') from a region inside it resolves to
+// an ancestor <svg> that is never === that <g> node. Every map root gets the 'em-map' class
+// unconditionally right there regardless of its tag (insets additionally get 'em-inset'), so
+// match on that class instead - see issue #390 (bar-chart hover only ever visibly highlighting
+// the MT/LI inset, since that's the only inset whose own geometry is actually in view; the main
+// map's own region never highlighted at all, for any region).
 function highlightRegionById(map, regionId) {
     const ownSvg = map.svg().node()
     const selector = getRegionsSelector(map)
@@ -414,7 +425,7 @@ function highlightRegionById(map, regionId) {
         .svg()
         .selectAll(selector)
         .filter(function (d) {
-            return d?.properties?.id === regionId && this.closest('svg') === ownSvg
+            return d?.properties?.id === regionId && this.closest('.em-map') === ownSvg
         })
     if (region.empty()) return
     region.each(function () {
@@ -431,7 +442,7 @@ function unhighlightRegionById(map, regionId) {
         .svg()
         .selectAll(selector)
         .filter(function (d) {
-            return d?.properties?.id === regionId && this.closest('svg') === ownSvg
+            return d?.properties?.id === regionId && this.closest('.em-map') === ownSvg
         })
     region.each(function () {
         const sel = select(this)
@@ -525,16 +536,19 @@ function drawRankedBarChart(out, baseX, baseY) {
     const classToFillStyle = out.getClassToFillStyle(out)
     const numberOfClasses = out.getNumberOfClasses(out)
     const hasClassifier = typeof classifier === 'function' && typeof classToFillStyle === 'function'
-    // Always format the region's own raw value - never a 'ranges' class-label formatter,
-    // regardless of any legend's own labelType setting. Ps bars show a SIZE value (often a large
-    // count), so default to the same compact-notation formatter used by other size legends
-    // (waffle/bar/circle-size) rather than a plain fixed-decimal one - unless the caller set
-    // their own labelFormatter, which always takes priority.
-    const valueFormatter = isPs && !out.labelFormatter ? formatSizeLabel : buildDiscreteLabelFormatter(out, () => [], stat, 'thresholds', out.labelFormatter)
 
     const barScale = scaleLinear()
         .domain([0, Math.max(...entries.map((e) => e.value), 0)])
         .range([0, MAX_BAR_WIDTH])
+
+    // Always format the region's own raw value - never a 'ranges' class-label formatter,
+    // regardless of any legend's own labelType setting. Ps bars show a SIZE value (often a large
+    // count), so default to the same compact-notation formatter used by other size legends
+    // (waffle/bar/circle-size) rather than a plain fixed-decimal one - unless the caller set
+    // their own labelFormatter, which always takes priority. formatSizeLabel itself now fixes
+    // the decimal count once values are large enough to use word/compact notation (see issue
+    // #393), so every bar is rounded consistently without needing a decimals override here.
+    const valueFormatter = isPs && !out.labelFormatter ? formatSizeLabel : buildDiscreteLabelFormatter(out, () => [], stat, 'thresholds', out.labelFormatter)
 
     // Fit the whole bar list within out.height when set, rather than letting it grow unbounded
     // with region count - all ~35 EU/EFTA/CC countries at the default row height can easily end

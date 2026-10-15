@@ -21,6 +21,10 @@ export function getMaxDomainPrecision(classifier) {
 // weight once the plain number gets long enough to be hard to parse at a glance (millions+).
 const WORD_NOTATION_THRESHOLD = 1_000_000
 
+// Default decimal precision once word/compact notation kicks in (see below) - enough to
+// distinguish entries at that scale without the inconsistency fixed-precision avoids.
+const DEFAULT_COMPACT_DECIMALS = 1
+
 export function formatSizeLabel(value, formatterOrDecimals) {
     if (!Number.isFinite(value)) return ''
     const normalizedValue = normalizeFloatingPointValue(value)
@@ -30,11 +34,20 @@ export function formatSizeLabel(value, formatterOrDecimals) {
         return formatterOrDecimals(normalizedValue)
     }
 
-    const dec = typeof formatterOrDecimals === 'number' ? formatterOrDecimals : detectValuePrecision(normalizedValue)
-
     if (Math.abs(normalizedValue) < WORD_NOTATION_THRESHOLD) {
+        const dec = typeof formatterOrDecimals === 'number' ? formatterOrDecimals : detectValuePrecision(normalizedValue)
         return spaceAsThousandSeparator(Number(normalizedValue.toFixed(dec)))
     }
+
+    // Word/compact notation rescales the value (e.g. 4 219 310 -> "4.2 million"), so detecting
+    // decimals from the RAW value's own digit count (as the branch above does) no longer means
+    // anything here - a value that happens to be a round number of millions and one with a
+    // fractional remainder look identical once scaled, so two entries in the same legend/chart
+    // could get wildly different decimal places depending on an artifact of their raw figure
+    // (e.g. one country's GDP happening to be a round number of millions and another's not).
+    // Default to a fixed precision instead, so every value at this scale is rounded consistently,
+    // unless the caller explicitly asked for a different one.
+    const dec = typeof formatterOrDecimals === 'number' ? formatterOrDecimals : DEFAULT_COMPACT_DECIMALS
 
     const compactIntlFormatter = new Intl.NumberFormat('en', {
         notation: 'compact',
