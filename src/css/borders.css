@@ -27,6 +27,11 @@
     opacity: 1;
 }
 
+/* disputed boundary halo: no halo, so only the dashed line shows (see .em-bn-d in world.css) */
+.em-cntbn-halo .em-bn-d {
+    stroke-width: 0px;
+}
+
 /* kosovo */
 .em-kosovo-bn {
     stroke: #666666;
