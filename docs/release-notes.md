@@ -1,5 +1,22 @@
 # Release notes
 
+## 4.12.2
+
+### Fixes
+
+- **Disputed country boundaries are now dashed on Europe/EFTA maps**, matching the world map. Boundaries flagged `ps > 0` in Nuts2json >= 2.1 (e.g. Israel/Palestine) previously rendered as solid national borders. They now use the `em-bn-d` class (dashed, lighter stroke), with no halo underneath.
+
+Example:
+
+```css
+/* disputed country boundaries pick up the same style as on the world map */
+.em-bn-d {
+    stroke: #818181;
+    stroke-width: 0.3px;
+    stroke-dasharray: 1 1;
+}
+```
+
 ## 4.12.1
 
 ### Fixes
