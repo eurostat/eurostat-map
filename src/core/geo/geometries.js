@@ -355,6 +355,8 @@ export const Geometries = function (map, withCenterPoints) {
                 .attr('d', pathFunction)
                 .attr('id', (bn) => 'em-bn-' + bn.properties.id + '-halo')
                 .attr('class', function (bn) {
+                    //disputed (ps > 0, Nuts2json >= 2.1): same dashed style as the world template
+                    if (bn.properties.ps > 0) return 'em-bn-d'
                     let classList = []
                     if (bn.properties.eu === 'T') classList.push('em-bn-eu')
                     if (bn.properties.efta === 'T') classList.push('em-bn-efta')
@@ -385,6 +387,8 @@ export const Geometries = function (map, withCenterPoints) {
                 .attr('d', pathFunction)
                 .attr('id', (bn) => 'em-bn-' + bn.properties.id)
                 .attr('class', function (bn) {
+                    //disputed (ps > 0, Nuts2json >= 2.1): same dashed style as the world template
+                    if (bn.properties.ps > 0) return 'em-bn-d'
                     let classList = []
                     if (bn.properties.eu === 'T') classList.push('em-bn-eu')
                     if (bn.properties.efta === 'T') classList.push('em-bn-efta')
