@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Instagram 4:5 map</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../build/eurostatmap.js"></script>
+        <script>
+            // Instagram portrait post: 4:5 (1080 x 1350 px)
+            const WIDTH = 1080
+            const HEIGHT = WIDTH * (5 / 4)
+
+            const myMap = eurostatmap
+                .map('choropleth')
+                .title('Population density in Europe')
+                .width(WIDTH)
+                .height(HEIGHT)
+                .nutsLevel(2)
+                .stat('population-density', {
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                })
+                .encoding('fill', { stat: 'population-density', scale: 'quantile', classes: 7 })
+                .legend({ position: 'top right', title: 'Density, people/km²' })
+                .build()
+        </script>
+    </body>
+</html>
