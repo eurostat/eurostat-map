@@ -50,7 +50,7 @@ export interface LegendConfig {
     /** Number of decimal places for auto-formatted labels. */
     decimals?: number
 
-    /** Legend layout direction. */
+    /** Legend layout direction. For discrete colour legends 'horizontal' draws a single low-to-high bar `width` pixels wide with labels beneath. */
     orientation?: 'vertical' | 'horizontal'
     /** Sort legend entries in ascending order when true. */
     ascending?: boolean
