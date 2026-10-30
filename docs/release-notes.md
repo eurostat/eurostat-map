@@ -4,7 +4,7 @@
 
 ### Features
 
-- **Horizontal discrete legends.** `legend({ orientation: 'horizontal', width })` now works for classed choropleth and proportional-symbol colour legends: a contiguous low-to-high bar with threshold labels under the seams (or range labels under each swatch), for wide-and-short layouts such as 4:5 social media maps.
+- **Horizontal discrete legends.** `legend({ orientation: 'horizontal', width })` now works for classed choropleth and proportional-symbol colour legends: a contiguous low-to-high bar with threshold labels under the seams (or range labels under each swatch), for wide-and-short layouts such as 4:5 social media maps. Supports max/min bounds (`maxMin`, `maxMinLabels`, `maxMinRegionLabels`, with the same hover-to-isolate behaviour) and the point of divergence (`pointOfDivergence`, `pointOfDivergenceLabel` incl. the `a|b` arrow form, `showDivergingLine`, `...LabelsStacked`, `...LabelsAtExtremes`), laid out horizontally.
 
 Example:
 
