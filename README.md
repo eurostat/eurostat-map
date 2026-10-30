@@ -22,7 +22,7 @@
 </div>
 
 <div align="center">
-  <a href="docs/reference.md" target="_blank"><strong>Documentation</strong></a> ·
+  <a href="https://eurostat.github.io/eurostat-map/docs/reference.html" target="_blank"><strong>Documentation</strong></a> ·
   <a href="https://eurostat.github.io/eurostat-map/examples/index.html" target="_blank"><strong>Live examples</strong></a> ·
   <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank"><strong>Quickstart notebook</strong></a>
 </div>
