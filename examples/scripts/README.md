@@ -46,7 +46,7 @@ The viewer of an example: the example runs in a frame on the left, and its sourc
 examples/view.html?example=choropleth/basic.html
 ```
 
-The cards of the gallery open it. The code is highlighted (highlight.js, loaded from a CDN), can be copied, and can be shown as the whole page or as its JavaScript only. The panel can be resized (drag the divider) or hidden, and the choice is remembered. "Open alone" opens the example without the panel.
+The cards of the gallery open it. The code is highlighted (highlight.js, loaded from a CDN), can be copied, and can be shown as the whole page or as its JavaScript only. The panel can be resized (drag the divider) or hidden, and the choice is remembered. "Open alone" opens the example without the panel. The button "Examples" goes back to the gallery as it was left: the same type, search and scroll position.
 
 It does not depend on the manifest: any `.html` file of the `examples/` folder can be opened in it, and its title is the one of the page. Nothing needs to be done when an example is added.
 

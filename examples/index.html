@@ -376,6 +376,10 @@
             let activeType = 'All'
 
             const sidebarNav = document.getElementById('sidebar-nav')
+            const setActiveType = (type) => {
+                activeType = type
+                sidebarNav.querySelectorAll('a').forEach((el) => el.classList.toggle('active', el.textContent === type))
+            }
             allTypes.forEach((type) => {
                 const li = document.createElement('li')
                 const a = document.createElement('a')
@@ -384,9 +388,7 @@
                 if (type === 'All') a.className = 'active'
                 a.addEventListener('click', (e) => {
                     e.preventDefault()
-                    activeType = type
-                    sidebarNav.querySelectorAll('a').forEach((el) => el.classList.remove('active'))
-                    a.classList.add('active')
+                    setActiveType(type)
                     renderExamples(search.value)
                 })
                 li.appendChild(a)
@@ -397,12 +399,54 @@
             const stats = document.getElementById('stats')
             const search = document.getElementById('search')
 
+            // Where the user was (the type, the search and the scroll), kept for when they come back from an example
+            // (the button "Examples" of the viewer) so that they find the page as they left it.
+            const STATE_KEY = 'eurostat-map-examples-gallery-state'
+            history.scrollRestoration = 'manual'
+            window.addEventListener('pagehide', () => {
+                try {
+                    sessionStorage.setItem(STATE_KEY, JSON.stringify({ type: activeType, search: search.value, scrollY: window.scrollY }))
+                } catch (e) {
+                    // the storage may be refused: the page is then simply shown from the top
+                }
+            })
+            // true when the page is shown again by the back button, or by a link from the viewer
+            const isReturning = () => {
+                const nav = performance.getEntriesByType('navigation')[0]
+                let fromViewer = false
+                try {
+                    fromViewer = new URL(document.referrer).pathname.endsWith('/view.html')
+                } catch (e) {
+                    // no referrer
+                }
+                return (nav && nav.type === 'back_forward') || fromViewer
+            }
+            // the scroll to restore, once the examples are shown
+            let scrollToRestore = null
+            const restoreState = () => {
+                if (!isReturning()) return
+                let s = null
+                try {
+                    s = JSON.parse(sessionStorage.getItem(STATE_KEY))
+                } catch (e) {
+                    // none
+                }
+                if (!s) return
+                search.value = s.search || ''
+                if (allTypes.includes(s.type)) setActiveType(s.type)
+                scrollToRestore = s.scrollY || 0
+            }
+
             const loadExamples = async () => {
                 const loaded = await Promise.all(
                     showcasePaths.map(async (path) => [path, await resolveTitle(path), detectDesc(path), previewPathFor(path), getTypes(path)])
                 )
                 examples = loaded
+                restoreState()
                 renderExamples(search.value)
+                // the thumbnails have a fixed ratio, so the page has its final height as soon as the cards are there
+                if (scrollToRestore !== null) window.scrollTo(0, scrollToRestore)
+                scrollToRestore = null
             }
 
             const renderExamples = (query) => {
