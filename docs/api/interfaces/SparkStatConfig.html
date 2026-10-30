@@ -17,7 +17,7 @@ or <code>customData</code> (custom data path) must be provided.</p>
 </div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">SparkStatConfig</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#customdata">customData</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#eurostatdatasetcode">eurostatDatasetCode</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#filters">filters</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#unittext">unitText</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#preprocess">preprocess</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">regionId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#transform">transform</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#dates">dates</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#labels">labels</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L7">src/types/layers/spark/SparkStatConfig.d.ts:7</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L7">src/types/layers/spark/SparkStatConfig.d.ts:7</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -52,52 +52,52 @@ When <code>customData</code> is set, <code>eurostatDatasetCode</code> is not req
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L19">src/types/layers/spark/SparkStatConfig.d.ts:19</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L19">src/types/layers/spark/SparkStatConfig.d.ts:19</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="eurostatdatasetcode"><code class="tsd-tag">Optional</code><span>eurostat<wbr/>Dataset<wbr/>Code</span><a href="#eurostatdatasetcode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">eurostatDatasetCode</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Eurostat dataset code. Required when not using <code>customData</code>.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L22">src/types/layers/spark/SparkStatConfig.d.ts:22</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L22">src/types/layers/spark/SparkStatConfig.d.ts:22</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="filters"><code class="tsd-tag">Optional</code><span>filters</span><a href="#filters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">filters</span><span class="tsd-signature-symbol">?:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
 <div class="tsd-comment tsd-typography"><p>Filters.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L24">src/types/layers/spark/SparkStatConfig.d.ts:24</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L24">src/types/layers/spark/SparkStatConfig.d.ts:24</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="unittext"><code class="tsd-tag">Optional</code><span>unit<wbr/>Text</span><a href="#unittext" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">unitText</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Unit text.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L26">src/types/layers/spark/SparkStatConfig.d.ts:26</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L26">src/types/layers/spark/SparkStatConfig.d.ts:26</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="preprocess"><code class="tsd-tag">Optional</code><span>preprocess</span><a href="#preprocess" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">preprocess</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">regionId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">any</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L27">src/types/layers/spark/SparkStatConfig.d.ts:27</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L27">src/types/layers/spark/SparkStatConfig.d.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="transform"><code class="tsd-tag">Optional</code><span>transform</span><a href="#transform" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">transform</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">number</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L28">src/types/layers/spark/SparkStatConfig.d.ts:28</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L28">src/types/layers/spark/SparkStatConfig.d.ts:28</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="dates"><code class="tsd-tag">Optional</code><span>dates</span><a href="#dates" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">dates</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 <div class="tsd-comment tsd-typography"><p>Date keys to fetch. Required when not using <code>customData</code>.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L30">src/types/layers/spark/SparkStatConfig.d.ts:30</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L30">src/types/layers/spark/SparkStatConfig.d.ts:30</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="labels"><code class="tsd-tag">Optional</code><span>labels</span><a href="#labels" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">labels</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 <div class="tsd-comment tsd-typography"><p>Display labels for each date.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/layers/spark/SparkStatConfig.d.ts#L32">src/types/layers/spark/SparkStatConfig.d.ts:32</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/layers/spark/SparkStatConfig.d.ts#L32">src/types/layers/spark/SparkStatConfig.d.ts:32</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
