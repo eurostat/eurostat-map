@@ -18,7 +18,7 @@ Pass this to map.stat() or as the config argument to statData().</p>
 </div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">StatConfig</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-property" href="#customdata">customData</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><br/>        <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-signature-type">number</span><br/>        <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">string</span><br/>        <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">status</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#eurostatdatasetcode">eurostatDatasetCode</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#filters">filters</a><span class="tsd-signature-symbol">?:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#precision">precision</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#csvurl">csvURL</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#geocol">geoCol</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#valuecol">valueCol</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#unittext">unitText</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#preprocess">preprocess</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">regionId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#transform">transform</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#label">label</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L8">src/types/core/stat/StatConfig.d.ts:8</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L8">src/types/core/stat/StatConfig.d.ts:8</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -47,14 +47,14 @@ Pass this to map.stat() or as the config argument to statData().</p>
 <div class="tsd-comment tsd-typography"><p>Custom data keyed by region ID. Use instead of a remote data source.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L10">src/types/core/stat/StatConfig.d.ts:10</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L10">src/types/core/stat/StatConfig.d.ts:10</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="eurostatdatasetcode"><code class="tsd-tag">Optional</code><span>eurostat<wbr/>Dataset<wbr/>Code</span><a href="#eurostatdatasetcode" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">eurostatDatasetCode</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Eurostat dataset code. e.g. 'demo_r_d3dens'</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L12">src/types/core/stat/StatConfig.d.ts:12</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L12">src/types/core/stat/StatConfig.d.ts:12</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="filters"><code class="tsd-tag">Optional</code><span>filters</span><a href="#filters" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">filters</span><span class="tsd-signature-symbol">?:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
@@ -67,7 +67,7 @@ Pass this to map.stat() or as the config argument to statData().</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L17">src/types/core/stat/StatConfig.d.ts:17</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L17">src/types/core/stat/StatConfig.d.ts:17</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="precision"><code class="tsd-tag">Optional</code><span>precision</span><a href="#precision" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">precision</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">number</span></div>
@@ -80,14 +80,14 @@ Pass this to map.stat() or as the config argument to statData().</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L19">src/types/core/stat/StatConfig.d.ts:19</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L19">src/types/core/stat/StatConfig.d.ts:19</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="csvurl"><code class="tsd-tag">Optional</code><span>csv<wbr/>URL</span><a href="#csvurl" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">csvURL</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>URL of a CSV file to use as the data source.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L21">src/types/core/stat/StatConfig.d.ts:21</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L21">src/types/core/stat/StatConfig.d.ts:21</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="geocol"><code class="tsd-tag">Optional</code><span>geo<wbr/>Col</span><a href="#geocol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">geoCol</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -100,7 +100,7 @@ Pass this to map.stat() or as the config argument to statData().</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L23">src/types/core/stat/StatConfig.d.ts:23</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L23">src/types/core/stat/StatConfig.d.ts:23</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="valuecol"><code class="tsd-tag">Optional</code><span>value<wbr/>Col</span><a href="#valuecol" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">valueCol</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
@@ -113,35 +113,35 @@ Pass this to map.stat() or as the config argument to statData().</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L25">src/types/core/stat/StatConfig.d.ts:25</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L25">src/types/core/stat/StatConfig.d.ts:25</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="unittext"><code class="tsd-tag">Optional</code><span>unit<wbr/>Text</span><a href="#unittext" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">unitText</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Unit of measure label shown in tooltips. e.g. 'people/km²'</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L27">src/types/core/stat/StatConfig.d.ts:27</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L27">src/types/core/stat/StatConfig.d.ts:27</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="preprocess"><code class="tsd-tag">Optional</code><span>preprocess</span><a href="#preprocess" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">preprocess</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">regionId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">any</span></div>
 <div class="tsd-comment tsd-typography"><p>Optional preprocessing hook called with (regionId, value) before transform. Return null/undefined/false to filter out the region.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L29">src/types/core/stat/StatConfig.d.ts:29</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L29">src/types/core/stat/StatConfig.d.ts:29</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="transform"><code class="tsd-tag">Optional</code><span>transform</span><a href="#transform" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">transform</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">number</span></div>
 <div class="tsd-comment tsd-typography"><p>Optional transform function applied to raw values after data loads. e.g. v =&gt; v * 1000</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L31">src/types/core/stat/StatConfig.d.ts:31</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L31">src/types/core/stat/StatConfig.d.ts:31</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="label"><code class="tsd-tag">Optional</code><span>label</span><a href="#label" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">label</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Dataset label/name from the Eurostat API response.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatConfig.d.ts#L33">src/types/core/stat/StatConfig.d.ts:33</a></li></ul></aside></section></section></details></div>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatConfig.d.ts#L33">src/types/core/stat/StatConfig.d.ts:33</a></li></ul></aside></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">

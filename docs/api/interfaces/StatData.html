@@ -16,7 +16,7 @@ Returned by map.statData() and created internally by statData().</p>
 </div></section>
 <div class="tsd-signature"><span class="tsd-signature-keyword">interface</span> <span class="tsd-kind-interface">StatData</span> <span class="tsd-signature-symbol">{</span><br/>    <a class="tsd-kind-call-signature" href="#get-1">get</a><span class="tsd-signature-symbol">(</span><br/>        <span class="tsd-kind-parameter">nutsId</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span><br/>        <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">status</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><br/>        <span class="tsd-signature-symbol">|</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">status</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getvalue-1">getValue</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">nutsId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#set-1">set</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">nutsId</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-kind-parameter">stat</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setdata-1">setData</a><span class="tsd-signature-symbol">(</span><br/>        <span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">|</span> <span class="tsd-signature-symbol">{</span> <span class="tsd-kind-property">value</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span> <span class="tsd-kind-property">status</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span> <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#setmanualmultidate-1">setManualMultiDate</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">data</span><span class="tsd-signature-symbol">:</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <a href="../types/_internal_.Record.html" class="tsd-signature-type tsd-kind-type-alias">Record</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#hasdata-1">hasData</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#hasnumericdata-1">hasNumericData</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getarray-1">getArray</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getuniquevalues-1">getUniqueValues</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getmin-1">getMin</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getmax-1">getMax</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getmaxregionid-1">getMaxRegionId</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#getminregionid-1">getMinRegionId</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#isready-1">isReady</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#gettime-1">getTime</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#unittext-1">unitText</a><span class="tsd-signature-symbol">()</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#unittext-2">unitText</a><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">text</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#metadata">metadata</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-symbol">{</span><br/>        <span class="tsd-kind-property">label</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">href</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">source</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">updated</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">time</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>        <span class="tsd-kind-property">extension</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">;</span><br/>    <span class="tsd-signature-symbol">}</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#eurostatdatasetcode_">eurostatDatasetCode_</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#csvurl_">csvURL_</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-property" href="#label_">label_</a><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">;</span><br/>    <a class="tsd-kind-call-signature" href="#retrievefromremote-1">retrieveFromRemote</a><span class="tsd-signature-symbol">(</span><br/>        <span class="tsd-kind-parameter">nutsLevel</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">lang</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">,</span><br/>        <span class="tsd-kind-parameter">callback</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">()</span> <span class="tsd-signature-symbol">=&gt;</span> <span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">,</span><br/>    <span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><span class="tsd-signature-symbol">;</span><br/><span class="tsd-signature-symbol">}</span></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L5">src/types/core/stat/StatData.d.ts:5</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L5">src/types/core/stat/StatData.d.ts:5</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-accordion" open><summary class="tsd-accordion-summary tsd-index-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
@@ -85,28 +85,28 @@ Returned by map.statData() and created internally by statData().</p>
 <div class="tsd-comment tsd-typography"><p>Extension.</p>
 </div></li></ul></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L83">src/types/core/stat/StatData.d.ts:83</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L83">src/types/core/stat/StatData.d.ts:83</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="eurostatdatasetcode_"><code class="tsd-tag">Optional</code><span>eurostat<wbr/>Dataset<wbr/>Code_</span><a href="#eurostatdatasetcode_" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">eurostatDatasetCode_</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Eurostat dataset code.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L99">src/types/core/stat/StatData.d.ts:99</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L99">src/types/core/stat/StatData.d.ts:99</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="csvurl_"><code class="tsd-tag">Optional</code><span>csv<wbr/>URL_</span><a href="#csvurl_" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">csvURL_</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>CSV source URL.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L101">src/types/core/stat/StatData.d.ts:101</a></li></ul></aside></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L101">src/types/core/stat/StatData.d.ts:101</a></li></ul></aside></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="label_"><code class="tsd-tag">Optional</code><span>label_</span><a href="#label_" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <div class="tsd-signature"><span class="tsd-kind-property">label_</span><span class="tsd-signature-symbol">?:</span> <span class="tsd-signature-type">string</span></div>
 <div class="tsd-comment tsd-typography"><p>Dataset label/name from the Eurostat API response or stat() config.</p>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L103">src/types/core/stat/StatData.d.ts:103</a></li></ul></aside></section></section></details>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L103">src/types/core/stat/StatData.d.ts:103</a></li></ul></aside></section></section></details>
 <details class="tsd-panel-group tsd-member-group tsd-accordion" open><summary class="tsd-accordion-summary" data-key="section-Methods"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
 <h2 class="tsd-anchor-link" id="methods-1">Methods<a href="#methods-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2></summary>
 <section>
@@ -131,7 +131,7 @@ If called with no argument, returns the entire data index.</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L11">src/types/core/stat/StatData.d.ts:11</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L11">src/types/core/stat/StatData.d.ts:11</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getvalue"><span>get<wbr/>Value</span><a href="#getvalue" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -152,7 +152,7 @@ If called with no argument, returns the entire data index.</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L17">src/types/core/stat/StatData.d.ts:17</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L17">src/types/core/stat/StatData.d.ts:17</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="set"><span>set</span><a href="#set" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -183,7 +183,7 @@ If called with no argument, returns the entire data index.</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L26">src/types/core/stat/StatData.d.ts:26</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L26">src/types/core/stat/StatData.d.ts:26</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setdata"><span>set<wbr/>Data</span><a href="#setdata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -205,7 +205,7 @@ Overwrites any previously loaded data.</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L36">src/types/core/stat/StatData.d.ts:36</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L36">src/types/core/stat/StatData.d.ts:36</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="setmanualmultidate"><span>set<wbr/>Manual<wbr/>Multi<wbr/>Date</span><a href="#setmanualmultidate" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -226,7 +226,7 @@ Overwrites any previously loaded data.</p>
 
 </div></div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L43">src/types/core/stat/StatData.d.ts:43</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L43">src/types/core/stat/StatData.d.ts:43</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="hasdata"><span>has<wbr/>Data</span><a href="#hasdata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -237,7 +237,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L46">src/types/core/stat/StatData.d.ts:46</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L46">src/types/core/stat/StatData.d.ts:46</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="hasnumericdata"><span>has<wbr/>Numeric<wbr/>Data</span><a href="#hasnumericdata" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -248,7 +248,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L49">src/types/core/stat/StatData.d.ts:49</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L49">src/types/core/stat/StatData.d.ts:49</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getarray"><span>get<wbr/>Array</span><a href="#getarray" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -259,7 +259,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L52">src/types/core/stat/StatData.d.ts:52</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L52">src/types/core/stat/StatData.d.ts:52</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getuniquevalues"><span>get<wbr/>Unique<wbr/>Values</span><a href="#getuniquevalues" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -270,7 +270,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L55">src/types/core/stat/StatData.d.ts:55</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L55">src/types/core/stat/StatData.d.ts:55</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getmin"><span>get<wbr/>Min</span><a href="#getmin" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -281,7 +281,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L58">src/types/core/stat/StatData.d.ts:58</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L58">src/types/core/stat/StatData.d.ts:58</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getmax"><span>get<wbr/>Max</span><a href="#getmax" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -292,7 +292,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L61">src/types/core/stat/StatData.d.ts:61</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L61">src/types/core/stat/StatData.d.ts:61</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getmaxregionid"><span>get<wbr/>Max<wbr/>Region<wbr/>Id</span><a href="#getmaxregionid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -303,7 +303,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L64">src/types/core/stat/StatData.d.ts:64</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L64">src/types/core/stat/StatData.d.ts:64</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="getminregionid"><span>get<wbr/>Min<wbr/>Region<wbr/>Id</span><a href="#getminregionid" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -314,7 +314,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L67">src/types/core/stat/StatData.d.ts:67</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L67">src/types/core/stat/StatData.d.ts:67</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="isready"><span>is<wbr/>Ready</span><a href="#isready" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -325,7 +325,7 @@ Overwrites any previously loaded data.</p>
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L70">src/types/core/stat/StatData.d.ts:70</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L70">src/types/core/stat/StatData.d.ts:70</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="gettime"><span>get<wbr/>Time</span><a href="#gettime" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -337,7 +337,7 @@ Reflects the 'time' filter if set, otherwise the first time dimension in the API
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L76">src/types/core/stat/StatData.d.ts:76</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L76">src/types/core/stat/StatData.d.ts:76</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="unittext"><span>unit<wbr/>Text</span><a href="#unittext" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -348,7 +348,7 @@ Reflects the 'time' filter if set, otherwise the first time dimension in the API
 </div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L79">src/types/core/stat/StatData.d.ts:79</a></li></ul></aside></div></li>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L79">src/types/core/stat/StatData.d.ts:79</a></li></ul></aside></div></li>
 <li class="">
 <div class="tsd-signature tsd-anchor-link" id="unittext-2"><span class="tsd-kind-call-signature">unitText</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">text</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">this</span><a href="#unittext-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></div>
 <div class="tsd-description">
@@ -358,7 +358,7 @@ Reflects the 'time' filter if set, otherwise the first time dimension in the API
 <li><span><span class="tsd-kind-parameter">text</span>: <span class="tsd-signature-type">string</span></span></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L80">src/types/core/stat/StatData.d.ts:80</a></li></ul></aside></div></li></ul></section>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L80">src/types/core/stat/StatData.d.ts:80</a></li></ul></aside></div></li></ul></section>
 <section class="tsd-panel tsd-member">
 <h3 class="tsd-anchor-link" id="retrievefromremote"><span>retrieve<wbr/>From<wbr/>Remote</span><a href="#retrievefromremote" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
@@ -382,7 +382,7 @@ Called internally by the map build pipeline.</p>
 </div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">this</span></h4><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/a937c307aa4921e3648f519e24905290b73f22f2/src/types/core/stat/StatData.d.ts#L112">src/types/core/stat/StatData.d.ts:112</a></li></ul></aside></div></li></ul></section></section></details></div>
+<li>Defined in <a href="https://github.com/eurostat/eurostat-map/blob/b89cff655236bd5dfe5a0f00cce2638cfd388721/src/types/core/stat/StatData.d.ts#L112">src/types/core/stat/StatData.d.ts:112</a></li></ul></aside></div></li></ul></section></section></details></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
