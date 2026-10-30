@@ -1,10 +1,22 @@
 # Release notes
 
-## Unreleased
+## 4.13.0
 
 ### Features
 
 - **Horizontal discrete legends.** `legend({ orientation: 'horizontal', width })` now works for classed choropleth and proportional-symbol colour legends: a contiguous low-to-high bar with threshold labels under the seams (or range labels under each swatch), for wide-and-short layouts such as 4:5 social media maps.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .legend({
+        orientation: 'horizontal',
+        width: 300,
+        labelType: 'thresholds', // or 'ranges' for a label under each swatch
+    })
+```
 
 ## 4.12.2
 
