@@ -105,11 +105,20 @@ export function drawDiscreteLegend(out, x, y) {
     // choropleths dont have multiple visual variables (yet), so we use the root legend config
     const config = out.map._mapType == 'ps' ? out.colorLegend : out // Use out.colorLegend for proportional symbols, out for choropleth
 
+    const horizontal = config.orientation === 'horizontal'
+
     // thresholds vs ranges
-    if (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges') {
+    if (horizontal) {
+        createHorizontalLegend(out, config)
+    } else if (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges') {
         createRangesLegend(out, config)
     } else {
         createThresholdsLegend(out, config)
+    }
+
+    if (horizontal) {
+        appendHorizontalExtraItems(out, config)
+        return
     }
 
     // Optionally add no-data
@@ -152,6 +161,128 @@ export function appendCategoryLegendItems(out, startY) {
         out.appendCategoryLegend(container, toCategoryEcl(rawValue), categoryFillStyle[rawValue], text, highlightFunction, unhighlightFunction)
         y += out.noDataShapeHeight + out.noDataPadding
     })
+}
+
+/**
+ * Horizontal variant of the discrete legend (orientation: 'horizontal'): one contiguous bar of
+ * class swatches running low -> high from left to right, `config.width` pixels wide in total
+ * (shared equally between the classes), with the class thresholds (labelType 'thresholds') labelled
+ * under the seams between swatches, or each class's range (labelType 'ranges') centred under its
+ * own swatch. Max/min labels and the point of divergence are not drawn in this layout.
+ */
+function createHorizontalLegend(out, config) {
+    const map = out.map
+    const container = out._discreteLegendContainer
+    const n = out.getNumberOfClasses(out)
+    const titlePadding = getTitlePadding(out)
+    const highlightFunction = out.getHighlightFunction(map)
+    const unhighlightFunction = out.getUnHighlightFunction(map)
+    const classifier = out.getColorClassifier(out)
+    const classToFillStyle = out.getClassToFillStyle(out)
+    const labelFormatter = out.getLabelFormatter(out)
+    const ranges = (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges')
+    const barWidth = config.width ?? out.width
+    const itemWidth = barWidth / n
+    const tickLength = config.tickLength ?? 4
+    const labelY = titlePadding + config.shapeHeight + tickLength + 2
+
+    // low -> high from left to right, whichever way the vertical legend would be ordered
+    for (let j = 0; j < n; j++) {
+        const x = j * itemWidth
+        const ecl = j
+        const itemContainer = container.append('g').attr('class', 'em-legend-item')
+
+        itemContainer
+            .append('rect')
+            .attr('class', 'em-legend-rect')
+            .attr('x', x)
+            .attr('y', titlePadding)
+            .attr('width', itemWidth)
+            .attr('height', config.shapeHeight)
+            .style('fill', classToFillStyle(ecl, n))
+            .on('mouseover', function () {
+                highlightFunction(map, ecl)
+                if (map.insetTemplates_) executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, ecl)
+            })
+            .on('mouseout', function () {
+                unhighlightFunction(map, ecl)
+                if (map.insetTemplates_) executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, ecl)
+            })
+
+        if (j > 0) {
+            itemContainer
+                .append('line')
+                .attr('class', 'em-legend-separator')
+                .attr('x1', x)
+                .attr('y1', titlePadding)
+                .attr('x2', x)
+                .attr('y2', titlePadding + config.shapeHeight)
+        }
+
+        if (ranges) {
+            // vertical-legend index of this class, as labelFormatter's 'ranges' mode expects
+            const i = out.ascending ? n - 1 - j : j
+            const text = classifier?.invertExtent ? labelFormatter(classifier.invertExtent(ecl)[out.ascending ? 0 : 1], i) : ''
+            itemContainer
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', x + itemWidth / 2)
+                .attr('y', titlePadding + config.shapeHeight + 4)
+                .attr('dy', '0.9em')
+                .attr('text-anchor', 'middle')
+                .text(config.labels ? config.labels[i] : text)
+        } else if (j < n - 1) {
+            // threshold between class j and j+1
+            const seamX = x + itemWidth
+            itemContainer
+                .append('line')
+                .attr('class', 'em-legend-tick')
+                .attr('x1', seamX)
+                .attr('y1', titlePadding + config.shapeHeight)
+                .attr('x2', seamX)
+                .attr('y2', titlePadding + config.shapeHeight + tickLength)
+            const text = config.labels
+                ? config.labels[out.ascending ? n - 2 - j : j]
+                : classifier?.invertExtent
+                  ? labelFormatter(classifier.invertExtent(ecl)[1])
+                  : ''
+            itemContainer
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', seamX)
+                .attr('y', labelY)
+                .attr('dy', '0.9em')
+                .attr('text-anchor', 'middle')
+                .text(text)
+        }
+    }
+}
+
+/** No-data and extra category swatches for the horizontal layout: a row to the right of the bar. */
+function appendHorizontalExtraItems(out, config) {
+    const barWidth = config.width ?? out.width
+    const titlePadding = getTitlePadding(out)
+    const highlightFunction = out.getHighlightFunction(out.map)
+    const unhighlightFunction = out.getUnHighlightFunction(out.map)
+    const gap = 16
+    let x = barWidth + gap
+    const place = (cls, draw) => {
+        const container = out._discreteLegendContainer.append('g').attr('class', cls).attr('transform', `translate(${x},${titlePadding})`)
+        draw(container)
+        x += container.node().getBBox().width + gap
+    }
+    if (config.noData) {
+        place('em-no-data-legend', (c) => out.appendNoDataLegend(c, config.noDataText, highlightFunction, unhighlightFunction))
+    }
+    const fills = out.layer?.categoryFillStyle_
+    if (fills) {
+        const texts = out.layer.categoryText_
+        Object.keys(fills).forEach((raw) =>
+            place('em-category-legend', (c) =>
+                out.appendCategoryLegend(c, toCategoryEcl(raw), fills[raw], (texts && texts[raw]) || raw, highlightFunction, unhighlightFunction)
+            )
+        )
+    }
 }
 
 function getTitlePadding(out) {
