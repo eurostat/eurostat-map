@@ -282,7 +282,7 @@
         <main class="wrap">
             <section class="hero">
                 <h1>eurostat-map live examples</h1>
-                <p class="sub">See eurostat-map in action with live examples.</p>
+                <p class="sub">See eurostat-map in action with live examples. Each example opens beside its source code.</p>
                 <div class="actions">
                     <a
                         class="btn primary"
@@ -318,6 +318,9 @@
         <script>
             const { paths, previewPathFor, legacyPreviewPathFor, isShowcasePath, typeForPath, typesForPath } = window.eurostatMapExamples
             const fallbackPreview = '../docs/img/previews/euro.png'
+
+            // an example is opened in the viewer, beside its source code
+            const viewerPath = (path) => './view.html?example=' + encodeURI(path)
 
             const toTitle = (path) => {
                 const name = path.replace(/\.html$/, '')
@@ -420,9 +423,7 @@
 
                     const thumbLink = document.createElement('a')
                     thumbLink.className = 'thumb-link'
-                    thumbLink.href = './' + file
-                    thumbLink.target = '_blank'
-                    thumbLink.rel = 'noopener noreferrer'
+                    thumbLink.href = viewerPath(file)
 
                     const img = document.createElement('img')
                     img.className = 'thumb'
@@ -459,9 +460,7 @@
 
                     const live = document.createElement('a')
                     live.className = 'live'
-                    live.href = './' + file
-                    live.target = '_blank'
-                    live.rel = 'noopener noreferrer'
+                    live.href = viewerPath(file)
                     live.textContent = 'Live'
                     row.appendChild(live)
 

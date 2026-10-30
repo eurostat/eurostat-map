@@ -38,6 +38,20 @@ Command:
 npm run generate-previews
 ```
 
+### `view.html`
+
+The viewer of an example: the example runs in a frame on the left, and its source code is shown on the right, in a window in the style of carbon.now.sh. It is opened with the path of the example, relative to the `examples/` folder:
+
+```
+examples/view.html?example=choropleth/basic.html
+```
+
+The cards of the gallery open it. The code is highlighted (highlight.js, loaded from a CDN), can be copied, and can be shown as the whole page or as its JavaScript only. The panel can be resized (drag the divider) or hidden, and the choice is remembered. "Open alone" opens the example without the panel.
+
+It does not depend on the manifest: any `.html` file of the `examples/` folder can be opened in it, and its title is the one of the page. Nothing needs to be done when an example is added.
+
+Maps are SVG with a fixed width, so a map wider than the frame is scrolled in the frame instead of being redrawn at the new width.
+
 ### `example-manifest.js`
 
 Auto-generated file consumed by:
