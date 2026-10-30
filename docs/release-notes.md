@@ -18,6 +18,21 @@ eurostatmap
     })
 ```
 
+Example (bounds and point of divergence):
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .legend({
+        orientation: 'horizontal',
+        width: 520,
+        maxMin: true, // min/max ticks at the ends of the bar, hover isolates the region
+        maxMinLabels: [' (min)', ' (max)'],
+        pointOfDivergence: 3,
+        pointOfDivergenceLabel: 'Below|Above', // or a single label
+    })
+```
+
 ## 4.12.2
 
 ### Fixes
