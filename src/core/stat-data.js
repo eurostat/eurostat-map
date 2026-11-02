@@ -104,8 +104,12 @@ export const statData = function (config) {
         out._data_ = out._data_ || {}
         const s = out._data_[nutsId]
 
+        // A stat object is {value, status}. Test for the key, not for a truthy value:
+        // `stat.value ? ...` treated {value: 0} as a bare value and nested the whole object.
+        const isStatObject = stat !== null && typeof stat === 'object' && 'value' in stat
+
         if (s) {
-            if (stat.value) {
+            if (isStatObject) {
                 s.value = stat.value
                 s.status = stat.status
             } else {
@@ -115,7 +119,7 @@ export const statData = function (config) {
             }
         } else {
             // be careful here setting values here, we need to maintain strings with trailing zeros because in JSON 1.0 === 1 and they are removed. User might want stats labels with trailing zeros.
-            out._data_[nutsId] = stat.value ? stat : { value: stat }
+            out._data_[nutsId] = isStatObject ? stat : { value: stat }
             //out._data_[nutsId] = stat.value ? stat : { value: isNaN(+stat) ? stat : +stat}
         }
         return out
