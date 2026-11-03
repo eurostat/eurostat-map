@@ -1,4 +1,4 @@
-import proj4 from 'proj4'
+import proj4 from './proj4-lite'
 
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */

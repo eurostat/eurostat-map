@@ -31,10 +31,6 @@ module.exports = {
         minimizer: [
             new TerserPlugin({
                 extractComments: false, // Disable extracting comments to a separate file
-                terserOptions: {
-                    keep_fnames: true,
-                    keep_classnames: true,
-                },
             }),
         ],
     },
@@ -70,7 +66,7 @@ module.exports = {
 
             {
                 test: /\.css$/i,
-                use: ['style-loader', 'css-loader'], // For CSS files
+                use: ['style-loader', { loader: 'css-loader', options: { sourceMap: false } }], // For CSS files (no source maps: they would be embedded in the bundle)
             },
         ],
     },

@@ -1,7 +1,7 @@
 import { geoOrthographic, geoPath } from 'd3-geo'
 import { feature } from 'topojson-client'
 import { json } from 'd3-fetch'
-import proj4 from 'proj4'
+import proj4 from './geo/proj4-lite'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
