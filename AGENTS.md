@@ -31,7 +31,7 @@ omits steps (e.g. creating and pushing the git tag, and the GitHub Release) that
 `docs/release-flow.md` requires. Skipping it produces a real gap: e.g. a version published to npm
 with no matching git tag ever created.
 
-This package is consumed by `image` (the sibling repo at `c:\Github\image\image`, dependency
+This package is consumed by `image` (the sibling `image` repo, dependency
 `eurostat-map` in its `package.json`) and possibly other consumers, so releases are not casual:
 
 - **Never run `npm publish` without first getting explicit go-ahead from the user in that
@@ -53,7 +53,7 @@ This package is consumed by `image` (the sibling repo at `c:\Github\image\image`
 
 ## Known bug class: confusing the shared layer with the current map/inset instance
 
-Several real bugs here (fixed 2026-07-29: issues ESTAT/image#379 and #380) came from the same
+Several real bugs here (fixed 2026-07-29: image-repo issues #379 and #380) came from the same
 root cause, so check for it first when a symptom looks similar:
 
 - Classifier/config state that's genuinely global to a map type (`classifierColor_`,
@@ -104,7 +104,7 @@ visibility in `map-choropleth.js`'s `styleMixedNUTS()` and `map-proportional-sym
 `map.nutsLevel(someConcreteLevel)` on a mixed-level map just to change which level's *data* is
 shown - that flips the map out of mixed mode and breaks all of the above. A consumer that wants
 "show me NUTS level N's data on an otherwise-mixed map" (e.g. IMAGE's exported-HTML NUTS-level
-dropdown, issue ESTAT/image#176) should leave `nutsLevel('mixed')` alone and only change the
+dropdown, image-repo issue #176) should leave `nutsLevel('mixed')` alone and only change the
 `geoLevel` stat filter on refetch - `styleMixedNUTS`/`styleMixedNUTSRegions` already show exactly
 the regions that end up with a classified/sized value from whatever data was just fetched.
 
@@ -134,6 +134,18 @@ the regions that end up with a classified/sized value from whatever data was jus
   changes on master (so `git pull` before your next push). Run `cmd /c npm run update-docs` to refresh it locally.
 - The Pages site serves `docs/*.md` raw at `.md` URLs; link to the rendered `.html` URL from HTML anchors (Jekyll only
   rewrites `.md` links written in Markdown syntax).
+
+## GitHub etiquette and history
+
+- **Never post a comment on an issue or PR (or close one with a comment) without showing the user the
+  draft and getting approval first.** These go out publicly under the user's account.
+- Don't rewrite or force-push `master` unless explicitly asked. If you must (e.g. scrubbing a commit message),
+  re-point every release tag in the rewritten range to its new commit and force-push them too, otherwise the
+  old commits stay reachable. External PRs branched before a rewrite can no longer be merged on GitHub: apply
+  the diff with `git cherry-pick`, keep the contributor as author, write the message yourself (no AI trailers),
+  then comment/close the PR (with approval, see above).
+- `statData.set()` tells a stat object `{value, status}` from a bare value with `'value' in stat`, never with a
+  truthy `stat.value`, so exact zeros and empty strings survive. Watch for the same `!x.value` pattern elsewhere.
 
 ## Never add a Co-Authored-By / AI-authorship trailer
 
