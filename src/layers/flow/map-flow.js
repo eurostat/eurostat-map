@@ -346,7 +346,6 @@ export const decorateFlowLayer = function (out, config) {
 
     //@override
     out.getLegendConstructor = function () {
-        //TODO: define legend
         return FlowLegend.legend
     }
 

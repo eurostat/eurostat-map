@@ -338,14 +338,21 @@ export function getFlowStroke(out, originId, destId, route, halfValue) {
 
     if (typeof out.flowColor_ === 'function') {
         let color
+        let error
         try {
             color = out.flowColor_(linkLike)
-        } catch (_) {}
+        } catch (e) {
+            error = e
+        }
         if (color == null && out.flowColor_.length >= 3) {
             try {
                 color = out.flowColor_(originId, destId, route)
-            } catch (_) {}
+                error = undefined
+            } catch (e) {
+                error = e
+            }
         }
+        if (color == null && error) console.warn('flowColor_ threw in straight flow getFlowColor:', error)
         if (color != null) return color
     }
     return colorByTopN(out, originId, destId, fallback)
