@@ -1,5 +1,19 @@
 # Release notes
 
+## 4.13.1
+
+### Fixes
+
+- **Exact zeros in `statData`.** `statData().set()` and `setData()` stored `{ value: 0 }` (and `{ value: '' }`) nested as `{ value: { value: 0 } }`, so the region was classified as `NaN`: grey on choropleth maps, and on proportional-symbol maps with a colour encoding the colour function threw, leaving later symbols unfilled and stopping the dorling layout. A stat object is now detected by its `value` key rather than a truthy value. Reported and fixed by @aborruso (#191, #192).
+
+Example:
+
+```javascript
+const sd = eurostatmap.map('choropleth').statData()
+sd.setData({ A: { value: 0, status: '' }, B: 0, C: { value: 1, status: 'e' } })
+sd.get('A') // { value: 0, status: '' }  (was { value: { value: 0, status: '' } })
+```
+
 ## 4.13.0
 
 ### Features
