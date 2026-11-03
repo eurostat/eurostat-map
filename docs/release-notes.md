@@ -866,6 +866,27 @@ Example:
 map.legend({ annotationLineEndOffsets: { x: 2, y: -2 } })
 ```
 
+## 4.8.4
+
+The bivariate legend changes of this release were documented together with 4.8.5, below; this is the summary of what 4.8.4 itself contained.
+
+### Improvements
+
+- **Bivariate legend API controls** were added and simplified, and the legend's map width is now capped.
+- **Bivariate legend option changes made via a live `.legend()` call are honoured** on the next redraw (`annotationOffsets`, `annotationLineEndOffsets`, `noDataYOffset`).
+- **The legend background box's conditional opacity stays in sync with the zoom state.**
+- **Bivariate legend x-axis break labels are offset by the tick length**, so they no longer sit on their tick marks.
+
+Example:
+
+```javascript
+map.legend({ annotationOffsets: { x: 0, y: -6 }, noDataYOffset: 10 })
+```
+
+### Breaking Changes
+
+- **`BivariateLegendConfig`'s deprecated `annotationPadding` option is removed.** Use `annotationOffsets`/`annotationLineEndOffsets` instead.
+
 ## 4.8.3
 
 ### Improvements

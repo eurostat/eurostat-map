@@ -1,6 +1,10 @@
 <svg id="map"></svg>
-<script src="https://unpkg.com/eurostat-map@3.3.0"></script>
+<script src="https://unpkg.com/eurostat-map"></script>
 <script>
-    eurostatmap.map("ch")
-    .build();
+    eurostatmap
+        .map('choropleth')
+        .title('Population density in Europe')
+        .stat('density', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
+        .encoding('fill', { stat: 'density' })
+        .build()
 </script>

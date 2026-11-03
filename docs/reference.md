@@ -1137,7 +1137,7 @@ Legacy waffle-prefixed setters (for example, `.waffleMinSize()` and `.waffleGrid
 
 ### Bar chart map
 
-[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/waffle_ex.png)](https://eurostat.github.io/eurostat-map/examples/bar-chart/bar-chart.html)
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/bar_ex.png)](https://eurostat.github.io/eurostat-map/examples/bar-chart/bar-chart.html)
 
 A bar chart map shows proportional bar charts positioned at region centroids. The library supports two layout modes:
 
@@ -1352,7 +1352,8 @@ map = eurostatmap.map(...)
         },
         statLabelsFilterFunction: (region, map) => {
             // filter the statistical value labels
-            const data = map.statData()
+            // the dataset whose values are labelled: use the name given to stat(name, ...)
+            const data = map.statData('population')
             const statValue = data.get(region.properties.id)
             if (!statValue || (!statValue.value && statValue.value !== 0)) {
                 return false

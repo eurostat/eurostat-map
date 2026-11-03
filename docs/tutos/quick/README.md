@@ -5,7 +5,7 @@ This page describes how to quickly create a statistical map with Eurostat data. 
 ## Create a map
 
 - Download [**eurostat_map.html**](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/tutos/quick/eurostat_map.html) file (with CTRL+S) on your desktop.
-- Double click on it: The map below should appear in a web browser. This is a default map showing the latest Eurostat figures on population.
+- Double click on it: The map below should appear in a web browser. This is a map showing the latest Eurostat figures on population density.
 
 ![map 1](map1.png)
 
@@ -20,25 +20,30 @@ You should see the short code snippet defining the map:
 
 ```html
 <svg id="map"></svg>
-<script src="https://unpkg.com/eurostat-map@3.3.0"></script>
+<script src="https://unpkg.com/eurostat-map"></script>
 <script>
-    eurostatmap.map('choropleth').build()
+    eurostatmap
+        .map('choropleth')
+        .title('Population density in Europe')
+        .stat('density', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
+        .encoding('fill', { stat: 'density' })
+        .build()
 </script>
 ```
 
-As first modifications, we propose to:
-
-- add a title: _Population in Europe_,
-- change the background color in light gray,
-- show place name labels.
-
-This can be achieved by simply inserting three lines as below:
+As a first modification, we propose to show the values of the statistics directly on the map. This can be achieved by inserting a single line (`.labels({ values: true })`) as below:
 
 ```html
 <svg id="map"></svg>
-<script src="https://unpkg.com/eurostat-map@3.3.0"></script>
+<script src="https://unpkg.com/eurostat-map"></script>
 <script>
-    eurostatmap.map('choropleth').title('Population in Europe').labelling(true).build()
+    eurostatmap
+        .map('choropleth')
+        .title('Population density in Europe')
+        .labels({ values: true })
+        .stat('density', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²' })
+        .encoding('fill', { stat: 'density' })
+        .build()
 </script>
 ```
 
@@ -51,15 +56,15 @@ The new map appears:
 
 ![map 2](map2.png)
 
-For each map characteristic to change, insert a line with the **name** of the characteristic (such as `.title`) and the desired **value** (such `"Population in Europe"`).
+For each map characteristic to change, insert a line with the **name** of the characteristic (such as `.title`) and the desired **value** (such as `'Population density in Europe'`).
 
-The list of caracteristics is described in the [documentation](../../reference.md).
+The list of characteristics is described in the [documentation](../../reference.md).
 
 The most important characteristic is of course the statistical data to show on the map, as described in the next section.
 
 ### Choose the Eurostat statistics
 
-Too show some specific Eurostat data, note the code of the corresponding database as indicated on [Eurostat website](https://ec.europa.eu/eurostat/web/main/data/database). For example, to select _data on at-risk-of-poverty population by NUTS 2 region_, note the code is **ilc_li41**.
+To show some specific Eurostat data, note the code of the corresponding database as indicated on [Eurostat website](https://ec.europa.eu/eurostat/web/main/data/database). For example, to select _data on at-risk-of-poverty population by NUTS 2 region_, note the code is **ilc_li41**.
 
 ![Eurostat website code](eb_code.png)
 
@@ -81,13 +86,14 @@ And insert it in the map definition following this format:
 
 ```html
 <svg id="map"></svg>
-<script src="https://unpkg.com/eurostat-map@3.3.0"></script>
+<script src="https://unpkg.com/eurostat-map"></script>
 <script>
     eurostatmap
         .map('choropleth')
         .title('Population at risk of poverty')
         .nutsLevel(2)
-        .stat({ eurostatDatasetCode: 'ilc_li41', filters: { unit: 'PC', time: 2018 } })
+        .stat('poverty', { eurostatDatasetCode: 'ilc_li41', unitText: '%', filters: { unit: 'PC', time: 2018 } })
+        .encoding('fill', { stat: 'poverty' })
         .build()
 </script>
 ```
