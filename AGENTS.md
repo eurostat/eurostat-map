@@ -178,6 +178,7 @@ suggests.
 ## Development & Build Commands on Windows
 Because script execution can be disabled in certain PowerShell environments, always use the Command Prompt prefix `cmd /c` when invoking npm scripts:
 * **Validate Types**: `cmd /c npm run type-check` (runs `tsc --noEmit`)
+* **Tests**: `cmd /c npm test` (node scripts in `test/` that run against the **built** `build/eurostatmap.js`, so rebuild the dev bundle first; add new ones to the `test` script)
 * **Production Build**: `cmd /c npm run build-prod` (copies typings and builds output to `build/`)
 * **Local Test Server**: `cmd /c npm run server`
 * **Format Files**: `cmd /c npm run format` (runs Prettier)

@@ -1,25 +1,4 @@
-globalThis.self = globalThis
-globalThis.window = globalThis
-globalThis.location = {
-    href: 'http://localhost/',
-    hostname: 'localhost'
-}
-globalThis.document = {
-    documentElement: {},
-    head: {
-        appendChild: () => {}
-    },
-    querySelector: () => ({
-        appendChild: () => {},
-        insertBefore: () => {}
-    }),
-    createElement: () => ({
-        setAttribute: () => {},
-        style: {},
-        appendChild: () => {}
-    }),
-    createTextNode: () => ({})
-}
+import './_dom-shim.js'
 
 import assert from 'node:assert'
 

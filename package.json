@@ -36,6 +36,7 @@
         "server": "webpack-dev-server --open --watch",
         "build-prod": "npm run copy-types && webpack --config webpack/webpack.config.prod.js",
         "build-prod-debug": "webpack --config webpack/webpack.config.debug-size.js",
+        "test": "node test/layer.phase1.test.js && node test/stat-data.test.js",
         "format": "prettier --write .",
         "copy-types": "node scripts/copy-types.js",
         "check:types:legend-config-sync": "node scripts/check-legend-config-sync.js",
