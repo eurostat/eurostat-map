@@ -284,6 +284,17 @@ const scaleLabelTexts = function (transform, map) {
     updates.forEach(({ element, targetFontSize }) => {
         element.style.setProperty('font-size', `${targetFontSize}px`, 'important')
     })
+
+    // A numeric dy offset (geographic labels sit 7px above their anchor) lives in the zoomed coordinate system
+    // too, so it has to shrink with the font. Otherwise the text drifts away from its background rect, which is
+    // scaled as a whole by scaleLabelBackgrounds.
+    labels.selectAll('text').each(function () {
+        const element = select(this)
+        const dy = element.attr('data-dy') ?? element.attr('dy')
+        if (dy === null || !/^-?\d*\.?\d+$/.test(dy.trim())) return
+        if (!element.attr('data-dy')) element.attr('data-dy', dy)
+        element.attr('dy', parseFloat(dy) / zoomFactor)
+    })
 }
 
 /**

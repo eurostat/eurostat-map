@@ -488,8 +488,10 @@ export const updateValuesLabels = function (map) {
     let statLabels = map.svg_.selectAll('g.em-stat-label')
 
     // filter stat-label elements to only show those with data
-    const filterFunction = map.labels_?.statLabelsFilterFunction ? map.labels_?.statLabelsFilterFunction : defaultStatLabelFilter
-    const statData = map.statData()
+    const statData = getStatLabelsData(map)
+    const filterFunction = map.labels_?.statLabelsFilterFunction
+        ? map.labels_.statLabelsFilterFunction
+        : (region) => defaultStatLabelFilter(region, statData)
     statLabels
         .filter((rg) => filterFunction(rg, map))
         // .append('text')
@@ -599,13 +601,28 @@ export const statLabelsTextFunction = (d, statData, map) => {
 }
 
 /**
+ * @description the statistical data whose values are labelled: the one encoded by the fill (or size) channel, which
+ *   is not the default dataset when the map is configured with a named stat, e.g. stat('value', {...}).encoding('fill', { stat: 'value' }).
+ * @param {Object} map eurostat-map map instance
+ * @return {Object} the statData
+ */
+const getStatLabelsData = (map) => {
+    // the facade map has no encodings of its own: they belong to its (active) layer
+    const layer = (typeof map.activeLayer === 'function' && map.activeLayer()) || map
+    for (const channel of ['fill', 'size']) {
+        const sd = layer.getEncodingStatData?.(channel)
+        if (sd?.get && sd._data_ && Object.keys(sd._data_).length) return sd
+    }
+    return map.statData()
+}
+
+/**
  * @description function for filtering statistical labels
  * @param {Object} d d3 selection json data element
  * @return {boolean}
  */
-const defaultStatLabelFilter = (region, map) => {
-    const s = map.statData()
-    const sv = s.get(region.properties.id)
+const defaultStatLabelFilter = (region, statData) => {
+    const sv = statData.get(region.properties.id)
     if (!sv || (!sv.value && sv !== 0 && sv.value !== 0)) {
         return false
     } else {

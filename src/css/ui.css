@@ -6,12 +6,14 @@
     cursor: pointer;
 }
 
-.em-button rect {
+.em-button rect,
+.em-button path.em-button-shape {
     fill: white;
     stroke: #ccc;
 }
 
-.em-button rect:hover {
+.em-button rect:hover,
+.em-button path.em-button-shape:hover {
     fill: lightgrey;
 }
 

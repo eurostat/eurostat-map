@@ -1,6 +1,15 @@
 import { select } from 'd3-selection'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
 
+// The two zoom buttons form one stack: only its outer corners are rounded, the + button on top and the - button below.
+const ZOOM_BUTTON_RADIUS = 5
+
+const roundedButtonPath = (size, radius, { top, bottom }) => {
+    const tl = top ? radius : 0
+    const bl = bottom ? radius : 0
+    return `M${tl},0 H${size - tl} ${tl ? `a${tl},${tl} 0 0 1 ${tl},${tl}` : ''} V${size - bl} ${bl ? `a${bl},${bl} 0 0 1 ${-bl},${bl}` : ''} H${bl} ${bl ? `a${bl},${bl} 0 0 1 ${-bl},${-bl}` : ''} V${tl} ${tl ? `a${tl},${tl} 0 0 1 ${tl},${-tl}` : ''} Z`
+}
+
 export const appendZoomButtons = (map) => {
     const svg = select('#' + map.svgId())
     const buttonSize = getButtonSize()
@@ -16,7 +25,7 @@ export const appendZoomButtons = (map) => {
 
     const zoomInBtn = buttonGroup.append('g').attr('class', 'em-zoom-in em-button').style('cursor', 'pointer')
     zoomInBtn.append('title').text('Zoom in')
-    zoomInBtn.append('rect').attr('width', buttonSize).attr('height', buttonSize)
+    zoomInBtn.append('path').attr('class', 'em-button-shape').attr('fill', 'white').attr('stroke', '#ccc').attr('d', roundedButtonPath(buttonSize, ZOOM_BUTTON_RADIUS, { top: true }))
     zoomInBtn
         .append('text')
         .attr('x', buttonSize / 2)
@@ -29,7 +38,7 @@ export const appendZoomButtons = (map) => {
         .style('cursor', 'pointer')
         .attr('transform', `translate(0, ${buttonSize})`)
     zoomOutBtn.append('title').text('Zoom out')
-    zoomOutBtn.append('rect').attr('width', buttonSize).attr('height', buttonSize)
+    zoomOutBtn.append('path').attr('class', 'em-button-shape').attr('fill', 'white').attr('stroke', '#ccc').attr('d', roundedButtonPath(buttonSize, ZOOM_BUTTON_RADIUS, { bottom: true }))
     zoomOutBtn
         .append('text')
         .attr('x', buttonSize / 2)

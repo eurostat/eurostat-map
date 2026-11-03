@@ -352,7 +352,16 @@
                     page = (await r.text()).replace(/\r\n/g, '\n').replace(/\s+$/, '') + '\n'
                     // the JavaScript written in the page: its scripts without src
                     const doc = new DOMParser().parseFromString(page, 'text/html')
-                    script = [...doc.querySelectorAll('script:not([src])')].map((s) => dedent(s.textContent.replace(/^\n+|\s+$/g, ''))).join('\n\n')
+                    const parts = [...doc.querySelectorAll('script:not([src])')].map((s) => dedent(s.textContent.replace(/^\n+|\s+$/g, '')))
+                    // and the scripts of the example itself, which are files beside the page (not the library or its dependencies)
+                    const files = [...doc.querySelectorAll('script[src]')]
+                        .map((s) => s.getAttribute('src'))
+                        .filter((src) => !/^(https?:)?\/\//.test(src) && !/(^|\/)(build|lib)\//.test(src) && !/\.min\.js$|eurostatmap|(^|\/)(d3|proj4)/i.test(src))
+                    for (const src of files) {
+                        const res = await fetch(new URL(src, new URL(example, location.href))).catch(() => null)
+                        if (res && res.ok) parts.push('// ' + src.replace(/^\.\//, '') + '\n' + (await res.text()).replace(/\r\n/g, '\n').replace(/\s+$/, ''))
+                    }
+                    script = parts.filter((p) => p.trim()).join('\n\n')
                     // the title of the example is the one of its page
                     if (doc.title.trim()) {
                         $('title').textContent = doc.title.trim()
