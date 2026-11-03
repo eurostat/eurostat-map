@@ -18,7 +18,7 @@ This document summarizes the comprehensive TypeScript support added to the euros
 
 ### New Files Created
 
-1. **`src/types/index.d.ts`** (654 lines)
+1. **`src/types/index.d.ts`** (barrel re-export of the type declarations in `src/types/`)
 
     - Comprehensive type definitions for all map types
     - Configuration interfaces for all features
@@ -316,7 +316,7 @@ When adding new features:
 For TypeScript-related issues:
 
 1. Check [TYPESCRIPT.md](TYPESCRIPT.md) for usage examples
-2. Review [type definitions](src/types/index.d.ts) for available types
+2. Review [type definitions](../../src/types/index.d.ts) for available types
 3. Open an issue on GitHub with `typescript` label
 4. Include TypeScript version and configuration
 

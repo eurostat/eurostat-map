@@ -106,6 +106,5 @@ or for a specific inset use:
 .em-tooltip
 .em-tooltip-text
 .em-tooltip-bar
-.em-tooltip-piechart-breakdown
 .em-tooltip-piechart-container
 ```

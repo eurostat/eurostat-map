@@ -63,7 +63,7 @@ Too show some specific Eurostat data, note the code of the corresponding databas
 
 ![Eurostat website code](eb_code.png)
 
-Then use the [query builder](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder) to specify more precisely the dataset figure to select. For our example, we will select the data for _2018_ and the unit _Percentage_.
+Then use the [query builder](https://ec.europa.eu/eurostat/web/query-builder) to specify more precisely the dataset figure to select. For our example, we will select the data for _2018_ and the unit _Percentage_.
 
 ![Eurostat website code](selection1.png)
 

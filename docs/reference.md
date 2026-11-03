@@ -176,7 +176,7 @@ If you wish to make maps using your own custom geometries instead of NUTS region
 | ------------------------------- | -------- | ------------- | ---------------------------------------------------------------------- |
 | _map_.**geometries**([*value*]) | Object[] | NUTS regions  | Here you can define your own custom geometries to be used in your maps |
 
-You can find a [live example here](https://eurostat.github.io/eurostat-map/examples/choropleth/custom-geometries.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/choropleth/custom-geometries.html))
+You can find a [live example here](https://eurostat.github.io/eurostat-map/examples/misc/custom-geometries.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/misc/custom-geometries.html))
 
 ### Statistical data
 
@@ -242,7 +242,7 @@ Helpers to read the stat bound to an encoding channel (useful in custom tooltips
 
 #### Eurostat database
 
-Specify statistical data to be retrieved on-the-fly from [Eurostat database](https://ec.europa.eu/eurostat/web/main/data/database). The query parameters can be retrieved from [this page](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/generate-new-query).
+Specify statistical data to be retrieved on-the-fly from [Eurostat database](https://ec.europa.eu/eurostat/web/main/data/database). The query parameters can be retrieved from [this page](https://ec.europa.eu/eurostat/web/query-builder).
 
 Example:
 
@@ -262,7 +262,7 @@ map.stat( {
 | Parameter               | Type   | Default value            | Description                                                                                                                                                                                                                                                   |
 | ----------------------- | ------ | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **eurostatDatasetCode** | String | _"demo_r_d3dens"_        | The Eurostat database code of the statistical variable. See [here](https://ec.europa.eu/eurostat/data/database) to find them.                                                                                                                                 |
-| **filters**             | Object | _{ lastTimePeriod : 1 }_ | The Eurostat dimension codes to filter/select the chosen statistical variable. See [here](https://ec.europa.eu/eurostat/data/database) or [here](https://ec.europa.eu/eurostat/web/json-and-unicode-web-services/getting-started/query-builder) to find them. |
+| **filters**             | Object | _{ lastTimePeriod : 1 }_ | The Eurostat dimension codes to filter/select the chosen statistical variable. See [here](https://ec.europa.eu/eurostat/data/database) or [here](https://ec.europa.eu/eurostat/web/query-builder) to find them. |
 | **precision**           | int    | _2_                      | The precision of the statistical variable to retrieve (number of decimal places).                                                                                                                                                                             |
 
 #### CSV
@@ -354,10 +354,10 @@ eurostatmap
 
 ### Proportional symbol map
 
-[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/pc_ex.png)](https://eurostat.github.io/eurostat-map/examples/proportional/prop-circles.html)
-[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/ps_ex.png)](https://eurostat.github.io/eurostat-map/examples/proportional/prop-circles.html)
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/pc_ex.png)](https://eurostat.github.io/eurostat-map/examples/proportional-symbols/prop-circles.html)
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/ps_ex.png)](https://eurostat.github.io/eurostat-map/examples/proportional-symbols/prop-circles.html)
 
-A proportional symbol map shows symbols (typically circles) **sized** in proportion to a statistical variable. These maps should be used to show statistical _extensive_ variables such as quantities, populations, numbers, etc. Here is [an example](https://eurostat.github.io/eurostat-map/examples/proportional/prop-circles.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/proportional/prop-circles.html)).
+A proportional symbol map shows symbols (typically circles) **sized** in proportion to a statistical variable. These maps should be used to show statistical _extensive_ variables such as quantities, populations, numbers, etc. Here is [an example](https://eurostat.github.io/eurostat-map/examples/proportional-symbols/prop-circles.html) (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/proportional-symbols/prop-circles.html)).
 
 Example:
 
@@ -1137,14 +1137,14 @@ Legacy waffle-prefixed setters (for example, `.waffleMinSize()` and `.waffleGrid
 
 ### Bar chart map
 
-[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/waffle_ex.png)](https://eurostat.github.io/eurostat-map/examples/composition/bar.html)
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/waffle_ex.png)](https://eurostat.github.io/eurostat-map/examples/bar-chart/bar-chart.html)
 
 A bar chart map shows proportional bar charts positioned at region centroids. The library supports two layout modes:
 
 - **Stacked bars** (horizontal): Bar width scales with the region total; colored segments represent category shares left-to-right. Good for comparing totals and composition simultaneously.
 - **Grouped bars** (vertical): Each category gets its own vertical bar; bar height scales with the individual category value. Good for comparing absolute category values across regions.
 
-Here is [an example](https://eurostat.github.io/eurostat-map/examples/composition/bar.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/composition/bar.html)).
+Here is [an example](https://eurostat.github.io/eurostat-map/examples/bar-chart/bar-chart.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/bar-chart/bar-chart.html)).
 
 Example (stacked horizontal bars):
 
@@ -1271,7 +1271,7 @@ map.gridCartogramSettings({
 
 Legacy setters such as `gridCartogramShape`, `gridCartogramMargins`, `gridCartogramCellPadding` and `gridCartogramPositions` are still available for backward compatibility but are deprecated.
 
-Here is [an example](https://eurostat.github.io/eurostat-map/examples/cartogram/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/cartogram/grid-cartogram.html))
+Here is [an example](https://eurostat.github.io/eurostat-map/examples/cartogram/grid/grid-cartogram.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/cartogram/grid/grid-cartogram.html))
 
 #### Dorling Cartograms
 
@@ -1723,7 +1723,6 @@ As proportional symbol maps allow for two visual variables (size and colour), a 
 | Parameter               | Type    | Default value | Description                                                                                     |
 | ----------------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------- |
 | _map_.**ascending**     | Boolean | _false_       | The order of the legend elements. Set to true to invert.                                        |
-| _map_.**legendSpacing** | Number  | _35_          | Spacing between the color & size legends (if applicable)                                        |
 | _map_.**labelFontSize** | Number  | _12_          | The font size of the legend labels                                                              |
 | _map_.**sizeLegend**    | Object  | see below     | The configuration object of the legend which illustrates the values of different symbol sizes   |
 | _map_.**colorLegend**   | Object  | see below     | The configuration object of the legend which illustrates the values of different symbol colours |
@@ -1791,7 +1790,6 @@ The following parameters are properties of the colorLegend object:
 | Method                             | Type   | Default value | Description                                                                                   |
 | ---------------------------------- | ------ | ------------- | --------------------------------------------------------------------------------------------- |
 | _map_.**labelFontSize**([*value*]) | int    | _12_          | Font size of the legend label.                                                                |
-| _map_.**legendSpacing**            | Number | _35_          | Spacing between the color & size legends (if applicable).                                     |
 | _map_.**sizeLegend**               | Object | see below     | The configuration object of the legend which illustrates the values of different pie sizes.   |
 | _map_.**colorLegend**              | Object | see below     | The configuration object of the legend which illustrates the values of different pie colours. |
 
