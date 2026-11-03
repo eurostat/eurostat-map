@@ -36,7 +36,6 @@ export function appendPlacenameLabels(out) {
     const zoomFactor = out.__lastTransform?.k || 1 // current zoom scale
 
     const filtered = getFilteredPlacenames(out)
-    console.log(`Filtered ${filtered.length} placenames for zoom level ${zoomFactor}`)
 
     // Remove old
     svg.select('#em-placenames').remove()
@@ -119,7 +118,6 @@ const getFilteredPlacenames = function (out) {
         if (filtered.length >= maxLabels) break
     }
 
-    console.log(`After filtering, ${filtered.length} placenames remain.`)
     return filtered
 }
 

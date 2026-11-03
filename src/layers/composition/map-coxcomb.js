@@ -860,7 +860,6 @@ export const decorateCoxcombLayer = function (out, config) {
 
         regions
             .on('mouseenter', function (e, rg) {
-                console.log('mouseenter', rg.properties.id)
                 if (!getRegionTotal(rg.properties.id)) return
                 const sel = select(this)
                 sel.attr('fill___', sel.style('fill'))
@@ -871,7 +870,6 @@ export const decorateCoxcombLayer = function (out, config) {
             //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
             // })
             .on('mouseleave', function (e, rg) {
-                console.log('mouseleave', rg.properties.id)
                 const sel = select(this)
                 const newFill = sel.attr('fill___')
                 if (newFill) {

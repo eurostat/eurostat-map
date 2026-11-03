@@ -945,7 +945,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * @returns {object} The map instance.
      */
     out.updateClassification = function () {
-        console.log('Map updateClassification function not implemented')
+        console.warn('Map updateClassification function not implemented')
         return out
     }
 
@@ -957,7 +957,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * @returns {object} The map instance.
      */
     out.updateStyle = function () {
-        console.log('Map updateStyle function not implemented')
+        console.warn('Map updateStyle function not implemented')
         return out
     }
 
@@ -966,7 +966,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * Function which return the legend constructor function for the map.
      */
     out.getLegendConstructor = function () {
-        console.log('Map getLegendConstructor function not implemented')
+        console.warn('Map getLegendConstructor function not implemented')
         return Legend.legend
     }
 

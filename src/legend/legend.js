@@ -166,7 +166,7 @@ export const legend = function (map) {
      * This is an abstract method to be defined for each specific legend.
      */
     out.update = function () {
-        console.log('Legend update function not implemented')
+        console.warn('Legend update function not implemented')
         return out
     }
 

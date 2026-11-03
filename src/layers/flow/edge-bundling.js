@@ -100,7 +100,6 @@ export function drawEdgeBundleLines(out, lineGroup) {
         )
         .force('link', forceLink().strength(out.flowBundleSettings_.linkStrength).distance(0).iterations(out.flowBundleSettings_.linkIterations))
         .on('tick', () => paths.attr('d', lineFunction))
-        .on('end', () => console.log('layout complete'))
 
     layout.nodes(bundle.nodes)
     layout.force('link').links(bundle.links)

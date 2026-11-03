@@ -476,13 +476,13 @@ const tooltipTextFunBiv = function (rg, map) {
         <tbody>
         <tr>
         <td>
-        ${sv1 && sv1.value ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && sv1.value ? unit1 : ''}
+        ${sv1 && (sv1.value || sv1.value === 0) ? spaceAsThousandSeparator(sv1.value) : ''} ${unit1 && sv1 && (sv1.value || sv1.value === 0) ? unit1 : ''}
         ${!sv1 || (sv1.value != 0 && !sv1.value) ? layer.noDataText_ : ''}
         </td>
         </tr>
         <tr>
         <td>
-        ${sv2 && sv2.value ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && sv2.value ? unit2 : ''}
+        ${sv2 && (sv2.value || sv2.value === 0) ? spaceAsThousandSeparator(sv2.value) : ''} ${unit2 && sv2 && (sv2.value || sv2.value === 0) ? unit2 : ''}
         ${!sv2 || (sv2.value != 0 && !sv2.value) ? layer.noDataText_ : ''}
         </td>
         </tr>

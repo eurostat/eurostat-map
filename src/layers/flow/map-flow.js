@@ -559,7 +559,7 @@ function addOverlayPolygons(out) {
         // Skip nodes that aren't in the geometry features
         const overlay = features.find((f) => f.properties.id === node.id)
         if (!overlay) {
-            console.log('could not find region geometry for', node.id)
+            console.warn('could not find region geometry for', node.id)
             return
         }
 
@@ -576,7 +576,7 @@ function addOverlayPolygons(out) {
     out.exporterRegionIds = exporterIds
 
     if (importerIds.length === 0 && exporterIds.length === 0) {
-        console.log('No importer or exporter regions found in the flow graph.')
+        console.warn('No importer or exporter regions found in the flow graph.')
         return
     }
 

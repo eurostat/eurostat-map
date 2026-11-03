@@ -316,7 +316,7 @@ function getFlowStroke(out, link) {
             if (c != null) return c
         } catch (e) {
             // swallow and fall back to top-N / default
-            console.log('flowColor_ threw in sankey getFlowStroke:', e)
+            console.warn('flowColor_ threw in sankey getFlowStroke:', e)
         }
     }
 
@@ -384,7 +384,7 @@ function computeNodeDepths({ nodes }) {
             }
         }
         if (++x > n) {
-            console.log('Detected circular link(s); continuing layout.')
+            console.warn('Detected circular link(s); continuing layout.')
             break // Don’t throw, just stop further propagation
         }
         current = next
@@ -407,7 +407,7 @@ function computeNodeHeights({ nodes }) {
         for (const { source } of node.targetLinks) {
             if (stack.includes(source)) {
                 // Circular reference detected — stop recursion, don't loop forever
-                console.log(`Circular link detected between ${source.id} and ${node.id}`)
+                console.warn(`Circular link detected between ${source.id} and ${node.id}`)
                 continue
             }
             const h = visit(source, depth + 1)

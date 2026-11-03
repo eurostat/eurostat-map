@@ -75,7 +75,6 @@ function shouldShowCell(regionId, map) {
         }
         for (const cfg of configs) {
             if (cfg && Array.isArray(cfg.regionIds) && cfg.regionIds.includes(regionId)) {
-                console.log(`[Grid] Showing ${regionId} - included in patternFill regionIds`)
                 return true
             }
         }
@@ -108,7 +107,6 @@ function shouldShowCell(regionId, map) {
 
     // If any category has ':' status or value, show the cell
     if (hasNoDataStatus) {
-        console.log(`[Grid] Showing ${regionId} - has ':' status/value`)
         return true
     }
 
@@ -122,14 +120,10 @@ function shouldShowCell(regionId, map) {
             hasData = true
         }
         if (entry && (entry.status === ':' || entry.value === ':')) {
-            console.log(`[Grid] Showing ${regionId} - totalCode ${totalCode} has ':' status/value`)
             return true
         }
     }
 
-    if (!hasData) {
-        console.log(`[Grid] Hiding ${regionId} - no data`)
-    }
     return hasData
 }
 
@@ -262,7 +256,6 @@ const getGridData = (position, out, filterFn) => {
     // Filter cells based on data availability if a filter function is provided
     if (filterFn && typeof filterFn === 'function') {
         const filtered = allCells.filter((cell) => filterFn(cell.id, out))
-        console.log(`[Grid] Cells after filtering: ${filtered.length}`)
         return filtered
     }
 

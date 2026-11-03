@@ -259,15 +259,15 @@ export const createLayer = function (map, config = {}) {
 
     // Abstract render methods — the type's decorate() overrides these in Phase 3+.
     layer.updateClassification = function () {
-        console.log('Layer updateClassification not implemented (' + layer.type + ')')
+        console.warn('Layer updateClassification not implemented (' + layer.type + ')')
         return layer
     }
     layer.updateStyle = function () {
-        console.log('Layer updateStyle not implemented (' + layer.type + ')')
+        console.warn('Layer updateStyle not implemented (' + layer.type + ')')
         return layer
     }
     layer.getLegendConstructor = function () {
-        console.log('Layer getLegendConstructor not implemented (' + layer.type + ')')
+        console.warn('Layer getLegendConstructor not implemented (' + layer.type + ')')
         return Legend.legend
     }
 

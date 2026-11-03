@@ -73,7 +73,6 @@ export function runDorlingSimulation(layerOrMap, radiusAccessor, padding = 0) {
                 return sim
             } else {
                 // === Web Worker branch ===
-                console.log('Running Dorling simulation asynchronously in a Web Worker')
                 const worker = new Worker(new URL('./dorling-worker.js', import.meta.url), { type: 'module' })
                 worker.postMessage({
                     nodes: nodes.map((n) => ({ ...n })), // shallow clone
