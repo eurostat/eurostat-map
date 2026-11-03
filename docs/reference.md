@@ -1,6 +1,6 @@
 # eurostat-map documentation
 
-Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
+Browse the <a href="https://eurostat.github.io/eurostat-map/examples/index.html" target="_blank">examples gallery</a> to see live maps with their source code. Check out <a href="https://observablehq.com/collection/@eurostat-ws/eurostatmap-js" target="_blank">this observable notebook</a> for a quickstart guide.
 
 This document is the narrative usage guide. For generated, signature-accurate API docs from TypeScript/JSDoc, see [the API docs](https://eurostat.github.io/eurostat-map/docs/api/index.html).
 
