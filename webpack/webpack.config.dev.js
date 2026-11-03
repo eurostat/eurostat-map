@@ -40,5 +40,6 @@ module.exports = {
     },
     plugins: [new LiveReloadPlugin()],
     watch: true,
-    devtool: 'inline-source-map',
+    // no inline source map: it made the bundle (the package's `module` entry) 8 MB instead of 3 MB
+    devtool: false,
 }
