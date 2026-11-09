@@ -181,7 +181,22 @@ Because script execution can be disabled in certain PowerShell environments, alw
 * **Tests**: `cmd /c npm test` (node scripts in `test/` that run against the **built** `build/eurostatmap.js`, so rebuild the dev bundle first; add new ones to the `test` script)
 * **Production Build**: `cmd /c npm run build-prod` (copies typings and builds output to `build/`)
 * **Local Test Server**: `cmd /c npm run server`
-* **Format Files**: `cmd /c npm run format` (runs Prettier)
+* **Format Files**: `cmd /c npm run format` (runs Prettier). Don't run it, or `prettier --write` on a
+  whole directory, for a small change: many tracked files aren't Prettier-clean (and some are CRLF),
+  so it rewrites dozens of unrelated files. Format only the files you touched.
+* `npm test` includes `test/kosovo-border.test.mjs`, which needs Playwright's Chromium
+  (`npx playwright install chromium` after a Playwright bump). It is offline: synthetic Nuts2json.
+* `node scripts/smoke-harness.js` (17 cherry-picked examples) compares serialized SVG against
+  `test/baselines/`; recapture with `--capture` after deliberate DOM changes. The `--all`
+  baselines are not maintained (many missing or stale), so only its page errors and timeouts mean anything.
+
+## Border hierarchy (Kosovo rule)
+
+The Kosovo border (`.em-kosovo-bn`) must always look in between national and regional borders:
+width and colour only, never opacity or dashing (unless national borders are dashed), no halo.
+Every map type that mutes national borders in `src/css/layers/*.css` (and world maps, via
+`world.css`) must scale `.em-kosovo-bn` down with them. When changing any border width or colour, run
+`node test/kosovo-border.test.mjs --verbose`; it prints national/Kosovo/regional per map type.
 
 ## Coding & Documentation Standards
 * Keep existing JSDoc comments intact and make sure they are accurate.

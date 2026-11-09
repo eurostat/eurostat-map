@@ -1,5 +1,76 @@
 # Release notes
 
+## Unreleased (next version)
+
+### Fixes
+
+- **The Kosovo border now always sits between national and regional borders, on every map type.** Eurostat's rule is that it must be less prominent than a national border and more prominent than a regional one, using stroke width and colour only. It used to have `opacity: 0.8`, which made its look depend on the fill underneath. That is gone: it is now a solid `#787878`, 0.5px line. Map types that mute their national borders used to draw Kosovo as heavy as, or heavier than, those borders: proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, plus world maps, whose national borders are only 0.5px. Each of these now scales the Kosovo border down to match. See the border hierarchy section in `docs/css.md` if you override border styles.
+
+Example:
+
+```css
+/* defaults: national > Kosovo > regional */
+.em-cntbn {
+    stroke: #353535;
+    stroke-width: 0.8px;
+}
+.em-kosovo-bn {
+    stroke: #787878;
+    /* no opacity, no dashing, no halo */
+    stroke-width: 0.5px;
+}
+.em-bn-1,
+.em-bn-2,
+.em-bn-3 {
+    stroke: #868686;
+    stroke-width: 0.3px;
+}
+```
+
+- **Thinner regional borders (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now 0.3px instead of 0.4px. This matches the Eurostat guideline and keeps them clearly lighter than the Kosovo border. Coastlines keep 0.4px. To restore the previous look:
+
+```css
+.em-bn-1,
+.em-bn-2,
+.em-bn-3,
+.em-nutsrg [lvl='1'],
+.em-nutsrg [lvl='2'],
+.em-nutsrg [lvl='3'] {
+    stroke-width: 0.4px;
+}
+```
+
+- **Flow maps: regional borders are muted (visible change).** At their default NUTS level 3, flow maps drew regional borders (0.4px) thicker than their own muted national borders (0.25px). Regional borders are now 0.07px, as on proportional symbol maps.
+- **Bar and waffle maps: national borders use a solid light grey (visible change).** They used to be muted with `opacity: 0.3`. They now use `stroke: #c2c2c2`, which looks the same on these maps' light fills but no longer depends on the fill. Their white halo is removed; at 0.3 opacity it was barely visible anyway.
+- **The bivariate choropleth tooltip shows exact zeros** instead of leaving the value blank.
+- **Geographic labels keep their background when zoomed.** The text used to drift away from its background box as you zoomed in.
+- **Value labels use the encoded stat.** With a named stat, `labels({ values: true })` labelled the empty default dataset. It now labels the stat encoded by the fill (or size) channel.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .stat('value', { eurostatDatasetCode: 'demo_r_d3dens' })
+    .encoding('fill', { stat: 'value' })
+    .labels({ values: true }) // now labels 'value'
+    .build()
+```
+
+- **Straight flow maps warn when a custom `flowColor` function throws**, instead of silently falling back to the default colours. Internal "not implemented" notices are now `console.warn`, and leftover debug logging has been removed.
+
+### Improvements
+
+- **Smaller bundles.** The minified bundle (`main`/`unpkg`) is down from 1.23 MB to 0.93 MB, and the unminified `module` bundle from 7.6 MB to 3.1 MB (it no longer inlines a source map). The minified bundle now targets browsers from roughly the last four years (Chrome/Edge/Firefox 100+, Safari 15+) and is no longer down-compiled to ES5.
+- **Rounded zoom buttons.** The zoom-in/zoom-out stack now has rounded outer corners. Each button is drawn as a `path.em-button-shape` instead of a `rect`, so update any custom CSS that targets `.em-button rect` for the zoom buttons:
+
+```css
+.em-zoom-in path.em-button-shape,
+.em-zoom-out path.em-button-shape {
+    fill: #f7f7f7;
+}
+```
+
 ## 4.13.1
 
 ### Fixes
