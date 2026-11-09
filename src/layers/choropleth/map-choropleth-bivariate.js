@@ -5,13 +5,7 @@ import { rgb } from 'd3-color'
 import { interpolateRgb } from 'd3-interpolate'
 import { schemeBlues, schemeOranges } from 'd3-scale-chromatic'
 import * as BivariateLegend from '../../legend/choropleth/legend-choropleth-bivariate'
-import {
-    getCSSPropertyFromClass,
-    spaceAsThousandSeparator,
-    executeForAllInsets,
-    getRegionsSelector,
-    getTextColorForBackground,
-} from '../../core/utils'
+import { spaceAsThousandSeparator, executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../../core/utils'
 import { buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 
@@ -242,7 +236,7 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
 
                     const ecl1 = select(this).attr('ecl1')
                     const ecl2 = select(this).attr('ecl2')
-                    if (!ecl1 && !ecl2) return getCSSPropertyFromClass('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+                    if (!ecl1 && !ecl2) return null // no inline fill: the stylesheet's land fill applies (incl. darkMode). GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
                     if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
                     let color = out.classToFillStyle_(+ecl1, +ecl2)
                     return color

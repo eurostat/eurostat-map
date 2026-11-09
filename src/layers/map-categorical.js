@@ -2,7 +2,7 @@ import { select } from 'd3-selection'
 import { scaleOrdinal } from 'd3-scale'
 
 import * as CategoricalLegend from '../legend/legend-categorical'
-import { executeForAllInsets, getCSSPropertyFromClass, getRegionsSelector, getTextColorForBackground } from '../core/utils'
+import { executeForAllInsets, getRegionsSelector, getTextColorForBackground } from '../core/utils'
 import { applyPatternFill } from '../core/decoration/pattern-fill'
 import { buildSingleLayerMap } from '../core/stat-map'
 import { registerLayerType } from '../core/layer-registry'
@@ -229,7 +229,7 @@ export const decorateCategoricalLayer = function (out, config) {
     const regionsFillFunction = function (rg) {
         const ecl = select(this).attr('ecl') // 'this' refers to the current DOM element
         if (out.Geometries.userGeometries) {
-            if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
+            if (!ecl) return null // no inline fill: the stylesheet's land fill applies (incl. darkMode)
             if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
             return out.classToFillStyle_[out.classifier().domain()[ecl]]
         } else {
@@ -242,7 +242,7 @@ export const decorateCategoricalLayer = function (out, config) {
             } else {
                 // NUTS template logic
                 const countryId = rg.properties.id.slice(0, 2)
-                if (!ecl) return getCSSPropertyFromClass('em-nutsrg', 'fill')
+                if (!ecl) return null // no inline fill: the stylesheet's land fill applies (incl. darkMode)
                 if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
                 return out.classToFillStyle_[out.classifier().domain()[ecl]]
             }
