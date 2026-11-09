@@ -555,35 +555,26 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             }
         })
 
-        // nuts border stroke
+        // nuts border stroke (and on world maps its width): regions with data below level 0 get
+        // their current stroke (inline, else computed) set inline, the others have it removed.
+        // Read every value first, then write: reading a computed style right after an inline
+        // style write forces a style recalculation, once per region when interleaved.
+        const strokes = new Map()
+        const strokeWidths = new Map()
+        regions.each(function (rg) {
+            const sv = sizeData.get(rg.properties.id)
+            if (!sv || !sv.value) return
+            const sel = select(this)
+            if (sel.attr('lvl') === '0') return
+            strokes.set(this, sel.style('stroke'))
+            if (map.geo_ == 'WORLD') strokeWidths.set(this, sel.style('stroke-width'))
+        })
         regions
-            .style('stroke', function (rg) {
-                const sel = select(this)
-                const lvl = sel.attr('lvl')
-                const stroke = sel.style('stroke')
-                const sv = sizeData.get(rg.properties.id)
-                if (!sv || !sv.value) {
-                    return
-                } else {
-                    if (lvl !== '0') {
-                        return stroke || '#777'
-                    }
-                }
+            .style('stroke', function () {
+                if (strokes.has(this)) return strokes.get(this) || '#777'
             })
-
-            // nuts border stroke width
-            .style('stroke-width', function (rg) {
-                const sel = select(this)
-                const lvl = sel.attr('lvl')
-                const strokeWidth = sel.style('stroke-width')
-                const sv = sizeData.get(rg.properties.id)
-                if (!sv || !sv.value) {
-                    return
-                } else if (map.geo_ == 'WORLD') {
-                    if (lvl !== '0') {
-                        return strokeWidth || '#777'
-                    }
-                }
+            .style('stroke-width', function () {
+                if (strokeWidths.has(this)) return strokeWidths.get(this) || '#777'
             })
     }
 
