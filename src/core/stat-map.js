@@ -41,6 +41,10 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
     // render scheduling flag
     let _renderScheduled = false
+    // updateGeoData() bookkeeping: the latest call, and how many of its targets (main map and
+    // insets) have not reported their geometry yet
+    let _geoGeneration = 0
+    let _geoTargetsPending = 0
     out._loadingGeoCount_ = 0
     out._loadingStatCount_ = 0
 
@@ -818,12 +822,32 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * @returns {object} The map instance.
      */
     out.updateGeoData = function () {
-        out._loadingGeoCount_ += countGeoUpdateTargets(out)
+        const targets = countGeoUpdateTargets(out)
+        out._loadingGeoCount_ += targets
         out.updateLoader()
+
+        // updateGeoMapTemplate() calls the callback below once per target (main map and every
+        // inset, nested ones included), each time that target's geometry has loaded (or failed to)
+        // and its template is built. Classify and style only once, when the last target of this
+        // call has reported: every map is then built and updateStatValues() styles them all.
+        // Running it on every callback that finds all geometry loaded restyled every map once per
+        // map (main + 14 insets = 15 full passes) whenever geometry came from the cache.
+        // A later updateGeoData() (or build()) supersedes this one: its pending callbacks still do
+        // the loader bookkeeping, but no longer trigger styling.
+        const generation = ++_geoGeneration
+        let remaining = targets
+        _geoTargetsPending = targets
 
         updateGeoMapTemplate(() => {
             out._loadingGeoCount_ = Math.max(0, out._loadingGeoCount_ - 1)
             out.updateLoader()
+
+            if (generation !== _geoGeneration) return
+            // a callback that throws is called a second time by updateGeoMapTemplate's catch, so
+            // remaining can drop below 0: that call runs the styling again, as it always did
+            remaining--
+            _geoTargetsPending = Math.max(0, remaining)
+            if (remaining > 0) return
 
             if (!out.Geometries.isGeoReady()) return
 
@@ -881,7 +905,8 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                     if (!isStatDataReady()) return
 
                     out._statDone_ = true
-                    if (!out.Geometries.isGeoReady()) return
+                    // geometry still loading/building: its last callback styles the maps
+                    if (_geoTargetsPending > 0 || !out.Geometries.isGeoReady()) return
 
                     if (_renderScheduled) {
                         // Render already scheduled, but still need to ensure callback fires
