@@ -6,8 +6,8 @@
 //   - effective opacity 1 (opacity and stroke-opacity multiplied up the ancestor chain), since
 //     a translucent line's look depends on the fill underneath;
 //   - same dash pattern as the national border (solid unless national borders are dashed);
-//   - a prominence score (width x darkness x opacity) below the national border and above the
-//     regional border.
+//   - a prominence score (width x contrast with the background x opacity) clearly (10%) below
+//     the national border and above the regional border.
 //
 // Renders each map type in headless Chromium (Playwright, already a devDependency) against the
 // built dev bundle (build/eurostatmap.js), fully offline: Nuts2json requests are answered with a
@@ -16,7 +16,13 @@
 // use the bundled src/assets/topojson/WORLD_4326.json. Computed styles come from the real CSS
 // cascade, so per-map-type overrides (e.g. `.em--ps .em-cntbn`) are covered.
 //
-// Usage: node test/kosovo-border.test.mjs [--verbose]
+// Every scenario runs in each border mode: default (dark borders), lightBorders(true),
+// darkMode(true), and both (set before build, and switched on an already-built map). Prominence
+// is measured against the mode's background (white land, a mid-grey data fill under light
+// borders, the dark land of darkMode), and a national border's halo counts towards it. Light mode must also turn national, Kosovo and regional
+// borders white; disputed borders must stay dashed in every mode; insets inherit the mode.
+//
+// Usage: node test/kosovo-border.test.mjs [--verbose] [--mode <mode name>]
 
 import fs from 'node:fs'
 import path from 'node:path'
@@ -25,6 +31,7 @@ import { fileURLToPath } from 'node:url'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const ORIGIN = 'http://em-test.local'
 const VERBOSE = process.argv.includes('--verbose')
+const ONLY_MODE = process.argv.includes('--mode') ? process.argv[process.argv.indexOf('--mode') + 1] : null
 
 let chromium
 try {
@@ -83,6 +90,8 @@ function topology(level) {
         { type: 'LineString', arcs: line(b++), properties: { id: 1, eu: 'T', efta: 'F', cc: 'F', oth: 'F', co: 'F' } },
         { type: 'LineString', arcs: line(b++), properties: { id: 2, eu: 'F', efta: 'F', cc: 'T', oth: 'F', co: 'F' } },
         { type: 'LineString', arcs: line(b++), properties: { id: 3, eu: 'T', efta: 'F', cc: 'F', oth: 'F', co: 'T' } },
+        // disputed border (Nuts2json >= 2.1 flags them with ps > 0)
+        { type: 'LineString', arcs: line(b++), properties: { id: 4, eu: 'T', efta: 'F', cc: 'F', oth: 'F', co: 'F', ps: 1 } },
     ]
     const gra = [{ type: 'LineString', arcs: line(b++), properties: {} }]
     const gc = (geometries) => ({ type: 'GeometryCollection', geometries })
@@ -142,7 +151,18 @@ const stat = (code = 'demo_r_d3dens', filters = {}) => ({ eurostatDatasetCode: c
 
 // Each scenario is a builder-chain snippet evaluated in the page with `m` = eurostatmap.map(type)
 const SCENARIOS = []
-const add = (name, type, setup) => SCENARIOS.push({ name, type, setup })
+const add = (name, type, setup, svgId = 'map') => SCENARIOS.push({ name, type, setup, svgId })
+
+// Border modes. bg is the background the borders are judged against: white land by default, a
+// mid-grey data fill for light (white) borders, and the dark land darkMode paints itself.
+const MODES = [
+    { name: 'default', lightBorders: false, darkMode: false, bg: '#ffffff' },
+    { name: 'light', lightBorders: true, darkMode: false, bg: '#808080' },
+    { name: 'dark', lightBorders: false, darkMode: true, bg: 'land' },
+    { name: 'light+dark', lightBorders: true, darkMode: true, bg: 'land' },
+    // both switched on an already-built map (and its insets), as an app toggling them would
+    { name: 'light+dark, set after build', lightBorders: true, darkMode: true, bg: 'land', afterBuild: true },
+].filter((m) => !ONLY_MODE || m.name === ONLY_MODE)
 
 for (const lvl of [0, 2, 3, 'mixed']) {
     const L = JSON.stringify(lvl)
@@ -176,21 +196,34 @@ const flow = `.flowGraph({ nodes: [{ id: 'FR' }, { id: 'DE' }], links: [{ source
 add('flow nutsLevel 0', 'flow', `m.nutsLevel(0)${flow}`)
 add('flow nutsLevel 2', 'flow', `m.nutsLevel(2)${flow}`)
 add('flow default nutsLevel (3)', 'flow', `m${flow}`)
+// insets must inherit the border mode of the main map (checked on the inset's own svg)
+add(
+    'choropleth nutsLevel 2, inset',
+    'choropleth',
+    `m.nutsLevel(2).stat(${JSON.stringify(stat())}).insets([{ geo: 'MT', svgId: 'inset', x: 0, y: 0, width: 200, height: 200, scale: '01M' }])`,
+    'inset'
+)
 add('choropleth WORLD', 'choropleth', `m.geo('WORLD').stat(${JSON.stringify(stat())})`)
 add('proportionalSymbol WORLD', 'proportionalSymbol', `m.geo('WORLD').stat('size', ${JSON.stringify(stat())})`)
 
 // --------------------------------------------------------------------------- in-page probe
 // Returns the style facts of the first national / Kosovo / regional border in the map svg.
-function probe() {
-    const svg = document.getElementById('map')
+function probe(svgId) {
+    const svg = document.getElementById(svgId)
+    // only elements of this map's own svg (an inset's svg sits inside the main map's svg)
     const pick = (sels) => {
         for (const s of sels) {
-            const el = svg.querySelector(s)
+            const el = Array.from(svg.querySelectorAll(s)).find((e) => e.closest('svg.em-map') === svg)
             if (el) return el
         }
         return null
     }
     const national = pick(['#em-cntbn path.em-bn-eu:not(.em-bn-co)', '#em-cntbn path:not(.em-bn-co):not(.em-bn-d)', '#em-worldbn path.em-worldbn'])
+    const halo = pick([
+        '#em-cntbn-halo path.em-bn-eu:not(.em-bn-co)',
+        '#em-cntbn-halo path:not(.em-bn-co):not(.em-bn-d)',
+        '#em-worldbn-halo path.em-worldbn-halo:not(.em-bn-d)',
+    ])
     const kosovo = pick(['path.em-kosovo-bn', '.em-kosovo-bn path'])
     const regional = pick([
         '#em-nutsbn path.em-bn-3',
@@ -200,6 +233,10 @@ function probe() {
         ".em-nutsrg-2 path[lvl='2']",
         ".em-nutsrg-1 path[lvl='1']",
     ])
+    const disputed = pick(['#em-cntbn path.em-bn-d', '#em-worldbn path.em-bn-d'])
+    const coast = pick(['#em-cntbn path.em-bn-co', '#em-nutsbn path.em-bn-co', '#em-worldbn path.em-bn-co'])
+    const land = pick(['.em-cntrg path', 'path.em-worldrg', '.em-worldrg path'])
+    const sea = pick(['.em-sea'])
     const parseColor = (c) => {
         const m = /rgba?\(([^)]+)\)/.exec(c || '')
         if (!m) return null
@@ -223,17 +260,23 @@ function probe() {
             className: el.getAttribute('class') || el.parentElement.getAttribute('class'),
             stroke: cs.stroke,
             rgb: col,
-            width: cs.stroke === 'none' || !col ? 0 : parseFloat(cs.strokeWidth),
+            width: cs.stroke === 'none' || !col || cs.display === 'none' ? 0 : parseFloat(cs.strokeWidth),
             dash: cs.strokeDasharray === 'none' ? 'none' : cs.strokeDasharray,
             opacity: +(op * (col ? col.a : 1)).toFixed(4),
             display: cs.display,
         }
     }
+    const fill = (el) => (el ? parseColor(getComputedStyle(el).fill) : null)
     return {
         svgClass: svg.getAttribute('class'),
         national: facts(national),
+        halo: facts(halo),
         kosovo: facts(kosovo),
         regional: facts(regional),
+        disputed: facts(disputed),
+        coast: facts(coast),
+        land: fill(land),
+        sea: fill(sea),
     }
 }
 
@@ -245,24 +288,52 @@ function luminance({ r, g, b }) {
     }
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
 }
-// How strongly a line stands out against a white/light background.
-const prominence = (f) => (f && f.rgb && f.width ? +(f.width * (1 - luminance(f.rgb)) * f.opacity).toFixed(4) : 0)
+const hexRgb = (h) => ({ r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) })
+const background = (res, mode) => (mode.bg === 'land' ? res.land || hexRgb('#000000') : hexRgb(mode.bg))
+// How strongly a line stands out against the background: width x luminance contrast x opacity.
+// Against white this is the original width x darkness x opacity score.
+const prominence = (f, bg) => (f && f.rgb && f.width ? +(f.width * Math.abs(luminance(bg) - luminance(f.rgb)) * f.opacity).toFixed(4) : 0)
+const WHITE = 'rgb(255, 255, 255)'
 
-function check(res) {
+function check(res, mode) {
     const errs = []
-    const { national: N, kosovo: K, regional: R } = res
+    const { national: N, halo: H, kosovo: K, regional: R, disputed: D } = res
     if (!K) return ['no Kosovo border drawn']
     if (!N) return ['no national border drawn']
-    const pn = prominence(N)
-    const pk = prominence(K)
-    const pr = R ? prominence(R) : null
+    const bg = background(res, mode)
+    // a national border is as prominent as the more visible of its line and its halo
+    const pn = Math.max(prominence(N, bg), prominence(H, bg))
+    const pk = prominence(K, bg)
+    const pr = R ? prominence(R, bg) : null
     if (!(K.width > 0)) errs.push(`Kosovo border invisible (stroke ${K.stroke}, width ${K.width})`)
     if (!(K.width < N.width)) errs.push(`Kosovo width ${K.width} not < national ${N.width}`)
     if (R && !(K.width > R.width)) errs.push(`Kosovo width ${K.width} not > regional ${R.width}`)
     if (K.opacity !== 1) errs.push(`Kosovo effective opacity ${K.opacity} != 1`)
     if (K.dash !== N.dash) errs.push(`Kosovo dash "${K.dash}" != national dash "${N.dash}"`)
-    if (!(pk < pn)) errs.push(`Kosovo prominence ${pk} not < national ${pn}`)
-    if (R && !(pk > pr)) errs.push(`Kosovo prominence ${pk} not > regional ${pr}`)
+    // "clearly" in between: at least 10% apart from either
+    if (!(pk < 0.9 * pn)) errs.push(`Kosovo prominence ${pk} not clearly < national ${pn}`)
+    if (R && !(pk > 1.1 * pr)) errs.push(`Kosovo prominence ${pk} not clearly > regional ${pr}`)
+    // disputed borders stay dashed in every mode
+    if (!D) errs.push('no disputed border drawn')
+    else if (D.dash === 'none' || !(D.width > 0)) errs.push(`disputed border not a visible dashed line (dash ${D.dash}, width ${D.width})`)
+    // the mode classes are on this map's own svg (insets inherit them)
+    const cls = (res.svgClass || '').split(/\s+/)
+    if (cls.includes('em--borders-light') !== mode.lightBorders)
+        errs.push(`svg class "${res.svgClass}" does not match lightBorders ${mode.lightBorders}`)
+    if (cls.includes('em--dark') !== mode.darkMode) errs.push(`svg class "${res.svgClass}" does not match darkMode ${mode.darkMode}`)
+    if (mode.lightBorders) {
+        for (const [label, f] of [
+            ['national', N],
+            ['Kosovo', K],
+            ['regional', R],
+        ])
+            if (f && f.stroke !== WHITE) errs.push(`light borders: ${label} stroke ${f.stroke} is not white`)
+        if (H && H.width > 0) errs.push(`light borders: national halo still drawn (${H.stroke} ${H.width}px)`)
+    }
+    if (mode.darkMode) {
+        if (!res.land || luminance(res.land) > 0.1) errs.push(`dark mode: land fill ${JSON.stringify(res.land)} is not dark`)
+        if (!res.sea || luminance(res.sea) > 0.1) errs.push(`dark mode: sea fill ${JSON.stringify(res.sea)} is not dark`)
+    }
     return errs
 }
 
@@ -274,75 +345,88 @@ const browser = await chromium.launch({ headless: true })
 let failures = 0
 const rows = []
 try {
-    for (const sc of SCENARIOS) {
-        const page = await browser.newPage({ viewport: { width: 1000, height: 800 } })
-        const pageErrors = []
-        page.on('pageerror', (e) => pageErrors.push(e.message))
-        await page.route('**/*', async (route) => {
-            const u = route.request().url()
-            const json = (body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
-            if (u === ORIGIN + '/')
-                return route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><html><body><svg id="map"></svg></body></html>' })
-            if (u.startsWith(ORIGIN + '/build/')) {
-                const f = path.join(ROOT, 'build', path.basename(new URL(u).pathname))
-                if (fs.existsSync(f)) return route.fulfill({ status: 200, contentType: 'application/javascript', body: fs.readFileSync(f) })
+    for (const mode of MODES)
+        for (const sc of SCENARIOS) {
+            const page = await browser.newPage({ viewport: { width: 1000, height: 800 } })
+            const pageErrors = []
+            page.on('pageerror', (e) => pageErrors.push(e.message))
+            await page.route('**/*', async (route) => {
+                const u = route.request().url()
+                const json = (body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
+                if (u === ORIGIN + '/')
+                    return route.fulfill({
+                        status: 200,
+                        contentType: 'text/html',
+                        body: '<!doctype html><html><body><svg id="map"></svg></body></html>',
+                    })
+                if (u.startsWith(ORIGIN + '/build/')) {
+                    const f = path.join(ROOT, 'build', path.basename(new URL(u).pathname))
+                    if (fs.existsSync(f)) return route.fulfill({ status: 200, contentType: 'application/javascript', body: fs.readFileSync(f) })
+                    return route.fulfill({ status: 404, body: '' })
+                }
+                if (/world_4326/i.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: world })
+                let m = /\/nutspt_(\d)\.json/.exec(u)
+                if (m) return json(centroids(+m[1]))
+                m = /nuts2json.*\/(\d)\.json/i.exec(u)
+                if (m) return json(topology(+m[1]))
+                if (/dissemination\/statistics/i.test(u)) return json(jsonstat(u))
                 return route.fulfill({ status: 404, body: '' })
+            })
+            await page.goto(ORIGIN + '/')
+            await page.addScriptTag({ url: ORIGIN + '/build/eurostatmap.js' })
+            await page.evaluate(
+                ({ type, setup, origin, mode }) => {
+                    const m = window.eurostatmap
+                        .map(type)
+                        .svgId('map')
+                        .width(800)
+                        .nuts2jsonBaseURL(origin + '/nuts2json/v2')
+                    if (m.worldTopojsonURL) m.worldTopojsonURL(origin + '/WORLD_4326.json')
+                    new Function('m', setup)(m)
+                    if (!mode.afterBuild && mode.lightBorders) m.lightBorders(true)
+                    if (!mode.afterBuild && mode.darkMode) m.darkMode(true)
+                    if (m.zoomButtons) m.zoomButtons(false)
+                    m.build()
+                    window.__map = m
+                },
+                { type: sc.type, setup: sc.setup, origin: ORIGIN, mode }
+            )
+            let res
+            try {
+                await page.waitForFunction((id) => document.querySelector('#' + id + ' .em-kosovo-bn'), sc.svgId, { timeout: 15000 })
+                await page.waitForTimeout(500) // let data-driven styling (mixed NUTS strokes, etc.) settle
+                if (mode.afterBuild) await page.evaluate((md) => window.__map.lightBorders(md.lightBorders).darkMode(md.darkMode), mode)
+                res = await page.evaluate(probe, sc.svgId)
+            } catch (e) {
+                res = {
+                    national: null,
+                    kosovo: null,
+                    regional: null,
+                    svgClass: await page.evaluate((id) => document.getElementById(id)?.getAttribute('class'), sc.svgId),
+                }
             }
-            if (/world_4326/i.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: world })
-            let m = /\/nutspt_(\d)\.json/.exec(u)
-            if (m) return json(centroids(+m[1]))
-            m = /nuts2json.*\/(\d)\.json/i.exec(u)
-            if (m) return json(topology(+m[1]))
-            if (/dissemination\/statistics/i.test(u)) return json(jsonstat(u))
-            return route.fulfill({ status: 404, body: '' })
-        })
-        await page.goto(ORIGIN + '/')
-        await page.addScriptTag({ url: ORIGIN + '/build/eurostatmap.js' })
-        await page.evaluate(
-            ({ type, setup, origin }) => {
-                const m = window.eurostatmap
-                    .map(type)
-                    .svgId('map')
-                    .width(800)
-                    .nuts2jsonBaseURL(origin + '/nuts2json/v2')
-                if (m.worldTopojsonURL) m.worldTopojsonURL(origin + '/WORLD_4326.json')
-                new Function('m', setup)(m)
-                if (m.zoomButtons) m.zoomButtons(false)
-                m.build()
-            },
-            { type: sc.type, setup: sc.setup, origin: ORIGIN }
-        )
-        let res
-        try {
-            await page.waitForFunction(() => document.querySelector('#map .em-kosovo-bn'), null, { timeout: 15000 })
-            await page.waitForTimeout(500) // let data-driven styling (mixed NUTS strokes, etc.) settle
-            res = await page.evaluate(probe)
-        } catch (e) {
-            res = {
-                national: null,
-                kosovo: null,
-                regional: null,
-                svgClass: await page.evaluate(() => document.getElementById('map')?.getAttribute('class')),
-            }
+            const errs = check(res, mode)
+            const bg = background(res, mode)
+            if (errs.length) failures++
+            const fmt = (f) =>
+                f
+                    ? `${f.stroke} ${f.width}px${f.dash !== 'none' ? ' dash ' + f.dash : ''}${f.opacity !== 1 ? ' op ' + f.opacity : ''} [p=${prominence(f, bg)}]`
+                    : '-'
+            rows.push({
+                name: `[${mode.name}] ${sc.name}`,
+                ok: !errs.length,
+                N: fmt(res.national),
+                H: fmt(res.halo),
+                D: fmt(res.disputed),
+                C: fmt(res.coast),
+                K: fmt(res.kosovo),
+                R: fmt(res.regional),
+                errs,
+                pageErrors,
+                svgClass: res.svgClass,
+            })
+            await page.close()
         }
-        const errs = check(res)
-        if (errs.length) failures++
-        const fmt = (f) =>
-            f
-                ? `${f.stroke} ${f.width}px${f.dash !== 'none' ? ' dash ' + f.dash : ''}${f.opacity !== 1 ? ' op ' + f.opacity : ''} [p=${prominence(f)}]`
-                : '-'
-        rows.push({
-            name: sc.name,
-            ok: !errs.length,
-            N: fmt(res.national),
-            K: fmt(res.kosovo),
-            R: fmt(res.regional),
-            errs,
-            pageErrors,
-            svgClass: res.svgClass,
-        })
-        await page.close()
-    }
 } finally {
     await browser.close()
 }
@@ -351,7 +435,9 @@ for (const r of rows) {
     console.log(`${r.ok ? 'ok  ' : 'FAIL'} ${r.name}`)
     if (VERBOSE || !r.ok) {
         console.log(`       svg class: ${r.svgClass}`)
-        console.log(`       national ${r.N}\n       kosovo   ${r.K}\n       regional ${r.R}`)
+        console.log(
+            `       national ${r.N} (halo ${r.H})\n       kosovo   ${r.K}\n       regional ${r.R}\n       disputed ${r.D}\n       coast    ${r.C}`
+        )
         r.errs.forEach((e) => console.log('       - ' + e))
         if (VERBOSE && r.pageErrors.length)
             console.log('       page errors (mock data, informational): ' + [...new Set(r.pageErrors)].slice(0, 3).join(' | '))

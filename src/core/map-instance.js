@@ -19,7 +19,7 @@ import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
 import { addScalebarToMap, getDefaultScalebarConfig, mergeScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
-import { createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
+import { applyBorderModeClasses, createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
 import { DEFAULT_FIT_ZOOM, defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
 import { addCentroidsToMap } from './geo/centroids'
 
@@ -179,6 +179,10 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     //background map toggle (e.g. for dorling)
     out.backgroundMap_ = true
 
+    //border modes: CSS modifier classes on the map svg, see css/border-modes.css and docs/css.md
+    out.lightBorders_ = false // white national, Kosovo, regional and disputed borders, no halo (em--borders-light)
+    out.darkMode_ = false // dark sea and land, with borders adjusted to them (em--dark)
+
     //labelling
     // see docs\reference.md#labelling
     out.labels_ = undefined
@@ -291,6 +295,18 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
                     v
                 )
             }
+            return out
+        }
+    })
+
+    // border modes: also set on every inset, and applied at once to an already-built map
+    ;['lightBorders_', 'darkMode_'].forEach(function (att) {
+        const name = att.substring(0, att.length - 1)
+        out[name] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = !!v
+            if (out.insetTemplates_) executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => inset[name](out[att]))
+            applyBorderModeClasses(out, true)
             return out
         }
     })

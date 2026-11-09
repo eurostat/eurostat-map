@@ -77,6 +77,129 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-annotations {
 
 /***/ },
 
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/css/border-modes.css"
+/*!************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/css/border-modes.css ***!
+  \************************************************************************/
+(module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/noSourceMaps.js */ "./node_modules/css-loader/dist/runtime/noSourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set on the map <svg> (and every inset's) by map.darkMode() and
+   map.lightBorders(). Imported last so that, at equal specificity, these rules win over the
+   per-map-type rules in css/layers. Every combination keeps the Kosovo border in between national
+   and regional borders (width and colour only): see docs/css.md and test/kosovo-border.test.mjs.
+   The dark-mode section comes first so that light borders win when both are set. */
+
+/* ---------------------------------------------------------------- dark mode (em--dark) */
+
+/* dark sea and land, which the border colours below are designed against */
+.em--dark .em-sea {
+    fill: #1a1a2e;
+}
+.em--dark .em-cntrg,
+.em--dark .em-worldrg,
+.em--dark .em-nutsrg,
+.em--dark [ecl='ni'] {
+    fill: #2a2a3e;
+}
+
+/* regional borders: dimmed so they stay below the Kosovo border on the dark land */
+.em--dark .em-bn-1,
+.em--dark .em-bn-2,
+.em--dark .em-bn-3,
+.em--dark .em-nutsrg [lvl='3'],
+.em--dark .em-nutsrg [lvl='2'],
+.em--dark .em-nutsrg [lvl='1'] {
+    stroke: #555577;
+}
+
+/* coastlines: a white or grey coastline would glare against the dark sea */
+.em--dark .em-bn-co {
+    stroke: #444466;
+}
+
+/* National borders with a white halo keep their colours: the halo carries them on the dark land.
+   On the dark land a lighter line stands out more, so where national borders are muted to a grey
+   (and have no halo to carry them), Kosovo gets a darker grey between them and the regional borders. */
+.em--dark.em--ps .em-kosovo-bn,
+.em--dark.em--flow .em-kosovo-bn {
+    stroke: #6e6e80;
+}
+.em--dark.em--spark .em-kosovo-bn {
+    stroke: #80808e;
+}
+.em--dark.em--bar .em-kosovo-bn,
+.em--dark.em--waffle .em-kosovo-bn {
+    stroke: #9a9aa8;
+}
+
+/* world maps: the 0.5px national borders only have a faint halo, so lighten them, and Kosovo less */
+.em--dark .em-worldbn {
+    stroke: #8a8a9a;
+}
+.em--dark #em-worldbn ~ .em-kosovo-bn {
+    stroke: #66667a;
+}
+
+/* ------------------------------------------------------ light borders (em--borders-light) */
+
+/* national: white, no halo */
+.em--borders-light .em-cntbn,
+.em--borders-light .em-worldbn {
+    stroke: #fff;
+}
+.em--borders-light #em-cntbn-halo {
+    stroke: none;
+}
+.em--borders-light .em-worldbn-halo:not(.em-bn-co) {
+    stroke: none;
+}
+/* 1px where national borders are not muted. Muted map types keep their own widths: proportional
+   symbol, pie, bar and waffle maps (muted by colour) stay at 0.8px, coxcomb, flow and sparkline
+   maps keep their thin lines. World maps keep 0.5px. (.em--ps also covers pie and coxcomb.) */
+.em--borders-light:not(.em--ps):not(.em--flow):not(.em--spark):not(.em--bar):not(.em--waffle) .em-cntbn {
+    stroke-width: 1px;
+}
+
+/* Kosovo: white, at each map type's own width (0.5px by default) */
+.em-map.em--borders-light .em-kosovo-bn,
+.em--borders-light #em-worldbn ~ .em-kosovo-bn {
+    stroke: #fff;
+}
+
+/* regional: white, at each map type's own width (0.3px by default) */
+.em--borders-light .em-bn-1,
+.em--borders-light .em-bn-2,
+.em--borders-light .em-bn-3,
+.em--borders-light .em-nutsrg [lvl='3'],
+.em--borders-light .em-nutsrg [lvl='2'],
+.em--borders-light .em-nutsrg [lvl='1'] {
+    stroke: #fff;
+}
+
+/* disputed: white, still dashed */
+.em--borders-light .em-bn-d {
+    stroke: #fff;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ },
+
 /***/ "./node_modules/css-loader/dist/cjs.js!./src/css/borders.css"
 /*!*******************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js!./src/css/borders.css ***!
@@ -403,7 +526,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_css_loader_dist_cjs_js_countries_css__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./countries.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/countries.css");
 /* harmony import */ var _node_modules_css_loader_dist_cjs_js_borders_css__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./borders.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/borders.css");
 /* harmony import */ var _node_modules_css_loader_dist_cjs_js_responsive_css__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./responsive.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/responsive.css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_border_modes_css__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./border-modes.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/border-modes.css");
 // Imports
+
 
 
 
@@ -441,6 +566,7 @@ ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_cartogram_css__WE
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_countries_css__WEBPACK_IMPORTED_MODULE_16__["default"]);
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_borders_css__WEBPACK_IMPORTED_MODULE_17__["default"]);
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_responsive_css__WEBPACK_IMPORTED_MODULE_18__["default"]);
+___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_border_modes_css__WEBPACK_IMPORTED_MODULE_19__["default"]);
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `
 `, ""]);
@@ -29814,6 +29940,8 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
         'processCentroids_',
         'nuts2jsonBaseURL_',
         'worldTopojsonURL_',
+        'lightBorders_',
+        'darkMode_',
     ].forEach(function (att) {
         mt[att] = out[att]
     })
@@ -31014,6 +31142,7 @@ const forwardChainableMethod = function (map, name) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   applyBorderModeClasses: () => (/* binding */ applyBorderModeClasses),
 /* harmony export */   createMapSVG: () => (/* binding */ createMapSVG),
 /* harmony export */   recalculateLayout: () => (/* binding */ recalculateLayout),
 /* harmony export */   wrapMapSvg: () => (/* binding */ wrapMapSvg)
@@ -31043,8 +31172,8 @@ const createMapSVG = function (out) {
     if (out.isInset) svg.classed('em-inset', true)
 
     // Determine the base map type
-    const baseLayer = out.layers_ && out.layers_.find(l => l.role === 'base')
-    const mapType = baseLayer ? (baseLayer.type || baseLayer._mapType) : out._mapType
+    const baseLayer = out.layers_ && out.layers_.find((l) => l.role === 'base')
+    const mapType = baseLayer ? baseLayer.type || baseLayer._mapType : out._mapType
 
     const CANONICAL_MAP_TYPES = {
         choropleth: 'ch',
@@ -31082,7 +31211,25 @@ const createMapSVG = function (out) {
             svg.classed('em--ps', true)
         }
     }
+    applyBorderModeClasses(out, false, svg)
     return svg
+}
+
+/**
+ * Sets the border mode modifier classes (em--borders-light, em--dark) on a map's svg. The styles
+ * live in css/border-modes.css. Insets get their own call (their svg is a separate map).
+ * @param {MapInstance} out
+ * @param {boolean} restyle true when switching the mode of an already-built map
+ * @param {*} svg d3 selection of the map svg (defaults to the built one)
+ */
+const applyBorderModeClasses = function (out, restyle, svg = out.svg_) {
+    if (!svg || svg.empty()) return
+    svg.classed('em--borders-light', !!out.lightBorders_).classed('em--dark', !!out.darkMode_)
+    if (restyle) {
+        // Region outlines of mixed-NUTS maps get their computed stroke copied inline when the
+        // data is styled, which would freeze the previous mode's colour: let the CSS apply again.
+        svg.selectAll('.em-nutsrg path[lvl]').style('stroke', null).style('stroke-width', null)
+    }
 }
 
 const wrapMapSvg = function (svg) {
@@ -31786,6 +31933,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     //background map toggle (e.g. for dorling)
     out.backgroundMap_ = true
 
+    //border modes: CSS modifier classes on the map svg, see css/border-modes.css and docs/css.md
+    out.lightBorders_ = false // white national, Kosovo, regional and disputed borders, no halo (em--borders-light)
+    out.darkMode_ = false // dark sea and land, with borders adjusted to them (em--dark)
+
     //labelling
     // see docs\reference.md#labelling
     out.labels_ = undefined
@@ -31898,6 +32049,18 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
                     v
                 )
             }
+            return out
+        }
+    })
+
+    // border modes: also set on every inset, and applied at once to an already-built map
+    ;['lightBorders_', 'darkMode_'].forEach(function (att) {
+        const name = att.substring(0, att.length - 1)
+        out[name] = function (v) {
+            if (!arguments.length) return out[att]
+            out[att] = !!v
+            if (out.insetTemplates_) (0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => inset[name](out[att]))
+            ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.applyBorderModeClasses)(out, true)
             return out
         }
     })
@@ -48064,9 +48227,10 @@ function updateBackgroundColor(map, symbolFill) {
     const hexColor = c ? c.formatHex() : '#ffffff'
     const mapId = map.svgId_ || ''
     const brightenFactor = map.psBrightenFactor_ || 0.9
-    const backgroundColor = getBackgroundColor(hexColor, brightenFactor)
-
-    ;(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.updateCSSRule)(`#${mapId}.em--ps .em-nutsrg`, 'fill', backgroundColor)
+    // a light tint of the symbol colour, or with darkMode() a dark one (mixed into the dark land
+    // fill of css/border-modes.css). Both rules are written so toggling darkMode() needs no restyle.
+    const backgroundColor = brightenHex(hexColor, brightenFactor)
+    const darkBackgroundColor = brightenHex(hexColor, brightenFactor, [0x2a, 0x2a, 0x3e])
 
     // Always update the em-cntrg rule so a previous mixed/level-0 build's rule
     // does not persist when the user switches to a different level.
@@ -48074,15 +48238,15 @@ function updateBackgroundColor(map, symbolFill) {
     // For all other levels, reset to '' so the static .em--ps .em-cntrg { fill:#f2f2f2 }
     // rule takes effect again.
     const lvl = map.nutsLevel_
-    const cntrgFill = lvl === 0 || lvl === '0' || lvl === 'mixed' ? backgroundColor : ''
-    ;(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.updateCSSRule)(`#${mapId}.em--ps .em-cntrg`, 'fill', cntrgFill)
+    const tintCountries = lvl === 0 || lvl === '0' || lvl === 'mixed'
+    ;(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.updateCSSRule)(`#${mapId}.em--ps:not(.em--dark) .em-nutsrg`, 'fill', backgroundColor)
+    ;(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.updateCSSRule)(`#${mapId}.em--ps.em--dark .em-nutsrg`, 'fill', darkBackgroundColor)
+    ;(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.updateCSSRule)(`#${mapId}.em--ps:not(.em--dark) .em-cntrg`, 'fill', tintCountries ? backgroundColor : '')
+    ;(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.updateCSSRule)(`#${mapId}.em--ps.em--dark .em-cntrg`, 'fill', tintCountries ? darkBackgroundColor : '')
 }
 
-function getBackgroundColor(fillColor, brightenFactor) {
-    return brightenHex(fillColor, brightenFactor)
-}
-
-function brightenHex(hex, brightenFactor) {
+// mixes hex towards target (white by default) by brightenFactor (0 to 1)
+function brightenHex(hex, brightenFactor, target = [255, 255, 255]) {
     const factor = brightenFactor // Brightening factor (0 to 1)
     // Ensure valid hex
     hex = hex.replace(/^#/, '')
@@ -48100,9 +48264,9 @@ function brightenHex(hex, brightenFactor) {
     let b = num & 255
 
     // Increase brightness
-    r = Math.min(255, Math.round(r + (255 - r) * factor))
-    g = Math.min(255, Math.round(g + (255 - g) * factor))
-    b = Math.min(255, Math.round(b + (255 - b) * factor))
+    r = Math.min(255, Math.round(r + (target[0] - r) * factor))
+    g = Math.min(255, Math.round(g + (target[1] - g) * factor))
+    b = Math.min(255, Math.round(b + (target[2] - b) * factor))
 
     // Return new hex
     return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`

@@ -176,6 +176,12 @@ export interface MapConfig {
     /** Graticule. */
     drawGraticule?: boolean
 
+    /** Light (white) borders, without national border halo (`em--borders-light`). Default `false`. */
+    lightBorders?: boolean
+
+    /** Dark sea and land, with borders adjusted to them (`em--dark`). Default `false`. */
+    darkMode?: boolean
+
     /**
      * Get or set label configuration for country names, statistical values, etc.
      * @example map.labels({ values: true, backgrounds: true, backgroundFill: '#B19122' })

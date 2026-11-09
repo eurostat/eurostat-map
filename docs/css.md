@@ -6,6 +6,8 @@ Here you can find the CSS classes used to style the map and its components, in c
 
 ```css
 .em-map
+.em--borders-light //on the map svg: map.lightBorders(true)
+.em--dark //on the map svg: map.darkMode(true)
 .em-title,
 .em-subtitle,
 .em-source-pretext
@@ -50,24 +52,25 @@ The defaults are:
 | Kosovo   | `.em-kosovo-bn` | `#787878` | 0.5px |
 | Regional | `.em-bn-1/2/3`  | `#868686` | 0.3px |
 
-Map types that mute their national borders (proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, and world maps) scale the Kosovo border down with them. If you override the national or regional border styles, adjust `.em-kosovo-bn` so it stays in between, for example with white borders:
+Map types that mute their national borders (proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, and world maps) scale the Kosovo border down with them. If you override the national or regional border styles, adjust `.em-kosovo-bn` so it stays in between.
 
-```css
-.em-cntbn {
-    stroke: #fff;
-    stroke-width: 1px;
-}
-.em-kosovo-bn {
-    stroke: #fff;
-    stroke-width: 0.5px;
-}
-.em-bn-1,
-.em-bn-2,
-.em-bn-3 {
-    stroke: #fff;
-    stroke-width: 0.3px;
-}
-```
+#### Border modes
+
+Rather than overriding these rules for white borders or a dark background, use the built-in modes. `map.lightBorders(true)` adds `.em--borders-light` and `map.darkMode(true)` adds `.em--dark` to the map's `<svg>` and every inset's (see [reference.md](./reference.md#border-modes)). Their rules are in `css/border-modes.css`; both modes can be combined, and disputed borders (`.em-bn-d`) stay dashed in all of them.
+
+| Mode           | National                                               | Kosovo            | Regional          | Disputed                |
+| -------------- | ------------------------------------------------------ | ----------------- | ----------------- | ----------------------- |
+| Default        | `#353535` 0.8px, 1.5px white halo                      | `#787878` 0.5px   | `#868686` 0.3px   | `#818181` 0.3px, dashed |
+| `lightBorders` | `#fff` 1px, no halo                                    | `#fff` 0.5px      | `#fff` 0.3px      | `#fff` 0.3px, dashed    |
+| `darkMode`     | unchanged (the white halo carries it on the dark land) | unchanged         | `#555577` 0.3px   | unchanged               |
+| both           | as `lightBorders`                                      | as `lightBorders` | as `lightBorders` | as `lightBorders`       |
+
+`darkMode` also fills the sea with `#1a1a2e` and land without data with `#2a2a3e`, and draws coastlines (`.em-bn-co`) in `#444466`. It does not restyle titles, legends, labels or tooltips.
+
+Muted map types keep their scaled-down widths in every mode:
+
+- with `lightBorders`, proportional symbol, pie, bar and waffle maps (muted by colour in the default mode) keep 0.8px national borders instead of 1px; coxcomb, flow and sparkline maps keep their thin lines (national 0.25/0.25/0.2px, Kosovo 0.16/0.16/0.12px); world maps keep 0.5px national and 0.3px Kosovo borders. Everything is white.
+- with `darkMode`, where national borders are muted to a grey, the Kosovo border uses a darker grey than them (a lighter line stands out more on the dark land): `#6e6e80` on proportional symbol, pie, coxcomb and flow maps, `#80808e` on sparkline maps, `#9a9aa8` on bar and waffle maps. World maps lighten their national borders to `#8a8a9a` and use `#66667a` for Kosovo.
 
 ## Legends
 

@@ -2216,6 +2216,25 @@ See deprecated.js for deprecated style functions and their successors. (or check
 | _map_.**drawCoastalMargin**([*value*])     | boolean | _false_                                                                                                                                  | Set to true to show a coastal blurry margin. False otherwise.                                                                                            |
 | _map_.**coastalMarginSettings**([*value*]) | object  | _{ standardDeviation: 0.8, x: '-50%', y: '-50%', width: '150%', height: '150%', strokeWidth: 0.6, color: 'rgb(0, 0, 0)', opacity: 0.1 }_ | The settings for the coastal margin.                                                                                                                     |
 | \_map\_.**drawGraticule**([*value*])       | boolean | _false_                                                                                                                                  | Set to true to show the graticule (meridian and parallel lines). False otherwise. Calls to this method after the map is built will update the graticule. |
+| _map_.**lightBorders**([*value*])          | boolean | _false_                                                                                                                                  | Set to true for light (white) borders: national, Kosovo, regional and disputed borders are drawn white, and national borders lose their white halo. Disputed borders stay dashed. Applies to insets too, and can be switched after the map is built. See [border modes](#border-modes). |
+| _map_.**darkMode**([*value*])              | boolean | _false_                                                                                                                                  | Set to true for a dark sea and land, with regional borders, coastlines and the Kosovo border adjusted to keep their hierarchy on the dark land. Titles, legends, labels and tooltips are not restyled. Combines with `lightBorders`. Applies to insets too, and can be switched after the map is built. See [border modes](#border-modes). |
+
+### Border modes
+
+`lightBorders()` and `darkMode()` add the `em--borders-light` and `em--dark` classes to the map's `<svg>` (and every inset's). The styles live in eurostat-map's own CSS (`css/border-modes.css`), so they also work in standalone pages that only load the library. In every combination, and on every map type and NUTS level, the Kosovo border stays less prominent than national borders and more prominent than regional ones. Values per mode and map type: see the border modes in [css.md](./css.md#border-modes).
+
+```javascript
+const map = eurostatmap
+    .map('choropleth')
+    .nutsLevel(2)
+    .stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { time: '2021' } })
+    .lightBorders(true) // white borders, no halo
+    .darkMode(true) // dark sea and land
+    .build()
+
+// later, e.g. from a UI toggle: no rebuild needed
+map.lightBorders(false)
+```
 
 ## Insets
 

@@ -331,6 +331,25 @@ export interface MapInstance {
     drawCoastalMargin(): boolean
     drawCoastalMargin(show: boolean): this
 
+    /**
+     * Light (white) borders: national, Kosovo, regional and disputed borders are drawn white, and
+     * national borders lose their halo. Adds the `em--borders-light` class to the map svg and every
+     * inset's; can be switched on an already-built map. Default `false` (dark borders).
+     * @example map.lightBorders(true)
+     */
+    lightBorders(): boolean
+    lightBorders(light: boolean): this
+
+    /**
+     * Dark mode: dark sea and land fills, with region borders, coastlines and the Kosovo border
+     * adjusted so they keep their hierarchy on the dark land. Titles, legends, labels and tooltips
+     * are not restyled. Adds the `em--dark` class to the map svg and every inset's; can be switched
+     * on an already-built map. Combines with `lightBorders()`. Default `false`.
+     * @example map.darkMode(true)
+     */
+    darkMode(): boolean
+    darkMode(dark: boolean): this
+
     /** Coastal margin appearance settings. */
     coastalMarginSettings(): CoastalMarginSettings
     coastalMarginSettings(settings: Partial<CoastalMarginSettings>): this

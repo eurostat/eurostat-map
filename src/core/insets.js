@@ -198,6 +198,8 @@ const buildInset = function (config, out, withCenterPoints, mapType) {
         'processCentroids_',
         'nuts2jsonBaseURL_',
         'worldTopojsonURL_',
+        'lightBorders_',
+        'darkMode_',
     ].forEach(function (att) {
         mt[att] = out[att]
     })

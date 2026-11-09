@@ -19,8 +19,8 @@ export const createMapSVG = function (out) {
     if (out.isInset) svg.classed('em-inset', true)
 
     // Determine the base map type
-    const baseLayer = out.layers_ && out.layers_.find(l => l.role === 'base')
-    const mapType = baseLayer ? (baseLayer.type || baseLayer._mapType) : out._mapType
+    const baseLayer = out.layers_ && out.layers_.find((l) => l.role === 'base')
+    const mapType = baseLayer ? baseLayer.type || baseLayer._mapType : out._mapType
 
     const CANONICAL_MAP_TYPES = {
         choropleth: 'ch',
@@ -58,7 +58,25 @@ export const createMapSVG = function (out) {
             svg.classed('em--ps', true)
         }
     }
+    applyBorderModeClasses(out, false, svg)
     return svg
+}
+
+/**
+ * Sets the border mode modifier classes (em--borders-light, em--dark) on a map's svg. The styles
+ * live in css/border-modes.css. Insets get their own call (their svg is a separate map).
+ * @param {MapInstance} out
+ * @param {boolean} restyle true when switching the mode of an already-built map
+ * @param {*} svg d3 selection of the map svg (defaults to the built one)
+ */
+export const applyBorderModeClasses = function (out, restyle, svg = out.svg_) {
+    if (!svg || svg.empty()) return
+    svg.classed('em--borders-light', !!out.lightBorders_).classed('em--dark', !!out.darkMode_)
+    if (restyle) {
+        // Region outlines of mixed-NUTS maps get their computed stroke copied inline when the
+        // data is styled, which would freeze the previous mode's colour: let the CSS apply again.
+        svg.selectAll('.em-nutsrg path[lvl]').style('stroke', null).style('stroke-width', null)
+    }
 }
 
 export const wrapMapSvg = function (svg) {

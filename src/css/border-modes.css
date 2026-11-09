@@ -1,0 +1,97 @@
+/* Border modes: modifier classes set on the map <svg> (and every inset's) by map.darkMode() and
+   map.lightBorders(). Imported last so that, at equal specificity, these rules win over the
+   per-map-type rules in css/layers. Every combination keeps the Kosovo border in between national
+   and regional borders (width and colour only): see docs/css.md and test/kosovo-border.test.mjs.
+   The dark-mode section comes first so that light borders win when both are set. */
+
+/* ---------------------------------------------------------------- dark mode (em--dark) */
+
+/* dark sea and land, which the border colours below are designed against */
+.em--dark .em-sea {
+    fill: #1a1a2e;
+}
+.em--dark .em-cntrg,
+.em--dark .em-worldrg,
+.em--dark .em-nutsrg,
+.em--dark [ecl='ni'] {
+    fill: #2a2a3e;
+}
+
+/* regional borders: dimmed so they stay below the Kosovo border on the dark land */
+.em--dark .em-bn-1,
+.em--dark .em-bn-2,
+.em--dark .em-bn-3,
+.em--dark .em-nutsrg [lvl='3'],
+.em--dark .em-nutsrg [lvl='2'],
+.em--dark .em-nutsrg [lvl='1'] {
+    stroke: #555577;
+}
+
+/* coastlines: a white or grey coastline would glare against the dark sea */
+.em--dark .em-bn-co {
+    stroke: #444466;
+}
+
+/* National borders with a white halo keep their colours: the halo carries them on the dark land.
+   On the dark land a lighter line stands out more, so where national borders are muted to a grey
+   (and have no halo to carry them), Kosovo gets a darker grey between them and the regional borders. */
+.em--dark.em--ps .em-kosovo-bn,
+.em--dark.em--flow .em-kosovo-bn {
+    stroke: #6e6e80;
+}
+.em--dark.em--spark .em-kosovo-bn {
+    stroke: #80808e;
+}
+.em--dark.em--bar .em-kosovo-bn,
+.em--dark.em--waffle .em-kosovo-bn {
+    stroke: #9a9aa8;
+}
+
+/* world maps: the 0.5px national borders only have a faint halo, so lighten them, and Kosovo less */
+.em--dark .em-worldbn {
+    stroke: #8a8a9a;
+}
+.em--dark #em-worldbn ~ .em-kosovo-bn {
+    stroke: #66667a;
+}
+
+/* ------------------------------------------------------ light borders (em--borders-light) */
+
+/* national: white, no halo */
+.em--borders-light .em-cntbn,
+.em--borders-light .em-worldbn {
+    stroke: #fff;
+}
+.em--borders-light #em-cntbn-halo {
+    stroke: none;
+}
+.em--borders-light .em-worldbn-halo:not(.em-bn-co) {
+    stroke: none;
+}
+/* 1px where national borders are not muted. Muted map types keep their own widths: proportional
+   symbol, pie, bar and waffle maps (muted by colour) stay at 0.8px, coxcomb, flow and sparkline
+   maps keep their thin lines. World maps keep 0.5px. (.em--ps also covers pie and coxcomb.) */
+.em--borders-light:not(.em--ps):not(.em--flow):not(.em--spark):not(.em--bar):not(.em--waffle) .em-cntbn {
+    stroke-width: 1px;
+}
+
+/* Kosovo: white, at each map type's own width (0.5px by default) */
+.em-map.em--borders-light .em-kosovo-bn,
+.em--borders-light #em-worldbn ~ .em-kosovo-bn {
+    stroke: #fff;
+}
+
+/* regional: white, at each map type's own width (0.3px by default) */
+.em--borders-light .em-bn-1,
+.em--borders-light .em-bn-2,
+.em--borders-light .em-bn-3,
+.em--borders-light .em-nutsrg [lvl='3'],
+.em--borders-light .em-nutsrg [lvl='2'],
+.em--borders-light .em-nutsrg [lvl='1'] {
+    stroke: #fff;
+}
+
+/* disputed: white, still dashed */
+.em--borders-light .em-bn-d {
+    stroke: #fff;
+}
