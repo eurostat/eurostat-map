@@ -203,11 +203,11 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   the dark section comes before the light one so light borders win when both are set. A new muted
   map type, or a new per-type border rule, needs checking in every mode: the test runs each scenario
   in all of them (`--mode <name>` to run one). Watch specificity: world Kosovo uses an id selector.
-- Filled map types put borders over fills of ANY lightness, and a solid line vanishes over a fill
-  of its own lightness. Two different greys for Kosovo and regional always leave a band of fills where
-  Kosovo loses (width ratio `ρ`, lightness gap `ΔL*`: band width `ΔL* x 2ρ/(ρ²-1)`), so Kosovo and
-  regional share one grey (`#787878`) and differ by width; world Kosovo shares the national colour.
-  Don't "fix" a data-fill failure by tuning a different Kosovo grey.
+- Colours follow Eurostat's guideline (Kosovo `#787878` 0.5px, regional `#858585` 0.3px, also in dark
+  mode); the user rejected sharing one grey to beat regional over every fill. A solid line vanishes over
+  a fill of its own lightness, so over mid-tone fills (L* ~43-52) regional out-contrasts Kosovo: the
+  test lists those rendered fills as guideline-limit notes, and fails on anything else. It measures
+  prominence over the fills each map really renders (land, sea, all class colours, no-data colour).
 - Mixed-NUTS styling (`styleMixedNUTS` and its ps/composition/bivariate twins) copies each region's
   *computed* stroke inline, freezing whatever CSS applied at that moment; `applyBorderModeClasses`
   clears it when a mode is switched on a built map. Anything else that restyles borders via CSS

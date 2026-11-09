@@ -39,18 +39,14 @@
     stroke-width: 0.5px;
 }
 
-/* NUTS boundaries stroke color: the Kosovo grey (the guideline's regional #858585 is 5 L* lighter).
-   Regions are filled with data colours of any lightness, and a solid line vanishes over a fill of its
-   own lightness: with two different greys, the Kosovo line vanishes over some mid-tone fills (L* 43-52
-   for #787878 vs #858585) where the regional lines still show. In one shared grey the two always keep
-   the ratio of their widths (0.5 / 0.3), so Kosovo stays above regional over every fill. */
+/* NUTS boundaries stroke color */
 .em-bn-1,
 .em-bn-2,
 .em-bn-3,
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: #787878;
+    stroke: #858585;
 }
 
 /*  regional and coastal boundaries stroke-width */

@@ -34,7 +34,7 @@ interface MapInstance {
 
 ### Fixes
 
-- **The Kosovo border now always sits between national and regional borders, on every map type.** Eurostat's rule is that it must be less prominent than a national border and more prominent than a regional one, using stroke width and colour only. It used to have `opacity: 0.8`, which made its look depend on the fill underneath. That is gone: it is now a solid `#787878`, 0.5px line. On maps whose regions are filled with data colours, the rule also holds over fills of any lightness, not only over the empty land. Map types that mute their national borders used to draw Kosovo as heavy as, or heavier than, those borders: proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, plus world maps, whose national borders are only 0.5px. Each of these now scales the Kosovo border down to match. See the border hierarchy section in `docs/css.md` if you override border styles.
+- **The Kosovo border now always sits between national and regional borders, on every map type.** Eurostat's rule is that it must be less prominent than a national border and more prominent than a regional one, using stroke width and colour only. It used to have `opacity: 0.8`, which made its look depend on the fill underneath. That is gone: it is now a solid `#787878`, 0.5px line. Map types that mute their national borders used to draw Kosovo as heavy as, or heavier than, those borders: proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, plus world maps, whose national borders are only 0.5px. Each of these now scales the Kosovo border down to match. See the border hierarchy section in `docs/css.md` if you override border styles.
 
 Example:
 
@@ -52,12 +52,12 @@ Example:
 .em-bn-1,
 .em-bn-2,
 .em-bn-3 {
-    stroke: #787878;
+    stroke: #858585;
     stroke-width: 0.3px;
 }
 ```
 
-- **Border colours and widths follow the Eurostat guideline (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now `#787878` and 0.3px instead of `#868686` and 0.4px: thinner than the Kosovo border, in the same grey. The guideline's regional `#858585` is not used: over mid-tone data fills (around L\* 43-52) a Kosovo line in a different grey vanished while the regional lines still showed. In the same grey, Kosovo always stands out more than regional borders by its width. The white halo under national borders is now 1.9px instead of 1.5px. Coastlines keep 0.4px. To restore the previous look:
+- **Border colours and widths follow the Eurostat guideline (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now `#858585` and 0.3px instead of `#868686` and 0.4px, clearly lighter and thinner than the Kosovo border. Over mid-tone data colours (about L\* 43-52) a solid `#858585` line stands out slightly more than the `#787878` Kosovo line; the guideline accepts this (see `docs/css.md`). The white halo under national borders is now 1.9px instead of 1.5px. Coastlines keep 0.4px. To restore the previous look:
 
 ```css
 .em-bn-1,

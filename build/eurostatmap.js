@@ -115,17 +115,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
     fill: #2a2a3e;
 }
 
-/* regional borders: the Kosovo grey, so that over data fills of any lightness they stay below the
-   (wider) Kosovo border by width. A dimmer colour (#555577) only worked on the empty dark land: over
-   mid-light data colours it stood out more than the Kosovo line. */
-.em--dark .em-bn-1,
-.em--dark .em-bn-2,
-.em--dark .em-bn-3,
-.em--dark .em-nutsrg [lvl='3'],
-.em--dark .em-nutsrg [lvl='2'],
-.em--dark .em-nutsrg [lvl='1'] {
-    stroke: #787878;
-}
+/* National (#353535 with its white halo), Kosovo (#787878 0.5px) and regional (#858585 0.3px) borders
+   keep their default colours: the guideline uses the same ones in dark mode. */
 
 /* coastlines: a white or grey coastline would glare against the dark sea */
 .em--dark .em-bn-co {
@@ -309,18 +300,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-cntbn,
     stroke-width: 0.5px;
 }
 
-/* NUTS boundaries stroke color: the Kosovo grey (the guideline's regional #858585 is 5 L* lighter).
-   Regions are filled with data colours of any lightness, and a solid line vanishes over a fill of its
-   own lightness: with two different greys, the Kosovo line vanishes over some mid-tone fills (L* 43-52
-   for #787878 vs #858585) where the regional lines still show. In one shared grey the two always keep
-   the ratio of their widths (0.5 / 0.3), so Kosovo stays above regional over every fill. */
+/* NUTS boundaries stroke color */
 .em-bn-1,
 .em-bn-2,
 .em-bn-3,
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: #787878;
+    stroke: #858585;
 }
 
 /*  regional and coastal boundaries stroke-width */
