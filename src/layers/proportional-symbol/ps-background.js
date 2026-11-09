@@ -1,5 +1,62 @@
 import { color as d3color } from 'd3-color'
-import { updateCSSRule } from '../../core/utils'
+
+// The background rules written below, by selector: { rule, id (of the map/inset svg), value }.
+// They live in eurostat-map's own <style id="custom-styles"> (where updateCSSRule() in
+// core/utils.js always created them). Updating a cached rule directly avoids scanning every rule of
+// every stylesheet of the page on each call (thousands in a host app, 4 calls per map and inset
+// per restyle).
+const backgroundRules = new Map()
+
+function getCustomStyleSheet() {
+    let customSheet = document.getElementById('custom-styles')
+    if (!customSheet) {
+        customSheet = document.createElement('style')
+        customSheet.id = 'custom-styles'
+        document.head.appendChild(customSheet)
+    }
+    return customSheet.sheet
+}
+
+// Rules of maps and insets whose svg is no longer in the document. Inset svg ids are random unless
+// configured, so every rebuild with new insets used to add rules that were never removed.
+function removeDetachedBackgroundRules() {
+    for (const [selector, entry] of backgroundRules) {
+        if (document.getElementById(entry.id)) continue
+        const sheet = entry.rule.parentStyleSheet
+        const index = sheet ? Array.prototype.indexOf.call(sheet.cssRules, entry.rule) : -1
+        if (index >= 0) sheet.deleteRule(index)
+        backgroundRules.delete(selector)
+    }
+}
+
+function setBackgroundRule(id, selector, value) {
+    const cached = backgroundRules.get(selector)
+    const sheet = cached && cached.rule.parentStyleSheet
+    if (sheet && sheet.ownerNode && sheet.ownerNode.isConnected) {
+        if (cached.value !== value) {
+            cached.rule.style.fill = value
+            cached.value = value
+        }
+        return
+    }
+    backgroundRules.delete(selector)
+
+    const customSheet = getCustomStyleSheet()
+    let rule = Array.prototype.find.call(customSheet.cssRules, (r) => r.selectorText === selector)
+    if (rule) {
+        rule.style.fill = value
+    } else {
+        removeDetachedBackgroundRules()
+        try {
+            customSheet.insertRule(`${selector} { fill: ${value}; }`, customSheet.cssRules.length)
+            rule = customSheet.cssRules[customSheet.cssRules.length - 1]
+        } catch (e) {
+            console.error(`Failed to insert rule: ${selector} { fill: ${value}; }`, e)
+            return
+        }
+    }
+    backgroundRules.set(selector, { rule, id, value })
+}
 
 //update the color of background regions of a proportional symbol map
 export function updateBackgroundColor(map, symbolFill) {
@@ -20,10 +77,10 @@ export function updateBackgroundColor(map, symbolFill) {
     // rule takes effect again.
     const lvl = map.nutsLevel_
     const tintCountries = lvl === 0 || lvl === '0' || lvl === 'mixed'
-    updateCSSRule(`#${mapId}.em--ps:not(.em--dark) .em-nutsrg`, 'fill', backgroundColor)
-    updateCSSRule(`#${mapId}.em--ps.em--dark .em-nutsrg`, 'fill', darkBackgroundColor)
-    updateCSSRule(`#${mapId}.em--ps:not(.em--dark) .em-cntrg`, 'fill', tintCountries ? backgroundColor : '')
-    updateCSSRule(`#${mapId}.em--ps.em--dark .em-cntrg`, 'fill', tintCountries ? darkBackgroundColor : '')
+    setBackgroundRule(mapId, `#${mapId}.em--ps:not(.em--dark) .em-nutsrg`, backgroundColor)
+    setBackgroundRule(mapId, `#${mapId}.em--ps.em--dark .em-nutsrg`, darkBackgroundColor)
+    setBackgroundRule(mapId, `#${mapId}.em--ps:not(.em--dark) .em-cntrg`, tintCountries ? backgroundColor : '')
+    setBackgroundRule(mapId, `#${mapId}.em--ps.em--dark .em-cntrg`, tintCountries ? darkBackgroundColor : '')
 }
 
 // mixes hex towards target (white by default) by brightenFactor (0 to 1)
