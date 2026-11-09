@@ -32,9 +32,11 @@
     stroke: none;
 }
 
-/* Kosovo: in between the muted national and the 0.1px regional borders */
+/* Kosovo: the muted national colour at 0.5px, so it stays below the 0.8px national line over any fill
+   (a lighter grey stood out as much as the national line over the no-data grey) and above the 0.1px
+   regional borders */
 .em--bar .em-kosovo-bn {
-    stroke: #d0d0d0;
+    stroke: #c2c2c2;
 }
 
 .em-bar-grouped-legend-label {

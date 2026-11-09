@@ -438,14 +438,14 @@ const KOSOVO_COLOUR = {
         ps: '#999999',
         flow: '#999999',
         spark: '#b5b5b5',
-        barwaffle: '#d0d0d0',
+        barwaffle: '#c2c2c2',
         world: '#8a8a8a',
         'world-ps': '#8a8a8a',
     },
-    dark: { guideline: '#787878', ps: '#6e6e80', flow: '#6e6e80', spark: '#80808e', barwaffle: '#9a9aa8', world: '#8a8a9a', 'world-ps': '#8a8a9a' },
+    dark: { guideline: '#787878', ps: '#808080', flow: '#6e6e80', spark: '#80808e', barwaffle: '#9a9aa8', world: '#8a8a9a', 'world-ps': '#8a8a9a' },
 }
 function expectedKosovoColour(res, mode, kind) {
-    if (mode.lightBorders) return nearWhiteLight(res, mode) || (kind === 'world-ps' && !mode.darkMode) ? '#dcdcdc' : '#ffffff'
+    if (mode.lightBorders) return nearWhiteLight(res, mode) || (kind === 'world-ps' && !mode.darkMode) ? '#cfcfcf' : '#ffffff'
     return KOSOVO_COLOUR[mode.darkMode ? 'dark' : 'default'][kind]
 }
 

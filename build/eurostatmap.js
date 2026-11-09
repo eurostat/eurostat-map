@@ -125,8 +125,13 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
 
 /* National borders with a white halo keep their colours: the halo carries them on the dark land.
    On the dark land a lighter line stands out more, so where national borders are muted to a grey
-   (and have no halo to carry them), Kosovo gets a darker grey between them and the regional borders. */
-.em--dark.em--ps .em-kosovo-bn,
+   (and have no halo to carry them), Kosovo gets a darker grey between them and the regional borders.
+   Proportional symbol, pie and coxcomb maps also paint no-data regions mid-grey (#adadad), where a
+   darker Kosovo grey stood out as much as their unhaloed national line: Kosovo takes the national
+   grey there, 0.5px against 0.8px. */
+.em--dark.em--ps .em-kosovo-bn {
+    stroke: #808080;
+}
 .em--dark.em--flow .em-kosovo-bn {
     stroke: #6e6e80;
 }
@@ -189,8 +194,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
 
 /* Near-white land: proportional symbol, pie, coxcomb, bar, waffle and sparkline maps fill their land
    with #f2f2f2 (or a light tint), where white borders would vanish. Without darkMode they use light
-   greys instead, at the same widths: national #cfcfcf, Kosovo and regional a lighter #dcdcdc (and
-   thinner), disputed #cfcfcf dashed. */
+   greys instead, at the same widths: national and disputed (dashed) #cfcfcf, Kosovo #cfcfcf too but
+   thinner (a lighter grey stood out as much as the national line over the #adadad no-data fill),
+   regional a lighter #dcdcdc. */
 .em--borders-light.em--ps:not(.em--dark) .em-cntbn,
 .em--borders-light.em--ps:not(.em--dark) .em-worldbn,
 .em--borders-light.em--bar:not(.em--dark) .em-cntbn,
@@ -199,14 +205,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
 .em--borders-light.em--ps:not(.em--dark) .em-bn-d,
 .em--borders-light.em--bar:not(.em--dark) .em-bn-d,
 .em--borders-light.em--waffle:not(.em--dark) .em-bn-d,
-.em--borders-light.em--spark:not(.em--dark) .em-bn-d {
-    stroke: #cfcfcf;
-}
+.em--borders-light.em--spark:not(.em--dark) .em-bn-d,
 .em--borders-light.em--ps:not(.em--dark) .em-kosovo-bn,
 .em--borders-light.em--ps:not(.em--dark) #em-worldbn ~ .em-kosovo-bn,
 .em--borders-light.em--bar:not(.em--dark) .em-kosovo-bn,
 .em--borders-light.em--waffle:not(.em--dark) .em-kosovo-bn,
-.em--borders-light.em--spark:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--spark:not(.em--dark) .em-kosovo-bn {
+    stroke: #cfcfcf;
+}
 .em--borders-light.em--ps:not(.em--dark) .em-bn-1,
 .em--borders-light.em--ps:not(.em--dark) .em-bn-2,
 .em--borders-light.em--ps:not(.em--dark) .em-bn-3,
@@ -957,9 +963,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* muted country fill */
     stroke: none;
 }
 
-/* Kosovo: in between the muted national and the 0.1px regional borders */
+/* Kosovo: the muted national colour at 0.5px, so it stays below the 0.8px national line over any fill
+   (a lighter grey stood out as much as the national line over the no-data grey) and above the 0.1px
+   regional borders */
 .em--bar .em-kosovo-bn {
-    stroke: #d0d0d0;
+    stroke: #c2c2c2;
 }
 
 .em-bar-grouped-legend-label {
@@ -1480,9 +1488,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* muted country fill */
     stroke: none;
 }
 
-/* Kosovo: in between the muted national and the 0.1px regional borders */
+/* Kosovo: the muted national colour at 0.5px, so it stays below the 0.8px national line over any fill
+   (a lighter grey stood out as much as the national line over the no-data grey) and above the 0.1px
+   regional borders */
 .em--waffle .em-kosovo-bn {
-    stroke: #d0d0d0;
+    stroke: #c2c2c2;
 }
 .em-tooltip-wafflechart-container {
     max-width: 150px;
