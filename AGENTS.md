@@ -208,6 +208,8 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   a fill of its own lightness, so over mid-tone fills (L* ~43-52) regional out-contrasts Kosovo: the
   test lists those rendered fills as guideline-limit notes, and fails on anything else. It measures
   prominence over the fills each map really renders (land, sea, all class colours, no-data colour).
+  Muted types paint no-data regions `#adadad`; where their national border has no halo, a Kosovo grey
+  other than the national one fails there, so Kosovo takes the national grey, thinner (ratio <= 0.7).
 - Mixed-NUTS styling (`styleMixedNUTS` and its ps/composition/bivariate twins) copies each region's
   *computed* stroke inline, freezing whatever CSS applied at that moment; `applyBorderModeClasses`
   clears it when a mode is switched on a built map. Anything else that restyles borders via CSS
