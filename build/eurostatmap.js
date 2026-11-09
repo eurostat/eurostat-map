@@ -773,8 +773,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* muted country fill */
 .em--bar .em-bn-3,
 .em--bar .em-nutsrg [lvl='3'],
 .em--bar .em-nutsrg [lvl='2'],
-.em--bar .em-nutsrg [lvl='1'],
-.em--bar .em-bn-co {
+.em--bar .em-nutsrg [lvl='1'] {
     stroke-width: 0.1px;
 }
 
@@ -839,11 +838,15 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/*   muted country boundaries */
     stroke-width: 0.16px;
 }
 
-/* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
-.em--ps .em-bn-co,
-.em--pie .em-bn-co {
-    stroke: grey;
-    stroke-width: 0.1px;
+/*   muted nuts boundaries: coxcomb maps also carry em--ps, whose 0.2px regional borders would be
+     wider than the muted national (0.25px) and Kosovo (0.16px) borders above */
+.em--coxcomb .em-bn-1,
+.em--coxcomb .em-bn-2,
+.em--coxcomb .em-bn-3,
+.em--coxcomb .em-nutsrg [lvl='3'],
+.em--coxcomb .em-nutsrg [lvl='2'],
+.em--coxcomb .em-nutsrg [lvl='1'] {
+    stroke-width: 0.07px;
 }
 
 /*  regions without data input */
@@ -1082,8 +1085,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional pie chart maps */
 .em--pie .em-bn-3,
 .em--pie .em-nutsrg [lvl='3'],
 .em--pie .em-nutsrg [lvl='2'],
-.em--pie .em-nutsrg [lvl='1'],
-.em--pie .em-bn-co {
+.em--pie .em-nutsrg [lvl='1'] {
     stroke-width: 0.07px;
 }
 
@@ -1154,15 +1156,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional symbol and pie styles 
     stroke: #999999;
 }
 
-/*   muted nuts boundaries */
+/*   muted nuts boundaries (pie and coxcomb maps also carry em--ps and override this) */
 .em--ps .em-bn-1,
 .em--ps .em-bn-2,
 .em--ps .em-bn-3,
 .em--ps .em-nutsrg [lvl='3'],
 .em--ps .em-nutsrg [lvl='2'],
-.em--ps .em-nutsrg [lvl='1'],
-.em--ps .em-bn-co {
-    stroke-width: 0.07px;
+.em--ps .em-nutsrg [lvl='1'] {
+    stroke-width: 0.2px;
 }
 
 /*  muted country fill */
@@ -1183,7 +1184,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional symbol and pie styles 
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
 .em--ps .em-bn-co {
     stroke: grey;
-    stroke-width: 0.2px;
+    stroke-width: 0.1px;
 }
 `, ""]);
 // Exports
@@ -1309,8 +1310,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* muted country fill */
 .em--waffle .em-bn-3,
 .em--waffle .em-nutsrg [lvl='3'],
 .em--waffle .em-nutsrg [lvl='2'],
-.em--waffle .em-nutsrg [lvl='1'],
-.em--waffle .em-bn-co {
+.em--waffle .em-nutsrg [lvl='1'] {
     stroke-width: 0.1px;
 }
 

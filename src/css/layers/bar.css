@@ -14,8 +14,7 @@
 .em--bar .em-bn-3,
 .em--bar .em-nutsrg [lvl='3'],
 .em--bar .em-nutsrg [lvl='2'],
-.em--bar .em-nutsrg [lvl='1'],
-.em--bar .em-bn-co {
+.em--bar .em-nutsrg [lvl='1'] {
     stroke-width: 0.1px;
 }
 

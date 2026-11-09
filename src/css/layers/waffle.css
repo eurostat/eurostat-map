@@ -14,8 +14,7 @@
 .em--waffle .em-bn-3,
 .em--waffle .em-nutsrg [lvl='3'],
 .em--waffle .em-nutsrg [lvl='2'],
-.em--waffle .em-nutsrg [lvl='1'],
-.em--waffle .em-bn-co {
+.em--waffle .em-nutsrg [lvl='1'] {
     stroke-width: 0.1px;
 }
 

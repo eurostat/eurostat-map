@@ -16,8 +16,7 @@
 .em--pie .em-bn-3,
 .em--pie .em-nutsrg [lvl='3'],
 .em--pie .em-nutsrg [lvl='2'],
-.em--pie .em-nutsrg [lvl='1'],
-.em--pie .em-bn-co {
+.em--pie .em-nutsrg [lvl='1'] {
     stroke-width: 0.07px;
 }
 
