@@ -32,8 +32,8 @@
     stroke-width: 0px;
 }
 
-/* kosovo: between national (0.8px) and regional borders, distinguished by width and colour only.
-   No opacity (its look would depend on the fill underneath) and no dashing (Eurostat guideline). */
+/* Kosovo: always in between national and regional borders, by width and colour only (no opacity,
+   dashing or halo). Muted map types adjust it in css/layers. See docs/css.md, test/kosovo-border.test.mjs */
 .em-kosovo-bn {
     stroke: #787878;
     stroke-width: 0.5px;
@@ -53,13 +53,16 @@
 .em-bn-0 {
     stroke: none;
 }
+/* regional: 0.3px, clearly thinner than the Kosovo border (0.5px) */
 .em-bn-1,
 .em-bn-2,
 .em-bn-3,
 /* when using MIXED NUTS levels, we add stroke to the regions, then show/hide those that have/dont have data */
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
-.em-nutsrg [lvl='1'],
+.em-nutsrg [lvl='1'] {
+    stroke-width: 0.3px;
+}
 .em-bn-co {
     /* coastal boundaries must block MIXED NUTS levels polygon stroke */
     stroke-width: 0.4;

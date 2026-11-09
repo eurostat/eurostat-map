@@ -11,6 +11,12 @@
     stroke-width: 0.5px;
 }
 
+/* Kosovo on world maps: national borders are only 0.5px here, so keep it in between */
+#em-worldbn ~ .em-kosovo-bn {
+    stroke: #8a8a8a;
+    stroke-width: 0.3px;
+}
+
 .em-worldbn,
 .em-worldbn-halo {
     fill: none;

@@ -25,10 +25,17 @@
     stroke-width: 0.2px;
 }
 
-/*  country borders  */
-.em--bar .em-cntbn,
-.em--bar .em-cntbn-halo {
-    opacity: 0.3;
+/*  country borders: muted with a solid colour, not opacity, so they do not depend on the fill  */
+.em--bar .em-cntbn {
+    stroke: #c2c2c2;
+}
+.em--bar #em-cntbn-halo {
+    stroke: none;
+}
+
+/* Kosovo: in between the muted national and the 0.1px regional borders */
+.em--bar .em-kosovo-bn {
+    stroke: #d0d0d0;
 }
 
 .em-bar-grouped-legend-label {

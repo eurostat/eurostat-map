@@ -4,6 +4,22 @@
     stroke-width: 0.25px;
 }
 
+/* muted nuts boundaries: thinner than the muted national borders above */
+.em--flow .em-bn-1,
+.em--flow .em-bn-2,
+.em--flow .em-bn-3,
+.em--flow .em-nutsrg [lvl='3'],
+.em--flow .em-nutsrg [lvl='2'],
+.em--flow .em-nutsrg [lvl='1'] {
+    stroke-width: 0.07px;
+}
+
+/* Kosovo: in between the muted national (0.25px) and regional (0.07px) borders */
+.em--flow .em-kosovo-bn {
+    stroke: #999999;
+    stroke-width: 0.16px;
+}
+
 /* dim everything except the highlighted color group */
 .em-flow-container line.dimmed,
 .em-flow-lines line.dimmed,

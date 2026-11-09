@@ -38,6 +38,37 @@ Here you can find the CSS classes used to style the map and its components, in c
 
 ```
 
+### Border hierarchy and the Kosovo border
+
+Eurostat's rule is that the Kosovo border (`.em-kosovo-bn`) must always look in between a national and a regional border: less prominent than `.em-cntbn` (or `.em-worldbn` on world maps), more prominent than `.em-bn-1/2/3` (or the region outlines `.em-nutsrg [lvl]` on mixed-level maps). Distinguish it by stroke colour and width only: no `opacity` (its look would then depend on the fill underneath), no dashing unless the national borders are dashed too, and no halo.
+
+The defaults are:
+
+| Border   | Class           | Stroke    | Width |
+| -------- | --------------- | --------- | ----- |
+| National | `.em-cntbn`     | `#353535` | 0.8px |
+| Kosovo   | `.em-kosovo-bn` | `#787878` | 0.5px |
+| Regional | `.em-bn-1/2/3`  | `#868686` | 0.3px |
+
+Map types that mute their national borders (proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, and world maps) scale the Kosovo border down with them. If you override the national or regional border styles, adjust `.em-kosovo-bn` so it stays in between, for example with white borders:
+
+```css
+.em-cntbn {
+    stroke: #fff;
+    stroke-width: 1px;
+}
+.em-kosovo-bn {
+    stroke: #fff;
+    stroke-width: 0.5px;
+}
+.em-bn-1,
+.em-bn-2,
+.em-bn-3 {
+    stroke: #fff;
+    stroke-width: 0.3px;
+}
+```
+
 ## Legends
 
 ```css

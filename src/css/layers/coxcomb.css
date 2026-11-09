@@ -4,6 +4,12 @@
     stroke-width: 0.25px;
 }
 
+/* Kosovo: in between the muted national (0.25px) and regional (0.07px) borders */
+.em--coxcomb .em-kosovo-bn {
+    stroke: #999999;
+    stroke-width: 0.16px;
+}
+
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
 .em--ps .em-bn-co,
 .em--pie .em-bn-co {

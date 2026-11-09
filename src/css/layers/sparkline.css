@@ -6,6 +6,12 @@
     stroke-width: 0.2px;
 }
 
+/* Kosovo: in between the muted national (0.2px) and regional (0.05px) borders */
+.em--spark .em-kosovo-bn {
+    stroke: #b5b5b5;
+    stroke-width: 0.12px;
+}
+
 .em--spark #em-cntbn-halo {
     stroke: none;
 }

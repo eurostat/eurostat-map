@@ -5,6 +5,11 @@
     stroke: grey;
 }
 
+/* Kosovo: lighter and thinner than the muted grey national borders */
+.em--ps .em-kosovo-bn {
+    stroke: #999999;
+}
+
 /*   muted nuts boundaries */
 .em--ps .em-bn-1,
 .em--ps .em-bn-2,

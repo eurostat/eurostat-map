@@ -130,11 +130,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-cntbn,
     stroke-width: 0px;
 }
 
-/* kosovo */
+/* Kosovo: always in between national and regional borders, by width and colour only (no opacity,
+   dashing or halo). Muted map types adjust it in css/layers. See docs/css.md, test/kosovo-border.test.mjs */
 .em-kosovo-bn {
-    stroke: #666666;
+    stroke: #787878;
     stroke-width: 0.5px;
-    opacity: 0.8;
 }
 
 /* NUTS boundaries stroke color */
@@ -151,13 +151,16 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-cntbn,
 .em-bn-0 {
     stroke: none;
 }
+/* regional: 0.3px, clearly thinner than the Kosovo border (0.5px) */
 .em-bn-1,
 .em-bn-2,
 .em-bn-3,
 /* when using MIXED NUTS levels, we add stroke to the regions, then show/hide those that have/dont have data */
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
-.em-nutsrg [lvl='1'],
+.em-nutsrg [lvl='1'] {
+    stroke-width: 0.3px;
+}
 .em-bn-co {
     /* coastal boundaries must block MIXED NUTS levels polygon stroke */
     stroke-width: 0.4;
@@ -781,10 +784,17 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* muted country fill */
     stroke-width: 0.2px;
 }
 
-/*  country borders  */
-.em--bar .em-cntbn,
-.em--bar .em-cntbn-halo {
-    opacity: 0.3;
+/*  country borders: muted with a solid colour, not opacity, so they do not depend on the fill  */
+.em--bar .em-cntbn {
+    stroke: #c2c2c2;
+}
+.em--bar #em-cntbn-halo {
+    stroke: none;
+}
+
+/* Kosovo: in between the muted national and the 0.1px regional borders */
+.em--bar .em-kosovo-bn {
+    stroke: #d0d0d0;
 }
 
 .em-bar-grouped-legend-label {
@@ -821,6 +831,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/*   muted country boundaries */
 .em--coxcomb .em-cntbn {
     stroke: grey;
     stroke-width: 0.25px;
+}
+
+/* Kosovo: in between the muted national (0.25px) and regional (0.07px) borders */
+.em--coxcomb .em-kosovo-bn {
+    stroke: #999999;
+    stroke-width: 0.16px;
 }
 
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
@@ -879,6 +895,22 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/*  muted country boundaries */
 .em--flow .em-cntbn {
     stroke: grey;
     stroke-width: 0.25px;
+}
+
+/* muted nuts boundaries: thinner than the muted national borders above */
+.em--flow .em-bn-1,
+.em--flow .em-bn-2,
+.em--flow .em-bn-3,
+.em--flow .em-nutsrg [lvl='3'],
+.em--flow .em-nutsrg [lvl='2'],
+.em--flow .em-nutsrg [lvl='1'] {
+    stroke-width: 0.07px;
+}
+
+/* Kosovo: in between the muted national (0.25px) and regional (0.07px) borders */
+.em--flow .em-kosovo-bn {
+    stroke: #999999;
+    stroke-width: 0.16px;
 }
 
 /* dim everything except the highlighted color group */
@@ -1039,6 +1071,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional pie chart maps */
     stroke: grey;
 }
 
+/* Kosovo: lighter and thinner than the muted grey national borders */
+.em--pie .em-kosovo-bn {
+    stroke: #999999;
+}
+
 /*   muted nuts boundaries */
 .em--pie .em-bn-1,
 .em--pie .em-bn-2,
@@ -1112,6 +1149,11 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional symbol and pie styles 
     stroke: grey;
 }
 
+/* Kosovo: lighter and thinner than the muted grey national borders */
+.em--ps .em-kosovo-bn {
+    stroke: #999999;
+}
+
 /*   muted nuts boundaries */
 .em--ps .em-bn-1,
 .em--ps .em-bn-2,
@@ -1175,6 +1217,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Sparkline maps */
 .em--spark .em-cntbn {
     stroke: rgb(163, 163, 163);
     stroke-width: 0.2px;
+}
+
+/* Kosovo: in between the muted national (0.2px) and regional (0.05px) borders */
+.em--spark .em-kosovo-bn {
+    stroke: #b5b5b5;
+    stroke-width: 0.12px;
 }
 
 .em--spark #em-cntbn-halo {
@@ -1272,10 +1320,17 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* muted country fill */
     stroke-width: 0.2px;
 }
 
-/*  country borders  */
-.em--waffle .em-cntbn,
-.em--waffle .em-cntbn-halo {
-    opacity: 0.3;
+/*  country borders: muted with a solid colour, not opacity, so they do not depend on the fill  */
+.em--waffle .em-cntbn {
+    stroke: #c2c2c2;
+}
+.em--waffle #em-cntbn-halo {
+    stroke: none;
+}
+
+/* Kosovo: in between the muted national and the 0.1px regional borders */
+.em--waffle .em-kosovo-bn {
+    stroke: #d0d0d0;
 }
 .em-tooltip-wafflechart-container {
     max-width: 150px;
@@ -2705,6 +2760,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#g_worldbn,
 .em-worldbn {
     stroke: #4d4d4d;
     stroke-width: 0.5px;
+}
+
+/* Kosovo on world maps: national borders are only 0.5px here, so keep it in between */
+#em-worldbn ~ .em-kosovo-bn {
+    stroke: #8a8a8a;
+    stroke-width: 0.3px;
 }
 
 .em-worldbn,
@@ -80516,7 +80577,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.13.1","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"node test/layer.phase1.test.js && node test/stat-data.test.js","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0"},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^5.2.3","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.13.1","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"node test/layer.phase1.test.js && node test/stat-data.test.js && node test/kosovo-border.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0"},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^5.2.3","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 
