@@ -14,10 +14,12 @@
 // Random inset svg ids are normalised. The result is compared with test/baselines/inset-regression.json.gz.
 //
 // Usage: node test/inset-regression.test.mjs [--capture] [--only <substring>] [--jobs <n>] [--verbose]
-//                                             [--against <old build dir>] [--dump <dir>]
+//                                             [--against <old build dir>] [--build <dir>] [--dump <dir>]
 //   --capture   write the baseline from the current build instead of comparing with it
 //   --against   compare live with another build directory (containing eurostatmap.js) instead
 //               of the stored baseline
+//   --build     render with the bundle of another build directory (e.g. to capture a baseline
+//               for a new scenario from the code before a change)
 //   --dump      write the serialised snapshots (one file per scenario) for manual diffing
 
 import fs from 'node:fs'
@@ -35,6 +37,7 @@ const ONLY = arg('--only')
 const JOBS = +(arg('--jobs') || 4)
 const AGAINST = arg('--against')
 const DUMP = arg('--dump')
+const BUILD_DIR = path.resolve(arg('--build') || path.join(ROOT, 'build'))
 const QUIET_MS = 1000
 
 let chromium
@@ -608,7 +611,8 @@ add('grid cartogram choropleth (insets configured)', 'choropleth', `m.nutsLevel(
     steps: [...DEFAULT_STEPS, ['grid off + rebuild', `m.gridCartogram(false).build()`]],
 })
 add('grid cartogram ps', 'proportionalSymbol', `m.nutsLevel(0).gridCartogram(true).stat('size', ${J(st())})`)
-add('WORLD choropleth', 'choropleth', `m.geo('WORLD').stat(${J(st('w'))})`)
+add('WORLD choropleth', 'choropleth', `m.geo('WORLD').stat(${J(st('w', { geoLevel: 'country' }))})`)
+add('WORLD proportionalSymbol', 'proportionalSymbol', `m.geo('WORLD').stat('size', ${J(st('w', { geoLevel: 'country' }))})`)
 
 // --------------------------------------------------------------------------- in-page helpers
 const INIT_SCRIPT = `
@@ -925,7 +929,7 @@ async function runAll(buildDir) {
 }
 
 const t0 = Date.now()
-const current = await runAll(path.join(ROOT, 'build'))
+const current = await runAll(BUILD_DIR)
 const names = SCENARIOS.filter((s) => !ONLY || s.name.includes(ONLY)).map((s) => s.name)
 if (DUMP) {
     fs.mkdirSync(DUMP, { recursive: true })
