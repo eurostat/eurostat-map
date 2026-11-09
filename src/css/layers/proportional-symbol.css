@@ -10,13 +10,14 @@
     stroke: #999999;
 }
 
-/*   muted nuts boundaries (pie and coxcomb maps also carry em--ps and override this) */
+/*   muted nuts boundaries */
 .em--ps .em-bn-1,
 .em--ps .em-bn-2,
 .em--ps .em-bn-3,
 .em--ps .em-nutsrg [lvl='3'],
 .em--ps .em-nutsrg [lvl='2'],
-.em--ps .em-nutsrg [lvl='1'] {
+.em--ps .em-nutsrg [lvl='1'],
+.em--ps .em-bn-co {
     stroke-width: 0.2px;
 }
 
@@ -38,5 +39,5 @@
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
 .em--ps .em-bn-co {
     stroke: grey;
-    stroke-width: 0.1px;
+    stroke-width: 0.2px;
 }

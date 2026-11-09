@@ -1,24 +1,8 @@
-/*   muted country boundaries */
-.em--coxcomb .em-cntbn {
+/* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
+.em--ps .em-bn-co,
+.em--pie .em-bn-co {
     stroke: grey;
-    stroke-width: 0.25px;
-}
-
-/* Kosovo: in between the muted national (0.25px) and regional (0.07px) borders */
-.em--coxcomb .em-kosovo-bn {
-    stroke: #999999;
-    stroke-width: 0.16px;
-}
-
-/*   muted nuts boundaries: coxcomb maps also carry em--ps, whose 0.2px regional borders would be
-     wider than the muted national (0.25px) and Kosovo (0.16px) borders above */
-.em--coxcomb .em-bn-1,
-.em--coxcomb .em-bn-2,
-.em--coxcomb .em-bn-3,
-.em--coxcomb .em-nutsrg [lvl='3'],
-.em--coxcomb .em-nutsrg [lvl='2'],
-.em--coxcomb .em-nutsrg [lvl='1'] {
-    stroke-width: 0.07px;
+    stroke-width: 0.2px;
 }
 
 /*  regions without data input */
