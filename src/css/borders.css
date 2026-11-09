@@ -32,11 +32,11 @@
     stroke-width: 0px;
 }
 
-/* kosovo */
+/* kosovo: between national (0.8px) and regional borders, distinguished by width and colour only.
+   No opacity (its look would depend on the fill underneath) and no dashing (Eurostat guideline). */
 .em-kosovo-bn {
-    stroke: #666666;
+    stroke: #787878;
     stroke-width: 0.5px;
-    opacity: 0.8;
 }
 
 /* NUTS boundaries stroke color */
