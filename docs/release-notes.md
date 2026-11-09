@@ -2,6 +2,34 @@
 
 ## 4.14.0
 
+### New
+
+- **Border modes: `lightBorders()` and `darkMode()`.** Apps no longer need to override border CSS for white borders or a dark background. `map.lightBorders(true)` draws national, Kosovo, regional and disputed borders in white and removes the national border halo (national 1px, Kosovo 0.5px, regional 0.3px). `map.darkMode(true)` gives a dark sea and land, dims regional borders and coastlines, and adjusts the Kosovo border where needed so it keeps its place between national and regional borders. Titles, legends, labels and tooltips are not restyled. The two combine, apply to insets, can be switched on an already-built map, and are also accepted in the map config. They add the `em--borders-light` and `em--dark` classes to the map svg; every map type keeps its muted widths, the Kosovo rule holds in every combination, and disputed borders stay dashed. See the border modes in `docs/css.md`.
+
+Example:
+
+```javascript
+const map = eurostatmap
+    .map('proportionalSymbol')
+    .nutsLevel(2)
+    .stat('size', { eurostatDatasetCode: 'demo_r_pjangrp3', filters: { time: '2023', sex: 'T', age: 'TOTAL' } })
+    .lightBorders(true) // white borders, no halo
+    .darkMode(true) // dark sea and land
+    .build()
+
+// later, from a UI toggle: no rebuild needed
+map.lightBorders(false)
+```
+
+```ts
+interface MapInstance {
+    lightBorders(): boolean
+    lightBorders(light: boolean): this
+    darkMode(): boolean
+    darkMode(dark: boolean): this
+}
+```
+
 ### Fixes
 
 - **The Kosovo border now always sits between national and regional borders, on every map type.** Eurostat's rule is that it must be less prominent than a national border and more prominent than a regional one, using stroke width and colour only. It used to have `opacity: 0.8`, which made its look depend on the fill underneath. That is gone: it is now a solid `#787878`, 0.5px line. Map types that mute their national borders used to draw Kosovo as heavy as, or heavier than, those borders: proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, plus world maps, whose national borders are only 0.5px. Each of these now scales the Kosovo border down to match. See the border hierarchy section in `docs/css.md` if you override border styles.
@@ -40,7 +68,24 @@ Example:
 }
 ```
 
-- **Flow maps: regional borders are muted (visible change).** At their default NUTS level 3, flow maps drew regional borders (0.4px) thicker than their own muted national borders (0.25px). Regional borders are now 0.07px, as on proportional symbol maps.
+- **Flow maps: regional borders are muted (visible change).** At their default NUTS level 3, flow maps drew regional borders (0.4px) thicker than their own muted national borders (0.25px). Regional borders are now 0.07px, as on pie and coxcomb maps.
+- **Proportional symbol maps: regional borders show more (visible change).** NUTS 1-3 borders on proportional symbol maps are now 0.2px instead of 0.07px. Pie and coxcomb maps keep 0.07px. Coastlines keep their width.
+- **Coxcomb maps: regional borders stay below the Kosovo border.** Coxcomb maps also use the proportional symbol styles, so the wider regional borders above would have made them 0.2px, wider than their 0.16px Kosovo border. They keep 0.07px.
+
+Example:
+
+```css
+/* restore the previous, finer regional borders on proportional symbol maps */
+.em--ps .em-bn-1,
+.em--ps .em-bn-2,
+.em--ps .em-bn-3,
+.em--ps .em-nutsrg [lvl='1'],
+.em--ps .em-nutsrg [lvl='2'],
+.em--ps .em-nutsrg [lvl='3'] {
+    stroke-width: 0.07px;
+}
+```
+
 - **Bar and waffle maps: national borders use a solid light grey (visible change).** They used to be muted with `opacity: 0.3`. They now use `stroke: #c2c2c2`, which looks the same on these maps' light fills but no longer depends on the fill. Their white halo is removed; at 0.3 opacity it was barely visible anyway.
 - **The bivariate choropleth tooltip shows exact zeros** instead of leaving the value blank.
 - **Geographic labels keep their background when zoomed.** The text used to drift away from its background box as you zoomed in.

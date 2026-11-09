@@ -198,6 +198,21 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 `world.css`) must scale `.em-kosovo-bn` down with them. When changing any border width or colour, run
 `node test/kosovo-border.test.mjs --verbose`; it prints national/Kosovo/regional per map type.
 
+- Border modes (`lightBorders()` -> `.em--borders-light`, `darkMode()` -> `.em--dark`) live in
+  `src/css/border-modes.css`, imported last so its rules beat same-specificity `css/layers` rules;
+  the dark section comes before the light one so light borders win when both are set. A new muted
+  map type, or a new per-type border rule, needs checking in every mode: the test runs each scenario
+  in all of them (`--mode <name>` to run one). Watch specificity: world Kosovo uses an id selector.
+- Mixed-NUTS styling (`styleMixedNUTS` and its ps/composition/bivariate twins) copies each region's
+  *computed* stroke inline, freezing whatever CSS applied at that moment; `applyBorderModeClasses`
+  clears it when a mode is switched on a built map. Anything else that restyles borders via CSS
+  classes after build has to do the same.
+- `ps-background.js` writes id-specific fill rules (`#svgId.em--ps ...`) that beat any class rule,
+  so it writes separate light and `.em--dark` variants.
+- There is no lockfile: a fresh `npm install` (e.g. in a new worktree) can pull a newer Playwright
+  whose browser isn't installed. `npm install --no-save playwright@<version of the main checkout>`
+  reuses the installed browser instead of downloading one.
+
 ## Coding & Documentation Standards
 * Keep existing JSDoc comments intact and make sure they are accurate.
 * Maintain existing formatting standards defined in `.prettierrc`.
