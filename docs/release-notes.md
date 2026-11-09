@@ -4,7 +4,9 @@
 
 ### New
 
-- **Border modes: `lightBorders()` and `darkMode()`.** Apps no longer need to override border CSS for white borders or a dark background. `map.lightBorders(true)` draws national, Kosovo, regional and disputed borders in white and removes the national border halo (national 1px, Kosovo 0.5px, regional 0.3px). On maps with near-white land (proportional symbol, pie, coxcomb, bar, waffle and sparkline maps), where white would vanish, they are light greys instead: national `#cfcfcf`, Kosovo and regional `#dcdcdc`. `map.darkMode(true)` restyles the map only: a dark sea and land, dimmed regional borders and coastlines, and a Kosovo border adjusted where needed so it keeps its place between national and regional borders. Titles, legends, labels and tooltips are not restyled. The two combine, apply to insets, can be switched on an already-built map, and are also accepted in the map config. They add the `em--borders-light` and `em--dark` classes to the map svg; every map type keeps its muted widths, the Kosovo rule holds in every combination, and disputed borders stay dashed. See the border modes in `docs/css.md`.
+- **Border modes: `lightBorders()` and `darkMode()`.** Apps no longer need to override border CSS for white borders or a dark background. `map.lightBorders(true)` draws national, Kosovo, regional and disputed borders in white and removes the national border halo (national 1px, Kosovo 0.5px, regional 0.3px). On maps with near-white land (proportional symbol, pie, coxcomb, bar, waffle and sparkline maps), where white would vanish, they are light greys instead: national `#cfcfcf`, Kosovo and regional `#dcdcdc`. `map.darkMode(true)` restyles the map only: a dark sea and land, dimmed coastlines, and a Kosovo border adjusted where needed so it keeps its place between national and regional borders. Titles, legends, labels and tooltips are not restyled. The two combine, apply to insets, can be switched on an already-built map, and are also accepted in the map config. They add the `em--borders-light` and `em--dark` classes to the map svg; every map type keeps its muted widths, the Kosovo rule holds in every combination, and disputed borders stay dashed. See the border modes in `docs/css.md`.
+
+- **Categorical and bivariate maps: regions missing from the data follow the land colour.** They were painted with an inline `#e1e1e1`, which ignored `darkMode` (light grey regions on a dark map) and the world land colour. They now take the land fill from the stylesheet.
 
 Example:
 
@@ -32,7 +34,7 @@ interface MapInstance {
 
 ### Fixes
 
-- **The Kosovo border now always sits between national and regional borders, on every map type.** Eurostat's rule is that it must be less prominent than a national border and more prominent than a regional one, using stroke width and colour only. It used to have `opacity: 0.8`, which made its look depend on the fill underneath. That is gone: it is now a solid `#787878`, 0.5px line. Map types that mute their national borders used to draw Kosovo as heavy as, or heavier than, those borders: proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, plus world maps, whose national borders are only 0.5px. Each of these now scales the Kosovo border down to match. See the border hierarchy section in `docs/css.md` if you override border styles.
+- **The Kosovo border now always sits between national and regional borders, on every map type.** Eurostat's rule is that it must be less prominent than a national border and more prominent than a regional one, using stroke width and colour only. It used to have `opacity: 0.8`, which made its look depend on the fill underneath. That is gone: it is now a solid `#787878`, 0.5px line. On maps whose regions are filled with data colours, the rule also holds over fills of any lightness, not only over the empty land. Map types that mute their national borders used to draw Kosovo as heavy as, or heavier than, those borders: proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, plus world maps, whose national borders are only 0.5px. Each of these now scales the Kosovo border down to match. See the border hierarchy section in `docs/css.md` if you override border styles.
 
 Example:
 
@@ -50,12 +52,12 @@ Example:
 .em-bn-1,
 .em-bn-2,
 .em-bn-3 {
-    stroke: #858585;
+    stroke: #787878;
     stroke-width: 0.3px;
 }
 ```
 
-- **Border colours and widths follow the Eurostat guideline (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now `#858585` and 0.3px instead of `#868686` and 0.4px, clearly lighter than the Kosovo border. The white halo under national borders is now 1.9px instead of 1.5px. Coastlines keep 0.4px. To restore the previous look:
+- **Border colours and widths follow the Eurostat guideline (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now `#787878` and 0.3px instead of `#868686` and 0.4px: thinner than the Kosovo border, in the same grey. The guideline's regional `#858585` is not used: over mid-tone data fills (around L\* 43-52) a Kosovo line in a different grey vanished while the regional lines still showed. In the same grey, Kosovo always stands out more than regional borders by its width. The white halo under national borders is now 1.9px instead of 1.5px. Coastlines keep 0.4px. To restore the previous look:
 
 ```css
 .em-bn-1,
@@ -64,6 +66,7 @@ Example:
 .em-nutsrg [lvl='1'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='3'] {
+    stroke: #868686;
     stroke-width: 0.4px;
 }
 .em-cntbn-halo:not(.em-bn-co) {

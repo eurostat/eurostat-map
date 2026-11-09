@@ -23,6 +23,11 @@
 // national border's halo counts towards it. Light mode must also turn national, Kosovo and regional
 // borders white; disputed borders must stay dashed in every mode; insets inherit the mode.
 //
+// Map types that fill regions with data colours are also checked over a sweep of fills (greys from
+// L* 0 to 100 plus saturated hues), with IMAGE's e2e metric: width x CIE L* contrast, Kosovo <= 0.7 x
+// national and > 1.1 x regional. A solid line vanishes over a fill of its own lightness, so this is
+// what catches a Kosovo colour that only works over the empty land.
+//
 // Usage: node test/kosovo-border.test.mjs [--verbose] [--mode <mode name>]
 
 import fs from 'node:fs'
@@ -206,6 +211,12 @@ add(
 )
 add('choropleth WORLD', 'choropleth', `m.geo('WORLD').stat(${JSON.stringify(stat())})`)
 add('proportionalSymbol WORLD', 'proportionalSymbol', `m.geo('WORLD').stat('size', ${JSON.stringify(stat())})`)
+add(
+    'bivariateChoropleth WORLD',
+    'bivariateChoropleth',
+    `m.geo('WORLD').stat('v1', ${JSON.stringify(stat())}).stat('v2', ${JSON.stringify(stat('x'))})`
+)
+add('categorical WORLD', 'categorical', `m.geo('WORLD').stat(${JSON.stringify(stat())})`)
 
 // --------------------------------------------------------------------------- in-page probe
 // Returns the style facts of the first national / Kosovo / regional border in the map svg.
@@ -236,7 +247,12 @@ function probe(svgId) {
     ])
     const disputed = pick(['#em-cntbn path.em-bn-d', '#em-worldbn path.em-bn-d'])
     const coast = pick(['#em-cntbn path.em-bn-co', '#em-nutsbn path.em-bn-co', '#em-worldbn path.em-bn-co'])
-    const land = pick(['.em-cntrg path', 'path.em-worldrg', '.em-worldrg path'])
+    // the empty land: a land path without a data colour of its own (filled world maps colour most)
+    const plain = (e) => !e.style.fill && !e.getAttribute('fill')
+    const land =
+        Array.from(svg.querySelectorAll('.em-cntrg path, path.em-worldrg, .em-worldrg path')).find(
+            (e) => e.closest('svg.em-map') === svg && plain(e)
+        ) || pick(['.em-cntrg path', 'path.em-worldrg', '.em-worldrg path'])
     const sea = pick(['.em-sea'])
     const parseColor = (c) => {
         const m = /rgba?\(([^)]+)\)/.exec(c || '')
@@ -300,6 +316,84 @@ const background = (res, mode) =>
 // Against white this is the original width x darkness x opacity score.
 const prominence = (f, bg) => (f && f.rgb && f.width ? +(f.width * Math.abs(luminance(bg) - luminance(f.rgb)) * f.opacity).toFixed(4) : 0)
 const WHITE = 'rgb(255, 255, 255)'
+
+// ------------------------------------------------------------------ data fills (filled map types)
+// Map types that paint regions with data colours: their borders run over ANY colour, not just the
+// empty land, so the hierarchy must hold over the whole range of fills. Measured like IMAGE's e2e
+// spec (image/e2e/kosovo-border.spec.ts): width x CIE L* contrast of the line as painted (alpha
+// blended) over the fill, a national border counting its halo; Kosovo must stay <= 0.7 x national
+// and clearly (10%) above regional. Unfilled types (proportional symbols, pies, flows, ...) keep
+// their land and are covered by the checks above.
+const FILLED_TYPES = ['choropleth', 'categorical', 'bivariateChoropleth', 'trivariateChoropleth', 'valueByAlpha', 'stripeComposition']
+const MAX_KOSOVO_TO_NATIONAL = 0.7
+const lstar = ({ r, g, b }) => {
+    const lin = [r, g, b].map((c) => {
+        const v = c / 255
+        return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+    })
+    const y = 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+    return y > 216 / 24389 ? 116 * Math.cbrt(y) - 16 : (24389 / 27) * y
+}
+// the grey of a given L*
+const greyOfL = (L) => {
+    const y = L > 8 ? ((L + 16) / 116) ** 3 : (L * 27) / 24389
+    const v = Math.round(255 * (y <= 0.0031308 ? 12.92 * y : 1.055 * y ** (1 / 2.4) - 0.055))
+    return { r: v, g: v, b: v }
+}
+const DATA_FILLS = [
+    // greys sweeping L* 0..100 in steps of 2.5 (light, mid and dark fills)
+    ...Array.from({ length: 41 }, (_, i) => greyOfL(i * 2.5)),
+    // saturated hues, incl. the mid-blue bivariate fill IMAGE caught (L* ~47)
+    ...[
+        '#5d68ce',
+        '#0060fa',
+        '#e04040',
+        '#ffd400',
+        '#2ca25f',
+        '#08306b',
+        '#fee0d2',
+        '#e8e8e8',
+        '#be64ac',
+        '#3b4994',
+        '#5ac8c8',
+        '#dfb0d6',
+        '#ace4e4',
+        '#a5add3',
+        '#8c62aa',
+    ].map(hexRgb),
+]
+const painted = (f, bg) => {
+    const a = f.opacity
+    return { r: f.rgb.r * a + bg.r * (1 - a), g: f.rgb.g * a + bg.g * (1 - a), b: f.rgb.b * a + bg.b * (1 - a) }
+}
+const promL = (f, bg) => (f && f.rgb && f.width ? (f.width * Math.abs(lstar(painted(f, bg)) - lstar(bg))) / 100 : 0)
+const rgbStr = ({ r, g, b }) => `rgb(${r}, ${g}, ${b})`
+
+function checkDataFills(res, mode, sc) {
+    if (!FILLED_TYPES.includes(sc.type)) return []
+    const { national: N, halo: H, kosovo: K, regional: R } = res
+    if (!K || !N) return []
+    const fills = [...DATA_FILLS, ...(mode.darkMode && res.land ? [res.land] : [])]
+    const bad = { national: [], regional: [] }
+    for (const bg of fills) {
+        const pk = promL(K, bg)
+        const pn = Math.max(promL(N, bg), promL(H, bg))
+        const pr = R ? promL(R, bg) : 0
+        // a fill of exactly the border colour hides every line of that colour: nothing to compare
+        if (pk === 0 && pr === 0) continue
+        if (!(pk <= MAX_KOSOVO_TO_NATIONAL * pn)) bad.national.push(`${rgbStr(bg)} L*${lstar(bg).toFixed(1)} (K ${pk.toFixed(3)} N ${pn.toFixed(3)})`)
+        if (R && !(pk > 1.1 * pr)) bad.regional.push(`${rgbStr(bg)} L*${lstar(bg).toFixed(1)} (K ${pk.toFixed(3)} R ${pr.toFixed(3)})`)
+    }
+    const errs = []
+    const sum = (l) => (l.length > 4 ? `${l.slice(0, 2).join(', ')} ... ${l.slice(-2).join(', ')}` : l.join(', '))
+    if (bad.national.length)
+        errs.push(
+            `data fills: Kosovo not <= ${MAX_KOSOVO_TO_NATIONAL} x national over ${bad.national.length}/${fills.length} fills: ${sum(bad.national)}`
+        )
+    if (bad.regional.length)
+        errs.push(`data fills: Kosovo not clearly > regional over ${bad.regional.length}/${fills.length} fills: ${sum(bad.regional)}`)
+    return errs
+}
 
 function check(res, mode) {
     const errs = []
@@ -417,7 +511,7 @@ try {
                     svgClass: await page.evaluate((id) => document.getElementById(id)?.getAttribute('class'), sc.svgId),
                 }
             }
-            const errs = check(res, mode)
+            const errs = [...check(res, mode), ...checkDataFills(res, mode, sc)]
             const bg = background(res, mode)
             if (errs.length) failures++
             const fmt = (f) =>

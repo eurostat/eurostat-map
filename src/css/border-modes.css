@@ -17,14 +17,16 @@
     fill: #2a2a3e;
 }
 
-/* regional borders: dimmed so they stay below the Kosovo border on the dark land */
+/* regional borders: the Kosovo grey, so that over data fills of any lightness they stay below the
+   (wider) Kosovo border by width. A dimmer colour (#555577) only worked on the empty dark land: over
+   mid-light data colours it stood out more than the Kosovo line. */
 .em--dark .em-bn-1,
 .em--dark .em-bn-2,
 .em--dark .em-bn-3,
 .em--dark .em-nutsrg [lvl='3'],
 .em--dark .em-nutsrg [lvl='2'],
 .em--dark .em-nutsrg [lvl='1'] {
-    stroke: #555577;
+    stroke: #787878;
 }
 
 /* coastlines: a white or grey coastline would glare against the dark sea */
@@ -47,12 +49,12 @@
     stroke: #9a9aa8;
 }
 
-/* world maps: the 0.5px national borders only have a faint halo, so lighten them, and Kosovo less */
-.em--dark .em-worldbn {
-    stroke: #8a8a9a;
-}
+/* world maps: the 0.5px national borders only have a faint halo, so lighten them. Kosovo takes the
+   same colour at 0.3px: any other solid colour stands out more than the national line over fills
+   near the national colour's lightness (a darker #66667a did over light fills). */
+.em--dark .em-worldbn,
 .em--dark #em-worldbn ~ .em-kosovo-bn {
-    stroke: #66667a;
+    stroke: #8a8a9a;
 }
 
 /* ------------------------------------------------------ light borders (em--borders-light) */

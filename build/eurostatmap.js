@@ -115,14 +115,16 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
     fill: #2a2a3e;
 }
 
-/* regional borders: dimmed so they stay below the Kosovo border on the dark land */
+/* regional borders: the Kosovo grey, so that over data fills of any lightness they stay below the
+   (wider) Kosovo border by width. A dimmer colour (#555577) only worked on the empty dark land: over
+   mid-light data colours it stood out more than the Kosovo line. */
 .em--dark .em-bn-1,
 .em--dark .em-bn-2,
 .em--dark .em-bn-3,
 .em--dark .em-nutsrg [lvl='3'],
 .em--dark .em-nutsrg [lvl='2'],
 .em--dark .em-nutsrg [lvl='1'] {
-    stroke: #555577;
+    stroke: #787878;
 }
 
 /* coastlines: a white or grey coastline would glare against the dark sea */
@@ -145,12 +147,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
     stroke: #9a9aa8;
 }
 
-/* world maps: the 0.5px national borders only have a faint halo, so lighten them, and Kosovo less */
-.em--dark .em-worldbn {
-    stroke: #8a8a9a;
-}
+/* world maps: the 0.5px national borders only have a faint halo, so lighten them. Kosovo takes the
+   same colour at 0.3px: any other solid colour stands out more than the national line over fills
+   near the national colour's lightness (a darker #66667a did over light fills). */
+.em--dark .em-worldbn,
 .em--dark #em-worldbn ~ .em-kosovo-bn {
-    stroke: #66667a;
+    stroke: #8a8a9a;
 }
 
 /* ------------------------------------------------------ light borders (em--borders-light) */
@@ -307,14 +309,18 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-cntbn,
     stroke-width: 0.5px;
 }
 
-/* NUTS boundaries stroke color */
+/* NUTS boundaries stroke color: the Kosovo grey (the guideline's regional #858585 is 5 L* lighter).
+   Regions are filled with data colours of any lightness, and a solid line vanishes over a fill of its
+   own lightness: with two different greys, the Kosovo line vanishes over some mid-tone fills (L* 43-52
+   for #787878 vs #858585) where the regional lines still show. In one shared grey the two always keep
+   the ratio of their widths (0.5 / 0.3), so Kosovo stays above regional over every fill. */
 .em-bn-1,
 .em-bn-2,
 .em-bn-3,
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: #858585;
+    stroke: #787878;
 }
 
 /*  regional and coastal boundaries stroke-width */
@@ -36607,7 +36613,7 @@ const decorateBivariateChoroplethLayer = function (out, config) {
 
                     const ecl1 = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__.select)(this).attr('ecl1')
                     const ecl2 = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__.select)(this).attr('ecl2')
-                    if (!ecl1 && !ecl2) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_7__.getCSSPropertyFromClass)('em-nutsrg', 'fill') // GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
+                    if (!ecl1 && !ecl2) return null // no inline fill: the stylesheet's land fill applies (incl. darkMode). GISCO-2678 - lack of data no longer means no data, instead it is explicitly set using ':'.
                     if (ecl2 === 'nd') return out.noDataFillStyle() || 'gray'
                     let color = out.classToFillStyle_(+ecl1, +ecl2)
                     return color
@@ -45928,7 +45934,7 @@ const decorateCategoricalLayer = function (out, config) {
     const regionsFillFunction = function (rg) {
         const ecl = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__.select)(this).attr('ecl') // 'this' refers to the current DOM element
         if (out.Geometries.userGeometries) {
-            if (!ecl) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getCSSPropertyFromClass)('em-nutsrg', 'fill')
+            if (!ecl) return null // no inline fill: the stylesheet's land fill applies (incl. darkMode)
             if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
             return out.classToFillStyle_[out.classifier().domain()[ecl]]
         } else {
@@ -45941,7 +45947,7 @@ const decorateCategoricalLayer = function (out, config) {
             } else {
                 // NUTS template logic
                 const countryId = rg.properties.id.slice(0, 2)
-                if (!ecl) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getCSSPropertyFromClass)('em-nutsrg', 'fill')
+                if (!ecl) return null // no inline fill: the stylesheet's land fill applies (incl. darkMode)
                 if (ecl === 'nd') return out.noDataFillStyle() || 'gray'
                 return out.classToFillStyle_[out.classifier().domain()[ecl]]
             }
