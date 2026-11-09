@@ -19,7 +19,8 @@
 // Every scenario runs in each border mode: default (dark borders), lightBorders(true),
 // darkMode(true), and both (set before build, and switched on an already-built map). Prominence
 // is measured against the mode's background (white land, a mid-grey data fill under light
-// borders, the dark land of darkMode), and a national border's halo counts towards it. Light mode must also turn national, Kosovo and regional
+// borders, #f2f2f2 for light borders on near-white land, the dark land of darkMode), and a
+// national border's halo counts towards it. Light mode must also turn national, Kosovo and regional
 // borders white; disputed borders must stay dashed in every mode; insets inherit the mode.
 //
 // Usage: node test/kosovo-border.test.mjs [--verbose] [--mode <mode name>]
@@ -289,7 +290,12 @@ function luminance({ r, g, b }) {
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
 }
 const hexRgb = (h) => ({ r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16) })
-const background = (res, mode) => (mode.bg === 'land' ? res.land || hexRgb('#000000') : hexRgb(mode.bg))
+// Map types whose land is near-white (#f2f2f2): light borders are light greys there, not white.
+const NEAR_WHITE_LAND = ['em--ps', 'em--bar', 'em--waffle', 'em--spark']
+const nearWhiteLight = (res, mode) =>
+    mode.lightBorders && !mode.darkMode && (res.svgClass || '').split(/\s+/).some((c) => NEAR_WHITE_LAND.includes(c))
+const background = (res, mode) =>
+    mode.bg === 'land' ? res.land || hexRgb('#000000') : nearWhiteLight(res, mode) ? hexRgb('#f2f2f2') : hexRgb(mode.bg)
 // How strongly a line stands out against the background: width x luminance contrast x opacity.
 // Against white this is the original width x darkness x opacity score.
 const prominence = (f, bg) => (f && f.rgb && f.width ? +(f.width * Math.abs(luminance(bg) - luminance(f.rgb)) * f.opacity).toFixed(4) : 0)
@@ -322,12 +328,18 @@ function check(res, mode) {
         errs.push(`svg class "${res.svgClass}" does not match lightBorders ${mode.lightBorders}`)
     if (cls.includes('em--dark') !== mode.darkMode) errs.push(`svg class "${res.svgClass}" does not match darkMode ${mode.darkMode}`)
     if (mode.lightBorders) {
+        const greys = nearWhiteLight(res, mode)
         for (const [label, f] of [
             ['national', N],
             ['Kosovo', K],
             ['regional', R],
-        ])
-            if (f && f.stroke !== WHITE) errs.push(`light borders: ${label} stroke ${f.stroke} is not white`)
+        ]) {
+            if (!f) continue
+            // pure white, or on near-white land a light grey that is still visible on it
+            if (!greys && f.stroke !== WHITE) errs.push(`light borders: ${label} stroke ${f.stroke} is not white`)
+            if (greys && !(f.rgb && luminance(f.rgb) > 0.5 && luminance(f.rgb) < luminance(bg) - 0.05))
+                errs.push(`light borders on near-white land: ${label} stroke ${f.stroke} is not a visible light grey`)
+        }
         if (H && H.width > 0) errs.push(`light borders: national halo still drawn (${H.stroke} ${H.width}px)`)
     }
     if (mode.darkMode) {

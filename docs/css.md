@@ -48,11 +48,11 @@ The defaults are:
 
 | Border   | Class           | Stroke    | Width |
 | -------- | --------------- | --------- | ----- |
-| National | `.em-cntbn`     | `#353535` | 0.8px |
+| National | `.em-cntbn`     | `#353535` | 0.8px, with a 1.9px white halo |
 | Kosovo   | `.em-kosovo-bn` | `#787878` | 0.5px |
-| Regional | `.em-bn-1/2/3`  | `#868686` | 0.3px |
+| Regional | `.em-bn-1/2/3`  | `#858585` | 0.3px |
 
-Map types that mute their national borders (proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, and world maps) scale the Kosovo border down with them. If you override the national or regional border styles, adjust `.em-kosovo-bn` so it stays in between.
+Map types that mute their national borders (proportional symbol, pie, coxcomb, sparkline, flow, bar and waffle maps, and world maps) scale the Kosovo border down with them. Proportional symbol, pie and coxcomb maps share one style: grey national borders (0.8px), a `#999` 0.5px Kosovo border, 0.2px regional borders and 0.2px grey coastlines. If you override the national or regional border styles, adjust `.em-kosovo-bn` so it stays in between.
 
 #### Border modes
 
@@ -60,7 +60,7 @@ Rather than overriding these rules for white borders or a dark background, use t
 
 | Mode           | National                                               | Kosovo            | Regional          | Disputed                |
 | -------------- | ------------------------------------------------------ | ----------------- | ----------------- | ----------------------- |
-| Default        | `#353535` 0.8px, 1.5px white halo                      | `#787878` 0.5px   | `#868686` 0.3px   | `#818181` 0.3px, dashed |
+| Default        | `#353535` 0.8px, 1.9px white halo                      | `#787878` 0.5px   | `#858585` 0.3px   | `#818181` 0.3px, dashed |
 | `lightBorders` | `#fff` 1px, no halo                                    | `#fff` 0.5px      | `#fff` 0.3px      | `#fff` 0.3px, dashed    |
 | `darkMode`     | unchanged (the white halo carries it on the dark land) | unchanged         | `#555577` 0.3px   | unchanged               |
 | both           | as `lightBorders`                                      | as `lightBorders` | as `lightBorders` | as `lightBorders`       |
@@ -69,7 +69,8 @@ Rather than overriding these rules for white borders or a dark background, use t
 
 Muted map types keep their scaled-down widths in every mode:
 
-- with `lightBorders`, proportional symbol, pie, bar and waffle maps (muted by colour in the default mode) keep 0.8px national borders instead of 1px; coxcomb, flow and sparkline maps keep their thin lines (national 0.25/0.25/0.2px, Kosovo 0.16/0.16/0.12px); world maps keep 0.5px national and 0.3px Kosovo borders. Everything is white.
+- with `lightBorders`, proportional symbol, pie, coxcomb, bar and waffle maps (muted by colour in the default mode) keep 0.8px national borders instead of 1px; flow and sparkline maps keep their thin lines (national 0.25/0.2px, Kosovo 0.16/0.12px); world maps keep 0.5px national and 0.3px Kosovo borders.
+- with `lightBorders` and without `darkMode`, proportional symbol, pie, coxcomb, bar, waffle and sparkline maps, whose land is near-white (`#f2f2f2`), use light greys instead of white, which would vanish there: national and disputed `#cfcfcf`, Kosovo and regional `#dcdcdc` (Kosovo stays wider than regional). Everywhere else light borders are white.
 - with `darkMode`, where national borders are muted to a grey, the Kosovo border uses a darker grey than them (a lighter line stands out more on the dark land): `#6e6e80` on proportional symbol, pie, coxcomb and flow maps, `#80808e` on sparkline maps, `#9a9aa8` on bar and waffle maps. World maps lighten their national borders to `#8a8a9a` and use `#66667a` for Kosovo.
 
 ## Legends

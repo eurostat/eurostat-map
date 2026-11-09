@@ -167,7 +167,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
     stroke: none;
 }
 /* 1px where national borders are not muted. Muted map types keep their own widths: proportional
-   symbol, pie, bar and waffle maps (muted by colour) stay at 0.8px, coxcomb, flow and sparkline
+   symbol, pie, coxcomb, bar and waffle maps (muted by colour) stay at 0.8px, flow and sparkline
    maps keep their thin lines. World maps keep 0.5px. (.em--ps also covers pie and coxcomb.) */
 .em--borders-light:not(.em--ps):not(.em--flow):not(.em--spark):not(.em--bar):not(.em--waffle) .em-cntbn {
     stroke-width: 1px;
@@ -192,6 +192,53 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Border modes: modifier classes set 
 /* disputed: white, still dashed */
 .em--borders-light .em-bn-d {
     stroke: #fff;
+}
+
+/* Near-white land: proportional symbol, pie, coxcomb, bar, waffle and sparkline maps fill their land
+   with #f2f2f2 (or a light tint), where white borders would vanish. Without darkMode they use light
+   greys instead, at the same widths: national #cfcfcf, Kosovo and regional a lighter #dcdcdc (and
+   thinner), disputed #cfcfcf dashed. */
+.em--borders-light.em--ps:not(.em--dark) .em-cntbn,
+.em--borders-light.em--ps:not(.em--dark) .em-worldbn,
+.em--borders-light.em--bar:not(.em--dark) .em-cntbn,
+.em--borders-light.em--waffle:not(.em--dark) .em-cntbn,
+.em--borders-light.em--spark:not(.em--dark) .em-cntbn,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-d,
+.em--borders-light.em--bar:not(.em--dark) .em-bn-d,
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-d,
+.em--borders-light.em--spark:not(.em--dark) .em-bn-d {
+    stroke: #cfcfcf;
+}
+.em--borders-light.em--ps:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--ps:not(.em--dark) #em-worldbn ~ .em-kosovo-bn,
+.em--borders-light.em--bar:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--waffle:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--spark:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-1,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-2,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-3,
+.em--borders-light.em--ps:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--ps:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--ps:not(.em--dark) .em-nutsrg [lvl='3'],
+.em--borders-light.em--bar:not(.em--dark) .em-bn-1,
+.em--borders-light.em--bar:not(.em--dark) .em-bn-2,
+.em--borders-light.em--bar:not(.em--dark) .em-bn-3,
+.em--borders-light.em--bar:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--bar:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--bar:not(.em--dark) .em-nutsrg [lvl='3'],
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-1,
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-2,
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-3,
+.em--borders-light.em--waffle:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--waffle:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--waffle:not(.em--dark) .em-nutsrg [lvl='3'],
+.em--borders-light.em--spark:not(.em--dark) .em-bn-1,
+.em--borders-light.em--spark:not(.em--dark) .em-bn-2,
+.em--borders-light.em--spark:not(.em--dark) .em-bn-3,
+.em--borders-light.em--spark:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--spark:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--spark:not(.em--dark) .em-nutsrg [lvl='3'] {
+    stroke: #dcdcdc;
 }
 `, ""]);
 // Exports
@@ -244,7 +291,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-cntbn,
 /* country boundary halo (not coastline) */
 .em-cntbn-halo:not(.em-bn-co) {
     stroke: white;
-    stroke-width: 1.5px;
+    stroke-width: 1.9px;
     opacity: 1;
 }
 
@@ -267,7 +314,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-cntbn,
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: #868686;
+    stroke: #858585;
 }
 
 /*  regional and coastal boundaries stroke-width */
@@ -952,27 +999,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `/*   muted country boundaries */
-.em--coxcomb .em-cntbn {
+___CSS_LOADER_EXPORT___.push([module.id, `/* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
+.em--ps .em-bn-co,
+.em--pie .em-bn-co {
     stroke: grey;
-    stroke-width: 0.25px;
-}
-
-/* Kosovo: in between the muted national (0.25px) and regional (0.07px) borders */
-.em--coxcomb .em-kosovo-bn {
-    stroke: #999999;
-    stroke-width: 0.16px;
-}
-
-/*   muted nuts boundaries: coxcomb maps also carry em--ps, whose 0.2px regional borders would be
-     wider than the muted national (0.25px) and Kosovo (0.16px) borders above */
-.em--coxcomb .em-bn-1,
-.em--coxcomb .em-bn-2,
-.em--coxcomb .em-bn-3,
-.em--coxcomb .em-nutsrg [lvl='3'],
-.em--coxcomb .em-nutsrg [lvl='2'],
-.em--coxcomb .em-nutsrg [lvl='1'] {
-    stroke-width: 0.07px;
+    stroke-width: 0.2px;
 }
 
 /*  regions without data input */
@@ -1211,8 +1242,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional pie chart maps */
 .em--pie .em-bn-3,
 .em--pie .em-nutsrg [lvl='3'],
 .em--pie .em-nutsrg [lvl='2'],
-.em--pie .em-nutsrg [lvl='1'] {
-    stroke-width: 0.07px;
+.em--pie .em-nutsrg [lvl='1'],
+.em--pie .em-bn-co {
+    stroke-width: 0.2px;
 }
 
 /*  muted country fill */
@@ -1282,13 +1314,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional symbol and pie styles 
     stroke: #999999;
 }
 
-/*   muted nuts boundaries (pie and coxcomb maps also carry em--ps and override this) */
+/*   muted nuts boundaries */
 .em--ps .em-bn-1,
 .em--ps .em-bn-2,
 .em--ps .em-bn-3,
 .em--ps .em-nutsrg [lvl='3'],
 .em--ps .em-nutsrg [lvl='2'],
-.em--ps .em-nutsrg [lvl='1'] {
+.em--ps .em-nutsrg [lvl='1'],
+.em--ps .em-bn-co {
     stroke-width: 0.2px;
 }
 
@@ -1310,7 +1343,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Proportional symbol and pie styles 
 /* Coastlines should not be drawn for choropleths, however for prop symbol maps with white regions they can be necessary */
 .em--ps .em-bn-co {
     stroke: grey;
-    stroke-width: 0.1px;
+    stroke-width: 0.2px;
 }
 `, ""]);
 // Exports

@@ -23,7 +23,7 @@
 /* country boundary halo (not coastline) */
 .em-cntbn-halo:not(.em-bn-co) {
     stroke: white;
-    stroke-width: 1.5px;
+    stroke-width: 1.9px;
     opacity: 1;
 }
 
@@ -46,7 +46,7 @@
 .em-nutsrg [lvl='3'],
 .em-nutsrg [lvl='2'],
 .em-nutsrg [lvl='1'] {
-    stroke: #868686;
+    stroke: #858585;
 }
 
 /*  regional and coastal boundaries stroke-width */

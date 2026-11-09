@@ -69,7 +69,7 @@
     stroke: none;
 }
 /* 1px where national borders are not muted. Muted map types keep their own widths: proportional
-   symbol, pie, bar and waffle maps (muted by colour) stay at 0.8px, coxcomb, flow and sparkline
+   symbol, pie, coxcomb, bar and waffle maps (muted by colour) stay at 0.8px, flow and sparkline
    maps keep their thin lines. World maps keep 0.5px. (.em--ps also covers pie and coxcomb.) */
 .em--borders-light:not(.em--ps):not(.em--flow):not(.em--spark):not(.em--bar):not(.em--waffle) .em-cntbn {
     stroke-width: 1px;
@@ -94,4 +94,51 @@
 /* disputed: white, still dashed */
 .em--borders-light .em-bn-d {
     stroke: #fff;
+}
+
+/* Near-white land: proportional symbol, pie, coxcomb, bar, waffle and sparkline maps fill their land
+   with #f2f2f2 (or a light tint), where white borders would vanish. Without darkMode they use light
+   greys instead, at the same widths: national #cfcfcf, Kosovo and regional a lighter #dcdcdc (and
+   thinner), disputed #cfcfcf dashed. */
+.em--borders-light.em--ps:not(.em--dark) .em-cntbn,
+.em--borders-light.em--ps:not(.em--dark) .em-worldbn,
+.em--borders-light.em--bar:not(.em--dark) .em-cntbn,
+.em--borders-light.em--waffle:not(.em--dark) .em-cntbn,
+.em--borders-light.em--spark:not(.em--dark) .em-cntbn,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-d,
+.em--borders-light.em--bar:not(.em--dark) .em-bn-d,
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-d,
+.em--borders-light.em--spark:not(.em--dark) .em-bn-d {
+    stroke: #cfcfcf;
+}
+.em--borders-light.em--ps:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--ps:not(.em--dark) #em-worldbn ~ .em-kosovo-bn,
+.em--borders-light.em--bar:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--waffle:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--spark:not(.em--dark) .em-kosovo-bn,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-1,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-2,
+.em--borders-light.em--ps:not(.em--dark) .em-bn-3,
+.em--borders-light.em--ps:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--ps:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--ps:not(.em--dark) .em-nutsrg [lvl='3'],
+.em--borders-light.em--bar:not(.em--dark) .em-bn-1,
+.em--borders-light.em--bar:not(.em--dark) .em-bn-2,
+.em--borders-light.em--bar:not(.em--dark) .em-bn-3,
+.em--borders-light.em--bar:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--bar:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--bar:not(.em--dark) .em-nutsrg [lvl='3'],
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-1,
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-2,
+.em--borders-light.em--waffle:not(.em--dark) .em-bn-3,
+.em--borders-light.em--waffle:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--waffle:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--waffle:not(.em--dark) .em-nutsrg [lvl='3'],
+.em--borders-light.em--spark:not(.em--dark) .em-bn-1,
+.em--borders-light.em--spark:not(.em--dark) .em-bn-2,
+.em--borders-light.em--spark:not(.em--dark) .em-bn-3,
+.em--borders-light.em--spark:not(.em--dark) .em-nutsrg [lvl='1'],
+.em--borders-light.em--spark:not(.em--dark) .em-nutsrg [lvl='2'],
+.em--borders-light.em--spark:not(.em--dark) .em-nutsrg [lvl='3'] {
+    stroke: #dcdcdc;
 }

@@ -4,7 +4,7 @@
 
 ### New
 
-- **Border modes: `lightBorders()` and `darkMode()`.** Apps no longer need to override border CSS for white borders or a dark background. `map.lightBorders(true)` draws national, Kosovo, regional and disputed borders in white and removes the national border halo (national 1px, Kosovo 0.5px, regional 0.3px). `map.darkMode(true)` gives a dark sea and land, dims regional borders and coastlines, and adjusts the Kosovo border where needed so it keeps its place between national and regional borders. Titles, legends, labels and tooltips are not restyled. The two combine, apply to insets, can be switched on an already-built map, and are also accepted in the map config. They add the `em--borders-light` and `em--dark` classes to the map svg; every map type keeps its muted widths, the Kosovo rule holds in every combination, and disputed borders stay dashed. See the border modes in `docs/css.md`.
+- **Border modes: `lightBorders()` and `darkMode()`.** Apps no longer need to override border CSS for white borders or a dark background. `map.lightBorders(true)` draws national, Kosovo, regional and disputed borders in white and removes the national border halo (national 1px, Kosovo 0.5px, regional 0.3px). On maps with near-white land (proportional symbol, pie, coxcomb, bar, waffle and sparkline maps), where white would vanish, they are light greys instead: national `#cfcfcf`, Kosovo and regional `#dcdcdc`. `map.darkMode(true)` restyles the map only: a dark sea and land, dimmed regional borders and coastlines, and a Kosovo border adjusted where needed so it keeps its place between national and regional borders. Titles, legends, labels and tooltips are not restyled. The two combine, apply to insets, can be switched on an already-built map, and are also accepted in the map config. They add the `em--borders-light` and `em--dark` classes to the map svg; every map type keeps its muted widths, the Kosovo rule holds in every combination, and disputed borders stay dashed. See the border modes in `docs/css.md`.
 
 Example:
 
@@ -50,12 +50,12 @@ Example:
 .em-bn-1,
 .em-bn-2,
 .em-bn-3 {
-    stroke: #868686;
+    stroke: #858585;
     stroke-width: 0.3px;
 }
 ```
 
-- **Thinner regional borders (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now 0.3px instead of 0.4px. This matches the Eurostat guideline and keeps them clearly lighter than the Kosovo border. Coastlines keep 0.4px. To restore the previous look:
+- **Border colours and widths follow the Eurostat guideline (visible change).** NUTS 1-3 borders (`.em-bn-1/2/3`, and the region outlines `.em-nutsrg [lvl]` on mixed-level maps) are now `#858585` and 0.3px instead of `#868686` and 0.4px, clearly lighter than the Kosovo border. The white halo under national borders is now 1.9px instead of 1.5px. Coastlines keep 0.4px. To restore the previous look:
 
 ```css
 .em-bn-1,
@@ -66,16 +66,18 @@ Example:
 .em-nutsrg [lvl='3'] {
     stroke-width: 0.4px;
 }
+.em-cntbn-halo:not(.em-bn-co) {
+    stroke-width: 1.5px;
+}
 ```
 
-- **Flow maps: regional borders are muted (visible change).** At their default NUTS level 3, flow maps drew regional borders (0.4px) thicker than their own muted national borders (0.25px). Regional borders are now 0.07px, as on pie and coxcomb maps.
-- **Proportional symbol maps: regional borders show more (visible change).** NUTS 1-3 borders on proportional symbol maps are now 0.2px instead of 0.07px. Pie and coxcomb maps keep 0.07px. Coastlines keep their width.
-- **Coxcomb maps: regional borders stay below the Kosovo border.** Coxcomb maps also use the proportional symbol styles, so the wider regional borders above would have made them 0.2px, wider than their 0.16px Kosovo border. They keep 0.07px.
+- **Flow maps: regional borders are muted (visible change).** At their default NUTS level 3, flow maps drew regional borders (0.4px) thicker than their own muted national borders (0.25px). Regional borders are now 0.07px.
+- **Proportional symbol, pie and coxcomb maps: regional borders and coastlines show more (visible change).** NUTS 1-3 borders are now 0.2px instead of 0.07px, and coastlines on proportional symbol and coxcomb maps 0.2px instead of 0.1px (as on pie maps). Coxcomb maps now use the standard proportional symbol border styling: their national borders are no longer thinned to 0.25px (grey 0.8px, no halo), and their Kosovo border is the same `#999` 0.5px line, which keeps it between national and the wider regional borders.
 
 Example:
 
 ```css
-/* restore the previous, finer regional borders on proportional symbol maps */
+/* restore the previous, finer regional borders and coastlines */
 .em--ps .em-bn-1,
 .em--ps .em-bn-2,
 .em--ps .em-bn-3,
@@ -83,6 +85,9 @@ Example:
 .em--ps .em-nutsrg [lvl='2'],
 .em--ps .em-nutsrg [lvl='3'] {
     stroke-width: 0.07px;
+}
+.em--ps .em-bn-co {
+    stroke-width: 0.1px;
 }
 ```
 
