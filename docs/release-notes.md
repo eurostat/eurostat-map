@@ -1,5 +1,64 @@
 # Release notes
 
+## 4.14.1
+
+### Improvements
+
+- **Maps with insets restyle once per update instead of once per inset.** When geometry came from the cache (any rebuild after the first: switching map type, scale, insets or template), the main map and every inset each triggered a full classification and style pass of all maps, so a map with 14 insets was styled 15 times over. It is now styled once, after the last map is built. Rendering is unchanged; in a host app a proportional-symbol rebuild with the IMAGE insets went from 15 `updateStatValues()` passes to 1.
+
+Example:
+
+```javascript
+// every one of these rebuilds now runs a single style pass, whatever the number of insets
+map.scale('20M').build()
+map.insets('image').build()
+```
+
+- **Faster proportional-symbol styling on mixed-NUTS maps.** `styleMixedNUTSRegions` read each region's computed stroke right after writing inline styles, forcing a style recalculation per region (thousands on a NUTS 3 map). It now reads all values first, then writes them.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('proportionalSymbol')
+    .nutsLevel('mixed')
+    .stat('size', { eurostatDatasetCode: 'nama_10r_3gdp', filters: { unit: 'EUR_HAB', time: '2023' } })
+    .build()
+```
+
+- **Proportional-symbol background rules no longer pile up or scan the page's stylesheets.** The background tint rules (`#<svgId>.em--ps .em-nutsrg`) are kept in eurostat-map's own `<style id="custom-styles">` and updated in place, instead of searching every rule of every stylesheet on each restyle (slow in apps with large CSS frameworks). Rules of maps and insets that are no longer in the document are removed: inset svg ids are random, so every rebuild used to add rules that were never deleted.
+
+Example:
+
+```javascript
+// restyling, rebuilding or recreating insets leaves one set of rules per live map/inset
+map.psSettings({ fill: '#2e7d32' }).updateStyle()
+```
+
+### Fixes
+
+- **`dorlingSettings({ animate: false, worker: true })` now works outside this repository.** The Web Worker was a separate chunk requested from `/build/`, which only existed on the library's dev server: apps that bundle eurostat-map never shipped it, and pages using unpkg looked for it under their own origin, so the symbols never moved. The worker is now embedded in the bundle and started from a Blob URL. It falls back to running on the main thread where a worker can't start (for example a Content-Security-Policy without `worker-src blob:`), gives the same layout as the main-thread simulation, and a newer simulation stops a running one. Use it for large Dorling cartograms: the animated default rewrites every symbol on each of ~300 ticks, which can freeze the page for a long time on NUTS 3 data.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('proportionalSymbol')
+    .nutsLevel(3)
+    .stat('size', { eurostatDatasetCode: 'demo_r_pjangrp3', filters: { time: '2023', sex: 'T', age: 'TOTAL' } })
+    .dorling(true)
+    .dorlingSettings({ animate: false, worker: true, onProgress: (p) => console.log(Math.round(p * 100) + '%') })
+    .build()
+```
+
+```ts
+interface DorlingSettings {
+    animate: boolean
+    /** Run the non-animated simulation in a Web Worker (embedded, Blob URL); main-thread fallback. */
+    worker: boolean
+}
+```
+
 ## 4.14.0
 
 ### New
