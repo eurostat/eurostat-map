@@ -22,7 +22,11 @@ export interface DorlingSettings {
     padding: number
     /** Progress callback used by worker-based simulation. */
     onProgress?: (progress: number, map: any) => void
-    /** Run non-animated simulation in a Web Worker. */
+    /**
+     * Run the non-animated simulation in a Web Worker (embedded in the bundle, started from a Blob URL), so it
+     * doesn't block the page. Falls back to the main thread where workers can't run (e.g. a CSP without
+     * `worker-src blob:`). The symbols move once, when the simulation ends.
+     */
     worker: boolean
     /** URL of the D3 bundle used by Dorling worker mode. */
     workerD3URL?: string

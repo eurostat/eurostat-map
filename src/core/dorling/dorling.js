@@ -1,6 +1,21 @@
 import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { executeForAllInsets } from '../utils'
 import { getCentroidsGroup } from '../geo/centroids'
+// the code of dorling-worker.js, built separately and embedded as a string (see webpack/dorling-worker.js)
+import dorlingWorkerSource from 'eurostat-map-dorling-worker-source'
+
+let dorlingWorkerURL = null
+
+/** A worker running dorling-worker.js from a Blob URL, or null when workers can't run here. */
+function createDorlingWorker() {
+    if (typeof Worker === 'undefined' || typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) return null
+    try {
+        if (!dorlingWorkerURL) dorlingWorkerURL = URL.createObjectURL(new Blob([dorlingWorkerSource], { type: 'text/javascript' }))
+        return new Worker(dorlingWorkerURL)
+    } catch (e) {
+        return null
+    }
+}
 
 const getLayerAndMap = function (layerOrMap) {
     if (layerOrMap?.map) {
@@ -55,8 +70,8 @@ export function runDorlingSimulation(layerOrMap, radiusAccessor, padding = 0) {
 
         // === Non-animated branch ===
         if (settings.animate === false) {
-            if (!useWorker) {
-                // Run synchronously on main thread
+            // Run synchronously on main thread
+            const runOnMainThread = () => {
                 const sim = forceSimulation(nodes)
                     .force('x', forceX((d) => d.properties.centroid[0]).strength(strengthX))
                     .force('y', forceY((d) => d.properties.centroid[1]).strength(strengthY))
@@ -71,36 +86,50 @@ export function runDorlingSimulation(layerOrMap, radiusAccessor, padding = 0) {
                 tickTransform(containers)
                 updateDorlingProgress(1, targetLayer)
                 return sim
-            } else {
-                // === Web Worker branch ===
-                const worker = new Worker(new URL('./dorling-worker.js', import.meta.url), { type: 'module' })
-                worker.postMessage({
-                    nodes: nodes.map((n) => ({ ...n })), // shallow clone
-                    radii: nodes.map((n) => Math.max(0, radiusAccessor(n) + effectivePadding)),
-                    strengthX,
-                    strengthY,
-                    iterations,
-                    d3URL,
-                })
-
-                worker.onmessage = (e) => {
-                    const { type, nodes: finalNodes, progress, total } = e.data
-                    if (type === 'progress') {
-                        updateDorlingProgress(progress / total, targetLayer)
-                        return
-                    }
-                    if (type === 'end' && finalNodes) {
-                        nodes.forEach((node, i) => {
-                            node.x = finalNodes[i].x
-                            node.y = finalNodes[i].y
-                        })
-                        tickTransform(containers)
-                        updateDorlingProgress(1, targetLayer)
-                        worker.terminate()
-                    }
-                }
-                return
             }
+
+            // === Web Worker branch === (falls back to the main thread when no worker can run)
+            const worker = useWorker ? createDorlingWorker() : null
+            if (!worker) return runOnMainThread()
+            targetLayer.dorlingWorker_ = worker
+            const finish = () => {
+                worker.terminate()
+                if (targetLayer.dorlingWorker_ === worker) targetLayer.dorlingWorker_ = null
+            }
+            worker.onerror = (e) => {
+                // e.g. a Content-Security-Policy without worker-src blob:
+                if (e && e.preventDefault) e.preventDefault()
+                if (targetLayer.dorlingWorker_ !== worker) return
+                finish()
+                runOnMainThread()
+            }
+            worker.onmessage = (e) => {
+                if (targetLayer.dorlingWorker_ !== worker) return // superseded by a newer simulation
+                const { type, nodes: finalNodes, progress, total } = e.data
+                if (type === 'progress') {
+                    updateDorlingProgress(progress / total, targetLayer)
+                    return
+                }
+                if (type === 'end' && finalNodes) {
+                    nodes.forEach((node, i) => {
+                        node.x = finalNodes[i].x
+                        node.y = finalNodes[i].y
+                    })
+                    tickTransform(containers)
+                    updateDorlingProgress(1, targetLayer)
+                    finish()
+                }
+            }
+            // only what the simulation reads; same starting positions as on the main thread
+            worker.postMessage({
+                nodes: nodes.map((n) => ({ x: n.x, y: n.y, properties: { centroid: n.properties.centroid } })),
+                radii: nodes.map((n) => Math.max(0, radiusAccessor(n) + effectivePadding)),
+                strengthX,
+                strengthY,
+                iterations,
+                d3URL,
+            })
+            return
         }
 
         // === Animated branch ===
@@ -147,6 +176,11 @@ export function stopDorlingSimulation(map) {
             // In legacy/single-layer maps, layers_ can include the map object itself.
             if (layer && layer !== map) stopDorlingSimulation(layer)
         })
+    }
+
+    if (map.dorlingWorker_) {
+        map.dorlingWorker_.terminate()
+        map.dorlingWorker_ = null
     }
 
     if (map.simulation) {

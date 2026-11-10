@@ -16,8 +16,11 @@ onmessage = (event) => {
     }
 
     const nodes = inputNodes.map((n, i) => {
-        n.x = n.properties.centroid[0]
-        n.y = n.properties.centroid[1]
+        // start from the caller's positions (the projected centroids, as on the main thread)
+        if (!Number.isFinite(n.x) || !Number.isFinite(n.y)) {
+            n.x = n.properties.centroid[0]
+            n.y = n.properties.centroid[1]
+        }
         n.r = radii[i]
         return n
     })

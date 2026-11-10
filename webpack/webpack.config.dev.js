@@ -1,9 +1,10 @@
 // dev
 const path = require('path')
+const { dorlingWorkerConfig, withDorlingWorker } = require('./dorling-worker')
 
 const LiveReloadPlugin = require('webpack-livereload-plugin')
 
-module.exports = {
+const mainConfig = {
     mode: 'development',
     entry: './src/index.js',
     output: {
@@ -43,3 +44,9 @@ module.exports = {
     // no inline source map: it made the bundle (the package's `module` entry) 8 MB instead of 3 MB
     devtool: false,
 }
+
+// the Dorling worker is built first and embedded in the bundle (see dorling-worker.js)
+module.exports = [
+    { ...dorlingWorkerConfig, watch: mainConfig.watch },
+    { ...mainConfig, ...withDorlingWorker(mainConfig) },
+]

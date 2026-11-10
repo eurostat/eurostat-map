@@ -530,6 +530,12 @@ add(
     'proportionalSymbol',
     `m.nutsLevel(2).stat('size', ${J(st())}).dorling(true).animateDorling(false).dorlingWorker(false)${INSETS.default}`
 )
+// must render exactly like the scenario above (the worker runs the same simulation off the main thread)
+add(
+    'ps nl2 dorling (not animated, worker)',
+    'proportionalSymbol',
+    `m.nutsLevel(2).stat('size', ${J(st())}).dorling(true).animateDorling(false).dorlingWorker(true)${INSETS.default}`
+)
 add('ps nl2 dorling animated', 'proportionalSymbol', `m.nutsLevel(2).stat('size', ${J(st())}).dorling(true).dorlingWorker(false)${INSETS.default}`, {
     steps: [['dorling off + rebuild', `m.dorling(false).build()`]],
 })

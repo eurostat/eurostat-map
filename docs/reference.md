@@ -412,7 +412,7 @@ and customise it with:
     .dorlingSettings({
         strength: { x: 1, y: 1 }, // forces applied during dorling simulation
         iterations: 1, // iterations of d3-force forceCollide
-        worker: false, // use a web worker for (non-animated) dorling cartograms to not block the main thread
+        worker: false, // run non-animated dorling cartograms in a web worker (embedded, started from a Blob URL) so they don't block the page; falls back to the main thread if workers can't run
         onProgress: undefined, // track dorling progress when using web workers
     })
 ```
@@ -1287,7 +1287,7 @@ and customised like so:
 .dorlingSettings({
     strength: { x: 1, y: 1 }, // forces applied during dorling simulation
     iterations: 1, // iterations of d3-force forceCollide
-    worker: false, // use a web worker for (non-animated) dorling cartograms to not block the main thread
+    worker: false, // run non-animated dorling cartograms in a web worker (embedded, started from a Blob URL) so they don't block the page; falls back to the main thread if workers can't run
     onProgress: undefined, // track dorling progress when using web workers
 })
 ```

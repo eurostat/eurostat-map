@@ -1,9 +1,10 @@
 const path = require('path')
+const { dorlingWorkerConfig, withDorlingWorker } = require('./dorling-worker')
 const webpack = require('webpack')
 const packageJson = require('../package.json')
 const TerserPlugin = require('terser-webpack-plugin')
 
-module.exports = {
+const mainConfig = {
     mode: 'production',
     entry: ['./src/index.js'],
     output: {
@@ -73,3 +74,9 @@ module.exports = {
     },
     watch: false,
 }
+
+// the Dorling worker is built first and embedded in the bundle (see dorling-worker.js)
+module.exports = [
+    { ...dorlingWorkerConfig, watch: mainConfig.watch },
+    { ...mainConfig, ...withDorlingWorker(mainConfig) },
+]
