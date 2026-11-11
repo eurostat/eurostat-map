@@ -34,7 +34,7 @@ This document summarizes the comprehensive TypeScript support added to the euros
     - Troubleshooting guide
     - API reference
 
-3. **`test/typescript-test.ts`**
+3. **`test/types/typescript-test.ts`**
     - Validation tests for all type definitions
     - Examples of proper TypeScript usage
     - Tests for type inference and IntelliSense
@@ -203,7 +203,7 @@ map.statData().setData({
 
 ### Validation Tests Created
 
-- 10 comprehensive test scenarios in `test/typescript-test.ts`
+- 10 comprehensive test scenarios in `test/types/typescript-test.ts`
 - Tests for all major map types
 - Builder pattern validation
 - Utility function testing

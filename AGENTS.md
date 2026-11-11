@@ -178,16 +178,24 @@ suggests.
 ## Development & Build Commands on Windows
 Because script execution can be disabled in certain PowerShell environments, always use the Command Prompt prefix `cmd /c` when invoking npm scripts:
 * **Validate Types**: `cmd /c npm run type-check` (runs `tsc --noEmit`)
-* **Tests**: `cmd /c npm test` (node scripts in `test/` that run against the **built** `build/eurostatmap.js`, so rebuild the dev bundle first; add new ones to the `test` script)
+* **Tests**: `cmd /c npm test` runs `test:unit`, `test:integration` and `test:e2e`; the layout and what goes where
+  are in `test/README.md`. Unit tests (`test/unit`, `node:test`) import `src/` directly through
+  `test/helpers/register-src.mjs` and need no build; integration and e2e run against the **built**
+  `build/eurostatmap.js`, so rebuild the dev bundle first. `*.test.mjs` files in `unit/` and `integration/` are
+  picked up automatically; a new e2e test has to be added to the `test:e2e` script.
+* New pure logic gets a unit test. A module that touches `window`/`document` at import time (e.g. `core/insets.js`,
+  `src/index.js`) cannot be loaded by the unit loader: test it through the bundle, or extract the logic.
+* `test/manual/` holds the browser pages to check by eye (formerly at the top of `test/`); they load the bundle by
+  relative path, so moving one means fixing its `../` depth.
 * **Production Build**: `cmd /c npm run build-prod` (copies typings and builds output to `build/`)
 * **Local Test Server**: `cmd /c npm run server`
 * **Format Files**: `cmd /c npm run format` (runs Prettier). Don't run it, or `prettier --write` on a
   whole directory, for a small change: many tracked files aren't Prettier-clean (and some are CRLF),
   so it rewrites dozens of unrelated files. Format only the files you touched.
-* `npm test` includes `test/kosovo-border.test.mjs`, which needs Playwright's Chromium
+* `npm test` includes `test/e2e/kosovo-border.test.mjs`, which needs Playwright's Chromium
   (`npx playwright install chromium` after a Playwright bump). It is offline: synthetic Nuts2json.
 * `node scripts/smoke-harness.js` (17 cherry-picked examples) compares serialized SVG against
-  `test/baselines/`; recapture with `--capture` after deliberate DOM changes. The `--all`
+  `test/e2e/baselines/`; recapture with `--capture` after deliberate DOM changes. The `--all`
   baselines are not maintained (many missing or stale), so only its page errors and timeouts mean anything.
 
 ## Border hierarchy (Kosovo rule)
@@ -196,7 +204,7 @@ The Kosovo border (`.em-kosovo-bn`) must always look in between national and reg
 width and colour only, never opacity or dashing (unless national borders are dashed), no halo.
 Every map type that mutes national borders in `src/css/layers/*.css` (and world maps, via
 `world.css`) must scale `.em-kosovo-bn` down with them. When changing any border width or colour, run
-`node test/kosovo-border.test.mjs --verbose`; it prints national/Kosovo/regional per map type.
+`node test/e2e/kosovo-border.test.mjs --verbose`; it prints national/Kosovo/regional per map type.
 
 - Border modes (`lightBorders()` -> `.em--borders-light`, `darkMode()` -> `.em--dark`) live in
   `src/css/border-modes.css`, imported last so its rules beat same-specificity `css/layers` rules;

@@ -104,7 +104,8 @@ out.numberOfClasses = function (v) {
 ### Testing Strategy
 
 - **Examples as tests**: [examples/](examples/) HTML files load built library and serve as integration tests
-- **Manual testing**: [test/](test/) directory contains specialized test pages (e.g., [test/test_classification_methods.html](test/test_classification_methods.html))
+- **Automated tests**: `npm test` runs unit ([test/unit/](test/unit/), against `src/`), integration and e2e tests; see [test/README.md](test/README.md)
+- **Manual testing**: [test/manual/](test/manual/) contains specialized test pages (e.g., [test/manual/test_classification_methods.html](test/manual/test_classification_methods.html))
 - Open examples directly in browser or via dev server
 
 ### Creating New Map Types

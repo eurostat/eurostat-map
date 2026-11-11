@@ -33,7 +33,7 @@
 }
 
 /* Kosovo: always in between national and regional borders, by width and colour only (no opacity,
-   dashing or halo). Muted map types adjust it in css/layers. See docs/css.md, test/kosovo-border.test.mjs */
+   dashing or halo). Muted map types adjust it in css/layers. See docs/css.md, test/e2e/kosovo-border.test.mjs */
 .em-kosovo-bn {
     stroke: #787878;
     stroke-width: 0.5px;

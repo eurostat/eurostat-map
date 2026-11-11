@@ -6,7 +6,7 @@ const { paths } = require('../examples/scripts/example-manifest');
 // ── Configuration ────────────────────────────────────────────────────────────
 const ROOT = path.resolve(__dirname, '..');
 const PORT = 8765;
-const BASELINE_DIR = path.join(ROOT, 'test', 'baselines');
+const BASELINE_DIR = path.join(ROOT, 'test', 'e2e', 'baselines');
 
 let playwright;
 try {

@@ -10,12 +10,12 @@ This directory contains utility, verification, and type-generation scripts used 
 A headless Playwright-based regression test suite. It starts a local HTTP server on port `8765`, loads a list of cherry-picked examples, intercepts Eurostat API calls with offline mock responses, and verifies that the maps build and render correctly.
 
 - **Verification Mode (default):**
-  Loads all examples in headless Chromium, verifies that `onBuild` triggers without console or page errors, and asserts that the serialized SVG markup matches the stored baselines in `test/baselines/`.
+  Loads all examples in headless Chromium, verifies that `onBuild` triggers without console or page errors, and asserts that the serialized SVG markup matches the stored baselines in `test/e2e/baselines/`.
   ```bash
   node scripts/smoke-harness.js
   ```
 - **Capture Mode:**
-  Captures the current SVG DOM structures and saves them as the new expected baselines inside `test/baselines/`. Run this when you have deliberately changed map/legend styles or layout structures.
+  Captures the current SVG DOM structures and saves them as the new expected baselines inside `test/e2e/baselines/`. Run this when you have deliberately changed map/legend styles or layout structures.
   ```bash
   node scripts/smoke-harness.js --capture
   ```

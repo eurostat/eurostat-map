@@ -136,7 +136,7 @@
             return json.options.find((o) => o.code === code) || json.options[0]
         }
 
-        // #newInsets is a PERMANENT sibling of #map (see test/IMAGE/insets.html) - only its
+        // #newInsets is a PERMANENT sibling of #map (see test/manual/IMAGE/insets.html) - only its
         // contents are cleared/rebuilt on each change. It must never be moved inside #map: doing
         // so would make the next resetMapDom() (which clears #map) delete it outright, leaving
         // nothing for createInsetDOMElements() to populate on the next dropdown change.

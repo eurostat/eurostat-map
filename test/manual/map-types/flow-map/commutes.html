@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <style>
+        .layout {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        #tooltip {
+            position: relative !important;
+            top: 100px !important;
+            left: unset !important;
+        }
+    </style>
+
+    <div class="layout">
+        <div>
+            <svg id="map"></svg>
+        </div>
+
+        <div id="tooltip"></div>
+    </div>
+    <script src="../../../../build/eurostatmap.js"></script>
+    <script src="./commutes.js"></script>
+
+    <script>
+        // Step 1: Collect all unique coordinates as nodes
+        let nodes = []
+        let nodeMap = new Map() // to quickly find node IDs
+
+        function getNodeId(x, y) {
+            const key = `${x},${y}`
+            if (!nodeMap.has(key)) {
+                const id = `node${nodeMap.size + 1}`
+                nodeMap.set(key, id)
+                if (nodeMap.size == 12) {
+                    const name = 'Katowice'
+                    nodes.push({ id, x, y, name })
+                } else {
+                    nodes.push({ id, x, y })
+                }
+            }
+            return nodeMap.get(key)
+        }
+
+        // Step 2: Build links array
+        let links = commutes
+            .filter((d) => d.nb > 100) // threshold for filtering
+            .map((d) => {
+                const source = getNodeId(d.x_start, d.y_start)
+                const target = getNodeId(d.x_end, d.y_end)
+                return { source, target, value: d.nb }
+            })
+
+        // Final graph object
+        const exampleGraph = { nodes, links }
+
+        const type = 'destination' // 'origin' or 'destination'
+        const topLocations = 4 // Number of top locations to highlight
+
+        const map = eurostatmap
+            .map('flow')
+            .title('Test')
+            .subtitle('test')
+
+            //flow settings
+            .flowGraph(exampleGraph)
+            .flowSettings({ lineType: 'straight', bidirectional: true })
+            .flowSettings({ topLocations: topLocations }) // Top N locations by flow volume
+            .flowSettings({ topLocationsType: type })
+            .flowSettings({ regionColors: ['#bbd7ee', '#c7e3c6'] }) // exporter, importers
+            .flowSettings({ arrows: false, outlines: false, nodes: true, nodeType: 'circle' })
+            .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
+            .flowSettings({ edgeBundling: true })
+
+            .position({ x: nodes[0].x, y: nodes[0].y, z: 100 })
+            .labels({
+                values: false,
+                backgrounds: true,
+                shadows: true,
+            })
+            .nutsLevel(0)
+            .legend({
+                x: 10,
+                y: 120,
+                //title: 'Test',
+                boxOpacity: 0,
+                flowWidthLegend: { title: 'Commutes' },
+                nodeSizeLegend: { title: 'Total incoming/outgoing' },
+                flowColorLegend: { title: 'Destination' },
+                regionColorLegend: { title: 'Region color' },
+            })
+            .tooltip({ id: 'tooltip' })
+            .insets(false)
+            .zoomExtent([0.03, 1000])
+            .lockPanUntilZoom(false)
+            .build()
+    </script>
+</body>
+
+</html>

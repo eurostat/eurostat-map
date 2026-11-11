@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="./pieStats.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('pie')
+                .dorling(true)
+                .animateDorling(true)
+                .dorlingStrength({ x: 1, y: 1 })
+                .dorlingIterations(0.5)
+                .transitionDuration(500)
+                .title('Cereal production')
+                .subtitle('2022')
+                .scale('60M')
+                .nutsLevel('mixed')
+                .geoCenter([5000000, 3500000])
+                .zoomExtent([1, 100])
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other', maxSize: 20, minSize: 2 })
+                .catLabels(Object.fromEntries(Object.entries(pieStats).map(([key, value]) => [key, value.name])))
+                .insets('default')
+                .insetBoxPosition([10, 100])
+                .insetsButton(true)
+                .zoomButtons(true)
+                .placenames(false)
+                .legend({
+                    x: 540,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: '1 000 tonnes',
+                        titlePadding: 22,
+                        values: [50, 6000],
+                        labelFormatter: (d) => {
+                            return d.toLocaleString('en-US', { maximumFractionDigits: 0 })
+                        },
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                    },
+                })
+
+            //add our own stat data objects
+            for (let k in pieStats) {
+                map.stat(k, {
+                    code: k,
+                    unitText: '1 000 tonnes',
+                })
+            }
+            // all crops
+            map.stat('C0000', {
+                code: 'C0000',
+                unitText: '1 000 tonnes',
+            }) // add 'all crops'
+            map.compositionTotalCode('C0000') //set total code to show on map
+
+            //set stat codes to show on map
+            map.statCodes(Object.keys(pieStats))
+
+            map.build()
+
+            // update our stat data after build
+            for (let key in map.statData_) {
+                if (pieStats[key]) {
+                    map.statData(key).setData({ ...pieStats[key].data })
+                }
+            }
+
+            // add totals dataset
+            map.statData(['C0000']).setData({ ...allCrops })
+
+            map.updateStatValues()
+        </script>
+    </body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+        <style>
+            /* override 'has data' color */
+            .em--ps .em-nutsrg {
+                fill: #fbffe5 !important;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <!-- <script src="../../../../build/eurostatmap.min.js"></script> -->
+        <script>
+            // basic barebones proportional circles example
+            const year = 2024
+            let map = eurostatmap
+                .map('ps')
+                .nutsLevel(2)
+                .scale('60M')
+                .title('Where do tourists come from?')
+                .subtitle(`Nights spent in tourist accommodation and share of foreign tourists in total nights spent, ${year}`)
+                .stat('nights-spent', {
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    unitText: 'Nights spent',
+                    filters: { c_resid: 'TOTAL', unit: 'NR', time: `${year}`, nace_r2: 'I551-I553' },
+                })
+                .encoding('size', { stat: 'nights-spent' })
+                .stat('foreign-share', {
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    unitText: 'share of foreign tourists',
+                    filters: { c_resid: 'FOR', unit: 'PC_TOT', time: `${year}`, nace_r2: 'I551-I553' },
+                })
+                .encoding('color', { stat: 'foreign-share' })
+                .legend({
+                    boxOpacity: 1,
+                    sizeLegend: { title: 'Nights spent', subtitle: 'in tourist accommodation' },
+                    colorLegend: {
+                        title: 'Tourist residency',
+                        subtitle: 'share of foreign tourists, in %',
+                        pointOfDivergence: 2,
+                        pointOfDivergenceLabel: 'mainly foreign| mainly domestic',
+                        decimals: 0,
+                    },
+                })
+                .psSettings({
+                    //classes: 5,
+                    thresholds: [25, 50, 75],
+
+                    colors: ['#997A00', '#F5DF71', '#A9E1BD', '#208486'],
+                    shape: 'circle',
+                    maxSize: 15,
+                })
+                .transitionDuration(900)
+                .dorling(true)
+                .dorlingStrength({ x: 0.1, y: 0.1 })
+                .dorlingIterations(1)
+                .animateDorling(true) // Set to false for non-animated dorling cartograms
+                .insets(false)
+
+            map.build()
+        </script>
+    </body>
+</html>

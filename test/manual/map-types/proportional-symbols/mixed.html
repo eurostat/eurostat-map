@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script>
+            let mapWidth = 800
+            let mapHeight = 600
+
+            const map = eurostatmap
+                .map('ps')
+                .width(mapWidth)
+                .height(mapHeight)
+                .legend({ title: 'Test' })
+                .nutsLevel('mixed')
+                .dorling(true)
+                .psSettings({
+                    fill: '#4ac499',
+                    maxSize: 10,
+                    minSize: 1,
+                })
+                .stat('madeup', {
+                    customData: {
+                        AL: 30,
+                        IT: 10,
+                        AT: 5,
+                        RO: 3,
+                        RS: 0,
+                        HU: 4,
+                        NO: 1,
+                        CY: 9,
+                        EL: 8,
+                        DE1: 4,
+                        DE2: 4,
+                        DE3: 4,
+                        DE4: 4,
+                        DE5: 4,
+                        DE11: 10,
+                        DE12: 5,
+                        DED2C: 2,
+                        PL228: 1,
+                        DED53: 3,
+                        DE40B: 4,
+                        PT: 23,
+                        RU: 30,
+                    },
+                })
+                .encoding('size', { stat: 'madeup' })
+
+                .build()
+        </script>
+    </body>
+</html>

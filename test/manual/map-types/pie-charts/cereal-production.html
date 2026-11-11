@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+
+        <script>
+            const cropOptions = [
+                { value: 'C1110', text: 'Common wheat and spelt' },
+                { value: 'C1500', text: 'Grain maize and corn-cob mix' },
+                { value: 'C1300', text: 'Barley' },
+                { value: 'C1600', text: 'Triticale' },
+                { value: 'C1200', text: 'Rye and winter cereal mixtures (maslin)' },
+                { value: 'C1120', text: 'Durum wheat' },
+                { value: 'C1410', text: 'Oats' },
+                { value: 'C2000', text: 'Rice' },
+            ]
+            let map = eurostatmap
+                .map('pie')
+                .dorling(true) // Enable Dorling cartogram
+                .title('Cereal production')
+                .subtitle('2024')
+                .scale('60M')
+                .nutsLvl(2)
+                //.dorling(true)
+                .geoCenter([5000000, 3500000])
+                .stat('composition', {
+                    eurostatDatasetCode: 'apro_cpshr',
+                    filters: { strucpro: 'HPRD_HUMD_EU_THS_T', time: '2024' },
+                    unitText: '1 000 tonnes',
+                    categoryParameter: 'crops', //parameter that the categories belong to
+                    categoryCodes: cropOptions.map((d) => d.value), //category codes
+                    categoryLabels: cropOptions.map((d) => d.text), //category labels
+                    categoryColors: ['#7fc97f', '#beaed4', '#fdc086', '#ffff99', '#386cb0', '#f0027f', '#bf5b17', '#666666'], //colours
+                    totalCode: 'C0000', //code for the total (all causes of death)
+                })
+                .encoding('composition', { stat: 'composition' })
+                .compositionSettings({ otherColor: '#FFCC80', otherText: 'Other', minSize: 6 })
+
+                .legend({
+                    x: 480,
+                    y: 10,
+                    boxOpacity: 1,
+                    titleFontWeight: 'bold',
+                    sizeLegend: {
+                        title: '1 000 tonnes',
+                        titlePadding: 10,
+                        values: [500, 6000],
+                    },
+                    colorLegend: {
+                        title: 'Cereal type',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>

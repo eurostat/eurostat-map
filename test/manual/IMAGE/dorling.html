@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg style="width: 100%; height: 1000px">
+            <svg id="map" x="2px" y="2px"></svg>
+        </svg>
+
+        <script src="../configs/insetConfig.js"></script>
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="../data/mixed.js"></script>
+        <script>
+            const map = eurostatmap
+                .map('proportionalSymbol')
+                .nutsLevel('mixed')
+                .psSettings({
+                    maxSize: 14,
+                    fillOpacity: 0.8
+                })
+                .dorling(true)
+                .psSettings({ codeLabels: true })
+                .insets(false)
+
+            map.statData().setData(mixedNUTS)
+
+            setTimeout(() => {
+                map.statData().setData({ ES: 1, FR: 2, DE: 3, IT: 4, PL: 5, PT: 6, RO: 7, SE: 8, GB: 9 })
+                map.updateClassification()
+                map.updateStyle()
+                map.updateStatValues()
+            }, 1000)
+
+            map.build()
+        </script>
+    </body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../../../../build/eurostatmap.js"></script>
+        <script>
+            const colors = [
+                '#f3e6e2',
+                '#f2caa5',
+                '#f2a96d',
+                '#f2893d',
+                '#dc530d',
+                '#c9d0d4',
+                '#c8b69b',
+                '#c89866',
+                '#c87c39',
+                '#b64a0c',
+                '#a1bfc8',
+                '#a0a892',
+                '#a08d60',
+                '#a07236',
+                '#91450c',
+                '#6da5be',
+                '#6c918b',
+                '#6c795c',
+                '#6c6233',
+                '#623b0b',
+                '#327ba8',
+                '#326c7a',
+                '#325a51',
+                '#32492d',
+                '#2d2c0a',
+            ]
+            const map = eurostatmap
+                .map('bivariateChoropleth')
+                .title('Unemployment and population density')
+                .subtitle('Inhabitants per km and % unemployed, 2021')
+                .nutsLevel(2)
+                .width(Math.min(1000, window.innerHeight))
+                .nutsYear(2021)
+                .stat('statV1', { eurostatDatasetCode: 'demo_r_d3dens', unitText: 'inh./km²', filters: { time: 2021 } })
+                .encoding('x', { stat: 'statV1' })
+                .stat('statV2', {
+                    eurostatDatasetCode: 'lfst_r_lfu3rt',
+                    filters: { age: 'Y20-64', sex: 'T', unit: 'PC', time: 2021 },
+                    unitText: '%',
+                })
+                .encoding('y', { stat: 'statV2' })
+                //.insets('default')
+                .scale('60M')
+                .legend({
+                    label1: 'Population',
+                    label2: 'Unemployment',
+                    x: 600,
+                    y: 100,
+                    boxOpacity: 0,
+                    rotation: -45,
+                    yAxisTitleOffset: { x: 5, y: 13 },
+                })
+                .numberOfClasses(5)
+                .classToFillStyle((i, j) => {
+                    if (i == null || j == null || i === ':' || j === ':') return null
+                    return colors[i * 5 + j] ?? 'gray'
+                })
+                .build()
+        </script>
+    </body>
+</html>

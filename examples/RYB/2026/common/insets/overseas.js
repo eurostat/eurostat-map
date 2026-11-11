@@ -240,7 +240,7 @@ const createOutermostInsetsConfig = () => {
                 inset.scalebarMaxWidth = 15
             }
             // The library's scalebar API takes a single `scalebar` config object per inset
-            // (see test/IMAGE/overseas.js) - the flat scalebar* properties above are otherwise
+            // (see test/manual/IMAGE/overseas.js) - the flat scalebar* properties above are otherwise
             // inert and never reach the map instance.
             inset.scalebar = {
                 tickHeight: inset.scalebarTickHeight,

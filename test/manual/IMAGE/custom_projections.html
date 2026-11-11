@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <div>
+            <svg id="map"></svg>
+        </div>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.1/d3.min.js" integrity="sha512-VcfmBa1zrzVT5htmBM63lMjDtqe4SAcxAlVLpQmBpUoO9beX5iNTKLGRWDuJ5F37jJZotqq65u00EZSVhJuikw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="../data/nuts3.js"></script>
+        <script src="../configs/insetConfig.js"></script>
+        <script src="../data/mixed.js"></script>
+        <script src="https://d3js.org/d3.v4.js"></script>
+        <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+        <script>
+            let mapWidth = 790
+            let mapHeight = 635
+
+            let proj = {
+                rotate: [1.5, -40.55],
+                scale: 3900,
+            }
+
+            let insets = [
+                {
+                    geo: 'IC',
+                    x: 0,
+                    y: 0,
+                    pixelSize: 2900,
+                    projectionFunction: undefined,
+                    geoCenter: [410000, 3160000],
+                    width: 200,
+                    height: 90,
+                    title: 'Islas Canarias',
+                    fontFamily: 'Myriad-Pro, Arial',
+                    labelling: false,
+                    titleFontSize: 14,
+                    titleFontWeight: '',
+                    frameStroke: 'grey',
+                    frameStrokeWidth: 1,
+                    showScalebar: true,
+                    scalebarTickHeight: 6,
+                    scalebarSegmentHeight: 6,
+                    scalebarFontSize: 9,
+                    scalebarUnits: ' km',
+                    scalebarTextOffset: [0, 8],
+                    scalebarPosition: [135, 72],
+                    scalebarMaxWidth: 35,
+                },
+                {
+                    geo: 'EUR',
+                    x: 250,
+                    y: 20,
+                    scale: '03M',
+                    pixelSize: 300,
+                    geoCenter: [2935033, 1564629],
+                    projectionFunction: undefined,
+                    width: 60,
+                    height: 60,
+                    title: 'Ceuta',
+                    titlePosition: [4, 13],
+                    fontFamily: 'Myriad-Pro, Arial',
+                    labelling: false,
+                    titleFontSize: 13,
+                    titleFontWeight: '',
+                    frameStroke: 'grey',
+                    frameStrokeWidth: 1,
+                    showScalebar: true,
+                    scalebarTickHeight: 6,
+                    scalebarSegmentHeight: 6,
+                    scalebarFontSize: 9,
+                    scalebarUnits: ' km',
+                    scalebarTextOffset: [0, 8],
+                    scalebarPosition: [26, 42],
+                    scalebarMaxWidth: 18,
+                },
+                {
+                    geo: 'EUR',
+                    x: 390,
+                    y: 40,
+                    scale: '03M',
+                    pixelSize: 250,
+                    geoCenter: [3141000, 1461000],
+                    projectionFunction: undefined,
+                    width: 60,
+                    height: 60,
+                    title: 'Melilla',
+                    titlePosition: [4, 13],
+                    fontFamily: 'Myriad-Pro, Arial',
+                    labelling: false,
+                    titleFontSize: 13,
+                    titleFontWeight: '',
+                    frameStroke: 'grey',
+                    frameStrokeWidth: 1,
+                    showScalebar: true,
+                    scalebarTickHeight: 6,
+                    scalebarSegmentHeight: 6,
+                    scalebarFontSize: 9,
+                    scalebarUnits: ' km',
+                    scalebarTextOffset: [0, 8],
+                    scalebarPosition: [23, 42],
+                    scalebarMaxWidth: 20,
+                },
+            ]
+
+            let projection = d3.geoAzimuthalEqualArea().rotate(proj.rotate).scale(proj.scale)
+
+            let map = eurostatmap
+                .map('choropleth')
+                .projectionFunction(projection)
+                .width(mapWidth)
+                .height(mapHeight)
+                .proj('4326')
+                .stat('value', {
+                    eurostatDatasetCode: 'demo_r_d3dens',
+                    unitText: 'people/km²',
+                    filters: { time: 2016 },
+                })
+                .encoding('fill', { stat: 'value' })
+                .proj('4326')
+                .nutsLevel(2)
+                .scale('03M')
+                .insets(insets)
+                .insetBoxPosition([0, 530])
+
+            // surrounding data or not
+            map.countriesToShow(['ES'])
+                .bordersToShow(['eu', 'efta', 'cc', 'oth'])
+                .filterGeometriesFunction((geom) => {
+                    console.log(geom)
+                    return geom
+                })
+
+            //IMAGE styling
+            map.drawCoastalMargin(false)
+                .seaFillStyle('#FFFFFF')
+                .cntrgFillStyle('#E6E6E6')
+                .nutsrgFillStyle('#E6E6E6')
+                .nutsbnStroke({
+                    0: '#000',
+                    1: '#000',
+                    2: '#000',
+                    3: '#000',
+                    co: 'grey',
+                })
+                .noDataFillStyle('darkgrey')
+                .nutsbnStrokeWidth({ 0: 2, 1: 0.4, 2: 0.4, 3: 0.4, oth: 2, co: 0 })
+                .cntbnStrokeWidth({ eu: 1, efta: 1, cc: 1, oth: 2, co: 0.2 })
+                .showScalebar(true)
+                .scalebarPosition([520, 560])
+                .hoverColor('#003E8C')
+                .zoomExtent([-100, 100])
+                .build()
+        </script>
+    </body>
+</html>

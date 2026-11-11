@@ -892,7 +892,7 @@ eurostatmap
 
 ### Flow map
 
-[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/flow_ex.png)](https://eurostat.github.io/eurostat-map/test/map-types/flow-map/flights/flights.html)
+[![Example](https://raw.githubusercontent.com/eurostat/eurostat-map/master/docs/img/flow_ex.png)](https://eurostat.github.io/eurostat-map/test/manual/map-types/flow-map/flights/flights.html)
 
 Here is [an example](https://eurostat.github.io/eurostat-map/examples/flow/flowmap.html) of such map (see [the code](https://github.com/eurostat/eurostat-map/blob/master/examples/flow/flowmap.html))
 

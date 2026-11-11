@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg height="700" width="700">
+            <g id="map"></g>
+            <g id="legend" transform="translate(10,200)"></g>
+        </svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script>
+            let map = eurostatmap
+                .map('ct')
+                .title('NUTS urban/rural typology')
+                .nutsLevel('mixed')
+                // .stat('default', { ES: 'a' })
+                // .stat('value', {
+                //     csvURL: 'https://eurostat.github.io/eurostat-map/examples/urb_rur_typo.csv',
+                //     geoCol: 'NUTS_ID_2013',
+                //     valueCol: 'urban_rural',
+                // })
+                .encoding('fill', { stat: 'value' })
+                .classToFillStyle({ a: '#fdb462', b: '#ffffb3', c: '#ccebc5' })
+                .classToText({ a: '1', b: '2', c: '3' })
+                .legend({
+                    svgId: 'legend',
+                    labelFontSize: 14,
+                    shapeWidth: 20,
+                    shapeHeight: 18,
+                })
+
+            map.statData('value').setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'c', IT: 'c', SI: 'c', RO: 'c', PL: 'b', PT: 'b', RU:'c' })
+            map.build()
+
+            // second
+            // setTimeout(() => {
+            //     map.classToFillStyle({ f: '#fdb462', b: '#ffffb3', c: '#ccebc5' }).classToText({ f: 'f', b: 'b', c: 'c' }).legend({
+            //         svgId: 'legend',
+            //         labelFontSize: 14,
+            //         shapeWidth: 20,
+            //         shapeHeight: 18,
+            //     })
+
+            //     map.statData('value').setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.updateStatValues()
+            //     map.updateClassification().updateStyle()
+            //     map.updateLegend()
+            // }, 2000)
+
+            // third
+            // setTimeout(() => {
+            //     map.statData('value').setData({ ES: 'e', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.updateStatValues()
+            //     map.legend({
+            //         svgId: 'legend',
+            //         labelFontSize: 14,
+            //         shapeWidth: 30,
+            //         shapeHeight: 30,
+            //         x: 100,
+            //         y: 270,
+            //     })
+            //     map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
+            //     map.classToText({ a: 'a', b: 'b', e: 'e' })
+            //     map.updateClassification().updateStyle()
+            //     map.updateLegend()
+            // }, 4000)
+
+            // setTimeout(() => {
+            //     map.classToFillStyle({ a: 'pink', b: 'violet', e: 'purple' })
+            //     map.classToText({ a: 'a', b: 'b', e: 'e' })
+            //     map.legend({
+            //         svgId: 'legend',
+            //         labelFontSize: 12,
+            //         shapeWidth: 10,
+            //         shapeHeight: 10,
+            //     })
+            //     map.statData('value').setData({ ES: 'a', FR: 'a', DE: 'a', MT: 'b', IT: 'b', SI: 'b', RO: 'c', PL: 'd', PT: 'e' })
+            //     map.updateStatValues()
+            //     map.updateClassification().updateStyle()
+            //     map.updateLegend()
+            // }, 6000)
+        </script>
+    </body>
+</html>

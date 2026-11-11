@@ -1,7 +1,7 @@
 /* Border modes: modifier classes set on the map <svg> (and every inset's) by map.darkMode() and
    map.lightBorders(). Imported last so that, at equal specificity, these rules win over the
    per-map-type rules in css/layers. Every combination keeps the Kosovo border in between national
-   and regional borders (width and colour only): see docs/css.md and test/kosovo-border.test.mjs.
+   and regional borders (width and colour only): see docs/css.md and test/e2e/kosovo-border.test.mjs.
    The dark-mode section comes first so that light borders win when both are set. */
 
 /* ---------------------------------------------------------------- dark mode (em--dark) */

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <style>
+            .em-zoom-buttons {
+                transform: translate(1%, 15%);
+            }
+        </style>
+        <svg id="map"></svg>
+        <script src="../../../../build/eurostatmap.js"></script>
+        <script src="../../data/nuts2.js"></script>
+        <script>
+            //https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lan_lcv_ovw?format=JSON&unit=PC&landcover=A00&lang=EN
+            const map = eurostatmap
+                .map('trivariateChoropleth')
+                .title('Land Cover')
+                .subtitle('')
+                .nutsLevel(2)
+                .ternarySettings({
+                    hue: 20,
+                    chroma: 110,
+                    lightness: 60,
+                    contrast: 0.4,
+                    spread: 1,
+                    breaks: 5,
+                    meanCentering: true,
+                })
+                .stat('statV1', {
+                    label: 'Artificial',
+                    eurostatDatasetCode: 'lan_lcv_ovw',
+                    filters: {
+                        unit: 'PC',
+                        landcover: 'A00',
+                    },
+                    unitText: '%',
+                })
+
+                .stat('statV2', {
+                    label: 'Cropland',
+                    eurostatDatasetCode: 'lan_lcv_ovw',
+                    filters: {
+                        unit: 'PC',
+                        landcover: 'B00',
+                    },
+                    unitText: '%',
+                })
+
+                .stat('statV3', {
+                    label: 'Woodland',
+                    eurostatDatasetCode: 'lan_lcv_ovw',
+                    filters: {
+                        unit: 'PC',
+                        landcover: 'C00',
+                    },
+                    unitText: '%',
+                })
+                .encoding('color', { stats: ['statV1', 'statV2', 'statV3'] })
+                .legend({
+                    title: 'Land Cover',
+                    x: 520,
+                    y: 10,
+                    boxOpacity: 0.9,
+                    width: 250,
+                    height: 250,
+                    labels: ['Artificial', 'Cropland', 'Woodland'],
+                    labelPosition: 'corner',
+                    padding: { top: 10, right: 30, bottom: 10, left: 30 },
+                    showLines: true,
+                    showCenter: true,
+                    centerLabel: 'Average',
+                    showData: true,
+                    colorTarget: 'triangles',
+                })
+                .zoomButtons(true)
+
+            // map.statData('statV1').setData(variable1)
+            // map.statData('statV2').setData(variable2)
+            // map.statData('statV3').setData(variable3)
+            map.build()
+        </script>
+    </body>
+</html>

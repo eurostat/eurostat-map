@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>eurostat-map.js</title>
+    </head>
+
+    <body>
+        <script src="../../../build/eurostatmap.js"></script>
+
+        <script>
+            const map = eurostatmap
+                .map('bar')
+                .dorling(true) // to prevent overlapping
+                .svgId('bar')
+                .scale('60M')
+                .nutsLevel(1)
+                .stat('composition', {
+                    eurostatDatasetCode: 'tour_occ_nin2',
+                    filters: { unit: 'NR', time: '2022', nace_r2: 'I551-I553' },
+                    unitText: 'Nights',
+                    categoryParameter: 'c_resid', //parameter that the categories belong to
+                    categoryCodes: ['FOR', 'DOM'], //category codes
+                    categoryLabels: ['Foreign', 'Domestic'], //category labels
+                    categoryColors: ['#7fc97f', '#beaed4', '#666666'], //colours
+                    //'TOTAL' //code for the total (not necessary here because there is no 'other' category)
+                })
+                .encoding('composition', { stat: 'composition' })
+                .title('Foreign and domestic tourism')
+                .subtitle('Nights spent in 2022')
+                .legend({
+                    x: 560,
+                    y: 60,
+                    boxOpacity: 0,
+                    boxFill: 'white',
+                    sizeLegend: {
+                        title: 'Nights spent',
+                        titlePadding: 10,
+                    },
+                    colorLegend: {
+                        title: 'Tourist origin',
+                    },
+                })
+
+            map.build()
+        </script>
+    </body>
+</html>
