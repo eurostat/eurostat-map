@@ -31402,15 +31402,63 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   statData: () => (/* binding */ statData)
 /* harmony export */ });
 /* harmony import */ var d3_fetch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-fetch */ "./node_modules/d3-fetch/src/dsv.js");
-/* harmony import */ var d3_fetch__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-fetch */ "./node_modules/d3-fetch/src/json.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
-/* harmony import */ var jsonstat_toolkit__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! jsonstat-toolkit */ "./node_modules/jsonstat-toolkit/import.mjs");
-/* harmony import */ var _toast__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./toast */ "./src/core/toast.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
+/* harmony import */ var jsonstat_toolkit__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jsonstat-toolkit */ "./node_modules/jsonstat-toolkit/import.mjs");
+/* harmony import */ var _toast__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./toast */ "./src/core/toast.js");
 
 
 
 
 
+
+const EUROSTAT_API_DOWN_MESSAGE =
+    'The Eurostat data service is currently unavailable, possibly for maintenance (announced on ec.europa.eu/eurostat). Please try again later.'
+const OFFLINE_MESSAGE = 'No internet connection: the statistical data could not be loaded.'
+
+/** Build an error whose message can be shown to the end user as it is. */
+const userFacingError = function (message, cause) {
+    const err = new Error(message)
+    err.userMessage = message
+    if (cause) err.cause = cause
+    return err
+}
+
+/**
+ * Fetch a JSON-stat response from the Eurostat API, turning the failures a browser reports
+ * opaquely into errors with a message for the end user (err.userMessage).
+ *
+ * When the API is down, the EC proxy answers with a 307 redirect to https://sorry.ec.europa.eu/
+ * (an HTML page, without CORS headers). A browser follows it, blocks the response and rejects
+ * with a bare TypeError ("Failed to fetch", "Load failed", "NetworkError when attempting to
+ * fetch resource" depending on the browser), with no status code to look at.
+ *
+ * @param {string} url
+ * @returns {Promise<object>}
+ */
+const fetchEurostatJSON = async function (url) {
+    let response
+    try {
+        response = await fetch(url)
+    } catch (cause) {
+        const offline = typeof navigator !== 'undefined' && navigator.onLine === false
+        throw userFacingError(offline ? OFFLINE_MESSAGE : EUROSTAT_API_DOWN_MESSAGE, cause)
+    }
+
+    // The API reports its own errors (unknown dataset, invalid filter...) as JSON with a 4xx status.
+    let data
+    try {
+        data = await response.json()
+    } catch (cause) {
+        data = undefined
+    }
+    if (data && typeof data === 'object' && (response.ok || data.error)) return data
+
+    // Not JSON: a maintenance or error page (also where a followed redirect lands outside a browser).
+    if (!response.ok && response.status < 500 && response.status !== 429) {
+        throw userFacingError('Eurostat API request failed: ' + response.status + ' ' + response.statusText)
+    }
+    throw userFacingError(EUROSTAT_API_DOWN_MESSAGE)
+}
 
 /** @typedef {import('../types/core/stat/StatData').StatData} StatData */
 /** @typedef {import('../types/core/stat/StatConfig').StatConfig} StatConfig */
@@ -31703,7 +31751,7 @@ const statData = function (config) {
         //out.filters_["filterNonGeo"] = 1; //DEPRECATED 16/11/2021
 
         //retrieve stat data from Eurostat API
-        return (0,d3_fetch__WEBPACK_IMPORTED_MODULE_1__["default"])((0,_utils__WEBPACK_IMPORTED_MODULE_2__.getEstatDataURL)(out.eurostatDatasetCode_, out.filters_, lang))
+        return fetchEurostatJSON((0,_utils__WEBPACK_IMPORTED_MODULE_1__.getEstatDataURL)(out.eurostatDatasetCode_, out.filters_, lang))
     }
 
     //for eurobase statistical data to retrieve from Eurostat API
@@ -31715,7 +31763,7 @@ const statData = function (config) {
             .then(function (data___) {
                 if (data___.error) {
                     const label = data___.error[0]?.label || 'Eurostat API request failed.'
-                    ;(0,_toast__WEBPACK_IMPORTED_MODULE_4__.showEurostatApiErrorToast)('Eurostat API request failed: ' + label)
+                    ;(0,_toast__WEBPACK_IMPORTED_MODULE_3__.showEurostatApiErrorToast)('Eurostat API request failed: ' + label)
                     console.error('Error retrieving Eurostat data: ' + label)
                     // Caller's loading counter (which drives the spinner overlay) only decrements
                     // inside this callback - skipping it on an API-reported error left the spinner
@@ -31724,7 +31772,7 @@ const statData = function (config) {
                     return
                 }
                 //decode stat data
-                const jsd = (0,jsonstat_toolkit__WEBPACK_IMPORTED_MODULE_3__["default"])(data___)
+                const jsd = (0,jsonstat_toolkit__WEBPACK_IMPORTED_MODULE_2__["default"])(data___)
 
                 //store jsonstat metadata
                 out.metadata = {
@@ -31737,7 +31785,7 @@ const statData = function (config) {
                 out.metadata.time = jsd.Dimension('time').id[0]
 
                 //index
-                out._data_ = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.jsonstatToIndex)(jsd)
+                out._data_ = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.jsonstatToIndex)(jsd)
                 //TODO: use maybe https://github.com/badosa/JSON-stat/blob/master/utils/fromtable.md to build directly an index ?
 
                 //handle null values
@@ -31760,9 +31808,9 @@ const statData = function (config) {
                 if (callback) callback()
             })
             .catch(function (err) {
-                const message = err?.message || 'Network or parsing error while retrieving Eurostat data.'
-                ;(0,_toast__WEBPACK_IMPORTED_MODULE_4__.showEurostatApiErrorToast)('Eurostat API request failed: ' + message)
-                console.error('Error retrieving Eurostat data:', err)
+                const message = err?.userMessage || 'Eurostat API request failed: ' + (err?.message || 'the response could not be read.')
+                ;(0,_toast__WEBPACK_IMPORTED_MODULE_3__.showEurostatApiErrorToast)(message)
+                console.error('Error retrieving Eurostat data: ' + message, err)
                 // Same reasoning as the data___.error branch above: a rejected fetch must still
                 // run the callback or the spinner never hides.
                 if (callback) callback()
@@ -31813,7 +31861,7 @@ const statData = function (config) {
         getCSVPromise()
             .then(function (data___) {
                 //decode stat data
-                out._data_ = (0,_utils__WEBPACK_IMPORTED_MODULE_2__.csvToIndex)(data___, out.geoCol_, out.valueCol_)
+                out._data_ = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.csvToIndex)(data___, out.geoCol_, out.valueCol_)
 
                 //store some metadata
                 out.metadata = { href: out.csvURL_ }
@@ -31826,7 +31874,7 @@ const statData = function (config) {
                 // Same reasoning as updateEurobase's .catch: a rejected fetch must still run the
                 // callback, or the caller's loading counter never decrements and the spinner spins forever.
                 const message = err?.message || 'Network or parsing error while retrieving CSV data.'
-                ;(0,_toast__WEBPACK_IMPORTED_MODULE_4__.showEurostatApiErrorToast)('CSV data request failed: ' + message)
+                ;(0,_toast__WEBPACK_IMPORTED_MODULE_3__.showEurostatApiErrorToast)('CSV data request failed: ' + message)
                 console.error('Error retrieving CSV data:', err)
                 if (callback) callback()
             })

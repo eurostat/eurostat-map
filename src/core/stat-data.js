@@ -1,8 +1,57 @@
-import { json, csv } from 'd3-fetch'
+import { csv } from 'd3-fetch'
 import { getEstatDataURL } from './utils'
 import JSONstat from 'jsonstat-toolkit'
 import { csvToIndex, jsonstatToIndex } from './utils'
 import { showEurostatApiErrorToast } from './toast'
+
+const EUROSTAT_API_DOWN_MESSAGE =
+    'The Eurostat data service is currently unavailable, possibly for maintenance (announced on ec.europa.eu/eurostat). Please try again later.'
+const OFFLINE_MESSAGE = 'No internet connection: the statistical data could not be loaded.'
+
+/** Build an error whose message can be shown to the end user as it is. */
+const userFacingError = function (message, cause) {
+    const err = new Error(message)
+    err.userMessage = message
+    if (cause) err.cause = cause
+    return err
+}
+
+/**
+ * Fetch a JSON-stat response from the Eurostat API, turning the failures a browser reports
+ * opaquely into errors with a message for the end user (err.userMessage).
+ *
+ * When the API is down, the EC proxy answers with a 307 redirect to https://sorry.ec.europa.eu/
+ * (an HTML page, without CORS headers). A browser follows it, blocks the response and rejects
+ * with a bare TypeError ("Failed to fetch", "Load failed", "NetworkError when attempting to
+ * fetch resource" depending on the browser), with no status code to look at.
+ *
+ * @param {string} url
+ * @returns {Promise<object>}
+ */
+const fetchEurostatJSON = async function (url) {
+    let response
+    try {
+        response = await fetch(url)
+    } catch (cause) {
+        const offline = typeof navigator !== 'undefined' && navigator.onLine === false
+        throw userFacingError(offline ? OFFLINE_MESSAGE : EUROSTAT_API_DOWN_MESSAGE, cause)
+    }
+
+    // The API reports its own errors (unknown dataset, invalid filter...) as JSON with a 4xx status.
+    let data
+    try {
+        data = await response.json()
+    } catch (cause) {
+        data = undefined
+    }
+    if (data && typeof data === 'object' && (response.ok || data.error)) return data
+
+    // Not JSON: a maintenance or error page (also where a followed redirect lands outside a browser).
+    if (!response.ok && response.status < 500 && response.status !== 429) {
+        throw userFacingError('Eurostat API request failed: ' + response.status + ' ' + response.statusText)
+    }
+    throw userFacingError(EUROSTAT_API_DOWN_MESSAGE)
+}
 
 /** @typedef {import('../types/core/stat/StatData').StatData} StatData */
 /** @typedef {import('../types/core/stat/StatConfig').StatConfig} StatConfig */
@@ -295,7 +344,7 @@ export const statData = function (config) {
         //out.filters_["filterNonGeo"] = 1; //DEPRECATED 16/11/2021
 
         //retrieve stat data from Eurostat API
-        return json(getEstatDataURL(out.eurostatDatasetCode_, out.filters_, lang))
+        return fetchEurostatJSON(getEstatDataURL(out.eurostatDatasetCode_, out.filters_, lang))
     }
 
     //for eurobase statistical data to retrieve from Eurostat API
@@ -352,9 +401,9 @@ export const statData = function (config) {
                 if (callback) callback()
             })
             .catch(function (err) {
-                const message = err?.message || 'Network or parsing error while retrieving Eurostat data.'
-                showEurostatApiErrorToast('Eurostat API request failed: ' + message)
-                console.error('Error retrieving Eurostat data:', err)
+                const message = err?.userMessage || 'Eurostat API request failed: ' + (err?.message || 'the response could not be read.')
+                showEurostatApiErrorToast(message)
+                console.error('Error retrieving Eurostat data: ' + message, err)
                 // Same reasoning as the data___.error branch above: a rejected fetch must still
                 // run the callback or the spinner never hides.
                 if (callback) callback()
