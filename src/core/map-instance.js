@@ -1,3 +1,4 @@
+import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
 import { select, selectAll } from 'd3-selection'
 import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox, isMobile } from './utils'
 import { appendAnnotations } from './decoration/annotations'
@@ -32,6 +33,15 @@ import { addCentroidsToMap } from './geo/centroids'
  * @param {string} mapType
  * @returns {MapInstance}
  */
+/**
+ * Inset maps are rounded boxes (same radius as the legend and insets background). The frame stroke, the
+ * sea and the clipPath rect that clips the inset's contents must all share the radius, otherwise the
+ * contents poke out of the rounded frame. Attributes, not CSS, so SVG/PNG/HTML export keep them.
+ */
+const roundInsetCorners = (out) => (sel) => {
+    if (out.isInset) sel.attr('rx', BOX_CORNER_RADIUS).attr('ry', BOX_CORNER_RADIUS)
+}
+
 export const createMapInstance = function (config, withCenterPoints, mapType) {
     //build map template object
     const out = {}
@@ -605,6 +615,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             .attr('y', 0)
             .attr('width', out.width_)
             .attr('height', out.height_)
+            .call(roundInsetCorners(out))
 
         if (out.drawCoastalMargin_) {
             //define filter for coastal margin
@@ -660,6 +671,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             .attr('y', 0)
             .attr('width', out.width_)
             .attr('height', out.height_)
+            .call(roundInsetCorners(out))
 
         if (out.stamp_) {
             appendStamp(out.stamp_, out)
@@ -856,6 +868,7 @@ const drawBackgroundMap = function (out) {
         .append('rect')
         .attr('id', 'sea')
         .attr('class', 'em-sea')
+        .call(roundInsetCorners(out))
         .attr('x', -5 * out.width_)
         .attr('y', -5 * out.height_)
         .attr('width', 11 * out.width_)
