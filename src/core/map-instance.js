@@ -1,4 +1,3 @@
-import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
 import { select, selectAll } from 'd3-selection'
 import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox, isMobile } from './utils'
 import { appendAnnotations } from './decoration/annotations'
@@ -23,6 +22,7 @@ import { attachLocationsApi, updateLocations } from './locations.js'
 import { applyBorderModeClasses, createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
 import { DEFAULT_FIT_ZOOM, defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
 import { addCentroidsToMap } from './geo/centroids'
+import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
