@@ -827,12 +827,20 @@ async function runScenario(browser, sc, buildDir) {
         }
     })
 
+    // "Settled" needs the library's own loading counters at zero as well as an idle network: a
+    // request the page has issued may not have reached the route handler yet (pending === 0), and
+    // the DOM stays quiet while a delayed request is in flight, so those two alone can declare the
+    // page settled in the middle of a load (the 'ps mixed stat delayed' baseline was captured that
+    // way, with 14 geometries and the stat request still loading and the map not yet drawn).
     const settle = async () => {
         const t0 = Date.now()
         await page.waitForTimeout(50)
         for (;;) {
-            const since = await page.evaluate(() => performance.now() - window.__lastMutation)
-            if (pending === 0 && since >= QUIET_MS) return
+            const { since, loading } = await page.evaluate(() => ({
+                since: performance.now() - window.__lastMutation,
+                loading: !!window.__map && (window.__map._loadingGeoCount_ > 0 || window.__map._loadingStatCount_ > 0),
+            }))
+            if (pending === 0 && !loading && since >= QUIET_MS) return
             if (Date.now() - t0 > 30000) throw new Error('page did not settle within 30 s')
             await page.waitForTimeout(100)
         }
