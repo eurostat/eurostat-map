@@ -10,6 +10,7 @@ import path from 'node:path'
 const args = process.argv.slice(2)
 const argVal = (k, d) => (args.includes(k) ? +args[args.indexOf(k) + 1] : d)
 let seed = argVal('--seed', 1)
+const SCROLL_ONLY = args.includes('--scroll-only') // only the continuous 4->1 wheel scrolling section
 const RANDOM_RUNS = argVal('--random', 25)
 const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32)
 
@@ -142,10 +143,10 @@ async function run(label, seq) {
 }
 
 // 1. every ordered pair of steps, fully settled in between
-for (const a of STEPS) for (const b of STEPS) if (a !== b) await run(`${a}->${b}`, [[a, SETTLE], [b, 0]])
+for (const a of STEPS) for (const b of STEPS) if (!SCROLL_ONLY && a !== b) await run(`${a}->${b}`, [[a, SETTLE], [b, 0]])
 
 // 2. reversal mid-flight: a -> b, interrupted after t ms by c
-for (const b of STEPS)
+for (const b of SCROLL_ONLY ? [] : STEPS)
     for (const c of STEPS)
         if (b !== c)
             for (const t of [300, 1200]) {
@@ -154,7 +155,7 @@ for (const b of STEPS)
             }
 
 // 3. random rapid scrolling
-for (let i = 0; i < RANDOM_RUNS; i++) {
+for (let i = 0; !SCROLL_ONLY && i < RANDOM_RUNS; i++) {
     const seq = []
     for (let j = 0; j < 7; j++) seq.push([STEPS[Math.floor(rand() * 4)], 30 + Math.floor(rand() * 2200)])
     await run(`random#${i} ${seq.map(([n, w]) => `${n}@${w}`).join(' ')}`, seq)
@@ -163,7 +164,7 @@ for (let i = 0; i < RANDOM_RUNS; i++) {
 // 4. real wheel scrolling up and down across the whole story
 await go(1)
 await page.waitForTimeout(SETTLE)
-for (let i = 0; i < 4; i++) {
+for (let i = 0; !SCROLL_ONLY && i < 4; i++) {
     for (let k = 0; k < 40; k++) { await page.mouse.wheel(0, 120); await page.waitForTimeout(15) }
     for (let k = 0; k < 40; k++) { await page.mouse.wheel(0, -120); await page.waitForTimeout(15) }
 }
@@ -172,6 +173,25 @@ const active = await page.evaluate(() => +document.querySelector('.step.active')
 const wheelOut = check(active, await snapshot(), 'wheel')
 runs++
 if (wheelOut.length) { failures.push(...wheelOut); console.log('FAIL', wheelOut.join('\n     ')) } else console.log('ok   wheel up/down, ended on step', active)
+
+// 5. continuous wheel scroll from the chart (step 4) up to step 1 through steps 3 and 2, at several speeds,
+//    starting both settled and while the chart morph is still in flight
+const topEl = () => page.evaluate(() => window.scrollY)
+for (const intervalMs of [5, 20, 60, 200])
+    for (const startDelay of [SETTLE, 600]) {
+        await go(4)
+        await page.waitForTimeout(startDelay)
+        for (let k = 0; k < 80 && (await topEl()) > 0; k++) {
+            await page.mouse.wheel(0, -150)
+            await page.waitForTimeout(intervalMs)
+        }
+        await go(1)
+        await page.waitForTimeout(SETTLE)
+        const out = check(1, await snapshot(), `scroll 4->1 every ${intervalMs}ms after ${startDelay}ms`)
+        runs++
+        if (out.length) { failures.push(...out); console.log('FAIL', out.join(' | ')) }
+        else console.log(`ok   scroll 4->1 every ${intervalMs}ms after ${startDelay}ms`)
+    }
 
 if (pageErrors.length) failures.push(...pageErrors.map((e) => 'page error: ' + e))
 await browser.close()
