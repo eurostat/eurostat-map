@@ -3245,6 +3245,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   circleStream: () => (/* binding */ circleStream),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cartesian.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/constant.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
@@ -3443,6 +3444,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _noop_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../noop.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/noop.js");
 
 
@@ -3482,6 +3484,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../cartesian.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _circle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../circle.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/circle.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
@@ -3678,6 +3681,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _buffer_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./buffer.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/clip/buffer.js");
 /* harmony import */ var _rejoin_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./rejoin.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/clip/rejoin.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
@@ -3828,6 +3832,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b, x0, y0, x1, y1) {
   var ax = a[0],
       ay = a[1],
@@ -4088,6 +4093,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _pointEqual_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../pointEqual.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/pointEqual.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
 
@@ -4207,6 +4213,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
 
   function compose(x, y) {
@@ -4233,6 +4240,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function() {
     return x;
@@ -4253,6 +4261,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (x => x);
+(Object.getOwnPropertyDescriptor(__WEBPACK_DEFAULT_EXPORT__, "name") || {}).writable || Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 
 
 /***/ },
@@ -4399,6 +4408,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
 
 
@@ -4419,6 +4429,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-geo-projection/node_modules/d3-array/src/fsum.js");
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cartesian.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
@@ -4781,6 +4792,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../cartesian.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
 /* harmony import */ var _transform_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../transform.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/transform.js");
@@ -4901,6 +4913,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   rotateRadians: () => (/* binding */ rotateRadians)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _compose_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./compose.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/compose.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/math.js");
 
@@ -4993,6 +5006,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function streamGeometry(geometry, stream) {
   if (geometry && streamGeometryType.hasOwnProperty(geometry.type)) {
     streamGeometryType[geometry.type](geometry, stream);
@@ -5077,6 +5091,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   transformer: () => (/* binding */ transformer)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(methods) {
   return {
     stream: transformer(methods)
@@ -5230,6 +5245,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   robinsonRaw: () => (/* binding */ robinsonRaw)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_geo__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-geo */ "./node_modules/d3-geo-projection/node_modules/d3-geo/src/projection/index.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo-projection/src/math.js");
 
@@ -7629,6 +7645,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function() {
     return x;
@@ -7648,6 +7665,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_dispatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-dispatch */ "./node_modules/d3-svg-annotation/node_modules/d3-dispatch/index.js");
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/index.js");
 /* harmony import */ var _nodrag__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./nodrag */ "./node_modules/d3-svg-annotation/node_modules/d3-drag/src/nodrag.js");
@@ -7717,7 +7735,7 @@ function defaultTouchable() {
   }
 
   function mousemoved() {
-    ;(0,_noevent__WEBPACK_IMPORTED_MODULE_3__["default"])();
+    (0,_noevent__WEBPACK_IMPORTED_MODULE_3__["default"])();
     if (!mousemoving) {
       var dx = d3_selection__WEBPACK_IMPORTED_MODULE_1__.event.clientX - mousedownx, dy = d3_selection__WEBPACK_IMPORTED_MODULE_1__.event.clientY - mousedowny;
       mousemoving = dx * dx + dy * dy > clickDistance2;
@@ -7726,7 +7744,7 @@ function defaultTouchable() {
   }
 
   function mouseupped() {
-    ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__.select)(d3_selection__WEBPACK_IMPORTED_MODULE_1__.event.view).on("mousemove.drag mouseup.drag", null);
+    (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__.select)(d3_selection__WEBPACK_IMPORTED_MODULE_1__.event.view).on("mousemove.drag mouseup.drag", null);
     (0,_nodrag__WEBPACK_IMPORTED_MODULE_2__.yesdrag)(d3_selection__WEBPACK_IMPORTED_MODULE_1__.event.view, mousemoving);
     (0,_noevent__WEBPACK_IMPORTED_MODULE_3__["default"])();
     gestures.mouse("end");
@@ -7790,7 +7808,7 @@ function defaultTouchable() {
         case "end": delete gestures[id], --active; // nobreak
         case "drag": p = point(container, id), n = active; break;
       }
-      ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__.customEvent)(new _event__WEBPACK_IMPORTED_MODULE_5__["default"](drag, type, s, id, n, p[0] + dx, p[1] + dy, p[0] - p0[0], p[1] - p0[1], sublisteners), sublisteners.apply, sublisteners, [type, that, args]);
+      (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__.customEvent)(new _event__WEBPACK_IMPORTED_MODULE_5__["default"](drag, type, s, id, n, p[0] + dx, p[1] + dy, p[0] - p0[0], p[1] - p0[1], sublisteners), sublisteners.apply, sublisteners, [type, that, args]);
     };
   }
 
@@ -7887,6 +7905,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   yesdrag: () => (/* binding */ yesdrag)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/index.js");
 /* harmony import */ var _noevent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./noevent */ "./node_modules/d3-svg-annotation/node_modules/d3-drag/src/noevent.js");
 
@@ -7932,6 +7951,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   nopropagation: () => (/* binding */ nopropagation)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/index.js");
 
 
@@ -8101,6 +8121,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function() {
     return x;
@@ -8120,6 +8141,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _creator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./creator */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/creator.js");
 /* harmony import */ var _select__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./select */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/select.js");
 
@@ -8142,6 +8164,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _namespace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./namespace */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/namespace.js");
 /* harmony import */ var _namespaces__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./namespaces */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/namespaces.js");
 
@@ -8292,6 +8315,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
   return function() {
     return this.matches(selector);
@@ -8311,6 +8335,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sourceEvent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sourceEvent */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/sourceEvent.js");
 /* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./point */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/point.js");
 
@@ -8335,6 +8360,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _namespaces__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./namespaces */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/namespaces.js");
 
 
@@ -8381,6 +8407,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(node, event) {
   var svg = node.ownerSVGElement || node;
 
@@ -8408,6 +8435,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _selection_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./selection/index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 
 
@@ -8430,6 +8458,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _selection_index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./selection/index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 
 
@@ -8452,6 +8481,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _creator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../creator */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/creator.js");
 
 
@@ -8475,6 +8505,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _namespace__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../namespace */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/namespace.js");
 
 
@@ -8547,6 +8578,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   var callback = arguments[0];
   arguments[0] = this;
@@ -8567,6 +8599,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function classArray(string) {
   return string.trim().split(/^|\s+/);
 }
@@ -8656,6 +8689,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function selection_cloneShallow() {
   return this.parentNode.insertBefore(this.cloneNode(false), this.nextSibling);
 }
@@ -8681,6 +8715,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _enter__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enter */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/enter.js");
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../constant */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/constant.js");
@@ -8816,6 +8851,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(value) {
   return arguments.length
       ? this.property("__data__", value)
@@ -8835,6 +8871,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _window__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../window */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/window.js");
 
 
@@ -8884,6 +8921,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(callback) {
 
   for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
@@ -8908,6 +8946,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   return !this.node();
 }
@@ -8926,6 +8965,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   EnterNode: () => (/* binding */ EnterNode),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sparse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sparse */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/sparse.js");
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 
@@ -8964,6 +9004,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sparse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sparse */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/sparse.js");
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 
@@ -8986,6 +9027,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _matcher__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../matcher */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/matcher.js");
 
@@ -9018,6 +9060,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function htmlRemove() {
   this.innerHTML = "";
 }
@@ -9183,6 +9226,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _creator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../creator */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/creator.js");
 /* harmony import */ var _selector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selector */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selector.js");
 
@@ -9213,6 +9257,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(onenter, onupdate, onexit) {
   var enter = this.enter(), update = this, exit = this.exit();
   enter = typeof onenter === "function" ? onenter(enter) : enter.append(onenter + "");
@@ -9234,6 +9279,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function lower() {
   if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
 }
@@ -9255,6 +9301,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 
 
@@ -9288,6 +9335,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
 
   for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
@@ -9313,6 +9361,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   var nodes = new Array(this.size()), i = -1;
   this.each(function() { nodes[++i] = this; });
@@ -9334,6 +9383,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   event: () => (/* binding */ event)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 var filterEvents = {};
 
 var event = null;
@@ -9455,6 +9505,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
 
   for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
@@ -9482,6 +9533,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function propertyRemove(name) {
   return function() {
     delete this[name];
@@ -9524,6 +9576,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function raise() {
   if (this.nextSibling) this.parentNode.appendChild(this);
 }
@@ -9545,6 +9598,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function remove() {
   var parent = this.parentNode;
   if (parent) parent.removeChild(this);
@@ -9567,6 +9621,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _selector__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selector */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selector.js");
 
@@ -9600,6 +9655,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _selectorAll__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selectorAll */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selectorAll.js");
 
@@ -9633,6 +9689,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   var size = 0;
   this.each(function() { ++size; });
@@ -9652,6 +9709,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/index.js");
 
 
@@ -9691,6 +9749,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(update) {
   return new Array(update.length);
 }
@@ -9709,6 +9768,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   styleValue: () => (/* binding */ styleValue)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _window__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../window */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/window.js");
 
 
@@ -9759,6 +9819,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function textRemove() {
   this.textContent = "";
 }
@@ -9798,6 +9859,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function none() {}
 
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
@@ -9819,6 +9881,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function empty() {
   return [];
 }
@@ -9842,6 +9905,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _selection_on__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./selection/on */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/selection/on.js");
 
 
@@ -9864,6 +9928,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sourceEvent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sourceEvent */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/sourceEvent.js");
 /* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./point */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/point.js");
 
@@ -9894,6 +9959,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sourceEvent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sourceEvent */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/sourceEvent.js");
 /* harmony import */ var _point__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./point */ "./node_modules/d3-svg-annotation/node_modules/d3-selection/src/point.js");
 
@@ -9922,6 +9988,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(node) {
   return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
       || (node.document && node) // node is a Window
@@ -10078,6 +10145,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-path */ "./node_modules/d3-svg-annotation/node_modules/d3-path/src/path.js");
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _math__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./math */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/math.js");
@@ -10358,6 +10426,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-path */ "./node_modules/d3-svg-annotation/node_modules/d3-path/src/path.js");
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _curve_linear__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./curve/linear */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/curve/linear.js");
@@ -10501,6 +10570,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function constant() {
     return x;
@@ -10522,6 +10592,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   point: () => (/* binding */ point)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function point(that, x, y) {
   that._context.bezierCurveTo(
     (2 * that._x0 + that._x1) / 3,
@@ -10587,6 +10658,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _noop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../noop */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/noop.js");
 /* harmony import */ var _basis__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./basis */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/curve/basis.js");
 
@@ -10655,6 +10727,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _basis__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./basis */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/curve/basis.js");
 
 
@@ -11274,6 +11347,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function Linear(context) {
   this._context = context;
 }
@@ -11319,6 +11393,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _noop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../noop */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/noop.js");
 
 
@@ -11478,6 +11553,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function Natural(context) {
   this._context = context;
 }
@@ -11611,6 +11687,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   stepAfter: () => (/* binding */ stepAfter),
 /* harmony export */   stepBefore: () => (/* binding */ stepBefore)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function Step(context, t) {
   this._context = context;
   this._t = t;
@@ -11678,6 +11755,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 }
@@ -11695,6 +11773,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(d) {
   return d;
 }
@@ -11712,6 +11791,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-path */ "./node_modules/d3-svg-annotation/node_modules/d3-path/src/path.js");
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _curve_linear__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./curve/linear */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/curve/linear.js");
@@ -11806,6 +11886,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {}
 
 
@@ -11821,6 +11902,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _none__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/offset/none.js");
 
 
@@ -11830,7 +11912,7 @@ __webpack_require__.r(__webpack_exports__);
     for (y = i = 0; i < n; ++i) y += series[i][j][1] || 0;
     if (y) for (i = 0; i < n; ++i) series[i][j][1] /= y;
   }
-  ;(0,_none__WEBPACK_IMPORTED_MODULE_0__["default"])(series, order);
+  (0,_none__WEBPACK_IMPORTED_MODULE_0__["default"])(series, order);
 }
 
 
@@ -11846,6 +11928,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(series, order) {
   if (!((n = series.length) > 1)) return;
   for (var i = 1, s0, s1 = series[order[0]], n, m = s1.length; i < n; ++i) {
@@ -11869,6 +11952,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _none__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/offset/none.js");
 
 
@@ -11878,7 +11962,7 @@ __webpack_require__.r(__webpack_exports__);
     for (var i = 0, y = 0; i < n; ++i) y += series[i][j][1] || 0;
     s0[j][1] += s0[j][0] = -y / 2;
   }
-  ;(0,_none__WEBPACK_IMPORTED_MODULE_0__["default"])(series, order);
+  (0,_none__WEBPACK_IMPORTED_MODULE_0__["default"])(series, order);
 }
 
 
@@ -11894,6 +11978,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _none__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/offset/none.js");
 
 
@@ -11934,6 +12019,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   sum: () => (/* binding */ sum)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _none__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/order/none.js");
 
 
@@ -11961,6 +12047,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _ascending__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ascending */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/order/ascending.js");
 
 
@@ -11981,6 +12068,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _none__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/order/none.js");
 /* harmony import */ var _ascending__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ascending */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/order/ascending.js");
 
@@ -12024,6 +12112,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(series) {
   var n = series.length, o = new Array(n);
   while (--n >= 0) o[n] = n;
@@ -12043,6 +12132,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _none__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/order/none.js");
 
 
@@ -12063,6 +12153,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _descending__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./descending */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/descending.js");
 /* harmony import */ var _identity__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./identity */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/identity.js");
@@ -12182,6 +12273,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _curve_radial__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./curve/radial */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/curve/radial.js");
 /* harmony import */ var _area__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./area */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/area.js");
 /* harmony import */ var _radialLine__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./radialLine */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/radialLine.js");
@@ -12229,6 +12321,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   radialLine: () => (/* binding */ radialLine)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _curve_radial__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./curve/radial */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/curve/radial.js");
 /* harmony import */ var _line__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./line */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/line.js");
 
@@ -12264,6 +12357,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./array */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/array.js");
 /* harmony import */ var _constant__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _offset_none__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./offset/none */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/offset/none.js");
@@ -12340,6 +12434,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   symbols: () => (/* binding */ symbols)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-path */ "./node_modules/d3-svg-annotation/node_modules/d3-path/src/path.js");
 /* harmony import */ var _symbol_circle__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./symbol/circle */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/symbol/circle.js");
 /* harmony import */ var _symbol_cross__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./symbol/cross */ "./node_modules/d3-svg-annotation/node_modules/d3-shape/src/symbol/cross.js");
@@ -13384,6 +13479,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var mgrs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mgrs */ "./node_modules/mgrs/mgrs.js");
 
 
+/**
+ * @deprecated v3.0.0 - use proj4.toPoint instead
+ * @param {number | import('./core').TemplateCoordinates | string} x
+ * @param {number} [y]
+ * @param {number} [z]
+ */
 function Point(x, y, z) {
   if (!(this instanceof Point)) {
     return new Point(x, y, z);
@@ -13398,9 +13499,9 @@ function Point(x, y, z) {
     this.z = x.z || 0.0;
   } else if (typeof x === 'string' && typeof y === 'undefined') {
     var coords = x.split(',');
-    this.x = parseFloat(coords[0], 10);
-    this.y = parseFloat(coords[1], 10);
-    this.z = parseFloat(coords[2], 10) || 0.0;
+    this.x = parseFloat(coords[0]);
+    this.y = parseFloat(coords[1]);
+    this.z = parseFloat(coords[2]) || 0.0;
   } else {
     this.x = x;
     this.y = y;
@@ -13447,10 +13548,35 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * @typedef {Object} DatumDefinition
+ * @property {number} datum_type - The type of datum.
+ * @property {number} a - Semi-major axis of the ellipsoid.
+ * @property {number} b - Semi-minor axis of the ellipsoid.
+ * @property {number} es - Eccentricity squared of the ellipsoid.
+ * @property {number} ep2 - Second eccentricity squared of the ellipsoid.
+ */
+
+/**
+ * @param {string | import('./core').PROJJSONDefinition | import('./defs').ProjectionDefinition} srsCode
+ * @param {(errorMessage?: string, instance?: Projection) => void} [callback]
+ */
 function Projection(srsCode, callback) {
   if (!(this instanceof Projection)) {
     return new Projection(srsCode);
   }
+  /** @type {<T extends import('./core').TemplateCoordinates>(coordinates: T, enforceAxis?: boolean) => T} */
+  this.forward = null;
+  /** @type {<T extends import('./core').TemplateCoordinates>(coordinates: T, enforceAxis?: boolean) => T} */
+  this.inverse = null;
+  /** @type {function(): void} */
+  this.init = null;
+  /** @type {string} */
+  this.name;
+  /** @type {Array<string>} */
+  this.names = null;
+  /** @type {string} */
+  this.title;
   callback = callback || function (error) {
     if (error) {
       throw error;
@@ -13482,6 +13608,7 @@ function Projection(srsCode, callback) {
   var sphere_ = (0,_deriveConstants__WEBPACK_IMPORTED_MODULE_3__.sphere)(json.a, json.b, json.rf, json.ellps, json.sphere);
   var ecc = (0,_deriveConstants__WEBPACK_IMPORTED_MODULE_3__.eccentricity)(sphere_.a, sphere_.b, sphere_.rf, json.R_A);
   var nadgrids = (0,_nadgrid__WEBPACK_IMPORTED_MODULE_7__.getNadgrids)(json.nadgrids);
+  /** @type {DatumDefinition} */
   var datumObj = json.datum || (0,_datum__WEBPACK_IMPORTED_MODULE_5__["default"])(json.datumCode, json.datum_params, sphere_.a, sphere_.b, ecc.es, ecc.ep2,
     nadgrids);
 
@@ -13503,7 +13630,9 @@ function Projection(srsCode, callback) {
   this.datum = datumObj;
 
   // init the projection
-  this.init();
+  if ('init' in this && typeof this.init === 'function') {
+    this.init();
+  }
 
   // legecy callback from back in the day when it went to spatialreference.org
   callback(null, this);
@@ -13525,11 +13654,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(crs, denorm, point) {
   var xin = point.x,
     yin = point.y,
     zin = point.z || 0.0;
   var v, t, i;
+  /** @type {import("./core").InterfaceCoordinates} */
   var out = {};
   for (i = 0; i < 3; i++) {
     if (denorm && i === 2 && point.z === undefined) {
@@ -13597,6 +13728,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(point) {
   checkCoord(point.x);
   checkCoord(point.y);
@@ -13626,6 +13758,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constants_values__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/values */ "./node_modules/proj4/lib/constants/values.js");
 /* harmony import */ var _sign__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./sign */ "./node_modules/proj4/lib/common/sign.js");
 
@@ -13648,6 +13781,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(eccent, sinphi, cosphi) {
   var con = eccent * sinphi;
   return cosphi / (Math.sqrt(1 - con * con));
@@ -13666,6 +13800,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constants_values__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/values */ "./node_modules/proj4/lib/constants/values.js");
 
 
@@ -13698,6 +13833,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(eccent, sinphi) {
   var con;
   if (eccent > 1.0e-7) {
@@ -13721,6 +13857,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return x < 0 ? -1 : 1;
 }
@@ -13738,6 +13875,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
+/**
+ * @param {Array<number>} array
+ * @returns {import("../core").InterfaceCoordinates}
+ */
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(array) {
   var out = {
     x: array[0],
@@ -13765,6 +13907,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constants_values__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/values */ "./node_modules/proj4/lib/constants/values.js");
 
 
@@ -15320,24 +15463,25 @@ var ellipsoids = {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ exports)
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-var exports = {};
+var primeMeridian = {};
 
+primeMeridian.greenwich = 0.0; // "0dE",
+primeMeridian.lisbon = -9.131906111111; // "9d07'54.862\"W",
+primeMeridian.paris = 2.337229166667; // "2d20'14.025\"E",
+primeMeridian.bogota = -74.080916666667; // "74d04'51.3\"W",
+primeMeridian.madrid = -3.687938888889; // "3d41'16.58\"W",
+primeMeridian.rome = 12.452333333333; // "12d27'8.4\"E",
+primeMeridian.bern = 7.439583333333; // "7d26'22.5\"E",
+primeMeridian.jakarta = 106.807719444444; // "106d48'27.79\"E",
+primeMeridian.ferro = -17.666666666667; // "17d40'W",
+primeMeridian.brussels = 4.367975; // "4d22'4.71\"E",
+primeMeridian.stockholm = 18.058277777778; // "18d3'29.8\"E",
+primeMeridian.athens = 23.7163375; // "23d42'58.815\"E",
+primeMeridian.oslo = 10.722916666667; // "10d43'22.5\"E"
 
-exports.greenwich = 0.0; // "0dE",
-exports.lisbon = -9.131906111111; // "9d07'54.862\"W",
-exports.paris = 2.337229166667; // "2d20'14.025\"E",
-exports.bogota = -74.080916666667; // "74d04'51.3\"W",
-exports.madrid = -3.687938888889; // "3d41'16.58\"W",
-exports.rome = 12.452333333333; // "12d27'8.4\"E",
-exports.bern = 7.439583333333; // "7d26'22.5\"E",
-exports.jakarta = 106.807719444444; // "106d48'27.79\"E",
-exports.ferro = -17.666666666667; // "17d40'W",
-exports.brussels = 4.367975; // "4d22'4.71\"E",
-exports.stockholm = 18.058277777778; // "18d3'29.8\"E",
-exports.athens = 23.7163375; // "23d42'58.815\"E",
-exports.oslo = 10.722916666667; // "10d43'22.5\"E"
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (primeMeridian);
 
 
 /***/ },
@@ -15455,6 +15599,85 @@ __webpack_require__.r(__webpack_exports__);
 
 var wgs84 = (0,_Proj__WEBPACK_IMPORTED_MODULE_0__["default"])('WGS84');
 
+/**
+ * @typedef {{x: number, y: number, z?: number, m?: number}} InterfaceCoordinates
+ */
+
+/**
+ * @typedef {Array<number> | InterfaceCoordinates} TemplateCoordinates
+ */
+
+/**
+ * @typedef {Object} Converter
+ * @property {<T extends TemplateCoordinates>(coordinates: T, enforceAxis?: boolean) => T} forward
+ * @property {<T extends TemplateCoordinates>(coordinates: T, enforceAxis?: boolean) => T} inverse
+ * @property {proj} [oProj]
+ */
+
+/**
+ * @typedef {Object} PROJJSONDefinition
+ * @property {string} [$schema]
+ * @property {string} type
+ * @property {string} [name]
+ * @property {{authority: string, code: number}} [id]
+ * @property {string} [scope]
+ * @property {string} [area]
+ * @property {{south_latitude: number, west_longitude: number, north_latitude: number, east_longitude: number}} [bbox]
+ * @property {PROJJSONDefinition[]} [components]
+ * @property {{type: string, name: string}} [datum]
+ * @property {{
+ *   name: string,
+ *   members: Array<{
+ *     name: string,
+ *     id?: {authority: string, code: number}
+ *   }>,
+ *   ellipsoid?: {
+ *     name: string,
+ *     semi_major_axis: number,
+ *     inverse_flattening?: number
+ *   },
+ *   accuracy?: string,
+ *   id?: {authority: string, code: number}
+ * }} [datum_ensemble]
+ * @property {{
+ *   subtype: string,
+ *   axis: Array<{
+ *     name: string,
+ *     abbreviation?: string,
+ *     direction: string,
+ *     unit: string
+ *   }>
+ * }} [coordinate_system]
+ * @property {{
+ *   name: string,
+ *   method: {name: string},
+ *   parameters: Array<{
+ *     name: string,
+ *     value: number,
+ *     unit?: string
+ *   }>
+ * }} [conversion]
+ * @property {{
+ *   name: string,
+ *   method: {name: string},
+ *   parameters: Array<{
+ *     name: string,
+ *     value: number,
+ *     unit?: string,
+ *     type?: string,
+ *     file_name?: string
+ *   }>
+ * }} [transformation]
+ */
+
+/**
+ * @template {TemplateCoordinates} T
+ * @param {proj} from
+ * @param {proj} to
+ * @param {T} coords
+ * @param {boolean} [enforceAxis]
+ * @returns {T}
+ */
 function transformer(from, to, coords, enforceAxis) {
   var transformedArray, out, keys;
   if (Array.isArray(coords)) {
@@ -15462,21 +15685,21 @@ function transformer(from, to, coords, enforceAxis) {
     if (coords.length > 2) {
       if ((typeof from.name !== 'undefined' && from.name === 'geocent') || (typeof to.name !== 'undefined' && to.name === 'geocent')) {
         if (typeof transformedArray.z === 'number') {
-          return [transformedArray.x, transformedArray.y, transformedArray.z].concat(coords.slice(3));
+          return /** @type {T} */ ([transformedArray.x, transformedArray.y, transformedArray.z].concat(coords.slice(3)));
         } else {
-          return [transformedArray.x, transformedArray.y, coords[2]].concat(coords.slice(3));
+          return /** @type {T} */ ([transformedArray.x, transformedArray.y, coords[2]].concat(coords.slice(3)));
         }
       } else {
-        return [transformedArray.x, transformedArray.y].concat(coords.slice(2));
+        return /** @type {T} */ ([transformedArray.x, transformedArray.y].concat(coords.slice(2)));
       }
     } else {
-      return [transformedArray.x, transformedArray.y];
+      return /** @type {T} */ ([transformedArray.x, transformedArray.y]);
     }
   } else {
     out = (0,_transform__WEBPACK_IMPORTED_MODULE_1__["default"])(from, to, coords, enforceAxis);
     keys = Object.keys(coords);
     if (keys.length === 2) {
-      return out;
+      return /** @type {T} */ (out);
     }
     keys.forEach(function (key) {
       if ((typeof from.name !== 'undefined' && from.name === 'geocent') || (typeof to.name !== 'undefined' && to.name === 'geocent')) {
@@ -15490,42 +15713,100 @@ function transformer(from, to, coords, enforceAxis) {
       }
       out[key] = coords[key];
     });
-    return out;
+    return /** @type {T} */ (out);
   }
 }
 
+/**
+ * @param {proj | string | PROJJSONDefinition | Converter} item
+ * @returns {import('./Proj').default}
+ */
 function checkProj(item) {
   if (item instanceof _Proj__WEBPACK_IMPORTED_MODULE_0__["default"]) {
     return item;
   }
-  if (item.oProj) {
+  if (typeof item === 'object' && 'oProj' in item) {
     return item.oProj;
   }
-  return (0,_Proj__WEBPACK_IMPORTED_MODULE_0__["default"])(item);
+  return (0,_Proj__WEBPACK_IMPORTED_MODULE_0__["default"])(/** @type {string | PROJJSONDefinition} */ (item));
 }
 
-function proj4(fromProj, toProj, coord) {
-  fromProj = checkProj(fromProj);
+/**
+ * @overload
+ * @param {string | PROJJSONDefinition | proj} toProj
+ * @returns {Converter}
+ */
+/**
+ * @overload
+ * @param {string | PROJJSONDefinition | proj} fromProj
+ * @param {string | PROJJSONDefinition | proj} toProj
+ * @returns {Converter}
+ */
+/**
+ * @template {TemplateCoordinates} T
+ * @overload
+ * @param {string | PROJJSONDefinition | proj} toProj
+ * @param {T} coord
+ * @returns {T}
+ */
+/**
+ * @template {TemplateCoordinates} T
+ * @overload
+ * @param {string | PROJJSONDefinition | proj} fromProj
+ * @param {string | PROJJSONDefinition | proj} toProj
+ * @param {T} coord
+ * @returns {T}
+ */
+/**
+ * @template {TemplateCoordinates} T
+ * @param {string | PROJJSONDefinition | proj} fromProjOrToProj
+ * @param {string | PROJJSONDefinition | proj | TemplateCoordinates} [toProjOrCoord]
+ * @param {T} [coord]
+ * @returns {T|Converter}
+ */
+function proj4(fromProjOrToProj, toProjOrCoord, coord) {
+  /** @type {proj} */
+  var fromProj;
+  /** @type {proj} */
+  var toProj;
   var single = false;
+  /** @type {Converter} */
   var obj;
-  if (typeof toProj === 'undefined') {
-    toProj = fromProj;
+  if (typeof toProjOrCoord === 'undefined') {
+    toProj = checkProj(fromProjOrToProj);
     fromProj = wgs84;
     single = true;
-  } else if (typeof toProj.x !== 'undefined' || Array.isArray(toProj)) {
-    coord = toProj;
-    toProj = fromProj;
+  } else if (typeof /** @type {?} */ (toProjOrCoord).x !== 'undefined' || Array.isArray(toProjOrCoord)) {
+    coord = /** @type {T} */ (/** @type {?} */ (toProjOrCoord));
+    toProj = checkProj(fromProjOrToProj);
     fromProj = wgs84;
     single = true;
   }
-  toProj = checkProj(toProj);
+  if (!fromProj) {
+    fromProj = checkProj(fromProjOrToProj);
+  }
+  if (!toProj) {
+    toProj = checkProj(/** @type {string | PROJJSONDefinition | proj } */ (toProjOrCoord));
+  }
   if (coord) {
     return transformer(fromProj, toProj, coord);
   } else {
     obj = {
+      /**
+       * @template {TemplateCoordinates} T
+       * @param {T} coords
+       * @param {boolean=} enforceAxis
+       * @returns {T}
+       */
       forward: function (coords, enforceAxis) {
         return transformer(fromProj, toProj, coords, enforceAxis);
       },
+      /**
+       * @template {TemplateCoordinates} T
+       * @param {T} coords
+       * @param {boolean=} enforceAxis
+       * @returns {T}
+       */
       inverse: function (coords, enforceAxis) {
         return transformer(toProj, fromProj, coords, enforceAxis);
       }
@@ -15536,6 +15817,7 @@ function proj4(fromProj, toProj, coord) {
     return obj;
   }
 }
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (proj4);
 
 
@@ -15865,6 +16147,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   applyGridShift: () => (/* binding */ applyGridShift),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constants_values__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants/values */ "./node_modules/proj4/lib/constants/values.js");
 /* harmony import */ var _datumUtils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./datumUtils */ "./node_modules/proj4/lib/datumUtils.js");
 /* harmony import */ var _common_adjust_lon__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./common/adjust_lon */ "./node_modules/proj4/lib/common/adjust_lon.js");
@@ -16077,6 +16360,66 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * @typedef {Object} ProjectionDefinition
+ * @property {string} title
+ * @property {string} [projName]
+ * @property {string} [ellps]
+ * @property {import('./Proj.js').DatumDefinition} [datum]
+ * @property {string} [datumName]
+ * @property {number} [rf]
+ * @property {number} [lat0]
+ * @property {number} [lat1]
+ * @property {number} [lat2]
+ * @property {number} [lat_ts]
+ * @property {number} [long0]
+ * @property {number} [long1]
+ * @property {number} [long2]
+ * @property {number} [alpha]
+ * @property {number} [longc]
+ * @property {number} [x0]
+ * @property {number} [y0]
+ * @property {number} [k0]
+ * @property {number} [a]
+ * @property {number} [b]
+ * @property {true} [R_A]
+ * @property {number} [zone]
+ * @property {true} [utmSouth]
+ * @property {string|Array<number>} [datum_params]
+ * @property {number} [to_meter]
+ * @property {string} [units]
+ * @property {number} [from_greenwich]
+ * @property {string} [datumCode]
+ * @property {string} [nadgrids]
+ * @property {string} [axis]
+ * @property {boolean} [sphere]
+ * @property {number} [rectified_grid_angle]
+ * @property {boolean} [approx]
+ * @property {<T extends import('./core').TemplateCoordinates>(coordinates: T, enforceAxis?: boolean) => T} inverse
+ * @property {<T extends import('./core').TemplateCoordinates>(coordinates: T, enforceAxis?: boolean) => T} forward
+ */
+
+/**
+ * @overload
+ * @param {string} name
+ * @param {string|ProjectionDefinition|import('./core.js').PROJJSONDefinition} projection
+ * @returns {void}
+ */
+/**
+ * @overload
+ * @param {Array<[string, string]>} name
+ * @returns {Array<ProjectionDefinition|undefined>}
+ */
+/**
+ * @overload
+ * @param {string} name
+ * @returns {ProjectionDefinition}
+ */
+
+/**
+ * @param {string | Array<Array<string>> | Partial<Record<'EPSG'|'ESRI'|'IAU2000', ProjectionDefinition>>} name
+ * @returns {ProjectionDefinition | Array<ProjectionDefinition|undefined> | void}
+ */
 function defs(name) {
   /* global console */
   var that = this;
@@ -16084,20 +16427,20 @@ function defs(name) {
     var def = arguments[1];
     if (typeof def === 'string') {
       if (def.charAt(0) === '+') {
-        defs[name] = (0,_projString__WEBPACK_IMPORTED_MODULE_1__["default"])(arguments[1]);
+        defs[/** @type {string} */ (name)] = (0,_projString__WEBPACK_IMPORTED_MODULE_1__["default"])(arguments[1]);
       } else {
-        defs[name] = (0,wkt_parser__WEBPACK_IMPORTED_MODULE_2__["default"])(arguments[1]);
+        defs[/** @type {string} */ (name)] = (0,wkt_parser__WEBPACK_IMPORTED_MODULE_2__["default"])(arguments[1]);
       }
     } else {
-      defs[name] = def;
+      defs[/** @type {string} */ (name)] = def;
     }
   } else if (arguments.length === 1) {
     if (Array.isArray(name)) {
       return name.map(function (v) {
         if (Array.isArray(v)) {
-          defs.apply(that, v);
+          return defs.apply(that, v);
         } else {
-          defs(v);
+          return defs(v);
         }
       });
     } else if (typeof name === 'string') {
@@ -16116,7 +16459,7 @@ function defs(name) {
     return;
   }
 }
-;(0,_global__WEBPACK_IMPORTED_MODULE_0__["default"])(defs);
+(0,_global__WEBPACK_IMPORTED_MODULE_0__["default"])(defs);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (defs);
 
 
@@ -16200,6 +16543,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(destination, source) {
   destination = destination || {};
   var value, property;
@@ -16228,6 +16572,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(defs) {
   defs('EPSG:4326', '+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees');
   defs('EPSG:4269', '+title=NAD83 (long/lat) +proj=longlat +a=6378137.0 +b=6356752.31414036 +ellps=GRS80 +datum=NAD83 +units=degrees');
@@ -16296,11 +16641,80 @@ __webpack_require__.r(__webpack_exports__);
  * - http://mimaka.com/help/gs/html/004_NTV2%20Data%20Format.htm
  */
 
+/**
+ * @typedef {Object} NadgridInfo
+ * @property {string} name The name of the NAD grid or 'null' if not specified.
+ * @property {boolean} mandatory Indicates if the grid is mandatory (true) or optional (false).
+ * @property {*} grid The loaded NAD grid object, or null if not loaded or not applicable.
+ * @property {boolean} isNull True if the grid is explicitly 'null', otherwise false.
+ */
+
+/**
+ * @typedef {Object} NTV2GridOptions
+ * @property {boolean} [includeErrorFields=true] Whether to include error fields in the subgrids.
+ */
+
+/**
+ * @typedef {Object} NadgridHeader
+ * @property {number} [nFields] Number of fields in the header.
+ * @property {number} [nSubgridFields] Number of fields in each subgrid header.
+ * @property {number} nSubgrids Number of subgrids in the file.
+ * @property {string} [shiftType] Type of shift (e.g., "SECONDS").
+ * @property {number} [fromSemiMajorAxis] Source ellipsoid semi-major axis.
+ * @property {number} [fromSemiMinorAxis] Source ellipsoid semi-minor axis.
+ * @property {number} [toSemiMajorAxis] Target ellipsoid semi-major axis.
+ * @property {number} [toSemiMinorAxis] Target ellipsoid semi-minor axis.
+ */
+
+/**
+ * @typedef {Object} Subgrid
+ * @property {Array<number>} ll Lower left corner of the grid in radians [longitude, latitude].
+ * @property {Array<number>} del Grid spacing in radians [longitude interval, latitude interval].
+ * @property {Array<number>} lim Number of columns in the grid [longitude columns, latitude columns].
+ * @property {number} [count] Total number of grid nodes.
+ * @property {Array} cvs Mapped node values for the grid.
+ */
+
+/** @typedef {{header: NadgridHeader, subgrids: Array<Subgrid>}} NADGrid */
+
+/**
+ * @typedef {Object} GeoTIFF
+ * @property {() => Promise<number>} getImageCount - Returns the number of images in the GeoTIFF.
+ * @property {(index: number) => Promise<GeoTIFFImage>} getImage - Returns a GeoTIFFImage for the given index.
+ */
+
+/**
+ * @typedef {Object} GeoTIFFImage
+ * @property {() => number} getWidth - Returns the width of the image.
+ * @property {() => number} getHeight - Returns the height of the image.
+ * @property {() => number[]} getBoundingBox - Returns the bounding box as [minX, minY, maxX, maxY] in degrees.
+ * @property {() => Promise<ArrayLike<ArrayLike<number>>>} readRasters - Returns the raster data as an array of bands.
+ * @property {Object} fileDirectory - The file directory object containing metadata.
+ * @property {Object} fileDirectory.ModelPixelScale - The pixel scale array [scaleX, scaleY, scaleZ] in degrees.
+ */
+
 var loadedNadgrids = {};
 
 /**
+ * @overload
+ * @param {string} key - The key to associate with the loaded grid.
+ * @param {ArrayBuffer} data - The NTv2 grid data as an ArrayBuffer.
+ * @param {NTV2GridOptions} [options] - Optional parameters for loading the grid.
+ * @returns {NADGrid} - The loaded NAD grid information.
+ */
+/**
+ * @overload
+ * @param {string} key - The key to associate with the loaded grid.
+ * @param {GeoTIFF} data - The GeoTIFF instance to read the grid from.
+ * @returns {{ready: Promise<NADGrid>}} - A promise that resolves to the loaded grid information.
+ */
+/**
  * Load either a NTv2 file (.gsb) or a Geotiff (.tif) to a key that can be used in a proj string like +nadgrids=<key>. Pass the NTv2 file
  * as an ArrayBuffer. Pass Geotiff as a GeoTIFF instance from the geotiff.js library.
+ * @param {string} key - The key to associate with the loaded grid.
+ * @param {ArrayBuffer|GeoTIFF} data The data to load, either an ArrayBuffer for NTv2 or a GeoTIFF instance.
+ * @param {NTV2GridOptions} [options] Optional parameters.
+ * @returns {{ready: Promise<NADGrid>}|NADGrid} - A promise that resolves to the loaded grid information.
  */
 function nadgrid(key, data, options) {
   if (data instanceof ArrayBuffer) {
@@ -16309,6 +16723,12 @@ function nadgrid(key, data, options) {
   return { ready: readGeotiffGrid(key, data) };
 }
 
+/**
+ * @param {string} key The key to associate with the loaded grid.
+ * @param {ArrayBuffer} data The NTv2 grid data as an ArrayBuffer.
+ * @param {NTV2GridOptions} [options] Optional parameters for loading the grid.
+ * @returns {NADGrid} The loaded NAD grid information.
+ */
 function readNTV2Grid(key, data, options) {
   var includeErrorFields = true;
   if (options !== undefined && options.includeErrorFields === false) {
@@ -16323,6 +16743,11 @@ function readNTV2Grid(key, data, options) {
   return nadgrid;
 }
 
+/**
+ * @param {string} key The key to associate with the loaded grid.
+ * @param {GeoTIFF} tiff The GeoTIFF instance to read the grid from.
+ * @returns {Promise<NADGrid>} A promise that resolves to the loaded NAD grid information.
+ */
 async function readGeotiffGrid(key, tiff) {
   var subgrids = [];
   var subGridCount = await tiff.getImageCount();
@@ -16370,6 +16795,8 @@ async function readGeotiffGrid(key, tiff) {
 
 /**
  * Given a proj4 value for nadgrids, return an array of loaded grids
+ * @param {string} nadgrids A comma-separated list of grid names, optionally prefixed with '@' to indicate optional grids.
+ * @returns
  */
 function getNadgrids(nadgrids) {
   // Format details: http://proj.maptools.org/gen_parms.html
@@ -16380,6 +16807,10 @@ function getNadgrids(nadgrids) {
   return grids.map(parseNadgridString);
 }
 
+/**
+ * @param {string} value The nadgrid string to get information for.
+ * @returns {NadgridInfo|null} An object with grid information, or null if the input is empty.
+ */
 function parseNadgridString(value) {
   if (value.length === 0) {
     return null;
@@ -16562,6 +16993,10 @@ function checkProjStr(item) {
 function testProj(code) {
   return code[0] === '+';
 }
+/**
+ * @param {string | import('./core').PROJJSONDefinition | import('./defs').ProjectionDefinition} code
+ * @returns {import('./defs').ProjectionDefinition}
+ */
 function parse(code) {
   if (testObj(code)) {
     // check to see if this is a WKT string
@@ -16583,7 +17018,7 @@ function parse(code) {
     if (testProj(code)) {
       return (0,_projString__WEBPACK_IMPORTED_MODULE_2__["default"])(code);
     }
-  } else if (!code.projName) {
+  } else if (!('projName' in code)) {
     return (0,wkt_parser__WEBPACK_IMPORTED_MODULE_1__["default"])(code);
   } else {
     return code;
@@ -16605,6 +17040,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constants_values__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants/values */ "./node_modules/proj4/lib/constants/values.js");
 /* harmony import */ var _constants_PrimeMeridian__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constants/PrimeMeridian */ "./node_modules/proj4/lib/constants/PrimeMeridian.js");
 /* harmony import */ var _constants_units__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./constants/units */ "./node_modules/proj4/lib/constants/units.js");
@@ -16614,13 +17050,19 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * @param {string} defData
+ * @returns {import('./defs').ProjectionDefinition}
+ */
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(defData) {
+  /** @type {import('./defs').ProjectionDefinition} */
   var self = {};
   var paramObj = defData.split('+').map(function (v) {
     return v.trim();
   }).filter(function (a) {
     return a;
   }).reduce(function (p, a) {
+    /** @type {Array<?>} */
     var split = a.split('=');
     split.push(true);
     p[split[0].toLowerCase()] = split[1];
@@ -16772,10 +17214,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _projections_longlat__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./projections/longlat */ "./node_modules/proj4/lib/projections/longlat.js");
 
 
+/** @type {Array<Partial<import('./Proj').default>>} */
 var projs = [_projections_merc__WEBPACK_IMPORTED_MODULE_0__["default"], _projections_longlat__WEBPACK_IMPORTED_MODULE_1__["default"]];
 var names = {};
 var projStore = [];
 
+/**
+ * @param {import('./Proj').default} proj
+ * @param {number} i
+ */
 function add(proj, i) {
   var len = projStore.length;
   if (!proj.names) {
@@ -16789,12 +17236,15 @@ function add(proj, i) {
   return this;
 }
 
-
-
 function getNormalizedProjName(n) {
   return n.replace(/[-\(\)\s]+/g, ' ').trim().replace(/ /g, '_');
 }
 
+/**
+ * Get a projection by name.
+ * @param {string} name
+ * @returns {import('./Proj').default|false}
+ */
 function get(name) {
   if (!name) {
     return false;
@@ -16847,6 +17297,24 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+/**
+ * @typedef {Object} LocalThis
+ * @property {number} mode
+ * @property {Array<number>} apa
+ * @property {number} dd
+ * @property {number} e
+ * @property {number} es
+ * @property {number} mmf
+ * @property {number} rq
+ * @property {number} qp
+ * @property {number} sinb1
+ * @property {number} cosb1
+ * @property {number} ymf
+ * @property {number} xmf
+ * @property {number} sinph0
+ * @property {number} cosph0
+ */
+
 /*
   reference
     "New Equal-Area Map Projections for Noncircular Regions", John P. Snyder,
@@ -16854,21 +17322,22 @@ __webpack_require__.r(__webpack_exports__);
   */
 
 var S_POLE = 1;
-
 var N_POLE = 2;
 var EQUIT = 3;
 var OBLIQ = 4;
 
-/* Initialize the Lambert Azimuthal Equal Area projection
-  ------------------------------------------------------ */
+/**
+ * Initialize the Lambert Azimuthal Equal Area projection
+ * @this {import('../defs.js').ProjectionDefinition & LocalThis}
+ */
 function init() {
   var t = Math.abs(this.lat0);
   if (Math.abs(t - _constants_values__WEBPACK_IMPORTED_MODULE_0__.HALF_PI) < _constants_values__WEBPACK_IMPORTED_MODULE_0__.EPSLN) {
-    this.mode = this.lat0 < 0 ? this.S_POLE : this.N_POLE;
+    this.mode = this.lat0 < 0 ? S_POLE : N_POLE;
   } else if (Math.abs(t) < _constants_values__WEBPACK_IMPORTED_MODULE_0__.EPSLN) {
-    this.mode = this.EQUIT;
+    this.mode = EQUIT;
   } else {
-    this.mode = this.OBLIQ;
+    this.mode = OBLIQ;
   }
   if (this.es > 0) {
     var sinphi;
@@ -16877,19 +17346,19 @@ function init() {
     this.mmf = 0.5 / (1 - this.es);
     this.apa = authset(this.es);
     switch (this.mode) {
-      case this.N_POLE:
+      case N_POLE:
         this.dd = 1;
         break;
-      case this.S_POLE:
+      case S_POLE:
         this.dd = 1;
         break;
-      case this.EQUIT:
+      case EQUIT:
         this.rq = Math.sqrt(0.5 * this.qp);
         this.dd = 1 / this.rq;
         this.xmf = 1;
         this.ymf = 0.5 * this.qp;
         break;
-      case this.OBLIQ:
+      case OBLIQ:
         this.rq = Math.sqrt(0.5 * this.qp);
         sinphi = Math.sin(this.lat0);
         this.sinb1 = (0,_common_qsfnz__WEBPACK_IMPORTED_MODULE_1__["default"])(this.e, sinphi) / this.qp;
@@ -16900,7 +17369,7 @@ function init() {
         break;
     }
   } else {
-    if (this.mode === this.OBLIQ) {
+    if (this.mode === OBLIQ) {
       this.sinph0 = Math.sin(this.lat0);
       this.cosph0 = Math.cos(this.lat0);
     }
@@ -17191,6 +17660,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+/**
+ * @typedef {Object} LocalThis
+ * @property {number} es
+ * @property {number} e
+ * @property {number} k
+ */
+
+/** @this {import('../defs.js').ProjectionDefinition & LocalThis} */
 function init() {
   var con = this.b / this.a;
   this.es = 1 - con * con;
@@ -17492,6 +17970,13 @@ function checkNotWGS(source, dest) {
   || ((dest.datum.datum_type === _constants_values__WEBPACK_IMPORTED_MODULE_0__.PJD_3PARAM || dest.datum.datum_type === _constants_values__WEBPACK_IMPORTED_MODULE_0__.PJD_7PARAM || dest.datum.datum_type === _constants_values__WEBPACK_IMPORTED_MODULE_0__.PJD_GRIDSHIFT) && source.datumCode !== 'WGS84');
 }
 
+/**
+ * @param {import('./defs').ProjectionDefinition} source
+ * @param {import('./defs').ProjectionDefinition} dest
+ * @param {import('./core').TemplateCoordinates} point
+ * @param {boolean} enforceAxis
+ * @returns {import('./core').InterfaceCoordinates | undefined}
+ */
 function transform(source, dest, point, enforceAxis) {
   var wgs84;
   if (Array.isArray(point)) {
@@ -17547,6 +18032,8 @@ function transform(source, dest, point, enforceAxis) {
   if (!point) {
     return;
   }
+
+  point = /** @type {import('./core').InterfaceCoordinates} */ (point);
 
   // Adjust for the prime meridian if necessary
   if (dest.from_greenwich) {
@@ -17918,6 +18405,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _transform_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./transform.js */ "./node_modules/topojson-client/src/transform.js");
 
 
@@ -17972,6 +18460,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, x) {
   var lo = 0, hi = a.length;
   while (lo < hi) {
@@ -17996,6 +18485,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   object: () => (/* binding */ object)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _reverse_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./reverse.js */ "./node_modules/topojson-client/src/reverse.js");
 /* harmony import */ var _transform_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./transform.js */ "./node_modules/topojson-client/src/transform.js");
 
@@ -18082,6 +18572,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return x;
 }
@@ -18139,6 +18630,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   mergeArcs: () => (/* binding */ mergeArcs)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _feature_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./feature.js */ "./node_modules/topojson-client/src/feature.js");
 /* harmony import */ var _stitch_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stitch.js */ "./node_modules/topojson-client/src/stitch.js");
 
@@ -18259,6 +18751,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   meshArcs: () => (/* binding */ meshArcs)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _feature_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./feature.js */ "./node_modules/topojson-client/src/feature.js");
 /* harmony import */ var _stitch_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stitch.js */ "./node_modules/topojson-client/src/stitch.js");
 
@@ -18328,6 +18821,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _bisect_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bisect.js */ "./node_modules/topojson-client/src/bisect.js");
 
 
@@ -18388,6 +18882,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _bbox_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bbox.js */ "./node_modules/topojson-client/src/bbox.js");
 /* harmony import */ var _untransform_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./untransform.js */ "./node_modules/topojson-client/src/untransform.js");
 
@@ -18458,6 +18953,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(array, n) {
   var t, j = array.length, i = j - n;
   while (i < --j) t = array[i], array[i++] = array[j], array[j] = t;
@@ -18476,6 +18972,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(topology, arcs) {
   var stitchedArcs = {},
       fragmentByStart = {},
@@ -18563,6 +19060,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _identity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./identity.js */ "./node_modules/topojson-client/src/identity.js");
 
 
@@ -18597,6 +19095,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _identity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./identity.js */ "./node_modules/topojson-client/src/identity.js");
 
 
@@ -24922,7 +25421,7 @@ const exportMapToPNG = async function (out, width, height, filename) {
     }
 
     // Inline computed styles and set explicit size/viewBox (must run while clone is in DOM)
-    ;(0,_utils__WEBPACK_IMPORTED_MODULE_0__.applyComputedStylesToSVG)(svgNodeClone)
+    (0,_utils__WEBPACK_IMPORTED_MODULE_0__.applyComputedStylesToSVG)(svgNodeClone)
     ;(0,_utils__WEBPACK_IMPORTED_MODULE_0__.ensureSvgSize)(svgNodeClone)
 
     // Insert white background rect as first child if none present
@@ -30066,7 +30565,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             out.labels_.scaleOnZoom = true
         }
         //update
-        ;(0,_decoration_labels__WEBPACK_IMPORTED_MODULE_3__.updateLabels)(out)
+        (0,_decoration_labels__WEBPACK_IMPORTED_MODULE_3__.updateLabels)(out)
         return out
     }
 
@@ -30102,7 +30601,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         }
 
         //clear SVG (to avoid building multiple svgs on top of each other during multiple build() calls)
-        ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + out.svgId() + ' > *').remove()
+        (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + out.svgId() + ' > *').remove()
 
         //set SVG dimensions
         if (!out.height()) {
@@ -30235,14 +30734,14 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // resolved here (it's only known once geo data has loaded, for maps without an explicit
         // z), leaving pixelSizeM undefined and baking NaN coordinates into the scalebar. Redraw it
         // now that position_.z is final, instead of waiting for a zoom event that may never come.
-        ;(0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.updateScalebar)(out)
+        (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.updateScalebar)(out)
 
         // d3 zoom
         if (out.zoomExtent_ || out.zoomButtons_) {
             if (!out.zoomExtent_) {
                 out.zoomExtent_ = [1, 10]
             }
-            ;(0,_zoom__WEBPACK_IMPORTED_MODULE_10__.defineMapZoom)(out)
+            (0,_zoom__WEBPACK_IMPORTED_MODULE_10__.defineMapZoom)(out)
         }
 
         // prepare group for proportional symbols, with centroids
@@ -30307,7 +30806,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
                 sb.position = [15, out.height_ - 50]
             }
 
-            ;(0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.addScalebarToMap)(out)
+            (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.addScalebarToMap)(out)
         }
 
         //minimap
@@ -30451,7 +30950,7 @@ const updateGeoMapTemplate = function (callback, map) {
     }
 
     // Use executeForAllInsets for recursive inset updates
-    ;(0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId_, (inset) => {
+    (0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId_, (inset) => {
         updateGeoMapTemplate(callback, inset)
     })
 
@@ -32403,7 +32902,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                 (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_7__.refreshCentroids)
             }
             //main map
-            ;(0,_geo_centroids__WEBPACK_IMPORTED_MODULE_7__.refreshCentroids)(out)
+            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_7__.refreshCentroids)(out)
         }
 
         out.updateAllLayers()
@@ -35837,7 +36336,7 @@ function getContinuousColor(value, layer) {
     return colorFn(Math.min(Math.max(t, 0), 1))
 }
 
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_10__.registerLayerType)('choropleth', 'base', decorateChoroplethLayer)
+(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_10__.registerLayerType)('choropleth', 'base', decorateChoroplethLayer)
 ;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_10__.registerLayerType)('ch', 'base', decorateChoroplethLayer)
 
 
@@ -36851,7 +37350,7 @@ const decorateBarLayer = function (out, config) {
         if (Object.keys(legacySettingsPatch).length) out.barSettings(legacySettingsPatch)
     }
 
-    ;(0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.buildGetterSetters)(out, [
+    (0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.buildGetterSetters)(out, [
         'catColors_',
         'catLabels_',
         'showOnlyWhenComplete_',
@@ -36949,7 +37448,7 @@ const decorateBarLayer = function (out, config) {
                     (0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.applyClassificationToMap)(map, out, _getAnchors, 'barTotalCode_', settings.minWidth, settings.maxWidth)
                 )
             }
-            ;(0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.applyClassificationToMap)(out, out, _getAnchors, 'barTotalCode_', settings.minWidth, settings.maxWidth)
+            (0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.applyClassificationToMap)(out, out, _getAnchors, 'barTotalCode_', settings.minWidth, settings.maxWidth)
         }
         return out
     }
@@ -37223,7 +37722,7 @@ const decorateBarLayer = function (out, config) {
                 addBarChartsToMap(regionFeatures)
             }
 
-            ;(0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.addMouseEventsToRegions)(regions, out)
+            (0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.addMouseEventsToRegions)(regions, out)
         }
 
         if (out.patternFill_) {
@@ -37245,7 +37744,7 @@ const decorateBarLayer = function (out, config) {
             addBarChartsToGridCartogram(regionIds, map)
         }
 
-        ;(0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.addMouseEventsToGridCartogram)(
+        (0,_composition_map__WEBPACK_IMPORTED_MODULE_10__.addMouseEventsToGridCartogram)(
             out,
             '.barchart',
             out.barSettings_.type === 'grouped' ? _getGroupedPresenceValue : _getRegionTotal,
@@ -39092,7 +39591,7 @@ const decoratePieLayer = function (out, config) {
                 (0,_composition_map__WEBPACK_IMPORTED_MODULE_11__.applyClassificationToMap)(map, out, _getAnchors, 'compositionTotalCode_', settings.minSize, settings.maxSize)
             )
         }
-        ;(0,_composition_map__WEBPACK_IMPORTED_MODULE_11__.applyClassificationToMap)(out, out, _getAnchors, 'compositionTotalCode_', settings.minSize, settings.maxSize)
+        (0,_composition_map__WEBPACK_IMPORTED_MODULE_11__.applyClassificationToMap)(out, out, _getAnchors, 'compositionTotalCode_', settings.minSize, settings.maxSize)
         out.radarAbsoluteMax_ = computeRadarAbsoluteMax(out)
         return out
     }
@@ -40174,7 +40673,7 @@ const decorateWaffleLayer = function (out, config) {
                 (0,_composition_map__WEBPACK_IMPORTED_MODULE_8__.applyClassificationToMap)(map, out, _getAnchors, 'waffleTotalCode_', settings.minSize, settings.maxSize)
             )
         }
-        ;(0,_composition_map__WEBPACK_IMPORTED_MODULE_8__.applyClassificationToMap)(out, out, _getAnchors, 'waffleTotalCode_', settings.minSize, settings.maxSize)
+        (0,_composition_map__WEBPACK_IMPORTED_MODULE_8__.applyClassificationToMap)(out, out, _getAnchors, 'waffleTotalCode_', settings.minSize, settings.maxSize)
         return out
     }
 
@@ -40795,7 +41294,7 @@ function drawNodeCircles(out, container) {
                 highlightLines(locKey)
             })
             .on("mouseout", function(event)  {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this).attr("stroke-width", 0.5)
+                (0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this).attr("stroke-width", 0.5)
                 if (out.map._tooltip) out.map._tooltip.mouseout(event)
                 unhighlightLines()
             })
@@ -40823,7 +41322,7 @@ function highlightLines(nodeId) {
 }
 
 function unhighlightLines() {
-  ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('.em-flow-link, .em-flow-link-bundled')
+  (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('.em-flow-link, .em-flow-link-bundled')
     .classed('highlighted', false)
     .classed('dimmed', false);
 }
@@ -40981,7 +41480,7 @@ function highlightLines(nodeId) {
 }
 
 function unhighlightLines() {
-  ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_7__["default"])('.em-flow-link, .em-flow-link-bundled')
+  (0,d3_selection__WEBPACK_IMPORTED_MODULE_7__["default"])('.em-flow-link, .em-flow-link-bundled')
     .classed('highlighted', false)
     .classed('dimmed', false);
 }
@@ -42607,7 +43106,7 @@ function addMouseEvents(out, mainSel, ctx) {
             if (out.map._tooltip) out.map._tooltip.mousemove(e)
         })
         .on('mouseout', function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this).attr('fill', paint)
+            (0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this).attr('fill', paint)
             if (out.map._tooltip) out.map._tooltip.mouseout()
         })
 }
@@ -43517,7 +44016,7 @@ function onFlowLineMouseMove(out) {
 
 function onFlowLineMouseOut(out, baseColor, arrowIds) {
     return function () {
-        ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_) // restore solid base color
+        (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_) // restore solid base color
         if (out.flowArrows_) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.setHoverArrow)((0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this), arrowIds, false)
         if (out.map._tooltip) out.map._tooltip.mouseout()
     }
@@ -45012,7 +45511,7 @@ const decorateProportionalSymbolLayer = function (layer, config) {
             }
 
             // apply to main map
-            ;(0,_ps_classification_js__WEBPACK_IMPORTED_MODULE_10__.applyClassificationToMap)(map, layer)
+            (0,_ps_classification_js__WEBPACK_IMPORTED_MODULE_10__.applyClassificationToMap)(map, layer)
 
             return layer
         } catch (e) {
@@ -46593,7 +47092,7 @@ function appendCirclesToMap(map, sizeData, out, styleSource) {
                 (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('pointer-events', null)
             })
             .on('interrupt', function (event, d) {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('r', setRadius(d))
+                (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('r', setRadius(d))
                 ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('pointer-events', null)
             })
     } else {
@@ -47226,7 +47725,7 @@ const legend = function (map, config) {
                         if (out.map.insetTemplates_) {
                             (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, highlightBivariateRegions, ecl1, ecl2)
                         }
-                        ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).raise() // raise legend square to avoid stroke issue
+                        (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).raise() // raise legend square to avoid stroke issue
                     })
                     .on('mouseout', function () {
                         unhighlightBivariateRegions(out.map)
@@ -49297,7 +49796,7 @@ function highlightLines(nodeId) {
 }
 
 function unhighlightLines() {
-    ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])('.em-flow-link, .em-flow-link-bundled').classed('highlighted', false).classed('dimmed', false)
+    (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])('.em-flow-link, .em-flow-link-bundled').classed('highlighted', false).classed('dimmed', false)
 }
 
 
@@ -49857,7 +50356,7 @@ const legend = function (map, config) {
                     }
                 })
                 .on('mouseout', function () {
-                    ;(0,_legend__WEBPACK_IMPORTED_MODULE_0__.unhighlightRegions)(out.map, ecl)
+                    (0,_legend__WEBPACK_IMPORTED_MODULE_0__.unhighlightRegions)(out.map, ecl)
                     if (out.map.insetTemplates_) {
                         (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(out.map.insetTemplates_, out.svgId_, _legend__WEBPACK_IMPORTED_MODULE_0__.unhighlightRegions, ecl)
                     }
@@ -50910,7 +51409,7 @@ const legend = function (map, config) {
                 ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
             })
             .on('mouseout', function () {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
+                (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
             })
     }
 
@@ -52026,7 +52525,7 @@ function applyMaxMinHighlight(map, ecl, id) {
         return
     }
 
-    ;(0,_legend_js__WEBPACK_IMPORTED_MODULE_3__.highlightRegions)(map, ecl)
+    (0,_legend_js__WEBPACK_IMPORTED_MODULE_3__.highlightRegions)(map, ecl)
     const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getLegendRegionsSelector)(map)
     map.svg_
         .selectAll(selector)
@@ -52555,7 +53054,7 @@ function unhighlightPatternFillRegions(map) {
             return !(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).classed('pattern-fill-overlay')
         })
         .each(function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('fill___'))
+            (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('fill___'))
         })
 }
 
@@ -53202,7 +53701,7 @@ const legend = function (map, config) {
     }
 
     function unhighlightSparkColors() {
-        ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])('.spark-line-segment, .spark-bar').style('opacity', null)
+        (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])('.spark-line-segment, .spark-bar').style('opacity', null)
     }
 
     /**
@@ -54773,7 +55272,7 @@ const legend = function (map, config) {
                     // position it below size legend ( + out.colorLegend.marginTop)
                     y += out._sizeLegendContainer.node().getBBox().height + out.colorLegend.marginTop
                 }
-                ;(0,_legend_discrete__WEBPACK_IMPORTED_MODULE_4__.drawDiscreteLegend)(out, x, y)
+                (0,_legend_discrete__WEBPACK_IMPORTED_MODULE_4__.drawDiscreteLegend)(out, x, y)
             } else if (!map.classifierColor_ && out.map.categoryFillStyle_ && out.colorLegend) {
                 // Size-only map (no color classifier configured) with extra categorical values
                 // mixed in (e.g. via IMAGE's "edit classification") - there's no numeric discrete
@@ -55463,7 +55962,7 @@ const tooltip = function (config) {
   \***************************************************************************/
 (module) {
 
-module.exports = "(()=>{\"use strict\";const t={dn:t=>{var n=Object.getOwnPropertyDescriptor(t,\"name\");(!n||!n.writable&&n.configurable)&&Object.defineProperty(t,\"name\",{value:\"default\",configurable:!0})}};var n={value:()=>{}};function r(){for(var t,n=0,r=arguments.length,i={};n<r;++n){if(!(t=arguments[n]+\"\")||t in i||/[\\s.]/.test(t))throw new Error(\"illegal type: \"+t);i[t]=[]}return new e(i)}function e(t){this._=t}function i(t,n){for(var r,e=0,i=t.length;e<i;++e)if((r=t[e]).name===n)return r.value}function o(t,r,e){for(var i=0,o=t.length;i<o;++i)if(t[i].name===r){t[i]=n,t=t.slice(0,i).concat(t.slice(i+1));break}return null!=e&&t.push({name:r,value:e}),t}e.prototype=r.prototype={constructor:e,on:function(t,n){var r,e,a=this._,u=(e=a,(t+\"\").trim().split(/^|\\s+/).map(function(t){var n=\"\",r=t.indexOf(\".\");if(r>=0&&(n=t.slice(r+1),t=t.slice(0,r)),t&&!e.hasOwnProperty(t))throw new Error(\"unknown type: \"+t);return{type:t,name:n}})),s=-1,l=u.length;if(!(arguments.length<2)){if(null!=n&&\"function\"!=typeof n)throw new Error(\"invalid callback: \"+n);for(;++s<l;)if(r=(t=u[s]).type)a[r]=o(a[r],t.name,n);else if(null==n)for(r in a)a[r]=o(a[r],t.name,null);return this}for(;++s<l;)if((r=(t=u[s]).type)&&(r=i(a[r],t.name)))return r},copy:function(){var t={},n=this._;for(var r in n)t[r]=n[r].slice();return new e(t)},call:function(t,n){if((r=arguments.length-2)>0)for(var r,e,i=new Array(r),o=0;o<r;++o)i[o]=arguments[o+2];if(!this._.hasOwnProperty(t))throw new Error(\"unknown type: \"+t);for(o=0,r=(e=this._[t]).length;o<r;++o)e[o].value.apply(n,i)},apply:function(t,n,r){if(!this._.hasOwnProperty(t))throw new Error(\"unknown type: \"+t);for(var e=this._[t],i=0,o=e.length;i<o;++i)e[i].value.apply(n,r)}};const a=r;var u,s,l=0,f=0,h=0,c=0,y=0,p=0,v=\"object\"==typeof performance&&performance.now?performance:Date,_=\"object\"==typeof window&&window.requestAnimationFrame?window.requestAnimationFrame.bind(window):function(t){setTimeout(t,17)};function d(){return y||(_(x),y=v.now()+p)}function x(){y=0}function g(){this._call=this._time=this._next=null}function w(t,n,r){var e=new g;return e.restart(t,n,r),e}function N(){y=(c=v.now())+p,l=f=0;try{!function(){d(),++l;for(var t,n=u;n;)(t=y-n._time)>=0&&n._call.call(void 0,t),n=n._next;--l}()}finally{l=0,function(){var t,n,r=u,e=1/0;for(;r;)r._call?(e>r._time&&(e=r._time),t=r,r=r._next):(n=r._next,r._next=null,r=t?t._next=n:u=n);s=t,A(e)}(),y=0}}function m(){var t=v.now(),n=t-c;n>1e3&&(p-=n,c=t)}function A(t){l||(f&&(f=clearTimeout(f)),t-y>24?(t<1/0&&(f=setTimeout(N,t-v.now()-p)),h&&(h=clearInterval(h))):(h||(c=v.now(),h=setInterval(m,1e3)),l=1,_(N)))}g.prototype=w.prototype={constructor:g,restart:function(t,n,r){if(\"function\"!=typeof t)throw new TypeError(\"callback is not a function\");r=(null==r?d():+r)+(null==n?0:+n),this._next||s===this||(s?s._next=this:u=this,s=this),this._call=t,this._time=r,A()},stop:function(){this._call&&(this._call=null,this._time=1/0,A())}},t.dn(E);const M=1664525,b=1013904223,k=4294967296;function E(){let t=1;return()=>(t=(M*t+b)%k)/k}t.dn(z);var O=10,q=Math.PI*(3-Math.sqrt(5));function z(t){var n,r=1,e=.001,i=1-Math.pow(e,1/300),o=0,u=.6,s=new Map,l=w(c),f=a(\"tick\",\"end\"),h=E();function c(){y(),f.call(\"tick\",n),r<e&&(l.stop(),f.call(\"end\",n))}function y(e){var a,l,f=t.length;void 0===e&&(e=1);for(var h=0;h<e;++h)for(r+=(o-r)*i,s.forEach(function(t){t(r)}),a=0;a<f;++a)null==(l=t[a]).fx?l.x+=l.vx*=u:(l.x=l.fx,l.vx=0),null==l.fy?l.y+=l.vy*=u:(l.y=l.fy,l.vy=0);return n}function p(){for(var n,r=0,e=t.length;r<e;++r){if((n=t[r]).index=r,null!=n.fx&&(n.x=n.fx),null!=n.fy&&(n.y=n.fy),isNaN(n.x)||isNaN(n.y)){var i=O*Math.sqrt(.5+r),o=r*q;n.x=i*Math.cos(o),n.y=i*Math.sin(o)}(isNaN(n.vx)||isNaN(n.vy))&&(n.vx=n.vy=0)}}function v(n){return n.initialize&&n.initialize(t,h),n}return null==t&&(t=[]),p(),n={tick:y,restart:function(){return l.restart(c),n},stop:function(){return l.stop(),n},nodes:function(r){return arguments.length?(t=r,p(),s.forEach(v),n):t},alpha:function(t){return arguments.length?(r=+t,n):r},alphaMin:function(t){return arguments.length?(e=+t,n):e},alphaDecay:function(t){return arguments.length?(i=+t,n):+i},alphaTarget:function(t){return arguments.length?(o=+t,n):o},velocityDecay:function(t){return arguments.length?(u=1-t,n):1-u},randomSource:function(t){return arguments.length?(h=t,s.forEach(v),n):h},force:function(t,r){return arguments.length>1?(null==r?s.delete(t):s.set(t,v(r)),n):s.get(t)},find:function(n,r,e){var i,o,a,u,s,l=0,f=t.length;for(null==e?e=1/0:e*=e,l=0;l<f;++l)(a=(i=n-(u=t[l]).x)*i+(o=r-u.y)*o)<e&&(s=u,e=a);return s},on:function(t,r){return arguments.length>1?(f.on(t,r),n):f.on(t)}}}function P(t){return function(){return t}}function D(t){var n,r,e,i=P(.1);function o(t){for(var i,o=0,a=n.length;o<a;++o)(i=n[o]).vx+=(e[o]-i.x)*r[o]*t}function a(){if(n){var o,a=n.length;for(r=new Array(a),e=new Array(a),o=0;o<a;++o)r[o]=isNaN(e[o]=+t(n[o],o,n))?0:+i(n[o],o,n)}}return\"function\"!=typeof t&&(t=P(null==t?0:+t)),o.initialize=function(t){n=t,a()},o.strength=function(t){return arguments.length?(i=\"function\"==typeof t?t:P(+t),a(),o):i},o.x=function(n){return arguments.length?(t=\"function\"==typeof n?n:P(+n),a(),o):t},o}function T(t){var n,r,e,i=P(.1);function o(t){for(var i,o=0,a=n.length;o<a;++o)(i=n[o]).vy+=(e[o]-i.y)*r[o]*t}function a(){if(n){var o,a=n.length;for(r=new Array(a),e=new Array(a),o=0;o<a;++o)r[o]=isNaN(e[o]=+t(n[o],o,n))?0:+i(n[o],o,n)}}return\"function\"!=typeof t&&(t=P(null==t?0:+t)),o.initialize=function(t){n=t,a()},o.strength=function(t){return arguments.length?(i=\"function\"==typeof t?t:P(+t),a(),o):i},o.y=function(n){return arguments.length?(t=\"function\"==typeof n?n:P(+n),a(),o):t},o}function j(t){const n=+this._x.call(null,t),r=+this._y.call(null,t);return F(this.cover(n,r),n,r,t)}function F(t,n,r,e){if(isNaN(n)||isNaN(r))return t;var i,o,a,u,s,l,f,h,c,y=t._root,p={data:e},v=t._x0,_=t._y0,d=t._x1,x=t._y1;if(!y)return t._root=p,t;for(;y.length;)if((l=n>=(o=(v+d)/2))?v=o:d=o,(f=r>=(a=(_+x)/2))?_=a:x=a,i=y,!(y=y[h=f<<1|l]))return i[h]=p,t;if(u=+t._x.call(null,y.data),s=+t._y.call(null,y.data),n===u&&r===s)return p.next=y,i?i[h]=p:t._root=p,t;do{i=i?i[h]=new Array(4):t._root=new Array(4),(l=n>=(o=(v+d)/2))?v=o:d=o,(f=r>=(a=(_+x)/2))?_=a:x=a}while((h=f<<1|l)==(c=(s>=a)<<1|u>=o));return i[c]=y,i[h]=p,t}function S(t,n){if(isNaN(t=+t)||isNaN(n=+n))return this;var r=this._x0,e=this._y0,i=this._x1,o=this._y1;if(isNaN(r))i=(r=Math.floor(t))+1,o=(e=Math.floor(n))+1;else{for(var a,u,s=i-r||1,l=this._root;r>t||t>=i||e>n||n>=o;)switch(u=(n<e)<<1|t<r,(a=new Array(4))[u]=l,l=a,s*=2,u){case 0:i=r+s,o=e+s;break;case 1:r=i-s,o=e+s;break;case 2:i=r+s,e=o-s;break;case 3:r=i-s,e=o-s}this._root&&this._root.length&&(this._root=l)}return this._x0=r,this._y0=e,this._x1=i,this._y1=o,this}function I(){var t=[];return this.visit(function(n){if(!n.length)do{t.push(n.data)}while(n=n.next)}),t}function X(t){return arguments.length?this.cover(+t[0][0],+t[0][1]).cover(+t[1][0],+t[1][1]):isNaN(this._x0)?void 0:[[this._x0,this._y0],[this._x1,this._y1]]}function Y(t,n,r,e,i){this.node=t,this.x0=n,this.y0=r,this.x1=e,this.y1=i}function C(t,n,r){var e,i,o,a,u,s,l,f=this._x0,h=this._y0,c=this._x1,y=this._y1,p=[],v=this._root;for(v&&p.push(new Y(v,f,h,c,y)),null==r?r=1/0:(f=t-r,h=n-r,c=t+r,y=n+r,r*=r);s=p.pop();)if(!(!(v=s.node)||(i=s.x0)>c||(o=s.y0)>y||(a=s.x1)<f||(u=s.y1)<h))if(v.length){var _=(i+a)/2,d=(o+u)/2;p.push(new Y(v[3],_,d,a,u),new Y(v[2],i,d,_,u),new Y(v[1],_,o,a,d),new Y(v[0],i,o,_,d)),(l=(n>=d)<<1|t>=_)&&(s=p[p.length-1],p[p.length-1]=p[p.length-1-l],p[p.length-1-l]=s)}else{var x=t-+this._x.call(null,v.data),g=n-+this._y.call(null,v.data),w=x*x+g*g;if(w<r){var N=Math.sqrt(r=w);f=t-N,h=n-N,c=t+N,y=n+N,e=v.data}}return e}function L(t){if(isNaN(o=+this._x.call(null,t))||isNaN(a=+this._y.call(null,t)))return this;var n,r,e,i,o,a,u,s,l,f,h,c,y=this._root,p=this._x0,v=this._y0,_=this._x1,d=this._y1;if(!y)return this;if(y.length)for(;;){if((l=o>=(u=(p+_)/2))?p=u:_=u,(f=a>=(s=(v+d)/2))?v=s:d=s,n=y,!(y=y[h=f<<1|l]))return this;if(!y.length)break;(n[h+1&3]||n[h+2&3]||n[h+3&3])&&(r=n,c=h)}for(;y.data!==t;)if(e=y,!(y=y.next))return this;return(i=y.next)&&delete y.next,e?(i?e.next=i:delete e.next,this):n?(i?n[h]=i:delete n[h],(y=n[0]||n[1]||n[2]||n[3])&&y===(n[3]||n[2]||n[1]||n[0])&&!y.length&&(r?r[c]=y:this._root=y),this):(this._root=i,this)}function R(){return this._root}function U(){var t=0;return this.visit(function(n){if(!n.length)do{++t}while(n=n.next)}),t}function B(t){var n,r,e,i,o,a,u=[],s=this._root;for(s&&u.push(new Y(s,this._x0,this._y0,this._x1,this._y1));n=u.pop();)if(!t(s=n.node,e=n.x0,i=n.y0,o=n.x1,a=n.y1)&&s.length){var l=(e+o)/2,f=(i+a)/2;(r=s[3])&&u.push(new Y(r,l,f,o,a)),(r=s[2])&&u.push(new Y(r,e,f,l,a)),(r=s[1])&&u.push(new Y(r,l,i,o,f)),(r=s[0])&&u.push(new Y(r,e,i,l,f))}return this}function G(t){var n,r=[],e=[];for(this._root&&r.push(new Y(this._root,this._x0,this._y0,this._x1,this._y1));n=r.pop();){var i=n.node;if(i.length){var o,a=n.x0,u=n.y0,s=n.x1,l=n.y1,f=(a+s)/2,h=(u+l)/2;(o=i[0])&&r.push(new Y(o,a,u,f,h)),(o=i[1])&&r.push(new Y(o,f,u,s,h)),(o=i[2])&&r.push(new Y(o,a,h,f,l)),(o=i[3])&&r.push(new Y(o,f,h,s,l))}e.push(n)}for(;n=e.pop();)t(n.node,n.x0,n.y0,n.x1,n.y1);return this}function H(t){return t[0]}function J(t){return arguments.length?(this._x=t,this):this._x}function K(t){return t[1]}function Q(t){return arguments.length?(this._y=t,this):this._y}function V(t,n,r){var e=new W(n??H,r??K,NaN,NaN,NaN,NaN);return null==t?e:e.addAll(t)}function W(t,n,r,e,i,o){this._x=t,this._y=n,this._x0=r,this._y0=e,this._x1=i,this._y1=o,this._root=void 0}function Z(t){for(var n={data:t.data},r=n;t=t.next;)r=r.next={data:t.data};return n}t.dn(P),t.dn(D),t.dn(T),t.dn(j),t.dn(S),t.dn(I),t.dn(X),t.dn(Y),t.dn(C),t.dn(L),t.dn(R),t.dn(U),t.dn(B),t.dn(G),t.dn(J),t.dn(Q);var $=V.prototype=W.prototype;function tt(t){return 1e-6*(t()-.5)}function nt(t){return t.x+t.vx}function rt(t){return t.y+t.vy}function et(t){var n,r,e,i=1,o=1;function a(){for(var t,a,s,l,f,h,c,y=n.length,p=0;p<o;++p)for(a=V(n,nt,rt).visitAfter(u),t=0;t<y;++t)s=n[t],h=r[s.index],c=h*h,l=s.x+s.vx,f=s.y+s.vy,a.visit(v);function v(t,n,r,o,a){var u=t.data,y=t.r,p=h+y;if(!u)return n>l+p||o<l-p||r>f+p||a<f-p;if(u.index>s.index){var v=l-u.x-u.vx,_=f-u.y-u.vy,d=v*v+_*_;d<p*p&&(0===v&&(d+=(v=tt(e))*v),0===_&&(d+=(_=tt(e))*_),d=(p-(d=Math.sqrt(d)))/d*i,s.vx+=(v*=d)*(p=(y*=y)/(c+y)),s.vy+=(_*=d)*p,u.vx-=v*(p=1-p),u.vy-=_*p)}}}function u(t){if(t.data)return t.r=r[t.data.index];for(var n=t.r=0;n<4;++n)t[n]&&t[n].r>t.r&&(t.r=t[n].r)}function s(){if(n){var e,i,o=n.length;for(r=new Array(o),e=0;e<o;++e)i=n[e],r[i.index]=+t(i,e,n)}}return\"function\"!=typeof t&&(t=P(null==t?1:+t)),a.initialize=function(t,r){n=t,e=r,s()},a.iterations=function(t){return arguments.length?(o=+t,a):o},a.strength=function(t){return arguments.length?(i=+t,a):i},a.radius=function(n){return arguments.length?(t=\"function\"==typeof n?n:P(+n),s(),a):t},a}$.copy=function(){var t,n,r=new W(this._x,this._y,this._x0,this._y0,this._x1,this._y1),e=this._root;if(!e)return r;if(!e.length)return r._root=Z(e),r;for(t=[{source:e,target:r._root=new Array(4)}];e=t.pop();)for(var i=0;i<4;++i)(n=e.source[i])&&(n.length?t.push({source:n,target:e.target[i]=new Array(4)}):e.target[i]=Z(n));return r},$.add=j,$.addAll=function(t){var n,r,e,i,o=t.length,a=new Array(o),u=new Array(o),s=1/0,l=1/0,f=-1/0,h=-1/0;for(r=0;r<o;++r)isNaN(e=+this._x.call(null,n=t[r]))||isNaN(i=+this._y.call(null,n))||(a[r]=e,u[r]=i,e<s&&(s=e),e>f&&(f=e),i<l&&(l=i),i>h&&(h=i));if(s>f||l>h)return this;for(this.cover(s,l).cover(f,h),r=0;r<o;++r)F(this,a[r],u[r],t[r]);return this},$.cover=S,$.data=I,$.extent=X,$.find=C,$.remove=L,$.removeAll=function(t){for(var n=0,r=t.length;n<r;++n)this.remove(t[n]);return this},$.root=R,$.size=U,$.visit=B,$.visitAfter=G,$.x=J,$.y=Q,t.dn(tt),t.dn(et),onmessage=t=>{const{nodes:n,radii:r,strengthX:e,strengthY:i,iterations:o,d3URL:a}=t.data;let u={forceSimulation:z,forceX:D,forceY:T,forceCollide:et};a&&(importScripts(a),u=self.d3);const s=n.map((t,n)=>(Number.isFinite(t.x)&&Number.isFinite(t.y)||(t.x=t.properties.centroid[0],t.y=t.properties.centroid[1]),t.r=r[n],t)),l=u.forceSimulation(s).force(\"x\",u.forceX(t=>t.properties.centroid[0]).strength(e)).force(\"y\",u.forceY(t=>t.properties.centroid[1]).strength(i)).force(\"collide\",u.forceCollide(t=>t.r).iterations(o)).stop(),f=Math.ceil(Math.log(l.alphaMin())/Math.log(1-l.alphaDecay()));for(let t=0;t<f;t++)l.tick(),t%10==0&&postMessage({type:\"progress\",progress:t,total:f});postMessage({type:\"end\",nodes:s}),self.close()}})();";
+module.exports = "(()=>{\"use strict\";var t={value:()=>{}};function n(){for(var t,n=0,r=arguments.length,i={};n<r;++n){if(!(t=arguments[n]+\"\")||t in i||/[\\s.]/.test(t))throw new Error(\"illegal type: \"+t);i[t]=[]}return new e(i)}function e(t){this._=t}function r(t,n){for(var e,r=0,i=t.length;r<i;++r)if((e=t[r]).name===n)return e.value}function i(n,e,r){for(var i=0,o=n.length;i<o;++i)if(n[i].name===e){n[i]=t,n=n.slice(0,i).concat(n.slice(i+1));break}return null!=r&&n.push({name:e,value:r}),n}e.prototype=n.prototype={constructor:e,on:function(t,n){var e,o,a=this._,u=(o=a,(t+\"\").trim().split(/^|\\s+/).map(function(t){var n=\"\",e=t.indexOf(\".\");if(e>=0&&(n=t.slice(e+1),t=t.slice(0,e)),t&&!o.hasOwnProperty(t))throw new Error(\"unknown type: \"+t);return{type:t,name:n}})),l=-1,f=u.length;if(!(arguments.length<2)){if(null!=n&&\"function\"!=typeof n)throw new Error(\"invalid callback: \"+n);for(;++l<f;)if(e=(t=u[l]).type)a[e]=i(a[e],t.name,n);else if(null==n)for(e in a)a[e]=i(a[e],t.name,null);return this}for(;++l<f;)if((e=(t=u[l]).type)&&(e=r(a[e],t.name)))return e},copy:function(){var t={},n=this._;for(var r in n)t[r]=n[r].slice();return new e(t)},call:function(t,n){if((e=arguments.length-2)>0)for(var e,r,i=new Array(e),o=0;o<e;++o)i[o]=arguments[o+2];if(!this._.hasOwnProperty(t))throw new Error(\"unknown type: \"+t);for(o=0,e=(r=this._[t]).length;o<e;++o)r[o].value.apply(n,i)},apply:function(t,n,e){if(!this._.hasOwnProperty(t))throw new Error(\"unknown type: \"+t);for(var r=this._[t],i=0,o=r.length;i<o;++i)r[i].value.apply(n,e)}};const o=n;var a,u,l=0,f=0,s=0,c=0,h=0,y=0,p=\"object\"==typeof performance&&performance.now?performance:Date,v=\"object\"==typeof window&&window.requestAnimationFrame?window.requestAnimationFrame.bind(window):function(t){setTimeout(t,17)};function d(){return h||(v(_),h=p.now()+y)}function _(){h=0}function g(){this._call=this._time=this._next=null}function x(t,n,e){var r=new g;return r.restart(t,n,e),r}function w(){h=(c=p.now())+y,l=f=0;try{!function(){d(),++l;for(var t,n=a;n;)(t=h-n._time)>=0&&n._call.call(void 0,t),n=n._next;--l}()}finally{l=0,function(){var t,n,e=a,r=1/0;for(;e;)e._call?(r>e._time&&(r=e._time),t=e,e=e._next):(n=e._next,e._next=null,e=t?t._next=n:a=n);u=t,b(r)}(),h=0}}function m(){var t=p.now(),n=t-c;n>1e3&&(y-=n,c=t)}function b(t){l||(f&&(f=clearTimeout(f)),t-h>24?(t<1/0&&(f=setTimeout(w,t-p.now()-y)),s&&(s=clearInterval(s))):(s||(c=p.now(),s=setInterval(m,1e3)),l=1,v(w)))}g.prototype=x.prototype={constructor:g,restart:function(t,n,e){if(\"function\"!=typeof t)throw new TypeError(\"callback is not a function\");e=(null==e?d():+e)+(null==n?0:+n),this._next||u===this||(u?u._next=this:a=this,u=this),this._call=t,this._time=e,b()},stop:function(){this._call&&(this._call=null,this._time=1/0,b())}},Object.defineProperty(j,\"name\",{value:\"default\",configurable:!0});const N=1664525,O=1013904223,P=4294967296;function j(){let t=1;return()=>(t=(N*t+O)%P)/P}Object.defineProperty(k,\"name\",{value:\"default\",configurable:!0});var A=10,M=Math.PI*(3-Math.sqrt(5));function k(t){var n,e=1,r=.001,i=1-Math.pow(r,1/300),a=0,u=.6,l=new Map,f=x(h),s=o(\"tick\",\"end\"),c=j();function h(){y(),s.call(\"tick\",n),e<r&&(f.stop(),s.call(\"end\",n))}function y(r){var o,f,s=t.length;void 0===r&&(r=1);for(var c=0;c<r;++c)for(e+=(a-e)*i,l.forEach(function(t){t(e)}),o=0;o<s;++o)null==(f=t[o]).fx?f.x+=f.vx*=u:(f.x=f.fx,f.vx=0),null==f.fy?f.y+=f.vy*=u:(f.y=f.fy,f.vy=0);return n}function p(){for(var n,e=0,r=t.length;e<r;++e){if((n=t[e]).index=e,null!=n.fx&&(n.x=n.fx),null!=n.fy&&(n.y=n.fy),isNaN(n.x)||isNaN(n.y)){var i=A*Math.sqrt(.5+e),o=e*M;n.x=i*Math.cos(o),n.y=i*Math.sin(o)}(isNaN(n.vx)||isNaN(n.vy))&&(n.vx=n.vy=0)}}function v(n){return n.initialize&&n.initialize(t,c),n}return null==t&&(t=[]),p(),n={tick:y,restart:function(){return f.restart(h),n},stop:function(){return f.stop(),n},nodes:function(e){return arguments.length?(t=e,p(),l.forEach(v),n):t},alpha:function(t){return arguments.length?(e=+t,n):e},alphaMin:function(t){return arguments.length?(r=+t,n):r},alphaDecay:function(t){return arguments.length?(i=+t,n):+i},alphaTarget:function(t){return arguments.length?(a=+t,n):a},velocityDecay:function(t){return arguments.length?(u=1-t,n):1-u},randomSource:function(t){return arguments.length?(c=t,l.forEach(v),n):c},force:function(t,e){return arguments.length>1?(null==e?l.delete(t):l.set(t,v(e)),n):l.get(t)},find:function(n,e,r){var i,o,a,u,l,f=0,s=t.length;for(null==r?r=1/0:r*=r,f=0;f<s;++f)(a=(i=n-(u=t[f]).x)*i+(o=e-u.y)*o)<r&&(l=u,r=a);return l},on:function(t,e){return arguments.length>1?(s.on(t,e),n):s.on(t)}}}function E(t){return function(){return t}}function q(t){var n,e,r,i=E(.1);function o(t){for(var i,o=0,a=n.length;o<a;++o)(i=n[o]).vx+=(r[o]-i.x)*e[o]*t}function a(){if(n){var o,a=n.length;for(e=new Array(a),r=new Array(a),o=0;o<a;++o)e[o]=isNaN(r[o]=+t(n[o],o,n))?0:+i(n[o],o,n)}}return\"function\"!=typeof t&&(t=E(null==t?0:+t)),o.initialize=function(t){n=t,a()},o.strength=function(t){return arguments.length?(i=\"function\"==typeof t?t:E(+t),a(),o):i},o.x=function(n){return arguments.length?(t=\"function\"==typeof n?n:E(+n),a(),o):t},o}function z(t){var n,e,r,i=E(.1);function o(t){for(var i,o=0,a=n.length;o<a;++o)(i=n[o]).vy+=(r[o]-i.y)*e[o]*t}function a(){if(n){var o,a=n.length;for(e=new Array(a),r=new Array(a),o=0;o<a;++o)e[o]=isNaN(r[o]=+t(n[o],o,n))?0:+i(n[o],o,n)}}return\"function\"!=typeof t&&(t=E(null==t?0:+t)),o.initialize=function(t){n=t,a()},o.strength=function(t){return arguments.length?(i=\"function\"==typeof t?t:E(+t),a(),o):i},o.y=function(n){return arguments.length?(t=\"function\"==typeof n?n:E(+n),a(),o):t},o}function T(t){const n=+this._x.call(null,t),e=+this._y.call(null,t);return D(this.cover(n,e),n,e,t)}function D(t,n,e,r){if(isNaN(n)||isNaN(e))return t;var i,o,a,u,l,f,s,c,h,y=t._root,p={data:r},v=t._x0,d=t._y0,_=t._x1,g=t._y1;if(!y)return t._root=p,t;for(;y.length;)if((f=n>=(o=(v+_)/2))?v=o:_=o,(s=e>=(a=(d+g)/2))?d=a:g=a,i=y,!(y=y[c=s<<1|f]))return i[c]=p,t;if(u=+t._x.call(null,y.data),l=+t._y.call(null,y.data),n===u&&e===l)return p.next=y,i?i[c]=p:t._root=p,t;do{i=i?i[c]=new Array(4):t._root=new Array(4),(f=n>=(o=(v+_)/2))?v=o:_=o,(s=e>=(a=(d+g)/2))?d=a:g=a}while((c=s<<1|f)==(h=(l>=a)<<1|u>=o));return i[h]=y,i[c]=p,t}function F(t,n){if(isNaN(t=+t)||isNaN(n=+n))return this;var e=this._x0,r=this._y0,i=this._x1,o=this._y1;if(isNaN(e))i=(e=Math.floor(t))+1,o=(r=Math.floor(n))+1;else{for(var a,u,l=i-e||1,f=this._root;e>t||t>=i||r>n||n>=o;)switch(u=(n<r)<<1|t<e,(a=new Array(4))[u]=f,f=a,l*=2,u){case 0:i=e+l,o=r+l;break;case 1:e=i-l,o=r+l;break;case 2:i=e+l,r=o-l;break;case 3:e=i-l,r=o-l}this._root&&this._root.length&&(this._root=f)}return this._x0=e,this._y0=r,this._x1=i,this._y1=o,this}function S(){var t=[];return this.visit(function(n){if(!n.length)do{t.push(n.data)}while(n=n.next)}),t}function I(t){return arguments.length?this.cover(+t[0][0],+t[0][1]).cover(+t[1][0],+t[1][1]):isNaN(this._x0)?void 0:[[this._x0,this._y0],[this._x1,this._y1]]}function X(t,n,e,r,i){this.node=t,this.x0=n,this.y0=e,this.x1=r,this.y1=i}function Y(t,n,e){var r,i,o,a,u,l,f,s=this._x0,c=this._y0,h=this._x1,y=this._y1,p=[],v=this._root;for(v&&p.push(new X(v,s,c,h,y)),null==e?e=1/0:(s=t-e,c=n-e,h=t+e,y=n+e,e*=e);l=p.pop();)if(!(!(v=l.node)||(i=l.x0)>h||(o=l.y0)>y||(a=l.x1)<s||(u=l.y1)<c))if(v.length){var d=(i+a)/2,_=(o+u)/2;p.push(new X(v[3],d,_,a,u),new X(v[2],i,_,d,u),new X(v[1],d,o,a,_),new X(v[0],i,o,d,_)),(f=(n>=_)<<1|t>=d)&&(l=p[p.length-1],p[p.length-1]=p[p.length-1-f],p[p.length-1-f]=l)}else{var g=t-+this._x.call(null,v.data),x=n-+this._y.call(null,v.data),w=g*g+x*x;if(w<e){var m=Math.sqrt(e=w);s=t-m,c=n-m,h=t+m,y=n+m,r=v.data}}return r}function C(t){if(isNaN(o=+this._x.call(null,t))||isNaN(a=+this._y.call(null,t)))return this;var n,e,r,i,o,a,u,l,f,s,c,h,y=this._root,p=this._x0,v=this._y0,d=this._x1,_=this._y1;if(!y)return this;if(y.length)for(;;){if((f=o>=(u=(p+d)/2))?p=u:d=u,(s=a>=(l=(v+_)/2))?v=l:_=l,n=y,!(y=y[c=s<<1|f]))return this;if(!y.length)break;(n[c+1&3]||n[c+2&3]||n[c+3&3])&&(e=n,h=c)}for(;y.data!==t;)if(r=y,!(y=y.next))return this;return(i=y.next)&&delete y.next,r?(i?r.next=i:delete r.next,this):n?(i?n[c]=i:delete n[c],(y=n[0]||n[1]||n[2]||n[3])&&y===(n[3]||n[2]||n[1]||n[0])&&!y.length&&(e?e[h]=y:this._root=y),this):(this._root=i,this)}function L(){return this._root}function R(){var t=0;return this.visit(function(n){if(!n.length)do{++t}while(n=n.next)}),t}function U(t){var n,e,r,i,o,a,u=[],l=this._root;for(l&&u.push(new X(l,this._x0,this._y0,this._x1,this._y1));n=u.pop();)if(!t(l=n.node,r=n.x0,i=n.y0,o=n.x1,a=n.y1)&&l.length){var f=(r+o)/2,s=(i+a)/2;(e=l[3])&&u.push(new X(e,f,s,o,a)),(e=l[2])&&u.push(new X(e,r,s,f,a)),(e=l[1])&&u.push(new X(e,f,i,o,s)),(e=l[0])&&u.push(new X(e,r,i,f,s))}return this}function B(t){var n,e=[],r=[];for(this._root&&e.push(new X(this._root,this._x0,this._y0,this._x1,this._y1));n=e.pop();){var i=n.node;if(i.length){var o,a=n.x0,u=n.y0,l=n.x1,f=n.y1,s=(a+l)/2,c=(u+f)/2;(o=i[0])&&e.push(new X(o,a,u,s,c)),(o=i[1])&&e.push(new X(o,s,u,l,c)),(o=i[2])&&e.push(new X(o,a,c,s,f)),(o=i[3])&&e.push(new X(o,s,c,l,f))}r.push(n)}for(;n=r.pop();)t(n.node,n.x0,n.y0,n.x1,n.y1);return this}function G(t){return t[0]}function H(t){return arguments.length?(this._x=t,this):this._x}function J(t){return t[1]}function K(t){return arguments.length?(this._y=t,this):this._y}function Q(t,n,e){var r=new V(n??G,e??J,NaN,NaN,NaN,NaN);return null==t?r:r.addAll(t)}function V(t,n,e,r,i,o){this._x=t,this._y=n,this._x0=e,this._y0=r,this._x1=i,this._y1=o,this._root=void 0}function W(t){for(var n={data:t.data},e=n;t=t.next;)e=e.next={data:t.data};return n}Object.defineProperty(E,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(q,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(z,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(T,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(F,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(S,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(I,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(X,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(Y,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(C,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(L,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(R,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(U,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(B,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(H,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(K,\"name\",{value:\"default\",configurable:!0});var Z=Q.prototype=V.prototype;function $(t){return 1e-6*(t()-.5)}function tt(t){return t.x+t.vx}function nt(t){return t.y+t.vy}function et(t){var n,e,r,i=1,o=1;function a(){for(var t,a,l,f,s,c,h,y=n.length,p=0;p<o;++p)for(a=Q(n,tt,nt).visitAfter(u),t=0;t<y;++t)l=n[t],c=e[l.index],h=c*c,f=l.x+l.vx,s=l.y+l.vy,a.visit(v);function v(t,n,e,o,a){var u=t.data,y=t.r,p=c+y;if(!u)return n>f+p||o<f-p||e>s+p||a<s-p;if(u.index>l.index){var v=f-u.x-u.vx,d=s-u.y-u.vy,_=v*v+d*d;_<p*p&&(0===v&&(_+=(v=$(r))*v),0===d&&(_+=(d=$(r))*d),_=(p-(_=Math.sqrt(_)))/_*i,l.vx+=(v*=_)*(p=(y*=y)/(h+y)),l.vy+=(d*=_)*p,u.vx-=v*(p=1-p),u.vy-=d*p)}}}function u(t){if(t.data)return t.r=e[t.data.index];for(var n=t.r=0;n<4;++n)t[n]&&t[n].r>t.r&&(t.r=t[n].r)}function l(){if(n){var r,i,o=n.length;for(e=new Array(o),r=0;r<o;++r)i=n[r],e[i.index]=+t(i,r,n)}}return\"function\"!=typeof t&&(t=E(null==t?1:+t)),a.initialize=function(t,e){n=t,r=e,l()},a.iterations=function(t){return arguments.length?(o=+t,a):o},a.strength=function(t){return arguments.length?(i=+t,a):i},a.radius=function(n){return arguments.length?(t=\"function\"==typeof n?n:E(+n),l(),a):t},a}Z.copy=function(){var t,n,e=new V(this._x,this._y,this._x0,this._y0,this._x1,this._y1),r=this._root;if(!r)return e;if(!r.length)return e._root=W(r),e;for(t=[{source:r,target:e._root=new Array(4)}];r=t.pop();)for(var i=0;i<4;++i)(n=r.source[i])&&(n.length?t.push({source:n,target:r.target[i]=new Array(4)}):r.target[i]=W(n));return e},Z.add=T,Z.addAll=function(t){var n,e,r,i,o=t.length,a=new Array(o),u=new Array(o),l=1/0,f=1/0,s=-1/0,c=-1/0;for(e=0;e<o;++e)isNaN(r=+this._x.call(null,n=t[e]))||isNaN(i=+this._y.call(null,n))||(a[e]=r,u[e]=i,r<l&&(l=r),r>s&&(s=r),i<f&&(f=i),i>c&&(c=i));if(l>s||f>c)return this;for(this.cover(l,f).cover(s,c),e=0;e<o;++e)D(this,a[e],u[e],t[e]);return this},Z.cover=F,Z.data=S,Z.extent=I,Z.find=Y,Z.remove=C,Z.removeAll=function(t){for(var n=0,e=t.length;n<e;++n)this.remove(t[n]);return this},Z.root=L,Z.size=R,Z.visit=U,Z.visitAfter=B,Z.x=H,Z.y=K,Object.defineProperty($,\"name\",{value:\"default\",configurable:!0}),Object.defineProperty(et,\"name\",{value:\"default\",configurable:!0}),onmessage=t=>{const{nodes:n,radii:e,strengthX:r,strengthY:i,iterations:o,d3URL:a}=t.data;let u={forceSimulation:k,forceX:q,forceY:z,forceCollide:et};a&&(importScripts(a),u=self.d3);const l=n.map((t,n)=>(Number.isFinite(t.x)&&Number.isFinite(t.y)||(t.x=t.properties.centroid[0],t.y=t.properties.centroid[1]),t.r=e[n],t)),f=u.forceSimulation(l).force(\"x\",u.forceX(t=>t.properties.centroid[0]).strength(r)).force(\"y\",u.forceY(t=>t.properties.centroid[1]).strength(i)).force(\"collide\",u.forceCollide(t=>t.r).iterations(o)).stop(),s=Math.ceil(Math.log(f.alphaMin())/Math.log(1-f.alphaDecay()));for(let t=0;t<s;t++)f.tick(),t%10==0&&postMessage({type:\"progress\",progress:t,total:s});postMessage({type:\"end\",nodes:l}),self.close()}})();";
 
 /***/ },
 
@@ -56673,6 +57172,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return x;
 }
@@ -56945,7 +57445,7 @@ function Rgb(r, g, b, opacity) {
   this.opacity = +opacity;
 }
 
-;(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Rgb, rgb, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(Color, {
+(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Rgb, rgb, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(Color, {
   brighter(k) {
     k = k == null ? brighter : Math.pow(brighter, k);
     return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
@@ -57043,7 +57543,7 @@ function Hsl(h, s, l, opacity) {
   this.opacity = +opacity;
 }
 
-;(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Hsl, hsl, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(Color, {
+(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Hsl, hsl, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(Color, {
   brighter(k) {
     k = k == null ? brighter : Math.pow(brighter, k);
     return new Hsl(this.h, this.s, this.l * k, this.opacity);
@@ -57110,6 +57610,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   extend: () => (/* binding */ extend)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(constructor, factory, prototype) {
   constructor.prototype = factory.prototype = prototype;
   prototype.constructor = constructor;
@@ -57186,7 +57687,7 @@ function Lab(l, a, b, opacity) {
   this.opacity = +opacity;
 }
 
-;(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Lab, lab, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(_color_js__WEBPACK_IMPORTED_MODULE_1__.Color, {
+(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Lab, lab, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(_color_js__WEBPACK_IMPORTED_MODULE_1__.Color, {
   brighter(k) {
     return new Lab(this.l + K * (k == null ? 1 : k), this.a, this.b, this.opacity);
   },
@@ -57254,7 +57755,7 @@ function hcl2lab(o) {
   return new Lab(o.l, Math.cos(h) * o.c, Math.sin(h) * o.c, o.opacity);
 }
 
-;(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Hcl, hcl, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(_color_js__WEBPACK_IMPORTED_MODULE_1__.Color, {
+(0,_define_js__WEBPACK_IMPORTED_MODULE_0__["default"])(Hcl, hcl, (0,_define_js__WEBPACK_IMPORTED_MODULE_0__.extend)(_color_js__WEBPACK_IMPORTED_MODULE_1__.Color, {
   brighter(k) {
     return new Hcl(this.h, this.c, this.l + K * (k == null ? 1 : k), this.opacity);
   },
@@ -57395,6 +57896,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   yesdrag: () => (/* binding */ yesdrag)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _noevent_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./noevent.js */ "./node_modules/d3-drag/src/noevent.js");
 
@@ -57442,6 +57944,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   nonpassivecapture: () => (/* binding */ nonpassivecapture),
 /* harmony export */   nopropagation: () => (/* binding */ nopropagation)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 // These are typically used in conjunction with noevent to ensure that we can
 // preventDefault on the event.
 const nonpassive = {passive: false};
@@ -57501,6 +58004,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 var EOL = {},
     EOF = {},
     QUOTE = 34,
@@ -57795,6 +58299,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function responseJson(response) {
   if (!response.ok) throw new Error(response.status + " " + response.statusText);
   if (response.status === 204 || response.status === 205) return;
@@ -57818,6 +58323,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function responseText(response) {
   if (!response.ok) throw new Error(response.status + " " + response.statusText);
   return response.text();
@@ -57840,6 +58346,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_quadtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-quadtree */ "./node_modules/d3-quadtree/src/quadtree.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
 /* harmony import */ var _jiggle_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./jiggle.js */ "./node_modules/d3-force/src/jiggle.js");
@@ -57957,6 +58464,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function() {
     return x;
@@ -57976,6 +58484,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(random) {
   return (random() - 0.5) * 1e-6;
 }
@@ -57993,6 +58502,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 // https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
 const a = 1664525;
 const c = 1013904223;
@@ -58016,6 +58526,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
 /* harmony import */ var _jiggle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./jiggle.js */ "./node_modules/d3-force/src/jiggle.js");
 
@@ -58149,6 +58660,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_quadtree__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-quadtree */ "./node_modules/d3-quadtree/src/quadtree.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
 /* harmony import */ var _jiggle_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./jiggle.js */ "./node_modules/d3-force/src/jiggle.js");
@@ -58285,6 +58797,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   x: () => (/* binding */ x),
 /* harmony export */   y: () => (/* binding */ y)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_dispatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-dispatch */ "./node_modules/d3-dispatch/src/dispatch.js");
 /* harmony import */ var d3_timer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-timer */ "./node_modules/d3-timer/src/timer.js");
 /* harmony import */ var _lcg_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lcg.js */ "./node_modules/d3-force/src/lcg.js");
@@ -58458,6 +58971,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
 
 
@@ -58514,6 +59028,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-force/src/constant.js");
 
 
@@ -58605,6 +59120,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _formatDecimal_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./formatDecimal.js */ "./node_modules/d3-format/src/formatDecimal.js");
 
 
@@ -58626,6 +59142,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   formatDecimalParts: () => (/* binding */ formatDecimalParts)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return Math.abs(x = Math.round(x)) >= 1e21
       ? x.toLocaleString("en").replace(/,/g, "")
@@ -58660,6 +59177,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(grouping, thousands) {
   return function(value, width) {
     var i = value.length,
@@ -58692,6 +59210,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(numerals) {
   return function(value) {
     return value.replace(/[0-9]/g, function(i) {
@@ -58714,6 +59233,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   prefixExponent: () => (/* binding */ prefixExponent)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _formatDecimal_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./formatDecimal.js */ "./node_modules/d3-format/src/formatDecimal.js");
 
 
@@ -58745,6 +59265,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _formatDecimal_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./formatDecimal.js */ "./node_modules/d3-format/src/formatDecimal.js");
 
 
@@ -58833,6 +59354,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 // Trims insignificant zeros, e.g., replaces 1.2000k with 1.2k.
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(s) {
   out: for (var n = s.length, i = 1, i0 = -1, i1; i < n; ++i) {
@@ -58894,6 +59416,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return x;
 }
@@ -58911,6 +59434,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _exponent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./exponent.js */ "./node_modules/d3-format/src/exponent.js");
 /* harmony import */ var _formatGroup_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./formatGroup.js */ "./node_modules/d3-format/src/formatGroup.js");
 /* harmony import */ var _formatNumerals_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./formatNumerals.js */ "./node_modules/d3-format/src/formatNumerals.js");
@@ -59081,6 +59605,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _exponent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./exponent.js */ "./node_modules/d3-format/src/exponent.js");
 
 
@@ -59101,6 +59626,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _exponent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./exponent.js */ "./node_modules/d3-format/src/exponent.js");
 
 
@@ -59121,6 +59647,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _exponent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./exponent.js */ "./node_modules/d3-format/src/exponent.js");
 
 
@@ -59196,6 +59723,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/fsum.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
 /* harmony import */ var _noop_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./noop.js */ "./node_modules/d3-geo/src/noop.js");
@@ -59358,6 +59886,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   circleStream: () => (/* binding */ circleStream),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./cartesian.js */ "./node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-geo/src/constant.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
@@ -59556,6 +60085,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _noop_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../noop.js */ "./node_modules/d3-geo/src/noop.js");
 
 
@@ -59595,6 +60125,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../cartesian.js */ "./node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _circle_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../circle.js */ "./node_modules/d3-geo/src/circle.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo/src/math.js");
@@ -59791,6 +60322,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _buffer_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./buffer.js */ "./node_modules/d3-geo/src/clip/buffer.js");
 /* harmony import */ var _rejoin_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./rejoin.js */ "./node_modules/d3-geo/src/clip/rejoin.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo/src/math.js");
@@ -59941,6 +60473,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b, x0, y0, x1, y1) {
   var ax = a[0],
       ay = a[1],
@@ -60201,6 +60734,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _pointEqual_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../pointEqual.js */ "./node_modules/d3-geo/src/pointEqual.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo/src/math.js");
 
@@ -60320,6 +60854,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
 
   function compose(x, y) {
@@ -60346,6 +60881,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function() {
     return x;
@@ -60488,6 +61024,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (x => x);
+(Object.getOwnPropertyDescriptor(__WEBPACK_DEFAULT_EXPORT__, "name") || {}).writable || Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 
 
 /***/ },
@@ -60877,6 +61414,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _identity_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../identity.js */ "./node_modules/d3-geo/src/identity.js");
 /* harmony import */ var _stream_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../stream.js */ "./node_modules/d3-geo/src/stream.js");
 /* harmony import */ var _area_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./area.js */ "./node_modules/d3-geo/src/path/area.js");
@@ -60909,7 +61447,7 @@ __webpack_require__.r(__webpack_exports__);
   }
 
   path.area = function(object) {
-    ;(0,_stream_js__WEBPACK_IMPORTED_MODULE_1__["default"])(object, projectionStream(_area_js__WEBPACK_IMPORTED_MODULE_2__["default"]));
+    (0,_stream_js__WEBPACK_IMPORTED_MODULE_1__["default"])(object, projectionStream(_area_js__WEBPACK_IMPORTED_MODULE_2__["default"]));
     return _area_js__WEBPACK_IMPORTED_MODULE_2__["default"].result();
   };
 
@@ -61137,6 +61675,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
 
 
@@ -61157,6 +61696,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/fsum.js");
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./cartesian.js */ "./node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
@@ -61357,6 +61897,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _clip_rectangle_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../clip/rectangle.js */ "./node_modules/d3-geo/src/clip/rectangle.js");
 /* harmony import */ var _identity_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../identity.js */ "./node_modules/d3-geo/src/identity.js");
 /* harmony import */ var _transform_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../transform.js */ "./node_modules/d3-geo/src/transform.js");
@@ -61664,6 +62205,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   orthographicRaw: () => (/* binding */ orthographicRaw)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo/src/math.js");
 /* harmony import */ var _azimuthal_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./azimuthal.js */ "./node_modules/d3-geo/src/projection/azimuthal.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-geo/src/projection/index.js");
@@ -61696,6 +62238,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _cartesian_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../cartesian.js */ "./node_modules/d3-geo/src/cartesian.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../math.js */ "./node_modules/d3-geo/src/math.js");
 /* harmony import */ var _transform_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../transform.js */ "./node_modules/d3-geo/src/transform.js");
@@ -61816,6 +62359,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   rotateRadians: () => (/* binding */ rotateRadians)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _compose_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./compose.js */ "./node_modules/d3-geo/src/compose.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
 
@@ -61911,6 +62455,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function streamGeometry(geometry, stream) {
   if (geometry && streamGeometryType.hasOwnProperty(geometry.type)) {
     streamGeometryType[geometry.type](geometry, stream);
@@ -61995,6 +62540,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   transformer: () => (/* binding */ transformer)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(methods) {
   return {
     stream: transformer(methods)
@@ -62036,6 +62582,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   genericArray: () => (/* binding */ genericArray)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _value_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./value.js */ "./node_modules/d3-interpolate/src/value.js");
 /* harmony import */ var _numberArray_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./numberArray.js */ "./node_modules/d3-interpolate/src/numberArray.js");
 
@@ -62075,6 +62622,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   basis: () => (/* binding */ basis),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function basis(t1, v0, v1, v2, v3) {
   var t2 = t1 * t1, t3 = t2 * t1;
   return ((1 - 3 * t1 + 3 * t2 - t3) * v0
@@ -62108,6 +62656,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _basis_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./basis.js */ "./node_modules/d3-interpolate/src/basis.js");
 
 
@@ -62183,6 +62732,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (x => () => x);
+(Object.getOwnPropertyDescriptor(__WEBPACK_DEFAULT_EXPORT__, "name") || {}).writable || Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 
 
 /***/ },
@@ -62197,6 +62747,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
   var d = new Date;
   return a = +a, b = +b, function(t) {
@@ -62249,6 +62800,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
   return a = +a, b = +b, function(t) {
     return a * (1 - t) + b * t;
@@ -62269,6 +62821,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   isNumberArray: () => (/* binding */ isNumberArray)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
   if (!b) b = [];
   var n = a ? Math.min(b.length, a.length) : 0,
@@ -62297,6 +62850,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _value_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./value.js */ "./node_modules/d3-interpolate/src/value.js");
 
 
@@ -62436,6 +62990,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
   return a = +a, b = +b, function(t) {
     return Math.round(a * (1 - t) + b * t);
@@ -62455,6 +63010,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _number_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./number.js */ "./node_modules/d3-interpolate/src/number.js");
 
 
@@ -62535,6 +63091,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   identity: () => (/* binding */ identity)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 var degrees = 180 / Math.PI;
 
 var identity = {
@@ -62689,6 +63246,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-color */ "./node_modules/d3-color/src/color.js");
 /* harmony import */ var _rgb_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./rgb.js */ "./node_modules/d3-interpolate/src/rgb.js");
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./array.js */ "./node_modules/d3-interpolate/src/array.js");
@@ -62992,6 +63550,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   addAll: () => (/* binding */ addAll),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(d) {
   const x = +this._x.call(null, d),
       y = +this._y.call(null, d);
@@ -63090,6 +63649,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x, y) {
   if (isNaN(x = +x) || isNaN(y = +y)) return this; // ignore invalid points
 
@@ -63147,6 +63707,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   var data = [];
   this.visit(function(node) {
@@ -63168,6 +63729,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(_) {
   return arguments.length
       ? this.cover(+_[0][0], +_[0][1]).cover(+_[1][0], +_[1][1])
@@ -63187,6 +63749,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _quad_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quad.js */ "./node_modules/d3-quadtree/src/quad.js");
 
 
@@ -63272,6 +63835,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(node, x0, y0, x1, y1) {
   this.node = node;
   this.x0 = x0;
@@ -63393,6 +63957,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   removeAll: () => (/* binding */ removeAll)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(d) {
   if (isNaN(x = +this._x.call(null, d)) || isNaN(y = +this._y.call(null, d))) return this; // ignore invalid points
 
@@ -63469,6 +64034,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   return this._root;
 }
@@ -63486,6 +64052,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   var size = 0;
   this.visit(function(node) {
@@ -63507,6 +64074,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _quad_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quad.js */ "./node_modules/d3-quadtree/src/quad.js");
 
 
@@ -63538,6 +64106,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _quad_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quad.js */ "./node_modules/d3-quadtree/src/quad.js");
 
 
@@ -63575,6 +64144,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   defaultX: () => (/* binding */ defaultX)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function defaultX(d) {
   return d[0];
 }
@@ -63597,6 +64167,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   defaultY: () => (/* binding */ defaultY)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function defaultY(d) {
   return d[1];
 }
@@ -63618,6 +64189,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(specifier) {
   var n = specifier.length / 6 | 0, colors = new Array(n), i = 0;
   while (i < n) colors[i] = "#" + specifier.slice(i * 6, ++i * 6);
@@ -63641,6 +64213,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (scheme => (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_0__.rgbBasis)(scheme[scheme.length - 1]));
+(Object.getOwnPropertyDescriptor(__WEBPACK_DEFAULT_EXPORT__, "name") || {}).writable || Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 
 
 /***/ },
@@ -64700,6 +65273,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function() {
     return x;
@@ -64719,6 +65293,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _creator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./creator.js */ "./node_modules/d3-selection/src/creator.js");
 /* harmony import */ var _select_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./select.js */ "./node_modules/d3-selection/src/select.js");
 
@@ -64741,6 +65316,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _namespace_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./namespace.js */ "./node_modules/d3-selection/src/namespace.js");
 /* harmony import */ var _namespaces_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./namespaces.js */ "./node_modules/d3-selection/src/namespaces.js");
 
@@ -64783,6 +65359,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   childMatcher: () => (/* binding */ childMatcher),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
   return function() {
     return this.matches(selector);
@@ -64809,6 +65386,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _namespaces_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./namespaces.js */ "./node_modules/d3-selection/src/namespaces.js");
 
 
@@ -64855,6 +65433,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sourceEvent_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sourceEvent.js */ "./node_modules/d3-selection/src/sourceEvent.js");
 
 
@@ -64890,6 +65469,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _selection_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./selection/index.js */ "./node_modules/d3-selection/src/selection/index.js");
 
 
@@ -64912,6 +65492,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./array.js */ "./node_modules/d3-selection/src/array.js");
 /* harmony import */ var _selection_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./selection/index.js */ "./node_modules/d3-selection/src/selection/index.js");
 
@@ -64936,6 +65517,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _creator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../creator.js */ "./node_modules/d3-selection/src/creator.js");
 
 
@@ -64959,6 +65541,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _namespace_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../namespace.js */ "./node_modules/d3-selection/src/namespace.js");
 
 
@@ -65031,6 +65614,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   var callback = arguments[0];
   arguments[0] = this;
@@ -65051,6 +65635,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function classArray(string) {
   return string.trim().split(/^|\s+/);
 }
@@ -65140,6 +65725,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function selection_cloneShallow() {
   var clone = this.cloneNode(false), parent = this.parentNode;
   return parent ? parent.insertBefore(clone, this.nextSibling) : clone;
@@ -65167,6 +65753,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _enter_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./enter.js */ "./node_modules/d3-selection/src/selection/enter.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../constant.js */ "./node_modules/d3-selection/src/constant.js");
@@ -65312,6 +65899,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(value) {
   return arguments.length
       ? this.property("__data__", value)
@@ -65331,6 +65919,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _window_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../window.js */ "./node_modules/d3-selection/src/window.js");
 
 
@@ -65380,6 +65969,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(callback) {
 
   for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
@@ -65404,6 +65994,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   return !this.node();
 }
@@ -65422,6 +66013,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   EnterNode: () => (/* binding */ EnterNode),
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sparse_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sparse.js */ "./node_modules/d3-selection/src/selection/sparse.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 
@@ -65460,6 +66052,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _sparse_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sparse.js */ "./node_modules/d3-selection/src/selection/sparse.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 
@@ -65482,6 +66075,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _matcher_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../matcher.js */ "./node_modules/d3-selection/src/matcher.js");
 
@@ -65514,6 +66108,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function htmlRemove() {
   this.innerHTML = "";
 }
@@ -65693,6 +66288,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _creator_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../creator.js */ "./node_modules/d3-selection/src/creator.js");
 /* harmony import */ var _selector_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selector.js */ "./node_modules/d3-selection/src/selector.js");
 
@@ -65723,6 +66319,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function* __WEBPACK_DEFAULT_EXPORT__() {
   for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
     for (var group = groups[j], i = 0, n = group.length, node; i < n; ++i) {
@@ -65744,6 +66341,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(onenter, onupdate, onexit) {
   var enter = this.enter(), update = this, exit = this.exit();
   if (typeof onenter === "function") {
@@ -65773,6 +66371,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function lower() {
   if (this.previousSibling) this.parentNode.insertBefore(this, this.parentNode.firstChild);
 }
@@ -65794,6 +66393,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 
 
@@ -65828,6 +66428,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
 
   for (var groups = this._groups, j = 0, m = groups.length; j < m; ++j) {
@@ -65853,6 +66454,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   return Array.from(this);
 }
@@ -65870,6 +66472,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function contextListener(listener) {
   return function(event) {
     listener.call(this, event, this.__data__);
@@ -65951,6 +66554,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
 
   for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
@@ -65978,6 +66582,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function propertyRemove(name) {
   return function() {
     delete this[name];
@@ -66020,6 +66625,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function raise() {
   if (this.nextSibling) this.parentNode.appendChild(this);
 }
@@ -66041,6 +66647,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function remove() {
   var parent = this.parentNode;
   if (parent) parent.removeChild(this);
@@ -66063,6 +66670,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _selector_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../selector.js */ "./node_modules/d3-selection/src/selector.js");
 
@@ -66096,6 +66704,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../array.js */ "./node_modules/d3-selection/src/array.js");
 /* harmony import */ var _selectorAll_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../selectorAll.js */ "./node_modules/d3-selection/src/selectorAll.js");
@@ -66138,6 +66747,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _matcher_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../matcher.js */ "./node_modules/d3-selection/src/matcher.js");
 
 
@@ -66171,6 +66781,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _matcher_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../matcher.js */ "./node_modules/d3-selection/src/matcher.js");
 
 
@@ -66204,6 +66815,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__() {
   let size = 0;
   for (const node of this) ++size; // eslint-disable-line no-unused-vars
@@ -66223,6 +66835,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-selection/src/selection/index.js");
 
 
@@ -66262,6 +66875,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(update) {
   return new Array(update.length);
 }
@@ -66280,6 +66894,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   styleValue: () => (/* binding */ styleValue)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _window_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../window.js */ "./node_modules/d3-selection/src/window.js");
 
 
@@ -66330,6 +66945,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function textRemove() {
   this.textContent = "";
 }
@@ -66369,6 +66985,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function none() {}
 
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(selector) {
@@ -66390,6 +67007,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function empty() {
   return [];
 }
@@ -66413,6 +67031,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(event) {
   let sourceEvent;
   while (sourceEvent = event.sourceEvent) event = sourceEvent;
@@ -66432,6 +67051,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(node) {
   return (node.ownerDocument && node.ownerDocument.defaultView) // node is a Node
       || (node.document && node) // node is a Window
@@ -66451,6 +67071,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-shape/src/math.js");
 /* harmony import */ var _path_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./path.js */ "./node_modules/d3-shape/src/path.js");
@@ -66736,6 +67357,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./array.js */ "./node_modules/d3-shape/src/array.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _curve_linear_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./curve/linear.js */ "./node_modules/d3-shape/src/curve/linear.js");
@@ -66869,6 +67491,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   slice: () => (/* binding */ slice)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 var slice = Array.prototype.slice;
 
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
@@ -66890,6 +67513,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(x) {
   return function constant() {
     return x;
@@ -66911,6 +67535,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   point: () => (/* binding */ point)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function point(that, x, y) {
   that._context.bezierCurveTo(
     (2 * that._x0 + that._x1) / 3,
@@ -67047,6 +67672,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function Linear(context) {
   this._context = context;
 }
@@ -67092,6 +67718,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
   return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
 }
@@ -67109,6 +67736,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(d) {
   return d;
 }
@@ -67126,6 +67754,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./array.js */ "./node_modules/d3-shape/src/array.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _curve_linear_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./curve/linear.js */ "./node_modules/d3-shape/src/curve/linear.js");
@@ -67249,6 +67878,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(series, order) {
   if (!((n = series.length) > 1)) return;
   for (var i = 1, j, s0, s1 = series[order[0]], n, m = s1.length; i < n; ++i) {
@@ -67272,6 +67902,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(series) {
   var n = series.length, o = new Array(n);
   while (--n >= 0) o[n] = n;
@@ -67325,6 +67956,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./array.js */ "./node_modules/d3-shape/src/array.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _descending_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./descending.js */ "./node_modules/d3-shape/src/descending.js");
@@ -67446,6 +68078,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _array_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./array.js */ "./node_modules/d3-shape/src/array.js");
 /* harmony import */ var _constant_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./constant.js */ "./node_modules/d3-shape/src/constant.js");
 /* harmony import */ var _offset_none_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./offset/none.js */ "./node_modules/d3-shape/src/offset/none.js");
@@ -68008,6 +68641,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _timer_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./timer.js */ "./node_modules/d3-timer/src/timer.js");
 
 
@@ -68161,6 +68795,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _transition_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./transition/index.js */ "./node_modules/d3-transition/src/transition/index.js");
 /* harmony import */ var _transition_schedule_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./transition/schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
@@ -68222,6 +68857,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _transition_schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./transition/schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68281,6 +68917,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _interrupt_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interrupt.js */ "./node_modules/d3-transition/src/interrupt.js");
 
 
@@ -68303,6 +68940,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _transition_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../transition/index.js */ "./node_modules/d3-transition/src/transition/index.js");
 /* harmony import */ var _transition_schedule_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../transition/schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 /* harmony import */ var d3_ease__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-ease */ "./node_modules/d3-ease/src/cubic.js");
@@ -68363,6 +69001,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/transform/index.js");
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/namespace.js");
 /* harmony import */ var _tween_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tween.js */ "./node_modules/d3-transition/src/transition/tween.js");
@@ -68459,6 +69098,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/namespace.js");
 
 
@@ -68518,6 +69158,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68529,7 +69170,7 @@ function delayFunction(id, value) {
 
 function delayConstant(id, value) {
   return value = +value, function() {
-    ;(0,_schedule_js__WEBPACK_IMPORTED_MODULE_0__.init)(this, id).delay = value;
+    (0,_schedule_js__WEBPACK_IMPORTED_MODULE_0__.init)(this, id).delay = value;
   };
 }
 
@@ -68556,6 +69197,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68567,7 +69209,7 @@ function durationFunction(id, value) {
 
 function durationConstant(id, value) {
   return value = +value, function() {
-    ;(0,_schedule_js__WEBPACK_IMPORTED_MODULE_0__.set)(this, id).duration = value;
+    (0,_schedule_js__WEBPACK_IMPORTED_MODULE_0__.set)(this, id).duration = value;
   };
 }
 
@@ -68594,6 +69236,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68625,6 +69268,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68654,6 +69298,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68698,6 +69343,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/matcher.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-transition/src/transition/index.js");
 
@@ -68840,6 +69486,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-color */ "./node_modules/d3-color/src/color.js");
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/number.js");
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/string.js");
@@ -68868,6 +69515,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-transition/src/transition/index.js");
 
 
@@ -68902,6 +69550,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -68949,6 +69598,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function removeFunction(id) {
   return function() {
     var parent = this.parentNode;
@@ -68984,6 +69634,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   init: () => (/* binding */ init),
 /* harmony export */   set: () => (/* binding */ set)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_dispatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-dispatch */ "./node_modules/d3-dispatch/src/dispatch.js");
 /* harmony import */ var d3_timer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-timer */ "./node_modules/d3-timer/src/timer.js");
 /* harmony import */ var d3_timer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-timer */ "./node_modules/d3-timer/src/timeout.js");
@@ -69091,7 +69742,7 @@ function create(node, id, self) {
     // Note the transition may be canceled after start and before the first tick!
     // Note this must be scheduled before the start event; see d3/d3-transition#16!
     // Assuming this is successful, subsequent callbacks go straight to tick.
-    ;(0,d3_timer__WEBPACK_IMPORTED_MODULE_2__["default"])(function() {
+    (0,d3_timer__WEBPACK_IMPORTED_MODULE_2__["default"])(function() {
       if (self.state === STARTED) {
         self.state = RUNNING;
         self.timer.restart(tick, self.delay, self.time);
@@ -69154,6 +69805,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selector.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-transition/src/transition/index.js");
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
@@ -69193,6 +69845,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selectorAll.js");
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-transition/src/transition/index.js");
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
@@ -69236,6 +69889,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selection/index.js");
 
 
@@ -69258,6 +69912,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/transform/index.js");
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selection/style.js");
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
@@ -69357,6 +70012,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function styleInterpolate(name, i, priority) {
   return function(t) {
     this.style.setProperty(name, i.call(this, t), priority);
@@ -69395,6 +70051,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _tween_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./tween.js */ "./node_modules/d3-transition/src/transition/tween.js");
 
 
@@ -69430,6 +70087,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function textInterpolate(i) {
   return function(t) {
     this.textContent = i.call(this, t);
@@ -69468,6 +70126,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.js */ "./node_modules/d3-transition/src/transition/index.js");
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
@@ -69509,6 +70168,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   tweenValue: () => (/* binding */ tweenValue)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _schedule_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./schedule.js */ "./node_modules/d3-transition/src/transition/schedule.js");
 
 
@@ -69606,6 +70266,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (x => () => x);
+(Object.getOwnPropertyDescriptor(__WEBPACK_DEFAULT_EXPORT__, "name") || {}).writable || Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 
 
 /***/ },
@@ -69670,6 +70331,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__),
 /* harmony export */   nopropagation: () => (/* binding */ nopropagation)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 function nopropagation(event) {
   event.stopImmediatePropagation();
 }
@@ -69759,6 +70421,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var d3_dispatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-dispatch */ "./node_modules/d3-dispatch/src/dispatch.js");
 /* harmony import */ var d3_drag__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-drag */ "./node_modules/d3-drag/src/nodrag.js");
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/zoom.js");
@@ -70028,7 +70691,7 @@ function defaultConstrain(transform, extent, translateExtent) {
       g.start();
     }
 
-    ;(0,_noevent_js__WEBPACK_IMPORTED_MODULE_9__["default"])(event);
+    (0,_noevent_js__WEBPACK_IMPORTED_MODULE_9__["default"])(event);
     g.wheel = setTimeout(wheelidled, wheelDelay);
     g.zoom("mouse", constrain(translate(scale(t, k), g.mouse[0], g.mouse[1]), g.extent, translateExtent));
 
@@ -70262,9 +70925,7 @@ function createStore(dbName, storeName) {
             // It seems like Safari sometimes likes to just close the connection.
             // It's supposed to fire this event when that happens. Let's hope it does!
             db.onclose = () => (dbp = undefined);
-        }, () => {
-            dbp = undefined;
-        });
+        }, () => { });
         return dbp;
     };
     return (txMode, callback) => getDB().then((db) => callback(db.transaction(storeName, txMode).objectStore(storeName)));
@@ -70333,17 +70994,15 @@ function update(key, updater, customStore = defaultGetStore()) {
     // If I try to chain promises, the transaction closes in browsers
     // that use a promise polyfill (IE10/11).
     new Promise((resolve, reject) => {
-        const req = store.get(key);
-        req.onsuccess = function () {
+        store.get(key).onsuccess = function () {
             try {
-                store.put(updater(req.result), key);
+                store.put(updater(this.result), key);
                 resolve(promisifyRequest(store.transaction));
             }
             catch (err) {
                 reject(err);
             }
         };
-        req.onerror = () => reject(req.error);
     }));
 }
 /**
@@ -70436,7 +71095,7 @@ function entries(customStore = defaultGetStore()) {
             ]).then(([keys, values]) => keys.map((key, i) => [key, values[i]]));
         }
         const items = [];
-        return eachCursor(store, (cursor) => items.push([cursor.key, cursor.value])).then(() => items);
+        return customStore('readonly', (store) => eachCursor(store, (cursor) => items.push([cursor.key, cursor.value])).then(() => items));
     });
 }
 
@@ -70529,10 +71188,11 @@ function keyof(value) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ r)
+/* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-// jsonstat-toolkit v1.6.0 Copyright 2025 Xavier Badosa https://jsonstat.com
-function t(i,r){var l,s,o,a,u=function(t,i,r){if(0===Object.entries(t).length)return null;var l,s=[];if(r&&!n(r.name)&&(r=null),"string"==typeof t&&(t=[t]),Array.isArray(t)||e(t)){if(t.length===i)return r&&-1===t.findIndex((function(t){return null==t}))?r.from(t):t;if(1===t.length){for(l=0;l<i;l++)s.push(t[0]);return s}}for(l=0;l<i;l++){var o=void 0===t[l]?null:t[l];s.push(o)}return s};if(this.length=0,this.id=[],null!=i)switch(this.class=i.class||"bundle",this.class){case"bundle":var h=[],f=0;if(this.error=null,this.length=0,null===i||"object"!=typeof i)return void(this.class=null);if(i.hasOwnProperty("error"))return void(this.error=i.error);if("dataset"===i.class||"collection"===i.class||"dimension"===i.class)return new t(i);for(s in i)f++,h.push(s);this.__tree__=i,this.length=f,this.id=h;break;case"dataset":i.hasOwnProperty("__tree__")?this.__tree__=l=i.__tree__:this.__tree__=l=i,this.label=l.label||null,this.note=l.note||null,this.link=l.link||null,this.href=l.href||null,this.updated=l.updated||null,this.source=l.source||null,this.extension=l.extension||null;var c,d=0,v=l.size||l.dimension&&l.dimension.size;if(this.size=v,this.value=l.hasOwnProperty("value")&&null!==l.value&&0!==l.value.length?l.value:{},Array.isArray(this.value)||e(this.value))d=this.value.length;else{var y=1;for(c=v.length;c--;)y*=v[c];d=y}if(this.value=u(this.value,d,r),this.status=l.hasOwnProperty("status")&&null!==l.status?u(l.status,d):null,l.hasOwnProperty("dimension")){var p=l.dimension,g=l.role||!l.version&&p.role||null,b=l.id||p.id,m=v.length,_=function(t){g.hasOwnProperty(t)||(g[t]=null)};if(!Array.isArray(b)||!Array.isArray(v)||b.length!=m)return;if(this.length=m,this.id=b,g&&(_("time"),_("geo"),_("metric"),_("classification")),g&&null===g.classification){var x=[],O=["time","geo","metric"],A=function(t,e){for(var n=e.length;n--;)if(t===e[n])return!0;return!1};for(c=0;c<3;c++){var w=g[O[c]];null!==w&&(x=x.concat(w))}for(g.classification=[],c=0;c<m;c++)A(b[c],x)||g.classification.push(b[c]);0===g.classification.length&&(g.classification=null)}this.role=g,this.n=d;for(var j=0,k=this.length;j<k;j++)if(p[b[j]].category.hasOwnProperty("index")){if(Array.isArray(p[b[j]].category.index)){var D={},P=p[b[j]].category.index;for(o=P.length,a=0;a<o;a++)D[P[a]]=a;p[b[j]].category.index=D}}else{var E=0;for(s in p[b[j]].category.index={},p[b[j]].category.label)p[b[j]].category.index[s]=E++}}else this.length=0;break;case"dimension":if(!i.hasOwnProperty("__tree__"))return new t({version:"2.0",class:"dataset",dimension:{d:i},id:["d"],size:[function(t){var e=void 0===t.index?t.label:t.index;return Array.isArray(e)?e.length:Object.keys(e).length}(i.category)],value:[null]}).Dimension(0);var z=[],S=(l=i.__tree__).category;if(!l.hasOwnProperty("category"))return;if(!S.hasOwnProperty("label"))for(s in S.label={},S.index)S.label[s]=s;for(s in S.index)z[S.index[s]]=s;this.__tree__=l,this.label=l.label||null,this.note=l.note||null,this.link=l.link||null,this.href=l.href||null,this.id=z,this.length=z.length,this.role=i.role,this.hierarchy=S.hasOwnProperty("child"),this.extension=l.extension||null;break;case"category":var C=i.child;this.id=C,this.length=null===C?0:C.length,this.index=i.index,this.label=i.label,this.note=i.note||null,this.unit=i.unit,this.coordinates=i.coord;break;case"collection":if(this.length=0,this.label=i.label||null,this.note=i.note||null,this.link=i.link||null,this.href=i.href||null,this.updated=i.updated||null,this.source=i.source||null,this.extension=i.extension||null,null!==this.link&&i.link.item){var I=i.link.item;if(this.length=Array.isArray(I)?I.length:0,this.length)for(a=0;a<this.length;a++)this.id[a]=I[a].href}}}function e(t){return"[object ArrayBuffer]"===Object.prototype.toString.call(t.buffer)}function n(t){return-1!==["Int8Array","Uint8Array","Uint8ClampedArray","Int16Array","Uint16Array","Int32Array","Uint32Array","Float32Array","Float64Array","BigInt64Array","BigUint64Array"].indexOf(t)}function i(t){if(!t.ok)throw new Error(t.status+" "+t.statusText);return t.json()}function r(e,n,r){var l="object"==typeof n?n:null;return"function"!=typeof r&&(r=null),r||"function"!=typeof n||(r=n),"object"==typeof e?new t(e,r):"version"===e?"1.6.0":fetch?fetch(e,l).then(i).then((function(e){return new t(e,r)})):void 0}t.prototype.Item=function(t){if(null===this||"collection"!==this.class||!this.length)return null;if("number"==typeof t)return t>this.length||t<0?null:this.link.item[t];var e,n=[];if("object"==typeof t){if(!t.class&&!t.follow)return null;t.class&&(e="dataset"===t.class&&"boolean"==typeof t.embedded?!0===t.embedded?function(t,e,i){var r=t.link.item[e];i.class===r.class&&r.id&&r.size&&r.dimension&&n.push(r)}:function(t,e,i){var r=t.link.item[e];i.class!==r.class||r.id&&r.size&&r.dimension||n.push(r)}:function(t,e,i){i.class===t.link.item[e].class&&n.push(t.link.item[e])})}else e=function(t,e){n.push(t.link.item[e])};for(var i=0;i<this.length;i++)e(this,i,t);return n},t.prototype.Dataset=function(e){if(null===this)return null;if("dataset"===this.class)return void 0!==e?this:[this];var n,i=[],r=0;if("collection"===this.class){var l=this.Item({class:"dataset",embedded:!0});if(void 0===e){for(n=l.length;r<n;r++)i.push(new t(l[r]));return i}if("number"==typeof e&&e>=0&&e<l.length)return new t(l[e]);if("string"==typeof e)for(n=l.length;r<n;r++)if(l[r].href===e)return new t(l[r]);return null}if("bundle"!==this.class)return null;if(void 0===e){for(n=this.id.length;r<n;r++)i.push(this.Dataset(this.id[r]));return i}if("number"==typeof e){var s=this.id[e];return void 0!==s?this.Dataset(s):null}var o=this.__tree__[e];return void 0===o?null:new t({class:"dataset",__tree__:o})},t.prototype.Dimension=function(e,n){n="boolean"!=typeof n||n;var i,r=[],l=this.id.length,s=function(t,e){if(null!==t)for(var n in t)for(var i=null!==t[n]?t[n].length:0;i--;)if(t[n][i]===e)return n;return null};if(null===this||"dataset"!==this.class)return null;if(void 0===e){for(i=0;i<l;i++)r.push(this.Dimension(this.id[i]));return r}if("number"==typeof e){var o=this.id[e];return void 0!==o?this.Dimension(o,n):null}var a=this.role;if("object"==typeof e){if(e.hasOwnProperty("role")){for(i=0;i<l;i++){var u=this.id[i];s(a,u)===e.role&&r.push(this.Dimension(u,n))}return void 0===r[0]?null:r}return null}var h=this.__tree__.dimension;if(void 0===h)return null;var f=h[e];return void 0===f?null:n?new t({class:"dimension",__tree__:f,role:s(a,e)}):function(t,e){var n=[];for(var i in t)n[t[i]]=e[i];return n}(f.category.index,f.category.label)},t.prototype.Category=function(e){if(null===this||"dimension"!==this.class)return null;if(void 0===e){for(var n=[],i=0,r=this.id.length;i<r;i++)n.push(this.Category(this.id[i]));return n}if("number"==typeof e){var l=this.id[e];return void 0!==l?this.Category(l):null}var s=this.__tree__.category;if(void 0===s)return null;var o=s.index[e];if(void 0===o)return null;var a=s.unit&&s.unit[e]||null,u=s.coordinates&&s.coordinates[e]||null,h=s.child&&s.child[e]||null,f=s.note&&s.note[e]||null;return new t({class:"category",index:o,label:s.label[e],note:f,child:h,unit:a,coord:u})},t.prototype.Dice=function(n,i,r){var l,s,o,a,u=function(t,e){return t.hasOwnProperty(e)&&!!t[e]};if(null===this||"dataset"!==this.class||null===this.value)return null;if("object"!=typeof n)return this;"object"!=typeof i?("boolean"==typeof i&&!0===i&&(l=!0),"boolean"==typeof r&&!0===r||(r=!1)):(l=u(i,"clone"),r=u(i,"drop"),s=u(i,"stringify"),o=u(i,"ovalue"),a=u(i,"ostatus"));var h,f=this.value,c=l?new t(JSON.parse(JSON.stringify(this))):this,d=c.status,v=[],y=[],p=function(t,e){var n,i,r,l=(n=t,i=e,r={},Array.isArray(n[i])?(n[i].forEach((function(t,e){null!==t&&(r[String(e)]=t)})),r):n[i]);delete t[e],t[e]=l};Array.isArray(n)&&(n=function(t){var e={};return t.forEach((function(t){e[t[0]]=t[1]})),e}(n)),null===n&&(n={});var g=Object.keys(n);return g.length>0&&(g.forEach((function(t){var e=n[t];Array.isArray(e)||(n[t]=[e]),0===n[t].length&&delete n[t]})),r&&(n=function(t){var e={};return Object.keys(t).forEach((function(n){e[n]=c.Dimension(n).id.filter((function(e){return-1===t[n].indexOf(e)}))})),e}(n)),c.toTable({type:"arrobj",content:"id",status:!0}).forEach((function(t,e){var i=[];g.forEach((function(e){var r=n[e],l=[];r.forEach((function(n){l.push(t[e]===n)})),i.push(-1!==l.indexOf(!0))})),-1===i.indexOf(!1)&&(v.push(t.value),y.push(t.status))})),g.forEach((function(t){var e=c.Dimension(t).id,i=0,r={};c.size[c.id.indexOf(t)]=n[t].length,e.forEach((function(e){-1!==n[t].indexOf(e)&&(r[e]=i,i++)})),c.__tree__.dimension[t].category.index=r})),c.n=v.length,c.value=c.__tree__.value=e(f)?function(t,e){return e.from(t)}(v,f.constructor):v,c.status=c.__tree__.status=null!==d?y:null),s?((h=c.__tree__).hasOwnProperty("id")||(h.version="2.0",h.hasOwnProperty("class")||(h.class="dataset"),h.id=h.dimension.id,h.size=h.dimension.size,delete h.dimension.id,delete h.dimension.size,h.dimension.hasOwnProperty("role")&&(h.role=h.dimension.role,delete h.dimension.role)),h.hasOwnProperty("status")&&-1!==["null","{}","[]"].indexOf(JSON.stringify(h.status))&&delete h.status,h.hasOwnProperty("role")&&(delete h.role.classification,["geo","time","metric"].forEach((function(t){null===h.role[t]&&delete h.role[t]}))),o&&p(h,"value"),a&&h.hasOwnProperty("status")&&p(h,"status"),JSON.stringify(h)):c},t.prototype.Slice=function(t){if(null===this||"dataset"!==this.class||0===Object.entries(this.value).length)return null;if(void 0===t)return this;if(!Array.isArray(t)){var e,n=[];for(e in t)n.push([e,t[e]]);t=n}return this.Dice(t.map((function(t){return[t[0],[t[1]]]})))},t.prototype.Data=function(t,e){var n,i,r=[],l=function(t){for(var e in t)if(t.hasOwnProperty(e))return e};if(null===this||"dataset"!==this.class||null===this.value)return null;if(void 0===t){for(i=this.value.length,n=0;n<i;n++)r.push(this.Data(n));return r}if("boolean"!=typeof e&&(e=!0),"number"==typeof t){var s=this.value[t];return void 0===s?null:e?{value:s,status:this.status?this.status[t]:null}:s}var o="object",a=this.__tree__,u=a.size||a.dimension&&a.dimension.size,h=u.length;if(Array.isArray(t)){if(!Array.isArray(t[0])){if(this.length!==t.length)return null;var f=1,c=0,d=[],v=[];for(n=0;n<h;n++)if(void 0!==t[n]){if("number"!=typeof t[n]||t[n]>=u[n])return null;c+=(f*=n>0?u[h-n]:1)*t[h-n-1]}else d.push(n),v.push(u[n]);if(d.length>1)return null;if(1===d.length){for(var y=0,p=v[0];y<p;y++){var g=[];for(n=0;n<h;n++)n!==d[0]?g.push(t[n]):g.push(y);r.push(this.Data(g,e))}return r}return e?{value:this.value[c],status:this.status?this.status[c]:null}:this.value[c]}o="array"}var b=function(t,e,n){var i,r=[],s={},o=t.dimension,a=t.id||o.id,u=t.size||o&&o.size;if("array"===n){for(i=e.length;i--;)s[e[i][0]]=e[i][1];e=s}for(var h=0,f=a.length;h<f;h++){var c=a[h],d=e[c];r.push("string"==typeof d?d:1===u[h]?l(o[c].category.index):null)}return r}(a,t,o),m=[],_=a.dimension,x=a.id||_.id;for(n=0,i=b.length;n<i;n++)m.push(_[x[n]].category.index[b[n]]);return this.Data(m,e)},t.prototype.toTable=function(t,e){if(null===this||"dataset"!==this.class||null===this.value)return null;1==arguments.length&&"function"==typeof t&&(e=t,t=null),"arrobj"!==(t=t||{field:"label",content:"label",vlabel:"Value",slabel:"Status",type:"array",status:!1,unit:!1,by:null,prefix:"",drop:[],meta:!1,comma:!1,bylabel:!1}).type&&"objarr"!==t.type||void 0!==t.field||(t.field="id");var i,r,l,s,o,a,u,h,f,c="id"===t.field,d=function(t){return(c?"value":t)||"Value"},v=function(t){return(c?"status":t)||"Status"},y=this.__tree__,p=!0===t.status;if("function"==typeof e){i=this.toTable(t);var g=[],b="array"!==t.type?0:1;for(o=(V="object"!==t.type?i.slice(b):i.rows.slice(0)).length,r=0;r<o;r++){var m=e.call(this,V[r],r);void 0!==m&&g.push(m)}return"object"===t.type?{cols:i.cols,rows:g}:("array"===t.type&&g.unshift(i[0]),g)}if("arrobj"===t.type||"objarr"===t.type){var _=[],x=y.role&&y.role.metric,O=function(){},A={},w=this,j=w.id,k=t.by&&-1!==j.indexOf(t.by)?t.by:null,D=!0===t.meta,P=void 0!==t.drop&&Array.isArray(t.drop)?t.drop:[],E=!0===t.comma,z=!0===t.bylabel,S=w.value.constructor,C=function(e){var i,r={},l=d(t.vlabel);if("objarr"===t.type&&(i=null===k&&n(S.name)?function(t){r[t]=t===l?S.from(e,(function(e){return e[t]})):e.map((function(e){return e[t]}))}:function(t){r[t]=e.map((function(e){return e[t]}))},Object.keys(e[0]).forEach(i),e=r),D){r={};return j.forEach((function(t){var e=w.Dimension(t);r[t]={label:e.label,role:e.role,categories:{id:e.id,label:w.Dimension(t,!1)}}})),{meta:{label:w.label,source:w.source,updated:w.updated,id:j,status:p,unit:t.unit,by:k,bylabel:z,drop:null!==k&&P.length>0?P:null,prefix:null!==k?q||"":null,comma:E,dimensions:r},data:e}}return e};k&&(t.field="id");var I=(i=this.toTable({field:t.field,vlabel:t.vlabel,slabel:t.slabel,content:t.content,status:p})).shift();if(null===k&&t.unit&&x){if("id"!==t.content)for(var U=x.length;U--;){var T=this.Dimension(x[U]);A[x[U]]={};for(var J=T.length;J--;)A[x[U]][T.Category(J).label]=T.id[J]}O=function(e,n){if(-1!==x.indexOf(e)){var i=y.dimension[e].category;i.unit?N.unit=i.unit["id"!==t.content?A[e][n]:n]:N.unit=null}},t.unit=!0}else t.unit=!1;for(o=i.length,r=0;r<o;r++){var N={};for(l=i[r].length;l--;)N[I[l]]=i[r][l],O(I[l],i[r][l]);_.push(N)}if(E&&_.forEach((function(t){null!==t.value&&(t.value=(""+t.value).replace(".",","))})),null!==k){var B,F={},V=[],M={},q=void 0!==t.prefix?t.prefix:"";P.forEach((function(t,e){(!w.Dimension(t)||w.Dimension(t).length>1)&&(P[e]="")}));var G=j.filter((function(t){return t!==k&&-1===P.indexOf(t)})),H=w.Dimension(k);for(var K in"id"!==t.content?z?B=function(t,e,n){t[e][q+n[k]]=n.value}:(H.Category().forEach((function(t,e){M[t.label]=H.id[e]})),B=function(t,e,n){t[e][q+M[n[k]]]=n.value}):B=function(t,e,n){t[e][q+n[k]]=n.value},_.forEach((function(t){var e=function(t,e){var n=[];return e.forEach((function(e){n.push(t[e])})),n.join("\t")}(t,G);void 0===F[e]&&(F[e]=function(t,e){var n={};return e.forEach((function(e){n[e]=t[e]})),n}(t,G)),B(F,e,t,k)})),F)V.push(F[K]);return p=!1,C(V)}return C(_)}if("object"===t.type){var L="number"==typeof this.value[0]||null===this.value[0]?"number":"string";a=function(t,e){var n=c&&t||e||t;it.push({id:t,label:n,type:"string"})},u=function(t,e,n){var i=d(t),r=v(e);n&&it.push({id:"status",label:r,type:"string"}),it.push({id:"value",label:i,type:L})},h=function(t){yt.push({v:t})},f=function(t){yt.push({v:t}),rt.push({c:yt})}}else a=function(t,e){var n=c&&t||e||t;it.push(n)},u=function(t,e,n){var i=d(t),r=v(e);n&&it.push(r),it.push(i),nt.push(it)},h=function(t){yt.push(t)},f=function(t){yt.push(t),nt.push(yt)};var Q=y.dimension,R=y.id||Q.id,W=y.size||Q.size,X=R.length;if(X!=W.length)return!1;var Y=[],Z=1,$=(U=1,[]),tt=[],et=[],nt=[],it=[],rt=[];for(r=0;r<X;r++){var lt=R[r];a(lt,Q[lt].label),Z*=W[r],U*=W[r];var st=[];for(l=0;l<W[r];l++)for(var ot in Q[R[r]].category.index)if(Q[R[r]].category.index[ot]===l){var at="id"!==t.content&&Q[R[r]].category.label?Q[R[r]].category.label[ot]:ot;st.push(at)}Y.push(st),$.push(U)}for(u(t.vlabel,t.slabel,p),o=Y.length,r=0;r<o;r++){for(var ut=[],ht=0,ft=Y[r].length;ht<ft;ht++)for(var ct=0;ct<Z/$[r];ct++)ut.push(Y[r][ht]);tt.push(ut)}for(o=tt.length,r=0;r<o;r++){var dt=[],vt=0;for(s=0;s<Z;s++)dt.push(tt[r][vt]),++vt===tt[r].length&&(vt=0);et.push(dt)}for(s=0;s<Z;s++){var yt=[];o=tt.length;for(var pt=0;pt<o;pt++)h(et[pt][s]);p&&h(this.status?this.status[s]:null),f(this.value[s])}return"object"===t.type?{cols:it,rows:rt}:nt},t.prototype.node=function(){return this.__tree__},t.prototype.toString=function(){return this.class},t.prototype.Unflatten=function(t){if(null===this||"dataset"!==this.class||null===this.value||"function"!=typeof t)return null;const e=this.id,n=this.size,i=[];for(let r=0;r<this.n;r++){const l=this.Data(r),s={};let o=r;for(let t=e.length-1;t>=0;t--){const e=this.Dimension(t),i=this.id[t],r=n[t],l=o%r;e.Category(l);const a=e.id[l];o=Math.floor(o/r),s[i]=a}const a=t(s,l,r,i);void 0!==a&&i.push(a)}return i};
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
+// jsonstat-toolkit v1.3.1 Copyright 2021 Xavier Badosa https://jsonstat.com
+function t(e){var n,i,r,l,s=function(t,e){var n,i=[];if("string"==typeof t&&(t=[t]),Array.isArray(t)){if(t.length===e)return t;if(1===t.length){for(n=0;n<e;n++)i.push(t[0]);return i}}for(n=0;n<e;n++){var r=void 0===t[n]?null:t[n];i.push(r)}return i};if(this.length=0,this.id=[],null!=e)switch(this.class=e.class||"bundle",this.class){case"bundle":var a=[],o=0;if(this.error=null,this.length=0,null===e||"object"!=typeof e)return void(this.class=null);if(e.hasOwnProperty("error"))return void(this.error=e.error);if("dataset"===e.class||"collection"===e.class||"dimension"===e.class)return new t(e);for(i in e)o++,a.push(i);this.__tree__=e,this.length=o,this.id=a;break;case"dataset":e.hasOwnProperty("__tree__")?this.__tree__=n=e.__tree__:this.__tree__=n=e,this.label=n.label||null,this.note=n.note||null,this.link=n.link||null,this.href=n.href||null,this.updated=n.updated||null,this.source=n.source||null,this.extension=n.extension||null;var u,h=0,f=n.size||n.dimension&&n.dimension.size;if(this.size=f,this.value=n.hasOwnProperty("value")&&null!==n.value&&0!==n.value.length?n.value:{},Array.isArray(this.value))h=this.value.length;else{var c=1;for(u=f.length;u--;)c*=f[u];h=c}if(this.value=s(this.value,h),this.status=n.hasOwnProperty("status")?s(n.status,h):null,n.hasOwnProperty("dimension")){var d=n.dimension,v=n.role||!n.version&&d.role||null,p=n.id||d.id,y=f.length,g=function(t){v.hasOwnProperty(t)||(v[t]=null)};if(!Array.isArray(p)||!Array.isArray(f)||p.length!=y)return;if(this.length=y,this.id=p,v&&(g("time"),g("geo"),g("metric"),g("classification")),v&&null===v.classification){var b=[],_=["time","geo","metric"],m=function(t,e){for(var n=e.length;n--;)if(t===e[n])return!0;return!1};for(u=0;u<3;u++){var x=v[_[u]];null!==x&&(b=b.concat(x))}for(v.classification=[],u=0;u<y;u++)m(p[u],b)||v.classification.push(p[u]);0===v.classification.length&&(v.classification=null)}this.role=v,this.n=h;for(var w=0,O=this.length;w<O;w++)if(d[p[w]].category.hasOwnProperty("index")){if(Array.isArray(d[p[w]].category.index)){var A={},k=d[p[w]].category.index;for(r=k.length,l=0;l<r;l++)A[k[l]]=l;d[p[w]].category.index=A}}else{var D=0;for(i in d[p[w]].category.index={},d[p[w]].category.label)d[p[w]].category.index[i]=D++}}else this.length=0;break;case"dimension":if(!e.hasOwnProperty("__tree__"))return new t({version:"2.0",class:"dataset",dimension:{d:e},id:["d"],size:[function(t){var e=void 0===t.index?t.label:t.index;return Array.isArray(e)?e.length:Object.keys(e).length}(e.category)],value:[null]}).Dimension(0);var j=[],P=(n=e.__tree__).category;if(!n.hasOwnProperty("category"))return;if(!P.hasOwnProperty("label"))for(i in P.label={},P.index)P.label[i]=i;for(i in P.index)j[P.index[i]]=i;this.__tree__=n,this.label=n.label||null,this.note=n.note||null,this.link=n.link||null,this.href=n.href||null,this.id=j,this.length=j.length,this.role=e.role,this.hierarchy=P.hasOwnProperty("child"),this.extension=n.extension||null;break;case"category":var E=e.child;this.id=E,this.length=null===E?0:E.length,this.index=e.index,this.label=e.label,this.note=e.note||null,this.unit=e.unit,this.coordinates=e.coord;break;case"collection":if(this.length=0,this.label=e.label||null,this.note=e.note||null,this.link=e.link||null,this.href=e.href||null,this.updated=e.updated||null,this.source=e.source||null,this.extension=e.extension||null,null!==this.link&&e.link.item){var z=e.link.item;if(this.length=Array.isArray(z)?z.length:0,this.length)for(l=0;l<this.length;l++)this.id[l]=z[l].href}}}function e(t){if(!t.ok)throw new Error(t.status+" "+t.statusText);return t.json()}t.prototype.Item=function(t){if(null===this||"collection"!==this.class||!this.length)return null;if("number"==typeof t)return t>this.length||t<0?null:this.link.item[t];var e,n=[];if("object"==typeof t){if(!t.class&&!t.follow)return null;t.class&&(e="dataset"===t.class&&"boolean"==typeof t.embedded?!0===t.embedded?function(t,e,i){var r=t.link.item[e];i.class===r.class&&r.id&&r.size&&r.dimension&&n.push(r)}:function(t,e,i){var r=t.link.item[e];i.class!==r.class||r.id&&r.size&&r.dimension||n.push(r)}:function(t,e,i){i.class===t.link.item[e].class&&n.push(t.link.item[e])})}else e=function(t,e){n.push(t.link.item[e])};for(var i=0;i<this.length;i++)e(this,i,t);return n},t.prototype.Dataset=function(e){if(null===this)return null;if("dataset"===this.class)return void 0!==e?this:[this];var n,i=[],r=0;if("collection"===this.class){var l=this.Item({class:"dataset",embedded:!0});if(void 0===e){for(n=l.length;r<n;r++)i.push(new t(l[r]));return i}if("number"==typeof e&&e>=0&&e<l.length)return new t(l[e]);if("string"==typeof e)for(n=l.length;r<n;r++)if(l[r].href===e)return new t(l[r]);return null}if("bundle"!==this.class)return null;if(void 0===e){for(n=this.id.length;r<n;r++)i.push(this.Dataset(this.id[r]));return i}if("number"==typeof e){var s=this.id[e];return void 0!==s?this.Dataset(s):null}var a=this.__tree__[e];return void 0===a?null:new t({class:"dataset",__tree__:a})},t.prototype.Dimension=function(e,n){n="boolean"!=typeof n||n;var i,r=[],l=this.id.length,s=function(t,e){if(null!==t)for(var n in t)for(var i=null!==t[n]?t[n].length:0;i--;)if(t[n][i]===e)return n;return null};if(null===this||"dataset"!==this.class)return null;if(void 0===e){for(i=0;i<l;i++)r.push(this.Dimension(this.id[i]));return r}if("number"==typeof e){var a=this.id[e];return void 0!==a?this.Dimension(a,n):null}var o=this.role;if("object"==typeof e){if(e.hasOwnProperty("role")){for(i=0;i<l;i++){var u=this.id[i];s(o,u)===e.role&&r.push(this.Dimension(u,n))}return void 0===r[0]?null:r}return null}var h=this.__tree__.dimension;if(void 0===h)return null;var f=h[e];return void 0===f?null:n?new t({class:"dimension",__tree__:f,role:s(o,e)}):function(t,e){var n=[];for(var i in t)n[t[i]]=e[i];return n}(f.category.index,f.category.label)},t.prototype.Category=function(e){if(null===this||"dimension"!==this.class)return null;if(void 0===e){for(var n=[],i=0,r=this.id.length;i<r;i++)n.push(this.Category(this.id[i]));return n}if("number"==typeof e){var l=this.id[e];return void 0!==l?this.Category(l):null}var s=this.__tree__.category;if(void 0===s)return null;var a=s.index[e];if(void 0===a)return null;var o=s.unit&&s.unit[e]||null,u=s.coordinates&&s.coordinates[e]||null,h=s.child&&s.child[e]||null,f=s.note&&s.note[e]||null;return new t({class:"category",index:a,label:s.label[e],note:f,child:h,unit:o,coord:u})},t.prototype.Dice=function(e,n,i){var r,l,s,a,o=function(t,e){return t.hasOwnProperty(e)&&!!t[e]};if(null===this||"dataset"!==this.class)return null;if("object"!=typeof e)return this;"object"!=typeof n?("boolean"==typeof n&&!0===n&&(r=!0),"boolean"==typeof i&&!0===i||(i=!1)):(r=o(n,"clone"),i=o(n,"drop"),l=o(n,"stringify"),s=o(n,"ovalue"),a=o(n,"ostatus"));var u,h=r?new t(JSON.parse(JSON.stringify(this))):this,f=h.status,c=[],d=[],v=function(t,e){var n,i,r,l=(n=t,i=e,r={},"[object Array]"===Object.prototype.toString.call(n[i])?(n[i].forEach((function(t,e){null!==t&&(r[String(e)]=t)})),r):n[i]);delete t[e],t[e]=l};Array.isArray(e)&&(e=function(t){var e={};return t.forEach((function(t){e[t[0]]=t[1]})),e}(e)),null===e&&(e={});var p=Object.keys(e);return p.length>0&&(p.forEach((function(t){var n=e[t];Array.isArray(n)||(e[t]=[n]),0===e[t].length&&delete e[t]})),i&&(e=function(t){var e={};return Object.keys(t).forEach(n=>e[n]=h.Dimension(n).id.filter(e=>-1===t[n].indexOf(e))),e}(e)),h.toTable({type:"arrobj",content:"id",status:!0}).forEach((function(t,n){var i=[];p.forEach((function(n){var r=e[n],l=[];r.forEach((function(e){l.push(t[n]===e)})),i.push(-1!==l.indexOf(!0))})),-1===i.indexOf(!1)&&(c.push(t.value),d.push(t.status))})),p.forEach((function(t){var n=h.Dimension(t).id,i=0,r={};h.size[h.id.indexOf(t)]=e[t].length,n.forEach((function(n){-1!==e[t].indexOf(n)&&(r[n]=i,i++)})),h.__tree__.dimension[t].category.index=r})),h.n=c.length,h.value=h.__tree__.value=c,h.status=h.__tree__.status=null!==f?d:null),l?((u=h.__tree__).hasOwnProperty("id")||(u.version="2.0",u.hasOwnProperty("class")||(u.class="dataset"),u.id=u.dimension.id,u.size=u.dimension.size,delete u.dimension.id,delete u.dimension.size,u.dimension.hasOwnProperty("role")&&(u.role=u.dimension.role,delete u.dimension.role)),u.hasOwnProperty("status")&&-1!==["null","{}","[]"].indexOf(JSON.stringify(u.status))&&delete u.status,u.hasOwnProperty("role")&&(delete u.role.classification,["geo","time","metric"].forEach((function(t){null===u.role[t]&&delete u.role[t]}))),s&&v(u,"value"),a&&u.hasOwnProperty("status")&&v(u,"status"),JSON.stringify(u)):h},t.prototype.Slice=function(t){if(null===this||"dataset"!==this.class)return null;if(void 0===t)return this;if(!Array.isArray(t)){var e,n=[];for(e in t)n.push([e,t[e]]);t=n}return this.Dice(t.map((function(t){return[t[0],[t[1]]]})))},t.prototype.Data=function(t,e){var n,i,r=[],l=function(t){for(var e in t)if(t.hasOwnProperty(e))return e};if(null===this||"dataset"!==this.class)return null;if(void 0===t){for(i=this.value.length,n=0;n<i;n++)r.push(this.Data(n));return r}if("boolean"!=typeof e&&(e=!0),"number"==typeof t){var s=this.value[t];return void 0===s?null:e?{value:s,status:this.status?this.status[t]:null}:s}var a="object",o=this.__tree__,u=o.size||o.dimension&&o.dimension.size,h=u.length;if(Array.isArray(t)){if(!Array.isArray(t[0])){if(this.length!==t.length)return null;var f=1,c=0,d=[],v=[];for(n=0;n<h;n++)if(void 0!==t[n]){if("number"!=typeof t[n]||t[n]>=u[n])return null;c+=(f*=n>0?u[h-n]:1)*t[h-n-1]}else d.push(n),v.push(u[n]);if(d.length>1)return null;if(1===d.length){for(var p=0,y=v[0];p<y;p++){var g=[];for(n=0;n<h;n++)n!==d[0]?g.push(t[n]):g.push(p);r.push(this.Data(g,e))}return r}return e?{value:this.value[c],status:this.status?this.status[c]:null}:this.value[c]}a="array"}var b=function(t,e,n){var i,r=[],s={},a=t.dimension,o=t.id||a.id,u=t.size||a&&a.size;if("array"===n){for(i=e.length;i--;)s[e[i][0]]=e[i][1];e=s}for(var h=0,f=o.length;h<f;h++){var c=o[h],d=e[c];r.push("string"==typeof d?d:1===u[h]?l(a[c].category.index):null)}return r}(o,t,a),_=[],m=o.dimension,x=o.id||m.id;for(n=0,i=b.length;n<i;n++)_.push(m[x[n]].category.index[b[n]]);return this.Data(_,e)},t.prototype.toTable=function(t,e){if(null===this||"dataset"!==this.class)return null;1==arguments.length&&"function"==typeof t&&(e=t,t=null),"arrobj"===(t=t||{field:"label",content:"label",vlabel:"Value",slabel:"Status",type:"array",status:!1,unit:!1,by:null,prefix:"",drop:[],meta:!1,comma:!1,bylabel:!1}).type&&void 0===t.field&&(t.field="id");var n,i,r,l,s,a=this.__tree__,o=!0===t.status;if("function"==typeof e){n=this.toTable(t);var u=[],h="array"!==t.type?0:1;for(s=(S="object"!==t.type?n.slice(h):n.rows.slice(0)).length,i=0;i<s;i++){var f=e.call(this,S[i],i);void 0!==f&&u.push(f)}return"object"===t.type?{cols:n.cols,rows:u}:("array"===t.type&&u.unshift(n[0]),u)}if("arrobj"===t.type){var c=[],d=a.role&&a.role.metric,v=function(){},p={},y=this,g=y.id,b=t.by&&-1!==g.indexOf(t.by)?t.by:null,_=!0===t.meta,m=void 0!==t.drop&&Array.isArray(t.drop)?t.drop:[],x=!0===t.comma,w=!0===t.bylabel,O=function(e){if(_){var n={};return g.forEach((function(t){var e=y.Dimension(t);n[t]={label:e.label,role:e.role,categories:{id:e.id,label:y.Dimension(t,!1)}}})),{meta:{label:y.label,source:y.source,updated:y.updated,id:g,status:o,unit:t.unit,by:b,bylabel:w,drop:null!==b&&m.length>0?m:null,prefix:null!==b?T||"":null,comma:x,dimensions:n},data:e}}return e};b&&(t.field="id");var A=(n=this.toTable({field:t.field,vlabel:t.vlabel,slabel:t.slabel,content:t.content,status:o})).shift();if(null===b&&t.unit&&d){if("id"!==t.content)for(var k=d.length;k--;){var D=this.Dimension(d[k]);p[d[k]]={};for(var j=D.length;j--;)p[d[k]][D.Category(j).label]=D.id[j]}v=function(e,n){if(-1!==d.indexOf(e)){var i=a.dimension[e].category;i.unit?P.unit=i.unit["id"!==t.content?p[e][n]:n]:P.unit=null}},t.unit=!0}else t.unit=!1;for(s=n.length,i=0;i<s;i++){var P={};for(r=n[i].length;r--;)P[A[r]]=n[i][r],v(A[r],n[i][r]);c.push(P)}if(x&&c.forEach((function(t){null!==t.value&&(t.value=(""+t.value).replace(".",","))})),null!==b){var E,z={},S=[],C={},T=void 0!==t.prefix?t.prefix:"";m.forEach((function(t,e){(!y.Dimension(t)||y.Dimension(t).length>1)&&(m[e]="")}));var J=g.filter((function(t){return t!==b&&-1===m.indexOf(t)})),N=y.Dimension(b),V=function(t,e){var n=[];return e.forEach((function(e){n.push(t[e])})),n.join("\t")},I=function(t,e){var n={};return e.forEach((function(e){n[e]=t[e]})),n};for(var q in"id"!==t.content?w?E=function(t,e,n){t[e][T+n[b]]=n.value}:(N.Category().forEach((function(t,e){C[t.label]=N.id[e]})),E=function(t,e,n){t[e][T+C[n[b]]]=n.value}):E=function(t,e,n){t[e][T+n[b]]=n.value},c.forEach((function(t){var e=V(t,J);void 0===z[e]&&(z[e]=I(t,J)),E(z,e,t,b)})),z)S.push(z[q]);return o=!1,O(S)}return O(c)}var B,F,G,H,K="id"===t.field;if("object"===t.type){var L="number"==typeof this.value[0]||null===this.value[0]?"number":"string";B=function(t,e){var n=K&&t||e||t;et.push({id:t,label:n,type:"string"})},F=function(t,e,n){var i=(K?"value":t)||"Value",r=(K?"status":e)||"Status";n&&et.push({id:"status",label:r,type:"string"}),et.push({id:"value",label:i,type:L})},G=function(t){vt.push({v:t})},H=function(t){vt.push({v:t}),nt.push({c:vt})}}else B=function(t,e){var n=K&&t||e||t;et.push(n)},F=function(t,e,n){var i=(K?"value":t)||"Value",r=(K?"status":e)||"Status";n&&et.push(r),et.push(i),tt.push(et)},G=function(t){vt.push(t)},H=function(t){vt.push(t),tt.push(vt)};var M=a.dimension,Q=a.id||M.id,R=a.size||M.size,U=Q.length;if(U!=R.length)return!1;var W=[],X=1,Y=(k=1,[]),Z=[],$=[],tt=[],et=[],nt=[];for(i=0;i<U;i++){var it=Q[i],rt=M[it].label;B(it,rt),X*=R[i],k*=R[i];var lt=[];for(r=0;r<R[i];r++)for(var st in M[Q[i]].category.index)if(M[Q[i]].category.index[st]===r){var at="id"!==t.content&&M[Q[i]].category.label?M[Q[i]].category.label[st]:st;lt.push(at)}W.push(lt),Y.push(k)}for(F(t.vlabel,t.slabel,o),s=W.length,i=0;i<s;i++){for(var ot=[],ut=0,ht=W[i].length;ut<ht;ut++)for(var ft=0;ft<X/Y[i];ft++)ot.push(W[i][ut]);Z.push(ot)}for(s=Z.length,i=0;i<s;i++){var ct=[],dt=0;for(l=0;l<X;l++)ct.push(Z[i][dt]),++dt===Z[i].length&&(dt=0);$.push(ct)}for(l=0;l<X;l++){var vt=[];s=Z.length;for(var pt=0;pt<s;pt++)G($[pt][l]);o&&G(this.status?this.status[l]:null),H(this.value[l])}return"object"===t.type?{cols:et,rows:nt}:tt},t.prototype.node=function(){return this.__tree__},t.prototype.toString=function(){return this.class};/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(n,i){return"object"==typeof n?new t(n):"version"===n?"1.3.1":fetch?fetch(n,i).then(e).then((function(e){return new t(e)})):void 0}
 
 
 /***/ },
@@ -70601,7 +71261,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   mode: () => (/* binding */ mode),
 /* harmony export */   modeFast: () => (/* binding */ modeFast),
 /* harmony export */   modeSorted: () => (/* binding */ modeSorted),
-/* harmony export */   normalDistribution: () => (/* binding */ normalDistribution),
 /* harmony export */   numericSort: () => (/* binding */ numericSort),
 /* harmony export */   perceptron: () => (/* binding */ PerceptronModel),
 /* harmony export */   permutationTest: () => (/* binding */ permutationTest),
@@ -70627,7 +71286,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   sampleStandardDeviation: () => (/* binding */ sampleStandardDeviation),
 /* harmony export */   sampleVariance: () => (/* binding */ sampleVariance),
 /* harmony export */   sampleWithReplacement: () => (/* binding */ sampleWithReplacement),
-/* harmony export */   scaledRootMeanSquare: () => (/* binding */ scaledRootMeanSquare),
 /* harmony export */   shuffle: () => (/* binding */ shuffle),
 /* harmony export */   shuffleInPlace: () => (/* binding */ shuffleInPlace),
 /* harmony export */   sign: () => (/* binding */ sign),
@@ -70643,32 +71301,1044 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   tTestTwoSample: () => (/* binding */ tTestTwoSample),
 /* harmony export */   uniqueCountSorted: () => (/* binding */ uniqueCountSorted),
 /* harmony export */   variance: () => (/* binding */ variance),
-/* harmony export */   weightedLinearRegression: () => (/* binding */ weightedLinearRegression),
-/* harmony export */   weightedMean: () => (/* binding */ weightedMean),
-/* harmony export */   weightedQuantile: () => (/* binding */ weightedQuantile),
-/* harmony export */   weightedStandardDeviation: () => (/* binding */ weightedStandardDeviation),
-/* harmony export */   weightedVariance: () => (/* binding */ weightedVariance),
 /* harmony export */   wilcoxonRankSum: () => (/* binding */ wilcoxonRankSum),
 /* harmony export */   zScore: () => (/* binding */ zScore)
 /* harmony export */ });
 /**
- * When adding a new value to a list, one does not have to necessary
- * recompute the mean of the list in linear time. They can instead use
- * this function to compute the new mean by providing the current mean,
- * the number of elements in the list that produced it and the new
- * value to add.
+ * [Simple linear regression](http://en.wikipedia.org/wiki/Simple_linear_regression)
+ * is a simple way to find a fitted line
+ * between a set of coordinates. This algorithm finds the slope and y-intercept of a regression line
+ * using the least sum of squares.
  *
- * @since 2.5.0
- * @param {number} mean current mean
- * @param {number} n number of items in the list
- * @param {number} newValue the added value
- * @returns {number} the new mean
+ * @param {Array<Array<number>>} data an array of two-element of arrays,
+ * like `[[0, 1], [2, 3]]`
+ * @returns {Object} object containing slope and intersect of regression line
+ * @example
+ * linearRegression([[0, 0], [1, 1]]); // => { m: 1, b: 0 }
+ */
+function linearRegression(data) {
+    var m;
+    var b;
+
+    // Store data length in a local variable to reduce
+    // repeated object property lookups
+    var dataLength = data.length;
+
+    //if there's only one point, arbitrarily choose a slope of 0
+    //and a y-intercept of whatever the y of the initial point is
+    if (dataLength === 1) {
+        m = 0;
+        b = data[0][1];
+    } else {
+        // Initialize our sums and scope the `m` and `b`
+        // variables that define the line.
+        var sumX = 0;
+        var sumY = 0;
+        var sumXX = 0;
+        var sumXY = 0;
+
+        // Use local variables to grab point values
+        // with minimal object property lookups
+        var point;
+        var x;
+        var y;
+
+        // Gather the sum of all x values, the sum of all
+        // y values, and the sum of x^2 and (x*y) for each
+        // value.
+        //
+        // In math notation, these would be SS_x, SS_y, SS_xx, and SS_xy
+        for (var i = 0; i < dataLength; i++) {
+            point = data[i];
+            x = point[0];
+            y = point[1];
+
+            sumX += x;
+            sumY += y;
+
+            sumXX += x * x;
+            sumXY += x * y;
+        }
+
+        // `m` is the slope of the regression line
+        m =
+            (dataLength * sumXY - sumX * sumY) /
+            (dataLength * sumXX - sumX * sumX);
+
+        // `b` is the y-intercept of the line.
+        b = sumY / dataLength - (m * sumX) / dataLength;
+    }
+
+    // Return both values as an object.
+    return {
+        m: m,
+        b: b
+    };
+}
+
+/**
+ * Given the output of `linearRegression`: an object
+ * with `m` and `b` values indicating slope and intercept,
+ * respectively, generate a line function that translates
+ * x values into y values.
+ *
+ * @param {Object} mb object with `m` and `b` members, representing
+ * slope and intersect of desired line
+ * @returns {Function} method that computes y-value at any given
+ * x-value on the line.
+ * @example
+ * var l = linearRegressionLine(linearRegression([[0, 0], [1, 1]]));
+ * l(0) // = 0
+ * l(2) // = 2
+ * linearRegressionLine({ b: 0, m: 1 })(1); // => 1
+ * linearRegressionLine({ b: 1, m: 1 })(1); // => 2
+ */
+function linearRegressionLine(mb /*: { b: number, m: number }*/) {
+    // Return a function that computes a `y` value for each
+    // x value it is given, based on the values of `b` and `a`
+    // that we just computed.
+    return function (x) {
+        return mb.b + mb.m * x;
+    };
+}
+
+/**
+ * Our default sum is the [Kahan-Babuska algorithm](https://pdfs.semanticscholar.org/1760/7d467cda1d0277ad272deb2113533131dc09.pdf).
+ * This method is an improvement over the classical
+ * [Kahan summation algorithm](https://en.wikipedia.org/wiki/Kahan_summation_algorithm).
+ * It aims at computing the sum of a list of numbers while correcting for
+ * floating-point errors. Traditionally, sums are calculated as many
+ * successive additions, each one with its own floating-point roundoff. These
+ * losses in precision add up as the number of numbers increases. This alternative
+ * algorithm is more accurate than the simple way of calculating sums by simple
+ * addition.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x input
+ * @return {number} sum of all input numbers
+ * @example
+ * sum([1, 2, 3]); // => 6
+ */
+function sum(x) {
+    // If the array is empty, we needn't bother computing its sum
+    if (x.length === 0) {
+        return 0;
+    }
+
+    // Initializing the sum as the first number in the array
+    var sum = x[0];
+
+    // Keeping track of the floating-point error correction
+    var correction = 0;
+
+    var transition;
+
+    if (typeof sum !== "number") {
+        return Number.NaN;
+    }
+
+    for (var i = 1; i < x.length; i++) {
+        if (typeof x[i] !== "number") {
+            return Number.NaN;
+        }
+        transition = sum + x[i];
+
+        // Here we need to update the correction in a different fashion
+        // if the new absolute value is greater than the absolute sum
+        if (Math.abs(sum) >= Math.abs(x[i])) {
+            correction += sum - transition + x[i];
+        } else {
+            correction += x[i] - transition + sum;
+        }
+
+        sum = transition;
+    }
+
+    // Returning the corrected sum
+    return sum + correction;
+}
+
+/**
+ * The mean, _also known as average_,
+ * is the sum of all values over the number of values.
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @throws {Error} if the length of x is less than one
+ * @returns {number} mean
+ * @example
+ * mean([0, 10]); // => 5
+ */
+function mean(x) {
+    if (x.length === 0) {
+        throw new Error("mean requires at least one data point");
+    }
+
+    return sum(x) / x.length;
+}
+
+/**
+ * The sum of deviations to the Nth power.
+ * When n=2 it's the sum of squared deviations.
+ * When n=3 it's the sum of cubed deviations.
+ *
+ * @param {Array<number>} x
+ * @param {number} n power
+ * @returns {number} sum of nth power deviations
  *
  * @example
- * addToMean(14, 5, 53); // => 20.5
+ * var input = [1, 2, 3];
+ * // since the variance of a set is the mean squared
+ * // deviations, we can calculate that with sumNthPowerDeviations:
+ * sumNthPowerDeviations(input, 2) / input.length;
  */
-function addToMean(mean, n, newValue) {
-    return mean + (newValue - mean) / (n + 1);
+function sumNthPowerDeviations(x, n) {
+    var meanValue = mean(x);
+    var sum = 0;
+    var tempValue;
+    var i;
+
+    // This is an optimization: when n is 2 (we're computing a number squared),
+    // multiplying the number by itself is significantly faster than using
+    // the Math.pow method.
+    if (n === 2) {
+        for (i = 0; i < x.length; i++) {
+            tempValue = x[i] - meanValue;
+            sum += tempValue * tempValue;
+        }
+    } else {
+        for (i = 0; i < x.length; i++) {
+            sum += Math.pow(x[i] - meanValue, n);
+        }
+    }
+
+    return sum;
+}
+
+/**
+ * The [variance](http://en.wikipedia.org/wiki/Variance)
+ * is the sum of squared deviations from the mean.
+ *
+ * This is an implementation of variance, not sample variance:
+ * see the `sampleVariance` method if you want a sample measure.
+ *
+ * @param {Array<number>} x a population of one or more data points
+ * @returns {number} variance: a value greater than or equal to zero.
+ * zero indicates that all values are identical.
+ * @throws {Error} if x's length is 0
+ * @example
+ * variance([1, 2, 3, 4, 5, 6]); // => 2.9166666666666665
+ */
+function variance(x) {
+    if (x.length === 0) {
+        throw new Error("variance requires at least one data point");
+    }
+
+    // Find the mean of squared deviations between the
+    // mean value and each value.
+    return sumNthPowerDeviations(x, 2) / x.length;
+}
+
+/**
+ * The [standard deviation](http://en.wikipedia.org/wiki/Standard_deviation)
+ * is the square root of the variance. This is also known as the population
+ * standard deviation. It's useful for measuring the amount
+ * of variation or dispersion in a set of values.
+ *
+ * Standard deviation is only appropriate for full-population knowledge: for
+ * samples of a population, {@link sampleStandardDeviation} is
+ * more appropriate.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} standard deviation
+ * @example
+ * variance([2, 4, 4, 4, 5, 5, 7, 9]); // => 4
+ * standardDeviation([2, 4, 4, 4, 5, 5, 7, 9]); // => 2
+ */
+function standardDeviation(x) {
+    if (x.length === 1) {
+        return 0;
+    }
+    var v = variance(x);
+    return Math.sqrt(v);
+}
+
+/**
+ * The [R Squared](http://en.wikipedia.org/wiki/Coefficient_of_determination)
+ * value of data compared with a function `f`
+ * is the sum of the squared differences between the prediction
+ * and the actual value.
+ *
+ * @param {Array<Array<number>>} x input data: this should be doubly-nested
+ * @param {Function} func function called on `[i][0]` values within the dataset
+ * @returns {number} r-squared value
+ * @example
+ * var samples = [[0, 0], [1, 1]];
+ * var regressionLine = linearRegressionLine(linearRegression(samples));
+ * rSquared(samples, regressionLine); // = 1 this line is a perfect fit
+ */
+function rSquared(x, func) {
+    if (x.length < 2) {
+        return 1;
+    }
+
+    // Compute the average y value for the actual
+    // data set in order to compute the
+    // _total sum of squares_
+    var sum = 0;
+    for (var i = 0; i < x.length; i++) {
+        sum += x[i][1];
+    }
+    var average = sum / x.length;
+
+    // Compute the total sum of squares - the
+    // squared difference between each point
+    // and the average of all points.
+    var sumOfSquares = 0;
+    for (var j = 0; j < x.length; j++) {
+        sumOfSquares += Math.pow(average - x[j][1], 2);
+    }
+
+    // Finally estimate the error: the squared
+    // difference between the estimate and the actual data
+    // value at each point.
+    var err = 0;
+    for (var k = 0; k < x.length; k++) {
+        err += Math.pow(x[k][1] - func(x[k][0]), 2);
+    }
+
+    // As the error grows larger, its ratio to the
+    // sum of squares increases and the r squared
+    // value grows lower.
+    return 1 - err / sumOfSquares;
+}
+
+/**
+ * The [mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number
+ * that appears in a list the highest number of times.
+ * There can be multiple modes in a list: in the event of a tie, this
+ * algorithm will return the most recently seen mode.
+ *
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * This runs in `O(n)` because the input is sorted.
+ *
+ * @param {Array<number>} sorted a sample of one or more data points
+ * @returns {number} mode
+ * @throws {Error} if sorted is empty
+ * @example
+ * modeSorted([0, 0, 1]); // => 0
+ */
+function modeSorted(sorted) {
+    // Handle edge cases:
+    // The mode of an empty list is undefined
+    if (sorted.length === 0) {
+        throw new Error("mode requires at least one data point");
+    }
+    if (sorted.length === 1) {
+        return sorted[0];
+    }
+
+    // This assumes it is dealing with an array of size > 1, since size
+    // 0 and 1 are handled immediately. Hence it starts at index 1 in the
+    // array.
+    var last = sorted[0];
+    // store the mode as we find new modes
+    var value = Number.NaN;
+    // store how many times we've seen the mode
+    var maxSeen = 0;
+    // how many times the current candidate for the mode
+    // has been seen
+    var seenThis = 1;
+
+    // end at sorted.length + 1 to fix the case in which the mode is
+    // the highest number that occurs in the sequence. the last iteration
+    // compares sorted[i], which is undefined, to the highest number
+    // in the series
+    for (var i = 1; i < sorted.length + 1; i++) {
+        // we're seeing a new number pass by
+        if (sorted[i] !== last) {
+            // the last number is the new mode since we saw it more
+            // often than the old one
+            if (seenThis > maxSeen) {
+                maxSeen = seenThis;
+                value = last;
+            }
+            seenThis = 1;
+            last = sorted[i];
+            // if this isn't a new number, it's one more occurrence of
+            // the potential mode
+        } else {
+            seenThis++;
+        }
+    }
+    return value;
+}
+
+/**
+ * Sort an array of numbers by their numeric value, ensuring that the
+ * array is not changed in place.
+ *
+ * This is necessary because the default behavior of .sort
+ * in JavaScript is to sort arrays as string values
+ *
+ *     [1, 10, 12, 102, 20].sort()
+ *     // output
+ *     [1, 10, 102, 12, 20]
+ *
+ * @param {Array<number>} x input array
+ * @return {Array<number>} sorted array
+ * @private
+ * @example
+ * numericSort([3, 2, 1]) // => [1, 2, 3]
+ */
+function numericSort(x) {
+    return (
+        x
+            // ensure the array is not changed in-place
+            .slice()
+            // comparator function that treats input as numeric
+            .sort(function (a, b) {
+                return a - b;
+            })
+    );
+}
+
+/**
+ * The [mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number
+ * that appears in a list the highest number of times.
+ * There can be multiple modes in a list: in the event of a tie, this
+ * algorithm will return the most recently seen mode.
+ *
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * This runs in `O(n log(n))` because it needs to sort the array internally
+ * before running an `O(n)` search to find the mode.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} mode
+ * @example
+ * mode([0, 0, 1]); // => 0
+ */
+function mode(x) {
+    // Sorting the array lets us iterate through it below and be sure
+    // that every time we see a new number it's new and we'll never
+    // see the same number twice
+    return modeSorted(numericSort(x));
+}
+
+/* globals Map: false */
+
+/**
+ * The [mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number
+ * that appears in a list the highest number of times.
+ * There can be multiple modes in a list: in the event of a tie, this
+ * algorithm will return the most recently seen mode.
+ *
+ * modeFast uses a Map object to keep track of the mode, instead of the approach
+ * used with `mode`, a sorted array. As a result, it is faster
+ * than `mode` and supports any data type that can be compared with `==`.
+ * It also requires a
+ * [JavaScript environment with support for Map](https://kangax.github.io/compat-table/es6/#test-Map),
+ * and will throw an error if Map is not available.
+ *
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * @param {Array<*>} x a sample of one or more data points
+ * @returns {?*} mode
+ * @throws {ReferenceError} if the JavaScript environment doesn't support Map
+ * @throws {Error} if x is empty
+ * @example
+ * modeFast(['rabbits', 'rabbits', 'squirrels']); // => 'rabbits'
+ */
+function modeFast(x) {
+    // This index will reflect the incidence of different values, indexing
+    // them like
+    // { value: count }
+    var index = new Map();
+
+    // A running `mode` and the number of times it has been encountered.
+    var mode;
+    var modeCount = 0;
+
+    for (var i = 0; i < x.length; i++) {
+        var newCount = index.get(x[i]);
+        if (newCount === undefined) {
+            newCount = 1;
+        } else {
+            newCount++;
+        }
+        if (newCount > modeCount) {
+            mode = x[i];
+            modeCount = newCount;
+        }
+        index.set(x[i], newCount);
+    }
+
+    if (modeCount === 0) {
+        throw new Error("mode requires at last one data point");
+    }
+
+    return mode;
+}
+
+/**
+ * The min is the lowest number in the array.
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @throws {Error} if the length of x is less than one
+ * @returns {number} minimum value
+ * @example
+ * min([1, 5, -10, 100, 2]); // => -10
+ */
+function min(x) {
+    if (x.length === 0) {
+        throw new Error("min requires at least one data point");
+    }
+
+    var value = x[0];
+    for (var i = 1; i < x.length; i++) {
+        if (x[i] < value) {
+            value = x[i];
+        }
+    }
+    return value;
+}
+
+/**
+ * This computes the maximum number in an array.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @returns {number} maximum value
+ * @throws {Error} if the length of x is less than one
+ * @example
+ * max([1, 2, 3, 4]);
+ * // => 4
+ */
+function max(x) {
+    if (x.length === 0) {
+        throw new Error("max requires at least one data point");
+    }
+
+    var value = x[0];
+    for (var i = 1; i < x.length; i++) {
+        if (x[i] > value) {
+            value = x[i];
+        }
+    }
+    return value;
+}
+
+/**
+ * This computes the minimum & maximum number in an array.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @returns {Array<number>} minimum & maximum value
+ * @throws {Error} if the length of x is less than one
+ * @example
+ * extent([1, 2, 3, 4]);
+ * // => [1, 4]
+ */
+function extent(x) {
+    if (x.length === 0) {
+        throw new Error("extent requires at least one data point");
+    }
+
+    var min = x[0];
+    var max = x[0];
+    for (var i = 1; i < x.length; i++) {
+        if (x[i] > max) {
+            max = x[i];
+        }
+        if (x[i] < min) {
+            min = x[i];
+        }
+    }
+    return [min, max];
+}
+
+/**
+ * The minimum is the lowest number in the array. With a sorted array,
+ * the first element in the array is always the smallest, so this calculation
+ * can be done in one step, or constant time.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} minimum value
+ * @example
+ * minSorted([-100, -10, 1, 2, 5]); // => -100
+ */
+function minSorted(x) {
+    return x[0];
+}
+
+/**
+ * The maximum is the highest number in the array. With a sorted array,
+ * the last element in the array is always the largest, so this calculation
+ * can be done in one step, or constant time.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} maximum value
+ * @example
+ * maxSorted([-100, -10, 1, 2, 5]); // => 5
+ */
+function maxSorted(x) {
+    return x[x.length - 1];
+}
+
+/**
+ * The extent is the lowest & highest number in the array. With a sorted array,
+ * the first element in the array is always the lowest while the last element is always the largest, so this calculation
+ * can be done in one step, or constant time.
+ *
+ * @param {Array<number>} x input
+ * @returns {Array<number>} minimum & maximum value
+ * @example
+ * extentSorted([-100, -10, 1, 2, 5]); // => [-100, 5]
+ */
+function extentSorted(x) {
+    return [x[0], x[x.length - 1]];
+}
+
+/**
+ * The simple [sum](https://en.wikipedia.org/wiki/Summation) of an array
+ * is the result of adding all numbers together, starting from zero.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x input
+ * @return {number} sum of all input numbers
+ * @example
+ * sumSimple([1, 2, 3]); // => 6
+ */
+function sumSimple(x) {
+    var value = 0;
+    for (var i = 0; i < x.length; i++) {
+        if (typeof x[i] !== "number") {
+            return Number.NaN;
+        }
+        value += x[i];
+    }
+    return value;
+}
+
+/**
+ * The [product](https://en.wikipedia.org/wiki/Product_(mathematics)) of an array
+ * is the result of multiplying all numbers together, starting using one as the multiplicative identity.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x input
+ * @return {number} product of all input numbers
+ * @example
+ * product([1, 2, 3, 4]); // => 24
+ */
+function product(x) {
+    var value = 1;
+    for (var i = 0; i < x.length; i++) {
+        value *= x[i];
+    }
+    return value;
+}
+
+/**
+ * This is the internal implementation of quantiles: when you know
+ * that the order is sorted, you don't need to re-sort it, and the computations
+ * are faster.
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @param {number} p desired quantile: a number between 0 to 1, inclusive
+ * @returns {number} quantile value
+ * @throws {Error} if p ix outside of the range from 0 to 1
+ * @throws {Error} if x is empty
+ * @example
+ * quantileSorted([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
+ */
+function quantileSorted(x, p) {
+    var idx = x.length * p;
+    if (x.length === 0) {
+        throw new Error("quantile requires at least one data point.");
+    } else if (p < 0 || p > 1) {
+        throw new Error("quantiles must be between 0 and 1");
+    } else if (p === 1) {
+        // If p is 1, directly return the last element
+        return x[x.length - 1];
+    } else if (p === 0) {
+        // If p is 0, directly return the first element
+        return x[0];
+    } else if (idx % 1 !== 0) {
+        // If p is not integer, return the next element in array
+        return x[Math.ceil(idx) - 1];
+    } else if (x.length % 2 === 0) {
+        // If the list has even-length, we'll take the average of this number
+        // and the next value, if there is one
+        return (x[idx - 1] + x[idx]) / 2;
+    } else {
+        // Finally, in the simple case of an integer value
+        // with an odd-length list, return the x value at the index.
+        return x[idx];
+    }
+}
+
+/**
+ * Rearrange items in `arr` so that all items in `[left, k]` range are the smallest.
+ * The `k`-th element will have the `(k - left + 1)`-th smallest value in `[left, right]`.
+ *
+ * Implements Floyd-Rivest selection algorithm https://en.wikipedia.org/wiki/Floyd-Rivest_algorithm
+ *
+ * @param {Array<number>} arr input array
+ * @param {number} k pivot index
+ * @param {number} [left] left index
+ * @param {number} [right] right index
+ * @returns {void} mutates input array
+ * @example
+ * var arr = [65, 28, 59, 33, 21, 56, 22, 95, 50, 12, 90, 53, 28, 77, 39];
+ * quickselect(arr, 8);
+ * // = [39, 28, 28, 33, 21, 12, 22, 50, 53, 56, 59, 65, 90, 77, 95]
+ */
+function quickselect(arr, k, left, right) {
+    left = left || 0;
+    right = right || arr.length - 1;
+
+    while (right > left) {
+        // 600 and 0.5 are arbitrary constants chosen in the original paper to minimize execution time
+        if (right - left > 600) {
+            var n = right - left + 1;
+            var m = k - left + 1;
+            var z = Math.log(n);
+            var s = 0.5 * Math.exp((2 * z) / 3);
+            var sd = 0.5 * Math.sqrt((z * s * (n - s)) / n);
+            if (m - n / 2 < 0) { sd *= -1; }
+            var newLeft = Math.max(left, Math.floor(k - (m * s) / n + sd));
+            var newRight = Math.min(
+                right,
+                Math.floor(k + ((n - m) * s) / n + sd)
+            );
+            quickselect(arr, k, newLeft, newRight);
+        }
+
+        var t = arr[k];
+        var i = left;
+        var j = right;
+
+        swap(arr, left, k);
+        if (arr[right] > t) { swap(arr, left, right); }
+
+        while (i < j) {
+            swap(arr, i, j);
+            i++;
+            j--;
+            while (arr[i] < t) { i++; }
+            while (arr[j] > t) { j--; }
+        }
+
+        if (arr[left] === t) { swap(arr, left, j); }
+        else {
+            j++;
+            swap(arr, j, right);
+        }
+
+        if (j <= k) { left = j + 1; }
+        if (k <= j) { right = j - 1; }
+    }
+}
+
+function swap(arr, i, j) {
+    var tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+
+/**
+ * The [quantile](https://en.wikipedia.org/wiki/Quantile):
+ * this is a population quantile, since we assume to know the entire
+ * dataset in this library. This is an implementation of the
+ * [Quantiles of a Population](http://en.wikipedia.org/wiki/Quantile#Quantiles_of_a_population)
+ * algorithm from wikipedia.
+ *
+ * Sample is a one-dimensional array of numbers,
+ * and p is either a decimal number from 0 to 1 or an array of decimal
+ * numbers from 0 to 1.
+ * In terms of a k/q quantile, p = k/q - it's just dealing with fractions or dealing
+ * with decimal values.
+ * When p is an array, the result of the function is also an array containing the appropriate
+ * quantiles in input order
+ *
+ * @param {Array<number>} x sample of one or more numbers
+ * @param {Array<number> | number} p the desired quantile, as a number between 0 and 1
+ * @returns {number} quantile
+ * @example
+ * quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
+ */
+function quantile(x, p) {
+    var copy = x.slice();
+
+    if (Array.isArray(p)) {
+        // rearrange elements so that each element corresponding to a requested
+        // quantile is on a place it would be if the array was fully sorted
+        multiQuantileSelect(copy, p);
+        // Initialize the result array
+        var results = [];
+        // For each requested quantile
+        for (var i = 0; i < p.length; i++) {
+            results[i] = quantileSorted(copy, p[i]);
+        }
+        return results;
+    } else {
+        var idx = quantileIndex(copy.length, p);
+        quantileSelect(copy, idx, 0, copy.length - 1);
+        return quantileSorted(copy, p);
+    }
+}
+
+function quantileSelect(arr, k, left, right) {
+    if (k % 1 === 0) {
+        quickselect(arr, k, left, right);
+    } else {
+        k = Math.floor(k);
+        quickselect(arr, k, left, right);
+        quickselect(arr, k + 1, k + 1, right);
+    }
+}
+
+function multiQuantileSelect(arr, p) {
+    var indices = [0];
+    for (var i = 0; i < p.length; i++) {
+        indices.push(quantileIndex(arr.length, p[i]));
+    }
+    indices.push(arr.length - 1);
+    indices.sort(compare);
+
+    var stack = [0, indices.length - 1];
+
+    while (stack.length) {
+        var r = Math.ceil(stack.pop());
+        var l = Math.floor(stack.pop());
+        if (r - l <= 1) { continue; }
+
+        var m = Math.floor((l + r) / 2);
+        quantileSelect(
+            arr,
+            indices[m],
+            Math.floor(indices[l]),
+            Math.ceil(indices[r])
+        );
+
+        stack.push(l, m, m, r);
+    }
+}
+
+function compare(a, b) {
+    return a - b;
+}
+
+function quantileIndex(len, p) {
+    var idx = len * p;
+    if (p === 1) {
+        // If p is 1, directly return the last index
+        return len - 1;
+    } else if (p === 0) {
+        // If p is 0, directly return the first index
+        return 0;
+    } else if (idx % 1 !== 0) {
+        // If index is not integer, return the next index in array
+        return Math.ceil(idx) - 1;
+    } else if (len % 2 === 0) {
+        // If the list has even-length, we'll return the middle of two indices
+        // around quantile to indicate that we need an average value of the two
+        return idx - 0.5;
+    } else {
+        // Finally, in the simple case of an integer index
+        // with an odd-length list, return the index
+        return idx;
+    }
+}
+
+/* eslint no-bitwise: 0 */
+
+/**
+ * This function returns the quantile in which one would find the given value in
+ * the given array. With a sorted array, leveraging binary search, we can find
+ * this information in logarithmic time.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} value value
+ * @example
+ * quantileRankSorted([1, 2, 3, 4], 3); // => 0.75
+ * quantileRankSorted([1, 2, 3, 3, 4], 3); // => 0.7
+ * quantileRankSorted([1, 2, 3, 4], 6); // => 1
+ * quantileRankSorted([1, 2, 3, 3, 5], 4); // => 0.8
+ */
+function quantileRankSorted(x, value) {
+    // Value is lesser than any value in the array
+    if (value < x[0]) {
+        return 0;
+    }
+
+    // Value is greater than any value in the array
+    if (value > x[x.length - 1]) {
+        return 1;
+    }
+
+    var l = lowerBound(x, value);
+
+    // Value is not in the array
+    if (x[l] !== value) {
+        return l / x.length;
+    }
+
+    l++;
+
+    var u = upperBound(x, value);
+
+    // The value exists only once in the array
+    if (u === l) {
+        return l / x.length;
+    }
+
+    // Here, we are basically computing the mean of the range of indices
+    // containing our searched value. But, instead, of initializing an
+    // array and looping over it, there is a dedicated math formula that
+    // we apply below to get the result.
+    var r = u - l + 1;
+    var sum = (r * (u + l)) / 2;
+    var mean = sum / r;
+
+    return mean / x.length;
+}
+
+function lowerBound(x, value) {
+    var mid = 0;
+    var lo = 0;
+    var hi = x.length;
+
+    while (lo < hi) {
+        mid = (lo + hi) >>> 1;
+
+        if (value <= x[mid]) {
+            hi = mid;
+        } else {
+            lo = -~mid;
+        }
+    }
+
+    return lo;
+}
+
+function upperBound(x, value) {
+    var mid = 0;
+    var lo = 0;
+    var hi = x.length;
+
+    while (lo < hi) {
+        mid = (lo + hi) >>> 1;
+
+        if (value >= x[mid]) {
+            lo = -~mid;
+        } else {
+            hi = mid;
+        }
+    }
+
+    return lo;
+}
+
+/**
+ * This function returns the quantile in which one would find the given value in
+ * the given array. It will copy and sort your array before each run, so
+ * if you know your array is already sorted, you should use `quantileRankSorted`
+ * instead.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} value value
+ * @example
+ * quantileRank([4, 3, 1, 2], 3); // => 0.75
+ * quantileRank([4, 3, 2, 3, 1], 3); // => 0.7
+ * quantileRank([2, 4, 1, 3], 6); // => 1
+ * quantileRank([5, 3, 1, 2, 3], 4); // => 0.8
+ */
+function quantileRank(x, value) {
+    // Cloning and sorting the array
+    var sortedCopy = numericSort(x);
+
+    return quantileRankSorted(sortedCopy, value);
+}
+
+/**
+ * The [Interquartile range](http://en.wikipedia.org/wiki/Interquartile_range) is
+ * a measure of statistical dispersion, or how scattered, spread, or
+ * concentrated a distribution is. It's computed as the difference between
+ * the third quartile and first quartile.
+ *
+ * @param {Array<number>} x sample of one or more numbers
+ * @returns {number} interquartile range: the span between lower and upper quartile,
+ * 0.25 and 0.75
+ * @example
+ * interquartileRange([0, 1, 2, 3]); // => 2
+ */
+function interquartileRange(x) {
+    // Interquartile range is the span between the upper quartile,
+    // at `0.75`, and lower quartile, `0.25`
+    var q1 = quantile(x, 0.75);
+    var q2 = quantile(x, 0.25);
+
+    if (typeof q1 === "number" && typeof q2 === "number") {
+        return q1 - q2;
+    }
+}
+
+/**
+ * The [median](http://en.wikipedia.org/wiki/Median) is
+ * the middle number of a list. This is often a good indicator of 'the middle'
+ * when there are outliers that skew the `mean()` value.
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * The median isn't necessarily one of the elements in the list: the value
+ * can be the average of two elements if the list has an even length
+ * and the two central values are different.
+ *
+ * @param {Array<number>} x input
+ * @returns {number} median value
+ * @example
+ * median([10, 2, 5, 100, 2, 1]); // => 3.5
+ */
+function median(x) {
+    return +quantile(x, 0.5);
+}
+
+/**
+ * The [Median Absolute Deviation](http://en.wikipedia.org/wiki/Median_absolute_deviation) is
+ * a robust measure of statistical
+ * dispersion. It is more resilient to outliers than the standard deviation.
+ *
+ * @param {Array<number>} x input array
+ * @returns {number} median absolute deviation
+ * @example
+ * medianAbsoluteDeviation([1, 1, 2, 2, 4, 6, 9]); // => 1
+ */
+function medianAbsoluteDeviation(x) {
+    var medianValue = median(x);
+    var medianAbsoluteDeviations = [];
+
+    // Make a list of absolute deviations from the median
+    for (var i = 0; i < x.length; i++) {
+        medianAbsoluteDeviations.push(Math.abs(x[i] - medianValue));
+    }
+
+    // Find the median value of that list
+    return median(medianAbsoluteDeviations);
 }
 
 /**
@@ -70716,6 +72386,139 @@ function chunk(x, chunkSize) {
 }
 
 /**
+ * Sampling with replacement is a type of sampling that allows the same
+ * item to be picked out of a population more than once.
+ *
+ * @param {Array<*>} x an array of any kind of value
+ * @param {number} n count of how many elements to take
+ * @param {Function} [randomSource=Math.random] an optional entropy source that
+ * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+ * @return {Array} n sampled items from the population
+ * @example
+ * var values = [1, 2, 3, 4];
+ * sampleWithReplacement(values, 2); // returns 2 random values, like [2, 4];
+ */
+function sampleWithReplacement(x, n, randomSource) {
+    if (x.length === 0) {
+        return [];
+    }
+
+    // a custom random number source can be provided if you want to use
+    // a fixed seed or another random number generator, like
+    // [random-js](https://www.npmjs.org/package/random-js)
+    randomSource = randomSource || Math.random;
+
+    var length = x.length;
+    var sample = [];
+
+    for (var i = 0; i < n; i++) {
+        var index = Math.floor(randomSource() * length);
+
+        sample.push(x[index]);
+    }
+
+    return sample;
+}
+
+/**
+ * A [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+ * in-place - which means that it **will change the order of the original
+ * array by reference**.
+ *
+ * This is an algorithm that generates a random [permutation](https://en.wikipedia.org/wiki/Permutation)
+ * of a set.
+ *
+ * @param {Array} x sample of one or more numbers
+ * @param {Function} [randomSource=Math.random] an optional entropy source that
+ * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+ * @returns {Array} x
+ * @example
+ * var x = [1, 2, 3, 4];
+ * shuffleInPlace(x);
+ * // x is shuffled to a value like [2, 1, 4, 3]
+ */
+function shuffleInPlace(x, randomSource) {
+    // a custom random number source can be provided if you want to use
+    // a fixed seed or another random number generator, like
+    // [random-js](https://www.npmjs.org/package/random-js)
+    randomSource = randomSource || Math.random;
+
+    // store the current length of the x to determine
+    // when no elements remain to shuffle.
+    var length = x.length;
+
+    // temporary is used to hold an item when it is being
+    // swapped between indices.
+    var temporary;
+
+    // The index to swap at each stage.
+    var index;
+
+    // While there are still items to shuffle
+    while (length > 0) {
+        // choose a random index within the subset of the array
+        // that is not yet shuffled
+        index = Math.floor(randomSource() * length--);
+
+        // store the value that we'll move temporarily
+        temporary = x[length];
+
+        // swap the value at `x[length]` with `x[index]`
+        x[length] = x[index];
+        x[index] = temporary;
+    }
+
+    return x;
+}
+
+/**
+ * A [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+ * is a fast way to create a random permutation of a finite set. This is
+ * a function around `shuffle_in_place` that adds the guarantee that
+ * it will not modify its input.
+ *
+ * @param {Array} x sample of 0 or more numbers
+ * @param {Function} [randomSource=Math.random] an optional entropy source that
+ * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+ * @return {Array} shuffled version of input
+ * @example
+ * var shuffled = shuffle([1, 2, 3, 4]);
+ * shuffled; // = [2, 3, 1, 4] or any other random permutation
+ */
+function shuffle(x, randomSource) {
+    // slice the original array so that it is not modified
+    var sample = x.slice();
+
+    // and then shuffle that shallow-copied array, in place
+    return shuffleInPlace(sample, randomSource);
+}
+
+/**
+ * Create a [simple random sample](http://en.wikipedia.org/wiki/Simple_random_sample)
+ * from a given array of `n` elements.
+ *
+ * The sampled values will be in any order, not necessarily the order
+ * they appear in the input.
+ *
+ * @param {Array<any>} x input array. can contain any type
+ * @param {number} n count of how many elements to take
+ * @param {Function} [randomSource=Math.random] an optional entropy source that
+ * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
+ * @return {Array} subset of n elements in original array
+ *
+ * @example
+ * var values = [1, 2, 4, 5, 6, 7, 8, 9];
+ * sample(values, 3); // returns 3 random values, like [2, 5, 8];
+ */
+function sample(x, n, randomSource) {
+    // shuffle the original array using a fisher-yates shuffle
+    var shuffled = shuffle(x, randomSource);
+
+    // and then return a subset of it - the first `n` elements.
+    return shuffled.slice(0, n);
+}
+
+/**
  * Create a new column x row matrix.
  *
  * @private
@@ -70735,35 +72538,6 @@ function makeMatrix(columns, rows) {
         matrix.push(column);
     }
     return matrix;
-}
-
-/**
- * Sort an array of numbers by their numeric value, ensuring that the
- * array is not changed in place.
- *
- * This is necessary because the default behavior of .sort
- * in JavaScript is to sort arrays as string values
- *
- *     [1, 10, 12, 102, 20].sort()
- *     // output
- *     [1, 10, 102, 12, 20]
- *
- * @param {Array<number>} x input array
- * @return {Array<number>} sorted array
- * @private
- * @example
- * numericSort([3, 2, 1]) // => [1, 2, 3]
- */
-function numericSort(x) {
-    return (
-        x
-            // ensure the array is not changed in-place
-            .slice()
-            // comparator function that treats input as numeric
-            .sort(function (a, b) {
-                return a - b;
-            })
-    );
 }
 
 /**
@@ -71071,788 +72845,6 @@ function ckmeans(x, nClusters) {
     return clusters;
 }
 
-/**
- * Our default sum is the [Kahan-Babuska algorithm](https://pdfs.semanticscholar.org/1760/7d467cda1d0277ad272deb2113533131dc09.pdf).
- * This method is an improvement over the classical
- * [Kahan summation algorithm](https://en.wikipedia.org/wiki/Kahan_summation_algorithm).
- * It aims at computing the sum of a list of numbers while correcting for
- * floating-point errors. Traditionally, sums are calculated as many
- * successive additions, each one with its own floating-point roundoff. These
- * losses in precision add up as the number of numbers increases. This alternative
- * algorithm is more accurate than the simple way of calculating sums by simple
- * addition.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x input
- * @return {number} sum of all input numbers
- * @example
- * sum([1, 2, 3]); // => 6
- */
-function sum(x) {
-    // If the array is empty, we needn't bother computing its sum
-    if (x.length === 0) {
-        return 0;
-    }
-
-    // Initializing the sum as the first number in the array
-    var sum = x[0];
-
-    // Keeping track of the floating-point error correction
-    var correction = 0;
-
-    var transition;
-
-    if (typeof sum !== "number") {
-        return Number.NaN;
-    }
-
-    for (var i = 1; i < x.length; i++) {
-        if (typeof x[i] !== "number") {
-            return Number.NaN;
-        }
-        transition = sum + x[i];
-
-        // Here we need to update the correction in a different fashion
-        // if the new absolute value is greater than the absolute sum
-        if (Math.abs(sum) >= Math.abs(x[i])) {
-            correction += sum - transition + x[i];
-        } else {
-            correction += x[i] - transition + sum;
-        }
-
-        sum = transition;
-    }
-
-    // Returning the corrected sum
-    return sum + correction;
-}
-
-/**
- * The mean, _also known as average_,
- * is the sum of all values over the number of values.
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @throws {Error} if the length of x is less than one
- * @returns {number} mean
- * @example
- * mean([0, 10]); // => 5
- */
-function mean(x) {
-    if (x.length === 0) {
-        throw new Error("mean requires at least one data point");
-    }
-
-    return sum(x) / x.length;
-}
-
-/**
- * The sum of deviations to the Nth power.
- * When n=2 it's the sum of squared deviations.
- * When n=3 it's the sum of cubed deviations.
- *
- * @param {Array<number>} x
- * @param {number} n power
- * @returns {number} sum of nth power deviations
- *
- * @example
- * var input = [1, 2, 3];
- * // since the variance of a set is the mean squared
- * // deviations, we can calculate that with sumNthPowerDeviations:
- * sumNthPowerDeviations(input, 2) / input.length;
- */
-function sumNthPowerDeviations(x, n) {
-    var meanValue = mean(x);
-    var sum = 0;
-    var tempValue;
-    var i;
-
-    // This is an optimization: when n is 2 (we're computing a number squared),
-    // multiplying the number by itself is significantly faster than using
-    // the Math.pow method.
-    if (n === 2) {
-        for (i = 0; i < x.length; i++) {
-            tempValue = x[i] - meanValue;
-            sum += tempValue * tempValue;
-        }
-    } else {
-        for (i = 0; i < x.length; i++) {
-            sum += Math.pow(x[i] - meanValue, n);
-        }
-    }
-
-    return sum;
-}
-
-/**
- * The [sample variance](https://en.wikipedia.org/wiki/Variance#Sample_variance)
- * is the sum of squared deviations from the mean. The sample variance
- * is distinguished from the variance by the usage of [Bessel's Correction](https://en.wikipedia.org/wiki/Bessel's_correction):
- * instead of dividing the sum of squared deviations by the length of the input,
- * it is divided by the length minus one. This corrects the bias in estimating
- * a value from a set that you don't know if full.
- *
- * References:
- * * [Wolfram MathWorld on Sample Variance](http://mathworld.wolfram.com/SampleVariance.html)
- *
- * @param {Array<number>} x a sample of two or more data points
- * @throws {Error} if the length of x is less than 2
- * @return {number} sample variance
- * @example
- * sampleVariance([1, 2, 3, 4, 5]); // => 2.5
- */
-function sampleVariance(x) {
-    if (x.length < 2) {
-        throw new Error("sampleVariance requires at least two data points");
-    }
-
-    var sumSquaredDeviationsValue = sumNthPowerDeviations(x, 2);
-
-    // this is Bessels' Correction: an adjustment made to sample statistics
-    // that allows for the reduced degree of freedom entailed in calculating
-    // values from samples rather than complete populations.
-    var besselsCorrection = x.length - 1;
-
-    // Find the mean value of that list
-    return sumSquaredDeviationsValue / besselsCorrection;
-}
-
-/**
- * The [sample standard deviation](http://en.wikipedia.org/wiki/Standard_deviation#Sample_standard_deviation)
- * is the square root of the sample variance.
- *
- * @param {Array<number>} x input array
- * @returns {number} sample standard deviation
- * @example
- * sampleStandardDeviation([2, 4, 4, 4, 5, 5, 7, 9]).toFixed(2);
- * // => '2.14'
- */
-function sampleStandardDeviation(x) {
-    var sampleVarianceX = sampleVariance(x);
-    return Math.sqrt(sampleVarianceX);
-}
-
-/**
- * The`coefficient of variation`_ is the ratio of the standard deviation to the mean.
- * .._`coefficient of variation`: https://en.wikipedia.org/wiki/Coefficient_of_variation
- *
- *
- * @param {Array} x input
- * @returns {number} coefficient of variation
- * @example
- * coefficientOfVariation([1, 2, 3, 4]).toFixed(3); // => 0.516
- * coefficientOfVariation([1, 2, 3, 4, 5]).toFixed(3); // => 0.527
- * coefficientOfVariation([-1, 0, 1, 2, 3, 4]).toFixed(3); // => 1.247
- */
-function coefficientOfVariation(x) {
-    return sampleStandardDeviation(x) / mean(x);
-}
-
-/**
- * Implementation of Combinations
- * Combinations are unique subsets of a collection - in this case, k x from a collection at a time.
- * https://en.wikipedia.org/wiki/Combination
- * @param {Array} x any type of data
- * @param {int} k the number of objects in each group (without replacement)
- * @returns {Array<Array>} array of permutations
- * @example
- * combinations([1, 2, 3], 2); // => [[1,2], [1,3], [2,3]]
- */
-
-function combinations(x, k) {
-    if (k === 0) {
-        return [[]];
-    }
-
-    var i;
-    var subI;
-    var combinationList = [];
-    var subsetCombinations;
-    var next;
-
-    for (i = 0; i < x.length; i++) {
-        if (k === 1) {
-            combinationList.push([x[i]]);
-        } else {
-            subsetCombinations = combinations(x.slice(i + 1, x.length), k - 1);
-            for (subI = 0; subI < subsetCombinations.length; subI++) {
-                next = subsetCombinations[subI];
-                next.unshift(x[i]);
-                combinationList.push(next);
-            }
-        }
-    }
-    return combinationList;
-}
-
-/**
- * Implementation of [Combinations](https://en.wikipedia.org/wiki/Combination) with replacement
- * Combinations are unique subsets of a collection - in this case, k x from a collection at a time.
- * 'With replacement' means that a given element can be chosen multiple times.
- * Unlike permutation, order doesn't matter for combinations.
- *
- * @param {Array} x any type of data
- * @param {int} k the number of objects in each group (without replacement)
- * @returns {Array<Array>} array of permutations
- * @example
- * combinationsReplacement([1, 2], 2); // => [[1, 1], [1, 2], [2, 2]]
- */
-function combinationsReplacement(x, k) {
-    if (k === 0) {
-        return [[]];
-    }
-
-    var combinationList = [];
-
-    for (var i = 0; i < x.length; i++) {
-        if (k === 1) {
-            // If we're requested to find only one element, we don't need
-            // to recurse: just push `x[i]` onto the list of combinations.
-            combinationList.push([x[i]]);
-        } else {
-            // Otherwise, recursively find combinations, given `k - 1`. Note that
-            // we request `k - 1`, so if you were looking for k=3 combinations, we're
-            // requesting k=2. This -1 gets reversed in the for loop right after this
-            // code, since we concatenate `x[i]` onto the selected combinations,
-            // bringing `k` back up to your requested level.
-            // This recursion may go many levels deep, since it only stops once
-            // k=1.
-            var subsetCombinations = combinationsReplacement(
-                x.slice(i, x.length),
-                k - 1
-            );
-
-            for (var j = 0; j < subsetCombinations.length; j++) {
-                combinationList.push([x[i]].concat(subsetCombinations[j]));
-            }
-        }
-    }
-
-    return combinationList;
-}
-
-/**
- * When combining two lists of values for which one already knows the means,
- * one does not have to necessary recompute the mean of the combined lists in
- * linear time. They can instead use this function to compute the combined
- * mean by providing the mean & number of values of the first list and the mean
- * & number of values of the second list.
- *
- * @since 3.0.0
- * @param {number} mean1 mean of the first list
- * @param {number} n1 number of items in the first list
- * @param {number} mean2 mean of the second list
- * @param {number} n2 number of items in the second list
- * @returns {number} the combined mean
- *
- * @example
- * combineMeans(5, 3, 4, 3); // => 4.5
- */
-function combineMeans(mean1, n1, mean2, n2) {
-    return (mean1 * n1 + mean2 * n2) / (n1 + n2);
-}
-
-/**
- * When combining two lists of values for which one already knows the variances,
- * one does not have to necessary recompute the variance of the combined lists
- * in linear time. They can instead use this function to compute the combined
- * variance by providing the variance, mean & number of values of the first list
- * and the variance, mean & number of values of the second list.
- *
- * @since 3.0.0
- * @param {number} variance1 variance of the first list
- * @param {number} mean1 mean of the first list
- * @param {number} n1 number of items in the first list
- * @param {number} variance2 variance of the second list
- * @param {number} mean2 mean of the second list
- * @param {number} n2 number of items in the second list
- * @returns {number} the combined mean
- *
- * @example
- * combineVariances(14 / 3, 5, 3, 8 / 3, 4, 3); // => 47 / 12
- */
-function combineVariances(variance1, mean1, n1, variance2, mean2, n2) {
-    var newMean = combineMeans(mean1, n1, mean2, n2);
-
-    return (
-        (n1 * (variance1 + Math.pow(mean1 - newMean, 2)) +
-            n2 * (variance2 + Math.pow(mean2 - newMean, 2))) /
-        (n1 + n2)
-    );
-}
-
-/**
- * This computes the maximum number in an array.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @returns {number} maximum value
- * @throws {Error} if the length of x is less than one
- * @example
- * max([1, 2, 3, 4]);
- * // => 4
- */
-function max(x) {
-    if (x.length === 0) {
-        throw new Error("max requires at least one data point");
-    }
-
-    var value = x[0];
-    for (var i = 1; i < x.length; i++) {
-        if (x[i] > value) {
-            value = x[i];
-        }
-    }
-    return value;
-}
-
-/**
- * The min is the lowest number in the array.
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @throws {Error} if the length of x is less than one
- * @returns {number} minimum value
- * @example
- * min([1, 5, -10, 100, 2]); // => -10
- */
-function min(x) {
-    if (x.length === 0) {
-        throw new Error("min requires at least one data point");
-    }
-
-    var value = x[0];
-    for (var i = 1; i < x.length; i++) {
-        if (x[i] < value) {
-            value = x[i];
-        }
-    }
-    return value;
-}
-
-/**
- * Given an array of x, this will find the extent of the
- * x and return an array of breaks that can be used
- * to categorize the x into a number of classes. The
- * returned array will always be 1 longer than the number of
- * classes because it includes the minimum value.
- *
- * @param {Array<number>} x an array of number values
- * @param {number} nClasses number of desired classes
- * @returns {Array<number>} array of class break positions
- * @example
- * equalIntervalBreaks([1, 2, 3, 4, 5, 6], 4); // => [1, 2.25, 3.5, 4.75, 6]
- */
-function equalIntervalBreaks(x, nClasses) {
-    if (x.length < 2) {
-        return x;
-    }
-
-    var theMin = min(x);
-    var theMax = max(x);
-
-    // the first break will always be the minimum value
-    // in the xset
-    var breaks = [theMin];
-
-    // The size of each break is the full range of the x
-    // divided by the number of classes requested
-    var breakSize = (theMax - theMin) / nClasses;
-
-    // In the case of nClasses = 1, this loop won't run
-    // and the returned breaks will be [min, max]
-    for (var i = 1; i < nClasses; i++) {
-        breaks.push(breaks[0] + breakSize * i);
-    }
-
-    // the last break will always be the
-    // maximum.
-    breaks.push(theMax);
-
-    return breaks;
-}
-
-/**
- * This computes the minimum & maximum number in an array.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @returns {Array<number>} minimum & maximum value
- * @throws {Error} if the length of x is less than one
- * @example
- * extent([1, 2, 3, 4]);
- * // => [1, 4]
- */
-function extent(x) {
-    if (x.length === 0) {
-        throw new Error("extent requires at least one data point");
-    }
-
-    var min = x[0];
-    var max = x[0];
-    for (var i = 1; i < x.length; i++) {
-        if (x[i] > max) {
-            max = x[i];
-        }
-        if (x[i] < min) {
-            min = x[i];
-        }
-    }
-    return [min, max];
-}
-
-/**
- * The extent is the lowest & highest number in the array. With a sorted array,
- * the first element in the array is always the lowest while the last element is always the largest, so this calculation
- * can be done in one step, or constant time.
- *
- * @param {Array<number>} x input
- * @returns {Array<number>} minimum & maximum value
- * @example
- * extentSorted([-100, -10, 1, 2, 5]); // => [-100, 5]
- */
-function extentSorted(x) {
-    return [x[0], x[x.length - 1]];
-}
-
-/**
- * The [Geometric Mean](https://en.wikipedia.org/wiki/Geometric_mean) is
- * a mean function that is more useful for numbers in different
- * ranges.
- *
- * This is the nth root of the input numbers multiplied by each other.
- *
- * The geometric mean is often useful for
- * **[proportional growth](https://en.wikipedia.org/wiki/Geometric_mean#Proportional_growth)**: given
- * growth rates for multiple years, like _80%, 16.66% and 42.85%_, a simple
- * mean will incorrectly estimate an average growth rate, whereas a geometric
- * mean will correctly estimate a growth rate that, over those years,
- * will yield the same end value.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @returns {number} geometric mean
- * @throws {Error} if x is empty
- * @throws {Error} if x contains a negative number
- * @example
- * var growthRates = [1.80, 1.166666, 1.428571];
- * var averageGrowth = ss.geometricMean(growthRates);
- * var averageGrowthRates = [averageGrowth, averageGrowth, averageGrowth];
- * var startingValue = 10;
- * var startingValueMean = 10;
- * growthRates.forEach(function(rate) {
- *   startingValue *= rate;
- * });
- * averageGrowthRates.forEach(function(rate) {
- *   startingValueMean *= rate;
- * });
- * startingValueMean === startingValue;
- */
-function geometricMean(x) {
-    if (x.length === 0) {
-        throw new Error("geometricMean requires at least one data point");
-    }
-
-    // the starting value.
-    var value = 1;
-
-    for (var i = 0; i < x.length; i++) {
-        // the geometric mean is only valid for positive numbers
-        if (x[i] < 0) {
-            throw new Error(
-                "geometricMean requires only non-negative numbers as input"
-            );
-        }
-
-        // repeatedly multiply the value by each number
-        value *= x[i];
-    }
-
-    return Math.pow(value, 1 / x.length);
-}
-
-/**
- * The [Harmonic Mean](https://en.wikipedia.org/wiki/Harmonic_mean) is
- * a mean function typically used to find the average of rates.
- * This mean is calculated by taking the reciprocal of the arithmetic mean
- * of the reciprocals of the input numbers.
- *
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @returns {number} harmonic mean
- * @throws {Error} if x is empty
- * @throws {Error} if x contains a negative number
- * @example
- * harmonicMean([2, 3]).toFixed(2) // => '2.40'
- */
-function harmonicMean(x) {
-    if (x.length === 0) {
-        throw new Error("harmonicMean requires at least one data point");
-    }
-
-    var reciprocalSum = 0;
-
-    for (var i = 0; i < x.length; i++) {
-        // the harmonic mean is only valid for positive numbers
-        if (x[i] <= 0) {
-            throw new Error(
-                "harmonicMean requires only positive numbers as input"
-            );
-        }
-
-        reciprocalSum += 1 / x[i];
-    }
-
-    // divide n by the reciprocal sum
-    return x.length / reciprocalSum;
-}
-
-/**
- * This is the internal implementation of quantiles: when you know
- * that the order is sorted, you don't need to re-sort it, and the computations
- * are faster.
- *
- * This implements the linear interpolation method (type=7 in R/numpy),
- * which is the default in numpy.percentile and R's quantile.
- *
- * @param {Array<number>} x sample of one or more data points
- * @param {number} p desired quantile: a number between 0 to 1, inclusive
- * @returns {number} quantile value
- * @throws {Error} if p ix outside of the range from 0 to 1
- * @throws {Error} if x is empty
- * @example
- * quantileSorted([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
- */
-function quantileSorted(x, p) {
-    // Use (n-1) * p for index, matching numpy's linear method (type=7)
-    var idx = (x.length - 1) * p;
-    if (x.length === 0) {
-        throw new Error("quantile requires at least one data point.");
-    } else if (p < 0 || p > 1) {
-        throw new Error("quantiles must be between 0 and 1");
-    } else if (p === 1) {
-        // If p is 1, directly return the last element
-        return x[x.length - 1];
-    } else if (p === 0) {
-        // If p is 0, directly return the first element
-        return x[0];
-    } else if (idx % 1 !== 0) {
-        // If idx is not integer, interpolate linearly between floor and ceil
-        var lower = Math.floor(idx);
-        var upper = Math.ceil(idx);
-        var fraction = idx - lower;
-        return x[lower] + fraction * (x[upper] - x[lower]);
-    } else {
-        // If idx is integer, type=7 returns the value at that index
-        return x[idx];
-    }
-}
-
-/**
- * Rearrange items in `arr` so that all items in `[left, k]` range are the smallest.
- * The `k`-th element will have the `(k - left + 1)`-th smallest value in `[left, right]`.
- *
- * Implements Floyd-Rivest selection algorithm https://en.wikipedia.org/wiki/Floyd-Rivest_algorithm
- *
- * @param {Array<number>} arr input array
- * @param {number} k pivot index
- * @param {number} [left] left index
- * @param {number} [right] right index
- * @returns {void} mutates input array
- * @example
- * var arr = [65, 28, 59, 33, 21, 56, 22, 95, 50, 12, 90, 53, 28, 77, 39];
- * quickselect(arr, 8);
- * // = [39, 28, 28, 33, 21, 12, 22, 50, 53, 56, 59, 65, 90, 77, 95]
- */
-function quickselect(arr, k, left, right) {
-    left = left || 0;
-    right = right || arr.length - 1;
-
-    while (right > left) {
-        // 600 and 0.5 are arbitrary constants chosen in the original paper to minimize execution time
-        if (right - left > 600) {
-            var n = right - left + 1;
-            var m = k - left + 1;
-            var z = Math.log(n);
-            var s = 0.5 * Math.exp((2 * z) / 3);
-            var sd = 0.5 * Math.sqrt((z * s * (n - s)) / n);
-            if (m - n / 2 < 0) { sd *= -1; }
-            var newLeft = Math.max(left, Math.floor(k - (m * s) / n + sd));
-            var newRight = Math.min(
-                right,
-                Math.floor(k + ((n - m) * s) / n + sd)
-            );
-            quickselect(arr, k, newLeft, newRight);
-        }
-
-        var t = arr[k];
-        var i = left;
-        var j = right;
-
-        swap(arr, left, k);
-        if (arr[right] > t) { swap(arr, left, right); }
-
-        while (i < j) {
-            swap(arr, i, j);
-            i++;
-            j--;
-            while (arr[i] < t) { i++; }
-            while (arr[j] > t) { j--; }
-        }
-
-        if (arr[left] === t) { swap(arr, left, j); }
-        else {
-            j++;
-            swap(arr, j, right);
-        }
-
-        if (j <= k) { left = j + 1; }
-        if (k <= j) { right = j - 1; }
-    }
-}
-
-function swap(arr, i, j) {
-    var tmp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = tmp;
-}
-
-/**
- * The [quantile](https://en.wikipedia.org/wiki/Quantile):
- * this is a population quantile, since we assume to know the entire
- * dataset in this library. This implementation uses linear interpolation,
- * equivalent to R's type=7 and numpy's default percentile method.
- *
- * Sample is a one-dimensional array of numbers,
- * and p is either a decimal number from 0 to 1 or an array of decimal
- * numbers from 0 to 1.
- * In terms of a k/q quantile, p = k/q - it's just dealing with fractions or dealing
- * with decimal values.
- * When p is an array, the result of the function is also an array containing the appropriate
- * quantiles in input order
- *
- * @param {Array<number>} x sample of one or more numbers
- * @param {Array<number> | number} p the desired quantile, as a number between 0 and 1
- * @returns {number} quantile
- * @example
- * quantile([3, 6, 7, 8, 8, 9, 10, 13, 15, 16, 20], 0.5); // => 9
- */
-function quantile(x, p) {
-    var copy = x.slice();
-
-    if (Array.isArray(p)) {
-        // rearrange elements so that each element corresponding to a requested
-        // quantile is on a place it would be if the array was fully sorted
-        multiQuantileSelect(copy, p);
-        // Initialize the result array
-        var results = [];
-        // For each requested quantile
-        for (var i = 0; i < p.length; i++) {
-            results[i] = quantileSorted(copy, p[i]);
-        }
-        return results;
-    } else {
-        var idx = quantileIndex(copy.length, p);
-        quantileSelect(copy, idx, 0, copy.length - 1);
-        return quantileSorted(copy, p);
-    }
-}
-
-function quantileSelect(arr, k, left, right) {
-    if (k % 1 === 0) {
-        quickselect(arr, k, left, right);
-    } else {
-        k = Math.floor(k);
-        quickselect(arr, k, left, right);
-        quickselect(arr, k + 1, k + 1, right);
-    }
-}
-
-function multiQuantileSelect(arr, p) {
-    // Collect every integer order statistic that the requested quantiles need.
-    // Linear interpolation (type=7) reads x[floor(idx)] and x[ceil(idx)], so both
-    // surrounding positions must be placed. Deduplicate to integer positions
-    // so each is selected with an unambiguous index.
-    var positions = new Set();
-    for (var i = 0; i < p.length; i++) {
-        var idx = quantileIndex(arr.length, p[i]);
-        positions.add(Math.floor(idx));
-        positions.add(Math.ceil(idx));
-    }
-    var indices = Array.from(positions).sort(compare);
-
-    multiselect(arr, indices, 0, indices.length - 1, 0, arr.length - 1);
-}
-
-// Place every order statistic in `indices` by partitioning around the median
-// requested position, then recursing into the two halves. The just-placed pivot
-// is excluded from the child ranges (indices[mid] ± 1) so that a later, narrower
-// quickselect cannot disturb an already-finalized position.
-function multiselect(arr, indices, lo, hi, left, right) {
-    if (lo > hi) { return; }
-    var mid = (lo + hi) >> 1;
-    quickselect(arr, indices[mid], left, right);
-    multiselect(arr, indices, lo, mid - 1, left, indices[mid] - 1);
-    multiselect(arr, indices, mid + 1, hi, indices[mid] + 1, right);
-}
-
-function compare(a, b) {
-    return a - b;
-}
-
-function quantileIndex(len, p) {
-    // Use (n-1) * p to match numpy's linear method (type=7)
-    var idx = (len - 1) * p;
-    if (p === 1) {
-        // If p is 1, directly return the last index
-        return len - 1;
-    } else if (p === 0) {
-        // If p is 0, directly return the first index
-        return 0;
-    } else if (idx % 1 !== 0) {
-        // If index is not integer, keep the fractional position so we can
-        // select both surrounding order statistics for interpolation.
-        return idx;
-    } else {
-        // If index is integer, return that exact position.
-        return idx;
-    }
-}
-
-/**
- * The [Interquartile range](http://en.wikipedia.org/wiki/Interquartile_range) is
- * a measure of statistical dispersion, or how scattered, spread, or
- * concentrated a distribution is. It's computed as the difference between
- * the third quartile and first quartile.
- *
- * @param {Array<number>} x sample of one or more numbers
- * @returns {number} interquartile range: the span between lower and upper quartile,
- * 0.25 and 0.75
- * @example
- * interquartileRange([0, 1, 2, 3]); // => 1.5
- */
-function interquartileRange(x) {
-    // Interquartile range is the span between the upper quartile,
-    // at `0.75`, and lower quartile, `0.25`
-    var q1 = quantile(x, 0.75);
-    var q2 = quantile(x, 0.25);
-
-    if (typeof q1 === "number" && typeof q2 === "number") {
-        return q1 - q2;
-    }
-}
-
 /*
  * Pull Breaks Values for Jenks
  *
@@ -71928,9 +72920,6 @@ function jenksMatrices(data, nClasses) {
         }
     }
 
-    // Shift values by the median to improve numeric stability
-    var shift = data[Math.floor(data.length / 2)];
-
     for (var l = 2; l < data.length + 1; l++) {
         // `SZ` originally. this is the sum of the values seen thus
         // far when calculating variance.
@@ -71949,7 +72938,7 @@ function jenksMatrices(data, nClasses) {
         for (var m = 1; m < l + 1; m++) {
             // `III` originally
             var lowerClassLimit = l - m + 1;
-            var val = data[lowerClassLimit - 1] - shift;
+            var val = data[lowerClassLimit - 1];
 
             // here we're estimating variance for each potential classing
             // of the data, for each potential number of classes. `w`
@@ -72010,9 +72999,7 @@ function jenksMatrices(data, nClasses) {
  *
  * @param {Array<number>} data input data, as an array of number values
  * @param {number} nClasses number of desired classes
- * @returns {Array<number> | null} array of class break positions, or null
- * when nClasses is greater than the number of data points
- * @example
+ * @returns {Array<number>} array of class break positions
  * // split data into 3 break points
  * jenks([1, 2, 4, 5, 7, 9, 10, 20], 3) // = [1, 7, 20, 20]
  */
@@ -72037,754 +73024,45 @@ function jenks(data, nClasses) {
 }
 
 /**
- * [Simple linear regression](http://en.wikipedia.org/wiki/Simple_linear_regression)
- * is a simple way to find a fitted line
- * between a set of coordinates. This algorithm finds the slope and y-intercept of a regression line
- * using the least sum of squares.
+ * Given an array of x, this will find the extent of the
+ * x and return an array of breaks that can be used
+ * to categorize the x into a number of classes. The
+ * returned array will always be 1 longer than the number of
+ * classes because it includes the minimum value.
  *
- * @param {Array<Array<number>>} data an array of two-element of arrays,
- * like `[[0, 1], [2, 3]]`
- * @returns {Object} object containing slope and intersect of regression line
+ * @param {Array<number>} x an array of number values
+ * @param {number} nClasses number of desired classes
+ * @returns {Array<number>} array of class break positions
  * @example
- * linearRegression([[0, 0], [1, 1]]); // => { m: 1, b: 0 }
+ * equalIntervalBreaks([1, 2, 3, 4, 5, 6], 4); // => [1, 2.25, 3.5, 4.75, 6]
  */
-function linearRegression(data) {
-    var m;
-    var b;
-
-    // Store data length in a local variable to reduce
-    // repeated object property lookups
-    var dataLength = data.length;
-
-    //if there's only one point, arbitrarily choose a slope of 0
-    //and a y-intercept of whatever the y of the initial point is
-    if (dataLength === 1) {
-        m = 0;
-        b = data[0][1];
-    } else {
-        // The means of x and y. Centering on them before accumulating the
-        // cross products keeps the sums small when the coordinates are not,
-        // which is what `weightedLinearRegression` already does.
-        var sumX = 0;
-        var sumY = 0;
-        for (var i = 0; i < dataLength; i++) {
-            sumX += data[i][0];
-            sumY += data[i][1];
-        }
-        var meanX = sumX / dataLength;
-        var meanY = sumY / dataLength;
-
-        var sumXY = 0;
-        var sumXX = 0;
-        for (var i$1 = 0; i$1 < dataLength; i$1++) {
-            var deviationX = data[i$1][0] - meanX;
-            sumXY += deviationX * (data[i$1][1] - meanY);
-            sumXX += deviationX * deviationX;
-        }
-
-        // `m` is the slope of the regression line, `b` its y-intercept.
-        m = sumXY / sumXX;
-        b = meanY - m * meanX;
-    }
-
-    // Return both values as an object.
-    return {
-        m: m,
-        b: b
-    };
-}
-
-/**
- * Given the output of `linearRegression`: an object
- * with `m` and `b` values indicating slope and intercept,
- * respectively, generate a line function that translates
- * x values into y values.
- *
- * @param {Object} mb object with `m` and `b` members, representing
- * slope and intersect of desired line
- * @returns {Function} method that computes y-value at any given
- * x-value on the line.
- * @example
- * var l = linearRegressionLine(linearRegression([[0, 0], [1, 1]]));
- * l(0) // = 0
- * l(2) // = 2
- * linearRegressionLine({ b: 0, m: 1 })(1); // => 1
- * linearRegressionLine({ b: 1, m: 1 })(1); // => 2
- */
-function linearRegressionLine(mb /*: { b: number, m: number }*/) {
-    // Return a function that computes a `y` value for each
-    // x value it is given, based on the values of `b` and `a`
-    // that we just computed.
-    return function (x) {
-        return mb.b + mb.m * x;
-    };
-}
-
-/**
- * The [log average](https://en.wikipedia.org/wiki/https://en.wikipedia.org/wiki/Geometric_mean#Relationship_with_logarithms)
- * is an equivalent way of computing the geometric mean of an array suitable for large or small products.
- *
- * It's found by calculating the average logarithm of the elements and exponentiating.
- *
- * @param {Array<number>} x sample of one or more data points
- * @returns {number} geometric mean
- * @throws {Error} if x is empty
- * @throws {Error} if x contains a negative number
- */
-function logAverage(x) {
-    if (x.length === 0) {
-        throw new Error("logAverage requires at least one data point");
-    }
-
-    var value = 0;
-    for (var i = 0; i < x.length; i++) {
-        if (x[i] < 0) {
-            throw new Error(
-                "logAverage requires only non-negative numbers as input"
-            );
-        }
-        value += Math.log(x[i]);
-    }
-
-    return Math.exp(value / x.length);
-}
-
-/**
- * The maximum is the highest number in the array. With a sorted array,
- * the last element in the array is always the largest, so this calculation
- * can be done in one step, or constant time.
- *
- * @param {Array<number>} x input
- * @returns {number} maximum value
- * @example
- * maxSorted([-100, -10, 1, 2, 5]); // => 5
- */
-function maxSorted(x) {
-    return x[x.length - 1];
-}
-
-/**
- * The simple [sum](https://en.wikipedia.org/wiki/Summation) of an array
- * is the result of adding all numbers together, starting from zero.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x input
- * @return {number} sum of all input numbers
- * @example
- * sumSimple([1, 2, 3]); // => 6
- */
-function sumSimple(x) {
-    var value = 0;
-    for (var i = 0; i < x.length; i++) {
-        if (typeof x[i] !== "number") {
-            return Number.NaN;
-        }
-        value += x[i];
-    }
-    return value;
-}
-
-/**
- * The mean, _also known as average_,
- * is the sum of all values over the number of values.
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * The simple mean uses the successive addition method internally
- * to calculate it's result. Errors in floating-point addition are
- * not accounted for, so if precision is required, the standard {@link mean}
- * method should be used instead.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- *
- * @param {Array<number>} x sample of one or more data points
- * @throws {Error} if the length of x is less than one
- * @returns {number} mean
- * @example
- * mean([0, 10]); // => 5
- */
-function meanSimple(x) {
-    if (x.length === 0) {
-        throw new Error("meanSimple requires at least one data point");
-    }
-
-    return sumSimple(x) / x.length;
-}
-
-/**
- * The [median](http://en.wikipedia.org/wiki/Median) is
- * the middle number of a list. This is often a good indicator of 'the middle'
- * when there are outliers that skew the `mean()` value.
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * The median isn't necessarily one of the elements in the list: the value
- * can be the average of two elements if the list has an even length
- * and the two central values are different.
- *
- * @param {Array<number>} x input
- * @returns {number} median value
- * @example
- * median([10, 2, 5, 100, 2, 1]); // => 3.5
- */
-function median(x) {
-    return +quantile(x, 0.5);
-}
-
-/**
- * The [Median Absolute Deviation](http://en.wikipedia.org/wiki/Median_absolute_deviation) is
- * a robust measure of statistical
- * dispersion. It is more resilient to outliers than the standard deviation.
- *
- * @param {Array<number>} x input array
- * @returns {number} median absolute deviation
- * @example
- * medianAbsoluteDeviation([1, 1, 2, 2, 4, 6, 9]); // => 1
- */
-function medianAbsoluteDeviation(x) {
-    var medianValue = median(x);
-    var medianAbsoluteDeviations = [];
-
-    // Make a list of absolute deviations from the median
-    for (var i = 0; i < x.length; i++) {
-        medianAbsoluteDeviations.push(Math.abs(x[i] - medianValue));
-    }
-
-    // Find the median value of that list
-    return median(medianAbsoluteDeviations);
-}
-
-/**
- * The [median](http://en.wikipedia.org/wiki/Median) is
- * the middle number of a list. This is often a good indicator of 'the middle'
- * when there are outliers that skew the `mean()` value.
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * The median isn't necessarily one of the elements in the list: the value
- * can be the average of two elements if the list has an even length
- * and the two central values are different.
- *
- * @param {Array<number>} sorted input
- * @returns {number} median value
- * @example
- * medianSorted([10, 2, 5, 100, 2, 1]); // => 52.5
- */
-function medianSorted(sorted) {
-    return quantileSorted(sorted, 0.5);
-}
-
-/**
- * The minimum is the lowest number in the array. With a sorted array,
- * the first element in the array is always the smallest, so this calculation
- * can be done in one step, or constant time.
- *
- * @param {Array<number>} x input
- * @returns {number} minimum value
- * @example
- * minSorted([-100, -10, 1, 2, 5]); // => -100
- */
-function minSorted(x) {
-    return x[0];
-}
-
-/**
- * The [mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number
- * that appears in a list the highest number of times.
- * There can be multiple modes in a list. This algorithm expects sorted input,
- * so equal values are adjacent and a tie resolves to the smallest of the tied
- * values. `modeFast` breaks ties differently, returning whichever tied value
- * reaches the highest count first.
- *
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * This runs in `O(n)` because the input is sorted.
- *
- * @param {Array<number>} sorted a sample of one or more data points
- * @returns {number} mode
- * @throws {Error} if sorted is empty
- * @example
- * modeSorted([0, 0, 1]); // => 0
- */
-function modeSorted(sorted) {
-    // Handle edge cases:
-    // The mode of an empty list is undefined
-    if (sorted.length === 0) {
-        throw new Error("mode requires at least one data point");
-    }
-    if (sorted.length === 1) {
-        return sorted[0];
-    }
-
-    // This assumes it is dealing with an array of size > 1, since size
-    // 0 and 1 are handled immediately. Hence it starts at index 1 in the
-    // array.
-    var last = sorted[0];
-    // store the mode as we find new modes
-    var value = Number.NaN;
-    // store how many times we've seen the mode
-    var maxSeen = 0;
-    // how many times the current candidate for the mode
-    // has been seen
-    var seenThis = 1;
-
-    // end at sorted.length + 1 to fix the case in which the mode is
-    // the highest number that occurs in the sequence. the last iteration
-    // compares sorted[i], which is undefined, to the highest number
-    // in the series
-    for (var i = 1; i < sorted.length + 1; i++) {
-        // we're seeing a new number pass by
-        if (sorted[i] !== last) {
-            // the last number is the new mode since we saw it more
-            // often than the old one
-            if (seenThis > maxSeen) {
-                maxSeen = seenThis;
-                value = last;
-            }
-            seenThis = 1;
-            last = sorted[i];
-            // if this isn't a new number, it's one more occurrence of
-            // the potential mode
-        } else {
-            seenThis++;
-        }
-    }
-    return value;
-}
-
-/**
- * The [mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number
- * that appears in a list the highest number of times.
- * There can be multiple modes in a list. This algorithm sorts its input, so a
- * tie resolves to the smallest of the tied values regardless of the order they
- * appeared in. `modeFast` breaks ties differently, returning whichever tied
- * value reaches the highest count first.
- *
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * This runs in `O(n log(n))` because it needs to sort the array internally
- * before running an `O(n)` search to find the mode.
- *
- * @param {Array<number>} x input
- * @returns {number} mode
- * @example
- * mode([0, 0, 1]); // => 0
- */
-function mode(x) {
-    // Sorting the array lets us iterate through it below and be sure
-    // that every time we see a new number it's new and we'll never
-    // see the same number twice
-    return modeSorted(numericSort(x));
-}
-
-/* globals Map: false */
-
-/**
- * The [mode](https://en.wikipedia.org/wiki/Mode_%28statistics%29) is the number
- * that appears in a list the highest number of times.
- * There can be multiple modes in a list. This algorithm walks the input in
- * order, so a tie resolves to whichever tied value reaches the highest count
- * first. `mode` and `modeSorted` break ties differently, returning the
- * smallest of the tied values.
- *
- * modeFast uses a Map object to keep track of the mode, instead of the approach
- * used with `mode`, a sorted array. As a result, it is faster
- * than `mode` and supports any data type that can be compared with `==`.
- * It also requires a
- * [JavaScript environment with support for Map](https://kangax.github.io/compat-table/es6/#test-Map),
- * and will throw an error if Map is not available.
- *
- * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
- * a method of finding a typical or central value of a set of numbers.
- *
- * @param {Array<*>} x a sample of one or more data points
- * @returns {?*} mode
- * @throws {ReferenceError} if the JavaScript environment doesn't support Map
- * @throws {Error} if x is empty
- * @example
- * modeFast(['rabbits', 'rabbits', 'squirrels']); // => 'rabbits'
- */
-function modeFast(x) {
-    // This index will reflect the incidence of different values, indexing
-    // them like
-    // { value: count }
-    var index = new Map();
-
-    // A running `mode` and the number of times it has been encountered.
-    var mode;
-    var modeCount = 0;
-
-    for (var i = 0; i < x.length; i++) {
-        var newCount = index.get(x[i]);
-        if (newCount === undefined) {
-            newCount = 1;
-        } else {
-            newCount++;
-        }
-        if (newCount > modeCount) {
-            mode = x[i];
-            modeCount = newCount;
-        }
-        index.set(x[i], newCount);
-    }
-
-    if (modeCount === 0) {
-        throw new Error("mode requires at last one data point");
-    }
-
-    return mode;
-}
-
-/**
- * Implementation of [Heap's Algorithm](https://en.wikipedia.org/wiki/Heap%27s_algorithm)
- * for generating permutations.
- *
- * @param {Array} elements any type of data
- * @returns {Array<Array>} array of permutations
- */
-function permutationsHeap(elements) {
-    var indexes = new Array(elements.length);
-    var permutations = [elements.slice()];
-
-    for (var i = 0; i < elements.length; i++) {
-        indexes[i] = 0;
-    }
-
-    for (var i$1 = 0; i$1 < elements.length; ) {
-        if (indexes[i$1] < i$1) {
-            // At odd indexes, swap from indexes[i] instead
-            // of from the beginning of the array
-            var swapFrom = 0;
-            if (i$1 % 2 !== 0) {
-                swapFrom = indexes[i$1];
-            }
-
-            // swap between swapFrom and i, using
-            // a temporary variable as storage.
-            var temp = elements[swapFrom];
-            elements[swapFrom] = elements[i$1];
-            elements[i$1] = temp;
-
-            permutations.push(elements.slice());
-            indexes[i$1]++;
-            i$1 = 0;
-        } else {
-            indexes[i$1] = 0;
-            i$1++;
-        }
-    }
-
-    return permutations;
-}
-
-/**
- * The [product](https://en.wikipedia.org/wiki/Product_(mathematics)) of an array
- * is the result of multiplying all numbers together, starting using one as the multiplicative identity.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x input
- * @return {number} product of all input numbers
- * @example
- * product([1, 2, 3, 4]); // => 24
- */
-function product(x) {
-    var value = 1;
-    for (var i = 0; i < x.length; i++) {
-        value *= x[i];
-    }
-    return value;
-}
-
-/* eslint no-bitwise: 0 */
-
-/**
- * This function returns the quantile in which one would find the given value in
- * the given array. With a sorted array, leveraging binary search, we can find
- * this information in logarithmic time.
- *
- * @param {Array<number>} x input
- * @param {number} value the value for which to find the quantile rank
- * @returns {number} the quantile rank
- * @example
- * quantileRankSorted([1, 2, 3, 4], 3); // => 0.75
- * quantileRankSorted([1, 2, 3, 3, 4], 3); // => 0.7
- * quantileRankSorted([1, 2, 3, 4], 6); // => 1
- * quantileRankSorted([1, 2, 3, 3, 5], 4); // => 0.8
- */
-function quantileRankSorted(x, value) {
-    // Value is lesser than any value in the array
-    if (value < x[0]) {
-        return 0;
-    }
-
-    // Value is greater than any value in the array
-    if (value > x[x.length - 1]) {
-        return 1;
-    }
-
-    var l = lowerBound(x, value);
-
-    // Value is not in the array
-    if (x[l] !== value) {
-        return l / x.length;
-    }
-
-    l++;
-
-    var u = upperBound(x, value);
-
-    // The value exists only once in the array
-    if (u === l) {
-        return l / x.length;
-    }
-
-    // Here, we are basically computing the mean of the range of indices
-    // containing our searched value. But, instead, of initializing an
-    // array and looping over it, there is a dedicated math formula that
-    // we apply below to get the result.
-    var r = u - l + 1;
-    var sum = (r * (u + l)) / 2;
-    var mean = sum / r;
-
-    return mean / x.length;
-}
-
-function lowerBound(x, value) {
-    var mid = 0;
-    var lo = 0;
-    var hi = x.length;
-
-    while (lo < hi) {
-        mid = (lo + hi) >>> 1;
-
-        if (value <= x[mid]) {
-            hi = mid;
-        } else {
-            lo = -~mid;
-        }
-    }
-
-    return lo;
-}
-
-function upperBound(x, value) {
-    var mid = 0;
-    var lo = 0;
-    var hi = x.length;
-
-    while (lo < hi) {
-        mid = (lo + hi) >>> 1;
-
-        if (value >= x[mid]) {
-            lo = -~mid;
-        } else {
-            hi = mid;
-        }
-    }
-
-    return lo;
-}
-
-/**
- * This function returns the quantile in which one would find the given value in
- * the given array. It will copy and sort your array before each run, so
- * if you know your array is already sorted, you should use `quantileRankSorted`
- * instead.
- *
- * @param {Array<number>} x input
- * @param {number} value the value for which to find the quantile rank
- * @returns {number} the quantile rank
- * @example
- * quantileRank([4, 3, 1, 2], 3); // => 0.75
- * quantileRank([4, 3, 2, 3, 1], 3); // => 0.7
- * quantileRank([2, 4, 1, 3], 6); // => 1
- * quantileRank([5, 3, 1, 2, 3], 4); // => 0.8
- */
-function quantileRank(x, value) {
-    // Cloning and sorting the array
-    var sortedCopy = numericSort(x);
-
-    return quantileRankSorted(sortedCopy, value);
-}
-
-/**
- * The [R Squared](http://en.wikipedia.org/wiki/Coefficient_of_determination)
- * value of data compared with a function `f`
- * is the sum of the squared differences between the prediction
- * and the actual value.
- *
- * @param {Array<Array<number>>} x input data: this should be doubly-nested
- * @param {Function} func function called on `[i][0]` values within the dataset
- * @returns {number} r-squared value
- * @example
- * var samples = [[0, 0], [1, 1]];
- * var regressionLine = linearRegressionLine(linearRegression(samples));
- * rSquared(samples, regressionLine); // = 1 this line is a perfect fit
- */
-function rSquared(x, func) {
+function equalIntervalBreaks(x, nClasses) {
     if (x.length < 2) {
-        return 1;
+        return x;
     }
 
-    // Compute the average y value for the actual
-    // data set in order to compute the
-    // _total sum of squares_
-    var sum = 0;
-    for (var i = 0; i < x.length; i++) {
-        sum += x[i][1];
-    }
-    var average = sum / x.length;
+    var theMin = min(x);
+    var theMax = max(x);
 
-    // Compute the total sum of squares - the
-    // squared difference between each point
-    // and the average of all points.
-    var sumOfSquares = 0;
-    for (var j = 0; j < x.length; j++) {
-        sumOfSquares += Math.pow(average - x[j][1], 2);
-    }
+    // the first break will always be the minimum value
+    // in the xset
+    var breaks = [theMin];
 
-    // Finally estimate the error: the squared
-    // difference between the estimate and the actual data
-    // value at each point.
-    var err = 0;
-    for (var k = 0; k < x.length; k++) {
-        err += Math.pow(x[k][1] - func(x[k][0]), 2);
+    // The size of each break is the full range of the x
+    // divided by the number of classes requested
+    var breakSize = (theMax - theMin) / nClasses;
+
+    // In the case of nClasses = 1, this loop won't run
+    // and the returned breaks will be [min, max]
+    for (var i = 1; i < nClasses; i++) {
+        breaks.push(breaks[0] + breakSize * i);
     }
 
-    // As the error grows larger, its ratio to the
-    // sum of squares increases and the r squared
-    // value grows lower.
-    return 1 - err / sumOfSquares;
-}
+    // the last break will always be the
+    // maximum.
+    breaks.push(theMax);
 
-/**
- * The Root Mean Square (RMS) is
- * a mean function used as a measure of the magnitude of a set
- * of numbers, regardless of their sign.
- * This is the square root of the mean of the squares of the
- * input numbers.
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x a sample of one or more data points
- * @returns {number} root mean square
- * @throws {Error} if x is empty
- * @example
- * rootMeanSquare([-1, 1, -1, 1]); // => 1
- */
-function rootMeanSquare(x) {
-    if (x.length === 0) {
-        throw new Error("rootMeanSquare requires at least one data point");
-    }
-
-    var sumOfSquares = 0;
-    for (var i = 0; i < x.length; i++) {
-        sumOfSquares += Math.pow(x[i], 2);
-    }
-
-    return Math.sqrt(sumOfSquares / x.length);
-}
-
-/**
- * A [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
- * in-place - which means that it **will change the order of the original
- * array by reference**.
- *
- * This is an algorithm that generates a random [permutation](https://en.wikipedia.org/wiki/Permutation)
- * of a set.
- *
- * @param {Array} x sample of one or more numbers
- * @param {Function} [randomSource=Math.random] an optional entropy source that
- * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
- * @returns {Array} x
- * @example
- * var x = [1, 2, 3, 4];
- * shuffleInPlace(x);
- * // x is shuffled to a value like [2, 1, 4, 3]
- */
-function shuffleInPlace(x, randomSource) {
-    // a custom random number source can be provided if you want to use
-    // a fixed seed or another random number generator, like
-    // [random-js](https://www.npmjs.org/package/random-js)
-    randomSource = randomSource || Math.random;
-
-    // store the current length of the x to determine
-    // when no elements remain to shuffle.
-    var length = x.length;
-
-    // temporary is used to hold an item when it is being
-    // swapped between indices.
-    var temporary;
-
-    // The index to swap at each stage.
-    var index;
-
-    // While there are still items to shuffle
-    while (length > 0) {
-        // choose a random index within the subset of the array
-        // that is not yet shuffled
-        index = Math.floor(randomSource() * length--);
-
-        // store the value that we'll move temporarily
-        temporary = x[length];
-
-        // swap the value at `x[length]` with `x[index]`
-        x[length] = x[index];
-        x[index] = temporary;
-    }
-
-    return x;
-}
-
-/**
- * A [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
- * is a fast way to create a random permutation of a finite set. This is
- * a function around `shuffle_in_place` that adds the guarantee that
- * it will not modify its input.
- *
- * @param {Array} x sample of 0 or more numbers
- * @param {Function} [randomSource=Math.random] an optional entropy source that
- * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
- * @return {Array} shuffled version of input
- * @example
- * var shuffled = shuffle([1, 2, 3, 4]);
- * shuffled; // = [2, 3, 1, 4] or any other random permutation
- */
-function shuffle(x, randomSource) {
-    // slice the original array so that it is not modified
-    var sample = x.slice();
-
-    // and then shuffle that shallow-copied array, in place
-    return shuffleInPlace(sample, randomSource);
-}
-
-/**
- * Create a [simple random sample](http://en.wikipedia.org/wiki/Simple_random_sample)
- * from a given array of `n` elements.
- *
- * The sampled values will be in any order, not necessarily the order
- * they appear in the input.
- *
- * @param {Array<any>} x input array. can contain any type
- * @param {number} n count of how many elements to take
- * @param {Function} [randomSource=Math.random] an optional entropy source that
- * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
- * @return {Array} subset of n elements in original array
- *
- * @example
- * var values = [1, 2, 4, 5, 6, 7, 8, 9];
- * sample(values, 3); // returns 3 random values, like [2, 5, 8];
- */
-function sample(x, n, randomSource) {
-    // shuffle the original array using a fisher-yates shuffle
-    var shuffled = shuffle(x, randomSource);
-
-    // and then return a subset of it - the first `n` elements.
-    return shuffled.slice(0, n);
+    return breaks;
 }
 
 /**
@@ -72838,6 +73116,54 @@ function sampleCovariance(x, y) {
 }
 
 /**
+ * The [sample variance](https://en.wikipedia.org/wiki/Variance#Sample_variance)
+ * is the sum of squared deviations from the mean. The sample variance
+ * is distinguished from the variance by the usage of [Bessel's Correction](https://en.wikipedia.org/wiki/Bessel's_correction):
+ * instead of dividing the sum of squared deviations by the length of the input,
+ * it is divided by the length minus one. This corrects the bias in estimating
+ * a value from a set that you don't know if full.
+ *
+ * References:
+ * * [Wolfram MathWorld on Sample Variance](http://mathworld.wolfram.com/SampleVariance.html)
+ *
+ * @param {Array<number>} x a sample of two or more data points
+ * @throws {Error} if the length of x is less than 2
+ * @return {number} sample variance
+ * @example
+ * sampleVariance([1, 2, 3, 4, 5]); // => 2.5
+ */
+function sampleVariance(x) {
+    if (x.length < 2) {
+        throw new Error("sampleVariance requires at least two data points");
+    }
+
+    var sumSquaredDeviationsValue = sumNthPowerDeviations(x, 2);
+
+    // this is Bessels' Correction: an adjustment made to sample statistics
+    // that allows for the reduced degree of freedom entailed in calculating
+    // values from samples rather than complete populations.
+    var besselsCorrection = x.length - 1;
+
+    // Find the mean value of that list
+    return sumSquaredDeviationsValue / besselsCorrection;
+}
+
+/**
+ * The [sample standard deviation](http://en.wikipedia.org/wiki/Standard_deviation#Sample_standard_deviation)
+ * is the square root of the sample variance.
+ *
+ * @param {Array<number>} x input array
+ * @returns {number} sample standard deviation
+ * @example
+ * sampleStandardDeviation([2, 4, 4, 4, 5, 5, 7, 9]).toFixed(2);
+ * // => '2.14'
+ */
+function sampleStandardDeviation(x) {
+    var sampleVarianceX = sampleVariance(x);
+    return Math.sqrt(sampleVarianceX);
+}
+
+/**
  * The [correlation](http://en.wikipedia.org/wiki/Correlation_and_dependence) is
  * a measure of how correlated two datasets are, between -1 and 1
  *
@@ -72854,6 +73180,86 @@ function sampleCorrelation(x, y) {
     var ystd = sampleStandardDeviation(y);
 
     return cov / xstd / ystd;
+}
+
+/**
+ * The [rank correlation](https://en.wikipedia.org/wiki/Rank_correlation) is
+ * a measure of the strength of monotonic relationship between two arrays
+ *
+ * @param {Array<number>} x first input
+ * @param {Array<number>} y second input
+ * @returns {number} sample rank correlation
+ */
+function sampleRankCorrelation(x, y) {
+    var xIndexes = x
+        .map(function (value, index) { return [value, index]; })
+        .sort(function (a, b) { return a[0] - b[0]; })
+        .map(function (pair) { return pair[1]; });
+    var yIndexes = y
+        .map(function (value, index) { return [value, index]; })
+        .sort(function (a, b) { return a[0] - b[0]; })
+        .map(function (pair) { return pair[1]; });
+
+    // At this step, we have an array of indexes
+    // that map from sorted numbers to their original indexes. We reverse
+    // that so that it is an array of the sorted destination index.
+    var xRanks = Array(xIndexes.length);
+    var yRanks = Array(xIndexes.length);
+    for (var i = 0; i < xIndexes.length; i++) {
+        xRanks[xIndexes[i]] = i;
+        yRanks[yIndexes[i]] = i;
+    }
+
+    return sampleCorrelation(xRanks, yRanks);
+}
+
+/**
+ * [Skewness](http://en.wikipedia.org/wiki/Skewness) is
+ * a measure of the extent to which a probability distribution of a
+ * real-valued random variable "leans" to one side of the mean.
+ * The skewness value can be positive or negative, or even undefined.
+ *
+ * Implementation is based on the adjusted Fisher-Pearson standardized
+ * moment coefficient, which is the version found in Excel and several
+ * statistical packages including Minitab, SAS and SPSS.
+ *
+ * @since 4.1.0
+ * @param {Array<number>} x a sample of 3 or more data points
+ * @returns {number} sample skewness
+ * @throws {Error} if x has length less than 3
+ * @example
+ * sampleSkewness([2, 4, 6, 3, 1]); // => 0.590128656384365
+ */
+function sampleSkewness(x) {
+    if (x.length < 3) {
+        throw new Error("sampleSkewness requires at least three data points");
+    }
+
+    var meanValue = mean(x);
+    var tempValue;
+    var sumSquaredDeviations = 0;
+    var sumCubedDeviations = 0;
+
+    for (var i = 0; i < x.length; i++) {
+        tempValue = x[i] - meanValue;
+        sumSquaredDeviations += tempValue * tempValue;
+        sumCubedDeviations += tempValue * tempValue * tempValue;
+    }
+
+    // this is Bessels' Correction: an adjustment made to sample statistics
+    // that allows for the reduced degree of freedom entailed in calculating
+    // values from samples rather than complete populations.
+    var besselsCorrection = x.length - 1;
+
+    // Find the mean value of that list
+    var theSampleStandardDeviation = Math.sqrt(
+        sumSquaredDeviations / besselsCorrection
+    );
+
+    var n = x.length;
+    var cubedS = Math.pow(theSampleStandardDeviation, 3);
+
+    return (n * sumCubedDeviations) / ((n - 1) * (n - 2) * cubedS);
 }
 
 /**
@@ -72898,264 +73304,364 @@ function sampleKurtosis(x) {
 }
 
 /**
- * Rank values, giving tied values the average of the ranks they span.
+ * Implementation of [Heap's Algorithm](https://en.wikipedia.org/wiki/Heap%27s_algorithm)
+ * for generating permutations.
  *
- * Spearman's rho is defined on these midranks. Assigning tied values
- * distinct consecutive ranks instead would make the rank of a value depend
- * on where it happens to sit in the input array, and therefore make the
- * correlation depend on the order the pairs are listed in.
- *
- * @private
- * @param {Array<number>} values input
- * @returns {Array<number>} ranks, in the order of the input
+ * @param {Array} elements any type of data
+ * @returns {Array<Array>} array of permutations
  */
-function midranks(values) {
-    var order = values
-        .map(function (value, index) { return [value, index]; })
-        .sort(function (a, b) { return a[0] - b[0]; });
+function permutationsHeap(elements) {
+    var indexes = new Array(elements.length);
+    var permutations = [elements.slice()];
 
-    var ranks = Array(values.length);
-    var i = 0;
-    while (i < order.length) {
-        // Extend j across every value tied with the one at i.
-        var j = i;
-        while (j + 1 < order.length && order[j + 1][0] === order[i][0]) {
-            j++;
-        }
-        var rank = (i + j) / 2;
-        for (var k = i; k <= j; k++) {
-            ranks[order[k][1]] = rank;
-        }
-        i = j + 1;
+    for (var i = 0; i < elements.length; i++) {
+        indexes[i] = 0;
     }
-    return ranks;
+
+    for (var i$1 = 0; i$1 < elements.length; ) {
+        if (indexes[i$1] < i$1) {
+            // At odd indexes, swap from indexes[i] instead
+            // of from the beginning of the array
+            var swapFrom = 0;
+            if (i$1 % 2 !== 0) {
+                swapFrom = indexes[i$1];
+            }
+
+            // swap between swapFrom and i, using
+            // a temporary variable as storage.
+            var temp = elements[swapFrom];
+            elements[swapFrom] = elements[i$1];
+            elements[i$1] = temp;
+
+            permutations.push(elements.slice());
+            indexes[i$1]++;
+            i$1 = 0;
+        } else {
+            indexes[i$1] = 0;
+            i$1++;
+        }
+    }
+
+    return permutations;
 }
 
 /**
- * The [rank correlation](https://en.wikipedia.org/wiki/Rank_correlation) is
- * a measure of the strength of monotonic relationship between two arrays
- *
- * Tied values share the average of the ranks they span, so the result
- * depends only on the paired data and not on the order the pairs are given
- * in. When either input has no rank variance the correlation is undefined
- * and the result is `NaN`.
- *
- * @param {Array<number>} x first input
- * @param {Array<number>} y second input
- * @returns {number} sample rank correlation
+ * Implementation of Combinations
+ * Combinations are unique subsets of a collection - in this case, k x from a collection at a time.
+ * https://en.wikipedia.org/wiki/Combination
+ * @param {Array} x any type of data
+ * @param {int} k the number of objects in each group (without replacement)
+ * @returns {Array<Array>} array of permutations
  * @example
- * sampleRankCorrelation([1, 2, 3, 4, 5], [1, 4, 9, 16, 25]);
- * // => 1
+ * combinations([1, 2, 3], 2); // => [[1,2], [1,3], [2,3]]
  */
-function sampleRankCorrelation(x, y) {
-    return sampleCorrelation(midranks(x), midranks(y));
+
+function combinations(x, k) {
+    var i;
+    var subI;
+    var combinationList = [];
+    var subsetCombinations;
+    var next;
+
+    for (i = 0; i < x.length; i++) {
+        if (k === 1) {
+            combinationList.push([x[i]]);
+        } else {
+            subsetCombinations = combinations(x.slice(i + 1, x.length), k - 1);
+            for (subI = 0; subI < subsetCombinations.length; subI++) {
+                next = subsetCombinations[subI];
+                next.unshift(x[i]);
+                combinationList.push(next);
+            }
+        }
+    }
+    return combinationList;
 }
 
 /**
- * [Skewness](http://en.wikipedia.org/wiki/Skewness) is
- * a measure of the extent to which a probability distribution of a
- * real-valued random variable "leans" to one side of the mean.
- * The skewness value can be positive or negative, or even undefined.
+ * Implementation of [Combinations](https://en.wikipedia.org/wiki/Combination) with replacement
+ * Combinations are unique subsets of a collection - in this case, k x from a collection at a time.
+ * 'With replacement' means that a given element can be chosen multiple times.
+ * Unlike permutation, order doesn't matter for combinations.
  *
- * Implementation is based on the adjusted Fisher-Pearson standardized
- * moment coefficient, which is the version found in Excel and several
- * statistical packages including Minitab, SAS and SPSS.
- *
- * Pass `biased` to opt into the biased coefficient instead, which is the
- * population moment ratio `m3 / m2^(3/2)`. That is what R reports and what
- * scipy returns by default; the adjusted coefficient above is scipy's
- * `bias=False`. The two differ by a factor of `sqrt(n * (n - 1)) / (n - 2)`.
- *
- * @since 4.1.0
- * @param {Array<number>} x a sample of 3 or more data points
- * @param {boolean} [biased=false] if true, return the biased coefficient
- * @returns {number} sample skewness
- * @throws {Error} if x has length less than 3
+ * @param {Array} x any type of data
+ * @param {int} k the number of objects in each group (without replacement)
+ * @returns {Array<Array>} array of permutations
  * @example
- * sampleSkewness([2, 4, 6, 3, 1]); // => 0.590128656384365
- * sampleSkewness([2, 4, 6, 3, 1], true); // => 0.3958703373438167
+ * combinationsReplacement([1, 2], 2); // => [[1, 1], [1, 2], [2, 2]]
  */
-function sampleSkewness(x, biased) {
-    if ( biased === void 0 ) biased = false;
-
-    if (x.length < 3) {
-        throw new Error("sampleSkewness requires at least three data points");
-    }
-
-    var meanValue = mean(x);
-    var tempValue;
-    var sumSquaredDeviations = 0;
-    var sumCubedDeviations = 0;
+function combinationsReplacement(x, k) {
+    var combinationList = [];
 
     for (var i = 0; i < x.length; i++) {
-        tempValue = x[i] - meanValue;
-        sumSquaredDeviations += tempValue * tempValue;
-        sumCubedDeviations += tempValue * tempValue * tempValue;
+        if (k === 1) {
+            // If we're requested to find only one element, we don't need
+            // to recurse: just push `x[i]` onto the list of combinations.
+            combinationList.push([x[i]]);
+        } else {
+            // Otherwise, recursively find combinations, given `k - 1`. Note that
+            // we request `k - 1`, so if you were looking for k=3 combinations, we're
+            // requesting k=2. This -1 gets reversed in the for loop right after this
+            // code, since we concatenate `x[i]` onto the selected combinations,
+            // bringing `k` back up to your requested level.
+            // This recursion may go many levels deep, since it only stops once
+            // k=1.
+            var subsetCombinations = combinationsReplacement(
+                x.slice(i, x.length),
+                k - 1
+            );
+
+            for (var j = 0; j < subsetCombinations.length; j++) {
+                combinationList.push([x[i]].concat(subsetCombinations[j]));
+            }
+        }
     }
 
-    var n = x.length;
+    return combinationList;
+}
 
-    if (biased) {
-        // The population moments, without Bessel's correction: the biased
-        // coefficient is the third central moment over the second raised
-        // to three halves.
-        var secondCentralMoment = sumSquaredDeviations / n;
-        var thirdCentralMoment = sumCubedDeviations / n;
+/**
+ * When adding a new value to a list, one does not have to necessary
+ * recompute the mean of the list in linear time. They can instead use
+ * this function to compute the new mean by providing the current mean,
+ * the number of elements in the list that produced it and the new
+ * value to add.
+ *
+ * @since 2.5.0
+ * @param {number} mean current mean
+ * @param {number} n number of items in the list
+ * @param {number} newValue the added value
+ * @returns {number} the new mean
+ *
+ * @example
+ * addToMean(14, 5, 53); // => 20.5
+ */
+function addToMean(mean, n, newValue) {
+    return mean + (newValue - mean) / (n + 1);
+}
 
-        return thirdCentralMoment / Math.pow(secondCentralMoment, 3 / 2);
-    }
+/**
+ * When combining two lists of values for which one already knows the means,
+ * one does not have to necessary recompute the mean of the combined lists in
+ * linear time. They can instead use this function to compute the combined
+ * mean by providing the mean & number of values of the first list and the mean
+ * & number of values of the second list.
+ *
+ * @since 3.0.0
+ * @param {number} mean1 mean of the first list
+ * @param {number} n1 number of items in the first list
+ * @param {number} mean2 mean of the second list
+ * @param {number} n2 number of items in the second list
+ * @returns {number} the combined mean
+ *
+ * @example
+ * combineMeans(5, 3, 4, 3); // => 4.5
+ */
+function combineMeans(mean1, n1, mean2, n2) {
+    return (mean1 * n1 + mean2 * n2) / (n1 + n2);
+}
 
-    // this is Bessels' Correction: an adjustment made to sample statistics
-    // that allows for the reduced degree of freedom entailed in calculating
-    // values from samples rather than complete populations.
-    var besselsCorrection = x.length - 1;
+/**
+ * When combining two lists of values for which one already knows the variances,
+ * one does not have to necessary recompute the variance of the combined lists
+ * in linear time. They can instead use this function to compute the combined
+ * variance by providing the variance, mean & number of values of the first list
+ * and the variance, mean & number of values of the second list.
+ *
+ * @since 3.0.0
+ * @param {number} variance1 variance of the first list
+ * @param {number} mean1 mean of the first list
+ * @param {number} n1 number of items in the first list
+ * @param {number} variance2 variance of the second list
+ * @param {number} mean2 mean of the second list
+ * @param {number} n2 number of items in the second list
+ * @returns {number} the combined mean
+ *
+ * @example
+ * combineVariances(14 / 3, 5, 3, 8 / 3, 4, 3); // => 47 / 12
+ */
+function combineVariances(variance1, mean1, n1, variance2, mean2, n2) {
+    var newMean = combineMeans(mean1, n1, mean2, n2);
 
-    // Find the mean value of that list
-    var theSampleStandardDeviation = Math.sqrt(
-        sumSquaredDeviations / besselsCorrection
+    return (
+        (n1 * (variance1 + Math.pow(mean1 - newMean, 2)) +
+            n2 * (variance2 + Math.pow(mean2 - newMean, 2))) /
+        (n1 + n2)
     );
-
-    var cubedS = Math.pow(theSampleStandardDeviation, 3);
-
-    return (n * sumCubedDeviations) / ((n - 1) * (n - 2) * cubedS);
 }
 
 /**
- * Sampling with replacement is a type of sampling that allows the same
- * item to be picked out of a population more than once.
+ * The [Geometric Mean](https://en.wikipedia.org/wiki/Geometric_mean) is
+ * a mean function that is more useful for numbers in different
+ * ranges.
  *
- * @param {Array<*>} x an array of any kind of value
- * @param {number} n count of how many elements to take
- * @param {Function} [randomSource=Math.random] an optional entropy source that
- * returns numbers between 0 inclusive and 1 exclusive: the range [0, 1)
- * @return {Array} n sampled items from the population
- * @example
- * var values = [1, 2, 3, 4];
- * sampleWithReplacement(values, 2); // returns 2 random values, like [2, 4];
- */
-function sampleWithReplacement(x, n, randomSource) {
-    if (x.length === 0) {
-        return [];
-    }
-
-    // a custom random number source can be provided if you want to use
-    // a fixed seed or another random number generator, like
-    // [random-js](https://www.npmjs.org/package/random-js)
-    randomSource = randomSource || Math.random;
-
-    var length = x.length;
-    var sample = [];
-
-    for (var i = 0; i < n; i++) {
-        var index = Math.floor(randomSource() * length);
-
-        sample.push(x[index]);
-    }
-
-    return sample;
-}
-
-/**
- * The [root mean square](https://en.wikipedia.org/wiki/Root_mean_square)
- * computed by scaling, which is an equivalent way of computing
- * `rootMeanSquare` suitable for values whose squares leave floating point
- * range.
+ * This is the nth root of the input numbers multiplied by each other.
  *
- * `rootMeanSquare` sums the squares directly, so it returns `Infinity` once
- * a value exceeds about 1e154 and `0` once every value falls below about
- * 1e-162. This function divides through by the largest magnitude first, so
- * the squares it sums are all at most one.
+ * The geometric mean is often useful for
+ * **[proportional growth](https://en.wikipedia.org/wiki/Geometric_mean#Proportional_growth)**: given
+ * growth rates for multiple years, like _80%, 16.66% and 42.85%_, a simple
+ * mean will incorrectly estimate an average growth rate, whereas a geometric
+ * mean will correctly estimate a growth rate that, over those years,
+ * will yield the same end value.
  *
- * It runs in `O(n)`, linear time, with respect to the length of the array,
- * in two passes rather than one.
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
  *
- * @param {Array<number>} x a sample of one or more data points
- * @returns {number} root mean square
+ * @param {Array<number>} x sample of one or more data points
+ * @returns {number} geometric mean
  * @throws {Error} if x is empty
+ * @throws {Error} if x contains a negative number
  * @example
- * scaledRootMeanSquare([-1, 1, -1, 1]); // => 1
- * scaledRootMeanSquare([1e200, 2e200, 3e200]); // => 2.1602468994692866e+200
+ * var growthRates = [1.80, 1.166666, 1.428571];
+ * var averageGrowth = ss.geometricMean(growthRates);
+ * var averageGrowthRates = [averageGrowth, averageGrowth, averageGrowth];
+ * var startingValue = 10;
+ * var startingValueMean = 10;
+ * growthRates.forEach(function(rate) {
+ *   startingValue *= rate;
+ * });
+ * averageGrowthRates.forEach(function(rate) {
+ *   startingValueMean *= rate;
+ * });
+ * startingValueMean === startingValue;
  */
-function scaledRootMeanSquare(x) {
+function geometricMean(x) {
     if (x.length === 0) {
-        throw new Error(
-            "scaledRootMeanSquare requires at least one data point"
-        );
+        throw new Error("geometricMean requires at least one data point");
     }
 
-    var max = 0;
+    // the starting value.
+    var value = 1;
+
     for (var i = 0; i < x.length; i++) {
-        var magnitude = Math.abs(x[i]);
-        max = Math.max(max, magnitude);
+        // the geometric mean is only valid for positive numbers
+        if (x[i] < 0) {
+            throw new Error(
+                "geometricMean requires only non-negative numbers as input"
+            );
+        }
+
+        // repeatedly multiply the value by each number
+        value *= x[i];
     }
 
-    // Every value is zero, and the division below would be 0 / 0.
-    if (max === 0) {
-        return 0;
-    }
-
-    // An infinite or missing largest value cannot be scaled away, and
-    // dividing by it would turn the result into NaN. Report it as
-    // `rootMeanSquare` does.
-    if (!Number.isFinite(max)) {
-        return max;
-    }
-
-    var sumOfSquares = 0;
-    for (var i$1 = 0; i$1 < x.length; i$1++) {
-        var scaled = x[i$1] / max;
-        sumOfSquares += scaled * scaled;
-    }
-
-    return max * Math.sqrt(sumOfSquares / x.length);
+    return Math.pow(value, 1 / x.length);
 }
 
 /**
- * The [variance](http://en.wikipedia.org/wiki/Variance)
- * is the sum of squared deviations from the mean.
+ * The [log average](https://en.wikipedia.org/wiki/https://en.wikipedia.org/wiki/Geometric_mean#Relationship_with_logarithms)
+ * is an equivalent way of computing the geometric mean of an array suitable for large or small products.
  *
- * This is an implementation of variance, not sample variance:
- * see the `sampleVariance` method if you want a sample measure.
+ * It's found by calculating the average logarithm of the elements and exponentiating.
  *
- * @param {Array<number>} x a population of one or more data points
- * @returns {number} variance: a value greater than or equal to zero.
- * zero indicates that all values are identical.
- * @throws {Error} if x's length is 0
- * @example
- * variance([1, 2, 3, 4, 5, 6]); // => 2.9166666666666665
+ * @param {Array<number>} x sample of one or more data points
+ * @returns {number} geometric mean
+ * @throws {Error} if x is empty
+ * @throws {Error} if x contains a negative number
  */
-function variance(x) {
+function logAverage(x) {
     if (x.length === 0) {
-        throw new Error("variance requires at least one data point");
+        throw new Error("logAverage requires at least one data point");
     }
 
-    // Find the mean of squared deviations between the
-    // mean value and each value.
-    return sumNthPowerDeviations(x, 2) / x.length;
+    var value = 0;
+    for (var i = 0; i < x.length; i++) {
+        if (x[i] < 0) {
+            throw new Error(
+                "logAverage requires only non-negative numbers as input"
+            );
+        }
+        value += Math.log(x[i]);
+    }
+
+    return Math.exp(value / x.length);
 }
 
 /**
- * The [standard deviation](http://en.wikipedia.org/wiki/Standard_deviation)
- * is the square root of the variance. This is also known as the population
- * standard deviation. It's useful for measuring the amount
- * of variation or dispersion in a set of values.
+ * The [Harmonic Mean](https://en.wikipedia.org/wiki/Harmonic_mean) is
+ * a mean function typically used to find the average of rates.
+ * This mean is calculated by taking the reciprocal of the arithmetic mean
+ * of the reciprocals of the input numbers.
  *
- * Standard deviation is only appropriate for full-population knowledge: for
- * samples of a population, {@link sampleStandardDeviation} is
- * more appropriate.
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
  *
- * @param {Array<number>} x input
- * @returns {number} standard deviation
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @returns {number} harmonic mean
+ * @throws {Error} if x is empty
+ * @throws {Error} if x contains a negative number
  * @example
- * variance([2, 4, 4, 4, 5, 5, 7, 9]); // => 4
- * standardDeviation([2, 4, 4, 4, 5, 5, 7, 9]); // => 2
+ * harmonicMean([2, 3]).toFixed(2) // => '2.40'
  */
-function standardDeviation(x) {
-    if (x.length === 1) {
-        return 0;
+function harmonicMean(x) {
+    if (x.length === 0) {
+        throw new Error("harmonicMean requires at least one data point");
     }
-    var v = variance(x);
-    return Math.sqrt(v);
+
+    var reciprocalSum = 0;
+
+    for (var i = 0; i < x.length; i++) {
+        // the harmonic mean is only valid for positive numbers
+        if (x[i] <= 0) {
+            throw new Error(
+                "harmonicMean requires only positive numbers as input"
+            );
+        }
+
+        reciprocalSum += 1 / x[i];
+    }
+
+    // divide n by the reciprocal sum
+    return x.length / reciprocalSum;
+}
+
+/**
+ * The mean, _also known as average_,
+ * is the sum of all values over the number of values.
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * The simple mean uses the successive addition method internally
+ * to calculate it's result. Errors in floating-point addition are
+ * not accounted for, so if precision is required, the standard {@link mean}
+ * method should be used instead.
+ *
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ *
+ * @param {Array<number>} x sample of one or more data points
+ * @throws {Error} if the length of x is less than one
+ * @returns {number} mean
+ * @example
+ * mean([0, 10]); // => 5
+ */
+function meanSimple(x) {
+    if (x.length === 0) {
+        throw new Error("meanSimple requires at least one data point");
+    }
+
+    return sumSimple(x) / x.length;
+}
+
+/**
+ * The [median](http://en.wikipedia.org/wiki/Median) is
+ * the middle number of a list. This is often a good indicator of 'the middle'
+ * when there are outliers that skew the `mean()` value.
+ * This is a [measure of central tendency](https://en.wikipedia.org/wiki/Central_tendency):
+ * a method of finding a typical or central value of a set of numbers.
+ *
+ * The median isn't necessarily one of the elements in the list: the value
+ * can be the average of two elements if the list has an even length
+ * and the two central values are different.
+ *
+ * @param {Array<number>} sorted input
+ * @returns {number} median value
+ * @example
+ * medianSorted([10, 2, 5, 100, 2, 1]); // => 52.5
+ */
+function medianSorted(sorted) {
+    return quantileSorted(sorted, 0.5);
 }
 
 /**
@@ -73175,6 +73681,49 @@ function standardDeviation(x) {
  */
 function subtractFromMean(mean, n, value) {
     return (mean * n - value) / (n - 1);
+}
+
+/**
+ * The Root Mean Square (RMS) is
+ * a mean function used as a measure of the magnitude of a set
+ * of numbers, regardless of their sign.
+ * This is the square root of the mean of the squares of the
+ * input numbers.
+ * This runs in `O(n)`, linear time, with respect to the length of the array.
+ *
+ * @param {Array<number>} x a sample of one or more data points
+ * @returns {number} root mean square
+ * @throws {Error} if x is empty
+ * @example
+ * rootMeanSquare([-1, 1, -1, 1]); // => 1
+ */
+function rootMeanSquare(x) {
+    if (x.length === 0) {
+        throw new Error("rootMeanSquare requires at least one data point");
+    }
+
+    var sumOfSquares = 0;
+    for (var i = 0; i < x.length; i++) {
+        sumOfSquares += Math.pow(x[i], 2);
+    }
+
+    return Math.sqrt(sumOfSquares / x.length);
+}
+
+/**
+ * The`coefficient of variation`_ is the ratio of the standard deviation to the mean.
+ * .._`coefficient of variation`: https://en.wikipedia.org/wiki/Coefficient_of_variation
+ *
+ *
+ * @param {Array} x input
+ * @returns {number} coefficient of variation
+ * @example
+ * coefficientOfVariation([1, 2, 3, 4]).toFixed(3); // => 0.516
+ * coefficientOfVariation([1, 2, 3, 4, 5]).toFixed(3); // => 0.527
+ * coefficientOfVariation([-1, 0, 1, 2, 3, 4]).toFixed(3); // => 1.247
+ */
+function coefficientOfVariation(x) {
+    return sampleStandardDeviation(x) / mean(x);
 }
 
 /**
@@ -73273,255 +73822,6 @@ function tTestTwoSample(sampleX, sampleY, difference) {
 }
 
 /**
- * Validate values and weights for weighted statistics and return the total
- * weight.
- *
- * @param {Array<number>} x input values
- * @param {Array<number>} weights weights for each input value
- * @param {string} name function name for error messages
- * @returns {number} total weight
- * @private
- */
-function validateWeightedInput(x, weights, name) {
-    if (x.length === 0) {
-        throw new Error((name + " requires at least one data point"));
-    }
-
-    if (x.length !== weights.length) {
-        throw new Error(
-            (name + " requires values and weights to be the same length")
-        );
-    }
-
-    var totalWeight = 0;
-
-    for (var i = 0; i < weights.length; i++) {
-        if (weights[i] < 0) {
-            throw new Error((name + " requires weights to be non-negative"));
-        }
-
-        totalWeight += weights[i];
-    }
-
-    if (totalWeight === 0) {
-        throw new Error((name + " requires at least one positive weight"));
-    }
-
-    return totalWeight;
-}
-
-/**
- * [Weighted least squares](https://en.wikipedia.org/wiki/Weighted_least_squares)
- * fits a line through a set of coordinates in which some observations count
- * for more than others, which is what R's `lm()` does when given a `weights`
- * argument. `linearRegression` is the special case where every weight is
- * equal.
- *
- * A weight of zero drops its observation from the fit. Weights are relative,
- * so scaling all of them by the same factor leaves the line unchanged.
- *
- * @param {Array<Array<number>>} data an array of two-element arrays,
- * like `[[0, 1], [2, 3]]`
- * @param {Array<number>} weights weight for each coordinate
- * @returns {Object} object containing slope and intersect of regression line
- * @throws {Error} if data is empty, weights is a different length than data,
- * all weights are zero, or a weight is negative
- * @example
- * weightedLinearRegression([[0, 0], [1, 1], [2, 2]], [1, 1, 1]); // => { m: 1, b: 0 }
- */
-function weightedLinearRegression(data, weights) {
-    var totalWeight = validateWeightedInput(
-        data,
-        weights,
-        "weightedLinearRegression"
-    );
-
-    // With one point the slope is unconstrained, so match `linearRegression`
-    // and take the horizontal line through it.
-    if (data.length === 1) {
-        return { m: 0, b: data[0][1] };
-    }
-
-    // The weighted means of x and y. Centering on them before accumulating
-    // the cross products keeps the sums small when the coordinates are not.
-    var sumWeightedX = 0;
-    var sumWeightedY = 0;
-    for (var i = 0; i < data.length; i++) {
-        sumWeightedX += weights[i] * data[i][0];
-        sumWeightedY += weights[i] * data[i][1];
-    }
-    var meanX = sumWeightedX / totalWeight;
-    var meanY = sumWeightedY / totalWeight;
-
-    var sumXY = 0;
-    var sumXX = 0;
-    for (var i$1 = 0; i$1 < data.length; i$1++) {
-        var deviationX = data[i$1][0] - meanX;
-        sumXY += weights[i$1] * deviationX * (data[i$1][1] - meanY);
-        sumXX += weights[i$1] * deviationX * deviationX;
-    }
-
-    var m = sumXY / sumXX;
-
-    return { m: m, b: meanY - m * meanX };
-}
-
-/**
- * The [weighted mean](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean),
- * _also known as weighted average_, is the sum of each value multiplied by its
- * weight, divided by the total weight.
- *
- * The weighted values are accumulated with the same
- * [Kahan-Babuska](https://pdfs.semanticscholar.org/1760/7d467cda1d0277ad272deb2113533131dc09.pdf)
- * correction that {@link sum} uses, so that terms which cancel do not lose
- * precision. The correction is applied in a single pass, without building an
- * intermediate array.
- *
- * This runs in `O(n)`, linear time, with respect to the length of the array.
- *
- * @param {Array<number>} x sample of one or more data points
- * @param {Array<number>} weights non-negative weights for each data point
- * @throws {Error} if x is empty, weights is a different length than x, all weights are zero, or a weight is negative
- * @returns {number} weighted mean
- * @example
- * weightedMean([80, 90, 100], [1, 1, 2]); // => 92.5
- */
-function weightedMean(x, weights) {
-    var totalWeight = validateWeightedInput(x, weights, "weightedMean");
-
-    var weightedSum = x[0] * weights[0];
-    var correction = 0;
-    var transition;
-    var value;
-
-    for (var i = 1; i < x.length; i++) {
-        value = x[i] * weights[i];
-        transition = weightedSum + value;
-
-        if (Math.abs(weightedSum) >= Math.abs(value)) {
-            correction += weightedSum - transition + value;
-        } else {
-            correction += value - transition + weightedSum;
-        }
-
-        weightedSum = transition;
-    }
-
-    return (weightedSum + correction) / totalWeight;
-}
-
-/**
- * The weighted quantile is the value whose cumulative weight reaches the
- * requested probability.
- *
- * This implementation sorts value/weight pairs by value, then returns the
- * first value where cumulative weight is greater than or equal to `p` times the
- * total weight. When p is an array, the result is also an array containing the
- * appropriate weighted quantiles in input order.
- *
- * @param {Array<number>} x sample of one or more data points
- * @param {Array<number>} weights non-negative weights for each data point
- * @param {Array<number> | number} p the desired quantile, as a number between 0 and 1
- * @throws {Error} if x is empty, weights is a different length than x, all weights are zero, a weight is negative, or p is outside of the range from 0 to 1
- * @returns {number} weighted quantile
- * @example
- * weightedQuantile([1, 2, 3], [1, 1, 2], 0.5); // => 2
- */
-function weightedQuantile(x, weights, p) {
-    var totalWeight = validateWeightedInput(x, weights, "weightedQuantile");
-    var sorted = [];
-
-    for (var i = 0; i < x.length; i++) {
-        sorted.push([x[i], weights[i]]);
-    }
-
-    sorted.sort(compareValue);
-
-    if (Array.isArray(p)) {
-        var results = [];
-
-        for (var i$1 = 0; i$1 < p.length; i$1++) {
-            results[i$1] = weightedQuantileSorted(sorted, totalWeight, p[i$1]);
-        }
-
-        return results;
-    }
-
-    return weightedQuantileSorted(sorted, totalWeight, p);
-}
-
-function weightedQuantileSorted(sorted, totalWeight, p) {
-    if (p < 0 || p > 1) {
-        throw new Error("quantiles must be between 0 and 1");
-    }
-
-    if (p === 0) {
-        return sorted[0][0];
-    }
-
-    var threshold = p * totalWeight;
-    var cumulativeWeight = 0;
-
-    for (var i = 0; i < sorted.length; i++) {
-        cumulativeWeight += sorted[i][1];
-
-        if (cumulativeWeight >= threshold) {
-            return sorted[i][0];
-        }
-    }
-
-    return sorted[sorted.length - 1][0];
-}
-
-function compareValue(a, b) {
-    return a[0] - b[0];
-}
-
-/**
- * The [weighted variance](https://en.wikipedia.org/wiki/Weighted_arithmetic_mean#Weighted_sample_variance)
- * is the average weighted squared deviation from the weighted mean.
- *
- * This is a population weighted variance: see the `variance` method for the
- * unweighted population variance.
- *
- * @param {Array<number>} x population of one or more data points
- * @param {Array<number>} weights non-negative weights for each data point
- * @throws {Error} if x is empty, weights is a different length than x, all weights are zero, or a weight is negative
- * @returns {number} weighted variance
- * @example
- * weightedVariance([2, 4, 4, 4, 5, 5, 7, 9], [1, 1, 1, 1, 1, 1, 1, 1]); // => 4
- */
-function weightedVariance(x, weights) {
-    var totalWeight = validateWeightedInput(x, weights, "weightedVariance");
-    var mean = weightedMean(x, weights);
-    var weightedSumSquaredDeviations = 0;
-
-    for (var i = 0; i < x.length; i++) {
-        var deviation = x[i] - mean;
-        weightedSumSquaredDeviations += weights[i] * deviation * deviation;
-    }
-
-    return weightedSumSquaredDeviations / totalWeight;
-}
-
-/**
- * The [weighted standard deviation](https://en.wikipedia.org/wiki/Standard_deviation)
- * is the square root of the weighted variance.
- *
- * This is a population weighted standard deviation.
- *
- * @param {Array<number>} x population of one or more data points
- * @param {Array<number>} weights non-negative weights for each data point
- * @throws {Error} if x is empty, weights is a different length than x, all weights are zero, or a weight is negative
- * @returns {number} weighted standard deviation
- * @example
- * weightedStandardDeviation([2, 4, 4, 4, 5, 5, 7, 9], [1, 1, 1, 1, 1, 1, 1, 1]); // => 2
- */
-function weightedStandardDeviation(x, weights) {
-    return Math.sqrt(weightedVariance(x, weights));
-}
-
-/**
  * This function calculates the Wilcoxon rank sum statistic for the first sample
  * with respect to the second. The Wilcoxon rank sum test is a non-parametric
  * alternative to the t-test which is equivalent to the
@@ -73560,10 +73860,9 @@ function wilcoxonRankSum(sampleX, sampleY) {
             if (i === pooledSamples.length - 1) {
                 replaceRanksInPlace(pooledSamples, tiedRanks);
             }
+        } else if (tiedRanks.length > 1) {
+            replaceRanksInPlace(pooledSamples, tiedRanks);
         } else {
-            if (tiedRanks.length > 1) {
-                replaceRanksInPlace(pooledSamples, tiedRanks);
-            }
             tiedRanks = [pooledSamples[i].rank];
         }
     }
@@ -73585,99 +73884,6 @@ function wilcoxonRankSum(sampleX, sampleY) {
     }
 
     return rankSum;
-}
-
-/**
- * We use `ε`, epsilon, as a stopping criterion when we want to iterate
- * until we're "close enough". Epsilon is a very small number: for
- * simple statistics, that number is **0.0001**
- *
- * This is used in calculations like the binomialDistribution, in which
- * the process of finding a value is [iterative](https://en.wikipedia.org/wiki/Iterative_method):
- * it progresses until it is close enough.
- *
- * Below is an example of using epsilon in [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent),
- * where we're trying to find a local minimum of a function's derivative,
- * given by the `fDerivative` method.
- *
- * @example
- * // From calculation, we expect that the local minimum occurs at x=9/4
- * var x_old = 0;
- * // The algorithm starts at x=6
- * var x_new = 6;
- * var stepSize = 0.01;
- *
- * function fDerivative(x) {
- *   return 4 * Math.pow(x, 3) - 9 * Math.pow(x, 2);
- * }
- *
- * // The loop runs until the difference between the previous
- * // value and the current value is smaller than epsilon - a rough
- * // meaure of 'close enough'
- * while (Math.abs(x_new - x_old) > ss.epsilon) {
- *   x_old = x_new;
- *   x_new = x_old - stepSize * fDerivative(x_old);
- * }
- *
- * console.log('Local minimum occurs at', x_new);
- */
-var epsilon = 0.0001;
-
-/**
- * Relative error.
- *
- * This is more difficult to calculate than it first appears [1,2].  The usual
- * formula for the relative error between an actual value A and an expected
- * value E is `|(A-E)/E|`, but:
- *
- * 1. If the expected value is 0, any other value has infinite relative error,
- *    which is counter-intuitive: if the expected voltage is 0, getting 1/10th
- *    of a volt doesn't feel like an infinitely large error.
- *
- * 2. This formula does not satisfy the mathematical definition of a metric [3].
- *    [4] solved this problem by defining the relative error as `|ln(|A/E|)|`,
- *    but that formula only works if all values are positive: for example, it
- *    reports the relative error of -10 and 10 as 0.
- *
- * Our implementation sticks with convention and returns:
- *
- * - 0 if the actual and expected values are both zero
- * - Infinity if the actual value is non-zero and the expected value is zero
- * - `|(A-E)/E|` in all other cases
- *
- * [1] https://math.stackexchange.com/questions/677852/how-to-calculate-relative-error-when-true-value-is-zero
- * [2] https://en.wikipedia.org/wiki/Relative_change_and_difference
- * [3] https://en.wikipedia.org/wiki/Metric_(mathematics)#Definition
- * [4] F.W.J. Olver: "A New Approach to Error Arithmetic." SIAM Journal on
- *     Numerical Analysis, 15(2), 1978, 10.1137/0715024.
- *
- * @param {number} actual The actual value.
- * @param {number} expected The expected value.
- * @return {number} The relative error.
- */
-function relativeError(actual, expected) {
-    // These lines are actually covered by tests, but it seems
-    // like c8 has a bug that marks them as not covered.
-    /* c8 ignore start */
-    if (actual === 0 && expected === 0) {
-        return 0;
-    }
-    /* c8 ignore end */
-    return Math.abs((actual - expected) / expected);
-}
-
-/**
- * Approximate equality.
- *
- * @param {number} actual The value to be tested.
- * @param {number} expected The reference value.
- * @param {number} [tolerance=epsilon] The acceptable relative difference.
- * @return {boolean} Whether numbers are within tolerance.
- */
-function approxEqual(actual, expected, tolerance) {
-    if ( tolerance === void 0 ) tolerance = epsilon;
-
-    return relativeError(actual, expected) <= tolerance;
 }
 
 /**
@@ -73762,11 +73968,8 @@ BayesianClassifier.prototype.score = function score (item) {
         var v = item[k];
         for (category in this.data) {
             // Create an empty object for storing key - value combinations
-            // for this category, keeping combinations already collected
-            // from earlier properties of the same item.
-            if (odds[category] === undefined) {
-                odds[category] = {};
-            }
+            // for this category.
+            odds[category] = {};
 
             // If this item doesn't even have a property, it counts for nothing,
             // but if it does have the property that we're looking for from
@@ -73798,41 +74001,232 @@ BayesianClassifier.prototype.score = function score (item) {
 };
 
 /**
- * The [Bernoulli distribution](http://en.wikipedia.org/wiki/Bernoulli_distribution)
- * is the probability discrete
- * distribution of a random variable which takes value 1 with success
- * probability `p` and value 0 with failure
- * probability `q` = 1 - `p`. It can be used, for example, to represent the
- * toss of a coin, where "1" is defined to mean "heads" and "0" is defined
- * to mean "tails" (or vice versa). It is
- * a special case of a Binomial Distribution
- * where `n` = 1.
- *
- * @param {number} p input value, between 0 and 1 inclusive
- * @returns {number[]} values of bernoulli distribution at this point
- * @throws {Error} if p is outside 0 and 1
+ * This is a single-layer [Perceptron Classifier](http://en.wikipedia.org/wiki/Perceptron) that takes
+ * arrays of numbers and predicts whether they should be classified
+ * as either 0 or 1 (negative or positive examples).
+ * @class
  * @example
- * bernoulliDistribution(0.3); // => [0.7, 0.3]
+ * // Create the model
+ * var p = new PerceptronModel();
+ * // Train the model with input with a diagonal boundary.
+ * for (var i = 0; i < 5; i++) {
+ *     p.train([1, 1], 1);
+ *     p.train([0, 1], 0);
+ *     p.train([1, 0], 0);
+ *     p.train([0, 0], 0);
+ * }
+ * p.predict([0, 0]); // 0
+ * p.predict([0, 1]); // 0
+ * p.predict([1, 0]); // 0
+ * p.predict([1, 1]); // 1
  */
-function bernoulliDistribution(p) /*: number[] */ {
-    // Check that `p` is a valid probability (0 ≤ p ≤ 1)
-    if (p < 0 || p > 1) {
-        throw new Error(
-            "bernoulliDistribution requires probability to be between 0 and 1 inclusive"
-        );
+var PerceptronModel = function PerceptronModel() {
+    // The weights, or coefficients of the model;
+    // weights are only populated when training with data.
+    this.weights = [];
+    // The bias term, or intercept; it is also a weight but
+    // it's stored separately for convenience as it is always
+    // multiplied by one.
+    this.bias = 0;
+};
+/**
+ * **Predict**: Use an array of features with the weight array and bias
+ * to predict whether an example is labeled 0 or 1.
+ *
+ * @param {Array<number>} features an array of features as numbers
+ * @returns {number} 1 if the score is over 0, otherwise 0
+ */
+PerceptronModel.prototype.predict = function predict (features) {
+    // Only predict if previously trained
+    // on the same size feature array(s).
+    if (features.length !== this.weights.length) {
+        return null;
     }
 
-    return [1 - p, p];
+    // Calculate the sum of features times weights,
+    // with the bias added (implicitly times one).
+    var score = 0;
+    for (var i = 0; i < this.weights.length; i++) {
+        score += this.weights[i] * features[i];
+    }
+    score += this.bias;
+
+    // Classify as 1 if the score is over 0, otherwise 0.
+    if (score > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+};
+
+/**
+ * **Train** the classifier with a new example, which is
+ * a numeric array of features and a 0 or 1 label.
+ *
+ * @param {Array<number>} features an array of features as numbers
+ * @param {number} label either 0 or 1
+ * @returns {PerceptronModel} this
+ */
+PerceptronModel.prototype.train = function train (features, label) {
+    // Require that only labels of 0 or 1 are considered.
+    if (label !== 0 && label !== 1) {
+        return null;
+    }
+    // The length of the feature array determines
+    // the length of the weight array.
+    // The perceptron will continue learning as long as
+    // it keeps seeing feature arrays of the same length.
+    // When it sees a new data shape, it initializes.
+    if (features.length !== this.weights.length) {
+        this.weights = features;
+        this.bias = 1;
+    }
+    // Make a prediction based on current weights.
+    var prediction = this.predict(features);
+    // Update the weights if the prediction is wrong.
+    if (typeof prediction === "number" && prediction !== label) {
+        var gradient = label - prediction;
+        for (var i = 0; i < this.weights.length; i++) {
+            this.weights[i] += gradient * features[i];
+        }
+        this.bias += gradient;
+    }
+    return this;
+};
+
+/**
+ * We use `ε`, epsilon, as a stopping criterion when we want to iterate
+ * until we're "close enough". Epsilon is a very small number: for
+ * simple statistics, that number is **0.0001**
+ *
+ * This is used in calculations like the binomialDistribution, in which
+ * the process of finding a value is [iterative](https://en.wikipedia.org/wiki/Iterative_method):
+ * it progresses until it is close enough.
+ *
+ * Below is an example of using epsilon in [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent),
+ * where we're trying to find a local minimum of a function's derivative,
+ * given by the `fDerivative` method.
+ *
+ * @example
+ * // From calculation, we expect that the local minimum occurs at x=9/4
+ * var x_old = 0;
+ * // The algorithm starts at x=6
+ * var x_new = 6;
+ * var stepSize = 0.01;
+ *
+ * function fDerivative(x) {
+ *   return 4 * Math.pow(x, 3) - 9 * Math.pow(x, 2);
+ * }
+ *
+ * // The loop runs until the difference between the previous
+ * // value and the current value is smaller than epsilon - a rough
+ * // meaure of 'close enough'
+ * while (Math.abs(x_new - x_old) > ss.epsilon) {
+ *   x_old = x_new;
+ *   x_new = x_old - stepSize * fDerivative(x_old);
+ * }
+ *
+ * console.log('Local minimum occurs at', x_new);
+ */
+var epsilon = 0.0001;
+
+/**
+ * A [Factorial](https://en.wikipedia.org/wiki/Factorial), usually written n!, is the product of all positive
+ * integers less than or equal to n. Often factorial is implemented
+ * recursively, but this iterative approach is significantly faster
+ * and simpler.
+ *
+ * @param {number} n input, must be an integer number 1 or greater
+ * @returns {number} factorial: n!
+ * @throws {Error} if n is less than 0 or not an integer
+ * @example
+ * factorial(5); // => 120
+ */
+function factorial(n) {
+    // factorial is mathematically undefined for negative numbers
+    if (n < 0) {
+        throw new Error("factorial requires a non-negative value");
+    }
+
+    if (Math.floor(n) !== n) {
+        throw new Error("factorial requires an integer input");
+    }
+
+    // typically you'll expand the factorial function going down, like
+    // 5! = 5 * 4 * 3 * 2 * 1. This is going in the opposite direction,
+    // counting from 2 up to the number in question, and since anything
+    // multiplied by 1 is itself, the loop only needs to start at 2.
+    var accumulator = 1;
+    for (var i = 2; i <= n; i++) {
+        // for each number up to and including the number `n`, multiply
+        // the accumulator my that number.
+        accumulator *= i;
+    }
+    return accumulator;
+}
+
+/**
+ * Compute the [gamma function](https://en.wikipedia.org/wiki/Gamma_function) of a value using Nemes' approximation.
+ * The gamma of n is equivalent to (n-1)!, but unlike the factorial function, gamma is defined for all real n except zero
+ * and negative integers (where NaN is returned). Note, the gamma function is also well-defined for complex numbers,
+ * though this implementation currently does not handle complex numbers as input values.
+ * Nemes' approximation is defined [here](https://arxiv.org/abs/1003.6020) as Theorem 2.2.
+ * Negative values use [Euler's reflection formula](https://en.wikipedia.org/wiki/Gamma_function#Properties) for computation.
+ *
+ * @param {number} n Any real number except for zero and negative integers.
+ * @returns {number} The gamma of the input value.
+ *
+ * @example
+ * gamma(11.5); // 11899423.084037038
+ * gamma(-11.5); // 2.29575810481609e-8
+ * gamma(5); // 24
+ */
+function gamma(n) {
+    if (Number.isInteger(n)) {
+        if (n <= 0) {
+            // gamma not defined for zero or negative integers
+            return Number.NaN;
+        } else {
+            // use factorial for integer inputs
+            return factorial(n - 1);
+        }
+    }
+
+    // Decrement n, because approximation is defined for n - 1
+    n--;
+
+    if (n < 0) {
+        // Use Euler's reflection formula for negative inputs
+        // see:  https://en.wikipedia.org/wiki/Gamma_function#Properties
+        return Math.PI / (Math.sin(Math.PI * -n) * gamma(-n));
+    } else {
+        // Nemes' expansion approximation
+        var seriesCoefficient =
+            Math.pow(n / Math.E, n) * Math.sqrt(2 * Math.PI * (n + 1 / 6));
+
+        var seriesDenom = n + 1 / 4;
+
+        var seriesExpansion =
+            1 +
+            1 / 144 / Math.pow(seriesDenom, 2) -
+            1 / 12960 / Math.pow(seriesDenom, 3) -
+            257 / 207360 / Math.pow(seriesDenom, 4) -
+            52 / 2612736 / Math.pow(seriesDenom, 5) +
+            5741173 / 9405849600 / Math.pow(seriesDenom, 6) +
+            37529 / 18811699200 / Math.pow(seriesDenom, 7);
+
+        return seriesCoefficient * seriesExpansion;
+    }
 }
 
 // Define series coefficients
 var COEFFICIENTS = [
-    0.99999999999999709182, 57.156235665862923517, -59.59796035547549,
-    14.136097974741747174, -0.4919138160976202, 0.33994649984811888699e-4,
-    0.46523628927048575665e-4, -9837447530487956e-20,
-    0.15808870322491248884e-3, -21026444172410488e-20,
-    0.2174396181152126432e-3, -1643181065367639e-19,
-    0.84418223983852743293e-4, -26190838401581408e-21,
+    0.99999999999999709182, 57.156235665862923517, -59.597960355475491248,
+    14.136097974741747174, -0.49191381609762019978, 0.33994649984811888699e-4,
+    0.46523628927048575665e-4, -0.98374475304879564677e-4,
+    0.15808870322491248884e-3, -0.21026444172410488319e-3,
+    0.2174396181152126432e-3, -0.16431810653676389022e-3,
+    0.84418223983852743293e-4, -0.2619083840158140867e-4,
     0.36899182659531622704e-5
 ];
 
@@ -73875,12 +74269,32 @@ function gammaln(n) {
 }
 
 /**
- * Discrete distributions are tabulated cell by cell, and the Poisson
- * distribution has no upper bound at all, so their tables need a length we can
- * still allocate. Past this, `binomialDistribution` and `poissonDistribution`
- * report a distribution they cannot produce rather than a partial one.
+ * The [Bernoulli distribution](http://en.wikipedia.org/wiki/Bernoulli_distribution)
+ * is the probability discrete
+ * distribution of a random variable which takes value 1 with success
+ * probability `p` and value 0 with failure
+ * probability `q` = 1 - `p`. It can be used, for example, to represent the
+ * toss of a coin, where "1" is defined to mean "heads" and "0" is defined
+ * to mean "tails" (or vice versa). It is
+ * a special case of a Binomial Distribution
+ * where `n` = 1.
+ *
+ * @param {number} p input value, between 0 and 1 inclusive
+ * @returns {number[]} values of bernoulli distribution at this point
+ * @throws {Error} if p is outside 0 and 1
+ * @example
+ * bernoulliDistribution(0.3); // => [0.7, 0.3]
  */
-var maxDistributionCells = 1e6;
+function bernoulliDistribution(p) /*: number[] */ {
+    // Check that `p` is a valid probability (0 ≤ p ≤ 1)
+    if (p < 0 || p > 1) {
+        throw new Error(
+            "bernoulliDistribution requires probability to be between 0 and 1 inclusive"
+        );
+    }
+
+    return [1 - p, p];
+}
 
 /**
  * The [Binomial Distribution](http://en.wikipedia.org/wiki/Binomial_distribution) is the discrete probability
@@ -73888,13 +74302,9 @@ var maxDistributionCells = 1e6;
  * success with probability `probability`. Such a success/failure experiment is also called a Bernoulli experiment or
  * Bernoulli trial; when trials = 1, the Binomial Distribution is a Bernoulli Distribution.
  *
- * Returns `undefined` when the distribution cannot be calculated: either
- * argument is outside its domain or is not a number, or when `trials` is large
- * enough that the table would run past a million cells.
- *
  * @param {number} trials number of trials to simulate
  * @param {number} probability
- * @returns {number[] | undefined} output
+ * @returns {number[]} output
  */
 function binomialDistribution(trials, probability) /*: ?number[] */ {
     // Check that `p` is a valid probability (0 ≤ p ≤ 1),
@@ -73903,138 +74313,78 @@ function binomialDistribution(trials, probability) /*: ?number[] */ {
         return undefined;
     }
 
-    // More successes than trials are impossible, and the table cannot outgrow
-    // what we can allocate.
-    var lastCell = Math.min(trials, maxDistributionCells - 1);
-
-    // The logarithms below are undefined at the ends of the probability range,
-    // where the outcome is certain anyway.
-    if (probability === 0) {
-        return [1];
-    }
-    if (probability === 1) {
-        if (trials > lastCell) {
-            return undefined;
-        }
-        var certain = new Array(trials + 1).fill(0);
-        certain[trials] = 1;
-        return certain;
-    }
-
-    // `x` is the random variable: the number of successes. We iterate until
-    // the cumulative probability is within `epsilon` of 1.0, at which point we
-    // have the useful range of the distribution.
+    // We initialize `x`, the random variable, and `accumulator`, an accumulator
+    // for the cumulative distribution function to 0. `distribution_functions`
+    // is the object we'll return with the `probability_of_x` and the
+    // `cumulativeProbability_of_x`, as well as the calculated mean &
+    // variance. We iterate until the `cumulativeProbability_of_x` is
+    // within `epsilon` of 1.0.
     var x = 0;
     var cumulativeProbability = 0;
     var cells = [];
-
-    // The terms of the mass function below that do not vary with `x`
-    var logTrialsFactorial = gammaln(trials + 1);
-    var logProbability = Math.log(probability);
-    // `log1p` rather than `Math.log(1 - probability)`, which cancels away the
-    // low digits of the complement as `probability` approaches 1.
-    var log1mProbability = Math.log1p(-probability);
+    var binomialCoefficient = 1;
 
     // This algorithm iterates through each potential outcome,
     // until the `cumulativeProbability` is very close to 1, at
     // which point we've defined the vast majority of outcomes
     do {
-        // A [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function),
-        // taken through its logarithm: the binomial coefficient and the two
-        // powers each leave floating-point range long before the product they
-        // form does, so computing them separately loses cells the distribution
-        // needs.
-        cells[x] = Math.exp(
-            logTrialsFactorial -
-                gammaln(x + 1) -
-                gammaln(trials - x + 1) +
-                x * logProbability +
-                (trials - x) * log1mProbability
-        );
+        // a [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function)
+        cells[x] =
+            binomialCoefficient *
+            Math.pow(probability, x) *
+            Math.pow(1 - probability, trials - x);
         cumulativeProbability += cells[x];
         x++;
-        // When the `cumulativeProbability` is nearly 1, we've calculated
+        binomialCoefficient = (binomialCoefficient * (trials - x + 1)) / x;
+        // when the cumulativeProbability is nearly 1, we've calculated
         // the useful range of this distribution
-    } while (cumulativeProbability < 1 - epsilon && x <= lastCell);
-
-    // Stopping for any other reason - a probability that is not a number, or
-    // more trials than the table can hold - leaves cells that do not add up to
-    // a distribution, so report that rather than returning them.
-    if (
-        Number.isNaN(cumulativeProbability) ||
-        cumulativeProbability < 1 - epsilon
-    ) {
-        return undefined;
-    }
+    } while (cumulativeProbability < 1 - epsilon);
 
     return cells;
 }
 
 /**
- * [Sign](https://en.wikipedia.org/wiki/Sign_function) is a function
- * that extracts the sign of a real number
+ * The [Poisson Distribution](http://en.wikipedia.org/wiki/Poisson_distribution)
+ * is a discrete probability distribution that expresses the probability
+ * of a given number of events occurring in a fixed interval of time
+ * and/or space if these events occur with a known average rate and
+ * independently of the time since the last event.
  *
- * @param {number} x input value
- * @returns {number} sign value either 1, 0 or -1
- * @throws {TypeError} if the input argument x is not a number
- * @private
+ * The Poisson Distribution is characterized by the strictly positive
+ * mean arrival or occurrence rate, `λ`.
  *
- * @example
- * sign(2); // => 1
+ * @param {number} lambda location poisson distribution
+ * @returns {number[]} values of poisson distribution at that point
  */
-function sign(x) {
-    if (typeof x === "number") {
-        if (x < 0) {
-            return -1;
-        } else if (x === 0) {
-            return 0;
-        } else {
-            return 1;
-        }
-    } else {
-        throw new TypeError("not a number");
-    }
-}
-
-/**
- * [Bisection method](https://en.wikipedia.org/wiki/Bisection_method) is a root-finding
- * method that repeatedly bisects an interval to find the root.
- *
- * This function returns a numerical approximation to the exact value.
- *
- * @param {Function} func input function
- * @param {number} start - start of interval
- * @param {number} end - end of interval
- * @param {number} maxIterations - the maximum number of iterations
- * @param {number} errorTolerance - the error tolerance
- * @returns {number} estimated root value
- * @throws {TypeError} Argument func must be a function
- *
- * @example
- * bisect(Math.cos,0,4,100,0.003); // => 1.572265625
- */
-function bisect(func, start, end, maxIterations, errorTolerance) {
-    if (typeof func !== "function")
-        { throw new TypeError("func must be a function"); }
-
-    for (var i = 0; i < maxIterations; i++) {
-        var output = (start + end) / 2;
-
-        if (
-            func(output) === 0 ||
-            Math.abs((end - start) / 2) < errorTolerance
-        ) {
-            return output;
-        }
-
-        if (sign(func(output)) === sign(func(start))) {
-            start = output;
-        } else {
-            end = output;
-        }
+function poissonDistribution(lambda) /*: ?number[] */ {
+    // Check that lambda is strictly positive
+    if (lambda <= 0) {
+        return undefined;
     }
 
-    throw new Error("maximum number of iterations exceeded");
+    // our current place in the distribution
+    var x = 0;
+    // and we keep track of the current cumulative probability, in
+    // order to know when to stop calculating chances.
+    var cumulativeProbability = 0;
+    // the calculated cells to be returned
+    var cells = [];
+    var factorialX = 1;
+
+    // This algorithm iterates through each potential outcome,
+    // until the `cumulativeProbability` is very close to 1, at
+    // which point we've defined the vast majority of outcomes
+    do {
+        // a [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function)
+        cells[x] = (Math.exp(-lambda) * Math.pow(lambda, x)) / factorialX;
+        cumulativeProbability += cells[x];
+        x++;
+        factorialX *= x;
+        // when the cumulativeProbability is nearly 1, we've calculated
+        // the useful range of this distribution
+    } while (cumulativeProbability < 1 - epsilon);
+
+    return cells;
 }
 
 /**
@@ -74129,7 +74479,7 @@ var chiSquaredDistributionTable = {
     },
     7: {
         0.995: 0.99,
-        0.99: 1.24,
+        0.99: 1.25,
         0.975: 1.69,
         0.95: 2.17,
         0.9: 2.83,
@@ -74368,7 +74718,7 @@ var chiSquaredDistributionTable = {
         0.95: 14.61,
         0.9: 16.47,
         0.5: 24.34,
-        0.1: 34.38,
+        0.1: 34.28,
         0.05: 37.65,
         0.025: 40.65,
         0.01: 44.31,
@@ -74599,52 +74949,25 @@ function chiSquaredGoodnessOfFit(data, distributionType, significance) {
         }
     }
 
-    if (expectedFrequencies.length === 0) {
-        throw new Error(
-            "chiSquaredGoodnessOfFit requires distributionType to return a distribution for the mean of the data"
-        );
-    }
-
-    // The hypothesized distribution can stop short of the largest observation,
-    // leaving those observations with no expected frequency to be compared
-    // against. Fold them into the last class the distribution does cover, the
-    // same treatment the collapse below gives to sparse classes, so that the
-    // two histograms describe the same classes.
-    var lastClass = expectedFrequencies.length - 1;
-    for (var k$1 = observedFrequencies.length - 1; k$1 > lastClass; k$1--) {
-        observedFrequencies[lastClass] += observedFrequencies[k$1];
-        observedFrequencies.pop();
-    }
-
     // Working backward through the expected frequencies, collapse classes
     // if less than three observations are expected for a class.
     // This transformation is applied to the observed frequencies as well.
-    // The class that was merged is the one that has to go: popping instead
-    // drops the last class, which is only the same thing until a class is
-    // large enough to keep. The first class is left alone, since there is no
-    // class before it to collapse it into.
-    for (var k$2 = expectedFrequencies.length - 1; k$2 >= 1; k$2--) {
-        if (expectedFrequencies[k$2] < 3) {
-            expectedFrequencies[k$2 - 1] += expectedFrequencies[k$2];
-            expectedFrequencies.splice(k$2, 1);
+    for (var k$1 = expectedFrequencies.length - 1; k$1 >= 0; k$1--) {
+        if (expectedFrequencies[k$1] < 3) {
+            expectedFrequencies[k$1 - 1] += expectedFrequencies[k$1];
+            expectedFrequencies.pop();
 
-            observedFrequencies[k$2 - 1] += observedFrequencies[k$2];
-            observedFrequencies.splice(k$2, 1);
+            observedFrequencies[k$1 - 1] += observedFrequencies[k$1];
+            observedFrequencies.pop();
         }
     }
 
     // Iterate through the squared differences between observed & expected
     // frequencies, accumulating the `chiSquared` statistic.
-    for (var k$3 = 0; k$3 < observedFrequencies.length; k$3++) {
+    for (var k$2 = 0; k$2 < observedFrequencies.length; k$2++) {
         chiSquared +=
-            Math.pow(observedFrequencies[k$3] - expectedFrequencies[k$3], 2) /
-            expectedFrequencies[k$3];
-    }
-
-    if (!Number.isFinite(chiSquared)) {
-        throw new Error(
-            "chiSquaredGoodnessOfFit could not compute a test statistic for this data and distribution"
-        );
+            Math.pow(observedFrequencies[k$2] - expectedFrequencies[k$2], 2) /
+            expectedFrequencies[k$2];
     }
 
     // Calculate degrees of freedom for this test and look it up in the
@@ -74653,52 +74976,137 @@ function chiSquaredGoodnessOfFit(data, distributionType, significance) {
     // Degrees of freedom, calculated as (number of class intervals -
     // number of hypothesized distribution parameters estimated - 1)
     var degreesOfFreedom = observedFrequencies.length - c - 1;
-    if (degreesOfFreedom < 1) {
-        throw new Error(
-            "chiSquaredGoodnessOfFit requires more data: the classes that survive collapsing leave no degrees of freedom"
-        );
-    }
-
-    var criticalValues = chiSquaredDistributionTable[degreesOfFreedom];
-    if (criticalValues === undefined) {
-        throw new Error(
-            ("chiSquaredGoodnessOfFit has no critical values tabulated for " + degreesOfFreedom + " degrees of freedom")
-        );
-    }
-    if (criticalValues[significance] === undefined) {
-        throw new Error(
-            ("chiSquaredGoodnessOfFit has no critical value tabulated for a significance of " + significance)
-        );
-    }
-
-    return criticalValues[significance] < chiSquared;
-}
-
-/**
- * **[Logistic Cumulative Distribution Function](https://en.wikipedia.org/wiki/Logistic_distribution)**
- *
- * @param {number} x
- * @returns {number} cumulative standard logistic probability
- */
-function cumulativeStdLogisticProbability(x) {
-    return 1 / (Math.exp(-x) + 1);
+    return (
+        chiSquaredDistributionTable[degreesOfFreedom][significance] < chiSquared
+    );
 }
 
 var SQRT_2PI$1 = Math.sqrt(2 * Math.PI);
+
+/**
+ * [Well-known kernels](https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use)
+ * @private
+ */
+var kernels = {
+    /**
+     * The gaussian kernel.
+     * @private
+     */
+    gaussian: function (u) {
+        return Math.exp(-0.5 * u * u) / SQRT_2PI$1;
+    }
+};
+
+/**
+ * Well known bandwidth selection methods
+ * @private
+ */
+var bandwidthMethods = {
+    /**
+     * The ["normal reference distribution"
+     * rule-of-thumb](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/bandwidth.nrd.html),
+     * a commonly used version of [Silverman's
+     * rule-of-thumb](https://en.wikipedia.org/wiki/Kernel_density_estimation#A_rule-of-thumb_bandwidth_estimator).
+     * @private
+     */
+    nrd: function (x) {
+        var s = sampleStandardDeviation(x);
+        var iqr = interquartileRange(x);
+        if (typeof iqr === "number") {
+            s = Math.min(s, iqr / 1.34);
+        }
+        return 1.06 * s * Math.pow(x.length, -0.2);
+    }
+};
+
+/**
+ * [Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation)
+ * is a useful tool for, among other things, estimating the shape of the
+ * underlying probability distribution from a sample.
+ *
+ * @name kernelDensityEstimation
+ * @param X sample values
+ * @param kernel The kernel function to use. If a function is provided, it should return non-negative values and integrate to 1. Defaults to 'gaussian'.
+ * @param bandwidthMethod The "bandwidth selection" method to use, or a fixed bandwidth value. Defaults to "nrd", the commonly-used ["normal reference distribution" rule-of-thumb](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/bandwidth.nrd.html).
+ * @returns {Function} An estimated [probability density function](https://en.wikipedia.org/wiki/Probability_density_function) for the given sample. The returned function runs in `O(X.length)`.
+ */
+function kernelDensityEstimation(X, kernel, bandwidthMethod) {
+    var kernelFn;
+    if (kernel === undefined) {
+        kernelFn = kernels.gaussian;
+    } else if (typeof kernel === "string") {
+        if (!kernels[kernel]) {
+            throw new Error('Unknown kernel "' + kernel + '"');
+        }
+        kernelFn = kernels[kernel];
+    } else {
+        kernelFn = kernel;
+    }
+
+    var bandwidth;
+    if (typeof bandwidthMethod === "undefined") {
+        bandwidth = bandwidthMethods.nrd(X);
+    } else if (typeof bandwidthMethod === "string") {
+        if (!bandwidthMethods[bandwidthMethod]) {
+            throw new Error(
+                'Unknown bandwidth method "' + bandwidthMethod + '"'
+            );
+        }
+        bandwidth = bandwidthMethods[bandwidthMethod](X);
+    } else {
+        bandwidth = bandwidthMethod;
+    }
+
+    return function (x) {
+        var i = 0;
+        var sum = 0;
+        for (i = 0; i < X.length; i++) {
+            sum += kernelFn((x - X[i]) / bandwidth);
+        }
+        return sum / bandwidth / X.length;
+    };
+}
+
+/**
+ * The [Z-Score, or Standard Score](http://en.wikipedia.org/wiki/Standard_score).
+ *
+ * The standard score is the number of standard deviations an observation
+ * or datum is above or below the mean. Thus, a positive standard score
+ * represents a datum above the mean, while a negative standard score
+ * represents a datum below the mean. It is a dimensionless quantity
+ * obtained by subtracting the population mean from an individual raw
+ * score and then dividing the difference by the population standard
+ * deviation.
+ *
+ * The z-score is only defined if one knows the population parameters;
+ * if one only has a sample set, then the analogous computation with
+ * sample mean and sample standard deviation yields the
+ * Student's t-statistic.
+ *
+ * @param {number} x
+ * @param {number} mean
+ * @param {number} standardDeviation
+ * @return {number} z score
+ * @example
+ * zScore(78, 80, 5); // => -0.4
+ */
+function zScore(x, mean, standardDeviation) {
+    return (x - mean) / standardDeviation;
+}
+
+var SQRT_2PI = Math.sqrt(2 * Math.PI);
 
 function cumulativeDistribution(z) {
     var sum = z;
     var tmp = z;
 
-    // The series converges more slowly as z grows: 15 terms fall short of
-    // 4-digit precision above z = 2.9. 30 terms converge across the whole
-    // domain of the table below, which ends at z = 3.09.
-    for (var i = 1; i < 30; i++) {
+    // 15 iterations are enough for 4-digit precision
+    for (var i = 1; i < 15; i++) {
         tmp *= (z * z) / (2 * i + 1);
         sum += tmp;
     }
     return (
-        Math.round((0.5 + (sum / SQRT_2PI$1) * Math.exp((-z * z) / 2)) * 1e4) /
+        Math.round((0.5 + (sum / SQRT_2PI) * Math.exp((-z * z) / 2)) * 1e4) /
         1e4
     );
 }
@@ -74757,6 +75165,16 @@ function cumulativeStdNormalProbability(z) {
 }
 
 /**
+ * **[Logistic Cumulative Distribution Function](https://en.wikipedia.org/wiki/Logistic_distribution)**
+ *
+ * @param {number} x
+ * @returns {number} cumulative standard logistic probability
+ */
+function cumulativeStdLogisticProbability(x) {
+    return 1 / (Math.exp(-x) + 1);
+}
+
+/**
  * **[Gaussian error function](http://en.wikipedia.org/wiki/Error_function)**
  *
  * The `errorFunction(x/(sd * Math.sqrt(2)))` is the probability that a value in a
@@ -74799,115 +75217,6 @@ function errorFunction(x) {
 }
 
 /**
- * A [Factorial](https://en.wikipedia.org/wiki/Factorial), usually written n!, is the product of all positive
- * integers less than or equal to n. Often factorial is implemented
- * recursively, but this iterative approach is significantly faster
- * and simpler.
- *
- * @param {number} n input, must be an integer number 1 or greater
- * @returns {number} factorial: n!
- * @throws {Error} if n is less than 0 or not an integer
- * @example
- * factorial(5); // => 120
- */
-function factorial(n) {
-    // factorial is mathematically undefined for negative numbers
-    if (n < 0) {
-        throw new Error("factorial requires a non-negative value");
-    }
-
-    if (Math.floor(n) !== n) {
-        throw new Error("factorial requires an integer input");
-    }
-
-    // typically you'll expand the factorial function going down, like
-    // 5! = 5 * 4 * 3 * 2 * 1. This is going in the opposite direction,
-    // counting from 2 up to the number in question, and since anything
-    // multiplied by 1 is itself, the loop only needs to start at 2.
-    var accumulator = 1;
-    for (var i = 2; i <= n; i++) {
-        // for each number up to and including the number `n`, multiply
-        // the accumulator my that number.
-        accumulator *= i;
-    }
-    return accumulator;
-}
-
-/**
- * Compute the [gamma function](https://en.wikipedia.org/wiki/Gamma_function) of a value using Nemes' approximation.
- * The gamma of n is equivalent to (n-1)!, but unlike the factorial function, gamma is defined for all real n except zero
- * and negative integers (where NaN is returned). Note, the gamma function is also well-defined for complex numbers,
- * though this implementation currently does not handle complex numbers as input values.
- * Nemes' approximation is defined [here](https://arxiv.org/abs/1003.6020) as Theorem 2.2.
- * Negative values use [Euler's reflection formula](https://en.wikipedia.org/wiki/Gamma_function#Properties) for computation.
- *
- * @param {number} n Any real number except for zero and negative integers.
- * @returns {number} The gamma of the input value.
- *
- * @example
- * gamma(11.5); // 11899423.083964102
- * gamma(-11.5); // 2.2957581048237436e-8
- * gamma(5); // 24
- */
-// The Nemes expansion is asymptotic, so it is only accurate for large
-// arguments. Below this the recurrence lifts the argument first. At 20
-// the worst relative error over (0, 30] is 1.9e-13, against 1.8 for the
-// expansion applied directly.
-var NEMES_MIN = 20;
-
-function gamma(n) {
-    if (Number.isInteger(n)) {
-        if (n <= 0) {
-            // gamma not defined for zero or negative integers
-            return Number.NaN;
-        } else {
-            // use factorial for integer inputs
-            return factorial(n - 1);
-        }
-    }
-
-    if (n > 0 && n < NEMES_MIN) {
-        // The Nemes expansion below divides its terms by powers of
-        // `n - 3/4`, so they stop shrinking once the argument is small
-        // and the series is worthless there: gamma(1.01) came back as
-        // 1.8 times its true value. Arguments in (0, 1) additionally
-        // recursed forever through the reflection branch, because the
-        // reflected argument stayed in (0, 1) and never reached the
-        // expansion at all.
-        //
-        // Lift into the range where the expansion converges, using the
-        // recurrence gamma(n) = gamma(n + 1) / n.
-        return gamma(n + 1) / n;
-    }
-
-    // Decrement n, because approximation is defined for n - 1
-    n--;
-
-    if (n < 0) {
-        // Use Euler's reflection formula for negative inputs
-        // see:  https://en.wikipedia.org/wiki/Gamma_function#Properties
-        return Math.PI / (Math.sin(Math.PI * -n) * gamma(-n));
-    } else {
-        // Nemes' expansion approximation
-        var seriesCoefficient =
-            Math.pow(n / Math.E, n) * Math.sqrt(2 * Math.PI * (n + 1 / 6));
-
-        var seriesDenom = n + 1 / 4;
-
-        var seriesExpansion =
-            1 +
-            1 / 144 / Math.pow(seriesDenom, 2) -
-            1 / 12960 / Math.pow(seriesDenom, 3) -
-            257 / 207360 / Math.pow(seriesDenom, 4) -
-            52 / 2612736 / Math.pow(seriesDenom, 5) +
-            5741173 / 9405849600 / Math.pow(seriesDenom, 6) +
-            37529 / 18811699200 / Math.pow(seriesDenom, 7);
-
-        return seriesCoefficient * seriesExpansion;
-    }
-}
-
-/**
  * The Inverse [Gaussian error function](http://en.wikipedia.org/wiki/Error_function)
  * returns a numerical approximation to the value that would have caused
  * `errorFunction()` to return x.
@@ -74931,6 +75240,208 @@ function inverseErrorFunction(x) {
     } else {
         return -inv;
     }
+}
+
+/**
+ * The [Probit](http://en.wikipedia.org/wiki/Probit)
+ * is the inverse of cumulativeStdNormalProbability(),
+ * and is also known as the normal quantile function.
+ *
+ * It returns the number of standard deviations from the mean
+ * where the p'th quantile of values can be found in a normal distribution.
+ * So, for example, probit(0.5 + 0.6827/2) ≈ 1 because 68.27% of values are
+ * normally found within 1 standard deviation above or below the mean.
+ *
+ * @param {number} p
+ * @returns {number} probit
+ */
+function probit(p) {
+    if (p === 0) {
+        p = epsilon;
+    } else if (p >= 1) {
+        p = 1 - epsilon;
+    }
+    return Math.sqrt(2) * inverseErrorFunction(2 * p - 1);
+}
+
+/**
+ * The [Logit](https://en.wikipedia.org/wiki/Logit)
+ * is the inverse of cumulativeStdLogisticProbability,
+ * and is also known as the logistic quantile function.
+ *
+ * @param {number} p
+ * @returns {number} logit
+ */
+function logit(p) {
+    if (p <= 0 || p >= 1) {
+        throw new Error("p must be strictly between zero and one");
+    }
+    return Math.log(p / (1 - p));
+}
+
+/**
+ * Conducts a [permutation test](https://en.wikipedia.org/wiki/Resampling_(statistics)#Permutation_tests)
+ * to determine if two data sets are *significantly* different from each other, using
+ * the difference of means between the groups as the test statistic.
+ * The function allows for the following hypotheses:
+ * - two_tail = Null hypothesis: the two distributions are equal.
+ * - greater = Null hypothesis: observations from sampleX tend to be smaller than those from sampleY.
+ * - less = Null hypothesis: observations from sampleX tend to be greater than those from sampleY.
+ * [Learn more about one-tail vs two-tail tests.](https://en.wikipedia.org/wiki/One-_and_two-tailed_tests)
+ *
+ * @param {Array<number>} sampleX first dataset (e.g. treatment data)
+ * @param {Array<number>} sampleY second dataset (e.g. control data)
+ * @param {string} alternative alternative hypothesis, either 'two_sided' (default), 'greater', or 'less'
+ * @param {number} k number of values in permutation distribution.
+ * @param {Function} [randomSource=Math.random] an optional entropy source
+ * @returns {number} p-value The probability of observing the difference between groups (as or more extreme than what we did), assuming the null hypothesis.
+ *
+ * @example
+ * var control = [2, 5, 3, 6, 7, 2, 5];
+ * var treatment = [20, 5, 13, 12, 7, 2, 2];
+ * permutationTest(control, treatment); // ~0.1324
+ */
+function permutationTest(sampleX, sampleY, alternative, k, randomSource) {
+    // Set default arguments
+    if (k === undefined) {
+        k = 10000;
+    }
+    if (alternative === undefined) {
+        alternative = "two_side";
+    }
+    if (
+        alternative !== "two_side" &&
+        alternative !== "greater" &&
+        alternative !== "less"
+    ) {
+        throw new Error(
+            "`alternative` must be either 'two_side', 'greater', or 'less'."
+        );
+    }
+
+    // get means for each sample
+    var meanX = mean(sampleX);
+    var meanY = mean(sampleY);
+
+    // calculate initial test statistic. This will be our point of comparison with
+    // the generated test statistics.
+    var testStatistic = meanX - meanY;
+
+    // create test-statistic distribution
+    var testStatDsn = new Array(k);
+
+    // combine datsets so we can easily shuffle later
+    var allData = sampleX.concat(sampleY);
+    var midIndex = Math.floor(allData.length / 2);
+
+    for (var i = 0; i < k; i++) {
+        // 1. shuffle data assignments
+        shuffleInPlace(allData, randomSource);
+        var permLeft = allData.slice(0, midIndex);
+        var permRight = allData.slice(midIndex, allData.length);
+
+        // 2.re-calculate test statistic
+        var permTestStatistic = mean(permLeft) - mean(permRight);
+
+        // 3. store test statistic to build test statistic distribution
+        testStatDsn[i] = permTestStatistic;
+    }
+
+    // Calculate p-value depending on alternative
+    // For this test, we calculate the percentage of 'extreme' test statistics (subject to our hypothesis)
+    // more info on permutation test p-value calculations: https://onlinecourses.science.psu.edu/stat464/node/35
+    var numExtremeTStats = 0;
+    if (alternative === "two_side") {
+        for (var i$1 = 0; i$1 <= k; i$1++) {
+            if (Math.abs(testStatDsn[i$1]) >= Math.abs(testStatistic)) {
+                numExtremeTStats += 1;
+            }
+        }
+    } else if (alternative === "greater") {
+        for (var i$2 = 0; i$2 <= k; i$2++) {
+            if (testStatDsn[i$2] >= testStatistic) {
+                numExtremeTStats += 1;
+            }
+        }
+    } else {
+        // alternative === 'less'
+        for (var i$3 = 0; i$3 <= k; i$3++) {
+            /* c8 ignore start */
+            if (testStatDsn[i$3] <= testStatistic) {
+                numExtremeTStats += 1;
+            }
+            /* c8 ignore end */
+        }
+    }
+
+    return numExtremeTStats / k;
+}
+
+/**
+ * [Sign](https://en.wikipedia.org/wiki/Sign_function) is a function
+ * that extracts the sign of a real number
+ *
+ * @param {number} x input value
+ * @returns {number} sign value either 1, 0 or -1
+ * @throws {TypeError} if the input argument x is not a number
+ * @private
+ *
+ * @example
+ * sign(2); // => 1
+ */
+function sign(x) {
+    if (typeof x === "number") {
+        if (x < 0) {
+            return -1;
+        } else if (x === 0) {
+            return 0;
+        } else {
+            return 1;
+        }
+    } else {
+        throw new TypeError("not a number");
+    }
+}
+
+/**
+ * [Bisection method](https://en.wikipedia.org/wiki/Bisection_method) is a root-finding
+ * method that repeatedly bisects an interval to find the root.
+ *
+ * This function returns a numerical approximation to the exact value.
+ *
+ * @param {Function} func input function
+ * @param {number} start - start of interval
+ * @param {number} end - end of interval
+ * @param {number} maxIterations - the maximum number of iterations
+ * @param {number} errorTolerance - the error tolerance
+ * @returns {number} estimated root value
+ * @throws {TypeError} Argument func must be a function
+ *
+ * @example
+ * bisect(Math.cos,0,4,100,0.003); // => 1.572265625
+ */
+function bisect(func, start, end, maxIterations, errorTolerance) {
+    if (typeof func !== "function")
+        { throw new TypeError("func must be a function"); }
+
+    for (var i = 0; i < maxIterations; i++) {
+        var output = (start + end) / 2;
+
+        if (
+            func(output) === 0 ||
+            Math.abs((end - start) / 2) < errorTolerance
+        ) {
+            return output;
+        }
+
+        if (sign(func(output)) === sign(func(start))) {
+            start = output;
+        } else {
+            end = output;
+        }
+    }
+
+    throw new Error("maximum number of iterations exceeded");
 }
 
 /**
@@ -74964,7 +75475,7 @@ function euclideanDistance(left, right) {
  * @throws {Error} If any centroids wind up friendless (i.e., without associated points).
  *
  * @example
- * kMeansCluster([[0.0, 0.5], [1.0, 0.5]], 2); // => {labels: [0, 1], centroids: [[0.0, 0.5], [1.0, 0.5]]}
+ * kMeansCluster([[0.0, 0.5], [1.0, 0.5]], 2); // => {labels: [0, 1], centroids: [[0.0, 0.5], [1.0 0.5]]}
  */
 function kMeansCluster(points, numCluster, randomSource) {
     if ( randomSource === void 0 ) randomSource = Math.random;
@@ -75064,438 +75575,6 @@ function calculateChange(left, right) {
         total += euclideanDistance(left[i], right[i]);
     }
     return total;
-}
-
-var SQRT_2PI = Math.sqrt(2 * Math.PI);
-
-/**
- * [Well-known kernels](https://en.wikipedia.org/wiki/Kernel_(statistics)#Kernel_functions_in_common_use)
- * @private
- */
-var kernels = {
-    /**
-     * The gaussian kernel.
-     * @private
-     */
-    gaussian: function (u) {
-        return Math.exp(-0.5 * u * u) / SQRT_2PI;
-    }
-};
-
-/**
- * Well known bandwidth selection methods
- * @private
- */
-var bandwidthMethods = {
-    /**
-     * The ["normal reference distribution"
-     * rule-of-thumb](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/bandwidth.nrd.html),
-     * a commonly used version of [Silverman's
-     * rule-of-thumb](https://en.wikipedia.org/wiki/Kernel_density_estimation#A_rule-of-thumb_bandwidth_estimator).
-     * @private
-     */
-    nrd: function (x) {
-        var s = sampleStandardDeviation(x);
-        var iqr = interquartileRange(x);
-        if (typeof iqr === "number") {
-            s = Math.min(s, iqr / 1.34);
-        }
-        return 1.06 * s * Math.pow(x.length, -0.2);
-    }
-};
-
-/**
- * [Kernel density estimation](https://en.wikipedia.org/wiki/Kernel_density_estimation)
- * is a useful tool for, among other things, estimating the shape of the
- * underlying probability distribution from a sample.
- *
- * @name kernelDensityEstimation
- * @param X sample values
- * @param kernel The kernel function to use. If a function is provided, it should return non-negative values and integrate to 1. Defaults to 'gaussian'.
- * @param bandwidthMethod The "bandwidth selection" method to use, or a fixed bandwidth value. Defaults to "nrd", the commonly-used ["normal reference distribution" rule-of-thumb](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/bandwidth.nrd.html).
- * @returns {Function} An estimated [probability density function](https://en.wikipedia.org/wiki/Probability_density_function) for the given sample. The returned function runs in `O(X.length)`.
- */
-function kernelDensityEstimation(X, kernel, bandwidthMethod) {
-    var kernelFn;
-    if (kernel === undefined) {
-        kernelFn = kernels.gaussian;
-    } else if (typeof kernel === "string") {
-        if (!kernels[kernel]) {
-            throw new Error('Unknown kernel "' + kernel + '"');
-        }
-        kernelFn = kernels[kernel];
-    } else {
-        kernelFn = kernel;
-    }
-
-    var bandwidth;
-    if (typeof bandwidthMethod === "undefined") {
-        bandwidth = bandwidthMethods.nrd(X);
-    } else if (typeof bandwidthMethod === "string") {
-        if (!bandwidthMethods[bandwidthMethod]) {
-            throw new Error(
-                'Unknown bandwidth method "' + bandwidthMethod + '"'
-            );
-        }
-        bandwidth = bandwidthMethods[bandwidthMethod](X);
-    } else {
-        bandwidth = bandwidthMethod;
-    }
-
-    return function (x) {
-        var i = 0;
-        var sum = 0;
-        for (i = 0; i < X.length; i++) {
-            sum += kernelFn((x - X[i]) / bandwidth);
-        }
-        return sum / bandwidth / X.length;
-    };
-}
-
-/**
- * The [Logit](https://en.wikipedia.org/wiki/Logit)
- * is the inverse of cumulativeStdLogisticProbability,
- * and is also known as the logistic quantile function.
- *
- * @param {number} p
- * @returns {number} logit
- */
-function logit(p) {
-    if (p <= 0 || p >= 1) {
-        throw new Error("p must be strictly between zero and one");
-    }
-    return Math.log(p / (1 - p));
-}
-
-/**
- * **[Normal distribution](https://en.wikipedia.org/wiki/Normal_distribution)**
- *
- * Returns either the probability density or the cumulative probability of a
- * normal distribution with the given mean and standard deviation, evaluated
- * at x. It is the equivalent of the NORM.DIST function found in spreadsheet
- * software.
- *
- * The cumulative form is computed with `errorFunction`, so it is more precise
- * than converting x to a z-score and looking it up in the four-decimal
- * `standardNormalTable` used by `cumulativeStdNormalProbability`.
- *
- * @param {number} x the value for which you want the distribution
- * @param {number} mean the mean of the distribution
- * @param {number} standardDeviation the standard deviation of the distribution
- * @param {boolean} [cumulative=false] if true, return the cumulative
- * distribution function; if false, return the probability density function
- * @returns {number} the probability density at x, or the probability of a
- * value at most x
- * @throws {Error} if standardDeviation is not greater than zero
- * @example
- * normalDistribution(42, 40, 1.5, true).toFixed(4); // => '0.9088'
- * normalDistribution(42, 40, 1.5, false).toFixed(4); // => '0.1093'
- */
-function normalDistribution(x, mean, standardDeviation, cumulative) {
-    if ( cumulative === void 0 ) cumulative = false;
-
-    if (standardDeviation <= 0) {
-        throw new Error(
-            "normalDistribution requires a standard deviation greater than zero"
-        );
-    }
-
-    var standardizedX = (x - mean) / standardDeviation;
-
-    if (cumulative) {
-        return 0.5 * (1 + errorFunction(standardizedX / Math.SQRT2));
-    }
-    return (
-        Math.exp(-0.5 * standardizedX * standardizedX) /
-        (standardDeviation * Math.sqrt(2 * Math.PI))
-    );
-}
-
-/**
- * This is a single-layer [Perceptron Classifier](http://en.wikipedia.org/wiki/Perceptron) that takes
- * arrays of numbers and predicts whether they should be classified
- * as either 0 or 1 (negative or positive examples).
- * @class
- * @example
- * // Create the model
- * var p = new PerceptronModel();
- * // Train the model with input with a diagonal boundary.
- * for (var i = 0; i < 5; i++) {
- *     p.train([1, 1], 1);
- *     p.train([0, 1], 0);
- *     p.train([1, 0], 0);
- *     p.train([0, 0], 0);
- * }
- * p.predict([0, 0]); // 0
- * p.predict([0, 1]); // 0
- * p.predict([1, 0]); // 0
- * p.predict([1, 1]); // 1
- */
-var PerceptronModel = function PerceptronModel() {
-    // The weights, or coefficients of the model;
-    // weights are only populated when training with data.
-    this.weights = [];
-    // The bias term, or intercept; it is also a weight but
-    // it's stored separately for convenience as it is always
-    // multiplied by one.
-    this.bias = 0;
-};
-/**
- * **Predict**: Use an array of features with the weight array and bias
- * to predict whether an example is labeled 0 or 1.
- *
- * @param {Array<number>} features an array of features as numbers
- * @returns {number|null} 1 if the score is over 0, otherwise 0; null if
- * the model has not been trained on feature arrays of this length
- */
-PerceptronModel.prototype.predict = function predict (features) {
-    // Only predict if previously trained
-    // on the same size feature array(s).
-    if (features.length !== this.weights.length) {
-        return null;
-    }
-
-    // Calculate the sum of features times weights,
-    // with the bias added (implicitly times one).
-    var score = 0;
-    for (var i = 0; i < this.weights.length; i++) {
-        score += this.weights[i] * features[i];
-    }
-    score += this.bias;
-
-    // Classify as 1 if the score is over 0, otherwise 0.
-    if (score > 0) {
-        return 1;
-    } else {
-        return 0;
-    }
-};
-
-/**
- * **Train** the classifier with a new example, which is
- * a numeric array of features and a 0 or 1 label.
- *
- * @param {Array<number>} features an array of features as numbers
- * @param {number} label either 0 or 1
- * @returns {PerceptronModel|null} this, or null if the label is not 0 or 1
- */
-PerceptronModel.prototype.train = function train (features, label) {
-    // Require that only labels of 0 or 1 are considered.
-    if (label !== 0 && label !== 1) {
-        return null;
-    }
-    // The length of the feature array determines
-    // the length of the weight array.
-    // The perceptron will continue learning as long as
-    // it keeps seeing feature arrays of the same length.
-    // When it sees a new data shape, it initializes.
-    if (features.length !== this.weights.length) {
-        this.weights = features.slice();
-        this.bias = 1;
-    }
-    // Make a prediction based on current weights.
-    var prediction = this.predict(features);
-    // Update the weights if the prediction is wrong.
-    if (typeof prediction === "number" && prediction !== label) {
-        var gradient = label - prediction;
-        for (var i = 0; i < this.weights.length; i++) {
-            this.weights[i] += gradient * features[i];
-        }
-        this.bias += gradient;
-    }
-    return this;
-};
-
-/**
- * Conducts a [permutation test](https://en.wikipedia.org/wiki/Resampling_(statistics)#Permutation_tests)
- * to determine if two data sets are *significantly* different from each other, using
- * the difference of means between the groups as the test statistic.
- * The function allows for the following hypotheses:
- * - two_side = Null hypothesis: the two distributions are equal.
- * - greater = Null hypothesis: observations from sampleX tend to be smaller than those from sampleY.
- * - less = Null hypothesis: observations from sampleX tend to be greater than those from sampleY.
- * [Learn more about one-tail vs two-tail tests.](https://en.wikipedia.org/wiki/One-_and_two-tailed_tests)
- *
- * @param {Array<number>} sampleX first dataset (e.g. treatment data)
- * @param {Array<number>} sampleY second dataset (e.g. control data)
- * @param {'two_side'|'greater'|'less'} [alternative='two_side'] alternative hypothesis
- * @param {number} k number of values in permutation distribution.
- * @param {Function} [randomSource=Math.random] an optional entropy source
- * @returns {number} p-value The probability of observing the difference between groups (as or more extreme than what we did), assuming the null hypothesis.
- *
- * @example
- * var control = [2, 5, 3, 6, 7, 2, 5];
- * var treatment = [20, 5, 13, 12, 7, 2, 2];
- * permutationTest(control, treatment); // ~0.1324
- */
-function permutationTest(sampleX, sampleY, alternative, k, randomSource) {
-    // Set default arguments
-    if (k === undefined) {
-        k = 10000;
-    }
-    if (alternative === undefined) {
-        alternative = "two_side";
-    }
-    if (
-        alternative !== "two_side" &&
-        alternative !== "greater" &&
-        alternative !== "less"
-    ) {
-        throw new Error(
-            "`alternative` must be either 'two_side', 'greater', or 'less'."
-        );
-    }
-
-    // get means for each sample
-    var meanX = mean(sampleX);
-    var meanY = mean(sampleY);
-
-    // calculate initial test statistic. This will be our point of comparison with
-    // the generated test statistics.
-    var testStatistic = meanX - meanY;
-
-    // create test-statistic distribution
-    var testStatDsn = new Array(k);
-
-    // combine datsets so we can easily shuffle later
-    var allData = sampleX.concat(sampleY);
-    // Each permutation reassigns the pooled values into two groups that keep
-    // the original sample sizes. Splitting at the midpoint only matches when
-    // both samples are the same length; for unequal samples it built the
-    // permutation distribution from the wrong group sizes.
-    var splitIndex = sampleX.length;
-
-    for (var i = 0; i < k; i++) {
-        // 1. shuffle data assignments
-        shuffleInPlace(allData, randomSource);
-        var permLeft = allData.slice(0, splitIndex);
-        var permRight = allData.slice(splitIndex, allData.length);
-
-        // 2.re-calculate test statistic
-        var permTestStatistic = mean(permLeft) - mean(permRight);
-
-        // 3. store test statistic to build test statistic distribution
-        testStatDsn[i] = permTestStatistic;
-    }
-
-    // Calculate p-value depending on alternative
-    // For this test, we calculate the percentage of 'extreme' test statistics (subject to our hypothesis)
-    // more info on permutation test p-value calculations: https://onlinecourses.science.psu.edu/stat464/node/35
-    var numExtremeTStats = 0;
-    if (alternative === "two_side") {
-        for (var i$1 = 0; i$1 <= k; i$1++) {
-            if (Math.abs(testStatDsn[i$1]) >= Math.abs(testStatistic)) {
-                numExtremeTStats += 1;
-            }
-        }
-    } else if (alternative === "greater") {
-        for (var i$2 = 0; i$2 <= k; i$2++) {
-            if (testStatDsn[i$2] >= testStatistic) {
-                numExtremeTStats += 1;
-            }
-        }
-    } else {
-        // alternative === 'less'
-        for (var i$3 = 0; i$3 <= k; i$3++) {
-            /* c8 ignore start */
-            if (testStatDsn[i$3] <= testStatistic) {
-                numExtremeTStats += 1;
-            }
-            /* c8 ignore end */
-        }
-    }
-
-    return numExtremeTStats / k;
-}
-
-/**
- * The [Poisson Distribution](http://en.wikipedia.org/wiki/Poisson_distribution)
- * is a discrete probability distribution that expresses the probability
- * of a given number of events occurring in a fixed interval of time
- * and/or space if these events occur with a known average rate and
- * independently of the time since the last event.
- *
- * The Poisson Distribution is characterized by the strictly positive
- * mean arrival or occurrence rate, `λ`.
- *
- * Returns `undefined` when the distribution cannot be calculated: when `lambda`
- * is not a strictly positive number, or when it is large enough that the table
- * would run past a million cells.
- *
- * @param {number} lambda location poisson distribution
- * @returns {number[] | undefined} values of poisson distribution at that point
- */
-function poissonDistribution(lambda) /*: ?number[] */ {
-    // Check that lambda is strictly positive
-    if (lambda <= 0) {
-        return undefined;
-    }
-
-    // The distribution peaks at `lambda`, so past the length of the table
-    // there is nothing to tabulate and no reason to start.
-    if (lambda >= maxDistributionCells) {
-        return undefined;
-    }
-
-    // Our current place in the distribution
-    var x = 0;
-    // And we keep track of the current cumulative probability, in
-    // order to know when to stop calculating chances.
-    var cumulativeProbability = 0;
-    // The calculated cells to be returned
-    var cells = [];
-
-    // The only term of the mass function below that does not vary with `x`
-    var logLambda = Math.log(lambda);
-
-    // This algorithm iterates through each potential outcome,
-    // until the `cumulativeProbability` is very close to 1, at
-    // which point we've defined the vast majority of outcomes
-    do {
-        // a [probability mass function](https://en.wikipedia.org/wiki/Probability_mass_function),
-        // taken through its logarithm: `lambda` raised to `x` and the factorial
-        // of `x` each leave floating-point range long before their ratio does,
-        // so computing them separately loses cells the distribution needs.
-        cells[x] = Math.exp(x * logLambda - lambda - gammaln(x + 1));
-        cumulativeProbability += cells[x];
-        x++;
-        // When the `cumulativeProbability` is nearly 1, we've calculated
-        // the useful range of this distribution
-    } while (cumulativeProbability < 1 - epsilon && x < maxDistributionCells);
-
-    // Stopping for any other reason - a lambda that is not a number, or a
-    // distribution too wide for the table - leaves cells that do not add up to
-    // a distribution, so report that rather than returning them.
-    if (
-        Number.isNaN(cumulativeProbability) ||
-        cumulativeProbability < 1 - epsilon
-    ) {
-        return undefined;
-    }
-
-    return cells;
-}
-
-/**
- * The [Probit](http://en.wikipedia.org/wiki/Probit)
- * is the inverse of cumulativeStdNormalProbability(),
- * and is also known as the normal quantile function.
- *
- * It returns the number of standard deviations from the mean
- * where the p'th quantile of values can be found in a normal distribution.
- * So, for example, probit(0.5 + 0.6827/2) ≈ 1 because 68.27% of values are
- * normally found within 1 standard deviation above or below the mean.
- *
- * @param {number} p
- * @returns {number} probit
- */
-function probit(p) {
-    if (p === 0) {
-        p = epsilon;
-    } else if (p >= 1) {
-        p = 1 - epsilon;
-    }
-    return Math.sqrt(2) * inverseErrorFunction(2 * p - 1);
 }
 
 /**
@@ -75613,8 +75692,8 @@ function meanDistanceToNearestGroup(which, labels, groupings, distances) {
 }
 
 /**
- * Calculate the mean distance from a point to the other members of a group,
- * which may be the point's own group.
+ * Calculate the mean distance between a point and all the points in a group
+ * (possibly its own).
  *
  * @private
  * @param {number} which The index of this point.
@@ -75627,15 +75706,10 @@ function meanDistanceToNearestGroup(which, labels, groupings, distances) {
  */
 function meanDistanceFromPointToGroup(which, group, distances) {
     var total = 0;
-    var count = 0;
     for (var i = 0; i < group.length; i++) {
-        if (group[i] === which) {
-            continue;
-        }
         total += distances[which][group[i]];
-        count++;
     }
-    return total / count;
+    return total / group.length;
 }
 
 /**
@@ -75657,30 +75731,60 @@ function silhouetteMetric(points, labels) {
 }
 
 /**
- * The [Z-Score, or Standard Score](http://en.wikipedia.org/wiki/Standard_score).
+ * Relative error.
  *
- * The standard score is the number of standard deviations an observation
- * or datum is above or below the mean. Thus, a positive standard score
- * represents a datum above the mean, while a negative standard score
- * represents a datum below the mean. It is a dimensionless quantity
- * obtained by subtracting the population mean from an individual raw
- * score and then dividing the difference by the population standard
- * deviation.
+ * This is more difficult to calculate than it first appears [1,2].  The usual
+ * formula for the relative error between an actual value A and an expected
+ * value E is `|(A-E)/E|`, but:
  *
- * The z-score is only defined if one knows the population parameters;
- * if one only has a sample set, then the analogous computation with
- * sample mean and sample standard deviation yields the
- * Student's t-statistic.
+ * 1. If the expected value is 0, any other value has infinite relative error,
+ *    which is counter-intuitive: if the expected voltage is 0, getting 1/10th
+ *    of a volt doesn't feel like an infinitely large error.
  *
- * @param {number} x
- * @param {number} mean
- * @param {number} standardDeviation
- * @return {number} z score
- * @example
- * zScore(78, 80, 5); // => -0.4
+ * 2. This formula does not satisfy the mathematical definition of a metric [3].
+ *    [4] solved this problem by defining the relative error as `|ln(|A/E|)|`,
+ *    but that formula only works if all values are positive: for example, it
+ *    reports the relative error of -10 and 10 as 0.
+ *
+ * Our implementation sticks with convention and returns:
+ *
+ * - 0 if the actual and expected values are both zero
+ * - Infinity if the actual value is non-zero and the expected value is zero
+ * - `|(A-E)/E|` in all other cases
+ *
+ * [1] https://math.stackexchange.com/questions/677852/how-to-calculate-relative-error-when-true-value-is-zero
+ * [2] https://en.wikipedia.org/wiki/Relative_change_and_difference
+ * [3] https://en.wikipedia.org/wiki/Metric_(mathematics)#Definition
+ * [4] F.W.J. Olver: "A New Approach to Error Arithmetic." SIAM Journal on
+ *     Numerical Analysis, 15(2), 1978, 10.1137/0715024.
+ *
+ * @param {number} actual The actual value.
+ * @param {number} expected The expected value.
+ * @return {number} The relative error.
  */
-function zScore(x, mean, standardDeviation) {
-    return (x - mean) / standardDeviation;
+function relativeError(actual, expected) {
+    // These lines are actually covered by tests, but it seems
+    // like c8 has a bug that marks them as not covered.
+    /* c8 ignore start */
+    if (actual === 0 && expected === 0) {
+        return 0;
+    }
+    /* c8 ignore end */
+    return Math.abs((actual - expected) / expected);
+}
+
+/**
+ * Approximate equality.
+ *
+ * @param {number} actual The value to be tested.
+ * @param {number} expected The reference value.
+ * @param {number} tolerance The acceptable relative difference.
+ * @return {boolean} Whether numbers are within tolerance.
+ */
+function approxEqual(actual, expected, tolerance) {
+    if ( tolerance === void 0 ) tolerance = epsilon;
+
+    return relativeError(actual, expected) <= tolerance;
 }
 
 
@@ -75707,7 +75811,7 @@ class PROJJSONBuilder2015 extends _PROJJSONBuilderBase_js__WEBPACK_IMPORTED_MODU
     super.convert(node, result);
 
     // Skip `CS` and `USAGE` nodes for WKT2-2015
-    if (result.coordinate_system?.subtype === "Cartesian") {
+    if (result.coordinate_system && result.coordinate_system.subtype === 'Cartesian') {
       delete result.coordinate_system;
     }
     if (result.usage) {
@@ -75740,7 +75844,7 @@ class PROJJSONBuilder2019 extends _PROJJSONBuilderBase_js__WEBPACK_IMPORTED_MODU
     super.convert(node, result);
 
     // Handle `CS` node for WKT2-2019
-    const csNode = node.find((child) => Array.isArray(child) && child[0] === "CS");
+    const csNode = node.find((child) => Array.isArray(child) && child[0] === 'CS');
     if (csNode) {
       result.coordinate_system = {
         subtype: csNode[1],
@@ -75749,13 +75853,21 @@ class PROJJSONBuilder2019 extends _PROJJSONBuilderBase_js__WEBPACK_IMPORTED_MODU
     }
 
     // Handle `USAGE` node for WKT2-2019
-    const usageNode = node.find((child) => Array.isArray(child) && child[0] === "USAGE");
+    const usageNode = node.find((child) => Array.isArray(child) && child[0] === 'USAGE');
     if (usageNode) {
-      result.usage = {
-        scope: usageNode.find((child) => Array.isArray(child) && child[0] === "SCOPE")?.[1],
-        area: usageNode.find((child) => Array.isArray(child) && child[0] === "AREA")?.[1],
-        bbox: usageNode.find((child) => Array.isArray(child) && child[0] === "BBOX")?.slice(1),
-      };
+      const scope = usageNode.find((child) => Array.isArray(child) && child[0] === 'SCOPE');
+      const area = usageNode.find((child) => Array.isArray(child) && child[0] === 'AREA');
+      const bbox = usageNode.find((child) => Array.isArray(child) && child[0] === 'BBOX');
+      result.usage = {};
+      if (scope) {
+        result.usage.scope = scope[1];
+      }
+      if (area) {
+        result.usage.area = area[1];
+      }
+      if (bbox) {
+        result.usage.bbox = bbox.slice(1);
+      }
     }
 
     return result;
@@ -75778,7 +75890,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class PROJJSONBuilderBase {
   static getId(node) {
-    const idNode = node.find((child) => Array.isArray(child) && child[0] === "ID");
+    const idNode = node.find((child) => Array.isArray(child) && child[0] === 'ID');
     if (idNode && idNode.length >= 3) {
       return {
         authority: idNode[1],
@@ -75788,20 +75900,20 @@ class PROJJSONBuilderBase {
     return null;
   }
 
-  static convertUnit(node, type = "unit") {
+  static convertUnit(node, type = 'unit') {
     if (!node || node.length < 3) {
-      return { type, name: "unknown", conversion_factor: null };
+      return { type, name: 'unknown', conversion_factor: null };
     }
 
     const name = node[1];
     const conversionFactor = parseFloat(node[2]) || null;
 
-    const idNode = node.find((child) => Array.isArray(child) && child[0] === "ID");
+    const idNode = node.find((child) => Array.isArray(child) && child[0] === 'ID');
     const id = idNode
       ? {
-          authority: idNode[1],
-          code: parseInt(idNode[2], 10),
-        }
+        authority: idNode[1],
+        code: parseInt(idNode[2], 10),
+      }
       : null;
 
     return {
@@ -75813,7 +75925,7 @@ class PROJJSONBuilderBase {
   }
 
   static convertAxis(node) {
-    const name = node[1] || "Unknown";
+    const name = node[1] || 'Unknown';
 
     // Determine the direction
     let direction;
@@ -75827,16 +75939,16 @@ class PROJJSONBuilderBase {
       else throw new Error(`Unknown axis abbreviation: ${abbreviation}`);
     } else {
       // Use the explicit direction provided in the AXIS node
-      direction = node[2]?.toLowerCase() || "unknown";
+      direction = node[2] ? node[2].toLowerCase() : 'unknown';
     }
 
-    const orderNode = node.find((child) => Array.isArray(child) && child[0] === "ORDER");
+    const orderNode = node.find((child) => Array.isArray(child) && child[0] === 'ORDER');
     const order = orderNode ? parseInt(orderNode[1], 10) : null;
 
     const unitNode = node.find(
       (child) =>
         Array.isArray(child) &&
-        (child[0] === "LENGTHUNIT" || child[0] === "ANGLEUNIT" || child[0] === "SCALEUNIT")
+        (child[0] === 'LENGTHUNIT' || child[0] === 'ANGLEUNIT' || child[0] === 'SCALEUNIT')
     );
     const unit = this.convertUnit(unitNode);
 
@@ -75850,7 +75962,7 @@ class PROJJSONBuilderBase {
 
   static extractAxes(node) {
     return node
-      .filter((child) => Array.isArray(child) && child[0] === "AXIS")
+      .filter((child) => Array.isArray(child) && child[0] === 'AXIS')
       .map((axis) => this.convertAxis(axis))
       .sort((a, b) => (a.order || 0) - (b.order || 0)); // Sort by the "order" property
   }
@@ -75858,17 +75970,17 @@ class PROJJSONBuilderBase {
   static convert(node, result = {}) {
 
     switch (node[0]) {
-      case "PROJCRS":
-        result.type = "ProjectedCRS";
+      case 'PROJCRS':
+        result.type = 'ProjectedCRS';
         result.name = node[1];
-        result.base_crs = node.find((child) => Array.isArray(child) && child[0] === "BASEGEOGCRS")
-          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === "BASEGEOGCRS"))
+        result.base_crs = node.find((child) => Array.isArray(child) && child[0] === 'BASEGEOGCRS')
+          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === 'BASEGEOGCRS'))
           : null;
-        result.conversion = node.find((child) => Array.isArray(child) && child[0] === "CONVERSION")
-          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === "CONVERSION"))
+        result.conversion = node.find((child) => Array.isArray(child) && child[0] === 'CONVERSION')
+          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === 'CONVERSION'))
           : null;
 
-        const csNode = node.find((child) => Array.isArray(child) && child[0] === "CS");
+        const csNode = node.find((child) => Array.isArray(child) && child[0] === 'CS');
         if (csNode) {
           result.coordinate_system = {
             type: csNode[1],
@@ -75876,7 +75988,7 @@ class PROJJSONBuilderBase {
           };
         }
 
-        const lengthUnitNode = node.find((child) => Array.isArray(child) && child[0] === "LENGTHUNIT");
+        const lengthUnitNode = node.find((child) => Array.isArray(child) && child[0] === 'LENGTHUNIT');
         if (lengthUnitNode) {
           const unit = this.convertUnit(lengthUnitNode);
           result.coordinate_system.unit = unit; // Add unit to coordinate_system
@@ -75885,23 +75997,23 @@ class PROJJSONBuilderBase {
         result.id = this.getId(node);
         break;
 
-      case "BASEGEOGCRS":
-      case "GEOGCRS":
-        result.type = "GeographicCRS";
+      case 'BASEGEOGCRS':
+      case 'GEOGCRS':
+        result.type = 'GeographicCRS';
         result.name = node[1];
       
         // Handle DATUM or ENSEMBLE
         const datumOrEnsembleNode = node.find(
-          (child) => Array.isArray(child) && (child[0] === "DATUM" || child[0] === "ENSEMBLE")
+          (child) => Array.isArray(child) && (child[0] === 'DATUM' || child[0] === 'ENSEMBLE')
         );
         if (datumOrEnsembleNode) {
           const datumOrEnsemble = this.convert(datumOrEnsembleNode);
-          if (datumOrEnsembleNode[0] === "ENSEMBLE") {
+          if (datumOrEnsembleNode[0] === 'ENSEMBLE') {
             result.datum_ensemble = datumOrEnsemble;
           } else {
             result.datum = datumOrEnsemble;
           }
-          const primem = node.find((child) => Array.isArray(child) && child[0] === "PRIMEM");
+          const primem = node.find((child) => Array.isArray(child) && child[0] === 'PRIMEM');
           if (primem && primem[1] !== 'Greenwich') {
             datumOrEnsemble.prime_meridian = {
               name: primem[1],
@@ -75911,42 +76023,42 @@ class PROJJSONBuilderBase {
         }
       
         result.coordinate_system = {
-          type: "ellipsoidal",
+          type: 'ellipsoidal',
           axis: this.extractAxes(node),
         };
       
         result.id = this.getId(node);
         break;
 
-      case "DATUM":
-        result.type = "GeodeticReferenceFrame";
+      case 'DATUM':
+        result.type = 'GeodeticReferenceFrame';
         result.name = node[1];
-        result.ellipsoid = node.find((child) => Array.isArray(child) && child[0] === "ELLIPSOID")
-          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === "ELLIPSOID"))
+        result.ellipsoid = node.find((child) => Array.isArray(child) && child[0] === 'ELLIPSOID')
+          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === 'ELLIPSOID'))
           : null;
         break;
       
-      case "ENSEMBLE":
-        result.type = "DatumEnsemble";
+      case 'ENSEMBLE':
+        result.type = 'DatumEnsemble';
         result.name = node[1];
       
         // Extract ensemble members
         result.members = node
-          .filter((child) => Array.isArray(child) && child[0] === "MEMBER")
+          .filter((child) => Array.isArray(child) && child[0] === 'MEMBER')
           .map((member) => ({
-            type: "DatumEnsembleMember",
+            type: 'DatumEnsembleMember',
             name: member[1],
             id: this.getId(member), // Extract ID as { authority, code }
           }));
       
         // Extract accuracy
-        const accuracyNode = node.find((child) => Array.isArray(child) && child[0] === "ENSEMBLEACCURACY");
+        const accuracyNode = node.find((child) => Array.isArray(child) && child[0] === 'ENSEMBLEACCURACY');
         if (accuracyNode) {
           result.accuracy = parseFloat(accuracyNode[1]);
         }
       
         // Extract ellipsoid
-        const ellipsoidNode = node.find((child) => Array.isArray(child) && child[0] === "ELLIPSOID");
+        const ellipsoidNode = node.find((child) => Array.isArray(child) && child[0] === 'ELLIPSOID');
         if (ellipsoidNode) {
           result.ellipsoid = this.convert(ellipsoidNode); // Convert the ellipsoid node
         }
@@ -75955,66 +76067,66 @@ class PROJJSONBuilderBase {
         result.id = this.getId(node);
         break;
 
-      case "ELLIPSOID":
-        result.type = "Ellipsoid";
+      case 'ELLIPSOID':
+        result.type = 'Ellipsoid';
         result.name = node[1];
         result.semi_major_axis = parseFloat(node[2]);
         result.inverse_flattening = parseFloat(node[3]);
-        const units = node.find((child) => Array.isArray(child) && child[0] === "LENGTHUNIT")
-          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === "LENGTHUNIT"), result)
+        const units = node.find((child) => Array.isArray(child) && child[0] === 'LENGTHUNIT')
+          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === 'LENGTHUNIT'), result)
           : null;
         break;
 
-      case "CONVERSION":
-        result.type = "Conversion";
+      case 'CONVERSION':
+        result.type = 'Conversion';
         result.name = node[1];
-        result.method = node.find((child) => Array.isArray(child) && child[0] === "METHOD")
-          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === "METHOD"))
+        result.method = node.find((child) => Array.isArray(child) && child[0] === 'METHOD')
+          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === 'METHOD'))
           : null;
         result.parameters = node
-          .filter((child) => Array.isArray(child) && child[0] === "PARAMETER")
+          .filter((child) => Array.isArray(child) && child[0] === 'PARAMETER')
           .map((param) => this.convert(param));
         break;
 
-      case "METHOD":
-        result.type = "Method";
+      case 'METHOD':
+        result.type = 'Method';
         result.name = node[1];
         result.id = this.getId(node);
         break;
 
-      case "PARAMETER":
-        result.type = "Parameter";
+      case 'PARAMETER':
+        result.type = 'Parameter';
         result.name = node[1];
         result.value = parseFloat(node[2]);
         result.unit = this.convertUnit(
           node.find(
             (child) =>
               Array.isArray(child) &&
-              (child[0] === "LENGTHUNIT" || child[0] === "ANGLEUNIT" || child[0] === "SCALEUNIT")
+              (child[0] === 'LENGTHUNIT' || child[0] === 'ANGLEUNIT' || child[0] === 'SCALEUNIT')
           )
         );
         result.id = this.getId(node);
         break;
 
-      case "BOUNDCRS":
-        result.type = "BoundCRS";
+      case 'BOUNDCRS':
+        result.type = 'BoundCRS';
 
         // Process SOURCECRS
-        const sourceCrsNode = node.find((child) => Array.isArray(child) && child[0] === "SOURCECRS");
+        const sourceCrsNode = node.find((child) => Array.isArray(child) && child[0] === 'SOURCECRS');
         if (sourceCrsNode) {
           const sourceCrsContent = sourceCrsNode.find((child) => Array.isArray(child));
           result.source_crs = sourceCrsContent ? this.convert(sourceCrsContent) : null;
         }
 
         // Process TARGETCRS
-        const targetCrsNode = node.find((child) => Array.isArray(child) && child[0] === "TARGETCRS");
+        const targetCrsNode = node.find((child) => Array.isArray(child) && child[0] === 'TARGETCRS');
         if (targetCrsNode) {
           const targetCrsContent = targetCrsNode.find((child) => Array.isArray(child));
           result.target_crs = targetCrsContent ? this.convert(targetCrsContent) : null;
         }
 
         // Process ABRIDGEDTRANSFORMATION
-        const transformationNode = node.find((child) => Array.isArray(child) && child[0] === "ABRIDGEDTRANSFORMATION");
+        const transformationNode = node.find((child) => Array.isArray(child) && child[0] === 'ABRIDGEDTRANSFORMATION');
         if (transformationNode) {
           result.transformation = this.convert(transformationNode);
         } else {
@@ -76022,25 +76134,25 @@ class PROJJSONBuilderBase {
         }
         break;
 
-      case "ABRIDGEDTRANSFORMATION":
-        result.type = "Transformation";
+      case 'ABRIDGEDTRANSFORMATION':
+        result.type = 'Transformation';
         result.name = node[1];
-        result.method = node.find((child) => Array.isArray(child) && child[0] === "METHOD")
-          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === "METHOD"))
+        result.method = node.find((child) => Array.isArray(child) && child[0] === 'METHOD')
+          ? this.convert(node.find((child) => Array.isArray(child) && child[0] === 'METHOD'))
           : null;
 
         result.parameters = node
-          .filter((child) => Array.isArray(child) && (child[0] === "PARAMETER" || child[0] === "PARAMETERFILE"))
+          .filter((child) => Array.isArray(child) && (child[0] === 'PARAMETER' || child[0] === 'PARAMETERFILE'))
           .map((param) => {
-            if (param[0] === "PARAMETER") {
+            if (param[0] === 'PARAMETER') {
               return this.convert(param);
-            } else if (param[0] === "PARAMETERFILE") {
+            } else if (param[0] === 'PARAMETERFILE') {
               return {
                 name: param[1],
                 value: param[2],
                 id: {
-                  "authority": "EPSG",
-                  "code": 8656
+                  'authority': 'EPSG',
+                  'code': 8656
                 }
               };
             }
@@ -76049,7 +76161,7 @@ class PROJJSONBuilderBase {
         // Adjust the Scale difference parameter if present
         if (result.parameters.length === 7) {
           const scaleDifference = result.parameters[6];
-          if (scaleDifference.name === "Scale difference") {
+          if (scaleDifference.name === 'Scale difference') {
             scaleDifference.value = Math.round((scaleDifference.value - 1) * 1e12) / 1e6;
           }
         }
@@ -76057,14 +76169,14 @@ class PROJJSONBuilderBase {
         result.id = this.getId(node);
         break;
       
-      case "AXIS":
+      case 'AXIS':
         if (!result.coordinate_system) {
-          result.coordinate_system = { type: "unspecified", axis: [] };
+          result.coordinate_system = { type: 'unspecified', axis: [] };
         }
         result.coordinate_system.axis.push(this.convertAxis(node));
         break;
       
-      case "LENGTHUNIT":
+      case 'LENGTHUNIT':
         const unit = this.convertUnit(node, 'LinearUnit');
         if (result.coordinate_system && result.coordinate_system.axis) {
           result.coordinate_system.axis.forEach((axis) => {
@@ -76118,21 +76230,21 @@ __webpack_require__.r(__webpack_exports__);
  */
 function detectWKT2Version(root) {
   // Check for WKT2-2019-specific nodes
-  if (root.find((child) => Array.isArray(child) && child[0] === "USAGE")) {
-    return "2019"; // `USAGE` is specific to WKT2-2019
+  if (root.find((child) => Array.isArray(child) && child[0] === 'USAGE')) {
+    return '2019'; // `USAGE` is specific to WKT2-2019
   }
 
   // Check for WKT2-2015-specific nodes
-  if (root.find((child) => Array.isArray(child) && child[0] === "CS")) {
-    return "2015"; // `CS` is valid in both, but default to 2015 unless `USAGE` is present
+  if (root.find((child) => Array.isArray(child) && child[0] === 'CS')) {
+    return '2015'; // `CS` is valid in both, but default to 2015 unless `USAGE` is present
   }
 
-  if (root[0] === "BOUNDCRS" || root[0] === "PROJCRS" || root[0] === "GEOGCRS") {
-    return "2015"; // These are valid in both, but default to 2015
+  if (root[0] === 'BOUNDCRS' || root[0] === 'PROJCRS' || root[0] === 'GEOGCRS') {
+    return '2015'; // These are valid in both, but default to 2015
   }
 
   // Default to WKT2-2015 if no specific indicators are found
-  return "2015";
+  return '2015';
 }
 
 /**
@@ -76142,7 +76254,7 @@ function detectWKT2Version(root) {
  */
 function buildPROJJSON(root) {
   const version = detectWKT2Version(root);
-  const builder = version === "2019" ? _PROJJSONBuilder2019_js__WEBPACK_IMPORTED_MODULE_1__["default"] : _PROJJSONBuilder2015_js__WEBPACK_IMPORTED_MODULE_0__["default"];
+  const builder = version === '2019' ? _PROJJSONBuilder2019_js__WEBPACK_IMPORTED_MODULE_1__["default"] : _PROJJSONBuilder2015_js__WEBPACK_IMPORTED_MODULE_0__["default"];
   return builder.convert(root);
 }
 
@@ -76170,30 +76282,30 @@ function detectWKTVersion(wkt) {
 
   // Check for WKT2-specific keywords
   if (
-    normalizedWKT.includes("PROJCRS") ||
-    normalizedWKT.includes("GEOGCRS") ||
-    normalizedWKT.includes("BOUNDCRS") ||
-    normalizedWKT.includes("VERTCRS") ||
-    normalizedWKT.includes("LENGTHUNIT") ||
-    normalizedWKT.includes("ANGLEUNIT") ||
-    normalizedWKT.includes("SCALEUNIT")
+    normalizedWKT.includes('PROJCRS') ||
+    normalizedWKT.includes('GEOGCRS') ||
+    normalizedWKT.includes('BOUNDCRS') ||
+    normalizedWKT.includes('VERTCRS') ||
+    normalizedWKT.includes('LENGTHUNIT') ||
+    normalizedWKT.includes('ANGLEUNIT') ||
+    normalizedWKT.includes('SCALEUNIT')
   ) {
-    return "WKT2";
+    return 'WKT2';
   }
 
   // Check for WKT1-specific keywords
   if (
-    normalizedWKT.includes("PROJCS") ||
-    normalizedWKT.includes("GEOGCS") ||
-    normalizedWKT.includes("LOCAL_CS") ||
-    normalizedWKT.includes("VERT_CS") ||
-    normalizedWKT.includes("UNIT")
+    normalizedWKT.includes('PROJCS') ||
+    normalizedWKT.includes('GEOGCS') ||
+    normalizedWKT.includes('LOCAL_CS') ||
+    normalizedWKT.includes('VERT_CS') ||
+    normalizedWKT.includes('UNIT')
   ) {
-    return "WKT1";
+    return 'WKT1';
   }
 
   // Default to WKT1 if no specific indicators are found
-  return "WKT1";
+  return 'WKT1';
 }
 
 /***/ },
@@ -76208,6 +76320,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
 /* harmony import */ var _buildPROJJSON_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./buildPROJJSON.js */ "./node_modules/wkt-parser/buildPROJJSON.js");
 /* harmony import */ var _detectWKTVersion_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./detectWKTVersion.js */ "./node_modules/wkt-parser/detectWKTVersion.js");
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./parser.js */ "./node_modules/wkt-parser/parser.js");
@@ -76778,7 +76891,7 @@ function processUnit(unit) {
     if (result.units === 'meter') {
       result.to_meter = 1; // Only set to_meter if units are 'meter'
     }
-  } else if (unit?.name) {
+  } else if (unit && unit.name) {
     result.units = unit.name.toLowerCase();
     if (result.units === 'metre') {
       result.units = 'meter'; // Normalize 'metre' to 'meter'
@@ -76819,7 +76932,7 @@ function transformPROJJSON(projjson, result = {}) {
     transformPROJJSON(projjson.source_crs, result);
 
     if (projjson.transformation) {
-      if (projjson.transformation.method?.name === 'NTv2') {
+      if (projjson.transformation.method && projjson.transformation.method.name === 'NTv2') {
         // Set nadgrids to the filename from the parameterfile
         result.nadgrids = projjson.transformation.parameters[0].value;
       } else {
@@ -76849,8 +76962,8 @@ function transformPROJJSON(projjson, result = {}) {
       case 'type':
         if (value === 'GeographicCRS') {
           result.projName = 'longlat';
-        } else if (value === 'ProjectedCRS') {
-          result.projName = projjson.conversion?.method?.name; // Retain original capitalization
+        } else if (value === 'ProjectedCRS' && projjson.conversion && projjson.conversion.method) {
+          result.projName = projjson.conversion.method.name; // Retain original capitalization
         }
         break;
 
@@ -76892,7 +77005,7 @@ function transformPROJJSON(projjson, result = {}) {
             const { units, to_meter } = processUnit(value.unit);
             result.units = units;
             result.to_meter = to_meter;
-          } else if (value.axis[0]?.unit) {
+          } else if (value.axis[0] && value.axis[0].unit) {
             const { units, to_meter } = processUnit(value.axis[0].unit);
             result.units = units;
             result.to_meter = to_meter;
@@ -77024,7 +77137,7 @@ function transformPROJJSON(projjson, result = {}) {
   }
 
   // Apply projection defaults
-  ;(0,_util_js__WEBPACK_IMPORTED_MODULE_0__.applyProjectionDefaults)(result);
+  (0,_util_js__WEBPACK_IMPORTED_MODULE_0__.applyProjectionDefaults)(result);
 
   return result;
 }
@@ -77081,17 +77194,17 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.14
 /******/ 	});
 /************************************************************************/
 /******/ 	// The module cache
-/******/ 	const __webpack_module_cache__ = {};
+/******/ 	var __webpack_module_cache__ = {};
 /******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
 /******/ 		// Check if module is in cache
-/******/ 		const cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
 /******/ 		if (cachedModule !== undefined) {
 /******/ 			return cachedModule.exports;
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
-/******/ 		const module = __webpack_module_cache__[moduleId] = {
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
 /******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
@@ -77100,7 +77213,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.14
 /******/ 		// Execute the module function
 /******/ 		if (!(moduleId in __webpack_modules__)) {
 /******/ 			delete __webpack_module_cache__[moduleId];
-/******/ 			const e = new Error("Cannot find module '" + moduleId + "'");
+/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
 /******/ 			e.code = 'MODULE_NOT_FOUND';
 /******/ 			throw e;
 /******/ 		}
@@ -77112,40 +77225,52 @@ module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.14
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = (module) => {
-/******/ 		const getter = module && module.__esModule ?
-/******/ 			() => (module['default']) :
-/******/ 			() => (module);
-/******/ 		__webpack_require__.d(getter, { a: getter });
-/******/ 		return getter;
-/******/ 	};
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	// define getter/value functions for harmony exports
-/******/ 	__webpack_require__.d = (exports, definition) => {
-/******/ 		for(var key in definition) {
-/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
 /******/ 			}
-/******/ 		}
-/******/ 	};
+/******/ 		};
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop));
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = (exports) => {
-/******/ 		Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/nonce */
-/******/ 	__webpack_require__.nc = undefined;
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
 /******/ 	
 /************************************************************************/
-let __webpack_exports__ = {};
+var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 /*!**********************!*\
