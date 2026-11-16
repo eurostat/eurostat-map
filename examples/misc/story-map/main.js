@@ -600,8 +600,7 @@ function showMap(layout, state, predicate, zoomPredicate) {
     state.highlightPredicate = predicate
     state.zoomPredicate = zoomPredicate
 
-    if (state.chartVisible) tweenToMap(layout, state)
-    else applyHighlight(layout, state)
+    tweenToMap(layout, state)
 
     hidePlaceLabels(layout)
     // Placenames only make sense once the map has settled on the area of interest
@@ -638,16 +637,19 @@ function zoomToRegions({ map, svg, regionData }, predicate, onEnd) {
         return
     }
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
-    svg.selectAll('#em-nutsrg path').each(function (d) {
-        const id = d?.properties?.id
-        if (!regionData.has(id) || !predicate(id)) return
-        // getBBox is in zoom-group coordinates, which don't change while zooming
-        const b = this.getBBox()
+    // Measure each region's *geographic* outline (r.mapD), never its live path: after the chart step the live
+    // paths are dots. getBBox is in zoom-group coordinates, which don't change while zooming.
+    const probe = svg.select('.em-zoom-group').append('path').attr('visibility', 'hidden').node()
+    regionData.forEach((r, id) => {
+        if (!predicate(id)) return
+        probe.setAttribute('d', r.mapD)
+        const b = probe.getBBox()
         x0 = Math.min(x0, b.x)
         y0 = Math.min(y0, b.y)
         x1 = Math.max(x1, b.x + b.width)
         y1 = Math.max(y1, b.y + b.height)
     })
+    probe.remove()
     if (!isFinite(x0)) return
 
     const w = +svg.attr('width')
@@ -655,32 +657,6 @@ function zoomToRegions({ map, svg, regionData }, predicate, onEnd) {
     const k = Math.min(w / (x1 - x0), h / (y1 - y0)) * 0.7
     const [x, y] = map._projection.invert([(x0 + x1) / 2, (y0 + y1) / 2])
     map.zoomTo({ x, y, z: map.__baseZ / k }, { duration: 2000, onEnd })
-}
-
-// Mute everything but the highlighted regions (no recolouring)
-function applyHighlight(layout, state) {
-    const { svg, regionData } = layout
-    const predicate = state.highlightPredicate
-    const t = (sel) => sel.transition('highlight').duration(400)
-
-    svg.selectAll('#em-nutsrg path').each(function (d) {
-        const id = d?.properties?.id
-        const r = regionData.get(id)
-        if (!r) return
-
-        const on = !predicate || predicate(id)
-        if (predicate && on) window.d3.select(this).raise()
-
-        t(window.d3.select(this))
-            .style('stroke', r.origStroke)
-            .style('stroke-width', r.origStrokeWidth)
-            .style('filter', on ? null : 'grayscale(70%) brightness(1.05)')
-            .style('opacity', on ? 1 : 0.08)
-    })
-
-    t(svg.selectAll('#em-cntrg path')).style('opacity', predicate ? 0.08 : 1)
-    t(svg.select('#em-cntbn')).style('opacity', predicate ? 0.3 : 1)
-    t(svg.select('#em-nutsbn')).style('opacity', predicate ? 0.08 : 1)
 }
 
 // ─── Morph constants ──────────────────────────────────────────────────────────
@@ -721,7 +697,7 @@ function rootToLocal(svgNode, x, y) {
 function tweenToChart(layout, state, focusCountry = null) {
     const { svg, svgW, regionData, countryPathData } = layout
 
-    if (state.chartVisible && state.focusCountry === focusCountry) return
+    // No early return: an interrupted step can leave the geometry half-way, so every step re-applies its full target
     state.chartVisible = true
     state.focusCountry = focusCountry
 
@@ -834,10 +810,12 @@ function tweenToChart(layout, state, focusCountry = null) {
 function tweenToMap(layout, state) {
     const { svg, svgW, regionData, countryPathData } = layout
 
-    if (!state.chartVisible) return
-
+    // No early return on state.chartVisible: an interrupted morph leaves shapes half-way while the flag already
+    // says 'map', so we always (re)apply the full map state. Shapes already at their target are left alone.
     state.chartVisible = false
     state.focusCountry = null
+    let morphing = false
+    const atTarget = (el, d) => el.getAttribute('d') === d
 
     svg.select('#em-chart-overlay').transition('overlay').duration(300).style('opacity', 0).remove()
 
@@ -847,11 +825,14 @@ function tweenToMap(layout, state) {
         const r = regionData.get(id)
         if (!r) return
 
-        let interp
-        try {
-            interp = flubberInterpolate(this.getAttribute('d'), r.mapD)
-        } catch {
-            return
+        let interp = null
+        if (!atTarget(this, r.mapD)) {
+            try {
+                interp = flubberInterpolate(this.getAttribute('d'), r.mapD)
+                morphing = true
+            } catch {
+                return
+            }
         }
 
         // Determine target stroke and filter based on active highlight predicate
@@ -870,13 +851,9 @@ function tweenToMap(layout, state) {
             }
         }
 
-        window.d3
-            .select(this)
-            .transition('morph')
-            .duration(MORPH_DURATION)
-            .ease(EASE)
-            .attrTween('d', () => interp)
-            .style('fill', r.origFill)
+        const tr = window.d3.select(this).transition('morph').duration(interp ? MORPH_DURATION : 400).ease(EASE)
+        if (interp) tr.attrTween('d', () => interp)
+        tr.style('fill', r.origFill)
             .style('stroke', targetStroke)
             .style('stroke-width', targetStrokeWidth)
             .style('filter', targetFilter)
@@ -892,24 +869,23 @@ function tweenToMap(layout, state) {
         const cp = countryPathData.get(cc)
         if (cp) {
             // Morph active country back to geographic shape
-            let interp
-            try {
-                interp = flubberInterpolate(this.getAttribute('d'), cp.mapD)
-            } catch {
-                return
+            let interp = null
+            if (!atTarget(this, cp.mapD)) {
+                try {
+                    interp = flubberInterpolate(this.getAttribute('d'), cp.mapD)
+                    morphing = true
+                } catch {
+                    return
+                }
             }
 
             // Since active country geometries sit under NUTS regions,
             // we dim them to match the active highlight predicate state
             const targetOpacity = state.highlightPredicate ? 0.08 : 1
 
-            window.d3
-                .select(this)
-                .transition('morph')
-                .duration(MORPH_DURATION)
-                .ease(EASE)
-                .attrTween('d', () => interp)
-                .style('fill', cp.origFill)
+            const ctr = window.d3.select(this).transition('morph').duration(interp ? MORPH_DURATION : 400).ease(EASE)
+            if (interp) ctr.attrTween('d', () => interp)
+            ctr.style('fill', cp.origFill)
                 .style('stroke', cp.origStroke)
                 .style('stroke-width', cp.origStrokeWidth)
                 .style('opacity', targetOpacity)
@@ -940,7 +916,7 @@ function tweenToMap(layout, state) {
         svg
             .select(sel)
             .transition()
-            .delay(MORPH_DURATION - 200)
+            .delay(morphing ? MORPH_DURATION - 200 : 0)
             .duration(500)
             .style('opacity', opacity)
     })

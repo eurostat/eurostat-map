@@ -1,0 +1,179 @@
+// Scroll-robustness test for examples/misc/story-map (scrollytelling).
+// Drives the page in headless Chromium through every step pair, mid-transition reversals and random rapid
+// scrolling, then asserts the *settled* state of the map/chart matches what that step should look like.
+// Needs network (the example loads d3/flubber from a CDN), so it is not part of `npm test`.
+//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N]
+import { chromium } from 'playwright'
+import { pathToFileURL } from 'node:url'
+import path from 'node:path'
+
+const args = process.argv.slice(2)
+const argVal = (k, d) => (args.includes(k) ? +args[args.indexOf(k) + 1] : d)
+let seed = argVal('--seed', 1)
+const RANDOM_RUNS = argVal('--random', 25)
+const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32)
+
+const URL = pathToFileURL(path.resolve('examples/misc/story-map/index.html')).href
+const SETTLE = 6000
+const STEPS = [1, 2, 3, 4]
+
+const browser = await chromium.launch()
+const page = await browser.newPage({ viewport: { width: 1300, height: 800 } })
+const pageErrors = []
+page.on('pageerror', (e) => pageErrors.push(e.message))
+page.on('console', (m) => m.type() === 'error' && pageErrors.push(m.text()))
+await page.goto(URL)
+await page.waitForFunction(() => document.querySelectorAll('#em-nutsrg path').length > 50, null, { timeout: 30000 })
+await page.waitForTimeout(3000)
+
+const go = (n) => page.evaluate((n) => document.getElementById('step-' + n).scrollIntoView({ block: 'center' }), n)
+
+// What the page looks like right now
+const snapshot = () =>
+    page.evaluate(() => {
+        const num = (v) => (v === '' || v == null ? 1 : parseFloat(v))
+        const regions = {}
+        document.querySelectorAll('#em-nutsrg path').forEach((el) => {
+            if (el.style.display === 'none') return
+            const b = el.getBBox()
+            regions[el.__data__.properties.id] = {
+                x: b.x, y: b.y, w: b.width, h: b.height,
+                opacity: num(getComputedStyle(el).opacity),
+            }
+        })
+        const op = (sel) => {
+            const el = document.querySelector(sel)
+            return el ? num(getComputedStyle(el).opacity) : null
+        }
+        const overlay = document.querySelectorAll('#em-chart-overlay')
+        const zg = document.querySelector('[id^=em-zoom-group]')
+        const m = /translate\(([^,]+),([^)]+)\) scale\(([^)]+)\)/.exec(zg.getAttribute('transform') || '')
+        return {
+            title: document.getElementById('map-title').textContent,
+            active: [...document.querySelectorAll('.step.active')].map((s) => s.dataset.step),
+            regions,
+            zoom: m ? { x: +m[1], y: +m[2], k: +m[3] } : { x: 0, y: 0, k: 1 },
+            labels: document.querySelectorAll('.em-geographic-label').length,
+            overlays: overlay.length,
+            overlayOpacity: overlay.length ? num(getComputedStyle(overlay[0]).opacity) : null,
+            legend: op('.em-legend'),
+            cntbn: op('#em-cntbn'),
+            nutsbn: op('#em-nutsbn'),
+        }
+    })
+
+// Baseline: the untouched step-1 map
+await go(1)
+await page.waitForTimeout(SETTLE)
+const base = await snapshot()
+const gdp = await page.evaluate(() => GDP_DATA)
+const isHigh = (id) => (gdp[id] || 0) > 130
+
+// Reference zoom for step 3, measured once from a clean 1 -> 3 run
+await go(3)
+await page.waitForTimeout(SETTLE)
+const zoom3 = (await snapshot()).zoom
+await go(1)
+await page.waitForTimeout(SETTLE)
+
+const near = (a, b, tol) => Math.abs(a - b) <= tol
+
+function check(step, s, label) {
+    const fails = []
+    const f = (msg) => fails.push(msg)
+    if (s.active.join() !== String(step)) f(`active card ${s.active} != ${step}`)
+    const ids = Object.keys(base.regions)
+    const mapShape = (id) => {
+        const r = s.regions[id], b = base.regions[id]
+        return r && near(r.x, b.x, 1) && near(r.y, b.y, 1) && near(r.w, b.w, 1) && near(r.h, b.h, 1)
+    }
+    if (step === 4) {
+        const bad = ids.filter((id) => !s.regions[id] || s.regions[id].w > 9.5 || s.regions[id].h > 9.5)
+        if (bad.length) f(`${bad.length} regions are not dots (e.g. ${bad[0]})`)
+        const dim = ids.filter((id) => s.regions[id] && s.regions[id].opacity < 0.95)
+        if (dim.length) f(`${dim.length} dots are dimmed`)
+        if (s.overlays !== 1 || s.overlayOpacity < 0.95) f(`overlay count ${s.overlays} opacity ${s.overlayOpacity}`)
+        if (s.legend > 0.05) f(`legend visible (${s.legend}) in chart`)
+        if (!near(s.zoom.k, 1, 0.001) || Math.abs(s.zoom.x) > 0.5 || Math.abs(s.zoom.y) > 0.5) f(`chart is zoomed ${JSON.stringify(s.zoom)}`)
+        if (s.labels) f(`${s.labels} place labels in chart`)
+    } else {
+        const bad = ids.filter((id) => !mapShape(id))
+        if (bad.length) f(`${bad.length} regions not back in map shape (e.g. ${bad[0]})`)
+        if (s.overlays) f(`${s.overlays} chart overlays left over`)
+        if (s.legend < 0.95) f(`legend hidden (${s.legend})`)
+        if (step === 1) {
+            const dim = ids.filter((id) => s.regions[id].opacity < 0.95)
+            if (dim.length) f(`${dim.length} regions dimmed on step 1`)
+            if (s.cntbn < 0.95 || s.nutsbn < 0.95) f(`borders faded on step 1 ${s.cntbn}/${s.nutsbn}`)
+        } else {
+            const wrong = ids.filter((id) => (isHigh(id) ? s.regions[id].opacity < 0.95 : s.regions[id].opacity > 0.15))
+            if (wrong.length) f(`${wrong.length} regions with wrong highlight opacity (e.g. ${wrong[0]} ${s.regions[wrong[0]].opacity})`)
+            if (!near(s.cntbn, 0.3, 0.05) || !near(s.nutsbn, 0.08, 0.05)) f(`border opacity ${s.cntbn}/${s.nutsbn}`)
+        }
+        if (step === 3) {
+            const z = s.zoom
+            if (!near(z.k, zoom3.k, 0.01) || !near(z.x, zoom3.x, 1) || !near(z.y, zoom3.y, 1))
+                f(`zoom ${JSON.stringify(z)} != reference ${JSON.stringify(zoom3)}`)
+            if (s.labels !== 9) f(`${s.labels} place labels (expected 9)`)
+        } else {
+            if (!near(s.zoom.k, 1, 0.001) || Math.abs(s.zoom.x) > 0.5 || Math.abs(s.zoom.y) > 0.5) f(`map is zoomed on step ${step} ${JSON.stringify(s.zoom)}`)
+            if (s.labels) f(`${s.labels} place labels on step ${step}`)
+        }
+    }
+    return fails.map((m) => `[${label}] step ${step}: ${m}`)
+}
+
+const failures = []
+let runs = 0
+async function run(label, seq) {
+    // seq: [[step, waitAfterMs], ...] - the last entry is held until settled
+    for (const [n, wait] of seq) {
+        await go(n)
+        await page.waitForTimeout(wait)
+    }
+    await page.waitForTimeout(SETTLE)
+    const last = seq[seq.length - 1][0]
+    const out = check(last, await snapshot(), label)
+    runs++
+    if (out.length) {
+        failures.push(...out)
+        console.log('FAIL', out.join('\n     '))
+    } else console.log('ok  ', label)
+}
+
+// 1. every ordered pair of steps, fully settled in between
+for (const a of STEPS) for (const b of STEPS) if (a !== b) await run(`${a}->${b}`, [[a, SETTLE], [b, 0]])
+
+// 2. reversal mid-flight: a -> b, interrupted after t ms by c
+for (const b of STEPS)
+    for (const c of STEPS)
+        if (b !== c)
+            for (const t of [300, 1200]) {
+                const a = STEPS.find((s) => s !== b && s !== c)
+                await run(`${a}->${b}(${t}ms)->${c}`, [[a, SETTLE], [b, t], [c, 0]])
+            }
+
+// 3. random rapid scrolling
+for (let i = 0; i < RANDOM_RUNS; i++) {
+    const seq = []
+    for (let j = 0; j < 7; j++) seq.push([STEPS[Math.floor(rand() * 4)], 30 + Math.floor(rand() * 2200)])
+    await run(`random#${i} ${seq.map(([n, w]) => `${n}@${w}`).join(' ')}`, seq)
+}
+
+// 4. real wheel scrolling up and down across the whole story
+await go(1)
+await page.waitForTimeout(SETTLE)
+for (let i = 0; i < 4; i++) {
+    for (let k = 0; k < 40; k++) { await page.mouse.wheel(0, 120); await page.waitForTimeout(15) }
+    for (let k = 0; k < 40; k++) { await page.mouse.wheel(0, -120); await page.waitForTimeout(15) }
+}
+await page.waitForTimeout(SETTLE)
+const active = await page.evaluate(() => +document.querySelector('.step.active')?.dataset.step)
+const wheelOut = check(active, await snapshot(), 'wheel')
+runs++
+if (wheelOut.length) { failures.push(...wheelOut); console.log('FAIL', wheelOut.join('\n     ')) } else console.log('ok   wheel up/down, ended on step', active)
+
+if (pageErrors.length) failures.push(...pageErrors.map((e) => 'page error: ' + e))
+await browser.close()
+console.log(`\n${runs} scenarios, ${failures.length} failures`)
+process.exit(failures.length ? 1 : 0)
