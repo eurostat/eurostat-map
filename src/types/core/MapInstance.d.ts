@@ -118,6 +118,8 @@ export interface MapInstance {
             duration?: number
             /** Easing function, t in [0, 1]. @default d3 cubic in-out */
             ease?: (t: number) => number
+            /** Called once the animation has finished (not if it is interrupted by another zoom). */
+            onEnd?: (map: MapInstance) => void
         }
     ): this
 

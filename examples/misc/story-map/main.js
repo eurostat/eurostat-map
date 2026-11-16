@@ -360,7 +360,7 @@ const STEPS = [
         card: {
             num: '03',
             h2: 'Zooming into a region',
-            body: 'The map glides to an area of interest.',
+            body: 'The map glides to an area of interest, then place names fade in.',
         },
     },
     {
@@ -603,11 +603,36 @@ function showMap(layout, state, predicate, zoomPredicate) {
     if (state.chartVisible) tweenToMap(layout, state)
     else applyHighlight(layout, state)
 
-    zoomToRegions(layout, zoomPredicate)
+    hidePlaceLabels(layout)
+    // Placenames only make sense once the map has settled on the area of interest
+    zoomToRegions(layout, zoomPredicate, zoomPredicate ? () => showPlaceLabels(layout) : undefined)
 }
 
-// Glide to the regions matching the predicate, or back to the full view when there is none
-function zoomToRegions({ map, svg, regionData }, predicate) {
+// Cities of the zoom area, in EPSG:3035 metres (the map projection)
+const PLACE_LABELS = [
+    { text: 'Paris', x: 3760650, y: 2889878 },
+    { text: 'Brussels', x: 3923550, y: 3097410 },
+    { text: 'Antwerp', x: 3930193, y: 3138200 },
+    { text: 'Rotterdam', x: 3941642, y: 3215469 },
+    { text: 'Amsterdam', x: 3973962, y: 3263333 },
+    { text: 'Luxembourg', x: 4041400, y: 2951503 },
+    { text: 'Cologne', x: 4107390, y: 3096507 },
+    { text: 'Düsseldorf', x: 4096165, y: 3129284 },
+    { text: 'Dortmund', x: 4145395, y: 3158524 },
+].map((l) => ({ ...l, class: 'countries' }))
+
+function showPlaceLabels({ map, svg }) {
+    map.labels({ labels: PLACE_LABELS, halos: true })
+    svg.select('#em-labels').style('opacity', 0).transition('placelabels').duration(600).style('opacity', 1)
+}
+
+function hidePlaceLabels({ map, svg }) {
+    svg.select('#em-labels').interrupt('placelabels')
+    if (map.labels_?.labels?.length) map.labels({ labels: [] })
+}
+
+// Glide to the regions matching the predicate (or back to the full view when there is none); onEnd runs when it lands
+function zoomToRegions({ map, svg, regionData }, predicate, onEnd) {
     if (!predicate) {
         map.zoomTo(null, { duration: 1200 })
         return
@@ -629,7 +654,7 @@ function zoomToRegions({ map, svg, regionData }, predicate) {
     const h = +svg.attr('height')
     const k = Math.min(w / (x1 - x0), h / (y1 - y0)) * 0.7
     const [x, y] = map._projection.invert([(x0 + x1) / 2, (y0 + y1) / 2])
-    map.zoomTo({ x, y, z: map.__baseZ / k }, { duration: 2000 })
+    map.zoomTo({ x, y, z: map.__baseZ / k }, { duration: 2000, onEnd })
 }
 
 // Mute everything but the highlighted regions (no recolouring)
@@ -700,6 +725,7 @@ function tweenToChart(layout, state, focusCountry = null) {
     state.chartVisible = true
     state.focusCountry = focusCountry
 
+    hidePlaceLabels(layout)
     // The chart is laid out in unzoomed coordinates: glide back out while the regions morph
     layout.map.zoomTo(null, { duration: MORPH_DURATION })
 

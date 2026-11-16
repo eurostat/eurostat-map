@@ -157,7 +157,7 @@ export function setMapView(map, pos) {
  */
 export function zoomMapTo(map, pos, options = {}) {
     if (!map.svg_ || !map.__zoomBehavior || !map.__baseZ) return
-    const { duration = 1500, ease } = options
+    const { duration = 1500, ease, onEnd } = options
 
     let transform = zoomIdentity
     if (pos) {
@@ -172,11 +172,26 @@ export function zoomMapTo(map, pos, options = {}) {
 
     if (!(duration > 0)) {
         map.svg_.call(map.__zoomBehavior.transform, transform)
+        onEnd?.(map)
         return
     }
     const t = map.svg_.transition().duration(duration)
     if (ease) t.ease(ease)
+    // 'end' only fires if the glide completes; a newer zoomTo/zoom interrupts it silently
+    if (onEnd) t.on('end', () => onEnd(map))
     t.call(map.__zoomBehavior.transform, transform)
+}
+
+/**
+ * Apply the current zoom scale to labels that were (re)built while the map is already zoomed, so they get the
+ * same counter-scaling as labels present during the zoom.
+ * @param {MapInstance} map
+ */
+export function applyZoomToLabels(map) {
+    const t = map.__lastTransform
+    if (!t || t.k === 1) return
+    if (map.labels_?.scaleOnZoom !== false) scaleLabelTexts(t, map)
+    if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
 }
 
 const panHandler = (event, map) => {

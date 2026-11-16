@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { applyZoomToLabels } from '../zoom'
 import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColorForBackground, compactFormatter } from '../utils'
 
@@ -137,6 +138,9 @@ export const addLabelsToMap = function (map, zg) {
         if (map.labels_.preventOverlap) {
             applyLabelOverlapPrevention(labelItems, labelTexts)
         }
+
+        // Labels rebuilt while the map is zoomed must match the zoom scale straight away
+        applyZoomToLabels(map)
     }
 }
 
