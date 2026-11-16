@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
+import { BOX_CORNER_RADIUS } from '../core/buttons/corner-radius'
 import { getCornerPosition, getCornerCoords } from '../core/decoration/corner-position'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
@@ -265,7 +266,7 @@ export const legend = function (map) {
 
     /** Draw legend background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background')
+        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background').attr('rx', BOX_CORNER_RADIUS).attr('ry', BOX_CORNER_RADIUS)
         out.updateBackgroundBoxOpacity()
     }
 

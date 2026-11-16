@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { createMapInstance } from './map-instance'
 import { getDefaultScalebarConfig, mergeScalebarConfig, normalizeLegacyScalebarFields } from './decoration/scalebar'
+import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
 import { getButtonPadding, getButtonSize } from './buttons/button-utils'
 import { isMobile } from './utils'
 
@@ -58,6 +59,8 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
         insetsGroup
             .append('rect')
             .attr('class', 'em-insets-background')
+            .attr('rx', BOX_CORNER_RADIUS)
+            .attr('ry', BOX_CORNER_RADIUS)
             .attr('x', 0)
             .attr('y', 0)
             .attr('width', OVERSEAS_BOX_WIDTH)
