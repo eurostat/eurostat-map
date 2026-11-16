@@ -106,6 +106,22 @@ export interface MapInstance {
     position(): { x: number; y: number; z: number }
 
     /**
+     * Animate the map view to a position, using a smooth "glide" zoom. Takes the same {x, y, z}
+     * as `position()`; omitted values keep their current value. Pass `null` to glide back to the
+     * initial, unzoomed view. Does nothing before the map is built.
+     * @example map.zoomTo({ x: 3900000, y: 3000000, z: 2500 }, { duration: 2000 })
+     */
+    zoomTo(
+        position: { x?: number; y?: number; z?: number } | null,
+        options?: {
+            /** Animation length in ms. 0 jumps straight to the view. @default 1500 */
+            duration?: number
+            /** Easing function, t in [0, 1]. @default d3 cubic in-out */
+            ease?: (t: number) => number
+        }
+    ): this
+
+    /**
      * Divides the exact bbox-fit pixel size used when position().z is left unset, so the
      * default view is zoomed in tighter than an exact fit (which tends to look too zoomed
      * out). Higher = more zoomed in by default; 1 = exact fit.

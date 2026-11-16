@@ -56,15 +56,26 @@
                         <p class="step-number">02 — Highlighting regions</p>
                         <h2>Highlighting regions on the map</h2>
                         <p>
-                            As the user scrolls, we highlight specific regions (e.g. high-income regions above 130) in red while dimming the
-                            background regions to guide focus.
+                            As the user scrolls, we highlight specific regions (e.g. high-income regions above 130) while muting the background
+                            regions to guide focus.
                         </p>
                     </div>
                 </div>
 
                 <div class="step" data-step="3" id="step-3">
                     <div class="step-card">
-                        <p class="step-number">03 — Transition to chart</p>
+                        <p class="step-number">03 — Zooming in</p>
+                        <h2>Zooming into a region</h2>
+                        <p>
+                            The map glides to an area of interest: a group of high-value regions around the Benelux, the Ruhr and Paris. This uses
+                            the library's <code>map.zoomTo()</code> method.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step" data-step="4" id="step-4">
+                    <div class="step-card">
+                        <p class="step-number">04 — Transition to chart</p>
                         <h2>Transitioning the map into a chart</h2>
                         <p>
                             Finally, we morph the complex geographic boundaries of each NUTS-2 region into a standard chart. Each polygon smoothly
@@ -86,7 +97,7 @@
                     <div class="map-header">
                         <div class="map-title" id="map-title">Loading map…</div>
                         <div class="map-subtitle" id="map-subtitle">GDP index · EU-27 = 100 · NUTS-2 regions</div>
-                        <div class="map-step-indicator" id="step-indicator">Step 1 of 3</div>
+                        <div class="map-step-indicator" id="step-indicator">Step 1 of 4</div>
                     </div>
 
                     <!--
@@ -103,12 +114,13 @@
                     -->
                     <div class="map-legend" id="map-legend">
                         <span class="legend-label">low</span>
+                        <div class="legend-swatch" style="background: #d4488f"></div>
                         <div class="legend-swatch" style="background: #e470a8"></div>
-                        <div class="legend-swatch" style="background: #e8b8cc"></div>
-                        <div class="legend-swatch" style="background: #d4c8e0"></div>
-                        <div class="legend-swatch" style="background: #b5e4c0"></div>
-                        <div class="legend-swatch" style="background: #6dca8a"></div>
-                        <div class="legend-swatch" style="background: #2a9455"></div>
+                        <div class="legend-swatch" style="background: #e8a4c4"></div>
+                        <div class="legend-swatch" style="background: #f1d2e0"></div>
+                        <div class="legend-swatch" style="background: #cde8d3"></div>
+                        <div class="legend-swatch" style="background: #8fd3a4"></div>
+                        <div class="legend-swatch" style="background: #3fa468"></div>
                         <div class="legend-swatch" style="background: #1a7a45"></div>
                         <span class="legend-end-label">high GDP index</span>
                     </div>

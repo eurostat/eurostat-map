@@ -8,7 +8,7 @@ import { buildInsets, removeInsets } from './insets'
 import { appendStamp } from './decoration/stamps'
 import { buildGridCartogramBase } from './cartograms'
 import { appendMinimap } from './minimaps'
-import { defineMapZoom, setMapView } from './zoom'
+import { defineMapZoom, setMapView, zoomMapTo } from './zoom'
 import { appendZoomButtons } from './buttons/zoom-buttons'
 import { appendInsetsButton } from './buttons/insets-button'
 import { appendLegendButton } from './buttons/legend-button'
@@ -538,6 +538,11 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         if (!arguments.length) return out.position_
         out.position_ = v
         setMapView(out, v)
+        return out
+    }
+
+    out.zoomTo = function (pos, options) {
+        zoomMapTo(out, pos, options)
         return out
     }
 

@@ -147,6 +147,38 @@ export function setMapView(map, pos) {
     map.position_.z = pos.z
 }
 
+/**
+ * Animate the map view to a position (same {x, y, z} as `position()`), using d3's smooth glide zoom
+ * (van Wijk interpolation) so the map zooms out and in again on long moves.
+ * Missing x/y/z keep their current value. A falsy `pos` returns to the initial (unzoomed) view.
+ * @param {MapInstance} map
+ * @param {{x?: number, y?: number, z?: number}|null} pos
+ * @param {{duration?: number, ease?: (t: number) => number}} [options]
+ */
+export function zoomMapTo(map, pos, options = {}) {
+    if (!map.svg_ || !map.__zoomBehavior || !map.__baseZ) return
+    const { duration = 1500, ease } = options
+
+    let transform = zoomIdentity
+    if (pos) {
+        const cur = map.position_ || {}
+        const x = pos.x ?? cur.x
+        const y = pos.y ?? cur.y
+        const z = pos.z ?? cur.z ?? map.__baseZ
+        const k = map.__baseZ / z
+        const [projX, projY] = map._projection([x, y])
+        transform = zoomIdentity.translate(map.width_ / 2 - projX * k, map.height_ / 2 - projY * k).scale(k)
+    }
+
+    if (!(duration > 0)) {
+        map.svg_.call(map.__zoomBehavior.transform, transform)
+        return
+    }
+    const t = map.svg_.transition().duration(duration)
+    if (ease) t.ease(ease)
+    t.call(map.__zoomBehavior.transform, transform)
+}
+
 const panHandler = (event, map) => {
     const t = event.transform
     const cx = (map.width_ / 2 - t.x) / t.k

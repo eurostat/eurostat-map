@@ -309,14 +309,20 @@ const COUNTRY_NAMES = {
     BG: 'Bulgaria',
 }
 
-const COLORS = ['#e470a8', '#e8b8cc', '#d4c8e0', '#b5e4c0', '#6dca8a', '#2a9455', '#1a7a45']
-const THRESHOLDS = [50, 75, 90, 110, 130, 160]
+// Diverging around 100 (EU-27 average): a class break sits exactly at 100, 4 classes below, 4 above
+const COLORS = ['#d4488f', '#e470a8', '#e8a4c4', '#f1d2e0', '#cde8d3', '#8fd3a4', '#3fa468', '#1a7a45']
+const THRESHOLDS = [50, 75, 90, 100, 110, 130, 160]
 
 const dotColor = (v) => {
     const i = THRESHOLDS.findIndex((t) => v < t)
     return i === -1 ? COLORS[COLORS.length - 1] : COLORS[i]
 }
 const nutsCountry = (id) => id.slice(0, 2)
+
+const HIGH_VALUE = (id) => (GDP_DATA[id] || 0) > 130
+
+// Area of interest for the zoom step: the Benelux, the Ruhr and Paris
+const ZOOM_REGIONS = (id) => nutsCountry(id) === 'BE' || nutsCountry(id) === 'LU' || nutsCountry(id) === 'NL' || id === 'FR10' || /^DEA[1-5]$/.test(id)
 
 // ─── Scroll steps (concise demo text) ────────────────────────────────────────
 
@@ -325,8 +331,7 @@ const STEPS = [
         title: 'GDP per capita — EU NUTS-2 regions',
         subtitle: 'Index: EU-27 = 100 · Purchasing power standard',
         enter: (l, s) => {
-            tweenToMap(l, s)
-            resetHighlights(l, s)
+            showMap(l, s, null, null)
         },
         card: {
             num: '01',
@@ -336,15 +341,26 @@ const STEPS = [
     },
     {
         title: 'Highlighting Regions on the Map',
-        subtitle: 'Regions with GDP index above 130 highlighted in red',
+        subtitle: 'Regions with GDP index above 130 highlighted',
         enter: (l, s) => {
-            tweenToMap(l, s)
-            highlight(l, s, (id) => (GDP_DATA[id] || 0) > 130, '#e84040')
+            showMap(l, s, HIGH_VALUE, null)
         },
         card: {
             num: '02',
             h2: 'Highlighting Regions',
-            body: 'As the user scrolls, we highlight specific regions (e.g. high-GDP regions above 130) in red while dimming background regions to focus attention.',
+            body: 'As the user scrolls, we highlight specific regions (e.g. high-GDP regions above 130) while muting the background regions to focus attention.',
+        },
+    },
+    {
+        title: 'Zooming into a Region',
+        subtitle: 'Benelux, the Ruhr and Paris: a cluster of high-value regions',
+        enter: (l, s) => {
+            showMap(l, s, HIGH_VALUE, ZOOM_REGIONS)
+        },
+        card: {
+            num: '03',
+            h2: 'Zooming into a region',
+            body: 'The map glides to an area of interest.',
         },
     },
     {
@@ -354,7 +370,7 @@ const STEPS = [
             tweenToChart(l, s)
         },
         card: {
-            num: '03',
+            num: '04',
             h2: 'Map to Chart Morph',
             body: 'Finally, we morph the complex geographic boundaries of each NUTS-2 region into a standard chart. Each polygon smoothly transitions into a dot on a horizontal dot plot.',
         },
@@ -402,11 +418,12 @@ const _map = window.eurostatmap.map('ch', {
         },
     },
     zoomButtons: false,
+    zoomExtent: [1, 12], // enables the zoom behaviour that map.zoomTo() drives (user input is unbound in init)
     showSourceLink: false,
     footnote: '© EuroGeographics · Eurostat NUTS 2021',
     onBuild(mapInstance) {
         setTimeout(() => {
-            init(mapInstance.svg(), mapInstance._pathFunction)
+            init(mapInstance.svg(), mapInstance)
         }, mapInstance.transitionDuration() + 100)
     },
 })
@@ -417,7 +434,7 @@ _map.build()
 // ─── Layout ───────────────────────────────────────────────────────────────────
 // Horizontal chart: GDP index on X axis, countries on Y axis (top = richest).
 
-function buildLayout(svg) {
+function buildLayout(svg, map) {
     const svgW = +svg.attr('width')
     const svgH = +svg.attr('height')
     // Generous left margin for full country names
@@ -510,37 +527,51 @@ function buildLayout(svg) {
         this.style.pointerEvents = 'none'
     })
 
-    return { svg, svgW, svgH, margin, xScale, yCenter, countries, countryAvgs, regionData, countryPathData }
+    return { map, svg, svgW, svgH, margin, xScale, yCenter, countries, countryAvgs, regionData, countryPathData }
 }
 
 // ─── init ─────────────────────────────────────────────────────────────────────
 
-function init(svg) {
-    const layout = buildLayout(svg)
+function init(svg, map) {
+    // The story drives the view itself: drop d3-zoom's wheel/drag/touch handlers so the page keeps scrolling
+    // normally over the map. map.zoomTo() is programmatic and doesn't need them.
+    svg.on('.zoom', null).style('touch-action', 'auto')
+
+    const layout = buildLayout(svg, map)
     const stepEls = document.querySelectorAll('.step')
     const titleEl = document.getElementById('map-title')
     const subEl = document.getElementById('map-subtitle')
     const cntEl = document.getElementById('step-indicator')
 
-    const state = { chartVisible: false, focusCountry: null, highlightPredicate: null, highlightColor: null }
+    const state = { chartVisible: false, focusCountry: null, highlightPredicate: null, zoomPredicate: null, step: -1 }
 
     function applyStep(i) {
         const step = STEPS[i]
-        if (!step) return
+        if (!step || i === state.step) return
+        state.step = i
+        stepEls.forEach((s) => s.classList.toggle('active', parseInt(s.dataset.step, 10) - 1 === i))
         titleEl.textContent = step.title
         subEl.textContent = step.subtitle
         cntEl.textContent = `Step ${i + 1} of ${STEPS.length}`
+        // Cancel whatever the previous step still has in flight, so fast scrolling can't leave
+        // two transitions fighting over the same attribute
+        interruptAll(layout)
         step.enter(layout, state)
     }
 
+    // Fast scrolling flips through several steps; only act on the one the reader settles on
+    const visible = new Set()
+    let settleTimer = null
     const observer = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
-                if (!entry.isIntersecting) return
-                stepEls.forEach((s) => s.classList.remove('active'))
-                entry.target.classList.add('active')
-                applyStep(parseInt(entry.target.dataset.step, 10) - 1)
+                const n = parseInt(entry.target.dataset.step, 10) - 1
+                if (entry.isIntersecting) visible.add(n)
+                else visible.delete(n)
             })
+            if (!visible.size) return
+            clearTimeout(settleTimer)
+            settleTimer = setTimeout(() => applyStep(Math.max(...visible)), 120)
         },
         { rootMargin: '-40% 0px -40% 0px' }
     )
@@ -552,74 +583,79 @@ function init(svg) {
 
 // ─── Map helpers ──────────────────────────────────────────────────────────────
 
-function resetHighlights(layout, state) {
-    state.highlightPredicate = null
-    state.highlightColor = null
-
-    if (state.chartVisible) return
-
-    const { svg, regionData } = layout
-    svg.selectAll('#em-nutsrg path').each(function (d) {
-        const r = regionData.get(d?.properties?.id)
-        if (!r) return
-        window.d3
-            .select(this)
-            .transition('highlight')
-            .duration(300)
-            .style('stroke', r.origStroke)
-            .style('stroke-width', r.origStrokeWidth)
-            .style('filter', null)
-            .style('opacity', 1)
+// Stop every in-flight transition started by a previous step (map zoom, morph, highlight, furniture)
+function interruptAll({ svg, map }) {
+    svg.interrupt() // the map's glide zoom runs on the svg itself
+    ;[null, 'morph', 'highlight'].forEach((name) => {
+        svg.selectAll('.em-zoom-group *').interrupt(name)
+        svg.selectAll('.em-legend, .em-legend *, .em-sea, .em-graticule, .em-footnote').interrupt(name)
     })
-
-    svg.selectAll('#em-cntrg path').each(function () {
-        window.d3
-            .select(this)
-            .transition('highlight')
-            .duration(300)
-            .style('opacity', 1)
-    })
-
-    svg.select('#em-cntbn').transition('highlight').duration(300).style('opacity', 1)
-    svg.select('#em-nutsbn').transition('highlight').duration(300).style('opacity', 1)
 }
 
-function highlight(layout, state, predicate, color) {
+/**
+ * Show the map view: optionally highlight regions (everything else is muted) and optionally
+ * glide the map to the bounding box of the regions matching `zoomPredicate`.
+ */
+function showMap(layout, state, predicate, zoomPredicate) {
     state.highlightPredicate = predicate
-    state.highlightColor = color
+    state.zoomPredicate = zoomPredicate
 
-    if (state.chartVisible) return
+    if (state.chartVisible) tweenToMap(layout, state)
+    else applyHighlight(layout, state)
 
+    zoomToRegions(layout, zoomPredicate)
+}
+
+// Glide to the regions matching the predicate, or back to the full view when there is none
+function zoomToRegions({ map, svg, regionData }, predicate) {
+    if (!predicate) {
+        map.zoomTo(null, { duration: 1200 })
+        return
+    }
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity
+    svg.selectAll('#em-nutsrg path').each(function (d) {
+        const id = d?.properties?.id
+        if (!regionData.has(id) || !predicate(id)) return
+        // getBBox is in zoom-group coordinates, which don't change while zooming
+        const b = this.getBBox()
+        x0 = Math.min(x0, b.x)
+        y0 = Math.min(y0, b.y)
+        x1 = Math.max(x1, b.x + b.width)
+        y1 = Math.max(y1, b.y + b.height)
+    })
+    if (!isFinite(x0)) return
+
+    const w = +svg.attr('width')
+    const h = +svg.attr('height')
+    const k = Math.min(w / (x1 - x0), h / (y1 - y0)) * 0.7
+    const [x, y] = map._projection.invert([(x0 + x1) / 2, (y0 + y1) / 2])
+    map.zoomTo({ x, y, z: map.__baseZ / k }, { duration: 2000 })
+}
+
+// Mute everything but the highlighted regions (no recolouring)
+function applyHighlight(layout, state) {
     const { svg, regionData } = layout
+    const predicate = state.highlightPredicate
+    const t = (sel) => sel.transition('highlight').duration(400)
+
     svg.selectAll('#em-nutsrg path').each(function (d) {
         const id = d?.properties?.id
         const r = regionData.get(id)
         if (!r) return
 
-        const on = predicate(id)
-        const selection = window.d3.select(this)
-        if (on) selection.raise()
+        const on = !predicate || predicate(id)
+        if (predicate && on) window.d3.select(this).raise()
 
-        selection
-            .transition('highlight')
-            .duration(400)
-            .style('stroke', on ? color : r.origStroke)
-            .style('style-width', on ? '2.5px' : r.origStrokeWidth)
-            .style('stroke-width', on ? '2.5px' : r.origStrokeWidth)
+        t(window.d3.select(this))
+            .style('stroke', r.origStroke)
+            .style('stroke-width', r.origStrokeWidth)
             .style('filter', on ? null : 'grayscale(70%) brightness(1.05)')
-            .style('opacity', on ? 1.0 : 0.08)
+            .style('opacity', on ? 1 : 0.08)
     })
 
-    svg.selectAll('#em-cntrg path').each(function () {
-        window.d3
-            .select(this)
-            .transition('highlight')
-            .duration(400)
-            .style('opacity', 0.08)
-    })
-
-    svg.select('#em-cntbn').transition('highlight').duration(400).style('opacity', 0.3)
-    svg.select('#em-nutsbn').transition('highlight').duration(400).style('opacity', 0.08)
+    t(svg.selectAll('#em-cntrg path')).style('opacity', predicate ? 0.08 : 1)
+    t(svg.select('#em-cntbn')).style('opacity', predicate ? 0.3 : 1)
+    t(svg.select('#em-nutsbn')).style('opacity', predicate ? 0.08 : 1)
 }
 
 // ─── Morph constants ──────────────────────────────────────────────────────────
@@ -638,12 +674,13 @@ const FURNITURE = ['#em-cntbn', '#em-nutsbn', '.em-legend', '.em-sea', '.em-grat
 // Small square path centered at (cx, cy)
 const squarePath = (cx, cy, s = 4.5) => `M${cx - s},${cy - s} L${cx + s},${cy - s} L${cx + s},${cy + s} L${cx - s},${cy + s} Z`
 
-// Convert root SVG coordinates to zoom-group local coordinates
+// Convert root SVG coordinates to zoom-group local coordinates *as they will be once the map is unzoomed*
+// (the parent's CTM ignores the group's own zoom transform; the chart is always shown at k=1)
 function rootToLocal(svgNode, x, y) {
     const zg = svgNode.querySelector('[id^="em-zoom-group"]')
     if (!zg) return { x, y }
     try {
-        const inv = zg.getCTM().inverse()
+        const inv = zg.parentNode.getCTM().inverse()
         const pt = svgNode.createSVGPoint()
         pt.x = x
         pt.y = y
@@ -662,6 +699,9 @@ function tweenToChart(layout, state, focusCountry = null) {
     if (state.chartVisible && state.focusCountry === focusCountry) return
     state.chartVisible = true
     state.focusCountry = focusCountry
+
+    // The chart is laid out in unzoomed coordinates: glide back out while the regions morph
+    layout.map.zoomTo(null, { duration: MORPH_DURATION })
 
     const zoomGroup = svg.select('.em-zoom-group')
 
@@ -751,18 +791,15 @@ function tweenToChart(layout, state, focusCountry = null) {
     })
 
     // AXES OVERLAY INSIDE ZOOM GROUP
-    let overlay = layout.svg.select('#em-chart-overlay')
-
-    if (overlay.empty()) {
-        overlay = buildAxesOverlay(layout)
-        const zoomGroup = layout.svg.select('.em-zoom-group')
-        zoomGroup.node().appendChild(overlay.node())
-        overlay.lower()
-    }
+    // Always rebuild: a previous overlay may be half faded out
+    layout.svg.select('#em-chart-overlay').interrupt('overlay').remove()
+    const overlay = buildAxesOverlay(layout)
+    layout.svg.select('.em-zoom-group').node().appendChild(overlay.node())
+    overlay.lower()
 
     overlay
         .style('opacity', 0)
-        .transition()
+        .transition('overlay')
         .delay(MORPH_DURATION + 200)
         .duration(400)
         .style('opacity', 1)
@@ -776,7 +813,7 @@ function tweenToMap(layout, state) {
     state.chartVisible = false
     state.focusCountry = null
 
-    svg.select('#em-chart-overlay').transition().duration(300).style('opacity', 0).remove()
+    svg.select('#em-chart-overlay').transition('overlay').duration(300).style('opacity', 0).remove()
 
     // DOTS → REGIONS
     svg.selectAll('#em-nutsrg path').each(function (d) {
@@ -800,8 +837,6 @@ function tweenToMap(layout, state) {
         if (state.highlightPredicate) {
             const on = state.highlightPredicate(id)
             if (on) {
-                targetStroke = state.highlightColor
-                targetStrokeWidth = '2.5px'
                 window.d3.select(this).raise()
             } else {
                 targetFilter = 'grayscale(70%) brightness(1.05)'
