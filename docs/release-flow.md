@@ -46,6 +46,7 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 
 3. Build distributables
 
+- install the locked toolchain first if `node_modules` is missing or stale: `npm ci` (see "Toolchain and lockfile" below; never a bare `npm install`)
 - run production build:
     - `npm run build-prod` (rebuilds `build/eurostatmap.min.js`, the `main`/`unpkg` target)
 - **also rebuild the unminified dev bundle** if `src/**` changed:
@@ -156,6 +157,41 @@ Snippet conventions:
 - always include a language on fenced code blocks (use `javascript` for JS examples and `ts` for TypeScript snippets)
 - keep snippets short (roughly 5-20 lines) and focused on a single change
 - prefer real API names and options exactly as released
+
+## Toolchain and lockfile
+
+`package-lock.json` is committed so the bundles in `build/` are reproducible. Without it every fresh
+`npm install` re-resolved the `^` ranges, and a rebuild with no source change rewrote thousands of
+lines of third-party code in `build/eurostatmap.js` (and changed the minified bundle).
+
+What the lock holds (chosen on 2026-11-16 because it rebuilds the 4.14.1 tag byte for byte:
+`build/eurostatmap.min.js` and its `.map` identical, third-party modules of `build/eurostatmap.js`
+identical):
+
+- `webpack` 5.106.2 (5.107+ no longer emits the `Object.defineProperty(... "name" ...)` lines for
+  anonymous default exports, 5.106.0 emits them with `Reflect.`; 5.106.1 and 5.106.2 match the bundle).
+- `proj4` 2.19.10 with `wkt-parser` 1.5.2 (later proj4 adds `authlat.js`/`authset.js`, later wkt-parser
+  renames the `PROJJSONBuilder*` files).
+- `d3-format` 3.1.0, `simple-statistics` 7.8.8, `idb-keyval` 6.2.2, `jsonstat-toolkit` 1.3.1, i.e. the
+  lowest versions allowed by `package.json` (the Nov 2026 d3 patch releases change the d3 source).
+- `schema-utils` 4.7.0 (4.8.0 to 4.8.2 demand `webpack` ^5.112), `playwright` 1.64.1 (the version whose
+  browser is installed on the maintainer's machine).
+- everything else: newest versions published before 2026-11-02, with `d3-svg-annotation` installed
+  after the other dependencies (so npm hoists d3-zoom's d3-drag/d3-transition, not d3-svg-annotation's
+  old ones, to the top level: that layout is part of the bundle).
+
+Rules:
+
+- Use `npm ci` to install. It never touches the lock and fails if `package.json` and the lock disagree.
+- Bumping a dependency is a deliberate change: `npm install <pkg>@<version>` (updates the lock),
+  rebuild both bundles, and commit `package-lock.json` and the new bundles together. Say in the commit
+  message which package moved and why.
+- Check what a bump did to the bundle before committing it. Build both bundles from the previous release
+  commit with the old lock, again with the new lock, and diff `build/eurostatmap.js`: apart from the bumped
+  package's modules there must be no difference. Strip `\r` first (`git` converts line endings on Windows).
+- To get a clean tree after editing `package.json`, use `npm install --package-lock-only` and then `npm ci`,
+  never delete the lock to "start fresh" (that re-resolves everything to the newest versions).
+- `overrides` in `package.json` (d3-color) apply to the lock as well; changing them needs the same care.
 
 ## Operational Notes
 

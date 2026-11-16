@@ -13,6 +13,7 @@ sitting uncommitted in the working tree.
 - Stage only the files relevant to the task (avoid broad `git add -A` sweeps that pick up
   unrelated in-progress work from elsewhere in the tree — check `git status` first, since
   multiple agents/sessions may be working in this repo concurrently).
+- Build with the locked toolchain (`npm ci` first in a new checkout or worktree).
 - If source under `src/` changed, rebuild the bundle (`npm run build-prod`, and the dev
   bundle via `npx webpack --config webpack/webpack.config.dev.js --no-watch` if
   `build/eurostatmap.js` is also tracked as changed) and include the updated `build/`
@@ -224,9 +225,12 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   classes after build has to do the same.
 - `ps-background.js` writes id-specific fill rules (`#svgId.em--ps ...`) that beat any class rule,
   so it writes separate light and `.em--dark` variants.
-- There is no lockfile: a fresh `npm install` (e.g. in a new worktree) can pull a newer Playwright
-  whose browser isn't installed. `npm install --no-save playwright@<version of the main checkout>`
-  reuses the installed browser instead of downloading one.
+- `package-lock.json` is committed and is the build toolchain: it reproduces the 4.14.1 bundles
+  (`build/eurostatmap.min.js` and its map byte for byte, third-party code in `build/eurostatmap.js`
+  with zero diff). Install with `npm ci` (never a bare `npm install`, which re-resolves `^` ranges
+  and changes the bundles with no source change). Playwright is locked to the version whose browser
+  is installed on the maintainer's machine. Refresh or bump deliberately, see "Toolchain and
+  lockfile" in `docs/release-flow.md`.
 
 ## Coding & Documentation Standards
 * Keep existing JSDoc comments intact and make sure they are accurate.
