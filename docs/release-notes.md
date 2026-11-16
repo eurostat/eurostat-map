@@ -1,5 +1,34 @@
 # Release notes
 
+## 4.14.2
+
+### Improvements
+
+- **Rounded corners on the legend, ranked bar chart and IMAGE inset backgrounds.** Their background rectangles now have a 5 px corner radius (`rx`/`ry`), matching the zoom buttons. The old `rx: 0` / `ry: 0` CSS defaults are gone, so a custom stylesheet can still override the radius.
+
+Example:
+
+```css
+/* square the corners again */
+.em-legend-background {
+    rx: 0;
+    ry: 0;
+}
+```
+
+### Fixes
+
+- **A Eurostat API outage is reported in plain words.** When the API is down, the EC proxy redirects to `sorry.ec.europa.eu`, which a browser blocks, so the error toast used to read "Failed to fetch". It now says the Eurostat data service is unavailable (or that there is no internet connection); API errors returned as JSON with a 4xx status keep their own message.
+
+Example:
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .stat('default', { eurostatDatasetCode: 'nama_10r_3gdp', filters: { unit: 'EUR_HAB', time: '2023' } })
+    .build() // during an outage: "The Eurostat data service is currently unavailable..."
+```
+
 ## 4.14.1
 
 ### Improvements
