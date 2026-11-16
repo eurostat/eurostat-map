@@ -1,8 +1,9 @@
 import { select } from 'd3-selection'
+import { BOX_CORNER_RADIUS } from './corner-radius'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
 
 // The two zoom buttons form one stack: only its outer corners are rounded, the + button on top and the - button below.
-const ZOOM_BUTTON_RADIUS = 5
+const ZOOM_BUTTON_RADIUS = BOX_CORNER_RADIUS
 
 const roundedButtonPath = (size, radius, { top, bottom }) => {
     const tl = top ? radius : 0

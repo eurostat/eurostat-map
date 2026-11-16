@@ -3,6 +3,7 @@ import { select } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
 import { scaleLinear } from 'd3-scale'
 import { executeForAllInsets, getTextColorForBackground, getFontSizeFromClass, getRegionsSelector } from '../utils'
+import { BOX_CORNER_RADIUS } from '../buttons/corner-radius'
 import { getCornerPosition, getCornerCoords } from './corner-position'
 import { deepMergeExistingKeys } from '../../legend/legend'
 import { buildDiscreteLabelFormatter } from '../../legend/legend-discrete'
@@ -296,7 +297,7 @@ export const rankedBarChart = function (map, config = {}) {
 
     /** Draw chart background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'em-ranked-bar-chart-background').attr('class', 'em-ranked-bar-chart-background')
+        out.lgg.append('rect').attr('id', 'em-ranked-bar-chart-background').attr('class', 'em-ranked-bar-chart-background').attr('rx', BOX_CORNER_RADIUS).attr('ry', BOX_CORNER_RADIUS)
         out.updateBackgroundBoxOpacity()
     }
 
