@@ -408,6 +408,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             if (!hasBaseLayer) {
                 // 1) clear any previous inline fill so CSS can apply to regions that now have data
                 dataRegions.style('fill', null)
+                // drop the saved fill too: a stale one (e.g. grey from an earlier no-data render) would be restored on hover-out
+                dataRegions.attr('fill___', null)
 
                 // 2) apply gray only to current no-data (":") regions
                 dataRegions

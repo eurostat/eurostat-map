@@ -510,6 +510,33 @@ add(
         ],
     }
 )
+// Regression: values first come back empty (':' for every region, grey inline fill + saved fill___), then real
+// values arrive. Hovering a region with data and leaving it must restore its data colour, never the stale grey.
+add(
+    'ps nl3 no data first, then data: hover-out keeps the fill',
+    'proportionalSymbol',
+    `m.nutsLevel(3).statData('size').setData(Object.fromEntries(Object.keys(window.__manual(0)).map((k) => [k, ':'])))`,
+    {
+        steps: [
+            ['setData+updateStatValues', `m.statData('size').setData(window.__manual(1)); m.updateStatValues()`],
+            [
+                'hover and leave every region with data',
+                `const bad = []
+                 const grey = (v) => !v || /^(gr[ae]y|#(ccc|cccccc|808080|999|999999|bbb|bbbbbb))$/i.test(v.trim())
+                 document.querySelectorAll('#em-nutsrg path').forEach((p) => {
+                     const id = p.__data__ && p.__data__.properties && p.__data__.properties.id
+                     const v = m.statData('size').get(id)
+                     if (!v || v.value === ':' || v.value == null) return
+                     p.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+                     p.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+                     const saved = p.getAttribute('fill___')
+                     if (saved !== null || p.style.fill) bad.push(id + ': fill___=' + saved + ' fill=' + p.style.fill)
+                 })
+                 if (bad.length) throw new Error('stale fill after hover-out on ' + bad.length + ' regions, e.g. ' + bad[0])`,
+            ],
+        ],
+    }
+)
 add(
     'ps nl2 size+colour custom insets',
     'proportionalSymbol',
