@@ -478,6 +478,7 @@ function buildLayout(svg, map) {
         const chartY = yCenter(country) + jitter(id)
 
         regionData.set(id, {
+            name: d.properties.na || id,
             mapD,
             chartX,
             chartY,
@@ -604,30 +605,72 @@ function showMap(layout, state, predicate, zoomPredicate) {
 
     hidePlaceLabels(layout)
     // Placenames only make sense once the map has settled on the area of interest
-    zoomToRegions(layout, zoomPredicate, zoomPredicate ? () => showPlaceLabels(layout) : undefined)
+    zoomToRegions(layout, zoomPredicate, zoomPredicate && predicate ? () => showPlaceLabels(layout, predicate) : undefined)
 }
 
-// Cities of the zoom area, in EPSG:3035 metres (the map projection)
-const PLACE_LABELS = [
-    { text: 'Paris', x: 3760650, y: 2889878 },
-    { text: 'Brussels', x: 3923550, y: 3097410 },
-    { text: 'Antwerp', x: 3930193, y: 3138200 },
-    { text: 'Rotterdam', x: 3941642, y: 3215469 },
-    { text: 'Amsterdam', x: 3973962, y: 3263333 },
-    { text: 'Luxembourg', x: 4041400, y: 2951503 },
-    { text: 'Cologne', x: 4107390, y: 3096507 },
-    { text: 'Düsseldorf', x: 4096165, y: 3129284 },
-    { text: 'Dortmund', x: 4145395, y: 3158524 },
-].map((l) => ({ ...l, class: 'countries' }))
+// NUTS names that are too long for a map label
+const SHORT_NAMES = { BE10: 'Brussels', NL42: 'Limburg', FR10: 'Île-de-France' }
 
-function showPlaceLabels({ map, svg }) {
-    map.labels({ labels: PLACE_LABELS, halos: true })
-    svg.select('#em-labels').style('opacity', 0).transition('placelabels').duration(600).style('opacity', 1)
+// A point + label (top-right of the point) for every highlighted region, shown once the zoom has landed.
+// Uses the library's locations API: no halo/background, so the data colours stay visible underneath.
+function regionLocations({ svg, map, regionData }, predicate) {
+    const probe = svg.select('.em-zoom-group').append('path').attr('visibility', 'hidden').node()
+    const out = []
+    regionData.forEach((r, id) => {
+        if (!predicate(id)) return
+        // geographic outline (r.mapD), not the live path, which may be a chart dot
+        probe.setAttribute('d', r.mapD)
+        const b = probe.getBBox()
+        const [x, y] = map._projection.invert([b.x + b.width / 2, b.y + b.height / 2])
+        out.push({
+            id: 'story-' + id,
+            x,
+            y,
+            label: SHORT_NAMES[id] || r.name,
+            shape: 'circle',
+            radius: 2.5,
+            fill: '#111',
+            stroke: '#fff',
+            strokeWidth: 1,
+            labelOffset: [4, -7], // top-right of its point (text is vertically centred on y, so -7 clears the dot)
+            labelStyle: { fontSize: '9px', fontWeight: 500, fill: '#111', haloWidth: 0, textAnchor: 'start' },
+        })
+    })
+    probe.remove()
+
+    // Keep every label (they are all highlighted regions) but stop neighbours overprinting each other: work in
+    // on-screen pixels at the current zoom and lift a colliding label up in 10px steps, always staying top-right.
+    const k = map.__lastTransform?.k || 1
+    const dot = (l) => {
+        const [px, py] = map._projection([l.x, l.y]).map((v) => v * k)
+        return { id: l.id, x0: px - 3, x1: px + 3, y0: py - 3, y1: py + 3 }
+    }
+    const dots = out.map(dot)
+    const boxes = []
+    out.sort((a, b) => map._projection([b.x, b.y])[1] - map._projection([a.x, a.y])[1]) // south to north
+    out.forEach((l) => {
+        const [px, py] = map._projection([l.x, l.y]).map((v) => v * k)
+        const w = l.label.length * 5 + 4
+        let lift = 0
+        const box = () => ({ x0: px + 4, x1: px + 4 + w, y0: py - 12 - lift, y1: py - 2 - lift })
+        const hits = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0
+        const blocked = () => boxes.some((b) => hits(box(), b)) || dots.some((d) => d.id !== l.id && hits(box(), d))
+        while (lift < 50 && blocked()) lift += 6
+        boxes.push(box())
+        l.labelOffset = [l.labelOffset[0], l.labelOffset[1] - lift]
+    })
+    return out
+}
+
+function showPlaceLabels(layout, predicate) {
+    const { map, svg } = layout
+    map.locations(regionLocations(layout, predicate))
+    svg.select('.em-locations').style('opacity', 0).transition('placelabels').duration(600).style('opacity', 1)
 }
 
 function hidePlaceLabels({ map, svg }) {
-    svg.select('#em-labels').interrupt('placelabels')
-    if (map.labels_?.labels?.length) map.labels({ labels: [] })
+    svg.select('.em-locations').interrupt('placelabels')
+    if (map.locations().length) map.clearLocations()
 }
 
 // Glide to the regions matching the predicate (or back to the full view when there is none); onEnd runs when it lands

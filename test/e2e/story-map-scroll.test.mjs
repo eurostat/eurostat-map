@@ -54,7 +54,12 @@ const snapshot = () =>
             active: [...document.querySelectorAll('.step.active')].map((s) => s.dataset.step),
             regions,
             zoom: m ? { x: +m[1], y: +m[2], k: +m[3] } : { x: 0, y: 0, k: 1 },
-            labels: document.querySelectorAll('.em-geographic-label').length,
+            labels: document.querySelectorAll('.em-location').length,
+            labelHalos: document.querySelectorAll('.em-loc-label-halo').length,
+            labelsTopRight: [...document.querySelectorAll('.em-location')].every((g) => {
+                const t = g.querySelector('text.em-loc-label')
+                return t && +t.getAttribute('x') > 0 && +t.getAttribute('y') < 0 && t.getAttribute('text-anchor') === 'start'
+            }),
             overlays: overlay.length,
             overlayOpacity: overlay.length ? num(getComputedStyle(overlay[0]).opacity) : null,
             legend: op('.em-legend'),
@@ -77,6 +82,7 @@ const zoom3 = (await snapshot()).zoom
 await go(1)
 await page.waitForTimeout(SETTLE)
 
+const expectedLabels = Object.keys(base.regions).filter(isHigh).length
 const near = (a, b, tol) => Math.abs(a - b) <= tol
 
 function check(step, s, label) {
@@ -115,7 +121,9 @@ function check(step, s, label) {
             const z = s.zoom
             if (!near(z.k, zoom3.k, 0.01) || !near(z.x, zoom3.x, 1) || !near(z.y, zoom3.y, 1))
                 f(`zoom ${JSON.stringify(z)} != reference ${JSON.stringify(zoom3)}`)
-            if (s.labels !== 9) f(`${s.labels} place labels (expected 9)`)
+            if (s.labels !== expectedLabels) f(`${s.labels} place labels (expected ${expectedLabels}, one per highlighted region)`)
+            if (s.labelHalos) f(`${s.labelHalos} label halos/backgrounds obscure the data colours`)
+            if (!s.labelsTopRight) f('a label is not to the top-right of its point')
         } else {
             if (!near(s.zoom.k, 1, 0.001) || Math.abs(s.zoom.x) > 0.5 || Math.abs(s.zoom.y) > 0.5) f(`map is zoomed on step ${step} ${JSON.stringify(s.zoom)}`)
             if (s.labels) f(`${s.labels} place labels on step ${step}`)

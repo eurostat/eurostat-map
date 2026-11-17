@@ -194,6 +194,17 @@ export function applyZoomToLabels(map) {
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
 }
 
+/**
+ * Same as applyZoomToLabels, for custom locations (points + labels) that are (re)rendered while the map is zoomed:
+ * they keep a constant screen size, so they need the inverse scale straight away.
+ * @param {MapInstance} map
+ */
+export function applyZoomToLocations(map) {
+    const t = map.__lastTransform
+    if (!t || t.k === 1) return
+    scaleLocations(t, map)
+}
+
 const panHandler = (event, map) => {
     const t = event.transform
     const cx = (map.width_ / 2 - t.x) / t.k

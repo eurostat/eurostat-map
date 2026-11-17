@@ -33,6 +33,7 @@
  */
 
 import { select } from 'd3-selection'
+import { applyZoomToLocations } from './zoom'
 
 // ─── Shape constants ───────────────────────────────────────────────────────────
 
@@ -251,6 +252,9 @@ export const updateLocations = (map) => {
                 .text(d.label)
         }
     })
+
+    // Locations rendered while the map is zoomed must get the constant-screen-size scale immediately
+    applyZoomToLocations(map)
 }
 
 // ─── Public API ────────────────────────────────────────────────────────────────
