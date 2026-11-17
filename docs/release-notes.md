@@ -1,5 +1,59 @@
 # Release notes
 
+## 4.15.0
+
+### New
+
+- **`map.zoomTo()` glides the map to a position.** It takes the same `{x, y, z}` as `position()` (omitted values keep their current value) and animates the view with a smooth zoom that zooms out and back in on long moves. `null` glides back to the initial view. Options: `duration` in ms (default 1500, `0` jumps), `ease`, and `onEnd(map)`, called when the glide completes (not when it is interrupted). It needs zoom enabled (`zoomExtent` or `zoomButtons`) and is built for scrollytelling (see the story-map example).
+
+Example:
+
+```javascript
+const map = eurostatmap.map('choropleth').zoomExtent([1, 30]).build()
+
+map.zoomTo({ x: 3900000, y: 3000000, z: 2500 }, { duration: 2000, onEnd: () => console.log('arrived') })
+map.zoomTo(null) // back to the initial view
+```
+
+### Improvements
+
+- **Rounded corners on the inset map frame, sea and clip path.** Like the legend and zoom buttons in 4.14.2, the inset rectangles now have a 5 px corner radius (`rx`/`ry`).
+
+Example:
+
+```javascript
+eurostatmap.map('choropleth').insets('default').build() // inset frames now have rounded corners
+```
+
+- **Labels rebuilt on a zoomed map match the zoom scale straight away.** Place-name labels that are re-created while the map is zoomed (for example after a data update) now get the same counter-scaling as the existing labels, instead of snapping to the wrong size until the next zoom.
+
+Example:
+
+```javascript
+map.labels({ values: true }).zoomTo({ z: 2500 }) // labels rebuilt while zoomed keep the right size
+```
+
+### Fixes
+
+- **Locations added on a zoomed map keep a constant screen size.** Points and labels from `locations()` that are (re)rendered while the map is zoomed (for example when a story-map step adds them after `zoomTo()`) used to appear at the map scale until the next zoom; they now get the inverse scale straight away. The story-map example uses this to label every highlighted region with a point and a label.
+
+Example:
+
+```javascript
+map.zoomTo({ x: 3900000, y: 3000000, z: 2500 }, {
+    onEnd: () => map.locations([{ lon: 2.35, lat: 48.85, label: 'Paris' }])
+})
+```
+
+- **Proportional-symbol regions no longer turn grey after hovering once data arrives.** When values first came back empty and a later filter change returned data, hovering a region and moving out restored a stale grey fill. The saved fill is now dropped when a region gains data.
+
+Example:
+
+```javascript
+map.stat('size', { eurostatDatasetCode: 'nama_10r_3gdp', filters: { unit: 'EUR_HAB', time: '2022' } }).updateStatValues()
+// hover-out now restores the data fill, not grey
+```
+
 ## 4.14.2
 
 ### Improvements

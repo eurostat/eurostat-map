@@ -29644,6 +29644,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateLocations: () => (/* binding */ updateLocations)
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _zoom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./zoom */ "./src/core/zoom.js");
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../types/core/locations').LocationConfig} LocationConfig */
@@ -29677,6 +29678,7 @@ __webpack_require__.r(__webpack_exports__);
  *   map.clearLocations()
  *   map.updateLocations()   // manual re-render
  */
+
 
 
 
@@ -29897,6 +29899,9 @@ const updateLocations = (map) => {
                 .text(d.label)
         }
     })
+
+    // Locations rendered while the map is zoomed must get the constant-screen-size scale immediately
+    ;(0,_zoom__WEBPACK_IMPORTED_MODULE_1__.applyZoomToLocations)(map)
 }
 
 // ─── Public API ────────────────────────────────────────────────────────────────
@@ -34292,6 +34297,7 @@ function applyNiceNumbers(thresholds, values) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   applyZoomToLabels: () => (/* binding */ applyZoomToLabels),
+/* harmony export */   applyZoomToLocations: () => (/* binding */ applyZoomToLocations),
 /* harmony export */   defineGeographicZoom: () => (/* binding */ defineGeographicZoom),
 /* harmony export */   defineMapZoom: () => (/* binding */ defineMapZoom),
 /* harmony export */   setMapView: () => (/* binding */ setMapView),
@@ -34494,6 +34500,17 @@ function applyZoomToLabels(map) {
     if (!t || t.k === 1) return
     if (map.labels_?.scaleOnZoom !== false) scaleLabelTexts(t, map)
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
+}
+
+/**
+ * Same as applyZoomToLabels, for custom locations (points + labels) that are (re)rendered while the map is zoomed:
+ * they keep a constant screen size, so they need the inverse scale straight away.
+ * @param {MapInstance} map
+ */
+function applyZoomToLocations(map) {
+    const t = map.__lastTransform
+    if (!t || t.k === 1) return
+    scaleLocations(t, map)
 }
 
 const panHandler = (event, map) => {
@@ -77262,7 +77279,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.14.2","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0"},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0"},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 
