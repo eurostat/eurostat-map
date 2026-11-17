@@ -10,3 +10,4 @@ input/
 .claude
 *.xlsx
 __pycache__/
+to-do.md
