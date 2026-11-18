@@ -76,7 +76,10 @@
         "topojson-client": "^3.1.0"
     },
     "overrides": {
-        "d3-color": "3.1.0"
+        "d3-color": "3.1.0",
+        "typedoc": {
+            "minimatch": "6.2.3"
+        }
     },
     "devDependencies": {
         "@babel/core": "^7.22.6",
