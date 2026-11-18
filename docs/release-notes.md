@@ -1,6 +1,6 @@
 # Release notes
 
-## 4.15.0 (unreleased)
+## 4.15.0
 
 ### New
 
