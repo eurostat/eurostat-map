@@ -1,12 +1,6 @@
 # Release notes
 
-## Unreleased
-
-### Fixes
-
-- **Wide tooltips keep the hovered point visible.** When the tooltip cannot fit to the left or right, shared positioning logic places it below or above the point within the visible map area. Tooltips wrap long names and cap their width at 140 px on screens up to 375 px wide.
-
-## 4.15.0
+## 4.15.0 (unreleased)
 
 ### New
 
@@ -41,7 +35,9 @@ map.labels({ values: true }).zoomTo({ z: 2500 }) // labels rebuilt while zoomed 
 
 ### Fixes
 
-- **Locations added on a zoomed map keep a constant screen size.** Points and labels from `locations()` that are (re)rendered while the map is zoomed (for example when a story-map step adds them after `zoomTo()`) used to appear at the map scale until the next zoom; they now get the inverse scale straight away. The story-map example uses this to label every highlighted region with a point and a label.
+- **Wide tooltips keep the hovered point visible.** When the tooltip cannot fit to the left or right, shared positioning logic places it below or above the point within the visible map area. Tooltips wrap long names and cap their width at 140 px on screens up to 375 px wide.
+
+- **Locations added on a zoomed map keep a constant screen size.** Points and labels from `locations()` that are (re)rendered while the map is zoomed (for example after `zoomTo()` completes) now get the inverse scale straight away.
 
 Example:
 
