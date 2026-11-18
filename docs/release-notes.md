@@ -37,6 +37,13 @@ map.labels({ values: true }).zoomTo({ z: 2500 }) // labels rebuilt while zoomed 
 
 - **Wide tooltips keep the hovered point visible.** When the tooltip cannot fit to the left or right, shared positioning logic places it below or above the point within the visible map area. Tooltips wrap long names and cap their width at 140 px on screens up to 375 px wide.
 
+Example:
+
+```javascript
+eurostatmap.map('choropleth').svgId('map').tooltip({ containerId: 'map' }).build()
+// Hover a region in a narrow map to see the tooltip move above or below the pointer when needed.
+```
+
 - **Locations added on a zoomed map keep a constant screen size.** Points and labels from `locations()` that are (re)rendered while the map is zoomed (for example after `zoomTo()` completes) now get the inverse scale straight away.
 
 Example:
