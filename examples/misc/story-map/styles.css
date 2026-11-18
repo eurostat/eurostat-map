@@ -235,6 +235,30 @@ body {
     height: 100%;
 }
 
+.story-place-labels {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+.story-place-labels text {
+    font: 600 12px system-ui, sans-serif;
+    fill: #161616;
+    stroke: #fff;
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    paint-order: stroke fill;
+}
+.story-place-labels line,
+.story-place-labels circle {
+    fill: #161616;
+    stroke: #161616;
+}
+.story-place-labels circle {
+    stroke: #fff;
+}
+
 /* Colour legend strip at the bottom of the map frame */
 .map-legend {
     padding: 12px 20px;
@@ -474,13 +498,13 @@ body {
         position: sticky;
         top: 0;
         width: 100vw;
-        height: 100vh;
+        height: 62vh;
         margin-left: 0;
         z-index: 1;
     }
 
     .map-frame {
-        height: 100vh;
+        height: 100%;
         border: none;
         border-radius: 0;
         box-shadow: none;
@@ -506,6 +530,7 @@ body {
     }
 
     .step-card {
+        top: 27vh;
         background: rgba(255, 254, 251, 0.95);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);

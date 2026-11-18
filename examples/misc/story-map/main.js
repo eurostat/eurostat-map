@@ -605,72 +605,95 @@ function showMap(layout, state, predicate, zoomPredicate) {
 
     hidePlaceLabels(layout)
     // Placenames only make sense once the map has settled on the area of interest
-    zoomToRegions(layout, zoomPredicate, zoomPredicate && predicate ? () => showPlaceLabels(layout, predicate) : undefined)
+    zoomToRegions(layout, zoomPredicate, zoomPredicate && predicate ? () => showPlaceLabels(layout, (id) => zoomPredicate(id) && predicate(id)) : undefined)
 }
 
 // NUTS names that are too long for a map label
 const SHORT_NAMES = { BE10: 'Brussels', NL42: 'Limburg', FR10: 'Île-de-France' }
 
-// A point + label (top-right of the point) for every highlighted region, shown once the zoom has landed.
-// Uses the library's locations API: no halo/background, so the data colours stay visible underneath.
-function regionLocations({ svg, map, regionData }, predicate) {
-    const probe = svg.select('.em-zoom-group').append('path').attr('visibility', 'hidden').node()
-    const out = []
-    regionData.forEach((r, id) => {
+// Project markers from the map and lay out the annotations in CSS pixels.
+function showPlaceLabels(layout, predicate) {
+    const { svg, regionData } = layout
+    const zoomGroup = svg.select('.em-zoom-group')
+    const probe = zoomGroup.append('path').attr('visibility', 'hidden').node()
+    const places = []
+    regionData.forEach((region, id) => {
         if (!predicate(id)) return
-        // geographic outline (r.mapD), not the live path, which may be a chart dot
-        probe.setAttribute('d', r.mapD)
-        const b = probe.getBBox()
-        const [x, y] = map._projection.invert([b.x + b.width / 2, b.y + b.height / 2])
-        out.push({
-            id: 'story-' + id,
-            x,
-            y,
-            label: SHORT_NAMES[id] || r.name,
-            shape: 'circle',
-            radius: 2.5,
-            fill: '#111',
-            stroke: '#fff',
-            strokeWidth: 1,
-            labelOffset: [4, -7], // top-right of its point (text is vertically centred on y, so -7 clears the dot)
-            labelStyle: { fontSize: '9px', fontWeight: 500, fill: '#111', haloWidth: 0, textAnchor: 'start' },
-        })
+        probe.setAttribute('d', region.mapD)
+        const { x, y, width, height } = probe.getBBox()
+        places.push({ id, name: SHORT_NAMES[id] || region.name, center: new DOMPoint(x + width / 2, y + height / 2) })
     })
     probe.remove()
 
-    // Keep every label (they are all highlighted regions) but stop neighbours overprinting each other: work in
-    // on-screen pixels at the current zoom and lift a colliding label up in 10px steps, always staying top-right.
-    const k = map.__lastTransform?.k || 1
-    const dot = (l) => {
-        const [px, py] = map._projection([l.x, l.y]).map((v) => v * k)
-        return { id: l.id, x0: px - 3, x1: px + 3, y0: py - 3, y1: py + 3 }
+    const overlay = window.d3.select(stage).append('svg').attr('class', 'story-place-labels')
+    const markers = overlay.append('g')
+    const labels = overlay.append('g').selectAll('text').data(places).join('text')
+        .attr('data-region', (place) => place.id)
+        .text((place) => place.name)
+
+    function positionLabels() {
+        const frame = overlay.node().getBoundingClientRect()
+        const matrix = zoomGroup.node().getScreenCTM()
+        const left = Math.max(0, -frame.left) + 6
+        const right = Math.min(frame.width, document.documentElement.clientWidth - frame.left) - 6
+        const bottom = frame.height - 6
+        const occupied = svg.selectAll('.em-legend, .em-footnote').nodes().map((node) => {
+            const rect = node.getBoundingClientRect()
+            return { x: rect.left - frame.left, y: rect.top - frame.top, w: rect.width, h: rect.height }
+        })
+        for (const place of places) {
+            const point = place.center.matrixTransform(matrix)
+            place.x = point.x - frame.left
+            place.y = point.y - frame.top
+            place.anchored = place.x >= left && place.x <= right && place.y >= 6 && place.y <= bottom
+            if (place.anchored) occupied.push({ x: place.x - 4, y: place.y - 4, w: 8, h: 8 })
+        }
+
+        labels.each(function (place) {
+            const text = this.getBBox()
+            const w = text.width + 6
+            const h = text.height + 4
+            let best
+            let bestDistance = Infinity
+            // Find the closest free rectangle to the preferred upper-right position.
+            for (let y = 6; y + h <= bottom; y += 4) {
+                for (let x = left; x + w <= right; x += 4) {
+                    const distance = (x - place.x - 5) ** 2 + (y + h - place.y + 4) ** 2
+                    if (distance >= bestDistance || occupied.some((b) => x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y)) continue
+                    best = { x, y, w, h }
+                    bestDistance = distance
+                }
+            }
+            place.box = best
+            this.style.visibility = best ? 'visible' : 'hidden'
+            if (!best) return
+            occupied.push(best)
+            this.setAttribute('transform', `translate(${best.x + 3 - text.x},${best.y + 2 - text.y})`)
+        })
+
+        const anchored = places.filter((place) => place.box && place.anchored)
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+        markers.selectAll('line').data(anchored).join('line')
+            .attr('x1', (p) => p.x).attr('y1', (p) => p.y)
+            .attr('x2', (p) => clamp(p.x, p.box.x, p.box.x + p.box.w))
+            .attr('y2', (p) => clamp(p.y, p.box.y, p.box.y + p.box.h))
+        markers.selectAll('circle').data(anchored).join('circle')
+            .attr('cx', (p) => p.x).attr('cy', (p) => p.y).attr('r', 2.5)
     }
-    const dots = out.map(dot)
-    const boxes = []
-    out.sort((a, b) => map._projection([b.x, b.y])[1] - map._projection([a.x, a.y])[1]) // south to north
-    out.forEach((l) => {
-        const [px, py] = map._projection([l.x, l.y]).map((v) => v * k)
-        const w = l.label.length * 5 + 4
-        let lift = 0
-        const box = () => ({ x0: px + 4, x1: px + 4 + w, y0: py - 12 - lift, y1: py - 2 - lift })
-        const hits = (a, b) => a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0
-        const blocked = () => boxes.some((b) => hits(box(), b)) || dots.some((d) => d.id !== l.id && hits(box(), d))
-        while (lift < 50 && blocked()) lift += 6
-        boxes.push(box())
-        l.labelOffset = [l.labelOffset[0], l.labelOffset[1] - lift]
-    })
-    return out
+
+    positionLabels()
+    const resize = new ResizeObserver(positionLabels)
+    resize.observe(stage)
+    layout.removePlaceLabels = () => {
+        resize.disconnect()
+        overlay.remove()
+    }
+    overlay.style('opacity', 0).transition().duration(600).style('opacity', 1)
 }
 
-function showPlaceLabels(layout, predicate) {
-    const { map, svg } = layout
-    map.locations(regionLocations(layout, predicate))
-    svg.select('.em-locations').style('opacity', 0).transition('placelabels').duration(600).style('opacity', 1)
-}
-
-function hidePlaceLabels({ map, svg }) {
-    svg.select('.em-locations').interrupt('placelabels')
-    if (map.locations().length) map.clearLocations()
+function hidePlaceLabels(layout) {
+    layout.removePlaceLabels?.()
+    layout.removePlaceLabels = null
 }
 
 // Glide to the regions matching the predicate (or back to the full view when there is none); onEnd runs when it lands

@@ -2,7 +2,8 @@
 // Drives the page in headless Chromium through every step pair, mid-transition reversals and random rapid
 // scrolling, then asserts the *settled* state of the map/chart matches what that step should look like.
 // Needs network (the example loads d3/flubber from a CDN), so it is not part of `npm test`.
-//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N]
+//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N] [--labels-only]
+import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { pathToFileURL } from 'node:url'
 import path from 'node:path'
@@ -29,6 +30,50 @@ await page.waitForTimeout(3000)
 
 const go = (n) => page.evaluate((n) => document.getElementById('step-' + n).scrollIntoView({ block: 'center' }), n)
 
+const labelLayout = () => page.evaluate(() => {
+    const labels = [...document.querySelectorAll('.story-place-labels text')]
+    const frame = document.querySelector('.map-stage').getBoundingClientRect()
+    const furniture = [...document.querySelectorAll('.em-legend, .em-footnote, .step.active .step-card')]
+        .map((node) => node.getBoundingClientRect())
+    const overlaps = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+    const boxes = labels.map((node) => node.getBoundingClientRect())
+    const issues = labels.flatMap((node, i) => {
+        const b = boxes[i]
+        const style = getComputedStyle(node)
+        const visible = style.visibility === 'visible' && style.fontSize === '12px'
+        const inFrame = b.left >= Math.max(0, frame.left) && b.right <= Math.min(innerWidth, frame.right)
+            && b.top >= Math.max(0, frame.top) && b.bottom <= Math.min(innerHeight, frame.bottom)
+        const clear = ![...boxes.slice(0, i), ...furniture].some((other) => overlaps(b, other))
+        return visible && inFrame && clear ? [] : [node.textContent]
+    })
+    const expected = [...document.querySelectorAll('#em-nutsrg path')]
+        .map((node) => node.__data__.properties.id)
+        .filter((id) => HIGH_VALUE(id) && ZOOM_REGIONS(id))
+        .sort()
+    return { ids: labels.map((node) => node.dataset.region).sort(), expected, issues }
+})
+
+if (args.includes('--labels-only')) {
+    try {
+        for (const [width, height] of [[1300, 800], [900, 650], [390, 844], [320, 568]]) {
+            await page.setViewportSize({ width, height })
+            await page.reload()
+            await page.waitForFunction(() => document.querySelector('.step.active'))
+            await go(3)
+            await page.waitForSelector('.story-place-labels text')
+            await page.waitForTimeout(700)
+            const { ids, expected, issues } = await labelLayout()
+            assert.ok(expected.length > 1)
+            assert.deepEqual(ids, expected)
+            assert.deepEqual(issues, [], `Clipped, overlapping, or incorrectly sized labels at ${width}×${height}`)
+            console.log(`ok   ${width}×${height}, ${ids.length} labels`)
+        }
+    } finally {
+        await browser.close()
+    }
+    process.exit(0)
+}
+
 // What the page looks like right now
 const snapshot = () =>
     page.evaluate(() => {
@@ -54,12 +99,7 @@ const snapshot = () =>
             active: [...document.querySelectorAll('.step.active')].map((s) => s.dataset.step),
             regions,
             zoom: m ? { x: +m[1], y: +m[2], k: +m[3] } : { x: 0, y: 0, k: 1 },
-            labels: document.querySelectorAll('.em-location').length,
-            labelHalos: document.querySelectorAll('.em-loc-label-halo').length,
-            labelsTopRight: [...document.querySelectorAll('.em-location')].every((g) => {
-                const t = g.querySelector('text.em-loc-label')
-                return t && +t.getAttribute('x') > 0 && +t.getAttribute('y') < 0 && t.getAttribute('text-anchor') === 'start'
-            }),
+            labels: document.querySelectorAll('.story-place-labels text').length,
             overlays: overlay.length,
             overlayOpacity: overlay.length ? num(getComputedStyle(overlay[0]).opacity) : null,
             legend: op('.em-legend'),
@@ -82,7 +122,7 @@ const zoom3 = (await snapshot()).zoom
 await go(1)
 await page.waitForTimeout(SETTLE)
 
-const expectedLabels = Object.keys(base.regions).filter(isHigh).length
+const expectedLabels = (await labelLayout()).expected.length
 const near = (a, b, tol) => Math.abs(a - b) <= tol
 
 function check(step, s, label) {
@@ -121,9 +161,7 @@ function check(step, s, label) {
             const z = s.zoom
             if (!near(z.k, zoom3.k, 0.01) || !near(z.x, zoom3.x, 1) || !near(z.y, zoom3.y, 1))
                 f(`zoom ${JSON.stringify(z)} != reference ${JSON.stringify(zoom3)}`)
-            if (s.labels !== expectedLabels) f(`${s.labels} place labels (expected ${expectedLabels}, one per highlighted region)`)
-            if (s.labelHalos) f(`${s.labelHalos} label halos/backgrounds obscure the data colours`)
-            if (!s.labelsTopRight) f('a label is not to the top-right of its point')
+            if (s.labels !== expectedLabels) f(`${s.labels} place labels (expected ${expectedLabels}, one per highlighted region in the focus area)`)
         } else {
             if (!near(s.zoom.k, 1, 0.001) || Math.abs(s.zoom.x) > 0.5 || Math.abs(s.zoom.y) > 0.5) f(`map is zoomed on step ${step} ${JSON.stringify(s.zoom)}`)
             if (s.labels) f(`${s.labels} place labels on step ${step}`)
