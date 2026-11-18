@@ -911,6 +911,15 @@ async function runScenario(browser, sc, buildDir) {
     return { snaps, pageErrors: [...new Set(pageErrors)], consoleErrors: [...new Set(consoleErrors)] }
 }
 
+function ignoreHiddenTooltipPlacement(line) {
+    if (!line.startsWith('1 <div class="em-tooltip"')) return line
+    return line.replace(/ style="([^"]*)"/, (attr, style) => {
+        if (!/(?:^|; )opacity: 0;/.test(style)) return attr
+        // Placement has its own browser test. Here the tooltip is hidden after the hover probe.
+        return ` style="${style.replace(/(?:--em-tooltip-(?:bounds-(?:width|height)|placement-height)|left|top): [^;]+; */g, '')}"`
+    })
+}
+
 function compare(name, base, cur) {
     const diffs = []
     if (!base) return [`no baseline for this scenario (run with --capture)`]
@@ -929,8 +938,8 @@ function compare(name, base, cur) {
         }
         for (const key of ['onBuildCount', 'loading']) if (J(b[key]) !== J(c[key])) diffs.push(`${where} ${key}: ${J(b[key])} -> ${J(c[key])}`)
         for (const key of ['lines', 'liveRules', 'tooltips']) {
-            const bl = b[key]
-            const cl = c[key]
+            const bl = key === 'lines' ? b[key].map(ignoreHiddenTooltipPlacement) : b[key]
+            const cl = key === 'lines' ? c[key].map(ignoreHiddenTooltipPlacement) : c[key]
             if (J(bl) === J(cl)) continue
             let shown = 0
             let count = 0
