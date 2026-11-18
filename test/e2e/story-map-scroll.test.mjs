@@ -71,8 +71,13 @@ const labelLayout = (step) => page.evaluate((step) => {
         return visible && inFrame && clear ? [] : [node.textContent]
     })
     const expected = [...document.querySelectorAll('#em-nutsrg path')]
+        .filter((node) => {
+            const b = node.getBoundingClientRect()
+            return b.left < Math.min(innerWidth, frame.right) - 6 && b.right > Math.max(0, frame.left) + 6
+                && b.top < frame.bottom - 6 && b.bottom > frame.top + 6
+        })
         .map((node) => node.__data__.properties.id)
-        .filter((id) => step === 6 ? LOW_ZOOM_REGIONS(id) : HIGH_VALUE(id) && ZOOM_REGIONS(id))
+        .filter((id) => step === 6 ? LOW_ZOOM_REGIONS(id) : HIGH_VALUE(id))
         .sort()
     return { ids: labels.map((node) => node.dataset.region).sort(), expected, issues }
 }, step)
@@ -91,6 +96,11 @@ if (args.includes('--labels-only')) {
                 const { ids, expected, issues } = await labelLayout(step)
                 assert.ok(expected.length > 1)
                 assert.deepEqual(ids, expected)
+                if (step === 3) {
+                    for (const id of ['DE71', 'DE11', 'DE60', 'DE21', 'DE30']) {
+                        assert.ok(ids.includes(id), `Missing ${id} label at ${width}×${height}`)
+                    }
+                }
                 assert.deepEqual(issues, [], `Clipped, overlapping, or incorrectly sized labels at ${width}×${height}, step ${step}`)
                 console.log(`ok   ${width}×${height}, step ${step}, ${ids.length} labels`)
             }

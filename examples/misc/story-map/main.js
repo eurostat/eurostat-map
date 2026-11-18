@@ -322,8 +322,8 @@ const nutsCountry = (id) => id.slice(0, 2)
 const HIGH_VALUE = (id) => (GDP_DATA[id] || 0) > 130
 const LOW_VALUE = (id) => GDP_DATA[id] < THRESHOLDS[0]
 
-// Area of interest for the zoom step: the Benelux, the Ruhr and Paris
-const ZOOM_REGIONS = (id) => nutsCountry(id) === 'BE' || nutsCountry(id) === 'LU' || nutsCountry(id) === 'NL' || id === 'FR10' || /^DEA[1-5]$/.test(id)
+// Frame the Benelux, Paris and the German high-value regions as far east as Berlin.
+const ZOOM_REGIONS = (id) => ['BE', 'LU', 'NL'].includes(nutsCountry(id)) || ['FR10', 'DE30'].includes(id) || /^DEA[1-5]$/.test(id)
 const LOW_ZOOM_REGIONS = (id) => LOW_VALUE(id) && ['BG', 'RO'].includes(nutsCountry(id))
 
 // ─── Scroll steps (concise demo text) ────────────────────────────────────────
@@ -355,9 +355,9 @@ const STEPS = [
     },
     {
         title: 'Zooming into a Region',
-        subtitle: 'Benelux, the Ruhr and Paris: a cluster of high-value regions',
+        subtitle: 'High-value regions around Benelux, France and Germany',
         enter: (l, s) => {
-            showMap(l, s, HIGH_VALUE, ZOOM_REGIONS)
+            showMap(l, s, HIGH_VALUE, ZOOM_REGIONS, HIGH_VALUE)
         },
         card: {
             num: '03',
@@ -632,7 +632,7 @@ function interruptAll({ svg, map }) {
  * Show the map view: optionally highlight regions (everything else is muted) and optionally
  * glide the map to the bounding box of the regions matching `zoomPredicate`.
  */
-function showMap(layout, state, predicate, zoomPredicate) {
+function showMap(layout, state, predicate, zoomPredicate, labelPredicate = zoomPredicate) {
     state.highlightPredicate = predicate
     state.zoomPredicate = zoomPredicate
 
@@ -640,7 +640,7 @@ function showMap(layout, state, predicate, zoomPredicate) {
 
     hidePlaceLabels(layout)
     // Placenames only make sense once the map has settled on the area of interest
-    zoomToRegions(layout, zoomPredicate, zoomPredicate && predicate ? () => showPlaceLabels(layout, (id) => zoomPredicate(id) && predicate(id)) : undefined)
+    zoomToRegions(layout, zoomPredicate, labelPredicate ? () => showPlaceLabels(layout, (id) => labelPredicate(id) && predicate(id)) : undefined)
 }
 
 // NUTS names that are too long for a map label
@@ -656,15 +656,19 @@ function showPlaceLabels(layout, predicate) {
         if (!predicate(id)) return
         probe.setAttribute('d', region.mapD)
         const { x, y, width, height } = probe.getBBox()
-        places.push({ id, name: SHORT_NAMES[id] || region.name, center: new DOMPoint(x + width / 2, y + height / 2) })
+        places.push({
+            id,
+            name: SHORT_NAMES[id] || region.name,
+            center: new DOMPoint(x + width / 2, y + height / 2),
+            topLeft: new DOMPoint(x, y),
+            bottomRight: new DOMPoint(x + width, y + height),
+        })
     })
     probe.remove()
 
     const overlay = window.d3.select(stage).append('svg').attr('class', 'story-place-labels')
     const markers = overlay.append('g')
-    const labels = overlay.append('g').selectAll('text').data(places).join('text')
-        .attr('data-region', (place) => place.id)
-        .text((place) => place.name)
+    const labelGroup = overlay.append('g')
 
     function positionLabels() {
         const frame = overlay.node().getBoundingClientRect()
@@ -672,18 +676,30 @@ function showPlaceLabels(layout, predicate) {
         const left = Math.max(0, -frame.left) + 6
         const right = Math.min(frame.width, document.documentElement.clientWidth - frame.left) - 6
         const bottom = frame.height - 6
-        const occupied = svg.selectAll('.em-legend, .em-footnote').nodes().map((node) => {
+        const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+        const furniture = svg.selectAll('.em-legend, .em-footnote').nodes()
+        const card = document.querySelector('.step.active .step-card')
+        if (card) furniture.push(card)
+        const occupied = furniture.map((node) => {
             const rect = node.getBoundingClientRect()
             return { x: rect.left - frame.left, y: rect.top - frame.top, w: rect.width, h: rect.height }
         })
-        for (const place of places) {
+        const visiblePlaces = places.filter((place) => {
+            const first = place.topLeft.matrixTransform(matrix)
+            const last = place.bottomRight.matrixTransform(matrix)
+            return first.x < frame.left + right && last.x > frame.left + left
+                && first.y < frame.top + bottom && last.y > frame.top + 6
+        })
+        for (const place of visiblePlaces) {
             const point = place.center.matrixTransform(matrix)
-            place.x = point.x - frame.left
-            place.y = point.y - frame.top
-            place.anchored = place.x >= left && place.x <= right && place.y >= 6 && place.y <= bottom
-            if (place.anchored) occupied.push({ x: place.x - 4, y: place.y - 4, w: 8, h: 8 })
+            place.x = clamp(point.x - frame.left, left, right)
+            place.y = clamp(point.y - frame.top, 6, bottom)
+            occupied.push({ x: place.x - 4, y: place.y - 4, w: 8, h: 8 })
         }
 
+        const labels = labelGroup.selectAll('text').data(visiblePlaces, (place) => place.id).join('text')
+            .attr('data-region', (place) => place.id)
+            .text((place) => place.name)
         labels.each(function (place) {
             const text = this.getBBox()
             const w = text.width + 6
@@ -706,8 +722,7 @@ function showPlaceLabels(layout, predicate) {
             this.setAttribute('transform', `translate(${best.x + 3 - text.x},${best.y + 2 - text.y})`)
         })
 
-        const anchored = places.filter((place) => place.box && place.anchored)
-        const clamp = (value, min, max) => Math.max(min, Math.min(max, value))
+        const anchored = visiblePlaces.filter((place) => place.box)
         markers.selectAll('line').data(anchored).join('line')
             .attr('x1', (p) => p.x).attr('y1', (p) => p.y)
             .attr('x2', (p) => clamp(p.x, p.box.x, p.box.x + p.box.w))
