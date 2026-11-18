@@ -142,7 +142,7 @@
                     <!--
                         The colour legend bar at the bottom of the panel.
                         This mirrors the choropleth classification in main.js.
-                        For the chart view it stays visible as a reference.
+                        The chart view uses its own legend for dots and squares.
                     -->
                     <div class="map-legend" id="map-legend">
                         <span class="legend-label">low</span>
@@ -155,6 +155,10 @@
                         <div class="legend-swatch" style="background: #3fa468"></div>
                         <div class="legend-swatch" style="background: #1a7a45"></div>
                         <span class="legend-end-label">high GDP index</span>
+                    </div>
+                    <div class="map-legend chart-legend" id="chart-legend" hidden>
+                        <span class="chart-legend-key"><span class="chart-legend-dot" aria-hidden="true"></span>NUTS-2 region</span>
+                        <span class="chart-legend-key"><span class="chart-legend-square" aria-hidden="true"></span>Country average</span>
                     </div>
                 </div>
             </div>

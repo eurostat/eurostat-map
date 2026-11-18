@@ -2,7 +2,7 @@
 // Drives the page in headless Chromium through every step pair, mid-transition reversals and random rapid
 // scrolling, then asserts the *settled* state of the map/chart matches what that step should look like.
 // Needs network (the example loads d3/flubber from a CDN), so it is not part of `npm test`.
-//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N] [--labels-only] [--new-stops-only] [--tooltip-only]
+//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N] [--labels-only] [--new-stops-only] [--tooltip-only] [--chart-only]
 import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { pathToFileURL } from 'node:url'
@@ -30,6 +30,58 @@ await page.waitForFunction(() => document.querySelectorAll('#em-nutsrg path').le
 await page.waitForTimeout(3000)
 
 const go = (n) => page.evaluate((n) => document.getElementById('step-' + n).scrollIntoView({ block: 'center' }), n)
+
+if (args.includes('--chart-only')) {
+    try {
+        for (const [width, height] of [[320, 568], [390, 844], [1300, 800]]) {
+            await page.setViewportSize({ width, height })
+            await page.reload()
+            await page.waitForSelector('.step.active')
+            await page.locator(`#step-${CHART_STEP}`).evaluate((node) => node.scrollIntoView({ block: 'center', behavior: 'instant' }))
+            const legend = page.locator('#chart-legend')
+            await legend.waitFor()
+            assert.match(await legend.innerText(), /NUTS-2 region\s+Country average/)
+            assert.equal(await page.locator('#map-legend').isVisible(), false)
+
+            const target = page.locator('.story-chart-average-targets [data-country="DE"]')
+            await page.mouse.move(1, 1)
+            await target.waitFor()
+            await page.waitForFunction(() => getComputedStyle(document.querySelector('.em-tooltip')).visibility === 'visible')
+            const box = await target.boundingBox()
+            await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+            const coveringElement = await legend.evaluate((node) => {
+                const { left, top, width, height } = node.getBoundingClientRect()
+                const element = document.elementFromPoint(left + width / 2, top + height / 2)
+                return node.contains(element) ? null : { top, height, element: element?.outerHTML.slice(0, 160) }
+            })
+            assert.equal(coveringElement, null, JSON.stringify(coveringElement))
+            await page.waitForFunction(() => {
+                const tooltip = document.querySelector('.em-tooltip')
+                const style = getComputedStyle(tooltip)
+                return style.visibility === 'visible' && Number(style.opacity) > 0.9 && tooltip.textContent.includes('Average of shown regions')
+            }, null, { timeout: 3000 })
+            const tooltip = page.locator('.em-tooltip')
+            assert.equal(await tooltip.locator('.em-tooltip-bar').innerText(), 'Germany')
+            const germanAverage = await page.evaluate(() => {
+                const values = [...document.querySelectorAll('#em-nutsrg path')]
+                    .map((node) => node.__data__.properties.id)
+                    .filter((id) => id.startsWith('DE') && GDP_DATA[id] != null)
+                    .map((id) => GDP_DATA[id])
+                return (values.reduce((total, value) => total + value, 0) / values.length).toFixed(1)
+            })
+            assert.equal(await tooltip.locator('.em-tooltip-text').innerText(), `Average of shown regions: ${germanAverage} (EU-27 = 100)`)
+
+            await go(7)
+            await legend.waitFor({ state: 'hidden' })
+            await target.waitFor({ state: 'detached' })
+            await page.locator('#map-legend').waitFor()
+            console.log(`ok   ${width}×${height}, country average hover and chart legend`)
+        }
+    } finally {
+        await browser.close()
+    }
+    process.exit(0)
+}
 
 if (args.includes('--tooltip-only')) {
     try {

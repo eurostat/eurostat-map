@@ -201,6 +201,7 @@ body {
  * from spilling outside the frame.
  */
 .map-stage {
+    order: 2;
     flex: 1;
     position: relative;
     overflow: hidden;
@@ -261,6 +262,7 @@ body {
 
 /* Colour legend strip at the bottom of the map frame */
 .map-legend {
+    order: 3;
     padding: 12px 20px;
     border-top: 1px solid var(--rule);
     display: flex;
@@ -272,6 +274,34 @@ body {
     font-size: 10px;
     color: var(--ink-faint);
     margin-right: 6px;
+}
+.map-legend[hidden] {
+    display: none;
+}
+.chart-legend {
+    order: 1;
+    border-top: 0;
+    border-bottom: 1px solid var(--rule);
+}
+.chart-legend-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: 12px;
+    color: var(--ink-muted);
+    font-size: 12px;
+}
+.chart-legend-dot,
+.chart-legend-square {
+    width: 9px;
+    height: 9px;
+}
+.chart-legend-dot {
+    border-radius: 50%;
+    background: var(--ink-muted);
+}
+.chart-legend-square {
+    border: 2px solid var(--chart-average-color);
 }
 .legend-swatch {
     height: 8px;
@@ -520,7 +550,7 @@ body {
 
     .step {
         margin-bottom: 65vh;
-        pointer-events: auto;
+        pointer-events: none;
     }
 
     .step:last-child {
@@ -529,6 +559,7 @@ body {
 
     .step-card {
         top: 27vh;
+        pointer-events: auto;
         background: rgba(255, 254, 251, 0.95);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
@@ -536,6 +567,10 @@ body {
         padding: 22px 26px;
         max-width: 480px;
         margin: 0 auto;
+    }
+
+    .story-container:has(.chart-legend:not([hidden])) .step:not(.active) .step-card {
+        visibility: hidden;
     }
 
     .footer {

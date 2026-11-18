@@ -313,6 +313,7 @@ const COUNTRY_NAMES = {
 const COLORS = ['#d4488f', '#e470a8', '#e8a4c4', '#f1d2e0', '#cde8d3', '#8fd3a4', '#3fa468', '#1a7a45']
 const THRESHOLDS = [50, 75, 90, 100, 110, 130, 160]
 const NO_DATA_COLOR = '#e0dbd6'
+const COUNTRY_AVERAGE_COLOR = '#1a7a45'
 
 const dotColor = (v) => {
     const i = THRESHOLDS.findIndex((t) => v < t)
@@ -415,6 +416,9 @@ const STEPS = [
 // ─── Mount point ──────────────────────────────────────────────────────────────
 
 const stage = document.querySelector('.map-stage')
+const mapLegend = document.getElementById('map-legend')
+const chartLegend = document.getElementById('chart-legend')
+chartLegend.style.setProperty('--chart-average-color', COUNTRY_AVERAGE_COLOR)
 stage.innerHTML = ''
 const mount = document.createElement('div')
 mount.id = 'eurostatmap-mount'
@@ -440,7 +444,7 @@ const _map = window.eurostatmap.map('ch', {
     classificationMethod: 'threshold',
     noDataFillStyle: NO_DATA_COLOR,
     legend: { titleText: 'GDP index (EU avg = 100)', x: 10, y: 10, boxPadding: 10 },
-    tooltip: { showFlags: false },
+    tooltip: { containerId: mount.id, showFlags: false },
     zoomButtons: false,
     zoomExtent: [1, 12], // enables the zoom behaviour that map.zoomTo() drives (user input is unbound in init)
     showSourceLink: false,
@@ -548,6 +552,7 @@ function buildLayout(svg, map) {
             mapD,
             chartX,
             chartY,
+            average: avg,
             origFill: node.getAttribute('fill___') || node.style.fill || node.getAttribute('fill') || '#e0dbd6',
             origStroke: node.style.stroke || node.getAttribute('stroke') || '#aaa',
             origStrokeWidth: node.style.strokeWidth || node.getAttribute('stroke-width') || '0.5px',
@@ -830,12 +835,15 @@ function tweenToChart(layout, state, focusCountry = null) {
     // No early return: an interrupted step can leave the geometry half-way, so every step re-applies its full target
     state.chartVisible = true
     state.focusCountry = focusCountry
+    mapLegend.hidden = true
+    chartLegend.hidden = false
 
     hidePlaceLabels(layout)
     // The chart is laid out in unzoomed coordinates: glide back out while the regions morph
     layout.map.zoomTo(null, { duration: MORPH_DURATION })
 
     const zoomGroup = svg.select('.em-zoom-group')
+    zoomGroup.select('.story-chart-average-targets').remove()
 
     // fade furniture only
     FURNITURE.forEach((sel) => svg.select(sel).transition().duration(400).style('opacity', 0))
@@ -908,8 +916,9 @@ function tweenToChart(layout, state, focusCountry = null) {
                 .ease(EASE)
                 .attrTween('d', () => interp)
                 .style('fill', 'none')
-                .style('stroke', on ? '#1a7a45' : '#bbb')
+                .style('stroke', on ? COUNTRY_AVERAGE_COLOR : '#bbb')
                 .style('stroke-width', on ? '1.8px' : '1px')
+                .style('opacity', on ? 1 : 0.2)
         } else {
             // Fade out non-active country geometries (like UK, RS, etc.)
             window.d3
@@ -935,6 +944,33 @@ function tweenToChart(layout, state, focusCountry = null) {
         .delay(MORPH_DURATION + 200)
         .duration(400)
         .style('opacity', 1)
+        .on('end', () => {
+            if (state.chartVisible) addCountryAverageTargets(layout, zoomGroup)
+        })
+}
+
+function addCountryAverageTargets({ svg, map, countryPathData }, zoomGroup) {
+    const tooltip = map._tooltip
+    const formatAverage = new Intl.NumberFormat('en', { maximumFractionDigits: 1 })
+    // Put the hit areas above the dots, including where a dot lies inside a hollow square.
+    const targets = zoomGroup.append('g').attr('class', 'story-chart-average-targets')
+    for (const [cc, { chartX, chartY, average }] of countryPathData) {
+        const { x, y } = rootToLocal(svg.node(), chartX, chartY)
+        targets.append('rect')
+            .attr('data-country', cc)
+            .attr('x', x - 4.5).attr('y', y - 4.5)
+            .attr('width', 9).attr('height', 9)
+            .attr('fill', 'transparent')
+            .on('pointerenter', (event) => {
+                tooltip?.mouseover(
+                    `<div class="em-tooltip-bar" style="background-color:${COUNTRY_AVERAGE_COLOR};color:${tooltipTextColor(COUNTRY_AVERAGE_COLOR)}"><b>${COUNTRY_NAMES[cc]}</b></div>
+                    <div class="em-tooltip-text">Average of shown regions: ${formatAverage.format(average)} (EU-27 = 100)</div>`,
+                    event
+                )
+            })
+            .on('pointermove', (event) => tooltip?.mousemove(event))
+            .on('pointerleave', () => tooltip?.mouseout())
+    }
 }
 
 function tweenToMap(layout, state) {
@@ -942,8 +978,14 @@ function tweenToMap(layout, state) {
 
     // No early return on state.chartVisible: an interrupted morph leaves shapes half-way while the flag already
     // says 'map', so we always (re)apply the full map state. Shapes already at their target are left alone.
+    if (state.chartVisible) {
+        layout.map._tooltip?.mouseout()
+        svg.select('.story-chart-average-targets').remove()
+    }
     state.chartVisible = false
     state.focusCountry = null
+    mapLegend.hidden = false
+    chartLegend.hidden = true
     let morphing = false
     const atTarget = (el, d) => el.getAttribute('d') === d
 
@@ -1118,33 +1160,6 @@ function buildAxesOverlay({ svg, svgW, svgH, margin, xScale, yCenter, countries 
             .attr('fill', focus ? '#1a7a45' : '#6b6760')
             .text(COUNTRY_NAMES[cc] || cc)
     })
-
-    // Legend
-    const [lx, ly] = [margin.left + 10, svgH - margin.bottom + 22]
-    g.append('circle').attr('cx', lx).attr('cy', ly).attr('r', 4).attr('fill', '#888780').attr('opacity', 0.7)
-    g.append('text')
-        .attr('x', lx + 9)
-        .attr('y', ly + 3.5)
-        .attr('font-size', 8.5)
-        .attr('font-family', 'DM Sans, sans-serif')
-        .attr('fill', '#888780')
-        .text('NUTS-2 region')
-    g.append('rect')
-        .attr('x', lx + 100)
-        .attr('y', ly - 4.5)
-        .attr('width', 9)
-        .attr('height', 9)
-        .attr('fill', 'none')
-        .attr('stroke', '#888780')
-        .attr('stroke-width', 1.2)
-        .attr('opacity', 0.7)
-    g.append('text')
-        .attr('x', lx + 115)
-        .attr('y', ly + 3.5)
-        .attr('font-size', 8.5)
-        .attr('font-family', 'DM Sans, sans-serif')
-        .attr('fill', '#888780')
-        .text('country average')
 
     return g
 }

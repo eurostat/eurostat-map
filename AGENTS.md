@@ -247,6 +247,13 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   `examples/scripts/example-manifest.js` output synchronized; `typeForPath()` is only the
   backward-compatible primary category.
 
+## Story-map interactions
+
+- On mobile, keep pointer events disabled on the overlaid `.step` and enable them on
+  `.step-card` only. The step's transparent area otherwise intercepts chart and map hover.
+- Set the story-map tooltip's `containerId` to its mount ID so the library can clamp its
+  position to the sticky panel while the page is scrolled.
+
 ## Built-in IMAGE insets
 
 - The `.insets('image')` preset renders each inset in a nested `<svg>`, unlike the RYB helper's
