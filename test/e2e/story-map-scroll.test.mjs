@@ -2,7 +2,7 @@
 // Drives the page in headless Chromium through every step pair, mid-transition reversals and random rapid
 // scrolling, then asserts the *settled* state of the map/chart matches what that step should look like.
 // Needs network (the example loads d3/flubber from a CDN), so it is not part of `npm test`.
-//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N] [--labels-only] [--new-stops-only]
+//   node test/e2e/story-map-scroll.test.mjs [--seed N] [--random N] [--labels-only] [--new-stops-only] [--tooltip-only]
 import assert from 'node:assert/strict'
 import { chromium } from 'playwright'
 import { pathToFileURL } from 'node:url'
@@ -30,6 +30,29 @@ await page.waitForFunction(() => document.querySelectorAll('#em-nutsrg path').le
 await page.waitForTimeout(3000)
 
 const go = (n) => page.evaluate((n) => document.getElementById('step-' + n).scrollIntoView({ block: 'center' }), n)
+
+if (args.includes('--tooltip-only')) {
+    try {
+        await go(1)
+        await page.waitForTimeout(1000)
+        const region = page.locator('#em-nutsrg path').filter({ visible: true }).first()
+        const tooltip = page.locator('.em-tooltip').first()
+        await region.dispatchEvent('mouseover')
+        await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.em-tooltip')).opacity) > 0.9)
+        await page.mouse.wheel(0, 120)
+        await tooltip.waitFor({ state: 'hidden' })
+        await page.waitForFunction(() => {
+            const style = getComputedStyle(document.querySelector('.em-tooltip'))
+            return style.visibility === 'visible' && Number(style.opacity) === 0
+        })
+        await region.dispatchEvent('mouseover')
+        await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.em-tooltip')).opacity) > 0.9)
+        console.log('ok   scrolling hides the tooltip and hover restores it')
+    } finally {
+        await browser.close()
+    }
+    process.exit(0)
+}
 
 const labelLayout = (step) => page.evaluate((step) => {
     const labels = [...document.querySelectorAll('.story-place-labels text')]

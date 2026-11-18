@@ -560,6 +560,19 @@ function init(svg, map) {
     // normally over the map. map.zoomTo() is programmatic and doesn't need them.
     svg.on('.zoom', null).style('touch-action', 'auto')
 
+    let scrollTimer
+    window.addEventListener('scroll', () => {
+        const tooltip = map._tooltip
+        if (!tooltip) return
+        tooltip.style('visibility', 'hidden')
+        clearTimeout(scrollTimer)
+        scrollTimer = setTimeout(() => {
+            // Cancel any hover triggered by the map moving under a stationary pointer.
+            tooltip.mouseout()
+            tooltip.style('opacity', 0).style('visibility', null)
+        }, 150)
+    }, { passive: true })
+
     const layout = buildLayout(svg, map)
     const stepEls = document.querySelectorAll('.step')
     const titleEl = document.getElementById('map-title')
