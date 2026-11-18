@@ -320,9 +320,11 @@ const dotColor = (v) => {
 const nutsCountry = (id) => id.slice(0, 2)
 
 const HIGH_VALUE = (id) => (GDP_DATA[id] || 0) > 130
+const LOW_VALUE = (id) => GDP_DATA[id] < THRESHOLDS[0]
 
 // Area of interest for the zoom step: the Benelux, the Ruhr and Paris
 const ZOOM_REGIONS = (id) => nutsCountry(id) === 'BE' || nutsCountry(id) === 'LU' || nutsCountry(id) === 'NL' || id === 'FR10' || /^DEA[1-5]$/.test(id)
+const LOW_ZOOM_REGIONS = (id) => LOW_VALUE(id) && ['BG', 'RO'].includes(nutsCountry(id))
 
 // ─── Scroll steps (concise demo text) ────────────────────────────────────────
 
@@ -364,13 +366,33 @@ const STEPS = [
         },
     },
     {
+        title: 'Back to the Full Map',
+        subtitle: 'All regions shown in their GDP class colours',
+        enter: (l, s) => showMap(l, s, null, null),
+    },
+    {
+        title: 'Highlighting the Lowest GDP Regions',
+        subtitle: 'Regions with a GDP index below 50 highlighted',
+        enter: (l, s) => showMap(l, s, LOW_VALUE, null),
+    },
+    {
+        title: 'Zooming into Romania and Bulgaria',
+        subtitle: 'A cluster of regions with a GDP index below 50',
+        enter: (l, s) => showMap(l, s, LOW_VALUE, LOW_ZOOM_REGIONS),
+    },
+    {
+        title: 'Back to the Full Map',
+        subtitle: 'All regions shown in their GDP class colours',
+        enter: (l, s) => showMap(l, s, null, null),
+    },
+    {
         title: 'Transitioning the Map into a Chart',
         subtitle: 'Each NUTS-2 region polygon morphs into a dot grouped by country',
         enter: (l, s) => {
             tweenToChart(l, s)
         },
         card: {
-            num: '04',
+            num: '08',
             h2: 'Map to Chart Morph',
             body: 'Finally, we morph the complex geographic boundaries of each NUTS-2 region into a standard chart. Each polygon smoothly transitions into a dot on a horizontal dot plot.',
         },
