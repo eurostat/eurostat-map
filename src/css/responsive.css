@@ -30,8 +30,8 @@
     /* Prevent the tooltip from being taller than half the screen,
        and ensure it never bleeds past either edge */
     .em-tooltip {
-        max-width: 150px;
-        max-height: 45vh;
+        --em-tooltip-max-width: min(150px, 72vw);
+        --em-tooltip-max-height: 45vh;
         /* Slightly larger shadow so it reads clearly over a map */
         box-shadow:
             0px 6px 12px rgba(0, 0, 0, 0.18),
@@ -88,7 +88,7 @@
 
 @media (max-width: 375px) {
     .em-tooltip {
-        max-width: 150px;
+        --em-tooltip-max-width: min(140px, 72vw);
         font-size: 11px;
     }
 

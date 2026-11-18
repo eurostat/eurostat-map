@@ -253,6 +253,9 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   `.step-card` only. The step's transparent area otherwise intercepts chart and map hover.
 - Set the story-map tooltip's `containerId` to its mount ID so the library can clamp its
   position to the sticky panel while the page is scrolled.
+- Keep responsive tooltip width and height caps in the CSS custom properties in
+  `src/css/responsive.css`. Setting `max-width` or `max-height` directly there overrides
+  the bounds used by `ensureTooltipOnScreen()`.
 
 ## Built-in IMAGE insets
 

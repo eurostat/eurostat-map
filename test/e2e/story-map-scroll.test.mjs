@@ -128,6 +128,34 @@ if (args.includes('--tooltip-only')) {
             assert.ok(contrast >= 4.5, `Tooltip contrast ${contrast} for ${fill}`)
         }
         console.log('ok   all eight tooltip header colours match the regions with at least 4.5:1 contrast')
+
+        await page.setViewportSize({ width: 320, height: 568 })
+        await page.reload()
+        await page.waitForSelector('.step.active')
+        await page.locator('#step-1').evaluate((node) => node.scrollIntoView({ block: 'center', behavior: 'instant' }))
+        await page.waitForTimeout(250)
+        const placements = await page.evaluate(() => {
+            const tooltip = document.querySelector('.em-tooltip')
+            const frame = document.getElementById('eurostatmap-mount').getBoundingClientRect()
+            const x = frame.left + frame.width / 2
+            const html = '<div class="em-tooltip-bar">Région de Bruxelles-Capitale / Brussels Hoofdstedelijk Gewest (BE10)</div>'
+                + '<div class="em-tooltip-text">224 (EU=100)</div>'
+            return [frame.top + 30, frame.bottom - 30].map((y) => {
+                _map._tooltip.mouseover(html, { pageX: x + scrollX, pageY: y + scrollY })
+                const box = tooltip.getBoundingClientRect()
+                return {
+                    inBounds: box.left >= frame.left && box.right <= frame.right && box.top >= frame.top && box.bottom <= frame.bottom,
+                    side: box.top > y ? 'below' : box.bottom < y ? 'above' : 'overlapping',
+                    compact: box.width <= 140 && getComputedStyle(tooltip.firstElementChild).fontSize === '12px'
+                        && getComputedStyle(tooltip.lastElementChild).fontSize === '13px',
+                }
+            })
+        })
+        assert.deepEqual(placements, [
+            { inBounds: true, side: 'below', compact: true },
+            { inBounds: true, side: 'above', compact: true },
+        ])
+        console.log('ok   long mobile tooltip stays inside the map and clear of the point')
     } finally {
         await browser.close()
     }

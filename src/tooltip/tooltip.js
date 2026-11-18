@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { placeTooltip } from './placement'
 
 /**
  * @param {*} config
@@ -21,28 +22,23 @@ export const tooltip = function (config) {
     let lastX = 0
     let lastY = 0
     let currentHtml = '' // Cache current HTML to avoid unnecessary DOM updates
-    let parentRect = null
-    let cachedParentWidth = 0
-    let cachedParentHeight = 0
-    let cachedTooltipWidth = 0
-    let cachedTooltipHeight = 0
-    let lastWindowWidth = window.innerWidth
-    let lastWindowHeight = window.innerHeight
+    let layout = null
 
     function refreshBoundsAndSize() {
-        const parent = document.getElementById(config.containerId)
-        if (!parent) return
-
-        parentRect = parent.getBoundingClientRect()
-        cachedParentWidth = parentRect.width
-        cachedParentHeight = parentRect.height
-
+        const { innerWidth, innerHeight, scrollX, scrollY } = window
+        const parentRect = document.getElementById(config.containerId)?.getBoundingClientRect()
+        const bounds = {
+            left: Math.max(0, parentRect?.left ?? 0) + scrollX,
+            top: Math.max(0, parentRect?.top ?? 0) + scrollY,
+            right: Math.min(innerWidth, parentRect?.right ?? innerWidth) + scrollX,
+            bottom: Math.min(innerHeight, parentRect?.bottom ?? innerHeight) + scrollY,
+        }
         const node = tooltip.node()
-        cachedTooltipWidth = node.clientWidth
-        cachedTooltipHeight = node.clientHeight
-
-        lastWindowWidth = window.innerWidth
-        lastWindowHeight = window.innerHeight
+        node.style.setProperty('--em-tooltip-bounds-width', Math.max(0, bounds.right - bounds.left) + 'px')
+        node.style.setProperty('--em-tooltip-bounds-height', Math.max(0, bounds.bottom - bounds.top) + 'px')
+        node.style.removeProperty('--em-tooltip-placement-height')
+        const { width, height } = node.getBoundingClientRect()
+        layout = { bounds, size: { width, height }, innerWidth, innerHeight, scrollX, scrollY }
     }
 
     function my() {
@@ -69,7 +65,6 @@ export const tooltip = function (config) {
             let y = activeEvent?.pageY || 0
             lastX = x
             lastY = y
-            if (!parentRect) refreshBoundsAndSize()
             my.ensureTooltipOnScreen(x, y)
             // Fade in
             tooltip
@@ -104,7 +99,7 @@ export const tooltip = function (config) {
         }
         // Clear HTML cache for next hover
         currentHtml = ''
-        parentRect = null
+        layout = null
         // Fade out
         tooltip.interrupt().transition().duration(config.transitionDuration).style('opacity', 0)
     }
@@ -126,32 +121,17 @@ export const tooltip = function (config) {
      * @description Prevents the tooltip from overflowing off screen
      */
     my.ensureTooltipOnScreen = function (eventX, eventY) {
-        let node = tooltip.node()
-
-        // Refresh cached layout info only when viewport changes or cache is empty.
-        if (!parentRect || window.innerWidth !== lastWindowWidth || window.innerHeight !== lastWindowHeight) {
+        const { innerWidth, innerHeight, scrollX, scrollY } = window
+        if (!layout || innerWidth !== layout.innerWidth || innerHeight !== layout.innerHeight ||
+            scrollX !== layout.scrollX || scrollY !== layout.scrollY) {
             refreshBoundsAndSize()
         }
-
-        const scrollX = window.pageXOffset || document.documentElement.scrollLeft
-        const scrollY = window.pageYOffset || document.documentElement.scrollTop
-        const minLeft = parentRect.left + scrollX
-        const maxLeft = minLeft + cachedParentWidth - cachedTooltipWidth
-        const minTop = parentRect.top + scrollY
-        const maxTop = minTop + cachedParentHeight - cachedTooltipHeight
-
-        let left = eventX + config.offset.x
-        if (left > maxLeft) {
-            left = eventX - cachedTooltipWidth - config.offset.x
-        }
-
-        let top = eventY - config.offset.y
-        if (top + cachedTooltipHeight > minTop + cachedParentHeight) {
-            top = eventY - cachedTooltipHeight - config.offset.y
-        }
-
-        node.style.left = Math.max(minLeft, Math.min(left, Math.max(minLeft, maxLeft))) + 'px'
-        node.style.top = Math.max(minTop, Math.min(top, Math.max(minTop, maxTop))) + 'px'
+        const { x, y, maxHeight } = placeTooltip(layout.bounds, layout.size, { x: eventX, y: eventY }, config.offset)
+        const node = tooltip.node()
+        if (maxHeight == null) node.style.removeProperty('--em-tooltip-placement-height')
+        else node.style.setProperty('--em-tooltip-placement-height', maxHeight + 'px')
+        node.style.left = x + 'px'
+        node.style.top = y + 'px'
     }
 
     my()

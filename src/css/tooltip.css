@@ -1,8 +1,10 @@
 .em-tooltip {
     font-family: Arial;
     color: #383838;
-    max-width: min(300px, calc(100vw - 24px));
-    max-height: min(70vh, calc(100vh - 24px));
+    width: max-content;
+    max-width: min(var(--em-tooltip-max-width, 300px), calc(100vw - 24px), var(--em-tooltip-bounds-width, 100vw));
+    max-height: min(var(--em-tooltip-max-height, 70vh), calc(100vh - 24px), var(--em-tooltip-bounds-height, 100vh), var(--em-tooltip-placement-height, 100vh));
+    overflow-wrap: anywhere;
     overflow: auto;
     background: white;
     padding: 0px;
