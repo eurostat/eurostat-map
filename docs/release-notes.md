@@ -2,16 +2,9 @@
 
 ## Unreleased
 
-### Improvements
-
-- **The story map now has eight stops.** After the high-GDP zoom, the map returns to its full view, highlights regions with a GDP index below 50, zooms into a cluster in Romania and Bulgaria, and restores the full map before morphing into the dot plot.
-- **The story map labels visible high-GDP regions in the zoomed view.** The frame includes Berlin, and labels stay at a readable size. Placement keeps them inside the map and clear of one another, the legend, and the active story card.
-- **The story-map dot plot explains its marks.** The legend identifies dots as NUTS-2 regions and squares as country averages. Hovering a square shows the country's name and the average GDP index of its plotted regions.
-
 ### Fixes
 
 - **Wide tooltips keep the hovered point visible.** When the tooltip cannot fit to the left or right, shared positioning logic places it below or above the point within the visible map area. Tooltips wrap long names and cap their width at 140 px on screens up to 375 px wide.
-- **Story-map tooltips dismiss on scroll and match the hovered region's GDP colour.** Headers use whichever of black or white gives better contrast. The tooltip reappears on the next hover after scrolling stops.
 
 ## 4.15.0
 
