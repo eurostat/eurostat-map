@@ -312,10 +312,23 @@ const COUNTRY_NAMES = {
 // Diverging around 100 (EU-27 average): a class break sits exactly at 100, 4 classes below, 4 above
 const COLORS = ['#d4488f', '#e470a8', '#e8a4c4', '#f1d2e0', '#cde8d3', '#8fd3a4', '#3fa468', '#1a7a45']
 const THRESHOLDS = [50, 75, 90, 100, 110, 130, 160]
+const NO_DATA_COLOR = '#e0dbd6'
 
 const dotColor = (v) => {
     const i = THRESHOLDS.findIndex((t) => v < t)
     return i === -1 ? COLORS[COLORS.length - 1] : COLORS[i]
+}
+
+function tooltipTextColor(background) {
+    const { r, g, b } = window.d3.rgb(background)
+    const linearize = (channel) => {
+        const s = channel / 255
+        return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+    }
+    const luminance = 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b)
+    const blackContrast = (luminance + 0.05) / 0.05
+    const whiteContrast = 1.05 / (luminance + 0.05)
+    return blackContrast >= whiteContrast ? 'black' : 'white'
 }
 const nutsCountry = (id) => id.slice(0, 2)
 
@@ -425,20 +438,9 @@ const _map = window.eurostatmap.map('ch', {
     colors: COLORS,
     thresholds: THRESHOLDS,
     classificationMethod: 'threshold',
-    noDataFillStyle: '#e0dbd6',
+    noDataFillStyle: NO_DATA_COLOR,
     legend: { titleText: 'GDP index (EU avg = 100)', x: 10, y: 10, boxPadding: 10 },
-    tooltip: {
-        showFlags: false,
-        textFunction: (region) => {
-            const id = region.properties.id
-            const val = GDP_DATA[id]
-            const name = region.properties.na || id
-            return `<div class="em-tooltip-bar"><b>${name}</b> (${id})</div>
-                    <div class="em-tooltip-text"><table class="em-tooltip-table">
-                    <tr><td>${val != null ? val + ' (EU=100)' : 'No data'}</td></tr>
-                    </table></div>`
-        },
-    },
+    tooltip: { showFlags: false },
     zoomButtons: false,
     zoomExtent: [1, 12], // enables the zoom behaviour that map.zoomTo() drives (user input is unbound in init)
     showSourceLink: false,
@@ -449,6 +451,18 @@ const _map = window.eurostatmap.map('ch', {
         }, mapInstance.transitionDuration() + 100)
     },
 })
+
+// Install the formatter after the choropleth layer registers its default.
+_map.tooltip().textFunction = (region) => {
+    const id = region.properties.id
+    const val = GDP_DATA[id]
+    const name = region.properties.na || id
+    const background = val == null ? NO_DATA_COLOR : dotColor(val)
+    return `<div class="em-tooltip-bar" style="background-color:${background};color:${tooltipTextColor(background)}"><b>${name}</b> (${id})</div>
+            <div class="em-tooltip-text"><table class="em-tooltip-table">
+            <tr><td>${val != null ? val + ' (EU=100)' : 'No data'}</td></tr>
+            </table></div>`
+}
 
 _map.statData().setData(GDP_DATA)
 _map.build()

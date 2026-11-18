@@ -48,6 +48,34 @@ if (args.includes('--tooltip-only')) {
         await region.dispatchEvent('mouseover')
         await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.em-tooltip')).opacity) > 0.9)
         console.log('ok   scrolling hides the tooltip and hover restores it')
+
+        const headers = await page.evaluate(() => {
+            const samples = new Map()
+            for (const node of document.querySelectorAll('#em-nutsrg path')) {
+                if (getComputedStyle(node).display === 'none') continue
+                const fill = node.getAttribute('fill___')
+                if (fill && !samples.has(fill)) samples.set(fill, node)
+            }
+            return [...samples].map(([fill, node]) => {
+                node.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+                const { backgroundColor, color } = getComputedStyle(document.querySelector('.em-tooltip .em-tooltip-bar'))
+                node.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+                return { fill: d3.rgb(fill).formatRgb(), backgroundColor, color }
+            })
+        })
+        assert.equal(headers.length, 8)
+        assert.deepEqual(new Set(headers.map(({ color }) => color)), new Set(['rgb(0, 0, 0)', 'rgb(255, 255, 255)']), JSON.stringify(headers))
+        for (const { fill, backgroundColor, color } of headers) {
+            assert.equal(backgroundColor, fill)
+            const [r, g, b] = backgroundColor.match(/\d+/g).map((channel) => {
+                const s = Number(channel) / 255
+                return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4
+            })
+            const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+            const contrast = color === 'rgb(0, 0, 0)' ? (luminance + 0.05) / 0.05 : 1.05 / (luminance + 0.05)
+            assert.ok(contrast >= 4.5, `Tooltip contrast ${contrast} for ${fill}`)
+        }
+        console.log('ok   all eight tooltip header colours match the regions with at least 4.5:1 contrast')
     } finally {
         await browser.close()
     }

@@ -85,6 +85,9 @@ root cause, so check for it first when a symptom looks similar:
 - `_tooltip` is created on the owning map during `build()`, after real layers are constructed, so
   do not expect `layer._tooltip` to inherit it. Interaction handlers on layers must resolve
   `layer.map._tooltip` (with the current map/inset tooltip as the first choice).
+- The choropleth decorator registers its default tooltip formatter during construction, replacing
+  a formatter supplied in the constructor config. For a single-layer choropleth example, assign
+  `map.tooltip().textFunction` after construction and before `build()`.
 
 ## `nutsLevel_ === 'mixed'` and remote stat refetches
 

@@ -410,8 +410,6 @@ body {
     box-shadow: var(--card-shadow) !important;
 }
 .em-tooltip-bar {
-    background: var(--accent) !important;
-    color: #fff !important;
     padding: 6px 10px !important;
     font-weight: 500 !important;
 }
