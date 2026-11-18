@@ -573,6 +573,16 @@ body {
         visibility: hidden;
     }
 
+    .story-container:has(.chart-legend:not([hidden])) .map-column {
+        z-index: 3;
+    }
+
+    .story-container:has(.chart-legend:not([hidden])) .step.active .step-card {
+        /* At the chart stop, place the card below the 62vh sticky panel. */
+        top: calc(12vh + 32px);
+        transform: translateY(50%);
+    }
+
     .footer {
         padding: 4rem 6vw 3rem;
         flex-direction: column;

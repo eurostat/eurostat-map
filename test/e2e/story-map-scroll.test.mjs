@@ -33,7 +33,7 @@ const go = (n) => page.evaluate((n) => document.getElementById('step-' + n).scro
 
 if (args.includes('--chart-only')) {
     try {
-        for (const [width, height] of [[320, 568], [390, 844], [1300, 800]]) {
+        for (const [width, height] of [[320, 568], [390, 844], [900, 500], [1300, 800]]) {
             await page.setViewportSize({ width, height })
             await page.reload()
             await page.waitForSelector('.step.active')
@@ -46,6 +46,21 @@ if (args.includes('--chart-only')) {
             const target = page.locator('.story-chart-average-targets [data-country="DE"]')
             await page.mouse.move(1, 1)
             await target.waitFor()
+            const clippedAxisText = await page.evaluate(() => {
+                const stage = document.querySelector('.map-stage').getBoundingClientRect()
+                const card = document.querySelector('.step.active .step-card').getBoundingClientRect()
+                const drawing = document.querySelector('.em-drawing-group')
+                const clip = document.querySelector('#em-map-clip-path rect')
+                const clipBottom = new DOMPoint(0, clip.height.baseVal.value).matrixTransform(drawing.getScreenCTM()).y
+                return [...document.querySelectorAll('#em-chart-overlay text[text-anchor="middle"]')].flatMap((label) => {
+                    const b = label.getBoundingClientRect()
+                    const covered = b.right > card.left && b.left < card.right && b.bottom > card.top && b.top < card.bottom
+                    const clipped = b.left < Math.max(0, stage.left) || b.right > Math.min(innerWidth, stage.right)
+                        || b.top < Math.max(0, stage.top) || b.bottom > Math.min(innerHeight, stage.bottom, clipBottom)
+                    return covered || clipped ? [label.textContent] : []
+                })
+            })
+            assert.deepEqual(clippedAxisText, [], `Clipped chart axis labels at ${width}×${height}`)
             await page.waitForFunction(() => getComputedStyle(document.querySelector('.em-tooltip')).visibility === 'visible')
             const box = await target.boundingBox()
             await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)

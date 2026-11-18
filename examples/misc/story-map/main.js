@@ -830,7 +830,7 @@ function rootToLocal(svgNode, x, y) {
 // ─── tweenToChart ─────────────────────────────────────────────────────────────
 
 function tweenToChart(layout, state, focusCountry = null) {
-    const { svg, svgW, regionData, countryPathData } = layout
+    const { svg, svgH, margin, regionData, countryPathData } = layout
 
     // No early return: an interrupted step can leave the geometry half-way, so every step re-applies its full target
     state.chartVisible = true
@@ -844,6 +844,14 @@ function tweenToChart(layout, state, focusCountry = null) {
 
     const zoomGroup = svg.select('.em-zoom-group')
     zoomGroup.select('.story-chart-average-targets').remove()
+    // The drawing clip excludes the map footer, and the CSS stage can be shorter still.
+    const drawing = zoomGroup.node().parentNode
+    const clip = svg.select(drawing.getAttribute('clip-path').slice(4, -1)).select('rect')
+    const stageBottom = new DOMPoint(0, stage.getBoundingClientRect().bottom)
+        .matrixTransform(drawing.getScreenCTM().inverse()).y
+    const chartBottom = Math.min(+clip.attr('height'), stageBottom) - 4
+    const scaleY = (y) => margin.top + (y - margin.top) *
+        (chartBottom - margin.top - margin.bottom) / (svgH - margin.top - margin.bottom)
 
     // fade furniture only
     FURNITURE.forEach((sel) => svg.select(sel).transition().duration(400).style('opacity', 0))
@@ -857,7 +865,7 @@ function tweenToChart(layout, state, focusCountry = null) {
 
         const on = !focusCountry || r.country === focusCountry
 
-        const local = rootToLocal(svg.node(), r.chartX, r.chartY)
+        const local = rootToLocal(svg.node(), r.chartX, scaleY(r.chartY))
 
         const DOT_R = 4
 
@@ -898,7 +906,7 @@ function tweenToChart(layout, state, focusCountry = null) {
         if (cp) {
             // Morph active country to square
             const on = !focusCountry || cc === focusCountry
-            const local = rootToLocal(svg.node(), cp.chartX, cp.chartY)
+            const local = rootToLocal(svg.node(), cp.chartX, scaleY(cp.chartY))
             const targetD = squarePath(local.x, local.y)
 
             let interp
@@ -934,7 +942,7 @@ function tweenToChart(layout, state, focusCountry = null) {
     // AXES OVERLAY INSIDE ZOOM GROUP
     // Always rebuild: a previous overlay may be half faded out
     layout.svg.select('#em-chart-overlay').interrupt('overlay').remove()
-    const overlay = buildAxesOverlay(layout)
+    const overlay = buildAxesOverlay({ ...layout, svgH: chartBottom, yCenter: (cc) => scaleY(layout.yCenter(cc)) }, focusCountry)
     layout.svg.select('.em-zoom-group').node().appendChild(overlay.node())
     overlay.lower()
 
@@ -945,17 +953,17 @@ function tweenToChart(layout, state, focusCountry = null) {
         .duration(400)
         .style('opacity', 1)
         .on('end', () => {
-            if (state.chartVisible) addCountryAverageTargets(layout, zoomGroup)
+            if (state.chartVisible) addCountryAverageTargets(layout, zoomGroup, scaleY)
         })
 }
 
-function addCountryAverageTargets({ svg, map, countryPathData }, zoomGroup) {
+function addCountryAverageTargets({ svg, map, countryPathData }, zoomGroup, scaleY) {
     const tooltip = map._tooltip
     const formatAverage = new Intl.NumberFormat('en', { maximumFractionDigits: 1 })
     // Put the hit areas above the dots, including where a dot lies inside a hollow square.
     const targets = zoomGroup.append('g').attr('class', 'story-chart-average-targets')
     for (const [cc, { chartX, chartY, average }] of countryPathData) {
-        const { x, y } = rootToLocal(svg.node(), chartX, chartY)
+        const { x, y } = rootToLocal(svg.node(), chartX, scaleY(chartY))
         targets.append('rect')
             .attr('data-country', cc)
             .attr('x', x - 4.5).attr('y', y - 4.5)
