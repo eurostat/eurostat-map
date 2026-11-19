@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Children and older adults in Europe</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            const population = {
+                eurostatDatasetCode: 'demo_pjanbroad',
+                unitText: 'people',
+            }
+
+            eurostatmap
+                .map('mushroom')
+                .nutsLevel(0)
+                .title('Children and older adults in Europe')
+                .subtitle('Population on 1 January 2025')
+                .position({ x: 4710000, y: 3550000, z: 6500 })
+                .dorling(true)
+                // Both semicircles use the same square-root scale so their areas can be compared directly.
+                .mushroomSettings({ orientation: 'horizontal', minSize: 0, maxSize: 38, colors: ['#007b83', '#a34978'] })
+                .stat('children', {
+                    ...population,
+                    label: 'Under 15',
+                    filters: { unit: 'NR', sex: 'T', age: 'Y_LT15', time: '2025' },
+                })
+                .encoding('left', { stat: 'children' })
+                .stat('olderAdults', {
+                    ...population,
+                    label: '65 and over',
+                    filters: { unit: 'NR', sex: 'T', age: 'Y_GE65', time: '2025' },
+                })
+                .encoding('right', { stat: 'olderAdults' })
+                .legend({
+                    x: 610,
+                    y: 60,
+                    sizeLegend: {
+                        title: 'Population',
+                        values: [15000000, 5000000, 1000000],
+                        labels: ['15 million', '5 million', '1 million'],
+                    },
+                    colorLegend: { labels: ['Under 15', '65 and over'] },
+                })
+                .build()
+        </script>
+        <p>
+            Source:
+            <a href="https://ec.europa.eu/eurostat/databrowser/view/demo_pjanbroad/default/table?lang=en">Eurostat (demo_pjanbroad)</a>
+        </p>
+    </body>
+</html>

@@ -56,6 +56,7 @@
         'misc/story-map/index.html',
         'multi-layer/choropleth-with-proportional-symbols.html',
         'mushroom/mushroom.html',
+        'mushroom/population-age-groups.html',
         'pie-charts/prop-piecharts.html',
         'proportional-symbols/population-change.html',
         'proportional-symbols/population-ring.html',
