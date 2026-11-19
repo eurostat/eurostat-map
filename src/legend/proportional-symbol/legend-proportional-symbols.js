@@ -32,6 +32,7 @@ export const legend = function (map, config) {
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,
         labels: null, // user-defined labels for each size
+        ringLabel: 'Share (%)',
         noData: false, // show no data legend item
         noDataText: 'No data', //no data text label
         _totalBarsHeight: 0,

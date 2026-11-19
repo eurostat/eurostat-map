@@ -418,6 +418,8 @@ map.nutsLevel(0)
 
 `ringWidth` is uniform across symbols and defaults to 3 SVG pixels. Set it to 0 to hide the ring. Set `ringTrackColor` to `'none'` to hide the track. The default tooltip includes the percentage.
 
+The size legend shows a half-filled ring on the largest circle. Set `sizeLegend.ringLabel` to describe the share, for example `map.legend({ sizeLegend: { ringLabel: 'Share of the population aged 65 and over' } })`.
+
 It is also possible to prevent overlapping via the 'dorling' method:
 
 ```javascript
@@ -1741,7 +1743,7 @@ In addition to [the default legend parameters](#map-legend), trivariate chorople
 ### Proportional symbol legends
 
 In addition to [the default legend parameters](#map-legend), proportional symbol maps have the following specific legend parameters:
-As proportional symbol maps allow for two visual variables (size and colour), a legend configuration object can be specified for each variable (sizeLegend and colorLegend).
+Use `sizeLegend` for symbol size and the percentage-ring callout, and `colorLegend` for symbol colour.
 
 | Parameter               | Type    | Default value | Description                                                                                     |
 | ----------------------- | ------- | ------------- | ----------------------------------------------------------------------------------------------- |
@@ -1770,6 +1772,7 @@ The following parameters are properties of the sizeLegend object:
 | **shapeStroke**      | String   | _undefined_                       | The stroke colour of the symbols in the size legend.                                          |
 | **shapeStrokeWidth** | Number   | _undefined_                       | The stroke width of the symbols in the size legend.                                           |
 | **labels**           | String[] | _null_                            | User-defined labels, one for each size.                                                       |
+| **ringLabel**        | String or false | _'Share (%)'_                 | Label for the half-filled ring on the largest circle when `ring` is encoded. Set to false to hide the callout and sample. |
 | **noData**           | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
 | **noDataText**       | String   | _'No data'_                       | Text shown in the 'no data' legend item in the size legend.                                   |
 

@@ -7,6 +7,7 @@ import { drawCircleSizeLegend } from '../legend-circle-size'
 import { buildSpikeLegend } from './legend-spike'
 import { buildD3SymbolItem } from './legend-d3-shape'
 import { symbolsLibrary } from '../../layers/proportional-symbol/symbols/d3-symbols'
+import { getCircleRingStatData } from '../../layers/proportional-symbol/symbols/circle-ring'
 import { getCentroidsGroup } from '../../core/geo/centroids'
 
 /**
@@ -37,7 +38,8 @@ export function drawSizeLegend(out, baseX, baseY) {
             out.sizeLegend.values,
             map.classifierSize_,
             out.sizeLegend.title,
-            out.sizeLegend.titlePadding
+            out.sizeLegend.titlePadding,
+            out.sizeLegend.ringLabel && getCircleRingStatData(map) ? map : undefined
         )
         // DO NOT return; we want No Data appended after everything
     } else if (map.psShape_ === 'spike') {

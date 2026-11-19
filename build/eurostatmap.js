@@ -47170,6 +47170,7 @@ function appendBarsToMap(map, sizeData, out, styleSource) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   appendCircleRing: () => (/* binding */ appendCircleRing),
 /* harmony export */   getCircleRingStatData: () => (/* binding */ getCircleRingStatData),
 /* harmony export */   parseCircleRingValue: () => (/* binding */ parseCircleRingValue)
 /* harmony export */ });
@@ -47183,6 +47184,28 @@ function parseCircleRingValue(value) {
 function getCircleRingStatData(layer) {
     if (layer.psShape_ !== 'circle' || layer.psCustomSVG_ || !Number.isFinite(layer.psRingWidth_) || layer.psRingWidth_ <= 0) return
     if (layer.getEncodingStat('ring')) return layer.getEncodingStatData('ring')
+}
+
+/** Append the track and the share of its circumference that is filled. */
+function appendCircleRing(parent, percentage, style, rotation = -90) {
+    const ring = parent
+        .append('g')
+        .attr('class', 'em-ps-ring')
+        .attr('aria-hidden', 'true')
+        .attr('pointer-events', 'none')
+        .attr('fill', 'none')
+        .attr('transform', `rotate(${rotation})`)
+        .attr('stroke-width', style.psRingWidth_)
+
+    ring.append('circle').attr('class', 'em-ps-ring-track').attr('stroke', style.psRingTrackColor_)
+    if (percentage > 0) {
+        ring.append('circle')
+            .attr('class', 'em-ps-ring-arc')
+            .attr('stroke', style.psRingColor_)
+            .attr('pathLength', 100)
+            .attr('stroke-dasharray', percentage === 100 ? null : `${percentage} ${100 - percentage}`)
+    }
+    return ring
 }
 
 
@@ -47256,24 +47279,7 @@ function appendCirclesToMap(map, sizeData, out, styleSource) {
                 const percentage = (0,_circle_ring__WEBPACK_IMPORTED_MODULE_2__.parseCircleRingValue)(ringData.get(d?.properties?.id)?.value)
                 if (percentage === undefined || !(setRadius(d) > 0)) return null
 
-                const ring = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
-                    .append('g')
-                    .attr('class', 'em-ps-ring')
-                    .attr('aria-hidden', 'true')
-                    .attr('pointer-events', 'none')
-                    .attr('fill', 'none')
-                    .attr('transform', 'rotate(-90)')
-                    .attr('stroke-width', thickness)
-
-                ring.append('circle').attr('class', 'em-ps-ring-track').attr('stroke', style.psRingTrackColor_)
-                if (percentage > 0) {
-                    ring.append('circle')
-                        .attr('class', 'em-ps-ring-arc')
-                        .attr('stroke', style.psRingColor_)
-                        .attr('pathLength', 100)
-                        .attr('stroke-dasharray', percentage === 100 ? null : `${percentage} ${100 - percentage}`)
-                }
-                return ring.node()
+                return (0,_circle_ring__WEBPACK_IMPORTED_MODULE_2__.appendCircleRing)((0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this), percentage, style).node()
             })
             .selectAll('circle')
         const ringRadius = (d) => setRadius(d) + thickness / 2
@@ -50611,6 +50617,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
 /* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend-utils */ "./src/legend/legend-utils.js");
+/* harmony import */ var _layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../layers/proportional-symbol/symbols/circle-ring */ "./src/layers/proportional-symbol/symbols/circle-ring.js");
+
 
 
 
@@ -50619,7 +50627,7 @@ __webpack_require__.r(__webpack_exports__);
  * @description builds a nested circle legend for proportional circles
  * @param {*} out legend object
  */
-function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePadding = 16) {
+function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePadding = 16, ringStyle) {
     //draw size legend title
     if (title) {
         const sizeLegendTitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-size-legend-title')
@@ -50662,16 +50670,19 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
     }
 
     let maxRadius = sizeScale((0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(values)) //maximum circle radius to be shown in legend
-    let x = maxRadius
-    let y = maxRadius * 2 + titlePadding // y position of the first circle
+    const ringWidth = maxRadius > 0 ? ringStyle?.psRingWidth_ || 0 : 0
+    let x = maxRadius + ringWidth
+    let y = maxRadius * 2 + titlePadding + ringWidth // y position of the first circle
 
-    const itemContainer = container
+    const circleLegend = container
         .append('g')
         .attr('transform', `translate(${x},${y})`)
         .attr('class', 'em-circle-size-legend')
         .attr('id', 'em-circle-size-legend')
         .attr('text-anchor', 'right')
         .style('fill', 'black')
+
+    const itemContainer = circleLegend
         .selectAll('g')
         .data(values.filter((d) => sizeScale(d))) // Filter data before binding
         .join('g')
@@ -50722,6 +50733,29 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
             let y = -1 - 2 * sizeScale(d)
             return y
         })
+
+    if (ringWidth) {
+        const ringRadius = maxRadius + ringWidth / 2
+        const sample = circleLegend.append('g').attr('class', 'em-ring-legend-sample').attr('transform', `translate(0,${-maxRadius})`)
+        ;(0,_layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_3__.appendCircleRing)(sample, 50, ringStyle, 90).selectAll('circle').attr('r', ringRadius)
+
+        const labelTop = ringWidth + 8
+        circleLegend
+            .append('line')
+            .attr('class', 'em-ring-legend-callout')
+            .attr('x1', -ringRadius)
+            .attr('x2', -ringRadius)
+            .attr('y1', -maxRadius)
+            .attr('y2', labelTop)
+            .attr('stroke', 'grey')
+        circleLegend
+            .append('text')
+            .attr('class', 'em-legend-label em-ring-legend-label')
+            .attr('text-anchor', 'start')
+            .attr('x', -x)
+            .attr('y', labelTop + (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-label'))
+            .text(out.sizeLegend.ringLabel)
+    }
 
     return out
 }
@@ -55382,6 +55416,7 @@ const legend = function (map, config) {
         decimals: 0, //the number of decimal for the legend labels
         labelFormatter: undefined,
         labels: null, // user-defined labels for each size
+        ringLabel: 'Share (%)',
         noData: false, // show no data legend item
         noDataText: 'No data', //no data text label
         _totalBarsHeight: 0,
@@ -55706,7 +55741,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _legend_spike__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-spike */ "./src/legend/proportional-symbol/legend-spike.js");
 /* harmony import */ var _legend_d3_shape__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./legend-d3-shape */ "./src/legend/proportional-symbol/legend-d3-shape.js");
 /* harmony import */ var _layers_proportional_symbol_symbols_d3_symbols__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../layers/proportional-symbol/symbols/d3-symbols */ "./src/layers/proportional-symbol/symbols/d3-symbols.js");
-/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../layers/proportional-symbol/symbols/circle-ring */ "./src/layers/proportional-symbol/symbols/circle-ring.js");
+/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
+
 
 
 
@@ -55746,7 +55783,8 @@ function drawSizeLegend(out, baseX, baseY) {
             out.sizeLegend.values,
             map.classifierSize_,
             out.sizeLegend.title,
-            out.sizeLegend.titlePadding
+            out.sizeLegend.titlePadding,
+            out.sizeLegend.ringLabel && (0,_layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_7__.getCircleRingStatData)(map) ? map : undefined
         )
         // DO NOT return; we want No Data appended after everything
     } else if (map.psShape_ === 'spike') {
@@ -55970,7 +56008,7 @@ function getShape(out) {
 
 function highlightPsRegions(map, ecl) {
     const layer = map.activeLayer ? map.activeLayer() : map
-    const allSymbols = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_7__.getCentroidsGroup)(layer).selectAll('[ecl]')
+    const allSymbols = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_8__.getCentroidsGroup)(layer).selectAll('[ecl]')
 
     // Set all symbols to visible
     allSymbols.each(function (d, i) {
@@ -55989,7 +56027,7 @@ function highlightPsRegions(map, ecl) {
 // Reset all regions to their original opacitys on mouseout
 function unhighlightPsRegions(map) {
     const layer = map.activeLayer ? map.activeLayer() : map
-    const allSymbols = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_7__.getCentroidsGroup)(layer).selectAll('[ecl]')
+    const allSymbols = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_8__.getCentroidsGroup)(layer).selectAll('[ecl]')
 
     // Restore each region's original opacity from the fill___ attribute
     allSymbols.each(function (d, i) {

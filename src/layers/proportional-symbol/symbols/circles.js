@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { getCentroidsGroup } from '../../../core/geo/centroids'
-import { getCircleRingStatData, parseCircleRingValue } from './circle-ring'
+import { appendCircleRing, getCircleRingStatData, parseCircleRingValue } from './circle-ring'
 /**
  * @description Appends <circle> elements for each region in the map SVG
  * @param {*} map map instance
@@ -53,24 +53,7 @@ export function appendCirclesToMap(map, sizeData, out, styleSource) {
                 const percentage = parseCircleRingValue(ringData.get(d?.properties?.id)?.value)
                 if (percentage === undefined || !(setRadius(d) > 0)) return null
 
-                const ring = select(this)
-                    .append('g')
-                    .attr('class', 'em-ps-ring')
-                    .attr('aria-hidden', 'true')
-                    .attr('pointer-events', 'none')
-                    .attr('fill', 'none')
-                    .attr('transform', 'rotate(-90)')
-                    .attr('stroke-width', thickness)
-
-                ring.append('circle').attr('class', 'em-ps-ring-track').attr('stroke', style.psRingTrackColor_)
-                if (percentage > 0) {
-                    ring.append('circle')
-                        .attr('class', 'em-ps-ring-arc')
-                        .attr('stroke', style.psRingColor_)
-                        .attr('pathLength', 100)
-                        .attr('stroke-dasharray', percentage === 100 ? null : `${percentage} ${100 - percentage}`)
-                }
-                return ring.node()
+                return appendCircleRing(select(this), percentage, style).node()
             })
             .selectAll('circle')
         const ringRadius = (d) => setRadius(d) + thickness / 2

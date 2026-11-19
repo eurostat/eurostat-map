@@ -46,6 +46,9 @@ export interface ProportionalSymbolSizeLegendConfig {
     /** User-defined labels for each size. */
     labels?: string[] | null
 
+    /** Callout label for the half-filled percentage ring on the largest circle. Set to false to hide the sample. @default 'Share (%)' */
+    ringLabel?: string | false
+
     /** Whether to show a "no data" item. @default false */
     noData?: boolean
 

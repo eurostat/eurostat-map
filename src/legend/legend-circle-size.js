@@ -1,12 +1,13 @@
 import { max } from 'd3-array'
 import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
 import { formatSizeLabel } from './legend-utils'
+import { appendCircleRing } from '../layers/proportional-symbol/symbols/circle-ring'
 
 /**
  * @description builds a nested circle legend for proportional circles
  * @param {*} out legend object
  */
-export function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePadding = 16) {
+export function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePadding = 16, ringStyle) {
     //draw size legend title
     if (title) {
         const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
@@ -49,16 +50,19 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
     }
 
     let maxRadius = sizeScale(max(values)) //maximum circle radius to be shown in legend
-    let x = maxRadius
-    let y = maxRadius * 2 + titlePadding // y position of the first circle
+    const ringWidth = maxRadius > 0 ? ringStyle?.psRingWidth_ || 0 : 0
+    let x = maxRadius + ringWidth
+    let y = maxRadius * 2 + titlePadding + ringWidth // y position of the first circle
 
-    const itemContainer = container
+    const circleLegend = container
         .append('g')
         .attr('transform', `translate(${x},${y})`)
         .attr('class', 'em-circle-size-legend')
         .attr('id', 'em-circle-size-legend')
         .attr('text-anchor', 'right')
         .style('fill', 'black')
+
+    const itemContainer = circleLegend
         .selectAll('g')
         .data(values.filter((d) => sizeScale(d))) // Filter data before binding
         .join('g')
@@ -109,6 +113,29 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
             let y = -1 - 2 * sizeScale(d)
             return y
         })
+
+    if (ringWidth) {
+        const ringRadius = maxRadius + ringWidth / 2
+        const sample = circleLegend.append('g').attr('class', 'em-ring-legend-sample').attr('transform', `translate(0,${-maxRadius})`)
+        appendCircleRing(sample, 50, ringStyle, 90).selectAll('circle').attr('r', ringRadius)
+
+        const labelTop = ringWidth + 8
+        circleLegend
+            .append('line')
+            .attr('class', 'em-ring-legend-callout')
+            .attr('x1', -ringRadius)
+            .attr('x2', -ringRadius)
+            .attr('y1', -maxRadius)
+            .attr('y2', labelTop)
+            .attr('stroke', 'grey')
+        circleLegend
+            .append('text')
+            .attr('class', 'em-legend-label em-ring-legend-label')
+            .attr('text-anchor', 'start')
+            .attr('x', -x)
+            .attr('y', labelTop + getFontSizeFromClass('em-legend-label'))
+            .text(out.sizeLegend.ringLabel)
+    }
 
     return out
 }
