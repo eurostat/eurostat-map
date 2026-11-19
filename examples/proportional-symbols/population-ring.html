@@ -19,6 +19,26 @@
                 padding: 5px;
                 font: inherit;
             }
+
+            .population-layout {
+                display: grid;
+                grid-template-columns: minmax(0, 795px) 285px;
+                align-items: start;
+                gap: 16px;
+                max-width: 1096px;
+            }
+
+            .population-layout svg {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+
+            @media (max-width: 680px) {
+                .population-layout {
+                    grid-template-columns: minmax(0, 1fr);
+                }
+            }
         </style>
     </head>
     <body>
@@ -30,7 +50,12 @@
                 <option value="naturalChange">Natural population change</option>
             </select>
         </div>
-        <svg id="map" aria-label="Population, share aged 65 and over, and life expectancy at age 65 by country"></svg>
+        <div class="population-layout">
+            <div>
+                <svg id="map" aria-label="Population, share aged 65 and over, and life expectancy at age 65 by country"></svg>
+            </div>
+            <svg id="population-legend" width="285" height="330" viewBox="0 0 285 330" aria-label="Population map legend"></svg>
+        </div>
         <script src="../../build/eurostatmap.js"></script>
         <script>
             const blues = ['#e1edf8', '#bed8ef', '#81b6db', '#4289bb', '#175583']
@@ -83,7 +108,9 @@
                 .noDataFillStyle('#9c9c9c')
                 .transitionDuration(0)
                 .insets(false)
-                .onBuild(() => {
+                .onBuild((map) => {
+                    const svg = map.svg()
+                    svg.attr('viewBox', `0 0 ${svg.attr('width')} ${svg.attr('height')}`)
                     selector.disabled = false
                 })
 
@@ -102,8 +129,7 @@
                     .encoding('color', { stat: key })
                     .psSettings({ thresholds, colors })
                     .legend({
-                        x: 10,
-                        y: 110,
+                        svgId: 'population-legend',
                         boxOpacity: 0,
                         sizeLegend: {
                             title: 'Total population',
