@@ -5,11 +5,75 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Passenger Flights</title>
         <style>
-            /* make sure the svg is visible — adjust as needed */
             html,
             body {
                 height: 100%;
                 margin: 0;
+            }
+
+            .flight-layout {
+                display: grid;
+                grid-template-columns: minmax(0, 795px) 235px;
+                grid-template-areas: 'map details';
+                align-items: start;
+                gap: 12px;
+                padding-right: 8px;
+            }
+
+            #flight-map {
+                grid-area: map;
+            }
+
+            #map {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .flight-details {
+                grid-area: details;
+                margin-top: 8px;
+                font: 14px Arial, sans-serif;
+                color: #383838;
+            }
+
+            .flight-details h2 {
+                margin: 0 0 6px;
+                font-size: 14px;
+            }
+
+            #flight-tooltip {
+                /* Keep the latest hover content visible in this panel between routes. */
+                position: static;
+                opacity: 1 !important;
+                pointer-events: auto;
+                width: 100%;
+                max-width: none;
+                height: 9rem;
+                max-height: none;
+                box-sizing: border-box;
+                overflow: auto;
+                border: 1px solid #d5d5d5;
+                border-radius: 6px;
+            }
+
+            .flight-tooltip-hint {
+                margin: 0;
+                padding: 10px;
+            }
+
+            @media (max-width: 640px) {
+                .flight-layout {
+                    grid-template-columns: minmax(0, 1fr);
+                    grid-template-areas: 'details' 'map';
+                    padding-right: 0;
+                }
+
+                .flight-details {
+                    justify-self: end;
+                    width: min(235px, calc(100% - 16px));
+                    margin-right: 8px;
+                }
             }
 
             .em-cntbn {
@@ -26,9 +90,14 @@
     </head>
 
     <body>
-        <div style="display: flex">
-            <svg id="map"></svg>
-            <!-- <svg id="legend"></svg> -->
+        <div class="flight-layout">
+            <div id="flight-map"><svg id="map"></svg></div>
+            <aside class="flight-details" aria-labelledby="flight-details-title">
+                <h2 id="flight-details-title">Flight details</h2>
+                <div id="flight-tooltip">
+                    <p class="flight-tooltip-hint">Hover over a route or airport to see passenger counts.</p>
+                </div>
+            </aside>
         </div>
 
         <script src="../../../build/eurostatmap.js"></script>
@@ -42,14 +111,10 @@
             const data = await fetch('eurostat-flight-data.json').then((r) => r.json())
             const graph = toFlowGraph(data)
 
-            // guard: get first node coords if present
-            const firstNode = graph?.nodes?.[0] ?? null
-            const posX = firstNode ? firstNode.x : 0
-            const posY = firstNode ? firstNode.y : 0
-
             // Build the map (assumes eurostatmap is available globally from your bundle)
             const map = eurostatmap
                 .map('flow')
+                .width(document.getElementById('flight-map').clientWidth)
                 .title('Passenger flights, 2024')
                 .header(true)
                 .footer(true)
@@ -90,11 +155,7 @@
 
                 .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
 
-                .tooltip({
-                    xOffset: 100,
-                    yOffset: 100,
-                })
-                //.position({ x: posX, y: posY, z: 300 })
+                .tooltip({ id: 'flight-tooltip' })
                 .labels({
                     values: false,
                     backgrounds: true,
@@ -123,6 +184,10 @@
                 .drawCoastalMargin(false)
                 .insets(false)
                 .zoomExtent([0.03, 1000])
+                .onBuild((map) => {
+                    const svg = map.svg()
+                    svg.attr('viewBox', `0 0 ${svg.attr('width')} ${svg.attr('height')}`)
+                })
                 .build()
         </script>
     </body>
