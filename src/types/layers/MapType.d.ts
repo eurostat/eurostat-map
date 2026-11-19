@@ -7,6 +7,7 @@ export type MapType =
     | 'proportionalSymbol'
     | 'proportionalSymbols'
     | 'ps'
+    | 'venn'
     | 'categorical'
     | 'ct'
     | 'bivariateChoropleth'

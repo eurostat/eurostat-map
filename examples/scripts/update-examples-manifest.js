@@ -105,6 +105,7 @@ ${stringifyPaths(paths)}
         ['Spark charts', /spark/],
         ['Stripe', /(^|[/_-])stripe([/_.-]|$)/],
         ['Trivariate', /(^|[/_-])trivariate([/_.-]|$)/],
+        ['Venn', /(^|[/_-])venn([/_.-]|$)/],
         ['Waffle', /(^|[/_-])waffle([/_.-]|$)/],
     ]
 

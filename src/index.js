@@ -4,6 +4,7 @@ import * as ProportionalSymbol from './layers/proportional-symbol/map-proportion
 import * as Categorical from './layers/map-categorical'
 import * as BivariateChoropleth from './layers/choropleth/map-choropleth-bivariate'
 import * as TrivariateChoropleth from './layers/choropleth/map-choropleth-trivariate'
+import * as Venn from './layers/proportional-symbol/map-venn'
 import * as FlowMap from './layers/flow/map-flow'
 import * as ValueByAlpha from './layers/choropleth/map-value-by-alpha'
 import * as Mushroom from './layers/proportional-symbol/mushrooms/map-mushroom.js'
@@ -65,6 +66,7 @@ export const map = function (type, config) {
         if (type == 'bivariateChoropleth' || type == 'chbi') return BivariateChoropleth.map(config)
         //trivariate choropleth
         if (type == 'trivariateChoropleth' || type == 'ternary' || type == 'chtri') return TrivariateChoropleth.map(config)
+        if (type === 'venn') return Venn.map(config)
         //stripes composition
         if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return StripeComposition.map(config)
         //composition (e.g. pie) charts

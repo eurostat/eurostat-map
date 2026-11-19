@@ -104,6 +104,7 @@
         'stripe/farm_size.html',
         'stripe/livestock_composition.html',
         'trivariate/trivariate.html',
+        'trivariate/venn.html',
         'URE/2026/gdp-change.html',
         'URE/2026/index.html',
         'URE/2026/natural-population-change.html',
@@ -175,6 +176,7 @@
         ['Spark charts', /spark/],
         ['Stripe', /(^|[/_-])stripe([/_.-]|$)/],
         ['Trivariate', /(^|[/_-])trivariate([/_.-]|$)/],
+        ['Venn', /(^|[/_-])venn([/_.-]|$)/],
         ['Waffle', /(^|[/_-])waffle([/_.-]|$)/],
     ]
 

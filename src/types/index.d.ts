@@ -17,6 +17,7 @@ import type { BivariateChoroplethConfig } from './layers/choropleth/BivariateCho
 import type { BivariateChoroplethMap } from './layers/choropleth/BivariateChoroplethMap'
 import type { TrivariateChoroplethConfig, TrivariateTernarySettings } from './layers/choropleth/TrivariateChoroplethConfig'
 import type { TrivariateChoroplethMap } from './layers/choropleth/TrivariateChoroplethMap'
+import type { VennConfig, VennMap } from './layers/proportional-symbol/VennMap'
 
 // Categorical map types
 import type { CategoricalMapConfig } from './layers/CategoricalMapConfig'
@@ -91,6 +92,8 @@ export type { ChoroplethLegendConfig } from './legend/choropleth/ChoroplethLegen
 export type { BivariateLegendConfig } from './legend/choropleth/BivariateLegendConfig'
 export type { HistogramLegendConfig } from './legend/choropleth/HistogramLegendConfig'
 export type { TrivariateLegendConfig } from './legend/choropleth/TrivariateLegendConfig'
+export type { VennLegendConfig } from './legend/proportional-symbol/VennLegendConfig'
+export type { VennConfig, VennMap, VennSettings } from './layers/proportional-symbol/VennMap'
 
 // Composition legend types
 export type { BarChartLegendConfig } from './legend/composition/BarChartLegendConfig'
@@ -210,6 +213,7 @@ export function map(type: 'proportionalSymbol' | 'proportionalSymbols' | 'ps', c
 export function map(type: 'categorical' | 'ct', config?: CategoricalMapConfig): CategoricalMap
 export function map(type: 'bivariateChoropleth' | 'chbi', config?: BivariateChoroplethConfig): BivariateChoroplethMap
 export function map(type: 'trivariateChoropleth' | 'ternary' | 'chtri', config?: TrivariateChoroplethConfig): TrivariateChoroplethMap
+export function map(type: 'venn', config?: VennConfig): VennMap
 export function map(type: 'alpha' | 'valueByAlpha', config?: ValueByAlphaConfig): ValueByAlphaMap
 export function map(type: 'coxcomb' | 'polar', config?: CoxcombMapConfig): CoxcombMap
 export function map(type: 'bar' | 'barComposition', config?: BarMapConfig): BarMap

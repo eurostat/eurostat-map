@@ -34,6 +34,7 @@ export const LAYER_ROLES = {
     // overlays
     ps: 'overlay',
     proportionalSymbol: 'overlay',
+    venn: 'overlay',
     proportionalSymbols: 'overlay',
     pie: 'overlay',
     pieChart: 'overlay',

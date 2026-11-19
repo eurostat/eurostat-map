@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Population Age Groups — Venn Map</title>
+    </head>
+    <body>
+        <svg id="map" aria-label="Venn circles showing three population age shares by NUTS 3 region"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            const ageShare = (label, indicator) => ({
+                label,
+                eurostatDatasetCode: 'demo_r_pjanind3',
+                filters: { indic_de: indicator, time: 2023, unit: 'PC' },
+                unitText: '%',
+            })
+
+            eurostatmap
+                .map('venn')
+                .title('Population age groups')
+                .subtitle('Share of residents by NUTS 3 region, 2023')
+                .nutsYear(2024)
+                .nutsLevel(3)
+                .scale('20M')
+                .insets(false)
+                .stat('young', ageShare('Aged 15–29', 'PC_Y15_29'))
+                .stat('middle', ageShare('Aged 45–64', 'PC_Y45_64'))
+                .stat('older', ageShare('Aged 65 and over', 'PC_Y65_MAX'))
+                .encoding('color', { stats: ['young', 'middle', 'older'] })
+                .vennSettings({ maxRadius: 6 })
+                .legend({
+                    position: 'top right',
+                    boxOpacity: 1,
+                    title: 'Population shares',
+                    labels: ['15–29', '45–64', '65+'],
+                    sizeValues: [30, 20, 10],
+                })
+                .build()
+        </script>
+    </body>
+</html>

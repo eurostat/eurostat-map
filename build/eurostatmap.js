@@ -29016,6 +29016,7 @@ const LAYER_ROLES = {
     // overlays
     ps: 'overlay',
     proportionalSymbol: 'overlay',
+    venn: 'overlay',
     proportionalSymbols: 'overlay',
     pie: 'overlay',
     pieChart: 'overlay',
@@ -46122,6 +46123,161 @@ const tooltipTextFunPs = function (region, layerOrMap) {
 
 /***/ },
 
+/***/ "./src/layers/proportional-symbol/map-venn.js"
+/*!****************************************************!*\
+  !*** ./src/layers/proportional-symbol/map-venn.js ***!
+  \****************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   decorateVennLayer: () => (/* binding */ decorateVennLayer),
+/* harmony export */   map: () => (/* binding */ map)
+/* harmony export */ });
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _core_scale__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/scale */ "./src/core/scale.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_proportional_symbol_legend_venn__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../legend/proportional-symbol/legend-venn */ "./src/legend/proportional-symbol/legend-venn.js");
+/* harmony import */ var _venn_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./venn-utils */ "./src/layers/proportional-symbol/venn-utils.js");
+
+
+
+
+
+
+
+
+const map = (config) => (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_0__.buildSingleLayerMap)('venn', config)
+
+function decorateVennLayer(layer, config) {
+    layer.vennSettings_ = {
+        colors: ['#00c7dd', '#f4cf18', '#e94398'],
+        maxRadius: 18,
+        maxValue: undefined,
+        opacity: 0.85,
+        ...config?.vennSettings,
+    }
+    layer.vennSettings = function (settings) {
+        if (!arguments.length) return layer.vennSettings_
+        Object.assign(layer.vennSettings_, settings)
+        return layer
+    }
+    layer.vennSeries_ = []
+    layer.vennScale_ = null
+    layer.vennTargets_ = []
+    layer.tooltip_.textFunction ??= (region) => renderTooltip(region, layer)
+
+    layer.updateClassification = function () {
+        const settings = layer.vennSettings_
+        layer.vennSeries_ = (layer.getEncodingStats('color') || []).slice(0, 3).map((key, index) => {
+            const data = layer.statData(key)
+            return { data, index, label: data?.label_ || key, color: settings.colors[index], unit: data?.unitText() || '' }
+        })
+        const maxValue = (0,_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)(settings.maxValue)
+        const values = maxValue > 0 ? [maxValue] : layer.vennSeries_.flatMap(({ data }) => data?.getArray() || []).map(_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)
+        layer.vennScale_ = (0,_core_scale__WEBPACK_IMPORTED_MODULE_3__.createSqrtScale)(values, settings.maxRadius)
+        return layer
+    }
+
+    layer.updateStyle = function () {
+        layer.vennTargets_ = []
+        const map = layer.map
+        renderSymbols(map, layer)
+        if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(map.insetTemplates_, map.svgId_, (inset) => renderSymbols(inset, layer))
+        return layer
+    }
+
+    layer.getLegendConstructor = () => _legend_proportional_symbol_legend_venn__WEBPACK_IMPORTED_MODULE_5__.legend
+    return layer
+}
+
+function renderSymbols(map, layer) {
+    if (!map.svg() || map.gridCartogram_ || !layer.vennScale_) return
+    const target = map === layer.map ? layer : map
+    let centroids = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__.getCentroidsGroup)(target)
+    if (!centroids || centroids.selectAll('g.em-centroid').empty()) {
+        (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__.addCentroidsToMap)(target)
+        centroids = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__.getCentroidsGroup)(target)
+    }
+    if (!centroids) return
+
+    const groups = centroids
+        .selectAll('g.em-centroid')
+        .selectAll('g.em-venn-symbol')
+        .data((region) => {
+            const circles = layer.vennSeries_.flatMap((series) => {
+                const radius = layer.vennScale_((0,_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)(series.data?.get(region.properties.id)?.value))
+                return radius > 0 ? [{ index: series.index, color: series.color, radius }] : []
+            })
+            return circles.length ? [{ region, circles }] : []
+        })
+        .join('g')
+        .attr('class', 'em-venn-symbol')
+        .style('isolation', 'isolate')
+        .style('cursor', 'pointer')
+    const circles = groups
+        .selectAll('circle')
+        .data(
+            ({ circles }) => circles,
+            (series) => series.index
+        )
+        .join('circle')
+        .attr('class', 'em-venn-circle')
+        .attr('r', (series) => series.radius)
+        .attr('fill', (series) => series.color)
+        .attr('fill-opacity', layer.vennSettings_.opacity)
+        .style('mix-blend-mode', 'multiply')
+        .style('opacity', null)
+    layer.vennTargets_.push(circles)
+
+    const tooltip = map._tooltip || layer.map._tooltip
+    groups
+        .on('mouseenter', function (event, { region }) {
+            if (layer.tooltip_.omitRegions?.includes(region.properties.id)) return
+            tooltip?.mouseover(layer.tooltip_.textFunction(region, map), event)
+            map.onRegionMouseOver_?.(event, region, this, map)
+        })
+        .on('mousemove', function (event, { region }) {
+            if (layer.tooltip_.omitRegions?.includes(region.properties.id)) return
+            tooltip?.mousemove(event)
+            map.onRegionMouseMove_?.(event, region, this, map)
+        })
+        .on('mouseleave', function (event, { region }) {
+            if (layer.tooltip_.omitRegions?.includes(region.properties.id)) return
+            tooltip?.mouseout()
+            map.onRegionMouseOut_?.(event, region, this, map)
+        })
+}
+
+function renderTooltip(region, layer) {
+    const container = document.createElement('div')
+    const heading = document.createElement('div')
+    heading.className = 'em-tooltip-bar'
+    const id = region.properties.id
+    heading.textContent = region.properties.na ? `${region.properties.na} (${id})` : id
+    container.append(heading)
+    const content = document.createElement('div')
+    content.className = 'em-tooltip-text'
+    for (const { data, label, unit, color } of layer.vennSeries_) {
+        const row = document.createElement('div')
+        const swatch = document.createElement('span')
+        Object.assign(swatch.style, { backgroundColor: color, display: 'inline-block', width: '0.75em', height: '0.75em', marginRight: '0.35em' })
+        const value = (0,_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)(data?.get(id)?.value)
+        const formatted = value === undefined ? layer.map.noDataText_ : [(0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.spaceAsThousandSeparator)(value), unit].filter(Boolean).join(' ')
+        row.append(swatch, `${label}: ${formatted}`)
+        content.append(row)
+    }
+    container.append(content)
+    return container.innerHTML
+}
+
+(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_1__.registerLayerType)('venn', 'overlay', decorateVennLayer)
+
+
+/***/ },
+
 /***/ "./src/layers/proportional-symbol/mushrooms/map-mushroom-interactions.js"
 /*!*******************************************************************************!*\
   !*** ./src/layers/proportional-symbol/mushrooms/map-mushroom-interactions.js ***!
@@ -47482,6 +47638,31 @@ function appendSpikesToMap(map, sizeData, out, styleSource) {
         .attr('stroke-width', style.psStrokeWidth_)
 
     return spikes
+}
+
+
+/***/ },
+
+/***/ "./src/layers/proportional-symbol/venn-utils.js"
+/*!******************************************************!*\
+  !*** ./src/layers/proportional-symbol/venn-utils.js ***!
+  \******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   parseVennValue: () => (/* binding */ parseVennValue),
+/* harmony export */   vennCircleHits: () => (/* binding */ vennCircleHits)
+/* harmony export */ });
+/** Venn circles represent non-negative magnitudes. Missing values are distinct from zero. */
+function parseVennValue(value) {
+    if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return undefined
+    const number = Number(value)
+    return Number.isFinite(number) && number >= 0 ? number : undefined
+}
+
+function vennCircleHits(centres, radius, x, y) {
+    return centres.flatMap(([cx, cy], index) => (Math.hypot(x - cx, y - cy) <= radius ? [index] : []))
 }
 
 
@@ -56034,6 +56215,168 @@ function unhighlightPsRegions(map) {
         let symbol = (0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this)
         symbol.style('opacity', layer.psFillOpacity_) // Restore original opacity for selected regions
     })
+}
+
+
+/***/ },
+
+/***/ "./src/legend/proportional-symbol/legend-venn.js"
+/*!*******************************************************!*\
+  !*** ./src/legend/proportional-symbol/legend-venn.js ***!
+  \*******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   legend: () => (/* binding */ legend)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/pointer.js");
+/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/ticks.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _layers_proportional_symbol_venn_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../layers/proportional-symbol/venn-utils */ "./src/layers/proportional-symbol/venn-utils.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
+/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../legend-utils */ "./src/legend/legend-utils.js");
+
+
+
+
+
+
+
+function legend(layer, config) {
+    const out = _legend__WEBPACK_IMPORTED_MODULE_4__.legend(layer)
+    Object.assign(out, { radius: 26, labels: undefined, sizeValues: undefined, interactive: true }, config)
+
+    out.update = function () {
+        out.updateConfig()
+        out.updateContainer()
+        if (!out.lgg.node()) return out
+
+        out.makeBackgroundBox()
+        if (out.title) out.addTitle()
+        if (out.subtitle) out.addSubtitle()
+
+        const source = out.layer
+        const series = source.vennSeries_
+        if (series.length) {
+            const content = out.lgg.append('g').attr('transform', `translate(${out.getBaseX()},${out.getBaseY()})`)
+            drawDiagram(content, out, series)
+
+            const scale = source.vennScale_
+            if (scale) {
+                const automatic = (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(0, scale.domain()[1], 3)
+                    .filter((value) => value > 0)
+                    .reverse()
+                const values = out.sizeValues || automatic
+                if (values.length) {
+                    const bounds = content.node().getBBox()
+                    const size = content.append('g').attr('transform', `translate(0,${bounds.y + bounds.height + 12})`)
+                    drawSizeSamples(size, scale, values, series[0].unit)
+                }
+            }
+        }
+        out.setBoxDimension()
+        return out
+    }
+
+    return out
+}
+
+function drawSizeSamples(container, scale, values, unit) {
+    const titleSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-size-legend-title')
+    const labelSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label')
+    const samples = values.map((value) => ({ value, radius: scale(value) })).filter(({ radius }) => radius > 0)
+    if (!samples.length) return
+
+    container
+        .append('text')
+        .attr('class', 'em-size-legend-title')
+        .attr('y', titleSize)
+        .text(unit ? `Circle area (${unit})` : 'Circle area')
+
+    const maxRadius = Math.max(...samples.map(({ radius }) => radius))
+    const baseline = titleSize + 10 + maxRadius * 2
+    let x = 0
+    for (const { value, radius } of samples) {
+        const label = container
+            .append('text')
+            .attr('class', 'em-legend-label')
+            .attr('text-anchor', 'middle')
+            .attr('y', baseline + labelSize + 4)
+            .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_5__.formatSizeLabel)(value))
+        const halfWidth = Math.max(radius, label.node().getBBox().width / 2)
+        const centre = x + halfWidth
+        label.attr('x', centre)
+        container
+            .append('circle')
+            .attr('class', 'em-venn-size-circle')
+            .attr('cx', centre)
+            .attr('cy', baseline - radius)
+            .attr('r', radius)
+            .attr('fill', 'none')
+            .attr('stroke', 'currentColor')
+        x += 2 * halfWidth + 14
+    }
+}
+
+function drawDiagram(content, out, series) {
+    const radius = out.radius
+    const separation = radius * 1.3
+    const labelSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label')
+    const yThird = radius + (separation * Math.sqrt(3)) / 2
+    const diagram = content.append('g').attr('class', 'em-venn-legend')
+    const labels = diagram
+        .selectAll('text')
+        .data(series)
+        .join('text')
+        .attr('class', 'em-legend-label')
+        .text(({ label, index }) => out.labels?.[index] ?? label)
+    const left = radius + labels.nodes()[0].getBBox().width + 8
+    const centres = [
+        [left, radius],
+        [left + separation, radius],
+        [left + separation / 2, yThird],
+    ]
+
+    const circles = diagram
+        .insert('g', 'text')
+        .style('isolation', 'isolate')
+        .selectAll('circle')
+        .data(series)
+        .join('circle')
+        .attr('class', 'em-venn-legend-circle')
+        .attr('cx', ({ index }) => centres[index][0])
+        .attr('cy', ({ index }) => centres[index][1])
+        .attr('r', radius)
+        .attr('fill', ({ color }) => color)
+        .attr('fill-opacity', out.layer.vennSettings_.opacity)
+        .style('mix-blend-mode', 'multiply')
+    labels
+        .attr('text-anchor', ({ index }) => ['end', 'start', 'middle'][index])
+        .attr('x', ({ index }) => centres[index][0] + [-radius - 8, radius + 8, 0][index])
+        .attr('y', ({ index }) => (index === 2 ? yThird + radius + labelSize + 4 : radius + labelSize / 3))
+
+    if (!out.interactive) return
+
+    function highlight(indices) {
+        circles.style('opacity', ({ index }) => (indices.length && !indices.includes(index) ? 0.25 : null))
+        for (const symbols of out.layer.vennTargets_) {
+            symbols.style('opacity', ({ index }) => (indices.length && !indices.includes(index) ? 0 : null))
+        }
+    }
+
+    diagram
+        .style('cursor', 'pointer')
+        .on('mousemove', (event) => {
+            if (event.target.classList.contains('em-legend-label')) return
+            const [x, y] = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(event, diagram.node())
+            highlight((0,_layers_proportional_symbol_venn_utils__WEBPACK_IMPORTED_MODULE_3__.vennCircleHits)(centres.slice(0, series.length), radius, x, y))
+        })
+        .on('mouseleave', () => highlight([]))
+    labels
+        .attr('tabindex', 0)
+        .on('mouseenter focus', (event, { index }) => highlight([index]))
+        .on('blur', () => highlight([]))
 }
 
 
@@ -77556,11 +77899,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getDefaultLabels: () => (/* binding */ getDefaultLabels),
 /* harmony export */   getFillPatternDefinitionFun: () => (/* binding */ getFillPatternDefinitionFun),
 /* harmony export */   getFillPatternDefinitionFunction: () => (/* binding */ getFillPatternDefinitionFunction),
-/* harmony export */   isLayerTypeRegistered: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__.isLayerTypeRegistered),
+/* harmony export */   isLayerTypeRegistered: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.isLayerTypeRegistered),
 /* harmony export */   map: () => (/* binding */ map),
-/* harmony export */   projectFromMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.projectFromMap),
-/* harmony export */   projectToMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.projectToMap),
-/* harmony export */   registerLayerType: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__.registerLayerType),
+/* harmony export */   projectFromMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__.projectFromMap),
+/* harmony export */   projectToMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__.projectToMap),
+/* harmony export */   registerLayerType: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.registerLayerType),
 /* harmony export */   version: () => (/* binding */ version)
 /* harmony export */ });
 /* harmony import */ var _css_index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./css/index.css */ "./src/css/index.css");
@@ -77569,21 +77912,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _layers_map_categorical__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./layers/map-categorical */ "./src/layers/map-categorical.js");
 /* harmony import */ var _layers_choropleth_map_choropleth_bivariate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./layers/choropleth/map-choropleth-bivariate */ "./src/layers/choropleth/map-choropleth-bivariate.js");
 /* harmony import */ var _layers_choropleth_map_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./layers/choropleth/map-choropleth-trivariate */ "./src/layers/choropleth/map-choropleth-trivariate.js");
-/* harmony import */ var _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./layers/flow/map-flow */ "./src/layers/flow/map-flow.js");
-/* harmony import */ var _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./layers/choropleth/map-value-by-alpha */ "./src/layers/choropleth/map-value-by-alpha.js");
-/* harmony import */ var _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./layers/proportional-symbol/mushrooms/map-mushroom.js */ "./src/layers/proportional-symbol/mushrooms/map-mushroom.js");
-/* harmony import */ var _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./layers/composition/map-pie */ "./src/layers/composition/map-pie.js");
-/* harmony import */ var _layers_map_spark__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./layers/map-spark */ "./src/layers/map-spark.js");
-/* harmony import */ var _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layers/composition/map-bar.js */ "./src/layers/composition/map-bar.js");
-/* harmony import */ var _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layers/composition/map-waffle.js */ "./src/layers/composition/map-waffle.js");
-/* harmony import */ var _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./layers/composition/map-coxcomb.js */ "./src/layers/composition/map-coxcomb.js");
-/* harmony import */ var _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./layers/composition/map-stripe.js */ "./src/layers/composition/map-stripe.js");
-/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./core/decoration/labels */ "./src/core/decoration/labels.js");
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
-/* harmony import */ var _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./core/geo/proj4.js */ "./src/core/geo/proj4.js");
-/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./core/layer-registry.js */ "./src/core/layer-registry.js");
-/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../package.json */ "./package.json");
+/* harmony import */ var _layers_proportional_symbol_map_venn__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./layers/proportional-symbol/map-venn */ "./src/layers/proportional-symbol/map-venn.js");
+/* harmony import */ var _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./layers/flow/map-flow */ "./src/layers/flow/map-flow.js");
+/* harmony import */ var _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./layers/choropleth/map-value-by-alpha */ "./src/layers/choropleth/map-value-by-alpha.js");
+/* harmony import */ var _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./layers/proportional-symbol/mushrooms/map-mushroom.js */ "./src/layers/proportional-symbol/mushrooms/map-mushroom.js");
+/* harmony import */ var _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./layers/composition/map-pie */ "./src/layers/composition/map-pie.js");
+/* harmony import */ var _layers_map_spark__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layers/map-spark */ "./src/layers/map-spark.js");
+/* harmony import */ var _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layers/composition/map-bar.js */ "./src/layers/composition/map-bar.js");
+/* harmony import */ var _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./layers/composition/map-waffle.js */ "./src/layers/composition/map-waffle.js");
+/* harmony import */ var _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./layers/composition/map-coxcomb.js */ "./src/layers/composition/map-coxcomb.js");
+/* harmony import */ var _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./layers/composition/map-stripe.js */ "./src/layers/composition/map-stripe.js");
+/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./core/decoration/labels */ "./src/core/decoration/labels.js");
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
+/* harmony import */ var _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./core/geo/proj4.js */ "./src/core/geo/proj4.js");
+/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./core/layer-registry.js */ "./src/core/layer-registry.js");
+/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../package.json */ "./package.json");
+
 
 
 
@@ -77607,7 +77952,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // set default d3 locale
 
-(0,d3_format__WEBPACK_IMPORTED_MODULE_17__["default"])({
+(0,d3_format__WEBPACK_IMPORTED_MODULE_18__["default"])({
     decimal: '.',
     thousands: ' ',
     grouping: [3],
@@ -77616,7 +77961,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // init proj4 with common projections and aliases
 ;
-(0,_core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.initProj4)()
+(0,_core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__.initProj4)()
 
 //types
 /** @typedef {import('./types/core/MapInstance').MapInstance} MapInstance */
@@ -77639,7 +77984,7 @@ __webpack_require__.r(__webpack_exports__);
 const map = function (type, config) {
     try {
         if (!type) {
-            return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_16__.createStatMap)(config || {}, true, undefined)
+            return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_17__.createStatMap)(config || {}, true, undefined)
         }
         //choropleth map
         if (type == 'choropleth' || type == 'ch') return _layers_choropleth_map_choropleth__WEBPACK_IMPORTED_MODULE_1__.map(config)
@@ -77651,30 +77996,31 @@ const map = function (type, config) {
         if (type == 'bivariateChoropleth' || type == 'chbi') return _layers_choropleth_map_choropleth_bivariate__WEBPACK_IMPORTED_MODULE_4__.map(config)
         //trivariate choropleth
         if (type == 'trivariateChoropleth' || type == 'ternary' || type == 'chtri') return _layers_choropleth_map_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_5__.map(config)
+        if (type === 'venn') return _layers_proportional_symbol_map_venn__WEBPACK_IMPORTED_MODULE_6__.map(config)
         //stripes composition
-        if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_14__.map(config)
+        if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_15__.map(config)
         //composition (e.g. pie) charts
-        if (type == 'pieChart' || type == 'pie' || type == 'composition') return _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_9__.map(config)
+        if (type == 'pieChart' || type == 'pie' || type == 'composition') return _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_10__.map(config)
         //sparkline maps
-        if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return _layers_map_spark__WEBPACK_IMPORTED_MODULE_10__.map(config)
+        if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return _layers_map_spark__WEBPACK_IMPORTED_MODULE_11__.map(config)
         //flow maps
-        if (type == 'flow' || type == 'flowmap') return _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_6__.map(config)
+        if (type == 'flow' || type == 'flowmap') return _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_7__.map(config)
         //coxcomb maps
-        if (type == 'coxcomb' || type == 'polar') return _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_13__.map(config)
+        if (type == 'coxcomb' || type == 'polar') return _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_14__.map(config)
         //value by alpha maps
-        if (type == 'alpha' || type == 'valueByAlpha') return _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_7__.map(config)
+        if (type == 'alpha' || type == 'valueByAlpha') return _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_8__.map(config)
         //mushroom (Cheysson )
-        if (type == 'mushroom') return _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_8__.map(config)
+        if (type == 'mushroom') return _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_9__.map(config)
         //waffle (Cheysson )
-        if (type == 'waffle') return _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_12__.map(config)
+        if (type == 'waffle') return _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_13__.map(config)
         //bar composition
-        if (type == 'bar' || type == 'barComposition') return _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_11__.map(config)
+        if (type == 'bar' || type == 'barComposition') return _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_12__.map(config)
 
         //add new map types here
         //if(type == "XX") return mapXX.map(config);
 
         console.warn(`[eurostat-map] Unknown map type: "${type}". See documentation for supported types.`)
-        return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_16__.createStatMap)(config, true, type)
+        return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_17__.createStatMap)(config, true, type)
     } catch (e) {
         console.error('Error in eurostat-map.map: ' + e.message)
         console.error(e)
@@ -77736,7 +78082,7 @@ const getFillPatternDefinitionFunction = function (opts) {
 const getFillPatternDefinitionFun = getFillPatternDefinitionFunction
 
 const getDefaultLabels = function () {
-    return _core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__.DEFAULTLABELS
+    return _core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__.DEFAULTLABELS
 }
 
 
@@ -77744,7 +78090,7 @@ const getDefaultLabels = function () {
 
 ;
 
-const version = _package_json__WEBPACK_IMPORTED_MODULE_20__.version
+const version = _package_json__WEBPACK_IMPORTED_MODULE_21__.version
 
 })();
 
