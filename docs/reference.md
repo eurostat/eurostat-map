@@ -1509,6 +1509,10 @@ const map = eurostatmap
 
 Specify the text to be shown at the bottom of the map.
 
+By default, hover over or focus **Credits** to see the boundary attribution and disclaimer.
+`map.footnoteTooltipText(false)` leaves only the attribution in the Credits tooltip.
+`map.footnote(false)` hides the label entirely.
+
 | Method                                    | Type            | Default value                   | Description                                                                                                                         |
 | ----------------------------------------- | --------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**footnote**([*value*])             | String or false | Credits                         | The footer label. Hover over or focus Credits to reveal the administrative boundary attribution. Set to false to hide the footnote. |

@@ -18,6 +18,7 @@ Here you can find the CSS classes used to style the map and its components, in c
 .em-scalebar-line
 .em-scalebar-label
 .em-footnote
+.em-credits // default Credits label
 .em-centroid
 .em-graticule
 
