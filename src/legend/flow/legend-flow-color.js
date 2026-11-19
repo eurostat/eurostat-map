@@ -1,4 +1,5 @@
-import { select, selectAll } from 'd3-selection'
+import { color } from 'd3-color'
+import { appendLegendSwatch, appendLegendSwatchLabel } from '../legend-swatch'
 
 // explain flow line colors
 export function drawFlowColorLegend(out, x, y) {
@@ -18,10 +19,10 @@ export function drawFlowColorLegend(out, x, y) {
         .text(out.flowColorLegend.title || 'Destination')
 
     let legendItems = []
-    if (typeof map.flowColor_ === 'function') {
+    const customColors = typeof map.flowColor_ === 'function'
+    if (customColors) {
         if (out.flowColorLegend.items && out.flowColorLegend.items.length > 0) {
-            // allow user-provided items; add key if provided
-            legendItems = out.flowColorLegend.items.map((d) => ({ label: d.label, color: d.color, key: d.key ?? null }))
+            legendItems = out.flowColorLegend.items
         } else {
             legendItems = [{ label: 'please specify legend items ...', color: '#888', key: null }]
         }
@@ -30,7 +31,7 @@ export function drawFlowColorLegend(out, x, y) {
         const colorScale = map.topLocationColorScale
         const topKeys = Array.from(map.topLocationKeys || [])
         legendItems = topKeys.map((key) => ({
-            key, // <<< NEW: stable key for matching
+            key,
             label: map.nodeNameMap.get(key) || key,
             color: colorScale(key),
         }))
@@ -46,62 +47,51 @@ export function drawFlowColorLegend(out, x, y) {
     const labelOffsetX = out.labelOffsets?.x ?? 5
     const titleOffset = titleBoxHeight + titlePadding
 
+    const scopedLinks = () => out.map.svg().selectAll('.em-flow-container .em-flow-link, .em-flow-container .em-flow-link-bundled')
+
     legendItems.forEach((item, i) => {
         const rowY = titleOffset + i * (shapeHeight + rowGap)
-
         const row = out._flowColorContainer
             .append('g')
             .attr('class', 'em-color-legend-item em-legend-item')
             .attr('transform', `translate(0, ${rowY})`)
-            .style('cursor', 'pointer')
-            .on('mouseover', function () {
-                highlightLines(item.key)
 
-                // bold text + stroke rect
-                select(this).select('text').style('font-weight', 'bold')
-                select(this).select('rect').attr('stroke', 'black').attr('stroke-width', 2)
+        const swatch = appendLegendSwatch(row, { x: 0, y: 0, width: shapeWidth, height: shapeHeight, color: item.color })
+        const label = appendLegendSwatchLabel(row, {
+            x: shapeWidth + labelOffsetX,
+            y: shapeHeight / 2,
+            dy: '0.35em',
+            text: item.label,
+        })
+        const colorKey = normalizeColor(item.color)
+        const matches = (link) => {
+            if (!customColors) return link.getAttribute('data-color-key') === String(item.key)
+            if (item.key != null) return link.getAttribute('data-dest') === String(item.key)
+            return normalizeColor(link.getAttribute('data-color')) === colorKey
+        }
+
+        row.style('cursor', 'pointer')
+            .on('mouseenter', () => {
+                const links = scopedLinks()
+                const matchingLinks = links.filter(function () {
+                    return matches(this)
+                })
+                if (matchingLinks.empty()) return
+
+                links.classed('highlighted', false).classed('dimmed', true)
+                matchingLinks.classed('highlighted', true).classed('dimmed', false)
+                label.style('font-weight', 'bold')
+                swatch.attr('stroke', 'black').attr('stroke-width', 2)
             })
-            .on('mouseout', function () {
-                unhighlightLines()
-
-                // reset text + rect
-                select(this).select('text').style('font-weight', 'normal')
-                select(this).select('rect').attr('stroke', 'none')
+            .on('mouseleave', () => {
+                scopedLinks().classed('highlighted', false).classed('dimmed', false)
+                label.style('font-weight', null)
+                swatch.attr('stroke', null).attr('stroke-width', null)
             })
-
-        row.append('rect')
-            .attr('class', 'em-legend-rect')
-            .attr('x', 0)
-            .attr('y', 0)
-            .attr('width', shapeWidth)
-            .attr('height', shapeHeight)
-            .attr('fill', item.color)
-
-        row.append('text')
-            .attr('x', shapeWidth + labelOffsetX)
-            .attr('y', shapeHeight * 0.5)
-            .attr('dy', '0.35em')
-            .attr('class', 'em-legend-label')
-            .text(item.label)
     })
 }
 
-function highlightLines(nodeId) {
-    if (!nodeId) return
-
-    selectAll('.em-flow-link, .em-flow-link-bundled')
-        .classed('highlighted', function () {
-            //const o = this.getAttribute('data-origin')
-            const d = this.getAttribute('data-dest')
-            return d === nodeId // destination only here
-        })
-        .classed('dimmed', function () {
-            //const o = this.getAttribute('data-origin')
-            const d = this.getAttribute('data-dest')
-            return !(d === nodeId)
-        })
-}
-
-function unhighlightLines() {
-    selectAll('.em-flow-link, .em-flow-link-bundled').classed('highlighted', false).classed('dimmed', false)
+function normalizeColor(value) {
+    const text = value?.trim()
+    return color(text)?.formatRgb() ?? text
 }

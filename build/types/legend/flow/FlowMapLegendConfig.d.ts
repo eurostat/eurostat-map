@@ -74,8 +74,8 @@ export interface FlowColorLegendConfig {
     /** Top margin for the flow color legend in pixels. @default 50 */
     marginTop?: number
 
-    /** User-defined legend items for custom flow color function. */
-    items?: Array<{ label: string; color: string }>
+    /** User-defined entries for a custom flow color function. Hover matches the destination ID if key is supplied, or the rendered color otherwise. */
+    items?: Array<{ label: string; color: string; key?: string }>
 
     /** Whether to use labels as ticks. @default false */
     ticks?: boolean

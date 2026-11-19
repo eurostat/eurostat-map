@@ -2022,7 +2022,7 @@ In addition to [the default legend parameters](#map-legend), flow maps can show 
 | **title**        | String  | _null_        | Title of the flow colour legend.                                       |
 | **titlePadding** | Number  | _0_           | Padding between the title and legend body.                             |
 | **marginTop**    | Number  | _50_          | Margin top in pixels.                                                  |
-| **items**        | Array   | _undefined_   | User-defined items `[{ label, color }]`, for a custom colour function. |
+| **items**        | Array   | _undefined_   | Entries `[{ label, color, key? }]` for a custom colour function. Hover highlights routes on this map by destination ID when a key is supplied, or by route colour otherwise. |
 | **ticks**        | Boolean | _false_       | Use the labels as ticks.                                               |
 
 **regionColorLegend**

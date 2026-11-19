@@ -1,6 +1,7 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
+import { appendLegendSwatch, appendLegendSwatchLabel } from './legend-swatch'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass, toCategoryEcl } from '../core/utils'
 import { highlightRegions, getDimmedFill } from './legend.js'
 import { getCentroidsGroup } from '../core/geo/centroids'
@@ -163,6 +164,11 @@ export function appendCategoryLegendItems(out, startY) {
     })
 }
 
+function highlightClass(map, callback, ecl) {
+    callback(map, ecl)
+    if (map.insetTemplates_) executeForAllInsets(map.insetTemplates_, map.svgId, callback, ecl)
+}
+
 /**
  * Horizontal variant of the discrete legend (orientation: 'horizontal'): one contiguous bar of
  * class swatches running low -> high from left to right, `config.width` pixels wide in total
@@ -210,22 +216,15 @@ function createHorizontalLegend(out, config) {
         const ecl = j
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
-        itemContainer
-            .append('rect')
-            .attr('class', 'em-legend-rect')
-            .attr('x', x)
-            .attr('y', titlePadding)
-            .attr('width', itemWidth)
-            .attr('height', config.shapeHeight)
-            .style('fill', classToFillStyle(ecl, n))
-            .on('mouseover', function () {
-                highlightFunction(map, ecl)
-                if (map.insetTemplates_) executeForAllInsets(map.insetTemplates_, map.svgId, highlightFunction, ecl)
-            })
-            .on('mouseout', function () {
-                unhighlightFunction(map, ecl)
-                if (map.insetTemplates_) executeForAllInsets(map.insetTemplates_, map.svgId, unhighlightFunction, ecl)
-            })
+        appendLegendSwatch(itemContainer, {
+            x,
+            y: titlePadding,
+            width: itemWidth,
+            height: config.shapeHeight,
+            color: classToFillStyle(ecl, n),
+            onEnter: () => highlightClass(map, highlightFunction, ecl),
+            onLeave: () => highlightClass(map, unhighlightFunction, ecl),
+        })
 
         if (j > 0 && !(gap && j === s)) {
             itemContainer
@@ -245,14 +244,7 @@ function createHorizontalLegend(out, config) {
                 : classifier?.invertExtent
                   ? labelFormatter(classifier.invertExtent(ecl)[out.ascending ? 0 : 1], i)
                   : ''
-            itemContainer
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', x + itemWidth / 2)
-                .attr('y', barBottom + 4)
-                .attr('dy', '0.9em')
-                .attr('text-anchor', 'middle')
-                .text(text)
+            appendLegendSwatchLabel(itemContainer, { x: x + itemWidth / 2, y: barBottom + 4, dy: '0.9em', anchor: 'middle', text })
         } else if (j < n - 1) {
             // threshold between class j and j+1
             const sx = seamX(j)
@@ -268,14 +260,7 @@ function createHorizontalLegend(out, config) {
                 : classifier?.invertExtent
                   ? labelFormatter(classifier.invertExtent(ecl)[1])
                   : ''
-            const label = itemContainer
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', sx)
-                .attr('y', labelY)
-                .attr('dy', '0.9em')
-                .attr('text-anchor', 'middle')
-                .text(text)
+            const label = appendLegendSwatchLabel(itemContainer, { x: sx, y: labelY, dy: '0.9em', anchor: 'middle', text })
             // mark the label at the divergence seam so drawHorizontalDivergence can move it
             if (hasDivergence && j + 1 === s) label.attr('class', 'em-legend-label em-legend-label-divergence')
         }
@@ -598,27 +583,15 @@ function createThresholdsLegend(out, config) {
         const itemContainer = container.append('g').attr('class', 'em-legend-item')
 
         // Append rectangle for each class
-        itemContainer
-            .append('rect')
-            .attr('class', 'em-legend-rect')
-            .attr('x', x)
-            .attr('y', y)
-            .attr('width', config.shapeWidth)
-            .attr('height', config.shapeHeight)
-            .style('fill', fillColor)
-            .on('mouseover', function () {
-                //select(this).raise().raise()
-                highlightFunction(map, ecl)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
-                }
-            })
-            .on('mouseout', function () {
-                unhighlightFunction(map, ecl)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
-                }
-            })
+        appendLegendSwatch(itemContainer, {
+            x,
+            y,
+            width: config.shapeWidth,
+            height: config.shapeHeight,
+            color: fillColor,
+            onEnter: () => highlightClass(map, highlightFunction, ecl),
+            onLeave: () => highlightClass(map, unhighlightFunction, ecl),
+        })
 
         // Append separation line
         if (i > 0) {
@@ -639,13 +612,11 @@ function createThresholdsLegend(out, config) {
         // Append label at internal boundaries
         if (i < numberOfClasses - 1) {
             // mark label so we can move it in drawDivergingLine
-            const label = itemContainer
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
-                .attr('y', y + config.shapeHeight)
-                .attr('dy', '0.3em') // ~vertical centering
-                .text(() => {
+            const label = appendLegendSwatchLabel(itemContainer, {
+                x: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
+                y: y + config.shapeHeight,
+                dy: '0.3em',
+                text: () => {
                     if (config.labels) return config.labels[i]
 
                     if (classifier?.invertExtent) {
@@ -653,7 +624,8 @@ function createThresholdsLegend(out, config) {
                         return labelFormatter(range[out.ascending ? 0 : 1])
                     }
                     return map.noDataText_ || ''
-                })
+                },
+            })
 
             // mark label so we can move it in drawDivergingLine
             if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
@@ -798,27 +770,15 @@ function createRangesLegend(out, config) {
         if (config.pointOfDivergenceLabel && i >= config.pointOfDivergence) y += config.pointOfDivergencePadding
 
         // Append rectangle
-        itemContainer
-            .append('rect')
-            .attr('class', 'em-legend-rect')
-            .attr('x', x)
-            .attr('y', y)
-            .attr('width', config.shapeWidth)
-            .attr('height', config.shapeHeight)
-            .style('fill', fillColor)
-            .on('mouseover', function () {
-                //select(this).raise()
-                highlightFunction(map, ecl)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, highlightFunction, ecl)
-                }
-            })
-            .on('mouseout', function () {
-                unhighlightFunction(map, ecl)
-                if (out.map.insetTemplates_) {
-                    executeForAllInsets(out.map.insetTemplates_, out.map.svgId, unhighlightFunction, ecl)
-                }
-            })
+        appendLegendSwatch(itemContainer, {
+            x,
+            y,
+            width: config.shapeWidth,
+            height: config.shapeHeight,
+            color: fillColor,
+            onEnter: () => highlightClass(map, highlightFunction, ecl),
+            onLeave: () => highlightClass(map, unhighlightFunction, ecl),
+        })
 
         // Append separation line
         if (i > 0) {
@@ -826,13 +786,12 @@ function createRangesLegend(out, config) {
         }
 
         // Append labels
-        itemContainer
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('x', Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0))
-            .attr('y', y + config.shapeHeight / 2)
-            .attr('dy', '0.3em')
-            .text(config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i))
+        appendLegendSwatchLabel(itemContainer, {
+            x: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
+            y: y + config.shapeHeight / 2,
+            dy: '0.3em',
+            text: config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i),
+        })
     }
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them

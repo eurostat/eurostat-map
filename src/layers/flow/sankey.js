@@ -4,6 +4,7 @@ import { select } from 'd3-selection'
 import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
 import { expandRoutesToSankeyMidpointGraph } from './flow-bidirectional.js'
 import { getResponsiveSymbolSize } from '../../core/responsive'
+import { computeColorKey } from './straight.js'
 
 // spatial sankey. Adopted from this notebook: https://observablehq.com/@bayre/deconstructed-sankey-diagram
 // See https://observablehq.com/@joewdavies/flow-map-of-europe
@@ -159,7 +160,9 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
 
     links.forEach((link, i) => {
         const dCenter = linkPath(link)
-        const colorKey = computeColorKey(out, link)
+        const originId = link.originId ?? link.source.id
+        const destId = link.destId ?? link.target.id
+        const colorKey = computeColorKey(out, originId, destId) ?? destId
         const baseColor = getFlowStroke(out, link)
         const paint = usesGradient ? `url(#${gradientIds[i]})` : baseColor
         const outlineWidth = getResponsiveSymbolSize(out.flowOutlineWidth_, 0)
@@ -208,6 +211,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
             .attr('fill', paint)
             .attr('class', 'em-flow-link em-flow-link-tapered')
             .attr('data-color-key', colorKey)
+            .attr('data-dest', destId)
             .attr('data-color', baseColor)
             .attr('data-link-index', i)
             .attr('data-center-path', dCenter) // ← store center path
@@ -227,13 +231,6 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
 function buildFlowsGroup(container, out) {
     return container.append('g').attr('class', 'em-flow-lines').attr('id', 'em-flow-lines').style('opacity', out.flowOpacity_)
 }
-
-function computeColorKey(out, link) {
-    // Stable key used by legend hover
-    if (out.topLocationKeys && out.topLocationKeys.has?.(link?.target?.id)) return link.target.id
-    return link?.target?.id ?? link?.source?.id ?? 'Other'
-}
-
 function addMouseEvents(out, mainSel, ctx) {
     const { usesGradient, paint, link } = ctx
 

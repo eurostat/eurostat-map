@@ -121,6 +121,9 @@ the regions that end up with a classified/sized value from whatever data was jus
 - Generic legends constructed for a real layer normalize their references as `legend.map` (the
   owning map/services) and `legend.layer` (the thematic state). Type-specific legends must read
   classifier, scale, date, color, and other decorator-owned state from `legend.layer`.
+- Discrete colour legends share the SVG swatch and label renderer in `src/legend/legend-swatch.js`.
+  Scope flow legend highlights to the owning SVG and match custom colour entries against the stable
+  `data-color` on each route. Route hover and gradients can change the visible fill or stroke.
 - `stat()` and `statData()` remain map-owned to avoid map-to-layer forwarding recursion. A layer
   that needs to expand a special one-object stat config (spark's `dates`, for example) must expose
   an own `handleStatConfig` hook; do not override `layer.stat()` and expect the public map facade
