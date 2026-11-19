@@ -2089,6 +2089,11 @@ a text {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.em-credits {
+    cursor: help;
+    text-decoration: underline;
+}
+
 .em-map.em-draggable g {
     cursor: grab;
 }
@@ -24456,6 +24461,7 @@ function wrapTextForMobile(textSelection, out, x) {
 const addFootnote = function (out) {
     const wrap = out.footnoteWrap_ || Infinity // e.g. user sets map.footnoteWrap(500)
     const text = out.footnote_ || ''
+    const isCredits = text === out.defaultFootnote_
 
     // In header mode, root-level elements must be shifted down by header height.
     let headerOffset = 0
@@ -24552,19 +24558,36 @@ const addFootnote = function (out) {
     // last line
     appendLine(line)
 
-    // --- Tooltip logic ---
-    foot.on('mouseover', function () {
-        out._tooltip.mw___ = out._tooltip.style('max-width')
-        out._tooltip.style('max-width', '400px')
-        if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_)
-    })
-        .on('mousemove', function (e) {
-            if (out.footnoteTooltipText_) out._tooltip.mousemove(e)
+    const attribution = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+
+    if (isCredits) {
+        foot.classed('em-credits', true).attr('tabindex', 0).attr('aria-label', `Credits. ${attribution}`)
+        if (!out._tooltip) foot.append('title').text(attribution)
+    }
+
+    if (!out._tooltip) return out
+
+    const tooltip = out._tooltip
+    const showTooltip = (event) => {
+        const disclaimer = out.footnoteTooltipText_ || ''
+        const content = isCredits ? `<div class="em-footnote-tooltip">${attribution}</div>${disclaimer}` : disclaimer
+        if (content) tooltip.mouseover(content, event)
+    }
+    const hideTooltip = () => tooltip.mouseout()
+
+    foot.on('mouseenter', showTooltip)
+        .on('mousemove', (event) => tooltip.mousemove(event))
+        .on('mouseleave', hideTooltip)
+
+    if (isCredits) {
+        foot.on('focus', function () {
+            const { left, top } = this.getBoundingClientRect()
+            showTooltip({ pageX: left + window.scrollX, pageY: top + window.scrollY })
+        }).on('blur', hideTooltip)
+        foot.on('keydown', (event) => {
+            if (event.key === 'Escape') hideTooltip()
         })
-        .on('mouseout', function () {
-            if (out.footnoteTooltipText_) out._tooltip.mouseout()
-            out._tooltip.style('max-width', out._tooltip.mw___)
-        })
+    }
 
     return out
 }
@@ -30255,11 +30278,11 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     //dataset source link
     out.showSourceLink_ = true
 
-    //default copyright and disclaimer text
-    out.defaultFootnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+    // Default credits label and disclaimer text
+    out.defaultFootnote_ = 'Credits'
     out.defaultFootnoteTooltipText_ =
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
-    out.footnote_ = out.defaultFootnote_ //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
+    out.footnote_ = out.defaultFootnote_
     out.footnoteTooltipText_ = out.defaultFootnoteTooltipText_
     out.footnoteWrap_ = false //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined
@@ -45652,16 +45675,16 @@ const decorateProportionalSymbolLayer = function (layer, config) {
             // append symbols to centroids
             let symb
             if (layer.psCustomSVG_) {
-                symb = (0,_symbols_custom_js__WEBPACK_IMPORTED_MODULE_17__.appendCustomSymbolsToMap)(map, sizeData, symbolTarget)
+                symb = (0,_symbols_custom_js__WEBPACK_IMPORTED_MODULE_17__.appendCustomSymbolsToMap)(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'bar') {
-                symb = (0,_symbols_bars_js__WEBPACK_IMPORTED_MODULE_15__.appendBarsToMap)(map, sizeData, symbolTarget)
+                symb = (0,_symbols_bars_js__WEBPACK_IMPORTED_MODULE_15__.appendBarsToMap)(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'circle') {
                 symb = (0,_symbols_circles_js__WEBPACK_IMPORTED_MODULE_14__.appendCirclesToMap)(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'spike') {
-                symb = (0,_symbols_spikes_js__WEBPACK_IMPORTED_MODULE_13__.appendSpikesToMap)(map, sizeData, symbolTarget)
+                symb = (0,_symbols_spikes_js__WEBPACK_IMPORTED_MODULE_13__.appendSpikesToMap)(map, sizeData, symbolTarget, layer)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
-                symb = (0,_symbols_d3_symbols_js__WEBPACK_IMPORTED_MODULE_16__.appendD3SymbolsToMap)(map, sizeData, symbolTarget)
+                symb = (0,_symbols_d3_symbols_js__WEBPACK_IMPORTED_MODULE_16__.appendD3SymbolsToMap)(map, sizeData, symbolTarget, layer)
             }
 
             setRegionStyles(map, sizeData)
@@ -47087,8 +47110,11 @@ __webpack_require__.r(__webpack_exports__);
  * @param {*} sizeData e.g. map.statData('size')
  * @return {*}
  */
-function appendBarsToMap(map, sizeData, out) {
-    const barWidth = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_1__.getResponsiveSymbolSize)(out.psBarWidth_, 1)
+function appendBarsToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
+    const barWidth = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_1__.getResponsiveSymbolSize)(style.psBarWidth_, 1)
     return (
         (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_0__.getCentroidsGroup)(out)
             .selectAll('g.em-centroid')
@@ -47104,7 +47130,7 @@ function appendBarsToMap(map, sizeData, out) {
                 if (!sv || !sv.value) {
                     return 0
                 }
-                let v = out.classifierSize_(+sv.value)
+                let v = style.classifierSize_(+sv.value)
                 return v
             })
             .attr('transform', function () {
@@ -47218,7 +47244,10 @@ __webpack_require__.r(__webpack_exports__);
  * @param {*} sizeData
  * @return {*}
  */
-function appendCustomSymbolsToMap(map, sizeData, out) {
+function appendCustomSymbolsToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
     return (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_0__.getCentroidsGroup)(out)
         .selectAll('g.em-centroid')
         .append('g')
@@ -47227,13 +47256,13 @@ function appendCustomSymbolsToMap(map, sizeData, out) {
             if (sv && sv.value !== ':') return rg
         })
         .attr('class', 'ps')
-        .html(out.psCustomSVG_)
+        .html(style.psCustomSVG_)
         .attr('transform', (rg) => {
             //calculate size
             const sv = sizeData.get(rg.properties.id)
-            let size = out.classifierSize_(+sv.value)
+            let size = style.classifierSize_(+sv.value)
             if (size) {
-                return `translate(${out.psOffset_.x * size},${out.psOffset_.y * size}) scale(${size})`
+                return `translate(${style.psOffset_.x * size},${style.psOffset_.y * size}) scale(${size})`
             }
         })
 }
@@ -47283,7 +47312,10 @@ const symbolsLibrary = {
  * @param {*} sizeData e.g. map.statData('size')
  * @return {*}
  */
-function appendD3SymbolsToMap(map, sizeData, out) {
+function appendD3SymbolsToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
     return (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_8__.getCentroidsGroup)(out)
         .selectAll('g.em-centroid')
         .append('path')
@@ -47297,13 +47329,13 @@ function appendD3SymbolsToMap(map, sizeData, out) {
             if (!sizeData) return
             const sv = sizeData.get(rg.properties.id)
             if (sv != 0 && !sv) return
-            let size = out.classifierSize_(+sv.value) || 0
+            let size = style.classifierSize_(+sv.value) || 0
 
             //apply size to shape
-            if (out.psCustomShape_) {
-                return out.psCustomShape_.size(size * size)()
+            if (style.psCustomShape_) {
+                return style.psCustomShape_.size(size * size)()
             } else {
-                const symbolType = symbolsLibrary[out.psShape_] || symbolsLibrary['circle']
+                const symbolType = symbolsLibrary[style.psShape_] || symbolsLibrary['circle']
                 return (0,d3_shape__WEBPACK_IMPORTED_MODULE_0__["default"])()
                     .type(symbolType)
                     .size(size * size)()
@@ -47329,9 +47361,12 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function appendSpikesToMap(map, sizeData, out) {
+function appendSpikesToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
     //The spike function creates a triangular path of the given length (height) with a base width of 7 pixels.
-    const spikeWidth = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_0__.getResponsiveSymbolSize)(out.psSpikeWidth_, 1)
+    const spikeWidth = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_0__.getResponsiveSymbolSize)(style.psSpikeWidth_, 1)
     const spike = (length, width = spikeWidth) => `M${-width / 2},0L0,${-length}L${width / 2},0`
     let symbolContainers = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_1__.getCentroidsGroup)(out).selectAll('g.em-centroid')
 
@@ -47340,15 +47375,15 @@ function appendSpikesToMap(map, sizeData, out) {
         .append('path')
         .attr('d', (d) => {
             const datum = sizeData.get(d.properties.id)
-            const value = datum ? out.classifierSize_(+datum.value) : 0
+            const value = datum ? style.classifierSize_(+datum.value) : 0
             let path = spike(value)
             return path
         })
         .style('fill', (d) => d.color || 'steelblue') // Adjust color as needed
         //.attr('fill', map.psFill_)
-        .attr('fill-opacity', map.psFillOpacity_)
-        .attr('stroke', map.psStroke_)
-        .attr('stroke-width', map.psStrokeWidth_)
+        .attr('fill-opacity', style.psFillOpacity_)
+        .attr('stroke', style.psStroke_)
+        .attr('stroke-width', style.psStrokeWidth_)
 
     return spikes
 }

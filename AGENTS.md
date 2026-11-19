@@ -203,6 +203,8 @@ Because script execution can be disabled in certain PowerShell environments, alw
 * `node scripts/smoke-harness.js` (17 cherry-picked examples) compares serialized SVG against
   `test/e2e/baselines/`; recapture with `--capture` after deliberate DOM changes. The `--all`
   baselines are not maintained (many missing or stale), so only its page errors and timeouts mean anything.
+  The harness mocks map geometry and statistics, but examples still need network access for external
+  scripts and CSVs. Restricted networking can cause page errors or timeouts in the 17-example run.
 
 ## Border hierarchy (Kosovo rule)
 

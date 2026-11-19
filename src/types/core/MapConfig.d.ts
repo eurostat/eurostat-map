@@ -76,10 +76,10 @@ export interface MapConfig {
     title?: string
     /** Map subtitle. */
     subtitle?: string
-    /** Footnote text shown below the map. */
+    /** Footnote text shown below the map. Defaults to Credits. */
     footnote?: string
 
-    /** Tooltip text shown when hovering over the footnote. */
+    /** Tooltip text for the footnote. The default Credits also shows boundary attribution. */
     footnoteTooltipText?: string | false
 
     /** Wrap footnote text at this many characters. */

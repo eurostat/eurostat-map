@@ -136,6 +136,7 @@ function wrapTextForMobile(textSelection, out, x) {
 export const addFootnote = function (out) {
     const wrap = out.footnoteWrap_ || Infinity // e.g. user sets map.footnoteWrap(500)
     const text = out.footnote_ || ''
+    const isCredits = text === out.defaultFootnote_
 
     // In header mode, root-level elements must be shifted down by header height.
     let headerOffset = 0
@@ -232,19 +233,36 @@ export const addFootnote = function (out) {
     // last line
     appendLine(line)
 
-    // --- Tooltip logic ---
-    foot.on('mouseover', function () {
-        out._tooltip.mw___ = out._tooltip.style('max-width')
-        out._tooltip.style('max-width', '400px')
-        if (out.footnoteTooltipText_) out._tooltip.mouseover(out.footnoteTooltipText_)
-    })
-        .on('mousemove', function (e) {
-            if (out.footnoteTooltipText_) out._tooltip.mousemove(e)
+    const attribution = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+
+    if (isCredits) {
+        foot.classed('em-credits', true).attr('tabindex', 0).attr('aria-label', `Credits. ${attribution}`)
+        if (!out._tooltip) foot.append('title').text(attribution)
+    }
+
+    if (!out._tooltip) return out
+
+    const tooltip = out._tooltip
+    const showTooltip = (event) => {
+        const disclaimer = out.footnoteTooltipText_ || ''
+        const content = isCredits ? `<div class="em-footnote-tooltip">${attribution}</div>${disclaimer}` : disclaimer
+        if (content) tooltip.mouseover(content, event)
+    }
+    const hideTooltip = () => tooltip.mouseout()
+
+    foot.on('mouseenter', showTooltip)
+        .on('mousemove', (event) => tooltip.mousemove(event))
+        .on('mouseleave', hideTooltip)
+
+    if (isCredits) {
+        foot.on('focus', function () {
+            const { left, top } = this.getBoundingClientRect()
+            showTooltip({ pageX: left + window.scrollX, pageY: top + window.scrollY })
+        }).on('blur', hideTooltip)
+        foot.on('keydown', (event) => {
+            if (event.key === 'Escape') hideTooltip()
         })
-        .on('mouseout', function () {
-            if (out.footnoteTooltipText_) out._tooltip.mouseout()
-            out._tooltip.style('max-width', out._tooltip.mw___)
-        })
+    }
 
     return out
 }

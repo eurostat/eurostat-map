@@ -152,12 +152,12 @@ export interface MapInstance {
 
     /**
      * Footnote text shown at the bottom of the map.
-     * Defaults to the standard EuroGeographics copyright notice.
+     * Defaults to Credits, which reveals the boundary attribution on hover or focus.
      */
     footnote(): string | false
     footnote(text: string | false): this
 
-    /** Tooltip text shown when hovering over the footnote. */
+    /** Tooltip text for the footnote. The default Credits also shows boundary attribution. */
     footnoteTooltipText(): string | false
     footnoteTooltipText(text: string | false): this
 

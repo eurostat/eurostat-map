@@ -207,11 +207,11 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     //dataset source link
     out.showSourceLink_ = true
 
-    //default copyright and disclaimer text
-    out.defaultFootnote_ = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+    // Default credits label and disclaimer text
+    out.defaultFootnote_ = 'Credits'
     out.defaultFootnoteTooltipText_ =
         '<div class="em-footnote-tooltip">The designations employed and the presentation of material on this map do not imply the expression of any opinion whatsoever on the part of the European Union concerning the legal status of any country, territory, city or area or of its authorities, or concerning the delimitation of its frontiers or boundaries. Kosovo*: This designation is without prejudice to positions on status, and is in line with UNSCR 1244/1999 and the ICJ Opinion on the Kosovo declaration of independence.</div>'
-    out.footnote_ = out.defaultFootnote_ //"(C)EuroGeographics (C)UN-FAO (C)Turkstat";
+    out.footnote_ = out.defaultFootnote_
     out.footnoteTooltipText_ = out.defaultFootnoteTooltipText_
     out.footnoteWrap_ = false //number of characters at which the footnote is wrapped
     out.footnotePosition_ = undefined

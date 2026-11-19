@@ -1511,8 +1511,8 @@ Specify the text to be shown at the bottom of the map.
 
 | Method                                    | Type            | Default value                   | Description                                                                                                                         |
 | ----------------------------------------- | --------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**footnote**([*value*])             | String          | _Some default text_             | The text. Note that the default value is mandatory.                                                                                 |
-| _map_ .**footnoteTooltipText**([*value*]) | String          | The default disclaimer message. | Set a text to be shown in a tooltip when passing over the footnote. Set to _null_ if no tooltip has to be shown.                    |
+| _map_.**footnote**([*value*])             | String or false | Credits                         | The footer label. Hover over or focus Credits to reveal the administrative boundary attribution. Set to false to hide the footnote. |
+| _map_ .**footnoteTooltipText**([*value*]) | String or false | The default disclaimer message. | Tooltip content for the footnote. The default Credits also shows boundary attribution. Set to false to omit the configured text.   |
 | _map_ .**showSourceLink**([*value*])      | Boolean         | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatasetcode specified when using the stat() function). |
 | _map_.**footnoteWrap**([*value*])         | Number or false | false                           | Wrap the footnote text at this many characters.                                                                                     |
 | _map_.**footnotePosition**([*value*])     | Array ([x,y])   | auto                            | Position adjustment of the footnote text.                                                                                           |

@@ -36,6 +36,11 @@ a text {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.em-credits {
+    cursor: help;
+    text-decoration: underline;
+}
+
 .em-map.em-draggable g {
     cursor: grab;
 }
