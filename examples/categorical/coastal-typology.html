@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Coastal Typology of NUTS 3 Regions</title>
+    </head>
+    <body>
+        <svg id="map" aria-label="Map of coastal and non-coastal NUTS 3 regions"></svg>
+        <p>
+            <a href="https://gisco-services.ec.europa.eu/distribution/v2/nuts/csv/NUTS_AT_2024.csv">GISCO source data</a>
+            · <a href="https://ec.europa.eu/eurostat/en/web/coastal-island-outermost-regions/methodology">Eurostat methodology</a>
+        </p>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map('categorical')
+                .width(800)
+                .height(650)
+                .title('Coastal typology')
+                .subtitle('NUTS 3 regions, 2024 boundaries')
+                .scale('20M')
+                .nutsYear(2024)
+                .nutsLevel(3)
+                .insets('default')
+                // GISCO COAST_TYPE codes 1 and 2 are coastal, 3 is non-coastal, and blank means unclassified.
+                .stat('coastal', {
+                    csvURL: './coastal-typology-nuts-2024.csv',
+                    geoCol: 'NUTS_ID',
+                    valueCol: 'coastal_typology',
+                })
+                .encoding('fill', { stat: 'coastal' })
+                .classToFillStyle({ coastal: '#20838b', 'non-coastal': '#e2bd81' })
+                .classToText({ coastal: 'Coastal', 'non-coastal': 'Non-coastal' })
+                .noDataFillStyle('#dedede')
+                .noDataText('Unclassified')
+                .legend({ x: 15, y: 115, noData: true, noDataText: 'Unclassified' })
+                .footnote('Source: Eurostat, GISCO (NUTS 2024)')
+                .build()
+        </script>
+    </body>
+</html>

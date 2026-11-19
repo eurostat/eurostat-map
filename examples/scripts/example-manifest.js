@@ -22,6 +22,7 @@
         'cartogram/grid/waffle.html',
         'cartogram/trade-asymmetry/index.html',
         'categorical/categorical.html',
+        'categorical/coastal-typology.html',
         'choropleth/annotations.html',
         'choropleth/basic.html',
         'choropleth/continuous.html',
