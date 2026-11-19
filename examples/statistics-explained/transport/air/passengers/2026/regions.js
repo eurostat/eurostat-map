@@ -56,7 +56,6 @@ const regions = {
     "BI", // Burundi
 
     "SD",
-    "TN",
     "EH",
     "AO",
     "BJ",
@@ -100,7 +99,6 @@ const regions = {
     "AM",
     "AZ",
     "BH",
-    "CY",
     "GE",
     "IR",
     "IQ",
@@ -117,7 +115,7 @@ const regions = {
     "AE",
     "YE"
   ],
-  "southern asia": ["AF", "BD", "BT", "IN", "IR", "MV", "NP", "PK", "LK"],
+  "southern asia": ["AF", "BD", "BT", "IN", "MV", "NP", "PK", "LK"],
   "central asia": ["KZ", "KG", "TJ", "TM", "UZ"],
   "eastern asia": ["CN", "HK", "JP", "KP", "KR", "MN", "MO", "TW"],
   "South Eastern Asia": ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
@@ -193,14 +191,5 @@ const regions = {
     "RU",
     "GL",
     "UK"
-  ],
-  "eu": [
-    "AT", "BE", "BG", "HR", "CY",
-    "CZ", "DK", "EE", "FI", "FR",
-    "DE", "EL", "HU", "IE", "IT",
-    "LV", "LT", "LU", "MT", "NL",
-    "PL", "PT", "RO", "SK", "SI",
-    "ES", // Spain
-    "SE"  // Sweden
   ]
 }

@@ -28,6 +28,7 @@
         <script src="../../../../d3.v7.min.js"></script>
         <script src="./regionLabels.js"></script>
         <script src="./regions.js"></script>
+        <script src="../../regional-palette.js"></script>
         <script src="./configs.js"></script>
         <script>
             const year = 2025
@@ -50,29 +51,9 @@
             fetch(`./passengersGraph${year}.json`)
                 .then((r) => r.json())
                 .then((graphData) => {
-                    const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F']
-                    const fourColorTheorem = [
-                        '#C8D4DC', // dusty blue-grey
-                        '#D4CCBC', // warm greige
-                        '#C4D0C4', // sage grey
-                        '#D4C8C8', // blush grey
-                    ]
-                    const regionColors = {
-                        'north america': fourColorTheorem[0],
-                        'central america and caribbean': fourColorTheorem[1],
-                        'south america': fourColorTheorem[2],
-                        'eastern africa': fourColorTheorem[0],
-                        'north africa': fourColorTheorem[2],
-                        'rest of africa': fourColorTheorem[1],
-                        'western asia': fourColorTheorem[0],
-                        'southern asia': fourColorTheorem[2],
-                        'central asia': fourColorTheorem[1],
-                        'eastern asia': fourColorTheorem[0],
-                        'South Eastern Asia': fourColorTheorem[1],
-                        'Oceania and southern polar regions': fourColorTheorem[2],
-                        EU: '#8099CC',
-                        'europe except eu': fourColorTheorem[2],
-                    }
+                    const regionByCountry = new Map(
+                        Object.entries(regions).flatMap(([region, codes]) => codes.map((code) => [code, region.toLowerCase()]))
+                    )
 
                     const valuesLabelFormatter = d3.format('.3~s')
 
@@ -176,13 +157,14 @@
                                 return colorFunction(parseChangeToPct(d.target.change))
                             },
                         })
-                        .flowSettings({ opacity: 0.9, arrows: true, arrowScale: 0.7, outlines: true, outlineWidth: 2, outlineColor: 'white', colorGradient: false, widthGradient: false, topLocations: 0, stack: false, nodes: false })
+                        .flowSettings({ opacity: 0.9, arrows: false, outlines: true, outlineWidth: 2, outlineColor: 'white', colorGradient: false, widthGradient: false, topLocations: 0, stack: false, nodes: false })
 
                         // legend
                         .legend({
                             x: width - 205,
                             y: 60,
                             boxPadding: 10,
+                            boxOpacity: 1,
                             title: 'Passengers carried',
                             flowWidthLegend: {
                                 marginTop: -10,
@@ -220,13 +202,7 @@
                         .callback(() => {
                             // set fill of regions
                             const countries = d3.selectAll('#air-passengers-map .em-worldrg path')
-                            countries.style('fill', (d) => {
-                                for (const [regionName, codes] of Object.entries(regions)) {
-                                    if (codes.includes(d.properties.id)) {
-                                        return regionColors[regionName]
-                                    }
-                                }
-                            })
+                            countries.style('fill', (d) => regionalColors[regionByCountry.get(d.properties.id)] ?? '#efefef')
                             // raise labels (fixed in next version of estatmap)
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()

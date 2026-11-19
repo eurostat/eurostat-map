@@ -28,6 +28,7 @@
         <script src="../../../../d3.v7.min.js"></script>
         <script src="./regionLabels.js"></script>
         <script src="./regions.js"></script>
+        <script src="../../regional-palette.js"></script>
         <script src="./configs.js"></script>
         <script>
             const year = 2025
@@ -50,28 +51,9 @@
             fetch(`./airFreightGraph${year}.json`)
                 .then((r) => r.json())
                 .then((graphData) => {
-                    const greys = ['#D3D3D3', '#A9A9A9', '#808080', '#696969', '#36454F'] // Light Gray, Dark Gray: #808080, Dim Gray: #696969, Charcoal: #36454F
-                    const fourColorTheorem = [
-                        '#388AE2', // blue
-                        '#B09120', // yellow
-                        '#33A033', // green
-                        '#E04040', // red
-                    ]
-                    const regionColors = {
-                        'north america': fourColorTheorem[0],
-                        'central america and caribbean': fourColorTheorem[1],
-                        'south america': fourColorTheorem[2],
-                        'eastern africa': fourColorTheorem[1],
-                        'rest of africa': fourColorTheorem[2],
-                        'western asia': fourColorTheorem[0],
-                        'southern asia': fourColorTheorem[2],
-                        'central asia': fourColorTheorem[1],
-                        'eastern asia': fourColorTheorem[0],
-                        'south eastern asia': fourColorTheorem[1],
-                        'Oceania and southern polar regions': fourColorTheorem[2],
-                        EU: '#003399',
-                        'europe except eu': fourColorTheorem[2],
-                    }
+                    const regionByCountry = new Map(
+                        Object.entries(regions).flatMap(([region, codes]) => codes.map((code) => [code, region.toLowerCase()]))
+                    )
 
                     const valuesLabelFormatter = d3.format('.3~s')
 
@@ -177,7 +159,7 @@
                                 return colorFunction(parseChangeToPct(d.target.change))
                             },
                         })
-                        .flowSettings({ opacity: 1, arrows: false, arrowScale: 0.7, outlines: true, outlineWidth: 2, outlineColor: 'white', colorGradient: false, widthGradient: false, topLocations: 0, stack: false })
+                        .flowSettings({ opacity: 1, arrows: false, outlines: true, outlineWidth: 2, outlineColor: 'white', colorGradient: false, widthGradient: false, topLocations: 0, stack: false })
                         //only for when stacked
                         // .flowOrder((a, b) => {
                         //     console.log(a, b);
@@ -222,6 +204,7 @@
                             x: width - 185,
                             y: 50,
                             boxPadding: 10,
+                            boxOpacity: 1,
                             title: 'Freight carried',
                             subtitle: '(tonnes)',
                             flowWidthLegend: {
@@ -259,13 +242,7 @@
                         .callback(() => {
                             // set fill of regions
                             const countries = d3.selectAll('#air-freight-map .em-worldrg path')
-                            countries.style('fill', (d) => {
-                                for (const [regionName, codes] of Object.entries(regions)) {
-                                    if (codes.includes(d.properties.id)) {
-                                        return regionColors[regionName]
-                                    }
-                                }
-                            })
+                            countries.style('fill', (d) => regionalColors[regionByCountry.get(d.properties.id)] ?? '#efefef')
                             // raise labels (fixed in next version of estatmap)
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()

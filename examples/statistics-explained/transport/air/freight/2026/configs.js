@@ -9,12 +9,12 @@ const airMapConfigs = {
                 20
             ],
             "colors": [
-                "#E04040",
-                "#FFA3A3",
-                "#C1C9EB",
-                "#93A2DC",
-                "#677CD2",
-                "#15246B"
+                "#ad292f",
+                "#d66567",
+                "#809dca",
+                "#557db7",
+                "#345d9f",
+                "#223d78"
             ],
             "legend": {
                 "title": "Change vs 2024 (%)",

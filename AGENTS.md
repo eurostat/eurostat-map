@@ -269,13 +269,16 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   `<g>` containers. Keep `.em-insets-image .em-inset { overflow: visible; }`: compact scale bars
   such as Svalbard's extend beyond the inset viewport and are otherwise silently clipped.
 
-## Statistics Explained maritime maps
+## Statistics Explained transport maps
 
 - Edition folders use the dissemination year. Map titles and data use the reference year
   in the supplied workbook. Keep legacy page URLs working when archiving an edition.
 - The archived maritime world-flow pages use the main `build/eurostatmap.js` bundle. The old
   Statistics Explained bundle can fail on current world geometry with an undefined `features`
   error. Apply label offsets to the matching `em-label-halo-*` IDs too, so the white halos stay aligned in PNG exports.
+- The 2026 extra-EU air maps share a muted regional palette in `examples/statistics-explained/transport/air/regional-palette.js`.
+  When changing country groups or fills, check for duplicate country assignments and verify that groups sharing
+  a border arc in the GISCO world geometry have distinct fills.
 
 ## Keep this file current for the next agent
 
