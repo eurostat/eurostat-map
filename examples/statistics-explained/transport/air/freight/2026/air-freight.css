@@ -26,16 +26,16 @@
 }
 
 #air-freight-map #em-label-EU,
-#air-freight-map #em-label-shadow-EU {
+#air-freight-map #em-label-halo-EU {
     opacity: 0.9 !important;
     font-size: 20px !important;
     transform: translate(5px, 0px);
 }
 
 #em-labels .em-label,
-.em-label-shadow,
+.em-label-halo,
 .em-flow-label,
-.em-flow-label-shadow {
+.em-flow-label-halo {
     font-family: 'Arial' !important;
     font-size: 15px !important;
     opacity: 0.8 !important;
@@ -68,16 +68,16 @@ td {
 }
 
 text#em-label-Eastern-Africa,
-text#em-label-shadow-Eastern-Africa {
+text#em-label-halo-Eastern-Africa {
     transform: translate(50px, 0px);
 }
 
 text#em-label-Rest-of-Africa,
-text#em-label-shadow-Rest-of-Africa {
+text#em-label-halo-Rest-of-Africa {
     transform: translate(-30px, 0px);
 }
 
 text#em-label-Eastern-Asia,
-text#em-label-shadow-Eastern-Asia {
+text#em-label-halo-Eastern-Asia {
     transform: translate(10px, 0px);
 }
