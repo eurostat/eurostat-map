@@ -23,7 +23,7 @@ function collectExampleHtmlFiles(dirPath) {
         if (!entry.isFile() || !entry.name.endsWith('.html')) continue
 
         const relPath = toPosix(path.relative(EXAMPLES_DIR, absPath))
-        if (relPath === 'index.html') continue
+        if (relPath === 'index.html' || relPath === 'view.html') continue
 
         out.push(relPath)
     }
@@ -71,13 +71,15 @@ ${stringifyPaths(paths)}
         if (examplePath.startsWith('categorical/')) return 'Categorical'
         if (examplePath.startsWith('CCM/')) return 'Country Comparison'
         if (examplePath.startsWith('choropleth/')) return 'Choropleth'
+        if (examplePath.startsWith('composition/')) return 'Pie Charts'
         if (examplePath.startsWith('coxcomb/')) return 'Coxcomb'
         if (examplePath.startsWith('dot-density/')) return 'Dot Density'
         if (examplePath.startsWith('flow/')) return 'Flow Map'
         if (examplePath.startsWith('miscellaneous/')) return 'Miscellaneous'
+        if (examplePath.startsWith('multi-layer/')) return 'Multiple Layers'
         if (examplePath.startsWith('mushroom/')) return 'Mushroom'
         if (examplePath.startsWith('pie-charts/')) return 'Pie Charts'
-        if (examplePath.startsWith('proportional/')) return 'Proportional'
+        if (examplePath.startsWith('proportional/') || examplePath.startsWith('proportional-symbols/')) return 'Proportional'
         if (examplePath.startsWith('RYB/')) return 'RYB'
         if (examplePath.startsWith('sparklines/')) return 'Spark charts'
         if (examplePath.startsWith('statistics-explained/')) return 'Statistics Explained'
@@ -106,8 +108,20 @@ ${stringifyPaths(paths)}
         ['Waffle', /(^|[/_-])waffle([/_.-]|$)/],
     ]
 
+    const additionalTypesByPath = {
+        'cartogram/dorling.html': 'Proportional',
+        'cartogram/grid/degurba.html': 'Bar Chart',
+        'cartogram/grid/grid-cartogram.html': 'Choropleth',
+        'cartogram/trade-asymmetry/index.html': 'Choropleth',
+        'composition/composition.html': 'Cartogram',
+        'proportional-symbols/population-change.html': 'Cartogram',
+        'proportional-symbols/prop-circles.html': 'Cartogram',
+    }
+
     const typesForPath = (examplePath) => {
         const types = [primaryTypeForPath(examplePath)]
+        const additionalType = additionalTypesByPath[examplePath]
+        if (additionalType) types.push(additionalType)
         secondaryTypeMatchers.forEach(([type, pattern]) => {
             if (pattern.test(examplePath) && !types.includes(type)) types.push(type)
         })

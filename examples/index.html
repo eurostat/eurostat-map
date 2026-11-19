@@ -200,9 +200,11 @@
 
             .sidebar {
                 flex-shrink: 0;
-                width: 168px;
+                width: 204px;
                 position: sticky;
                 top: 20px;
+                max-height: calc(100vh - 40px);
+                overflow-y: auto;
             }
 
             .sidebar-panel {
@@ -221,13 +223,25 @@
                 color: var(--muted);
             }
 
-            .sidebar-nav {
+            .sidebar-nav,
+            .sidebar-subnav {
                 list-style: none;
                 margin: 0;
                 padding: 0;
                 display: flex;
                 flex-direction: column;
                 gap: 2px;
+            }
+
+            .sidebar-subnav {
+                padding-left: 12px;
+            }
+
+            .sidebar-chapter {
+                display: block;
+                padding: 6px 8px;
+                font-size: 13px;
+                font-weight: 700;
             }
 
             .sidebar-nav li a {
@@ -264,8 +278,9 @@
                 .sidebar {
                     width: 100%;
                     position: static;
+                    max-height: none;
                 }
-                .sidebar-nav {
+                .sidebar-subnav {
                     flex-direction: row;
                     flex-wrap: wrap;
                 }
@@ -299,8 +314,10 @@
             <div class="layout">
                 <aside class="sidebar">
                     <div class="sidebar-panel">
-                        <p class="sidebar-heading">Map Types</p>
-                        <ul class="sidebar-nav" id="sidebar-nav"></ul>
+                        <nav aria-labelledby="sidebar-heading">
+                            <p class="sidebar-heading" id="sidebar-heading">Contents</p>
+                            <ul class="sidebar-nav" id="sidebar-nav"></ul>
+                        </nav>
                     </div>
                 </aside>
 
@@ -316,7 +333,7 @@
 
         <script src="./scripts/example-manifest.js"></script>
         <script>
-            const { paths, previewPathFor, legacyPreviewPathFor, isShowcasePath, typeForPath, typesForPath } = window.eurostatMapExamples
+            const { paths, previewPathFor, legacyPreviewPathFor, isShowcasePath, typesForPath } = window.eurostatMapExamples
             const fallbackPreview = '../docs/img/previews/euro.png'
 
             // an example is opened in the viewer, beside its source code
@@ -370,30 +387,73 @@
             const showcasePaths = paths.filter(isShowcasePath)
             let examples = []
 
-            // Build sidebar nav
-            const getTypes = (path) => (typesForPath ? typesForPath(path) : [typeForPath(path) || 'Other'])
-            const allTypes = ['All', ...Array.from(new Set(showcasePaths.flatMap(getTypes))).sort()]
+            const featureTopics = {
+                'Annotations & labels': ['annotations', 'placenames'],
+                'Custom data & geometry': ['custom-geometries', 'custom-stats'],
+                'Map styling': ['hatching'],
+                'Locations & map context': ['locations', 'minimap', 'mixed-nuts-levels', 'projection', 'scalebar'],
+                'Export & sharing': ['export', 'stamp'],
+                'Story maps': ['story-map/index'],
+            }
+            const featuresByPath = new Map(
+                Object.entries(featureTopics).flatMap(([topic, files]) => files.map((file) => ['misc/' + file + '.html', topic]))
+            )
+            const getTypes = (path) => {
+                const types = typesForPath(path)
+                const topic = featuresByPath.get(path)
+                return topic ? [...types, topic] : types
+            }
+            const standaloneTypes = ['Multiple Layers', 'Cartogram']
+            const layerTypes = [...new Set(showcasePaths.flatMap(typesForPath))]
+                .filter((type) => type !== 'Other' && !standaloneTypes.includes(type))
+                .sort()
+            const allTypes = ['All', ...layerTypes, ...standaloneTypes, 'Other', ...Object.keys(featureTopics)]
+            const typeLabels = { Proportional: 'Proportional Symbols', Cartogram: 'Cartograms' }
             let activeType = 'All'
 
             const sidebarNav = document.getElementById('sidebar-nav')
             const setActiveType = (type) => {
                 activeType = type
-                sidebarNav.querySelectorAll('a').forEach((el) => el.classList.toggle('active', el.textContent === type))
+                sidebarNav.querySelectorAll('a').forEach((el) => {
+                    const active = el.dataset.type === type
+                    el.classList.toggle('active', active)
+                    if (active) el.setAttribute('aria-current', 'true')
+                    else el.removeAttribute('aria-current')
+                })
             }
-            allTypes.forEach((type) => {
+            const addFilter = (list, type) => {
                 const li = document.createElement('li')
                 const a = document.createElement('a')
-                a.textContent = type
+                a.textContent = typeLabels[type] || type
+                a.dataset.type = type
                 a.href = '#'
-                if (type === 'All') a.className = 'active'
                 a.addEventListener('click', (e) => {
                     e.preventDefault()
                     setActiveType(type)
                     renderExamples(search.value)
                 })
                 li.appendChild(a)
-                sidebarNav.appendChild(li)
-            })
+                list.appendChild(li)
+                return li
+            }
+            const addSubchapters = (chapter, types) => {
+                const list = document.createElement('ul')
+                list.className = 'sidebar-subnav'
+                types.forEach((type) => addFilter(list, type))
+                chapter.appendChild(list)
+            }
+
+            addFilter(sidebarNav, 'All')
+            const layerChapter = document.createElement('li')
+            const layerHeading = document.createElement('span')
+            layerHeading.className = 'sidebar-chapter'
+            layerHeading.textContent = 'Layer Types'
+            layerChapter.appendChild(layerHeading)
+            addSubchapters(layerChapter, layerTypes)
+            sidebarNav.appendChild(layerChapter)
+            standaloneTypes.forEach((type) => addFilter(sidebarNav, type))
+            addSubchapters(addFilter(sidebarNav, 'Other'), Object.keys(featureTopics))
+            setActiveType('All')
 
             const grid = document.getElementById('grid')
             const stats = document.getElementById('stats')

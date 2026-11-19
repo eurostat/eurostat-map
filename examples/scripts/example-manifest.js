@@ -62,6 +62,7 @@
         'proportional-symbols/prop-symbols.html',
         'RYB/2026/CH02/CH02M02.html',
         'RYB/2026/CH02/CH02M03.html',
+        'RYB/2026/CH02/static/CH02M03.html',
         'RYB/2026/CH03/CH03M02.html',
         'RYB/2026/CH03/static/static.html',
         'RYB/2026/CH04/CH04M03.html',
@@ -69,6 +70,8 @@
         'RYB/2026/CH08/CH08M04.html',
         'RYB/2026/CH10/CH10M02.html',
         'RYB/2026/CH10/CH10M06.html',
+        'RYB/2026/CH10/static/CH10M02.html',
+        'RYB/2026/CH10/static/CH10M06.html',
         'RYB/2026/CH11/CH11M04.html',
         'RYB/2026/CH11/CH11M05.html',
         'RYB/2026/CH11/static/CH11M04.html',
@@ -136,13 +139,15 @@
         if (examplePath.startsWith('categorical/')) return 'Categorical'
         if (examplePath.startsWith('CCM/')) return 'Country Comparison'
         if (examplePath.startsWith('choropleth/')) return 'Choropleth'
+        if (examplePath.startsWith('composition/')) return 'Pie Charts'
         if (examplePath.startsWith('coxcomb/')) return 'Coxcomb'
         if (examplePath.startsWith('dot-density/')) return 'Dot Density'
         if (examplePath.startsWith('flow/')) return 'Flow Map'
         if (examplePath.startsWith('miscellaneous/')) return 'Miscellaneous'
+        if (examplePath.startsWith('multi-layer/')) return 'Multiple Layers'
         if (examplePath.startsWith('mushroom/')) return 'Mushroom'
         if (examplePath.startsWith('pie-charts/')) return 'Pie Charts'
-        if (examplePath.startsWith('proportional/')) return 'Proportional'
+        if (examplePath.startsWith('proportional/') || examplePath.startsWith('proportional-symbols/')) return 'Proportional'
         if (examplePath.startsWith('RYB/')) return 'RYB'
         if (examplePath.startsWith('sparklines/')) return 'Spark charts'
         if (examplePath.startsWith('statistics-explained/')) return 'Statistics Explained'
@@ -171,8 +176,20 @@
         ['Waffle', /(^|[/_-])waffle([/_.-]|$)/],
     ]
 
+    const additionalTypesByPath = {
+        'cartogram/dorling.html': 'Proportional',
+        'cartogram/grid/degurba.html': 'Bar Chart',
+        'cartogram/grid/grid-cartogram.html': 'Choropleth',
+        'cartogram/trade-asymmetry/index.html': 'Choropleth',
+        'composition/composition.html': 'Cartogram',
+        'proportional-symbols/population-change.html': 'Cartogram',
+        'proportional-symbols/prop-circles.html': 'Cartogram',
+    }
+
     const typesForPath = (examplePath) => {
         const types = [primaryTypeForPath(examplePath)]
+        const additionalType = additionalTypesByPath[examplePath]
+        if (additionalType) types.push(additionalType)
         secondaryTypeMatchers.forEach(([type, pattern]) => {
             if (pattern.test(examplePath) && !types.includes(type)) types.push(type)
         })
