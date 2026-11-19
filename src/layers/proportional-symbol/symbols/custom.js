@@ -6,7 +6,10 @@ import { getCentroidsGroup } from '../../../core/geo/centroids'
  * @param {*} sizeData
  * @return {*}
  */
-export function appendCustomSymbolsToMap(map, sizeData, out) {
+export function appendCustomSymbolsToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
     return getCentroidsGroup(out)
         .selectAll('g.em-centroid')
         .append('g')
@@ -15,13 +18,13 @@ export function appendCustomSymbolsToMap(map, sizeData, out) {
             if (sv && sv.value !== ':') return rg
         })
         .attr('class', 'ps')
-        .html(out.psCustomSVG_)
+        .html(style.psCustomSVG_)
         .attr('transform', (rg) => {
             //calculate size
             const sv = sizeData.get(rg.properties.id)
-            let size = out.classifierSize_(+sv.value)
+            let size = style.classifierSize_(+sv.value)
             if (size) {
-                return `translate(${out.psOffset_.x * size},${out.psOffset_.y * size}) scale(${size})`
+                return `translate(${style.psOffset_.x * size},${style.psOffset_.y * size}) scale(${size})`
             }
         })
 }

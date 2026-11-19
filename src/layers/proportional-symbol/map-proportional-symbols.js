@@ -308,16 +308,16 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             // append symbols to centroids
             let symb
             if (layer.psCustomSVG_) {
-                symb = appendCustomSymbolsToMap(map, sizeData, symbolTarget)
+                symb = appendCustomSymbolsToMap(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'bar') {
-                symb = appendBarsToMap(map, sizeData, symbolTarget)
+                symb = appendBarsToMap(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'circle') {
                 symb = appendCirclesToMap(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'spike') {
-                symb = appendSpikesToMap(map, sizeData, symbolTarget)
+                symb = appendSpikesToMap(map, sizeData, symbolTarget, layer)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
-                symb = appendD3SymbolsToMap(map, sizeData, symbolTarget)
+                symb = appendD3SymbolsToMap(map, sizeData, symbolTarget, layer)
             }
 
             setRegionStyles(map, sizeData)

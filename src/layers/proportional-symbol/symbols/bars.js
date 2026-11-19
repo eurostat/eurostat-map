@@ -11,8 +11,11 @@ import { getResponsiveSymbolSize } from '../../../core/responsive'
  * @param {*} sizeData e.g. map.statData('size')
  * @return {*}
  */
-export function appendBarsToMap(map, sizeData, out) {
-    const barWidth = getResponsiveSymbolSize(out.psBarWidth_, 1)
+export function appendBarsToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
+    const barWidth = getResponsiveSymbolSize(style.psBarWidth_, 1)
     return (
         getCentroidsGroup(out)
             .selectAll('g.em-centroid')
@@ -28,7 +31,7 @@ export function appendBarsToMap(map, sizeData, out) {
                 if (!sv || !sv.value) {
                     return 0
                 }
-                let v = out.classifierSize_(+sv.value)
+                let v = style.classifierSize_(+sv.value)
                 return v
             })
             .attr('transform', function () {

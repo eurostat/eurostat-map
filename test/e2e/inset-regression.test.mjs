@@ -547,6 +547,16 @@ add(
 )
 add('ps nl2 bars own-config insets', 'proportionalSymbol', `m.nutsLevel(2).stat('size', ${J(st())}).psSettings({ shape: 'bar' })${INSETS.own}`)
 add('ps nl2 spikes nested insets', 'proportionalSymbol', `m.nutsLevel(2).stat('size', ${J(st())}).psSettings({ shape: 'spike' })${INSETS.nested}`)
+// Non-circle shapes must also draw in the default insets (Malta, Liechtenstein, ...): the shape/size state lives on the layer, not on the inset
+for (const [label, settings] of [
+    ['bars', `{ shape: 'bar' }`],
+    ['spikes', `{ shape: 'spike' }`],
+    ['squares', `{ shape: 'square' }`],
+    ['diamonds', `{ shape: 'diamond' }`],
+    ['custom svg', `{ customSVG: '<circle r="1" fill="#c33"/>', offset: { x: 0, y: 0 } }`],
+]) {
+    add(`ps nl2 ${label} default insets`, 'proportionalSymbol', `m.nutsLevel(2).stat('size', ${J(st())}).psSettings(${settings})${INSETS.default}`)
+}
 add(
     'ps nl0 squares external insets',
     'proportionalSymbol',

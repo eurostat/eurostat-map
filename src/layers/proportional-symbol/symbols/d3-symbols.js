@@ -20,7 +20,10 @@ import { getCentroidsGroup } from '../../../core/geo/centroids'
  * @param {*} sizeData e.g. map.statData('size')
  * @return {*}
  */
-export function appendD3SymbolsToMap(map, sizeData, out) {
+export function appendD3SymbolsToMap(map, sizeData, out, styleSource) {
+    // `out` is the map/inset the symbols are drawn into. Insets never receive the proportional-symbol
+    // style state (it lives on the shared layer), so it is read from `styleSource` (the layer).
+    const style = styleSource || out
     return getCentroidsGroup(out)
         .selectAll('g.em-centroid')
         .append('path')
@@ -34,13 +37,13 @@ export function appendD3SymbolsToMap(map, sizeData, out) {
             if (!sizeData) return
             const sv = sizeData.get(rg.properties.id)
             if (sv != 0 && !sv) return
-            let size = out.classifierSize_(+sv.value) || 0
+            let size = style.classifierSize_(+sv.value) || 0
 
             //apply size to shape
-            if (out.psCustomShape_) {
-                return out.psCustomShape_.size(size * size)()
+            if (style.psCustomShape_) {
+                return style.psCustomShape_.size(size * size)()
             } else {
-                const symbolType = symbolsLibrary[out.psShape_] || symbolsLibrary['circle']
+                const symbolType = symbolsLibrary[style.psShape_] || symbolsLibrary['circle']
                 return symbol()
                     .type(symbolType)
                     .size(size * size)()
