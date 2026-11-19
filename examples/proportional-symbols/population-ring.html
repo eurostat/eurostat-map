@@ -4,17 +4,64 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Population and Share Aged 65+</title>
+        <style>
+            .indicator-control {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                margin: 12px 0;
+                font: 14px Arial, sans-serif;
+            }
+
+            #color-indicator {
+                max-width: 100%;
+                padding: 5px;
+                font: inherit;
+            }
+        </style>
     </head>
     <body>
-        <svg id="map" aria-label="Population size and share aged 65 and over by country"></svg>
+        <div class="indicator-control">
+            <label for="color-indicator">Circle colour</label>
+            <select id="color-indicator" disabled>
+                <option value="lifeExpectancy">Life expectancy at age 65</option>
+                <option value="healthyLifeYears">Healthy life years at age 65</option>
+                <option value="naturalChange">Natural population change</option>
+            </select>
+        </div>
+        <svg id="map" aria-label="Population, share aged 65 and over, and life expectancy at age 65 by country"></svg>
         <script src="../../build/eurostatmap.js"></script>
         <script>
-            eurostatmap
+            const blues = ['#e1edf8', '#bed8ef', '#81b6db', '#4289bb', '#175583']
+            const indicators = {
+                lifeExpectancy: {
+                    stat: { eurostatDatasetCode: 'demo_mlexpec', unitText: 'years', filters: { age: 'Y65', sex: 'T', unit: 'YR' } },
+                    legendTitle: 'Life expectancy at 65 (years)',
+                    thresholds: [18, 20, 21, 22],
+                    colors: blues,
+                },
+                healthyLifeYears: {
+                    stat: { eurostatDatasetCode: 'hlth_hlye', unitText: 'years', filters: { hlth_hle: 'HLY_Y65', sex: 'T', unit: 'YR' } },
+                    legendTitle: 'Healthy life years at 65',
+                    thresholds: [7, 9, 11, 13],
+                    colors: blues,
+                },
+                naturalChange: {
+                    stat: { eurostatDatasetCode: 'demo_gind', unitText: 'per 1,000 residents', filters: { indic_de: 'NATGROWRT' } },
+                    legendTitle: 'Natural change per 1,000',
+                    thresholds: [-6, -2, 0, 2, 6],
+                    colors: ['#693b86', '#9c72b4', '#dfcfe9', '#c7e4dc', '#67ac9c', '#226b5c'],
+                },
+            }
+
+            const selector = document.getElementById('color-indicator')
+            const map = eurostatmap
                 .map('proportionalSymbol')
                 .nutsLevel(0)
                 .scale('20M')
                 .title('Population and share aged 65+')
-                .subtitle('1 January 2024 · Ring shows the percentage aged 65 and over')
+                .subtitle('2024 · Ring shows the percentage aged 65 and over')
                 .stat('population', {
                     eurostatDatasetCode: 'demo_r_pjanaggr3',
                     unitText: 'people',
@@ -27,21 +74,54 @@
                 .encoding('size', { stat: 'population' })
                 .encoding('ring', { stat: 'share65Plus' })
                 .psSettings({
-                    fill: '#305f8a',
                     minSize: 3,
                     maxSize: 30,
                     ringWidth: 4,
                     ringColor: '#c65312',
                     ringTrackColor: '#53647555',
                 })
-                .legend({
-                    x: 10,
-                    y: 110,
-                    boxOpacity: 0,
-                    sizeLegend: { title: 'Total population', values: [80_000_000, 20_000_000, 1_000_000] },
-                })
+                .noDataFillStyle('#9c9c9c')
+                .transitionDuration(0)
                 .insets(false)
-                .build()
+                .onBuild(() => {
+                    selector.disabled = false
+                })
+
+            for (const [key, { stat }] of Object.entries(indicators)) {
+                map.stat(key, { ...stat, filters: { ...stat.filters, time: '2024' } })
+            }
+
+            function selectIndicator(key) {
+                const { legendTitle, thresholds, colors } = indicators[key]
+                const ranges = [
+                    `< ${thresholds[0]}`,
+                    ...thresholds.slice(1).map((upper, index) => `${thresholds[index]} – < ${upper}`),
+                    `≥ ${thresholds.at(-1)}`,
+                ].reverse()
+                map
+                    .encoding('color', { stat: key })
+                    .psSettings({ thresholds, colors })
+                    .legend({
+                        x: 10,
+                        y: 110,
+                        boxOpacity: 0,
+                        sizeLegend: { title: 'Total population', values: [80_000_000, 20_000_000, 1_000_000] },
+                        colorLegend: {
+                            title: legendTitle,
+                            labelType: 'ranges',
+                            labelFormatter: (_, index) => ranges[index],
+                            noData: true,
+                        },
+                    })
+                document.getElementById('map').setAttribute(
+                    'aria-label',
+                    `Population, share aged 65 and over, and ${selector.selectedOptions[0].textContent.toLowerCase()} by country`
+                )
+            }
+
+            selector.addEventListener('change', () => selectIndicator(selector.value))
+            selectIndicator(selector.value)
+            map.build()
         </script>
     </body>
 </html>
