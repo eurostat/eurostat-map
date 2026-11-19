@@ -269,6 +269,14 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   `<g>` containers. Keep `.em-insets-image .em-inset { overflow: visible; }`: compact scale bars
   such as Svalbard's extend beyond the inset viewport and are otherwise silently clipped.
 
+## Statistics Explained maritime maps
+
+- Edition folders use the dissemination year. Map titles and data use the reference year
+  in the supplied workbook. Keep legacy page URLs working when archiving an edition.
+- The archived maritime world-flow pages use the main `build/eurostatmap.js` bundle. The old
+  Statistics Explained bundle can fail on current world geometry with an undefined `features`
+  error. Apply label offsets to the matching `em-label-halo-*` IDs too, so the white halos stay aligned in PNG exports.
+
 ## Keep this file current for the next agent
 
 Different agents and sessions (potentially different providers entirely) work in this repo over
