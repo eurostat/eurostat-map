@@ -17,6 +17,12 @@ export interface ProportionalSymbolSettings {
     stroke?: string
     strokeWidth?: number
     strokeOpacity?: number
+    /** Uniform outer-ring thickness in pixels for the 'ring' encoding. Set to 0 to hide it. @default 3 */
+    ringWidth?: number
+    /** Color of the filled portion of the outer ring. @default '#d95f02' */
+    ringColor?: string
+    /** Color of the full ring track. Use 'none' to hide the track. @default '#00000026' */
+    ringTrackColor?: string
     sizeScale?: 'sqrt' | 'linear'
     minSize?: number
     maxSize?: number

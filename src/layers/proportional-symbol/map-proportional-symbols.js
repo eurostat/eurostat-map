@@ -12,6 +12,7 @@ import { updateBackgroundColor } from './ps-background.js'
 import { addMouseEvents } from './ps-interactions.js'
 import { appendSpikesToMap } from './symbols/spikes.js'
 import { appendCirclesToMap } from './symbols/circles.js'
+import { getCircleRingStatData, parseCircleRingValue } from './symbols/circle-ring.js'
 import { appendBarsToMap } from './symbols/bars.js'
 import { appendD3SymbolsToMap } from './symbols/d3-symbols.js'
 import { appendCustomSymbolsToMap } from './symbols/custom.js'
@@ -63,6 +64,9 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     layer.psStroke_ = '#ffffff'
     layer.psStrokeWidth_ = 0.2
     layer.psStrokeOpacity_ = 1
+    layer.psRingWidth_ = 3
+    layer.psRingColor_ = '#d95f02'
+    layer.psRingTrackColor_ = '#00000026'
     layer.psClasses_ = 5
     layer.psColors_ = ['#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d']
     layer.psColorFun_ = interpolateOrRd
@@ -105,6 +109,9 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             stroke: layer.psStroke_,
             strokeWidth: layer.psStrokeWidth_,
             strokeOpacity: layer.psStrokeOpacity_,
+            ringWidth: layer.psRingWidth_,
+            ringColor: layer.psRingColor_,
+            ringTrackColor: layer.psRingTrackColor_,
             sizeScale: layer.psSizeScale_,
             minSize: layer.psMinSize_,
             maxSize: layer.psMaxSize_,
@@ -136,6 +143,9 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         if (v.stroke !== undefined) layer.psStroke_ = v.stroke
         if (v.strokeWidth !== undefined) layer.psStrokeWidth_ = v.strokeWidth
         if (v.strokeOpacity !== undefined) layer.psStrokeOpacity_ = v.strokeOpacity
+        if (v.ringWidth !== undefined) layer.psRingWidth_ = v.ringWidth
+        if (v.ringColor !== undefined) layer.psRingColor_ = v.ringColor
+        if (v.ringTrackColor !== undefined) layer.psRingTrackColor_ = v.ringTrackColor
         if (v.sizeScale !== undefined) layer.psSizeScale_ = v.sizeScale
         if (v.minSize !== undefined) layer.psMinSize_ = v.minSize
         if (v.maxSize !== undefined) layer.psMaxSize_ = v.maxSize
@@ -601,11 +611,15 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
                 }
 
                 const sizeData = getSizeStatData(layer)
+                const ringData = getCircleRingStatData(layer)
                 runDorlingSimulation(
                     layer,
                     (d) => {
                         const datum = sizeData.get(d.properties.id)
                         const r = datum ? layer.classifierSize_(+datum.value) : 0
+                        if (r > 0 && ringData && parseCircleRingValue(ringData.get(d.properties.id)?.value) !== undefined) {
+                            return r + layer.psRingWidth_
+                        }
                         return layer.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                     },
                     layer.dorlingSettings_.padding || 0
@@ -714,6 +728,10 @@ const tooltipTextFunPs = function (region, layerOrMap) {
         row2 = `<tr><td>${formatValue(sv2?.value, unit2, map.noDataText_)}</td></tr>`
     }
 
+    const ringData = getCircleRingStatData(layer)
+    const ringValue = ringData && parseCircleRingValue(ringData.get(regionId)?.value)
+    const ringRow = ringData ? `<tr><td>${formatValue(ringValue, '%', map.noDataText_)}</td></tr>` : ''
+
     return `
     <div class="em-tooltip-bar">
       <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
@@ -722,7 +740,7 @@ const tooltipTextFunPs = function (region, layerOrMap) {
       <table class="em-tooltip-table">
         <tbody>
           ${row1}
-          ${row2}
+          ${row2}${ringRow}
         </tbody>
       </table>
     </div>

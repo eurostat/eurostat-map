@@ -401,6 +401,23 @@ map.statData('size').setData({ ES: 5, FR: 2, DE: 3 })
 map.statData('color').setData({ ES: 2, FR: 7, DE: 5 })
 ```
 
+#### Percentage rings
+
+On proportional circles, bind a second dataset to the `ring` encoding to draw a clockwise arc around each circle. The circle size still represents the `size` dataset. Ring values are percentages in the range 0–100. Zero shows only the track, 100 fills the ring, and missing or out-of-range values leave the circle without a ring.
+
+```javascript
+const map = eurostatmap.map('proportionalSymbol')
+map.statData('population').setData({ ES: 48_620_000, FR: 68_467_000 })
+map.statData('share65Plus').setData({ ES: 20.4, FR: 21.5 })
+map.nutsLevel(0)
+    .encoding('size', { stat: 'population' })
+    .encoding('ring', { stat: 'share65Plus' })
+    .psSettings({ ringWidth: 4, ringColor: '#d95f02', ringTrackColor: '#00000026' })
+    .build()
+```
+
+`ringWidth` is uniform across symbols and defaults to 3 SVG pixels. Set it to 0 to hide the ring. Set `ringTrackColor` to `'none'` to hide the track. The default tooltip includes the percentage.
+
 It is also possible to prevent overlapping via the 'dorling' method:
 
 ```javascript
@@ -435,7 +452,7 @@ Please be aware that by using this method you will essentially be turning the ma
 
 | Method                                      | Type             | Default value                                                      | Description                                                                                                                                                                                                                |
 | ------------------------------------------- | ---------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**psSettings**([*value*])             | object           | _{ stroke, strokeWidth, sizeScale, minSize, maxSize, codeLabels }_ | Grouped proportional-symbol settings. Supported keys: `stroke`, `strokeWidth`, `sizeScale`, `minSize`, `maxSize`, `codeLabels`.                                                                                            |
+| _map_.**psSettings**([*value*])             | object           | Varies by setting | Grouped proportional-symbol settings, including `ringWidth`, `ringColor`, and `ringTrackColor` for percentage rings. |
 | _map_.**psShape**([*value*])                | string           | _circle_                                                           | The shape of the symbol. Accepted values: circle, spike, bar, square, star, cross, diamond, triangle, wye or custom                                                                                                        |
 | _map_.**psCustomShape**([*value*])          | Object           | null                                                               | A custom symbol to be used with d3.symbol when psShape is set to "custom". See http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT                                                                                       |
 | _map_.**psCustomSVG**([*value*])            | Template Literal | null                                                               | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psSettings({ customSVG: `<svg width="100" height="100"><rect width="100" height="100" /></svg>` }).                     |

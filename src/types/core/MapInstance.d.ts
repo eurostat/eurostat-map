@@ -196,6 +196,7 @@ export interface MapInstance {
     /**
      * Get or set visual encodings that map named stats to visual variables.
      * @example map.encoding('size', { stat: 'population', scale: 'sqrt', range: [4, 30] })
+     * @example map.encoding('ring', { stat: 'share65Plus' }) // Percentages from 0 to 100, for proportional circles
      */
     encoding(): Record<string, EncodingConfig>
     encoding(channel: string): EncodingConfig | undefined

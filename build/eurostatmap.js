@@ -45359,12 +45359,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ps_interactions_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./ps-interactions.js */ "./src/layers/proportional-symbol/ps-interactions.js");
 /* harmony import */ var _symbols_spikes_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./symbols/spikes.js */ "./src/layers/proportional-symbol/symbols/spikes.js");
 /* harmony import */ var _symbols_circles_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./symbols/circles.js */ "./src/layers/proportional-symbol/symbols/circles.js");
-/* harmony import */ var _symbols_bars_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./symbols/bars.js */ "./src/layers/proportional-symbol/symbols/bars.js");
-/* harmony import */ var _symbols_d3_symbols_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./symbols/d3-symbols.js */ "./src/layers/proportional-symbol/symbols/d3-symbols.js");
-/* harmony import */ var _symbols_custom_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./symbols/custom.js */ "./src/layers/proportional-symbol/symbols/custom.js");
-/* harmony import */ var _core_decoration_labels_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../../core/decoration/labels.js */ "./src/core/decoration/labels.js");
-/* harmony import */ var _core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../core/geo/centroids.js */ "./src/core/geo/centroids.js");
-/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../../core/layer-registry.js */ "./src/core/layer-registry.js");
+/* harmony import */ var _symbols_circle_ring_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./symbols/circle-ring.js */ "./src/layers/proportional-symbol/symbols/circle-ring.js");
+/* harmony import */ var _symbols_bars_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./symbols/bars.js */ "./src/layers/proportional-symbol/symbols/bars.js");
+/* harmony import */ var _symbols_d3_symbols_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./symbols/d3-symbols.js */ "./src/layers/proportional-symbol/symbols/d3-symbols.js");
+/* harmony import */ var _symbols_custom_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./symbols/custom.js */ "./src/layers/proportional-symbol/symbols/custom.js");
+/* harmony import */ var _core_decoration_labels_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../core/decoration/labels.js */ "./src/core/decoration/labels.js");
+/* harmony import */ var _core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../../core/geo/centroids.js */ "./src/core/geo/centroids.js");
+/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../../core/layer-registry.js */ "./src/core/layer-registry.js");
+
 
 
 
@@ -45430,6 +45432,9 @@ const decorateProportionalSymbolLayer = function (layer, config) {
     layer.psStroke_ = '#ffffff'
     layer.psStrokeWidth_ = 0.2
     layer.psStrokeOpacity_ = 1
+    layer.psRingWidth_ = 3
+    layer.psRingColor_ = '#d95f02'
+    layer.psRingTrackColor_ = '#00000026'
     layer.psClasses_ = 5
     layer.psColors_ = ['#b7b9fc', '#898fec', '#5d68ce', '#3145a7', '#00237d']
     layer.psColorFun_ = d3_scale_chromatic__WEBPACK_IMPORTED_MODULE_1__["default"]
@@ -45472,6 +45477,9 @@ const decorateProportionalSymbolLayer = function (layer, config) {
             stroke: layer.psStroke_,
             strokeWidth: layer.psStrokeWidth_,
             strokeOpacity: layer.psStrokeOpacity_,
+            ringWidth: layer.psRingWidth_,
+            ringColor: layer.psRingColor_,
+            ringTrackColor: layer.psRingTrackColor_,
             sizeScale: layer.psSizeScale_,
             minSize: layer.psMinSize_,
             maxSize: layer.psMaxSize_,
@@ -45503,6 +45511,9 @@ const decorateProportionalSymbolLayer = function (layer, config) {
         if (v.stroke !== undefined) layer.psStroke_ = v.stroke
         if (v.strokeWidth !== undefined) layer.psStrokeWidth_ = v.strokeWidth
         if (v.strokeOpacity !== undefined) layer.psStrokeOpacity_ = v.strokeOpacity
+        if (v.ringWidth !== undefined) layer.psRingWidth_ = v.ringWidth
+        if (v.ringColor !== undefined) layer.psRingColor_ = v.ringColor
+        if (v.ringTrackColor !== undefined) layer.psRingTrackColor_ = v.ringTrackColor
         if (v.sizeScale !== undefined) layer.psSizeScale_ = v.sizeScale
         if (v.minSize !== undefined) layer.psMinSize_ = v.minSize
         if (v.maxSize !== undefined) layer.psMaxSize_ = v.maxSize
@@ -45660,10 +45671,10 @@ const decorateProportionalSymbolLayer = function (layer, config) {
         if (map.svg_) {
             // Ensure centroid anchors exist for the target context (main map or inset).
             // External inset SVG containers may not have centroid groups yet.
-            let centroidsGroup = (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_19__.getCentroidsGroup)(symbolTarget)
+            let centroidsGroup = (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_20__.getCentroidsGroup)(symbolTarget)
             if (!centroidsGroup || centroidsGroup.empty() || centroidsGroup.selectAll('g.em-centroid').size() === 0) {
-                (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_19__.addCentroidsToMap)(symbolTarget)
-                centroidsGroup = (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_19__.getCentroidsGroup)(symbolTarget)
+                (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_20__.addCentroidsToMap)(symbolTarget)
+                centroidsGroup = (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_20__.getCentroidsGroup)(symbolTarget)
             }
 
             //clear previous symbols in this layer group
@@ -45675,21 +45686,21 @@ const decorateProportionalSymbolLayer = function (layer, config) {
             // append symbols to centroids
             let symb
             if (layer.psCustomSVG_) {
-                symb = (0,_symbols_custom_js__WEBPACK_IMPORTED_MODULE_17__.appendCustomSymbolsToMap)(map, sizeData, symbolTarget, layer)
+                symb = (0,_symbols_custom_js__WEBPACK_IMPORTED_MODULE_18__.appendCustomSymbolsToMap)(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'bar') {
-                symb = (0,_symbols_bars_js__WEBPACK_IMPORTED_MODULE_15__.appendBarsToMap)(map, sizeData, symbolTarget, layer)
+                symb = (0,_symbols_bars_js__WEBPACK_IMPORTED_MODULE_16__.appendBarsToMap)(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'circle') {
                 symb = (0,_symbols_circles_js__WEBPACK_IMPORTED_MODULE_14__.appendCirclesToMap)(map, sizeData, symbolTarget, layer)
             } else if (layer.psShape_ == 'spike') {
                 symb = (0,_symbols_spikes_js__WEBPACK_IMPORTED_MODULE_13__.appendSpikesToMap)(map, sizeData, symbolTarget, layer)
             } else {
                 // circle, cross, star, triangle, diamond, square, wye or custom
-                symb = (0,_symbols_d3_symbols_js__WEBPACK_IMPORTED_MODULE_16__.appendD3SymbolsToMap)(map, sizeData, symbolTarget, layer)
+                symb = (0,_symbols_d3_symbols_js__WEBPACK_IMPORTED_MODULE_17__.appendD3SymbolsToMap)(map, sizeData, symbolTarget, layer)
             }
 
             setRegionStyles(map, sizeData)
             setSymbolStyles(symb)
-            ;(0,_core_decoration_labels_js__WEBPACK_IMPORTED_MODULE_18__.appendLabelsToSymbols)(map, sizeData, layer)
+            ;(0,_core_decoration_labels_js__WEBPACK_IMPORTED_MODULE_19__.appendLabelsToSymbols)(map, sizeData, layer)
 
             const transitionDuration = map.transitionDuration_ || 0
             if (transitionDuration > 0) {
@@ -45870,7 +45881,7 @@ const decorateProportionalSymbolLayer = function (layer, config) {
         const sorted = centroidFeatures.slice().sort((a, b) => valueOf(b) - valueOf(a))
 
         // Clear old symbol containers
-        const centroidsGroup = (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_19__.getCentroidsGroup)(target)
+        const centroidsGroup = (0,_core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_20__.getCentroidsGroup)(target)
         centroidsGroup.selectAll('g.em-centroid').remove()
 
         // Re-select fresh, then recreate sorted symbol containers
@@ -45968,11 +45979,15 @@ const decorateProportionalSymbolLayer = function (layer, config) {
                 }
 
                 const sizeData = getSizeStatData(layer)
+                const ringData = (0,_symbols_circle_ring_js__WEBPACK_IMPORTED_MODULE_15__.getCircleRingStatData)(layer)
                 ;(0,_core_dorling_dorling_js__WEBPACK_IMPORTED_MODULE_9__.runDorlingSimulation)(
                     layer,
                     (d) => {
                         const datum = sizeData.get(d.properties.id)
                         const r = datum ? layer.classifierSize_(+datum.value) : 0
+                        if (r > 0 && ringData && (0,_symbols_circle_ring_js__WEBPACK_IMPORTED_MODULE_15__.parseCircleRingValue)(ringData.get(d.properties.id)?.value) !== undefined) {
+                            return r + layer.psRingWidth_
+                        }
                         return layer.psShape_ === 'square' ? (r / 2) * Math.SQRT2 : r
                     },
                     layer.dorlingSettings_.padding || 0
@@ -46081,6 +46096,10 @@ const tooltipTextFunPs = function (region, layerOrMap) {
         row2 = `<tr><td>${formatValue(sv2?.value, unit2, map.noDataText_)}</td></tr>`
     }
 
+    const ringData = (0,_symbols_circle_ring_js__WEBPACK_IMPORTED_MODULE_15__.getCircleRingStatData)(layer)
+    const ringValue = ringData && (0,_symbols_circle_ring_js__WEBPACK_IMPORTED_MODULE_15__.parseCircleRingValue)(ringData.get(regionId)?.value)
+    const ringRow = ringData ? `<tr><td>${formatValue(ringValue, '%', map.noDataText_)}</td></tr>` : ''
+
     return `
     <div class="em-tooltip-bar">
       <b>${regionName}</b>${regionId ? ` (${regionId})` : ''}
@@ -46089,16 +46108,16 @@ const tooltipTextFunPs = function (region, layerOrMap) {
       <table class="em-tooltip-table">
         <tbody>
           ${row1}
-          ${row2}
+          ${row2}${ringRow}
         </tbody>
       </table>
     </div>
   `.trim()
 }
 
-;(0,_core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.registerLayerType)('proportionalSymbol', 'overlay', decorateProportionalSymbolLayer)
-;(0,_core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.registerLayerType)('ps', 'overlay', decorateProportionalSymbolLayer)
-;(0,_core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.registerLayerType)('proportionalSymbols', 'overlay', decorateProportionalSymbolLayer)
+;(0,_core_layer_registry_js__WEBPACK_IMPORTED_MODULE_21__.registerLayerType)('proportionalSymbol', 'overlay', decorateProportionalSymbolLayer)
+;(0,_core_layer_registry_js__WEBPACK_IMPORTED_MODULE_21__.registerLayerType)('ps', 'overlay', decorateProportionalSymbolLayer)
+;(0,_core_layer_registry_js__WEBPACK_IMPORTED_MODULE_21__.registerLayerType)('proportionalSymbols', 'overlay', decorateProportionalSymbolLayer)
 
 
 /***/ },
@@ -47143,6 +47162,32 @@ function appendBarsToMap(map, sizeData, out, styleSource) {
 
 /***/ },
 
+/***/ "./src/layers/proportional-symbol/symbols/circle-ring.js"
+/*!***************************************************************!*\
+  !*** ./src/layers/proportional-symbol/symbols/circle-ring.js ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   getCircleRingStatData: () => (/* binding */ getCircleRingStatData),
+/* harmony export */   parseCircleRingValue: () => (/* binding */ parseCircleRingValue)
+/* harmony export */ });
+/** Return a valid percentage, including numeric strings from CSV data. */
+function parseCircleRingValue(value) {
+    if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return undefined
+    const percentage = Number(value)
+    return percentage >= 0 && percentage <= 100 ? percentage : undefined
+}
+
+function getCircleRingStatData(layer) {
+    if (layer.psShape_ !== 'circle' || layer.psCustomSVG_ || !Number.isFinite(layer.psRingWidth_) || layer.psRingWidth_ <= 0) return
+    if (layer.getEncodingStat('ring')) return layer.getEncodingStatData('ring')
+}
+
+
+/***/ },
+
 /***/ "./src/layers/proportional-symbol/symbols/circles.js"
 /*!***********************************************************!*\
   !*** ./src/layers/proportional-symbol/symbols/circles.js ***!
@@ -47155,6 +47200,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../core/geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _circle_ring__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./circle-ring */ "./src/layers/proportional-symbol/symbols/circle-ring.js");
+
 
 
 /**
@@ -47201,6 +47248,49 @@ function appendCirclesToMap(map, sizeData, out, styleSource) {
         return radius
     }
 
+    const ringData = (0,_circle_ring__WEBPACK_IMPORTED_MODULE_2__.getCircleRingStatData)(style)
+    if (ringData) {
+        const thickness = style.psRingWidth_
+        const rings = symbolContainers
+            .select(function (d) {
+                const percentage = (0,_circle_ring__WEBPACK_IMPORTED_MODULE_2__.parseCircleRingValue)(ringData.get(d?.properties?.id)?.value)
+                if (percentage === undefined || !(setRadius(d) > 0)) return null
+
+                const ring = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                    .append('g')
+                    .attr('class', 'em-ps-ring')
+                    .attr('aria-hidden', 'true')
+                    .attr('pointer-events', 'none')
+                    .attr('fill', 'none')
+                    .attr('transform', 'rotate(-90)')
+                    .attr('stroke-width', thickness)
+
+                ring.append('circle').attr('class', 'em-ps-ring-track').attr('stroke', style.psRingTrackColor_)
+                if (percentage > 0) {
+                    ring.append('circle')
+                        .attr('class', 'em-ps-ring-arc')
+                        .attr('stroke', style.psRingColor_)
+                        .attr('pathLength', 100)
+                        .attr('stroke-dasharray', percentage === 100 ? null : `${percentage} ${100 - percentage}`)
+                }
+                return ring.node()
+            })
+            .selectAll('circle')
+        const ringRadius = (d) => setRadius(d) + thickness / 2
+        if (transitionDuration > 0) {
+            rings
+                .attr('r', 0)
+                .transition()
+                .duration(transitionDuration)
+                .attr('r', ringRadius)
+                .on('interrupt', function (d) {
+                    (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('r', ringRadius(d))
+                })
+        } else {
+            rings.attr('r', ringRadius)
+        }
+    }
+
     if (transitionDuration > 0) {
         // Ensure circles always have a radius even if the transition is interrupted.
         circles
@@ -47211,7 +47301,7 @@ function appendCirclesToMap(map, sizeData, out, styleSource) {
             .on('end', function () {
                 (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('pointer-events', null)
             })
-            .on('interrupt', function (event, d) {
+            .on('interrupt', function (d) {
                 (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('r', setRadius(d))
                 ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('pointer-events', null)
             })

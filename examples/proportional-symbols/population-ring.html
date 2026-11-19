@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Population and Share Aged 65+</title>
+    </head>
+    <body>
+        <svg id="map" aria-label="Population size and share aged 65 and over by country"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            eurostatmap
+                .map('proportionalSymbol')
+                .nutsLevel(0)
+                .scale('20M')
+                .title('Population and share aged 65+')
+                .subtitle('1 January 2024 · Ring shows the percentage aged 65 and over')
+                .stat('population', {
+                    eurostatDatasetCode: 'demo_r_pjanaggr3',
+                    unitText: 'people',
+                    filters: { time: '2024', sex: 'T', age: 'TOTAL' },
+                })
+                .stat('share65Plus', {
+                    eurostatDatasetCode: 'demo_pjanind',
+                    filters: { time: '2024', indic_de: 'PC_Y65_MAX' },
+                })
+                .encoding('size', { stat: 'population' })
+                .encoding('ring', { stat: 'share65Plus' })
+                .psSettings({
+                    fill: '#305f8a',
+                    minSize: 3,
+                    maxSize: 30,
+                    ringWidth: 4,
+                    ringColor: '#c65312',
+                    ringTrackColor: '#53647555',
+                })
+                .legend({
+                    x: 10,
+                    y: 110,
+                    boxOpacity: 0,
+                    sizeLegend: { title: 'Total population', values: [80_000_000, 20_000_000, 1_000_000] },
+                })
+                .insets(false)
+                .build()
+        </script>
+    </body>
+</html>

@@ -58,6 +58,7 @@
         'mushroom/mushroom.html',
         'pie-charts/prop-piecharts.html',
         'proportional-symbols/population-change.html',
+        'proportional-symbols/population-ring.html',
         'proportional-symbols/population-total.html',
         'proportional-symbols/prop-circles.html',
         'proportional-symbols/prop-symbols.html',
